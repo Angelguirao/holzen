@@ -14,26 +14,20 @@ export type RunReflectGenerationInput = {
   signal: AbortSignal;
 };
 
-/** @deprecated Prefer `ReflectGenerator` from `ports/reflect-generator.ts`. */
-export type RunReflectGenerationPorts = ReflectGenerator;
-
-/** @deprecated Prefer `ReflectGenerationResult` from `domain/reflect/generation/reflect-generation-result.ts`. */
-export type RunReflectGenerationResult = ReflectGenerationResult;
-
 /**
  * Reflect-step copy: nav seed → artifact cache → edge `holzen-reflect`.
  * Hook owns React state, abort validity, and i18n for missing context.
  */
 export async function runReflectGeneration(
   input: RunReflectGenerationInput,
-  ports: RunReflectGenerationPorts,
+  generator: ReflectGenerator,
 ): Promise<ReflectGenerationResult> {
   const seed = input.initialReflectionMessage.trim();
   if (seed) {
     return { status: 'seed', message: seed };
   }
 
-  const cached = await ports.fetchReflectionText(input.pauseInstanceId);
+  const cached = await generator.fetchReflectionText(input.pauseInstanceId);
   if (cached) {
     return { status: 'cached', message: cached };
   }
@@ -47,8 +41,8 @@ export async function runReflectGeneration(
       profile: input.profile,
       signal: input.signal,
     });
-    const recencyHints = await ports.loadRecencyHints();
-    const { message } = await ports.generateReflection(edgeInput, recencyHints);
+    const recencyHints = await generator.loadRecencyHints();
+    const { message } = await generator.generateReflection(edgeInput, recencyHints);
     return { status: 'generated', message };
   } catch (e: unknown) {
     if (isAbortLikeReflectError(e) || input.signal.aborted) {

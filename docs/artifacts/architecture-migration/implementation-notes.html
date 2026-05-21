@@ -10546,4 +10546,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — runReflectGeneration ReflectGenerator param (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; holzen-reflect use case names port like Home manual trigger</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. <code>runReflectGeneration</code> second argument is <code>generator: ReflectGenerator</code> (removed deprecated <code>RunReflectGenerationPorts</code> / <code>RunReflectGenerationResult</code> aliases). <code>initial-breath-segment-rpc-flags</code> imports <code>mapPersistedStep</code> from sibling <code>session/step-map</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>public-rpc</code> <code>runPauseReflectGeneration</code> wiring unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Historical implementation-notes may still mention deprecated type names; no runtime export surface removed from <code>public-rpc</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional <code>usePauseBreathingTimedLoop</code> on <code>public-ritual-breathe</code>; colocate breath segment RPC loggers under <code>presentation/session/</code> if we revise §10.1 placement.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
