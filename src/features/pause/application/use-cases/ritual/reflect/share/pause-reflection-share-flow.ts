@@ -8,3 +8,5 @@ export {
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
 } from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';
+export { runReflectionShareImage } from './run-reflection-share-image';
+export type { DeliverReflectionShareImageDeps } from './deliver-reflection-share-image';
