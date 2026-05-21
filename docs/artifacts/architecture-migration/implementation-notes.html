@@ -8693,11 +8693,11 @@
     <h3>§6 peel: dead adapter barrel removed; vote read stays in query module</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code> — no reflect moves. Delete unused <code>public-ports.ts</code> (zero <code>src/</code> importers). Remove dead <code>fetchPauseCompanionFeedbackVote</code> from <code>public-rpc.ts</code>; TanStack reads stay on <code>companion-feedback-vote-query</code> → <code>runFetchCompanionFeedbackVote</code> + <code>supabasePauseAnalyticsRepository</code>. Write path keeps <code>logPauseCompanionFeedbackVote</code> on <code>public-rpc</code>.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code> — no reflect moves. Delete unused <code>public-ports.ts</code> (zero <code>src/</code> importers). Re-export port types and default adapters on <code>public-rpc.ts</code> with local imports (re-export-only bindings break facade calls in tests). Remove dead <code>fetchPauseCompanionFeedbackVote</code> from <code>public-rpc.ts</code>; TanStack reads stay on <code>companion-feedback-vote-query</code> → <code>runFetchCompanionFeedbackVote</code> + <code>supabasePauseAnalyticsRepository</code>. Write path keeps <code>logPauseCompanionFeedbackVote</code> on <code>public-rpc</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Cross-context callers that need a vote read must use <code>public-queries</code> query options, not a removed RPC facade.</dd>
+      <dd>Cross-context callers that need a vote read must use <code>public-queries</code> query options, not a removed RPC facade. <code>public-rpc</code> is the single infrastructure-touching barrel for mutations + default adapters.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: companion orchestrate thin runners on <code>public-rpc</code>, or audit stray mutations bypassing <code>PauseRepository</code>.</dd>
     </dl>
