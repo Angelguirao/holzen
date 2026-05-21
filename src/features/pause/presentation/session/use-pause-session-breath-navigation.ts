@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
-import { isPauseSessionHeaderBackVisible } from '@/features/pause/application/use-cases/session/header-back';
+import { isPauseSessionHeaderBackVisible } from '@/features/pause/public-session';
 import type { BriefPauseStep, PauseStep, RitualDepth } from '@/features/pause/public-hooks';
 import { usePauseSessionBreathUi } from './use-pause-session-breath-ui';
 import { usePauseSessionGoBack } from './use-pause-session-go-back';
