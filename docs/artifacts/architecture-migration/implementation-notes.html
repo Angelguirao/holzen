@@ -8532,4 +8532,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect presentation tests drop use-case imports (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Mood/hub hook tests: public-rpc mocks + domain fixtures only</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Remote already mocked <code>public-rpc</code> for mood/hub conductors; this slice removes the last <code>run-initial-emotion-log</code> use-case import from the mood test (uses <code>domain/reflect/mood/initial-emotion-presentation</code> for <code>initialEmotionResetUi</code>) and aligns hub shift dedupe key with <code>buildShiftEmotionFrameHubLogBundle()</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation tests assert facade call counts + hook UI side effects; ritual/reflect use-case tests own repository dedupe.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: companion feedback vote read on <code>public-queries</code>, or thin orchestrator runner facades on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

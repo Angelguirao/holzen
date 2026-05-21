@@ -2,9 +2,10 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
+import { buildShiftEmotionFrameHubLogBundle } from '@/features/pause/domain/reflect/hub/shift-emotion-log';
 import { usePauseShiftFrameDoneHandler } from './use-pause-shift-frame-done-handler';
 
-const SHIFT_LOG_KEY = '{"shift":true}';
+const { logKey: SHIFT_LOG_KEY } = buildShiftEmotionFrameHubLogBundle();
 
 const { logPauseShiftEmotionFrameHubDoneMock, showPauseStepSyncFailedToast } = vi.hoisted(() => ({
   logPauseShiftEmotionFrameHubDoneMock: vi.fn(),

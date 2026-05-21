@@ -2,8 +2,10 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
-import { initialEmotionResetUi } from '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
-import { initialEmotionSelectRollbackUi } from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
+import {
+  initialEmotionResetUi,
+  initialEmotionSelectRollbackUi,
+} from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
 import { usePauseSessionInitialMoodHandlers } from './use-pause-session-initial-mood-handlers';
 
 const CALM_LOG_KEY = '{"mood":"calm","intensity":3}';
