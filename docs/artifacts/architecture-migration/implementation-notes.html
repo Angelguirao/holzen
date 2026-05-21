@@ -15163,4 +15163,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect+decide preflight/post-generation in domain</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — pause-session-reflect-and-decide-flow → domain</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Move pure preflight/post-generation helpers from <code>application/use-cases/ritual/reflect/flows/</code> to <code>domain/reflect/flows/pause-session-reflect-and-decide-flow.ts</code> beside <code>pause-session-reflect-and-decide-view.ts</code>; <code>presentation/reflect/flows/pause-reflect-flows-io.ts</code> imports domain (presentation must not deep-import application).</dd>
+      <dt>Deviation</dt>
+      <dd>Supersedes May 2026 note that kept flow helpers in application — they are port-free pure functions.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>application/use-cases/ritual/reflect/flows/</code> directory retained empty for CI alignment until another RPC use case lands there.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>reflect-frame-focus-ambience</code> domain peel or <code>use-companion-orchestrate-retry</code> through companion orchestrate I/O.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

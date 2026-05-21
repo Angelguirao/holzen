@@ -61,7 +61,7 @@ vi.mock('./use-pause-session-decide-handler', () => ({
 
 vi.mock('./pause-reflect-flows-io', async () => {
   const flow = await import(
-    '@/features/pause/application/use-cases/ritual/reflect/flows/pause-session-reflect-and-decide-flow'
+    '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow'
   );
   return {
     resolvePauseSessionReflectAndDecideAfterGeneration:
