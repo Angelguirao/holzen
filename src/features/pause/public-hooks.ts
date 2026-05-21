@@ -191,7 +191,7 @@ export {
   type SettingsExportCompanionEvent,
   type SettingsExportPauseRow,
   type SettingsExportStepEvent,
-} from './presentation/load-settings-data-export-bundle';
+} from './presentation/settings/load-settings-data-export-bundle';
 export {
   useCurrentPause,
   currentPauseQueryKey,
