@@ -11363,4 +11363,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel reflection_step hook off public-rpc (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ steps cluster — all four hooks bypass public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. Align <code>use-pause-reflection-step-log</code> with note/tags/favorite: call <code>runPauseReflectionStepLogOnce</code> with <code>supabasePauseRepository</code> and <code>reflectionStepSessionStorage</code> directly; remove <code>logPauseReflectionStepOnce</code> from <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>reflectionStepSessionStorage</code> remains exported on <code>public-rpc</code> for tests/adapters; presentation imports infrastructure adapter directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: wire remaining companion/home/archive facades; §6 audit companion-only <code>public-rpc</code> exports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
