@@ -49,6 +49,10 @@ mustExist(
   'src/features/pause/application/use-cases/ritual/reflect/flows',
   'pause/application/use-cases/ritual/reflect/flows/',
 );
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/ambience',
+  'pause/application/use-cases/ritual/reflect/ambience/',
+);
 mustExist('src/features/pause/application/use-cases/session', 'pause/application/use-cases/session/');
 mustExist('src/features/pause/application/use-cases/ritual/brief', 'pause/application/use-cases/ritual/brief/');
 mustNotExist(

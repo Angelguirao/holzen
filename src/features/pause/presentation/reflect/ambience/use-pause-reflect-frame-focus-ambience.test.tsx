@@ -11,7 +11,7 @@ const { startMock, stopMock, lastGate } = vi.hoisted(() => {
   return { startMock, stopMock, lastGate };
 });
 
-vi.mock('@/features/pause/domain/reflect/ambience/reflect-frame-focus-ambience', () => ({
+vi.mock('@/features/pause/application/use-cases/ritual/reflect/ambience/reflect-frame-focus-ambience', () => ({
   startPauseReflectFrameFocusAmbience: startMock,
   stopPauseReflectFrameFocusAmbience: stopMock,
 }));

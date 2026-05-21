@@ -12712,4 +12712,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect frame-focus bed → ritual/reflect/ambience (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate Reflect/Frame Web Audio bed with other reflect use cases</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves were already complete. Move <code>reflect-frame-focus-ambience</code> (+ test) from <code>domain/reflect/ambience/</code> to <code>application/use-cases/ritual/reflect/ambience/</code> — browser <code>AudioContext</code> side effects belong with ritual reflect beat orchestration (same rationale as <code>reflect-generation-hook-flow</code> under <code>generation/</code>). Presentation hook imports application path directly.</dd>
+      <dt>Deviation</dt>
+      <dd>Prior note placed the bed in domain for parity with telemetry; PostHog trackers already live under <code>application/.../telemetry/</code>. Owner doc §10.1 paths updated.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Shared <code>pause-ritual-audio-context</code> stays in <code>domain/ritual/breathe/</code>; only the reflect/frame focus stack moves.</dd>
+      <dt>Open questions</dt>
+      <dd>Phase B: subscription/auth <code>src/lib/*</code> shims using pause as template.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
