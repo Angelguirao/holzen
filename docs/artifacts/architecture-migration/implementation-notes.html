@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — home reflect telemetry through telemetry flow anchor</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-telemetry-io</code> imports PostHog helpers via <code>pause-home-reflect-telemetry-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder move remains complete. Add telemetry cluster anchor for Home manual-open + dismiss/banner trackers; presentation telemetry I/O imports through the anchor instead of two deep <code>application/.../telemetry/*</code> modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session reflect UI telemetry (<code>pause-reflect-telemetry-io</code> → infrastructure) unchanged this slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion frame UI pure helpers through frame UI flow anchors, or session conductors still importing deep <code>application/use-cases/session/*</code> outside shell/scaffold I/O.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect share I/O domain imports (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
