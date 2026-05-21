@@ -4580,6 +4580,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect-step-query domain-only exports (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; drop duplicate row projection re-exports from query module</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> and domain hook-flow/result types were already on <code>cursor/arch-migrate-src-ca70</code>. <code>reflect-step-query.ts</code> keeps TanStack query keys/factories only; <code>PAUSE_REFLECT_STEP_*</code> constants and <code>noteTextFromReflectRow</code> / <code>tagsFromReflectRow</code> export via <code>public-queries</code> from <code>domain/reflect-step-latest</code> (no infrastructure re-export).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Callers must import row types/projections from <code>public-queries</code> or domain, not the infrastructure query path.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
