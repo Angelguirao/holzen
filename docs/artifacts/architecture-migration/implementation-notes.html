@@ -12807,4 +12807,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — CI guard domain/reflect subclusters (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Lock domain + reflect I/O taxonomy after application/presentation guards</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) and presentation subcluster guards were already complete on <code>cursor/arch-migrate-src-ca70</code>. Extend <code>check:architecture-alignment</code> with <code>mustExist</code> for <code>domain/reflect/</code> subclusters (<code>flows/</code>, <code>generation/</code>, <code>steps/</code>, <code>hub/</code>, <code>mood/</code>, <code>share/</code>, <code>scaffold/</code>) plus <code>infrastructure/queries/reflect/</code> and <code>infrastructure/edge/reflect/</code>. PostHog reflect UI telemetry stays application-only (no <code>domain/reflect/telemetry/</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI-only; no runtime or import path changes.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Does not yet guard <code>presentation/session/</code> or <code>presentation/companion/</code> subfolders — optional follow-up.</dd>
+      <dt>Open questions</dt>
+      <dd>Phase B: subscription/auth <code>src/lib/*</code> shims using pause as template.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
