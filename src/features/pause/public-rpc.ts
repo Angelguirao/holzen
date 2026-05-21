@@ -141,10 +141,7 @@ import {
   runShiftEmotionFrameHubDone,
   type RunShiftEmotionFrameHubDoneResult,
 } from './application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
-import {
-  runReflectGeneration,
-  type RunReflectGenerationInput,
-} from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
+import type { RunReflectGenerationInput } from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
 import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
 import { showPauseStepSyncFailedToast } from './presentation/ritual/pause-step-sync-toast';
 export {
@@ -430,13 +427,6 @@ export function logPauseShiftEmotionFrameHubDone(
   input: Parameters<typeof runShiftEmotionFrameHubDone>[1],
 ): Promise<RunShiftEmotionFrameHubDoneResult> {
   return runShiftEmotionFrameHubDone(supabasePauseRepository, input);
-}
-
-/** Reflect-step holzen-reflect — nav seed → artifact cache → edge via `ReflectGenerator` (wired). */
-export function runPauseReflectGeneration(
-  input: RunReflectGenerationInput,
-): Promise<ReflectGenerationResult> {
-  return runReflectGeneration(input, supabaseReflectGenerator);
 }
 
 /** Persisted `reflection_text` for an instance — wired `ReflectGenerator` (presentation reads). */
