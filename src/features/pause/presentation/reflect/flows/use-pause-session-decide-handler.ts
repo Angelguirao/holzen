@@ -12,7 +12,7 @@ import {
   resolvePauseDecideOutcomeFlow,
 } from '@/features/pause/public-session';
 import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
-import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
 import type { UsePauseSessionDecideHandlerParams } from './pause-session-decide-handler-types';
 

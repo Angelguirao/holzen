@@ -12,7 +12,7 @@ import {
 } from '@/features/pause/domain/reflect/generation/reflect-generation-hook-flow';
 import { resolveEffectiveReflectionCopy } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
 import { runReflectGeneration } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation';
-import { supabaseReflectGenerator } from '@/features/pause/infrastructure/supabase-reflect-generator';
+import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
 import type { UsePauseReflectGenerationParams } from './use-pause-reflect-generation-types';
 import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-text';
 
