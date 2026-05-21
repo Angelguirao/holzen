@@ -9121,4 +9121,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect share image on public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>§6 peel: share handlers import public-rpc for runReflectionShareImage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no folder moves. Re-export <code>runReflectionShareImage</code> (+ outcome type) on <code>public-rpc</code> beside other reflect facades; <code>use-reflection-share-handlers</code> imports the facade instead of <code>application/use-cases/ritual/reflect/share/</code> directly. Domain channel URLs + copy helpers unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; download toast still only when fallback path runs.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hook test mocks <code>public-rpc</code> (wider barrel) — same pattern as mood/shift-frame reflect hooks after telemetry peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: export <code>showPauseStepSyncFailedToast</code> for remaining session hooks (brief-done, breath segment), or peel companion <code>ritual/frame/*</code> presentation imports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

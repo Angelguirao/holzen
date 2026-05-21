@@ -147,6 +147,8 @@ import {
   type RunReflectGenerationInput,
 } from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
 import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
+import { runReflectionShareImage } from './application/use-cases/ritual/reflect/share/run-reflection-share-image';
+import type { DeliverReflectionShareImageOutcome } from './application/use-cases/ritual/reflect/share/deliver-reflection-share-image';
 import { showPauseStepSyncFailedToast } from './presentation/ritual/pause-step-sync-toast';
 export {
   trackPauseReflectPostItOpen,
@@ -161,6 +163,8 @@ export type {
   RunShiftEmotionFrameHubDoneResult,
 };
 export type { RunReflectGenerationInput, ReflectGenerationResult };
+export type { DeliverReflectionShareImageOutcome };
+export { runReflectionShareImage };
 
 /** Lifecycle + ritual mutations — wired facades only; no generic `pauseLogStep` export. */
 
