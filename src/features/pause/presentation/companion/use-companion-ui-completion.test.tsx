@@ -92,6 +92,7 @@ describe('useCompanionUiCompletion', () => {
       'inst-1',
       'haiku',
     );
+    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
     expect(invalidateCompanionUiCompletionQueryMock).toHaveBeenCalledWith('inst-1');
   });
 

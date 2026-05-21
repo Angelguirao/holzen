@@ -12313,4 +12313,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion orchestrate port-lock (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; CompanionOrchestrator sentinel in presentation tests</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder moves. Backlog #4: assert <code>mockCompanionOrchestrator.port === 'supabaseCompanionOrchestrator'</code> on slot orchestrate + intervention-fetch hooks; assert <code>supabasePauseRepository</code> sentinel on companion UI completion + library-favorite hooks (parity with reflect/decide port-lock tests).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only; production wiring unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not add separate <code>*.port-lock.test.tsx</code> files for companion — extended existing hook tests to keep slice minimal.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog reads behind <code>PauseAnalyticsRepository</code>, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
