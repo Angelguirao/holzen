@@ -59,6 +59,28 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase B slice — subscription checkout guard lib shim (Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>src/lib/subscription-checkout-guard-ref.ts</code> re-exports checkout guard cleanup</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Phase A pause interior backlog is complete on this branch. Add Tier 1 cross-context shim: <code>App.tsx</code> calls <code>scheduleCheckoutGuardCleanup</code> via <code>@/lib/subscription-checkout-guard-ref</code> instead of <code>@/features/subscription/public</code> (implementation stays in subscription application; lib is the stable app↔subscription seam — mirrors <code>holzen-query-client-ref</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import path only for app shell.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other app/config call sites (e.g. <code>site-seo-defaults</code> <code>PRICING</code>) still import subscription <code>public</code> until a dedicated pricing shim slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: subscription pricing/entitlement lib shim, or Phase B auth/market Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A — backlog #1 verified; reflect telemetry I/O peels aligned (Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,9 +91,9 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Flow anchor is a thin re-export barrel for <code>check:architecture-alignment</code> Home reflect telemetry cluster detection.</dd>
+      <dd>Flow anchors are thin re-export barrels for <code>check:architecture-alignment</code> reflect telemetry cluster detection.</dd>
       <dt>Open questions</dt>
-      <dd>Next: subscription Tier 1 shim following <code>holzen-query-client-ref</code>, or reconcile flow-anchor vs direct-import pattern across reflect clusters.</dd>
+      <dd>Next: reconcile flow-anchor vs direct-import pattern for hub/steps/flows reflect clusters, or subscription pricing lib shim.</dd>
     </dl>
   </article>
 
