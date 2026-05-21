@@ -1,16 +1,14 @@
 import { useCallback } from 'react';
 import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/features/auth/public';
-import { pauseReflectOutcomeLog } from './pause-reflect-flows-io';
-import {
-  showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
-} from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
 import {
   formatReinforcementQuoteFromSession,
+  getSessionQuote,
+  pauseReflectOutcomeLog,
   resolvePauseDecideOutcomeFlow,
-} from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow';
-import { getSessionQuote } from '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes';
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
+} from './pause-reflect-flows-io';
 import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
 import type { UsePauseSessionDecideHandlerParams } from './pause-session-decide-handler-types';

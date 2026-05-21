@@ -14707,4 +14707,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — decide handler ritual helpers on pause-reflect-flows-io</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect flows cluster — backlog #1 follow-up</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Re-export <code>resolvePauseDecideOutcomeFlow</code>, reinforcement quote helpers, and outcome toasts on <code>pause-reflect-flows-io.ts</code>; <code>use-pause-session-decide-handler</code> imports flows I/O only (+ unit test on io module).</dd>
+      <dt>Deviation</dt>
+      <dd>Decide use cases stay under <code>application/use-cases/ritual/decide/</code> (not <code>ritual/reflect/</code>) — flows I/O is the presentation seam for the reflect/decide conductor cluster.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-session-flow-io.ts</code> still re-exports reflect-and-decide view helpers from application until a single flows barrel merge.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B cross-context slice or consolidate session-flow + flows-io re-exports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -1,6 +1,23 @@
+import {
+  formatReinforcementQuoteFromSession,
+  resolvePauseDecideOutcomeFlow,
+} from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow';
+import {
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
+} from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
 import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
+import { getSessionQuote } from '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
+
+export {
+  formatReinforcementQuoteFromSession,
+  getSessionQuote,
+  resolvePauseDecideOutcomeFlow,
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
+};
 
 /** Default port + use case: decide step `outcome_logged` RPC. */
 export function pauseReflectOutcomeLog(
