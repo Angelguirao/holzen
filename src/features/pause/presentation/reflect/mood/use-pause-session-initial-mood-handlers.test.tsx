@@ -3,7 +3,7 @@ import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/feedback/step-sync-toast';
+import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
 import {
   runInitialEmotionSelect as runInitialEmotionSelectUseCase,
   runInitialEmotionSkip as runInitialEmotionSkipUseCase,
@@ -23,7 +23,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
     runInitialEmotionSkipUseCase(mockRepository, input),
 }));
 
-vi.mock('@/features/pause/application/use-cases/feedback/step-sync-toast', () => ({
+vi.mock('@/features/pause/application/use-cases/ritual/step-sync-toast', () => ({
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 

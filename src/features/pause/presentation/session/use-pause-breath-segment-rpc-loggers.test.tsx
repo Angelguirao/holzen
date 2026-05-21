@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import { usePauseBreathSegmentRpcLoggers } from './use-pause-breath-segment-rpc-loggers';
-import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/feedback/step-sync-toast';
+import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
 const { pauseLogStepMock, invalidateCompanionUiCompletionQueryMock } = vi.hoisted(() => ({
@@ -59,7 +59,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
     mockBreathSegmentLog(input, { breath_segment: 2, skipped: true }),
 }));
 
-vi.mock('@/features/pause/application/use-cases/feedback/step-sync-toast', () => ({
+vi.mock('@/features/pause/application/use-cases/ritual/step-sync-toast', () => ({
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 

@@ -10,7 +10,7 @@ import { logPauseOutcome } from '@/features/pause/public-rpc';
 import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-} from '@/features/pause/application/use-cases/feedback/outcome-toast';
+} from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
 import type { PauseImpactData } from '@/features/pause/application/use-cases/ritual/decide/impact-data';
 import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 import type { RitualDepth } from '@/features/pause/public-hooks';

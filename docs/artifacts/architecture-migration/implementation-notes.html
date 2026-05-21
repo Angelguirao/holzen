@@ -4143,6 +4143,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate ritual feedback toasts (backlog #1 complete)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Tier 5 ritual beat consolidation; empty feedback/ removed</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move shared step-sync Sonner helper to <code>ritual/step-sync-toast.ts</code>; move decide outcome Sonner helpers under <code>ritual/decide/outcome-toast.ts</code>. Presentation + <code>ritual/brief/ritual-depth-upgrade</code> import paths updated; no <code>public.ts</code> re-exports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>step-sync-toast</code> is cross-beat (reflect, breathe, brief) but lives at <code>ritual/</code> root beside the <code>ritual/log/</code> cluster rather than under <code>reflect/steps/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>CompanionOrchestrator</code> port (backlog #4 remainder), or further <code>ritual/brief/</code> consolidation per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

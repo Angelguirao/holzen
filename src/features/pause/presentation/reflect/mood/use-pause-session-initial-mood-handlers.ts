@@ -7,7 +7,7 @@ import {
   runInitialEmotionSelect,
   runInitialEmotionSkip,
 } from '@/features/pause/public-rpc';
-import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/feedback/step-sync-toast';
+import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
 import {
   initialEmotionResetUi,
   type InitialEmotionUiState,
