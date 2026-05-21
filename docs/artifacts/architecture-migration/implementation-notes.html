@@ -15917,9 +15917,9 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; import path only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Frame-focus ambience I/O still routes through application anchor until a follow-up peel.</dd>
+      <dd>Mood chrome and frame-focus ambience I/O were still on application anchors when this slice landed; follow-up peels completed on the same branch.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel reflect mood chrome domain through <code>pause-reflect-mood-io</code>, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: peel <code>pause-reflect-telemetry-io</code> presentation boundary, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -15953,11 +15953,11 @@
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. <code>presentation/reflect/ambience/pause-reflect-ambience-io.ts</code> imports <code>startPauseReflectFrameFocusAmbience</code> / <code>stopPauseReflectFrameFocusAmbience</code> from <code>domain/ritual/breathe/reflect-frame-focus-ambience.ts</code>. Application <code>ritual/reflect/ambience/reflect-frame-focus-ambience.ts</code> stays as CI cluster anchor only.</dd>
       <dt>Deviation</dt>
-      <dd>None — behavior parity; import path only.</dd>
+      <dd>None — behavior parity; import path only (supersedes interim routing through application re-export noted in session ritual-restore slice).</dd>
       <dt>Tradeoffs</dt>
-      <dd>Generation I/O still imports <code>run-reflect-generation</code> from application; breath segment log outcome helpers still bypass session breath I/O.</dd>
+      <dd>Telemetry and steps I/O still bind application use cases; peel incrementally.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>applyBreathSegmentLogOutcome</code> through <code>pause-session-breath-io</code>, or initial-emotion presentation through reflect mood I/O.</dd>
+      <dd>Next: peel <code>pause-reflect-telemetry-io</code> presentation boundary, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
