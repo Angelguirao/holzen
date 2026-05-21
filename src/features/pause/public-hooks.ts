@@ -323,6 +323,7 @@ export {
   initialBreathSegmentRpcLoggedFlagsFromRestored,
   usePauseBreathSegmentRpcLoggers,
   usePauseFeelShiftLogDedupeRefs,
+  usePauseSessionBreathReflectHandlers,
 } from './public-ritual-reflect';
 export {
   useCompanionHistoryThread,
@@ -417,7 +418,6 @@ export {
 export { usePauseSessionExitNavigation } from './presentation/session/use-pause-session-exit-navigation';
 export { usePauseSessionPendingPauseOfferNavigation } from './presentation/session/use-pause-session-pending-pause-offer-navigation';
 export { usePauseSessionPendingLeaveSheet } from './presentation/session/use-pause-session-pending-leave-sheet';
-export { usePauseSessionBreathReflectHandlers } from './presentation/reflect/flows/use-pause-session-breath-reflect-handlers';
 export { usePauseSessionEntryPresentationEffects } from './presentation/session/use-pause-session-entry-presentation-effects';
 export { usePauseSessionTerminalEntryRedirect } from './presentation/session/use-pause-session-terminal-entry-redirect';
 export { usePauseSessionStepTransition } from './presentation/session/use-pause-session-step-transition';

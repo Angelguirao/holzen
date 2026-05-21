@@ -10736,4 +10736,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — usePauseSessionBreathReflectHandlers on public-ritual-reflect (backlog #1 verified, §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>breath-reflect conductor on ritual reflect barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified. Export <code>usePauseSessionBreathReflectHandlers</code> on <code>public-ritual-reflect.ts</code>; conductor imports <code>usePauseShiftFrameDoneHandler</code> and <code>usePauseSessionReflectAndDecide</code> via sibling <code>presentation/reflect/</code> paths (not the barrel) to avoid circular eager loads. <code>public-hooks</code> re-exports; <code>use-pause-session-step-handlers</code> keeps direct feature-internal import.</dd>
+      <dt>Deviation</dt>
+      <dd>None — breath navigation + reflect/decide + frame-done wiring unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>usePauseSessionBreathStepHandlers</code> and <code>usePauseSessionBreathHandlers</code> remain on <code>public-hooks</code> direct paths until next peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: breath step handlers on <code>public-ritual-reflect</code>; backlog #4 <code>PauseRepository</code> presentation audit.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
