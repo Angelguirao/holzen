@@ -1,32 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabaseReflectGenerator } from '@/features/pause/infrastructure/supabase-reflect-generator';
+import type {
+  PauseArtifactHaikuFetchPhase,
+  UsePauseArtifactHaikuParams,
+  UsePauseArtifactHaikuResult,
+} from './use-pause-artifact-haiku-types';
 
-export type PauseArtifactHaikuFetchPhase = 'idle' | 'loading' | 'error' | 'done';
-
-type UsePauseArtifactHaikuBase = {
-  pauseInstanceId: string | null;
-  companionHaikuEnabled: boolean;
-};
-
-export type UsePauseArtifactHaikuImmediateParams = UsePauseArtifactHaikuBase & {
-  /** Fetch as soon as `pauseInstanceId` is set (Reflect step). */
-  trigger: 'immediate';
-};
-
-export type UsePauseArtifactHaikuWhenEnabledParams = UsePauseArtifactHaikuBase & {
-  /** Fetch only when true (Frame step — user expanded haiku). */
-  trigger: 'whenEnabled';
-  fetchEnabled: boolean;
-};
-
-export type UsePauseArtifactHaikuParams =
-  | UsePauseArtifactHaikuImmediateParams
-  | UsePauseArtifactHaikuWhenEnabledParams;
-
-export type UsePauseArtifactHaikuResult = {
-  artifactHaiku: string | null;
-  haikuFetch: PauseArtifactHaikuFetchPhase;
-};
+export type {
+  PauseArtifactHaikuFetchPhase,
+  UsePauseArtifactHaikuImmediateParams,
+  UsePauseArtifactHaikuParams,
+  UsePauseArtifactHaikuResult,
+  UsePauseArtifactHaikuWhenEnabledParams,
+} from './use-pause-artifact-haiku-types';
 
 /**
  * Loads persisted haiku text from `pause_ai_artifacts` for Reflect / Frame steps.

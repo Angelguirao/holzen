@@ -12480,7 +12480,26 @@
       <dt>Tradeoffs</dt>
       <dd>Test-only slice; artifact haiku/reflection-text hooks already assert port in their own tests.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: wire more pause mutations through <code>PauseRepository</code>, or Phase B subscription/auth template slice.</dd>
+      <dd>Next: colocate artifact haiku/reflection-text hook param unions, backlog #4 <code>PauseRepository</code> wiring, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — artifact haiku + reflection-text hook params (backlog #1 follow-up, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-artifact-*-types</code> beside artifact hydrate hooks</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) complete. Colocate discriminated-union params for <code>usePauseArtifactHaiku</code> and <code>usePauseArtifactReflectionText</code> in <code>*-types.ts</code> modules (mirrors <code>use-pause-reflect-generation-types</code>). <code>public-ritual-reflect</code> re-exports types from <code>*-types.ts</code>, not hook modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Types-only slice; hooks still re-export types for co-located tests.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: wire remaining pause mutations through <code>PauseRepository</code>, or Phase B subscription/auth template slice.</dd>
     </dl>
   </article>
 

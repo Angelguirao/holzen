@@ -1,31 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabaseReflectGenerator } from '@/features/pause/infrastructure/supabase-reflect-generator';
+import type {
+  PauseArtifactReflectionTextFetchPhase,
+  UsePauseArtifactReflectionTextParams,
+  UsePauseArtifactReflectionTextResult,
+} from './use-pause-artifact-reflection-text-types';
 
-export type PauseArtifactReflectionTextFetchPhase = 'idle' | 'loading' | 'error' | 'done';
-
-type UsePauseArtifactReflectionTextBase = {
-  pauseInstanceId: string | null;
-};
-
-export type UsePauseArtifactReflectionTextImmediateParams = UsePauseArtifactReflectionTextBase & {
-  /** Fetch as soon as `pauseInstanceId` is set (Reflect step hydration). */
-  trigger: 'immediate';
-};
-
-export type UsePauseArtifactReflectionTextWhenEnabledParams = UsePauseArtifactReflectionTextBase & {
-  /** Fetch only when true (deferred read — e.g. Frame fallback when session seed is empty). */
-  trigger: 'whenEnabled';
-  fetchEnabled: boolean;
-};
-
-export type UsePauseArtifactReflectionTextParams =
-  | UsePauseArtifactReflectionTextImmediateParams
-  | UsePauseArtifactReflectionTextWhenEnabledParams;
-
-export type UsePauseArtifactReflectionTextResult = {
-  artifactReflectionText: string | null;
-  reflectionTextFetch: PauseArtifactReflectionTextFetchPhase;
-};
+export type {
+  PauseArtifactReflectionTextFetchPhase,
+  UsePauseArtifactReflectionTextImmediateParams,
+  UsePauseArtifactReflectionTextParams,
+  UsePauseArtifactReflectionTextResult,
+  UsePauseArtifactReflectionTextWhenEnabledParams,
+} from './use-pause-artifact-reflection-text-types';
 
 /**
  * Loads persisted `reflection_text` from `pause_ai_artifacts` for Reflect / Frame steps.
