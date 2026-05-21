@@ -3,9 +3,11 @@ import type { TFunction } from 'i18next';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 import {
   applyBreathSegmentLogOutcome,
+  initialBreathSegmentRpcLoggedFlagsFromRestored,
+} from '@/features/pause/public-session';
+import {
   ensureBreathSegment1Logged,
   ensureBreathSegment2Logged,
-  initialBreathSegmentRpcLoggedFlagsFromRestored,
   logBreathSegment1Skipped,
   logBreathSegment2Skipped,
   showPauseStepSyncFailedToast,

@@ -10131,19 +10131,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — breath segment test uses public-session helpers (backlog #1 verified, #4)</span>
+      <span>Phase A slice — breath segment pure helpers on public-session (backlog #1 verified, #4)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>ritual/reflect/ complete; breath RPC test avoids deep application mocks</h3>
+    <h3>ritual/reflect/ complete; breath hook splits session vs RPC barrels</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 verified — no reflect moves. Export <code>applyBreathSegmentLogOutcome</code> and <code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> on <code>public-session.ts</code> (no Supabase). <code>use-pause-breath-segment-rpc-loggers.test</code> stubs <code>public-rpc</code> facades and <code>importActual</code> pure helpers from <code>public-session</code> instead of <code>run-breath-segment-log</code> / <code>step-map</code> paths.</dd>
+      <dd>Backlog #1 verified — no reflect moves. Pure breath dedupe helpers on <code>public-session</code>; <code>use-pause-breath-segment-rpc-loggers</code> imports RPC facades from <code>public-rpc</code> only. Test mocks <code>public-rpc</code> without <code>importOriginal</code> (no Supabase client load).</dd>
       <dt>Deviation</dt>
-      <dd>None — hook still imports breath facades from <code>public-rpc</code> at runtime.</dd>
+      <dd>None — segment log behavior unchanged.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Cannot <code>importActual(public-rpc)</code> in unit tests without loading Supabase client.</dd>
+      <dd>Removed duplicate re-exports from <code>public-rpc</code>; other presentation tests may still deep-mock application paths until audited.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: audit presentation <code>infrastructure/*</code> imports (realtime, archive json-local-storage).</dd>
+      <dd>Next backlog #4: audit decide/outcome presentation tests and <code>infrastructure/*</code> imports in presentation.</dd>
     </dl>
   </article>
 

@@ -18,21 +18,13 @@ const {
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-rpc', async () => {
-  const session = await vi.importActual<typeof import('@/features/pause/public-session')>(
-    '@/features/pause/public-session',
-  );
-  return {
-    applyBreathSegmentLogOutcome: session.applyBreathSegmentLogOutcome,
-    initialBreathSegmentRpcLoggedFlagsFromRestored:
-      session.initialBreathSegmentRpcLoggedFlagsFromRestored,
-    ensureBreathSegment1Logged: ensureBreathSegment1LoggedMock,
-    ensureBreathSegment2Logged: ensureBreathSegment2LoggedMock,
-    logBreathSegment1Skipped: logBreathSegment1SkippedMock,
-    logBreathSegment2Skipped: logBreathSegment2SkippedMock,
-    showPauseStepSyncFailedToast,
-  };
-});
+vi.mock('@/features/pause/public-rpc', () => ({
+  ensureBreathSegment1Logged: ensureBreathSegment1LoggedMock,
+  ensureBreathSegment2Logged: ensureBreathSegment2LoggedMock,
+  logBreathSegment1Skipped: logBreathSegment1SkippedMock,
+  logBreathSegment2Skipped: logBreathSegment2SkippedMock,
+  showPauseStepSyncFailedToast,
+}));
 
 const t = ((k: string) => k) as TFunction;
 
