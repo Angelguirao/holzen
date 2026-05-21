@@ -1,6 +1,6 @@
 /**
  * CI cluster anchor for session brief hydration + depth-upgrade RPC (§3 / check:architecture-alignment).
- * Use cases live in sibling modules; re-export for presentation I/O imports.
+ * Use cases live in sibling modules; `pause-session-brief-io` and `pause-session-ritual-restore-io` import siblings directly.
  */
 export {
   initialBriefIntegrateDoneFromRestored,
