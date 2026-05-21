@@ -134,6 +134,10 @@ mustExist(
   'src/features/pause/infrastructure/queries/reflect/steps',
   'pause/infrastructure/queries/reflect/steps/',
 );
+mustExist(
+  'src/features/pause/infrastructure/queries/reflect/generation',
+  'pause/infrastructure/queries/reflect/generation/',
+);
 mustExist('src/features/pause/infrastructure/edge/reflect', 'pause/infrastructure/edge/reflect/');
 mustExist('src/features/pause/application/use-cases/session', 'pause/application/use-cases/session/');
 mustExist('src/features/pause/application/use-cases/ritual/brief', 'pause/application/use-cases/ritual/brief/');
