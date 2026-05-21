@@ -15410,4 +15410,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion slot UI types via pause-companion-orchestrate-io (backlog #2, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-companion-slot-ui-state</code> slot cache types off orchestrate I/O module</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>ritual/frame/</code>) complete on this branch. <code>use-companion-slot-ui-state</code> imports <code>CompanionSlotAutosaveParams</code>, relaxations, and cache id types from <code>pause-companion-orchestrate-io.ts</code> (same module as retry + slot orchestrate conductors).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other companion hooks still import <code>ritual/frame/*</code> directly — peel in follow-up slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>use-companion-section</code> / <code>use-companion-fullview-page</code> through frame I/O, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

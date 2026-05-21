@@ -1,13 +1,13 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { CachedHistoricalInsightShape } from '@/features/pause/domain/historical-insight';
 import type { ZoomOutData } from '@/features/pause/domain/zoom-out-display';
-import type { CompanionSlotAutosaveParams } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
 import {
   EMPTY_COMPANION_SLOT_RELAXATIONS,
+  type CompanionSlotAutosaveParams,
   type CompanionSlotCacheIds,
   type CompanionSlotCommitters,
   type CompanionSlotRelaxations,
-} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
+} from './pause-companion-orchestrate-io';
 
 interface NudgeData {
   title: string;
