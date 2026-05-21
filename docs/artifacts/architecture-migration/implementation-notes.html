@@ -19096,4 +19096,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — remove orphan application decide outcome flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Delete <code>ritual/decide/pause-decide-outcome-flow.ts</code> application re-export</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-flows-io</code> and <code>pause-reflect-flows-flow</code> already import <code>domain/decide/pause-decide-outcome-flow</code>; zero runtime imports referenced the application duplicate after toast/log-flow removal (<code>dde2b049f</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; delete unused file only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Decide outcome flow mapping lives only under <code>domain/decide/</code>; <code>application/use-cases/ritual/decide/</code> keeps mutation + toast modules.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: align remaining reflect subcluster flow anchors (steps/share/hub/generation) if drift appears, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
