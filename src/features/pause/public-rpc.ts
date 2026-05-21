@@ -170,12 +170,6 @@ import type { DeliverReflectionShareImageOutcome } from './domain/reflect/share/
 import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
 import { showPauseStepSyncFailedToast } from './presentation/ritual/pause-step-sync-toast';
 export {
-  trackPauseReflectPostItOpen,
-  trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
-} from './domain/reflect/telemetry/pause-reflect-ui-telemetry';
-export type { PauseReflectTelemetrySurface } from './domain/reflect/telemetry/pause-reflect-ui-telemetry';
-export {
   trackPauseOutcomeRetrospective,
   type PauseOutcomeRetrospectiveSurface,
 } from './application/use-cases/archive/archive-retrospective-telemetry';
