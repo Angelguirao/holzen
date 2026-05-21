@@ -2,11 +2,11 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import type { PauseSeverity } from '@/features/pause/public-navigation';
-import { pauseSeverityToOrchestrateNumber } from '@/features/pause/application/use-cases/ritual/frame/full-view-page-helpers';
 import {
   getCompanionSectionVisibility,
   isCompanionSectionVisible,
-} from '@/features/pause/application/use-cases/ritual/frame/section-visibility';
+  pauseSeverityToOrchestrateNumber,
+} from './pause-companion-frame-ui-io';
 import { useCompanionData } from './use-companion-data';
 
 export type UseCompanionSectionParams = {
