@@ -323,7 +323,11 @@ export {
   initialBreathSegmentRpcLoggedFlagsFromRestored,
   usePauseBreathSegmentRpcLoggers,
   usePauseFeelShiftLogDedupeRefs,
+  usePauseSessionBreathStepHandlers,
+  usePauseSessionBreathHandlers,
+  type UsePauseSessionBreathHandlersParams,
   usePauseSessionBreathReflectHandlers,
+  usePauseSessionDepthAndBriefCopy,
 } from './public-ritual-reflect';
 export {
   useCompanionHistoryThread,
@@ -403,7 +407,6 @@ export {
   usePauseSessionBriefToDeep,
   type UsePauseSessionBriefToDeepParams,
 } from './presentation/session/use-pause-session-brief-to-deep';
-export { usePauseSessionBreathStepHandlers } from './presentation/reflect/flows/use-pause-session-breath-step-handlers';
 export { usePauseSessionDecideHandler } from './presentation/decide/use-pause-session-decide-handler';
 export { usePauseSessionPersistToStorage } from './presentation/session/use-pause-session-persist-to-storage';
 export { usePauseSessionRitualStorageSync } from './presentation/session/use-pause-session-ritual-storage-sync';
@@ -411,17 +414,12 @@ export {
   usePauseSessionBreathNavigation,
   type UsePauseSessionBreathNavigationParams,
 } from './presentation/session/use-pause-session-breath-navigation';
-export {
-  usePauseSessionBreathHandlers,
-  type UsePauseSessionBreathHandlersParams,
-} from './presentation/reflect/flows/use-pause-session-breath-handlers';
 export { usePauseSessionExitNavigation } from './presentation/session/use-pause-session-exit-navigation';
 export { usePauseSessionPendingPauseOfferNavigation } from './presentation/session/use-pause-session-pending-pause-offer-navigation';
 export { usePauseSessionPendingLeaveSheet } from './presentation/session/use-pause-session-pending-leave-sheet';
 export { usePauseSessionEntryPresentationEffects } from './presentation/session/use-pause-session-entry-presentation-effects';
 export { usePauseSessionTerminalEntryRedirect } from './presentation/session/use-pause-session-terminal-entry-redirect';
 export { usePauseSessionStepTransition } from './presentation/session/use-pause-session-step-transition';
-export { usePauseSessionDepthAndBriefCopy } from './presentation/reflect/mood/use-pause-session-depth-and-brief-copy';
 export {
   usePauseSessionScaffoldRitual,
   type UsePauseSessionScaffoldRitualParams,
