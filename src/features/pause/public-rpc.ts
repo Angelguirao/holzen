@@ -96,14 +96,12 @@ import {
   runDeclinePendingPauseOffer,
   type RunDeclinePendingPauseOfferResult,
 } from './application/use-cases/pending-offer/run-decline-pending-pause-offer';
-import { logPauseRitualDepthUpgraded as logPauseRitualDepthUpgradedUseCase } from './application/use-cases/ritual/brief/ritual-depth-upgrade';
 import {
   applyBulkHoldOutcomes as applyBulkHoldOutcomesUseCase,
   type BulkHoldApplyResult,
 } from './application/use-cases/home/bulk-hold/apply-bulk-hold-outcomes';
 import { openManualPauseFromHome as openManualPauseFromHomeUseCase } from './application/use-cases/trigger/open-manual-pause-from-home';
 import type { OpenManualPauseFromHomeParams } from './application/use-cases/trigger/open-manual-pause-from-home';
-import type { TFunction } from 'i18next';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from './domain/bulk-hold';
 import type { PauseState } from './domain/pause-state';
 import type { PostPauseFeelSnapshot } from './domain/ritual/done/post-pause-emotion-log';
@@ -230,16 +228,6 @@ export function openManualPauseFromHome(params: OpenManualPauseFromHomeParams) {
     },
     params,
   );
-}
-
-/** Brief → deep upgrade — `ritual_depth_upgraded` via `PauseRepository`; toast on sync failure. */
-export async function logPauseRitualDepthUpgraded(instanceId: string, t: TFunction): Promise<boolean> {
-  const outcome = await logPauseRitualDepthUpgradedUseCase(supabasePauseRepository, instanceId);
-  if (outcome.status === 'sync_failed') {
-    showPauseStepSyncFailedToast(t);
-    return false;
-  }
-  return true;
 }
 
 export function applyBulkHoldOutcomes(

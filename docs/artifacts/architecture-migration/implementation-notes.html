@@ -11214,13 +11214,13 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — brief→deep upgrade off public-rpc (backlog #1 verified / #4)</span>
+      <span>Phase A slice — brief-to-deep hook off public-rpc (backlog #1 verified, backlog #4 / §6)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>use-pause-session-brief-to-deep → PauseRepository port</h3>
+    <h3>ritual_depth_upgraded: presentation → ritual/brief + PauseRepository</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no folder move. Frame-hub shift peel was already on remote (<code>b797a0f3</code>). <code>use-pause-session-brief-to-deep</code> calls <code>logPauseRitualDepthUpgraded</code> + <code>supabasePauseRepository</code> and step-sync toast from <code>presentation/ritual/</code>; <code>public-rpc</code> boolean facade unchanged for cross-context callers.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no folder move. After frame-hub shift peel (<code>b797a0f3</code>), <code>use-pause-session-brief-to-deep</code> imports <code>logPauseRitualDepthUpgraded</code> with <code>supabasePauseRepository</code> and step-sync toast from <code>presentation/ritual/</code> (same pattern as reflect step hooks). Removed <code>logPauseRitualDepthUpgraded</code> boolean facade from <code>public-rpc</code>; <code>ritualDepthUpgradedPayload</code> type re-export remains.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior unchanged.</dd>
       <dt>Tradeoffs</dt>
