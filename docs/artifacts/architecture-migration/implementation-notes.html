@@ -12275,4 +12275,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate decide conductor under presentation/reflect/flows/ (backlog #1 verified, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; reflect+decide presentation grouping</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no use-case folder move. Move <code>use-pause-session-decide-handler</code> (+ types + test) from <code>presentation/decide/</code> beside <code>use-pause-session-reflect-and-decide</code> under <code>presentation/reflect/flows/</code>; <code>public-hooks</code> re-export path only. Add <code>mockPauseRepository.port === 'supabasePauseRepository'</code> on decide handler tests (backlog #4 port-lock).</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 reflect+decide conductor grouping; empty <code>presentation/decide/</code> removed.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Decide handler remains exported on <code>public-hooks</code> for direct screen/tests; breath-reflect compose stays under <code>presentation/session/</code> per prior slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: companion intervention/orchestrate integration port-lock, optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

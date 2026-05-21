@@ -7,7 +7,7 @@ import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { RitualDepth } from '@/features/pause/domain/ritual-types';
 import { usePauseReflectGeneration } from '../generation/use-pause-reflect-generation';
-import { usePauseSessionDecideHandler } from '../../decide/use-pause-session-decide-handler';
+import { usePauseSessionDecideHandler } from './use-pause-session-decide-handler';
 
 /** Params for deep ritual reflection + decide completion in the session conductor. */
 export interface UsePauseSessionReflectAndDecideParams {
