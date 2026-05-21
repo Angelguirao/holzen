@@ -86,5 +86,6 @@ describe('usePauseArtifactHaiku', () => {
     await waitFor(() => {
       expect(fetchHaikuTextMock).toHaveBeenCalledWith('pause-3');
     });
+    expect(mockReflectGenerator.port).toBe('supabaseReflectGenerator');
   });
 });

@@ -191,6 +191,7 @@ describe('usePauseReflectGeneration', () => {
         mockReflectGenerator,
       );
     });
+    expect(mockReflectGenerator.port).toBe('supabaseReflectGenerator');
   });
 
   it('reports missing-context error without calling holzen-reflect', async () => {
