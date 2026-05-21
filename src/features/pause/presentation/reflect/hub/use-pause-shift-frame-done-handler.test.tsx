@@ -7,10 +7,12 @@ import { usePauseShiftFrameDoneHandler } from './use-pause-shift-frame-done-hand
 
 const { logKey: SHIFT_LOG_KEY } = buildShiftEmotionFrameHubLogBundle();
 
-const { runShiftEmotionFrameHubDoneMock, showPauseStepSyncFailedToast } = vi.hoisted(() => ({
-  runShiftEmotionFrameHubDoneMock: vi.fn(),
-  showPauseStepSyncFailedToast: vi.fn(),
-}));
+const { runShiftEmotionFrameHubDoneMock, showPauseStepSyncFailedToast, mockPauseRepository } =
+  vi.hoisted(() => ({
+    runShiftEmotionFrameHubDoneMock: vi.fn(),
+    showPauseStepSyncFailedToast: vi.fn(),
+    mockPauseRepository: { port: 'supabasePauseRepository' },
+  }));
 
 vi.mock(
   '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
@@ -20,7 +22,7 @@ vi.mock(
 );
 
 vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
-  supabasePauseRepository: {},
+  supabasePauseRepository: mockPauseRepository,
 }));
 
 vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
@@ -59,10 +61,18 @@ describe('usePauseShiftFrameDoneHandler', () => {
       await result.current.handleFrameImDone();
     });
     expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(1);
+    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledWith(mockPauseRepository, {
+      pauseInstanceId: 'pi-1',
+      lastShiftLogKey: null,
+    });
     await act(async () => {
       await result.current.handleFrameImDone();
     });
     expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(2);
+    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenLastCalledWith(mockPauseRepository, {
+      pauseInstanceId: 'pi-1',
+      lastShiftLogKey: SHIFT_LOG_KEY,
+    });
     expect(goToStep).toHaveBeenLastCalledWith('breath2');
     expect(setFrameDone).toHaveBeenCalled();
     expect(setMoodAfterDone).toHaveBeenCalled();
@@ -117,6 +127,10 @@ describe('usePauseShiftFrameDoneHandler', () => {
       await result.current.handleFrameImDone();
     });
     expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(1);
+    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledWith(mockPauseRepository, {
+      pauseInstanceId: null,
+      lastShiftLogKey: null,
+    });
     expect(goToStep).toHaveBeenCalledWith('breath2');
   });
 });

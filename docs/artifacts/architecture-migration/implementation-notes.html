@@ -11781,4 +11781,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock reflection-step + shift-frame + initial-mood to PauseRepository (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; remaining reflect-strip presentation port assertions</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Strengthen <code>use-pause-reflection-step-log</code>, <code>use-pause-shift-frame-done-handler</code>, and <code>use-pause-session-initial-mood-handlers</code> tests to assert <code>supabasePauseRepository</code> (and <code>reflectionStepSessionStorage</code> for step log) are passed into ritual reflect use cases — completes the reflect-strip port-lock cluster started with favorite/note/tag/breath RPC loggers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Three presentation test files in one commit — same backlog #4 guardrail pattern; no application code changes.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog analytics-port consolidation, decide/outcome presentation port assertions, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

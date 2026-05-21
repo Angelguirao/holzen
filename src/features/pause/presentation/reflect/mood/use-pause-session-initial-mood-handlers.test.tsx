@@ -14,10 +14,12 @@ const {
   runInitialEmotionSelectMock,
   runInitialEmotionSkipMock,
   showPauseStepSyncFailedToast,
+  mockPauseRepository,
 } = vi.hoisted(() => ({
   runInitialEmotionSelectMock: vi.fn(),
   runInitialEmotionSkipMock: vi.fn(),
   showPauseStepSyncFailedToast: vi.fn(),
+  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log', () => ({
@@ -26,7 +28,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-
 }));
 
 vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
-  supabasePauseRepository: {},
+  supabasePauseRepository: mockPauseRepository,
 }));
 
 vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
@@ -94,6 +96,13 @@ describe('usePauseSessionInitialMoodHandlers', () => {
       await result.current.handleMoodSelect('calm', 3);
     });
     expect(runInitialEmotionSelectMock).toHaveBeenCalledTimes(1);
+    expect(runInitialEmotionSelectMock).toHaveBeenCalledWith(mockPauseRepository, {
+      pauseInstanceId: 'pi-1',
+      mood: 'calm',
+      intensity: 3,
+      opts: undefined,
+      lastFeelLogKey: null,
+    });
     expect(lastFeelLogKeyRef.current).toBe(CALM_LOG_KEY);
     await act(async () => {
       await result.current.handleMoodSelect('calm', 3);
@@ -123,6 +132,9 @@ describe('usePauseSessionInitialMoodHandlers', () => {
       await result.current.handleMoodSkip();
     });
     expect(runInitialEmotionSkipMock).toHaveBeenCalledTimes(1);
+    expect(runInitialEmotionSkipMock).toHaveBeenCalledWith(mockPauseRepository, {
+      pauseInstanceId: 'pi-1',
+    });
     expect(deps.setMoodDone).toHaveBeenCalledWith(true);
   });
 
