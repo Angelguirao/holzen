@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — session scaffold presentation I/O</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-scaffold-io</code> for persist snapshot, storage sync, and scaffold derived VM</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder move remains complete. Scaffold conductors (<code>use-pause-session-persist-to-storage</code>, <code>use-pause-session-ritual-storage-sync</code>, <code>use-pause-session-scaffold-ritual</code>) import <code>buildPauseSessionPersistSnapshot</code>, <code>computePauseStorageRitualSyncPatch</code>, and <code>buildPauseSessionScaffoldRitualDerived</code> through <code>presentation/session/scaffold/pause-session-scaffold-io.ts</code> instead of deep <code>application/use-cases/session/*</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; application modules remain for unit tests and alignment checks.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Pairs with <code>pause-session-shell-io</code> (header-back + mount log + shell VM); tab-session load/save stays on <code>pause-persisted-tab-session-io</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect share orchestration through presentation I/O only, or companion hooks still importing use cases outside <code>pause-companion-orchestrate-io</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — session shell bootstrap through pause-session-shell-io</span>
       <span class="status resolved">resolved</span>
     </header>
