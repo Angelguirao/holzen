@@ -105,7 +105,6 @@ import type { OpenManualPauseFromHomeParams } from './application/use-cases/trig
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from './domain/bulk-hold';
 import type { PauseState } from './domain/pause-state';
 import type { PostPauseFeelSnapshot } from './domain/ritual/done/post-pause-emotion-log';
-import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
 import type { RunPauseFavoriteToggleResult } from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import type { RunPauseReflectTagUpdateResult } from './application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
@@ -369,14 +368,6 @@ export function fetchPauseDevModeSetting(userId: string): Promise<boolean | null
 /** Admin rapid-testing toggle write — screen helper (delegates to `logPauseDevModeSetting`). */
 export async function logDevModeSetting(userId: string, enabled: boolean): Promise<void> {
   await logPauseDevModeSetting({ userId, enabled });
-}
-
-/** Decide step — `outcome_logged` via repository port (wired for presentation). */
-export function logPauseOutcome(params: {
-  pauseInstanceId: string | null;
-  decision: string;
-}) {
-  return runPauseOutcomeLog(supabasePauseRepository, params);
 }
 
 export { showPauseStepSyncFailedToast };

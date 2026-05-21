@@ -1,17 +1,18 @@
 import { useCallback } from 'react';
 import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/features/auth/public';
+import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
+import {
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
+} from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
 import {
   formatReinforcementQuoteFromSession,
   getSessionQuote,
   resolvePauseDecideOutcomeFlow,
 } from '@/features/pause/public-session';
-import {
-  clearSession,
-  logPauseOutcome,
-  showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
-} from '@/features/pause/public-rpc';
+import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
+import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
 import type { UsePauseSessionDecideHandlerParams } from './pause-session-decide-handler-types';
 
@@ -49,7 +50,7 @@ export function usePauseSessionDecideHandler(
       try {
         hapticFeedback('medium');
 
-        const outcome = await logPauseOutcome({
+        const outcome = await runPauseOutcomeLog(supabasePauseRepository, {
           pauseInstanceId,
           decision: d,
         });
