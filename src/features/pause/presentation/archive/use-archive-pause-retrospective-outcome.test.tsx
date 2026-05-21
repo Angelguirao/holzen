@@ -11,9 +11,6 @@ const { logRetrospectiveOutcomeMock, trackRetrospectiveMock, invalidateStatsMock
 
 vi.mock('@/features/pause/public-rpc', () => ({
   logRetrospectiveOutcome: logRetrospectiveOutcomeMock,
-}));
-
-vi.mock('@/features/pause/application/use-cases/archive/archive-retrospective-telemetry', () => ({
   trackPauseOutcomeRetrospective: trackRetrospectiveMock,
 }));
 
