@@ -11,6 +11,7 @@ import {
 } from '@/features/pause/public-rpc';
 
 export { shouldLogPauseReflectionStep, shouldShowFavoriteProHint };
+export { showPauseFavoriteProHintToast } from './pause-favorite-pro-hint-toast';
 
 /** Default port + use case: reflect post-it tags commit. */
 export function pauseReflectTagUpdate(

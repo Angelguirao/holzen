@@ -2,10 +2,14 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import { usePauseFavoriteToggle } from './use-pause-favorite-toggle';
-import { showPauseFavoriteProHintToast } from '@/features/pause/presentation/reflect/steps/pause-favorite-pro-hint-toast';
 
-const { pauseReflectFavoriteToggleMock, invalidateQueriesMock } = vi.hoisted(() => ({
+const {
+  pauseReflectFavoriteToggleMock,
+  showPauseFavoriteProHintToastMock,
+  invalidateQueriesMock,
+} = vi.hoisted(() => ({
   pauseReflectFavoriteToggleMock: vi.fn(),
+  showPauseFavoriteProHintToastMock: vi.fn(),
   invalidateQueriesMock: vi.fn(),
 }));
 
@@ -16,15 +20,12 @@ vi.mock('./pause-reflect-steps-io', async () => {
   return {
     shouldShowFavoriteProHint,
     pauseReflectFavoriteToggle: pauseReflectFavoriteToggleMock,
+    showPauseFavoriteProHintToast: showPauseFavoriteProHintToastMock,
   };
 });
 
 vi.mock('@/features/pause/public-queries', () => ({
   pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
-}));
-
-vi.mock('@/features/pause/presentation/reflect/steps/pause-favorite-pro-hint-toast', () => ({
-  showPauseFavoriteProHintToast: vi.fn(),
 }));
 
 vi.mock('@tanstack/react-query', () => ({
@@ -48,7 +49,7 @@ beforeEach(() => {
   pauseReflectFavoriteToggleMock.mockReset();
   pauseReflectFavoriteToggleMock.mockResolvedValue({ status: 'success', newValue: true });
   invalidateQueriesMock.mockClear();
-  vi.mocked(showPauseFavoriteProHintToast).mockClear();
+  showPauseFavoriteProHintToastMock.mockClear();
 });
 
 describe('usePauseFavoriteToggle', () => {
@@ -89,7 +90,7 @@ describe('usePauseFavoriteToggle', () => {
       pauseInstanceId: 'pi-1',
       isFavorite: false,
     });
-    expect(showPauseFavoriteProHintToast).toHaveBeenCalledWith(t);
+    expect(showPauseFavoriteProHintToastMock).toHaveBeenCalledWith(t);
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: archiveListPrefix('archive-user-1'),
     });
@@ -109,7 +110,7 @@ describe('usePauseFavoriteToggle', () => {
     await act(async () => {
       await result.current.toggleFavorite();
     });
-    expect(showPauseFavoriteProHintToast).not.toHaveBeenCalled();
+    expect(showPauseFavoriteProHintToastMock).not.toHaveBeenCalled();
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: archiveListPrefix('archive-user-1'),
     });

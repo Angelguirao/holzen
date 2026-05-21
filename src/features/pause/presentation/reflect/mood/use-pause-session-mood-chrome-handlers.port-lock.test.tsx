@@ -27,6 +27,7 @@ vi.mock('../steps/pause-reflect-steps-io', async () => {
   return {
     shouldShowFavoriteProHint,
     pauseReflectFavoriteToggle: pauseReflectFavoriteToggleMock,
+    showPauseFavoriteProHintToast: vi.fn(),
   };
 });
 
@@ -44,10 +45,6 @@ vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
 
 vi.mock('@/features/pause/public-queries', () => ({
   pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
-}));
-
-vi.mock('@/features/pause/presentation/reflect/steps/pause-favorite-pro-hint-toast', () => ({
-  showPauseFavoriteProHintToast: vi.fn(),
 }));
 
 vi.mock('@tanstack/react-query', () => ({

@@ -3,6 +3,7 @@ import {
   pauseReflectFavoriteToggle,
   pauseReflectionStepLogOnce,
   shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
 } from './pause-reflect-steps-io';
 
 const runPauseReflectionStepLogOnceMock = vi.hoisted(() => vi.fn());
@@ -28,6 +29,11 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 describe('pause-reflect-steps-io', () => {
+  it('re-exports favorite pro-hint gate from domain', () => {
+    expect(shouldShowFavoriteProHint(true, false)).toBe(true);
+    expect(shouldShowFavoriteProHint(true, true)).toBe(false);
+  });
+
   it('re-exports reflection_step gate for presentation conductors', () => {
     expect(
       shouldLogPauseReflectionStep({
