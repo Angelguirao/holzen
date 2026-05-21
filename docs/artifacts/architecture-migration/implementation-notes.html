@@ -8418,4 +8418,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — bulk-hold apply outcomes via public-rpc (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel use-bulk-hold-apply-outcomes off public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. <code>use-bulk-hold-apply-outcomes</code> calls <code>applyBulkHoldOutcomes</code> on <code>public-rpc</code> (wired <code>PauseRepository</code>) instead of the use case + <code>supabasePauseRepository</code> from <code>public-ports</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import surface only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-manual-pause-trigger</code> and companion orchestrate hooks still inject <code>public-ports</code> until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>use-manual-pause-trigger</code> → <code>openManualPauseFromHome</code> on <code>public-rpc</code>, or colocate flat session hooks (<code>use-pause-session-shell</code>).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
