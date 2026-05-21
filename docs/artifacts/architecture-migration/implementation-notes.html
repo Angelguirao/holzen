@@ -13187,4 +13187,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate mount-log-params under ritual/reflect/scaffold/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up; reflect scaffold mount diagnostics</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>mapPersistedStep</code> moved to <code>domain/session/</code> and ritual restore helpers split across beats, move <code>buildPauseSessionMountLogParams</code> (+ test) from <code>application/use-cases/session/</code> to <code>ritual/reflect/scaffold/</code> — it only composes <code>initialRitualEntry</code>, brief restore, and decide phase restore. <code>public-session</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; presentation still imports via <code>public-session</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Still depends on <code>session/hydration</code> for hydration status typing — session shell concern, not moved.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription/auth <code>src/lib/*</code> shims, or peel remaining session-only exports from <code>public-session</code> when conductors import use cases directly.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
