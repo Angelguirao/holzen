@@ -1,33 +1,16 @@
 import { runPersistSilentReflectionStub } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-persist-silent-reflection-stub';
+import type {
+  RunOpenManualPauseSilentModeAfterCreateInput,
+  RunOpenManualPauseSilentModeAfterCreateResult,
+} from '@/features/pause/domain/reflect/generation/open-manual-pause-silent-mode-after-create-types';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 
-export type RunOpenManualPauseSilentModeAfterCreateInput = {
-  pauseInstanceId: string;
-  userId: string;
-  contextText: string;
-  silentMessage: string;
-  pendingOffer: boolean;
-  created: boolean;
-};
-
-export type RunOpenManualPauseSilentModeAfterCreateOpened = {
-  outcome: 'opened';
-  instanceId: string;
-  context: string;
-  pendingOffer: boolean;
-  created: boolean;
-  silentStubPersisted: true;
-};
-
-export type RunOpenManualPauseSilentModeAfterCreateError = {
-  outcome: 'error';
-  userMessage: string;
-  isNetwork: false;
-};
-
-export type RunOpenManualPauseSilentModeAfterCreateResult =
-  | RunOpenManualPauseSilentModeAfterCreateOpened
-  | RunOpenManualPauseSilentModeAfterCreateError;
+export type {
+  RunOpenManualPauseSilentModeAfterCreateError,
+  RunOpenManualPauseSilentModeAfterCreateInput,
+  RunOpenManualPauseSilentModeAfterCreateOpened,
+  RunOpenManualPauseSilentModeAfterCreateResult,
+} from '@/features/pause/domain/reflect/generation/open-manual-pause-silent-mode-after-create-types';
 
 /** Home silent-mode: persist reflection stub after `pause_create_or_reuse`, then return opened payload. */
 export async function runOpenManualPauseSilentModeAfterCreate(
