@@ -1,7 +1,7 @@
 import {
   BRIEF_DEPTH_PICKER_RITUAL_ENTRY,
   DEEP_DEPTH_PICKER_RITUAL_ENTRY,
-} from '@/features/pause/domain/reflect/mood/pause-session-mood-chrome-flow';
+} from './depth-picker-ritual-entries';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 
 export type ApplyDepthPickerRitualEntryPorts = {

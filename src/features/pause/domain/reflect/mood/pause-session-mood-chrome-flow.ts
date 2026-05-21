@@ -1,13 +1,4 @@
-import type { BriefPauseStep, FeelStepTile, RitualDepth } from '@/features/pause/domain/ritual-types';
-
-export const BRIEF_DEPTH_PICKER_RITUAL_ENTRY = {
-  ritualEntry: 'brief' as const,
-  briefStep: 'feel' as const satisfies BriefPauseStep,
-};
-
-export const DEEP_DEPTH_PICKER_RITUAL_ENTRY = {
-  ritualEntry: 'deep' as const,
-};
+import type { FeelStepTile, RitualDepth } from '@/features/pause/domain/ritual-types';
 
 export function isBriefRitualEntry(ritualEntry: RitualDepth | 'picker'): ritualEntry is 'brief' {
   return ritualEntry === 'brief';

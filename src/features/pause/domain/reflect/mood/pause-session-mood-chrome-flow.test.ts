@@ -1,8 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-  BRIEF_DEPTH_PICKER_RITUAL_ENTRY,
   buildFeelTilesMoodLogOptions,
-  DEEP_DEPTH_PICKER_RITUAL_ENTRY,
   isBriefRitualEntry,
   resolvePauseSessionChromeCloseAction,
   runDeepPausePickerEntryIfPro,
@@ -10,11 +8,6 @@ import {
 } from './pause-session-mood-chrome-flow';
 
 describe('pause-session-mood-chrome-flow', () => {
-  it('exposes depth picker ritual entry constants', () => {
-    expect(BRIEF_DEPTH_PICKER_RITUAL_ENTRY).toEqual({ ritualEntry: 'brief', briefStep: 'feel' });
-    expect(DEEP_DEPTH_PICKER_RITUAL_ENTRY).toEqual({ ritualEntry: 'deep' });
-  });
-
   it('detects brief ritual and builds feel tile log options', () => {
     expect(isBriefRitualEntry('brief')).toBe(true);
     expect(isBriefRitualEntry('deep')).toBe(false);

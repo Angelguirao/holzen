@@ -7614,7 +7614,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity with prior inline <code>BRIEF_DEPTH_PICKER_RITUAL_ENTRY</code> / <code>DEEP_DEPTH_PICKER_RITUAL_ENTRY</code> usage.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Domain constants remain in <code>pause-session-mood-chrome-flow.ts</code>; application layer applies them via setter ports.</dd>
+      <dd>Depth-picker entry payloads later moved to <code>depth-picker-ritual-entries.ts</code>; application applies them via setter ports.</dd>
       <dt>Open questions</dt>
       <dd>Next: backlog #4 peel <code>use-companion-orchestrate-session</code> off <code>public-rpc</code>, or port-backed analytics read for feedback vote fetch.</dd>
     </dl>
@@ -7661,6 +7661,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — reflect/decide conductor params under reflect/flows (backlog #1 presentation)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -7674,6 +7675,21 @@
       <dd>Hook still composes decide handler from <code>presentation/decide/</code>; no new slice types for decide-only fields this slice.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel remaining companion orchestrate <code>public-rpc</code> re-exports, or backlog #4 remaining <code>PauseRepository</code> call sites.</dd>
+=======
+      <span>Phase A slice — depth-picker ritual entry constants in ritual/reflect/mood (backlog #1 incremental)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>depth-picker-ritual-entries.ts</code> feeds <code>apply-depth-picker-ritual-entry</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Follow-up to <code>apply-depth-picker-ritual-entry</code>: move <code>BRIEF_*</code> / <code>DEEP_*</code> payloads out of <code>domain/reflect/mood/pause-session-mood-chrome-flow.ts</code> into <code>ritual/reflect/mood/</code> beside the apply helpers. Chrome-close and feel-tile helpers remain domain until a later peel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Domain mood chrome module still owns feel-tile log option builders; application owns depth-picker entry payloads + apply ports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move <code>buildFeelTilesMoodLogOptions</code> into <code>ritual/reflect/mood/</code>, or peel remaining companion orchestrate <code>public-rpc</code> re-exports (backlog #4).</dd>
+>>>>>>> d5543b3f (refactor(pause): move depth-picker ritual entries to ritual/reflect/mood)
     </dl>
   </article>
 
