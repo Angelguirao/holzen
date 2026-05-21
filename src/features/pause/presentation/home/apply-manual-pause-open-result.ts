@@ -7,7 +7,7 @@ import {
   trackPauseManualCompleted,
   type TrackManualPauseInstanceCreatedPayload,
   type TrackPauseManualCompletedPayload,
-} from './manual-pause-trigger-telemetry';
+} from '@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry';
 import type { OpenManualPauseFromHomeResult } from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home-types';
 
 export type ManualPauseHomePreviewPorts = {

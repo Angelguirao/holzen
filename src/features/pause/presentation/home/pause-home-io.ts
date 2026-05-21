@@ -7,6 +7,11 @@ import { openManualPauseFromHome } from '@/features/pause/application/use-cases/
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository, supabaseReflectGenerator } from '@/features/pause/public-rpc';
 
+export { applyManualPauseOpenResult } from './apply-manual-pause-open-result';
+export type {
+  ApplyManualPauseOpenResultInput,
+  ManualPauseHomePreviewPorts,
+} from './apply-manual-pause-open-result';
 export { buildManualPauseOpenParams, openManualPauseFromHome, type BuildManualPauseOpenParamsInput };
 
 /** Default ports for `openManualPauseFromHome` (Home manual trigger). */
