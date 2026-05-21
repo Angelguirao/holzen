@@ -8224,7 +8224,26 @@
       <dt>Tradeoffs</dt>
       <dd>Breath phase cues stay in <code>ritual/breathe/ritual-audio.ts</code>; shared <code>AudioContext</code> singleton unchanged.</dd>
       <dt>Open questions</dt>
-      <dd>Next: port-backed companion feedback vote write/read facades on <code>public-rpc</code> / <code>public-queries</code>, or wire <code>use-pause-reflect-generation</code> through a reflect-generator facade.</dd>
+      <dd>Next: wire <code>use-pause-reflect-generation</code> through a reflect-generator facade, or audit remaining presentation <code>public-ports</code> imports.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion feedback vote I/O on public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Re-wire vote facades after §6 peel; query + presentation use them</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Prior slice removed unused vote facades; this slice restores <code>fetchPauseCompanionFeedbackVote</code> and <code>logPauseCompanionFeedbackVote</code> on <code>public-rpc.ts</code> and routes <code>companion-feedback-vote-query</code> + <code>use-companion-feedback-vote</code> through them (presentation no longer imports <code>run*</code> + <code>public-ports</code> for vote I/O). Fullview telemetry still uses <code>public-ports</code> until a follow-up.</dd>
+      <dt>Deviation</dt>
+      <dd>Supersedes the “no vote facades on <code>public-rpc</code>” tradeoff only for the shipped companion vote path — facades are no longer dead code.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Infrastructure query imports <code>public-rpc</code> (loads Supabase adapter); same pattern as dev-mode analytics tests.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-fullview-telemetry</code> to a <code>logPauseCompanionFullviewOpened</code> facade, or audit remaining presentation <code>public-ports</code> imports.</dd>
     </dl>
   </article>
 
