@@ -248,11 +248,11 @@ export {
   resolvePauseSessionChromeCloseAction,
   runDeepPausePickerEntryIfPro,
   runPauseSessionChromeCloseAction,
-} from './application/use-cases/ritual/feel/pause-session-mood-chrome-flow';
+} from './domain/reflect/mood/pause-session-mood-chrome-flow';
 export type {
   PauseSessionChromeCloseAction,
   PauseSessionPhase,
-} from './application/use-cases/ritual/feel/pause-session-mood-chrome-flow';
+} from './domain/reflect/mood/pause-session-mood-chrome-flow';
 
 export type {
   CompanionFeedbackVote,

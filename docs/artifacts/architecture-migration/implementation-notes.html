@@ -6533,22 +6533,22 @@
       <dt>Tradeoffs</dt>
       <dd>Mood chrome conductors peeled in the follow-up slice on this branch.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel depth-picker / feel-tiles / mood-chrome handlers through <code>public-rpc</code>.</dd>
+      <dd>Next: peel depth-picker / feel-tiles / mood-chrome handlers through <code>public-rpc</code> (done in follow-up slice).</dd>
     </dl>
   </article>
 
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect mood chrome-flow via public-rpc (backlog #1 done, #3)</span>
+      <span>Phase A slice — reflect mood chrome-flow via public-rpc + domain (backlog #1, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Peel presentation/reflect/mood from pause-session-mood-chrome-flow application path</h3>
+    <h3>Colocate pause-session-mood-chrome-flow under domain/reflect/mood; presentation uses public-rpc</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>ritual/reflect/</code> folder move is complete. Re-export pure feel chrome helpers (<code>buildFeelTilesMoodLogOptions</code>, depth-picker ritual entry constants, session chrome close, <code>runDeepPausePickerEntryIfPro</code>) on <code>public-rpc</code>; all four <code>presentation/reflect/mood/</code> conductors that imported <code>pause-session-mood-chrome-flow</code> now use the barrel only.</dd>
+      <dd><code>ritual/reflect/</code> folder move is complete. Move <code>pause-session-mood-chrome-flow</code> (+ test) from <code>ritual/feel/</code> application to <code>domain/reflect/mood/</code>; re-export pure helpers on <code>public-rpc</code>; all four <code>presentation/reflect/mood/</code> conductors import the barrel only.</dd>
       <dt>Deviation</dt>
-      <dd>None — behavior parity; use-case unit tests remain beside <code>pause-session-mood-chrome-flow.ts</code>.</dd>
+      <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
       <dd><code>use-pause-session-reflect-and-decide</code> still imports <code>PauseImpactData</code> type from <code>ritual/decide/impact-data</code> until a type re-export lands on <code>public-hooks</code> or <code>public-rpc</code>.</dd>
       <dt>Open questions</dt>
