@@ -66,7 +66,7 @@ export { usePauseSessionDepthAndBriefCopy } from './presentation/reflect/mood/us
 
 export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/reflect/mood/pause-depth-picker-styles';
 export { usePauseFeelShiftLogDedupeRefs } from './presentation/reflect/mood/use-pause-feel-shift-log-dedupe-refs';
-export { usePauseSessionBreathStepHandlers } from './presentation/reflect/flows/use-pause-session-breath-step-handlers';
+export { usePauseSessionBreathStepHandlers } from './presentation/session/use-pause-session-breath-step-handlers';
 export {
   usePauseSessionBreathHandlers,
   type UsePauseSessionBreathHandlersParams,
