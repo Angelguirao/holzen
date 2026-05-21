@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import type { BulkHoldPendingPause, BulkHoldReviewSection } from '../../domain/bulk-hold';
+import type { BulkHoldPendingPause, BulkHoldReviewSection } from '@/features/pause/domain/bulk-hold';
 
 function localDayKey(iso: string): string {
   const d = new Date(iso);

@@ -1,7 +1,7 @@
-import { logPauseStep } from './ritual/log-pause-step';
-import { buildOutcomeLoggedPayload } from './ritual/decide/outcome-log-payload';
-import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from '../../domain/bulk-hold';
-import type { PauseRepository } from '../../ports/pause-repository';
+import { logPauseStep } from '../../ritual/log-pause-step';
+import { buildOutcomeLoggedPayload } from '../../ritual/decide/outcome-log-payload';
+import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from '@/features/pause/domain/bulk-hold';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
 export type BulkHoldApplyResult =
   | { status: 'success'; count: number }
