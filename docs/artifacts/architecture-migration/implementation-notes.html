@@ -17114,9 +17114,9 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>pause-companion-orchestrate-io</code> still binds many <code>ritual/frame/*</code> paths directly until a follow-up orchestrate flow anchor.</dd>
+      <dd>Slot orchestrate conductors still imported <code>pause-companion-orchestrate-io</code> until the orchestrate flow anchor landed in the following slice.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-companion-orchestrate-io</code> flow anchor, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Resolved by <code>pause-companion-orchestrate-flow</code> slice below.</dd>
     </dl>
   </article>
 
@@ -17136,6 +17136,25 @@
       <dd>Session decide hydration I/O still binds <code>restored-decide-ritual-state</code> directly until a decide flow anchor peel.</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>pause-session-decide-flow</code> on decide I/O, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion orchestrate I/O via pause-companion-orchestrate-flow (backlog #1–2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestrate-flow</code> on <code>pause-companion-orchestrate-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1–2 (<code>ritual/reflect/</code>, <code>ritual/frame/</code>) remain complete — no folder moves. <code>pause-companion-orchestration-flow</code> already landed on remote. Add orchestrate cluster anchor for slot orchestrate, intervention bootstrap, retry reset, telemetry, and UI state; <code>pause-companion-orchestrate-io</code> imports through the anchor instead of many deep <code>ritual/frame/*</code> modules. <code>companionOrchestrator</code> still re-exported from <code>pause-companion-orchestration-io</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation hooks still import <code>pause-companion-orchestrate-io</code> as the conductor surface; no per-hook path changes.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-decide-flow</code> on decide I/O, <code>pause-reflect-mood-flow</code> convergence, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
