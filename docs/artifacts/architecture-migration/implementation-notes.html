@@ -14080,4 +14080,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — brief + back-row layout on public-session (backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 complete; all ritual step chrome uses public-session for pauseStepLayout</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. After done-beat peel, <code>PauseBriefIntegrate</code> and <code>pause-ritual-back-row</code> import <code>pauseStepLayout</code> from <code>public-session</code> — no pause ritual step component uses <code>public-hooks</code> for layout tokens.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-hooks</code> still re-exports <code>pauseStepLayout</code> for non-screen callers until a follow-up removes the duplicate export.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>public-home</code> cluster 2 (bulk-hold + pending-offer) or Phase B <code>holzen-query-client-ref</code> shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
