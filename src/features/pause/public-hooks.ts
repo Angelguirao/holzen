@@ -188,6 +188,18 @@ export {
 } from './presentation/session/use-pause-brief-done-check-in';
 export { usePauseBriefIntegrateCountdown } from './presentation/session/use-pause-brief-integrate-countdown';
 export {
+  initialBreathingFirstCompletedFromRestored,
+  initialBreathingSecondCompletedFromRestored,
+  initialBriefIntegrateDoneFromRestored,
+  initialBriefPauseStepFromRestored,
+  initialDecisionFromRestored,
+  initialFrameDoneFromRestored,
+  initialPhaseFromRestored,
+  initialRitualEntry,
+  initialSelectedBriefFaceFromRestored,
+  mapPersistedStep,
+} from './application/use-cases/session/step-map';
+export {
   useBulkHoldPending,
   bulkHoldPendingQueryKey,
   type BulkHoldPendingPause,

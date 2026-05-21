@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { PauseImpactData } from '@/features/pause/public-hooks';
+import type { PersistedSession } from '@/features/pause/domain/session-model';
 import {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
@@ -11,9 +11,11 @@ import {
   initialRitualEntry,
   initialSelectedBriefFaceFromRestored,
   mapPersistedStep,
-} from '@/features/pause/application/use-cases/session/step-map';
-import type { PersistedSession } from '@/features/pause/domain/session-model';
-import type { BriefPauseStep, PauseStep, RitualDepth } from '@/features/pause/public-hooks';
+  type BriefPauseStep,
+  type PauseImpactData,
+  type PauseStep,
+  type RitualDepth,
+} from '@/features/pause/public-hooks';
 import type { MoodValue } from '../../domain/mood-value';
 import { usePauseSessionEntryPresentationEffects } from './use-pause-session-entry-presentation-effects';
 
