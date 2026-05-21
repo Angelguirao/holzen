@@ -40,7 +40,7 @@ Index + full-`src` rings: [client-architecture-overview.md](../../fundamentals/c
 - [x] Move `application/use-cases/reflect/*` → `ritual/reflect/` (incremental)
 - [x] Move `application/use-cases/companion/*` → `ritual/frame/` (incremental)
 - [x] Peel `public.ts` toward slim target + `public-rpc` (spec §6) — active tree done; legacy stats re-exports remain
-- [ ] Route remaining pause mutations through `PauseRepository` port (exists — wire call sites; spec §5, §8) — lifecycle create/dismiss + pending-offer + home dismiss on port (May 2026); companion feedback vote **read** on `PauseAnalyticsRepository` (May 2026); `CompanionOrchestrator` port for slot lazy-fetch/regenerate (May 2026); other analytics reads optional
+- [x] Route remaining pause mutations through `PauseRepository` port (spec §5, §8) — RPC mutations + `analytics_events` I/O on ports (May 2026); PostHog product telemetry remains in application use-case modules + `pause-rpc-lifecycle-telemetry` (not `PauseAnalyticsRepository`)
 - [x] Group archive queries under `infrastructure/queries/archive/` (spec §5.2)
 
 ## Running log

@@ -12636,4 +12636,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — backlog #1 verified; metadata client CI guard (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>ritual/reflect/</code> complete; lock <code>pause-instance-metadata-client</code> behind <code>PauseRepository</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — 18 modules under <code>ritual/reflect/</code> (generation, hub, mood, share, steps, telemetry), zero legacy paths. No folder moves this slice. Backlog #4: extend <code>check:architecture-alignment</code> so direct <code>pause-instance-metadata-client</code> imports are allowed only in the adapter module and <code>supabase-pause-repository.ts</code>; companion slot favorites must use <code>PauseRepository.toggleCompanionSlotFavorite</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI-only; tree already complied.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not add a <code>@/lib/posthog</code> import guard — PostHog product telemetry is intentionally colocated in application use-case modules, separate from <code>analytics_events</code> port I/O.</dd>
+      <dt>Open questions</dt>
+      <dd>Phase B: subscription/auth <code>src/lib/*</code> shims using pause as template.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
