@@ -249,10 +249,8 @@ export {
 export { getSessionQuote } from './application/use-cases/session/wisdom-quotes';
 export { initialEmotionResetUi };
 
-/** Feel / depth-picker / ritual chrome — pure helpers for reflect mood presentation. */
+/** Feel / ritual chrome — pure helpers for reflect mood presentation (depth-picker constants import domain directly). */
 export {
-  BRIEF_DEPTH_PICKER_RITUAL_ENTRY,
-  DEEP_DEPTH_PICKER_RITUAL_ENTRY,
   buildFeelTilesMoodLogOptions,
   resolvePauseSessionChromeCloseAction,
   runDeepPausePickerEntryIfPro,
