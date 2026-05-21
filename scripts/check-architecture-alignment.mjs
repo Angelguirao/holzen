@@ -77,6 +77,10 @@ mustExist(
   'src/features/pause/application/use-cases/ritual/reflect/mood',
   'pause/application/use-cases/ritual/reflect/mood/',
 );
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/scaffold',
+  'pause/application/use-cases/ritual/reflect/scaffold/',
+);
 mustExist('src/features/pause/presentation/reflect', 'pause/presentation/reflect/');
 mustExist(
   'src/features/pause/presentation/reflect/flows',
@@ -161,10 +165,13 @@ mustNotExist(
 const LEGACY_PAUSE_USE_CASE_IMPORTS = [
   '@/features/pause/application/use-cases/reflect/',
   '@/features/pause/application/use-cases/companion/',
+  '@/features/pause/application/use-cases/session/scaffold-ritual-derived',
   "from './application/use-cases/reflect/",
   "from './application/use-cases/companion/",
+  "from './application/use-cases/session/scaffold-ritual-derived'",
   "from '../application/use-cases/reflect/",
   "from '../application/use-cases/companion/",
+  "from '../application/use-cases/session/scaffold-ritual-derived'",
 ];
 
 /** Flat presentation/reflect paths — use subclusters (generation/, steps/, mood/, …). */
