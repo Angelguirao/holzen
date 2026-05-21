@@ -16455,4 +16455,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — Home manual-open generation via manual-open flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-manual-open-flow</code> on <code>pause-home-reflect-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add generation cluster anchor for Home manual-open use cases (<code>dismissOpenPauseHome</code>, <code>openManualPauseFromHome</code>, silent-mode stub/open); <code>pause-home-reflect-io</code> imports orchestration through the anchor instead of deep <code>run-*</code> / <code>open-*</code> modules. Domain builders and types stay on domain re-exports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Home reflect PostHog still binds <code>ritual/reflect/telemetry/</code> on <code>pause-home-reflect-telemetry-io</code>; session shell/scaffold presentation I/O peels remain incremental.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session shell or scaffold presentation I/O flow anchors, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
