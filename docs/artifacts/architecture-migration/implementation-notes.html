@@ -10242,4 +10242,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breathe timed-loop on public-session (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; peel phase-advance + breath cues onto session barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. Export <code>computeBreathingPhaseAdvance</code>, <code>resolveBreathingCompleted</code>, <code>resolveBreathingPhaseAdvanceOutcome</code>, <code>PauseBreathingPhase</code>, and breath cue helpers on <code>public-session.ts</code>; <code>use-pause-breathing-timed-loop</code> imports the barrel; <code>public-hooks</code> re-exports screen-facing types/helpers from the same barrel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — timed loop tick/advance and Web Audio cue timing unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Orb metrics, ritual-pattern, and timed-display helpers remain on <code>public-hooks</code> → application until a later breathe peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: remaining <code>PauseRepository</code> stray call-site audit; optional ritual-pattern cluster on <code>public-session</code> or <code>public-ritual-brief</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

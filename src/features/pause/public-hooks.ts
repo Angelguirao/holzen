@@ -94,7 +94,7 @@ export {
   resolveTriangleKickerDisplay,
   type TriangleKickerDisplay,
 } from './application/use-cases/ritual/breathe/resolve-triangle-kicker-display';
-export type { PauseBreathingPhase } from './application/use-cases/ritual/breathe/pause-breathing-phase';
+export type { PauseBreathingPhase } from './public-session';
 export {
   resolvePauseBreathingTimedDisplay,
   type PauseBreathingTimedDisplay,
@@ -122,8 +122,10 @@ export type {
   ZoomOutEchoData,
   ZoomOutOnThisDayEntry,
 } from './domain/zoom-out-display';
-export { resumePauseAudioContext } from './application/use-cases/ritual/breathe/ritual-audio';
-export { computeBreathingPhaseAdvance } from './application/use-cases/ritual/breathe/phase-advance';
+export {
+  computeBreathingPhaseAdvance,
+  resumePauseAudioContext,
+} from './public-session';
 export {
   BRIEF_TRIANGLE_CYCLE_COUNT,
   BOX_BREATH_PHASE_COUNT,
