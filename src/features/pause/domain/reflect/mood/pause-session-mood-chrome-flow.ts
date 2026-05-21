@@ -1,9 +1,3 @@
-import type { RitualDepth } from '@/features/pause/domain/ritual-types';
-
-export function isBriefRitualEntry(ritualEntry: RitualDepth | 'picker'): ritualEntry is 'brief' {
-  return ritualEntry === 'brief';
-}
-
 /** Pro gate for depth picker → deep ritual; returns whether deep entry ran. */
 export function runDeepPausePickerEntryIfPro(
   requirePro: (feature: 'deep_pause') => boolean,
