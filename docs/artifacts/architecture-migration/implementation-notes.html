@@ -11572,4 +11572,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel pending-offer mutations off public-rpc (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; session pending-offer conductor bypasses public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. After bulk-hold apply peel (<code>be21c15e</code>), align <code>use-pending-pause-offer-mutations</code> with other session/home conductors: <code>runAdoptPendingPauseOffer</code> / <code>runDeclinePendingPauseOffer</code> + <code>supabasePauseRepository</code>; PostHog telemetry from <code>pending-pause-offer-telemetry</code> directly. Remove <code>adoptPendingPauseOffer</code>, <code>declinePendingPauseOffer</code>, and pending-offer telemetry re-exports from <code>public-rpc</code> (no cross-context callers).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>openManualPauseFromHome</code> and lifecycle <code>pauseCreateOrReuse</code> / <code>pauseDismissCurrent</code> facades remain on <code>public-rpc</code> for cross-context / multi-port wiring.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-manual-pause-trigger</code> or wire remaining stray <code>pauseLogStep</code> call sites exclusively through <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
