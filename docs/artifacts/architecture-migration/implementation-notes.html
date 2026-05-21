@@ -4583,7 +4583,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
       <span>Phase A slice — reflect-step-query domain-only exports (Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -4597,7 +4596,12 @@
       <dd>Callers must import row types/projections from <code>public-queries</code> or domain, not the infrastructure query path.</dd>
       <dt>Open questions</dt>
       <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
-=======
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — PauseAnalyticsRepository on public-ports (backlog #4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -4611,7 +4615,6 @@
       <dd>Infrastructure → <code>public-ports</code> is acceptable inside the pause bounded context; screens still avoid deep infrastructure paths.</dd>
       <dt>Open questions</dt>
       <dd>Next: wire any remaining mutations bypassing <code>PauseRepository</code>, or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
->>>>>>> 1114d0d2 (refactor(pause): export PauseAnalyticsRepository on public-ports)
     </dl>
   </article>
 
