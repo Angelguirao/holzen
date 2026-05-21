@@ -6,7 +6,6 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 import {
-  applyManualPauseOpenResult,
   buildManualPauseCreateOrReuseParams,
   buildManualPauseMarketContext,
   buildManualPauseOpenParams,
@@ -60,9 +59,5 @@ describe('pause-home-io', () => {
   it('re-exports silent-mode reflect use cases for Home test seams', () => {
     expect(typeof runPersistSilentReflectionStub).toBe('function');
     expect(typeof runOpenManualPauseSilentModeAfterCreate).toBe('function');
-  });
-
-  it('re-exports manual-open preview mapping via pause-home-reflect-io', () => {
-    expect(typeof applyManualPauseOpenResult).toBe('function');
   });
 });

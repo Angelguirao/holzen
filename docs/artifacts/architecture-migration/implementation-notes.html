@@ -19286,4 +19286,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — applyManualPauseOpenResult telemetry via flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel default PostHog off <code>pause-home-reflect-telemetry-io</code> in open-result mapper</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>apply-manual-pause-open-result.ts</code> imports <code>trackManualPauseInstanceCreated</code> / <code>trackPauseManualCompleted</code> from <code>pause-home-reflect-telemetry-flow</code> (application CI anchor) instead of the presentation telemetry I/O barrel. <code>use-manual-pause-trigger</code> imports the mapper from <code>apply-manual-pause-open-result.ts</code> directly; <code>pause-home-reflect-io</code> stays manual-open RPC/use-case cluster only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundaries only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Aggregate <code>pause-home-io</code> no longer re-exports <code>applyManualPauseOpenResult</code> — conductors import leaf modules.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: delete aggregate <code>pause-home-io</code> if only smoke-tested, or Phase B subscription Tier 1 lib shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
