@@ -28,17 +28,6 @@ export {
 export { isPauseSessionDepthPickerActive } from './domain/reflect/mood/pause-depth-picker-active';
 export { isPauseSessionWaitingForInstanceFetch } from './domain/session/waiting-for-instance-fetch';
 export {
-  computePauseSessionHydration,
-  computePauseSessionResolved,
-  type PauseSessionHydrationInput,
-  type PauseSessionHydrationReady,
-  type PauseSessionHydrationState,
-} from './application/use-cases/session/hydration';
-export {
-  coalescePauseSessionShellViewModel,
-  type PauseSessionShellViewModel,
-} from './application/use-cases/session/shell-view-model';
-export {
   buildPauseSessionStepRitualBundle,
   buildPauseSessionStepShellBundle,
 } from './application/use-cases/session/step-bundles';
