@@ -190,7 +190,7 @@ Shared reads live in `infrastructure/queries/`, exported via **`public-queries`*
 | `public-navigation.ts` | Router state for pause deep links (`NotificationNavigateState`, `parsePauseSessionLocationState`); Home → `/pause` helpers (`canNavigateToPauseSession`, `buildHomePauseSessionLocationState`, `shouldNavigateAfterManualTrigger`) |
 | `public-home.ts` | Home read-model helpers (`resolvePauseArrivalToneAction`, `buildHomePauseCardBodyProps`, `buildZenModeHomeRouteProps`, `pauseHomeError*` / snooze gate) — no Supabase |
 | `public-scheduling.ts` | Quarter-hour scheduling math for Home context refresh (no Supabase) |
-| `public-session.ts` | Session shell pure helpers (`computePauseHeaderBackIntent`, `buildPauseSessionMountLogParams`, `buildPauseSessionStepTransitionConfig`, `pauseStepSwipeDirection`, …) — no Supabase |
+| `public-session.ts` | Session shell pure helpers (`computePauseHeaderBackIntent`, `buildPauseSessionMountLogParams`, `buildPauseSessionStepTransitionConfig`, `pauseStepSwipeDirection`, `buildPauseSessionPersistSnapshot`, persisted-session guards, …) — no Supabase |
 | `public-ritual-brief.ts` | Brief ritual pure helpers (integrate timer, `computePauseGoBackPlan`, `computeBriefPastStepClick`, `briefSwitchToDeepPauseState`) — no Supabase |
 | `public-trigger.ts` | Manual-trigger cooldown math, localStorage keys, error mapping — no Supabase |
 | `public-queries.ts` | `get*QueryOptions` factories |

@@ -24,3 +24,12 @@ export {
   type PauseSessionSwipeDirection,
 } from './application/use-cases/session/step-transition';
 export { pauseStepSwipeDirection } from './application/use-cases/session/step-swipe-direction';
+export {
+  buildPauseSessionPersistSnapshot,
+  type PauseSessionPersistSnapshotInput,
+} from './application/use-cases/session/persist-snapshot';
+export {
+  hasPersistablePauseSessionAnchor,
+  hasPersistedPauseSessionPayload,
+  type PersistedSessionAnchor,
+} from './application/use-cases/session/persisted-session-guards';

@@ -9957,4 +9957,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — public-session persist-snapshot barrel (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; autosave snapshot + session guards on public-session</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — 14 modules under <code>ritual/reflect/</code>, zero <code>application/use-cases/reflect/</code>. Extend <code>public-session.ts</code> with <code>buildPauseSessionPersistSnapshot</code>, <code>PauseSessionPersistSnapshotInput</code>, and persisted-session guard helpers; <code>use-pause-session-persist-to-storage</code>, <code>use-pause-session-shell</code>, and <code>public-hooks</code> import the barrel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — autosave anchor rules and snapshot field mapping unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hydration, gate-flags, and shell-view-model remain on direct <code>application/use-cases/session/*</code> until next peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next #3: <code>gate-flags</code> / <code>shell-view-model</code> cluster on <code>public-session</code>; backlog #4: breath segment RPC presentation imports audit for <code>public-rpc</code>-only.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
