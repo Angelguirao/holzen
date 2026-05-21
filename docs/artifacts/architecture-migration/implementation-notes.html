@@ -15809,4 +15809,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — restored breath ritual state via pause-session-breath-io (Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Merge <code>restored-breath-ritual-state</code> into session breath I/O</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no reflect folder moves. Re-export <code>initialBreathingFirstCompletedFromRestored</code> and <code>initialBreathingSecondCompletedFromRestored</code> on <code>presentation/session/breath/pause-session-breath-io.ts</code>; <code>pause-session-ritual-restore-io</code> imports breath hydration helpers from the breath barrel only (follow-up to timed-loop + segment RPC I/O).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import path change only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Segment RPC loggers still import domain breath outcome helpers directly — peel in a follow-up slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>applyBreathSegmentLogOutcome</code> + RPC flags through <code>pause-session-breath-io</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
