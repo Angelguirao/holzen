@@ -1,6 +1,6 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
+import { computePauseStorageRitualSyncPatch } from '@/features/pause/application/use-cases/ritual/reflect/scaffold/storage-ritual-sync';
 import { loadSession } from '@/features/pause/public-session';
-import { computePauseStorageRitualSyncPatch } from '@/features/pause/public-session';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 
