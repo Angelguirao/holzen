@@ -10888,4 +10888,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood/session conductors use sibling imports (backlog #1 verified, §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; presentation avoids public-ritual-reflect cycle</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — use cases under <code>ritual/reflect/</code>. After home/session domain type imports, align <code>presentation/reflect/mood/</code> and <code>use-pause-session-step-handlers</code> to import <code>usePauseFavoriteToggle</code>, <code>usePauseFeelShiftLogDedupeRefs</code>, and <code>usePauseSessionBreathReflectHandlers</code> from sibling presentation modules instead of <code>public-ritual-reflect</code> (barrel re-export cycle). <code>pause-session-scaffold-vm-types</code> uses <code>BriefPauseStep</code> from <code>domain/ritual-types</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged; <code>public-hooks</code> still re-exports hooks for screens.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Feature-internal only; screens unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: wire stray presentation mutations through <code>PauseRepository</code> audit; screens/home ritual types via domain re-exports on <code>public-hooks</code> if cycle-safe.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
