@@ -13,7 +13,7 @@ import {
 import { useCompanionData } from './use-companion-data';
 import { useFullviewTelemetry, type FullviewCompanion } from './use-fullview-telemetry';
 import { usePauseSessionCompanionSnapshot } from './use-pause-session-companion-snapshot';
-import { useStaggeredReveal } from '../use-staggered-reveal';
+import { useStaggeredReveal } from './use-staggered-reveal';
 
 export type UseCompanionFullViewPageParams = {
   routeInstanceId: string | undefined;

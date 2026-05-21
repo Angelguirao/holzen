@@ -183,7 +183,7 @@ export {
 } from './presentation/archive/use-journey-pause-instances';
 export { logPwaInstallAnalyticsEvent } from './public-queries';
 export { useSignalSourceTrustedHost } from './presentation/use-signal-source-trusted-host';
-export { useStaggeredReveal } from './presentation/use-staggered-reveal';
+export { useStaggeredReveal } from './presentation/companion/use-staggered-reveal';
 export {
   fetchSettingsDataExportBundle,
   type SettingsDataExportBundle,
