@@ -2,11 +2,17 @@ import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { usePauseBreathingTimedLoop } from './use-pause-breathing-timed-loop';
 
-vi.mock('@/features/pause/application/use-cases/ritual/breathe/ritual-audio', () => ({
-  playPauseBreathPhaseCue: vi.fn(),
-  playPauseBreathPatternCompleteCue: vi.fn(),
-  resumePauseAudioContext: vi.fn(),
-}));
+vi.mock('./pause-session-breath-io', async () => {
+  const phaseAdvance = await vi.importActual<
+    typeof import('@/features/pause/application/use-cases/ritual/breathe/phase-advance')
+  >('@/features/pause/application/use-cases/ritual/breathe/phase-advance');
+  return {
+    ...phaseAdvance,
+    playPauseBreathPhaseCue: vi.fn(),
+    playPauseBreathPatternCompleteCue: vi.fn(),
+    resumePauseAudioContext: vi.fn(),
+  };
+});
 
 vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),
