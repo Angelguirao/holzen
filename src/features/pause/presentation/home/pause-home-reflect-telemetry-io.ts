@@ -1,13 +1,17 @@
 /**
  * Home reflect beat PostHog helpers (manual open + dismiss/banner).
- * Imports through `pause-home-reflect-telemetry-flow` (parity with session reflect telemetry I/O).
+ * Imports trackers directly from `home-pause-actions-telemetry` and
+ * `manual-pause-trigger-telemetry` (off `pause-home-reflect-telemetry-flow`
+ * CI anchor; parity with session reflect telemetry I/O).
  */
 export {
-  markPauseManualStartedHomeOnce,
   trackHomePendingPauseBannerPauseOpened,
-  trackManualPauseInstanceCreated,
-  trackPauseManualCompleted,
   trackPauseOpenDismissed,
   type OpenPauseStateForAnalytics,
   type PauseDismissAnalyticsSurface,
-} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/home-pause-actions-telemetry';
+export {
+  markPauseManualStartedHomeOnce,
+  trackManualPauseInstanceCreated,
+  trackPauseManualCompleted,
+} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/manual-pause-trigger-telemetry';
