@@ -52,7 +52,7 @@ const {
   };
 });
 
-vi.mock('./use-pause-session-breath-handlers', () => ({
+vi.mock('./breath/use-pause-session-breath-handlers', () => ({
   usePauseSessionBreathHandlers: usePauseSessionBreathHandlersMock,
 }));
 

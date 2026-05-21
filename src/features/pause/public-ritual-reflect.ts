@@ -66,5 +66,5 @@ export { usePauseSessionBreathStepHandlers } from './presentation/session/use-pa
 export {
   usePauseSessionBreathHandlers,
   type UsePauseSessionBreathHandlersParams,
-} from './presentation/session/use-pause-session-breath-handlers';
+} from './presentation/session/breath/use-pause-session-breath-handlers';
 export { usePauseSessionBreathReflectHandlers } from './presentation/session/use-pause-session-breath-reflect-handlers';

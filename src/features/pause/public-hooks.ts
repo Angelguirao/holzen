@@ -183,7 +183,7 @@ export {
   type UsePauseBriefDoneCheckInParams,
 } from './presentation/ritual/done/use-pause-brief-done-check-in';
 export { usePauseBriefIntegrateCountdown } from './presentation/session/use-pause-brief-integrate-countdown';
-export { usePauseBreathSegmentRpcLoggers } from './presentation/session/use-pause-breath-segment-rpc-loggers';
+export { usePauseBreathSegmentRpcLoggers } from './presentation/session/breath/use-pause-breath-segment-rpc-loggers';
 export {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
