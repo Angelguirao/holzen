@@ -1,17 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
+import { buildShiftEmotionFrameHubLogBundle } from '@/features/pause/domain/reflect/hub/shift-emotion-log';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-import {
-  buildShiftEmotionFrameHubLogBundle,
-  runShiftEmotionFrameHubDone,
-} from './shift-emotion-log';
-
-describe('buildShiftEmotionFrameHubLogBundle', () => {
-  it('keeps payload and logKey in sync', () => {
-    const { payload, logKey } = buildShiftEmotionFrameHubLogBundle();
-    expect(payload).toEqual({ from_frame_hub: true });
-    expect(logKey).toBe(JSON.stringify(payload));
-  });
-});
+import { runShiftEmotionFrameHubDone } from './run-shift-emotion-frame-hub-done';
 
 describe('runShiftEmotionFrameHubDone', () => {
   it('skips RPC when log key matches', async () => {
