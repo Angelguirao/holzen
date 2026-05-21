@@ -32,6 +32,10 @@ describe('pause-session-breath-io', () => {
       segment1Logged: true,
       segment2Logged: false,
     });
+    expect(initialBreathSegmentRpcLoggedFlagsFromRestored(null)).toEqual({
+      segment1Logged: false,
+      segment2Logged: false,
+    });
     expect(
       applyBreathSegmentLogOutcome({ status: 'success', markSegmentLogged: true }, ref),
     ).toBe(true);
