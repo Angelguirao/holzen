@@ -10508,4 +10508,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — openManualPauseFromHome full ports (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; manual trigger accepts full PauseRepository + ReflectGenerator</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. Replace <code>Pick&lt;PauseRepository, 'createOrReuse'&gt;</code> / <code>Pick&lt;ReflectGenerator, 'persistReflectionArtifacts'&gt;</code> on <code>OpenManualPauseFromHomePorts</code> with full port interfaces; <code>public-rpc</code> still wires <code>supabasePauseRepository</code> + <code>supabaseReflectGenerator</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — Home silent-mode reflect stub and create-or-reuse RPC behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit tests use <code>as unknown as</code> partial mocks; production wiring unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: port-backed analytics read for companion feedback vote fetch; optional mood/flow hooks on <code>public-ritual-reflect</code> when a screen needs them without <code>public-hooks</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
