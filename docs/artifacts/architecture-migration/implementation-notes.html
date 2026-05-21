@@ -4393,7 +4393,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
       <span>Phase A slice — reflect prereq gate in domain/ (Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -4407,7 +4406,12 @@
       <dd><code>reflect-generation-enabled</code> and <code>reflect-generation-hook-flow</code> remain under <code>ritual/reflect/generation/</code> until a later peel.</dd>
       <dt>Open questions</dt>
       <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4), or Phase B cross-context slice.</dd>
-=======
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — runReflectGeneration loads recency hints (backlog #4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -4421,7 +4425,6 @@
       <dd><code>ReflectGenerator.generateReflection</code> takes hints as a second argument (adapter implements port, use case orchestrates).</dd>
       <dt>Open questions</dt>
       <dd>Next: wire remaining stray <code>PauseRepository</code> call sites, or session-storage reads behind <code>PauseSessionStorage</code> port.</dd>
->>>>>>> b3fe8550 (refactor(pause): load recency hints in runReflectGeneration use case)
     </dl>
   </article>
 
