@@ -1,9 +1,9 @@
 import type { BtcPriceData } from '@/features/market/public';
+import type { OpenManualPauseFromHomeParams } from '@/features/pause/application/use-cases/trigger/open-manual-pause-from-home';
 import {
   buildManualPauseMarketContext,
   type ManualPauseMarketContext,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/build-manual-pause-market-context';
-import type { OpenManualPauseFromHomeParams } from '@/features/pause/application/use-cases/trigger/open-manual-pause-from-home';
+} from './build-manual-pause-market-context';
 
 export type { ManualPauseMarketContext };
 
