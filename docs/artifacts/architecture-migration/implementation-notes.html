@@ -7905,4 +7905,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath-step handlers under presentation/reflect/flows (backlog #1 presentation)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-pause-session-breath-step-handlers colocated with breath-reflect conductors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-pause-session-breath-step-handlers</code> (+ test) from <code>presentation/session/</code> to <code>presentation/reflect/flows/</code> beside <code>use-pause-session-breath-reflect-handlers</code>; <code>use-pause-session-breath-handlers</code> imports sibling reflect path; <code>public-hooks</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; types-only path change for the hook file location.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Broader breath navigation bundle (<code>use-pause-session-breath-handlers</code>, segment RPC loggers) stays under <code>presentation/session/</code> until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed analytics read for companion feedback vote fetch, or colocate breath-handlers conductor under <code>reflect/flows/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
