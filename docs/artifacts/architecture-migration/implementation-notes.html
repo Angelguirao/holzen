@@ -7772,4 +7772,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — decide handler params under presentation/decide (backlog #1 presentation)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>UsePauseSessionDecideHandlerParams</code> → <code>presentation/decide/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder migration is complete. Colocate Decide-step hook params with <code>use-pause-session-decide-handler</code> (paired with reflect/decide params slice in <code>presentation/reflect/flows/</code>). <code>PauseImpactData</code> and <code>RitualDepth</code> import from domain/decide modules instead of <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — types-only move; behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Tests use explicit params type instead of <code>Parameters&lt;typeof hook&gt;</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 remaining <code>PauseRepository</code> / companion orchestrate <code>public-rpc</code> peels.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
