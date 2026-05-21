@@ -324,7 +324,7 @@ export {
   type FullviewCompanion,
 } from './presentation/use-fullview-telemetry';
 export { usePauseFavoriteToggle } from './presentation/reflect/steps/use-pause-favorite-toggle';
-export { usePauseReflectFrameFocusAmbience } from './presentation/reflect/use-pause-reflect-frame-focus-ambience';
+export { usePauseReflectFrameFocusAmbience } from './presentation/reflect/ambience/use-pause-reflect-frame-focus-ambience';
 export { usePauseFeelShiftLogDedupeRefs } from './presentation/reflect/use-pause-feel-shift-log-dedupe-refs';
 export { usePauseBreathSegmentRpcLoggers } from './presentation/session/use-pause-breath-segment-rpc-loggers';
 export { usePauseSessionMountLog } from './presentation/session/use-pause-session-mount-log';
