@@ -35,5 +35,3 @@ export {
   type OpenPauseStateForAnalytics,
   type PauseDismissAnalyticsSurface,
 } from './pause-home-reflect-telemetry-io';
-export { mapManualTriggerStartError } from '@/features/pause/public-trigger';
-export { shouldNavigateAfterManualTrigger } from '@/features/pause/public-navigation';
