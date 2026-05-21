@@ -308,8 +308,9 @@ export {
   usePauseReflectUiTelemetry,
   useReflectionShareHandlers,
   type UseReflectionShareHandlersParams,
+  usePauseFavoriteToggle,
+  PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS,
 } from './public-ritual-reflect';
-export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './public-ritual-reflect';
 export {
   useCompanionHistoryThread,
   type HistoryThreadRow,
@@ -375,7 +376,6 @@ export {
   useFullviewTelemetry,
   type FullviewCompanion,
 } from './presentation/companion/use-fullview-telemetry';
-export { usePauseFavoriteToggle } from './public-ritual-reflect';
 export { usePauseFeelShiftLogDedupeRefs } from './presentation/reflect/mood/use-pause-feel-shift-log-dedupe-refs';
 export { usePauseBreathSegmentRpcLoggers } from './presentation/reflect/flows/use-pause-breath-segment-rpc-loggers';
 export { usePauseSessionMountLog } from './presentation/session/use-pause-session-mount-log';
