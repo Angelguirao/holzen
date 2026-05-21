@@ -5188,4 +5188,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect hook-flow → ritual/reflect/generation (backlog #1 peel)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>reflect-generation-hook-flow</code> out of domain</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete. Peel presentation-conductor helpers (<code>resolveReflectGenerationPrefetch</code>, stale-run guards, result message mapping) from <code>domain/reflect/generation/</code> into <code>application/use-cases/ritual/reflect/generation/</code> beside <code>run-reflect-generation</code>; domain keeps prereq/result/edge-params only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>usePauseReflectGeneration</code> imports application hook-flow + domain prereq.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation still imports application directly for hook-flow (in-feature, not <code>public*</code>) — matches other reflect conductors.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 <code>PauseRepository</code> stragglers (analytics reads) or companion presentation grouping follow-up.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
