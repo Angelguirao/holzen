@@ -9881,4 +9881,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home widget error in domain (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; public-home error helpers in domain/home</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — no reflect moves. Colocate <code>pause-home-widget-error</code> (+ test) under <code>domain/home/</code> with arrival tone; <code>public-home.ts</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — error kind / surface / snooze gates unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Card body + zen route props still in <code>application/use-cases/home/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>home-pause-card-body-props</code> or extend <code>public-session</code> with <code>step-swipe-direction</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

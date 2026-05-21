@@ -18,7 +18,7 @@ export {
   shouldShowHomePauseSectionSnooze,
   shouldSurfacePauseWidgetError,
   type PauseHomeErrorKind,
-} from './application/use-cases/home/pause-home-widget-error';
+} from './domain/home/pause-home-widget-error';
 export {
   buildZenModeHomeRouteProps,
   type BuildZenModeHomeRoutePropsInput,
