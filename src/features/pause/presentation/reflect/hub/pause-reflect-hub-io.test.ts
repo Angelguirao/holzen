@@ -8,10 +8,16 @@ import {
 const runShiftEmotionFrameHubDoneMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
-  () => ({
-    runShiftEmotionFrameHubDone: runShiftEmotionFrameHubDoneMock,
-  }),
+  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow',
+  async (importOriginal) => {
+    const actual = await importOriginal<
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow')
+    >();
+    return {
+      ...actual,
+      runShiftEmotionFrameHubDone: runShiftEmotionFrameHubDoneMock,
+    };
+  },
 );
 
 vi.mock('@/features/pause/public-rpc', () => ({
