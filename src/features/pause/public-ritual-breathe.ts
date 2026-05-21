@@ -41,3 +41,22 @@ export {
   type StandaloneBreathSeverityRingColors,
   type StandaloneBreathingPhase,
 } from './application/use-cases/ritual/breathe/standalone-breathing-patterns';
+export type { PauseBreathingPhase } from './application/use-cases/ritual/breathe/pause-breathing-phase';
+export {
+  computeBreathingPhaseAdvance,
+  resolveBreathingCompleted,
+  resolveBreathingPhaseAdvanceOutcome,
+  type BreathingPhaseAdvanceOutcome,
+  type BreathingPhaseAdvanceResult,
+  type BreathingTimedLoopState,
+} from './application/use-cases/ritual/breathe/phase-advance';
+export {
+  playPauseBreathPatternCompleteCue,
+  playPauseBreathPhaseCue,
+  resumePauseAudioContext,
+} from './application/use-cases/ritual/breathe/ritual-audio';
+export {
+  resolvePauseBreathSecondLabelVariant,
+  viteWantsPauseBreathSecondLabelShift,
+  type PauseBreathSecondLabelVariant,
+} from './application/use-cases/ritual/breathe/breath-second-label-variant';
