@@ -4,17 +4,17 @@ const runLogCompanionFeedbackVoteMock = vi.hoisted(() => vi.fn());
 const runLogCompanionFullviewOpenedMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/pause-companion-analytics-flow',
-  async (importOriginal) => {
-    const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/frame/pause-companion-analytics-flow')
-    >();
-    return {
-      ...actual,
-      runLogCompanionFeedbackVote: runLogCompanionFeedbackVoteMock,
-      runLogCompanionFullviewOpened: runLogCompanionFullviewOpenedMock,
-    };
-  },
+  '@/features/pause/application/use-cases/ritual/frame/run-log-companion-feedback-vote',
+  () => ({
+    runLogCompanionFeedbackVote: runLogCompanionFeedbackVoteMock,
+  }),
+);
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/frame/run-log-companion-fullview-opened',
+  () => ({
+    runLogCompanionFullviewOpened: runLogCompanionFullviewOpenedMock,
+  }),
 );
 
 vi.mock('@/features/pause/public-rpc', () => ({

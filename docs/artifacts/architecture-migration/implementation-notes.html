@@ -18754,4 +18754,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion analytics I/O direct ritual/frame (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-analytics-io</code> off <code>pause-companion-analytics-flow</code> anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>ritual/frame/</code>) remains complete — no folder moves. Align analytics presentation I/O with frame-ui/orchestrate peels: feedback vote and fullview opened from <code>run-log-companion-feedback-vote</code> and <code>run-log-companion-fullview-opened</code>; input types from sibling <code>log-companion-*</code> modules. Keep <code>pause-companion-analytics-flow.ts</code> as CI cluster anchor only.</dd>
+      <dt>Deviation</dt>
+      <dd>Reverts route-through-flow on branch tip (commit <code>48bc195a6</code>) — presentation I/O matches direct-import pattern used for reflect mood/hub/steps and companion frame UI.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit test mocks sibling run-* modules directly (same seam as frame-ui I/O).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-telemetry-io</code> peel from telemetry-flow anchor, or Phase B cross-context Tier 1 shim (subscription).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
