@@ -13795,4 +13795,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — bind home bulk-hold RPC I/O (reflect backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Home presentation — bulk-hold outcomes off public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>presentation/home/pause-home-bulk-hold-io.ts</code> as the bound import for <code>applyBulkHoldOutcomes</code>; <code>use-bulk-hold-apply-outcomes</code> imports the I/O module instead of <code>public-rpc</code> (complements <code>pause-home-io.ts</code> manual/dismiss wiring).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving wiring only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Archive retrospective still imports <code>public-rpc</code> directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>presentation/archive/pause-archive-io.ts</code> for retrospective outcome, <code>public-ritual-frame</code> barrel peel, or Phase B cross-context shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
