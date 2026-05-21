@@ -10185,4 +10185,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — presentation I/O via public-queries (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; realtime + archive cache off infrastructure imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths; no reflect file moves this slice. Re-export <code>subscribePauseInstancesForUser</code> and <code>readJsonLocalStorage</code> / <code>writeJsonLocalStorage</code> on <code>public-queries.ts</code>; <code>presentation/realtime</code> and <code>presentation/archive</code> hooks import the barrel instead of <code>infrastructure/*</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged; Supabase realtime + localStorage seed contract unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-queries</code> still loads Supabase client (existing contract). Session breathe helpers still import <code>application/use-cases/ritual/breathe/*</code> directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional <code>public-session</code> peel for breathe presentation imports; remaining <code>PauseRepository</code> stray call-site audit.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
