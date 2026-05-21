@@ -7221,4 +7221,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel brief-done-check-in off public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-pause-brief-done-check-in calls runPostPauseEmotionLogIfDirty + PauseRepository</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on this branch. <code>use-pause-brief-done-check-in</code> calls <code>runPostPauseEmotionLogIfDirty(supabasePauseRepository, …)</code> from <code>public-ports.ts</code> and imports <code>showPauseStepSyncFailedToast</code> from the ritual use-case module; <code>logPostPauseEmotionIfDirty</code> facade on <code>public-rpc.ts</code> unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; hook test mocks <code>public-ports</code> repository.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Breath segment RPC loggers and pending-offer mutations still use <code>public-rpc</code> facades.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel breath segment RPC loggers or pending-offer mutations off <code>public-rpc</code>, or backlog #4 stray mutation call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
