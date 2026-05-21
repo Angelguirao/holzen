@@ -65,7 +65,7 @@
     <h3><code>pause-home-reflect-telemetry-io</code> imports Home PostHog trackers through <code>pause-home-reflect-telemetry-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route <code>pause-home-reflect-telemetry-io</code> through <code>pause-home-reflect-telemetry-flow</code> instead of deep <code>home-pause-actions-telemetry</code> / <code>manual-pause-trigger-telemetry</code> paths (parity with <code>pause-reflect-telemetry-io</code> → <code>pause-reflect-telemetry-flow</code>).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route <code>pause-home-reflect-telemetry-io</code> through <code>pause-home-reflect-telemetry-flow</code> instead of deep <code>home-pause-actions-telemetry</code> / <code>manual-pause-trigger-telemetry</code> paths. Session reflect UI (<code>pause-reflect-telemetry-io</code>) imports <code>pause-reflect-session-ui-telemetry</code> directly (off flow CI anchor; parity with steps/hub).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
