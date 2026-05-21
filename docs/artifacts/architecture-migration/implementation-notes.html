@@ -14266,7 +14266,26 @@
       <dt>Tradeoffs</dt>
       <dd>Home trigger still depends on <code>ReflectGenerator</code> port; only the persist branch moved to ritual/reflect.</dd>
       <dt>Open questions</dt>
-      <dd>Next: export <code>usePendingPauseOfferMutations</code> on <code>public-session</code>, or Phase B <code>holzen-query-client-ref</code> shim.</dd>
+      <dd>Next: export <code>usePendingPauseOfferMutations</code> on <code>public-home</code>, or Phase B <code>holzen-query-client-ref</code> shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — public-home cluster 5 (pending-offer mutations)</span>
+      <span class="status resolved">resolved</status>
+    </header>
+    <h3>Backlog #1 verified; pending-offer mutations on public-home</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect use cases remain under <code>ritual/reflect/</code> (backlog #1 complete). Export <code>usePendingPauseOfferMutations</code> from <code>public-home.ts</code>; <code>PendingPauseOfferShell</code> imports read + mutations from one barrel. <code>public-hooks</code> re-exports for transitional callers; <code>use-pause-session-pending-leave-sheet</code> keeps direct presentation import (session-only).</dd>
+      <dt>Deviation</dt>
+      <dd>None — import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Split barrels (home vs session) until leave sheet also uses <code>public-home</code> or a session barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>holzen-query-client-ref</code> shim for pause query invalidation helpers.</dd>
     </dl>
   </article>
 

@@ -1,7 +1,7 @@
 /**
  * Home pause widget read-model helpers (no Supabase).
  * Scheduling quarter-hour math: `public-scheduling`. Home widget reads + conductors (pending-offer, completed count, dismiss outlet, pause actions, context previews, manual trigger, HolzenProvider state) live here (§6 peel).
- * Screens/home, `HolzenProvider`, and pause pending-offer read UI import here; mutations stay on `public-hooks`. Presentation imports barrels, not `application/*`.
+ * Screens/home, `HolzenProvider`, and pause pending-offer UI (read + adopt/decline mutations) import here. Session leave sheet keeps direct presentation import. `public-hooks` re-exports mutations for transitional callers. Presentation imports barrels, not `application/*`.
  */
 export {
   resolvePauseArrivalToneAction,
@@ -81,3 +81,4 @@ export {
   type UseHolzenManualTriggerOrchestrationParams,
 } from './presentation/home/use-holzen-manual-trigger-orchestration';
 export { useHolzenHomeContextState } from './presentation/home/use-holzen-home-context-state';
+export { usePendingPauseOfferMutations } from './presentation/session/use-pending-pause-offer-mutations';
