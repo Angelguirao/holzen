@@ -20,6 +20,10 @@ export {
   type OpenManualPauseFromHomeResult,
   runOpenManualPauseSilentModeAfterCreate,
   runPersistSilentReflectionStub,
+  type TrackManualPauseInstanceCreatedPayload,
+  type TrackPauseManualCompletedPayload,
+} from './pause-home-reflect-io';
+export {
   markPauseManualStartedHomeOnce,
   trackHomePendingPauseBannerPauseOpened,
   trackManualPauseInstanceCreated,
@@ -27,9 +31,7 @@ export {
   trackPauseOpenDismissed,
   type OpenPauseStateForAnalytics,
   type PauseDismissAnalyticsSurface,
-  type TrackManualPauseInstanceCreatedPayload,
-  type TrackPauseManualCompletedPayload,
-} from './pause-home-reflect-io';
+} from './pause-home-reflect-telemetry-io';
 
 /** Default ports for `openManualPauseFromHome` (Home manual trigger). */
 export const pauseHomeManualOpenPorts = {
