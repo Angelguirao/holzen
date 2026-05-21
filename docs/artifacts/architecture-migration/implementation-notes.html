@@ -11173,4 +11173,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect artifact hydrate hooks off public-rpc (backlog #4 / §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Artifact reads: presentation → ReflectGenerator port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no folder move. After holzen-reflect generation peel, <code>use-pause-artifact-reflection-text</code> and <code>use-pause-artifact-haiku</code> call <code>supabaseReflectGenerator.fetchReflectionText</code> / <code>fetchHaikuText</code> (port methods backed by <code>infrastructure/queries/reflect/*</code>). Removed <code>fetchReflectionTextForPauseInstance</code> / <code>fetchHaikuTextForPauseInstance</code> facades from <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mood/frame hub ritual log facades (<code>logPauseInitialEmotion*</code>, <code>logPauseShiftEmotionFrameHubDone</code>) still on <code>public-rpc</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel shift-frame hub done handler off <code>public-rpc</code>; audit remaining presentation imports of ritual log facades.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

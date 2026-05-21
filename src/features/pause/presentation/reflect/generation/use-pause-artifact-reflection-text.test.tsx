@@ -6,8 +6,10 @@ const { fetchReflectionTextMock } = vi.hoisted(() => ({
   fetchReflectionTextMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  fetchReflectionTextForPauseInstance: fetchReflectionTextMock,
+vi.mock('@/features/pause/infrastructure/supabase-reflect-generator', () => ({
+  supabaseReflectGenerator: {
+    fetchReflectionText: fetchReflectionTextMock,
+  },
 }));
 
 describe('usePauseArtifactReflectionText', () => {
