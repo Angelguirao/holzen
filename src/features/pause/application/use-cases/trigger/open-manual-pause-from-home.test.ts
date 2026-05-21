@@ -1,4 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 import { openManualPauseFromHome } from './open-manual-pause-from-home';
 
 describe('openManualPauseFromHome', () => {
@@ -13,8 +15,8 @@ describe('openManualPauseFromHome', () => {
             pending_offer: false,
             prior_open_instance_id: null,
           }),
-        },
-        reflect: { persistReflectionArtifacts: vi.fn() },
+        } as PauseRepository,
+        reflect: { persistReflectionArtifacts: vi.fn() } as ReflectGenerator,
       },
       {
         userId: 'u1',
@@ -44,8 +46,8 @@ describe('openManualPauseFromHome', () => {
             pending_offer: false,
             prior_open_instance_id: null,
           }),
-        },
-        reflect: { persistReflectionArtifacts },
+        } as PauseRepository,
+        reflect: { persistReflectionArtifacts } as ReflectGenerator,
       },
       {
         userId: 'u1',
@@ -85,8 +87,8 @@ describe('openManualPauseFromHome', () => {
             pending_offer: true,
             prior_open_instance_id: null,
           }),
-        },
-        reflect: { persistReflectionArtifacts },
+        } as PauseRepository,
+        reflect: { persistReflectionArtifacts } as ReflectGenerator,
       },
       {
         userId: 'u1',
