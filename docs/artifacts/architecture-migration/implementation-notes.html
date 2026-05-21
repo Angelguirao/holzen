@@ -14355,13 +14355,32 @@
     <h3>Reflect → ritual/reflect/ complete; §6 session barrel peel</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified — zero legacy reflect use-case paths; <code>run-persist-silent-reflection-stub</code> already under <code>ritual/reflect/generation/</code>. Continue backlog #3 §6: session adopt/decline on <code>public-session.ts</code> (removed duplicate export from <code>public-home.ts</code> after rebase); <code>PendingPauseOfferShell</code> reads via <code>public-home</code>, mutations via <code>public-session</code>; <code>public-hooks</code> re-exports from <code>public-session</code>.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified — zero legacy reflect use-case paths; <code>run-persist-silent-reflection-stub</code> already under <code>ritual/reflect/generation/</code>. Continue backlog #3 §6: session adopt/decline on <code>public-session.ts</code> (removed duplicate export from <code>public-home.ts</code> after rebase); <code>PendingPauseOfferShell</code> reads via <code>public-home</code>, mutations via <code>public-session</code>; <code>public-hooks</code> re-exports from <code>public-session</code>. Leave sheet conductor imports mutations from <code>public-session</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — import paths only; I/O still bound in <code>presentation/session/pause-session-pending-offer-io.ts</code>.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Leave sheet conductor still imports the hook from a sibling presentation path (session-internal).</dd>
+      <dd>Split barrels (home read vs session mutations) until a single session barrel covers all session-only hooks.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B <code>holzen-query-client-ref</code> shim for pause query invalidation helpers.</dd>
+      <dd>Next: <code>public-ritual-frame</code> barrel peel or companion feedback vote port path.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase B Tier 1 — holzen-query-client-ref owned by pause infrastructure</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 verified; query client ref shim</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. Move TanStack <code>QueryClient</code> holder to <code>features/pause/infrastructure/holzen-query-client-ref.ts</code>; pause RPC + query invalidation import the feature module. <code>public-queries</code> re-exports getters/setters; <code>src/lib/holzen-query-client-ref.ts</code> re-exports via <code>public-queries</code> for <code>App.tsx</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; global singleton unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>App shell still registers via <code>@/lib</code> shim until a future app-layer module owns cross-feature query wiring.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>public-ritual-frame</code> barrel peel.</dd>
     </dl>
   </article>
 

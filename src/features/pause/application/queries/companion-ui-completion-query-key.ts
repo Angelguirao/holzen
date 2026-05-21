@@ -1,4 +1,4 @@
-import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
+import { getHolzenQueryClient } from '../../infrastructure/holzen-query-client-ref';
 import { PAUSE_QUERY_PREFIX } from './pause-query-namespace';
 
 /**
