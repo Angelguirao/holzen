@@ -115,10 +115,6 @@ import {
   type RunPauseFavoriteToggleResult,
 } from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import {
-  runPauseReflectTagUpdate,
-  type RunPauseReflectTagUpdateResult,
-} from './application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
-import {
   runPauseReflectionStepLogOnce,
   type RunPauseReflectionStepLogResult,
 } from './application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
@@ -451,13 +447,6 @@ export function logPauseFavoriteToggle(
   input: Parameters<typeof runPauseFavoriteToggle>[1],
 ): Promise<RunPauseFavoriteToggleResult> {
   return runPauseFavoriteToggle(supabasePauseRepository, input);
-}
-
-/** Reflect tags — `tag_updated` via `PauseRepository` (wired for presentation). */
-export function logPauseReflectTagUpdate(
-  input: Parameters<typeof runPauseReflectTagUpdate>[1],
-): Promise<RunPauseReflectTagUpdateResult> {
-  return runPauseReflectTagUpdate(supabasePauseRepository, input);
 }
 
 /** Reflect copy settled — `reflection_step` once per tab via `PauseRepository` + session storage. */
