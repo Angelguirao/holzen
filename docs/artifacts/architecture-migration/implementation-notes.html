@@ -6962,7 +6962,26 @@
       <dt>Tradeoffs</dt>
       <dd>Step hook tests mock <code>public-ports</code> to avoid loading the Supabase client barrel.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel reflect generation / shift-frame hub presentation hooks off <code>public-rpc</code>, or backlog #4 remaining mutation call sites.</dd>
+      <dd>Next: peel reflect generation presentation hooks off <code>public-rpc</code>, or backlog #4 remaining mutation call sites.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel shift-frame hub conductor off public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect frame-hub handler uses use case + repository directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Continue backlog #3 §6 slim barrel: <code>use-pause-shift-frame-done-handler</code> imports <code>run-shift-emotion-frame-hub-done</code>, <code>shift-frame-hub-done-presentation</code>, <code>step-sync-toast</code>, and <code>supabasePauseRepository</code> directly; <code>public-rpc</code> facades unchanged for other callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect generation hooks still use <code>public-rpc</code> wired facades.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-reflect-generation</code> / artifact hooks off <code>public-rpc</code>, or backlog #4 companion feedback vote read adapter.</dd>
     </dl>
   </article>
 
