@@ -1,11 +1,13 @@
 import {
-  buildReflectionShareTelegramUrl,
-  buildReflectionShareText,
-  buildReflectionShareTweetUrl,
-  buildReflectionShareWhatsAppUrl,
   runReflectionShareImage,
   type DeliverReflectionShareImageDeps,
-} from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image';
+import {
+  buildReflectionShareTelegramUrl,
+  buildReflectionShareTweetUrl,
+  buildReflectionShareWhatsAppUrl,
+} from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';
+import { buildReflectionShareText } from '@/features/pause/domain/reflect/share/reflection-share-text';
 
 export {
   buildReflectionShareTelegramUrl,

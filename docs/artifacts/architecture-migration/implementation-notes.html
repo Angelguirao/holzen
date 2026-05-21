@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect share I/O domain imports (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-share-io</code> imports share builders from <code>domain/reflect/share/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. <code>pause-reflect-share-io</code> imports <code>buildReflectionShareText</code> and channel URL builders from <code>domain/reflect/share/</code>; PNG orchestration stays on <code>run-reflection-share-image</code> (application). Application <code>pause-reflection-share-flow</code> anchor unchanged for alignment checks.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mirrors hub/generation I/O peels; steps I/O still imports <code>pause-reflect-steps-mutation-flow</code> barrel until a follow-up slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: steps I/O import <code>run-*</code> modules directly, or mood/hub RPC-only paths unchanged.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect hub + generation I/O domain imports (backlog #1 follow-up)</span>
       <span class="status resolved">resolved</span>
     </header>
