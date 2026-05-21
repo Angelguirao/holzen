@@ -3554,6 +3554,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate reflect+decide session conductor under presentation/reflect/flows/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 presentation peel — Tier 4 flows conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Application reflect/decide progression lives under <code>ritual/reflect/flows/pause-session-reflect-decide-flow</code>. Move <code>use-pause-session-reflect-and-decide</code> to <code>presentation/reflect/flows/</code>; fix relative imports to <code>generation/</code> and <code>decide/</code>; <code>public-hooks</code> and <code>use-pause-session-breath-reflect-handlers</code> paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mood/feel/breath reflect conductors remain at <code>presentation/reflect/</code> root until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-journey-pause-instances</code> under <code>presentation/archive/</code>, or port-back PWA install analytics via <code>PauseAnalyticsRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
