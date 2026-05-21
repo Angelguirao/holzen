@@ -4684,7 +4684,7 @@
     <h3>Backlog #1 complete; presentation uses wired ritual facades only</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code> (automation push was docs-only). Remove unused generic exports <code>pauseLogStep</code>, <code>pauseLogCompanion</code>, <code>pauseCreateOrReuse</code>, and <code>pauseDismissCurrent</code> from <code>public-rpc.ts</code> — presentation already calls beat-specific facades (<code>logPauseReflectNote</code>, <code>ensureBreathSegment1Logged</code>, <code>openManualPauseFromHome</code>, <code>dismissOpenPauseHomePreview</code>, …) backed by <code>PauseRepository</code> use cases.</dd>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Remove unused generic exports <code>pauseLogStep</code>, <code>pauseLogCompanion</code>, <code>pauseCreateOrReuse</code>, and <code>pauseDismissCurrent</code> from <code>public-rpc.ts</code> — presentation already calls beat-specific facades (<code>logPauseReflectNote</code>, <code>ensureBreathSegment1Logged</code>, <code>openManualPauseFromHome</code>, <code>dismissOpenPauseHomePreview</code>, …) backed by <code>PauseRepository</code> use cases.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; infrastructure adapter unchanged.</dd>
       <dt>Tradeoffs</dt>
@@ -4786,6 +4786,25 @@
       <dd>Incremental domain taxonomy — avoids big-bang <code>domain/reflect/</code> rename of all generation helpers in one commit.</dd>
       <dt>Open questions</dt>
       <dd>Next: group <code>domain/reflect-generation-*</code> under <code>domain/reflect/generation/</code>, or wire remaining <code>PauseRepository</code> call sites (backlog #4).</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — wire holzen-reflect generation via public-rpc (backlog #3 §6 / #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; ReflectGenerator default on presentation hook</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> use cases were already complete. Add <code>runPauseReflectGeneration</code> to <code>public-rpc.ts</code> (wired <code>supabaseReflectGenerator</code>); <code>use-pause-reflect-generation</code> imports <code>public-rpc</code> only — no direct <code>public-ports</code> + application pairing in presentation.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>run-reflect-generation</code> use case and port tests unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Feature tests that need a stub generator should mock <code>public-rpc</code> or call <code>runReflectGeneration</code> with an injected port in application tests.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed companion feedback vote read, or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
     </dl>
   </article>
 

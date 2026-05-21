@@ -10,8 +10,7 @@ import {
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
 } from '@/features/pause/domain/reflect-generation-hook-flow';
-import { runReflectGeneration } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation';
-import { supabaseReflectGenerator } from '@/features/pause/public-ports';
+import { runPauseReflectGeneration } from '@/features/pause/public-rpc';
 
 export type UsePauseReflectGenerationParams = {
   pauseInstanceId: string | null;
@@ -96,18 +95,15 @@ export function usePauseReflectGeneration({
     setError(null);
 
     try {
-      const result = await runReflectGeneration(
-        {
-          pauseInstanceId: instanceForThisRun,
-          userId: user!.id,
-          context: context!.trim(),
-          initialReflectionMessage,
-          severityAbsPct,
-          profile,
-          signal: ac.signal,
-        },
-        supabaseReflectGenerator,
-      );
+      const result = await runPauseReflectGeneration({
+        pauseInstanceId: instanceForThisRun,
+        userId: user!.id,
+        context: context!.trim(),
+        initialReflectionMessage,
+        severityAbsPct,
+        profile,
+        signal: ac.signal,
+      });
       if (!shouldCommitReflectGeneration(validityTicket, validityRef.current)) return;
       const message = messageFromReflectGenerationResult(result);
       if (message != null) setReflectionMessage(message);
