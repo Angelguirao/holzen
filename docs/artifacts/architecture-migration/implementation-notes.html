@@ -19058,4 +19058,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — remove orphan decide outcome flow CI anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel <code>public-rpc</code> outcome toasts; delete unused <code>pause-decide-outcome-*-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-flows-io</code> already imports <code>outcome-toast</code> and <code>run-pause-outcome-log</code> directly; <code>public-rpc</code> now matches. Remove zero-import <code>pause-decide-outcome-toast-flow</code> and <code>pause-decide-outcome-log-flow</code> CI duplicates. <code>pause-decide-outcome-flow.ts</code> (application) and <code>pause-reflect-flows-flow.ts</code> remain as cluster anchors.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Decide presentation I/O tests still mock <code>run-pause-outcome-log</code> (same seam as before log-flow anchor removal).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: delete application <code>pause-decide-outcome-flow.ts</code> if <code>pause-reflect-flows-flow</code> can point at domain only, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

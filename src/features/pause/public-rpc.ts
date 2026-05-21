@@ -59,7 +59,7 @@ export async function pauseDismissCurrent(): Promise<PauseState | null> {
 export {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-} from './application/use-cases/ritual/decide/pause-decide-outcome-toast-flow';
+} from './application/use-cases/ritual/decide/outcome-toast';
 
 export type {
   CompanionFeedbackVote,
