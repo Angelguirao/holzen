@@ -4390,6 +4390,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect prereq gate in domain/ (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; holzen-reflect prerequisite gate colocated with domain reflect types</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move pure <code>reflectGenerationPrerequisite</code> to <code>domain/reflect-generation-prerequisites.ts</code>; <code>use-pause-reflect-generation</code> and <code>reflect-generation-hook-flow</code> import domain. Re-export <code>ReflectRecencyHints</code> types from <code>domain/reflect-recency-hints</code> on <code>public-queries</code> (replacing infrastructure query re-export).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>reflect-generation-enabled</code> and <code>reflect-generation-hook-flow</code> remain under <code>ritual/reflect/generation/</code> until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4), or Phase B cross-context slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

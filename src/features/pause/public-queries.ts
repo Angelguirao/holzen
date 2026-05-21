@@ -232,6 +232,10 @@ export {
   type PauseReflectStepType,
 } from './infrastructure/queries/reflect/reflect-step-query';
 export { supabaseReflectGenerator } from './infrastructure/supabase-reflect-generator';
+export type {
+  ReflectMoodHistoryEntry,
+  ReflectRecencyHints,
+} from './domain/reflect-recency-hints';
 export { supabaseCompanionOrchestrator } from './infrastructure/supabase-companion-orchestrator';
 export {
   generateReflectionAtReflectStep,
@@ -262,11 +266,6 @@ export {
 } from './infrastructure/queries/related-biases-ground-nudge-query';
 export { loadMoodHistoryForOrchestrate } from './infrastructure/companion/mood-history';
 export { loadActiveOrchestrateSources } from './infrastructure/companion/orchestrate-sources';
-export {
-  loadReflectRecencyHints,
-  type ReflectMoodHistoryEntry,
-  type ReflectRecencyHints,
-} from './infrastructure/queries/reflect/load-reflect-recency-hints';
 export {
   fetchSettingsDataExportBundle,
   type SettingsDataExportBundle,
