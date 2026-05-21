@@ -5682,4 +5682,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — feel conductors use PauseRepository via public-ports (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel initial emotion + shift-frame hub from public-rpc in presentation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and shift-frame hub flow in <code>ritual/feel/</code> were already complete on <code>cursor/arch-migrate-src-ca70</code>. Export <code>supabasePauseRepository</code> on <code>public-ports.ts</code>; <code>use-pause-session-initial-mood-handlers</code> and <code>use-pause-shift-frame-done-handler</code> call <code>runInitialEmotionSelect</code> / <code>runInitialEmotionSkip</code> / <code>runShiftEmotionFrameHubDone</code> with the default repository directly (same wiring as <code>public-rpc</code> facades). Screens keep stable <code>public-rpc</code> exports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; tests mock <code>public-ports</code> repository instead of <code>public-rpc</code> facades.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other presentation hooks still import ritual mutation facades from <code>public-rpc</code> until peeled slice-by-slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel remaining reflect step hooks (note/tag/favorite) or breath segment loggers from <code>public-rpc</code>; audit other <code>analytics_events</code> reads.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

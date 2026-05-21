@@ -4,18 +4,18 @@ import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
-import { runShiftEmotionFrameHubDone as runShiftEmotionFrameHubDoneUseCase } from '@/features/pause/application/use-cases/ritual/feel/shift-emotion-log';
 import { usePauseShiftFrameDoneHandler } from './use-pause-shift-frame-done-handler';
 
-const { logStepMock } = vi.hoisted(() => ({
-  logStepMock: vi.fn(),
-}));
+const { logStepMock, mockRepository } = vi.hoisted(() => {
+  const logStepMock = vi.fn();
+  return {
+    logStepMock,
+    mockRepository: { logStep: logStepMock } as unknown as PauseRepository,
+  };
+});
 
-const mockRepository = { logStep: logStepMock } as unknown as PauseRepository;
-
-vi.mock('@/features/pause/public-rpc', () => ({
-  runShiftEmotionFrameHubDone: (input: Parameters<typeof runShiftEmotionFrameHubDoneUseCase>[1]) =>
-    runShiftEmotionFrameHubDoneUseCase(mockRepository, input),
+vi.mock('@/features/pause/public-ports', () => ({
+  supabasePauseRepository: mockRepository,
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/step-sync-toast', () => ({
