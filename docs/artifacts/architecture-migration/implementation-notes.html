@@ -15372,4 +15372,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — pending-offer telemetry under session use cases</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up — session pending-offer PostHog out of ritual/reflect/telemetry</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. <code>pending-pause-offer-telemetry</code> (+ test) belongs with session lifecycle telemetry (<code>pause-session-telemetry</code>), not the Reflect beat — move to <code>application/use-cases/session/</code>; <code>pause-session-pending-offer-telemetry-io</code> re-exports for <code>use-pending-pause-offer-mutations</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; no new PostHog events.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>ritual/reflect/telemetry/</code> keeps Home manual + reflect UI trackers only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: lifecycle create/dismiss thin use cases on <code>public-rpc</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
