@@ -5,7 +5,8 @@ import type { LogCompanionFullviewOpenedInput } from '@/features/pause/applicati
 import { runLogCompanionFullviewOpened } from '@/features/pause/application/use-cases/ritual/frame/run-log-companion-fullview-opened';
 import { supabasePauseAnalyticsRepository } from '@/features/pause/public-rpc';
 
-export type { LogCompanionFeedbackVoteInput, LogCompanionFullviewOpenedInput };
+export type { CompanionFullviewKind, LogCompanionFullviewOpenedInput } from '@/features/pause/application/use-cases/ritual/frame/log-companion-fullview-opened';
+export type { LogCompanionFeedbackVoteInput } from '@/features/pause/application/use-cases/ritual/frame/log-companion-feedback-vote';
 
 /** Default port + use case: persist companion thumbs feedback. */
 export function logCompanionFeedbackVote(
