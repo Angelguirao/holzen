@@ -59,6 +59,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — reflect flows presentation I/O (backlog #1 follow-up)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -72,6 +73,21 @@
       <dd>Thin re-export only — no RPC port on preflight/post-generation path.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>use-companion-library-favorites</code> through orchestration I/O; or bind <code>use-pause-session-decide-handler</code> decide-cluster imports through flows-io.</dd>
+=======
+      <span>Phase A slice — reflect mood initial-emotion I/O binding (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>pauseInitialEmotionSelect / pauseInitialEmotionSkip on pause-reflect-mood-io</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Mirror hub I/O: <code>pause-reflect-mood-io.ts</code> wraps <code>runInitialEmotionSelect</code> and <code>runInitialEmotionSkip</code> with default <code>PauseRepository</code>; <code>use-pause-session-initial-mood-handlers</code> imports I/O only (+ unit tests on io module and hook).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Share and generation conductors still deep-import use cases until follow-up I/O peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: bind <code>use-reflection-share-handlers</code> or <code>use-pause-reflect-generation</code> through cluster I/O modules.</dd>
+>>>>>>> 58cc53c4 (refactor(pause): bind initial-emotion mood handlers through pause-reflect-mood-io)
     </dl>
   </article>
 

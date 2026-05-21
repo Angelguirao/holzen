@@ -5,18 +5,13 @@ import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/comp
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import { usePauseSessionMoodAndPersist } from './use-pause-session-mood-and-persist';
 
-const { runInitialEmotionSelectMock, mockPauseRepository } = vi.hoisted(() => ({
-  runInitialEmotionSelectMock: vi.fn(),
-  mockPauseRepository: { port: 'reflectPauseRepository' },
-}));
-
-vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log', () => ({
-  runInitialEmotionSelect: runInitialEmotionSelectMock,
-  runInitialEmotionSkip: vi.fn(),
+const { pauseInitialEmotionSelectMock } = vi.hoisted(() => ({
+  pauseInitialEmotionSelectMock: vi.fn(),
 }));
 
 vi.mock('./pause-reflect-mood-io', () => ({
-  reflectPauseRepository: mockPauseRepository,
+  pauseInitialEmotionSelect: pauseInitialEmotionSelectMock,
+  pauseInitialEmotionSkip: vi.fn(),
 }));
 
 vi.mock('@/features/pause/presentation/session/scaffold/use-pause-session-ritual-storage-sync', () => ({
@@ -80,7 +75,7 @@ function baseParams(
 }
 
 beforeEach(() => {
-  runInitialEmotionSelectMock.mockReset().mockResolvedValue({
+  pauseInitialEmotionSelectMock.mockReset().mockResolvedValue({
     status: 'synced',
     logKey: '{"mood":"calm","intensity":2}',
     ui: {
@@ -100,14 +95,13 @@ describe('usePauseSessionMoodAndPersist', () => {
       result.current.onFeelTilesSelect('calm', 2, 'calm');
     });
 
-    expect(runInitialEmotionSelectMock).toHaveBeenCalledWith(mockPauseRepository, {
+    expect(pauseInitialEmotionSelectMock).toHaveBeenCalledWith({
       pauseInstanceId: 'pi-1',
       mood: 'calm',
       intensity: 2,
       opts: { briefFace: 'calm' },
       lastFeelLogKey: null,
     });
-    expect(mockPauseRepository.port).toBe('reflectPauseRepository');
   });
 
   it('brief ritual adds briefRitual to feel-tile mood log options', async () => {
@@ -119,7 +113,7 @@ describe('usePauseSessionMoodAndPersist', () => {
       result.current.onFeelTilesSelect('calm', 2, 'calm');
     });
 
-    expect(runInitialEmotionSelectMock).toHaveBeenCalledWith(mockPauseRepository, {
+    expect(pauseInitialEmotionSelectMock).toHaveBeenCalledWith({
       pauseInstanceId: 'pi-1',
       mood: 'calm',
       intensity: 2,
