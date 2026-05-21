@@ -2,33 +2,30 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import { toast } from 'sonner';
-import {
-  trackPausePendingAdopted,
-  trackPausePendingDeclined,
-} from '@/features/pause/application/use-cases/trigger/pending-pause-offer-telemetry';
 import { usePendingPauseOfferMutations } from './use-pending-pause-offer-mutations';
 
-const { adoptPendingPauseOfferMock, declinePendingPauseOfferMock } = vi.hoisted(() => ({
+const {
+  adoptPendingPauseOfferMock,
+  declinePendingPauseOfferMock,
+  trackPausePendingAdoptedMock,
+  trackPausePendingDeclinedMock,
+} = vi.hoisted(() => ({
   adoptPendingPauseOfferMock: vi.fn(),
   declinePendingPauseOfferMock: vi.fn(),
+  trackPausePendingAdoptedMock: vi.fn(),
+  trackPausePendingDeclinedMock: vi.fn(),
 }));
 
 vi.mock('@/features/pause/public-rpc', () => ({
   adoptPendingPauseOffer: adoptPendingPauseOfferMock,
   declinePendingPauseOffer: declinePendingPauseOfferMock,
+  trackPausePendingAdopted: trackPausePendingAdoptedMock,
+  trackPausePendingDeclined: trackPausePendingDeclinedMock,
 }));
 
 vi.mock('sonner', () => ({
   toast: { error: vi.fn() },
 }));
-
-vi.mock(
-  '@/features/pause/application/use-cases/trigger/pending-pause-offer-telemetry',
-  () => ({
-    trackPausePendingAdopted: vi.fn(),
-    trackPausePendingDeclined: vi.fn(),
-  }),
-);
 
 const t = ((k: string) => k) as TFunction;
 const pending = { id: 'offer-1' } as import('./use-pending-pause-offer').PendingPauseOfferRow;
@@ -37,8 +34,8 @@ beforeEach(() => {
   adoptPendingPauseOfferMock.mockReset();
   declinePendingPauseOfferMock.mockReset();
   vi.mocked(toast.error).mockClear();
-  vi.mocked(trackPausePendingAdopted).mockClear();
-  vi.mocked(trackPausePendingDeclined).mockClear();
+  trackPausePendingAdoptedMock.mockClear();
+  trackPausePendingDeclinedMock.mockClear();
 });
 
 describe('usePendingPauseOfferMutations', () => {
@@ -65,7 +62,7 @@ describe('usePendingPauseOfferMutations', () => {
 
     expect(ok).toBe(true);
     expect(adoptPendingPauseOfferMock).toHaveBeenCalledTimes(1);
-    expect(trackPausePendingAdopted).toHaveBeenCalledWith('inst-9');
+    expect(trackPausePendingAdoptedMock).toHaveBeenCalledWith('inst-9');
     expect(onAfterMutation).toHaveBeenCalled();
     expect(navigateAfterAdopt).toHaveBeenCalledWith('inst-9');
     expect(refreshPendingOffer).toHaveBeenCalled();
@@ -92,7 +89,7 @@ describe('usePendingPauseOfferMutations', () => {
 
     expect(ok).toBe(true);
     expect(declinePendingPauseOfferMock).toHaveBeenCalledTimes(1);
-    expect(trackPausePendingDeclined).toHaveBeenCalledWith('offer-1');
+    expect(trackPausePendingDeclinedMock).toHaveBeenCalledWith('offer-1');
     expect(onAfterMutation).toHaveBeenCalled();
     expect(refreshPendingOffer).toHaveBeenCalled();
   });
