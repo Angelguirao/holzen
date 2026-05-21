@@ -12218,4 +12218,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate breath-reflect handler types under presentation/session/ (backlog #1 verified, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-breath-reflect-handler-types</code> beside step-handler composite types</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no use-case move. Remote already colocated <code>use-pause-session-breath-handlers</code> + <code>use-pause-session-breath-step-handlers</code> under <code>presentation/session/</code>. Move <code>pause-session-breath-reflect-handler-types.ts</code> beside <code>pause-session-step-handler-types.ts</code>; <code>use-pause-session-breath-reflect-handlers</code> stays in <code>reflect/flows/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §10.1 session conductor grouping (composite slice types live with session step-handlers).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Types-only move; breath-reflect compose hook remains under reflect beat ownership.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: companion intervention/orchestrate integration port-lock, optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
