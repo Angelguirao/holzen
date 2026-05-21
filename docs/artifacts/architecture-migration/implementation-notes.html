@@ -5397,4 +5397,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — analytics query adapters via public-ports (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Companion feedback vote, PWA install, fullview — dev-mode pattern</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) was already complete; prior slice colocated <code>reflect-generation-hook-flow</code> with the conductor. Route <code>companion-feedback-vote-query</code>, <code>pwa-install-analytics</code>, and <code>companion-fullview-analytics</code> through <code>supabasePauseAnalyticsRepository</code> + use cases (same as <code>dev-mode-analytics</code>) instead of <code>public-rpc</code> facades. <code>useCompanionFeedbackVote</code> writes via <code>logCompanionFeedbackVote</code> on <code>public-queries</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>public-rpc</code> facades unchanged for other call sites.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Infrastructure query modules now depend on <code>public-ports</code>; presentation should keep importing <code>public-queries</code> / <code>public-rpc</code>, not <code>public-ports</code>, except inside <code>features/pause</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed read for stray <code>supabase.from('analytics_events')</code> in query modules, or peel <code>screens/pause/lib/</code> breathing helpers.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
