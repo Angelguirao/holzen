@@ -8,7 +8,7 @@ import {
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
 } from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';
-import { generateReflectionShareImage } from '@/features/pause/application/use-cases/ritual/reflect/share/reflection-share-canvas';
+import { generateReflectionShareImage } from '@/features/pause/domain/reflect/share/reflection-share-canvas';
 
 export type UseReflectionShareHandlersParams = {
   message: string;

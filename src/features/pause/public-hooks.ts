@@ -309,7 +309,7 @@ export {
   type PauseReflectMessageView,
 } from './domain/reflect/generation/resolve-pause-reflect-message-view';
 export { buildReflectionShareText } from './domain/reflect/share/reflection-share-text';
-export { generateReflectionShareImage } from './application/use-cases/ritual/reflect/share/reflection-share-canvas';
+export { generateReflectionShareImage } from './domain/reflect/share/reflection-share-canvas';
 export {
   useReflectionShareHandlers,
   type UseReflectionShareHandlersParams,
