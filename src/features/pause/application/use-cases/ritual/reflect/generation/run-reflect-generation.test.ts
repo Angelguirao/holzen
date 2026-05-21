@@ -22,7 +22,7 @@ const baseInput = {
   signal: new AbortController().signal,
 };
 
-const noopHaikuPort = { fetchHaikuText: vi.fn() };
+const noopReflectPortExtras = { fetchHaikuText: vi.fn(), loadRecencyHints: vi.fn() };
 
 describe('runReflectGeneration', () => {
   it('returns seed without calling ports', async () => {
@@ -31,7 +31,7 @@ describe('runReflectGeneration', () => {
 
     const result = await runReflectGeneration(
       { ...baseInput, initialReflectionMessage: '  seeded  ' },
-      { fetchReflectionText, generateReflection, ...noopHaikuPort },
+      { fetchReflectionText, generateReflection, ...noopReflectPortExtras },
     );
 
     expect(result).toEqual({ status: 'seed', message: 'seeded' });
@@ -45,7 +45,7 @@ describe('runReflectGeneration', () => {
       {
         fetchReflectionText: vi.fn().mockResolvedValue('from cache'),
         generateReflection: vi.fn(),
-        ...noopHaikuPort,
+        ...noopReflectPortExtras,
       },
     );
 
@@ -60,7 +60,7 @@ describe('runReflectGeneration', () => {
       {
         fetchReflectionText: vi.fn().mockResolvedValue(null),
         generateReflection,
-        ...noopHaikuPort,
+        ...noopReflectPortExtras,
       },
     );
 
@@ -83,7 +83,7 @@ describe('runReflectGeneration', () => {
       {
         fetchReflectionText: vi.fn().mockResolvedValue(null),
         generateReflection: vi.fn().mockRejectedValue(new DOMException('aborted', 'AbortError')),
-        ...noopHaikuPort,
+        ...noopReflectPortExtras,
       },
     );
 
