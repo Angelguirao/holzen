@@ -15309,9 +15309,32 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; no new PostHog events.</dd>
       <dt>Tradeoffs</dt>
+<<<<<<< HEAD
       <dd>Cooldown math was still in <code>trigger/</code> on <code>public-trigger</code> until the follow-up domain peel (next note).</dd>
+=======
+      <dd>Navigation guard stays in application (uses <code>ManualPauseTriggerResult</code>); cooldown math peeled to domain in a follow-up commit on the same branch.</dd>
+>>>>>>> ab060a6f (refactor(pause): colocate manual-trigger cooldown helpers in domain)
       <dt>Open questions</dt>
-      <dd>Next: <code>use-companion-orchestrate-retry</code> through <code>pause-companion-orchestrate-io</code>, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: wire <code>use-companion-orchestrate-retry</code> through <code>pause-companion-orchestrate-io</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual-trigger cooldown helpers in domain/reflect/generation/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — peel trigger cooldown pure modules</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Move <code>compute-pause-trigger-cooldowns</code> and <code>manual-trigger-cooldown-flow</code> (+ tests) from <code>application/use-cases/trigger/</code> to <code>domain/reflect/generation/</code>; <code>public-trigger.ts</code> re-exports domain paths. Empty <code>trigger/</code> cluster removed after <code>should-navigate-after-manual-trigger</code> moved to <code>ritual/reflect/generation/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>use-holzen-manual-trigger-orchestration</code> still imports <code>public-trigger</code> only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Auto cooldown helper colocated with manual cooldown (both Home/trigger concerns) despite cron path living outside manual open.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire <code>use-companion-orchestrate-retry</code> through <code>pause-companion-orchestrate-io</code>, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
