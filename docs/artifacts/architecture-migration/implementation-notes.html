@@ -9463,4 +9463,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home dismiss telemetry on public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; home pause actions peel application telemetry</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — zero legacy paths. Continue backlog #3 §6 slim barrel: re-export <code>trackPauseOpenDismissed</code> and <code>trackHomePendingPauseBannerPauseOpened</code> on <code>public-rpc</code>; <code>use-home-pause-actions</code> imports telemetry from the barrel (matches pending-offer and session-abandoned peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — PostHog events unchanged; navigation/session helpers still import <code>application/use-cases/*</code> directly this slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>PauseDismissAnalyticsSurface</code> still re-exported from the home hook for <code>public-hooks</code> consumers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel manual-trigger telemetry (<code>markPauseManualStartedHomeOnce</code>, cooldown helpers) or port-backed analytics read for companion feedback vote fetch.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
