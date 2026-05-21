@@ -17690,4 +17690,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood I/O imports mood subcluster anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-io</code> off deleted <code>pause-reflect-mood-flow</code> umbrella</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align mood presentation I/O with steps/telemetry peels: import depth-picker, feel-tiles, initial-emotion RPC, presentation rollback, and session chrome helpers from sibling <code>*-mood-flow</code> anchors (CI cluster files only; no umbrella re-export).</dd>
+      <dt>Deviation</dt>
+      <dd>Fixes broken import after <code>pause-reflect-mood-flow.ts</code> removal — presentation had still referenced the deleted barrel.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit tests mock <code>run-initial-emotion-log</code> directly (parity with <code>pause-reflect-steps-io</code>).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-generation-io</code> peel from <code>pause-reflect-generation-hook-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
