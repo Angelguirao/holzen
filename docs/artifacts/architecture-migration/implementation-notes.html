@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation I/O direct domain hook helpers (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-io</code> imports generation hook helpers from <code>domain/reflect/generation/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. <code>pause-reflect-generation-io</code> imports prefetch/commit/clear helpers, prerequisites, errors, and effective copy from <code>domain/reflect/generation/</code> instead of <code>pause-reflect-generation-hook-flow</code> (completes the import peel documented with hub I/O; <code>runReflectGeneration</code> already binds via sibling <code>run-reflect-generation</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-generation-hook-flow</code> remains the CI cluster anchor for <code>check:architecture-alignment</code>; presentation I/O no longer routes through it.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect steps I/O import <code>run-*</code> modules and domain step gates directly, or companion orchestrate-io peel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — session pending-offer I/O direct run-* + telemetry (Tier 3)</span>
       <span class="status resolved">resolved</span>
     </header>
