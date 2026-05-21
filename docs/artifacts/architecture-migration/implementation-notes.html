@@ -4751,4 +4751,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect step domain cluster under domain/reflect/steps (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; colocate reflection_step + favorite pure rules</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>reflection-step-log</code> and <code>favorite-toggle</code> (+ tests) from <code>domain/</code> root to <code>domain/reflect/steps/</code> to mirror <code>ritual/reflect/steps/</code> and <code>presentation/reflect/steps/</code>; import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>Other reflect domain modules remain at <code>domain/reflect-*.ts</code> until a later slice groups generation vs steps.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Incremental domain taxonomy — avoids big-bang <code>domain/reflect/</code> rename of all generation helpers in one commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: group <code>domain/reflect-generation-*</code> under <code>domain/reflect/generation/</code>, or wire remaining <code>PauseRepository</code> call sites (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
