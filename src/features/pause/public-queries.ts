@@ -224,8 +224,6 @@ export {
   PAUSE_REFLECT_STEP_QUERY_PREFIX,
   pauseReflectStepLatestQueryKey,
 } from './infrastructure/queries/reflect/reflect-step-query';
-export { fetchReflectionTextForPauseInstance } from './infrastructure/queries/reflect/reflection-text-artifact-query';
-export { fetchHaikuTextForPauseInstance } from './infrastructure/queries/reflect/haiku-artifact-query';
 export {
   fetchOpenPauseHomePreview,
   type OpenPauseHomePreview,

@@ -8969,4 +8969,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect artifact reads on public-rpc (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; finish ReflectGenerator read peel from public-queries</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder moves. A prior note peeled <code>fetchHaikuTextForPauseInstance</code> / <code>fetchReflectionTextForPauseInstance</code> from <code>public-queries.ts</code>, but presentation hooks still imported the query barrel. Re-export wired reads on <code>public-rpc.ts</code> via <code>supabaseReflectGenerator</code>; <code>use-pause-artifact-haiku</code> and <code>use-pause-artifact-reflection-text</code> import <code>public-rpc</code> only. Infrastructure query modules unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; same function names on <code>public-rpc</code> for minimal churn.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Artifact read facades live beside <code>runPauseReflectGeneration</code> on the infrastructure-touching barrel — consistent with §6 mutations + generation.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel remaining companion presentation imports of <code>ritual/frame/*</code> apply/telemetry modules, or audit stray mutations bypassing <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -421,6 +421,18 @@ export function runPauseReflectGeneration(
   return runReflectGeneration(input, supabaseReflectGenerator);
 }
 
+/** Persisted `reflection_text` for an instance — wired `ReflectGenerator` (presentation reads). */
+export function fetchReflectionTextForPauseInstance(
+  pauseInstanceId: string,
+): Promise<string | null> {
+  return supabaseReflectGenerator.fetchReflectionText(pauseInstanceId);
+}
+
+/** Persisted haiku for an instance — wired `ReflectGenerator` (presentation reads). */
+export function fetchHaikuTextForPauseInstance(pauseInstanceId: string): Promise<string | null> {
+  return supabaseReflectGenerator.fetchHaikuText(pauseInstanceId);
+}
+
 export { applyBreathSegmentLogOutcome, initialBreathSegmentRpcLoggedFlagsFromRestored };
 export type { RunBreathSegmentLogResult };
 
