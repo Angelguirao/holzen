@@ -17896,4 +17896,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect share I/O off share-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-share-io</code> imports domain + <code>run-reflection-share-image</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align share presentation I/O with steps/mood/hub peels: channel URL builders and share text from <code>domain/reflect/share/</code>; branded PNG delivery from <code>run-reflection-share-image</code>. Keep <code>pause-reflection-share-flow.ts</code> as CI cluster anchor only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; unit test already mocked <code>run-reflection-share-image</code> directly.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Remote slice routed share through flow anchor for cluster parity — this slice restores direct imports per presentation I/O pattern.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-generation-io</code> peel from <code>pause-reflect-generation-hook-flow</code>, <code>pause-session-brief-io</code> off brief-flow anchor, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
