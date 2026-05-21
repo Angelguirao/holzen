@@ -3418,6 +3418,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate holzen-reflect + haiku hooks under presentation/reflect/generation/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 reflect generation conductors grouped</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/generation/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-pause-reflect-generation</code> and <code>use-pause-artifact-haiku</code> into <code>presentation/reflect/generation/</code> beside application generation modules; <code>public-hooks</code> and <code>use-pause-session-reflect-and-decide</code> import paths only — screens keep <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>; mirrors §3 / §10.1 <code>ritual/reflect/generation/</code> taxonomy.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Telemetry, ambience, hub, and flows conductors remain at <code>presentation/reflect/</code> root until later peels (<code>telemetry/</code>, <code>ambience/</code>, <code>hub/</code>, <code>flows/</code>).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-pause-reflect-ui-telemetry</code> under <code>presentation/reflect/telemetry/</code>, or port-back <code>logDevModeSetting</code> via <code>PauseAnalyticsRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

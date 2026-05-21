@@ -244,13 +244,13 @@ export {
 export {
   usePauseReflectGeneration,
   type UsePauseReflectGenerationParams,
-} from './presentation/reflect/use-pause-reflect-generation';
+} from './presentation/reflect/generation/use-pause-reflect-generation';
 export {
   usePauseArtifactHaiku,
   type PauseArtifactHaikuFetchPhase,
   type UsePauseArtifactHaikuParams,
   type UsePauseArtifactHaikuResult,
-} from './presentation/reflect/use-pause-artifact-haiku';
+} from './presentation/reflect/generation/use-pause-artifact-haiku';
 export { useCompanionSlotOrchestratePorts } from './presentation/companion/use-companion-slot-orchestrate-ports';
 export { usePauseReflectionStepLog } from './presentation/reflect/steps/use-pause-reflection-step-log';
 export {
