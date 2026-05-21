@@ -11021,4 +11021,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — feel-step constants peel to public-ritual-reflect (backlog #1 verified, §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Feel tile grid, intensity slider, and ritual Feel step use reflect barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) is complete. Continue §6: export <code>FeelStepTile</code>, <code>PAUSE_FEEL_STEP_TILE_ROWS</code>, <code>PAUSE_FEEL_INTENSITY_KEYS</code>, and <code>clampFeelIntensity</code> on <code>public-ritual-reflect</code>. Feel/mood screen components (<code>pause-ritual-feel-tile-grid</code>, <code>pause-ritual-feel-intensity-slider</code>, <code>pause-done-brief-check-in-intensity</code>, <code>PauseRitualFeelStep</code>) import from the reflect barrel; <code>PauseRitualFeelStep</code> uses <code>pauseStepLayout</code> from <code>public-session</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-hooks</code> still re-exports feel constants for non-peeled call sites; bulk <code>pauseStepLayout</code> peel remains.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: bulk <code>pauseStepLayout</code> screen peel to <code>public-session</code>, <code>usePauseBriefDoneCheckIn</code> / <code>resolveDoneWallpaperMood</code> screen barrels, or backlog #4 <code>PauseRepository</code> audit.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
