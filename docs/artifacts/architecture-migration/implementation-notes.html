@@ -17364,4 +17364,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — wire reflect steps I/O after flow-anchor deletion (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-io</code> imports <code>run-pause-*</code> directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Prior slice deleted orphan <code>pause-reflect-steps-mutation-flow</code> (and sibling step flow anchors) but left presentation I/O importing the removed module — broken build. Route tag/note/favorite/<code>reflection_step</code> RPC use cases through sibling <code>run-pause-*</code> modules; domain gates stay direct. Unit tests mock <code>run-pause-reflection-step-log</code> and <code>run-pause-favorite-toggle</code> modules.</dd>
+      <dt>Deviation</dt>
+      <dd>Repair commit for incomplete orphan-removal slice — behavior parity unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No application cluster anchor under <code>ritual/reflect/steps/</code>; presentation I/O is the conductor import surface.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect flows I/O anchor peel (preflight/post-generation), <code>pause-session-decide-flow</code> on decide I/O, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
