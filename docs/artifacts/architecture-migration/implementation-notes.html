@@ -5929,4 +5929,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect step hooks via public-rpc (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel reflect note/tag/favorite/reflection_step conductors from direct use-case imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete. <code>presentation/reflect/steps/</code> hooks call wired <code>public-rpc</code> facades (<code>logPauseReflectNote</code>, <code>logPauseReflectTags</code>, <code>logPauseFavoriteToggle</code>, <code>logPauseReflectionStepOnce</code>) instead of importing use cases + <code>supabasePauseRepository</code> / session storage from <code>public-ports</code>. Pro-hint toast stays on the use-case module (UI-only).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; favorite toggle test mocks <code>public-rpc</code> facade outcomes.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect mood/feel/hub/telemetry conductors still import <code>application/use-cases/ritual/*</code> directly until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>persistCompanionUiStepCompletion</code> or reflect mood conductors through <code>public-rpc</code> / ports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
