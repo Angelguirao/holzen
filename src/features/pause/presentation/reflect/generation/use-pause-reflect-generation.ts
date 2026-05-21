@@ -12,7 +12,7 @@ import {
   shouldCommitReflectGeneration,
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/reflect-generation-hook-flow';
 import { runReflectGeneration } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation';
-import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
+import { reflectGenerator } from './pause-reflect-generation-io';
 import type { UsePauseReflectGenerationParams } from './use-pause-reflect-generation-types';
 import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-text';
 
@@ -112,7 +112,7 @@ export function usePauseReflectGeneration({
           profile,
           signal: ac.signal,
         },
-        supabaseReflectGenerator,
+        reflectGenerator,
       );
       if (!shouldCommitReflectGeneration(validityTicket, validityRef.current)) return;
       const message = messageFromReflectGenerationResult(result);

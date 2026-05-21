@@ -13624,4 +13624,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — bind reflect generation I/O (ritual/reflect verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect presentation — holzen-reflect + artifact hydrate off public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>presentation/reflect/generation/pause-reflect-generation-io.ts</code> as the bound <code>ReflectGenerator</code> import for <code>use-pause-reflect-generation</code>, <code>use-pause-artifact-haiku</code>, and <code>use-pause-artifact-reflection-text</code> (mirrors <code>pause-reflect-steps-io.ts</code> and companion orchestration I/O).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving wiring only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect mood, hub, flows, and decide hooks still import <code>public-rpc</code> directly; home manual trigger still binds <code>supabaseReflectGenerator</code> from <code>public-rpc</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>presentation/reflect/mood/*</code> or <code>flows/*</code> bound <code>PauseRepository</code> I/O module, <code>public-ritual-frame</code> barrel peel, or Phase B <code>src/lib/holzen-query-client-ref</code> shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
