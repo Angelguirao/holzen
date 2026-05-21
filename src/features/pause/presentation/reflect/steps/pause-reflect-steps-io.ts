@@ -1,6 +1,7 @@
 /**
  * Reflect step mutation presentation I/O (bound PauseRepository + step storage).
- * Imports run-* use cases and domain step gates through the steps flow cluster anchor.
+ * Imports run-* use cases and domain step gates through `pause-reflect-steps-flow`
+ * (parity with hub I/O; mood I/O uses direct domain/run-* paths).
  */
 import {
   runPauseFavoriteToggle,
