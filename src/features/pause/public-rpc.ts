@@ -308,6 +308,13 @@ export function loadPauseCompanionOrchestrateSession(input: LoadCompanionOrchest
 /** Inline companion card expand — lazy-fetch on first open (Pro gate). */
 export { nextExpandedWithLazyFetch } from './application/use-cases/ritual/frame/next-expanded-with-lazy-fetch';
 
+/** Companion slot orchestrate — presentation param types (no Supabase side effects). */
+export type {
+  CompanionSlotCacheIds,
+  CompanionSlotCommitters,
+  CompanionSlotRelaxations,
+} from './application/use-cases/ritual/frame/orchestrate-slot-apply';
+
 /** Frame / companion UI — `pause_log_companion` via `PauseRepository` (wired for presentation). */
 export function logPauseCompanion(params: {
   instanceId: string | null;
