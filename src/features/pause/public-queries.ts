@@ -224,7 +224,7 @@ export {
   tagsFromReflectRow,
   type PauseReflectStepLatestRow,
   type PauseReflectStepType,
-} from './domain/reflect-step-latest';
+} from './domain/reflect/steps/reflect-step-latest';
 export {
   fetchLatestPauseReflectStep,
   getLatestPauseReflectNoteQueryOptions,

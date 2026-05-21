@@ -1,10 +1,10 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
-import type { ReflectArtifactPersistInput } from '@/features/pause/domain/reflect-artifact-persist';
+import type { ReflectArtifactPersistInput } from '@/features/pause/domain/reflect/generation/reflect-artifact-persist';
 import { invokeHolzenReflect } from './holzen-reflect-edge';
-import type { ReflectRecencyHints } from '@/features/pause/domain/reflect-recency-hints';
+import type { ReflectRecencyHints } from '@/features/pause/domain/reflect/generation/reflect-recency-hints';
 
-/** @deprecated Prefer `ReflectArtifactPersistInput` from `domain/reflect-artifact-persist.ts`. */
+/** @deprecated Prefer `ReflectArtifactPersistInput` from `domain/reflect/generation/reflect-artifact-persist.ts`. */
 export type PersistReflectionArtifactsParams = ReflectArtifactPersistInput;
 
 /** Upserts reflection (+ optional haiku / ground nudge) after `holzen-reflect`. */

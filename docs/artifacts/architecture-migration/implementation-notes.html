@@ -4827,4 +4827,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — finish domain/reflect taxonomy (Tier 5 | backlog #1 tail)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Group last root reflect domain modules under domain/reflect/</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> and <code>domain/reflect/generation/reflect-generation-*</code> were already complete on remote. Move <code>reflect-recency-hints</code> + <code>reflect-artifact-persist</code> → <code>domain/reflect/generation/</code>; <code>reflect-step-latest</code> → <code>domain/reflect/steps/</code>; import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — no <code>domain/reflect-*</code> files remain at pause domain root.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Skipped duplicate domain-generation grouping commit already on <code>origin/cursor/arch-migrate-src-ca70</code> (50523e32 + de90d176).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining <code>PauseRepository</code> stragglers (backlog #4), or Phase B cross-context slice per scheduling table.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
