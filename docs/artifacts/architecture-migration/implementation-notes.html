@@ -17874,4 +17874,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home reflect telemetry I/O direct modules (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-telemetry-io</code> imports sibling telemetry modules</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Peel <code>pause-home-reflect-telemetry-io</code> to <code>home-pause-actions-telemetry</code> and <code>manual-pause-trigger-telemetry</code>; delete zero-import <code>pause-home-reflect-telemetry-flow</code> and <code>pause-reflect-generation-manual-open-flow</code> anchors. <code>pause-home-reflect-io</code> already uses direct generation/domain modules.</dd>
+      <dt>Deviation</dt>
+      <dd>Reverts transient re-route through <code>pause-home-reflect-telemetry-flow</code> on branch tip — presentation I/O should match steps/mood/share peel pattern.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflection-share-flow</code> remains CI anchor while share presentation I/O may still peel incrementally.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion orchestrate-io direct <code>ritual/frame/*</code> imports, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
