@@ -12,7 +12,7 @@ import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   type PauseSessionReflectAndDecideViewInput,
-} from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-session-reflect-and-decide-flow';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
