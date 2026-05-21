@@ -255,7 +255,6 @@ export {
   getRelatedBiasesGroundNudgeQueryOptions,
   relatedBiasesGroundNudgeQueryKey,
 } from './infrastructure/queries/related-biases-ground-nudge-query';
-export { loadMoodHistoryForOrchestrate } from './infrastructure/companion/mood-history';
 export { loadActiveOrchestrateSources } from './infrastructure/companion/orchestrate-sources';
 export {
   fetchSettingsDataExportBundle,

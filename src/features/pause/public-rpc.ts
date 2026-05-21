@@ -15,9 +15,7 @@ export type { ReflectGenerator } from './ports/reflect-generator';
 export type { PauseAnalyticsRepository } from './ports/pause-analytics-repository';
 
 export { ritualDepthUpgradedPayload } from './application/use-cases/ritual/brief/ritual-depth-upgrade';
-export { invokeCompanionOrchestrate } from './infrastructure/edge/companion-orchestrate-edge';
 export type { CompanionOrchestrator } from './ports/companion-orchestrator';
-export { createCompanionSlotOrchestratePorts } from './infrastructure/supabase-companion-orchestrator';
 import { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
 import { supabaseCompanionOrchestrator } from './infrastructure/supabase-companion-orchestrator';
 import { supabasePauseAnalyticsRepository } from './infrastructure/supabase-pause-analytics-repository';
@@ -28,38 +26,6 @@ export {
   supabasePauseAnalyticsRepository,
   supabaseReflectGenerator,
 };
-export type { CompanionOrchestrateSessionContext } from './application/use-cases/ritual/frame/build-companion-orchestrate-body';
-export type {
-  CompanionSlotAutosaveParams,
-  CompanionSlotCacheIds,
-  CompanionSlotCommitters,
-  CompanionSlotRelaxations,
-} from './application/use-cases/ritual/frame/orchestrate-slot-apply';
-export { EMPTY_COMPANION_SLOT_RELAXATIONS } from './application/use-cases/ritual/frame/orchestrate-slot-apply';
-export { applyCompanionOrchestrateRetryReset } from './application/use-cases/ritual/frame/apply-companion-orchestrate-retry-reset';
-export { resetInterventionIdempotency } from './application/use-cases/ritual/frame/intervention-idempotency';
-export { applyCompanionSlotOrchestrateOutcome } from './application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome';
-export type { ApplyCompanionSlotOrchestrateFailureUiPorts } from './application/use-cases/ritual/frame/companion-slot-orchestrate-failure-ui';
-export { logCompanionSlotOrchestrateInvoke } from './application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry';
-export { trackCompanionGenerationInitiated } from './application/use-cases/ritual/frame/companion-generation-telemetry';
-export {
-  setCompanionSlotError,
-  setCompanionSlotLoading,
-  type CompanionSlotErrorSetters,
-  type CompanionSlotLoadingSetters,
-} from './application/use-cases/ritual/frame/companion-slot-ui-state';
-import {
-  runCompanionInterventionBootstrap as runCompanionInterventionBootstrapUseCase,
-  type RunCompanionInterventionBootstrapInput,
-  type RunCompanionInterventionBootstrapResult,
-} from './application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
-import {
-  runCompanionSlotOrchestrate,
-  type CompanionSlotOrchestrateMode,
-  type RunCompanionSlotOrchestrateResult,
-} from './application/use-cases/ritual/frame/run-companion-slot-orchestrate';
-import { fetchParsedPauseArtifactCache } from './infrastructure/queries/artifact-cache-query';
-import type { RegenerateCompanionSlot } from './domain/companion-orchestrate';
 export {
   invokeGroundingEnrich,
   type GroundingEnrichBody,
@@ -200,33 +166,6 @@ export type {
 } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
 export type { LogPwaInstallAnalyticsEventInput } from './application/use-cases/home/run-log-pwa-install-analytics-event';
 
-export type {
-  CompanionSlotOrchestrateMode,
-  RunCompanionSlotOrchestrateResult,
-  RunCompanionInterventionBootstrapInput,
-  RunCompanionInterventionBootstrapResult,
-};
-
-/** Lazy-fetch / regenerate `companion-orchestrate` — wired `CompanionOrchestrator` (presentation). */
-export function invokeCompanionSlotOrchestrate(
-  mode: CompanionSlotOrchestrateMode,
-  slot: RegenerateCompanionSlot,
-  session: CompanionOrchestrateSessionContext,
-): Promise<RunCompanionSlotOrchestrateResult> {
-  return runCompanionSlotOrchestrate(mode, slot, session, supabaseCompanionOrchestrator);
-}
-
-/** Frame intervention bootstrap — cache hydrate + idempotent `companion-orchestrate` invoke. */
-export function runPauseCompanionInterventionBootstrap(
-  input: RunCompanionInterventionBootstrapInput,
-  loadOrchestrateSession: () => Promise<CompanionOrchestrateSessionContext | null>,
-): Promise<RunCompanionInterventionBootstrapResult> {
-  return runCompanionInterventionBootstrapUseCase(input, {
-    fetchArtifactCache: fetchParsedPauseArtifactCache,
-    loadOrchestrateSession,
-    invokeIntervention: (session) => supabaseCompanionOrchestrator.invokeIntervention(session),
-  });
-}
 /** Frame / companion UI — `pause_log_companion` via `PauseRepository` (wired for presentation). */
 export function logPauseCompanion(params: {
   instanceId: string | null;

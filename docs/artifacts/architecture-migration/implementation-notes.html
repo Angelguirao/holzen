@@ -11515,4 +11515,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel companion slot orchestrate cluster off public-rpc (backlog #1 verified, backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; frame slot + intervention conductors bypass public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. After orchestrate session peel (<code>3547af96</code>), align <code>use-companion-slot-run-orchestrate</code>, <code>use-companion-intervention-fetch</code>, retry/UI-state/orchestrate-actions companions with other frame conductors: <code>runCompanionSlotOrchestrate</code> / <code>runCompanionInterventionBootstrap</code> + <code>supabaseCompanionOrchestrator</code> and co-located <code>ritual/frame/*</code> helpers; remove <code>invokeCompanionSlotOrchestrate</code>, <code>runPauseCompanionInterventionBootstrap</code>, and slot re-exports from <code>public-rpc</code>. Drop unused <code>loadMoodHistoryForOrchestrate</code> from <code>public-queries</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged; <code>x-cid</code> stays on edge via <code>supabaseCompanionOrchestrator</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Home lifecycle facades (<code>openManualPauseFromHome</code>, pending-offer, bulk-hold) remain on <code>public-rpc</code> for cross-context callers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #3/#4: peel home lifecycle facades or wire remaining stray <code>pauseLogStep</code> call sites exclusively through <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
