@@ -5,14 +5,14 @@ import { Activity, ChevronRight, ZoomOut } from 'lucide-react';
 import { pauseStepLayout } from '@/features/pause/public-hooks';
 import { Button } from '@/components/ui/button';
 import {
+  resolveEffectiveReflectionCopy,
+  resolveFrameHaikuDisplayBody,
   usePauseArtifactHaiku,
   usePauseArtifactReflectionText,
 } from '@/features/pause/public-hooks';
-import { resolveEffectiveReflectionCopy } from '@/features/pause/public-hooks';
 import { hapticFeedback } from '@/lib/haptics';
 import { PauseFrameHaikuCard } from '@/screens/pause/components/pause-frame-haiku-card';
 import { PauseFrameToolRow } from '@/screens/pause/components/pause-frame-tool-row';
-import { resolveFrameHaikuDisplayBody } from '@/screens/pause/lib/resolve-frame-haiku-display-body';
 
 export interface PauseFrameProps {
   pauseInstanceId: string | null;

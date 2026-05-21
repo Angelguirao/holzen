@@ -5169,4 +5169,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — Frame haiku display body in domain/reflect (backlog #1 adjacent)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate <code>resolveFrameHaikuDisplayBody</code> + DRY reflect copy in generation hook</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no folder moves. Pure Frame haiku card copy rules move from <code>screens/pause/lib/</code> to <code>domain/reflect/generation/</code>; <code>PauseFrame</code> imports via <code>public-hooks</code>. <code>usePauseReflectGeneration</code> artifact hydrate reuses <code>resolveEffectiveReflectionCopy</code> (same seed-then-artifact rule as Frame).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; screen lib deleted.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Frame-specific naming stays under <code>domain/reflect/generation/</code> (not <code>ritual/frame/</code>) because it composes reflection + haiku artifact reads, not companion orchestration.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 stray <code>PauseRepository</code> audit.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
