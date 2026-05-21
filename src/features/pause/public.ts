@@ -7,6 +7,11 @@
 export type { PersistedSession } from './domain/session-model';
 
 export {
+  resolvePauseArrivalToneAction,
+  type PauseArrivalToneAction,
+} from './application/use-cases/home/resolve-pause-arrival-tone-action';
+
+export {
   effectivePauseShiftIntensity,
   effectivePauseShiftMood,
   hasPauseShiftOrPostEmotion,
