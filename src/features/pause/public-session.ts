@@ -28,10 +28,6 @@ export {
 export { isPauseSessionDepthPickerActive } from './domain/reflect/mood/pause-depth-picker-active';
 export { isPauseSessionWaitingForInstanceFetch } from './domain/session/waiting-for-instance-fetch';
 export {
-  buildPauseSessionStepRitualBundle,
-  buildPauseSessionStepShellBundle,
-} from './application/use-cases/session/step-bundles';
-export {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
   TERMINAL_PAUSE_DB_STATES,
@@ -57,22 +53,6 @@ export {
 } from './application/use-cases/ritual/breathe/ritual-audio';
 export type { PauseStep } from './domain/pause-ritual-steps';
 export type { BriefPauseStep, RitualDepth } from './domain/ritual-types';
-export {
-  initialBriefIntegrateDoneFromRestored,
-  initialBriefPauseStepFromRestored,
-  initialSelectedBriefFaceFromRestored,
-} from './application/use-cases/ritual/reflect/scaffold/restored-brief-ritual-state';
-export {
-  initialBreathingFirstCompletedFromRestored,
-  initialBreathingSecondCompletedFromRestored,
-} from './application/use-cases/ritual/breathe/restored-breath-ritual-state';
-export { initialFrameDoneFromRestored } from './application/use-cases/ritual/frame/restored-frame-ritual-state';
-export {
-  initialDecisionFromRestored,
-  initialPhaseFromRestored,
-} from './application/use-cases/ritual/decide/restored-decide-ritual-state';
-export { mapPersistedStep } from './domain/session/map-persisted-step';
-export { initialRitualEntry } from './application/use-cases/ritual/reflect/scaffold/initial-ritual-entry';
 export { getSessionQuote, type WisdomQuote } from './application/use-cases/ritual/decide/wisdom-quotes';
 export {
   formatReinforcementQuoteFromSession,
