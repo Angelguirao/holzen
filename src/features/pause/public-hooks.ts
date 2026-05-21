@@ -373,7 +373,7 @@ export { usePauseSessionExitNavigation } from './presentation/session/use-pause-
 export { usePauseSessionPendingPauseOfferNavigation } from './presentation/session/use-pause-session-pending-pause-offer-navigation';
 export { usePauseSessionPendingLeaveSheet } from './presentation/session/use-pause-session-pending-leave-sheet';
 export { usePauseSessionMoodChromeHandlers } from './presentation/reflect/use-pause-session-mood-chrome-handlers';
-export { usePauseSessionBreathReflectHandlers } from './presentation/reflect/use-pause-session-breath-reflect-handlers';
+export { usePauseSessionBreathReflectHandlers } from './presentation/reflect/flows/use-pause-session-breath-reflect-handlers';
 export { usePauseSessionEntryPresentationEffects } from './presentation/session/use-pause-session-entry-presentation-effects';
 export { usePauseSessionTerminalEntryRedirect } from './presentation/session/use-pause-session-terminal-entry-redirect';
 export { usePauseSessionStepTransition } from './presentation/session/use-pause-session-step-transition';

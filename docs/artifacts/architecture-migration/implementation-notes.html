@@ -3630,6 +3630,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate breath+reflect session conductor under presentation/reflect/flows/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 presentation peel — Tier 4 flows conductor (breath bridge)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-pause-session-breath-reflect-handlers</code> beside <code>use-pause-session-reflect-and-decide</code> under <code>presentation/reflect/flows/</code>; <code>public-hooks</code> and <code>use-pause-session-step-handlers</code> import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mood/feel/chrome reflect conductors remain at <code>presentation/reflect/</code> root until a later <code>mood/</code> peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: group mood chrome hooks under <code>presentation/reflect/mood/</code>, or port PWA install analytics via <code>PauseAnalyticsRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
