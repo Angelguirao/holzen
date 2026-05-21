@@ -5,8 +5,8 @@ import { hapticFeedback } from '@/lib/haptics';
 import {
   companionFeedbackVoteQueryKey,
   getCompanionFeedbackVoteQueryOptions,
-  logCompanionFeedbackVote,
 } from '../../public-queries';
+import { logPauseCompanionFeedbackVote } from '../../public-rpc';
 
 export function useCompanionFeedbackVote(options: {
   pauseInstanceId?: string | null;
@@ -41,7 +41,7 @@ export function useCompanionFeedbackVote(options: {
       hapticFeedback('light');
 
       try {
-        const { ok } = await logCompanionFeedbackVote({
+        const { ok } = await logPauseCompanionFeedbackVote({
           userId,
           companionType,
           vote: type,
