@@ -10745,13 +10745,13 @@
     <h3>breath-reflect conductor on ritual reflect barrel</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 verified. Export <code>usePauseSessionBreathReflectHandlers</code> on <code>public-ritual-reflect.ts</code>; conductor imports <code>usePauseShiftFrameDoneHandler</code> and <code>usePauseSessionReflectAndDecide</code> via sibling <code>presentation/reflect/</code> paths (not the barrel) to avoid circular eager loads. <code>public-hooks</code> re-exports; <code>use-pause-session-step-handlers</code> keeps direct feature-internal import.</dd>
+      <dd>Backlog #1 verified. Export <code>usePauseSessionBreathReflectHandlers</code> on <code>public-ritual-reflect.ts</code>; conductor imports <code>usePauseShiftFrameDoneHandler</code> and <code>usePauseSessionReflectAndDecide</code> via sibling <code>presentation/reflect/</code> paths (not the barrel) to avoid circular eager loads. <code>public-hooks</code> re-exports; <code>use-pause-session-step-handlers</code> imports breath-reflect via <code>public-ritual-reflect</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — breath navigation + reflect/decide + frame-done wiring unchanged.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>usePauseSessionBreathStepHandlers</code> and <code>usePauseSessionBreathHandlers</code> remain on <code>public-hooks</code> direct paths until next peel.</dd>
+      <dd>Breath step/handlers peeled in follow-up commit on same push window.</dd>
       <dt>Open questions</dt>
-      <dd>Next: breath step handlers on <code>public-ritual-reflect</code>; backlog #4 <code>PauseRepository</code> presentation audit.</dd>
+      <dd>Next: backlog #4 <code>PauseRepository</code> presentation audit.</dd>
     </dl>
   </article>
 
@@ -10764,7 +10764,7 @@
     <h3>ritual/reflect/ complete; finish §6 reflect presentation peel on public-ritual-reflect</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 verified — use cases under <code>ritual/reflect/</code>. Export <code>usePauseSessionDepthAndBriefCopy</code> and re-export breath step/handlers from <code>public-ritual-reflect.ts</code> only (no duplicate direct paths on <code>public-hooks</code>).</dd>
+      <dd>Backlog #1 verified — use cases under <code>ritual/reflect/</code>. Export <code>usePauseSessionDepthAndBriefCopy</code> and re-export <code>usePauseSessionBreathStepHandlers</code>, <code>usePauseSessionBreathHandlers</code>, and <code>usePauseSessionBreathReflectHandlers</code> from <code>public-ritual-reflect.ts</code> only (no duplicate direct paths on <code>public-hooks</code>).</dd>
       <dt>Deviation</dt>
       <dd>None — scaffold depth context line behavior unchanged.</dd>
       <dt>Tradeoffs</dt>
