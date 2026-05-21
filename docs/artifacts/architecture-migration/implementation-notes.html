@@ -8554,19 +8554,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — analytics query modules off public-ports (backlog #1 verified, #4)</span>
+      <span>Phase A slice — analytics infra peel + delete duplicates (backlog #1 verified, #4)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Reflect ritual/reflect/ complete; infrastructure queries import adapters directly</h3>
+    <h3>Reflect ritual/reflect/ complete; drop unused analytics query modules</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no legacy reflect use-case paths. <code>infrastructure/queries/*-analytics*</code> and <code>dev-mode-admin-query</code> import <code>supabasePauseAnalyticsRepository</code> from <code>infrastructure/supabase-pause-analytics-repository</code> instead of <code>public-ports</code> (presentation-only barrel).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no legacy reflect use-case paths. <code>dev-mode-admin-query</code> imports <code>supabasePauseAnalyticsRepository</code> from <code>infrastructure/</code> (not <code>public-ports</code>). Deleted zero-importer duplicates <code>dev-mode-analytics.ts</code> and <code>companion-fullview-analytics.ts</code> — facades live on <code>public-rpc</code> (<code>logDevModeSetting</code>, <code>logPauseCompanionFullviewOpened</code>).</dd>
       <dt>Deviation</dt>
-      <dd>None — behavior parity; import layering only.</dd>
+      <dd>None — behavior parity; <code>dev-mode-analytics.test.ts</code> still exercises <code>public-rpc</code>.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>public-ports</code> remains the presentation injection surface for orchestrator + reflect generator + pause repository adapters.</dd>
+      <dd><code>public-ports</code> remains for default adapters wired by <code>public-rpc</code>; no active presentation imports.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: colocate <code>dismiss/</code> under <code>home/</code>, or peel any remaining direct <code>pause-rpc-client</code> call sites.</dd>
+      <dd>Next backlog #4: <code>PauseRepository</code> call-site audit or companion orchestrate thin runners on <code>public-rpc</code>.</dd>
     </dl>
   </article>
 
