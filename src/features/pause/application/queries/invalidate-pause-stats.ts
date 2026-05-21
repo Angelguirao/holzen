@@ -3,7 +3,7 @@ import { journeyPauseInstancesQueryKey } from './journey-pause-instances-keys';
 import { COMPLETED_PAUSE_COUNT_QUERY_KEY } from './completed-pause-count-keys';
 import { currentPauseQueryKey } from './current-pause-keys';
 import { pendingPauseOfferQueryKey } from './pending-pause-offer-keys';
-import { getHolzenQueryClient } from '@/lib/holzen-query-client-ref';
+import { getHolzenQueryClient } from '../../infrastructure/holzen-query-client-ref';
 import { archivePausesTabHasRowsQueryPrefix } from './archive-pauses-tab-keys';
 
 /**

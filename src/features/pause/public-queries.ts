@@ -178,6 +178,10 @@ export {
   isPauseArchiveListInitialLoading,
 } from './domain/archive/pause-archive-list-ui-state';
 export { pauseArchiveRowAllowsRetrospectiveOutcome } from './domain/archive/retrospective-outcome-eligibility';
+export {
+  getHolzenQueryClient,
+  setHolzenQueryClient,
+} from './infrastructure/holzen-query-client-ref';
 export { invalidatePauseStatsDataForUser } from './application/queries/invalidate-pause-stats';
 export { PAUSE_QUERY_PREFIX } from './application/queries/pause-query-namespace';
 export {
