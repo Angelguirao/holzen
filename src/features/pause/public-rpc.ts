@@ -231,8 +231,11 @@ export {
   stopPauseReflectFrameFocusAmbience,
 } from './application/use-cases/ritual/reflect/ambience/reflect-frame-focus-ambience';
 
-export type { ShiftFrameHubDonePresentation } from './application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-flow';
-export { resolveShiftFrameHubDonePresentation } from './application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-flow';
+export type {
+  ShiftEmotionFrameHubDoneOutcome,
+  ShiftFrameHubDonePresentation,
+} from './domain/reflect/hub/shift-frame-hub-done-presentation';
+export { resolveShiftFrameHubDonePresentation } from './domain/reflect/hub/shift-frame-hub-done-presentation';
 
 export { showPauseStepSyncFailedToast } from './application/use-cases/ritual/step-sync-toast';
 

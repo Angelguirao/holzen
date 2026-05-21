@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   PAUSE_STEP_AFTER_FRAME_HUB_DONE,
   resolveShiftFrameHubDonePresentation,
-} from './pause-shift-frame-hub-flow';
+} from './shift-frame-hub-done-presentation';
 
-describe('pause-shift-frame-hub-flow', () => {
+describe('shift-frame-hub-done-presentation', () => {
   it('exposes breath2 as the post-frame hub step', () => {
     expect(PAUSE_STEP_AFTER_FRAME_HUB_DONE).toBe('breath2');
   });

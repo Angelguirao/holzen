@@ -6385,4 +6385,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — shift-frame hub presentation → domain/reflect/hub (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel pause-shift-frame-hub-flow from application ritual/reflect/hub</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Pure hub done presentation mapping and <code>ShiftEmotionFrameHubDoneOutcome</code> live in <code>domain/reflect/hub/shift-frame-hub-done-presentation.ts</code>; <code>shift-emotion-log</code> aliases <code>RunShiftEmotionFrameHubDoneResult</code>; <code>public-rpc</code> re-exports <code>resolveShiftFrameHubDonePresentation</code> for presentation (same peel pattern as reflect/decide domain helpers).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; domain tests colocated; hub conductor test still mocks <code>public-rpc</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Empty <code>application/use-cases/ritual/reflect/hub/</code> folder removed with the move.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pending-pause-offer-mutations</code> or <code>use-archive-pause-retrospective-outcome</code> through <code>public-rpc</code> (backlog #4 remainder).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
