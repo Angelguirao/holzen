@@ -7468,4 +7468,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood depth context params (backlog #1 incremental)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>resolvePauseDepthContextLineParams</code> under <code>ritual/reflect/mood/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder migration (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. Peel depth-picker market context interpolation (symbol + abs % change) from <code>use-pause-session-depth-and-brief-copy</code> into a pure helper beside <code>run-initial-emotion-log</code>; hook keeps <code>t()</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Depth-picker card chrome styles remain in <code>presentation/reflect/mood/pause-depth-picker-styles.ts</code> per §10.1.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 stray <code>PauseRepository</code> call sites or peel companion orchestrate session off <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

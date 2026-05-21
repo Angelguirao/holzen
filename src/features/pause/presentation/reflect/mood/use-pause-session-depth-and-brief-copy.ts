@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { TFunction } from 'i18next';
-import { trackedAssetSymbol, type BtcPriceData } from '@/features/market/public';
+import type { BtcPriceData } from '@/features/market/public';
+import { resolvePauseDepthContextLineParams } from '@/features/pause/application/use-cases/ritual/reflect/mood/resolve-pause-depth-context-line-params';
 import type { RitualDepth } from '@/features/pause/public-hooks';
 
 /** Depth-picker context line for the depth picker (`PauseSessionDepthPickerStack`). */
@@ -13,12 +14,12 @@ export function usePauseSessionDepthAndBriefCopy(input: {
   const { t, btcData, trackedAssetId, ritualEntry } = input;
 
   const depthContextLine = useMemo(() => {
-    if (!btcData) return null;
-    const sym = trackedAssetSymbol(trackedAssetId);
+    const params = resolvePauseDepthContextLineParams(btcData, trackedAssetId);
+    if (!params) return null;
     return t('pause.depthPicker.contextMoved', {
       defaultValue: '{{sym}} moved {{pct}}% in the last 24 hours.',
-      sym,
-      pct: Math.abs(btcData.changePercent).toFixed(1),
+      sym: params.sym,
+      pct: params.pct,
     });
   }, [btcData, trackedAssetId, t]);
 
