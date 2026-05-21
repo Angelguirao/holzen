@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A — reflect hub I/O via hub flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-io</code> imports hub use case + presentation mapping via <code>pause-reflect-hub-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route hub presentation I/O through <code>pause-reflect-hub-flow</code> instead of deep <code>run-shift-emotion-frame-hub-done</code> and <code>domain/reflect/hub/</code> imports (parity with steps and session telemetry I/O peels on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flow anchor remains a re-export barrel for <code>check:architecture-alignment</code> hub cluster detection; I/O test mocks the anchor path for <code>runShiftEmotionFrameHubDone</code> only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: share/mood/generation I/O through their flow anchors, or companion orchestration-io peel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — session reflect telemetry through telemetry flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
