@@ -7388,7 +7388,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>use-manual-pause-trigger</code> and companion hooks still import <code>public-rpc</code> facades.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>use-manual-pause-trigger</code> or <code>use-open-pause-home-preview</code> off <code>public-rpc</code>.</dd>
+      <dd>Next: peel <code>use-manual-pause-trigger</code> or companion feedback vote off <code>public-rpc</code>.</dd>
     </dl>
   </article>
 
@@ -7407,7 +7407,26 @@
       <dt>Tradeoffs</dt>
       <dd>Screen remains responsible for dropdown chrome; hook owns clipboard, native share, and window.open flows.</dd>
       <dt>Open questions</dt>
-      <dd>Next: backlog #4 remaining <code>public-rpc</code> peels (e.g. home preview dismiss direct use-case import) or companion feedback vote write path audit.</dd>
+      <dd>Next: backlog #4 remaining <code>public-rpc</code> peels or companion feedback vote write path audit.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — favorite pro-hint toast under ritual/reflect/steps (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate showPauseFavoriteProHintToast with reflect step use cases</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder migration is complete; this slice colocates <code>pause-favorite-pro-hint-toast</code> (+ test) beside <code>run-pause-favorite-toggle</code> under <code>application/use-cases/ritual/reflect/steps/</code> per §10.1. <code>use-pause-favorite-toggle</code> imports the application module directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Toast still uses Sonner directly (UI side-effect in application layer until a notification port exists).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-feedback-vote</code> off <code>public-rpc</code>, or move remaining reflect presentation pure helpers into <code>ritual/reflect/</code>.</dd>
     </dl>
   </article>
 
