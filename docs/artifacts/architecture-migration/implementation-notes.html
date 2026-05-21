@@ -11876,4 +11876,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock companion feedback vote to PauseAnalyticsRepository (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; analytics port presentation guardrail</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Add <code>use-companion-feedback-vote</code> tests asserting <code>runLogCompanionFeedbackVote</code> receives <code>supabasePauseAnalyticsRepository</code>; replace empty <code>{}</code> repository mock in <code>dismiss-open-pause-home</code> application test with hoisted <code>PauseRepository</code> sentinel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestrate/intervention presentation hooks still lack port sentinels — defer to next backlog #4 slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: <code>use-companion-slot-run-orchestrate</code> / <code>use-companion-intervention-fetch</code> CompanionOrchestrator assertions, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -2,8 +2,9 @@ import { describe, expect, it, vi } from 'vitest';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { dismissOpenPauseHome } from './dismiss-open-pause-home';
 
-const { runPauseDismissCurrentMock } = vi.hoisted(() => ({
+const { runPauseDismissCurrentMock, mockPauseRepository } = vi.hoisted(() => ({
   runPauseDismissCurrentMock: vi.fn(),
+  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
 vi.mock(
@@ -14,7 +15,7 @@ vi.mock(
 );
 
 describe('dismissOpenPauseHome', () => {
-  const repository = {} as PauseRepository;
+  const repository = mockPauseRepository as PauseRepository;
 
   it('clears preview without RPC when signed out', async () => {
     const clearPreview = vi.fn();
