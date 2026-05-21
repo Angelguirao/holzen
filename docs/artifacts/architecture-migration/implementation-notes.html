@@ -8022,19 +8022,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflection-share-canvas in domain/reflect/share (backlog #1 follow-up)</span>
+      <span>Phase A slice — reflection-share-canvas in presentation/reflect/share (backlog #1 hygiene)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>generateReflectionShareImage</code> → <code>domain/reflect/share/</code></h3>
+    <h3><code>generateReflectionShareImage</code> → <code>presentation/reflect/share/</code> (not domain)</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. Browser canvas PNG rendering has no RPC/repository I/O — colocate beside <code>reflection-share-text</code> and channel URL builders in <code>domain/reflect/share/</code>; <code>use-reflection-share-handlers</code> imports domain; <code>public-hooks</code> re-export path only.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. Browser <code>document.createElement('canvas')</code> PNG rendering is presentation I/O (P5) — colocate under <code>presentation/reflect/share/reflection-share-canvas.ts</code> beside <code>use-reflection-share-handlers</code>; plain-text + channel URL builders stay in <code>domain/reflect/share/</code>; drop <code>public-hooks</code> re-export.</dd>
       <dt>Deviation</dt>
-      <dd>None — behavior parity.</dd>
+      <dd>Corrects a parallel slice that placed canvas in <code>domain/reflect/share/</code> — domain must stay DOM-free per pause-client-architecture §3 / P5.</dd>
       <dt>Tradeoffs</dt>
-      <dd>DOM/canvas code lives in domain for share beat cohesion; presentation conductor still owns navigator.share / download UX.</dd>
+      <dd>Share beat spans domain (copy/URLs) + presentation (canvas + navigator.share UX); no <code>public-hooks</code> export for the canvas helper.</dd>
       <dt>Open questions</dt>
-      <dd>Next: wired facades for reflect note/tag/favorite/<code>reflection_step</code> step logs, or port-backed analytics read for companion feedback vote fetch.</dd>
+      <dd>Next: colocate <code>use-pause-session-breath-handlers</code> under <code>reflect/flows/</code>, or port-backed analytics read for companion feedback vote fetch.</dd>
     </dl>
   </article>
 
