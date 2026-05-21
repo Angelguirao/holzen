@@ -65,11 +65,11 @@
     <h3><code>pause-reflect-steps-io</code> imports step mutations and gates through <code>pause-reflect-steps-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. <code>pause-reflect-steps-io</code> imports note/tag/favorite/<code>reflection_step</code> use cases and domain gates through <code>pause-reflect-steps-flow</code> instead of deep <code>run-pause-*</code> and <code>domain/reflect/steps/*</code> paths (parity with flows and generation I/O peels).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. <code>pause-reflect-steps-io</code> imports note/tag/favorite/<code>reflection_step</code> use cases and domain gates through <code>pause-reflect-steps-flow</code> instead of deep <code>run-pause-*</code> and <code>domain/reflect/steps/*</code> paths (hub parity; mood I/O uses direct domain + <code>run-initial-emotion-log</code>).</dd>
       <dt>Deviation</dt>
-      <dd>None — behavior parity; import boundary only.</dd>
+      <dd>Intentional asymmetry: hub + steps use flow anchors; mood uses direct paths until subcluster routing is reconciled.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Flow anchor already existed for <code>check:architecture-alignment</code>; presentation I/O now consumes it (single cluster import).</dd>
+      <dd>Flow anchor kept for <code>check:architecture-alignment</code>; unit tests mock leaf <code>run-pause-*</code> modules.</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>pause-reflect-share-io</code> through a share flow anchor, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
