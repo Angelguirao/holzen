@@ -38,7 +38,7 @@ import { openManualPauseFromHome as openManualPauseFromHomeUseCase } from './app
 import type { OpenManualPauseFromHomeParams } from './application/use-cases/trigger/open-manual-pause-from-home';
 import type { TFunction } from 'i18next';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from './domain/bulk-hold';
-import type { PauseCompanionAction, PauseState } from './domain/pause-state';
+import type { PauseState } from './domain/pause-state';
 import {
   runPostPauseEmotionLogIfDirty,
   type PostPauseFeelSnapshot,
@@ -72,18 +72,9 @@ import {
   type RunShiftEmotionFrameHubDoneResult,
 } from './application/use-cases/ritual/feel/shift-emotion-log';
 import type { InitialEmotionLogOpts } from './application/use-cases/ritual/feel/initial-emotion-log';
-import { logPauseStep } from './application/use-cases/ritual/log/log-pause-step';
-import { logPauseCompanion } from './application/use-cases/ritual/log/log-pause-companion';
-import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
 import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
 
-/** Lifecycle + step mutations — default port is `PauseRepository`, not raw RPC client. */
-
-export function pauseCreateOrReuse(
-  params: Parameters<typeof supabasePauseRepository.createOrReuse>[0],
-) {
-  return runPauseCreateOrReuse(supabasePauseRepository, params);
-}
+/** Lifecycle + ritual mutations — wired facades only; no generic `pauseLogStep` / `pauseCreateOrReuse` exports. */
 
 /** Pending offer — adopt via `PauseRepository` (wired for presentation). */
 export function adoptPendingPauseOffer(): Promise<RunAdoptPendingPauseOfferResult> {
@@ -104,25 +95,6 @@ export function dismissOpenPauseHomePreview(
     clearPreview,
     dismissCurrent: () => runPauseDismissCurrent(supabasePauseRepository),
   });
-}
-
-export function pauseDismissCurrent() {
-  return runPauseDismissCurrent(supabasePauseRepository);
-}
-
-export function pauseLogStep(
-  params: Parameters<typeof supabasePauseRepository.logStep>[0],
-) {
-  return logPauseStep(supabasePauseRepository, params);
-}
-
-export function pauseLogCompanion(params: {
-  instanceId: string | null;
-  companionType: string;
-  action: PauseCompanionAction;
-  entryPoint: string;
-}) {
-  return logPauseCompanion(supabasePauseRepository, params);
 }
 
 export type { BulkHoldApplyResult };
