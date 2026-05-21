@@ -9862,4 +9862,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — backlog #1 verified; brief navigation on public-ritual-brief (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; session brief go-back / past-step / brief→deep peel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — 14 modules under <code>ritual/reflect/</code>, zero legacy paths. Extend <code>public-ritual-brief.ts</code> for <code>computePauseGoBackPlan</code>, <code>computeBriefPastStepClick</code>, and <code>briefSwitchToDeepPauseState</code>; <code>use-pause-session-go-back</code>, <code>use-pause-session-brief-past-step</code>, and <code>use-pause-session-brief-to-deep</code> import the barrel instead of <code>application/use-cases/ritual/brief/*</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; RPC for depth upgrade stays on <code>public-rpc</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Pure helpers remain under <code>application/use-cases/ritual/brief/</code>; integrate timer already on the same barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #3: session <code>step-transition</code> cluster on <code>public-session</code>; backlog #4: breath segment RPC audit via <code>public-rpc</code> only.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

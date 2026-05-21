@@ -1,5 +1,5 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
-import { computePauseGoBackPlan } from '@/features/pause/application/use-cases/ritual/brief/go-back-plan';
+import { computePauseGoBackPlan } from '@/features/pause/public-ritual-brief';
 import { hapticFeedback } from '@/lib/haptics';
 import type { BriefPauseStep, PauseStep, RitualDepth } from '@/features/pause/public-hooks';
 

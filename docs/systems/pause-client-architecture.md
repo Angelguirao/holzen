@@ -191,6 +191,7 @@ Shared reads live in `infrastructure/queries/`, exported via **`public-queries`*
 | `public-home.ts` | Home read-model helpers (`resolvePauseArrivalToneAction`, `buildHomePauseCardBodyProps`, `buildZenModeHomeRouteProps`, `pauseHomeError*` / snooze gate) — no Supabase |
 | `public-scheduling.ts` | Quarter-hour scheduling math for Home context refresh (no Supabase) |
 | `public-session.ts` | Session shell pure helpers (`computePauseHeaderBackIntent`, `buildPauseSessionMountLogParams`, …) — no Supabase |
+| `public-ritual-brief.ts` | Brief ritual pure helpers (integrate timer, `computePauseGoBackPlan`, `computeBriefPastStepClick`, `briefSwitchToDeepPauseState`) — no Supabase |
 | `public-trigger.ts` | Manual-trigger cooldown math, localStorage keys, error mapping — no Supabase |
 | `public-queries.ts` | `get*QueryOptions` factories |
 | `public-hooks.ts` | Screen-facing conductors |
