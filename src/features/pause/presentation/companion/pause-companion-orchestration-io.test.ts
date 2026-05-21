@@ -17,17 +17,17 @@ const {
 }));
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session',
-  () => ({
-    loadCompanionOrchestrateSession: loadCompanionOrchestrateSessionMock,
-  }),
-);
-
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite',
-  () => ({
-    runToggleCompanionLibraryFavorite: runToggleCompanionLibraryFavoriteMock,
-  }),
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow',
+  async (importOriginal) => {
+    const actual = await importOriginal<
+      typeof import('@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow')
+    >();
+    return {
+      ...actual,
+      loadCompanionOrchestrateSession: loadCompanionOrchestrateSessionMock,
+      runToggleCompanionLibraryFavorite: runToggleCompanionLibraryFavoriteMock,
+    };
+  },
 );
 
 vi.mock('@/features/pause/public-queries', () => ({
@@ -54,7 +54,7 @@ describe('pause-companion-orchestration-io', () => {
     );
   });
 
-  it('re-exports nextExpandedWithLazyFetch for section expansion conductors', () => {
+  it('re-exports nextExpandedWithLazyFetch from frame orchestration flow anchor', () => {
     const fetch = vi.fn();
     expect(
       nextExpandedWithLazyFetch(false, {
