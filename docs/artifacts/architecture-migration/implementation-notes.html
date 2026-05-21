@@ -9767,4 +9767,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — brief integrate timer on public-ritual-brief (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; session brief integrate hook peels application import</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — no reflect folder moves. Add <code>public-ritual-brief.ts</code> for integrate timer constants + ring math; <code>use-pause-brief-integrate-countdown</code> imports the barrel (avoids <code>public-hooks</code> ↔ hook cycle); <code>public-hooks</code> re-exports for screen components.</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>BRIEF_INTEGRATE_SECONDS</code> still 20.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other session presentation hooks still import <code>application/use-cases/session/*</code> and <code>ritual/brief/*</code> directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #3/#4: extend <code>public-ritual-brief</code> for brief-to-deep / past-step helpers, or session <code>step-transition</code> cluster.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
