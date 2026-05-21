@@ -8,7 +8,7 @@ import {
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
 } from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';
-import { generateReflectionShareImage } from '@/features/pause/domain/reflect/share/reflection-share-canvas';
+import { runReflectionShareImage } from '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image';
 
 export type UseReflectionShareHandlersParams = {
   message: string;
@@ -32,27 +32,12 @@ export function useReflectionShareHandlers({
 
   const shareImage = useCallback(async () => {
     try {
-      const blob = await generateReflectionShareImage(message, context, haiku);
-      const file = new File([blob], 'holzen-reflection.png', { type: 'image/png' });
-
-      if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: 'Holzen Reflection',
-        });
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'holzen-reflection.png';
-        a.click();
-        URL.revokeObjectURL(url);
+      const outcome = await runReflectionShareImage(message, context, haiku);
+      if (outcome === 'downloaded') {
         toast(t('share.imageDownloaded'));
       }
-    } catch (e: unknown) {
-      if (!(e instanceof DOMException && e.name === 'AbortError')) {
-        toast.error(t('share.couldNotShareImage'));
-      }
+    } catch {
+      toast.error(t('share.couldNotShareImage'));
     }
   }, [message, context, haiku, t]);
 

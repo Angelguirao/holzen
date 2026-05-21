@@ -7,9 +7,12 @@ vi.mock('sonner', () => ({
   toast: Object.assign(vi.fn(), { error: vi.fn() }),
 }));
 
-vi.mock('@/features/pause/domain/reflect/share/reflection-share-canvas', () => ({
-  generateReflectionShareImage: vi.fn(async () => new Blob(['png'], { type: 'image/png' })),
-}));
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image',
+  () => ({
+    runReflectionShareImage: vi.fn(async () => 'downloaded' as const),
+  }),
+);
 
 describe('useReflectionShareHandlers', () => {
   const t = ((key: string) => key) as unknown as TFunction;
