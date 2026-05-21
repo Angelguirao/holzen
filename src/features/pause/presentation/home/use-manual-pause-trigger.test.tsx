@@ -42,7 +42,7 @@ vi.mock('@/features/pause/application/use-cases/trigger/manual-pause-trigger-tel
   trackPauseManualCompleted: trackPauseManualCompletedMock,
 }));
 
-vi.mock('@/features/pause/application/use-cases/trigger/build-manual-pause-open-params', () => ({
+vi.mock('@/features/pause/application/use-cases/ritual/reflect/generation/build-manual-pause-open-params', () => ({
   buildManualPauseOpenParams: (input: {
     userId: string;
     silentMode: boolean;

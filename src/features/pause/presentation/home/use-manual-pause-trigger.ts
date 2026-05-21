@@ -7,7 +7,7 @@ import {
 } from '@/features/pause/domain/manual-pause-trigger-result';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import { applyManualPauseOpenResult } from '@/features/pause/application/use-cases/trigger/apply-manual-pause-open-result';
-import { buildManualPauseOpenParams } from '@/features/pause/application/use-cases/trigger/build-manual-pause-open-params';
+import { buildManualPauseOpenParams } from '@/features/pause/application/use-cases/ritual/reflect/generation/build-manual-pause-open-params';
 import {
   markPauseManualStartedHomeOnce,
   trackManualPauseInstanceCreated,
