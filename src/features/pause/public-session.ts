@@ -77,13 +77,17 @@ export {
   viteWantsPauseBreathSecondLabelShift,
   type PauseBreathSecondLabelVariant,
 } from './application/use-cases/ritual/breathe/breath-second-label-variant';
+export type { PauseBreathingPhase } from './application/use-cases/ritual/breathe/pause-breathing-phase';
 export {
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
   resolveBreathingPhaseAdvanceOutcome,
+  type BreathingPhaseAdvanceOutcome,
+  type BreathingPhaseAdvanceResult,
+  type BreathingTimedLoopState,
 } from './application/use-cases/ritual/breathe/phase-advance';
 export {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
+  resumePauseAudioContext,
 } from './application/use-cases/ritual/breathe/ritual-audio';
-export type { PauseBreathingPhase } from './application/use-cases/ritual/breathe/pause-breathing-phase';
