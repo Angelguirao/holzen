@@ -12921,4 +12921,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate scaffold ritual payloads under presentation/session/scaffold/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 5 session scaffold subcluster (first peel)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate <code>scaffold-ritual-payloads</code> (+ test) under <code>presentation/session/scaffold/</code>; <code>use-pause-session-scaffold-ritual</code> and <code>use-pause-session-scaffold-presentation</code> import sibling scaffold path. No <code>public-hooks</code> re-export (presentation-only).</dd>
+      <dt>Deviation</dt>
+      <dd>None — session grouping wins over flat <code>presentation/session/</code> root per §3.2 (mirrors <code>session/breath/</code> peel).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Scaffold VM / chrome-slot hooks remain flat under <code>presentation/session/</code> until a follow-up peel; CI forbids flat <code>scaffold-ritual-payloads</code> import strings.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-pause-session-scaffold-*</code> + <code>pause-session-scaffold-vm-types</code> under <code>session/scaffold/</code>, or Phase B subscription/auth shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

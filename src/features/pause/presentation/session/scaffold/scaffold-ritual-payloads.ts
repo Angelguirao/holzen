@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
-import type { FeelStepTile } from '../../domain/feel-step-tile';
-import type { MoodValue } from '../../domain/mood-value';
+import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
+import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { PauseBreathingHandle } from '@/features/pause/presentation/session/breath/pause-breathing-handle';
 import type {
   PauseSessionBriefRitualBodyProps,
