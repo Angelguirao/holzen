@@ -7,7 +7,7 @@ import {
   DEEP_PAUSE_STEP_AFTER_FIRST_BREATH,
   DEEP_PAUSE_STEP_AFTER_SECOND_BREATH,
   shouldResetBriefIntegrateAdvanceGuard,
-} from '@/features/pause/application/use-cases/ritual/breath/pause-breath-step-navigation';
+} from '@/features/pause/application/use-cases/ritual/breathe/pause-breath-step-navigation';
 import type { BriefPauseStep, PauseStep, RitualDepth } from '@/features/pause/public-hooks';
 
 /**

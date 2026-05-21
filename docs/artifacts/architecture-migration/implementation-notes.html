@@ -4010,6 +4010,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — consolidate ritual/breath into ritual/breathe</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; breath step navigation colocated</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code> (no legacy path). Move <code>pause-breath-step-navigation</code> (+ test) from duplicate <code>ritual/breath/</code> into <code>ritual/breathe/</code>; single consumer <code>use-pause-session-breath-step-handlers</code> import path updated.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Empty <code>ritual/breath/</code> folder removed; naming aligns with §3 breathe beat (not a separate top-level concern).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 remainder (ReflectGenerator / CompanionOrchestrator ports), or <code>ritual/brief/</code> beat consolidation per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
