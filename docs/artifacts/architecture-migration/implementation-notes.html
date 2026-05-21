@@ -12009,4 +12009,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock companion orchestrate session hook to frame loader (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-companion-orchestrate-session</code> presentation guardrail</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified complete — no reflect folder move. Add tests asserting the hook delegates to <code>loadCompanionOrchestrateSession</code> with <code>loadMoodHistoryForOrchestrate</code> as the mood-history port (frame session builder; not <code>CompanionOrchestrator</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Test-only — slot/intervention hooks mock this hook; explicit contract test documents the default wiring.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
