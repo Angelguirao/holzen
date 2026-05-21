@@ -8874,4 +8874,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — runPauseCompanionInterventionBootstrap on public-rpc (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; intervention bootstrap wired facade</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no legacy reflect use-case paths. Add <code>runPauseCompanionInterventionBootstrap</code> on <code>public-rpc</code> (wired <code>supabaseCompanionOrchestrator.invokeIntervention</code> + <code>fetchParsedPauseArtifactCache</code>); <code>use-companion-intervention-fetch</code> imports facade instead of use case + orchestrator adapter.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import surface only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other frame orchestration helpers still import <code>ritual/frame/*</code> directly until further thin facades land.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit stray mutations bypassing <code>PauseRepository</code>, or peel remaining companion presentation imports of <code>ritual/frame/*</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
