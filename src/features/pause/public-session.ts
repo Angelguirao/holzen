@@ -37,11 +37,6 @@ export {
   TERMINAL_PAUSE_DB_STATES,
 } from './application/use-cases/session/terminal-entry-guard';
 export {
-  pickPauseHolzenProvidersSlice,
-  type PauseHolzenProvidersSlice,
-  type PickPauseHolzenProvidersSliceSource,
-} from './application/use-cases/session/pause-holzen-providers-slice';
-export {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
   type PauseBreathSecondLabelVariant,
