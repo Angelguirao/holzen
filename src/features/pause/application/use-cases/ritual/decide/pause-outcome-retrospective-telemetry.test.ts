@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { trackPauseOutcomeRetrospective } from './archive-retrospective-telemetry';
+import { trackPauseOutcomeRetrospective } from './pause-outcome-retrospective-telemetry';
 
 const trackEvent = vi.fn();
 
@@ -7,7 +7,7 @@ vi.mock('@/lib/posthog', () => ({
   trackEvent: (...args: unknown[]) => trackEvent(...args),
 }));
 
-describe('archive-retrospective-telemetry', () => {
+describe('pause-outcome-retrospective-telemetry', () => {
   beforeEach(() => {
     trackEvent.mockClear();
   });

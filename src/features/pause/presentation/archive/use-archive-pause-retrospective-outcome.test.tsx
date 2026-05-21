@@ -17,9 +17,12 @@ vi.mock('@/features/pause/application/use-cases/ritual/decide/log-retrospective-
   logRetrospectiveOutcome: logRetrospectiveOutcomeMock,
 }));
 
-vi.mock('@/features/pause/presentation/archive/archive-retrospective-telemetry', () => ({
-  trackPauseOutcomeRetrospective: trackRetrospectiveMock,
-}));
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry',
+  () => ({
+    trackPauseOutcomeRetrospective: trackRetrospectiveMock,
+  }),
+);
 
 vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
   supabasePauseRepository: mockPauseRepository,
