@@ -8,12 +8,10 @@ import {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
 } from '@/features/pause/application/use-cases/ritual/breathe/ritual-audio';
+import type { PauseBreathingPhase } from '@/features/pause/application/use-cases/ritual/breathe/resolve-pause-breathing-timed-display';
 import { hapticFeedback } from '@/lib/haptics';
 
-export type PauseBreathingPhase = {
-  duration: number;
-  labelKey: string;
-};
+export type { PauseBreathingPhase };
 
 export type UsePauseBreathingTimedLoopInput = {
   phases: readonly PauseBreathingPhase[];
