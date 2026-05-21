@@ -2,12 +2,14 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-text';
 
-const { fetchReflectionTextMock } = vi.hoisted(() => ({
+const { fetchReflectionTextMock, mockReflectGenerator } = vi.hoisted(() => ({
   fetchReflectionTextMock: vi.fn(),
+  mockReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
 vi.mock('@/features/pause/infrastructure/supabase-reflect-generator', () => ({
   supabaseReflectGenerator: {
+    ...mockReflectGenerator,
     fetchReflectionText: fetchReflectionTextMock,
   },
 }));
@@ -53,6 +55,21 @@ describe('usePauseArtifactReflectionText', () => {
     await waitFor(() => {
       expect(result.current.artifactReflectionText).toBe('late read');
       expect(result.current.reflectionTextFetch).toBe('done');
+    });
+  });
+
+  it('routes artifact reads through the default ReflectGenerator port adapter', async () => {
+    fetchReflectionTextMock.mockResolvedValue('port-backed');
+
+    renderHook(() =>
+      usePauseArtifactReflectionText({
+        pauseInstanceId: 'pause-3',
+        trigger: 'immediate',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(fetchReflectionTextMock).toHaveBeenCalledWith('pause-3');
     });
   });
 });
