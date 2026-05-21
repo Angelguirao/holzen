@@ -5701,4 +5701,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect PostHog UI telemetry in ritual/reflect/telemetry (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Pure reflect beat trackers beside frame telemetry</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>pause-reflect-ui-telemetry</code> (+ test) from <code>presentation/reflect/telemetry/</code> to <code>application/use-cases/ritual/reflect/telemetry/</code> (same pattern as <code>ritual/frame/companion-generation-telemetry</code>); <code>use-pause-reflect-ui-telemetry</code> imports the use-case module directly.</dd>
+      <dt>Deviation</dt>
+      <dd>Reverses May 2026 presentation-local placement — reflect PostHog helpers are ritual-beat policy, not React conductors.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Application layer depends on <code>@/lib/posthog</code> (same as frame telemetry modules); presentation hook stays thin.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 audit stray <code>analytics_events</code> reads (e.g. dev-mode fetch), or colocate flat <code>use-pause-session-shell</code> under <code>presentation/session/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
