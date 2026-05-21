@@ -14,9 +14,11 @@ import {
   trackPauseManualCompleted,
 } from '@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry';
 import { openManualPauseFromHome } from '@/features/pause/application/use-cases/trigger/open-manual-pause-from-home';
-import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
-import { supabaseReflectGenerator } from '@/features/pause/infrastructure/supabase-reflect-generator';
-import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
+import {
+  supabasePauseRepository,
+  supabaseReflectGenerator,
+} from '@/features/pause/public-rpc';
+import { clearSession } from '@/features/pause/public-session';
 import { holzenLog } from '@/lib/holzen-console';
 
 const manualPauseOpenPorts = {

@@ -12541,4 +12541,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — session/home ports via public barrels (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Breath segment loggers + manual/open home preview off infrastructure</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder moves. Continue §6 barrel hygiene: <code>use-pause-breath-segment-rpc-loggers</code>, <code>use-manual-pause-trigger</code>, and <code>use-open-pause-home-preview</code> import <code>supabasePauseRepository</code> (and home manual trigger <code>supabaseReflectGenerator</code>) from <code>public-rpc</code>; <code>clearSession</code> from <code>public-session</code>. Tests mock barrels for port-lock parity.</dd>
+      <dt>Deviation</dt>
+      <dd>None — extends prior reflect <code>public-rpc</code> slice; session shell hooks still import <code>infrastructure/session/*</code> directly until sliced.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Import-path only; use cases unchanged. Did not batch companion/archive conductors in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: <code>public-rpc</code> / <code>public-session</code> for remaining session shell + companion/archive conductors, or wire more mutations through <code>PauseRepository</code> call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
