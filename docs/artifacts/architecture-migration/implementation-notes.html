@@ -10261,4 +10261,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home dismiss via PauseRepository (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; wire dismissOpenPauseHome through repository port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths; no reflect file moves. Replace ad-hoc <code>DismissOpenPauseHomePorts.dismissCurrent</code> with <code>PauseRepository</code> + <code>runPauseDismissCurrent</code>; <code>dismissOpenPauseHomePreview</code> passes <code>supabasePauseRepository</code> (same path as <code>pauseDismissCurrent</code> facade).</dd>
+      <dt>Deviation</dt>
+      <dd>None — preview clear + non-fatal RPC failure behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>openManualPauseFromHome</code> still uses <code>Pick&lt;PauseRepository, 'createOrReuse'&gt;</code> — separate slice if we unify home/trigger port shapes.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit remaining partial port shapes (manual trigger, lifecycle telemetry).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
