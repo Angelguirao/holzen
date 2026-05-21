@@ -14684,7 +14684,26 @@
       <dt>Tradeoffs</dt>
       <dd>None.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B <code>holzen-query-client-ref</code> shim or extract context fingerprint helpers beside manual-open generation cluster.</dd>
+      <dd>Next: extract context fingerprint helpers beside manual-open generation cluster.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual open create-or-reuse params in ritual/reflect/generation</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — context fingerprint cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Extract <code>buildManualPauseCreateOrReuseParams</code> (+ test) beside <code>build-manual-pause-open-params</code>; <code>openManualPauseFromHome</code> orchestrates create-or-reuse + silent stub only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>MANUAL_PAUSE_VOLATILITY_TEMPLATE</code> constant colocated with builder.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>mapCreateOrReuseError</code> stays in <code>open-manual-pause-from-home</code> until a shared error mapper peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>holzen-query-client-ref</code> shim or re-export create-or-reuse builder on <code>pause-home-io</code> if Home tests need it.</dd>
     </dl>
   </article>
 
