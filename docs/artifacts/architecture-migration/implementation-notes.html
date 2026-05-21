@@ -14935,4 +14935,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase B Tier 1 — App boot uses pause public-queries for QueryClient ref</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Cross-context shim peel — delete lib/holzen-query-client-ref</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Phase A pause backlog complete on branch. <code>App.tsx</code> imports <code>setHolzenQueryClient</code> from <code>@/features/pause/public-queries</code>; remove <code>src/lib/holzen-query-client-ref.ts</code> re-export shim (implementation already in <code>features/pause/infrastructure/</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>App shell now depends on pause <code>public-queries</code> for boot wiring; acceptable until a shared app-level query module exists.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion presentation I/O peels or <code>public-ritual-frame</code> barrel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
