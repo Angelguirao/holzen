@@ -7715,4 +7715,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — depth picker gate in domain/reflect/mood (backlog #1 incremental)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>isPauseSessionDepthPickerActive</code> → <code>domain/reflect/mood/pause-depth-picker-active.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. Depth-picker visibility is a reflect/mood ritual beat predicate, not session hydration — colocate with mood chrome flow helpers; <code>gate-flags.ts</code> keeps instance-fetch wait and re-exports the depth-picker helper for existing doc links.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation scaffold imports domain path directly; cross-context callers should not import gate predicates.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 peel remaining companion orchestrate <code>public-rpc</code> re-exports, or wire ritual log call sites through <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  isPauseSessionDepthPickerActive,
-  isPauseSessionWaitingForInstanceFetch,
-} from './gate-flags';
+import { isPauseSessionWaitingForInstanceFetch } from './gate-flags';
 
 describe('isPauseSessionWaitingForInstanceFetch', () => {
   it('is true only in fetch hydration without failure and without instance', () => {
@@ -48,48 +45,6 @@ describe('isPauseSessionWaitingForInstanceFetch', () => {
           grounding_title: null,
           grounding_body: null,
         },
-      }),
-    ).toBe(false);
-  });
-});
-
-describe('isPauseSessionDepthPickerActive', () => {
-  it('is true in session on picker with coalesced shell (message or instance id)', () => {
-    expect(
-      isPauseSessionDepthPickerActive({
-        phase: 'session',
-        ritualEntry: 'picker',
-        hasShellMessage: true,
-      }),
-    ).toBe(true);
-  });
-
-  it('is false without coalesced shell', () => {
-    expect(
-      isPauseSessionDepthPickerActive({
-        phase: 'session',
-        ritualEntry: 'picker',
-        hasShellMessage: false,
-      }),
-    ).toBe(false);
-  });
-
-  it('is false when ritual already chosen', () => {
-    expect(
-      isPauseSessionDepthPickerActive({
-        phase: 'session',
-        ritualEntry: 'deep',
-        hasShellMessage: true,
-      }),
-    ).toBe(false);
-  });
-
-  it('is false on done phase', () => {
-    expect(
-      isPauseSessionDepthPickerActive({
-        phase: 'done',
-        ritualEntry: 'picker',
-        hasShellMessage: true,
       }),
     ).toBe(false);
   });
