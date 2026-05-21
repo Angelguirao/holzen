@@ -90,6 +90,7 @@ import { runPauseDismissCurrent } from './application/use-cases/session/run-paus
 import type { LogCompanionFeedbackVoteInput } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
 import { runFetchCompanionFeedbackVote } from './application/use-cases/ritual/frame/run-fetch-companion-feedback-vote';
 import { runLogCompanionFeedbackVote } from './application/use-cases/ritual/frame/run-log-companion-feedback-vote';
+import { runLogCompanionFullviewOpened } from './application/use-cases/ritual/frame/run-log-companion-fullview-opened';
 import { logPauseCompanion as logPauseCompanionUseCase } from './application/use-cases/ritual/log/log-pause-companion';
 import {
   runLogPwaInstallAnalyticsEvent,
@@ -261,6 +262,13 @@ export function logPauseCompanionFeedbackVote(
   input: LogCompanionFeedbackVoteInput,
 ): Promise<{ ok: boolean }> {
   return runLogCompanionFeedbackVote(supabasePauseAnalyticsRepository, input);
+}
+
+/** Companion fullview open — wired `PauseAnalyticsRepository.insertEvent` (presentation telemetry). */
+export function logPauseCompanionFullviewOpened(
+  input: LogCompanionFullviewOpenedInput,
+): Promise<{ ok: boolean }> {
+  return runLogCompanionFullviewOpened(supabasePauseAnalyticsRepository, input);
 }
 
 /** Frame slot orchestrate — ritual session payload + mood history (wired for presentation). */
