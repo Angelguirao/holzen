@@ -13130,4 +13130,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate frame restore helper under ritual/frame/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up; frame ritual hydration cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After breath restore helpers landed in <code>ritual/breathe/restored-breath-ritual-state.ts</code>, move <code>initialFrameDoneFromRestored</code> out of <code>session/step-map.ts</code> into <code>ritual/frame/restored-frame-ritual-state.ts</code>. <code>step-map</code> keeps <code>mapPersistedStep</code>, phase/decide restore; <code>public-session</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; presentation still consumes via <code>public-hooks</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Phase/decide restore helpers remain in <code>step-map</code> until a follow-up slice groups them under <code>ritual/decide/</code> or session shell.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>initialDecisionFromRestored</code> → <code>ritual/decide/</code>, or Phase B subscription/auth <code>src/lib/*</code> shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
