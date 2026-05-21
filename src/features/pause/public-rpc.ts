@@ -129,13 +129,6 @@ import {
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
 import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from './application/use-cases/ritual/frame/persist-ui-step-completion';
 import type { CompanionUiCompletionStep } from './application/use-cases/ritual/frame/companion-ui-completion-types';
-import {
-  runEnsureBreathSegment1Logged,
-  runEnsureBreathSegment2Logged,
-  runLogBreathSegment1Skipped,
-  runLogBreathSegment2Skipped,
-  type RunBreathSegmentLogResult,
-} from './application/use-cases/ritual/breathe/run-breath-segment-log';
 import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
 import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
 import type { LogCompanionFeedbackVoteInput } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
@@ -243,7 +236,6 @@ export function dismissOpenPauseHomePreview(
 
 export type { BulkHoldApplyResult };
 export type { PostPauseFeelSnapshot };
-export type { RunBreathSegmentLogResult };
 export type { CompanionUiCompletionStep };
 export type { RunAdoptPendingPauseOfferResult, RunDeclinePendingPauseOfferResult };
 export type {
@@ -509,39 +501,6 @@ export function fetchHaikuTextForPauseInstance(pauseInstanceId: string): Promise
 }
 
 export { showPauseStepSyncFailedToast };
-export type { RunBreathSegmentLogResult };
-
-const breathSegmentLogDeps = {
-  onSegmentLogged: invalidateCompanionUiCompletionQuery,
-};
-
-/** Breath segment 1 — `breath_completed` via repository port (wired for presentation). */
-export function ensureBreathSegment1Logged(
-  input: Parameters<typeof runEnsureBreathSegment1Logged>[1],
-) {
-  return runEnsureBreathSegment1Logged(supabasePauseRepository, input, breathSegmentLogDeps);
-}
-
-/** Breath segment 2 — `breath_completed` via repository port (wired for presentation). */
-export function ensureBreathSegment2Logged(
-  input: Parameters<typeof runEnsureBreathSegment2Logged>[1],
-) {
-  return runEnsureBreathSegment2Logged(supabasePauseRepository, input, breathSegmentLogDeps);
-}
-
-/** Breath segment 1 skip — wired with default `PauseRepository`. */
-export function logBreathSegment1Skipped(
-  input: Parameters<typeof runLogBreathSegment1Skipped>[1],
-) {
-  return runLogBreathSegment1Skipped(supabasePauseRepository, input, breathSegmentLogDeps);
-}
-
-/** Breath segment 2 skip — wired with default `PauseRepository`. */
-export function logBreathSegment2Skipped(
-  input: Parameters<typeof runLogBreathSegment2Skipped>[1],
-) {
-  return runLogBreathSegment2Skipped(supabasePauseRepository, input, breathSegmentLogDeps);
-}
 
 /** Brief done save — `post_pause_emotion_logged` when check-in differs from ritual snapshot. */
 /** Brief done “Save to journey” — `post_pause_emotion_logged` when feel changed. */

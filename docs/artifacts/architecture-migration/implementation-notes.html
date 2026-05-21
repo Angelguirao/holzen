@@ -11024,6 +11024,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — feel-step constants peel to public-ritual-reflect (backlog #1 verified, §6)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -11037,6 +11038,21 @@
       <dd><code>public-hooks</code> still re-exports feel constants for non-peeled call sites; bulk <code>pauseStepLayout</code> peel remains.</dd>
       <dt>Open questions</dt>
       <dd>Next: bulk <code>pauseStepLayout</code> screen peel to <code>public-session</code>, <code>usePauseBriefDoneCheckIn</code> / <code>resolveDoneWallpaperMood</code> screen barrels, or backlog #4 <code>PauseRepository</code> audit.</dd>
+=======
+      <span>Phase A slice — reflect breath segment RPC loggers off public-rpc (backlog #1 verified, §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Breath_completed segment hooks wire ritual/breathe + PauseRepository directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) is complete on <code>cursor/arch-migrate-src-ca70</code>. Continue §6 slim <code>public-rpc</code>: <code>use-pause-breath-segment-rpc-loggers</code> imports <code>runEnsureBreathSegment*</code> / <code>runLogBreathSegment*</code> from <code>ritual/breathe/run-breath-segment-log</code> with <code>supabasePauseRepository</code> and companion UI invalidation deps; step-sync toast from <code>presentation/ritual/pause-step-sync-toast</code>. Removed breath segment facades from <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged; breath→reflect flow still dedupes via refs + domain outcome helper.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation hook imports default repository adapter (same wiring previously in <code>public-rpc</code> facades).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: presentation <code>PauseRepository</code> audit; peel remaining reflect step RPC facades off <code>public-rpc</code> where hooks are the only consumer.</dd>
+>>>>>>> 8dd53a1a (refactor(pause): peel reflect breath segment RPC off public-rpc)
     </dl>
   </article>
 
