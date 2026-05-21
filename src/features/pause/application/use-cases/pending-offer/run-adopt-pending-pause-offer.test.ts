@@ -4,14 +4,14 @@ import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
 describe('runAdoptPendingPauseOffer', () => {
   it('returns ok when repository returns instance id', async () => {
-    const repository = {
-      adoptPendingOffer: vi.fn().mockResolvedValue({ ok: true, instance_id: 'inst-1' }),
-    } as unknown as PauseRepository;
+    const adoptPendingOffer = vi.fn().mockResolvedValue({ ok: true, instance_id: 'inst-1' });
+    const repository = { adoptPendingOffer } as unknown as PauseRepository;
 
     await expect(runAdoptPendingPauseOffer(repository)).resolves.toEqual({
       status: 'ok',
       instanceId: 'inst-1',
     });
+    expect(adoptPendingOffer).toHaveBeenCalledOnce();
   });
 
   it('returns failed when repository response is incomplete', async () => {
