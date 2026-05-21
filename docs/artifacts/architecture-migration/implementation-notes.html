@@ -5207,4 +5207,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — Reflect message view resolver in domain (backlog #1 adjacent)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate <code>resolvePauseReflectMessageView</code> under <code>domain/reflect/generation/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves are complete. Pure Reflect card error/loading/body branch rules move from <code>screens/pause/lib/</code> to <code>domain/reflect/generation/</code>; <code>PauseReflectMessageBody</code> imports via <code>public-hooks</code> (same pattern as Frame haiku display body).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; tests colocated with domain module.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Screen component depends on pause <code>public-hooks</code> for a one-liner pure helper — acceptable per cross-context barrel rule.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 stray <code>PauseRepository</code> audit, or peel remaining reflect pure rules from <code>screens/pause/lib/</code> (e.g. <code>reflection-share-text</code>).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

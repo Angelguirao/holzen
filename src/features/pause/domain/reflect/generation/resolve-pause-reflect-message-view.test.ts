@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolvePauseReflectMessageView } from '@/screens/pause/lib/resolve-pause-reflect-message-view';
+import { resolvePauseReflectMessageView } from './resolve-pause-reflect-message-view';
 
 describe('resolvePauseReflectMessageView', () => {
   it('prefers error over loading', () => {

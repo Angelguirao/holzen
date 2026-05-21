@@ -2,7 +2,7 @@ import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { HomePauseBlockingErrorPanel } from '@/screens/home/components/HomePauseBlockingErrorPanel';
-import { resolvePauseReflectMessageView } from '@/screens/pause/lib/resolve-pause-reflect-message-view';
+import { resolvePauseReflectMessageView } from '@/features/pause/public-hooks';
 
 export type PauseReflectMessageBodyProps = {
   context: string | null;
