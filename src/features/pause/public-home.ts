@@ -1,6 +1,6 @@
 /**
  * Home pause widget read-model helpers (no Supabase).
- * Scheduling quarter-hour math: `public-scheduling`. Pending-offer read + completed count + dismiss outlet live here (§6 peel).
+ * Scheduling quarter-hour math: `public-scheduling`. Home widget reads + conductors (pending-offer, completed count, dismiss outlet, pause actions, context previews) live here (§6 peel).
  * Screens/home import here; pause/archive may use `public-hooks`. Presentation imports barrels, not `application/*`.
  */
 export {
