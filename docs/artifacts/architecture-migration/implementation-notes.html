@@ -15052,6 +15052,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — companion slot + intervention presentation I/O</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -15065,6 +15066,21 @@
       <dd>Other companion hooks still import <code>ritual/frame/</code> directly — peel retry/section/fullview incrementally.</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>public-ritual-frame</code> barrel or Phase B cross-context Tier 1 shim.</dd>
+=======
+      <span>Phase A slice — manual-open result types in domain</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — open-manual-pause-from-home-types → domain</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Move <code>open-manual-pause-from-home-types</code> (result unions + ports) to <code>domain/reflect/generation/</code> beside <code>open-manual-pause-from-home-params</code>; <code>open-manual-pause-from-home</code> orchestration re-exports from domain; <code>pause-home-manual-open-types</code> imports domain path.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Domain types module imports port interfaces (same pattern as create-or-reuse params).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: silent-mode cluster I/O on <code>pause-home-reflect-io</code> or companion slot orchestrate presentation barrel.</dd>
+>>>>>>> f29b1c5f (refactor(pause): move manual-open result types to domain generation)
     </dl>
   </article>
 
