@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — Home reflect telemetry I/O via home telemetry flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-telemetry-io</code> imports Home PostHog trackers through <code>pause-home-reflect-telemetry-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route <code>pause-home-reflect-telemetry-io</code> through <code>pause-home-reflect-telemetry-flow</code> instead of deep <code>home-pause-actions-telemetry</code> / <code>manual-pause-trigger-telemetry</code> paths (parity with <code>pause-reflect-telemetry-io</code> → <code>pause-reflect-telemetry-flow</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flow anchor is a thin re-export barrel for <code>check:architecture-alignment</code> Home reflect telemetry cluster detection.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: subscription Tier 1 shim following <code>holzen-query-client-ref</code>, or reconcile flow-anchor vs direct-import pattern across reflect clusters.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect telemetry I/O flow binding test (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-client-architecture.md</code> §10 session row documents <code>pause-reflect-telemetry-io</code> → flow anchor import path.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-home-reflect-telemetry-io</code> flow anchor, or subscription Tier 1 shim following <code>holzen-query-client-ref</code>.</dd>
+      <dd>Next: subscription Tier 1 shim following <code>holzen-query-client-ref</code>, or reconcile flow-anchor vs direct-import pattern across reflect clusters.</dd>
     </dl>
   </article>
 
