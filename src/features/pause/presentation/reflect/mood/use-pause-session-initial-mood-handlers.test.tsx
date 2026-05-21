@@ -14,7 +14,7 @@ const {
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-rpc', async () => {
+vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log', async () => {
   const mood = await vi.importActual<
     typeof import('@/features/pause/domain/reflect/mood/initial-emotion-presentation')
   >('@/features/pause/domain/reflect/mood/initial-emotion-presentation');
@@ -22,9 +22,16 @@ vi.mock('@/features/pause/public-rpc', async () => {
     runInitialEmotionSelect: runInitialEmotionSelectMock,
     runInitialEmotionSkip: runInitialEmotionSkipMock,
     initialEmotionResetUi: mood.initialEmotionResetUi,
-    showPauseStepSyncFailedToast,
   };
 });
+
+vi.mock('@/features/pause/application/use-cases/ritual/step-sync-toast', () => ({
+  showPauseStepSyncFailedToast,
+}));
+
+vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+  supabasePauseRepository: {},
+}));
 
 const syncedSelectUi = {
   moodDone: true,
