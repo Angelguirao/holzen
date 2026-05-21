@@ -154,25 +154,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — companion frame UI I/O via frame-ui flow anchor (backlog #2 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-companion-frame-ui-io</code> imports section visibility and full-view helpers through <code>pause-companion-frame-ui-flow</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) and #2 (<code>ritual/frame/</code>) folder moves remain complete — no folder moves. Route <code>pause-companion-frame-ui-io</code> through <code>pause-companion-frame-ui-flow</code> instead of deep <code>full-view-page-helpers</code> and <code>section-visibility</code> paths (pairs with orchestration/orchestrate presentation I/O anchors).</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior parity; import boundary only.</dd>
-      <dt>Tradeoffs</dt>
-      <dd>Flow anchor is a thin re-export barrel for <code>check:architecture-alignment</code> frame UI cluster detection.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: <code>pause-companion-analytics-io</code> flow anchor, or Phase B cross-context Tier 1 shim.</dd>
-    </dl>
-  </article>
-
-  <article class="note">
-    <header>
-      <span>2026-05-21</span>
       <span>Phase A slice — reflect flows I/O via flows-flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -18693,7 +18674,26 @@
       <dt>Tradeoffs</dt>
       <dd>Unit test mocks <code>run-shift-emotion-frame-hub-done</code> directly (same seam as mood/steps I/O).</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-companion-frame-ui-io</code> peel, Phase B cross-context Tier 1 shim (auth/subscription), or backlog #3 remaining <code>public.ts</code> peels.</dd>
+      <dd>Next: Phase B cross-context Tier 1 shim (auth/subscription), or backlog #3 remaining <code>public.ts</code> peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion frame UI I/O direct ritual/frame (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-frame-ui-io</code> off <code>pause-companion-frame-ui-flow</code> anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1–#2 (<code>ritual/reflect/</code>, <code>ritual/frame/</code>) remain complete — no folder moves. Align frame UI presentation I/O with reflect mood/flows peels: import <code>full-view-page-helpers</code> and <code>section-visibility</code> directly. Keep <code>pause-companion-frame-ui-flow.ts</code> as CI cluster anchor only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Conductors still import only <code>pause-companion-frame-ui-io</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-telemetry-io</code> flow peel, <code>pause-companion-analytics-io</code> anchor, or Phase B cross-context Tier 1 shim (auth/subscription).</dd>
     </dl>
   </article>
 
