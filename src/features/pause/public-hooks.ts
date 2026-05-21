@@ -307,7 +307,7 @@ export {
   useReflectionShareHandlers,
   type UseReflectionShareHandlersParams,
 } from './public-ritual-reflect';
-export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/reflect/mood/pause-depth-picker-styles';
+export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './public-ritual-reflect';
 export {
   useCompanionHistoryThread,
   type HistoryThreadRow,
