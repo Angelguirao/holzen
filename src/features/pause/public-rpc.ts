@@ -115,10 +115,6 @@ import {
   type RunPauseFavoriteToggleResult,
 } from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import {
-  runPauseReflectNoteUpdate,
-  type RunPauseReflectNoteUpdateResult,
-} from './application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
-import {
   runPauseReflectTagUpdate,
   type RunPauseReflectTagUpdateResult,
 } from './application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
@@ -456,13 +452,6 @@ export function logPauseFavoriteToggle(
   input: Parameters<typeof runPauseFavoriteToggle>[1],
 ): Promise<RunPauseFavoriteToggleResult> {
   return runPauseFavoriteToggle(supabasePauseRepository, input);
-}
-
-/** Reflect post-it note — `note_updated` via `PauseRepository` (wired for presentation). */
-export function logPauseReflectNoteUpdate(
-  input: Parameters<typeof runPauseReflectNoteUpdate>[1],
-): Promise<RunPauseReflectNoteUpdateResult> {
-  return runPauseReflectNoteUpdate(supabasePauseRepository, input);
 }
 
 /** Reflect tags — `tag_updated` via `PauseRepository` (wired for presentation). */

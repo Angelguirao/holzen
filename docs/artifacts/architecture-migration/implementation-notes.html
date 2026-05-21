@@ -11059,4 +11059,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect note hook off public-rpc (backlog #1 verified, backlog #4 / §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>note_updated: presentation → ritual/reflect/steps + PauseRepository</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move this session. Continue backlog #4 / §6 slim <code>public-rpc</code>: <code>use-pause-reflect-note</code> imports <code>runPauseReflectNoteUpdate</code> with <code>supabasePauseRepository</code> (same pattern as breath segment RPC loggers). Removed <code>logPauseReflectNoteUpdate</code> facade from <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Tag, favorite, and <code>reflection_step</code> hooks still use <code>public-rpc</code> facades until peeled incrementally.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-reflect-tags</code>, <code>use-pause-favorite-toggle</code>, or <code>use-pause-reflection-step-log</code> off <code>public-rpc</code>; bulk <code>pauseStepLayout</code> screen peel to <code>public-session</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
