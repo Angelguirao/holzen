@@ -1,7 +1,7 @@
 import {
   runInitialEmotionSelect,
   runInitialEmotionSkip,
-} from '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow';
 import {
   resolvePauseSessionChromeCloseAction,
   runDeepPausePickerEntryIfPro,

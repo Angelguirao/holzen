@@ -14,7 +14,7 @@ const {
 }));
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow',
   () => ({
     runInitialEmotionSelect: runInitialEmotionSelectMock,
     runInitialEmotionSkip: runInitialEmotionSkipMock,
