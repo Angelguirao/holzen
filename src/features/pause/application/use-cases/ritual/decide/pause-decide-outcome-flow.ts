@@ -4,7 +4,7 @@ import {
   type PauseImpactData,
 } from '@/features/pause/application/use-cases/ritual/decide/impact-data';
 import type { RunPauseOutcomeLogResult } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
-import type { WisdomQuote } from '@/features/pause/application/use-cases/session/wisdom-quotes';
+import type { WisdomQuote } from '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes';
 
 export type PauseDecideOutcomeFlow =
   | { kind: 'abort_sync_failed' }

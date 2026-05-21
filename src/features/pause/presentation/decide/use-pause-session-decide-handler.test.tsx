@@ -24,8 +24,8 @@ vi.mock('@/features/pause/public-rpc', async () => {
     typeof import('@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow')
   >('@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow');
   const quotes = await vi.importActual<
-    typeof import('@/features/pause/application/use-cases/session/wisdom-quotes')
-  >('@/features/pause/application/use-cases/session/wisdom-quotes');
+    typeof import('@/features/pause/application/use-cases/ritual/decide/wisdom-quotes')
+  >('@/features/pause/application/use-cases/ritual/decide/wisdom-quotes');
   return {
     logPauseOutcome: logPauseOutcomeMock,
     clearSession: () => clearSessionMock(),
