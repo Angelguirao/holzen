@@ -10061,7 +10061,7 @@
     <h3>ritual/reflect/ complete; terminal redirect predicates on session barrel</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 verified — no reflect moves. Export <code>isTerminalPauseDbState</code> and <code>persistedPauseSessionAllowsTerminalEntry</code> on <code>public-session.ts</code>; <code>use-pause-session-terminal-entry-redirect</code> imports the barrel.</dd>
+      <dd>Backlog #1 verified — no reflect moves. Export <code>isTerminalPauseDbState</code>, <code>persistedPauseSessionAllowsTerminalEntry</code>, and <code>TERMINAL_PAUSE_DB_STATES</code> on <code>public-session.ts</code>; <code>use-pause-session-terminal-entry-redirect</code> imports the barrel (composes with step-bundles peel).</dd>
       <dt>Deviation</dt>
       <dd>None — terminal DB set and local-storage allowance rules unchanged.</dd>
       <dt>Tradeoffs</dt>
