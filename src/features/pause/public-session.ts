@@ -29,10 +29,8 @@ export {
   hasPersistedPauseSessionPayload,
   type PersistedSessionAnchor,
 } from './domain/session/persisted-session-guards';
-export {
-  isPauseSessionDepthPickerActive,
-  isPauseSessionWaitingForInstanceFetch,
-} from './application/use-cases/session/gate-flags';
+export { isPauseSessionDepthPickerActive } from './domain/reflect/mood/pause-depth-picker-active';
+export { isPauseSessionWaitingForInstanceFetch } from './domain/session/waiting-for-instance-fetch';
 export {
   computePauseSessionHydration,
   computePauseSessionResolved,

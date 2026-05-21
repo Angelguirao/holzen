@@ -13244,4 +13244,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — drop session gate-flags shim; domain owns fetch-wait predicate</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up; session gate predicates</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After persisted-session guards moved to <code>domain/session/</code>, delete <code>application/use-cases/session/gate-flags.ts</code>. <code>isPauseSessionWaitingForInstanceFetch</code> lives in <code>domain/session/waiting-for-instance-fetch.ts</code>; depth-picker gate exports from <code>domain/reflect/mood/pause-depth-picker-active.ts</code> via <code>public-session.ts</code> only (no application re-export hop).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving; presentation already imported depth-picker from domain in scaffold conductor.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Fetch-wait input uses a narrow <code>hydrationStatus</code> union instead of importing <code>PauseSessionHydrationState</code> from application (domain must not depend on application).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>hydration</code> / <code>shell-view-model</code> exports on <code>public-session</code>, or Phase B <code>src/lib/*</code> shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

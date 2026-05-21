@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isPauseSessionWaitingForInstanceFetch } from './gate-flags';
+import { isPauseSessionWaitingForInstanceFetch } from './waiting-for-instance-fetch';
 
 describe('isPauseSessionWaitingForInstanceFetch', () => {
   it('is true only in fetch hydration without failure and without instance', () => {
