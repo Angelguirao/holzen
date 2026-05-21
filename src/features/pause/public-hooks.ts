@@ -449,7 +449,7 @@ export {
   usePauseSessionStepHandlers,
   type PauseSessionStepHandlersResult,
 } from './presentation/session/use-pause-session-step-handlers';
-export type { PauseSessionStepHandlersProvidersSlice } from './presentation/reflect/flows/pause-session-step-handler-types';
+export type { PauseSessionStepHandlersProvidersSlice } from './presentation/session/pause-session-step-handler-types';
 export {
   usePauseSessionScaffoldPresentation,
   type UsePauseSessionScaffoldPresentationParams,
