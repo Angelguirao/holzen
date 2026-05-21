@@ -39,6 +39,9 @@ export type {
   CompanionSlotRelaxations,
 } from './application/use-cases/ritual/frame/orchestrate-slot-apply';
 export { EMPTY_COMPANION_SLOT_RELAXATIONS } from './application/use-cases/ritual/frame/orchestrate-slot-apply';
+export { applyCompanionOrchestrateRetryReset } from './application/use-cases/ritual/frame/apply-companion-orchestrate-retry-reset';
+export { resetInterventionIdempotency } from './application/use-cases/ritual/frame/intervention-idempotency';
+export { nextExpandedWithLazyFetch } from './application/use-cases/ritual/frame/next-expanded-with-lazy-fetch';
 export type { LoadCompanionOrchestrateSessionInput } from './application/use-cases/ritual/frame/load-companion-orchestrate-session';
 import {
   runCompanionInterventionBootstrap as runCompanionInterventionBootstrapUseCase,
