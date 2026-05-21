@@ -6138,4 +6138,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect note hook test (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Add port-backed note conductor test</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> migration and <code>use-pause-reflect-note</code> port wiring were already on <code>cursor/arch-migrate-src-ca70</code> (<code>77f501d6</code>). Add <code>use-pause-reflect-note.test.tsx</code> mirroring home dismiss / favorite-toggle patterns — mocks <code>public-ports</code> <code>PauseRepository.logStep</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — no code path change.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Tags hook still has no dedicated test.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel companion orchestrate hooks from <code>public-rpc</code> or add tags hook test.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
