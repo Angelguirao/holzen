@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect telemetry I/O via telemetry flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-telemetry-io</code> imports session reflect PostHog trackers through <code>pause-reflect-telemetry-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route <code>pause-reflect-telemetry-io</code> through <code>pause-reflect-telemetry-flow</code> instead of deep <code>pause-reflect-session-ui-telemetry</code> (parity with steps/mood/hub presentation I/O anchors; Home manual-open telemetry stays on <code>pause-home-reflect-telemetry-io</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flow anchor is a thin re-export barrel for <code>check:architecture-alignment</code> reflect telemetry cluster detection.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-home-reflect-telemetry-io</code> flow anchor, or subscription Tier 1 shim following <code>holzen-query-client-ref</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — companion analytics I/O via analytics-flow anchor (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd>Flow anchor is a thin re-export barrel for <code>check:architecture-alignment</code> frame analytics cluster detection.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-reflect-telemetry-io</code> flow peel, or subscription Tier 1 shim following <code>holzen-query-client-ref</code>.</dd>
+      <dd>Next: <code>pause-home-reflect-telemetry-io</code> flow anchor, or subscription Tier 1 shim following <code>holzen-query-client-ref</code>.</dd>
     </dl>
   </article>
 
@@ -90,7 +109,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-reflect-steps-flow.ts</code> remains for <code>check:architecture-alignment</code> steps cluster detection.</dd>
       <dt>Open questions</dt>
-      <dd>Next: companion analytics flow anchor (done on branch tip), or telemetry I/O peel.</dd>
+      <dd>Next: subscription Tier 1 shim following <code>holzen-query-client-ref</code>, or reconcile flow-anchor vs direct-import pattern across reflect clusters.</dd>
     </dl>
   </article>
 
