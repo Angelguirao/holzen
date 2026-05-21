@@ -3,6 +3,7 @@ import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
 import { usePauseSessionDecideHandler } from './use-pause-session-decide-handler';
 import {
   showPauseOutcomeNotCompletedToast,
@@ -19,8 +20,9 @@ const { logStepMock, clearSessionMock, invalidatePauseStatsMock, mockRepository 
   };
 });
 
-vi.mock('@/features/pause/public-ports', () => ({
-  supabasePauseRepository: mockRepository,
+vi.mock('@/features/pause/public-rpc', () => ({
+  logPauseOutcome: (params: Parameters<typeof runPauseOutcomeLog>[1]) =>
+    runPauseOutcomeLog(mockRepository, params),
 }));
 
 vi.mock('@/lib/haptics', () => ({
