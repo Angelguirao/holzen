@@ -314,7 +314,6 @@ export {
   type UseReflectionShareHandlersParams,
 } from './presentation/reflect/share/use-reflection-share-handlers';
 export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/reflect/mood/pause-depth-picker-styles';
-export { useCompanionSlotOrchestratePorts } from './presentation/companion/use-companion-slot-orchestrate-ports';
 export { usePauseReflectionStepLog } from './presentation/reflect/steps/use-pause-reflection-step-log';
 export {
   usePauseReflectUiTelemetry,

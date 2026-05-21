@@ -5,7 +5,6 @@ import type {
   CompanionSlotRelaxations,
 } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
-import { useCompanionSlotOrchestratePorts } from './use-companion-slot-orchestrate-ports';
 import { useCompanionSlotOrchestrateFailurePorts } from './use-companion-slot-orchestrate-failure-ports';
 import { useCompanionSlotRunOrchestrate } from './use-companion-slot-run-orchestrate';
 
@@ -69,7 +68,6 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
     companionSlotErrorSetters,
   } = params;
 
-  const slotOrchestratePorts = useCompanionSlotOrchestratePorts();
   const failureUiPorts = useCompanionSlotOrchestrateFailurePorts({
     fetchedSlotsRef,
     requirePro,
@@ -84,7 +82,6 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
     mood,
     severityNumber,
     language,
-    slotOrchestratePorts,
     failureUiPorts,
     toast,
     refreshSubscription,
