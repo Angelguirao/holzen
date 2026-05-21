@@ -352,15 +352,15 @@ export {
   usePauseSessionReflectAndDecide,
   type UsePauseSessionReflectAndDecideParams,
 } from './presentation/reflect/flows/use-pause-session-reflect-and-decide';
-export { usePauseSessionDepthPickerHandlers } from './presentation/reflect/use-pause-session-depth-picker-handlers';
-export { usePauseSessionFeelTilesSelect } from './presentation/reflect/use-pause-session-feel-tiles-select';
-export { usePauseSessionInitialMoodHandlers } from './presentation/reflect/use-pause-session-initial-mood-handlers';
+export { usePauseSessionDepthPickerHandlers } from './presentation/reflect/steps/use-pause-session-depth-picker-handlers';
+export { usePauseSessionFeelTilesSelect } from './presentation/reflect/steps/use-pause-session-feel-tiles-select';
+export { usePauseSessionInitialMoodHandlers } from './presentation/reflect/steps/use-pause-session-initial-mood-handlers';
 export { usePauseSessionPersistToStorage } from './presentation/session/use-pause-session-persist-to-storage';
 export { usePauseSessionRitualStorageSync } from './presentation/session/use-pause-session-ritual-storage-sync';
 export {
   usePauseSessionMoodAndPersist,
   type UsePauseSessionMoodAndPersistParams,
-} from './presentation/reflect/use-pause-session-mood-and-persist';
+} from './presentation/reflect/steps/use-pause-session-mood-and-persist';
 export {
   usePauseSessionBreathNavigation,
   type UsePauseSessionBreathNavigationParams,
@@ -372,7 +372,7 @@ export {
 export { usePauseSessionExitNavigation } from './presentation/session/use-pause-session-exit-navigation';
 export { usePauseSessionPendingPauseOfferNavigation } from './presentation/session/use-pause-session-pending-pause-offer-navigation';
 export { usePauseSessionPendingLeaveSheet } from './presentation/session/use-pause-session-pending-leave-sheet';
-export { usePauseSessionMoodChromeHandlers } from './presentation/reflect/use-pause-session-mood-chrome-handlers';
+export { usePauseSessionMoodChromeHandlers } from './presentation/reflect/steps/use-pause-session-mood-chrome-handlers';
 export { usePauseSessionBreathReflectHandlers } from './presentation/reflect/flows/use-pause-session-breath-reflect-handlers';
 export { usePauseSessionEntryPresentationEffects } from './presentation/session/use-pause-session-entry-presentation-effects';
 export { usePauseSessionTerminalEntryRedirect } from './presentation/session/use-pause-session-terminal-entry-redirect';
