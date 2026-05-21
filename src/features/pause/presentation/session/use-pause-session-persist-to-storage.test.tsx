@@ -10,11 +10,15 @@ const { saveSessionMock } = vi.hoisted(() => ({
   saveSessionMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
-  clearSession: vi.fn(),
-  loadSession: () => null,
-  saveSession: (...args: unknown[]) => saveSessionMock(...args),
-}));
+vi.mock('@/features/pause/public-session', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/pause/public-session')>();
+  return {
+    ...actual,
+    clearSession: vi.fn(),
+    loadSession: () => null,
+    saveSession: (...args: unknown[]) => saveSessionMock(...args),
+  };
+});
 
 const companions = { haiku: null, groundingTitle: null, groundingBody: null } as const;
 const companionPrefs = {
