@@ -1,4 +1,4 @@
-import { logPauseStep } from '../../ritual/log-pause-step';
+import { logPauseStep } from '../../ritual/log/log-pause-step';
 import { buildOutcomeLoggedPayload } from '../../ritual/decide/outcome-log-payload';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from '@/features/pause/domain/bulk-hold';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';

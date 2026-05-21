@@ -1,4 +1,4 @@
-import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
+import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
 export type RunPauseReflectTagUpdateResult =
