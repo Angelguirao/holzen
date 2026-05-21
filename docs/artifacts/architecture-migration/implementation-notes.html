@@ -8000,4 +8000,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — feel-tiles mood log options in domain/reflect/mood (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>buildFeelTilesMoodLogOptions</code> → <code>domain/reflect/mood/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder migration is complete. <code>buildFeelTilesMoodLogOptions</code> shapes <code>InitialEmotionLogOpts</code> with no I/O — colocate beside <code>initial-emotion-log.ts</code> (prior slice had placed it under <code>application/ritual/reflect/mood/</code> next to <code>run-initial-emotion-log</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation feel-tiles hook imports domain directly; <code>run-initial-emotion-log</code> unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wired <code>runInitialEmotionSelect</code> / <code>runShiftEmotionFrameHubDone</code> facades on <code>public-rpc</code>, or port-backed analytics read for companion feedback vote fetch.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
