@@ -1,8 +1,7 @@
 /**
  * Pause read-model React hooks — import from here in screens and tests.
- * Pure frame/format helpers used by pause screens also live here (§6 slim `public.ts`).
+ * Ritual layout tokens: `public-session` (`pauseStepLayout`). Pure helpers: §6 slim `public.ts`.
  */
-export { pauseStepLayout } from './presentation/session/pause-step-layout';
 export {
   buildPauseSessionStepTransitionConfig,
   PAUSE_SESSION_STEP_SLIDE_OFFSET_PX,

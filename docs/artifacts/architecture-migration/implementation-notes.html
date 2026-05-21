@@ -14137,4 +14137,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — pauseStepLayout only on public-session (backlog #3 §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel duplicate layout token re-export from public-hooks</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>All pause ritual step components already import <code>pauseStepLayout</code> from <code>public-session</code>. Remove the duplicate re-export on <code>public-hooks</code> so session chrome tokens have one barrel.</dd>
+      <dt>Deviation</dt>
+      <dd>None.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Cross-context callers that need layout tokens must use <code>public-session</code> (none in active tree today).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>public-home</code> cluster 2b (pending-offer + completed count + dismiss outlet) or Phase B <code>holzen-query-client-ref</code> shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
