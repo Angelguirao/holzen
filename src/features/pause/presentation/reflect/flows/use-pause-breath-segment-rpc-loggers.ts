@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, type MutableRefObject } from 'react';
 import type { TFunction } from 'i18next';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
-import { applyBreathSegmentLogOutcome } from '@/features/pause/application/use-cases/ritual/reflect/flows/apply-breath-segment-log-outcome';
-import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/application/use-cases/ritual/reflect/flows/initial-breath-segment-rpc-flags';
+import { applyBreathSegmentLogOutcome } from '@/features/pause/domain/reflect/flows/apply-breath-segment-log-outcome';
+import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/domain/reflect/flows/initial-breath-segment-rpc-flags';
 import {
   ensureBreathSegment1Logged,
   ensureBreathSegment2Logged,
