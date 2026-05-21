@@ -30,5 +30,11 @@ export function isPauseMoodValue(s: string | null | undefined): s is MoodValue {
   return s != null && (PAUSE_MOOD_VALUES as readonly string[]).includes(s);
 }
 
+/** Ritual feel intensity slider: clamp to 1–5 with default 3. */
+export function clampFeelIntensity(n: number | null | undefined): number {
+  if (typeof n === 'number' && n >= 1 && n <= 5) return n;
+  return 3;
+}
+
 /** For `MoodCheck` presentation — mood groups with i18n keys. */
 export const PAUSE_MOOD_GROUPS = MOOD_GROUPS;

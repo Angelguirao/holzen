@@ -19,10 +19,6 @@ const { logStepMock, mockRepository, showPauseStepSyncFailedToast } = vi.hoisted
   };
 });
 
-const { showPauseStepSyncFailedToast } = vi.hoisted(() => ({
-  showPauseStepSyncFailedToast: vi.fn(),
-}));
-
 vi.mock('@/features/pause/public-rpc', () => ({
   runInitialEmotionSelect: (input: Parameters<typeof runInitialEmotionSelectUseCase>[1]) =>
     runInitialEmotionSelectUseCase(mockRepository, input),
