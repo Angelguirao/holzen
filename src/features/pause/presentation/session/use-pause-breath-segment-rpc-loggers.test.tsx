@@ -2,6 +2,12 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+import {
+  runEnsureBreathSegment1Logged,
+  runEnsureBreathSegment2Logged,
+  runLogBreathSegment1Skipped,
+  runLogBreathSegment2Skipped,
+} from '@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log';
 import { usePauseBreathSegmentRpcLoggers } from './use-pause-breath-segment-rpc-loggers';
 import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
@@ -16,13 +22,19 @@ const { logStepMock, invalidateCompanionUiCompletionQueryMock, mockRepository } 
   };
 });
 
-vi.mock('@/features/pause/public-ports', () => ({
-  supabasePauseRepository: mockRepository,
-}));
+const breathSegmentLogDeps = {
+  onSegmentLogged: invalidateCompanionUiCompletionQueryMock,
+};
 
-vi.mock('@/features/pause/application/queries/companion-ui-completion-query-key', () => ({
-  invalidateCompanionUiCompletionQuery: (...args: unknown[]) =>
-    invalidateCompanionUiCompletionQueryMock(...args),
+vi.mock('@/features/pause/public-rpc', () => ({
+  ensureBreathSegment1Logged: (input: Parameters<typeof runEnsureBreathSegment1Logged>[1]) =>
+    runEnsureBreathSegment1Logged(mockRepository, input, breathSegmentLogDeps),
+  ensureBreathSegment2Logged: (input: Parameters<typeof runEnsureBreathSegment2Logged>[1]) =>
+    runEnsureBreathSegment2Logged(mockRepository, input, breathSegmentLogDeps),
+  logBreathSegment1Skipped: (input: Parameters<typeof runLogBreathSegment1Skipped>[1]) =>
+    runLogBreathSegment1Skipped(mockRepository, input, breathSegmentLogDeps),
+  logBreathSegment2Skipped: (input: Parameters<typeof runLogBreathSegment2Skipped>[1]) =>
+    runLogBreathSegment2Skipped(mockRepository, input, breathSegmentLogDeps),
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/step-sync-toast', () => ({
