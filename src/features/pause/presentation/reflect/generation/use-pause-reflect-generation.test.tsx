@@ -8,10 +8,18 @@ const { pauseReflectGenerationMock, mockReflectGenerator } = vi.hoisted(() => ({
   mockReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
-vi.mock('./pause-reflect-generation-io', () => ({
-  reflectGenerator: mockReflectGenerator,
-  pauseReflectGeneration: pauseReflectGenerationMock,
-}));
+vi.mock('./pause-reflect-generation-io', async () => {
+  const hookFlow = await vi.importActual<
+    typeof import('@/features/pause/application/use-cases/ritual/reflect/generation/reflect-generation-hook-flow')
+  >(
+    '@/features/pause/application/use-cases/ritual/reflect/generation/reflect-generation-hook-flow',
+  );
+  return {
+    ...hookFlow,
+    reflectGenerator: mockReflectGenerator,
+    pauseReflectGeneration: pauseReflectGenerationMock,
+  };
+});
 
 vi.mock('./use-pause-artifact-reflection-text', () => ({
   usePauseArtifactReflectionText: vi.fn(),
