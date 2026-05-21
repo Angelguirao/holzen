@@ -3,8 +3,9 @@ import type { PersistedSession } from '@/features/pause/domain/session-model';
 import { mapPersistedStep } from '@/features/pause/application/use-cases/session/step-map';
 
 /**
- * When resuming from local storage past the first or second breath beat, `usePauseBreathSegmentRpcLoggers`
- * must treat `breath_completed` segment RPCs as already satisfied (refs start `true`).
+ * When resuming from local storage past the first or second breath beat,
+ * `presentation/reflect/flows/use-pause-breath-segment-rpc-loggers` must treat `breath_completed`
+ * segment RPCs as already satisfied (refs start `true`).
  * Uses the same `mapPersistedStep` + `STEPS` order as initial `step` state in `PauseSession.tsx`.
  */
 export function initialBreathSegmentRpcLoggedFlagsFromRestored(restored: PersistedSession | null): {

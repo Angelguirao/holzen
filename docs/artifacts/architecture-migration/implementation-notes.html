@@ -10375,4 +10375,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate breath segment RPC loggers under reflect/flows (backlog #1 verified, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; group breath→reflect conductor cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — 14 use-case modules under <code>ritual/reflect/</code>, zero <code>application/use-cases/reflect/</code>. Move <code>use-pause-breath-segment-rpc-loggers</code> (+ test) from <code>presentation/session/</code> to <code>presentation/reflect/flows/</code> beside <code>use-pause-session-breath-handlers</code> (sole consumer); <code>public-hooks</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — RPC still via <code>public-rpc</code> facades + <code>public-session</code> restore flags; behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Brief-only breathe paths that add segment loggers later should import from <code>reflect/flows/</code> or <code>public-hooks</code>, not <code>session/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #3: <code>public-ritual-breathe</code> peel for timed-loop helpers; backlog #4: unify <code>openManualPauseFromHome</code> port shape to full <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
