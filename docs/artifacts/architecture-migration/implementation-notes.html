@@ -7183,4 +7183,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion orchestrator via public-ports (backlog #2 / #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Frame presentation ports import CompanionOrchestrator from public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect backlog #1 and recent §6 peels are complete on remote. Align frame conductors: <code>use-companion-slot-orchestrate-ports</code> and <code>use-companion-intervention-fetch</code> import <code>supabaseCompanionOrchestrator</code> from <code>public-ports</code> (same adapter, no <code>public-rpc</code> side-effect barrel).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other companion hooks still use <code>public-rpc</code> wired facades until follow-up peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel session brief/breath presentation off <code>public-rpc</code>, or backlog #4 stray <code>PauseRepository</code> call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
