@@ -5815,4 +5815,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — brief-to-deep via public-ports (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel ritual_depth_upgraded from public-rpc in presentation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. <code>use-pause-session-brief-to-deep</code> calls <code>logPauseRitualDepthUpgraded</code> with <code>supabasePauseRepository</code> from <code>public-ports.ts</code>; <code>public-rpc</code> facade unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test mocks the use-case module directly.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Post-pause emotion and archive retrospective hooks still use <code>public-rpc</code> until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-brief-done-check-in</code> or <code>use-archive-pause-retrospective-outcome</code> from <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
