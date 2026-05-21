@@ -13567,4 +13567,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — decide handler on public-ritual-reflect (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>§6 peel — reflect flows hook off public-hooks direct path</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Export <code>usePauseSessionDecideHandler</code> from <code>public-ritual-reflect.ts</code> beside <code>usePauseSessionReflectAndDecide</code> (reflect/decide flows cluster); <code>public-hooks</code> re-exports the reflect barrel only. Completes the scaffold/decide peel started when persist/sync moved to <code>public-ritual-reflect</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving export peel only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Decide hook remains under <code>presentation/reflect/flows/</code> (not <code>ritual/decide/</code> presentation) because it composes with reflect-and-decide; use-case I/O stays in <code>ritual/decide/*</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>src/lib/*</code> shims (subscription/auth) or peel remaining per-hook <code>public-rpc</code> imports in companion orchestration.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

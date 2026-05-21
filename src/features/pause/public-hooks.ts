@@ -295,6 +295,7 @@ export {
   usePauseReflectUiTelemetry,
   usePauseSessionReflectAndDecide,
   type UsePauseSessionReflectAndDecideParams,
+  usePauseSessionDecideHandler,
   usePauseShiftFrameDoneHandler,
   useReflectionShareHandlers,
   type UseReflectionShareHandlersParams,
@@ -395,7 +396,6 @@ export {
   usePauseSessionBriefToDeep,
   type UsePauseSessionBriefToDeepParams,
 } from './presentation/session/use-pause-session-brief-to-deep';
-export { usePauseSessionDecideHandler } from './presentation/reflect/flows/use-pause-session-decide-handler';
 export {
   usePauseSessionBreathNavigation,
   type UsePauseSessionBreathNavigationParams,

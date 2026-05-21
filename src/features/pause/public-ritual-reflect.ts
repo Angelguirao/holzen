@@ -58,6 +58,7 @@ export {
   usePauseSessionReflectAndDecide,
   type UsePauseSessionReflectAndDecideParams,
 } from './presentation/reflect/flows/use-pause-session-reflect-and-decide';
+export { usePauseSessionDecideHandler } from './presentation/reflect/flows/use-pause-session-decide-handler';
 export { usePauseSessionDepthAndBriefCopy } from './presentation/reflect/mood/use-pause-session-depth-and-brief-copy';
 export { usePauseSessionPersistToStorage } from './presentation/reflect/scaffold/use-pause-session-persist-to-storage';
 export { usePauseSessionRitualStorageSync } from './presentation/reflect/scaffold/use-pause-session-ritual-storage-sync';
