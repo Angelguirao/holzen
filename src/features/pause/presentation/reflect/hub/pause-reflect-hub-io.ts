@@ -1,8 +1,8 @@
 import {
   resolveShiftFrameHubDonePresentation,
-  runShiftEmotionFrameHubDone,
   type ShiftFrameHubDonePresentation,
-} from '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-flow';
+} from '@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation';
+import { runShiftEmotionFrameHubDone } from '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 export {
