@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for ritual reflect+decide flows presentation I/O (§3 / check:architecture-alignment).
  * Re-exports reflect preflight/post-generation and decide outcome helpers for application-layer imports.
- * Presentation: `pause-reflect-flows-io.ts` imports domain/run-* directly (CI anchor only).
+ * Presentation: `pause-reflect-flows-io.ts` imports through this anchor (off deep domain/decide paths).
  */
 export {
   resolvePauseSessionReflectAndDecideAfterGeneration,

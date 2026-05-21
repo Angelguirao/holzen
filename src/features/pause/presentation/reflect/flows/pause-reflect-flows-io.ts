@@ -1,23 +1,19 @@
 /**
  * Reflect+decide flows presentation I/O (preflight, decide outcome RPC, outcome toasts).
- * Imports domain reflect/decide helpers and `run-pause-outcome-log` directly (off
- * `pause-reflect-flows-flow` and decide flow CI anchors; parity with steps/mood/share I/O peels).
+ * Imports reflect/decide helpers and `runPauseOutcomeLog` via `pause-reflect-flows-flow` CI anchor
+ * (parity with hub/steps/share I/O flow anchors).
  */
 import {
   formatReinforcementQuoteFromSession,
+  getSessionQuote,
   resolvePauseDecideOutcomeFlow,
-} from '@/features/pause/domain/decide/pause-decide-outcome-flow';
-import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
-import {
-  showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
-} from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
-import { getSessionQuote } from '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes';
-import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
+  runPauseOutcomeLog,
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
   type PauseSessionReflectAndDecideViewInput,
-} from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 

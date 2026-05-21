@@ -2,9 +2,18 @@ import { describe, expect, it, vi } from 'vitest';
 
 const runPauseOutcomeLogMock = vi.hoisted(() => vi.fn());
 
-vi.mock('@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log', () => ({
-  runPauseOutcomeLog: runPauseOutcomeLogMock,
-}));
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow',
+  async (importOriginal) => {
+    const actual = await importOriginal<
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow')
+    >();
+    return {
+      ...actual,
+      runPauseOutcomeLog: runPauseOutcomeLogMock,
+    };
+  },
+);
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
@@ -20,7 +29,7 @@ import {
 } from './pause-reflect-flows-io';
 
 describe('pause-reflect-flows-io', () => {
-  it('re-exports reflect-and-decide preflight helpers for presentation conductors', () => {
+  it('re-exports reflect-and-decide preflight helpers from pause-reflect-flows-flow', () => {
     const view = resolvePauseSessionReflectAndDecidePreflight({
       seedMessage: 'seed',
       ritualEntry: 'deep',
@@ -31,7 +40,7 @@ describe('pause-reflect-flows-io', () => {
     expect(view.effectiveReflectionMessage).toBe('seed');
   });
 
-  it('re-exports decide flow helpers for presentation conductors', () => {
+  it('re-exports decide flow helpers from pause-reflect-flows-flow', () => {
     const quote = getSessionQuote();
     expect(formatReinforcementQuoteFromSession(quote)).toContain(quote.author);
     expect(
