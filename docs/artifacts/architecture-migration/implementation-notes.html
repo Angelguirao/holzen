@@ -15600,4 +15600,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lifecycle create/dismiss facades on public-rpc (backlog #4; reflect Home)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; restore wired lifecycle exports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete on <code>cursor/arch-migrate-src-ca70</code> — no folder moves. Re-add <code>pauseCreateOrReuse</code> and <code>pauseDismissCurrent</code> on <code>public-rpc.ts</code> (delegate to session use cases + <code>supabasePauseRepository</code>); <code>pauseDismissOpenPauseHomePreview</code> calls <code>pauseDismissCurrent()</code> instead of inlining repository wiring. <code>openManualPauseFromHome</code> still injects <code>repository.createOrReuse</code> via <code>pauseHomeManualOpenPorts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>Facades were previously peeled in <code>9369c55a</code> as unused; this slice restores them with an active Home dismiss call site.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pauseDismissOpenPauseHomePreviewWithRepository</code> keeps <code>dismissOpenPauseHome</code> for tests; production Home path uses the facade only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel session breath timed-loop helpers through <code>pause-session-breath-io</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
