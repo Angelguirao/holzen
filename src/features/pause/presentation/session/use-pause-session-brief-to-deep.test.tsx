@@ -1,12 +1,21 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 
-const { logPauseRitualDepthUpgradedMock } = vi.hoisted(() => ({
-  logPauseRitualDepthUpgradedMock: vi.fn().mockResolvedValue(true),
+const { logPauseRitualDepthUpgradedMock, showPauseStepSyncFailedToast } = vi.hoisted(() => ({
+  logPauseRitualDepthUpgradedMock: vi.fn().mockResolvedValue({ status: 'success' as const }),
+  showPauseStepSyncFailedToast: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
+vi.mock('@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade', () => ({
   logPauseRitualDepthUpgraded: logPauseRitualDepthUpgradedMock,
+}));
+
+vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+  supabasePauseRepository: {},
+}));
+
+vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
+  showPauseStepSyncFailedToast,
 }));
 
 import { usePauseSessionBriefToDeep } from './use-pause-session-brief-to-deep';
@@ -78,13 +87,13 @@ describe('usePauseSessionBriefToDeep', () => {
     await act(async () => {
       await result.current.handleBriefSwitchToDeepPause();
     });
-    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith('pause-1', expect.any(Function));
+    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith({}, 'pause-1');
     expect(setRitualEntry).toHaveBeenCalledWith('deep');
     expect(setStep).toHaveBeenCalledWith('reflect');
   });
 
-  it('handleBriefSwitchToDeepPause bails when RPC facade returns false', async () => {
-    logPauseRitualDepthUpgradedMock.mockResolvedValueOnce(false);
+  it('handleBriefSwitchToDeepPause bails when RPC sync fails', async () => {
+    logPauseRitualDepthUpgradedMock.mockResolvedValueOnce({ status: 'sync_failed' });
     const setStep = vi.fn();
     const t = ((key: string) => key) as Parameters<typeof usePauseSessionBriefToDeep>[0]['t'];
     const { result } = renderHook(() =>
@@ -93,7 +102,8 @@ describe('usePauseSessionBriefToDeep', () => {
     await act(async () => {
       await result.current.handleBriefSwitchToDeepPause();
     });
-    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith('pause-1', t);
+    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith({}, 'pause-1');
+    expect(showPauseStepSyncFailedToast).toHaveBeenCalledWith(t);
     expect(setStep).not.toHaveBeenCalled();
   });
 });

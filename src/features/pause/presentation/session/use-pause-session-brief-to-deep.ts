@@ -1,7 +1,9 @@
 import { useCallback, useEffect, type Dispatch, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
+import { logPauseRitualDepthUpgraded } from '@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade';
+import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
+import { showPauseStepSyncFailedToast } from '@/features/pause/presentation/ritual/pause-step-sync-toast';
 import { briefSwitchToDeepPauseState } from '@/features/pause/public-ritual-brief';
-import { logPauseRitualDepthUpgraded } from '@/features/pause/public-rpc';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 
@@ -57,8 +59,11 @@ export function usePauseSessionBriefToDeep({
   const handleBriefSwitchToDeepPause = useCallback(async () => {
     if (!requirePro('deep_pause')) return;
     if (pauseInstanceId) {
-      const ok = await logPauseRitualDepthUpgraded(pauseInstanceId, t);
-      if (!ok) return;
+      const outcome = await logPauseRitualDepthUpgraded(supabasePauseRepository, pauseInstanceId);
+      if (outcome.status === 'sync_failed') {
+        showPauseStepSyncFailedToast(t);
+        return;
+      }
     }
     const next = briefSwitchToDeepPauseState();
     setSwipeDirection('forward');

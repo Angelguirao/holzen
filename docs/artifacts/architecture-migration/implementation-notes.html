@@ -11211,4 +11211,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — brief→deep upgrade off public-rpc (backlog #1 verified / #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-pause-session-brief-to-deep → PauseRepository port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no folder move. Frame-hub shift peel was already on remote (<code>b797a0f3</code>). <code>use-pause-session-brief-to-deep</code> calls <code>logPauseRitualDepthUpgraded</code> + <code>supabasePauseRepository</code> and step-sync toast from <code>presentation/ritual/</code>; <code>public-rpc</code> boolean facade unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Decide outcome and brief done check-in still use <code>public-rpc</code> facades.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-pause-session-decide-handler</code> or <code>use-pause-brief-done-check-in</code>; audit companion presentation <code>public-rpc</code> imports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
