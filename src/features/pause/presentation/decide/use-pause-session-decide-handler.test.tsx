@@ -9,20 +9,18 @@ import {
   showPauseOutcomeSaveFailedToast,
 } from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
 
-const { runPauseOutcomeLogMock, clearSessionMock, invalidatePauseStatsMock, mockRepository } =
-  vi.hoisted(() => ({
-    runPauseOutcomeLogMock: vi.fn(),
+const { logStepMock, clearSessionMock, invalidatePauseStatsMock, mockRepository } = vi.hoisted(() => {
+  const logStepMock = vi.fn();
+  return {
+    logStepMock,
     clearSessionMock: vi.fn(),
     invalidatePauseStatsMock: vi.fn(),
-    mockRepository: { logStep: vi.fn() } as unknown as PauseRepository,
-  }));
+    mockRepository: { logStep: logStepMock } as unknown as PauseRepository,
+  };
+});
 
 vi.mock('@/features/pause/public-ports', () => ({
   supabasePauseRepository: mockRepository,
-}));
-
-vi.mock('@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log', () => ({
-  runPauseOutcomeLog: (...args: unknown[]) => runPauseOutcomeLogMock(...args),
 }));
 
 vi.mock('@/lib/haptics', () => ({
@@ -44,13 +42,9 @@ vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () 
   saveSession: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/pause/public')>();
-  return {
-    ...actual,
-    getSessionQuote: () => ({ text: 'Q', author: 'A' }),
-  };
-});
+vi.mock('@/features/pause/application/use-cases/session/wisdom-quotes', () => ({
+  getSessionQuote: () => ({ text: 'Q', author: 'A' }),
+}));
 
 vi.mock('@/features/auth/public', () => ({
   useAuth: () => ({
@@ -88,7 +82,7 @@ function baseInput(overrides: Partial<Parameters<typeof usePauseSessionDecideHan
 }
 
 beforeEach(() => {
-  runPauseOutcomeLogMock.mockReset();
+  logStepMock.mockReset();
   clearSessionMock.mockReset();
   invalidatePauseStatsMock.mockReset();
   vi.mocked(showPauseOutcomeSaveFailedToast).mockClear();
@@ -97,16 +91,12 @@ beforeEach(() => {
 
 describe('usePauseSessionDecideHandler', () => {
   it('completes without outcome RPC when no pause instance id', async () => {
-    runPauseOutcomeLogMock.mockResolvedValueOnce({ status: 'no_instance' });
     const input = baseInput();
     const { result } = renderHook(() => usePauseSessionDecideHandler(input));
     await act(async () => {
       await result.current.handleDecide('hold');
     });
-    expect(runPauseOutcomeLogMock).toHaveBeenCalledWith(mockRepository, {
-      pauseInstanceId: null,
-      decision: 'hold',
-    });
+    expect(logStepMock).not.toHaveBeenCalled();
     expect(invalidatePauseStatsMock).not.toHaveBeenCalled();
     expect(input.setDecision).toHaveBeenCalledWith('hold');
     expect(clearSessionMock).toHaveBeenCalled();
@@ -115,17 +105,17 @@ describe('usePauseSessionDecideHandler', () => {
   });
 
   it('logs outcome and completes when RPC returns completed', async () => {
-    runPauseOutcomeLogMock.mockResolvedValueOnce({ status: 'completed' });
+    logStepMock.mockResolvedValueOnce('completed');
     const input = baseInput({ pauseInstanceId: 'pi-1' });
     const { result } = renderHook(() => usePauseSessionDecideHandler(input));
     await act(async () => {
       await result.current.handleDecide('hold');
     });
-    expect(runPauseOutcomeLogMock).toHaveBeenCalledTimes(1);
-    expect(runPauseOutcomeLogMock.mock.calls[0]).toEqual([
-      mockRepository,
-      { pauseInstanceId: 'pi-1', decision: 'hold' },
-    ]);
+    expect(logStepMock).toHaveBeenCalledTimes(1);
+    expect(logStepMock.mock.calls[0][0]).toMatchObject({
+      instanceId: 'pi-1',
+      stepType: 'outcome_logged',
+    });
     expect(invalidatePauseStatsMock).not.toHaveBeenCalled();
     expect(input.refreshSubscription).toHaveBeenCalled();
     expect(input.setDecision).toHaveBeenCalledWith('hold');
@@ -133,7 +123,7 @@ describe('usePauseSessionDecideHandler', () => {
   });
 
   it('toasts and aborts when outcome RPC throws', async () => {
-    runPauseOutcomeLogMock.mockResolvedValueOnce({ status: 'sync_failed' });
+    logStepMock.mockRejectedValueOnce(new Error('rpc failed'));
     const input = baseInput({ pauseInstanceId: 'pi-1' });
     const { result } = renderHook(() => usePauseSessionDecideHandler(input));
     await act(async () => {
@@ -146,10 +136,7 @@ describe('usePauseSessionDecideHandler', () => {
   });
 
   it('toasts and refreshes subscription when outcome is not completed', async () => {
-    runPauseOutcomeLogMock.mockResolvedValueOnce({
-      status: 'not_completed',
-      outcomeState: 'pending',
-    });
+    logStepMock.mockResolvedValueOnce('pending');
     const input = baseInput({ pauseInstanceId: 'pi-1' });
     const { result } = renderHook(() => usePauseSessionDecideHandler(input));
     await act(async () => {
