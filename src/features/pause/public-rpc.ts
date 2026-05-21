@@ -22,14 +22,11 @@ import { supabasePauseRepository } from './infrastructure/supabase-pause-reposit
 import { supabaseCompanionOrchestrator } from './infrastructure/supabase-companion-orchestrator';
 import { supabasePauseAnalyticsRepository } from './infrastructure/supabase-pause-analytics-repository';
 import { supabaseReflectGenerator } from './infrastructure/supabase-reflect-generator';
-import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
-
 export {
   supabasePauseRepository,
   supabaseCompanionOrchestrator,
   supabasePauseAnalyticsRepository,
   supabaseReflectGenerator,
-  reflectionStepSessionStorage,
 };
 export type { CompanionOrchestrateSessionContext } from './application/use-cases/ritual/frame/build-companion-orchestrate-body';
 export type {
@@ -112,8 +109,6 @@ import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUse
 import type { CompanionUiCompletionStep } from './application/use-cases/ritual/frame/companion-ui-completion-types';
 import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
 import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
-import type { LogCompanionFeedbackVoteInput } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
-import { runLogCompanionFeedbackVote } from './application/use-cases/ritual/frame/run-log-companion-feedback-vote';
 import { runLogCompanionFullviewOpened } from './application/use-cases/ritual/frame/run-log-companion-fullview-opened';
 import { logPauseCompanion as logPauseCompanionUseCase } from './application/use-cases/ritual/log/log-pause-companion';
 import { runToggleCompanionLibraryFavorite } from './application/use-cases/ritual/frame/run-toggle-companion-library-favorite';
@@ -258,13 +253,6 @@ export type {
   LogCompanionFullviewOpenedInput,
 } from './application/use-cases/ritual/frame/log-companion-fullview-opened';
 export type { LogPwaInstallAnalyticsEventInput } from './application/use-cases/home/run-log-pwa-install-analytics-event';
-
-/** Companion feedback vote write — wired `PauseAnalyticsRepository.logCompanionFeedbackVote`. */
-export function logPauseCompanionFeedbackVote(
-  input: LogCompanionFeedbackVoteInput,
-): Promise<{ ok: boolean }> {
-  return runLogCompanionFeedbackVote(supabasePauseAnalyticsRepository, input);
-}
 
 /** Companion fullview open — wired `PauseAnalyticsRepository.insertEvent` (observation only). */
 export function logPauseCompanionFullviewOpened(
