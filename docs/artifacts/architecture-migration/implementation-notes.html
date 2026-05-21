@@ -14498,4 +14498,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual open types in ritual/reflect/generation</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect cluster incremental — backlog #1 verified</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. Peel <code>OpenManualPauseFromHome*</code> types and <code>pauseCreateSkippedUserMessage</code> into <code>ritual/reflect/generation/</code> so <code>build-manual-pause-open-params</code> no longer imports from <code>trigger/open-manual-pause-from-home</code>; trigger orchestrator re-exports types for stable call sites.</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>openManualPauseFromHome</code> stays in <code>trigger/</code> (create-or-reuse + telemetry orchestration).</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>apply-manual-pause-open-result</code> still lives under <code>trigger/</code> until a Home presentation I/O peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>apply-manual-pause-open-result</code> under <code>presentation/home/</code> or move open orchestrator types-only consumers to <code>pause-home-io</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
