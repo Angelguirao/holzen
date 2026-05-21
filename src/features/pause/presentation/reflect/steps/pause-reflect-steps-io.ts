@@ -1,3 +1,7 @@
+/**
+ * Reflect step mutation presentation I/O (bound PauseRepository + step storage).
+ * Imports run-* use cases and domain step gates directly (off steps-flow CI anchor).
+ */
 import { runPauseFavoriteToggle } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import { runPauseReflectNoteUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
 import { runPauseReflectTagUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
