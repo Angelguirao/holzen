@@ -71,7 +71,26 @@
       <dt>Tradeoffs</dt>
       <dd>Query read path unchanged; toggle write path only on I/O module.</dd>
       <dt>Open questions</dt>
-      <dd>Next: bind <code>use-pause-session-decide-handler</code> decide-cluster imports through flows-io, or lifecycle create/dismiss thin use cases on <code>public-rpc</code>.</dd>
+      <dd>Next: lifecycle create/dismiss thin use cases on <code>public-rpc</code>, or reflect share hook test port-lock.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect flows decide-handler I/O (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Decide cluster re-exports on <code>pause-reflect-flows-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Extend <code>presentation/reflect/flows/pause-reflect-flows-io.ts</code> with decide beat helpers (<code>resolvePauseDecideOutcomeFlow</code>, outcome toasts, <code>getSessionQuote</code>) so <code>use-pause-session-decide-handler</code> imports presentation I/O only; expand <code>pause-reflect-flows-io.test.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; RPC outcome log binding unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Decide use cases stay under <code>application/use-cases/ritual/decide/</code> (ritual beat, not reflect folder); I/O module is the reflect/decide conductor seam.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: bind <code>use-reflection-share-handlers</code> through <code>pause-reflect-share-io</code> only (hook already uses io — verify tests).</dd>
     </dl>
   </article>
 
