@@ -63,12 +63,14 @@ import { invalidateCompanionUiCompletionQuery } from './application/queries/comp
 import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from './application/use-cases/ritual/frame/persist-ui-step-completion';
 import type { CompanionUiCompletionStep } from './application/use-cases/ritual/frame/companion-ui-completion-types';
 import {
+  applyBreathSegmentLogOutcome,
   runEnsureBreathSegment1Logged,
   runEnsureBreathSegment2Logged,
   runLogBreathSegment1Skipped,
   runLogBreathSegment2Skipped,
   type RunBreathSegmentLogResult,
 } from './application/use-cases/ritual/breathe/run-breath-segment-log';
+import { initialBreathSegmentRpcLoggedFlagsFromRestored } from './application/use-cases/session/step-map';
 import {
   initialEmotionResetUi,
   runInitialEmotionSelect as runInitialEmotionSelectUseCase,
@@ -398,6 +400,9 @@ export function logPauseOutcome(params: {
 }) {
   return runPauseOutcomeLog(supabasePauseRepository, params);
 }
+
+export { applyBreathSegmentLogOutcome, initialBreathSegmentRpcLoggedFlagsFromRestored };
+export type { RunBreathSegmentLogResult };
 
 const breathSegmentLogDeps = {
   onSegmentLogged: invalidateCompanionUiCompletionQuery,

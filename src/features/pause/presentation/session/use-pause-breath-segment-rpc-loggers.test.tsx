@@ -3,11 +3,13 @@ import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import {
+  applyBreathSegmentLogOutcome,
   runEnsureBreathSegment1Logged,
   runEnsureBreathSegment2Logged,
   runLogBreathSegment1Skipped,
   runLogBreathSegment2Skipped,
 } from '@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log';
+import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/application/use-cases/session/step-map';
 import { usePauseBreathSegmentRpcLoggers } from './use-pause-breath-segment-rpc-loggers';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
@@ -33,6 +35,8 @@ vi.mock('@/features/pause/public-rpc', () => ({
     runLogBreathSegment1Skipped(mockRepository, input, breathSegmentLogDeps),
   logBreathSegment2Skipped: (input: Parameters<typeof runLogBreathSegment2Skipped>[1]) =>
     runLogBreathSegment2Skipped(mockRepository, input, breathSegmentLogDeps),
+  applyBreathSegmentLogOutcome,
+  initialBreathSegmentRpcLoggedFlagsFromRestored,
   showPauseStepSyncFailedToast,
 }));
 
