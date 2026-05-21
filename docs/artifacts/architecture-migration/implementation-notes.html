@@ -59,19 +59,38 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect steps I/O via steps flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-io</code> imports step mutations and gates through <code>pause-reflect-steps-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route <code>pause-reflect-steps-io</code> through <code>pause-reflect-steps-flow</code> instead of deep <code>run-pause-*</code> and <code>domain/reflect/steps/*</code> paths (parity with mood/hub/flows/ambience presentation I/O anchors; generation I/O stays direct domain + holzen-reflect sibling imports).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flow anchor is a thin re-export barrel for <code>check:architecture-alignment</code> reflect steps cluster detection.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-telemetry-io</code> flow peel, <code>pause-companion-analytics-io</code> flow anchor, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect hub I/O via hub-flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
     <h3><code>pause-reflect-hub-io</code> imports shift-frame hub through <code>pause-reflect-hub-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route <code>pause-reflect-hub-io</code> through <code>pause-reflect-hub-flow</code> instead of deep <code>run-shift-emotion-frame-hub-done</code> and <code>domain/reflect/hub/shift-frame-hub-done-presentation</code> paths (parity with mood/share/flows presentation I/O anchors; steps and generation I/O use direct sibling imports off their CI anchors).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route <code>pause-reflect-hub-io</code> through <code>pause-reflect-hub-flow</code> instead of deep <code>run-shift-emotion-frame-hub-done</code> and <code>domain/reflect/hub/shift-frame-hub-done-presentation</code> paths (parity with mood/share/flows presentation I/O anchors; generation I/O uses direct sibling imports off its CI anchor).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
       <dd>Hub flow anchor stays a thin re-export barrel for <code>check:architecture-alignment</code> reflect hub cluster detection.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-reflect-telemetry-io</code> flow peel, <code>pause-reflect-steps-io</code> through <code>pause-reflect-steps-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: <code>pause-reflect-telemetry-io</code> flow peel, share I/O flow-anchor parity, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
