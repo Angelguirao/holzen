@@ -74,7 +74,7 @@ vi.mock('./breath/use-pause-session-breath-reflect-handlers', () => ({
   usePauseSessionBreathReflectHandlers: usePauseSessionBreathReflectHandlersMock,
 }));
 
-vi.mock('@/features/pause/public-session', () => ({
+vi.mock('@/features/pause/application/use-cases/session/step-bundles', () => ({
   buildPauseSessionStepShellBundle: buildPauseSessionStepShellBundleMock,
   buildPauseSessionStepRitualBundle: buildPauseSessionStepRitualBundleMock,
 }));

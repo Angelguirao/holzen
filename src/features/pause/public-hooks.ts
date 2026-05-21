@@ -181,18 +181,6 @@ export {
 export { usePauseBriefIntegrateCountdown } from './presentation/session/use-pause-brief-integrate-countdown';
 export { usePauseBreathSegmentRpcLoggers } from './presentation/session/breath/use-pause-breath-segment-rpc-loggers';
 export {
-  initialBreathingFirstCompletedFromRestored,
-  initialBreathingSecondCompletedFromRestored,
-  initialBriefIntegrateDoneFromRestored,
-  initialBriefPauseStepFromRestored,
-  initialDecisionFromRestored,
-  initialFrameDoneFromRestored,
-  initialPhaseFromRestored,
-  initialRitualEntry,
-  initialSelectedBriefFaceFromRestored,
-  mapPersistedStep,
-} from './public-session';
-export {
   useBulkHoldPending,
   bulkHoldPendingQueryKey,
   type BulkHoldPendingPause,
