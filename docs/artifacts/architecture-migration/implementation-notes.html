@@ -12066,4 +12066,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock reflect/frame focus ambience hook to domain (backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-reflect-frame-focus-ambience</code> presentation guardrail</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Add tests asserting the hook delegates start/stop to <code>domain/reflect/ambience/reflect-frame-focus-ambience</code> and gates playback on active + unmuted + motion preference.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Test-only — domain module already has audio runtime tests; hook test documents presentation→domain contract.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: <code>use-pause-session-mood-chrome-handlers</code> composite port-lock, PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
