@@ -7924,4 +7924,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — session go-to-step ritual types off public-hooks (backlog #3 §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Smallest session presentation cluster after reflect types peel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Continue §6 slim barrel: <code>use-pause-session-go-to-step</code>, <code>scaffold-ritual-payloads</code>, and <code>use-pause-session-brief-past-step</code> import <code>PauseStep</code> / <code>BriefPauseStep</code> from <code>domain/</code> instead of <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — import paths only; behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Remaining session breath/navigation hooks still use <code>public-hooks</code> for ritual types until a follow-up batch.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: batch remaining <code>presentation/session/*</code> ritual type imports, or port-backed analytics read for companion feedback vote fetch.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
