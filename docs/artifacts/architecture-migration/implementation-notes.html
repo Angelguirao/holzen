@@ -11872,7 +11872,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>use-pause-breath-segment-rpc-loggers</code> stays under <code>presentation/reflect/flows/</code> (session conductor wiring); only domain + barrel paths changed.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: <code>use-pause-reflect-generation</code> ReflectGenerator port sentinel, optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+      <dd>Next backlog #4: <code>use-pause-reflect-generation</code> ReflectGenerator port sentinel (landed in follow-up commit), optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
     </dl>
   </article>
 
@@ -11892,6 +11892,25 @@
       <dd>Companion orchestrate/intervention presentation hooks still lack port sentinels — defer to next backlog #4 slice.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: <code>use-companion-slot-run-orchestrate</code> / <code>use-companion-intervention-fetch</code> CompanionOrchestrator assertions, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock holzen-reflect generation hook to ReflectGenerator port (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/generation presentation port-lock</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Align <code>use-pause-reflect-generation</code> tests to the shared <code>port: 'supabaseReflectGenerator'</code> sentinel and assert <code>runReflectGeneration</code> receives the default adapter (matches <code>use-manual-pause-trigger</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Test-only — closes the weak <code>{}</code> reflect-generator mock on the core Reflect beat hook.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: <code>use-fullview-telemetry</code> analytics port sentinel, <code>use-companion-slot-run-orchestrate</code> / <code>use-companion-intervention-fetch</code> CompanionOrchestrator assertions, or Phase B subscription/auth template slice.</dd>
     </dl>
   </article>
 

@@ -3,8 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { usePauseReflectGeneration } from './use-pause-reflect-generation';
 import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-text';
 
-const { runReflectGenerationMock } = vi.hoisted(() => ({
+const { runReflectGenerationMock, mockReflectGenerator } = vi.hoisted(() => ({
   runReflectGenerationMock: vi.fn(),
+  mockReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
 vi.mock(
@@ -15,7 +16,7 @@ vi.mock(
 );
 
 vi.mock('@/features/pause/infrastructure/supabase-reflect-generator', () => ({
-  supabaseReflectGenerator: {},
+  supabaseReflectGenerator: mockReflectGenerator,
 }));
 
 vi.mock('./use-pause-artifact-reflection-text', () => ({
@@ -103,7 +104,14 @@ describe('usePauseReflectGeneration', () => {
     await waitFor(() => {
       expect(result.current.reflectionMessage).toBe('persisted reflection');
     });
-    expect(runReflectGenerationMock).toHaveBeenCalled();
+    expect(runReflectGenerationMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pauseInstanceId: 'pause-1',
+        userId: 'user-1',
+        context: 'btc',
+      }),
+      mockReflectGenerator,
+    );
   });
 
   it('keeps nav seed when initialReflectionMessage is non-empty', async () => {
@@ -147,6 +155,28 @@ describe('usePauseReflectGeneration', () => {
     resolveEdge({ status: 'generated', message: 'edge copy' });
     await waitFor(() => {
       expect(result.current.reflectionMessage).toBe('edge copy');
+    });
+  });
+
+  it('routes holzen-reflect through the default ReflectGenerator port adapter', async () => {
+    runReflectGenerationMock.mockResolvedValue({ status: 'generated', message: 'edge' });
+    usePauseArtifactReflectionTextMock.mockReturnValue({
+      artifactReflectionText: null,
+      reflectionTextFetch: 'idle',
+    });
+
+    renderHook(() => usePauseReflectGeneration(baseParams()));
+
+    await waitFor(() => {
+      expect(runReflectGenerationMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pauseInstanceId: 'pause-1',
+          userId: 'user-1',
+          context: 'btc',
+          severityAbsPct: 50,
+        }),
+        mockReflectGenerator,
+      );
     });
   });
 
