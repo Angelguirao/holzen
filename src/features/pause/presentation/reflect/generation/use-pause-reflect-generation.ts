@@ -9,7 +9,7 @@ import {
   resolveReflectGenerationPrefetch,
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/reflect-generation-hook-flow';
+} from './reflect-generation-hook-flow';
 import { resolveEffectiveReflectionCopy } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
 import { runPauseReflectGeneration } from '@/features/pause/public-rpc';
 import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-text';
