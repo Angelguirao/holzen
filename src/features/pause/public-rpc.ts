@@ -36,7 +36,7 @@ export {
 } from './infrastructure/edge/grounding-enrich-edge';
 import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
 import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
-import type { RunReflectGenerationInput } from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
+import type { RunReflectGenerationInput } from './application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation';
 import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
 import type { PauseRepository } from './ports/pause-repository';
 import { showPauseStepSyncFailedToast } from './presentation/ritual/pause-step-sync-toast';
