@@ -4,8 +4,11 @@ import { clampFeelIntensity } from '@/features/pause/application/use-cases/ritua
 import type { MoodValue } from '../domain/mood-value';
 import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
 import { isPauseMoodValue } from '@/features/pause/domain/mood-value';
-import { logPostPauseEmotionIfDirty } from '@/features/pause/public-rpc';
-import type { PostPauseFeelSnapshot } from '@/features/pause/application/use-cases/ritual/done/post-pause-emotion-log';
+import {
+  runPostPauseEmotionLogIfDirty,
+  type PostPauseFeelSnapshot,
+} from '@/features/pause/application/use-cases/ritual/done/post-pause-emotion-log';
+import { supabasePauseRepository } from '@/features/pause/public-ports';
 
 export type UsePauseBriefDoneCheckInParams = {
   doneVariant: 'default' | 'brief';
@@ -43,7 +46,7 @@ export function usePauseBriefDoneCheckIn({
     if (!onSaveToJourney) return;
     setSaveBusy(true);
     try {
-      const outcome = await logPostPauseEmotionIfDirty({
+      const outcome = await runPostPauseEmotionLogIfDirty(supabasePauseRepository, {
         pauseInstanceId: pauseInstanceId ?? null,
         mood: briefDoneMood,
         intensity: briefDoneIntensity,
