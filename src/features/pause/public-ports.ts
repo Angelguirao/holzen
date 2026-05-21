@@ -11,3 +11,4 @@ export {
   supabaseCompanionOrchestrator,
 } from './infrastructure/supabase-companion-orchestrator';
 export { supabasePauseAnalyticsRepository } from './infrastructure/supabase-pause-analytics-repository';
+export { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
