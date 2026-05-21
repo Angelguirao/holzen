@@ -4403,7 +4403,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>reflect-generation-enabled</code> and <code>reflect-generation-hook-flow</code> remain under <code>ritual/reflect/generation/</code> until a later peel.</dd>
+      <dd><code>reflect-generation-hook-flow</code> and <code>run-reflect-generation</code> remain under <code>ritual/reflect/generation/</code> until a later peel.</dd>
       <dt>Open questions</dt>
       <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4), or Phase B cross-context slice.</dd>
     </dl>
@@ -4460,7 +4460,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>favorite-toast.ts</code> stays in <code>ritual/reflect/steps/</code> (Sonner side effect); peel to presentation if we split UI effects later.</dd>
+      <dd>Sonner toast peeled in a follow-up slice to <code>presentation/reflect/steps/pause-favorite-pro-hint-toast.ts</code>.</dd>
       <dt>Open questions</dt>
       <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
     </dl>
@@ -4482,6 +4482,25 @@
       <dd><code>reflect-generation-hook-flow</code> and <code>run-reflect-generation</code> remain under <code>ritual/reflect/generation/</code> until a later peel.</dd>
       <dt>Open questions</dt>
       <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4), or peel <code>reflect-generation-hook-flow</code> if another reflect domain cluster is needed.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — favorite pro-hint toast in presentation/reflect/steps (Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Sonner toast leaves application use-cases</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> migration and <code>domain/favorite-toggle.ts</code> were already on <code>cursor/arch-migrate-src-ca70</code>. Move <code>showPauseFavoriteProHintToast</code> from <code>ritual/reflect/steps/favorite-toast</code> to <code>presentation/reflect/steps/pause-favorite-pro-hint-toast.ts</code>; <code>use-pause-favorite-toggle</code> imports sibling presentation module (domain + <code>public-rpc</code> + <code>public-queries</code> unchanged).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Toast helper is presentation-only (Sonner + i18n); use cases stay free of UI dependencies.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4 remainder), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
     </dl>
   </article>
 
