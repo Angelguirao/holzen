@@ -75,6 +75,16 @@ const PAUSE_RPC_CLIENT_IMPORT_NEEDLES = [
   "from '../pause-rpc-client'",
 ];
 
+const PAUSE_ANALYTICS_EVENTS_ALLOWLIST = new Set([
+  'src/features/pause/infrastructure/analytics-events.ts',
+  'src/features/pause/infrastructure/supabase-pause-analytics-repository.ts',
+]);
+const PAUSE_ANALYTICS_EVENTS_IMPORT_NEEDLES = [
+  "from '@/features/pause/infrastructure/analytics-events",
+  "from './analytics-events'",
+  "from '../analytics-events'",
+];
+
 for (const file of walkTs(join(root, 'src'))) {
   const rel = relative(root, file).replace(/\\/g, '/');
   if (rel.startsWith('legacy/')) continue;
@@ -89,6 +99,16 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: direct pause-rpc-client import (${needle}) — use PauseRepository via supabase-pause-repository`,
+        );
+        break;
+      }
+    }
+  }
+  if (!PAUSE_ANALYTICS_EVENTS_ALLOWLIST.has(rel)) {
+    for (const needle of PAUSE_ANALYTICS_EVENTS_IMPORT_NEEDLES) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: direct analytics-events import (${needle}) — use PauseAnalyticsRepository via supabase-pause-analytics-repository`,
         );
         break;
       }
