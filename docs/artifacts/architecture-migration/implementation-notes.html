@@ -10774,4 +10774,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath flow domain type imports (backlog #1 verified, §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>reflect/flows breath hooks avoid public-hooks barrel cycle</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After parallel barrel peels on <code>public-ritual-reflect</code>, <code>usePauseSessionBreathHandlers</code> and <code>usePauseSessionBreathStepHandlers</code> import <code>PauseStep</code> / <code>BriefPauseStep</code> / <code>RitualDepth</code> from <code>domain/</code> instead of <code>public-hooks</code> so <code>public-hooks</code> → barrel → breath modules does not create a type re-export cycle.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other presentation modules may still import ritual types from <code>public-hooks</code> until peeled incrementally.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: <code>PauseRepository</code> presentation audit (pending-offer, stray RPC paths).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
