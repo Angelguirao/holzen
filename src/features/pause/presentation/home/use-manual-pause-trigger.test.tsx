@@ -21,15 +21,12 @@ const {
   mockReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
-vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
+vi.mock('@/features/pause/public-session', () => ({
   clearSession: clearSessionMock,
 }));
 
-vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: mockPauseRepository,
-}));
-
-vi.mock('@/features/pause/infrastructure/supabase-reflect-generator', () => ({
   supabaseReflectGenerator: mockReflectGenerator,
 }));
 
