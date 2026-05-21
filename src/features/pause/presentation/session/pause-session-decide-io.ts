@@ -1,6 +1,6 @@
 /**
  * Presentation I/O for `/pause` decide ritual hydration from `PersistedSession`.
- * Session restore hooks import here instead of deep `application/use-cases/ritual/decide/*`.
+ * Imports restored decide fields from `ritual/decide/` (off `pause-session-decide-flow` CI anchor).
  */
 export {
   initialDecisionFromRestored,
