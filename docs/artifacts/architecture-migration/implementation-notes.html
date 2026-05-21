@@ -5150,4 +5150,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation artifact prefetch tests (backlog #1 adjacent)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-reflect-generation.test.tsx</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves are complete. Lock artifact prefetch contract: empty nav seed enables <code>usePauseArtifactReflectionText</code>, hydrates <code>reflectionMessage</code> before a stalled <code>runPauseReflectGeneration</code> resolves, and does not override a non-empty seed.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests mock child hook + RPC; no production behavior change.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Does not integration-test real artifact query — covered by <code>use-pause-artifact-reflection-text.test.tsx</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 <code>PauseRepository</code> stragglers or move remaining flat companion orchestration hooks under <code>presentation/companion/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
