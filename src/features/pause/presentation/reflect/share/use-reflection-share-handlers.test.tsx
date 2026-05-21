@@ -7,9 +7,13 @@ vi.mock('sonner', () => ({
   toast: Object.assign(vi.fn(), { error: vi.fn() }),
 }));
 
-vi.mock('./pause-reflect-share-io', () => ({
-  pauseReflectionShareImage: vi.fn(async () => 'downloaded' as const),
-}));
+vi.mock('./pause-reflect-share-io', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./pause-reflect-share-io')>();
+  return {
+    ...actual,
+    pauseReflectionShareImage: vi.fn(async () => 'downloaded' as const),
+  };
+});
 
 describe('useReflectionShareHandlers', () => {
   const t = ((key: string) => key) as unknown as TFunction;

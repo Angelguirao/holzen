@@ -1,13 +1,13 @@
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { SITE_ORIGIN } from '@/config/site';
-import { buildReflectionShareText } from '@/features/pause/domain/reflect/share/reflection-share-text';
 import {
   buildReflectionShareTelegramUrl,
+  buildReflectionShareText,
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
-} from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';
-import { pauseReflectionShareImage } from './pause-reflect-share-io';
+  pauseReflectionShareImage,
+} from './pause-reflect-share-io';
 import type { UseReflectionShareHandlersParams } from './reflection-share-handler-types';
 
 export type { UseReflectionShareHandlersParams } from './reflection-share-handler-types';
