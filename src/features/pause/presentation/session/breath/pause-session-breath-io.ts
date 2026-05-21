@@ -12,7 +12,7 @@ export {
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
   resolveBreathingPhaseAdvanceOutcome,
-} from '@/features/pause/application/use-cases/ritual/breathe/phase-advance';
+} from '@/features/pause/domain/ritual/breathe/phase-advance';
 export type { PauseBreathingPhase } from '@/features/pause/application/use-cases/ritual/breathe/pause-breathing-phase';
 export {
   playPauseBreathPatternCompleteCue,

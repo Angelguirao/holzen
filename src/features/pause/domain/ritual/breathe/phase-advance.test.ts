@@ -3,12 +3,12 @@ import {
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
   resolveBreathingPhaseAdvanceOutcome,
-} from './phase-advance';
+} from '@/features/pause/domain/ritual/breathe/phase-advance';
 import {
   BOX_BREATH_PHASE_COUNT,
   BRIEF_TRIANGLE_CYCLE_COUNT,
   TRIANGLE_PHASE_COUNT,
-} from './ritual-pattern';
+} from '@/features/pause/application/use-cases/ritual/breathe/ritual-pattern';
 
 describe('resolveBreathingCompleted', () => {
   it('uses session-local completion when parent prop is false', () => {
