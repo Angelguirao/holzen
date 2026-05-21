@@ -6375,13 +6375,13 @@
     <h3>Peel use-pause-breath-segment-rpc-loggers from public-ports</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no folder move. <code>use-pause-breath-segment-rpc-loggers</code> calls wired <code>ensureBreathSegment*</code> / <code>logBreathSegment*Skipped</code> on <code>public-rpc</code> instead of use cases + <code>supabasePauseRepository</code> from <code>public-ports</code>; test mocks <code>public-rpc</code> while delegating to use cases with stub <code>PauseRepository</code>.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no folder move. <code>use-pause-breath-segment-rpc-loggers</code> calls wired <code>ensureBreathSegment*</code> / <code>logBreathSegment*Skipped</code> and <code>showPauseStepSyncFailedToast</code> on <code>public-rpc</code> instead of use cases + <code>supabasePauseRepository</code> from <code>public-ports</code>; test mocks <code>public-rpc</code> while delegating to use cases with stub <code>PauseRepository</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Pending-offer mutations and archive retrospective outcome still use <code>public-ports</code> until peeled.</dd>
+      <dd>Pure <code>applyBreathSegmentLogOutcome</code> remains a direct application import (no I/O). Pending-offer mutations and archive retrospective outcome still use <code>public-ports</code> until peeled.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>use-pending-pause-offer-mutations</code> or <code>use-archive-pause-retrospective-outcome</code> through <code>public-rpc</code>.</dd>
+      <dd>Next: peel <code>use-pause-session-initial-mood-handlers</code> step-sync toast (done in follow-up slice), then <code>use-pending-pause-offer-mutations</code> or <code>use-archive-pause-retrospective-outcome</code>.</dd>
     </dl>
   </article>
 
@@ -6439,6 +6439,25 @@
       <dd>Companion UI completion and analytics read paths still use <code>public-ports</code> until peeled.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>use-companion-ui-completion</code> through <code>persistCompanionUiStepCompletion</code> on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect initial mood step-sync toast via public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel use-pause-session-initial-mood-handlers sync toast from application</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. <code>use-pause-session-initial-mood-handlers</code> imports <code>showPauseStepSyncFailedToast</code> from <code>public-rpc</code> alongside existing <code>runInitialEmotionSelect</code> / <code>runInitialEmotionSkip</code> facades; test mocks the barrel only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>initialEmotionResetUi</code> remains a direct application import (pure UI state).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-brief-done-check-in</code> via <code>logPostPauseEmotionIfDirty</code>, or reflect decide handler outcome flow through <code>public-rpc</code>.</dd>
     </dl>
   </article>
 
