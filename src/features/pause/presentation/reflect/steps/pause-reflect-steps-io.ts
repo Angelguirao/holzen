@@ -1,4 +1,5 @@
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+import { shouldLogPauseReflectionStep } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflection-step-flow';
 import { runPauseFavoriteToggle } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import { runPauseReflectNoteUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
 import { runPauseReflectTagUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
@@ -7,6 +8,8 @@ import {
   reflectionStepSessionStorage,
   supabasePauseRepository,
 } from '@/features/pause/public-rpc';
+
+export { shouldLogPauseReflectionStep };
 
 /** Default port + use case: reflect post-it tags commit. */
 export function pauseReflectTagUpdate(

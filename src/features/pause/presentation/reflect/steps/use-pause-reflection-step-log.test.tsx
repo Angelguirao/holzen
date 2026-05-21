@@ -6,9 +6,15 @@ const { pauseReflectionStepLogOnceMock } = vi.hoisted(() => ({
   pauseReflectionStepLogOnceMock: vi.fn(),
 }));
 
-vi.mock('./pause-reflect-steps-io', () => ({
-  pauseReflectionStepLogOnce: pauseReflectionStepLogOnceMock,
-}));
+vi.mock('./pause-reflect-steps-io', async () => {
+  const { shouldLogPauseReflectionStep } = await import(
+    '@/features/pause/domain/reflect/steps/reflection-step-log'
+  );
+  return {
+    shouldLogPauseReflectionStep,
+    pauseReflectionStepLogOnce: pauseReflectionStepLogOnceMock,
+  };
+});
 
 beforeEach(() => {
   pauseReflectionStepLogOnceMock.mockReset().mockResolvedValue({ status: 'logged' });

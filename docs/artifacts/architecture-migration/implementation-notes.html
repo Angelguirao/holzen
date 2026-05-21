@@ -15499,7 +15499,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; re-exports only.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>use-pause-session-ritual-state</code> still imports <code>ritual/frame/restored-frame-ritual-state</code> directly — peel in follow-up slices.</dd>
+      <dd><code>use-pause-session-ritual-state</code> still imported <code>ritual/frame/restored-frame-ritual-state</code> directly until ritual-restore-io slice.</dd>
       <dt>Open questions</dt>
       <dd>Next: lifecycle create/dismiss facades on <code>public-rpc</code>, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
@@ -15616,6 +15616,25 @@
       <dd><code>pauseDismissOpenPauseHomePreviewWithRepository</code> keeps <code>dismissOpenPauseHome</code> for tests; production Home path uses the facade only.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel session breath timed-loop helpers through <code>pause-session-breath-io</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflection_step gate via steps flow anchor (backlog #1, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflection-step-flow</code> in <code>ritual/reflect/steps/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder move remains complete — no relocations. Add <code>pause-reflection-step-flow.ts</code> beside step mutation use cases; <code>pause-reflect-steps-io</code> re-exports <code>shouldLogPauseReflectionStep</code>; <code>use-pause-reflection-step-log</code> imports gate + RPC facade from steps I/O only (same pattern as hub/flows anchors).</dd>
+      <dt>Deviation</dt>
+      <dd>None — domain still owns pure gate; behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other reflect step hooks (favorite pro hint, mood chrome) still import domain directly — peel incrementally.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: lifecycle create/dismiss thin use cases on <code>public-rpc</code>, session breath hooks through <code>pause-session-breath-io</code>, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
