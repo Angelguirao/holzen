@@ -110,6 +110,7 @@ export {
   type PauseScienceStepKey,
 } from './domain/pause-science/pause-science-steps';
 export { stepHighlightsScienceRow } from './domain/pause-science/pause-science-step-highlight';
+export { briefStepToPauseScienceStep } from './domain/pause-science/brief-step-to-pause-science-step';
 export type { FeelStepTile } from './domain/feel-step-tile';
 export { PAUSE_FEEL_STEP_TILE_ROWS } from './domain/pause-feel-step-tiles';
 export {

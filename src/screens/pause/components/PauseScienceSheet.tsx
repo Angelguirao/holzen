@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import type { PauseStep } from '@/screens/pause/components/PauseProgress';
+import type { PauseStep } from '@/features/pause/public-hooks';
 import { PauseScienceStepRow } from '@/screens/pause/components/pause-science-step-row';
 import { PAUSE_SCIENCE_STEPS, stepHighlightsScienceRow } from '@/features/pause/public-hooks';
 

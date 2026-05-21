@@ -5587,4 +5587,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — brief science step map in domain/pause-science (backlog #1 complete)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate brief→deep science highlight keys with pause-science domain</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code> — no legacy reflect paths remain. Move <code>briefStepToPauseScienceStep</code> from <code>session/step-map</code> to <code>domain/pause-science/</code>; export via <code>public-hooks</code>. <code>PauseScienceSheet</code> imports <code>PauseStep</code> from <code>public-hooks</code> (not <code>PauseProgress</code> screen re-export).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving; function was only referenced by its unit test.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Brief science sheet callers can adopt <code>briefStepToPauseScienceStep</code> when wiring dynamic <code>currentStep</code>; depth picker still passes a literal <code>feel</code> key.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 audit remaining mutation/analytics stragglers, or move <code>pause-shift-frame-hub-flow</code> to <code>ritual/reflect/</code> or <code>ritual/feel/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

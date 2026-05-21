@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 import {
-  briefStepToPauseScienceStep,
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
   initialBreathSegmentRpcLoggedFlagsFromRestored,
@@ -127,15 +126,6 @@ describe('initialDecisionFromRestored', () => {
 
   it('reads stored decision', () => {
     expect(initialDecisionFromRestored(makeTestPersistedPauseSession({ decision: 'hold' }))).toBe('hold');
-  });
-});
-
-describe('briefStepToPauseScienceStep', () => {
-  it('maps brief steps to deep stepper keys for science sheet', () => {
-    expect(briefStepToPauseScienceStep('feel')).toBe('feel');
-    expect(briefStepToPauseScienceStep('breath')).toBe('breathe');
-    expect(briefStepToPauseScienceStep('integrate')).toBe('reflect');
-    expect(briefStepToPauseScienceStep('decide')).toBe('decide');
   });
 });
 
