@@ -3949,26 +3949,26 @@
       <dt>Tradeoffs</dt>
       <dd>Flat <code>presentation/</code> now holds only shared layout helpers (e.g. <code>pause-step-layout</code>, <code>load-settings-data-export-bundle</code>).</dd>
       <dt>Open questions</dt>
-      <dd>Next: backlog #4 optional analytics read port wiring, or peel remaining flat presentation helpers.</dd>
+      <dd>Resolved by use-current-pause archive colocation slice below.</dd>
     </dl>
   </article>
 
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — colocate staggered-reveal under presentation/companion/</span>
+      <span>Phase A slice — colocate use-current-pause under presentation/archive/</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Backlog #1 complete; Tier 4 companion full-view pacing</h3>
+    <h3>Tier 4 — archive open-pause read conductor</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-staggered-reveal</code> (+ test) beside <code>use-companion-fullview-page</code> under <code>presentation/companion/</code>; <code>public-hooks</code> re-export path only.</dd>
+      <dd>Move <code>use-current-pause</code> beside journey archive hooks; primary consumer is Archive <code>CurrentPauseCard</code> via <code>public-hooks</code>; relative imports to <code>public-queries</code> and <code>realtime/</code> updated only.</dd>
       <dt>Deviation</dt>
-      <dd>None — behavior-preserving <code>git mv</code>; hook only gates companion Full View feedback CTAs.</dd>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>use-current-pause</code>, <code>use-signal-source-trusted-host</code>, and <code>pause-step-layout</code> remain flat under <code>presentation/</code>.</dd>
+      <dd><code>use-signal-source-trusted-host</code> and layout helpers remain flat under <code>presentation/</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next: backlog #4 optional analytics read port wiring, or colocate remaining flat presentation helpers.</dd>
+      <dd>Next: backlog #4 optional analytics read port wiring, or consolidate <code>ritual/brief/</code> beats per §10.1.</dd>
     </dl>
   </article>
 
