@@ -1,5 +1,5 @@
 import { runLogPwaInstallAnalyticsEvent } from '@/features/pause/application/use-cases/home/run-log-pwa-install-analytics-event';
-import { supabasePauseAnalyticsRepository } from '@/features/pause/infrastructure/supabase-pause-analytics-repository';
+import { supabasePauseAnalyticsRepository } from '@/features/pause/public-ports';
 
 /** Fire-and-forget PWA install funnel events (`analytics_events` table). */
 export function logPwaInstallAnalyticsEvent(
