@@ -13206,4 +13206,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate persisted-session guards under domain/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up; session resume predicates in domain</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>mapPersistedStep</code> landed in <code>domain/session/</code>, move <code>hasPersistablePauseSessionAnchor</code> / <code>hasPersistedPauseSessionPayload</code> out of <code>application/use-cases/session/persisted-session-guards</code> beside it. Hydration, terminal-entry, and <code>ritual/reflect/scaffold/initial-ritual-entry</code> import domain; <code>public-session</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>Supersedes earlier notes that kept guards in application <code>session/</code> — same rationale as dropping the step-map shim.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect scaffold still depends on session-domain guards for depth-picker restore; no new barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Phase B: subscription/auth <code>src/lib/*</code> shims using pause as template.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -6,7 +6,7 @@ import {
   type FetchedPauseInstance,
   type PersistedSession,
 } from '@/features/pause/domain/session-model';
-import { hasPersistedPauseSessionPayload } from '@/features/pause/application/use-cases/session/persisted-session-guards';
+import { hasPersistedPauseSessionPayload } from '@/features/pause/domain/session/persisted-session-guards';
 
 /**
  * Pure hydration merge for `/pause`: which reflection payload wins (restore vs nav vs Holzen) and
