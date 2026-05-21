@@ -5,7 +5,7 @@ import type {
   CompanionSlotAutosaveParams,
   CompanionSlotCommitters,
   CompanionSlotRelaxations,
-} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
+} from '@/features/pause/public-rpc';
 import { useCompanionOrchestrateSession } from './use-companion-orchestrate-session';
 import { useCompanionInterventionFetch } from './use-companion-intervention-fetch';
 

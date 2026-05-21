@@ -7,7 +7,7 @@ import type {
   CompanionSlotCacheIds,
   CompanionSlotCommitters,
   CompanionSlotRelaxations,
-} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
+} from '@/features/pause/public-rpc';
 import type { CompanionSlotOrchestrateMode } from '@/features/pause/application/use-cases/ritual/frame/run-companion-slot-orchestrate';
 import { invokeCompanionSlotOrchestrate } from '@/features/pause/public-rpc';
 import {

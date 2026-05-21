@@ -4,7 +4,7 @@ import { applyCompanionOrchestrateRetryReset } from '@/features/pause/applicatio
 import {
   EMPTY_COMPANION_SLOT_RELAXATIONS,
   type CompanionSlotRelaxations,
-} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
+} from '@/features/pause/public-rpc';
 import { resetInterventionIdempotency } from '@/features/pause/application/use-cases/ritual/frame/intervention-idempotency';
 
 export type UseCompanionOrchestrateRetryParams = {

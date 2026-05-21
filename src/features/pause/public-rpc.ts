@@ -32,6 +32,13 @@ export {
   reflectionStepSessionStorage,
 };
 export type { CompanionOrchestrateSessionContext } from './application/use-cases/ritual/frame/build-companion-orchestrate-body';
+export type {
+  CompanionSlotAutosaveParams,
+  CompanionSlotCacheIds,
+  CompanionSlotCommitters,
+  CompanionSlotRelaxations,
+} from './application/use-cases/ritual/frame/orchestrate-slot-apply';
+export { EMPTY_COMPANION_SLOT_RELAXATIONS } from './application/use-cases/ritual/frame/orchestrate-slot-apply';
 export type { LoadCompanionOrchestrateSessionInput } from './application/use-cases/ritual/frame/load-companion-orchestrate-session';
 import {
   runCompanionInterventionBootstrap as runCompanionInterventionBootstrapUseCase,
