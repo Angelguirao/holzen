@@ -6879,4 +6879,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect UI telemetry → domain (backlog #1 done)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate pause-reflect-ui-telemetry under domain/reflect/telemetry</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Move pure PostHog <code>trackPauseReflect*</code> helpers from <code>ritual/reflect/telemetry/</code> to <code>domain/reflect/telemetry/pause-reflect-ui-telemetry.ts</code>; <code>use-pause-reflect-ui-telemetry</code> imports domain (§6 peel keeps trackers off <code>public-rpc</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; mirrors hook-flow colocation in <code>domain/reflect/generation/</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Frame-focus bed remains in <code>ritual/reflect/ambience/</code> (Web Audio + ritual audio context).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-slot-run-orchestrate</code> to <code>public-rpc</code>, or backlog #4 companion feedback vote read adapter.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
