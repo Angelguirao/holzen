@@ -255,7 +255,7 @@ export { useCompanionSlotOrchestratePorts } from './presentation/companion/use-c
 export { usePauseReflectionStepLog } from './presentation/reflect/steps/use-pause-reflection-step-log';
 export {
   usePauseReflectUiTelemetry,
-} from './presentation/reflect/use-pause-reflect-ui-telemetry';
+} from './presentation/reflect/telemetry/use-pause-reflect-ui-telemetry';
 export { usePauseReflectTags } from './presentation/reflect/steps/use-pause-reflect-tags';
 export { usePauseReflectNote } from './presentation/reflect/steps/use-pause-reflect-note';
 export {
