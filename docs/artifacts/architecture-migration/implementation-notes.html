@@ -3649,6 +3649,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate feel-shift dedupe refs under presentation/reflect/steps/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 presentation peel — smallest reflect steps cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-pause-feel-shift-log-dedupe-refs</code> (+ test) from <code>presentation/reflect/</code> root into <code>presentation/reflect/steps/</code> beside note/tag/favorite/reflection_step conductors; <code>use-pause-session-mood-and-persist</code> and <code>public-hooks</code> import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 reflect step conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mood/feel/chrome/breath reflect conductors remain at <code>presentation/reflect/</code> root until a later peel bundles them under <code>steps/</code> or <code>mood/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate remaining flat mood hooks (<code>use-pause-session-mood-and-persist</code>, depth picker, feel tiles, initial mood, mood chrome, breath-reflect) under <code>presentation/reflect/steps/</code>, or backlog #4 port-backed analytics read for feedback vote fetch.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
