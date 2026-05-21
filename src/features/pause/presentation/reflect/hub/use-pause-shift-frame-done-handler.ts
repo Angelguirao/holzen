@@ -1,8 +1,10 @@
 import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
-import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
 import { resolveShiftFrameHubDonePresentation } from '@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation';
-import { logPauseShiftEmotionFrameHubDone } from '@/features/pause/public-rpc';
+import {
+  logPauseShiftEmotionFrameHubDone,
+  showPauseStepSyncFailedToast,
+} from '@/features/pause/public-rpc';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 
 /**

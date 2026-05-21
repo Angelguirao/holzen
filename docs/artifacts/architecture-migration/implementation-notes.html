@@ -9001,7 +9001,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Step-sync toast still imports <code>ritual/step-sync-toast</code> directly (presentation-only UX; avoids <code>public-rpc</code> Supabase load in unit tests).</dd>
+      <dd>Session breath/brief hooks still import <code>ritual/step-sync-toast</code> directly until reflect mood/hub peel (follow-up slice).</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: audit remaining presentation imports of <code>ritual/frame/*</code>, or wire other session conductors off deep application paths.</dd>
     </dl>
@@ -9042,6 +9042,25 @@
       <dd><code>PostPauseFeelSnapshot</code> still re-exported on <code>public-rpc</code> for cross-context callers; presentation prefers domain import for the ref type.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: audit remaining presentation <code>ritual/frame/*</code> imports or session-storage port.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect telemetry + step-sync via public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>§6 peel: presentation/reflect imports public-rpc for PostHog + sync toast</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder moves. Re-export <code>trackPauseReflect*</code> and <code>showPauseStepSyncFailedToast</code> on <code>public-rpc</code>; <code>presentation/reflect/telemetry</code>, mood initial handlers, and shift-frame hub handler import facades instead of <code>domain/reflect/telemetry</code> or <code>ritual/step-sync-toast</code> directly.</dd>
+      <dt>Deviation</dt>
+      <dd>Trackers remain implemented in <code>domain/reflect/telemetry/</code> (PostHog via <code>@/lib/posthog</code>) — <code>public-rpc</code> re-exports only, no new port.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect hooks that import <code>public-rpc</code> load the wider RPC barrel in tests — same pattern as companion fullview / mood RPC facades. Session breath/brief hooks may still import <code>step-sync-toast</code> directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel remaining companion <code>ritual/frame/*</code> presentation imports, or export <code>showPauseStepSyncFailedToast</code> for session hooks too.</dd>
     </dl>
   </article>
 
