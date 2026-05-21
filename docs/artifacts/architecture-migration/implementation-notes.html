@@ -5454,4 +5454,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breathing timed display in ritual/breathe (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>resolve-pause-breathing-timed-display</code> out of <code>screens/pause/lib/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Follow <code>breath-orb-geometry</code> peel: move orb + triangle kicker display composer to <code>application/use-cases/ritual/breathe/</code>; <code>PauseBreathing</code> and <code>pause-breathing-body</code> import via <code>public-hooks</code>. Sibling imports use <code>pause-breath-orb-metrics</code> and <code>resolve-triangle-kicker-display</code> (no <code>public-hooks</code> cycle).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; Vitest colocated with use case.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>PauseBreathingPhase</code> still exported from <code>use-pause-breathing-timed-loop</code> for the conductor; timed-display module keeps a matching local type for the pure helper input.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-science-step-highlight</code> / scaffold chrome from <code>screens/pause/lib/</code>, or backlog #4 stray <code>analytics_events</code> reads.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

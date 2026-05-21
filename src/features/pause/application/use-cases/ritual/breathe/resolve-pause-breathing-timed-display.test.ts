@@ -1,13 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
-
-vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn(),
-    auth: { getSession: vi.fn() },
-  },
-}));
-
-import { resolvePauseBreathingTimedDisplay } from '@/screens/pause/lib/resolve-pause-breathing-timed-display';
+import { describe, expect, it } from 'vitest';
+import { resolvePauseBreathingTimedDisplay } from './resolve-pause-breathing-timed-display';
 
 const phases = [
   { labelKey: 'breathing.phases.inhale', duration: 4 },
