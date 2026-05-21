@@ -6,7 +6,7 @@ import {
   computePauseSessionResolved,
   type PauseSessionHydrationReady,
   type PauseSessionHydrationState,
-} from '@/features/pause/application/use-cases/session/hydration';
+} from './pause-session-shell-io';
 import { hasPersistedPauseSessionPayload } from '@/features/pause/domain/session/persisted-session-guards';
 import type { PauseSessionNavParsed } from '@/features/pause/public-navigation';
 import { usePauseSessionFetch } from './use-pause-session-fetch';

@@ -1,7 +1,13 @@
 /**
- * Presentation I/O for `/pause` shell chrome (header back, mount log params, shell view model).
+ * Presentation I/O for `/pause` shell chrome (hydration, header back, mount log, shell VM).
  * Imports session shell use cases directly instead of `pause-session-shell-flow` CI anchor.
  */
+export {
+  computePauseSessionHydration,
+  computePauseSessionResolved,
+  type PauseSessionHydrationReady,
+  type PauseSessionHydrationState,
+} from '@/features/pause/application/use-cases/session/hydration';
 export {
   computePauseHeaderBackIntent,
   isPauseSessionHeaderBackVisible,
