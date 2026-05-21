@@ -14,7 +14,7 @@ export {
   buildPauseSessionMountLogParams,
   type BuildPauseSessionMountLogParamsInput,
   type PauseSessionMountLogParams,
-} from './application/use-cases/session/mount-log-params';
+} from './application/use-cases/ritual/reflect/scaffold/mount-log-params';
 export {
   buildPauseSessionStepTransitionConfig,
   PAUSE_SESSION_STEP_SLIDE_OFFSET_PX,
