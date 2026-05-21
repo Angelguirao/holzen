@@ -71,7 +71,7 @@ export {
   type PickPauseHolzenProvidersSliceSource,
 } from './application/use-cases/session/pause-holzen-providers-slice';
 export { applyBreathSegmentLogOutcome } from './application/use-cases/ritual/breathe/run-breath-segment-log';
-export { initialBreathSegmentRpcLoggedFlagsFromRestored } from './application/use-cases/ritual/breathe/initial-breath-segment-rpc-flags';
+export { initialBreathSegmentRpcLoggedFlagsFromRestored } from './application/use-cases/ritual/reflect/flows/initial-breath-segment-rpc-flags';
 export {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
