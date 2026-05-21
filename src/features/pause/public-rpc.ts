@@ -57,7 +57,7 @@ import { runPauseReflectionStepLogOnce } from './application/use-cases/ritual/re
 import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
 import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
-import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionInfra } from './infrastructure/companion/companion-ui-completion-sync';
+import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from './application/use-cases/ritual/frame/persist-ui-step-completion';
 import type { CompanionUiCompletionStep } from './application/use-cases/ritual/frame/companion-ui-completion-types';
 import {
   runEnsureBreathSegment1Logged,
@@ -145,12 +145,18 @@ export type { CompanionUiCompletionStep };
 export type { RunAdoptPendingPauseOfferResult, RunDeclinePendingPauseOfferResult };
 
 /** Frame companion UI step completion — wired with default `PauseRepository`. */
-export function persistCompanionUiStepCompletion(
+export async function persistCompanionUiStepCompletion(
   pauseInstanceId: string,
   step: CompanionUiCompletionStep,
   options?: { entryPoint?: string },
 ): Promise<void> {
-  return persistCompanionUiStepCompletionInfra(pauseInstanceId, step, options);
+  await persistCompanionUiStepCompletionUseCase(
+    supabasePauseRepository,
+    pauseInstanceId,
+    step,
+    options,
+  );
+  invalidateCompanionUiCompletionQuery(pauseInstanceId);
 }
 
 /** Home manual trigger — `pause_create_or_reuse` (+ silent reflection stub). */
