@@ -142,6 +142,7 @@ describe('useCompanionSlotRunOrchestrate', () => {
       orchestrateSessionFixture,
       mockCompanionOrchestrator,
     );
+    expect(mockCompanionOrchestrator.port).toBe('supabaseCompanionOrchestrator');
     expect(applyCompanionSlotOrchestrateOutcomeMock).toHaveBeenCalled();
   });
 });

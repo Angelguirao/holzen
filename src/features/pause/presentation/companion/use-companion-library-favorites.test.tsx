@@ -70,5 +70,6 @@ describe('useCompanionLibraryFavorites', () => {
         onBucketComputed: expect.any(Function),
       }),
     );
+    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
   });
 });

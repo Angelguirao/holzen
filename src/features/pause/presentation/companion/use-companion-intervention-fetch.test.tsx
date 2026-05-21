@@ -102,6 +102,7 @@ describe('useCompanionInterventionFetch', () => {
 
     await capturedPorts!.invokeIntervention(sessionFixture);
     expect(invokeInterventionMock).toHaveBeenCalledWith(sessionFixture);
+    expect(mockCompanionOrchestrator.port).toBe('supabaseCompanionOrchestrator');
   });
 
   it('does not re-fetch for the same pause instance and retry generation', async () => {
