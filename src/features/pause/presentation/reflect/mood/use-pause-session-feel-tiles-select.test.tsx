@@ -1,4 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
+}));
 import { renderHook, act } from '@testing-library/react';
 
 vi.mock('./pause-reflect-mood-io', async () => {

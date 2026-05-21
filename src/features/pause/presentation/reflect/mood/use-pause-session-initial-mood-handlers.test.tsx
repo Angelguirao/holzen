@@ -20,10 +20,18 @@ const {
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 
-vi.mock('./pause-reflect-mood-io', () => ({
-  pauseInitialEmotionSelect: pauseInitialEmotionSelectMock,
-  pauseInitialEmotionSkip: pauseInitialEmotionSkipMock,
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
 }));
+
+vi.mock('./pause-reflect-mood-io', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./pause-reflect-mood-io')>();
+  return {
+    ...actual,
+    pauseInitialEmotionSelect: pauseInitialEmotionSelectMock,
+    pauseInitialEmotionSkip: pauseInitialEmotionSkipMock,
+  };
+});
 
 vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
   showPauseStepSyncFailedToast,

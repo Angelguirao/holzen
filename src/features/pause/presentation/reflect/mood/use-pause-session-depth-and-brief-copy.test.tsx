@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
+}));
 import { renderHook } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/features/market/public';
