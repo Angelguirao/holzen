@@ -37,6 +37,10 @@ vi.mock('@/features/pause/application/use-cases/trigger/manual-pause-trigger-tel
 vi.mock('./pause-home-io', () => ({
   pauseHomeManualOpenPorts: mockPauseHomeManualOpenPorts,
   pauseDismissOpenPauseHomePreview: vi.fn(),
+  applyManualPauseOpenResult: async (
+    _input: { result: { outcome: string; userMessage?: string } },
+    _ports: unknown,
+  ) => ({ opened: false as const }),
   openManualPauseFromHome: openManualPauseFromHomeMock,
   applyManualPauseOpenResult: async (
     _input: { result: { outcome: string; userMessage?: string } },
