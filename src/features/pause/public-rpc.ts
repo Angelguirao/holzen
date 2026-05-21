@@ -264,7 +264,7 @@ export function logPauseCompanionFeedbackVote(
   return runLogCompanionFeedbackVote(supabasePauseAnalyticsRepository, input);
 }
 
-/** Companion fullview open — wired `PauseAnalyticsRepository.insertEvent` (presentation telemetry). */
+/** Companion fullview open — wired `PauseAnalyticsRepository.insertEvent` (observation only). */
 export function logPauseCompanionFullviewOpened(
   input: LogCompanionFullviewOpenedInput,
 ): Promise<{ ok: boolean }> {

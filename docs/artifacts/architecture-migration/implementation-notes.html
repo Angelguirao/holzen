@@ -8585,7 +8585,26 @@
       <dt>Tradeoffs</dt>
       <dd>Empty <code>dismiss/</code> folder removed; pending-offer stays separate (not home-only).</dd>
       <dt>Open questions</dt>
-      <dd>Next: route <code>companion-feedback-vote-query</code> fetch through <code>fetchPauseCompanionFeedbackVote</code> on <code>public-rpc</code> only.</dd>
+      <dd>Next: route <code>companion-feedback-vote-query</code> fetch through <code>PauseAnalyticsRepository</code> (port-backed read).</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion feedback vote read via analytics port (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>companion-feedback-vote-query → PauseAnalyticsRepository</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. TanStack companion feedback vote reads call <code>runFetchCompanionFeedbackVote</code> with <code>supabasePauseAnalyticsRepository</code> in <code>infrastructure/queries/companion-feedback-vote-query.ts</code> instead of <code>fetchPauseCompanionFeedbackVote</code> on <code>public-rpc</code>; write path stays on <code>public-rpc</code> for <code>use-companion-feedback-vote</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; mirrors <code>reflect-step-query</code> direct-read pattern.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>fetchPauseCompanionFeedbackVote</code> remains on <code>public-rpc</code> for external/tests; query module no longer depends on the RPC barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: drop unused vote read facade from <code>public-rpc</code> if nothing else imports it, or <code>PauseRepository</code> call-site audit.</dd>
     </dl>
   </article>
 
