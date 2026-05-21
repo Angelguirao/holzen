@@ -15505,4 +15505,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — session ritual restore via pause-session-ritual-restore-io (Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; backlog #2 presentation peel follow-up</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete on <code>cursor/arch-migrate-src-ca70</code> — no folder moves. Add <code>presentation/session/pause-session-ritual-restore-io.ts</code> for breath/decide/frame/brief hydration helpers; <code>use-pause-session-ritual-state</code> imports I/O only (same pattern as <code>pause-companion-frame-ui-io</code>). Owner doc §10.1: Home reflect PostHog consolidated on <code>pause-home-reflect-io.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; re-exports only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session breath hooks (<code>pause-session-breath-io</code>, timed loop) still import <code>ritual/breathe/*</code> directly — peel in follow-up slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: lifecycle create/dismiss facades on <code>public-rpc</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

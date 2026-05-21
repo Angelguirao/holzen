@@ -2,18 +2,14 @@ import { useState } from 'react';
 import {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
-} from '@/features/pause/application/use-cases/ritual/breathe/restored-breath-ritual-state';
-import {
-  initialDecisionFromRestored,
-  initialPhaseFromRestored,
-} from '@/features/pause/application/use-cases/ritual/decide/restored-decide-ritual-state';
-import { initialFrameDoneFromRestored } from '@/features/pause/application/use-cases/ritual/frame/restored-frame-ritual-state';
-import { initialRitualEntry } from '@/features/pause/application/use-cases/session/initial-ritual-entry';
-import {
   initialBriefIntegrateDoneFromRestored,
   initialBriefPauseStepFromRestored,
+  initialDecisionFromRestored,
+  initialFrameDoneFromRestored,
+  initialPhaseFromRestored,
+  initialRitualEntry,
   initialSelectedBriefFaceFromRestored,
-} from '@/features/pause/application/use-cases/session/restored-brief-ritual-state';
+} from './pause-session-ritual-restore-io';
 import type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
 import { mapPersistedStep } from '@/features/pause/domain/session/map-persisted-step';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
