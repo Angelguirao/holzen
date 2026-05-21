@@ -163,6 +163,10 @@ export {
   pauseArchiveStorageCacheKey,
 } from './infrastructure/queries/archive/archive-list-query';
 export {
+  readJsonLocalStorage,
+  writeJsonLocalStorage,
+} from './infrastructure/json-local-storage';
+export {
   buildPauseArchiveInfiniteInitialData,
   isPauseArchiveListInitialLoading,
 } from './domain/archive/pause-archive-list-ui-state';

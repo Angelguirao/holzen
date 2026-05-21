@@ -10166,4 +10166,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — archive list localStorage via public-queries (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; presentation archive hook off infrastructure</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — 14 modules under <code>ritual/reflect/</code>, zero <code>application/use-cases/reflect/</code>. Re-export <code>readJsonLocalStorage</code> / <code>writeJsonLocalStorage</code> on <code>public-queries.ts</code>; <code>use-pause-archive-list</code> imports archive cache helpers from the queries barrel alongside infinite-query keys.</dd>
+      <dt>Deviation</dt>
+      <dd>None — localStorage seed/write behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-instances-realtime</code> still imports <code>infrastructure/realtime/*</code> directly until a follow-up re-export.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: re-export <code>subscribePauseInstancesForUser</code> on <code>public-queries</code> (or dedicated realtime barrel) for presentation realtime hook.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

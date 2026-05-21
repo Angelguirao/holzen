@@ -3,10 +3,6 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/public';
 import {
-  readJsonLocalStorage,
-  writeJsonLocalStorage,
-} from '@/features/pause/infrastructure/json-local-storage';
-import {
   PAUSE_ARCHIVE_PAGE_SIZE,
   buildPauseArchiveInfiniteInitialData,
   fetchPauseArchivePage,
@@ -14,6 +10,8 @@ import {
   isPauseArchiveListInitialLoading,
   pauseArchiveInfiniteQueryKey,
   pauseArchiveStorageCacheKey,
+  readJsonLocalStorage,
+  writeJsonLocalStorage,
   type PauseArchiveListSort,
   type PauseArchiveRow,
   type PauseArchiveSegment,
