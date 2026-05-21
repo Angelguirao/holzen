@@ -18903,7 +18903,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; re-export paths only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Thin application <code>pause-session-reflect-and-decide-flow.ts</code> re-export remains on disk for historical CI imports; anchor now points at domain like presentation.</dd>
+      <dd>Application <code>pause-session-reflect-and-decide-flow.ts</code> re-export removed in follow-up slice once anchor pointed at domain; <code>pause-reflect-flows-flow.ts</code> remains the CI cluster anchor.</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B cross-context Tier 1 shim (subscription), or delete orphan application reflect/decide flow re-exports once CI allows.</dd>
     </dl>
@@ -18925,6 +18925,25 @@
       <dd><code>pause-session-decide-io</code> and <code>pause-session-frame-io</code> remain for other conductors; ritual-restore no longer re-exports through them.</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B cross-context Tier 1 shim (subscription), or remaining <code>public.ts</code> legacy stats peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — remove orphan reflect flows application re-export (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Delete <code>pause-session-reflect-and-decide-flow.ts</code> application CI duplicate</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Pure reflect+decide preflight/post-generation helpers live only in <code>domain/reflect/flows/pause-session-reflect-and-decide-flow.ts</code>; <code>pause-reflect-flows-flow</code> and <code>pause-reflect-flows-io</code> already import domain paths. Remove unused application re-export file after flows-flow alignment (<code>658b44e53</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — no runtime imports referenced the application file.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>application/use-cases/ritual/reflect/flows/</code> folder still satisfies <code>check:architecture-alignment</code> via <code>pause-reflect-flows-flow.ts</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: delete orphan <code>ritual/decide/pause-decide-outcome-*-flow</code> re-exports once <code>public-rpc</code> peels toasts, or Phase B subscription Tier 1 shim.</dd>
     </dl>
   </article>
 
