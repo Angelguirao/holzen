@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 const runPauseOutcomeLogMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-log-flow',
   () => ({
     runPauseOutcomeLog: runPauseOutcomeLogMock,
   }),
