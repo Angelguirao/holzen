@@ -1,6 +1,6 @@
 import type { CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
-import type { PauseSeverity } from '@/features/pause/application/use-cases/session/location-state';
+import type { PauseSeverity } from '@/features/pause/public-navigation';
 
 /** Breathing-room delay before feedback CTAs on companion Full View routes. */
 export const COMPANION_FULL_VIEW_BREATHING_ROOM_MS = 8000;
