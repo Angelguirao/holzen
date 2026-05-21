@@ -17009,6 +17009,44 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation I/O direct domain hook-flow (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-io</code> imports domain generation helpers directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. <code>pause-reflect-generation-io</code> imports prefetch/commit/clear helpers from <code>domain/reflect/generation/reflect-generation-hook-flow</code> plus prerequisite, error, and effective-copy modules instead of <code>pause-reflect-generation-hook-flow</code> CI anchor (mirrors hub I/O peel). <code>runReflectGeneration</code> stays on <code>run-reflect-generation</code>. Unit tests mock via <code>importActual</code> on the I/O module.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-generation-hook-flow</code> remains application cluster anchor for <code>check:architecture-alignment</code>; no presentation imports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-orchestrate-io</code> flow anchor, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — generation hook tests mock I/O module (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect generation unit tests mock <code>pause-reflect-generation-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — test-only. <code>use-pause-reflect-generation</code> and port-lock mocks use <code>importActual</code> on <code>pause-reflect-generation-io</code> (plus mocked <code>public-rpc</code>) instead of four deep <code>domain/reflect/generation/*</code> paths — follows generation I/O as the presentation import surface.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only; behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>None.</dd>
+      <dt>Open questions</dt>
+      <dd>Superseded by generation I/O domain peel; tests updated to importActual I/O module.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect session UI telemetry I/O anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -17022,25 +17060,6 @@
       <dd>Deletes infrastructure telemetry module; PostHog calls live beside other reflect telemetry use cases.</dd>
       <dt>Open questions</dt>
       <dd>Next: companion orchestration-io peel, or Phase B cross-context Tier 1 shim.</dd>
-    </dl>
-  </article>
-
-  <article class="note">
-    <header>
-      <span>2026-05-21</span>
-      <span>Phase A slice — generation hook tests mock application anchor (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3>Reflect generation unit tests align with <code>pause-reflect-generation-hook-flow</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no production moves. Update <code>use-pause-reflect-generation</code> and port-lock mocks to importActual the generation cluster anchor (and mock <code>public-rpc</code>) instead of four deep <code>domain/reflect/generation/*</code> paths — matches <code>pause-reflect-generation-io</code> production imports.</dd>
-      <dt>Deviation</dt>
-      <dd>None — test-only; behavior parity.</dd>
-      <dt>Tradeoffs</dt>
-      <dd>None.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: <code>pause-companion-orchestration-flow</code> on companion orchestration I/O, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
