@@ -51,7 +51,9 @@ function baseProviders() {
   };
 }
 
-function baseShell(overrides: Partial<Parameters<typeof usePauseSessionMoodChromeHandlers>[1]['shell']> = {}) {
+function baseShell(
+  overrides: Partial<Parameters<typeof usePauseSessionMoodChromeHandlers>[1]['shell']> = {},
+) {
   return {
     message: 'msg',
     context: null,
@@ -64,7 +66,9 @@ function baseShell(overrides: Partial<Parameters<typeof usePauseSessionMoodChrom
   };
 }
 
-function baseRitual(overrides: Partial<Parameters<typeof usePauseSessionMoodChromeHandlers>[1]['ritual']> = {}) {
+function baseRitual(
+  overrides: Partial<Parameters<typeof usePauseSessionMoodChromeHandlers>[1]['ritual']> = {},
+) {
   return {
     phase: 'session' as const,
     ritualEntry: 'deep' as const,
