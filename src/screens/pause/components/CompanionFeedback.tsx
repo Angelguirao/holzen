@@ -3,6 +3,7 @@ import { hapticFeedback } from '@/lib/haptics';
 import type { RegenerateCompanionSlot } from '@/features/pause/public-hooks';
 import {
   isCompanionRegenerateUiEnabled,
+  resolveCompanionRegenerateClick,
   useCompanionFeedbackVote,
 } from '@/features/pause/public-hooks';
 import { useSubscription } from '@/features/subscription/public-hooks';
@@ -10,8 +11,6 @@ import { useProGate } from '@/features/subscription/public-hooks';
 import { isPaidLimitReached, showLimitReachedToast } from '@/features/subscription/public-limits';
 import { CompanionFeedbackRegenerateButton } from '@/screens/pause/components/companion/companion-feedback-regenerate-button';
 import { CompanionFeedbackVoteButtons } from '@/screens/pause/components/companion/companion-feedback-vote-buttons';
-import { resolveCompanionRegenerateClick } from '@/screens/pause/lib/companion-feedback-regenerate';
-
 interface Props {
   /** Reflection ID this companion belongs to */
   pauseInstanceId?: string | null;
