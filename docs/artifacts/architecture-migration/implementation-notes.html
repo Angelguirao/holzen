@@ -6670,4 +6670,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — shift-emotion RPC use case → ritual/reflect/hub (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Clear empty ritual/feel after initial-emotion mood move</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog <code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Move <code>run-shift-emotion-frame-hub-done</code> (+ test) from <code>ritual/feel/</code> to <code>ritual/reflect/hub/</code> beside frame-hub domain modules; <code>public-rpc</code> <code>runShiftEmotionFrameHubDone</code> import path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; mechanical path move.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Removed empty <code>ritual/feel/</code> folder; rewrite script gains one path replacement for stale imports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 remainder (optional analytics read adapters) or companion frame conductors importing <code>application/ritual/frame/*</code> through <code>public-rpc</code> only.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
