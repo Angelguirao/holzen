@@ -8997,13 +8997,32 @@
     <h3>No reflect folder moves; breath segment + brief done presentation peel</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — zero legacy reflect use-case paths. Continue backlog #4: <code>use-pause-breath-segment-rpc-loggers</code> imports port-backed <code>applyBreathSegmentLogOutcome</code> from <code>public-rpc</code>; <code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> stays on <code>session/step-map</code> (pure hydration — avoids loading Supabase in jsdom when mocking <code>public-rpc</code>). <code>use-pause-brief-done-check-in</code> imports <code>PostPauseFeelSnapshot</code> from <code>public-rpc</code> alongside <code>logPostPauseEmotionIfDirty</code>.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — zero legacy reflect use-case paths. Continue backlog #4: <code>use-pause-breath-segment-rpc-loggers</code> imports port-backed <code>applyBreathSegmentLogOutcome</code> from <code>public-rpc</code>; <code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> stays on <code>session/step-map</code> (pure hydration — avoids loading Supabase in jsdom when mocking <code>public-rpc</code>). <code>use-pause-brief-done-check-in</code> calls <code>logPostPauseEmotionIfDirty</code> on <code>public-rpc</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
       <dd>Step-sync toast still imports <code>ritual/step-sync-toast</code> directly (presentation-only UX; avoids <code>public-rpc</code> Supabase load in unit tests).</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: audit remaining presentation imports of <code>ritual/frame/*</code>, or wire other session conductors off deep application paths.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — post-pause feel helpers in domain (backlog #1 done, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; brief-done snapshot types off application layer</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no reflect moves. Extract <code>PostPauseFeelSnapshot</code>, <code>isPostPauseEmotionDirty</code>, and <code>buildPostPauseEmotionLoggedPayload</code> to <code>domain/ritual/done/post-pause-emotion-log.ts</code>; <code>use-pause-brief-done-check-in</code> imports the snapshot type from domain and RPC from <code>public-rpc</code>; <code>runPostPauseEmotionLogIfDirty</code> stays in application.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3 domain vs application split.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>PostPauseFeelSnapshot</code> still re-exported on <code>public-rpc</code> for cross-context callers; presentation prefers domain import for the ref type.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit remaining presentation <code>ritual/frame/*</code> imports or session-storage port.</dd>
     </dl>
   </article>
 
