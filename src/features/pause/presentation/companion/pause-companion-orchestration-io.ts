@@ -1,4 +1,5 @@
 import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
+import { nextExpandedWithLazyFetch } from '@/features/pause/application/use-cases/ritual/frame/next-expanded-with-lazy-fetch';
 import { runToggleCompanionLibraryFavorite } from '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite';
 import { persistCompanionUiStepCompletion } from '@/features/pause/application/use-cases/ritual/frame/persist-ui-step-completion';
 import type { CompanionUiCompletionStep } from '@/features/pause/application/use-cases/ritual/frame/companion-ui-completion-types';
@@ -21,7 +22,7 @@ export function pauseCompanionUiStepCompletion(
   return persistCompanionUiStepCompletion(companionPauseRepository, pauseInstanceId, step);
 }
 
-export { invalidateCompanionUiCompletionQuery };
+export { invalidateCompanionUiCompletionQuery, nextExpandedWithLazyFetch };
 
 /** Default port + use case: per-slot companion card favorites on pause instance metadata. */
 export function pauseToggleCompanionLibraryFavorite(

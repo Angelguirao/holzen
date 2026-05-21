@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   companionPauseRepository,
+  nextExpandedWithLazyFetch,
   pauseToggleCompanionLibraryFavorite,
 } from './pause-companion-orchestration-io';
 
@@ -21,6 +22,21 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 describe('pause-companion-orchestration-io', () => {
+  it('re-exports nextExpandedWithLazyFetch for section expansion conductors', () => {
+    const fetch = vi.fn();
+    expect(
+      nextExpandedWithLazyFetch(false, {
+        data: null,
+        loading: false,
+        error: null,
+        canAccess: () => true,
+        fetch,
+        slot: 'signal',
+      }),
+    ).toBe(true);
+    expect(fetch).toHaveBeenCalledWith('signal');
+  });
+
   it('routes library favorite toggle through the default PauseRepository port', async () => {
     runToggleCompanionLibraryFavoriteMock.mockResolvedValue(true);
     const onBucketComputed = vi.fn();
