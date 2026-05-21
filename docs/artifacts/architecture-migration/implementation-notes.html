@@ -10878,7 +10878,7 @@
     <h3>PostHog reflect trackers: presentation → domain/reflect/telemetry</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) is complete on <code>cursor/arch-migrate-src-ca70</code>. Continue §6 slim <code>public-rpc</code>: <code>use-pause-reflect-ui-telemetry</code> imports <code>trackPauseReflect*</code> from <code>domain/reflect/telemetry/pause-reflect-ui-telemetry.ts</code> (no RPC). Screens still use <code>usePauseReflectUiTelemetry</code> via <code>public-ritual-reflect</code>.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) is complete on <code>cursor/arch-migrate-src-ca70</code>. Continue §6 slim <code>public-rpc</code>: <code>use-pause-reflect-ui-telemetry</code> imports <code>trackPauseReflect*</code> from <code>domain/reflect/telemetry/pause-reflect-ui-telemetry.ts</code> (no RPC). Screens still use <code>usePauseReflectUiTelemetry</code> via <code>public-ritual-reflect</code>. Removed dead <code>trackPauseReflect*</code> re-exports from <code>public-rpc</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior unchanged.</dd>
       <dt>Tradeoffs</dt>
