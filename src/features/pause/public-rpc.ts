@@ -48,7 +48,6 @@ export {
   type CompanionSlotErrorSetters,
   type CompanionSlotLoadingSetters,
 } from './application/use-cases/ritual/frame/companion-slot-ui-state';
-export type { LoadCompanionOrchestrateSessionInput } from './application/use-cases/ritual/frame/load-companion-orchestrate-session';
 import {
   runCompanionInterventionBootstrap as runCompanionInterventionBootstrapUseCase,
   type RunCompanionInterventionBootstrapInput,
@@ -61,11 +60,6 @@ import {
 } from './application/use-cases/ritual/frame/run-companion-slot-orchestrate';
 import { fetchParsedPauseArtifactCache } from './infrastructure/queries/artifact-cache-query';
 import type { RegenerateCompanionSlot } from './domain/companion-orchestrate';
-import {
-  loadCompanionOrchestrateSession as loadCompanionOrchestrateSessionUseCase,
-  type LoadCompanionOrchestrateSessionInput,
-} from './application/use-cases/ritual/frame/load-companion-orchestrate-session';
-import { loadMoodHistoryForOrchestrate } from './infrastructure/companion/mood-history';
 export {
   invokeGroundingEnrich,
   type GroundingEnrichBody,
@@ -205,13 +199,6 @@ export type {
   LogCompanionFeedbackVoteInput,
 } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
 export type { LogPwaInstallAnalyticsEventInput } from './application/use-cases/home/run-log-pwa-install-analytics-event';
-
-/** Frame slot orchestrate — ritual session payload + mood history (wired for presentation). */
-export function loadPauseCompanionOrchestrateSession(input: LoadCompanionOrchestrateSessionInput) {
-  return loadCompanionOrchestrateSessionUseCase(input, {
-    loadMoodHistory: loadMoodHistoryForOrchestrate,
-  });
-}
 
 export type {
   CompanionSlotOrchestrateMode,
