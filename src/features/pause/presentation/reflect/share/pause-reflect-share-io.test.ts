@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
-import { pauseReflectionShareImage } from './pause-reflect-share-io';
+import {
+  buildReflectionShareText,
+  buildReflectionShareTweetUrl,
+  pauseReflectionShareImage,
+} from './pause-reflect-share-io';
 
 const runReflectionShareImageMock = vi.hoisted(() => vi.fn());
 
@@ -11,6 +15,12 @@ vi.mock(
 );
 
 describe('pause-reflect-share-io', () => {
+  it('re-exports share text and channel URL builders for presentation conductors', () => {
+    const text = buildReflectionShareText('Stay calm.');
+    expect(text).toContain('Stay calm.');
+    expect(buildReflectionShareTweetUrl(text)).toContain('https://x.com/intent/tweet?text=');
+  });
+
   it('delegates to runReflectionShareImage', async () => {
     runReflectionShareImageMock.mockResolvedValue('downloaded');
 
