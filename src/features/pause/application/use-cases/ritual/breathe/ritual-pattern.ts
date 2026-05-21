@@ -1,4 +1,5 @@
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
+import type { PauseBreathingPhase } from './resolve-pause-breathing-timed-display';
 
 /**
  * Ritual breathing (`PauseBreathing`) pattern selection.
@@ -105,7 +106,7 @@ export type ResolvePauseBreathingPhasesInput = {
  */
 export function resolvePauseBreathingPhases(
   input: ResolvePauseBreathingPhasesInput,
-): ReadonlyArray<{ labelKey: string; duration: number }> {
+): readonly PauseBreathingPhase[] {
   const mode = input.mode ?? PAUSE_RITUAL_BREATHING_PATTERN_MODE;
 
   if (mode === 'feel_tile_mapped') {
