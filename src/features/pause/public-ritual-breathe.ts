@@ -60,3 +60,9 @@ export {
   viteWantsPauseBreathSecondLabelShift,
   type PauseBreathSecondLabelVariant,
 } from './application/use-cases/ritual/breathe/breath-second-label-variant';
+export { usePauseSessionBreathStepHandlers } from './presentation/session/breath/use-pause-session-breath-step-handlers';
+export {
+  usePauseSessionBreathHandlers,
+  type UsePauseSessionBreathHandlersParams,
+} from './presentation/session/breath/use-pause-session-breath-handlers';
+export { usePauseSessionBreathReflectHandlers } from './presentation/session/breath/use-pause-session-breath-reflect-handlers';

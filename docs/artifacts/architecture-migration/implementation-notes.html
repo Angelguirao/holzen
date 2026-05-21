@@ -13491,4 +13491,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath hooks off public-ritual-reflect barrel (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>§6 peel — breathe beat exports on public-ritual-breathe</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Session breath conductors (<code>usePauseSessionBreathStepHandlers</code>, <code>usePauseSessionBreathHandlers</code>, <code>usePauseSessionBreathReflectHandlers</code>) export from <code>public-ritual-breathe.ts</code> only; <code>public-ritual-reflect.ts</code> keeps reflect/mood/flows hooks. <code>public-hooks</code> re-exports both barrels for screens.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving export peel only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Feature <code>presentation/</code> may still import breath hooks from sibling paths; screens stay on <code>public-hooks</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>src/lib/*</code> shims (subscription/auth) or port-backed companion feedback vote write path.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
