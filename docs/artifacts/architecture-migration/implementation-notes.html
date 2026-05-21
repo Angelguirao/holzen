@@ -16344,6 +16344,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — reflect flows decide I/O through domain + log anchor (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -16357,6 +16358,21 @@
       <dd>Application <code>pause-decide-outcome-flow.ts</code> CI anchor remains for non-presentation application imports.</dd>
       <dt>Open questions</dt>
       <dd>Next: second-label + restored-breath anchors on breath I/O, or Phase B cross-context Tier 1 shim.</dd>
+=======
+      <span>Phase A slice — holzen-reflect generation run + hook flow anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-run-flow</code> + hook-flow on <code>pause-reflect-generation-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add run-flow cluster anchor for <code>runReflectGeneration</code>; route presentation I/O through existing <code>pause-reflect-generation-hook-flow</code> for prefetch/commit/clear/prerequisite/error/copy helpers (no direct <code>domain/reflect/generation/</code> on the I/O module). Bound <code>pauseReflectGeneration</code> facade unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect flows, share, and home manual-open presentation I/O still bind application or domain paths directly until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect flows I/O anchor peel, home manual-open generation cluster anchor, or Phase B cross-context Tier 1 shim.</dd>
+>>>>>>> ec5dd90c (refactor(pause): holzen-reflect generation run + hook flow anchors)
     </dl>
   </article>
 
