@@ -13937,11 +13937,11 @@
     <h3>Reflect scaffold cleanup — session mount diagnostics off ritual/reflect/</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. <code>buildPauseSessionMountLogParams</code> is shell-first-paint diagnostics for <code>/pause</code>, not reflect ritual logic — colocate with <code>hydration</code> / <code>shell-view-model</code> under <code>application/use-cases/session/</code>. Still imports reflect scaffold restore helpers (<code>initial-ritual-entry</code>, <code>restored-brief-ritual-state</code>) for first-paint snapshot fields.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. <code>buildPauseSessionMountLogParams</code> is shell-first-paint diagnostics for <code>/pause</code>, not reflect ritual logic — colocate with <code>hydration</code> / <code>shell-view-model</code> under <code>application/use-cases/session/</code>. Imports session restore helpers (<code>initial-ritual-entry</code>, <code>restored-brief-ritual-state</code>) for first-paint snapshot fields (moved out of <code>ritual/reflect/scaffold/</code> in a follow-up slice).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior-preserving move only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Session use case depends on reflect scaffold modules for restore-derived fields; acceptable until restore helpers move to <code>domain/session/</code> or shared ritual restore package.</dd>
+      <dd>Session mount + restore helpers share a cluster; long-term they may move to <code>domain/session/</code>.</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B <code>src/lib/holzen-query-client-ref</code> shim or peel remaining session hooks still re-exported only on <code>public-hooks</code>.</dd>
     </dl>
@@ -13963,6 +13963,25 @@
       <dd>Bulk-hold and manual-trigger home hooks remain on <code>public-hooks</code> until a follow-up home cluster peel.</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>public-home</code> cluster 2 (bulk-hold + pending-offer hooks) or Phase B <code>holzen-query-client-ref</code> shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — session restore helpers off ritual/reflect/scaffold (backlog #1 incremental)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect scaffold cleanup — colocate hydration restore with session use-cases</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. <code>initialRitualEntry</code> and brief <code>initial*FromRestored</code> helpers are session hydration / mount diagnostics inputs, not Reflect ritual RPC — move from <code>ritual/reflect/scaffold/</code> to <code>application/use-cases/session/</code> beside <code>mount-log-params</code>, <code>hydration</code>, and <code>shell-view-model</code>. <code>storage-ritual-sync</code> still imports <code>initialRitualEntry</code> from session.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect scaffold folder still owns persist/snapshot/sync derived props; only cross-beat restore inference left session cluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel Decide/Feel/Breathe/Done <code>pauseStepLayout</code> screen imports to <code>public-session</code>, or Phase B <code>holzen-query-client-ref</code> shim.</dd>
     </dl>
   </article>
 
