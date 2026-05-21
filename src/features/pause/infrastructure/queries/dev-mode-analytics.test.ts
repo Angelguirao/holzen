@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 const insertEvent = vi.fn(async () => ({ ok: true }));
 
-vi.mock('@/features/pause/infrastructure/supabase-pause-analytics-repository', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseAnalyticsRepository: { insertEvent },
 }));
 
