@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — companion UI completion presentation I/O</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pauseCompanionUiStepCompletion</code> on <code>pause-companion-orchestration-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Follow reflect telemetry I/O: <code>use-companion-ui-completion</code> imports persist + query invalidation only from <code>presentation/companion/pause-companion-orchestration-io.ts</code> (bound <code>PauseRepository</code> + <code>persistCompanionUiStepCompletion</code>; re-export <code>invalidateCompanionUiCompletionQuery</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; use case stays in <code>application/use-cases/ritual/frame/persist-ui-step-completion.ts</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Matches <code>pause-reflect-steps-io</code> / other companion hooks: one I/O module per presentation cluster; library-favorites still imports use case + port separately until a later slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-library-favorites</code> through the same I/O module, or Phase B cross-context slice.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect ambience presentation I/O (backlog #1 follow-up)</span>
       <span class="status resolved">resolved</span>
     </header>
