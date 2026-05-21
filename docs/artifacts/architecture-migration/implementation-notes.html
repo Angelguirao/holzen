@@ -13377,4 +13377,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel reflect decide outcome flow off public-session</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; §6 slim public-session follow-up</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> migration was already complete (ritual restore initializers peeled on prior commit). <code>use-pause-session-decide-handler</code> imports <code>pause-decide-outcome-flow</code> and <code>wisdom-quotes</code> from <code>ritual/decide/*</code>; <code>public-session</code> drops decide re-exports. Session I/O stays on <code>public-session</code> — <code>check:architecture-alignment</code> forbids direct <code>persisted-session-storage</code> from presentation.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving import peel only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Step-transition + swipe-direction cluster still on <code>public-session</code> until next peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel step-transition / swipe-direction when session scaffold imports use cases directly, or Phase B <code>src/lib/*</code> shims (subscription/auth).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

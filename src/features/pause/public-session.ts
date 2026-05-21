@@ -46,12 +46,6 @@ export {
 } from './application/use-cases/ritual/breathe/ritual-audio';
 export type { PauseStep } from './domain/pause-ritual-steps';
 export type { BriefPauseStep, RitualDepth } from './domain/ritual-types';
-export { getSessionQuote, type WisdomQuote } from './application/use-cases/ritual/decide/wisdom-quotes';
-export {
-  formatReinforcementQuoteFromSession,
-  resolvePauseDecideOutcomeFlow,
-  type PauseDecideOutcomeFlow,
-} from './application/use-cases/ritual/decide/pause-decide-outcome-flow';
 export {
   clearSession,
   loadSession,

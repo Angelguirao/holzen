@@ -8,9 +8,9 @@ import {
 } from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
 import {
   formatReinforcementQuoteFromSession,
-  getSessionQuote,
   resolvePauseDecideOutcomeFlow,
-} from '@/features/pause/public-session';
+} from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow';
+import { getSessionQuote } from '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes';
 import { clearSession } from '@/features/pause/public-session';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
