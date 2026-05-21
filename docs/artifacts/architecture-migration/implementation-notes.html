@@ -12655,4 +12655,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — backlog #1 verified; RPC lifecycle telemetry CI guard (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>ritual/reflect/</code> complete — lock PostHog RPC side effects behind <code>pause-rpc-client</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — 18 modules under <code>generation/</code>, <code>hub/</code>, <code>mood/</code>, <code>share/</code>, <code>steps/</code>, <code>telemetry/</code>; zero legacy paths. No folder moves this slice. Backlog #4: extend <code>check:architecture-alignment</code> so direct <code>pause-rpc-lifecycle-telemetry</code> imports are allowed only in <code>pause-rpc-client.ts</code> and the module itself (PostHog dedupe after RPC success stays off <code>PauseRepository</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI-only; tree already complied.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Product PostHog in <code>ritual/reflect/telemetry/</code> and other use-case modules remains intentional — separate from <code>analytics_events</code> port I/O.</dd>
+      <dt>Open questions</dt>
+      <dd>Phase B: subscription/auth template slices; optional <code>@/lib/posthog</code> guard if direct imports spread outside use-case modules.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
