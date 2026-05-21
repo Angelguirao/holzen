@@ -3,11 +3,18 @@
  * Mutations/edge stay on `public-rpc.ts`; session shell on `public-session.ts`.
  */
 export {
+  clampFeelIntensity,
   isPauseMoodValue,
   PAUSE_MOOD_GROUPS,
   PAUSE_MOOD_VALUES,
   type MoodValue,
 } from './domain/mood-value';
+export type { FeelStepTile } from './domain/feel-step-tile';
+export { PAUSE_FEEL_STEP_TILE_ROWS } from './domain/pause-feel-step-tiles';
+export {
+  PAUSE_FEEL_INTENSITY_KEYS,
+  type PauseFeelIntensityKey,
+} from './domain/pause-feel-intensity';
 export { resolveEffectiveReflectionCopy } from './domain/reflect/generation/resolve-effective-reflection-copy';
 export { resolveFrameHaikuDisplayBody } from './domain/reflect/generation/resolve-frame-haiku-display-body';
 export {
