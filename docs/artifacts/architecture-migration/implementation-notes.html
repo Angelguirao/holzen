@@ -15182,4 +15182,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home pause-card telemetry under ritual/reflect/telemetry/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up — Home dismiss + pending-banner PostHog cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Move <code>home-pause-actions-telemetry</code> (+ test) from <code>application/use-cases/trigger/</code> to <code>ritual/reflect/telemetry/</code> beside <code>manual-pause-trigger-telemetry</code> and <code>pause-reflect-ui-telemetry</code>; <code>pause-home-actions-telemetry-io</code> imports the ritual path.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; no new PostHog events.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Remaining <code>trigger/</code> modules (cooldowns, pending-offer telemetry, navigation guards) stay until a later slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>pending-pause-offer-telemetry</code> under <code>ritual/reflect/telemetry/</code> or a session/trigger presentation I/O module.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
