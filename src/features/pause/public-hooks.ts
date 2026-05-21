@@ -152,7 +152,7 @@ export {
   type StandaloneBreathSeverityRingColors,
   type StandaloneBreathingPhase,
 } from './application/use-cases/ritual/breathe/standalone-breathing-patterns';
-export type { PauseImpactData } from './application/use-cases/ritual/decide/impact-data';
+export type { PauseImpactData } from './domain/decide/pause-impact-data';
 export {
   buildPauseScoreImpacts,
   type PauseScoreImpactRow,

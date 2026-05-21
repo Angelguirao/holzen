@@ -1,22 +1,8 @@
+import type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { RitualDepth } from '@/features/pause/domain/ritual-types';
 
-/** Snapshot passed into the pause “done” / impact shell after a successful Decide. */
-export type PauseImpactData = {
-  mood: string | null;
-  moodAfter: string | null;
-  breathingCompleted: boolean;
-  decision: string | null;
-  context: string | null;
-  engagedTools: number;
-  wroteNote: boolean;
-  usedTags: boolean;
-  feelIntensity?: number | null;
-  shiftIntensity?: number | null;
-  reinforcementQuote?: string | null;
-  reflectionMessage?: string | null;
-  haiku?: string | null;
-};
+export type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
 
 export type BuildPauseImpactDataOnCompleteInput = {
   decision: string;
