@@ -1,21 +1,16 @@
 import { supabase } from '@/integrations/supabase/client';
+import type {
+  ReflectMoodHistoryEntry,
+  ReflectRecencyHints,
+} from '@/features/pause/domain/reflect-recency-hints';
+
+export type { ReflectMoodHistoryEntry, ReflectRecencyHints };
 
 /**
  * Pause V2: mood + dedup hints for edge `holzen-reflect` (Reflect step in `PauseSession`).
  * Mirrors `pauseRecencyInputs` in `supabase/functions/_shared/pause-cron-parity.ts`
  * so the manual reflect-step sees the same shapes as `check-volatility`.
  */
-export type ReflectMoodHistoryEntry = {
-  mood: string;
-  outcome: string | null;
-  created_at: string | undefined;
-};
-
-export type ReflectRecencyHints = {
-  moodHistory?: ReflectMoodHistoryEntry[];
-  recentMessages?: string[];
-  recentHaikus?: string[];
-};
 
 /**
  * Loads recency hints for the signed-in user. Returns empty fields on error or

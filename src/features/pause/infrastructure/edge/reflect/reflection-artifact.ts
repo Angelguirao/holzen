@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import { invokeHolzenReflect } from './holzen-reflect-edge';
-import { loadReflectRecencyHints } from '../../queries/reflect/load-reflect-recency-hints';
+import type { ReflectRecencyHints } from '@/features/pause/domain/reflect-recency-hints';
 
 export type PersistReflectionArtifactsParams = {
   pauseInstanceId: string;
@@ -85,6 +85,7 @@ export type GenerateReflectionAtReflectParams = {
   groundingActivities?: string[];
   currency: string;
   language: string;
+  recencyHints: ReflectRecencyHints;
   /** Cancels the edge invoke when the run is superseded, `pauseInstanceId` changes, reflect generation is disabled in `PauseSession`, or the effect cleans up. */
   signal?: AbortSignal;
 };
@@ -98,7 +99,7 @@ export type GenerateReflectionAtReflectResult = {
 export async function generateReflectionAtReflectStep(
   params: GenerateReflectionAtReflectParams,
 ): Promise<GenerateReflectionAtReflectResult> {
-  const { moodHistory, recentMessages, recentHaikus } = await loadReflectRecencyHints();
+  const { moodHistory, recentMessages, recentHaikus } = params.recencyHints;
 
   const { data: fnData, error: fnError } = await invokeHolzenReflect(
     {
