@@ -5739,4 +5739,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect frame-focus bed in ritual/reflect/ambience (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Pure Reflect/Frame Web Audio bed beside telemetry cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> tree) is complete. Move <code>reflect-frame-focus-ambience</code> (+ test) from <code>presentation/reflect/ambience/</code> to <code>application/use-cases/ritual/reflect/ambience/</code> (same pattern as PostHog trackers in <code>ritual/reflect/telemetry/</code>); <code>use-pause-reflect-frame-focus-ambience</code> stays in presentation and imports the use-case module.</dd>
+      <dt>Deviation</dt>
+      <dd>Reverses interim May 2026 placement that colocated the bed beside the hook in presentation — §3 treats ritual audio policy as application, React gate as presentation.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Application module still depends on <code>ritual/breathe/pause-ritual-audio-context</code> for shared <code>AudioContext</code>; no new port.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 peel reflect step hooks (note/tag/favorite) from <code>public-rpc</code> to <code>public-ports</code> + use cases, or colocate <code>use-pause-session-shell</code> under <code>presentation/session/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
