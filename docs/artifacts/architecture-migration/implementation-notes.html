@@ -59,13 +59,32 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood I/O via mood flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-io</code> imports mood helpers through <code>pause-reflect-mood-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route <code>pause-reflect-mood-io</code> through <code>pause-reflect-mood-flow</code> instead of deep <code>domain/reflect/mood/*</code> and <code>run-initial-emotion-log</code> paths (parity with share/hub/steps presentation I/O anchors; generation I/O uses direct domain + holzen-reflect sibling imports).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Umbrella mood flow anchor is thin re-exports for <code>check:architecture-alignment</code> mood cluster detection.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B cross-context Tier 1 shim, or session/companion presentation I/O anchor peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect generation I/O direct domain + run-reflect-generation (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
     <h3><code>pause-reflect-generation-io</code> off <code>pause-reflect-generation-hook-flow</code> anchor</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no folder moves. Peel <code>pause-reflect-generation-io</code> to domain hook helpers and sibling <code>run-reflect-generation</code> (under <code>generation/holzen-reflect/</code> on branch tip) instead of <code>pause-reflect-generation-hook-flow</code>. Steps and hub use flow anchors; mood and session telemetry use direct sibling imports.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no folder moves. Peel <code>pause-reflect-generation-io</code> to domain hook helpers and sibling <code>run-reflect-generation</code> (under <code>generation/holzen-reflect/</code> on branch tip) instead of <code>pause-reflect-generation-hook-flow</code>. Share, hub, steps, and mood use flow anchors; session telemetry uses direct sibling imports.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; <code>pauseReflectGeneration</code> still binds default <code>reflectGenerator</code> from <code>public-rpc</code>.</dd>
       <dt>Tradeoffs</dt>

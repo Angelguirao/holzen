@@ -1,29 +1,23 @@
 /**
  * Reflect mood beat presentation I/O (feel tiles, depth picker, chrome close, initial emotion RPC).
- * Imports domain mood helpers and run-initial-emotion-log directly (off `pause-reflect-mood-flow` CI anchor).
+ * Imports through `pause-reflect-mood-flow` (parity with hub/share/steps presentation I/O anchors).
  */
-import {
-  runInitialEmotionSelect,
-  runInitialEmotionSkip,
-} from '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
 import {
   applyBriefDepthPickerRitualEntry,
   applyDeepDepthPickerRitualEntry,
-} from '@/features/pause/domain/reflect/mood/apply-depth-picker-ritual-entry';
-import { buildFeelTilesMoodLogOptions } from '@/features/pause/domain/reflect/mood/build-feel-tiles-mood-log-options';
-import {
+  buildFeelTilesMoodLogOptions,
   initialEmotionResetUi,
   initialEmotionSelectRollbackUi,
-  type InitialEmotionUiState,
-} from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
-import {
+  resolvePauseDepthContextLineParams,
   resolvePauseSessionChromeCloseAction,
   runDeepPausePickerEntryIfPro,
+  runInitialEmotionSelect,
+  runInitialEmotionSkip,
   runPauseSessionChromeCloseAction,
+  type InitialEmotionUiState,
   type PauseSessionChromeCloseAction,
   type PauseSessionPhase,
-} from '@/features/pause/domain/reflect/mood/pause-session-mood-chrome-flow';
-import { resolvePauseDepthContextLineParams } from '@/features/pause/domain/reflect/mood/resolve-pause-depth-context-line-params';
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 export {
