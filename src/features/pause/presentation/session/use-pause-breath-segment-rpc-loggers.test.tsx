@@ -22,8 +22,13 @@ vi.mock('@/features/pause/public-rpc', async () => {
   const breathLog = await vi.importActual<
     typeof import('@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log')
   >('@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log');
+  const stepMap = await vi.importActual<
+    typeof import('@/features/pause/application/use-cases/session/step-map')
+  >('@/features/pause/application/use-cases/session/step-map');
   return {
     applyBreathSegmentLogOutcome: breathLog.applyBreathSegmentLogOutcome,
+    initialBreathSegmentRpcLoggedFlagsFromRestored:
+      stepMap.initialBreathSegmentRpcLoggedFlagsFromRestored,
     ensureBreathSegment1Logged: ensureBreathSegment1LoggedMock,
     ensureBreathSegment2Logged: ensureBreathSegment2LoggedMock,
     logBreathSegment1Skipped: logBreathSegment1SkippedMock,
