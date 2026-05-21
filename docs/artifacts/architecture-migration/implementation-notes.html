@@ -5961,9 +5961,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; no dedicated hook test (optimistic cache + RPC persist unchanged).</dd>
       <dt>Tradeoffs</dt>
-      <dd>Companion feedback vote, home triggers, and pending-offer hooks still import <code>public-rpc</code> until peeled slice-by-slice.</dd>
+      <dd>Companion feedback vote and companion orchestrate presentation still import <code>public-rpc</code> until peeled slice-by-slice.</dd>
       <dt>Open questions</dt>
-      <dd>Next: port-backed companion feedback vote read in <code>use-companion-feedback-vote</code>, or peel home <code>openManualPauseFromHome</code> / pending-offer presentation imports.</dd>
+      <dd>Next: port-backed companion feedback vote read in <code>use-companion-feedback-vote</code>, or peel companion orchestrate ports from <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home presentation via PauseRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel Home open-pause, manual trigger, and bulk-hold from public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no folder move. <code>use-open-pause-home-preview</code>, <code>use-manual-pause-trigger</code>, and <code>use-bulk-hold-apply-outcomes</code> call <code>dismissOpenPauseHome</code> / <code>openManualPauseFromHome</code> / <code>applyBulkHoldOutcomes</code> with <code>supabasePauseRepository</code> (+ <code>supabaseReflectGenerator</code> for manual trigger) from <code>public-ports.ts</code>. <code>public-rpc</code> facades unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; dismiss hook test mocks <code>public-ports</code> repository.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestrate and feedback-vote presentation still import <code>public-rpc</code> until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed companion feedback vote read or peel companion orchestrate hooks from <code>public-rpc</code>.</dd>
     </dl>
   </article>
 
