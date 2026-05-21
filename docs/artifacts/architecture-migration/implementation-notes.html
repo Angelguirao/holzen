@@ -19305,4 +19305,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — re-apply reflect generation I/O peel after rebase (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-io</code> off <code>pause-reflect-generation-hook-flow</code> anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Rebase conflict-marker fix (<code>a193a8735</code>) left generation I/O importing through <code>pause-reflect-generation-hook-flow</code>; restore direct imports from <code>domain/reflect/generation/*</code> and sibling <code>run-reflect-generation</code> (parity with steps/hub/share/mood peels on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-generation-hook-flow.ts</code> remains CI cluster anchor only; unit test mocks <code>run-reflect-generation</code> directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-brief-io</code> peel from brief-flow anchor, companion orchestrate-io peel, or Phase B subscription Tier 1 shim (<code>subscription-checkout-guard-ref</code>).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
