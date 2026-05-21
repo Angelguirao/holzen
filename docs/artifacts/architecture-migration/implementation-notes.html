@@ -6759,7 +6759,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>favorite_toggled</code> payload remains inline in <code>run-pause-favorite-toggle</code> until a later peel.</dd>
+      <dd><code>favorite_toggled</code> payload peeled in a follow-up slice (same module as note/tag builders).</dd>
       <dt>Open questions</dt>
       <dd>Next: backlog #4 companion feedback vote read via <code>fetchPauseCompanionFeedbackVote</code>, or further frame conductor <code>public-rpc</code> peels.</dd>
     </dl>
@@ -6844,17 +6844,17 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect favorite_toggled payload → domain (backlog #1)</span>
+      <span>Phase A slice — reflect favorite_toggled payload (backlog #1)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Peel favorite_toggled step payload from ritual/reflect use case</h3>
+    <h3>Peel favorite_toggled step payload beside note/tag builders</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Continue reflect <code>domain/reflect/steps</code> peels after note/tag: <code>buildReflectFavoriteToggledPayload</code> colocated with <code>computeFavoriteToggleNext</code> in <code>favorite-toggle.ts</code>; <code>run-pause-favorite-toggle</code> keeps RPC wiring only.</dd>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Group all reflect step RPC payloads in <code>domain/reflect/steps/reflect-note-tag-payload.ts</code> (<code>note_updated</code>, <code>tag_updated</code>, <code>favorite_toggled</code>); <code>computeFavoriteToggleNext</code> stays in <code>favorite-toggle.ts</code>; <code>run-pause-favorite-toggle</code> keeps RPC wiring only.</dd>
       <dt>Deviation</dt>
-      <dd>None — behavior parity.</dd>
+      <dd>Prior slice briefly colocated payload with toggle math in <code>favorite-toggle.ts</code>; consolidated here to match note/tag peel pattern.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>reflection_step</code> payload (<code>{ surface: 'pause_reflect' }</code>) remains inline in <code>run-pause-reflection-step-log</code> until a later peel.</dd>
+      <dd>Module name still says note-tag; renaming to <code>reflect-step-payloads</code> deferred. <code>reflection_step</code> payload remains inline in <code>run-pause-reflection-step-log</code> until a later peel.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>reflection_step</code> payload to domain, backlog #4 companion feedback vote read, or frame conductor <code>public-rpc</code> peels.</dd>
     </dl>
