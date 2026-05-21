@@ -59,21 +59,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
-      <span>Phase A slice — reflect manual-open subcluster (backlog #1 follow-up, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3>Home manual-open use cases under <code>ritual/reflect/generation/manual-open/</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder move remains complete. Colocate Home manual-open + silent-mode use cases in <code>generation/manual-open/</code> (four modules + tests); <code>pause-home-reflect-io</code> import paths only. Domain builders/types stay in <code>domain/reflect/generation/</code>.</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior parity; mechanical path move.</dd>
-      <dt>Tradeoffs</dt>
-      <dd>Holzen-reflect generation (<code>run-reflect-generation</code>) stays at <code>generation/</code> root until a separate slice.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: delete zero-import reflect/session/frame flow CI anchors when safe, or Phase B cross-context Tier 1 shim.</dd>
-=======
       <span>Phase A slice — companion orchestrate I/O via orchestrate-flow anchor (backlog #1–2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -87,7 +72,25 @@
       <dd>Flow anchor stays a thin re-export barrel for <code>check:architecture-alignment</code> frame orchestrate cluster detection.</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B cross-context Tier 1 shim (e.g. <code>src/lib/holzen-query-client-ref</code>).</dd>
->>>>>>> 9c71ebce2 (refactor(pause): route companion orchestrate I/O through flow anchor)
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect manual-open subcluster (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Home manual-open use cases under <code>ritual/reflect/generation/manual-open/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder move remains complete. Colocate Home manual-open + silent-mode use cases in <code>generation/manual-open/</code> (four modules + tests); <code>pause-home-reflect-io</code> import paths only. Domain builders/types stay in <code>domain/reflect/generation/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; mechanical path move.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Holzen-reflect generation (<code>run-reflect-generation</code>) stays at <code>generation/</code> root until a separate slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: delete zero-import reflect/session/frame flow CI anchors when safe, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
