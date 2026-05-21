@@ -38,6 +38,10 @@ vi.mock('./pause-home-io', () => ({
   pauseHomeManualOpenPorts: mockPauseHomeManualOpenPorts,
   pauseDismissOpenPauseHomePreview: vi.fn(),
   openManualPauseFromHome: openManualPauseFromHomeMock,
+  applyManualPauseOpenResult: async (
+    _input: { result: { outcome: string; userMessage?: string } },
+    _ports: unknown,
+  ) => ({ opened: false as const }),
   buildManualPauseOpenParams: (input: {
     userId: string;
     silentMode: boolean;
@@ -62,13 +66,6 @@ vi.mock('./pause-home-io', () => ({
     fearGreedLabel: null,
     onChainBand: null,
   }),
-}));
-
-vi.mock('@/features/pause/application/use-cases/trigger/apply-manual-pause-open-result', () => ({
-  applyManualPauseOpenResult: async (
-    _input: { result: { outcome: string; userMessage?: string } },
-    _ports: unknown,
-  ) => ({ opened: false as const }),
 }));
 
 vi.mock('@/lib/holzen-console', () => ({
