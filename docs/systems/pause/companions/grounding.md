@@ -140,7 +140,7 @@ When `selectIntervention` picks **trap** as the primary intervention:
 | Enrichment presentation | `src/screens/pause/components/companion/GroundingEnrichment.tsx` |
 | Enrichment cache table | `grounding_enrichment_cache` (migration `20260418140000_grounding_enrichment_cache.sql`) |
 | Related biases rail | `src/screens/pause/components/companion/RelatedBiasesThisMonth.tsx` (+ `related-biases-util.ts`) |
-| Full View telemetry hook | `src/features/pause/presentation/use-fullview-telemetry.ts` (`public-hooks`; event `companion_fullview_opened`) |
+| Full View telemetry hook | `src/features/pause/presentation/companion/use-fullview-telemetry.ts` (`public-hooks`; event `companion_fullview_opened`) |
 
 ---
 
