@@ -15774,25 +15774,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — restored breath hydration via pause-session-breath-io (backlog #1 verified, Tier 4)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3>Merge <code>restored-breath-ritual-state</code> into breath presentation I/O</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete on <code>cursor/arch-migrate-src-ca70</code> — no folder moves. Re-export <code>initialBreathingFirstCompletedFromRestored</code> and <code>initialBreathingSecondCompletedFromRestored</code> from <code>pause-session-breath-io</code>; <code>pause-session-ritual-restore-io</code> imports breath hydration through the breath I/O barrel only (decide/frame/brief restore helpers unchanged).</dd>
-      <dt>Deviation</dt>
-      <dd>None — use case module stays under <code>ritual/breathe/</code>; behavior parity.</dd>
-      <dt>Tradeoffs</dt>
-      <dd><code>pause-session-ritual-restore-io</code> remains the aggregate for non-breath ritual restore exports until a later peel.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: peel mood chrome domain helpers through reflect mood I/O, or Phase B cross-context Tier 1 shim.</dd>
-    </dl>
-  </article>
-
-  <article class="note">
-    <header>
-      <span>2026-05-21</span>
       <span>Phase A slice — mood chrome close via mood flow anchor (backlog #1, Tier 4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -15825,6 +15806,25 @@
       <dd>Segment RPC loggers still import domain breath outcome helpers directly — peel in a follow-up slice.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>applyBreathSegmentLogOutcome</code> + RPC flags through <code>pause-session-breath-io</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect flows I/O imports domain preflight (backlog #1 verified; Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>pause-reflect-flows-io stops deep-importing application reflect/decide anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. <code>presentation/reflect/flows/pause-reflect-flows-io.ts</code> imports <code>resolvePauseSessionReflectAndDecidePreflight</code> / <code>resolvePauseSessionReflectAndDecideAfterGeneration</code> from <code>domain/reflect/flows/pause-session-reflect-and-decide-flow.ts</code> (pure helpers already live in domain). Application <code>ritual/reflect/flows/pause-session-reflect-and-decide-flow.ts</code> stays as CI cluster anchor only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import path only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Decide outcome RPC + decide flow/toast helpers still import from <code>application/use-cases/ritual/decide/*</code> on the same I/O module until a follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel generation hook-flow imports through domain on <code>pause-reflect-generation-io</code>, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
