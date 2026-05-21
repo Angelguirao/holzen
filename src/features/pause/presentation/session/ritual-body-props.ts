@@ -1,10 +1,7 @@
 import type { RefObject } from 'react';
-import type {
-  BriefPauseStep,
-  CompanionData,
-  CompanionPrefs,
-  PauseStep,
-} from '@/features/pause/public-hooks';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
+import type { BriefPauseStep } from '@/features/pause/domain/ritual-types';
 import type { FeelStepTile } from '../../domain/feel-step-tile';
 import type { MoodValue } from '../../domain/mood-value';
 import type { PauseSessionStepTransitionConfig } from '@/features/pause/public-session';

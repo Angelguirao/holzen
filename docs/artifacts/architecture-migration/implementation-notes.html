@@ -10812,4 +10812,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — session presentation ritual types from domain (backlog #1 verified, §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; session conductors avoid public-hooks type cycle</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — use cases under <code>ritual/reflect/</code>. After breath <code>reflect/flows</code> peeled domain imports (parallel commit), align remaining <code>presentation/session/</code> hooks and <code>ritual-body-props.ts</code> to import <code>PauseStep</code>, <code>BriefPauseStep</code>, <code>RitualDepth</code>, and companion card types from <code>domain/</code> instead of <code>public-hooks</code> so <code>public-hooks</code> → barrels → session modules does not create a re-export cycle.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Screens still import ritual types via <code>public-hooks</code>; feature-internal session cluster only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional <code>analytics-events</code> import guard; Phase B subscription/auth <code>src/lib/*</code> shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

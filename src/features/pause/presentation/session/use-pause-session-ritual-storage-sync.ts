@@ -1,7 +1,7 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 import { loadSession } from '@/features/pause/public-rpc';
 import { computePauseStorageRitualSyncPatch } from '@/features/pause/public-session';
-import type { BriefPauseStep, RitualDepth } from '@/features/pause/public-hooks';
+import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 
 /**

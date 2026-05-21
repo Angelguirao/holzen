@@ -2,7 +2,8 @@ import { useCallback, useEffect, type Dispatch, type SetStateAction } from 'reac
 import type { TFunction } from 'i18next';
 import { briefSwitchToDeepPauseState } from '@/features/pause/public-ritual-brief';
 import { logPauseRitualDepthUpgraded } from '@/features/pause/public-rpc';
-import type { BriefPauseStep, PauseStep, RitualDepth } from '@/features/pause/public-hooks';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
+import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 
 export interface UsePauseSessionBriefToDeepParams {
   subLoading: boolean;
