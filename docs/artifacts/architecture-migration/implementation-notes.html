@@ -12123,4 +12123,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate breath-handlers in presentation/session/ (backlog #1 verified, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-session-breath-handlers</code> beside segment RPC loggers</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no use-case move. Move <code>use-pause-session-breath-handlers</code> from <code>presentation/reflect/flows/</code> to <code>presentation/session/</code> beside <code>use-pause-breath-segment-rpc-loggers</code> and breath navigation; <code>use-pause-session-breath-step-handlers</code> stays in <code>reflect/flows/</code> (reflect→decide segment transitions). <code>public-ritual-reflect</code> + breath-reflect wrapper import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 session conductor grouping (reverses interim reflect/flows placement).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Breath-reflect composite conductor remains under <code>reflect/flows/</code>; only the breath navigation bundle moves.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
