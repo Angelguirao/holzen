@@ -234,6 +234,21 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_IMPORTS = [
   '@/features/pause/presentation/session/scaffold-ritual-payloads',
   "from './presentation/session/scaffold-ritual-payloads'",
   "from '../presentation/session/scaffold-ritual-payloads'",
+  '@/features/pause/presentation/session/use-pause-session-scaffold-ritual',
+  '@/features/pause/presentation/session/use-pause-session-scaffold-presentation',
+  '@/features/pause/presentation/session/use-pause-session-scaffold-vm',
+  '@/features/pause/presentation/session/use-pause-session-scaffold-chrome-slots',
+  '@/features/pause/presentation/session/pause-session-scaffold-vm-types',
+  "from './presentation/session/use-pause-session-scaffold-ritual'",
+  "from './presentation/session/use-pause-session-scaffold-presentation'",
+  "from './presentation/session/use-pause-session-scaffold-vm'",
+  "from './presentation/session/use-pause-session-scaffold-chrome-slots'",
+  "from './presentation/session/pause-session-scaffold-vm-types'",
+  "from '../presentation/session/use-pause-session-scaffold-ritual'",
+  "from '../presentation/session/use-pause-session-scaffold-presentation'",
+  "from '../presentation/session/use-pause-session-scaffold-vm'",
+  "from '../presentation/session/use-pause-session-scaffold-chrome-slots'",
+  "from '../presentation/session/pause-session-scaffold-vm-types'",
 ];
 
 const PAUSE_RPC_CLIENT_ALLOWLIST = new Set([

@@ -424,7 +424,7 @@ export {
   usePauseSessionScaffoldRitual,
   type UsePauseSessionScaffoldRitualParams,
   type PauseSessionScaffoldRitualDerivedParams,
-} from './presentation/session/use-pause-session-scaffold-ritual';
+} from './presentation/session/scaffold/use-pause-session-scaffold-ritual';
 export { usePauseSessionBreathSecondLabelVariant } from './presentation/session/breath/use-pause-session-breath-second-label-variant';
 export { usePauseSessionFetch } from './presentation/session/use-pause-session-fetch';
 export {
@@ -453,16 +453,16 @@ export type { PauseSessionStepHandlersProvidersSlice } from './presentation/sess
 export {
   usePauseSessionScaffoldPresentation,
   type UsePauseSessionScaffoldPresentationParams,
-} from './presentation/session/use-pause-session-scaffold-presentation';
+} from './presentation/session/scaffold/use-pause-session-scaffold-presentation';
 export {
   usePauseSessionScaffoldVm,
   type PauseSessionScaffoldVmResult,
-} from './presentation/session/use-pause-session-scaffold-vm';
+} from './presentation/session/scaffold/use-pause-session-scaffold-vm';
 export type {
   PauseScaffoldChromeRegistry,
   PauseSessionScaffoldVmChromeSlots,
   PauseSessionScaffoldVmProvidersSlice,
-} from './presentation/session/pause-session-scaffold-vm-types';
+} from './presentation/session/scaffold/pause-session-scaffold-vm-types';
 export {
   usePauseSessionFlowCore,
   type PauseSessionFlowCoreProvidersSlice,
