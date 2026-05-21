@@ -9,11 +9,13 @@ const {
   runDeclinePendingPauseOfferMock,
   trackPausePendingAdoptedMock,
   trackPausePendingDeclinedMock,
+  mockPauseRepository,
 } = vi.hoisted(() => ({
   runAdoptPendingPauseOfferMock: vi.fn(),
   runDeclinePendingPauseOfferMock: vi.fn(),
   trackPausePendingAdoptedMock: vi.fn(),
   trackPausePendingDeclinedMock: vi.fn(),
+  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
 vi.mock('@/features/pause/application/use-cases/pending-offer/run-adopt-pending-pause-offer', () => ({
@@ -30,7 +32,7 @@ vi.mock('@/features/pause/application/use-cases/trigger/pending-pause-offer-tele
 }));
 
 vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
-  supabasePauseRepository: {},
+  supabasePauseRepository: mockPauseRepository,
 }));
 
 vi.mock('sonner', () => ({
@@ -72,6 +74,7 @@ describe('usePendingPauseOfferMutations', () => {
 
     expect(ok).toBe(true);
     expect(runAdoptPendingPauseOfferMock).toHaveBeenCalledTimes(1);
+    expect(runAdoptPendingPauseOfferMock).toHaveBeenCalledWith(mockPauseRepository);
     expect(trackPausePendingAdoptedMock).toHaveBeenCalledWith('inst-9');
     expect(onAfterMutation).toHaveBeenCalled();
     expect(navigateAfterAdopt).toHaveBeenCalledWith('inst-9');
@@ -99,6 +102,7 @@ describe('usePendingPauseOfferMutations', () => {
 
     expect(ok).toBe(true);
     expect(runDeclinePendingPauseOfferMock).toHaveBeenCalledTimes(1);
+    expect(runDeclinePendingPauseOfferMock).toHaveBeenCalledWith(mockPauseRepository);
     expect(trackPausePendingDeclinedMock).toHaveBeenCalledWith('offer-1');
     expect(onAfterMutation).toHaveBeenCalled();
     expect(refreshPendingOffer).toHaveBeenCalled();

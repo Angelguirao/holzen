@@ -11724,4 +11724,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — assert pending-offer mutations use PauseRepository port (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; pending-offer adopt/decline tests lock port wiring</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Strengthen tests so <code>usePendingPauseOfferMutations</code> asserts <code>runAdoptPendingPauseOffer</code> / <code>runDeclinePendingPauseOffer</code> receive <code>supabasePauseRepository</code>; application tests assert <code>PauseRepository.adoptPendingOffer</code> / <code>declinePendingOffer</code> delegation (same pattern as home dismiss + <code>runPauseDismissCurrent</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation test uses a sentinel mock object for the default repository adapter — not the real Supabase client.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

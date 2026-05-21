@@ -4,11 +4,11 @@ import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
 describe('runDeclinePendingPauseOffer', () => {
   it('returns ok when repository succeeds', async () => {
-    const repository = {
-      declinePendingOffer: vi.fn().mockResolvedValue({ ok: true, cleared: 1 }),
-    } as unknown as PauseRepository;
+    const declinePendingOffer = vi.fn().mockResolvedValue({ ok: true, cleared: 1 });
+    const repository = { declinePendingOffer } as unknown as PauseRepository;
 
     await expect(runDeclinePendingPauseOffer(repository)).resolves.toEqual({ status: 'ok' });
+    expect(declinePendingOffer).toHaveBeenCalledOnce();
   });
 
   it('returns failed when repository throws', async () => {
