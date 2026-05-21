@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { BRIEF_INTEGRATE_SECONDS } from '@/features/pause/application/use-cases/ritual/brief/brief-integrate-timer';
+import { BRIEF_INTEGRATE_SECONDS } from '@/features/pause/public-ritual-brief';
 
 export function usePauseBriefIntegrateCountdown(done: boolean, onComplete: () => void) {
   const [remaining, setRemaining] = useState(BRIEF_INTEGRATE_SECONDS);

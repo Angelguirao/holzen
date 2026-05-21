@@ -27,7 +27,7 @@ export {
   BRIEF_INTEGRATE_SECONDS,
   briefIntegrateRemainingProgress,
   briefIntegrateRingDashOffset,
-} from './application/use-cases/ritual/brief/brief-integrate-timer';
+} from './public-ritual-brief';
 export {
   formatPauseOpenMaxRemaining,
   pauseOpenMaxDeadlineMs,
