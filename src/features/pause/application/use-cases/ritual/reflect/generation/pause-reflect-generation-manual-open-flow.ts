@@ -31,7 +31,6 @@ export type {
   RunOpenManualPauseSilentModeAfterCreateOpened,
   RunOpenManualPauseSilentModeAfterCreateResult,
 } from '@/features/pause/domain/reflect/generation/open-manual-pause-silent-mode-after-create-types';
-export { shouldNavigateAfterManualTrigger } from '@/features/pause/domain/reflect/generation/should-navigate-after-manual-trigger';
 export type {
   TrackManualPauseInstanceCreatedPayload,
   TrackPauseManualCompletedPayload,
