@@ -311,6 +311,9 @@ export {
   usePauseFavoriteToggle,
   usePauseSessionMoodAndPersist,
   type UsePauseSessionMoodAndPersistParams,
+  usePauseSessionDepthPickerHandlers,
+  usePauseSessionFeelTilesSelect,
+  usePauseSessionInitialMoodHandlers,
   PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS,
   applyBreathSegmentLogOutcome,
   initialBreathSegmentRpcLoggedFlagsFromRestored,
@@ -402,9 +405,6 @@ export {
   usePauseSessionReflectAndDecide,
   type UsePauseSessionReflectAndDecideParams,
 } from './presentation/reflect/flows/use-pause-session-reflect-and-decide';
-export { usePauseSessionDepthPickerHandlers } from './presentation/reflect/mood/use-pause-session-depth-picker-handlers';
-export { usePauseSessionFeelTilesSelect } from './presentation/reflect/mood/use-pause-session-feel-tiles-select';
-export { usePauseSessionInitialMoodHandlers } from './presentation/reflect/mood/use-pause-session-initial-mood-handlers';
 export { usePauseSessionPersistToStorage } from './presentation/session/use-pause-session-persist-to-storage';
 export { usePauseSessionRitualStorageSync } from './presentation/session/use-pause-session-ritual-storage-sync';
 export {

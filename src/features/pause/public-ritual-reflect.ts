@@ -41,6 +41,9 @@ export {
   usePauseSessionMoodAndPersist,
   type UsePauseSessionMoodAndPersistParams,
 } from './presentation/reflect/mood/use-pause-session-mood-and-persist';
+export { usePauseSessionDepthPickerHandlers } from './presentation/reflect/mood/use-pause-session-depth-picker-handlers';
+export { usePauseSessionFeelTilesSelect } from './presentation/reflect/mood/use-pause-session-feel-tiles-select';
+export { usePauseSessionInitialMoodHandlers } from './presentation/reflect/mood/use-pause-session-initial-mood-handlers';
 
 export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/reflect/mood/pause-depth-picker-styles';
 
