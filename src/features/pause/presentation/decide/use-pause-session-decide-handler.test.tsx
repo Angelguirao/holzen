@@ -5,20 +5,39 @@ import type { MutableRefObject } from 'react';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
 import {
-  showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
-} from '@/features/pause/public-rpc';
+  formatReinforcementQuoteFromSession,
+  resolvePauseDecideOutcomeFlow,
+} from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow';
 import { usePauseSessionDecideHandler } from './use-pause-session-decide-handler';
 
-const { logStepMock, clearSessionMock, invalidatePauseStatsMock, mockRepository } = vi.hoisted(() => {
+const {
+  logStepMock,
+  clearSessionMock,
+  invalidatePauseStatsMock,
+  mockRepository,
+  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeNotCompletedToast,
+} = vi.hoisted(() => {
   const logStepMock = vi.fn();
   return {
     logStepMock,
     clearSessionMock: vi.fn(),
     invalidatePauseStatsMock: vi.fn(),
     mockRepository: { logStep: logStepMock } as unknown as PauseRepository,
+    showPauseOutcomeSaveFailedToast: vi.fn(),
+    showPauseOutcomeNotCompletedToast: vi.fn(),
   };
 });
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  logPauseOutcome: (params: Parameters<typeof runPauseOutcomeLog>[1]) =>
+    runPauseOutcomeLog(mockRepository, params),
+  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeNotCompletedToast,
+  formatReinforcementQuoteFromSession,
+  resolvePauseDecideOutcomeFlow,
+  getSessionQuote: () => ({ text: 'Q', author: 'A' }),
+}));
 
 vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),
@@ -27,20 +46,6 @@ vi.mock('@/lib/haptics', () => ({
 vi.mock('@/features/pause/public-queries', () => ({
   invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
 }));
-
-vi.mock('@/features/pause/public-rpc', async () => {
-  const decideFlow = await vi.importActual<
-    typeof import('@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow')
-  >('@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow');
-  return {
-    ...decideFlow,
-    logPauseOutcome: (params: Parameters<typeof runPauseOutcomeLog>[1]) =>
-      runPauseOutcomeLog(mockRepository, params),
-    showPauseOutcomeSaveFailedToast: vi.fn(),
-    showPauseOutcomeNotCompletedToast: vi.fn(),
-    getSessionQuote: () => ({ text: 'Q', author: 'A' }),
-  };
-});
 
 vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
   clearSession: () => clearSessionMock(),
