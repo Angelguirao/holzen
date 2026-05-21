@@ -17519,4 +17519,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood I/O via mood-flow cluster anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-io</code> → <code>pause-reflect-mood-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Presentation mood I/O imports depth-picker, feel-tiles, initial-emotion presentation, chrome-close helpers, and <code>runInitialEmotionSelect</code>/<code>runInitialEmotionSkip</code> through the mood cluster anchor (parity with generation/steps/flows I/O modules).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; repository binding unchanged on the I/O module.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit test mocks <code>pause-reflect-mood-flow</code> with partial <code>importOriginal</code> so pure helpers stay real while RPC use cases are stubbed.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: home reflect I/O via <code>pause-reflect-generation-manual-open-flow</code>, hub I/O cluster anchor, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
