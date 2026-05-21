@@ -2,6 +2,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useHomePauseActions } from './use-home-pause-actions';
 
+const { trackPauseOpenDismissedMock, trackHomePendingPauseBannerPauseOpenedMock } = vi.hoisted(
+  () => ({
+    trackPauseOpenDismissedMock: vi.fn(),
+    trackHomePendingPauseBannerPauseOpenedMock: vi.fn(),
+  }),
+);
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  trackPauseOpenDismissed: trackPauseOpenDismissedMock,
+  trackHomePendingPauseBannerPauseOpened: trackHomePendingPauseBannerPauseOpenedMock,
+}));
+
 const navigate = vi.fn();
 const manualTrigger = vi.fn();
 

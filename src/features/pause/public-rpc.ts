@@ -186,6 +186,12 @@ export {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
 } from './application/use-cases/trigger/pending-pause-offer-telemetry';
+export {
+  trackHomePendingPauseBannerPauseOpened,
+  trackPauseOpenDismissed,
+  type OpenPauseStateForAnalytics,
+  type PauseDismissAnalyticsSurface,
+} from './application/use-cases/trigger/home-pause-actions-telemetry';
 
 export type {
   RunInitialEmotionSelectResult,
