@@ -11,7 +11,7 @@ import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
 } from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
-import type { PauseImpactData } from '@/features/pause/application/use-cases/ritual/decide/impact-data';
+import type { PauseImpactData } from '@/features/pause/public-hooks';
 import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 import type { RitualDepth } from '@/features/pause/public-hooks';
 import { getSessionQuote } from '@/features/pause/application/use-cases/session/wisdom-quotes';
