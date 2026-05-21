@@ -1,6 +1,6 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
-import { runDeepPausePickerEntryIfPro } from '@/features/pause/domain/reflect/mood/pause-session-mood-chrome-flow';
+import { runDeepPausePickerEntryIfPro } from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
