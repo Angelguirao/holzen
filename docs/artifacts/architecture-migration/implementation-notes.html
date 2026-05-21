@@ -4336,6 +4336,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — reflect steps import public-queries only (Tier 3)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -4349,6 +4350,21 @@
       <dd>Query key helpers remain in <code>application/queries/</code> for infrastructure and invalidation modules; presentation must use <code>public-queries</code> barrel.</dd>
       <dt>Open questions</dt>
       <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (if any), or Phase B cross-context slice.</dd>
+=======
+      <span>Phase A slice — colocate intervention invoke in CompanionOrchestrator adapter</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; peel edge intervention helper</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Prior slice routed presentation through <code>CompanionOrchestrator.invokeIntervention</code>; this slice inlines <code>buildInterventionOrchestrateBody</code> in <code>supabaseCompanionOrchestrator</code> and removes <code>invokeCompanionIntervention</code> from the edge module + <code>public-rpc</code> export.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>invokeEdge('companion-orchestrate')</code> unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Intervention body shaping stays in application use-case module (imported by infrastructure adapter only).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4 remainder), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+>>>>>>> 070d16cf (refactor(pause): colocate intervention invoke in orchestrator adapter)
     </dl>
   </article>
 
