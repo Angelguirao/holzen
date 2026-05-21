@@ -1,8 +1,7 @@
 import { useCallback, useEffect, type Dispatch, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import { briefSwitchToDeepPauseState } from '@/features/pause/application/use-cases/ritual/brief/brief-switch-to-deep';
-import { logPauseRitualDepthUpgraded } from '@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade';
-import { supabasePauseRepository } from '@/features/pause/public-ports';
+import { logPauseRitualDepthUpgraded } from '@/features/pause/public-rpc';
 import type { BriefPauseStep, PauseStep, RitualDepth } from '@/features/pause/public-hooks';
 
 export interface UsePauseSessionBriefToDeepParams {
@@ -57,7 +56,7 @@ export function usePauseSessionBriefToDeep({
   const handleBriefSwitchToDeepPause = useCallback(async () => {
     if (!requirePro('deep_pause')) return;
     if (pauseInstanceId) {
-      const ok = await logPauseRitualDepthUpgraded(supabasePauseRepository, pauseInstanceId, t);
+      const ok = await logPauseRitualDepthUpgraded(pauseInstanceId, t);
       if (!ok) return;
     }
     const next = briefSwitchToDeepPauseState();
