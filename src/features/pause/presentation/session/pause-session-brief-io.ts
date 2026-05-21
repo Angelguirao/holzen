@@ -1,14 +1,15 @@
 /**
  * Presentation I/O for `/pause` brief ritual depth upgrade RPC and brief hydration from storage.
- * Imports restored brief fields from `session/` + `ritual/brief/` (off `pause-session-brief-flow` CI anchor).
+ * Imports restored brief fields and depth-upgrade RPC via `pause-session-brief-flow` CI anchor
+ * (parity with `pause-reflect-steps-io` → steps flow).
  */
-import { logPauseRitualDepthUpgraded } from '@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade';
-import { initialRitualEntry } from '@/features/pause/application/use-cases/session/initial-ritual-entry';
 import {
   initialBriefIntegrateDoneFromRestored,
   initialBriefPauseStepFromRestored,
+  initialRitualEntry,
   initialSelectedBriefFaceFromRestored,
-} from '@/features/pause/application/use-cases/session/restored-brief-ritual-state';
+  logPauseRitualDepthUpgraded,
+} from '@/features/pause/application/use-cases/session/pause-session-brief-flow';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 

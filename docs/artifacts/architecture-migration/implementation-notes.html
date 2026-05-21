@@ -19457,4 +19457,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — session brief I/O via flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-brief-io</code> imports through <code>pause-session-brief-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Route brief hydration helpers and <code>logPauseRitualDepthUpgraded</code> through <code>pause-session-brief-flow</code> (parity with reflect steps/hub/share presentation I/O on branch tip). <code>pause-session-ritual-restore-io</code> keeps direct session sibling imports for restored brief fields.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit test uses <code>importActual</code> on the flow module so hydration helpers stay real while depth-upgrade RPC is mocked.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion orchestrate-io peel, or Phase B subscription Tier 1 shim (<code>subscription-checkout-guard-ref</code>).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
