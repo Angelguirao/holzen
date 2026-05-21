@@ -5302,4 +5302,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — dev-mode analytics queries via port (backlog #4 partial, Tier 3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Stop <code>infrastructure/queries</code> re-importing <code>public-rpc</code> for dev-mode</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>dev-mode-analytics.ts</code> and <code>dev-mode-admin-query.ts</code> call <code>runLogDevModeSetting</code> / <code>runFetchDevModeSetting</code> with <code>supabasePauseAnalyticsRepository</code> from <code>public-ports</code>. Screens/admin still use <code>public-rpc</code> facades; infrastructure avoids layering RPC barrel over query modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; existing Vitest for admin query unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion fullview, PWA install, and feedback-vote query modules still delegate through <code>public-rpc</code> — follow-up cluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: same port pattern for <code>companion-fullview-analytics</code>, <code>pwa-install-analytics</code>, <code>companion-feedback-vote-query</code>, or companion route-lib peels.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
