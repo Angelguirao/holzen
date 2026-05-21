@@ -6005,4 +6005,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion feedback vote write via PauseAnalyticsRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel logPauseCompanionFeedbackVote from public-rpc in presentation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Read path was already port-backed via <code>companion-feedback-vote-query</code> + <code>public-ports</code>. <code>use-companion-feedback-vote</code> write path calls <code>runLogCompanionFeedbackVote</code> with <code>supabasePauseAnalyticsRepository</code>; <code>logPauseCompanionFeedbackVote</code> facade on <code>public-rpc</code> unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; no dedicated hook test (optimistic vote + query cache unchanged).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Fullview telemetry, home triggers, and companion orchestrate hooks still import <code>public-rpc</code> until peeled slice-by-slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-fullview-telemetry</code> analytics writes or home <code>openManualPauseFromHome</code> / pending-offer presentation imports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
