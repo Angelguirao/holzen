@@ -4732,4 +4732,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate reflect-frame-focus-ambience in presentation/reflect/ambience (Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Web Audio bed beside reflect ambience hook</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>reflect-frame-focus-ambience</code> (+ test) from <code>application/.../ritual/reflect/ambience/</code> to <code>presentation/reflect/ambience/</code> beside <code>use-pause-reflect-frame-focus-ambience</code>; hook imports sibling module. Empty application <code>reflect/ambience/</code> removed.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; still uses <code>pause-ritual-audio-context</code> from <code>ritual/breathe/</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Web Audio side effects are presentation concerns, not domain use cases — keeps <code>ritual/reflect/</code> for I/O and step logs only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>pause-shift-frame-hub-flow</code> under <code>presentation/reflect/hub/</code>, wire remaining <code>PauseRepository</code> stragglers (backlog #4), or colocate flat session shell hooks.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
