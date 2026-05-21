@@ -17158,4 +17158,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — remove orphan reflect steps flow anchors (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Delete <code>pause-favorite-toggle-flow</code>, <code>pause-reflection-step-flow</code>, <code>pause-reflect-steps-mutation-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-steps-io</code> already imports <code>run-pause-*</code> modules and <code>domain/reflect/steps/</code> gates directly (prior slice). Remove three thin application re-export anchors with zero remaining imports (mirrors <code>pause-shift-frame-hub-flow</code> removal).</dd>
+      <dt>Deviation</dt>
+      <dd>None.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Steps presentation I/O is the import surface; no application cluster anchor in <code>ritual/reflect/steps/</code> besides <code>run-*</code> use cases.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect flows I/O anchor peel (preflight/post-generation), session pending-offer I/O through <code>pause-session-pending-offer-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
