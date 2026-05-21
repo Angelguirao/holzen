@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildPauseImpactDataOnComplete } from './impact-data';
+import { buildPauseImpactDataOnComplete } from './build-pause-impact-data-on-complete';
 
 const base = () => ({
   decision: 'hold',

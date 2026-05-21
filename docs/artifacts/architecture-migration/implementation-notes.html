@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect flows I/O decide pure helpers from domain (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-io</code> imports decide flow + quotes from <code>domain/decide/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder move remains complete. Peel decide beat pure helpers (<code>resolvePauseDecideOutcomeFlow</code>, <code>formatReinforcementQuoteFromSession</code>, <code>getSessionQuote</code>, <code>buildPauseImpactDataOnComplete</code>, <code>RunPauseOutcomeLogResult</code>) into <code>domain/decide/</code>; presentation <code>pause-reflect-flows-io</code> imports domain paths. RPC <code>runPauseOutcomeLog</code> and Sonner toasts stay on application paths inside the same I/O module.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; thin re-export anchors under <code>application/use-cases/ritual/decide/</code> remain for non-presentation application imports.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Moved application unit tests beside domain modules; deleted duplicate application test files.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion orchestrate-session through orchestration-io, or peel outcome toasts behind presentation decide I/O only if conductors import application directly.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — session shell header-back presentation I/O</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd>Shell I/O barrel can absorb mount-log / shell-view-model re-exports in a follow-up slice.</dd>
       <dt>Open questions</dt>
-      <dd>Next: scaffold persist + derived props through <code>presentation/session/scaffold/</code> I/O, or reflect flows decide toasts from domain.</dd>
+      <dd>Next: scaffold persist + derived props through <code>presentation/session/scaffold/</code> I/O, or companion orchestrate-session through orchestration-io.</dd>
     </dl>
   </article>
 
