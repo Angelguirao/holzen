@@ -11838,4 +11838,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — align manual pause trigger port test sentinels (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Home trigger presentation port-lock</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Align <code>use-manual-pause-trigger</code> test mocks to the shared <code>port: 'supabasePauseRepository'</code> / <code>supabaseReflectGenerator</code> sentinel pattern (matches companion library favorites + pending-offer hooks).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Test-only — companion library favorites port-lock landed in the prior commit on this branch.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
