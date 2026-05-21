@@ -9900,4 +9900,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — public-session step-transition barrel (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; Framer step transition helpers on public-session</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. Extend <code>public-session.ts</code> with step-transition constants + <code>buildPauseSessionStepTransitionConfig</code>; session scaffold presentation imports the barrel; <code>public-hooks</code> re-exports from <code>public-session</code> (composes with header-back + mount-log).</dd>
+      <dt>Deviation</dt>
+      <dd>None — slide offset, duration, and ease unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Persist snapshot, gate flags, and hydration helpers remain on direct <code>application/use-cases/session/*</code> until the next peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next #3: <code>persist-snapshot</code> cluster on <code>public-session</code>; backlog #4: audit breath segment RPC presentation imports for <code>public-rpc</code>-only.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -11,7 +11,7 @@ export {
   PAUSE_SESSION_STEP_TRANSITION_EASE,
   type PauseSessionStepTransitionConfig,
   type PauseSessionSwipeDirection,
-} from './application/use-cases/session/step-transition';
+} from './public-session';
 export {
   buildPauseSessionMountLogParams,
   type PauseSessionMountLogParams,
