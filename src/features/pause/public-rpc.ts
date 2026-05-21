@@ -113,6 +113,11 @@ import {
   runShiftEmotionFrameHubDone,
   type RunShiftEmotionFrameHubDoneResult,
 } from './application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
+import {
+  runReflectGeneration,
+  type RunReflectGenerationInput,
+} from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
+import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
 
 export type {
   RunInitialEmotionSelectResult,
@@ -405,6 +410,15 @@ export function logBreathSegment2Skipped(
 ) {
   return runLogBreathSegment2Skipped(supabasePauseRepository, input, breathSegmentLogDeps);
 }
+
+/** Reflect step — nav seed → artifact cache → `holzen-reflect` (wired `ReflectGenerator`). */
+export function runPauseReflectGeneration(
+  input: RunReflectGenerationInput,
+): Promise<ReflectGenerationResult> {
+  return runReflectGeneration(input, supabaseReflectGenerator);
+}
+
+export type { RunReflectGenerationInput, ReflectGenerationResult };
 
 /** Brief done save — `post_pause_emotion_logged` when check-in differs from ritual snapshot. */
 /** Brief done “Save to journey” — `post_pause_emotion_logged` when feel changed. */

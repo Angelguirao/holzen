@@ -8323,4 +8323,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation wired public-queries + public-rpc (backlog #1 done, #3/#4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel reflect generation hooks off public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. Artifact reads (<code>reflection_text</code>, haiku) re-export from <code>infrastructure/queries/reflect/</code> on <code>public-queries</code>; <code>runPauseReflectGeneration</code> on <code>public-rpc</code> wires <code>runReflectGeneration</code> + default <code>ReflectGenerator</code>. Presentation hooks under <code>presentation/reflect/generation/</code> import barrels only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; Home manual trigger still uses <code>supabaseReflectGenerator</code> via <code>public-ports</code> / <code>openManualPauseFromHome</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>reflect-step-query</code> still reaches artifact reads through the <code>ReflectGenerator</code> adapter internally; optional follow-up to call query modules directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed companion feedback vote read on <code>public-queries</code>, or peel remaining <code>public-ports</code> presentation imports (breath segment loggers, pending-offer, home preview).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
