@@ -4,8 +4,10 @@ import type { TFunction } from 'i18next';
 import { useAuth } from '@/features/auth/public';
 import { showPauseFavoriteProHintToast } from '@/features/pause/presentation/reflect/steps/pause-favorite-pro-hint-toast';
 import { pauseArchiveListQueryPrefix } from '@/features/pause/public-queries';
-import { shouldShowFavoriteProHint } from '@/features/pause/domain/reflect/steps/favorite-toggle';
-import { pauseReflectFavoriteToggle } from './pause-reflect-steps-io';
+import {
+  pauseReflectFavoriteToggle,
+  shouldShowFavoriteProHint,
+} from './pause-reflect-steps-io';
 import { hapticFeedback } from '@/lib/haptics';
 
 export function usePauseFavoriteToggle(input: {

@@ -20,9 +20,15 @@ vi.mock('./pause-reflect-mood-io', () => ({
   pauseInitialEmotionSkip: vi.fn(),
 }));
 
-vi.mock('../steps/pause-reflect-steps-io', () => ({
-  pauseReflectFavoriteToggle: pauseReflectFavoriteToggleMock,
-}));
+vi.mock('../steps/pause-reflect-steps-io', async () => {
+  const { shouldShowFavoriteProHint } = await import(
+    '@/features/pause/domain/reflect/steps/favorite-toggle'
+  );
+  return {
+    shouldShowFavoriteProHint,
+    pauseReflectFavoriteToggle: pauseReflectFavoriteToggleMock,
+  };
+});
 
 vi.mock('@/features/pause/presentation/session/scaffold/use-pause-session-ritual-storage-sync', () => ({
   usePauseSessionRitualStorageSync: vi.fn(),

@@ -9,9 +9,15 @@ const { pauseReflectFavoriteToggleMock, invalidateQueriesMock } = vi.hoisted(() 
   invalidateQueriesMock: vi.fn(),
 }));
 
-vi.mock('./pause-reflect-steps-io', () => ({
-  pauseReflectFavoriteToggle: pauseReflectFavoriteToggleMock,
-}));
+vi.mock('./pause-reflect-steps-io', async () => {
+  const { shouldShowFavoriteProHint } = await import(
+    '@/features/pause/domain/reflect/steps/favorite-toggle'
+  );
+  return {
+    shouldShowFavoriteProHint,
+    pauseReflectFavoriteToggle: pauseReflectFavoriteToggleMock,
+  };
+});
 
 vi.mock('@/features/pause/public-queries', () => ({
   pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
