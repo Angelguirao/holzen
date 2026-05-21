@@ -14017,9 +14017,28 @@
       <dt>Deviation</dt>
       <dd>None — import paths only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Feel, brief integrate, done, and shared back-row still use <code>public-hooks</code> for layout; peel per ritual beat.</dd>
+      <dd>Brief integrate, done, and shared back-row still use <code>public-hooks</code> for layout; peel per ritual beat.</dd>
       <dt>Open questions</dt>
       <dd>Next: move <code>scaffold-ritual-derived</code> to <code>session/</code> or <code>public-home</code> cluster 2.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — Feel step layout on public-session (backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect ritual beat — Feel step chrome off public-hooks</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. <code>PauseRitualFeelStep</code> already imports mood types from <code>public-ritual-reflect</code>; import <code>pauseStepLayout</code> from <code>public-session</code> so Feel matches Reflect/Frame/Decide/Breathe (no <code>public-hooks</code> on the component).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Brief, done, and shared chrome still import layout from <code>public-hooks</code>; peel per beat.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>public-home</code> cluster 2 or Phase B <code>holzen-query-client-ref</code> shim.</dd>
     </dl>
   </article>
 
