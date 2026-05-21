@@ -236,7 +236,6 @@ export type { CompanionUiCompletionStep };
 export type { RunAdoptPendingPauseOfferResult, RunDeclinePendingPauseOfferResult };
 export type {
   RunPauseFavoriteToggleResult,
-  RunPauseReflectNoteUpdateResult,
   RunPauseReflectTagUpdateResult,
   RunPauseReflectionStepLogResult,
 };
