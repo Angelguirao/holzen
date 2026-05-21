@@ -11806,10 +11806,10 @@
       <span>Phase A slice — lock brief-to-deep, bulk-hold, archive retrospective to PauseRepository (backlog #4)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Remaining presentation port-lock cluster after decide handler</h3>
+    <h3>Remaining presentation port-lock cluster after decide + brief-done handlers</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no folder move. Strengthen <code>use-pause-session-brief-to-deep</code>, <code>use-pause-brief-done-check-in</code>, <code>use-bulk-hold-apply-outcomes</code>, and <code>use-archive-pause-retrospective-outcome</code> tests to assert the <code>supabasePauseRepository</code> sentinel is passed into ritual/home/archive use cases (closes the empty <code>{}</code> repository mock gap noted after decide port-lock).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no folder move. <code>use-pause-brief-done-check-in</code> port sentinel landed in prior slice (<code>ac655de7</code>). This slice strengthens <code>use-pause-session-brief-to-deep</code>, <code>use-bulk-hold-apply-outcomes</code>, and <code>use-archive-pause-retrospective-outcome</code> tests to assert <code>supabasePauseRepository</code> is passed into ritual/home/archive use cases.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior unchanged.</dd>
       <dt>Tradeoffs</dt>
