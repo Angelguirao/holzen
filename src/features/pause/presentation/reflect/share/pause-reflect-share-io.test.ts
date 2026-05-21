@@ -8,9 +8,14 @@ import {
 const runReflectionShareImageMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image',
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-flow',
   () => ({
     runReflectionShareImage: runReflectionShareImageMock,
+    buildReflectionShareText: (message: string) => message,
+    buildReflectionShareTweetUrl: (text: string) =>
+      `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`,
+    buildReflectionShareTelegramUrl: () => 'https://t.me/share/url',
+    buildReflectionShareWhatsAppUrl: () => 'https://wa.me/',
   }),
 );
 

@@ -17345,4 +17345,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — fix reflect steps I/O after anchor removal (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-io</code> imports <code>run-*</code> directly; share I/O via <code>pause-reflection-share-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Prior slice deleted orphan <code>pause-reflect-steps-mutation-flow</code> but left a broken import — restore direct <code>run-pause-*</code> imports with domain step gates on the I/O module (matches implementation note intent). <code>pause-reflect-share-io</code> imports builders + <code>runReflectionShareImage</code> through <code>pause-reflection-share-flow</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; fixes import resolution after anchor deletion.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No application cluster anchor in <code>ritual/reflect/steps/</code> besides <code>run-*</code> use cases (CI still requires <code>pause-favorite-toggle-flow</code> / <code>pause-reflection-step-flow</code> anchors if present for alignment checks — verify script).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-flows-io</code> decide/outcome anchor peel, <code>pause-session-decide-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
