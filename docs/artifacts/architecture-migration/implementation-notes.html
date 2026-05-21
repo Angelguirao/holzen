@@ -15077,7 +15077,7 @@
     <h3>Reflect backlog #1 follow-up — open-manual-pause-from-home-types → domain</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Move <code>open-manual-pause-from-home-types</code> (result unions + ports) to <code>domain/reflect/generation/</code> beside <code>open-manual-pause-from-home-params</code>; <code>open-manual-pause-from-home</code> orchestration re-exports from domain; <code>pause-home-manual-open-types</code> imports domain path.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Move <code>open-manual-pause-from-home-types</code> (result unions + ports) to <code>domain/reflect/generation/</code> beside <code>open-manual-pause-from-home-params</code>; <code>open-manual-pause-from-home</code> orchestration re-exports from domain; <code>pause-home-reflect-io</code> re-exports params + result from domain (aggregate <code>pause-home-io</code> unchanged).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>

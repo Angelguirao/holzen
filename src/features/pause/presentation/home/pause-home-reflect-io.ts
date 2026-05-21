@@ -11,6 +11,8 @@ export {
   buildManualPauseMarketContext,
   type ManualPauseMarketContext,
 } from '@/features/pause/domain/reflect/generation/build-manual-pause-market-context';
-export type { OpenManualPauseFromHomeParams } from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-params';
+export type {
+  OpenManualPauseFromHomeParams,
+  OpenManualPauseFromHomeResult,
+} from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-types';
 export { openManualPauseFromHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home';
-export type { OpenManualPauseFromHomeResult } from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-types';

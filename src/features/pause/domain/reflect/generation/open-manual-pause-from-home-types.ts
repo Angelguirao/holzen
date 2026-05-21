@@ -1,7 +1,7 @@
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 
-export type { OpenManualPauseFromHomeParams } from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-params';
+export type { OpenManualPauseFromHomeParams } from './open-manual-pause-from-home-params';
 
 export type OpenManualPauseFromHomeSuccess = {
   outcome: 'opened';
