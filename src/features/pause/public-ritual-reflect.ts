@@ -25,18 +25,18 @@ export { buildReflectionShareText } from './domain/reflect/share/reflection-shar
 
 export { usePauseReflectGeneration } from './presentation/reflect/generation/use-pause-reflect-generation';
 export type { UsePauseReflectGenerationParams } from './presentation/reflect/generation/use-pause-reflect-generation-types';
-export {
-  usePauseArtifactHaiku,
-  type PauseArtifactHaikuFetchPhase,
-  type UsePauseArtifactHaikuParams,
-  type UsePauseArtifactHaikuResult,
-} from './presentation/reflect/generation/use-pause-artifact-haiku';
-export {
-  usePauseArtifactReflectionText,
-  type PauseArtifactReflectionTextFetchPhase,
-  type UsePauseArtifactReflectionTextParams,
-  type UsePauseArtifactReflectionTextResult,
-} from './presentation/reflect/generation/use-pause-artifact-reflection-text';
+export { usePauseArtifactHaiku } from './presentation/reflect/generation/use-pause-artifact-haiku';
+export type {
+  PauseArtifactHaikuFetchPhase,
+  UsePauseArtifactHaikuParams,
+  UsePauseArtifactHaikuResult,
+} from './presentation/reflect/generation/use-pause-artifact-haiku-types';
+export { usePauseArtifactReflectionText } from './presentation/reflect/generation/use-pause-artifact-reflection-text';
+export type {
+  PauseArtifactReflectionTextFetchPhase,
+  UsePauseArtifactReflectionTextParams,
+  UsePauseArtifactReflectionTextResult,
+} from './presentation/reflect/generation/use-pause-artifact-reflection-text-types';
 export { useReflectionShareHandlers } from './presentation/reflect/share/use-reflection-share-handlers';
 export type { UseReflectionShareHandlersParams } from './presentation/reflect/share/reflection-share-handler-types';
 export { usePauseReflectionStepLog } from './presentation/reflect/steps/use-pause-reflection-step-log';
