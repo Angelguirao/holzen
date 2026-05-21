@@ -12237,4 +12237,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — archive retrospective telemetry beside presentation hook (backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>archive-retrospective-telemetry</code> off <code>application/use-cases/archive/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no reflect moves. After <code>log-retrospective-outcome</code> landed under <code>ritual/decide/</code>, colocate PostHog <code>pause_outcome_retrospective</code> with <code>use-archive-pause-retrospective-outcome</code> under <code>presentation/archive/</code>. Removes the last <code>application/use-cases/archive/</code> folder (reads already live in <code>infrastructure/queries/archive/</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged; taxonomy event unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Telemetry is presentation-adjacent (direct <code>trackEvent</code>), not a port use case — keeps analytics out of <code>ritual/decide/</code> application layer.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog consolidation behind <code>PauseAnalyticsRepository</code>, companion port-lock parity, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
