@@ -31,8 +31,9 @@ vi.mock('@/features/pause/application/use-cases/trigger/pending-pause-offer-tele
   trackPausePendingDeclined: trackPausePendingDeclinedMock,
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: mockPauseRepository,
+vi.mock('./pause-session-pending-offer-io', () => ({
+  pauseAdoptPendingOffer: () => runAdoptPendingPauseOfferMock(mockPauseRepository),
+  pauseDeclinePendingOffer: () => runDeclinePendingPauseOfferMock(mockPauseRepository),
 }));
 
 vi.mock('sonner', () => ({
