@@ -16,17 +16,19 @@ export type {
   OpenManualPauseFromHomePorts,
   OpenManualPauseFromHomeResult,
 } from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-types';
+export type {
+  PersistSilentReflectionStubInput,
+  PersistSilentReflectionStubResult,
+} from '@/features/pause/domain/reflect/generation/persist-silent-reflection-stub-types';
+export type {
+  RunOpenManualPauseSilentModeAfterCreateError,
+  RunOpenManualPauseSilentModeAfterCreateInput,
+  RunOpenManualPauseSilentModeAfterCreateOpened,
+  RunOpenManualPauseSilentModeAfterCreateResult,
+} from '@/features/pause/domain/reflect/generation/open-manual-pause-silent-mode-after-create-types';
 export { openManualPauseFromHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home';
-export {
-  runOpenManualPauseSilentModeAfterCreate,
-  type RunOpenManualPauseSilentModeAfterCreateInput,
-  type RunOpenManualPauseSilentModeAfterCreateResult,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/run-open-manual-pause-silent-mode-after-create';
-export {
-  runPersistSilentReflectionStub,
-  type PersistSilentReflectionStubInput,
-  type PersistSilentReflectionStubResult,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/run-persist-silent-reflection-stub';
+export { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-open-manual-pause-silent-mode-after-create';
+export { runPersistSilentReflectionStub } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-persist-silent-reflection-stub';
 export {
   applyManualPauseOpenResult,
   type ApplyManualPauseOpenResultInput,
