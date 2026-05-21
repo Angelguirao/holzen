@@ -1,28 +1,17 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
-const { logStepMock, mockRepository, trackRetrospectiveMock, invalidateStatsMock } = vi.hoisted(
-  () => {
-    const logStepMock = vi.fn().mockResolvedValue(null);
-    return {
-      logStepMock,
-      mockRepository: { logStep: logStepMock } as unknown as PauseRepository,
-      trackRetrospectiveMock: vi.fn(),
-      invalidateStatsMock: vi.fn(),
-    };
-  },
+const { logRetrospectiveOutcomeMock, trackRetrospectiveMock, invalidateStatsMock } = vi.hoisted(
+  () => ({
+    logRetrospectiveOutcomeMock: vi.fn().mockResolvedValue(null),
+    trackRetrospectiveMock: vi.fn(),
+    invalidateStatsMock: vi.fn(),
+  }),
 );
 
-vi.mock('@/features/pause/public-rpc', async () => {
-  const { logRetrospectiveOutcome } = await import(
-    '@/features/pause/application/use-cases/archive/log-retrospective-outcome'
-  );
-  return {
-    logRetrospectiveOutcome: (params: { instanceId: string; outcome: string }) =>
-      logRetrospectiveOutcome(mockRepository, params),
-  };
-});
+vi.mock('@/features/pause/public-rpc', () => ({
+  logRetrospectiveOutcome: logRetrospectiveOutcomeMock,
+}));
 
 vi.mock('@/features/pause/application/use-cases/archive/archive-retrospective-telemetry', () => ({
   trackPauseOutcomeRetrospective: trackRetrospectiveMock,
@@ -48,11 +37,11 @@ const t = ((key: string) => key) as Parameters<
 
 beforeEach(() => {
   vi.clearAllMocks();
-  logStepMock.mockResolvedValue(null);
+  logRetrospectiveOutcomeMock.mockResolvedValue(null);
 });
 
 describe('useArchivePauseRetrospectiveOutcome', () => {
-  it('handleDecide logs outcome via repository port', async () => {
+  it('handleDecide logs outcome via public-rpc facade', async () => {
     const onOpenChange = vi.fn();
     const onSuccess = vi.fn();
     const { result } = renderHook(() =>
@@ -69,12 +58,10 @@ describe('useArchivePauseRetrospectiveOutcome', () => {
       result.current.handleDecide('held');
     });
 
-    expect(logStepMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        instanceId: 'inst-1',
-        stepType: 'outcome_logged',
-      }),
-    );
+    expect(logRetrospectiveOutcomeMock).toHaveBeenCalledWith({
+      instanceId: 'inst-1',
+      outcome: 'held',
+    });
     expect(trackRetrospectiveMock).toHaveBeenCalledWith({
       pauseInstanceId: 'inst-1',
       outcome: 'held',
