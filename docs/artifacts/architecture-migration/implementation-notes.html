@@ -7354,4 +7354,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel companion UI completion off public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-companion-ui-completion → persist-ui-step-completion + public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1–#2 (<code>ritual/reflect/</code>, <code>ritual/frame/</code>) are complete. <code>use-companion-ui-completion</code> calls <code>persistCompanionUiStepCompletion(supabasePauseRepository, …)</code> then <code>invalidateCompanionUiCompletionQuery</code>; wired facade on <code>public-rpc</code> unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity (optimistic cache update + RPC persist + query invalidation).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Feedback vote, fullview telemetry, and home preview hooks still import <code>public-rpc</code> facades.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-feedback-vote</code> or <code>use-fullview-telemetry</code> off <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
