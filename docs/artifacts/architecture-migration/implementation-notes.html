@@ -15480,9 +15480,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>use-companion-section</code>, <code>use-companion-fullview-page</code>, and <code>use-pause-session-ritual-state</code> still import <code>ritual/frame/*</code> directly — peel in follow-up slices.</dd>
+      <dd><code>use-companion-section</code>, <code>use-companion-fullview-page</code>, and <code>use-pause-session-ritual-state</code> still imported <code>ritual/frame/*</code> directly — peeled in follow-up frame-ui-io slice.</dd>
       <dt>Open questions</dt>
       <dd>Next: frame section/fullview helpers through companion I/O, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect backlog #1 verified; companion section/fullview via frame-ui-io (Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete on branch; backlog #2 presentation peel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete on <code>cursor/arch-migrate-src-ca70</code> — no folder moves this session. Add <code>presentation/companion/pause-companion-frame-ui-io.ts</code> for <code>section-visibility</code> + <code>full-view-page-helpers</code>; <code>use-companion-section</code> and <code>use-companion-fullview-page</code> import I/O only (same pattern as <code>pause-companion-orchestrate-io</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; re-exports only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-ritual-state</code> still imports <code>ritual/frame/restored-frame-ritual-state</code> directly — peel in follow-up slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: lifecycle create/dismiss facades on <code>public-rpc</code>, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
