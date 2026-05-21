@@ -65,7 +65,7 @@ export {
 export {
   getPendingPauseOfferDisplay,
   type PendingPauseOfferDisplay,
-} from './application/use-cases/pending-offer/pending-pause-offer-display';
+} from './application/use-cases/session/pending-offer/pending-pause-offer-display';
 export {
   useHomePauseActions,
   type PauseDismissAnalyticsSurface,
