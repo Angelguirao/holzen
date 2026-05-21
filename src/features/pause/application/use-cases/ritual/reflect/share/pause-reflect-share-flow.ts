@@ -1,6 +1,7 @@
 /**
  * CI cluster anchor for ritual reflect share presentation I/O (§3 / check:architecture-alignment).
- * Re-exports domain share builders and PNG orchestration for a single presentation import surface.
+ * Re-exports domain share builders and PNG orchestration for application-layer imports.
+ * Presentation: `pause-reflect-share-io.ts` imports domain builders and `run-reflection-share-image` directly.
  */
 export type { DeliverReflectionShareImageDeps } from './deliver-reflection-share-image';
 export { runReflectionShareImage } from './run-reflection-share-image';
