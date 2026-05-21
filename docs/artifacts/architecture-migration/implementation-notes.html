@@ -5340,4 +5340,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation hook-flow beside conductor (backlog #1 adjacent, Tier 2)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>reflect-generation-hook-flow</code> → <code>presentation/reflect/generation/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate hook-only prefetch/async guards with <code>use-pause-reflect-generation</code>; <code>run-reflect-generation</code> stays in <code>ritual/reflect/generation/</code> (port-backed edge path).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; tests colocated with conductor.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Pure helpers live in presentation because only the reflect generation conductor imports them; domain types unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 wire <code>companion-fullview-analytics</code> / <code>pwa-install-analytics</code> / <code>companion-feedback-vote-query</code> through <code>public-ports</code> (same pattern as dev-mode), or peel remaining <code>screens/pause/lib/</code> helpers.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
