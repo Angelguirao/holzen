@@ -10128,4 +10128,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath segment test uses public-session helpers (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; breath RPC test avoids deep application mocks</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — no reflect moves. Export <code>applyBreathSegmentLogOutcome</code> and <code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> on <code>public-session.ts</code> (no Supabase). <code>use-pause-breath-segment-rpc-loggers.test</code> stubs <code>public-rpc</code> facades and <code>importActual</code> pure helpers from <code>public-session</code> instead of <code>run-breath-segment-log</code> / <code>step-map</code> paths.</dd>
+      <dt>Deviation</dt>
+      <dd>None — hook still imports breath facades from <code>public-rpc</code> at runtime.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Cannot <code>importActual(public-rpc)</code> in unit tests without loading Supabase client.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit presentation <code>infrastructure/*</code> imports (realtime, archive json-local-storage).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

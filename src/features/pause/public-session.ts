@@ -57,7 +57,10 @@ export {
   persistedPauseSessionAllowsTerminalEntry,
   TERMINAL_PAUSE_DB_STATES,
 } from './application/use-cases/session/terminal-entry-guard';
-export { buildPauseSessionScaffoldRitualDerived } from './application/use-cases/session/scaffold-ritual-derived';
+export {
+  buildPauseSessionScaffoldRitualDerived,
+  type PauseSessionScaffoldRitualDerived,
+} from './application/use-cases/session/scaffold-ritual-derived';
 export {
   computePauseStorageRitualSyncPatch,
   type PauseStorageRitualSyncPatch,
@@ -67,3 +70,5 @@ export {
   type PauseHolzenProvidersSlice,
   type PickPauseHolzenProvidersSliceSource,
 } from './application/use-cases/session/pause-holzen-providers-slice';
+export { applyBreathSegmentLogOutcome } from './application/use-cases/ritual/breathe/run-breath-segment-log';
+export { initialBreathSegmentRpcLoggedFlagsFromRestored } from './application/use-cases/session/step-map';
