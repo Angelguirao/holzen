@@ -3307,6 +3307,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-20</span>
+      <span>Phase A slice — colocate session storage hooks under presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 session persist + ritual storage sync</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> subfolders (<code>steps/</code>, <code>hub/</code>, <code>flows/</code>, …) is complete on <code>cursor/arch-migrate-src-ca70</code> — no reflect use-case path moves this slice. Move <code>use-pause-session-persist-to-storage</code> and <code>use-pause-session-ritual-storage-sync</code> (+ tests) beside step-transition and mood conductors under <code>presentation/session/</code>; <code>public-hooks</code> re-export path only; <code>use-pause-session-mood-and-persist</code> imports sibling <code>session/</code> paths.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Scaffold VM/flow-core and shell/flow hooks remain flat under <code>presentation/</code> until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate scaffold/flow-core under <code>presentation/session/</code>, or port-back <code>logDevModeSetting</code> via <code>PauseAnalyticsRepository</code> (backlog #4 remainder).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
