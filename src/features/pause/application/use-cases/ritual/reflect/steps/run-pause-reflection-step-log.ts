@@ -1,5 +1,5 @@
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
-import { buildReflectReflectionStepPayload } from '@/features/pause/domain/reflect/steps/reflect-note-tag-payload';
+import { buildReflectReflectionStepPayload } from '@/features/pause/domain/reflect/steps/reflect-step-payloads';
 import { reflectionStepLoggedStorageKey } from '@/features/pause/domain/reflect/steps/reflection-step-log';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import type { ReflectionStepLogStoragePort } from '@/features/pause/ports/reflection-step-log-storage';
