@@ -6,8 +6,8 @@ import type {
   CompanionSlotCommitters,
   CompanionSlotRelaxations,
 } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
-import { fetchParsedPauseArtifactCache } from '@/features/pause/infrastructure/queries/artifact-cache-query';
-import { supabaseCompanionOrchestrator } from '@/features/pause/infrastructure/supabase-companion-orchestrator';
+import { fetchParsedPauseArtifactCache } from '@/features/pause/public-queries';
+import { supabaseCompanionOrchestrator } from '@/features/pause/public-rpc';
 
 export type UseCompanionInterventionFetchParams = {
   pauseInstanceId?: string | null;

@@ -19,7 +19,7 @@ import type {
   CompanionSlotCommitters,
   CompanionSlotRelaxations,
 } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
-import { supabaseCompanionOrchestrator } from '@/features/pause/infrastructure/supabase-companion-orchestrator';
+import { supabaseCompanionOrchestrator } from '@/features/pause/public-rpc';
 import { useCompanionOrchestrateSession } from './use-companion-orchestrate-session';
 
 export type UseCompanionSlotRunOrchestrateParams = {

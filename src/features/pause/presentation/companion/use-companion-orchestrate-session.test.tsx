@@ -16,7 +16,7 @@ vi.mock(
   }),
 );
 
-vi.mock('@/features/pause/infrastructure/companion/mood-history', () => ({
+vi.mock('@/features/pause/public-queries', () => ({
   loadMoodHistoryForOrchestrate: loadMoodHistoryForOrchestrateMock,
 }));
 

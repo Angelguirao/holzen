@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useAuth } from '@/features/auth/public';
 import { runLogCompanionFullviewOpened } from '@/features/pause/application/use-cases/ritual/frame/run-log-companion-fullview-opened';
 import type { CompanionFullviewKind } from '@/features/pause/application/use-cases/ritual/frame/log-companion-fullview-opened';
-import { supabasePauseAnalyticsRepository } from '@/features/pause/infrastructure/supabase-pause-analytics-repository';
+import { supabasePauseAnalyticsRepository } from '@/features/pause/public-rpc';
 
 export type { CompanionFullviewKind as FullviewCompanion };
 
