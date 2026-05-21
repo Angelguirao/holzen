@@ -10508,4 +10508,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath segment RPC flags under ritual/reflect/flows (backlog #1, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; colocate resume flags + full PauseRepository on manual trigger</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — 14 use-case modules under <code>ritual/reflect/</code>, zero <code>application/use-cases/reflect/</code>. Move <code>initial-breath-segment-rpc-flags</code> (+ test) from <code>ritual/breathe/</code> to <code>ritual/reflect/flows/</code> (sole consumer: breath-segment RPC loggers in <code>presentation/reflect/flows/</code>); <code>public-session</code> re-export path only. <code>openManualPauseFromHome</code> ports take full <code>PauseRepository</code> and <code>ReflectGenerator</code> (still uses <code>createOrReuse</code> + <code>persistReflectionArtifacts</code> only).</dd>
+      <dt>Deviation</dt>
+      <dd>None — segment dedupe math and Home silent-stub behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Brief-only breathe paths that need the same restore contract should import via <code>public-session</code> or <code>ritual/reflect/flows/</code>, not <code>ritual/breathe/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit other <code>Pick&lt;PauseRepository, …&gt;</code> use-case ports; optional <code>usePauseFavoriteToggle</code> on <code>public-ritual-reflect</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
