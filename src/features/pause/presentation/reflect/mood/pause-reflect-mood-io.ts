@@ -7,9 +7,11 @@ import {
   runDeepPausePickerEntryIfPro,
   runPauseSessionChromeCloseAction,
 } from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow';
+import { buildFeelTilesMoodLogOptions } from '@/features/pause/domain/reflect/mood/build-feel-tiles-mood-log-options';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 export {
+  buildFeelTilesMoodLogOptions,
   resolvePauseSessionChromeCloseAction,
   runDeepPausePickerEntryIfPro,
   runPauseSessionChromeCloseAction,
