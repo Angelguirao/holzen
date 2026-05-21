@@ -11591,4 +11591,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel manual-pause trigger off public-rpc (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; Home manual trigger conductor bypasses public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. After pending-offer mutations peel (<code>0349fdb0</code>), align <code>use-manual-pause-trigger</code> with other home conductors: <code>openManualPauseFromHome</code> + <code>supabasePauseRepository</code> / <code>supabaseReflectGenerator</code>; trigger/apply helpers and PostHog telemetry from <code>application/use-cases/trigger/*</code> directly. Remove <code>openManualPauseFromHome</code>, manual-trigger telemetry re-exports, and unused lifecycle <code>pauseCreateOrReuse</code> / <code>pauseDismissCurrent</code> facades from <code>public-rpc</code> (no cross-context callers).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>logPauseCompanion</code>, PWA/dev analytics, and home dismiss telemetry remain on <code>public-rpc</code> for cross-context callers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-pause-session-pending-leave-sheet</code> / <code>use-home-pause-actions</code> telemetry off <code>public-rpc</code>, or remove unused <code>logPauseCompanion</code> facade if no callers remain.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
