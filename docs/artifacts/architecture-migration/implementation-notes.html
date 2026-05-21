@@ -8741,4 +8741,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — InitialEmotionUiState typed from domain (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>§6 peel: mood UI type no longer re-exported through run-initial-emotion-log</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) complete — no reflect folder moves. <code>public-rpc</code> re-exports <code>InitialEmotionUiState</code> from <code>domain/reflect/mood/initial-emotion-presentation</code> instead of the use-case module; duplicate <code>initialEmotionResetUi</code> test removed from <code>run-initial-emotion-log.test</code> (covered in domain).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation mood handlers already import reset UI from domain; cross-hook typing stays on <code>public-rpc</code> for now.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: companion orchestrate thin runners on <code>public-rpc</code>, or peel <code>logPauseCompanionFullviewOpened</code> presentation import.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

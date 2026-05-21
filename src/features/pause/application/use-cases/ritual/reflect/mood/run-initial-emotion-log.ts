@@ -16,9 +16,6 @@ import {
 } from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
-export type { InitialEmotionUiState };
-export { initialEmotionResetUi };
-
 export type RunInitialEmotionSelectResult =
   | { status: 'deduped'; ui: InitialEmotionUiState }
   | { status: 'synced'; ui: InitialEmotionUiState; logKey: string }
