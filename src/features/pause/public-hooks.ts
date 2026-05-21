@@ -181,7 +181,7 @@ export {
   useJourneyPauseInstances,
   type JourneyPauseRow,
 } from './presentation/archive/use-journey-pause-instances';
-export { logPwaInstallAnalyticsEvent } from './presentation/log-pwa-install-analytics';
+export { logPwaInstallAnalyticsEvent } from './public-queries';
 export { useSignalSourceTrustedHost } from './presentation/use-signal-source-trusted-host';
 export { useStaggeredReveal } from './presentation/use-staggered-reveal';
 export {
