@@ -4,24 +4,23 @@ import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { runShiftEmotionFrameHubDone as runShiftEmotionFrameHubDoneUseCase } from '@/features/pause/application/use-cases/ritual/feel/shift-emotion-log';
-import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
+import { resolveShiftFrameHubDonePresentation } from '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-flow';
 import { usePauseShiftFrameDoneHandler } from './use-pause-shift-frame-done-handler';
 
-const { logStepMock, mockRepository } = vi.hoisted(() => {
+const { logStepMock, mockRepository, showPauseStepSyncFailedToast } = vi.hoisted(() => {
   const logStepMock = vi.fn();
   return {
     logStepMock,
     mockRepository: { logStep: logStepMock } as unknown as PauseRepository,
+    showPauseStepSyncFailedToast: vi.fn(),
   };
 });
 
 vi.mock('@/features/pause/public-rpc', () => ({
   runShiftEmotionFrameHubDone: (input: Parameters<typeof runShiftEmotionFrameHubDoneUseCase>[1]) =>
     runShiftEmotionFrameHubDoneUseCase(mockRepository, input),
-}));
-
-vi.mock('@/features/pause/application/use-cases/ritual/step-sync-toast', () => ({
-  showPauseStepSyncFailedToast: vi.fn(),
+  resolveShiftFrameHubDonePresentation,
+  showPauseStepSyncFailedToast,
 }));
 
 const t = ((k: string) => k) as TFunction;

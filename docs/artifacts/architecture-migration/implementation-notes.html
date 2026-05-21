@@ -6347,4 +6347,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect shift-frame hub via public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel frame-hub done flow + step-sync toast from application imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete — no folder move. <code>use-pause-shift-frame-done-handler</code> imports <code>resolveShiftFrameHubDonePresentation</code>, <code>runShiftEmotionFrameHubDone</code>, and <code>showPauseStepSyncFailedToast</code> from <code>public-rpc</code> re-exports (pure flow + shared ritual toast; RPC already port-backed).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; hub test mocks <code>public-rpc</code> barrel only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect mood conductors and <code>use-pause-session-reflect-and-decide</code> still import application paths until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-session-reflect-decide-flow</code> pure helpers through <code>public-rpc</code>, or reflect mood initial-emotion handlers.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
