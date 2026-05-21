@@ -1,13 +1,17 @@
+/**
+ * Companion orchestration presentation I/O (session load, UI completion, favorites, expansion).
+ * Imports through `pause-companion-orchestration-flow` instead of deep `ritual/frame/*` modules.
+ */
 import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
-import type { CompanionUiCompletionStep } from '@/features/pause/application/use-cases/ritual/frame/companion-ui-completion-types';
 import {
   loadCompanionOrchestrateSession,
+  nextExpandedWithLazyFetch,
+  persistCompanionUiStepCompletion,
+  runToggleCompanionLibraryFavorite,
+  type CompanionUiCompletionStep,
   type LoadCompanionOrchestrateSessionInput,
   type LoadCompanionOrchestrateSessionPorts,
-} from '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session';
-import { nextExpandedWithLazyFetch } from '@/features/pause/application/use-cases/ritual/frame/next-expanded-with-lazy-fetch';
-import { persistCompanionUiStepCompletion } from '@/features/pause/application/use-cases/ritual/frame/persist-ui-step-completion';
-import { runToggleCompanionLibraryFavorite } from '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite';
+} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow';
 import { loadMoodHistoryForOrchestrate } from '@/features/pause/public-queries';
 import {
   supabaseCompanionOrchestrator,
