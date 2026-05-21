@@ -2,19 +2,17 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 const {
-  logRetrospectiveOutcomeMock,
+  pauseArchiveLogRetrospectiveOutcomeMock,
   trackRetrospectiveMock,
   invalidateStatsMock,
-  mockPauseRepository,
 } = vi.hoisted(() => ({
-  logRetrospectiveOutcomeMock: vi.fn().mockResolvedValue(null),
+  pauseArchiveLogRetrospectiveOutcomeMock: vi.fn().mockResolvedValue(null),
   trackRetrospectiveMock: vi.fn(),
   invalidateStatsMock: vi.fn(),
-  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
-vi.mock('@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome', () => ({
-  logRetrospectiveOutcome: logRetrospectiveOutcomeMock,
+vi.mock('./pause-archive-io', () => ({
+  pauseArchiveLogRetrospectiveOutcome: pauseArchiveLogRetrospectiveOutcomeMock,
 }));
 
 vi.mock(
@@ -23,10 +21,6 @@ vi.mock(
     trackPauseOutcomeRetrospective: trackRetrospectiveMock,
   }),
 );
-
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: mockPauseRepository,
-}));
 
 vi.mock('@/features/pause/public-queries', () => ({
   invalidatePauseStatsDataForUser: invalidateStatsMock,
@@ -48,11 +42,11 @@ const t = ((key: string) => key) as Parameters<
 
 beforeEach(() => {
   vi.clearAllMocks();
-  logRetrospectiveOutcomeMock.mockResolvedValue(null);
+  pauseArchiveLogRetrospectiveOutcomeMock.mockResolvedValue(null);
 });
 
 describe('useArchivePauseRetrospectiveOutcome', () => {
-  it('handleDecide logs outcome via PauseRepository use case', async () => {
+  it('handleDecide logs outcome via archive presentation I/O', async () => {
     const onOpenChange = vi.fn();
     const onSuccess = vi.fn();
     const { result } = renderHook(() =>
@@ -69,11 +63,10 @@ describe('useArchivePauseRetrospectiveOutcome', () => {
       result.current.handleDecide('held');
     });
 
-    expect(logRetrospectiveOutcomeMock).toHaveBeenCalledWith(
-      mockPauseRepository,
-      { instanceId: 'inst-1', outcome: 'held' },
-    );
-    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
+    expect(pauseArchiveLogRetrospectiveOutcomeMock).toHaveBeenCalledWith({
+      instanceId: 'inst-1',
+      outcome: 'held',
+    });
     expect(trackRetrospectiveMock).toHaveBeenCalledWith({
       pauseInstanceId: 'inst-1',
       outcome: 'held',

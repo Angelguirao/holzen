@@ -13814,4 +13814,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — bind archive retrospective RPC I/O (reflect backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Archive presentation — retrospective outcome_logged off public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>presentation/archive/pause-archive-io.ts</code> as the bound import for <code>logRetrospectiveOutcome</code>; <code>use-archive-pause-retrospective-outcome</code> imports the I/O module instead of <code>public-rpc</code> (mirrors <code>pause-home-bulk-hold-io.ts</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving wiring only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>All active pause presentation mutation hooks now bind via I/O modules; <code>public-rpc</code> remains adapter barrel for I/O modules and cross-context re-exports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>public-ritual-frame</code> barrel peel or Phase B <code>src/lib/holzen-query-client-ref</code> shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
