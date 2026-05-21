@@ -30,11 +30,11 @@ vi.mock('../steps/pause-reflect-steps-io', () => ({
   pauseReflectFavoriteToggle: pauseReflectFavoriteToggleMock,
 }));
 
-vi.mock('../scaffold/use-pause-session-ritual-storage-sync', () => ({
+vi.mock('@/features/pause/presentation/session/scaffold/use-pause-session-ritual-storage-sync', () => ({
   usePauseSessionRitualStorageSync: vi.fn(),
 }));
 
-vi.mock('../scaffold/use-pause-session-persist-to-storage', () => ({
+vi.mock('@/features/pause/presentation/session/scaffold/use-pause-session-persist-to-storage', () => ({
   usePauseSessionPersistToStorage: vi.fn(),
 }));
 

@@ -6,7 +6,7 @@ import type { PersistedSession } from '@/features/pause/domain/session-model';
  * Brief ritual fields when hydrating `/pause` from local storage.
  *
  * **Persistence contract:** `docs/systems/pause-system.md` section 7.2 (hydration / local snapshot).
- * **Ritual sync caveat:** `computePauseStorageRitualSyncPatch` in `storage-ritual-sync.ts`
+ * **Ritual sync caveat:** `computePauseStorageRitualSyncPatch` in `application/use-cases/session/storage-ritual-sync.ts`
  * may intentionally omit `briefStep` when syncing — see `initialBriefPauseStepFromRestored` note below.
  */
 

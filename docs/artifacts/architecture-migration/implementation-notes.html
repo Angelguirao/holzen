@@ -14061,4 +14061,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — session persist cluster off ritual/reflect/scaffold (backlog #1 incremental)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect scaffold cleanup — tab autosave/sync belongs in session</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. <code>persist-snapshot</code>, <code>storage-ritual-sync</code>, and <code>migrate-persisted-session</code> are cross-beat tab session I/O, not Reflect RPC — colocate under <code>application/use-cases/session/</code> beside restore helpers and <code>mount-log-params</code>. Presentation conductors <code>use-pause-session-persist-to-storage</code> and <code>use-pause-session-ritual-storage-sync</code> move to <code>presentation/session/scaffold/</code>; <code>public-ritual-reflect</code> / <code>public-hooks</code> re-export paths only. <code>ritual/reflect/scaffold/</code> keeps <code>scaffold-ritual-derived</code> (reflect UI derived props).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; <code>check:architecture-alignment</code> legacy import strings inverted (session canonical, reflect/scaffold forbidden for persist modules).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mood bundle still wires persist via <code>use-pause-session-mood-and-persist</code> under <code>presentation/reflect/mood/</code> — acceptable until session conductor owns full shell wiring.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: export persist snapshot types on <code>public-session</code>, or <code>public-home</code> cluster 2 (bulk-hold + pending-offer).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
