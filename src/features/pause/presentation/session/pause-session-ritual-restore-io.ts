@@ -5,7 +5,7 @@
 export {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
-} from '@/features/pause/application/use-cases/ritual/breathe/restored-breath-ritual-state';
+} from '@/features/pause/presentation/session/breath/pause-session-breath-io';
 export {
   initialDecisionFromRestored,
   initialPhaseFromRestored,

@@ -1,7 +1,11 @@
 /**
- * Presentation I/O for `/pause` breath segment RPC + timed breathing UI.
+ * Presentation I/O for `/pause` breath segment RPC, timed breathing UI, and breath hydration.
  * Session breath hooks import here instead of deep `application/use-cases/ritual/breathe/*`.
  */
+export {
+  initialBreathingFirstCompletedFromRestored,
+  initialBreathingSecondCompletedFromRestored,
+} from '@/features/pause/application/use-cases/ritual/breathe/restored-breath-ritual-state';
 export {
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
