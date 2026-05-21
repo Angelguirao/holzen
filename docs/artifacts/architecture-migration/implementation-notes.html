@@ -9919,4 +9919,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — step swipe direction on public-session (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; peel go-to-step navigation helper</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder moves. Extend <code>public-session.ts</code> with <code>pauseStepSwipeDirection</code>; <code>use-pause-session-go-to-step</code> imports the barrel instead of <code>application/use-cases/session/step-swipe-direction</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — swipe direction parity with <code>STEPS</code> index order unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Composes with step-transition exports on the same barrel; persist snapshot and gate flags remain on direct application imports until follow-up peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next #3: <code>persist-snapshot</code> cluster on <code>public-session</code>; backlog #4: ritual log call sites audit via <code>public-rpc</code> only.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
