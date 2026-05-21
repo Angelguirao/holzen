@@ -11154,4 +11154,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — holzen-reflect generation hook off public-rpc (backlog #4 / §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-pause-reflect-generation → runReflectGeneration + ReflectGenerator port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no folder move. Continue backlog #4 / §6 slim <code>public-rpc</code>: <code>use-pause-reflect-generation</code> imports <code>runReflectGeneration</code> with <code>supabaseReflectGenerator</code> (same pattern as reflect step hooks + repository port). Removed <code>runPauseReflectGeneration</code> facade; artifact read facades remain for hydrate hooks until peeled.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>fetchReflectionTextForPauseInstance</code> / <code>fetchHaikuTextForPauseInstance</code> still on <code>public-rpc</code> for artifact conductors.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel artifact hydrate hooks to <code>supabaseReflectGenerator</code> or query modules; mood/frame hub facades still on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
