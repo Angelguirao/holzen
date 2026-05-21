@@ -4,12 +4,18 @@ import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-c
 import { applyBreathSegmentLogOutcome } from '@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log';
 import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/application/use-cases/session/step-map';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
+import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 import {
-  ensureBreathSegment1Logged,
-  ensureBreathSegment2Logged,
-  logBreathSegment1Skipped,
-  logBreathSegment2Skipped,
-} from '@/features/pause/public-rpc';
+  runEnsureBreathSegment1Logged,
+  runEnsureBreathSegment2Logged,
+  runLogBreathSegment1Skipped,
+  runLogBreathSegment2Skipped,
+} from '@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log';
+import { supabasePauseRepository } from '@/features/pause/public-ports';
+
+const breathSegmentLogDeps = {
+  onSegmentLogged: invalidateCompanionUiCompletionQuery,
+};
 
 /**
  * Dedupes `breath_completed` RPCs for deep + brief breath segments and resets when `pauseInstanceId` changes.
@@ -58,34 +64,50 @@ export function usePauseBreathSegmentRpcLoggers(input: {
 
   const ensureBreathSegment1LoggedHandler = useCallback(
     async (briefRitual?: boolean): Promise<boolean> => {
-      const outcome = await ensureBreathSegment1Logged({
-        pauseInstanceId,
-        segmentAlreadyLogged: breath1RpcDoneRef.current,
-        briefRitual,
-      });
+      const outcome = await runEnsureBreathSegment1Logged(
+        supabasePauseRepository,
+        {
+          pauseInstanceId,
+          segmentAlreadyLogged: breath1RpcDoneRef.current,
+          briefRitual,
+        },
+        breathSegmentLogDeps,
+      );
       return handleBreathOutcome(outcome, breath1RpcDoneRef);
     },
     [pauseInstanceId, handleBreathOutcome],
   );
 
   const ensureBreathSegment2LoggedHandler = useCallback(async (): Promise<boolean> => {
-    const outcome = await ensureBreathSegment2Logged({
-      pauseInstanceId,
-      segmentAlreadyLogged: breath2RpcDoneRef.current,
-    });
+    const outcome = await runEnsureBreathSegment2Logged(
+      supabasePauseRepository,
+      {
+        pauseInstanceId,
+        segmentAlreadyLogged: breath2RpcDoneRef.current,
+      },
+      breathSegmentLogDeps,
+    );
     return handleBreathOutcome(outcome, breath2RpcDoneRef);
   }, [pauseInstanceId, handleBreathOutcome]);
 
   const logBreathSegment1SkippedHandler = useCallback(
     async (opts?: { briefRitual?: boolean }): Promise<boolean> => {
-      const outcome = await logBreathSegment1Skipped({ pauseInstanceId, opts });
+      const outcome = await runLogBreathSegment1Skipped(
+        supabasePauseRepository,
+        { pauseInstanceId, opts },
+        breathSegmentLogDeps,
+      );
       return handleBreathOutcome(outcome, breath1RpcDoneRef);
     },
     [pauseInstanceId, handleBreathOutcome],
   );
 
   const logBreathSegment2SkippedHandler = useCallback(async (): Promise<boolean> => {
-    const outcome = await logBreathSegment2Skipped({ pauseInstanceId });
+    const outcome = await runLogBreathSegment2Skipped(
+      supabasePauseRepository,
+      { pauseInstanceId },
+      breathSegmentLogDeps,
+    );
     return handleBreathOutcome(outcome, breath2RpcDoneRef);
   }, [pauseInstanceId, handleBreathOutcome]);
 

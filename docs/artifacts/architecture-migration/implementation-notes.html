@@ -5777,4 +5777,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath segment loggers via public-ports (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel breath_completed RPC conductor from public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code> (reflect step hooks landed in <code>c755cb99</code>). Wire <code>use-pause-breath-segment-rpc-loggers</code> through <code>runEnsureBreathSegment*</code> / <code>runLogBreathSegment*Skipped</code> with <code>supabasePauseRepository</code> and <code>invalidateCompanionUiCompletionQuery</code> deps (same pattern as feel/reflect conductors). <code>public-rpc</code> facades unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test mocks <code>public-ports</code> repository and query invalidation helper.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Decide/outcome, brief depth upgrade, companion orchestration, and home triggers still import <code>public-rpc</code> until peeled slice-by-slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-session-decide-handler</code> or <code>use-pause-brief-done-check-in</code> from <code>public-rpc</code>, port-backed companion feedback vote read, or colocate <code>use-pause-session-shell</code> under <code>presentation/session/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
