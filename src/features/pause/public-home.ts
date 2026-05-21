@@ -1,7 +1,7 @@
 /**
  * Home pause widget read-model helpers (no Supabase).
- * Scheduling quarter-hour math: `public-scheduling`. Home widget reads + conductors (pending-offer, completed count, dismiss outlet, pause actions, context previews) live here (§6 peel).
- * Screens/home import here; pause/archive may use `public-hooks`. Presentation imports barrels, not `application/*`.
+ * Scheduling quarter-hour math: `public-scheduling`. Home widget reads + conductors (pending-offer, completed count, dismiss outlet, pause actions, context previews, manual trigger, HolzenProvider state) live here (§6 peel).
+ * Screens/home and `HolzenProvider` import here; pause/archive may use `public-hooks`. Presentation imports barrels, not `application/*`.
  */
 export {
   resolvePauseArrivalToneAction,
@@ -71,3 +71,13 @@ export {
   type PauseDismissAnalyticsSurface,
 } from './presentation/home/use-home-pause-actions';
 export { usePauseContextHomePreviews } from './presentation/home/use-pause-context-home-previews';
+export { useOpenPauseHomePreview } from './presentation/home/use-open-pause-home-preview';
+export {
+  useManualPauseTrigger,
+  type UseManualPauseTriggerParams,
+} from './presentation/home/use-manual-pause-trigger';
+export {
+  useHolzenManualTriggerOrchestration,
+  type UseHolzenManualTriggerOrchestrationParams,
+} from './presentation/home/use-holzen-manual-trigger-orchestration';
+export { useHolzenHomeContextState } from './presentation/home/use-holzen-home-context-state';

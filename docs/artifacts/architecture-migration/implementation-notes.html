@@ -14213,4 +14213,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — backlog #1 verified; public-home cluster 4 (manual trigger)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect ritual paths complete; HolzenProvider on public-home</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified — no legacy reflect use-case paths. Continue backlog #3 §6: export <code>useOpenPauseHomePreview</code>, <code>useManualPauseTrigger</code>, <code>useHolzenManualTriggerOrchestration</code>, and <code>useHolzenHomeContextState</code> from <code>public-home.ts</code>; <code>HolzenProvider</code> imports <code>public-home</code>; <code>public-hooks</code> re-exports for transitional callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>usePendingPauseOfferMutations</code> remains on <code>public-hooks</code> (pause session shell only).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>holzen-query-client-ref</code> shim, or peel PWA install analytics for <code>InstallHolzenCard</code> → <code>public-queries</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
