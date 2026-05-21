@@ -11,8 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { SITE_ORIGIN } from '@/config/site';
-import { buildReflectionShareText } from '@/features/pause/public-hooks';
-import { generateReflectionShareImage } from '@/screens/pause/lib/reflection-share-canvas';
+import { buildReflectionShareText, generateReflectionShareImage } from '@/features/pause/public-hooks';
 
 interface Props {
   message: string;
