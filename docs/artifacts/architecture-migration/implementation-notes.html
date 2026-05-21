@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A — manual-open ports on Home reflect I/O (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pauseHomeManualOpenPorts</code> colocated on <code>pause-home-reflect-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/generation/manual-open/</code>) remains complete. Bind default <code>PauseRepository</code> + <code>ReflectGenerator</code> ports on <code>pause-home-reflect-io.ts</code>; <code>use-manual-pause-trigger</code> imports reflect I/O only (off aggregate <code>pause-home-io</code>). Aggregate barrel still re-exports ports for preview-dismiss tests.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-home-io</code> keeps preview dismiss facade; manual-open cluster owns port binding.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel preview dismiss off <code>pause-home-io</code>, or Phase B subscription pricing lib shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase B slice — subscription checkout guard lib shim (Tier 1)</span>
       <span class="status resolved">resolved</span>
     </header>

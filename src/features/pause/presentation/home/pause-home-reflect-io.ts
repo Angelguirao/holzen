@@ -1,3 +1,8 @@
+import {
+  supabasePauseRepository,
+  supabaseReflectGenerator,
+} from '@/features/pause/public-rpc';
+
 export {
   buildManualPauseCreateOrReuseParams,
   MANUAL_PAUSE_VOLATILITY_TEMPLATE,
@@ -55,3 +60,9 @@ export {
   type ApplyManualPauseOpenResultInput,
   type ManualPauseHomePreviewPorts,
 } from './apply-manual-pause-open-result';
+
+/** Default ports for `openManualPauseFromHome` (Home manual trigger). */
+export const pauseHomeManualOpenPorts = {
+  repository: supabasePauseRepository,
+  reflect: supabaseReflectGenerator,
+} as const;

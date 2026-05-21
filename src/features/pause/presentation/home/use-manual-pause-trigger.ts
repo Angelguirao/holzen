@@ -10,13 +10,13 @@ import {
   applyManualPauseOpenResult,
   buildManualPauseOpenParams,
   openManualPauseFromHome,
+  pauseHomeManualOpenPorts,
 } from './pause-home-reflect-io';
 import {
   markPauseManualStartedHomeOnce,
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
 } from './pause-home-reflect-telemetry-io';
-import { pauseHomeManualOpenPorts } from './pause-home-io';
 import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import { holzenLog } from '@/lib/holzen-console';
 
