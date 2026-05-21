@@ -38,11 +38,6 @@ export {
   type TrackManualPauseInstanceCreatedPayload,
   type TrackPauseManualCompletedPayload,
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-manual-open-flow';
-export {
-  applyManualPauseOpenResult,
-  type ApplyManualPauseOpenResultInput,
-  type ManualPauseHomePreviewPorts,
-} from './apply-manual-pause-open-result';
 
 /** Default ports for `openManualPauseFromHome` (Home manual trigger). */
 export const pauseHomeManualOpenPorts = {

@@ -172,6 +172,124 @@ Leaf hooks call **use cases** or **`public-rpc` wired helpers** — not `infrast
 | Home silent reflection stub | `ritual/reflect/generation/manual-open/run-persist-silent-reflection-stub` | `ReflectGenerator.persistReflectionArtifacts` |
 | Home silent open after create | `ritual/reflect/generation/manual-open/run-open-manual-pause-silent-mode-after-create` | composes stub + opened payload (`open-manual-pause-from-home`) |
 | Log ritual step | `logPauseStep` → `PauseRepository` | `pause_log_step` |
+
+Components and `.tsx` files **never** call RPC clients directly.
+
+### 5.2 Queries
+
+Shared reads live in `infrastructure/queries/`, exported via **`public-queries`**. Archive **Pauses / Echoes** use `v_pause_archive_*` — not user collection tables (§7).
+
+---
+
+## 6. Public API (cross-context surface)
+
+| Barrel | Purpose |
+|--------|---------|
+| `public.ts` | Types, constants, pure formatters — **no eager Supabase** |
+| `public-navigation.ts` | Router state for pause deep links (`NotificationNavigateState`, `parsePauseSessionLocationState`); Home → `/pause` helpers (`canNavigateToPauseSession`, `buildHomePauseSessionLocationState`, `shouldNavigateAfterManualTrigger`) |
+| `public-home.ts` | Home read-model helpers (`resolvePauseArrivalToneAction`, `buildHomePauseCardBodyProps`, `buildZenModeHomeRouteProps`, `pauseHomeError*` / snooze gate, bulk-hold formatters) + home hooks (`usePauseCardProjection`, `useZenModeHomeRouteProps`, `usePauseArrivalAudio`, `useBulkHold*`, `useCompletedPauseCount`, `useDismissOutletPauseReady`, `usePendingPauseOffer`, `getPendingPauseOfferDisplay`, `useHomePauseActions`, `usePauseContextHomePreviews`, `useOpenPauseHomePreview`, `useManualPauseTrigger`, `useHolzenManualTriggerOrchestration`, `useHolzenHomeContextState` for `HolzenProvider`) — no Supabase; pause shell pending-offer **read** UI (`PendingPauseOfferShell`, `PauseLeaveWithPendingSheet`) imports here; adopt/decline mutations stay on `public-hooks` |
+| `public-scheduling.ts` | Quarter-hour scheduling math for Home context refresh (no Supabase) |
+| `public-session.ts` | Tab session I/O — `loadSession`/`saveSession`/`clearSession` + `PersistedSessionAnchor`; **layout** (`pauseStepLayout`) for all shipped ritual step chrome (Reflect/Frame/Decide/Breathe/Feel/Done/Brief integrate — May 2026). No Supabase. Breath helpers on `public-ritual-breathe.ts`; gate predicates import from `domain/*` / `presentation/*` directly (May 2026 peels) |
+| `public-ritual-brief.ts` | Brief ritual pure helpers (integrate timer, `computePauseGoBackPlan`, `computeBriefPastStepClick`, `briefSwitchToDeepPauseState`) — no Supabase |
+| `public-ritual-reflect.ts` | Reflect ritual beat — mood/feel constants, reflect/decide flow hooks (`usePauseSessionReflectAndDecide`, `usePauseSessionDecideHandler`, scaffold persist/sync), share handlers — screens import here instead of `public-hooks` for reflect UI |
+| `public-ritual-frame.ts` | Frame ritual beat — companion types/helpers, orchestration hooks, full-view pages (`useCompanionData`, `useCompanionFullViewPage`, zoom-out display types) — screens import here instead of `public-hooks` for Frame / `/companion/*` UI |
+| `public-ritual-done.ts` | Post-pause done step — `usePauseBriefDoneCheckIn`, `resolveDoneWallpaperMood` (RPC-backed hook; keep off `public-session` so pure session imports stay Supabase-free) |
+| `public-trigger.ts` | Manual-trigger cooldown math, localStorage keys, error mapping (`domain/reflect/generation/*`) — no Supabase |
+| `public-queries.ts` | `get*QueryOptions` factories |
+| `public-hooks.ts` | Screen-facing conductors |
+| `public-rpc.ts` | Wired mutations, edge invoke facades, and default port adapters (`supabasePauseRepository`, `supabaseReflectGenerator`, …) |
+
+Screens, `app/`, and `components/` import **`public*` only**. Tests follow the same rule (`check:feature-imports`).
+
+---
+
+## 7. MVP scope: user collections → legacy
+
+**Not shipped in pause-first MVP:** Archive **Collections** tab and user-defined **`collections` / `collection_items`** grouping.
+
+| Still shipped | Out of MVP (move to `src/legacy/` when stripped) |
+|---------------|--------------------------------------------------|
+| Archive **Pauses** / **Echoes** tabs | `usePauseLibraryBundle`, collection mutations *(moved to `src/legacy/archive-collections/`)* |
+| `companion_catalog` (curated pool) | `LibraryCollections`, Archive collections segment *(legacy)* |
+| Companion slot favorites (`pause_instances.metadata`) | `application/use-cases/library/*`, `domain/library-bundle` *(legacy archive-collections)* |
+
+**Naming trap:** `companion_catalog` and `useCompanionLibraryFavorites` are **not** user collections — do not delete them during the collections strip.
+
+When active code no longer imports collection modules, update [active-surface.md](../ops/active-surface.md) and [information-architecture.md](../design/information-architecture.md). DB tables may remain until a follow-up migration; client must not query them from active `src/`.
+
+---
+
+## 8. Non-negotiables (pause)
+
+1. **One state machine owner** — `domain/instance.ts` + `domain/ritual-steps.ts`; UI projects, does not invent transitions.
+2. **One mutation port** — `PauseRepository` for step/companion/create/dismiss paths.
+3. **Step-mapped use cases** — folder names match ritual beats and RPC `step_type` where applicable.
+4. **Instance-scoped AI** — every reflect/orchestrate/grounding call includes `pauseInstanceId`.
+5. **Explicit read models** — archive/journey queries under `infrastructure/queries/archive/`, not scattered in screens.
+
+---
+
+## 9. Applying this template to other contexts
+
+Other shipped contexts (`subscription`, `auth`, `market`, `user`, `notifications`) should follow the **same module shape** where it makes sense — adapted to their vocabulary, not copied literally.
+
+**Client-architecture docs:** each context has a scaffold target doc — see [client-architecture-overview.md](../fundamentals/client-architecture-overview.md) §3. Expand scaffolds during Phase B slices; pause doc remains the reference depth.
+
+### 9.1 Shared module skeleton
+
+```text
+features/<context>/
+  domain/                    # pure types + rules (no React, no Supabase)
+  application/use-cases/     # grouped by product concern, not by file age
+  ports/                     # interfaces infrastructure implements
+  infrastructure/            # supabase, edge, queries/
+  presentation/              # hooks only (optional UI in subscription is exception — prefer screens/)
+  public.ts
+  public-queries.ts          # when TanStack reads exist
+  public-hooks.ts            # when React conductors are exported
+  public-rpc.ts              # when mutations / edge invokes are exported
+```
+
+### 9.2 How grouping differs by context
+
+| Context | Group `use-cases/` by… | Example folders |
+|---------|------------------------|-----------------|
+| **pause** | Ritual beat + session + trigger + archive reads | `ritual/reflect/`, `ritual/frame/`, `session/` |
+| **subscription** | Billing lifecycle + entitlement projection | `checkout/`, `trial/`, `portal/`, `entitlement/` |
+| **auth** | Session + credential flows | `sign-in/`, `recovery/`, `account-deletion/` |
+| **market** | Context build + display | `volatility/`, `display/` |
+| **user** | Profile + prefs + marketing reads | `profile/`, `roadmap/`, `changelog/` |
+| **notifications** | Channels + registration | `push/`, `inbox/` |
+
+**Rule:** use-case folders follow **ubiquitous language** from the matching `docs/systems/*` doc — not route names (`home/`, `settings/`) and not transport names (`supabase/`, `stripe-edge/`).
+
+### 9.3 What every context shares
+
+- **`public*` only** across context boundaries.
+- **No `supabase.from` in `.tsx`** in any screen.
+- **Commands** through use cases → ports → infrastructure.
+- **Reads** through `public-queries` / `queryOptions`.
+- **Screens stay in `src/screens/<route>/`** — no `features/home`.
+
+Pause is the **reference implementation** because it is the largest context; subscription and auth are already partially aligned ([`src/features/subscription/`](../../src/features/subscription/), [`src/features/auth/`](../../src/features/auth/)).
+
+---
+
+## 10. Transitional state (May 2026)
+
+The repo is mid-migration. Expect:
+
+- ~~Companion slot orchestration under `application/use-cases/companion/`~~ — **done:** under `ritual/frame/` (May 2026).
+- ~~Reflect use cases under `application/use-cases/reflect/`~~ — **done:** under `ritual/reflect/`.
+- Other ritual beats may live outside §3 folder names until Phase A slices land — see **interior map** below.
+- `public.ts` is **cross-context slim** (May 2026) — notifications + legacy stats types only; feature internals use domain / use-case paths; hooks/queries/RPC via `public-hooks` / `public-queries` / `public-rpc`.
+- ~~Collection code in active tree~~ — **done:** moved to `src/legacy/archive-collections/` (§7).
+
+### 10.1 Interior folder map (on disk → target)
+
+| Concern | On disk today (May 2026) | Target (§3) | Phase A slice |
+|---------|--------------------------|-------------|---------------|
+| Reflect generation, UI telemetry, generation gate, session reflect/decide flow, shift-frame hub done presentation, reflect/frame focus ambience, note/tag/favorite/`reflection_step` logs, favorite pro-hint toast; persist/abort error copy; science sheet brief→deep highlight map | `application/use-cases/ritual/reflect/` (holzen-reflect in `generation/holzen-reflect/` (`run-reflect-generation`); Home manual-open in `generation/manual-open/` (`open-manual-pause-from-home`, `dismiss-open-pause-home`, `run-persist-silent-reflection-stub`, `run-open-manual-pause-silent-mode-after-create`); CI anchor `pause-reflect-generation-manual-open-flow` (manual-open use cases + domain builders only); `build-manual-pause-market-context` in `domain/reflect/generation/`, `build-manual-pause-open-params`, `build-manual-pause-create-or-reuse-params` in `domain/reflect/generation/`, `open-manual-pause-from-home-params` in `domain/reflect/generation/`, `open-manual-pause-from-home-types` (+ result/ports unions), `persist-silent-reflection-stub-types`, `open-manual-pause-silent-mode-after-create-types`, and `manual-pause-home-telemetry-types` in `domain/reflect/generation/`; Home manual + silent-mode via `presentation/home/pause-home-reflect-io.ts` (imports `pause-reflect-generation-manual-open-flow`; `applyManualPauseOpenResult` in `presentation/home/apply-manual-pause-open-result.ts` with default PostHog via `pause-home-reflect-telemetry-flow`, May 2026); `pause-create-skipped-user-message` in `domain/reflect/generation/`, `map-manual-pause-open-error`, `map-manual-trigger-start-error`, `compute-pause-trigger-cooldowns`, `manual-trigger-cooldown-flow`, `should-navigate-after-manual-trigger` in `domain/reflect/generation/` (`public-trigger` / `public-navigation` only — not manual-open CI anchor or `pause-home-reflect-io`); progression + metadata + favorite in `steps/`; reflect+decide preflight/post-generation in `domain/reflect/flows/pause-session-reflect-and-decide-flow.ts`; view math in `domain/reflect/flows/pause-session-reflect-and-decide-view.ts` (gates + severity + effective copy; domain helpers in `domain/reflect/generation/` incl. `reflect-generation-hook-flow`, `reflect-generation-enabled`, `resolve-effective-reflection-message`, `reflect-generation-severity-abs-pct`); brief science map in `domain/pause-science/brief-step-to-pause-science-step.ts`; shift-frame hub outcome mapping in `domain/reflect/hub/shift-frame-hub-done-presentation.ts`, frame-hub shift payload/dedupe in `domain/reflect/hub/shift-emotion-log.ts` (RPC in `ritual/reflect/hub/run-shift-emotion-frame-hub-done`); initial-emotion payload/dedupe + feel-tiles log options in `domain/reflect/mood/` (`initial-emotion-log.ts`, `build-feel-tiles-mood-log-options.ts`); Feel-step UI in `domain/reflect/mood/initial-emotion-presentation.ts`; mood chrome close + deep-picker pro gate in `domain/reflect/mood/pause-session-mood-chrome-flow.ts` (RPC in `run-initial-emotion-log`); frame-focus bed in `domain/ritual/breathe/reflect-frame-focus-ambience.ts` (`runPauseRitualAudioWhenReady` from `pause-ritual-audio-context`; thin re-export in `application/use-cases/ritual/reflect/ambience/reflect-frame-focus-ambience.ts`; `use-pause-reflect-frame-focus-ambience` imports via `presentation/reflect/ambience/pause-reflect-ambience-io.ts` → ambience cluster anchor); PostHog trackers in `application/use-cases/ritual/reflect/telemetry/` (`pause-reflect-session-ui-telemetry` + CI anchor `pause-reflect-telemetry-flow`; session reflect UI via `presentation/reflect/telemetry/pause-reflect-telemetry-io.ts` importing trackers directly, off flow anchor; `home-pause-actions-telemetry` + `manual-pause-trigger-telemetry` + CI anchor `pause-home-reflect-telemetry-flow`; Home manual open + dismiss/banner via `presentation/home/pause-home-reflect-telemetry-io.ts` importing trackers directly (off flow anchor; generation on `pause-home-reflect-io.ts`; `use-manual-pause-trigger` imports manual-open use cases via `pause-home-reflect-io` and `applyManualPauseOpenResult` via `apply-manual-pause-open-result.ts`; `use-home-pause-actions` imports `shouldNavigateAfterManualTrigger` via `public-navigation` + reflect I/O/telemetry directly, not `pause-home-io`; `use-holzen-manual-trigger-orchestration` imports cooldown + start-error mapping via `public-trigger`, not `pause-home-reflect-io`)); pro-hint toast in `presentation/reflect/steps/pause-favorite-pro-hint-toast.ts`; depth-picker card chrome in `presentation/reflect/mood/pause-depth-picker-styles.ts`; holzen-reflect gate + prereq + errors + edge invoke body + result + recency hints row projection (`build-reflect-recency-hints`) + artifact persist input + `reflection_text` row parsing + `resolve-pause-reflect-message-view` + `resolve-frame-haiku-display-body` + `resolve-effective-reflection-copy` in `domain/reflect/generation/`; reflect-step row projections + `reflection_step` gate/storage key + latest-step projections + `note_updated`/`tag_updated`/`favorite_toggled` payload builders in `reflect-step-payloads.ts`, `reflection_step` payload in `reflection-step-log.ts`, toggle math in `favorite-toggle.ts`; share plain-text + channel URLs in `domain/reflect/share/`; share PNG renderer in `application/use-cases/ritual/reflect/share/reflection-share-canvas.ts`; share orchestration in `application/use-cases/ritual/reflect/share/run-reflection-share-image`; native share/download in `application/use-cases/ritual/reflect/share/deliver-reflection-share-image.ts`; presentation share hook (`use-reflection-share-handlers`) imports `pauseReflectionShareImage` via `presentation/reflect/share/pause-reflect-share-io.ts` (off `public-rpc` per §6 peel); holzen-reflect hook via `pauseReflectGeneration` + `reflectGenerator` in `presentation/reflect/generation/pause-reflect-generation-io.ts` (imports `pause-reflect-generation-hook-flow` CI anchor; off `public-rpc`, May 2026); artifact reads via `usePauseArtifactHaiku` + `usePauseArtifactReflectionText` → `reflectGenerator` on the same I/O module (off `public-rpc`, May 2026) | `ritual/reflect/` + `domain/reflect/` + `presentation/reflect/` | Done (May 2026); `domain/reflect/` generation + steps clusters complete (May 2026) |
 | Frame / companion slots | `application/use-cases/ritual/frame/` (orchestration hub: `orchestrate-slot-apply`, `run-companion-slot-orchestrate`, `apply-companion-slot-orchestrate-outcome`, intervention bootstrap/invoke, body builders, cache hydrate, telemetry, UI helpers incl. `companion-section-pro-favorite`, `companion-feedback-regenerate`) | `ritual/frame/` | Done (May 2026) |
 | Partial ritual beats (brief/deep) | `application/use-cases/ritual/brief/` (depth-upgrade, brief↔deep navigation, integrate timer, past-step, `go-back-plan`, brief/deep go-back helpers) | `ritual/brief/` | Brief + brief↔deep navigation colocated (May 2026); `ritual/deep/` removed |
 | Companion orchestrate session load | `use-companion-orchestrate-session` → `pauseLoadCompanionOrchestrateSession` on `pause-companion-orchestration-io` (off `public-rpc`, May 2026) | `ritual/frame/load-companion-orchestrate-session` | Done (May 2026) |

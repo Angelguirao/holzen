@@ -3,7 +3,6 @@
  * Conductors import `pause-home-reflect-io` / `pause-home-reflect-telemetry-io` directly when possible.
  */
 export {
-  applyManualPauseOpenResult,
   buildManualPauseCreateOrReuseParams,
   buildManualPauseMarketContext,
   buildManualPauseOpenParams,
@@ -13,7 +12,6 @@ export {
   pauseDismissOpenPauseHomePreview,
   pauseDismissOpenPauseHomePreviewWithRepository,
   pauseHomeManualOpenPorts,
-  type ApplyManualPauseOpenResultInput,
   type BuildManualPauseOpenParamsInput,
   type ManualPauseCreateOrReuseParams,
   type ManualPauseHomePreviewPorts,
