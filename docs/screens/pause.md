@@ -59,7 +59,7 @@ Presentation hooks (`src/features/pause/presentation/session/`, `presentation/re
 
 ## Navigation out
 
-[`usePauseSessionExitNavigation`](../../src/features/pause/presentation/session/use-pause-session-exit-navigation.ts) (`public-hooks`) provides close/return handlers consumed by the gate and scaffold. Pending pause offers use [`usePauseSessionPendingPauseOfferNavigation`](../../src/features/pause/presentation/session/use-pause-session-pending-pause-offer-navigation.ts) for adopt/resync flows.
+[`usePauseSessionExitNavigation`](../../src/features/pause/presentation/session/use-pause-session-exit-navigation.ts) (`public-hooks`) provides close/return handlers consumed by the gate and scaffold. Pending-offer **read** + display copy: [`public-home`](../../src/features/pause/public-home.ts) (`usePendingPauseOffer`, `getPendingPauseOfferDisplay`) in `PendingPauseOfferShell` / `PauseLeaveWithPendingSheet`; **mutations** stay on `public-hooks` (`usePendingPauseOfferMutations`). Adopt/resync navigation: [`usePauseSessionPendingPauseOfferNavigation`](../../src/features/pause/presentation/session/use-pause-session-pending-pause-offer-navigation.ts).
 
 ## Analytics
 
