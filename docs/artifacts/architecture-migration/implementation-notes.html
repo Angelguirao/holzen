@@ -13909,4 +13909,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect screens off public-hooks for layout (backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect ritual beat — pauseStepLayout on public-session</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Export <code>pauseStepLayout</code> from <code>public-session.ts</code> so Reflect/Frame step components (<code>PauseReflect</code>, <code>pause-reflect-step-nav</code>, <code>PauseFrame</code>) import ritual layout from the session barrel and reflect hooks/types only from <code>public-ritual-reflect</code> — no <code>public-hooks</code> on those files.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other ritual steps still import <code>pauseStepLayout</code> from <code>public-hooks</code>; peel incrementally per beat.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>src/lib/holzen-query-client-ref</code> shim or decide/brief screen layout peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

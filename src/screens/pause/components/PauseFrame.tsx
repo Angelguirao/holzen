@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Activity, ChevronRight, ZoomOut } from 'lucide-react';
-import { pauseStepLayout } from '@/features/pause/public-hooks';
 import { Button } from '@/components/ui/button';
 import {
   resolveEffectiveReflectionCopy,
@@ -10,6 +9,7 @@ import {
   usePauseArtifactHaiku,
   usePauseArtifactReflectionText,
 } from '@/features/pause/public-ritual-reflect';
+import { pauseStepLayout } from '@/features/pause/public-session';
 import { hapticFeedback } from '@/lib/haptics';
 import { PauseFrameHaikuCard } from '@/screens/pause/components/pause-frame-haiku-card';
 import { PauseFrameToolRow } from '@/screens/pause/components/pause-frame-tool-row';
