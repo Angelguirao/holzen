@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect session telemetry I/O direct trackers (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-telemetry-io</code> imports session UI PostHog from <code>pause-reflect-session-ui-telemetry</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Peel <code>pause-reflect-telemetry-io</code> to <code>pause-reflect-session-ui-telemetry</code> instead of <code>pause-reflect-telemetry-flow</code> (parity with mood I/O direct imports on this branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-telemetry-flow.ts</code> remains for <code>check:architecture-alignment</code>; home telemetry I/O still uses <code>pause-home-reflect-telemetry-flow</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-home-reflect-telemetry-io</code> off its flow anchor, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect hub I/O via hub flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
