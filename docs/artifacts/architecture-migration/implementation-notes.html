@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect hub I/O via hub flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-io</code> imports hub RPC + presentation through <code>pause-reflect-hub-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Align hub presentation I/O with generation peel: <code>runShiftEmotionFrameHubDone</code> and <code>resolveShiftFrameHubDonePresentation</code> import through <code>pause-reflect-hub-flow</code> instead of split <code>run-shift-emotion-frame-hub-done</code> + <code>domain/reflect/hub/</code> paths (code now matches prior note intent).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit test mocks <code>pause-reflect-hub-flow</code> with partial <code>importOriginal</code> (same seam as generation hook-flow mock).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B cross-context Tier 1 shim (e.g. <code>src/lib/holzen-query-client-ref</code>).</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect mood I/O direct domain + run-initial-emotion-log (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -262,25 +281,6 @@
       <dd><code>pause-ritual-audio-breathe-flow.ts</code> remains for <code>check:architecture-alignment</code> breathe audio cluster detection.</dd>
       <dt>Open questions</dt>
       <dd>Next: route <code>use-pause-session-shell</code> hydration through <code>pause-session-shell-io</code>, or companion orchestrate-io consolidate <code>ritual/frame/*</code> imports.</dd>
-    </dl>
-  </article>
-
-  <article class="note">
-    <header>
-      <span>2026-05-21</span>
-      <span>Phase A slice — reflect hub I/O via hub flow anchor (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-reflect-hub-io</code> imports RPC + presentation via <code>pause-reflect-hub-flow</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. <code>pause-reflect-hub-io</code> imports <code>runShiftEmotionFrameHubDone</code> and <code>resolveShiftFrameHubDonePresentation</code> through <code>pause-reflect-hub-flow</code> instead of deep <code>run-shift-emotion-frame-hub-done</code> + <code>domain/reflect/hub/</code> split imports (mirrors generation and share I/O peels).</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior parity; import boundary only.</dd>
-      <dt>Tradeoffs</dt>
-      <dd><code>pause-reflect-hub-flow.ts</code> remains for <code>check:architecture-alignment</code> hub cluster detection.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: reflect flows I/O decide/toast anchor peel, or companion orchestration-io peel.</dd>
     </dl>
   </article>
 
