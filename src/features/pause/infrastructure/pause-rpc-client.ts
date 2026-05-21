@@ -28,7 +28,7 @@ import {
   trackPauseCompanionNotCounted,
   trackPauseCompletedOnce,
   trackPauseEngagedOnce,
-} from '@/features/pause/application/use-cases/session/pause-rpc-lifecycle-telemetry';
+} from '@/features/pause/infrastructure/pause-rpc-lifecycle-telemetry';
 import type {
   PauseAdoptPendingResult,
   PauseCreateOrReuseResult,
