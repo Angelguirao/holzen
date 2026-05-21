@@ -8171,4 +8171,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — mood chrome flow in domain/reflect/mood (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-mood-chrome-flow</code> → <code>domain/reflect/mood/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Chrome-close resolve/run and deep-picker pro gate are pure (no <code>PauseRepository</code>) — colocate in <code>domain/reflect/mood/</code> beside <code>build-feel-tiles-mood-log-options</code>; presentation mood hooks import domain directly.</dd>
+      <dt>Deviation</dt>
+      <dd>Reverses interim placement under <code>application/use-cases/ritual/reflect/mood/</code> (May 2026).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No <code>public-rpc</code> re-export — helpers are not cross-context; mood RPC stays on wired facades.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>use-pause-brief-done-check-in</code> → <code>logPostPauseEmotionIfDirty</code>, or port-backed companion feedback vote analytics read.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
