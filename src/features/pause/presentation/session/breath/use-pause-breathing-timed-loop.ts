@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   computeBreathingPhaseAdvance,
-  playPauseBreathPatternCompleteCue,
-  playPauseBreathPhaseCue,
   resolveBreathingCompleted,
   resolveBreathingPhaseAdvanceOutcome,
-  type PauseBreathingPhase,
-} from '@/features/pause/public-session';
+} from '@/features/pause/application/use-cases/ritual/breathe/phase-advance';
+import type { PauseBreathingPhase } from '@/features/pause/application/use-cases/ritual/breathe/pause-breathing-phase';
+import {
+  playPauseBreathPatternCompleteCue,
+  playPauseBreathPhaseCue,
+} from '@/features/pause/application/use-cases/ritual/breathe/ritual-audio';
 import { hapticFeedback } from '@/lib/haptics';
 
 export type { PauseBreathingPhase };

@@ -85,7 +85,7 @@ export {
   resolveHoldMandalaLayerWeights,
   type HoldMandalaLayerWeights,
 } from './application/use-cases/ritual/breathe/breath-orb-geometry';
-export type { PauseBreathingPhase } from './public-session';
+export type { PauseBreathingPhase } from './application/use-cases/ritual/breathe/pause-breathing-phase';
 export {
   resolveTriangleKickerDisplay,
   resolvePauseBreathingTimedDisplay,
@@ -140,10 +140,8 @@ export type {
   ZoomOutEchoData,
   ZoomOutOnThisDayEntry,
 } from './domain/zoom-out-display';
-export {
-  computeBreathingPhaseAdvance,
-  resumePauseAudioContext,
-} from './public-session';
+export { computeBreathingPhaseAdvance } from './application/use-cases/ritual/breathe/phase-advance';
+export { resumePauseAudioContext } from './application/use-cases/ritual/breathe/ritual-audio';
 export type { PauseImpactData } from './domain/decide/pause-impact-data';
 export {
   buildPauseScoreImpacts,
