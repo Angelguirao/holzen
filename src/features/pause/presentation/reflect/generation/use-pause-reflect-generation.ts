@@ -11,10 +11,7 @@ import {
   shouldCommitReflectGeneration,
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/reflect-generation-hook-flow';
 import { runReflectGeneration } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation';
-import {
-  fetchReflectionTextForPauseInstance,
-  generateReflectionAtReflectStep,
-} from '../../../public-queries';
+import { supabaseReflectGenerator } from '../../../public-queries';
 
 export type UsePauseReflectGenerationParams = {
   pauseInstanceId: string | null;
@@ -109,13 +106,7 @@ export function usePauseReflectGeneration({
           profile,
           signal: ac.signal,
         },
-        {
-          fetchReflectionText: fetchReflectionTextForPauseInstance,
-          generateReflection: async (params) => {
-            const { message } = await generateReflectionAtReflectStep(params);
-            return { message };
-          },
-        },
+        supabaseReflectGenerator,
       );
       if (!shouldCommitReflectGeneration(validityTicket, validityRef.current)) return;
       const message = messageFromReflectGenerationResult(result);

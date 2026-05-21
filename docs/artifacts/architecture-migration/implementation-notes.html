@@ -4124,6 +4124,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — ReflectGenerator port (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; holzen-reflect I/O behind ReflectGenerator</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>ports/reflect-generator.ts</code> + <code>supabaseReflectGenerator</code>; <code>runReflectGeneration</code> accepts <code>ReflectGenerator</code>; <code>use-pause-reflect-generation</code> passes default adapter via <code>public-queries</code> (no inline port lambdas).</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>fetchReflectionTextForPauseInstance</code> / <code>generateReflectionAtReflectStep</code> export names unchanged for other call sites.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>RunReflectGenerationPorts</code> kept as deprecated alias for tests/docs; edge persist still lives in <code>reflection-artifact.ts</code> inside <code>generateReflectionAtReflectStep</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>CompanionOrchestrator</code> port (backlog #4 remainder), or <code>ritual/brief/</code> beat consolidation per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

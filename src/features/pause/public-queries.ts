@@ -232,6 +232,7 @@ export {
 } from './infrastructure/queries/reflect/reflect-step-query';
 export { fetchHaikuTextForPauseInstance } from './infrastructure/queries/reflect/haiku-artifact-query';
 export { fetchReflectionTextForPauseInstance } from './infrastructure/queries/reflect/reflection-text-artifact-query';
+export { supabaseReflectGenerator } from './infrastructure/supabase-reflect-generator';
 export {
   generateReflectionAtReflectStep,
   persistReflectionArtifacts,

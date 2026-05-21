@@ -1,9 +1,7 @@
 import { buildReflectGenerationEdgeInvokeInput } from '@/features/pause/domain/reflect-generation-edge-params';
-import type {
-  ReflectGenerationEdgeInvokeInput,
-  ReflectGenerationProfileInput,
-} from '@/features/pause/domain/reflect-generation-edge-params';
+import type { ReflectGenerationProfileInput } from '@/features/pause/domain/reflect-generation-edge-params';
 import { isAbortLikeReflectError } from '@/features/pause/domain/reflect-generation-errors';
+import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 
 export type RunReflectGenerationInput = {
   pauseInstanceId: string;
@@ -15,10 +13,8 @@ export type RunReflectGenerationInput = {
   signal: AbortSignal;
 };
 
-export type RunReflectGenerationPorts = {
-  fetchReflectionText: (pauseInstanceId: string) => Promise<string | null>;
-  generateReflection: (params: ReflectGenerationEdgeInvokeInput) => Promise<{ message: string }>;
-};
+/** @deprecated Prefer `ReflectGenerator` from `ports/reflect-generator.ts`. */
+export type RunReflectGenerationPorts = ReflectGenerator;
 
 export type RunReflectGenerationResult =
   | { status: 'seed'; message: string }
