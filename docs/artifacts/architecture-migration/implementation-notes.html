@@ -6043,4 +6043,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood/hub hooks via public-rpc (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel initial-mood and shift-frame-done conductors from public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move. <code>presentation/reflect/mood/use-pause-session-initial-mood-handlers</code> and <code>presentation/reflect/hub/use-pause-shift-frame-done-handler</code> call wired <code>public-rpc</code> facades (<code>runInitialEmotionSelect</code>, <code>runInitialEmotionSkip</code>, <code>runShiftEmotionFrameHubDone</code>) instead of use cases + <code>supabasePauseRepository</code> from <code>public-ports</code>. Reset UI helper stays on the feel use-case module.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; co-located tests mock <code>public-rpc</code> while delegating to use cases with a stub <code>PauseRepository</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect telemetry/ambience and session feel-tiles conductors may still import <code>application/use-cases/ritual/*</code> directly until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed companion feedback vote read in <code>use-companion-feedback-vote</code>, or peel brief-to-deep / post-pause hooks through <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

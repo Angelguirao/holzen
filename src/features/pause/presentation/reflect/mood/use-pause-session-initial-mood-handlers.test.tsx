@@ -3,6 +3,10 @@ import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+import {
+  runInitialEmotionSelect as runInitialEmotionSelectUseCase,
+  runInitialEmotionSkip as runInitialEmotionSkipUseCase,
+} from '@/features/pause/application/use-cases/ritual/feel/run-initial-emotion-log';
 import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
 import { usePauseSessionInitialMoodHandlers } from './use-pause-session-initial-mood-handlers';
 
@@ -14,8 +18,11 @@ const { logStepMock, mockRepository } = vi.hoisted(() => {
   };
 });
 
-vi.mock('@/features/pause/public-ports', () => ({
-  supabasePauseRepository: mockRepository,
+vi.mock('@/features/pause/public-rpc', () => ({
+  runInitialEmotionSelect: (input: Parameters<typeof runInitialEmotionSelectUseCase>[1]) =>
+    runInitialEmotionSelectUseCase(mockRepository, input),
+  runInitialEmotionSkip: (input: Parameters<typeof runInitialEmotionSkipUseCase>[1]) =>
+    runInitialEmotionSkipUseCase(mockRepository, input),
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/step-sync-toast', () => ({
