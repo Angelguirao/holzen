@@ -8,6 +8,7 @@ export type {
   PauseLogCompanionResult,
 } from './domain/rpc-types';
 export type { OpenManualPauseFromHomeResult } from './application/use-cases/trigger/open-manual-pause-from-home';
+export type { RunReflectGenerationInput };
 
 export { ritualDepthUpgradedPayload } from './application/use-cases/ritual/brief/ritual-depth-upgrade';
 export { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
@@ -49,6 +50,10 @@ import { runPauseReflectTagUpdate } from './application/use-cases/ritual/reflect
 import { runPauseFavoriteToggle } from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import { runPauseReflectionStepLogOnce } from './application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
 import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
+import {
+  runReflectGeneration as runReflectGenerationUseCase,
+  type RunReflectGenerationInput,
+} from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
 import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
 import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from './application/use-cases/ritual/frame/persist-ui-step-completion';
@@ -162,6 +167,11 @@ export function logPauseFavoriteToggle(params: {
   isFavorite: boolean;
 }) {
   return runPauseFavoriteToggle(supabasePauseRepository, params);
+}
+
+/** Reflect holzen-reflect generation — wired with default `ReflectGenerator`. */
+export function runPauseReflectGeneration(input: RunReflectGenerationInput) {
+  return runReflectGenerationUseCase(input, supabaseReflectGenerator);
 }
 
 /** Reflect progression — `reflection_step` once per instance (sessionStorage dedupe). */
