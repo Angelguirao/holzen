@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
-import { runPauseReflectTagUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
-import { supabasePauseRepository } from '@/features/pause/public-ports';
+import { logPauseReflectTagUpdate } from '@/features/pause/public-rpc';
 import {
   getLatestPauseReflectTagsQueryOptions,
   PAUSE_REFLECT_STEP_TAGS,
@@ -27,7 +26,7 @@ export function usePauseReflectTags(pauseInstanceId: string) {
     async (next: string[]) => {
       setTags(next);
       try {
-        const outcome = await runPauseReflectTagUpdate(supabasePauseRepository, {
+        const outcome = await logPauseReflectTagUpdate({
           pauseInstanceId,
           tags: next,
         });
