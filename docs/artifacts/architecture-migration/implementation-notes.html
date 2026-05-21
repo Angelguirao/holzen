@@ -16968,4 +16968,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — remove orphan pause-shift-frame-hub-flow (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Delete <code>pause-shift-frame-hub-flow</code> after hub I/O direct imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Remote already peeled <code>pause-reflect-hub-io</code> to <code>run-shift-emotion-frame-hub-done</code> + domain presentation. No remaining imports of <code>pause-shift-frame-hub-flow</code> — remove the thin re-export module (mirrors <code>pause-reflect-generation-run-flow</code> removal).</dd>
+      <dt>Deviation</dt>
+      <dd>None.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hub presentation I/O is the import surface; no application cluster anchor in <code>ritual/reflect/hub/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-orchestration-flow</code> on companion orchestration I/O, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
