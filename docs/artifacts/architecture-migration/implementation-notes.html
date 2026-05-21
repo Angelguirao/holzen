@@ -12180,4 +12180,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock reflect step hooks to PauseRepository port (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/steps presentation port-lock (note, tags, favorite)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Add explicit <code>mockPauseRepository.port === 'supabasePauseRepository'</code> assertions on <code>use-pause-reflect-note</code>, <code>use-pause-reflect-tags</code>, and <code>use-pause-favorite-toggle</code> (matches reflection_step log + mood handlers).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Test-only — closes gap where step hooks mocked the repository but did not name the default adapter contract.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
