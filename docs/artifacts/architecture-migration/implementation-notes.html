@@ -10945,4 +10945,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion slot favorites via PauseRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 verified; metadata heart toggle on repository port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> migration is complete — no <code>application/use-cases/reflect/</code> paths remain. Smallest backlog #4 slice: companion slot favorites are not <code>pause_log_step</code>; extend <code>PauseRepository</code> with <code>toggleCompanionSlotFavorite</code> (adapter in <code>pause-instance-metadata-client.ts</code>), use case <code>run-toggle-companion-library-favorite</code>, facade <code>toggleCompanionLibraryFavorite</code> on <code>public-rpc</code>. Reads stay on <code>public-queries</code>; <code>use-companion-library-favorites</code> imports mutation from <code>public-rpc</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same metadata key and optimistic cache update behavior.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Pure bucket helpers in <code>domain/companion/companion-slot-favorites-metadata.ts</code> shared by read query + write adapter.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit any remaining direct <code>pause_instances</code> writes outside ports; optional <code>analytics-events</code> import guard.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

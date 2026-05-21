@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { toggleCompanionLibraryFavorite } from '@/features/pause/public-rpc';
 import {
   companionLibraryFavoritesQueryKey,
   getCompanionLibraryFavoritesQueryOptions,
-  toggleCompanionLibraryFavorite,
 } from '@/features/pause/public-queries';
 
 /**
