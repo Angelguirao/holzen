@@ -3,7 +3,7 @@ import { renderHook, act } from '@testing-library/react';
 import {
   BRIEF_DEPTH_PICKER_RITUAL_ENTRY,
   DEEP_DEPTH_PICKER_RITUAL_ENTRY,
-} from '@/features/pause/application/use-cases/ritual/feel/pause-session-mood-chrome-flow';
+} from '@/features/pause/domain/reflect/mood/pause-session-mood-chrome-flow';
 import { usePauseSessionDepthPickerHandlers } from './use-pause-session-depth-picker-handlers';
 
 vi.mock('@/features/pause/public-rpc', () => ({
