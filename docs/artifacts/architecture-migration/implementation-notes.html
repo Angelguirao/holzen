@@ -9634,4 +9634,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home arrival tone on public-hooks (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; use-pause-arrival-audio imports public only</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — no reflect moves. Re-export <code>resolvePauseArrivalToneAction</code> on slim <code>public.ts</code> (avoids <code>public-hooks</code> ↔ hook cycle); <code>use-pause-arrival-audio</code> drops direct <code>application/use-cases/home/</code> import.</dd>
+      <dt>Deviation</dt>
+      <dd>None — chime dedupe behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Pure helper stays under <code>application/use-cases/home/</code>; barrel is presentation import surface.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel remaining Home/session <code>application/</code> imports (<code>use-pause-card-projection</code>, brief integrate constant via domain, or session step-transition cluster on <code>public-hooks</code>).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
