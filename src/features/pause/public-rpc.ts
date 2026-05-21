@@ -240,6 +240,16 @@ export type {
 export { resolveShiftFrameHubDonePresentation } from './domain/reflect/hub/shift-frame-hub-done-presentation';
 
 export { showPauseStepSyncFailedToast } from './application/use-cases/ritual/step-sync-toast';
+export {
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
+} from './application/use-cases/ritual/decide/outcome-toast';
+export {
+  formatReinforcementQuoteFromSession,
+  resolvePauseDecideOutcomeFlow,
+  type PauseDecideOutcomeFlow,
+} from './application/use-cases/ritual/decide/pause-decide-outcome-flow';
+export { getSessionQuote } from './application/use-cases/session/wisdom-quotes';
 export { initialEmotionResetUi };
 export {
   BRIEF_DEPTH_PICKER_RITUAL_ENTRY,

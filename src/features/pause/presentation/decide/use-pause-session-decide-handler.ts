@@ -4,17 +4,19 @@ import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/features/auth/public';
 import {
   formatReinforcementQuoteFromSession,
+  getSessionQuote,
+  logPauseOutcome,
   resolvePauseDecideOutcomeFlow,
-} from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow';
-import { logPauseOutcome } from '@/features/pause/public-rpc';
-import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
+<<<<<<< HEAD
 } from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
 import type { PauseImpactData } from '@/features/pause/public-hooks';
+=======
+} from '@/features/pause/public-rpc';
+import type { PauseImpactData, RitualDepth } from '@/features/pause/public-hooks';
+>>>>>>> 26129a48 (refactor(pause): peel reflect/decide flow conductors to public barrels)
 import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
-import type { RitualDepth } from '@/features/pause/public-hooks';
-import { getSessionQuote } from '@/features/pause/application/use-cases/session/wisdom-quotes';
 import type { MoodValue } from '../../domain/mood-value';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
 
