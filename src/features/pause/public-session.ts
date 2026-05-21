@@ -33,3 +33,8 @@ export {
   hasPersistedPauseSessionPayload,
   type PersistedSessionAnchor,
 } from './application/use-cases/session/persisted-session-guards';
+
+export {
+  isPauseSessionDepthPickerActive,
+  isPauseSessionWaitingForInstanceFetch,
+} from './application/use-cases/session/gate-flags';
