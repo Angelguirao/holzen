@@ -19,17 +19,14 @@ const {
   showPauseOutcomeNotCompletedToast: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-rpc', async () => {
-  const flow = await vi.importActual<
-    typeof import('@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow')
-  >('@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow');
-  return {
-    ...flow,
-    logPauseOutcome: logPauseOutcomeMock,
-    showPauseOutcomeSaveFailedToast,
-    showPauseOutcomeNotCompletedToast,
-  };
-});
+vi.mock('@/features/pause/application/use-cases/ritual/decide/outcome-toast', () => ({
+  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeNotCompletedToast,
+}));
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  logPauseOutcome: logPauseOutcomeMock,
+}));
 
 vi.mock('@/features/pause/application/use-cases/session/wisdom-quotes', () => ({
   getSessionQuote: () => ({ text: 'Q', author: 'A' }),
