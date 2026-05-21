@@ -8570,4 +8570,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate dismiss-open-pause-home under home/ (backlog #1 done)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Home dismiss use case beside bulk-hold and manual trigger</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>dismiss-open-pause-home</code> (+ test) from <code>application/use-cases/dismiss/</code> to <code>application/use-cases/home/</code>; <code>public-rpc</code> <code>dismissOpenPauseHomePreview</code> import path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Empty <code>dismiss/</code> folder removed; pending-offer stays separate (not home-only).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: route <code>companion-feedback-vote-query</code> fetch through <code>fetchPauseCompanionFeedbackVote</code> on <code>public-rpc</code> only.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

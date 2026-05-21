@@ -28,7 +28,7 @@ export {
   type GroundingEnrichBody,
   type GroundingEnrichment,
 } from './infrastructure/edge/grounding-enrich-edge';
-import { dismissOpenPauseHome } from './application/use-cases/dismiss/dismiss-open-pause-home';
+import { dismissOpenPauseHome } from './application/use-cases/home/dismiss-open-pause-home';
 import { logRetrospectiveOutcome as logRetrospectiveOutcomeUseCase } from './application/use-cases/archive/log-retrospective-outcome';
 import {
   runAdoptPendingPauseOffer,
