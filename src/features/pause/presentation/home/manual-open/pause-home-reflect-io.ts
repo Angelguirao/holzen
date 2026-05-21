@@ -1,5 +1,6 @@
 /**
  * Home manual-open reflect cluster I/O (use cases, domain builders, dismiss preview, default ports).
+ * Colocated under `presentation/home/manual-open/` (parity with `generation/manual-open/` application cluster).
  * Imports `generation/manual-open/` use cases and domain builders directly (off
  * `pause-reflect-generation-manual-open-flow` CI anchor; parity with generation I/O peels).
  */

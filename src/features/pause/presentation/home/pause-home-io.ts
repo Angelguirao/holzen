@@ -1,6 +1,6 @@
 /**
  * Home presentation aggregate barrel (manual-open reflect cluster + telemetry + dismiss).
- * Conductors import `pause-home-reflect-io` / `pause-home-reflect-telemetry-io` directly when possible.
+ * Conductors import `manual-open/pause-home-reflect-io` / `manual-open/pause-home-reflect-telemetry-io` directly when possible.
  */
 export {
   buildManualPauseCreateOrReuseParams,
@@ -23,7 +23,7 @@ export {
   runPersistSilentReflectionStub,
   type TrackManualPauseInstanceCreatedPayload,
   type TrackPauseManualCompletedPayload,
-} from './pause-home-reflect-io';
+} from './manual-open/pause-home-reflect-io';
 export {
   markPauseManualStartedHomeOnce,
   trackHomePendingPauseBannerPauseOpened,
@@ -32,4 +32,4 @@ export {
   trackPauseOpenDismissed,
   type OpenPauseStateForAnalytics,
   type PauseDismissAnalyticsSurface,
-} from './pause-home-reflect-telemetry-io';
+} from './manual-open/pause-home-reflect-telemetry-io';

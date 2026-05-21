@@ -19295,7 +19295,7 @@
     <h3>Peel default PostHog off <code>pause-home-reflect-telemetry-io</code> in open-result mapper</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>apply-manual-pause-open-result.ts</code> imports <code>trackManualPauseInstanceCreated</code> / <code>trackPauseManualCompleted</code> from <code>pause-home-reflect-telemetry-flow</code> (application CI anchor) instead of the presentation telemetry I/O barrel. <code>use-manual-pause-trigger</code> imports the mapper from <code>apply-manual-pause-open-result.ts</code> directly; <code>pause-home-reflect-io</code> stays manual-open RPC/use-case cluster only.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>presentation/home/manual-open/apply-manual-pause-open-result.ts</code> imports <code>trackManualPauseInstanceCreated</code> / <code>trackPauseManualCompleted</code> from <code>pause-home-reflect-telemetry-flow</code> (application CI anchor) instead of the presentation telemetry I/O barrel. <code>use-manual-pause-trigger</code> imports the mapper from <code>manual-open/apply-manual-pause-open-result.ts</code> directly; <code>pause-home-reflect-io</code> stays manual-open RPC/use-case cluster only.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundaries only.</dd>
       <dt>Tradeoffs</dt>
@@ -19359,6 +19359,25 @@
       <dd>Hub and share presentation I/O still import run-* / domain builders directly; align in follow-up slices if drift reappears.</dd>
       <dt>Open questions</dt>
       <dd>Next: route <code>pause-reflect-hub-io</code> and <code>pause-reflect-share-io</code> through cluster flow anchors, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate Home manual-open presentation under manual-open/ (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect generation/manual-open parity in presentation/home/manual-open/</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no application folder moves. Colocate Home manual-open I/O (<code>pause-home-reflect-io</code>, <code>pause-home-reflect-telemetry-io</code>, <code>apply-manual-pause-open-result</code> + tests) under <code>presentation/home/manual-open/</code> beside <code>generation/manual-open/</code> use cases. <code>applyManualPauseOpenResult</code> default PostHog imports <code>pause-home-reflect-telemetry-flow</code> directly (off presentation telemetry I/O). Conductors import <code>manual-open/*</code>; aggregate <code>pause-home-io</code> re-exports for tests only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; path colocation only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move <code>use-manual-pause-trigger</code> into <code>manual-open/</code> in the same commit (conductors stay at <code>presentation/home/</code> root).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 lib shim, or align reflect steps/hub/share presentation I/O to import through flow anchors if CI drift appears.</dd>
     </dl>
   </article>
 

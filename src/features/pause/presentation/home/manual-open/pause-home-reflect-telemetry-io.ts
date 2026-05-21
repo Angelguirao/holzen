@@ -1,5 +1,6 @@
 /**
- * Home reflect beat PostHog helpers (manual open + dismiss/banner).
+ * Home manual-open PostHog helpers (manual open + dismiss/banner).
+ * Colocated under `presentation/home/manual-open/`.
  * Imports trackers via `pause-home-reflect-telemetry-flow` CI anchor
  * (parity with `pause-reflect-generation-io` → hook-flow anchor).
  */
