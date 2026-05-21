@@ -429,18 +429,6 @@ export function logPauseShiftEmotionFrameHubDone(
   return runShiftEmotionFrameHubDone(supabasePauseRepository, input);
 }
 
-/** Persisted `reflection_text` for an instance — wired `ReflectGenerator` (presentation reads). */
-export function fetchReflectionTextForPauseInstance(
-  pauseInstanceId: string,
-): Promise<string | null> {
-  return supabaseReflectGenerator.fetchReflectionText(pauseInstanceId);
-}
-
-/** Persisted haiku for an instance — wired `ReflectGenerator` (presentation reads). */
-export function fetchHaikuTextForPauseInstance(pauseInstanceId: string): Promise<string | null> {
-  return supabaseReflectGenerator.fetchHaikuText(pauseInstanceId);
-}
-
 export { showPauseStepSyncFailedToast };
 
 /** Brief done save — `post_pause_emotion_logged` when check-in differs from ritual snapshot. */
