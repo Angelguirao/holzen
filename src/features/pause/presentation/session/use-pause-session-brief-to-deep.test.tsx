@@ -1,17 +1,19 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 
-const { logPauseRitualDepthUpgradedMock, showPauseStepSyncFailedToast } = vi.hoisted(() => ({
-  logPauseRitualDepthUpgradedMock: vi.fn().mockResolvedValue({ status: 'success' as const }),
-  showPauseStepSyncFailedToast: vi.fn(),
-}));
+const { logPauseRitualDepthUpgradedMock, showPauseStepSyncFailedToast, mockPauseRepository } =
+  vi.hoisted(() => ({
+    logPauseRitualDepthUpgradedMock: vi.fn().mockResolvedValue({ status: 'success' as const }),
+    showPauseStepSyncFailedToast: vi.fn(),
+    mockPauseRepository: { port: 'supabasePauseRepository' },
+  }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade', () => ({
   logPauseRitualDepthUpgraded: logPauseRitualDepthUpgradedMock,
 }));
 
 vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
-  supabasePauseRepository: {},
+  supabasePauseRepository: mockPauseRepository,
 }));
 
 vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
@@ -87,7 +89,7 @@ describe('usePauseSessionBriefToDeep', () => {
     await act(async () => {
       await result.current.handleBriefSwitchToDeepPause();
     });
-    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith({}, 'pause-1');
+    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith(mockPauseRepository, 'pause-1');
     expect(setRitualEntry).toHaveBeenCalledWith('deep');
     expect(setStep).toHaveBeenCalledWith('reflect');
   });
@@ -102,7 +104,7 @@ describe('usePauseSessionBriefToDeep', () => {
     await act(async () => {
       await result.current.handleBriefSwitchToDeepPause();
     });
-    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith({}, 'pause-1');
+    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith(mockPauseRepository, 'pause-1');
     expect(showPauseStepSyncFailedToast).toHaveBeenCalledWith(t);
     expect(setStep).not.toHaveBeenCalled();
   });

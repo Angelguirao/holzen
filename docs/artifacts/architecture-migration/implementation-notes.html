@@ -11803,19 +11803,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — lock brief-done check-in to PauseRepository (backlog #1 verified, backlog #4)</span>
+      <span>Phase A slice — lock brief-to-deep, bulk-hold, archive retrospective to PauseRepository (backlog #4)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>ritual/reflect/ complete; brief done post-pause emotion port assertion</h3>
+    <h3>Remaining presentation port-lock cluster after decide handler</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 verified complete — no folder move. <code>use-pause-session-decide-handler</code> port sentinel landed on branch in prior slice; this slice adds <code>use-pause-brief-done-check-in</code> hoisted <code>supabasePauseRepository</code> sentinel + <code>runPostPauseEmotionLogIfDirty</code> assertions.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no folder move. Strengthen <code>use-pause-session-brief-to-deep</code>, <code>use-pause-brief-done-check-in</code>, <code>use-bulk-hold-apply-outcomes</code>, and <code>use-archive-pause-retrospective-outcome</code> tests to assert the <code>supabasePauseRepository</code> sentinel is passed into ritual/home/archive use cases (closes the empty <code>{}</code> repository mock gap noted after decide port-lock).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior unchanged.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Presentation tests for brief-to-deep, bulk-hold, and archive retrospective still use empty <code>{}</code> repository mocks — next backlog #4 peels.</dd>
+      <dd>Four presentation test files in one commit — same backlog #4 guardrail pattern; no application code changes.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: home bulk-hold outcomes, archive retrospective, brief-to-deep depth upgrade, or optional PostHog analytics-port consolidation; then Phase B subscription/auth template slice.</dd>
+      <dd>Next backlog #4: optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
     </dl>
   </article>
 
