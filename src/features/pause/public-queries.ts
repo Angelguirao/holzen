@@ -39,6 +39,7 @@ export {
   logCompanionFeedbackVote,
 } from './infrastructure/queries/companion-feedback-vote-query';
 export { insertPauseAnalyticsEvent } from './infrastructure/analytics-events';
+export { logPwaInstallAnalyticsEvent } from './infrastructure/queries/pwa-install-analytics';
 export { logDevModeSetting } from './infrastructure/queries/dev-mode-analytics';
 export {
   logCompanionFullviewOpened,

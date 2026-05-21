@@ -3668,6 +3668,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — port PWA install analytics through PauseAnalyticsRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; analytics write use case for home PWA funnel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> migration was already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>run-log-pwa-install-analytics-event</code> under <code>application/use-cases/home/</code>; wire <code>logPwaInstallAnalyticsEvent</code> in <code>infrastructure/queries/pwa-install-analytics.ts</code> with default <code>supabasePauseAnalyticsRepository</code>. <code>InstallHolzenCard</code> still imports via <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — fire-and-forget export signature unchanged; removed <code>presentation/log-pwa-install-analytics.ts</code> in favor of queries module (matches companion feedback vote pattern).</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>insertPauseAnalyticsEvent</code> still exported from <code>public-queries</code> for repository adapter wiring only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate flat bulk-hold presentation hooks, or port-backed analytics read adapters for remaining direct <code>supabase.from</code> paths.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
