@@ -230,18 +230,6 @@ export function fetchPauseReflectReflectionText(
   return supabaseReflectGenerator.fetchReflectionText(pauseInstanceId);
 }
 
-export type { PauseReflectTelemetrySurface } from './application/use-cases/ritual/reflect/telemetry/pause-reflect-ui-telemetry';
-export {
-  trackPauseReflectPostItOpen,
-  trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
-} from './application/use-cases/ritual/reflect/telemetry/pause-reflect-ui-telemetry';
-
-export {
-  startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
-} from './application/use-cases/ritual/reflect/ambience/reflect-frame-focus-ambience';
-
 export type {
   ShiftEmotionFrameHubDoneOutcome,
   ShiftFrameHubDonePresentation,

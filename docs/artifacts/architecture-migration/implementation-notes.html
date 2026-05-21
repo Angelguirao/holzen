@@ -6765,4 +6765,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel reflect ambience + UI telemetry off public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; §6 slim barrel — reflect presentation imports use cases</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete on <code>cursor/arch-migrate-src-ca70</code>. <code>use-pause-reflect-frame-focus-ambience</code> and <code>use-pause-reflect-ui-telemetry</code> import <code>ritual/reflect/ambience/*</code> and <code>ritual/reflect/telemetry/*</code> directly; remove non-RPC re-exports from <code>public-rpc.ts</code>. Screens still use <code>public-hooks</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Cross-context callers that need PostHog reflect trackers must import the use case module or add a deliberate <code>public-rpc</code> facade later.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel session <code>step-map</code> types for presentation conductors onto <code>domain/*</code> + direct <code>step-map</code> imports, or backlog #4 stray <code>PauseRepository</code> call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
