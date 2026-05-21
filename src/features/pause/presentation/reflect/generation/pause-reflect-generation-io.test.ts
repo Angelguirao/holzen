@@ -4,10 +4,16 @@ import { pauseReflectGeneration, reflectGenerator } from './pause-reflect-genera
 const runReflectGenerationMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation',
-  () => ({
-    runReflectGeneration: runReflectGenerationMock,
-  }),
+  '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/pause-reflect-generation-hook-flow',
+  async (importOriginal) => {
+    const actual = await importOriginal<
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/pause-reflect-generation-hook-flow')
+    >();
+    return {
+      ...actual,
+      runReflectGeneration: runReflectGenerationMock,
+    };
+  },
 );
 
 vi.mock('@/features/pause/public-rpc', () => ({

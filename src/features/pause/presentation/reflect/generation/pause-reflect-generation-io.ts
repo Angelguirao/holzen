@@ -1,22 +1,20 @@
 /**
  * Holzen-reflect generation presentation I/O (bound ReflectGenerator port).
- * Imports domain hook helpers and `run-reflect-generation` directly (off
- * `pause-reflect-generation-hook-flow` CI anchor).
+ * Imports domain hook helpers and `run-reflect-generation` via
+ * `pause-reflect-generation-hook-flow` CI anchor (parity with mood/hub/share I/O).
  */
 import {
-  runReflectGeneration,
-  type RunReflectGenerationInput,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation';
-import { reflectGenerationUserErrorMessage } from '@/features/pause/domain/reflect/generation/reflect-generation-errors';
-import {
   messageFromReflectGenerationResult,
+  reflectGenerationPrerequisite,
+  reflectGenerationUserErrorMessage,
+  resolveEffectiveReflectionCopy,
   resolveReflectGenerationPrefetch,
+  runReflectGeneration,
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
   type ReflectGenerationPrefetch,
-} from '@/features/pause/domain/reflect/generation/reflect-generation-hook-flow';
-import { reflectGenerationPrerequisite } from '@/features/pause/domain/reflect/generation/reflect-generation-prerequisites';
-import { resolveEffectiveReflectionCopy } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
+  type RunReflectGenerationInput,
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/pause-reflect-generation-hook-flow';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
 
