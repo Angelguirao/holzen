@@ -1,21 +1,23 @@
 /**
  * Companion frame analytics presentation I/O (feedback vote + fullview opened).
- * Imports through `pause-companion-analytics-flow` instead of deep `ritual/frame/*` modules.
+ * Imports `run-log-companion-*` and input types directly (off
+ * `pause-companion-analytics-flow` CI anchor; parity with frame-ui/orchestrate I/O peels).
  */
 import type { PauseAnalyticsRepository } from '@/features/pause/ports/pause-analytics-repository';
-import {
-  runLogCompanionFeedbackVote,
-  runLogCompanionFullviewOpened,
-  type LogCompanionFeedbackVoteInput,
-  type LogCompanionFullviewOpenedInput,
-} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-analytics-flow';
+import type {
+  CompanionFullviewKind,
+  LogCompanionFullviewOpenedInput,
+} from '@/features/pause/application/use-cases/ritual/frame/log-companion-fullview-opened';
+import type { LogCompanionFeedbackVoteInput } from '@/features/pause/application/use-cases/ritual/frame/log-companion-feedback-vote';
+import { runLogCompanionFeedbackVote } from '@/features/pause/application/use-cases/ritual/frame/run-log-companion-feedback-vote';
+import { runLogCompanionFullviewOpened } from '@/features/pause/application/use-cases/ritual/frame/run-log-companion-fullview-opened';
 import { supabasePauseAnalyticsRepository } from '@/features/pause/public-rpc';
 
 export type {
   CompanionFullviewKind,
   LogCompanionFeedbackVoteInput,
   LogCompanionFullviewOpenedInput,
-} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-analytics-flow';
+};
 
 /** Default port + use case: persist companion thumbs feedback. */
 export function logCompanionFeedbackVote(
