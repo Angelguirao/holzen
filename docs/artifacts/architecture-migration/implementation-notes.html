@@ -7202,4 +7202,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — drop dead reflect RPC facades from public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Presentation already port-backed; remove unused re-exports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Parallel slices on <code>cursor/arch-migrate-src-ca70</code> already moved reflect presentation to <code>public-ports</code> + use cases. Delete unused <code>runPauseReflectGeneration</code> / <code>fetchPauseReflect*</code> from <code>public-rpc.ts</code> after verifying no active importers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>openManualPauseFromHome</code> still injects <code>supabaseReflectGenerator</code> via <code>public-rpc</code> wiring (cross-context entry).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 breath segment / companion UI completion peels, or remaining decide/brief hooks on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
