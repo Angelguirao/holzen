@@ -336,7 +336,7 @@ export {
   usePauseBreathingTimedLoop,
   type PauseBreathingPhase,
   type UsePauseBreathingTimedLoopInput,
-} from './presentation/use-pause-breathing-timed-loop';
+} from './presentation/session/use-pause-breathing-timed-loop';
 export {
   usePauseSessionBreathUi,
   type UsePauseSessionBreathUiParams,
