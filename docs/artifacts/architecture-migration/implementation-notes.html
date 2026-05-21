@@ -19191,4 +19191,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — Home manual-open navigation via public-navigation (backlog #1 verified, Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>shouldNavigateAfterManualTrigger</code> off <code>pause-home-reflect-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>use-home-pause-actions</code> imports post-manual-open navigation gating from <code>public-navigation</code> (parity with <code>use-holzen-manual-trigger-orchestration</code> → <code>public-trigger</code>). <code>pause-home-reflect-io</code> stays manual-open RPC/use-case cluster only; trim stale <code>mapManualTriggerStartError</code> / navigation re-exports from <code>pause-home-io</code> aggregate barrel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-generation-manual-open-flow</code> CI anchor no longer re-exports <code>shouldNavigateAfterManualTrigger</code> (domain + <code>public-navigation</code> own it).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: align remaining reflect subcluster flow anchors (steps/share/hub/generation) if drift appears, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
