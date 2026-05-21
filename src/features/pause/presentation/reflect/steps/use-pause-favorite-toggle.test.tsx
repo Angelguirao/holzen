@@ -1,13 +1,18 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { usePauseFavoriteToggle } from './use-pause-favorite-toggle';
 import { showPauseFavoriteProHintToast } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-favorite-pro-hint-toast';
 
-const { logPauseFavoriteToggleMock, invalidateQueriesMock } = vi.hoisted(() => ({
-  logPauseFavoriteToggleMock: vi.fn(),
-  invalidateQueriesMock: vi.fn(),
-}));
+const { logStepMock, mockRepository, invalidateQueriesMock } = vi.hoisted(() => {
+  const logStepMock = vi.fn();
+  return {
+    logStepMock,
+    mockRepository: { logStep: logStepMock } as unknown as PauseRepository,
+    invalidateQueriesMock: vi.fn(),
+  };
+});
 
 vi.mock('@/features/pause/public-queries', () => ({
   pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
@@ -25,8 +30,8 @@ vi.mock('@/features/auth/public', () => ({
   useAuth: () => ({ user: { id: 'archive-user-1' }, loading: false }),
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  logPauseFavoriteToggle: (...args: unknown[]) => logPauseFavoriteToggleMock(...args),
+vi.mock('@/features/pause/public-ports', () => ({
+  supabasePauseRepository: mockRepository,
 }));
 
 vi.mock('@/lib/haptics', () => ({
@@ -39,8 +44,8 @@ const archiveListPrefix = (userId: string) => ['pause-archive', userId] as const
 const t = ((k: string) => k) as TFunction;
 
 beforeEach(() => {
-  logPauseFavoriteToggleMock.mockReset();
-  logPauseFavoriteToggleMock.mockResolvedValue({ status: 'success', newValue: true });
+  logStepMock.mockReset();
+  logStepMock.mockResolvedValue(null);
   invalidateQueriesMock.mockClear();
   vi.mocked(showPauseFavoriteProHintToast).mockClear();
 });
@@ -61,7 +66,7 @@ describe('usePauseFavoriteToggle', () => {
       await result.current.toggleFavorite();
     });
     expect(setIsFavorite).not.toHaveBeenCalled();
-    expect(logPauseFavoriteToggleMock).not.toHaveBeenCalled();
+    expect(logStepMock).not.toHaveBeenCalled();
   });
 
   it('optimistic toggle, RPC payload, and Pro hint when favoriting while not subscribed', async () => {
@@ -79,9 +84,10 @@ describe('usePauseFavoriteToggle', () => {
       await result.current.toggleFavorite();
     });
     expect(setIsFavorite).toHaveBeenCalledWith(true);
-    expect(logPauseFavoriteToggleMock).toHaveBeenCalledWith({
-      pauseInstanceId: 'pi-1',
-      isFavorite: false,
+    expect(logStepMock).toHaveBeenCalledWith({
+      instanceId: 'pi-1',
+      stepType: 'favorite_toggled',
+      payload: { is_favorite: true },
     });
     expect(showPauseFavoriteProHintToast).toHaveBeenCalledWith(t);
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
@@ -110,10 +116,7 @@ describe('usePauseFavoriteToggle', () => {
   });
 
   it('rolls back optimistic favorite when RPC fails', async () => {
-    logPauseFavoriteToggleMock.mockResolvedValueOnce({
-      status: 'sync_failed',
-      attemptedValue: true,
-    });
+    logStepMock.mockRejectedValueOnce(new Error('rpc failed'));
     const setIsFavorite = vi.fn();
     const { result } = renderHook(() =>
       usePauseFavoriteToggle({

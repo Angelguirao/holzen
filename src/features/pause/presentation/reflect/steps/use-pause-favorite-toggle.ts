@@ -5,7 +5,8 @@ import { useAuth } from '@/features/auth/public';
 import { showPauseFavoriteProHintToast } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-favorite-pro-hint-toast';
 import { pauseArchiveListQueryPrefix } from '@/features/pause/public-queries';
 import { shouldShowFavoriteProHint } from '@/features/pause/domain/reflect/steps/favorite-toggle';
-import { logPauseFavoriteToggle } from '@/features/pause/public-rpc';
+import { runPauseFavoriteToggle } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
+import { supabasePauseRepository } from '@/features/pause/public-ports';
 import { hapticFeedback } from '@/lib/haptics';
 
 export function usePauseFavoriteToggle(input: {
@@ -25,7 +26,10 @@ export function usePauseFavoriteToggle(input: {
     setIsFavorite(optimisticNext);
     hapticFeedback('light');
 
-    const outcome = await logPauseFavoriteToggle({ pauseInstanceId, isFavorite });
+    const outcome = await runPauseFavoriteToggle(supabasePauseRepository, {
+      pauseInstanceId,
+      isFavorite,
+    });
     if (outcome.status === 'no_instance') return;
 
     if (outcome.status === 'sync_failed') {
