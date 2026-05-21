@@ -1,5 +1,6 @@
 import {
   fetchCompanionFeedbackVoteFromAnalytics,
+  fetchDevModeSettingFromAnalytics,
   insertPauseAnalyticsEvent,
 } from '@/features/pause/infrastructure/analytics-events';
 import type { PauseAnalyticsRepository } from '@/features/pause/ports/pause-analytics-repository';
@@ -8,4 +9,5 @@ import type { PauseAnalyticsRepository } from '@/features/pause/ports/pause-anal
 export const supabasePauseAnalyticsRepository: PauseAnalyticsRepository = {
   insertEvent: insertPauseAnalyticsEvent,
   fetchCompanionFeedbackVote: fetchCompanionFeedbackVoteFromAnalytics,
+  fetchDevModeSetting: fetchDevModeSettingFromAnalytics,
 };
