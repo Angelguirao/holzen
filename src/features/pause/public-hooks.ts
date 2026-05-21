@@ -83,6 +83,18 @@ export {
 } from './application/use-cases/pending-offer/pending-pause-offer-display';
 export { resolveBreathOrbVisualMetrics } from './application/use-cases/ritual/breathe/pause-breath-orb-metrics';
 export {
+  BREATH_ORB_CX,
+  BREATH_ORB_CY,
+  BREATH_ORB_HEX_PATH_LEN,
+  BREATH_ORB_INNER_LEN,
+  BREATH_ORB_INNER_RING_R,
+  BREATH_ORB_PX,
+  BREATH_RING_C,
+  BREATH_RING_R,
+  resolveHoldMandalaLayerWeights,
+  type HoldMandalaLayerWeights,
+} from './application/use-cases/ritual/breathe/breath-orb-geometry';
+export {
   resolveTriangleKickerDisplay,
   type TriangleKickerDisplay,
 } from './application/use-cases/ritual/breathe/resolve-triangle-kicker-display';
