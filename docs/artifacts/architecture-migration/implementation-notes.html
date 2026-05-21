@@ -7373,4 +7373,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home bulk-hold apply on PauseRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-bulk-hold-apply-outcomes port-backed</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) was already complete. <code>use-bulk-hold-apply-outcomes</code> calls <code>applyBulkHoldOutcomes(supabasePauseRepository, …)</code>; <code>public-rpc</code> facade unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-manual-pause-trigger</code> and companion hooks still import <code>public-rpc</code> facades.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-manual-pause-trigger</code> or <code>use-open-pause-home-preview</code> off <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
