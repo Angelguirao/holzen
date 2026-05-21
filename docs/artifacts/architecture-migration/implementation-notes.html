@@ -14232,4 +14232,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — backlog #1 verification; InstallHolzenCard → public-queries</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect → ritual/reflect/ complete; home PWA analytics import hygiene</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Automation session confirmed backlog #1: all reflect use cases live under <code>application/use-cases/ritual/reflect/</code> (14 application modules + domain/presentation/infrastructure clusters); <code>check:architecture-alignment</code> forbids legacy <code>reflect/</code> and <code>companion/</code> paths. No folder moves. <code>InstallHolzenCard</code> imports <code>logPwaInstallAnalyticsEvent</code> from <code>public-queries</code> (implementation already on that barrel) instead of <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-home</code> cluster 4 (manual trigger + <code>useHolzenHomeContextState</code>) landed on remote before this agent run — no duplicate commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>holzen-query-client-ref</code> shim for pause query invalidation helpers.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
