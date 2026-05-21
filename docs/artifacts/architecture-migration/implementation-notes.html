@@ -13225,4 +13225,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel mount-log-params from public-session barrel</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up; §6 slim public-session</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>buildPauseSessionMountLogParams</code> landed in <code>ritual/reflect/scaffold/</code>, session shell bootstrap and mount-log conductor import the use-case module directly — not <code>public-session</code> / <code>public-hooks</code>. Cross-context screens never needed mount diagnostics.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving export peel only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other reflect scaffold helpers (<code>persist-snapshot</code>, <code>storage-ritual-sync</code>) remain on <code>public-session</code> until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription/auth <code>src/lib/*</code> shims, or peel remaining session-only exports from <code>public-session</code> when conductors import use cases directly.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
