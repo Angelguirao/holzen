@@ -1,6 +1,6 @@
 /**
  * Reflect ritual beat — screen-facing pure helpers and presentation hooks.
- * Mutations/edge stay on `public-rpc.ts`; session shell on `public-session.ts`.
+ * Mutations/edge stay on `public-rpc.ts`; tab session I/O via `infrastructure/session/persisted-session-storage` in reflect scaffold hooks.
  */
 export {
   clampFeelIntensity,

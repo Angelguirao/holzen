@@ -117,7 +117,7 @@ features/pause/
   public-rpc.ts              # wired mutations + edge facades
 ```
 
-> **On disk (May 2026):** `ports/pause-repository.ts`, `ports/pause-analytics-repository.ts`, `ports/reflect-generator.ts`, `ports/companion-orchestrator.ts`, `ports/reflection-step-log-storage.ts`. Session persistence adapter: `infrastructure/session/persisted-session-storage.ts` — `loadSession` / `saveSession` / `clearSession` on `public-session` (session shell + reflect decide + home manual/open preview). Default adapters + `reflectionStepSessionStorage` on `public-rpc` — `presentation/reflect/`, breath segment loggers, home manual trigger import barrels (May 2026). Presentation subfolders (`session/`, `companion/`, …) are largely grouped (§10.1).
+> **On disk (May 2026):** `ports/pause-repository.ts`, `ports/pause-analytics-repository.ts`, `ports/reflect-generator.ts`, `ports/companion-orchestrator.ts`, `ports/reflection-step-log-storage.ts`. Session persistence adapter: `infrastructure/session/persisted-session-storage.ts` — `loadSession` / `saveSession` / `clearSession` on `public-session` (cross-context + session/home hooks); `presentation/reflect/scaffold/` imports storage directly (May 2026). Default adapters + `reflectionStepSessionStorage` on `public-rpc` — `presentation/reflect/`, breath segment loggers, home manual trigger import barrels (May 2026). Presentation subfolders (`session/`, `companion/`, …) are largely grouped (§10.1).
 
 ### 3.1 Why `ritual/reflect/` and `ritual/frame/` — not top-level `reflect/` + `companion/`
 
