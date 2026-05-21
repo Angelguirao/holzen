@@ -4846,4 +4846,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — wire haiku artifact read via public-rpc (backlog #3 §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; ReflectGenerator haiku read on presentation hook</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> use cases were already complete. Add <code>fetchPauseReflectHaiku</code> beside <code>runPauseReflectGeneration</code> on <code>public-rpc.ts</code>; <code>use-pause-artifact-haiku</code> imports <code>public-rpc</code> only — no direct <code>public-ports</code> adapter in reflect generation conductors.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; lazy hydrate still uses <code>ReflectGenerator.fetchHaikuText</code> via default adapter.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestration hooks still import <code>public-ports</code> until a later §6 peel adds wired facades.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed companion feedback vote read, or wire remaining <code>PauseRepository</code> stragglers (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

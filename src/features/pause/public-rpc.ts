@@ -174,6 +174,11 @@ export function runPauseReflectGeneration(input: RunReflectGenerationInput) {
   return runReflectGenerationUseCase(input, supabaseReflectGenerator);
 }
 
+/** Persisted haiku artifact read for Reflect / Frame — wired `ReflectGenerator.fetchHaikuText`. */
+export function fetchPauseReflectHaiku(pauseInstanceId: string): Promise<string | null> {
+  return supabaseReflectGenerator.fetchHaikuText(pauseInstanceId);
+}
+
 /** Reflect progression — `reflection_step` once per instance (sessionStorage dedupe). */
 export function logPauseReflectionStepOnce(pauseInstanceId: string) {
   return runPauseReflectionStepLogOnce(
