@@ -20,7 +20,7 @@ export {
   buildPauseSessionPersistSnapshot,
   type PauseSessionPersistSnapshotInput,
 } from './application/use-cases/session/persist-snapshot';
-export { computePauseGoBackPlan } from './application/use-cases/session/go-back-plan';
+export { computePauseGoBackPlan } from './application/use-cases/ritual/brief/go-back-plan';
 export {
   BRIEF_INTEGRATE_RING_CIRC,
   BRIEF_INTEGRATE_RING_R,

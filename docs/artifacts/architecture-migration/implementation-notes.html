@@ -4694,4 +4694,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate go-back-plan under ritual/brief (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; brief navigation hub grouped</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>computePauseGoBackPlan</code> (+ test) from <code>session/</code> to <code>ritual/brief/</code> beside <code>brief-pause-go-back</code> and <code>deep-go-back</code>; <code>public-hooks</code> re-export path only. Re-export lifecycle RPC result types from <code>domain/rpc-types</code> in <code>public-rpc</code> (not <code>pause-rpc-client</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session folder still owns lifecycle/hydration use cases; only the brief+deep back facade moved.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire any remaining mutations bypassing <code>PauseRepository</code> (backlog #4), or colocate flat <code>use-pause-session-shell</code> / pending-leave sheet under <code>presentation/session/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
