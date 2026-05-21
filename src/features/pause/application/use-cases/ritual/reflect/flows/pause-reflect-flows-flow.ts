@@ -7,14 +7,14 @@ export {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   type PauseSessionReflectAndDecideViewInput,
-} from './pause-session-reflect-and-decide-flow';
+} from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow';
 export {
   formatReinforcementQuoteFromSession,
   resolvePauseDecideOutcomeFlow,
-} from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow';
-export { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-log-flow';
+} from '@/features/pause/domain/decide/pause-decide-outcome-flow';
+export { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
 export {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-} from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-toast-flow';
+} from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
 export { getSessionQuote } from '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes';

@@ -18868,4 +18868,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect flows CI anchor matches presentation I/O paths (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-flow</code> re-exports align with <code>pause-reflect-flows-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-flows-io</code> already imports domain reflect/decide helpers and decide <code>run-*</code> siblings directly; update <code>pause-reflect-flows-flow.ts</code> CI anchor to the same paths so cluster detection matches on-disk presentation imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; re-export paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Thin application <code>pause-session-reflect-and-decide-flow.ts</code> re-export remains on disk for historical CI imports; anchor now points at domain like presentation.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B cross-context Tier 1 shim (subscription), or delete orphan application reflect/decide flow re-exports once CI allows.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
