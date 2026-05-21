@@ -10014,4 +10014,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — shell-view-model on public-session (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; coalesce shell VM on public-session barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — no reflect moves. Export <code>coalescePauseSessionShellViewModel</code> + <code>PauseSessionShellViewModel</code> from <code>public-session.ts</code>; <code>use-pause-session-shell-bootstrap</code> imports gate flags + shell VM from one barrel (composes with persist-snapshot/guards peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — hydration coalesce defaults unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>hydration.ts</code> remains on direct application import in <code>use-pause-session-shell</code>; depth-picker gate still imported from domain in scaffold presentation.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: breath segment RPC presentation audit for <code>public-rpc</code>-only; optional <code>hydration</code> peel after gate cluster stabilizes.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
