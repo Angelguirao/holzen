@@ -13586,4 +13586,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — bind companion orchestration I/O (backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Frame presentation — orchestrate + pause RPC ports off per-hook public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code> — no reflect path move this slice. Add <code>presentation/companion/pause-companion-orchestration-io.ts</code> as the bound import surface for <code>companionOrchestrator</code> and <code>companionPauseRepository</code>; slot orchestrate, intervention bootstrap, library favorites, and UI completion hooks import it instead of <code>public-rpc</code> (mirrors tab session I/O and companion analytics I/O).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving wiring only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>I/O module still binds adapters from <code>public-rpc</code>; analytics-io unchanged on same barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>src/lib/holzen-query-client-ref</code> shim (pause query invalidation) or <code>public-ritual-frame</code> barrel for companion hooks on <code>public-hooks</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -19,8 +19,8 @@ vi.mock(
   }),
 );
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: mockPauseRepository,
+vi.mock('./pause-companion-orchestration-io', () => ({
+  companionPauseRepository: mockPauseRepository,
 }));
 
 vi.mock('@/features/pause/public-queries', () => ({
