@@ -4409,6 +4409,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — ReflectGenerator fetchLatestReflectStep (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; reflect note/tags hydrate on reflect port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Extend <code>ReflectGenerator</code> with <code>fetchLatestReflectStep</code>; step types in <code>domain/reflect-step-latest.ts</code>; Supabase read in <code>fetch-latest-pause-reflect-step.ts</code>; TanStack query options route through <code>supabaseReflectGenerator</code> (mirrors haiku artifact read).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>fetchLatestPauseReflectStep</code> still exported from <code>public-queries</code> for query keys.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>reflect-step-query.ts</code> imports the default adapter (query module → infrastructure); acceptable for thin TanStack wrappers until a dedicated read port split is needed.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining stray <code>PauseRepository</code> call sites, or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
