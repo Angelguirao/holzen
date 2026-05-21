@@ -5853,4 +5853,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — shift-frame hub flow under ritual/reflect/hub/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 remainder — frame-hub presentation mapping colocated with reflect hub</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Top-level <code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>pause-shift-frame-hub-flow</code> (+ test) from <code>ritual/feel/</code> to <code>ritual/reflect/hub/</code>; <code>shift-emotion-log</code> stays in <code>ritual/feel/</code>; <code>use-pause-shift-frame-done-handler</code> imports the reflect hub module.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.1 reflect vs frame ritual grouping; RPC dedupe remains on feel use case.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Application hub module imports feel outcome types across ritual subfolders (acceptable until a shared <code>ritual/types</code> peel).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>persistCompanionUiStepCompletion</code> or <code>use-archive-pause-retrospective-outcome</code> from <code>public-rpc</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
