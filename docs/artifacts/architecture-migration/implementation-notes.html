@@ -6400,7 +6400,7 @@
       <dt>Tradeoffs</dt>
       <dd>Empty <code>application/use-cases/ritual/reflect/hub/</code> folder removed with the move.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>use-pending-pause-offer-mutations</code> or <code>use-archive-pause-retrospective-outcome</code> through <code>public-rpc</code> (backlog #4 remainder).</dd>
+      <dd>Next: peel <code>use-archive-pause-retrospective-outcome</code> through <code>public-rpc</code> (backlog #4 remainder).</dd>
     </dl>
   </article>
 
@@ -6419,7 +6419,26 @@
       <dt>Tradeoffs</dt>
       <dd>Other reflect mood conductors still import <code>ritual/feel/pause-session-mood-chrome-flow</code> directly until peeled.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel mood chrome / feel-tiles conductors or <code>use-pause-brief-done-check-in</code> through <code>public-rpc</code>.</dd>
+      <dd>Next: peel mood chrome / feel-tiles conductors through <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — archive retrospective outcome via public-rpc (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel use-archive-pause-retrospective-outcome from public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> migration is complete on <code>cursor/arch-migrate-src-ca70</code>. <code>use-archive-pause-retrospective-outcome</code> calls wired <code>logRetrospectiveOutcome</code> on <code>public-rpc</code> instead of use case + <code>supabasePauseRepository</code> from <code>public-ports</code>; telemetry stays on application archive module.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; no co-located hook test.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion UI completion and analytics read paths still use <code>public-ports</code> until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-ui-completion</code> through <code>persistCompanionUiStepCompletion</code> on <code>public-rpc</code>.</dd>
     </dl>
   </article>
 
