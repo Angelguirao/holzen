@@ -7145,4 +7145,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel brief-to-deep hook off public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-pause-session-brief-to-deep calls ritual-depth-upgrade use case + PauseRepository</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and holzen-reflect generation peel were already on remote. <code>use-pause-session-brief-to-deep</code> calls <code>logPauseRitualDepthUpgraded(repository, …)</code> with <code>supabasePauseRepository</code> from <code>public-ports.ts</code>; <code>logPauseRitualDepthUpgraded</code> facade on <code>public-rpc.ts</code> unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Decide handler and breath segment loggers still import <code>public-rpc</code> facades until follow-up peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-session-decide-handler</code> or breath segment RPC loggers off <code>public-rpc</code>, or backlog #4 stray mutation call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -5,7 +5,11 @@ const { logPauseRitualDepthUpgradedMock } = vi.hoisted(() => ({
   logPauseRitualDepthUpgradedMock: vi.fn().mockResolvedValue(true),
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
+vi.mock('@/features/pause/public-ports', () => ({
+  supabasePauseRepository: {},
+}));
+
+vi.mock('@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade', () => ({
   logPauseRitualDepthUpgraded: logPauseRitualDepthUpgradedMock,
 }));
 
@@ -78,7 +82,11 @@ describe('usePauseSessionBriefToDeep', () => {
     await act(async () => {
       await result.current.handleBriefSwitchToDeepPause();
     });
-    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith('pause-1', expect.any(Function));
+    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith(
+      expect.anything(),
+      'pause-1',
+      expect.any(Function),
+    );
     expect(setRitualEntry).toHaveBeenCalledWith('deep');
     expect(setStep).toHaveBeenCalledWith('reflect');
   });
