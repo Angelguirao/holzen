@@ -15087,4 +15087,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual-open telemetry payload types in domain</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — remove pause-home-manual-open-types shim</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Colocate <code>TrackManualPauseInstanceCreatedPayload</code> and <code>TrackPauseManualCompletedPayload</code> in <code>domain/reflect/generation/manual-pause-home-telemetry-types.ts</code>; <code>manual-pause-trigger-telemetry</code> imports domain types; Home presentation imports domain directly; delete <code>pause-home-manual-open-types.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — PostHog call sites unchanged; behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Telemetry trackers remain in <code>application/use-cases/trigger/</code> (PostHog side effects); only payload shapes moved to domain.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: lifecycle create/dismiss thin use cases on <code>public-rpc</code>, colocate <code>use-pause-session-shell-bootstrap</code> under <code>presentation/session/</code>, or port-backed companion feedback vote write path.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
