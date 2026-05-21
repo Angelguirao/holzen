@@ -5,10 +5,10 @@ import {
   PAUSE_MOOD_GROUPS,
   PAUSE_MOOD_VALUES,
   type MoodValue,
-} from '@/features/pause/public-hooks';
+} from '@/features/pause/public-ritual-reflect';
 
-export type { MoodValue } from '@/features/pause/public-hooks';
-export { PAUSE_MOOD_VALUES } from '@/features/pause/public-hooks';
+export type { MoodValue } from '@/features/pause/public-ritual-reflect';
+export { PAUSE_MOOD_VALUES } from '@/features/pause/public-ritual-reflect';
 
 interface Props {
   onSelect: (mood: MoodValue) => void;
