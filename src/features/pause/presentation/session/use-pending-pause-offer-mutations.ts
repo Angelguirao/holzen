@@ -1,12 +1,13 @@
 import { useCallback, useState } from 'react';
 import type { TFunction } from 'i18next';
 import { toast } from 'sonner';
+import { runAdoptPendingPauseOffer } from '@/features/pause/application/use-cases/pending-offer/run-adopt-pending-pause-offer';
+import { runDeclinePendingPauseOffer } from '@/features/pause/application/use-cases/pending-offer/run-decline-pending-pause-offer';
 import {
-  adoptPendingPauseOffer,
-  declinePendingPauseOffer,
   trackPausePendingAdopted,
   trackPausePendingDeclined,
-} from '@/features/pause/public-rpc';
+} from '@/features/pause/application/use-cases/trigger/pending-pause-offer-telemetry';
+import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
 import type { PendingPauseOfferRow } from './use-pending-pause-offer';
 
 export function usePendingPauseOfferMutations(options: {
@@ -23,7 +24,7 @@ export function usePendingPauseOfferMutations(options: {
     if (!pending || busy) return false;
     setBusy(true);
     try {
-      const r = await adoptPendingPauseOffer();
+      const r = await runAdoptPendingPauseOffer(supabasePauseRepository);
       if (r.status !== 'ok') {
         toast.error(t('pause.pendingAdoptFailed', { defaultValue: 'Could not switch to the new pause. Try again.' }));
         return false;
@@ -45,7 +46,7 @@ export function usePendingPauseOfferMutations(options: {
     if (!pending || busy) return false;
     setBusy(true);
     try {
-      const r = await declinePendingPauseOffer();
+      const r = await runDeclinePendingPauseOffer(supabasePauseRepository);
       if (r.status !== 'ok') {
         toast.error(t('pause.pendingDeclineFailed', { defaultValue: 'Could not dismiss the offer. Try again.' }));
         return false;

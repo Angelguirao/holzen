@@ -5,22 +5,32 @@ import { toast } from 'sonner';
 import { usePendingPauseOfferMutations } from './use-pending-pause-offer-mutations';
 
 const {
-  adoptPendingPauseOfferMock,
-  declinePendingPauseOfferMock,
+  runAdoptPendingPauseOfferMock,
+  runDeclinePendingPauseOfferMock,
   trackPausePendingAdoptedMock,
   trackPausePendingDeclinedMock,
 } = vi.hoisted(() => ({
-  adoptPendingPauseOfferMock: vi.fn(),
-  declinePendingPauseOfferMock: vi.fn(),
+  runAdoptPendingPauseOfferMock: vi.fn(),
+  runDeclinePendingPauseOfferMock: vi.fn(),
   trackPausePendingAdoptedMock: vi.fn(),
   trackPausePendingDeclinedMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  adoptPendingPauseOffer: adoptPendingPauseOfferMock,
-  declinePendingPauseOffer: declinePendingPauseOfferMock,
+vi.mock('@/features/pause/application/use-cases/pending-offer/run-adopt-pending-pause-offer', () => ({
+  runAdoptPendingPauseOffer: runAdoptPendingPauseOfferMock,
+}));
+
+vi.mock('@/features/pause/application/use-cases/pending-offer/run-decline-pending-pause-offer', () => ({
+  runDeclinePendingPauseOffer: runDeclinePendingPauseOfferMock,
+}));
+
+vi.mock('@/features/pause/application/use-cases/trigger/pending-pause-offer-telemetry', () => ({
   trackPausePendingAdopted: trackPausePendingAdoptedMock,
   trackPausePendingDeclined: trackPausePendingDeclinedMock,
+}));
+
+vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+  supabasePauseRepository: {},
 }));
 
 vi.mock('sonner', () => ({
@@ -31,8 +41,8 @@ const t = ((k: string) => k) as TFunction;
 const pending = { id: 'offer-1' } as import('./use-pending-pause-offer').PendingPauseOfferRow;
 
 beforeEach(() => {
-  adoptPendingPauseOfferMock.mockReset();
-  declinePendingPauseOfferMock.mockReset();
+  runAdoptPendingPauseOfferMock.mockReset();
+  runDeclinePendingPauseOfferMock.mockReset();
   vi.mocked(toast.error).mockClear();
   trackPausePendingAdoptedMock.mockClear();
   trackPausePendingDeclinedMock.mockClear();
@@ -40,7 +50,7 @@ beforeEach(() => {
 
 describe('usePendingPauseOfferMutations', () => {
   it('adopts via pending-offer use case and navigates on success', async () => {
-    adoptPendingPauseOfferMock.mockResolvedValue({ status: 'ok', instanceId: 'inst-9' });
+    runAdoptPendingPauseOfferMock.mockResolvedValue({ status: 'ok', instanceId: 'inst-9' });
     const onAfterMutation = vi.fn().mockResolvedValue(undefined);
     const navigateAfterAdopt = vi.fn();
     const refreshPendingOffer = vi.fn().mockResolvedValue(undefined);
@@ -61,7 +71,7 @@ describe('usePendingPauseOfferMutations', () => {
     });
 
     expect(ok).toBe(true);
-    expect(adoptPendingPauseOfferMock).toHaveBeenCalledTimes(1);
+    expect(runAdoptPendingPauseOfferMock).toHaveBeenCalledTimes(1);
     expect(trackPausePendingAdoptedMock).toHaveBeenCalledWith('inst-9');
     expect(onAfterMutation).toHaveBeenCalled();
     expect(navigateAfterAdopt).toHaveBeenCalledWith('inst-9');
@@ -69,7 +79,7 @@ describe('usePendingPauseOfferMutations', () => {
   });
 
   it('declines via pending-offer use case on success', async () => {
-    declinePendingPauseOfferMock.mockResolvedValue({ status: 'ok' });
+    runDeclinePendingPauseOfferMock.mockResolvedValue({ status: 'ok' });
     const onAfterMutation = vi.fn().mockResolvedValue(undefined);
     const refreshPendingOffer = vi.fn().mockResolvedValue(undefined);
 
@@ -88,14 +98,14 @@ describe('usePendingPauseOfferMutations', () => {
     });
 
     expect(ok).toBe(true);
-    expect(declinePendingPauseOfferMock).toHaveBeenCalledTimes(1);
+    expect(runDeclinePendingPauseOfferMock).toHaveBeenCalledTimes(1);
     expect(trackPausePendingDeclinedMock).toHaveBeenCalledWith('offer-1');
     expect(onAfterMutation).toHaveBeenCalled();
     expect(refreshPendingOffer).toHaveBeenCalled();
   });
 
   it('toasts when adopt RPC returns not ok', async () => {
-    adoptPendingPauseOfferMock.mockResolvedValue({ status: 'failed' });
+    runAdoptPendingPauseOfferMock.mockResolvedValue({ status: 'failed' });
     const { result } = renderHook(() =>
       usePendingPauseOfferMutations({
         pending,

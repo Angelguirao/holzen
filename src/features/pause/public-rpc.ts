@@ -31,14 +31,6 @@ export {
   type GroundingEnrichBody,
   type GroundingEnrichment,
 } from './infrastructure/edge/grounding-enrich-edge';
-import {
-  runAdoptPendingPauseOffer,
-  type RunAdoptPendingPauseOfferResult,
-} from './application/use-cases/pending-offer/run-adopt-pending-pause-offer';
-import {
-  runDeclinePendingPauseOffer,
-  type RunDeclinePendingPauseOfferResult,
-} from './application/use-cases/pending-offer/run-decline-pending-pause-offer';
 import { openManualPauseFromHome as openManualPauseFromHomeUseCase } from './application/use-cases/trigger/open-manual-pause-from-home';
 import type { OpenManualPauseFromHomeParams } from './application/use-cases/trigger/open-manual-pause-from-home';
 import type { PauseState } from './domain/pause-state';
@@ -62,10 +54,6 @@ import type { RunReflectGenerationInput } from './application/use-cases/ritual/r
 import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
 import { showPauseStepSyncFailedToast } from './presentation/ritual/pause-step-sync-toast';
 export { trackPauseSessionAbandoned } from './application/use-cases/session/pause-session-telemetry';
-export {
-  trackPausePendingAdopted,
-  trackPausePendingDeclined,
-} from './application/use-cases/trigger/pending-pause-offer-telemetry';
 export {
   trackHomePendingPauseBannerPauseOpened,
   trackPauseOpenDismissed,
@@ -104,19 +92,8 @@ export function pauseDismissCurrent(): Promise<PauseState | null> {
   return runPauseDismissCurrent(supabasePauseRepository);
 }
 
-/** Pending offer — adopt via `PauseRepository` (wired for presentation). */
-export function adoptPendingPauseOffer(): Promise<RunAdoptPendingPauseOfferResult> {
-  return runAdoptPendingPauseOffer(supabasePauseRepository);
-}
-
-/** Pending offer — decline via `PauseRepository` (wired for presentation). */
-export function declinePendingPauseOffer(): Promise<RunDeclinePendingPauseOfferResult> {
-  return runDeclinePendingPauseOffer(supabasePauseRepository);
-}
-
 export type { PostPauseFeelSnapshot };
 export type { CompanionUiCompletionStep };
-export type { RunAdoptPendingPauseOfferResult, RunDeclinePendingPauseOfferResult };
 export type { RunPauseFavoriteToggleResult, RunPauseReflectTagUpdateResult };
 
 /** Home manual trigger — `pause_create_or_reuse` (+ silent reflection stub). */
