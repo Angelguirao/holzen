@@ -65,11 +65,11 @@
     <h3><code>pause-reflect-hub-io</code> imports hub RPC + domain presentation directly</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. <code>pause-reflect-hub-io</code> imports <code>resolveShiftFrameHubDonePresentation</code> from <code>domain/reflect/hub/shift-frame-hub-done-presentation</code> and <code>runShiftEmotionFrameHubDone</code> from sibling <code>run-shift-emotion-frame-hub-done</code> instead of <code>pause-shift-frame-hub-flow</code> CI anchor. Application anchor file unchanged for <code>check:architecture-alignment</code>.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. <code>pause-reflect-hub-io</code> imports <code>resolveShiftFrameHubDonePresentation</code> from <code>domain/reflect/hub/shift-frame-hub-done-presentation</code> and <code>runShiftEmotionFrameHubDone</code> from sibling <code>run-shift-emotion-frame-hub-done</code> instead of <code>pause-shift-frame-hub-flow</code> CI anchor (mirrors generation I/O peel).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Mirrors generation I/O peel; flows I/O may still bind some decide domain helpers directly until incremental peels.</dd>
+      <dd>Orphan <code>pause-shift-frame-hub-flow</code> removed after peel; <code>ritual/reflect/hub/</code> cluster is use case + domain only. Flows I/O may still bind some decide domain helpers directly until incremental peels.</dd>
       <dt>Open questions</dt>
       <dd>Next: companion orchestration-io consolidate <code>load-companion-orchestrate-session</code> imports, or reflect flows I/O preflight/post-generation anchor peel.</dd>
     </dl>

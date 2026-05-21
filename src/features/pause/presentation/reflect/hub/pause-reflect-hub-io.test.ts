@@ -19,7 +19,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 describe('pause-reflect-hub-io', () => {
-  it('re-exports shift-frame hub flow helpers for presentation conductors', () => {
+  it('re-exports shift-frame hub presentation mapping for presentation conductors', () => {
     expect(
       resolveShiftFrameHubDonePresentation({ status: 'sync_failed' }),
     ).toEqual({ kind: 'abort_sync_failed' });
