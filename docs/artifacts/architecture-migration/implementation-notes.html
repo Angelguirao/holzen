@@ -11344,4 +11344,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect reflection_step via public-rpc; drop session storage re-exports (backlog #1 verified, #3 / #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; §6 public-rpc peel + backlog #4 hook</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move. After <code>loadSession</code> / <code>saveSession</code> peel, remove dead <code>clearSession</code> / <code>loadSession</code> / <code>saveSession</code> re-exports from <code>public-rpc</code> (no cross-context callers). Wire <code>use-pause-reflection-step-log</code> through <code>logPauseReflectionStepOnce</code> facade (default <code>PauseRepository</code> + <code>reflectionStepSessionStorage</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Note/tag/favorite reflect hooks still call use cases with <code>supabasePauseRepository</code> directly; peel in follow-up slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: facades for <code>runPauseReflectNoteUpdate</code> / tag / favorite / initial-emotion / breath segment logs; or §6 audit companion-only <code>public-rpc</code> type re-exports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
