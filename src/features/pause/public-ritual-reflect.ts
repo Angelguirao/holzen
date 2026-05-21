@@ -49,6 +49,7 @@ export {
   usePauseSessionReflectAndDecide,
   type UsePauseSessionReflectAndDecideParams,
 } from './presentation/reflect/flows/use-pause-session-reflect-and-decide';
+export { usePauseSessionBreathReflectHandlers } from './presentation/reflect/flows/use-pause-session-breath-reflect-handlers';
 
 export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/reflect/mood/pause-depth-picker-styles';
 export { usePauseFeelShiftLogDedupeRefs } from './presentation/reflect/mood/use-pause-feel-shift-log-dedupe-refs';
