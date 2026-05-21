@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { buildReflectFavoriteToggledPayload } from '@/features/pause/domain/reflect/steps/favorite-toggle';
+import { buildReflectFavoriteToggledPayload } from '@/features/pause/domain/reflect/steps/reflect-note-tag-payload';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { runPauseFavoriteToggle } from './run-pause-favorite-toggle';
 

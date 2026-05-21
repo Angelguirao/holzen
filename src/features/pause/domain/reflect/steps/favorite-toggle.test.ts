@@ -1,15 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  buildReflectFavoriteToggledPayload,
-  computeFavoriteToggleNext,
-  shouldShowFavoriteProHint,
-} from './favorite-toggle';
-
-describe('buildReflectFavoriteToggledPayload', () => {
-  it('builds favorite_toggled payload', () => {
-    expect(buildReflectFavoriteToggledPayload(true)).toEqual({ is_favorite: true });
-  });
-});
+import { computeFavoriteToggleNext, shouldShowFavoriteProHint } from './favorite-toggle';
 
 describe('computeFavoriteToggleNext', () => {
   it('flips boolean', () => {
