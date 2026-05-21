@@ -1,55 +1,24 @@
 import { bucketChangePercent, computeContextFingerprint } from '@/features/pause/domain/pause-fingerprint';
-import { pauseCreateSkippedUserMessage } from '@/features/pause/application/use-cases/trigger/pause-create-skipped-user-message';
+import { pauseCreateSkippedUserMessage } from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-create-skipped-user-message';
 import { runPauseCreateOrReuse } from '@/features/pause/application/use-cases/session/run-pause-create-or-reuse';
 import { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-open-manual-pause-silent-mode-after-create';
-import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
+import type {
+  OpenManualPauseFromHomeError,
+  OpenManualPauseFromHomeParams,
+  OpenManualPauseFromHomePorts,
+  OpenManualPauseFromHomeResult,
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home-types';
+
+export type {
+  OpenManualPauseFromHomeError,
+  OpenManualPauseFromHomeIdle,
+  OpenManualPauseFromHomeParams,
+  OpenManualPauseFromHomePorts,
+  OpenManualPauseFromHomeResult,
+  OpenManualPauseFromHomeSuccess,
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home-types';
+
 const VOLATILITY_TEMPLATE = 'volatility_v1';
-
-export type OpenManualPauseFromHomeParams = {
-  userId: string;
-  silentMode: boolean;
-  contextText: string;
-  silentMessage: string;
-  mood?: string | null;
-  changePercent: number;
-  cumulativeChangePercent: number | null;
-  trackedAssetId: string;
-  severityBand: string;
-  fearGreedLabel: string | null;
-  onChainBand: string | null;
-};
-
-export type OpenManualPauseFromHomeSuccess = {
-  outcome: 'opened';
-  instanceId: string;
-  context: string;
-  pendingOffer: boolean;
-  created: boolean;
-  /** When true, caller should set Home message to `silentMessage`. */
-  silentStubPersisted: boolean;
-};
-
-export type OpenManualPauseFromHomeIdle = {
-  outcome: 'idle';
-  userMessage: string;
-};
-
-export type OpenManualPauseFromHomeError = {
-  outcome: 'error';
-  userMessage: string;
-  isNetwork: boolean;
-};
-
-export type OpenManualPauseFromHomeResult =
-  | OpenManualPauseFromHomeSuccess
-  | OpenManualPauseFromHomeIdle
-  | OpenManualPauseFromHomeError;
-
-export type OpenManualPauseFromHomePorts = {
-  repository: PauseRepository;
-  reflect: ReflectGenerator;
-};
 
 function mapCreateOrReuseError(e: unknown): OpenManualPauseFromHomeError {
   const raw = e instanceof Error ? e.message : String(e);
