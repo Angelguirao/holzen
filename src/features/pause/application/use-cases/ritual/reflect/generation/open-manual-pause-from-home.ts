@@ -7,7 +7,7 @@ import type {
   OpenManualPauseFromHomeParams,
   OpenManualPauseFromHomePorts,
   OpenManualPauseFromHomeResult,
-} from './open-manual-pause-from-home-types';
+} from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-types';
 
 export type {
   OpenManualPauseFromHomeError,
@@ -16,7 +16,7 @@ export type {
   OpenManualPauseFromHomePorts,
   OpenManualPauseFromHomeResult,
   OpenManualPauseFromHomeSuccess,
-} from './open-manual-pause-from-home-types';
+} from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-types';
 
 /** Home "Need a moment": `pause_create_or_reuse` (+ silent reflection stub when enabled). */
 export async function openManualPauseFromHome(

@@ -1,4 +1,4 @@
-export type { OpenManualPauseFromHomeResult } from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home-types';
+export type { OpenManualPauseFromHomeResult } from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-types';
 export type {
   TrackManualPauseInstanceCreatedPayload,
   TrackPauseManualCompletedPayload,
