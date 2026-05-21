@@ -14729,6 +14729,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect-generation-hook-flow → domain/reflect/generation</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — pure holzen-reflect hook guards in domain</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete. Move prefetch/stale-run/result-map helpers from <code>application/use-cases/ritual/reflect/generation/</code> to <code>domain/reflect/generation/reflect-generation-hook-flow.ts</code>; <code>pause-reflect-generation-io.ts</code> re-exports domain path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>run-reflect-generation</code> stays in application (port + edge I/O); hook tests mock importActual from domain in generation-io mocks.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move <code>pause-create-skipped-user-message</code> to domain or peel <code>mapCreateOrReuseError</code> beside manual-open cluster.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — decide handler ritual helpers on pause-reflect-flows-io</span>
       <span class="status resolved">resolved</span>
     </header>
