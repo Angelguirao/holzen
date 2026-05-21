@@ -6,10 +6,10 @@ import {
   type ManualPauseTriggerResult,
 } from '@/features/pause/domain/manual-pause-trigger-result';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
+import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 import {
   applyManualPauseOpenResult,
   buildManualPauseOpenParams,
-  clearSession,
   markPauseManualStartedHomeOnce,
   openManualPauseFromHome,
   trackManualPauseInstanceCreated,
