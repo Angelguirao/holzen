@@ -6,7 +6,7 @@ export type {
   PauseAdoptPendingResult,
   PauseCreateOrReuseResult,
   PauseLogCompanionResult,
-} from './infrastructure/pause-rpc-client';
+} from './domain/rpc-types';
 export type { OpenManualPauseFromHomeResult } from './application/use-cases/trigger/open-manual-pause-from-home';
 
 export { ritualDepthUpgradedPayload } from './application/use-cases/ritual/brief/ritual-depth-upgrade';
