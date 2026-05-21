@@ -3605,9 +3605,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior-preserving <code>git mv</code>; query options stay on <code>public-queries</code>.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>use-pause-breathing-timed-loop</code> and bulk-hold hooks remain flat under <code>presentation/</code>.</dd>
+      <dd>Breathing timed loop moved under <code>presentation/session/</code> in the next slice; bulk-hold remains flat.</dd>
       <dt>Open questions</dt>
-      <dd>Next: colocate <code>use-pause-breathing-timed-loop</code>, or port-back PWA install analytics via <code>PauseAnalyticsRepository</code> (backlog #4).</dd>
+      <dd>Resolved by breathing timed loop peel below.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate breathing timed loop under presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 session breathing conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-pause-breathing-timed-loop</code> (+ test) beside other session ritual hooks under <code>presentation/session/</code>; <code>public-hooks</code> re-export path only — <code>PauseBreathing</code> screen keeps <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>; phase-advance/audio imports unchanged (already <code>ritual/breathe/</code>).</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-bulk-hold</code> remains flat under <code>presentation/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-back PWA install analytics via <code>PauseAnalyticsRepository</code>, or wire more ritual log RPCs through <code>PauseRepository</code> (backlog #4).</dd>
     </dl>
   </article>
 
