@@ -1,17 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-  isBriefRitualEntry,
   resolvePauseSessionChromeCloseAction,
   runDeepPausePickerEntryIfPro,
   runPauseSessionChromeCloseAction,
 } from './pause-session-mood-chrome-flow';
 
 describe('pause-session-mood-chrome-flow', () => {
-  it('detects brief ritual entry', () => {
-    expect(isBriefRitualEntry('brief')).toBe(true);
-    expect(isBriefRitualEntry('deep')).toBe(false);
-  });
-
   it('resolves chrome close to return or request exit', () => {
     expect(resolvePauseSessionChromeCloseAction('done')).toBe('return');
     expect(resolvePauseSessionChromeCloseAction('session')).toBe('request_exit');
