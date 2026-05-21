@@ -8646,4 +8646,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion feedback vote read off public-rpc (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect ritual/reflect/ complete; vote TanStack query uses PauseAnalyticsRepository adapter</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete on <code>cursor/arch-migrate-src-ca70</code>. Align <code>companion-feedback-vote-query</code> with <code>dev-mode-admin-query</code> / <code>companion-fullview-analytics</code>: <code>runFetchCompanionFeedbackVote(supabasePauseAnalyticsRepository, …)</code> in infrastructure; presentation write path unchanged (<code>logPauseCompanionFeedbackVote</code> on <code>public-rpc</code>). <code>fetchPauseCompanionFeedbackVote</code> facade kept for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import layering only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Read and write vote paths now use different import surfaces (queries → infrastructure adapter; hook → <code>public-rpc</code>).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-fullview-telemetry</code> off <code>public-ports</code>, or audit remaining <code>public-rpc</code> facades only used by infrastructure queries.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
