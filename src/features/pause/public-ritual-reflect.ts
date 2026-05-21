@@ -59,6 +59,8 @@ export {
   type UsePauseSessionReflectAndDecideParams,
 } from './presentation/reflect/flows/use-pause-session-reflect-and-decide';
 export { usePauseSessionDepthAndBriefCopy } from './presentation/reflect/mood/use-pause-session-depth-and-brief-copy';
+export { usePauseSessionPersistToStorage } from './presentation/reflect/scaffold/use-pause-session-persist-to-storage';
+export { usePauseSessionRitualStorageSync } from './presentation/reflect/scaffold/use-pause-session-ritual-storage-sync';
 
 export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/reflect/mood/pause-depth-picker-styles';
 export { usePauseFeelShiftLogDedupeRefs } from './presentation/reflect/mood/use-pause-feel-shift-log-dedupe-refs';
