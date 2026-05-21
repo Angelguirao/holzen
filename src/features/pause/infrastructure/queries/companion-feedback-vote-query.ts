@@ -1,7 +1,8 @@
 import type { LogCompanionFeedbackVoteInput } from '@/features/pause/application/use-cases/ritual/frame/log-companion-feedback-vote';
-import { runFetchCompanionFeedbackVote } from '@/features/pause/application/use-cases/ritual/frame/run-fetch-companion-feedback-vote';
-import { runLogCompanionFeedbackVote } from '@/features/pause/application/use-cases/ritual/frame/run-log-companion-feedback-vote';
-import { supabasePauseAnalyticsRepository } from '@/features/pause/public-ports';
+import {
+  fetchPauseCompanionFeedbackVote,
+  logPauseCompanionFeedbackVote,
+} from '@/features/pause/public-rpc';
 
 export const COMPANION_FEEDBACK_VOTE_QUERY_PREFIX = ['companion-feedback-vote'] as const;
 
@@ -23,7 +24,7 @@ export function companionFeedbackVoteQueryKey(
 export async function logCompanionFeedbackVote(
   input: LogCompanionFeedbackVoteInput,
 ): Promise<{ ok: boolean }> {
-  return runLogCompanionFeedbackVote(supabasePauseAnalyticsRepository, input);
+  return logPauseCompanionFeedbackVote(input);
 }
 
 export async function fetchCompanionFeedbackVote(
@@ -31,11 +32,7 @@ export async function fetchCompanionFeedbackVote(
   pauseInstanceId: string,
   companionType: string,
 ): Promise<'up' | 'down' | null> {
-  return runFetchCompanionFeedbackVote(supabasePauseAnalyticsRepository, {
-    userId,
-    pauseInstanceId,
-    companionType,
-  });
+  return fetchPauseCompanionFeedbackVote(userId, pauseInstanceId, companionType);
 }
 
 export function getCompanionFeedbackVoteQueryOptions(

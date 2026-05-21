@@ -80,6 +80,10 @@ import {
 } from './application/use-cases/ritual/feel/shift-emotion-log';
 import type { InitialEmotionLogOpts } from './application/use-cases/ritual/feel/initial-emotion-log';
 import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
+import type { LogCompanionFeedbackVoteInput } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
+import { runFetchCompanionFeedbackVote } from './application/use-cases/ritual/frame/run-fetch-companion-feedback-vote';
+import { runLogCompanionFeedbackVote } from './application/use-cases/ritual/frame/run-log-companion-feedback-vote';
+import { supabasePauseAnalyticsRepository } from './infrastructure/supabase-pause-analytics-repository';
 
 /** Lifecycle + ritual mutations — wired facades only; no generic `pauseLogStep` / `pauseCreateOrReuse` exports. */
 
@@ -179,6 +183,31 @@ export function runPauseReflectGeneration(input: RunReflectGenerationInput) {
 /** Persisted haiku artifact read for Reflect / Frame — wired `ReflectGenerator.fetchHaikuText`. */
 export function fetchPauseReflectHaiku(pauseInstanceId: string): Promise<string | null> {
   return supabaseReflectGenerator.fetchHaikuText(pauseInstanceId);
+}
+
+export type {
+  CompanionFeedbackVote,
+  LogCompanionFeedbackVoteInput,
+} from './application/use-cases/ritual/frame/log-companion-feedback-vote';
+
+/** Companion feedback vote read — wired `PauseAnalyticsRepository.fetchCompanionFeedbackVote`. */
+export function fetchPauseCompanionFeedbackVote(
+  userId: string,
+  pauseInstanceId: string,
+  companionType: string,
+): Promise<'up' | 'down' | null> {
+  return runFetchCompanionFeedbackVote(supabasePauseAnalyticsRepository, {
+    userId,
+    pauseInstanceId,
+    companionType,
+  });
+}
+
+/** Companion feedback vote write — wired `PauseAnalyticsRepository.logCompanionFeedbackVote`. */
+export function logPauseCompanionFeedbackVote(
+  input: LogCompanionFeedbackVoteInput,
+): Promise<{ ok: boolean }> {
+  return runLogCompanionFeedbackVote(supabasePauseAnalyticsRepository, input);
 }
 
 /** Reflect progression — `reflection_step` once per instance (sessionStorage dedupe). */
