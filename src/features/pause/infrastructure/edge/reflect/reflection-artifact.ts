@@ -1,22 +1,14 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
+import type { ReflectArtifactPersistInput } from '@/features/pause/domain/reflect-artifact-persist';
 import { invokeHolzenReflect } from './holzen-reflect-edge';
 import type { ReflectRecencyHints } from '@/features/pause/domain/reflect-recency-hints';
 
-export type PersistReflectionArtifactsParams = {
-  pauseInstanceId: string;
-  userId: string;
-  context: string;
-  message: string;
-  haiku?: string | null;
-  groundingTitle?: string | null;
-  groundingBody?: string | null;
-  groundingCitation?: string | null;
-  groundingUrl?: string | null;
-};
+/** @deprecated Prefer `ReflectArtifactPersistInput` from `domain/reflect-artifact-persist.ts`. */
+export type PersistReflectionArtifactsParams = ReflectArtifactPersistInput;
 
 /** Upserts reflection (+ optional haiku / ground nudge) after `holzen-reflect`. */
-export async function persistReflectionArtifacts(params: PersistReflectionArtifactsParams): Promise<void> {
+export async function persistReflectionArtifacts(params: ReflectArtifactPersistInput): Promise<void> {
   const {
     pauseInstanceId,
     userId,

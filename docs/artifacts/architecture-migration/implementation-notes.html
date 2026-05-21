@@ -4637,4 +4637,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — ReflectGenerator persist port (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Home silent stub artifact persist via <code>ReflectGenerator</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 <code>ritual/reflect/</code> was already complete. Add <code>persistReflectionArtifacts</code> to <code>ReflectGenerator</code> with <code>ReflectArtifactPersistInput</code> in <code>domain/reflect-artifact-persist.ts</code>. <code>openManualPauseFromHome</code> injects <code>PauseRepository</code> + <code>ReflectGenerator</code> picks instead of a raw infrastructure function; <code>public-rpc</code> wires <code>supabasePauseRepository</code> + <code>supabaseReflectGenerator</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>PersistReflectionArtifactsParams</code> remains a deprecated alias on the infrastructure module for edge helpers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire any remaining ad-hoc mutation paths, or <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

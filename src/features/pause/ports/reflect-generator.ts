@@ -1,3 +1,4 @@
+import type { ReflectArtifactPersistInput } from '@/features/pause/domain/reflect-artifact-persist';
 import type { ReflectGenerationEdgeInvokeInput } from '@/features/pause/domain/reflect-generation-edge-params';
 import type { ReflectRecencyHints } from '@/features/pause/domain/reflect-recency-hints';
 import type {
@@ -18,4 +19,5 @@ export interface ReflectGenerator {
     params: ReflectGenerationEdgeInvokeInput,
     recencyHints: ReflectRecencyHints,
   ): Promise<{ message: string }>;
+  persistReflectionArtifacts(params: ReflectArtifactPersistInput): Promise<void>;
 }

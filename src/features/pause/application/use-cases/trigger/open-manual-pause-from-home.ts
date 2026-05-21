@@ -2,6 +2,8 @@ import { bucketChangePercent, computeContextFingerprint } from '@/features/pause
 import { pauseCreateSkippedUserMessage } from '@/features/pause/application/use-cases/trigger/pause-create-skipped-user-message';
 import { reflectionPersistErrorMessage } from '@/features/pause/domain/pause-persist-error';
 import type { PauseCreateOrReuseResult } from '@/features/pause/domain/rpc-types';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 const VOLATILITY_TEMPLATE = 'volatility_v1';
 
 export type OpenManualPauseFromHomeParams = {
@@ -45,19 +47,8 @@ export type OpenManualPauseFromHomeResult =
   | OpenManualPauseFromHomeError;
 
 export type OpenManualPauseFromHomePorts = {
-  createOrReuse: (params: {
-    templateSlug: string;
-    source: string;
-    contextSnapshot: Record<string, unknown>;
-    contextRuleResult: Record<string, unknown>;
-    contextFingerprint: string;
-  }) => Promise<PauseCreateOrReuseResult>;
-  persistReflectionArtifacts: (params: {
-    pauseInstanceId: string;
-    userId: string;
-    context: string;
-    message: string;
-  }) => Promise<void>;
+  repository: Pick<PauseRepository, 'createOrReuse'>;
+  reflect: Pick<ReflectGenerator, 'persistReflectionArtifacts'>;
 };
 
 function mapCreateOrReuseError(e: unknown): OpenManualPauseFromHomeError {
@@ -110,7 +101,7 @@ export async function openManualPauseFromHome(
   };
 
   try {
-    const res = await ports.createOrReuse(createParams);
+    const res = await ports.repository.createOrReuse(createParams);
     if (!res.instance_id) {
       return { outcome: 'idle', userMessage: pauseCreateSkippedUserMessage(res.reused_reason) };
     }
@@ -119,7 +110,7 @@ export async function openManualPauseFromHome(
 
     if (params.silentMode) {
       try {
-        await ports.persistReflectionArtifacts({
+        await ports.reflect.persistReflectionArtifacts({
           pauseInstanceId: res.instance_id,
           userId: params.userId,
           context: params.contextText,

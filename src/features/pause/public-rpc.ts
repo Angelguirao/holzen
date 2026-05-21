@@ -33,8 +33,8 @@ import {
   type BulkHoldApplyResult,
 } from './application/use-cases/home/bulk-hold/apply-bulk-hold-outcomes';
 import { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
+import { supabaseReflectGenerator } from './infrastructure/supabase-reflect-generator';
 import { openManualPauseFromHome as openManualPauseFromHomeUseCase } from './application/use-cases/trigger/open-manual-pause-from-home';
-import { persistReflectionArtifacts } from './infrastructure/edge/reflect/reflection-artifact';
 import type { OpenManualPauseFromHomeParams } from './application/use-cases/trigger/open-manual-pause-from-home';
 import type { TFunction } from 'i18next';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from './domain/bulk-hold';
@@ -156,7 +156,10 @@ export async function persistCompanionUiStepCompletion(
 /** Home manual trigger — `pause_create_or_reuse` (+ silent reflection stub). */
 export function openManualPauseFromHome(params: OpenManualPauseFromHomeParams) {
   return openManualPauseFromHomeUseCase(
-    { createOrReuse: supabasePauseRepository.createOrReuse, persistReflectionArtifacts },
+    {
+      repository: supabasePauseRepository,
+      reflect: supabaseReflectGenerator,
+    },
     params,
   );
 }
