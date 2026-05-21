@@ -11610,4 +11610,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel home + session abandon telemetry off public-rpc (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; Home + pending-leave PostHog bypass public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. After manual-trigger peel (<code>bae6fee5</code>), align <code>use-home-pause-actions</code> and <code>use-pause-session-pending-leave-sheet</code> with other presentation conductors: import <code>home-pause-actions-telemetry</code> / <code>pause-session-telemetry</code> directly; remove telemetry re-exports from <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>logPauseCompanion</code> and PWA/dev analytics remain on <code>public-rpc</code> for cross-context callers; <code>PauseDismissAnalyticsSurface</code> still re-exported via <code>public-hooks</code> from <code>use-home-pause-actions</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: remove unused <code>logPauseCompanion</code> facade from <code>public-rpc</code> if no external callers remain, or peel admin dev-mode re-export from <code>screens/admin/public-queries</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
