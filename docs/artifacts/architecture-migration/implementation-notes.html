@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — delete orphan reflect share-flow anchor (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-share-io</code> direct imports; remove <code>pause-reflection-share-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Align share presentation I/O with steps/home telemetry peels: domain URL/text builders + <code>run-reflection-share-image</code> on <code>pause-reflect-share-io</code>; delete zero-import <code>pause-reflection-share-flow</code> CI anchor after branch tip already peeled share I/O off the anchor.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; unit test already mocked <code>run-reflection-share-image</code> directly.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Share cluster still detected via <code>ritual/reflect/share/</code> directory + sibling use cases.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion orchestrate-io direct <code>ritual/frame/*</code> imports, or peel <code>pause-reflect-generation-io</code> off hook-flow to domain + <code>run-reflect-generation</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — session scaffold I/O direct session use cases (Phase A follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -17838,7 +17857,11 @@
       <dt>Tradeoffs</dt>
       <dd>Unit test mocks <code>runReflectGeneration</code> on the hook-flow module path.</dd>
       <dt>Open questions</dt>
+<<<<<<< HEAD
       <dd>Next: <code>pause-session-brief-io</code> off brief-flow anchor, companion orchestration-io peel, or Phase B cross-context Tier 1 shim.</dd>
+=======
+      <dd>Next: companion orchestrate-io peel, session brief flow-anchor peel, or Phase B cross-context Tier 1 shim.</dd>
+>>>>>>> d48ef7803 (refactor(pause): peel reflect share I/O off pause-reflection-share-flow)
     </dl>
   </article>
 
