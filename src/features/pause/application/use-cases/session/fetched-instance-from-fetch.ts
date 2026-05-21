@@ -1,4 +1,5 @@
 import { companionDataFromArtifacts } from '@/features/pause/application/use-cases/ritual/frame/companion-data-from-artifacts';
+import { reflectionTextMessageFromArtifactRows } from '@/features/pause/domain/reflect/generation/reflection-text-from-artifact-rows';
 import type { FetchedPauseInstance } from '@/features/pause/domain/session-model';
 import type { PauseState } from '@/features/pause/domain/pause-state';
 
@@ -29,9 +30,7 @@ export function buildFetchedPauseInstanceFromFetch(
   artifactRows: PauseAiArtifactKindRow[],
 ): FetchedPauseInstance {
   const companionData = companionDataFromArtifacts(artifactRows);
-  const reflectionArt = artifactRows.find((a) => a.kind === 'reflection_text');
-  const msg =
-    typeof reflectionArt?.content?.message === 'string' ? (reflectionArt.content.message as string) : '';
+  const msg = reflectionTextMessageFromArtifactRows(artifactRows) ?? '';
   const ctxSnap = inst.context_snapshot ?? {};
   const ctx = typeof ctxSnap.context_text === 'string' ? (ctxSnap.context_text as string) : null;
   return {

@@ -47,6 +47,13 @@ describe('buildFetchedPauseInstanceFromFetch', () => {
     expect(out.context).toBeNull();
   });
 
+  it('treats whitespace-only reflection_text as empty', () => {
+    const out = buildFetchedPauseInstanceFromFetch('p-whitespace', { context_snapshot: null }, [
+      { kind: 'reflection_text', content: { message: '   ' } },
+    ]);
+    expect(out.reflection_message).toBe('');
+  });
+
   it('passes through engaged_at from instance row', () => {
     const out = buildFetchedPauseInstanceFromFetch(
       'p4',
