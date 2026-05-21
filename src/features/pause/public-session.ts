@@ -28,7 +28,7 @@ export { pauseStepSwipeDirection } from './application/use-cases/session/step-sw
 export {
   buildPauseSessionPersistSnapshot,
   type PauseSessionPersistSnapshotInput,
-} from './application/use-cases/session/persist-snapshot';
+} from './application/use-cases/ritual/reflect/scaffold/persist-snapshot';
 export {
   hasPersistablePauseSessionAnchor,
   hasPersistedPauseSessionPayload,

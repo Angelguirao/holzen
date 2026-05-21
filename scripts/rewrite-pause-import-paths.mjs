@@ -24,6 +24,10 @@ const REPLACEMENTS = [
   ['@/features/pause/application/use-cases/companion/', '@/features/pause/application/use-cases/ritual/frame/'],
   ['@/features/pause/application/use-cases/reflect/', '@/features/pause/application/use-cases/ritual/reflect/'],
   [
+    '@/features/pause/application/use-cases/session/persist-snapshot',
+    '@/features/pause/application/use-cases/ritual/reflect/scaffold/persist-snapshot',
+  ],
+  [
     '@/features/pause/application/use-cases/ritual/feel/run-shift-emotion-frame-hub-done',
     '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
   ],
@@ -39,6 +43,10 @@ const REPLACEMENTS = [
   ['./application/use-cases/companion/', './application/use-cases/ritual/frame/'],
   ['./application/use-cases/reflect/', './application/use-cases/ritual/reflect/'],
   [
+    './application/use-cases/session/persist-snapshot',
+    './application/use-cases/ritual/reflect/scaffold/persist-snapshot',
+  ],
+  [
     './application/use-cases/ritual/feel/run-shift-emotion-frame-hub-done',
     './application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
   ],
@@ -53,6 +61,10 @@ const REPLACEMENTS = [
   ['application/use-cases/breathing/', 'application/use-cases/ritual/breathe/'],
   ['application/use-cases/companion/', 'application/use-cases/ritual/frame/'],
   ['application/use-cases/reflect/', 'application/use-cases/ritual/reflect/'],
+  [
+    'application/use-cases/session/persist-snapshot',
+    'application/use-cases/ritual/reflect/scaffold/persist-snapshot',
+  ],
   [
     'application/use-cases/ritual/feel/run-shift-emotion-frame-hub-done',
     'application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
