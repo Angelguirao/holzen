@@ -1,5 +1,4 @@
-import { runFetchDevModeSetting } from '@/features/pause/application/use-cases/admin/run-fetch-dev-mode-setting';
-import { supabasePauseAnalyticsRepository } from '@/features/pause/public-ports';
+import { fetchPauseDevModeSetting } from '@/features/pause/public-rpc';
 
 /** Matches `screens/admin/lib/admin-query-namespace` — keep in sync if the prefix changes. */
 const ADMIN_QUERY_PREFIX = ['admin'] as const;
@@ -27,7 +26,7 @@ export function adminDevModeSettingQueryKey(userId: string) {
 
 /** Admin: hydrate rapid-testing toggle from latest analytics_events row. */
 export async function fetchDevModeFromAnalytics(userId: string): Promise<boolean> {
-  const dbValue = await runFetchDevModeSetting(supabasePauseAnalyticsRepository, userId);
+  const dbValue = await fetchPauseDevModeSetting(userId);
   if (dbValue === null) {
     return readLocalDevMode();
   }

@@ -1,9 +1,8 @@
-import { runLogDevModeSetting } from '@/features/pause/application/use-cases/admin/run-log-dev-mode-setting';
-import { supabasePauseAnalyticsRepository } from '@/features/pause/public-ports';
+import { logPauseDevModeSetting } from '@/features/pause/public-rpc';
 
 export type { LogDevModeSettingInput } from '@/features/pause/application/use-cases/admin/run-log-dev-mode-setting';
 
 /** Persists admin dev-mode toggle via `PauseAnalyticsRepository`. */
 export async function logDevModeSetting(userId: string, enabled: boolean): Promise<void> {
-  await runLogDevModeSetting(supabasePauseAnalyticsRepository, { userId, enabled });
+  await logPauseDevModeSetting({ userId, enabled });
 }

@@ -89,6 +89,15 @@ import { runLogCompanionFeedbackVote } from './application/use-cases/ritual/fram
 import { runLogCompanionFullviewOpened } from './application/use-cases/ritual/frame/run-log-companion-fullview-opened';
 import type { LogCompanionFullviewOpenedInput } from './application/use-cases/ritual/frame/log-companion-fullview-opened';
 import { logPauseCompanion as logPauseCompanionUseCase } from './application/use-cases/ritual/log/log-pause-companion';
+import {
+  runLogPwaInstallAnalyticsEvent,
+  type LogPwaInstallAnalyticsEventInput,
+} from './application/use-cases/home/run-log-pwa-install-analytics-event';
+import {
+  runLogDevModeSetting,
+  type LogDevModeSettingInput,
+} from './application/use-cases/admin/run-log-dev-mode-setting';
+import { runFetchDevModeSetting } from './application/use-cases/admin/run-fetch-dev-mode-setting';
 import { supabasePauseAnalyticsRepository } from './infrastructure/supabase-pause-analytics-repository';
 
 /** Lifecycle + ritual mutations — wired facades only; no generic `pauseLogStep` export. */
@@ -254,6 +263,25 @@ export function logPauseCompanion(params: {
   entryPoint: string;
 }): Promise<PauseLogCompanionResult> {
   return logPauseCompanionUseCase(supabasePauseRepository, params);
+}
+
+/** PWA install funnel — wired `PauseAnalyticsRepository.insertEvent` (Home / settings). */
+export function logPausePwaInstallAnalyticsEvent(
+  input: LogPwaInstallAnalyticsEventInput,
+): Promise<{ ok: boolean }> {
+  return runLogPwaInstallAnalyticsEvent(supabasePauseAnalyticsRepository, input);
+}
+
+/** Admin rapid-testing toggle write — wired `PauseAnalyticsRepository.insertEvent`. */
+export function logPauseDevModeSetting(
+  input: LogDevModeSettingInput,
+): Promise<{ ok: boolean }> {
+  return runLogDevModeSetting(supabasePauseAnalyticsRepository, input);
+}
+
+/** Admin rapid-testing toggle read — wired `PauseAnalyticsRepository.fetchDevModeSetting`. */
+export function fetchPauseDevModeSetting(userId: string): Promise<boolean | null> {
+  return runFetchDevModeSetting(supabasePauseAnalyticsRepository, userId);
 }
 
 /** Reflect progression — `reflection_step` once per instance (sessionStorage dedupe). */
