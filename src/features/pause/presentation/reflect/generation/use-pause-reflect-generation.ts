@@ -2,14 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
-import { reflectGenerationPrerequisite } from '@/features/pause/domain/reflect-generation-prerequisites';
-import { reflectGenerationUserErrorMessage } from '@/features/pause/domain/reflect-generation-errors';
+import { reflectGenerationPrerequisite } from '@/features/pause/domain/reflect/generation/reflect-generation-prerequisites';
+import { reflectGenerationUserErrorMessage } from '@/features/pause/domain/reflect/generation/reflect-generation-errors';
 import {
   messageFromReflectGenerationResult,
   resolveReflectGenerationPrefetch,
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
-} from '@/features/pause/domain/reflect-generation-hook-flow';
+} from '@/features/pause/domain/reflect/generation/reflect-generation-hook-flow';
 import { runPauseReflectGeneration } from '@/features/pause/public-rpc';
 
 export type UsePauseReflectGenerationParams = {

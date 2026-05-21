@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   isAbortLikeReflectError,
   reflectGenerationUserErrorMessage,
-} from '@/features/pause/domain/reflect-generation-errors';
+} from './reflect-generation-errors';
 
 describe('isAbortLikeReflectError', () => {
   it('detects AbortError by name', () => {
