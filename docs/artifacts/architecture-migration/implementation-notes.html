@@ -15514,7 +15514,7 @@
     <h3>Backlog #1 complete; backlog #2 presentation peel follow-up</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete on <code>cursor/arch-migrate-src-ca70</code> — no folder moves. Add <code>presentation/session/pause-session-ritual-restore-io.ts</code> for breath/decide/frame/brief hydration helpers; <code>use-pause-session-ritual-state</code> imports I/O only (same pattern as <code>pause-companion-frame-ui-io</code>). Owner doc §10.1: Home reflect PostHog consolidated on <code>pause-home-reflect-io.ts</code>.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete on <code>cursor/arch-migrate-src-ca70</code> — no folder moves. Add <code>presentation/session/pause-session-ritual-restore-io.ts</code> for breath/decide/frame/brief hydration helpers; <code>use-pause-session-ritual-state</code> imports I/O only (same pattern as <code>pause-companion-frame-ui-io</code>).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; re-exports only.</dd>
       <dt>Tradeoffs</dt>
@@ -15540,6 +15540,25 @@
       <dd>Application <code>ritual/reflect/flows/</code> modules remain thin re-exports (CI cluster anchors), not relocated domain logic.</dd>
       <dt>Open questions</dt>
       <dd>Next: lifecycle create/dismiss facades on <code>public-rpc</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect backlog #1 verified; Home reflect telemetry cluster I/O (Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/telemetry presentation peel for Home</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete on <code>cursor/arch-migrate-src-ca70</code> — no legacy folder moves. Align Home with session reflect telemetry: add <code>presentation/home/pause-home-reflect-telemetry-io.ts</code> for PostHog helpers under <code>ritual/reflect/telemetry/</code>; <code>pause-home-reflect-io.ts</code> keeps manual-open generation use cases only; <code>pause-home-io</code> aggregates both barrels for conductors.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; re-exports only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>One extra Home presentation file vs the prior single-barrel consolidation — matches <code>presentation/reflect/telemetry/pause-reflect-telemetry-io.ts</code> cluster boundary.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: lifecycle create/dismiss use cases on <code>public-rpc</code>, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
