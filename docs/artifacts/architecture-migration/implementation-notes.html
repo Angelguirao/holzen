@@ -13510,4 +13510,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect scaffold hooks on public-ritual-reflect (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>§6 peel — persist + ritual-storage-sync off public-hooks direct paths</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Export <code>usePauseSessionPersistToStorage</code> and <code>usePauseSessionRitualStorageSync</code> from <code>public-ritual-reflect.ts</code> (reflect scaffold cluster); <code>public-hooks</code> re-exports the reflect barrel for screens. Mirrors breath hooks on <code>public-ritual-breathe</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving export peel only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>usePauseSessionDecideHandler</code> still re-exported from <code>public-hooks</code> via direct <code>presentation/reflect/flows/</code> path until a follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel decide handler onto <code>public-ritual-reflect</code>, Phase B <code>src/lib/*</code> shims (subscription/auth), or companion feedback vote via analytics port.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -308,6 +308,8 @@ export {
   PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS,
   usePauseFeelShiftLogDedupeRefs,
   usePauseSessionDepthAndBriefCopy,
+  usePauseSessionPersistToStorage,
+  usePauseSessionRitualStorageSync,
 } from './public-ritual-reflect';
 export {
   usePauseSessionBreathStepHandlers,
@@ -394,8 +396,6 @@ export {
   type UsePauseSessionBriefToDeepParams,
 } from './presentation/session/use-pause-session-brief-to-deep';
 export { usePauseSessionDecideHandler } from './presentation/reflect/flows/use-pause-session-decide-handler';
-export { usePauseSessionPersistToStorage } from './presentation/reflect/scaffold/use-pause-session-persist-to-storage';
-export { usePauseSessionRitualStorageSync } from './presentation/reflect/scaffold/use-pause-session-ritual-storage-sync';
 export {
   usePauseSessionBreathNavigation,
   type UsePauseSessionBreathNavigationParams,
