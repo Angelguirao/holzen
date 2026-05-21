@@ -6692,6 +6692,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — companion orchestrate session via public-rpc (backlog #1 done, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -6724,6 +6725,21 @@
       <dd>None.</dd>
       <dt>Open questions</dt>
       <dd>Next: session storage I/O via port/facade from decide handler, or backlog #4 companion feedback vote read consolidation.</dd>
+=======
+      <span>Phase A slice — reflect generation hook-flow → domain (backlog #1 done)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate reflect-generation-hook-flow under domain/reflect/generation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Move pure prefetch/stale-run guards from <code>presentation/reflect/generation/</code> to <code>domain/reflect/generation/reflect-generation-hook-flow.ts</code>; <code>use-pause-reflect-generation</code> imports domain path. Reflect mood/hub presentation tests mock <code>public-rpc</code> only (no <code>application/ritual/feel/*</code> imports).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hub/mood tests no longer integration-test <code>PauseRepository.logStep</code>; use-case tests retain RPC coverage.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion orchestrate presentation imports still on <code>application/ritual/frame/*</code>, or backlog #4 stray <code>PauseRepository</code> call sites.</dd>
+>>>>>>> 57a0e087 (refactor(pause): colocate reflect-generation-hook-flow in domain)
     </dl>
   </article>
 

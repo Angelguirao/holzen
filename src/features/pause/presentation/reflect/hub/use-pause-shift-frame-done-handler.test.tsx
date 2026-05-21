@@ -2,32 +2,29 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
-import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-import { runShiftEmotionFrameHubDone as runShiftEmotionFrameHubDoneUseCase } from '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
-import { resolveShiftFrameHubDonePresentation } from '@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation';
 import { usePauseShiftFrameDoneHandler } from './use-pause-shift-frame-done-handler';
 
-const { logStepMock, mockRepository, showPauseStepSyncFailedToast } = vi.hoisted(() => {
-  const logStepMock = vi.fn();
+const { runShiftEmotionFrameHubDoneMock, showPauseStepSyncFailedToast } = vi.hoisted(() => ({
+  runShiftEmotionFrameHubDoneMock: vi.fn(),
+  showPauseStepSyncFailedToast: vi.fn(),
+}));
+
+vi.mock('@/features/pause/public-rpc', async () => {
+  const presentation = await vi.importActual<
+    typeof import('@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation')
+  >('@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation');
   return {
-    logStepMock,
-    mockRepository: { logStep: logStepMock } as unknown as PauseRepository,
-    showPauseStepSyncFailedToast: vi.fn(),
+    ...presentation,
+    runShiftEmotionFrameHubDone: runShiftEmotionFrameHubDoneMock,
+    showPauseStepSyncFailedToast,
   };
 });
-
-vi.mock('@/features/pause/public-rpc', () => ({
-  runShiftEmotionFrameHubDone: (input: Parameters<typeof runShiftEmotionFrameHubDoneUseCase>[1]) =>
-    runShiftEmotionFrameHubDoneUseCase(mockRepository, input),
-  resolveShiftFrameHubDonePresentation,
-  showPauseStepSyncFailedToast,
-}));
 
 const t = ((k: string) => k) as TFunction;
 
 beforeEach(() => {
-  logStepMock.mockReset();
-  logStepMock.mockResolvedValue(null);
+  runShiftEmotionFrameHubDoneMock.mockReset();
+  runShiftEmotionFrameHubDoneMock.mockResolvedValue({ status: 'advance', logKey: 'shift:1' });
   vi.mocked(showPauseStepSyncFailedToast).mockClear();
 });
 
@@ -50,19 +47,18 @@ describe('usePauseShiftFrameDoneHandler', () => {
     await act(async () => {
       await result.current.handleFrameImDone();
     });
-    expect(logStepMock).toHaveBeenCalledTimes(1);
-    expect(logStepMock.mock.calls[0][0].stepType).toBe('shift_emotion_logged');
+    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(1);
     await act(async () => {
       await result.current.handleFrameImDone();
     });
-    expect(logStepMock).toHaveBeenCalledTimes(1);
+    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(2);
     expect(goToStep).toHaveBeenLastCalledWith('breath2');
     expect(setFrameDone).toHaveBeenCalled();
     expect(setMoodAfterDone).toHaveBeenCalled();
   });
 
   it('does not advance when RPC fails', async () => {
-    logStepMock.mockRejectedValueOnce(new Error('network'));
+    runShiftEmotionFrameHubDoneMock.mockResolvedValueOnce({ status: 'sync_failed' });
     const lastShiftLogKeyRef: MutableRefObject<string | null> = { current: null };
     const setFrameDone = vi.fn();
     const setMoodAfterDone = vi.fn();
@@ -82,9 +78,11 @@ describe('usePauseShiftFrameDoneHandler', () => {
     });
     expect(setFrameDone).not.toHaveBeenCalled();
     expect(goToStep).not.toHaveBeenCalled();
+    expect(showPauseStepSyncFailedToast).toHaveBeenCalledWith(t);
   });
 
   it('advances without RPC when no pause instance id', async () => {
+    runShiftEmotionFrameHubDoneMock.mockResolvedValueOnce({ status: 'advance', logKey: 'shift:local' });
     const lastShiftLogKeyRef: MutableRefObject<string | null> = { current: null };
     const setFrameDone = vi.fn();
     const setMoodAfterDone = vi.fn();
@@ -102,7 +100,10 @@ describe('usePauseShiftFrameDoneHandler', () => {
     await act(async () => {
       await result.current.handleFrameImDone();
     });
-    expect(logStepMock).not.toHaveBeenCalled();
+    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledWith({
+      pauseInstanceId: null,
+      lastShiftLogKey: null,
+    });
     expect(goToStep).toHaveBeenCalledWith('breath2');
   });
 });
