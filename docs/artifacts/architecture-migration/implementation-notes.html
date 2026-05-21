@@ -6784,4 +6784,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion section expansion via public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel <code>use-companion-section-expansion</code> off application imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code> — no reflect folder moves this session. Continue backlog #3 (§6): re-export pure <code>nextExpandedWithLazyFetch</code> on <code>public-rpc</code>; <code>use-companion-section-expansion</code> imports the barrel only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; use-case module unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other companion presentation hooks still import <code>ritual/frame/*</code> application paths until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-slot-run-orchestrate</code> / section cluster imports to <code>public-rpc</code>, or backlog #4 stray mutation call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
