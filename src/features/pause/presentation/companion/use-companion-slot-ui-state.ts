@@ -7,7 +7,7 @@ import {
   type CompanionSlotCacheIds,
   type CompanionSlotCommitters,
   type CompanionSlotRelaxations,
-} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
+} from '@/features/pause/public-rpc';
 
 interface NudgeData {
   title: string;
