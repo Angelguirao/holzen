@@ -3,14 +3,17 @@ import { renderHook, act } from '@testing-library/react';
 import type { User } from '@supabase/supabase-js';
 import { useBulkHoldApplyOutcomes } from './use-bulk-hold-apply-outcomes';
 
-const applyBulkHoldOutcomesMock = vi.hoisted(() => vi.fn());
+const { applyBulkHoldOutcomesMock, mockPauseRepository } = vi.hoisted(() => ({
+  applyBulkHoldOutcomesMock: vi.fn(),
+  mockPauseRepository: { port: 'supabasePauseRepository' },
+}));
 
 vi.mock('@/features/pause/application/use-cases/home/bulk-hold/apply-bulk-hold-outcomes', () => ({
   applyBulkHoldOutcomes: applyBulkHoldOutcomesMock,
 }));
 
 vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
-  supabasePauseRepository: {},
+  supabasePauseRepository: mockPauseRepository,
 }));
 
 vi.mock('@/features/pause/public-queries', () => ({
@@ -56,7 +59,7 @@ describe('useBulkHoldApplyOutcomes', () => {
     });
 
     expect(applyBulkHoldOutcomesMock).toHaveBeenCalledWith(
-      expect.anything(),
+      mockPauseRepository,
       [row],
       expect.any(Function),
     );

@@ -5,12 +5,12 @@ import { usePauseBriefDoneCheckIn } from './use-pause-brief-done-check-in';
 
 const {
   runPostPauseEmotionLogIfDirtyMock,
-  mockPauseRepository,
   showPauseStepSyncFailedToast,
+  mockPauseRepository,
 } = vi.hoisted(() => ({
   runPostPauseEmotionLogIfDirtyMock: vi.fn(),
-  mockPauseRepository: { port: 'supabasePauseRepository' },
   showPauseStepSyncFailedToast: vi.fn(),
+  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/done/post-pause-emotion-log', () => ({
