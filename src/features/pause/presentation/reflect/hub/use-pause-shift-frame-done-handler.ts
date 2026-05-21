@@ -1,10 +1,9 @@
 import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
+import { runShiftEmotionFrameHubDone } from '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
 import { resolveShiftFrameHubDonePresentation } from '@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation';
-import {
-  logPauseShiftEmotionFrameHubDone,
-  showPauseStepSyncFailedToast,
-} from '@/features/pause/public-rpc';
+import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
+import { showPauseStepSyncFailedToast } from '@/features/pause/presentation/ritual/pause-step-sync-toast';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 
 /**
@@ -22,7 +21,7 @@ export function usePauseShiftFrameDoneHandler(input: {
 
   const handleFrameImDone = useCallback(async () => {
     const flow = resolveShiftFrameHubDonePresentation(
-      await logPauseShiftEmotionFrameHubDone({
+      await runShiftEmotionFrameHubDone(supabasePauseRepository, {
         pauseInstanceId,
         lastShiftLogKey: lastShiftLogKeyRef.current,
       }),

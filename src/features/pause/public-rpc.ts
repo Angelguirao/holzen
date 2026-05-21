@@ -131,16 +131,6 @@ import {
   type LogDevModeSettingInput,
 } from './application/use-cases/admin/run-log-dev-mode-setting';
 import { runFetchDevModeSetting } from './application/use-cases/admin/run-fetch-dev-mode-setting';
-import {
-  runInitialEmotionSelect,
-  runInitialEmotionSkip,
-  type RunInitialEmotionSelectResult,
-  type RunInitialEmotionSkipResult,
-} from './application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
-import {
-  runShiftEmotionFrameHubDone,
-  type RunShiftEmotionFrameHubDoneResult,
-} from './application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
 import type { RunReflectGenerationInput } from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
 import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
 import { showPauseStepSyncFailedToast } from './presentation/ritual/pause-step-sync-toast';
@@ -175,11 +165,6 @@ export {
 } from './application/use-cases/trigger/apply-manual-pause-open-result';
 export { buildManualPauseOpenParams } from './application/use-cases/trigger/build-manual-pause-open-params';
 
-export type {
-  RunInitialEmotionSelectResult,
-  RunInitialEmotionSkipResult,
-  RunShiftEmotionFrameHubDoneResult,
-};
 export type { RunReflectGenerationInput, ReflectGenerationResult };
 
 /** Lifecycle + ritual mutations — wired facades only; no generic `pauseLogStep` export. */
@@ -406,27 +391,6 @@ export function logPauseOutcome(params: {
   decision: string;
 }) {
   return runPauseOutcomeLog(supabasePauseRepository, params);
-}
-
-/** Feel step — `initial_emotion_logged` on mood select (wired for presentation). */
-export function logPauseInitialEmotionSelect(
-  input: Parameters<typeof runInitialEmotionSelect>[1],
-): Promise<RunInitialEmotionSelectResult> {
-  return runInitialEmotionSelect(supabasePauseRepository, input);
-}
-
-/** Feel step — `initial_emotion_logged` with `{ skipped: true }` (wired for presentation). */
-export function logPauseInitialEmotionSkip(
-  input: Parameters<typeof runInitialEmotionSkip>[1],
-): Promise<RunInitialEmotionSkipResult> {
-  return runInitialEmotionSkip(supabasePauseRepository, input);
-}
-
-/** Frame hub “I'm done” — deduped `shift_emotion_logged` (wired for presentation). */
-export function logPauseShiftEmotionFrameHubDone(
-  input: Parameters<typeof runShiftEmotionFrameHubDone>[1],
-): Promise<RunShiftEmotionFrameHubDoneResult> {
-  return runShiftEmotionFrameHubDone(supabasePauseRepository, input);
 }
 
 export { showPauseStepSyncFailedToast };

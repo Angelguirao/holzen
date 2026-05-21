@@ -7,26 +7,36 @@ import { usePauseShiftFrameDoneHandler } from './use-pause-shift-frame-done-hand
 
 const { logKey: SHIFT_LOG_KEY } = buildShiftEmotionFrameHubLogBundle();
 
-const { logPauseShiftEmotionFrameHubDoneMock, showPauseStepSyncFailedToast } = vi.hoisted(() => ({
-  logPauseShiftEmotionFrameHubDoneMock: vi.fn(),
+const { runShiftEmotionFrameHubDoneMock, showPauseStepSyncFailedToast } = vi.hoisted(() => ({
+  runShiftEmotionFrameHubDoneMock: vi.fn(),
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  logPauseShiftEmotionFrameHubDone: logPauseShiftEmotionFrameHubDoneMock,
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
+  () => ({
+    runShiftEmotionFrameHubDone: runShiftEmotionFrameHubDoneMock,
+  }),
+);
+
+vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+  supabasePauseRepository: {},
+}));
+
+vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
   showPauseStepSyncFailedToast,
 }));
 
 const t = ((k: string) => k) as TFunction;
 
 beforeEach(() => {
-  logPauseShiftEmotionFrameHubDoneMock.mockReset();
+  runShiftEmotionFrameHubDoneMock.mockReset();
   vi.mocked(showPauseStepSyncFailedToast).mockClear();
 });
 
 describe('usePauseShiftFrameDoneHandler', () => {
   it('logs shift_emotion_logged once when logKey unchanged on second Im done', async () => {
-    logPauseShiftEmotionFrameHubDoneMock.mockResolvedValue({
+    runShiftEmotionFrameHubDoneMock.mockResolvedValue({
       status: 'advance',
       logKey: SHIFT_LOG_KEY,
     });
@@ -48,18 +58,18 @@ describe('usePauseShiftFrameDoneHandler', () => {
     await act(async () => {
       await result.current.handleFrameImDone();
     });
-    expect(logPauseShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(1);
+    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(1);
     await act(async () => {
       await result.current.handleFrameImDone();
     });
-    expect(logPauseShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(2);
+    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(2);
     expect(goToStep).toHaveBeenLastCalledWith('breath2');
     expect(setFrameDone).toHaveBeenCalled();
     expect(setMoodAfterDone).toHaveBeenCalled();
   });
 
   it('does not advance when RPC fails', async () => {
-    logPauseShiftEmotionFrameHubDoneMock.mockResolvedValue({ status: 'sync_failed' });
+    runShiftEmotionFrameHubDoneMock.mockResolvedValue({ status: 'sync_failed' });
 
     const lastShiftLogKeyRef: MutableRefObject<string | null> = { current: null };
     const setFrameDone = vi.fn();
@@ -84,7 +94,7 @@ describe('usePauseShiftFrameDoneHandler', () => {
   });
 
   it('advances without RPC when no pause instance id', async () => {
-    logPauseShiftEmotionFrameHubDoneMock.mockResolvedValue({
+    runShiftEmotionFrameHubDoneMock.mockResolvedValue({
       status: 'advance',
       logKey: SHIFT_LOG_KEY,
     });
@@ -106,7 +116,7 @@ describe('usePauseShiftFrameDoneHandler', () => {
     await act(async () => {
       await result.current.handleFrameImDone();
     });
-    expect(logPauseShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(1);
+    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(1);
     expect(goToStep).toHaveBeenCalledWith('breath2');
   });
 });

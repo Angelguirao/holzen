@@ -11186,9 +11186,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior unchanged.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Mood/frame hub ritual log facades (<code>logPauseInitialEmotion*</code>, <code>logPauseShiftEmotionFrameHubDone</code>) still on <code>public-rpc</code>.</dd>
+      <dd>Mood/frame hub ritual log facades (<code>logPauseInitialEmotion*</code>, <code>logPauseShiftEmotionFrameHubDone</code>) still on <code>public-rpc</code> until frame-hub peel.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: peel shift-frame hub done handler off <code>public-rpc</code>; audit remaining presentation imports of ritual log facades.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect frame-hub shift hook off public-rpc (backlog #1 verified, backlog #4 / §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>shift_emotion_logged: presentation → ritual/reflect/hub + PauseRepository</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move. Continue backlog #4 / §6 slim <code>public-rpc</code>: <code>use-pause-shift-frame-done-handler</code> imports <code>runShiftEmotionFrameHubDone</code> with <code>supabasePauseRepository</code> and step-sync toast from <code>presentation/ritual/</code> (same pattern as initial-emotion mood + reflect step hooks). Removed <code>logPauseShiftEmotionFrameHubDone</code> and unused <code>logPauseInitialEmotion*</code> facades from <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Holzen-reflect generation and artifact reads already off <code>public-rpc</code> on this branch.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: presentation <code>PauseRepository</code> audit for stray writes; peel remaining ritual log facades on <code>public-rpc</code> where hooks are sole consumers.</dd>
     </dl>
   </article>
 
