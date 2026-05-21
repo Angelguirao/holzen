@@ -1,7 +1,7 @@
 import { bucketChangePercent, computeContextFingerprint } from '@/features/pause/domain/pause-fingerprint';
 import { pauseCreateSkippedUserMessage } from '@/features/pause/application/use-cases/trigger/pause-create-skipped-user-message';
 import { runPauseCreateOrReuse } from '@/features/pause/application/use-cases/session/run-pause-create-or-reuse';
-import { reflectionPersistErrorMessage } from '@/features/pause/domain/pause-persist-error';
+import { runPersistSilentReflectionStub } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-persist-silent-reflection-stub';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 const VOLATILITY_TEMPLATE = 'volatility_v1';
@@ -109,17 +109,16 @@ export async function openManualPauseFromHome(
     const pendingOffer = res.pending_offer === true;
 
     if (params.silentMode) {
-      try {
-        await ports.reflect.persistReflectionArtifacts({
-          pauseInstanceId: res.instance_id,
-          userId: params.userId,
-          context: params.contextText,
-          message: params.silentMessage,
-        });
-      } catch (e: unknown) {
+      const persistResult = await runPersistSilentReflectionStub(ports.reflect, {
+        pauseInstanceId: res.instance_id,
+        userId: params.userId,
+        context: params.contextText,
+        message: params.silentMessage,
+      });
+      if (persistResult.outcome === 'error') {
         return {
           outcome: 'error',
-          userMessage: reflectionPersistErrorMessage(e),
+          userMessage: persistResult.userMessage,
           isNetwork: false,
         };
       }
