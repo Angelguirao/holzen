@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { BulkHoldPendingPause } from '../domain/bulk-hold';
+import type { BulkHoldPendingPause } from '../../domain/bulk-hold';
 import {
   bulkHoldPendingQueryKey,
   getBulkHoldPendingQueryOptions,
-} from '../public-queries';
+} from '../../public-queries';
 
 export type { BulkHoldPendingPause };
 export { bulkHoldPendingQueryKey };
