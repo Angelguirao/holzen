@@ -17269,4 +17269,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect steps + flows I/O import repair (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-io</code> + <code>pause-reflect-flows-io</code> cluster imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Complete orphan-flow removal: <code>pause-reflect-steps-io</code> imports four <code>run-pause-*</code> step use cases directly (domain gates unchanged). <code>pause-reflect-flows-io</code> imports reflect-and-decide preflight/post-generation through <code>application/use-cases/ritual/reflect/flows/pause-session-reflect-and-decide-flow</code> instead of deep <code>domain/reflect/flows/</code>; decide outcome RPC/toasts still from <code>ritual/decide/*</code> until a decide flow anchor peel.</dd>
+      <dt>Deviation</dt>
+      <dd>Prior commit deleted step flow anchors before presentation I/O was repointed — repaired in this slice (behavior parity).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No new application re-export anchors in <code>ritual/reflect/steps/</code>; steps cluster stays <code>run-*</code> + presentation I/O only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-decide-flow</code> on decide portions of flows I/O, share I/O via <code>pause-reflection-share-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
