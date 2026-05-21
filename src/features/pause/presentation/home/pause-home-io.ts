@@ -1,15 +1,19 @@
-import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-import { pauseDismissCurrent } from '@/features/pause/public-rpc';
+/**
+ * Home presentation aggregate barrel (manual-open reflect cluster + telemetry + dismiss).
+ * Conductors import `pause-home-reflect-io` / `pause-home-reflect-telemetry-io` directly when possible.
+ */
 export {
   applyManualPauseOpenResult,
-  dismissOpenPauseHome,
-  pauseHomeManualOpenPorts,
   buildManualPauseCreateOrReuseParams,
   buildManualPauseMarketContext,
   buildManualPauseOpenParams,
+  dismissOpenPauseHome,
   mapManualTriggerStartError,
   MANUAL_PAUSE_VOLATILITY_TEMPLATE,
   openManualPauseFromHome,
+  pauseDismissOpenPauseHomePreview,
+  pauseDismissOpenPauseHomePreviewWithRepository,
+  pauseHomeManualOpenPorts,
   shouldNavigateAfterManualTrigger,
   type ApplyManualPauseOpenResultInput,
   type BuildManualPauseOpenParamsInput,
@@ -33,28 +37,3 @@ export {
   type OpenPauseStateForAnalytics,
   type PauseDismissAnalyticsSurface,
 } from './pause-home-reflect-telemetry-io';
-
-/** Default facade: clear Home preview and dismiss current pause instance. */
-export async function pauseDismissOpenPauseHomePreview(ports: {
-  hasUser: boolean;
-  clearPreview: () => void;
-}): Promise<void> {
-  ports.clearPreview();
-  if (!ports.hasUser) return;
-  try {
-    await pauseDismissCurrent();
-  } catch {
-    /* non-fatal — preview already cleared locally */
-  }
-}
-
-/** Test seam: inject a custom `PauseRepository` for Home dismiss. */
-export function pauseDismissOpenPauseHomePreviewWithRepository(
-  repository: PauseRepository,
-  ports: { hasUser: boolean; clearPreview: () => void },
-): ReturnType<typeof dismissOpenPauseHome> {
-  return dismissOpenPauseHome(ports.hasUser, {
-    clearPreview: ports.clearPreview,
-    repository,
-  });
-}

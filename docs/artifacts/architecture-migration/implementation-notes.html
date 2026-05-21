@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A — Home preview dismiss on reflect I/O (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pauseDismissOpenPauseHomePreview</code> on <code>pause-home-reflect-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Follow-up to <code>pauseHomeManualOpenPorts</code> on reflect I/O: move <code>pauseDismissOpenPauseHomePreview</code> off aggregate <code>pause-home-io</code>; <code>use-open-pause-home-preview</code> imports reflect cluster directly. <code>pause-home-io.ts</code> is re-exports only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Aggregate barrel and <code>pause-home-io.test.ts</code> still smoke-test re-exports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-holzen-manual-trigger-orchestration</code> cooldown through <code>public-trigger</code> Tier 1 shim, or Phase B pricing lib shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — holzen-reflect generation hook-flow colocation (backlog #1, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
