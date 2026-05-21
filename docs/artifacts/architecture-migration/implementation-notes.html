@@ -10071,4 +10071,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — step bundles on public-session (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; peel step-handler bundle builders</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — 14 modules under <code>ritual/reflect/</code>, zero <code>application/use-cases/reflect/</code>. Export <code>buildPauseSessionStepShellBundle</code> and <code>buildPauseSessionStepRitualBundle</code> on <code>public-session.ts</code>; <code>use-pause-session-step-handlers</code> imports the barrel (composes with terminal-entry peel on same barrel).</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §6 session barrel peel; no behavior change.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Also export <code>TERMINAL_PAUSE_DB_STATES</code> for tests; scaffold-derived and storage-ritual-sync remain on direct application imports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #3: <code>scaffold-ritual-derived</code> / <code>storage-ritual-sync</code> on <code>public-session</code>; backlog #4: audit remaining presentation imports of ritual log use cases outside <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

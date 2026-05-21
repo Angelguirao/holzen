@@ -55,4 +55,5 @@ export {
 export {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
+  TERMINAL_PAUSE_DB_STATES,
 } from './application/use-cases/session/terminal-entry-guard';
