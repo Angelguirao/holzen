@@ -16,10 +16,12 @@ import {
   useCompletedPauseCount,
   useDismissOutletPauseReady,
   useHomePauseActions,
-  usePauseArrivalAudio,
   usePauseContextHomePreviews,
-  useZenModeHomeRouteProps,
 } from '@/features/pause/public-hooks';
+import {
+  usePauseArrivalAudio,
+  useZenModeHomeRouteProps,
+} from '@/features/pause/public-home';
 import { useMarketDisplayPreferences } from '@/features/market/public-hooks';
 import { useState } from 'react';
 import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
