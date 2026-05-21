@@ -1,15 +1,15 @@
 /**
  * Reflect share presentation I/O — plain-text/channel builders (domain) + PNG orchestration (application).
- * Presentation imports here instead of application CI cluster anchors.
+ * Imports through `pause-reflect-share-flow` (parity with hub/steps presentation I/O anchors).
  */
-import type { DeliverReflectionShareImageDeps } from '@/features/pause/application/use-cases/ritual/reflect/share/deliver-reflection-share-image';
-import { runReflectionShareImage } from '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image';
-import { buildReflectionShareText } from '@/features/pause/domain/reflect/share/reflection-share-text';
 import {
   buildReflectionShareTelegramUrl,
+  buildReflectionShareText,
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
-} from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';
+  runReflectionShareImage,
+  type DeliverReflectionShareImageDeps,
+} from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow';
 
 export {
   buildReflectionShareTelegramUrl,
