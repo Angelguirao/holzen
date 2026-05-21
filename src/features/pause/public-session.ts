@@ -4,13 +4,6 @@
  */
 export { pauseStepLayout } from './presentation/session/pause-step-layout';
 export {
-  computePauseHeaderBackIntent,
-  isPauseSessionHeaderBackVisible,
-  type PauseHeaderBackIntent,
-  type PauseHeaderBackIntentInput,
-  type PauseSessionHeaderBackInput,
-} from './application/use-cases/session/header-back';
-export {
   buildPauseSessionStepTransitionConfig,
   PAUSE_SESSION_STEP_SLIDE_OFFSET_PX,
   PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S,

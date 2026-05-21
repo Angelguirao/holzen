@@ -20,7 +20,7 @@ Authoritative orchestration: [`PauseSessionScreen.tsx`](../../src/screens/pause/
 | Brief ritual beats (Framer transitions)      | `[PauseSessionBriefRitualBody.tsx](../../src/screens/pause/components/PauseSessionBriefRitualBody.tsx)`   |
 | Deep ritual beats                            | `[PauseSessionDeepRitualBody.tsx](../../src/screens/pause/components/PauseSessionDeepRitualBody.tsx)`     |
 | Brief macro stepper (read-only)              | `[PauseBriefProgress.tsx](../../src/screens/pause/components/PauseBriefProgress.tsx)`                     |
-| Header back visibility (pure)                | `[header-back.ts](../../src/features/pause/application/use-cases/session/header-back.ts)` (`isPauseSessionHeaderBackVisible` via `public`) |
+| Header back visibility (pure)                | `[header-back.ts](../../src/features/pause/application/use-cases/session/header-back.ts)` — session breath navigation imports directly (May 2026) |
 | Scaffold chrome registry (route JSX)         | `[pause-scaffold-chrome-registry.tsx](../../src/screens/pause/components/pause-scaffold-chrome-registry.tsx)` |
 
 
