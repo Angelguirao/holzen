@@ -6020,7 +6020,26 @@
       <dt>Tradeoffs</dt>
       <dd>Fullview telemetry, home triggers, and companion orchestrate hooks still import <code>public-rpc</code> until peeled slice-by-slice.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>use-fullview-telemetry</code> analytics writes or home <code>openManualPauseFromHome</code> / pending-offer presentation imports.</dd>
+      <dd>Next: peel home open-pause dismiss or <code>use-fullview-telemetry</code> analytics writes.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home open-pause dismiss via PauseRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; peel dismissOpenPauseHomePreview from public-rpc in presentation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> folder migration is complete — no move this slice. <code>use-open-pause-home-preview</code> calls <code>dismissOpenPauseHome</code> with <code>runPauseDismissCurrent(supabasePauseRepository)</code> from <code>public-ports.ts</code>; <code>dismissOpenPauseHomePreview</code> on <code>public-rpc</code> unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity (clear preview then dismiss RPC).</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-manual-pause-trigger</code> and <code>use-bulk-hold-apply-outcomes</code> still import <code>public-rpc</code> facades.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel home manual trigger / bulk-hold from <code>public-rpc</code>, or <code>use-fullview-telemetry</code> analytics writes.</dd>
     </dl>
   </article>
 
