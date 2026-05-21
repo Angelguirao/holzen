@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
-import { logPauseReflectNote } from '@/features/pause/public-rpc';
+import { runPauseReflectNoteUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
+import { supabasePauseRepository } from '@/features/pause/public-ports';
 import {
   getLatestPauseReflectNoteQueryOptions,
   PAUSE_REFLECT_STEP_NOTE,
@@ -26,7 +27,7 @@ export function usePauseReflectNote(pauseInstanceId: string) {
     async (next: string) => {
       setSaving(true);
       try {
-        const outcome = await logPauseReflectNote({
+        const outcome = await runPauseReflectNoteUpdate(supabasePauseRepository, {
           pauseInstanceId,
           text: next,
         });
