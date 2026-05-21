@@ -10090,4 +10090,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — scaffold + storage ritual sync on public-session (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; peel scaffold-derived + storage sync onto session barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — 14 modules under <code>ritual/reflect/</code>, zero <code>application/use-cases/reflect/</code>. Export <code>buildPauseSessionScaffoldRitualDerived</code> and <code>computePauseStorageRitualSyncPatch</code> on <code>public-session.ts</code>; scaffold + ritual-storage presentation hooks import the barrel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — brief/deep ritual restore patch rules unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-holzen-providers-slice</code> and <code>step-map</code> remain on direct application imports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: wire any remaining breath/outcome logs only via <code>public-rpc</code>; optional providers-slice peel on <code>public-session</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
