@@ -11,7 +11,7 @@ import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
 } from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
-import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
+import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-log-flow';
 import { getSessionQuote } from '@/features/pause/domain/decide/session-wisdom-quotes';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';

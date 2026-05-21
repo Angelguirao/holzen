@@ -16306,6 +16306,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — reflect hub I/O via shift-frame hub flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -16319,6 +16320,21 @@
       <dd><code>runShiftEmotionFrameHubDone</code> still imported from application on hub I/O; flows/generation I/O peel incrementally.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel reflect flows I/O decide helpers through ritual/decide anchors, or Phase B cross-context Tier 1 shim.</dd>
+=======
+      <span>Phase A slice — reflect flows decide I/O through domain + log anchor (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-io</code> + <code>pause-decide-outcome-log-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Decide flow + session quotes were already on <code>domain/decide/</code> in <code>pause-reflect-flows-io</code>. Add <code>pause-decide-outcome-log-flow</code> anchor so outcome_logged RPC binds through the decide cluster anchor instead of deep <code>run-pause-outcome-log</code>; bound <code>pauseReflectOutcomeLog</code> facades unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; Sonner toasts still bind <code>outcome-toast</code> on the I/O module.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Application <code>pause-decide-outcome-flow.ts</code> CI anchor remains for non-presentation application imports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: second-label + restored-breath anchors on breath I/O, or Phase B cross-context Tier 1 shim.</dd>
+>>>>>>> 7e4cdfd4 (refactor(pause): route reflect flows outcome log through decide anchor)
     </dl>
   </article>
 
