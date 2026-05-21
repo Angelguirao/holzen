@@ -10052,4 +10052,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — terminal-entry guard on public-session (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; terminal redirect predicates on session barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — no reflect moves. Export <code>isTerminalPauseDbState</code> and <code>persistedPauseSessionAllowsTerminalEntry</code> on <code>public-session.ts</code>; <code>use-pause-session-terminal-entry-redirect</code> imports the barrel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — terminal DB set and local-storage allowance rules unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Scaffold-derived, ritual-storage sync, and providers slice remain on direct <code>application/use-cases/session/*</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next #3: <code>scaffold-ritual-derived</code> / <code>storage-ritual-sync</code> on <code>public-session</code>; backlog #4: breath segment test mocks → <code>public-rpc</code> only.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
