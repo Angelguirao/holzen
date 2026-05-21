@@ -38,25 +38,27 @@ export {
   type DoneWallpaperMoodInput,
 } from './application/use-cases/ritual/done/resolve-done-wallpaper-mood';
 export type { BriefPauseStep, RitualDepth } from './domain/ritual-types';
-export type { CompanionData, CompanionPrefs } from './domain/companion-card-types';
-export type { CachedHistoricalInsightShape } from './domain/historical-insight';
-export type {
-  InterventionState,
-  RegenerateCompanionSlot,
-} from './domain/companion-orchestrate';
-export type { CompanionFeedbackVote } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
-export type {
-  CompanionSlotCacheIds,
-  CompanionSlotRelaxations,
-} from './application/use-cases/ritual/frame/orchestrate-slot-apply';
 export {
   companionSectionProFavoriteProps,
-  type CompanionSectionProFavoriteProps,
-} from './application/use-cases/ritual/frame/companion-section-pro-favorite';
-export {
+  estimateReadTime,
+  formatCompanionHistoryRelativeDay,
   resolveCompanionRegenerateClick,
+  zoomOutTotalCharsForReadTime,
+  type CachedHistoricalInsightShape,
+  type CompanionData,
+  type CompanionFeedbackVote,
+  type CompanionPrefs,
   type CompanionRegenerateClickResult,
-} from './application/use-cases/ritual/frame/companion-feedback-regenerate';
+  type CompanionSectionProFavoriteProps,
+  type CompanionSlotCacheIds,
+  type CompanionSlotRelaxations,
+  type EchoUserWord,
+  type InterventionState,
+  type RegenerateCompanionSlot,
+  type ZoomOutData,
+  type ZoomOutEchoData,
+  type ZoomOutOnThisDayEntry,
+} from './public-ritual-frame';
 export {
   BRIEF_PAUSE_ORDER,
   computeBriefMacroProgressPosition,
@@ -131,15 +133,6 @@ export {
   PAUSE_FEEL_INTENSITY_KEYS,
   type PauseFeelIntensityKey,
 } from './domain/pause-feel-intensity';
-export { estimateReadTime } from './application/use-cases/ritual/frame/estimate-read-time';
-export { formatCompanionHistoryRelativeDay } from './application/use-cases/ritual/frame/format-companion-history-relative-day';
-export { zoomOutTotalCharsForReadTime } from './application/use-cases/ritual/frame/zoom-out-payload';
-export type {
-  EchoUserWord,
-  ZoomOutData,
-  ZoomOutEchoData,
-  ZoomOutOnThisDayEntry,
-} from './domain/zoom-out-display';
 export {
   computeBreathingPhaseAdvance,
   resumePauseAudioContext,

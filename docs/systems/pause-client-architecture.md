@@ -193,6 +193,7 @@ Shared reads live in `infrastructure/queries/`, exported via **`public-queries`*
 | `public-session.ts` | Tab session I/O only — `loadSession`/`saveSession`/`clearSession` via `infrastructure/session/persisted-session-storage` + `PersistedSessionAnchor` type; no Supabase. **Layout** (`pauseStepLayout`) on `public-hooks` for screens; breath helpers on `public-ritual-breathe.ts`; gate predicates and persisted guards import from `domain/*` / `presentation/*` directly (May 2026 peels) |
 | `public-ritual-brief.ts` | Brief ritual pure helpers (integrate timer, `computePauseGoBackPlan`, `computeBriefPastStepClick`, `briefSwitchToDeepPauseState`) — no Supabase |
 | `public-ritual-reflect.ts` | Reflect ritual beat — mood/feel constants, reflect/decide flow hooks (`usePauseSessionReflectAndDecide`, `usePauseSessionDecideHandler`, scaffold persist/sync), share handlers — screens import here instead of `public-hooks` for reflect UI |
+| `public-ritual-frame.ts` | Frame / companion pure exports (slot types, zoom-out payload types, read-time, regenerate/favorite helpers) — cluster 1 peeled May 2026; orchestration hooks still on `public-hooks` until next slice |
 | `public-ritual-done.ts` | Post-pause done step — `usePauseBriefDoneCheckIn`, `resolveDoneWallpaperMood` (RPC-backed hook; keep off `public-session` so pure session imports stay Supabase-free) |
 | `public-trigger.ts` | Manual-trigger cooldown math, localStorage keys, error mapping — no Supabase |
 | `public-queries.ts` | `get*QueryOptions` factories |

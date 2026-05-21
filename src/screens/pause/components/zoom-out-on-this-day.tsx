@@ -1,5 +1,5 @@
 import { TrendingDown, TrendingUp, CloudOff } from 'lucide-react';
-import type { ZoomOutData } from '@/features/pause/public-hooks';
+import type { ZoomOutData } from '@/features/pause/public-ritual-frame';
 
 export type ZoomOutOnThisDayProps = {
   currentPrice: number;
