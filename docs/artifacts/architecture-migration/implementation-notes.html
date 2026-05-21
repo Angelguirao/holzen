@@ -8351,13 +8351,13 @@
     <h3>Peel use-archive-pause-retrospective-outcome off public-ports</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. <code>use-archive-pause-retrospective-outcome</code> calls <code>logRetrospectiveOutcome</code> on <code>public-rpc</code> (wired <code>PauseRepository</code>) instead of the use case + <code>supabasePauseRepository</code> from <code>public-ports</code>; PostHog telemetry stays on the application import (no repository I/O).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code> — no legacy reflect paths under <code>src/</code>. <code>use-archive-pause-retrospective-outcome</code> calls <code>logRetrospectiveOutcome</code> on <code>public-rpc</code> (wired <code>PauseRepository</code>) instead of the use case + <code>supabasePauseRepository</code> from <code>public-ports</code>; PostHog telemetry stays on the application import (no repository I/O). Unit test mocks the facade directly (same pattern as reflect step hooks).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import surface only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Home bulk-hold and open-pause preview dismiss still inject <code>public-ports</code> until peeled.</dd>
+      <dd>Home bulk-hold, open-pause preview dismiss, companion orchestration, and fullview telemetry still inject <code>public-ports</code> until peeled.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>use-bulk-hold-apply-outcomes</code> → <code>applyBulkHoldOutcomes</code>, or home open-pause dismiss → <code>dismissOpenPauseHomePreview</code>.</dd>
+      <dd>Next: <code>use-bulk-hold-apply-outcomes</code> → <code>applyBulkHoldOutcomes</code>, or home open-pause dismiss → <code>pauseDismissCurrent</code> via <code>dismissOpenPauseHome</code> on <code>public-rpc</code>.</dd>
     </dl>
   </article>
 
