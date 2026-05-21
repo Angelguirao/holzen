@@ -4659,7 +4659,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
       <span>Phase A slice — reflect PostHog UI telemetry in presentation/reflect/telemetry (Tier 4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -4673,7 +4672,12 @@
       <dd>Reflect UI analytics stays presentation-local (like favorite pro-hint toast); application layer keeps I/O use cases only.</dd>
       <dt>Open questions</dt>
       <dd>Next: wire remaining mutations bypassing <code>PauseRepository</code> (backlog #4), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
-=======
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — peel generic pauseLogStep facades from public-rpc (backlog #3 §6)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -4687,7 +4691,6 @@
       <dd>Tests or scripts that imported generic RPC names from <code>public-rpc</code> must use wired facades or <code>supabasePauseRepository</code> in feature tests.</dd>
       <dt>Open questions</dt>
       <dd>Next: wire any remaining mutations bypassing <code>PauseRepository</code>, or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
->>>>>>> 85003f6a (refactor(pause): peel unused generic RPC exports from public-rpc)
     </dl>
   </article>
 
