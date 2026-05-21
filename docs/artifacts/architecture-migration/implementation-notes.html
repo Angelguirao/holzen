@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood I/O pure helpers from domain (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-io</code> imports mood chrome, depth-picker, feel-tile, and Feel-step UI helpers from <code>domain/reflect/mood/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder move remains complete. Presentation mood I/O imports pure helpers directly from <code>domain/reflect/mood/</code> instead of application CI anchor re-exports (<code>pause-*-mood-flow.ts</code>). <code>runInitialEmotionSelect</code> / <code>runInitialEmotionSkip</code> RPC use cases stay on application paths inside the same I/O module.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; thin application anchors under <code>application/use-cases/ritual/reflect/mood/</code> remain for <code>check:architecture-alignment</code> and non-presentation imports.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Smallest follow-up to the flows decide peel — no file moves, import-path alignment only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion <code>load-companion-orchestrate-session</code> through orchestration-io, or reflect share/steps/hub I/O domain import alignment where anchors still sit on application paths.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect flows I/O decide pure helpers from domain (backlog #1 follow-up)</span>
       <span class="status resolved">resolved</span>
     </header>
