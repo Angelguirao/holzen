@@ -13,21 +13,10 @@ import {
 import { resolveEffectiveReflectionCopy } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
 import { runReflectGeneration } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation';
 import { supabaseReflectGenerator } from '@/features/pause/infrastructure/supabase-reflect-generator';
+import type { UsePauseReflectGenerationParams } from './use-pause-reflect-generation-types';
 import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-text';
 
-export type UsePauseReflectGenerationParams = {
-  pauseInstanceId: string | null;
-  context: string | null;
-  /** Hydrated / nav seed — when non-empty, used as-is and skips edge `holzen-reflect`. */
-  initialReflectionMessage: string;
-  severityAbsPct: number;
-  /**
-   * When false, aborts in-flight work and idles. For `/pause` deep ritual, `PauseSession` passes
-   * true on Reflect, Frame, second Breathe, and Decide so `holzen-reflect` can finish after the
-   * Reflect card (see `docs/systems/pause-system.md` §7.1, Reflection + haiku (deep)).
-   */
-  enabled: boolean;
-};
+export type { UsePauseReflectGenerationParams } from './use-pause-reflect-generation-types';
 
 export function usePauseReflectGeneration({
   pauseInstanceId,

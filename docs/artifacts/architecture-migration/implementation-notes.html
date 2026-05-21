@@ -12446,4 +12446,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation hook params (backlog #1 follow-up, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-reflect-generation-types</code> beside holzen-reflect presentation hook</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) complete. Colocate <code>UsePauseReflectGenerationParams</code> beside <code>use-pause-reflect-generation</code> (mirrors share + reflect/decide type modules). <code>public-ritual-reflect</code> re-exports params from <code>*-types.ts</code> files, not hook modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Types-only slice; <code>public-hooks</code> paths unchanged (still via <code>public-ritual-reflect</code>).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate artifact haiku/reflection-text hook param unions, backlog #4 analytics port reads, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

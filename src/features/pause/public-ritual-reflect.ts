@@ -23,10 +23,8 @@ export {
 } from './domain/reflect/generation/resolve-pause-reflect-message-view';
 export { buildReflectionShareText } from './domain/reflect/share/reflection-share-text';
 
-export {
-  usePauseReflectGeneration,
-  type UsePauseReflectGenerationParams,
-} from './presentation/reflect/generation/use-pause-reflect-generation';
+export { usePauseReflectGeneration } from './presentation/reflect/generation/use-pause-reflect-generation';
+export type { UsePauseReflectGenerationParams } from './presentation/reflect/generation/use-pause-reflect-generation-types';
 export {
   usePauseArtifactHaiku,
   type PauseArtifactHaikuFetchPhase,
@@ -39,10 +37,8 @@ export {
   type UsePauseArtifactReflectionTextParams,
   type UsePauseArtifactReflectionTextResult,
 } from './presentation/reflect/generation/use-pause-artifact-reflection-text';
-export {
-  useReflectionShareHandlers,
-  type UseReflectionShareHandlersParams,
-} from './presentation/reflect/share/use-reflection-share-handlers';
+export { useReflectionShareHandlers } from './presentation/reflect/share/use-reflection-share-handlers';
+export type { UseReflectionShareHandlersParams } from './presentation/reflect/share/reflection-share-handler-types';
 export { usePauseReflectionStepLog } from './presentation/reflect/steps/use-pause-reflection-step-log';
 export { usePauseReflectUiTelemetry } from './presentation/reflect/telemetry/use-pause-reflect-ui-telemetry';
 export { usePauseReflectTags } from './presentation/reflect/steps/use-pause-reflect-tags';
