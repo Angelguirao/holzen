@@ -17,7 +17,7 @@ import {
   getCurrentPauseQueryOptions,
   type CurrentPauseRow,
 } from '../public-queries';
-import { usePauseInstancesRealtime } from './use-pause-instances-realtime';
+import { usePauseInstancesRealtime } from './realtime/use-pause-instances-realtime';
 
 export type { CurrentPauseRow };
 export { currentPauseQueryKey };

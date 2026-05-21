@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { subscribePauseInstancesForUser } from '../infrastructure/realtime/pause-instances-realtime';
+import { subscribePauseInstancesForUser } from '@/features/pause/infrastructure/realtime/pause-instances-realtime';
 
 /**
  * Invalidate or resync when `pause_instances` changes (cron offers, complete, dismiss).

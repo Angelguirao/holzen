@@ -5,7 +5,7 @@ import type { CompanionData } from '@/features/pause/domain/companion-card-types
 import { dismissOpenPauseHomePreview } from '@/features/pause/public-rpc';
 import { fetchOpenPauseHomePreview } from '../../public-queries';
 import { DEFAULT_COMPANIONS } from '../../domain/session-model';
-import { usePauseInstancesRealtime } from '../use-pause-instances-realtime';
+import { usePauseInstancesRealtime } from '../realtime/use-pause-instances-realtime';
 
 /**
  * Home open-pause preview from `v_pause_current` + reflection/companion artifacts.

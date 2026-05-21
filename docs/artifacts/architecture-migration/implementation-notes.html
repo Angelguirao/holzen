@@ -3535,6 +3535,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate pause instances realtime hook under presentation/realtime/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Tier 4 cross-route realtime conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Move <code>use-pause-instances-realtime</code> beside <code>infrastructure/realtime/</code> adapter under <code>presentation/realtime/</code>; home preview, pending-offer, and <code>use-current-pause</code> import sibling paths — not exported on <code>public-hooks</code> (internal conductor only).</dd>
+      <dt>Deviation</dt>
+      <dd>None — mirrors infrastructure realtime folder naming.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Bulk-hold and breathing-timed-loop hooks remain flat under <code>presentation/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-pause-session-reflect-and-decide</code> under <code>presentation/reflect/flows/</code>, or port PWA install analytics through <code>PauseAnalyticsRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
