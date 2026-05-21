@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect steps I/O direct run-* + domain gates (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-io</code> imports <code>run-*</code> modules and domain step gates directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. <code>pause-reflect-steps-io</code> imports <code>shouldShowFavoriteProHint</code> and <code>shouldLogPauseReflectionStep</code> from <code>domain/reflect/steps/</code>; RPC use cases from sibling <code>run-pause-*</code> modules instead of <code>pause-reflect-steps-mutation-flow</code> barrel. Application flow anchors unchanged for <code>check:architecture-alignment</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mirrors share/hub/generation I/O peels; <code>pause-reflect-generation-io</code> still imports <code>pause-reflect-generation-run-flow</code> anchor until a follow-up slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: generation I/O import <code>run-reflect-generation</code> directly, or companion orchestration-io for <code>load-companion-orchestrate-session</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — home reflect telemetry through telemetry flow anchor</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -88,9 +107,9 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Mirrors hub/generation I/O peels; steps I/O still imports <code>pause-reflect-steps-mutation-flow</code> barrel until a follow-up slice.</dd>
+      <dd>Mirrors hub/generation I/O peels; steps I/O follow-up landed in a later slice (direct <code>run-*</code> + domain gates).</dd>
       <dt>Open questions</dt>
-      <dd>Next: steps I/O import <code>run-*</code> modules directly, or mood/hub RPC-only paths unchanged.</dd>
+      <dd>Next: generation I/O import <code>run-reflect-generation</code> directly, or companion orchestration-io.</dd>
     </dl>
   </article>
 

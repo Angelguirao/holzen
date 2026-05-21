@@ -10,9 +10,15 @@ const runPauseReflectionStepLogOnceMock = vi.hoisted(() => vi.fn());
 const runPauseFavoriteToggleMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-mutation-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log',
   () => ({
     runPauseReflectionStepLogOnce: runPauseReflectionStepLogOnceMock,
+  }),
+);
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle',
+  () => ({
     runPauseFavoriteToggle: runPauseFavoriteToggleMock,
   }),
 );
@@ -23,12 +29,12 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 describe('pause-reflect-steps-io', () => {
-  it('re-exports favorite pro-hint gate from application steps flow anchor', () => {
+  it('re-exports favorite pro-hint gate from domain reflect steps', () => {
     expect(shouldShowFavoriteProHint(true, false)).toBe(true);
     expect(shouldShowFavoriteProHint(true, true)).toBe(false);
   });
 
-  it('re-exports reflection_step gate from application steps flow anchor', () => {
+  it('re-exports reflection_step gate from domain reflect steps', () => {
     expect(
       shouldLogPauseReflectionStep({
         pauseInstanceId: 'pi-1',
