@@ -13757,4 +13757,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — bind session pending-offer RPC I/O (ritual/reflect verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Session — adopt/decline pending pause offer off public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>presentation/session/pause-session-pending-offer-io.ts</code> as the bound import for <code>runAdoptPendingPauseOffer</code> / <code>runDeclinePendingPauseOffer</code>; <code>use-pending-pause-offer-mutations</code> imports the I/O module instead of <code>public-rpc</code> (mirrors <code>pause-ritual-done-io.ts</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving wiring only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Home manual trigger, open-pause dismiss, bulk-hold apply, and archive retrospective still import <code>public-rpc</code> directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>presentation/home/pause-home-io.ts</code> for manual trigger + bulk-hold, or <code>public-ritual-frame</code> barrel peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
