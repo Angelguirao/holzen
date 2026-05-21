@@ -8820,6 +8820,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — fullview telemetry port-backed in presentation (backlog #1 done, #4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -8831,6 +8832,19 @@
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
       <dd>Presentation companion hook imports infrastructure adapter; screens still use <code>public-hooks</code> re-export only.</dd>
+=======
+      <span>Phase A slice — ritual audio context in domain (backlog #1 done, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Shared ritual <code>AudioContext</code> → <code>domain/ritual/breathe/pause-ritual-audio-context</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) complete — no reflect use-case moves. Pure browser singleton (<code>getPauseRitualAudioContext</code>, <code>runPauseRitualAudioWhenReady</code>) moves from <code>application/use-cases/ritual/breathe/</code> to <code>domain/ritual/breathe/</code> so <code>presentation/reflect/ambience/reflect-frame-focus-ambience.ts</code> and <code>ritual-audio.ts</code> import domain, not application or <code>public-rpc</code> (avoids Supabase client load in ambience unit tests).</dd>
+      <dt>Deviation</dt>
+      <dd>Did not re-export on <code>public-rpc</code> — that barrel pulls infrastructure and breaks jsdom tests without env.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect mood/hub still import <code>showPauseStepSyncFailedToast</code> from <code>ritual/step-sync-toast</code> directly (same test/isolation pattern).</dd>
+>>>>>>> d820b602 (refactor(pause): move ritual audio context to domain (reflect follow-up))
       <dt>Open questions</dt>
       <dd>Next backlog #4: intervention bootstrap thin runner on <code>public-rpc</code>, or audit stray mutations bypassing <code>PauseRepository</code>.</dd>
     </dl>
