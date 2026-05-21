@@ -9235,4 +9235,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — brief depth-upgrade outcome on public-rpc (#3, backlog #1 done)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>logPauseRitualDepthUpgraded drops application→presentation import</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> verified complete — no folder moves. Use case returns <code>success</code> / <code>sync_failed</code> (no <code>TFunction</code>); <code>public-rpc</code> facade shows <code>showPauseStepSyncFailedToast</code> and preserves boolean for <code>use-pause-session-brief-to-deep</code> — matches breath segment outcome pattern.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation still imports <code>briefSwitchToDeepPauseState</code> from <code>ritual/brief/</code> (pure navigation, not RPC).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit mutations bypassing <code>PauseRepository</code> outside <code>public-rpc</code> facades.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -260,9 +260,14 @@ export function openManualPauseFromHome(params: OpenManualPauseFromHomeParams) {
   );
 }
 
-/** Wired with default Supabase repository — screens/tests keep a stable import. */
-export function logPauseRitualDepthUpgraded(instanceId: string, t: TFunction): Promise<boolean> {
-  return logPauseRitualDepthUpgradedUseCase(supabasePauseRepository, instanceId, t);
+/** Brief → deep upgrade — `ritual_depth_upgraded` via `PauseRepository`; toast on sync failure. */
+export async function logPauseRitualDepthUpgraded(instanceId: string, t: TFunction): Promise<boolean> {
+  const outcome = await logPauseRitualDepthUpgradedUseCase(supabasePauseRepository, instanceId);
+  if (outcome.status === 'sync_failed') {
+    showPauseStepSyncFailedToast(t);
+    return false;
+  }
+  return true;
 }
 
 export function applyBulkHoldOutcomes(
