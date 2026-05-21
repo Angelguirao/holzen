@@ -29,7 +29,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: mockPauseRepository,
 }));
 
-vi.mock('../../session/use-pause-session-ritual-storage-sync', () => ({
+vi.mock('../scaffold/use-pause-session-ritual-storage-sync', () => ({
   usePauseSessionRitualStorageSync: vi.fn(),
 }));
 

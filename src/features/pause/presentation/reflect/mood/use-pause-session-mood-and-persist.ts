@@ -11,7 +11,7 @@ import { usePauseSessionDepthPickerHandlers } from './use-pause-session-depth-pi
 import { usePauseSessionFeelTilesSelect } from './use-pause-session-feel-tiles-select';
 import { usePauseSessionInitialMoodHandlers } from './use-pause-session-initial-mood-handlers';
 import { usePauseSessionPersistToStorage } from '../../session/use-pause-session-persist-to-storage';
-import { usePauseSessionRitualStorageSync } from '../../session/use-pause-session-ritual-storage-sync';
+import { usePauseSessionRitualStorageSync } from '../scaffold/use-pause-session-ritual-storage-sync';
 
 export interface UsePauseSessionMoodAndPersistParams {
   pauseInstanceId: string | null;

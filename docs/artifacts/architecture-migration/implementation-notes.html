@@ -12997,4 +12997,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate ritual-storage-sync conductor under presentation/reflect/scaffold/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up; presentation reflect scaffold subcluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>storage-ritual-sync</code> landed in <code>ritual/reflect/scaffold/</code>, colocate <code>use-pause-session-ritual-storage-sync</code> (+ test) under <code>presentation/reflect/scaffold/</code> beside mood consumers; <code>public-hooks</code> re-export path only. Mood <code>use-pause-session-mood-and-persist</code> imports sibling scaffold path.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; hook still reads <code>loadSession</code> / <code>computePauseStorageRitualSyncPatch</code> via <code>public-session</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-persist-to-storage</code> remains under <code>presentation/session/</code> until a follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Phase B: subscription/auth <code>src/lib/*</code> shims using pause as template.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
