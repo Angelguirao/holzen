@@ -1,7 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
-import { applyBreathSegmentLogOutcome } from '@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log';
 import { usePauseBreathSegmentRpcLoggers } from './use-pause-breath-segment-rpc-loggers';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
@@ -23,12 +22,18 @@ vi.mock('@/features/pause/application/use-cases/ritual/step-sync-toast', () => (
   showPauseStepSyncFailedToast,
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  ensureBreathSegment1Logged: ensureBreathSegment1LoggedMock,
-  ensureBreathSegment2Logged: ensureBreathSegment2LoggedMock,
-  logBreathSegment1Skipped: logBreathSegment1SkippedMock,
-  logBreathSegment2Skipped: logBreathSegment2SkippedMock,
-}));
+vi.mock('@/features/pause/public-rpc', async () => {
+  const breathLog = await vi.importActual<
+    typeof import('@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log')
+  >('@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log');
+  return {
+    applyBreathSegmentLogOutcome: breathLog.applyBreathSegmentLogOutcome,
+    ensureBreathSegment1Logged: ensureBreathSegment1LoggedMock,
+    ensureBreathSegment2Logged: ensureBreathSegment2LoggedMock,
+    logBreathSegment1Skipped: logBreathSegment1SkippedMock,
+    logBreathSegment2Skipped: logBreathSegment2SkippedMock,
+  };
+});
 
 const t = ((k: string) => k) as TFunction;
 
