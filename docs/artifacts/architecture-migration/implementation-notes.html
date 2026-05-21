@@ -7829,4 +7829,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — feel-tiles mood log options in ritual/reflect/mood (backlog #1 incremental)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>buildFeelTilesMoodLogOptions</code> → application mood cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. Move feel-tile <code>initial_emotion_logged</code> payload shaping beside <code>run-initial-emotion-log</code>; domain mood chrome flow keeps chrome-close and depth-picker pro gate only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>isBriefRitualEntry</code> remains in domain until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed analytics read for companion feedback vote fetch, or remaining wired <code>public-rpc</code> facades audit.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

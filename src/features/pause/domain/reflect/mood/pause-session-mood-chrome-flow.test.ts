@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-  buildFeelTilesMoodLogOptions,
   isBriefRitualEntry,
   resolvePauseSessionChromeCloseAction,
   runDeepPausePickerEntryIfPro,
@@ -8,14 +7,9 @@ import {
 } from './pause-session-mood-chrome-flow';
 
 describe('pause-session-mood-chrome-flow', () => {
-  it('detects brief ritual and builds feel tile log options', () => {
+  it('detects brief ritual entry', () => {
     expect(isBriefRitualEntry('brief')).toBe(true);
     expect(isBriefRitualEntry('deep')).toBe(false);
-    expect(buildFeelTilesMoodLogOptions(true, 'calm')).toEqual({
-      briefRitual: true,
-      briefFace: 'calm',
-    });
-    expect(buildFeelTilesMoodLogOptions(false, 'anxious')).toEqual({ briefFace: 'anxious' });
   });
 
   it('resolves chrome close to return or request exit', () => {
