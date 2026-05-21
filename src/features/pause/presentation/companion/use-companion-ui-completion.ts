@@ -2,13 +2,13 @@ import { useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { hapticFeedback } from '@/lib/haptics';
 import {
+  companionUiCompletionQueryKey,
   EMPTY_COMPANION_UI_COMPLETION,
   getCompanionUiCompletionQueryOptions,
   type CompanionUiCompletionStep,
   type CompanionUiCompletionState,
 } from '@/features/pause/public-queries';
 import { persistCompanionUiStepCompletion } from '@/features/pause/public-rpc';
-import { companionUiCompletionQueryKey } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 
 /**
  * Per-pause-instance companion UI step completion (TanStack Query + RPC persist).

@@ -4333,6 +4333,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect steps import public-queries only (Tier 3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; note/tag archive invalidation boundary</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Align <code>use-pause-reflect-note</code> and <code>use-pause-reflect-tags</code> with <code>use-pause-favorite-toggle</code>: import <code>pauseArchiveListQueryPrefix</code> from <code>public-queries</code>, not <code>application/queries/archive-query-keys</code>. Re-export <code>companionUiCompletionQueryKey</code> on <code>public-queries</code> so <code>use-companion-ui-completion</code> stops importing application query keys.</dd>
+      <dt>Deviation</dt>
+      <dd>None — import-path hygiene only; mutations still via <code>public-rpc</code> → <code>PauseRepository</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Query key helpers remain in <code>application/queries/</code> for infrastructure and invalidation modules; presentation must use <code>public-queries</code> barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (if any), or Phase B cross-context slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
