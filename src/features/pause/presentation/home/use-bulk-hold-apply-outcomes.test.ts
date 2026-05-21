@@ -12,7 +12,7 @@ vi.mock('@/features/pause/application/use-cases/home/bulk-hold/apply-bulk-hold-o
   applyBulkHoldOutcomes: applyBulkHoldOutcomesMock,
 }));
 
-vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: mockPauseRepository,
 }));
 

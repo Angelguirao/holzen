@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { hapticFeedback } from '@/lib/haptics';
 import { logRetrospectiveOutcome } from '@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome';
 import { trackPauseOutcomeRetrospective } from '@/features/pause/application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry';
-import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
 
 export type UseArchivePauseRetrospectiveOutcomeParams = {

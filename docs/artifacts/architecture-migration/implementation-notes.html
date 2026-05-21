@@ -12560,4 +12560,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — session/archive/home ritual ports via public-rpc (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Pending offer, brief→deep, done check-in, bulk-hold, archive retrospective off infrastructure</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder moves. Continue §6 barrel hygiene after session/home breath slice: <code>use-pending-pause-offer-mutations</code>, <code>use-pause-session-brief-to-deep</code>, <code>use-pause-brief-done-check-in</code>, <code>use-bulk-hold-apply-outcomes</code>, and <code>use-archive-pause-retrospective-outcome</code> import <code>supabasePauseRepository</code> from <code>public-rpc</code>; tests mock <code>public-rpc</code> for port-lock parity.</dd>
+      <dt>Deviation</dt>
+      <dd>None — extends prior reflect/session/home <code>public-rpc</code> slices; companion conductors still import <code>infrastructure/*</code> until next slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Import-path only; use cases unchanged. Did not batch companion orchestrator/analytics barrels in the same commit.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: <code>public-rpc</code> / <code>public-queries</code> for companion presentation (orchestrator + analytics adapters), or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

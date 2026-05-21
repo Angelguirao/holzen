@@ -7,7 +7,7 @@ import type {
   BulkHoldPendingPause,
 } from '@/features/pause/domain/bulk-hold';
 import { applyBulkHoldOutcomes } from '@/features/pause/application/use-cases/home/bulk-hold/apply-bulk-hold-outcomes';
-import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
 
 export type UseBulkHoldApplyOutcomesParams = {

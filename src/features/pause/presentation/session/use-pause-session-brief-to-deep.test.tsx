@@ -12,7 +12,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrad
   logPauseRitualDepthUpgraded: logPauseRitualDepthUpgradedMock,
 }));
 
-vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: mockPauseRepository,
 }));
 

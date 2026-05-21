@@ -1,7 +1,7 @@
 import { useCallback, useEffect, type Dispatch, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import { logPauseRitualDepthUpgraded } from '@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade';
-import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import { showPauseStepSyncFailedToast } from '@/features/pause/presentation/ritual/pause-step-sync-toast';
 import { briefSwitchToDeepPauseState } from '@/features/pause/public-ritual-brief';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
