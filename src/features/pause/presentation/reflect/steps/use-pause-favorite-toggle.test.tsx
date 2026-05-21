@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import { usePauseFavoriteToggle } from './use-pause-favorite-toggle';
-import { showPauseFavoriteProHintToast } from '@/features/pause/application/use-cases/ritual/reflect/steps/favorite-toast';
+import { showPauseFavoriteProHintToast } from './pause-favorite-pro-hint-toast';
 
 const { logPauseFavoriteToggleMock, invalidateQueriesMock } = vi.hoisted(() => ({
   logPauseFavoriteToggleMock: vi.fn(),
@@ -13,7 +13,7 @@ vi.mock('@/features/pause/public-queries', () => ({
   pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
 }));
 
-vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/favorite-toast', () => ({
+vi.mock('./pause-favorite-pro-hint-toast', () => ({
   showPauseFavoriteProHintToast: vi.fn(),
 }));
 
