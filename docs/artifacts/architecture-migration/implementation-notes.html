@@ -8114,4 +8114,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — brief→deep depth upgrade via public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-session-brief-to-deep</code> → <code>logPauseRitualDepthUpgraded</code> facade</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Continue backlog #4: brief Integrate → deep upgrade conductor imports the wired <code>logPauseRitualDepthUpgraded</code> facade from <code>public-rpc.ts</code> instead of the use case + <code>supabasePauseRepository</code> from <code>public-ports</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import surface only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other session ritual hooks (brief done check-in, breath segment loggers, decide outcome) still inject <code>public-ports</code> until peeled in follow-up slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>use-pause-brief-done-check-in</code> → <code>logPostPauseEmotionIfDirty</code>, or breath segment RPC facades on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
