@@ -17250,4 +17250,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — generation hook-flow exports holzen-reflect run (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>runReflectGeneration</code> on <code>pause-reflect-generation-hook-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Remote already imported <code>runReflectGeneration</code> from the hook-flow anchor in <code>pause-reflect-generation-io</code> but the anchor lacked the re-export — add <code>runReflectGeneration</code> + <code>RunReflectGenerationInput</code> beside pure hook helpers.</dd>
+      <dt>Deviation</dt>
+      <dd><code>pause-reflect-generation-io.test.ts</code> still mocks <code>run-reflect-generation</code> (Vitest module hoist) — same effective seam as hook-flow.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>None.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-decide-flow</code> on decide I/O, <code>pause-reflect-mood-flow</code> convergence, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -12,3 +12,7 @@ export {
 export { reflectGenerationPrerequisite } from '@/features/pause/domain/reflect/generation/reflect-generation-prerequisites';
 export { reflectGenerationUserErrorMessage } from '@/features/pause/domain/reflect/generation/reflect-generation-errors';
 export { resolveEffectiveReflectionCopy } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
+export {
+  runReflectGeneration,
+  type RunReflectGenerationInput,
+} from './run-reflect-generation';
