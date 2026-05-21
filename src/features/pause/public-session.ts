@@ -100,6 +100,8 @@ export {
 export {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
+} from './application/use-cases/ritual/breathe/restored-breath-ritual-state';
+export {
   initialDecisionFromRestored,
   initialFrameDoneFromRestored,
   initialPhaseFromRestored,
