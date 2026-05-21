@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { buildReflectTagUpdatedPayload } from '@/features/pause/domain/reflect/steps/reflect-note-tag-payload';
+import { buildReflectTagUpdatedPayload } from '@/features/pause/domain/reflect/steps/reflect-step-payloads';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { runPauseReflectTagUpdate } from './run-pause-reflect-tag-update';
 

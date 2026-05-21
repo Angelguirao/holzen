@@ -1,5 +1,5 @@
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
-import { buildReflectTagUpdatedPayload } from '@/features/pause/domain/reflect/steps/reflect-note-tag-payload';
+import { buildReflectTagUpdatedPayload } from '@/features/pause/domain/reflect/steps/reflect-step-payloads';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
 export type RunPauseReflectTagUpdateResult =

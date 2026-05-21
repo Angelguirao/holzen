@@ -4,9 +4,9 @@ import {
   buildReflectNoteUpdatedPayload,
   buildReflectReflectionStepPayload,
   buildReflectTagUpdatedPayload,
-} from './reflect-note-tag-payload';
+} from './reflect-step-payloads';
 
-describe('reflect-note-tag-payload', () => {
+describe('reflect-step-payloads', () => {
   it('builds note_updated payload', () => {
     expect(buildReflectNoteUpdatedPayload('hello')).toEqual({ text: 'hello' });
   });

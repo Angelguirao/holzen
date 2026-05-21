@@ -1,5 +1,5 @@
 import { computeFavoriteToggleNext } from '@/features/pause/domain/reflect/steps/favorite-toggle';
-import { buildReflectFavoriteToggledPayload } from '@/features/pause/domain/reflect/steps/reflect-note-tag-payload';
+import { buildReflectFavoriteToggledPayload } from '@/features/pause/domain/reflect/steps/reflect-step-payloads';
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
