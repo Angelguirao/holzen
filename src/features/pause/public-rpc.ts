@@ -79,7 +79,7 @@ import {
 } from './application/use-cases/ritual/feel/shift-emotion-log';
 import type { InitialEmotionLogOpts } from './application/use-cases/ritual/feel/initial-emotion-log';
 import { logPauseStep } from './application/use-cases/ritual/log/log-pause-step';
-import { logPauseCompanion } from './application/use-cases/ritual/frame/log-pause-companion';
+import { logPauseCompanion } from './application/use-cases/ritual/log/log-pause-companion';
 import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
 import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
 

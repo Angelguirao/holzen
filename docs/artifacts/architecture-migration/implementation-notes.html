@@ -4162,6 +4162,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate log-pause-companion under ritual/log/ (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; shared ritual companion-log use case</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>log-pause-companion</code> (+ test) from <code>ritual/frame/</code> into <code>ritual/log/</code> beside <code>log-pause-step</code>; <code>public-rpc</code> and <code>persist-ui-step-completion</code> import the ritual path. Behavior unchanged — still delegates to <code>PauseRepository.logCompanion</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>ritual/frame/</code> keeps orchestration-only modules; companion RPC logging is not frame orchestration.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>CompanionOrchestrator</code> port (backlog #4 remainder), or <code>ritual/deep/</code> consolidation under <code>ritual/brief/</code> per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

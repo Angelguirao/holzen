@@ -1,4 +1,4 @@
-import { logPauseCompanion } from '@/features/pause/application/use-cases/ritual/frame/log-pause-companion';
+import { logPauseCompanion } from '@/features/pause/application/use-cases/ritual/log/log-pause-companion';
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
 import type { PauseStepType } from '@/features/pause/domain/pause-state';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
