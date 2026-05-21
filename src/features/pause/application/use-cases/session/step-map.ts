@@ -1,9 +1,10 @@
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
-import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
-import { STEPS } from '@/features/pause/domain/pause-ritual-steps';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
+import { mapPersistedStep } from '@/features/pause/domain/session/map-persisted-step';
 import { hasPersistedPauseSessionPayload } from './persisted-session-guards';
+
+export { mapPersistedStep };
 
 /**
  * Pause route helpers: map persisted step strings and derive initial ritual UI from `PersistedSession`.
@@ -13,17 +14,6 @@ import { hasPersistedPauseSessionPayload } from './persisted-session-guards';
  * may intentionally omit `briefStep` when syncing — see `initialBriefPauseStepFromRestored` note below.
  * **Code map:** same pause doc, section 10 (Related docs and code).
  */
-
-/** Map persisted `step` string (including legacy keys) to the current `PauseStep` union. */
-export function mapPersistedStep(s: string | undefined): PauseStep {
-  if (!s || s === 'pause') return 'feel';
-  if (s === 'ground') return 'reflect';
-  if (s === 'shift') return 'frame';
-  /** Removed client-only `choose` beat — resume on Decide. */
-  if (s === 'choose') return 'decide';
-  if (STEPS.includes(s as PauseStep)) return s as PauseStep;
-  return 'feel';
-}
 
 /**
  * Initial depth-picker vs brief/deep from restored local session.

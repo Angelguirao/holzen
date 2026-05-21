@@ -53,8 +53,8 @@ export { usePauseSessionDepthAndBriefCopy } from './presentation/reflect/mood/us
 
 export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/reflect/mood/pause-depth-picker-styles';
 export { usePauseFeelShiftLogDedupeRefs } from './presentation/reflect/mood/use-pause-feel-shift-log-dedupe-refs';
-export { applyBreathSegmentLogOutcome } from './application/use-cases/ritual/reflect/flows/apply-breath-segment-log-outcome';
-export { initialBreathSegmentRpcLoggedFlagsFromRestored } from './application/use-cases/ritual/reflect/flows/initial-breath-segment-rpc-flags';
+export { applyBreathSegmentLogOutcome } from './domain/reflect/flows/apply-breath-segment-log-outcome';
+export { initialBreathSegmentRpcLoggedFlagsFromRestored } from './domain/reflect/flows/initial-breath-segment-rpc-flags';
 export { usePauseBreathSegmentRpcLoggers } from './presentation/reflect/flows/use-pause-breath-segment-rpc-loggers';
 export { usePauseSessionBreathStepHandlers } from './presentation/reflect/flows/use-pause-session-breath-step-handlers';
 export {

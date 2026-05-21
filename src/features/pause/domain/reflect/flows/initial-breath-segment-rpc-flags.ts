@@ -1,6 +1,6 @@
 import { STEPS } from '@/features/pause/domain/pause-ritual-steps';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
-import { mapPersistedStep } from '@/features/pause/application/use-cases/session/step-map';
+import { mapPersistedStep } from '@/features/pause/domain/session/map-persisted-step';
 
 /**
  * When resuming from local storage past the first or second breath beat,
