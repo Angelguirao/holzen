@@ -19210,4 +19210,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — Home reflect telemetry I/O via flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-telemetry-io</code> imports via <code>pause-home-reflect-telemetry-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no application path moves. Align Home PostHog presentation I/O with session reflect generation I/O: re-export manual-open + dismiss/banner trackers through <code>pause-home-reflect-telemetry-flow</code> instead of deep <code>home/</code> and <code>manual-open/</code> telemetry paths.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session <code>pause-reflect-telemetry-io</code> still imports <code>pause-reflect-session-ui-telemetry</code> directly (off-anchor peel); Home manual-open generation I/O unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>apply-manual-pause-open-result</code> default telemetry off deep <code>pause-home-reflect-telemetry-io</code>, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

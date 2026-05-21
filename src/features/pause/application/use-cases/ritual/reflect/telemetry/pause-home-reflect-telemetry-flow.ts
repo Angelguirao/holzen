@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for Home reflect PostHog telemetry (§3 / check:architecture-alignment).
  * Trackers live in `home/home-pause-actions-telemetry.ts` and `manual-open/manual-pause-trigger-telemetry.ts`.
- * Presentation: `pause-home-reflect-telemetry-io.ts` imports trackers directly (off this CI anchor).
+ * Presentation: `pause-home-reflect-telemetry-io.ts` imports through this anchor (off deep telemetry paths).
  */
 export {
   trackHomePendingPauseBannerPauseOpened,
