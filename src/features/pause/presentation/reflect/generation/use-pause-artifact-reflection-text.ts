@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { supabaseReflectGenerator } from '@/features/pause/public-ports';
+import { fetchPauseReflectReflectionText } from '@/features/pause/public-rpc';
 
 export type PauseArtifactReflectionTextFetchPhase = 'idle' | 'loading' | 'error' | 'done';
 
@@ -63,7 +63,7 @@ export function usePauseArtifactReflectionText(
       setReflectionTextFetch('loading');
     }
 
-    void supabaseReflectGenerator.fetchReflectionText(myId)
+    void fetchPauseReflectReflectionText(myId)
       .then((text) => {
         if (cancelled) return;
         if (trigger === 'whenEnabled' && fetchedForPauseRef.current !== myId) return;

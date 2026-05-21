@@ -6100,4 +6100,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — wire reflect generation hooks through public-rpc</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; backlog #4 reflect generation cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move. <code>presentation/reflect/generation/</code> holzen-reflect conductor and artifact hydrate hooks call wired <code>public-rpc</code> facades (<code>runPauseReflectGeneration</code>, <code>fetchPauseReflectReflectionText</code>, <code>fetchPauseReflectHaiku</code>) instead of use case + <code>supabaseReflectGenerator</code> from <code>public-ports</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; co-located tests mock <code>public-rpc</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect telemetry/ambience conductors may still import <code>application/use-cases/ritual/reflect/*</code> directly until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel brief-to-deep / post-pause session hooks through <code>public-rpc</code>, or port-backed companion feedback vote read.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
