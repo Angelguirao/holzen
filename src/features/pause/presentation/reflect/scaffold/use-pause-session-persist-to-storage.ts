@@ -4,14 +4,13 @@ import {
   type PauseSessionPersistSnapshotInput,
 } from '@/features/pause/application/use-cases/ritual/reflect/scaffold/persist-snapshot';
 import { hasPersistablePauseSessionAnchor } from '@/features/pause/domain/session/persisted-session-guards';
-import { savePersistedTabSession } from '@/features/pause/application/use-cases/session/persisted-tab-session';
-import { persistedTabSessionStorage } from '@/features/pause/public-rpc';
+import { savePausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 
 /** Autosave ritual fields to `holzen_pause_session` when we have an instance id and/or reflection copy. */
 export function usePauseSessionPersistToStorage(p: PauseSessionPersistSnapshotInput): void {
   useEffect(() => {
     if (!hasPersistablePauseSessionAnchor(p.pauseInstanceId, p.message)) return;
-    savePersistedTabSession(persistedTabSessionStorage, buildPauseSessionPersistSnapshot(p));
+    savePausePersistedTabSession(buildPauseSessionPersistSnapshot(p));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- list snapshot fields, not `p` (caller passes a new object each render).
   }, [
     p.message,

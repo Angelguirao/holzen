@@ -10,8 +10,7 @@ import {
 import { hasPersistedPauseSessionPayload } from '@/features/pause/domain/session/persisted-session-guards';
 import type { PauseSessionNavParsed } from '@/features/pause/public-navigation';
 import { usePauseSessionFetch } from './use-pause-session-fetch';
-import { loadPersistedTabSession } from '@/features/pause/application/use-cases/session/persisted-tab-session';
-import { persistedTabSessionStorage } from '@/features/pause/public-rpc';
+import { loadPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 
 export type UsePauseSessionShellParams = {
   locationKey: string;
@@ -37,13 +36,13 @@ export function usePauseSessionShell(params: UsePauseSessionShellParams): {
   const { locationKey, nav, holzen } = params;
 
   const restored = useMemo(() => {
-    const saved = loadPersistedTabSession(persistedTabSessionStorage);
+    const saved = loadPausePersistedTabSession();
     if (!hasPersistedPauseSessionPayload(saved)) return null;
     if (nav.pauseInstanceId && saved.pauseInstanceId && saved.pauseInstanceId !== nav.pauseInstanceId) {
       return null;
     }
     return saved;
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on location.key + nav pause id; loadPersistedTabSession is a stable module import
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on location.key + nav pause id; loadPausePersistedTabSession is a stable module import
   }, [locationKey, nav.pauseInstanceId]);
 
   const holzenAligned =

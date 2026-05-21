@@ -7,8 +7,7 @@ import { useProGate } from '@/features/subscription/public-hooks';
 import { usePauseSessionExitNavigation } from './use-pause-session-exit-navigation';
 import { usePauseSessionBreathSecondLabelVariant } from './breath/use-pause-session-breath-second-label-variant';
 import { JOURNEY_PREFIX } from '@/lib/app-routes';
-import { clearPersistedTabSession } from '@/features/pause/application/use-cases/session/persisted-tab-session';
-import { persistedTabSessionStorage } from '@/features/pause/public-rpc';
+import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import type { PauseSessionShellHolzen } from '@/features/pause/domain/pause-session-shell-holzen';
 import type {
   PauseSessionHolzenProvidersSlice,
@@ -27,7 +26,7 @@ export function usePauseSessionProvidersFromHolzenSlice(
   const { handleReturn, handleClose } = usePauseSessionExitNavigation(navigate);
 
   const handleBriefSaveToJourney = useCallback(() => {
-    clearPersistedTabSession(persistedTabSessionStorage);
+    clearPausePersistedTabSession();
     navigate(JOURNEY_PREFIX, { replace: true });
   }, [navigate]);
 
