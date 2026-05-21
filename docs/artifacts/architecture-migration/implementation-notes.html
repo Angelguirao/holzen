@@ -5549,4 +5549,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect/decide flow in ritual/reflect/flows (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Pure reflect+decide gates out of presentation/reflect/flows</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Smallest remaining reflect cluster: move <code>pause-session-reflect-decide-flow</code> (+ test) from <code>presentation/reflect/flows/</code> to <code>application/use-cases/ritual/reflect/flows/</code>; <code>use-pause-session-reflect-and-decide</code> imports the use-case module directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3 application layer for pure ritual logic; presentation keeps React conductors only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>presentation/reflect/hub/pause-shift-frame-hub-flow</code> remains in presentation until a follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move <code>pause-shift-frame-hub-flow</code> to <code>ritual/reflect/</code> or <code>ritual/feel/</code>, or backlog #4 analytics read stragglers.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
