@@ -2,28 +2,31 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 import { runPauseCreateOrReuse } from '@/features/pause/application/use-cases/session/run-pause-create-or-reuse';
+import { runPersistSilentReflectionStub } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-persist-silent-reflection-stub';
 import { openManualPauseFromHome } from './open-manual-pause-from-home';
 
 vi.mock('@/features/pause/application/use-cases/session/run-pause-create-or-reuse', () => ({
   runPauseCreateOrReuse: vi.fn(),
 }));
 
-const runPauseCreateOrReuseMock = vi.mocked(runPauseCreateOrReuse);
+vi.mock('@/features/pause/application/use-cases/ritual/reflect/generation/run-persist-silent-reflection-stub', () => ({
+  runPersistSilentReflectionStub: vi.fn(),
+}));
 
-function mockPorts(overrides: {
-  persistReflectionArtifacts?: ReflectGenerator['persistReflectionArtifacts'];
-}): { repository: PauseRepository; reflect: ReflectGenerator } {
+const runPauseCreateOrReuseMock = vi.mocked(runPauseCreateOrReuse);
+const runPersistSilentReflectionStubMock = vi.mocked(runPersistSilentReflectionStub);
+
+function mockPorts(): { repository: PauseRepository; reflect: ReflectGenerator } {
   return {
     repository: { createOrReuse: vi.fn() } as unknown as PauseRepository,
-    reflect: {
-      persistReflectionArtifacts: overrides.persistReflectionArtifacts ?? vi.fn(),
-    } as unknown as ReflectGenerator,
+    reflect: { persistReflectionArtifacts: vi.fn() } as unknown as ReflectGenerator,
   };
 }
 
 describe('openManualPauseFromHome', () => {
   beforeEach(() => {
     runPauseCreateOrReuseMock.mockReset();
+    runPersistSilentReflectionStubMock.mockReset();
   });
 
   it('routes create through runPauseCreateOrReuse on the repository port', async () => {
@@ -75,7 +78,7 @@ describe('openManualPauseFromHome', () => {
       pending_offer: false,
       prior_open_instance_id: null,
     });
-    const result = await openManualPauseFromHome(mockPorts({}), {
+    const result = await openManualPauseFromHome(mockPorts(), {
       userId: 'u1',
       silentMode: false,
       contextText: 'ctx',
@@ -91,7 +94,6 @@ describe('openManualPauseFromHome', () => {
   });
 
   it('persists silent stub when silentMode is on', async () => {
-    const persistReflectionArtifacts = vi.fn().mockResolvedValue(undefined);
     runPauseCreateOrReuseMock.mockResolvedValue({
       instance_id: 'pause-1',
       created: true,
@@ -99,7 +101,9 @@ describe('openManualPauseFromHome', () => {
       pending_offer: false,
       prior_open_instance_id: null,
     });
-    const result = await openManualPauseFromHome(mockPorts({ persistReflectionArtifacts }), {
+    runPersistSilentReflectionStubMock.mockResolvedValue({ outcome: 'ok' });
+    const ports = mockPorts();
+    const result = await openManualPauseFromHome(ports, {
       userId: 'u1',
       silentMode: true,
       contextText: 'ctx',
@@ -116,7 +120,7 @@ describe('openManualPauseFromHome', () => {
       instanceId: 'pause-1',
       silentStubPersisted: true,
     });
-    expect(persistReflectionArtifacts).toHaveBeenCalledWith({
+    expect(runPersistSilentReflectionStubMock).toHaveBeenCalledWith(ports.reflect, {
       pauseInstanceId: 'pause-1',
       userId: 'u1',
       context: 'ctx',
@@ -124,8 +128,38 @@ describe('openManualPauseFromHome', () => {
     });
   });
 
+  it('returns error when silent stub persist fails', async () => {
+    runPauseCreateOrReuseMock.mockResolvedValue({
+      instance_id: 'pause-1',
+      created: true,
+      reused_reason: null,
+      pending_offer: false,
+      prior_open_instance_id: null,
+    });
+    runPersistSilentReflectionStubMock.mockResolvedValue({
+      outcome: 'error',
+      userMessage: 'Could not save reflection.',
+    });
+    const result = await openManualPauseFromHome(mockPorts(), {
+      userId: 'u1',
+      silentMode: true,
+      contextText: 'ctx',
+      silentMessage: 'BTC moved.',
+      changePercent: 2,
+      cumulativeChangePercent: 1,
+      trackedAssetId: 'bitcoin',
+      severityBand: 'mild',
+      fearGreedLabel: null,
+      onChainBand: null,
+    });
+    expect(result).toEqual({
+      outcome: 'error',
+      userMessage: 'Could not save reflection.',
+      isNetwork: false,
+    });
+  });
+
   it('skips artifact persist for non-silent opens', async () => {
-    const persistReflectionArtifacts = vi.fn();
     runPauseCreateOrReuseMock.mockResolvedValue({
       instance_id: 'pause-2',
       created: true,
@@ -133,7 +167,7 @@ describe('openManualPauseFromHome', () => {
       pending_offer: true,
       prior_open_instance_id: null,
     });
-    const result = await openManualPauseFromHome(mockPorts({ persistReflectionArtifacts }), {
+    const result = await openManualPauseFromHome(mockPorts(), {
       userId: 'u1',
       silentMode: false,
       contextText: 'ctx',
@@ -150,6 +184,6 @@ describe('openManualPauseFromHome', () => {
       pendingOffer: true,
       silentStubPersisted: false,
     });
-    expect(persistReflectionArtifacts).not.toHaveBeenCalled();
+    expect(runPersistSilentReflectionStubMock).not.toHaveBeenCalled();
   });
 });
