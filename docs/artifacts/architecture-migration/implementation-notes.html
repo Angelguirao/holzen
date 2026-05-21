@@ -11268,4 +11268,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — session exit navigation clearSession off public-rpc (backlog #1 verified, #4 / §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-pause-session-exit-navigation → persisted-session-storage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move. Remote already peeled decide handler (<code>33ad8e2f</code>). Continue §6: <code>use-pause-session-exit-navigation</code> imports <code>clearSession</code> from <code>infrastructure/session/persisted-session-storage</code> (same adapter as decide handler); <code>public-hooks</code> re-export path unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other session/home hooks still import <code>clearSession</code> / <code>loadSession</code> / <code>saveSession</code> via <code>public-rpc</code> until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next §6: peel <code>clearSession</code> on providers, pending-offer navigation, or home preview; backlog #4 archive retrospective facade audit.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
