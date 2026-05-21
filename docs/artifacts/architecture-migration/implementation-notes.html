@@ -17595,4 +17595,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect steps I/O imports run-* + domain gates (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-io</code> off <code>pause-reflect-steps-flow</code> anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align steps presentation I/O with share peel: domain step gates from <code>domain/reflect/steps/</code>; tag/note/favorite/<code>reflection_step</code> RPC use cases from sibling <code>run-pause-*</code> modules. Keep <code>pause-reflect-steps-flow.ts</code> as CI cluster anchor only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; presentation no longer imports application re-export barrel.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit tests mock <code>run-pause-reflection-step-log</code> and <code>run-pause-favorite-toggle</code> directly; domain gates exercised without mock in re-export smoke tests.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-mood-io</code> peel from <code>pause-reflect-mood-flow</code>, or <code>pause-reflect-flows-io</code> preflight/post-generation import from <code>domain/reflect/flows/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
