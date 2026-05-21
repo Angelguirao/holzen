@@ -13475,38 +13475,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect scaffold session I/O off public-session</span>
+      <span>Phase A slice — tab session I/O use case (backlog #1 complete, session peel)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Backlog #1 complete; §6 peel — presentation/reflect/scaffold/</h3>
+    <h3>Reflect scaffold + session hooks off public-session barrel</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. <code>use-pause-session-persist-to-storage</code> and <code>use-pause-session-ritual-storage-sync</code> import <code>loadSession</code>/<code>saveSession</code> from <code>infrastructure/session/persisted-session-storage</code> directly; <code>public-session</code> remains the cross-context tab I/O barrel for session/home hooks not yet peeled.</dd>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>PersistedTabSessionStoragePort</code> + <code>persisted-tab-session</code> use case; default adapter on <code>public-rpc</code> as <code>persistedTabSessionStorage</code>. Reflect scaffold persist/sync, decide clear, home manual trigger, and session shell/providers/exit hooks call use cases with the port (not <code>public-session</code>). <code>public-session.ts</code> re-exports bound <code>loadSession</code>/<code>saveSession</code>/<code>clearSession</code> for cross-context only.</dd>
       <dt>Deviation</dt>
-      <dd>None — behavior-preserving import path only.</dd>
+      <dd>None — behavior-preserving wiring only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Session/home/decide presentation hooks still use <code>public-session</code> until the next peel cluster.</dd>
+      <dd>Presentation unit tests mock the use-case module instead of <code>public-session</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel remaining <code>public-session</code> consumers in <code>presentation/session/</code> and <code>presentation/home/</code>, or Phase B <code>src/lib/*</code> shims.</dd>
-    </dl>
-  </article>
-
-  <article class="note">
-    <header>
-      <span>2026-05-21</span>
-      <span>Phase A slice — peel session/home/decide presentation off public-session</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3>Backlog #1 complete; §6 slim public-session follow-up</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. After scaffold persist/sync peeled, route remaining feature <code>presentation/</code> consumers (<code>session/</code>, <code>home/</code>, <code>reflect/flows/</code> decide handler) to <code>infrastructure/session/persisted-session-storage</code> directly. <code>public-session</code> stays the cross-context tab I/O barrel for non-pause imports.</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior-preserving import path only.</dd>
-      <dt>Tradeoffs</dt>
-      <dd>Cross-context code outside <code>features/pause/presentation/</code> may still import <code>public-session</code> until a Phase B shim peel.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: Phase B <code>src/lib/*</code> shims (subscription/auth) or port-backed companion feedback vote write path.</dd>
+      <dd>Next: Phase B <code>src/lib/*</code> shims (subscription/auth) or companion feedback vote via analytics port.</dd>
     </dl>
   </article>
 

@@ -30,12 +30,15 @@ vi.mock('@/features/pause/application/use-cases/ritual/decide/outcome-toast', ()
   showPauseOutcomeNotCompletedToast,
 }));
 
-vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
-  clearSession: clearSessionMock,
+vi.mock('@/features/pause/application/use-cases/session/persisted-tab-session', () => ({
+  clearPersistedTabSession: () => clearSessionMock(),
+  loadPersistedTabSession: () => null,
+  savePersistedTabSession: vi.fn(),
 }));
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: mockPauseRepository,
+  persistedTabSessionStorage: { load: vi.fn(), save: vi.fn(), clear: vi.fn() },
 }));
 
 vi.mock('@/lib/haptics', () => ({
