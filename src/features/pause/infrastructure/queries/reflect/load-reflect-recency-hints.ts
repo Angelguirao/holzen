@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { buildReflectRecencyHintsFromRows } from '@/features/pause/domain/reflect/generation/build-reflect-recency-hints';
 import type {
   ReflectMoodHistoryEntry,
   ReflectRecencyHints,
@@ -39,45 +40,15 @@ export async function loadReflectRecencyHints(): Promise<ReflectRecencyHints> {
         .limit(20),
     ]);
 
-    let moodHistory: ReflectMoodHistoryEntry[] | undefined;
-    const byInstance = new Map<string, { mood?: string; outcome?: string; created_at?: string }>();
-    for (const r of (stepRows ?? []) as Array<{
-      pause_instance_id: string;
-      step_type: string;
-      payload: Record<string, unknown> | null;
-      created_at: string;
-    }>) {
-      const e = byInstance.get(r.pause_instance_id) ?? {};
-      if (r.step_type === 'initial_emotion_logged' && typeof r.payload?.mood === 'string') {
-        e.mood = r.payload.mood as string;
-        e.created_at = r.created_at;
-      } else if (r.step_type === 'outcome_logged' && typeof r.payload?.outcome === 'string') {
-        e.outcome = r.payload.outcome as string;
-      }
-      byInstance.set(r.pause_instance_id, e);
-    }
-    const entries = Array.from(byInstance.values()).filter((e) => e.mood);
-    if (entries.length > 0) {
-      moodHistory = entries
-        .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))
-        .map((e) => ({ mood: e.mood!, outcome: e.outcome ?? null, created_at: e.created_at }));
-    }
-
-    const msgs: string[] = [];
-    const haikus: string[] = [];
-    for (const a of (artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>) {
-      if (a.kind === 'reflection_text' && typeof a.content?.message === 'string') {
-        msgs.push(a.content.message as string);
-      } else if (a.kind === 'haiku' && typeof a.content?.haiku === 'string') {
-        haikus.push(a.content.haiku as string);
-      }
-    }
-
-    return {
-      moodHistory,
-      recentMessages: msgs.length > 0 ? msgs.slice(0, 5) : undefined,
-      recentHaikus: haikus.length > 0 ? haikus.slice(0, 5) : undefined,
-    };
+    return buildReflectRecencyHintsFromRows(
+      (stepRows ?? []) as Array<{
+        pause_instance_id: string;
+        step_type: string;
+        payload: Record<string, unknown> | null;
+        created_at: string;
+      }>,
+      (artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>,
+    );
   } catch {
     return {};
   }

@@ -5226,4 +5226,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — recency hints row projection in domain (backlog #1 adjacent)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>buildReflectRecencyHintsFromRows</code> for holzen-reflect hints</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Extract mood/artifact row → <code>ReflectRecencyHints</code> projection from <code>load-reflect-recency-hints</code> into <code>domain/reflect/generation/build-reflect-recency-hints.ts</code>; infrastructure query module keeps auth + Supabase fetch only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving; tests lock projection rules without mocking Supabase.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Removed empty legacy <code>application/use-cases/breathing/</code> placeholder in the same commit (no files left after <code>ritual/breathe/</code> migration).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 stray <code>PauseRepository</code> audit, or move <code>buildReflectionShareText</code> from <code>screens/pause/lib/</code> (pass <code>SITE_HOST</code> at call site).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
