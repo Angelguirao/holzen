@@ -9143,6 +9143,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect share delivery in domain (backlog #1, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Pure browser share/download leaves application/use-cases</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder map complete. Move <code>deliver-reflection-share-image</code> (+ tests) to <code>domain/reflect/share/</code> beside <code>reflection-share-canvas</code>; <code>run-reflection-share-image</code> stays the thin use-case orchestrator. <code>public-rpc</code> outcome type re-exports from domain.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Application layer retains only the canvas→deliver glue use case until a later peel consolidates share entirely under domain + <code>public-rpc</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-signal-source-trusted-host</code> frame import, or wire remaining ritual mutations through <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — frame full-view + section visibility on public-rpc (#1 done, #4)</span>
       <span class="status resolved">resolved</span>
     </header>
