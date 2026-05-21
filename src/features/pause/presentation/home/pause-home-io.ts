@@ -19,25 +19,20 @@ import {
   type ApplyManualPauseOpenResultInput,
   type ManualPauseHomePreviewPorts,
 } from './apply-manual-pause-open-result';
-<<<<<<< HEAD
 
 export {
   applyManualPauseOpenResult,
   buildManualPauseOpenParams,
   openManualPauseFromHome,
-  type ApplyManualPauseOpenResultInput,
-  type BuildManualPauseOpenParamsInput,
-  type ManualPauseHomePreviewPorts,
-=======
-export { buildManualPauseOpenParams, openManualPauseFromHome, type BuildManualPauseOpenParamsInput };
-export type { OpenManualPauseFromHomeResult };
-export {
   markPauseManualStartedHomeOnce,
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
+  type ApplyManualPauseOpenResultInput,
+  type BuildManualPauseOpenParamsInput,
+  type ManualPauseHomePreviewPorts,
+  type OpenManualPauseFromHomeResult,
   type TrackManualPauseInstanceCreatedPayload,
   type TrackPauseManualCompletedPayload,
->>>>>>> efc275e6 (refactor(pause): bind manual-pause telemetry on pause-home-io)
 };
 
 /** Default ports for `openManualPauseFromHome` (Home manual trigger). */
