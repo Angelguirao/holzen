@@ -7718,6 +7718,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — peel slot failure UI types off public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-companion-slot-orchestrate-failure-ports → companion-slot-orchestrate-failure-ui</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Follow-up to section-expansion peel: <code>use-companion-slot-orchestrate-failure-ports</code> imports <code>ApplyCompanionSlotOrchestrateFailureUiPorts</code> from <code>ritual/frame/companion-slot-orchestrate-failure-ui</code> directly; <code>public-rpc</code> type re-export unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Slot run/actions/retry hooks still import the larger orchestrate cluster from <code>public-rpc</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-slot-run-orchestrate</code> imports off <code>public-rpc</code>, or backlog #4 remaining ritual log call sites.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — depth picker gate in domain/reflect/mood (backlog #1 incremental)</span>
       <span class="status resolved">resolved</span>
     </header>
