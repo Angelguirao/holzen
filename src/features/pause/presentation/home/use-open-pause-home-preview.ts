@@ -3,7 +3,7 @@ import type { User } from '@supabase/supabase-js';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import { dismissOpenPauseHome } from '@/features/pause/application/use-cases/home/dismiss-open-pause-home';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
-import { clearSession } from '@/features/pause/public-session';
+import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 import { fetchOpenPauseHomePreview } from '../../public-queries';
 import { DEFAULT_COMPANIONS } from '../../domain/session-model';
 import { usePauseInstancesRealtime } from '../realtime/use-pause-instances-realtime';

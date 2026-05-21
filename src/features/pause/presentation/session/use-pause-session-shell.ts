@@ -10,7 +10,7 @@ import {
 import { hasPersistedPauseSessionPayload } from '@/features/pause/domain/session/persisted-session-guards';
 import type { PauseSessionNavParsed } from '@/features/pause/public-navigation';
 import { usePauseSessionFetch } from './use-pause-session-fetch';
-import { loadSession } from '@/features/pause/public-session';
+import { loadSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 
 export type UsePauseSessionShellParams = {
   locationKey: string;
