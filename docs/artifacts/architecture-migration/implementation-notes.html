@@ -6404,4 +6404,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect initial-mood handlers via public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel feel-step mood conductor off application imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete — no folder move. <code>use-pause-session-initial-mood-handlers</code> imports <code>initialEmotionResetUi</code>, <code>showPauseStepSyncFailedToast</code>, and wired RPC helpers from <code>public-rpc</code> only (parity with shift-frame hub peel).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test mocks single <code>public-rpc</code> barrel.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other reflect mood conductors still import <code>ritual/feel/pause-session-mood-chrome-flow</code> directly until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel mood chrome / feel-tiles conductors or <code>use-pause-brief-done-check-in</code> through <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

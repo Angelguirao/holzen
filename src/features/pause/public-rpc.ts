@@ -70,6 +70,7 @@ import {
   type RunBreathSegmentLogResult,
 } from './application/use-cases/ritual/breathe/run-breath-segment-log';
 import {
+  initialEmotionResetUi,
   runInitialEmotionSelect as runInitialEmotionSelectUseCase,
   runInitialEmotionSkip as runInitialEmotionSkipUseCase,
   type InitialEmotionUiState,
@@ -238,6 +239,7 @@ export type {
 export { resolveShiftFrameHubDonePresentation } from './domain/reflect/hub/shift-frame-hub-done-presentation';
 
 export { showPauseStepSyncFailedToast } from './application/use-cases/ritual/step-sync-toast';
+export { initialEmotionResetUi };
 
 export type {
   CompanionFeedbackVote,

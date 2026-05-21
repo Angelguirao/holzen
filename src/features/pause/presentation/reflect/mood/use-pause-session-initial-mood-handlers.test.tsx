@@ -4,17 +4,18 @@ import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import {
+  initialEmotionResetUi,
   runInitialEmotionSelect as runInitialEmotionSelectUseCase,
   runInitialEmotionSkip as runInitialEmotionSkipUseCase,
 } from '@/features/pause/application/use-cases/ritual/feel/run-initial-emotion-log';
-import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
 import { usePauseSessionInitialMoodHandlers } from './use-pause-session-initial-mood-handlers';
 
-const { logStepMock, mockRepository } = vi.hoisted(() => {
+const { logStepMock, mockRepository, showPauseStepSyncFailedToast } = vi.hoisted(() => {
   const logStepMock = vi.fn();
   return {
     logStepMock,
     mockRepository: { logStep: logStepMock } as unknown as PauseRepository,
+    showPauseStepSyncFailedToast: vi.fn(),
   };
 });
 
@@ -23,10 +24,8 @@ vi.mock('@/features/pause/public-rpc', () => ({
     runInitialEmotionSelectUseCase(mockRepository, input),
   runInitialEmotionSkip: (input: Parameters<typeof runInitialEmotionSkipUseCase>[1]) =>
     runInitialEmotionSkipUseCase(mockRepository, input),
-}));
-
-vi.mock('@/features/pause/application/use-cases/ritual/step-sync-toast', () => ({
-  showPauseStepSyncFailedToast: vi.fn(),
+  initialEmotionResetUi,
+  showPauseStepSyncFailedToast,
 }));
 
 vi.mock('@/lib/haptics', () => ({
@@ -38,6 +37,7 @@ const t = ((k: string) => k) as TFunction;
 beforeEach(() => {
   logStepMock.mockReset();
   logStepMock.mockResolvedValue(null);
+  vi.mocked(showPauseStepSyncFailedToast).mockClear();
 });
 
 function stableMoodSetters() {
@@ -88,6 +88,25 @@ describe('usePauseSessionInitialMoodHandlers', () => {
     expect(logStepMock).toHaveBeenCalledTimes(1);
     expect(logStepMock.mock.calls[0][0].stepType).toBe('initial_emotion_logged');
     expect(deps.setMoodDone).toHaveBeenCalledWith(true);
+  });
+
+  it('shows step-sync toast when select RPC fails', async () => {
+    logStepMock.mockRejectedValueOnce(new Error('rpc'));
+    const lastFeelLogKeyRef: MutableRefObject<string | null> = { current: null };
+    const deps = stableMoodSetters();
+    const { result } = renderHook(() =>
+      usePauseSessionInitialMoodHandlers({
+        pauseInstanceId: 'pi-1',
+        t,
+        lastFeelLogKeyRef,
+        ...deps,
+      }),
+    );
+    await act(async () => {
+      await result.current.handleMoodSelect('calm', 3);
+    });
+    expect(showPauseStepSyncFailedToast).toHaveBeenCalledWith(t);
+    expect(lastFeelLogKeyRef.current).toBeNull();
   });
 
   it('handleMoodReset clears dedupe ref and mood fields', () => {

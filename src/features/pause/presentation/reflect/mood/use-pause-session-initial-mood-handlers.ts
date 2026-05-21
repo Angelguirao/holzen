@@ -3,14 +3,12 @@ import type { TFunction } from 'i18next';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 import { hapticFeedback } from '@/lib/haptics';
-import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
 import {
   initialEmotionResetUi,
-  type InitialEmotionUiState,
-} from '@/features/pause/application/use-cases/ritual/feel/run-initial-emotion-log';
-import {
   runInitialEmotionSelect,
   runInitialEmotionSkip,
+  showPauseStepSyncFailedToast,
+  type InitialEmotionUiState,
 } from '@/features/pause/public-rpc';
 
 export function usePauseSessionInitialMoodHandlers(input: {
