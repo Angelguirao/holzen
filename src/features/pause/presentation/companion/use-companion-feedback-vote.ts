@@ -2,8 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
 import { hapticFeedback } from '@/lib/haptics';
-import { runLogCompanionFeedbackVote } from '@/features/pause/application/use-cases/ritual/frame/run-log-companion-feedback-vote';
-import { supabasePauseAnalyticsRepository } from '@/features/pause/public-rpc';
+import { logCompanionFeedbackVote } from '@/features/pause/presentation/companion/pause-companion-analytics-io';
 import {
   companionFeedbackVoteQueryKey,
   getCompanionFeedbackVoteQueryOptions,
@@ -42,7 +41,7 @@ export function useCompanionFeedbackVote(options: {
       hapticFeedback('light');
 
       try {
-        const { ok } = await runLogCompanionFeedbackVote(supabasePauseAnalyticsRepository, {
+        const { ok } = await logCompanionFeedbackVote({
           userId,
           companionType,
           vote: type,

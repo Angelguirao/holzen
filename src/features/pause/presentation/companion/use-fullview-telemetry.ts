@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useAuth } from '@/features/auth/public';
-import { runLogCompanionFullviewOpened } from '@/features/pause/application/use-cases/ritual/frame/run-log-companion-fullview-opened';
 import type { CompanionFullviewKind } from '@/features/pause/application/use-cases/ritual/frame/log-companion-fullview-opened';
-import { supabasePauseAnalyticsRepository } from '@/features/pause/public-rpc';
+import { logCompanionFullviewOpened } from '@/features/pause/presentation/companion/pause-companion-analytics-io';
 
 export type { CompanionFullviewKind as FullviewCompanion };
 
@@ -24,7 +23,7 @@ export function useFullviewTelemetry(
     if (firedRef.current === key) return;
     firedRef.current = key;
 
-    void runLogCompanionFullviewOpened(supabasePauseAnalyticsRepository, {
+    void logCompanionFullviewOpened({
       userId,
       companion,
       pauseInstanceId,
