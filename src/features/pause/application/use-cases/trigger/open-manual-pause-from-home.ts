@@ -1,5 +1,5 @@
 import { bucketChangePercent, computeContextFingerprint } from '@/features/pause/domain/pause-fingerprint';
-import { pauseCreateSkippedUserMessage } from '@/features/pause/application/use-cases/create-skipped-message';
+import { pauseCreateSkippedUserMessage } from '@/features/pause/application/use-cases/trigger/pause-create-skipped-user-message';
 import { reflectionPersistErrorMessage } from '@/features/pause/domain/pause-persist-error';
 import type { PauseCreateOrReuseResult } from '@/features/pause/domain/rpc-types';
 const VOLATILITY_TEMPLATE = 'volatility_v1';
