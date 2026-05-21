@@ -136,7 +136,7 @@ When `selectIntervention` picks **trap** as the primary intervention:
 | Full View presentation | `src/screens/pause/components/companion/GroundingFullView.tsx` |
 | Enrichment edge fn | `supabase/functions/grounding-enrich/index.ts` |
 | Enrichment helpers | `supabase/functions/_shared/grounding-enrichment-util.ts` |
-| Enrichment client hook | `src/features/pause/presentation/use-grounding-enrichment.ts` (`public-hooks`) |
+| Enrichment client hook | `src/features/pause/presentation/companion/use-grounding-enrichment.ts` (`public-hooks`) |
 | Enrichment presentation | `src/screens/pause/components/companion/GroundingEnrichment.tsx` |
 | Enrichment cache table | `grounding_enrichment_cache` (migration `20260418140000_grounding_enrichment_cache.sql`) |
 | Related biases rail | `src/screens/pause/components/companion/RelatedBiasesThisMonth.tsx` (+ `related-biases-util.ts`) |

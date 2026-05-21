@@ -317,7 +317,7 @@ export {
 export {
   useGroundingEnrichment,
   type GroundingEnrichment,
-} from './presentation/use-grounding-enrichment';
+} from './presentation/companion/use-grounding-enrichment';
 export { usePauseSessionCompanionSnapshot } from './presentation/companion/use-pause-session-companion-snapshot';
 export {
   useFullviewTelemetry,
