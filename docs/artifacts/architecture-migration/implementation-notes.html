@@ -8912,4 +8912,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect share canvas in domain (backlog #1 done, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 verified; branded PNG renderer colocated with share text/URLs</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move pure canvas <code>generateReflectionShareImage</code> from <code>presentation/reflect/share/</code> to <code>domain/reflect/share/reflection-share-canvas.ts</code> beside <code>reflection-share-text</code> and channel URL builders; <code>use-reflection-share-handlers</code> imports domain (test mock path updated).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Domain module uses browser <code>document</code>/<code>canvas</code> (same as before); presentation hook remains the React/sonner surface.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel remaining companion <code>ritual/frame/*</code> presentation imports, or audit stray mutations bypassing <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
