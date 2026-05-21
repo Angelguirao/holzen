@@ -13890,4 +13890,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Automation — Phase A reflect backlog #1 verified</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; ZenModeHome frame types on ritual barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Triggered slice targeted reflect move, but <code>application/use-cases/reflect/</code> is gone — CI guards <code>ritual/reflect/</code>. Parallel push already peeled companion hooks to <code>public-ritual-frame</code>; this session only points <code>ZenModeHome</code> <code>CompanionData</code>/<code>CompanionPrefs</code> at the frame barrel (types; <code>shouldSurfacePauseWidgetError</code> stays on <code>public-hooks</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>None.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>src/lib/holzen-query-client-ref</code> shim (pause query invalidation).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
