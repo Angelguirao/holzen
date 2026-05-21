@@ -9270,4 +9270,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — archive retrospective telemetry on public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; archive hook peels application import</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no reflect folder moves this session. Re-export <code>trackPauseOutcomeRetrospective</code> on <code>public-rpc</code> beside <code>logRetrospectiveOutcome</code>; <code>use-archive-pause-retrospective-outcome</code> imports both from the barrel (matches reflect/archive §6 peel pattern).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; PostHog event unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hook test mocks the wider <code>public-rpc</code> barrel for RPC + telemetry — same tradeoff as reflect mood hooks.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit remaining analytics writes or presentation hooks still importing <code>application/use-cases/archive/*</code> directly.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

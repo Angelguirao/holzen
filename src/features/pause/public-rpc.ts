@@ -177,6 +177,10 @@ export {
   trackPauseReflectWallpaperTap,
 } from './domain/reflect/telemetry/pause-reflect-ui-telemetry';
 export type { PauseReflectTelemetrySurface } from './domain/reflect/telemetry/pause-reflect-ui-telemetry';
+export {
+  trackPauseOutcomeRetrospective,
+  type PauseOutcomeRetrospectiveSurface,
+} from './application/use-cases/archive/archive-retrospective-telemetry';
 
 export type {
   RunInitialEmotionSelectResult,
