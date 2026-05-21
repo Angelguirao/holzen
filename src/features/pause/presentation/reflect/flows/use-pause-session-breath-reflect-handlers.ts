@@ -6,7 +6,7 @@ import type {
   PauseSessionBreathReflectProvidersSlice,
   PauseSessionBreathReflectRitualSlice,
   PauseSessionBreathReflectShellSlice,
-} from '../../session/pause-session-step-handler-types';
+} from './pause-session-breath-reflect-handler-types';
 
 /** Breath segment navigation, shift frame done, and reflect/decide for the pause session ritual. */
 export function usePauseSessionBreathReflectHandlers(
