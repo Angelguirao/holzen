@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — session breath I/O direct ritual-audio cues (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-breath-io</code> imports Web Audio cues from <code>ritual-audio</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no reflect folder moves. <code>pause-session-breath-io</code> imports <code>playPauseBreathPhaseCue</code>, <code>playPauseBreathPatternCompleteCue</code>, and <code>resumePauseAudioContext</code> from <code>ritual/breathe/ritual-audio</code> instead of <code>pause-ritual-audio-breathe-flow</code> CI anchor (parity with session brief/decide/scaffold I/O peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-ritual-audio-breathe-flow.ts</code> remains for <code>check:architecture-alignment</code> breathe audio cluster detection.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: route <code>use-pause-session-shell</code> hydration through <code>pause-session-shell-io</code>, or companion orchestrate-io consolidate <code>ritual/frame/*</code> imports.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect hub I/O via hub flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

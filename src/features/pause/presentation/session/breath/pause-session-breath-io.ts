@@ -1,6 +1,6 @@
 /**
  * Presentation I/O for `/pause` breath segment RPC, timed breathing UI, and breath hydration.
- * Session breath hooks import here instead of deep `application/use-cases/ritual/breathe/*`.
+ * Ritual audio cues import from `ritual-audio` (off `pause-ritual-audio-breathe-flow` CI anchor).
  */
 export { applyBreathSegmentLogOutcome } from '@/features/pause/domain/ritual/breathe/apply-breath-segment-log-outcome';
 export { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags';
@@ -18,7 +18,7 @@ export {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
-} from '@/features/pause/application/use-cases/ritual/breathe/pause-ritual-audio-breathe-flow';
+} from '@/features/pause/application/use-cases/ritual/breathe/ritual-audio';
 export {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
