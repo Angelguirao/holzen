@@ -8475,4 +8475,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual trigger via public-rpc (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel use-manual-pause-trigger off public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. <code>useManualPauseTrigger</code> calls wired <code>openManualPauseFromHome</code> on <code>public-rpc</code> instead of injecting <code>supabasePauseRepository</code> + <code>supabaseReflectGenerator</code> from <code>public-ports</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; presentation test mocks <code>public-rpc</code> facade.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestrate, pending-offer, breath segment loggers, and <code>use-fullview-telemetry</code> still use <code>public-ports</code> until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>use-fullview-telemetry</code> analytics facade, or colocate <code>dismiss/</code> under <code>home/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
