@@ -2,7 +2,6 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import { applyBreathSegmentLogOutcome } from '@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log';
-import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/application/use-cases/session/step-map';
 import { usePauseBreathSegmentRpcLoggers } from './use-pause-breath-segment-rpc-loggers';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
@@ -29,8 +28,6 @@ vi.mock('@/features/pause/public-rpc', () => ({
   ensureBreathSegment2Logged: ensureBreathSegment2LoggedMock,
   logBreathSegment1Skipped: logBreathSegment1SkippedMock,
   logBreathSegment2Skipped: logBreathSegment2SkippedMock,
-  applyBreathSegmentLogOutcome,
-  initialBreathSegmentRpcLoggedFlagsFromRestored,
 }));
 
 const t = ((k: string) => k) as TFunction;

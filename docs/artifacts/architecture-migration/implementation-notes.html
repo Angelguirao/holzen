@@ -8687,6 +8687,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect §6 peel step-sync toast (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</status>
+    </header>
+    <h3>Backlog #1 verified; reflect mood/hub conductors import ritual toast helper directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Peel <code>showPauseStepSyncFailedToast</code> off <code>public-rpc</code> for <code>presentation/reflect/mood</code> and <code>presentation/reflect/hub</code>; RPC facades (<code>logPauseInitialEmotion*</code>, <code>logPauseShiftEmotionFrameHubDone</code>) stay on <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session hooks still imported step-sync toast via <code>public-rpc</code> until the session-cluster peel (next note).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel session/brief toast imports, or drop <code>public-ports.ts</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — drop public-ports + unused vote read facade (backlog #1 done, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -8706,19 +8725,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect §6 peel step-sync toast (backlog #1 done, #3)</span>
-      <span class="status resolved">resolved</span>
+      <span>Phase A slice — session/decide §6 peel ritual toasts off public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</status>
     </header>
-    <h3>Backlog #1 verified; reflect mood/hub conductors import ritual toast helper directly</h3>
+    <h3>Backlog #1 complete; presentation imports toast helpers from ritual use cases</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Peel <code>showPauseStepSyncFailedToast</code> off <code>public-rpc</code> for <code>presentation/reflect/mood</code> and <code>presentation/reflect/hub</code>; session/brief conductors keep the <code>public-rpc</code> re-export. RPC facades (<code>logPauseInitialEmotion*</code>, <code>logPauseShiftEmotionFrameHubDone</code>) stay on <code>public-rpc</code>.</dd>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete — no folder moves. Peel <code>showPauseStepSyncFailedToast</code> for <code>presentation/session</code> breath + brief-done conductors and <code>showPauseOutcome*Toast</code> + decide flow helpers for <code>presentation/decide</code>; remove unused re-exports from <code>public-rpc.ts</code>. RPC mutation facades unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Session hooks still import step-sync toast via <code>public-rpc</code> until a later session-cluster peel.</dd>
+      <dd><code>getSessionQuote</code> remains on <code>public-rpc</code> for cross-surface re-export; decide conductor imports flow module directly.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: companion orchestrate thin runners on <code>public-rpc</code>, or peel session/brief step-sync toast imports off <code>public-rpc</code>.</dd>
+      <dd>Next backlog #4: companion orchestrate thin runners on <code>public-rpc</code>, or audit mutations still bypassing <code>PauseRepository</code>.</dd>
     </dl>
   </article>
 
