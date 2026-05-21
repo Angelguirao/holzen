@@ -29,10 +29,6 @@ export {
   type GroundingEnrichBody,
   type GroundingEnrichment,
 } from './infrastructure/edge/grounding-enrich-edge';
-import {
-  runLogPwaInstallAnalyticsEvent,
-  type LogPwaInstallAnalyticsEventInput,
-} from './application/use-cases/home/run-log-pwa-install-analytics-event';
 import type { RunReflectGenerationInput } from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
 import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
 import { showPauseStepSyncFailedToast } from './presentation/ritual/pause-step-sync-toast';
@@ -50,27 +46,5 @@ export type {
   CompanionFeedbackVote,
   LogCompanionFeedbackVoteInput,
 } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
-export type { LogPwaInstallAnalyticsEventInput } from './application/use-cases/home/run-log-pwa-install-analytics-event';
-
-/** PWA install funnel — wired `PauseAnalyticsRepository.insertEvent` (Home / settings). */
-export function logPausePwaInstallAnalyticsEvent(
-  input: LogPwaInstallAnalyticsEventInput,
-): Promise<{ ok: boolean }> {
-  return runLogPwaInstallAnalyticsEvent(supabasePauseAnalyticsRepository, input);
-}
-
-/** Fire-and-forget PWA install funnel events — screens import via `public-hooks` / `public-rpc`. */
-export function logPwaInstallAnalyticsEvent(
-  userId: string | undefined,
-  event: string,
-  metadata?: Record<string, unknown>,
-): void {
-  if (!userId) return;
-  void logPausePwaInstallAnalyticsEvent({
-    userId,
-    event,
-    metadata: metadata ?? {},
-  });
-}
 
 export { showPauseStepSyncFailedToast };
