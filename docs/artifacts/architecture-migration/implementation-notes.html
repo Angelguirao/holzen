@@ -8801,6 +8801,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — intervention bootstrap facade on public-rpc (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; use-companion-intervention-fetch on public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified complete. Add <code>runPauseCompanionInterventionBootstrap</code> on <code>public-rpc</code> (wired artifact cache read + <code>supabaseCompanionOrchestrator.invokeIntervention</code>); <code>use-companion-intervention-fetch</code> imports facade instead of assembling ports inline.</dd>
+      <dt>Deviation</dt>
+      <dd>Slot orchestrate facade landed as <code>invokeCompanionSlotOrchestrate</code> in a parallel slice — same pattern, different export name.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Outcome/telemetry helpers in frame paths still import <code>ritual/frame/*</code> directly until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel remaining companion presentation imports of <code>ritual/frame/*</code> apply/telemetry modules, or audit stray mutations bypassing <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — session §6 peel step-sync toast (backlog #1 done, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -8813,7 +8832,7 @@
       <dt>Tradeoffs</dt>
       <dd>Presentation + use-case callers import the ritual module directly; no cross-context screen needs the toast on <code>public-rpc</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: intervention bootstrap thin runner on <code>public-rpc</code>, or audit stray mutations bypassing <code>PauseRepository</code>.</dd>
+      <dd>Next backlog #4: audit stray mutations bypassing <code>PauseRepository</code>, or peel companion apply/telemetry imports off <code>ritual/frame/*</code>.</dd>
     </dl>
   </article>
 

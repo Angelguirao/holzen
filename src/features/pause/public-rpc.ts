@@ -44,6 +44,12 @@ import {
   type LoadCompanionOrchestrateSessionInput,
 } from './application/use-cases/ritual/frame/load-companion-orchestrate-session';
 import { loadMoodHistoryForOrchestrate } from './infrastructure/companion/mood-history';
+import {
+  runCompanionInterventionBootstrap,
+  type RunCompanionInterventionBootstrapInput,
+  type RunCompanionInterventionBootstrapResult,
+} from './application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
+import { fetchParsedPauseArtifactCache } from './infrastructure/queries/artifact-cache-query';
 export {
   invokeGroundingEnrich,
   type GroundingEnrichBody,
@@ -269,7 +275,12 @@ export function loadPauseCompanionOrchestrateSession(input: LoadCompanionOrchest
   });
 }
 
-export type { CompanionSlotOrchestrateMode, RunCompanionSlotOrchestrateResult };
+export type {
+  CompanionSlotOrchestrateMode,
+  RunCompanionSlotOrchestrateResult,
+  RunCompanionInterventionBootstrapInput,
+  RunCompanionInterventionBootstrapResult,
+};
 
 /** Lazy-fetch / regenerate `companion-orchestrate` — wired `CompanionOrchestrator` (presentation). */
 export function invokeCompanionSlotOrchestrate(
@@ -280,6 +291,17 @@ export function invokeCompanionSlotOrchestrate(
   return runCompanionSlotOrchestrate(mode, slot, session, supabaseCompanionOrchestrator);
 }
 
+/** Frame intervention bootstrap — cache hydrate + idempotent `companion-orchestrate` invoke. */
+export function runPauseCompanionInterventionBootstrap(
+  input: RunCompanionInterventionBootstrapInput,
+  loadOrchestrateSession: () => Promise<CompanionOrchestrateSessionContext | null>,
+): Promise<RunCompanionInterventionBootstrapResult> {
+  return runCompanionInterventionBootstrap(input, {
+    fetchArtifactCache: fetchParsedPauseArtifactCache,
+    loadOrchestrateSession,
+    invokeIntervention: (session) => supabaseCompanionOrchestrator.invokeIntervention(session),
+  });
+}
 /** Frame / companion UI — `pause_log_companion` via `PauseRepository` (wired for presentation). */
 export function logPauseCompanion(params: {
   instanceId: string | null;
