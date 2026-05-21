@@ -15366,7 +15366,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; hook file stays under <code>presentation/companion/</code>; <code>public-ritual-frame</code> re-export unchanged.</dd>
       <dt>Tradeoffs</dt>
-      <dd>I/O module grows slightly; avoids deep <code>application/</code> imports from presentation hooks.</dd>
+      <dd>I/O module grows slightly; avoids deep <code>application/</code> imports from presentation hooks. <code>use-companion-slot-ui-state</code> still imports <code>EMPTY_COMPANION_SLOT_RELAXATIONS</code> from <code>ritual/frame/orchestrate-slot-apply</code> until a follow-up peel.</dd>
       <dt>Open questions</dt>
       <dd>Next: lifecycle create/dismiss thin use cases on <code>public-rpc</code>, or Phase B cross-context Tier 1 shim.</dd>
     </dl>

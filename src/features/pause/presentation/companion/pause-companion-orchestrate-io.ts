@@ -1,4 +1,8 @@
-import { applyCompanionOrchestrateRetryReset } from '@/features/pause/application/use-cases/ritual/frame/apply-companion-orchestrate-retry-reset';
+import {
+  applyCompanionOrchestrateRetryReset,
+  type CompanionOrchestrateRetryResetInput,
+  type CompanionOrchestrateRetryResetPorts,
+} from '@/features/pause/application/use-cases/ritual/frame/apply-companion-orchestrate-retry-reset';
 import { applyCompanionSlotOrchestrateOutcome } from '@/features/pause/application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome';
 import type { CompanionOrchestrateSessionContext } from '@/features/pause/application/use-cases/ritual/frame/build-companion-orchestrate-body';
 import { logCompanionSlotOrchestrateInvoke } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry';
@@ -29,6 +33,8 @@ export { companionOrchestrator } from './pause-companion-orchestration-io';
 
 export type {
   ApplyCompanionSlotOrchestrateFailureUiPorts,
+  CompanionOrchestrateRetryResetInput,
+  CompanionOrchestrateRetryResetPorts,
   CompanionOrchestrateSessionContext,
   CompanionSlotAutosaveParams,
   CompanionSlotCacheIds,
