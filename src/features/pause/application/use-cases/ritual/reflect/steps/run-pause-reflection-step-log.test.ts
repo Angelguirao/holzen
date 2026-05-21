@@ -1,8 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import {
-  buildReflectReflectionStepPayload,
-  reflectionStepLoggedStorageKey,
-} from '@/features/pause/domain/reflect/steps/reflection-step-log';
+import { buildReflectReflectionStepPayload } from '@/features/pause/domain/reflect/steps/reflect-note-tag-payload';
+import { reflectionStepLoggedStorageKey } from '@/features/pause/domain/reflect/steps/reflection-step-log';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { runPauseReflectionStepLogOnce } from './run-pause-reflection-step-log';
 

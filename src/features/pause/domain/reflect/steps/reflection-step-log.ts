@@ -4,11 +4,6 @@ export function reflectionStepLoggedStorageKey(pauseInstanceId: string): string 
   return `${REFLECTION_STEP_LOGGED_STORAGE_PREFIX}${pauseInstanceId}`;
 }
 
-/** `reflection_step` payload after reflect copy is ready or failed. */
-export function buildReflectReflectionStepPayload(): { surface: 'pause_reflect' } {
-  return { surface: 'pause_reflect' };
-}
-
 /** Gate before firing `reflection_step` (copy ready or error surfaced). */
 export function shouldLogPauseReflectionStep(input: {
   pauseInstanceId: string | null;
