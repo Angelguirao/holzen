@@ -3,17 +3,26 @@ import { renderHook, act } from '@testing-library/react';
 import type { User } from '@supabase/supabase-js';
 import { useManualPauseTrigger } from './use-manual-pause-trigger';
 
-const { openManualPauseFromHomeMock, clearSessionMock, markPauseManualStartedHomeOnceMock } =
-  vi.hoisted(() => ({
-    openManualPauseFromHomeMock: vi.fn(),
-    clearSessionMock: vi.fn(),
-    markPauseManualStartedHomeOnceMock: vi.fn(),
-  }));
+const {
+  openManualPauseFromHomeMock,
+  clearSessionMock,
+  markPauseManualStartedHomeOnceMock,
+  trackManualPauseInstanceCreatedMock,
+  trackPauseManualCompletedMock,
+} = vi.hoisted(() => ({
+  openManualPauseFromHomeMock: vi.fn(),
+  clearSessionMock: vi.fn(),
+  markPauseManualStartedHomeOnceMock: vi.fn(),
+  trackManualPauseInstanceCreatedMock: vi.fn(),
+  trackPauseManualCompletedMock: vi.fn(),
+}));
 
 vi.mock('@/features/pause/public-rpc', () => ({
   openManualPauseFromHome: openManualPauseFromHomeMock,
   clearSession: clearSessionMock,
   markPauseManualStartedHomeOnce: markPauseManualStartedHomeOnceMock,
+  trackManualPauseInstanceCreated: trackManualPauseInstanceCreatedMock,
+  trackPauseManualCompleted: trackPauseManualCompletedMock,
   buildManualPauseOpenParams: (input: {
     userId: string;
     silentMode: boolean;
