@@ -7471,6 +7471,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — reflect mood depth context params (backlog #1 incremental)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -7503,6 +7504,21 @@
       <dd>Companion orchestrate hooks still import <code>public-rpc</code> helpers.</dd>
       <dt>Open questions</dt>
       <dd>Next: wire stray ritual log call sites through <code>PauseRepository</code> (backlog #4 remainder), or peel companion orchestrate hooks off <code>public-rpc</code> re-exports.</dd>
+=======
+      <span>Phase A slice — reflect flows handler types (backlog #1 presentation)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Breath/reflect handler slices → <code>presentation/reflect/flows/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate <code>PauseSessionBreathReflect*</code> slice types with <code>use-pause-session-breath-reflect-handlers</code> under <code>presentation/reflect/flows/</code>; <code>pause-session-step-handler-types.ts</code> re-exports for <code>PauseSessionStepHandlersProvidersSlice</code> and <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; types-only move.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mood chrome slice types remain on <code>presentation/session/</code> until a follow-up colocation slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-fullview-telemetry</code> off <code>public-rpc</code> (backlog #3), or backlog #4 remaining <code>PauseRepository</code> call sites.</dd>
+>>>>>>> 4057ea74 (refactor(pause): colocate breath-reflect handler types under reflect/flows)
     </dl>
   </article>
 

@@ -1,8 +1,5 @@
-import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
-import type { BtcPriceData } from '@/features/market/public';
-import type { PauseImpactData } from '@/features/pause/public-hooks';
-import type { PersistedSession } from '@/features/pause/domain/session-model';
 import type {
   BriefPauseStep,
   CompanionData,
@@ -12,6 +9,14 @@ import type {
 } from '@/features/pause/public-hooks';
 import type { FeelStepTile } from '../../domain/feel-step-tile';
 import type { MoodValue } from '../../domain/mood-value';
+import type { PauseSessionBreathReflectProvidersSlice } from '../reflect/flows/pause-session-breath-reflect-handler-types';
+
+export type {
+  PauseSessionBreathReflectMoodSlice,
+  PauseSessionBreathReflectProvidersSlice,
+  PauseSessionBreathReflectRitualSlice,
+  PauseSessionBreathReflectShellSlice,
+} from '../reflect/flows/pause-session-breath-reflect-handler-types';
 
 /** Subset of `usePauseSessionProviders` passed into mood chrome handlers. */
 export type PauseSessionMoodChromeProvidersSlice = {
@@ -59,57 +64,6 @@ export type PauseSessionMoodChromeRitualSlice = {
   setMoodDone: Dispatch<SetStateAction<boolean>>;
   setSelectedMood: Dispatch<SetStateAction<MoodValue | null>>;
   setFeelIntensity: Dispatch<SetStateAction<number | null>>;
-};
-
-/** Subset of `usePauseSessionProviders` passed into breath/reflect handlers. */
-export type PauseSessionBreathReflectProvidersSlice = {
-  t: TFunction;
-  dismissMessage: () => void | Promise<void>;
-  btcData: BtcPriceData | null;
-  subscribed: boolean;
-  subLoading: boolean;
-  requirePro: (feature: 'deep_pause') => boolean;
-  refreshSubscription: () => void | Promise<void>;
-};
-
-/** Subset of shell bootstrap passed into breath/reflect handlers. */
-export type PauseSessionBreathReflectShellSlice = {
-  restored: PersistedSession | null;
-  message: string;
-  context: string | null;
-  pauseInstanceId: string | null;
-  companions: CompanionData;
-};
-
-/** Subset of ritual state passed into breath/reflect handlers. */
-export type PauseSessionBreathReflectRitualSlice = {
-  step: PauseStep;
-  phase: 'session' | 'done';
-  ritualEntry: RitualDepth | 'picker';
-  briefStep: BriefPauseStep;
-  breathingFirstCompleted: boolean;
-  breathingSecondCompleted: boolean;
-  selectedMood: MoodValue | null;
-  selectedMoodAfter: MoodValue | null;
-  feelIntensity: number | null;
-  shiftIntensity: number | null;
-  setSwipeDirection: Dispatch<SetStateAction<'forward' | 'back'>>;
-  setStep: Dispatch<SetStateAction<PauseStep>>;
-  setBriefStep: Dispatch<SetStateAction<BriefPauseStep>>;
-  setBriefIntegrateDone: Dispatch<SetStateAction<boolean>>;
-  setBreathingFirstCompleted: Dispatch<SetStateAction<boolean>>;
-  setBreathingSecondCompleted: Dispatch<SetStateAction<boolean>>;
-  setRitualEntry: Dispatch<SetStateAction<RitualDepth | 'picker'>>;
-  setFrameDone: Dispatch<SetStateAction<boolean>>;
-  setMoodAfterDone: Dispatch<SetStateAction<boolean>>;
-  setDecision: Dispatch<SetStateAction<string | null>>;
-  setPauseImpactData: Dispatch<SetStateAction<PauseImpactData | null>>;
-  setPhase: Dispatch<SetStateAction<'session' | 'done'>>;
-};
-
-/** Dedupe refs from `usePauseSessionMoodAndPersist` for shift/frame RPC logging. */
-export type PauseSessionBreathReflectMoodSlice = {
-  lastShiftLogKeyRef: MutableRefObject<string | null>;
 };
 
 /** Provider fields for mood + breath/reflect step handlers (subset of `usePauseSessionProviders`). */
