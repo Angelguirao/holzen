@@ -1,4 +1,4 @@
-import { bucketChangePercent, computeContextFingerprint } from '@/features/pause/domain/pause-fingerprint';
+import { buildManualPauseCreateOrReuseParams } from '@/features/pause/application/use-cases/ritual/reflect/generation/build-manual-pause-create-or-reuse-params';
 import { pauseCreateSkippedUserMessage } from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-create-skipped-user-message';
 import { runPauseCreateOrReuse } from '@/features/pause/application/use-cases/session/run-pause-create-or-reuse';
 import { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-open-manual-pause-silent-mode-after-create';
@@ -17,8 +17,6 @@ export type {
   OpenManualPauseFromHomeResult,
   OpenManualPauseFromHomeSuccess,
 } from './open-manual-pause-from-home-types';
-
-const VOLATILITY_TEMPLATE = 'volatility_v1';
 
 function mapCreateOrReuseError(e: unknown): OpenManualPauseFromHomeError {
   const raw = e instanceof Error ? e.message : String(e);
@@ -41,35 +39,8 @@ export async function openManualPauseFromHome(
   ports: OpenManualPauseFromHomePorts,
   params: OpenManualPauseFromHomeParams,
 ): Promise<OpenManualPauseFromHomeResult> {
-  const directionBucket = params.changePercent < 0 ? 'down' : 'up';
-  const contextFingerprint = await computeContextFingerprint({
-    templateSlug: VOLATILITY_TEMPLATE,
-    directionBucket,
-    severityBand: params.severityBand,
-    dailyBucketPct: bucketChangePercent(params.changePercent),
-    cumulativeBucketPct: bucketChangePercent(params.cumulativeChangePercent ?? 0),
-    trackedAssetId: params.trackedAssetId,
-    fearGreedBand: params.fearGreedLabel,
-    onChainBand: params.onChainBand,
-  });
-
-  const createParams = {
-    templateSlug: VOLATILITY_TEMPLATE,
-    source: 'manual' as const,
-    contextSnapshot: {
-      change_24h_pct: params.changePercent,
-      change_7d_pct: params.cumulativeChangePercent ?? null,
-      direction: directionBucket,
-      severity: params.severityBand,
-      context_text: params.contextText,
-      last_reported_mood: params.mood ?? null,
-      tracked_asset_id: params.trackedAssetId,
-    },
-    contextRuleResult: { triggered: ['manual'] as const },
-    contextFingerprint,
-  };
-
   try {
+    const createParams = await buildManualPauseCreateOrReuseParams(params);
     const res = await runPauseCreateOrReuse(ports.repository, createParams);
     if (!res.instance_id) {
       return { outcome: 'idle', userMessage: pauseCreateSkippedUserMessage(res.reused_reason) };
