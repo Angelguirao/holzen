@@ -7069,4 +7069,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood/hub use public-ports (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Presentation conductors import default PauseRepository from public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Parallel commits already peeled mood/hub off <code>public-rpc</code> wired facades. This slice switches <code>use-pause-session-initial-mood-handlers</code> and <code>use-pause-shift-frame-done-handler</code> from <code>infrastructure/supabase-pause-repository</code> to <code>public-ports</code> (same adapter, presentation-safe barrel); tests mock <code>public-ports</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session storage and other presentation paths may still import <code>infrastructure/session/*</code> until a dedicated port peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel decide/brief session hooks off <code>public-rpc</code>, companion retry/intervention cluster, or backlog #4 stray mutation call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

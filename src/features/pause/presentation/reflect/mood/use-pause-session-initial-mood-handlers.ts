@@ -10,7 +10,7 @@ import {
   type InitialEmotionUiState,
 } from '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
 import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
-import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
+import { supabasePauseRepository } from '@/features/pause/public-ports';
 
 export function usePauseSessionInitialMoodHandlers(input: {
   pauseInstanceId: string | null;

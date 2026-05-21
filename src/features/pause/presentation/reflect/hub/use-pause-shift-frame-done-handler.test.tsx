@@ -14,7 +14,7 @@ const { logStepMock, mockRepository, showPauseStepSyncFailedToast } = vi.hoisted
   };
 });
 
-vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+vi.mock('@/features/pause/public-ports', () => ({
   supabasePauseRepository: mockRepository,
 }));
 
