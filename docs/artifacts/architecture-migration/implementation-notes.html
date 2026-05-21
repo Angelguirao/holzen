@@ -15309,9 +15309,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; no new PostHog events.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Cooldown math stays in <code>trigger/</code> (scheduling concern) on <code>public-trigger</code>.</dd>
+      <dd>Cooldown math was still in <code>trigger/</code> on <code>public-trigger</code> until the follow-up domain peel (next note).</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>use-companion-orchestrate-retry</code> through <code>pause-companion-orchestrate-io</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual-trigger cooldown pure helpers in domain</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up — compute/flow cooldown → domain/reflect/generation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Move <code>compute-pause-trigger-cooldowns</code> and <code>manual-trigger-cooldown-flow</code> (+ tests) from <code>application/use-cases/trigger/</code> to <code>domain/reflect/generation/</code>; <code>public-trigger</code> and <code>presentation/home/pause-home-reflect-io</code> re-export; <code>use-holzen-manual-trigger-orchestration</code> imports only <code>pause-home-reflect-io</code> (no <code>public-trigger</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; localStorage adapter stays in <code>infrastructure/manual-trigger-cooldown-storage</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>application/use-cases/trigger/</code> is empty after this slice; navigation guard lives under <code>ritual/reflect/generation/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire <code>use-companion-orchestrate-retry</code> through <code>pause-companion-orchestrate-io</code> or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
