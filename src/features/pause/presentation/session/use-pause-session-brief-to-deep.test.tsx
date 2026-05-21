@@ -1,12 +1,21 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { usePauseSessionBriefToDeep } from './use-pause-session-brief-to-deep';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  logPauseRitualDepthUpgraded: vi.fn().mockResolvedValue(true),
+const { logPauseRitualDepthUpgradedMock, mockRepository } = vi.hoisted(() => ({
+  logPauseRitualDepthUpgradedMock: vi.fn().mockResolvedValue(true),
+  mockRepository: { logStep: vi.fn() } as unknown as PauseRepository,
 }));
 
-import { logPauseRitualDepthUpgraded } from '@/features/pause/public-rpc';
+vi.mock('@/features/pause/public-ports', () => ({
+  supabasePauseRepository: mockRepository,
+}));
+
+vi.mock('@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade', () => ({
+  logPauseRitualDepthUpgraded: (...args: unknown[]) => logPauseRitualDepthUpgradedMock(...args),
+}));
+
+import { usePauseSessionBriefToDeep } from './use-pause-session-brief-to-deep';
 
 function baseInput(overrides: Partial<Parameters<typeof usePauseSessionBriefToDeep>[0]> = {}) {
   return {
@@ -62,7 +71,7 @@ describe('usePauseSessionBriefToDeep', () => {
       await result.current.handleBriefSwitchToDeepPause();
     });
     expect(requirePro).toHaveBeenCalledWith('deep_pause');
-    expect(logPauseRitualDepthUpgraded).not.toHaveBeenCalled();
+    expect(logPauseRitualDepthUpgradedMock).not.toHaveBeenCalled();
     expect(setStep).not.toHaveBeenCalled();
   });
 
@@ -75,7 +84,11 @@ describe('usePauseSessionBriefToDeep', () => {
     await act(async () => {
       await result.current.handleBriefSwitchToDeepPause();
     });
-    expect(logPauseRitualDepthUpgraded).toHaveBeenCalledWith('pause-1', expect.any(Function));
+    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith(
+      mockRepository,
+      'pause-1',
+      expect.any(Function),
+    );
     expect(setRitualEntry).toHaveBeenCalledWith('deep');
     expect(setStep).toHaveBeenCalledWith('reflect');
   });
