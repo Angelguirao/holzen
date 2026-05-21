@@ -8437,4 +8437,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual pause trigger via public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-manual-pause-trigger → openManualPauseFromHome facade</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>use-manual-pause-trigger</code> calls wired <code>openManualPauseFromHome</code> on <code>public-rpc</code> (repository + silent ReflectGenerator stub) instead of the use case + <code>public-ports</code> adapters.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; use-case unit tests unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestrate + fullview telemetry still inject <code>public-ports</code> until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>use-fullview-telemetry</code> analytics facade, or breath segment loggers off <code>public-ports</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
