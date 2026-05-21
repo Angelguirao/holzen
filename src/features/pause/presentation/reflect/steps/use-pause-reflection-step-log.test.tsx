@@ -2,27 +2,16 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { usePauseReflectionStepLog } from './use-pause-reflection-step-log';
 
-const { runPauseReflectionStepLogOnceMock, mockPauseRepository, mockReflectionStepStorage } =
-  vi.hoisted(() => ({
-    runPauseReflectionStepLogOnceMock: vi.fn(),
-    mockPauseRepository: { port: 'supabasePauseRepository' },
-    mockReflectionStepStorage: { port: 'reflectionStepSessionStorage' },
-  }));
-
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: mockPauseRepository,
-  reflectionStepSessionStorage: mockReflectionStepStorage,
+const { pauseReflectionStepLogOnceMock } = vi.hoisted(() => ({
+  pauseReflectionStepLogOnceMock: vi.fn(),
 }));
 
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log',
-  () => ({
-    runPauseReflectionStepLogOnce: runPauseReflectionStepLogOnceMock,
-  }),
-);
+vi.mock('./pause-reflect-steps-io', () => ({
+  pauseReflectionStepLogOnce: pauseReflectionStepLogOnceMock,
+}));
 
 beforeEach(() => {
-  runPauseReflectionStepLogOnceMock.mockReset().mockResolvedValue({ status: 'logged' });
+  pauseReflectionStepLogOnceMock.mockReset().mockResolvedValue({ status: 'logged' });
 });
 
 describe('usePauseReflectionStepLog', () => {
@@ -37,14 +26,10 @@ describe('usePauseReflectionStepLog', () => {
     );
 
     await waitFor(() => {
-      expect(runPauseReflectionStepLogOnceMock).toHaveBeenCalledWith(
-        mockPauseRepository,
-        { pauseInstanceId: 'pause-1' },
-        { storage: mockReflectionStepStorage },
-      );
+      expect(pauseReflectionStepLogOnceMock).toHaveBeenCalledWith({
+        pauseInstanceId: 'pause-1',
+      });
     });
-    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
-    expect(mockReflectionStepStorage.port).toBe('reflectionStepSessionStorage');
   });
 
   it('does not log while loading or without copy', async () => {
@@ -60,7 +45,7 @@ describe('usePauseReflectionStepLog', () => {
       },
     );
 
-    expect(runPauseReflectionStepLogOnceMock).not.toHaveBeenCalled();
+    expect(pauseReflectionStepLogOnceMock).not.toHaveBeenCalled();
 
     rerender({
       pauseInstanceId: 'pause-1',
@@ -69,6 +54,6 @@ describe('usePauseReflectionStepLog', () => {
       reflectionError: null,
     });
 
-    expect(runPauseReflectionStepLogOnceMock).not.toHaveBeenCalled();
+    expect(pauseReflectionStepLogOnceMock).not.toHaveBeenCalled();
   });
 });

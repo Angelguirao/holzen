@@ -2,21 +2,13 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { usePauseReflectTags } from './use-pause-reflect-tags';
 
-const { runPauseReflectTagUpdateMock, emptyTags, mockPauseRepository } = vi.hoisted(() => ({
-  runPauseReflectTagUpdateMock: vi.fn(),
+const { pauseReflectTagUpdateMock, emptyTags } = vi.hoisted(() => ({
+  pauseReflectTagUpdateMock: vi.fn(),
   emptyTags: [] as string[],
-  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update',
-  () => ({
-    runPauseReflectTagUpdate: runPauseReflectTagUpdateMock,
-  }),
-);
-
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: mockPauseRepository,
+vi.mock('./pause-reflect-steps-io', () => ({
+  pauseReflectTagUpdate: pauseReflectTagUpdateMock,
 }));
 
 vi.mock('@/features/auth/public', () => ({
@@ -36,11 +28,11 @@ vi.mock('@/features/pause/public-queries', () => ({
 }));
 
 beforeEach(() => {
-  runPauseReflectTagUpdateMock.mockReset().mockResolvedValue({ status: 'success' });
+  pauseReflectTagUpdateMock.mockReset().mockResolvedValue({ status: 'success' });
 });
 
 describe('usePauseReflectTags', () => {
-  it('commits new tag via runPauseReflectTagUpdate + PauseRepository', async () => {
+  it('commits new tag via pauseReflectTagUpdate I/O', async () => {
     const { result } = renderHook(() => usePauseReflectTags('pause-1'));
 
     act(() => {
@@ -51,10 +43,9 @@ describe('usePauseReflectTags', () => {
       result.current.addDraft();
     });
 
-    expect(runPauseReflectTagUpdateMock).toHaveBeenCalledWith(mockPauseRepository, {
+    expect(pauseReflectTagUpdateMock).toHaveBeenCalledWith({
       pauseInstanceId: 'pause-1',
       tags: ['calm'],
     });
-    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
   });
 });

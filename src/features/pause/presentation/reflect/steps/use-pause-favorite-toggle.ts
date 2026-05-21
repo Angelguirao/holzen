@@ -4,9 +4,8 @@ import type { TFunction } from 'i18next';
 import { useAuth } from '@/features/auth/public';
 import { showPauseFavoriteProHintToast } from '@/features/pause/presentation/reflect/steps/pause-favorite-pro-hint-toast';
 import { pauseArchiveListQueryPrefix } from '@/features/pause/public-queries';
-import { runPauseFavoriteToggle } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import { shouldShowFavoriteProHint } from '@/features/pause/domain/reflect/steps/favorite-toggle';
-import { supabasePauseRepository } from '@/features/pause/public-rpc';
+import { pauseReflectFavoriteToggle } from './pause-reflect-steps-io';
 import { hapticFeedback } from '@/lib/haptics';
 
 export function usePauseFavoriteToggle(input: {
@@ -26,7 +25,7 @@ export function usePauseFavoriteToggle(input: {
     setIsFavorite(optimisticNext);
     hapticFeedback('light');
 
-    const outcome = await runPauseFavoriteToggle(supabasePauseRepository, {
+    const outcome = await pauseReflectFavoriteToggle({
       pauseInstanceId,
       isFavorite,
     });
