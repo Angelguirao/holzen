@@ -55,7 +55,7 @@ The ecosystem moved **away from**:
 
 | Check | Target | Today |
 |-------|--------|-------|
-| New ritual logic lands under pause feature module | ✅ required | ⚠️ converging — some use cases still at `application/use-cases/companion/` / `reflect/` (target `ritual/frame/` + `ritual/reflect/`) |
+| New ritual logic lands under pause feature module | ✅ required | ✅ converged — reflect + frame use cases under `application/use-cases/ritual/reflect/` and `ritual/frame/` ([pause-client-architecture.md](../systems/pause-client-architecture.md) §10.1) |
 | Nav tabs are screens, not packages | ✅ | ⚠️ naming implied otherwise in old layout |
 | Delete a feature = delete one folder/package | ✅ | ❌ cross-cutting imports |
 
@@ -237,7 +237,7 @@ packages/shared-kernel/      # minimal shared types
 
 ```text
 application/use-cases/ritual/reflect/   # reflect use cases (Phase A complete May 2026)
-application/use-cases/ritual/frame/     # target — companion still at application/use-cases/companion/ until Phase A
+application/use-cases/ritual/frame/     # companion orchestration (Phase A complete May 2026)
 presentation/   OR   apps/web/src/screens/pause/
 ```
 
@@ -267,7 +267,7 @@ Add to [react-spa-review-template.md](../reviews/react-spa-review-template.md) f
 Order that satisfies **both** this doc and [frontend-module-layout.md](frontend-module-layout.md):
 
 1. **Screens** — `apps/web/src/screens/*` (Home, Archive, Pause, …).
-2. **`packages/pause`** (today: `src/features/pause/`) — domain + use cases first; reflect + frame **target** `application/use-cases/ritual/reflect/` and `ritual/frame/` — on disk still `application/use-cases/companion/` (orchestration hub) until Phase A companion slices finish ([pause-client-architecture.md](../systems/pause-client-architecture.md) §3, §10).
+2. **`packages/pause`** (today: `src/features/pause/`) — domain + use cases first; reflect + frame under `application/use-cases/ritual/reflect/` and `ritual/frame/` ([pause-client-architecture.md](../systems/pause-client-architecture.md) §3, §10).
 3. **`packages/infrastructure`** — adapters; Query `queryOptions` factories move here.
 4. **Thin hooks** — screens call use cases. **Home/settings:** orchestration in `screens/<route>/hooks/` where screen-local. **Pause:** conductors in `features/pause/presentation/` per [pause-client-architecture.md](../systems/pause-client-architecture.md) §3.2 (no `screens/pause/hooks/`).
 5. **`contracts`** — when touching edge/RPC JSON.

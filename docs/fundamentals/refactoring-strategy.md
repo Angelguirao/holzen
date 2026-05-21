@@ -19,7 +19,7 @@ It complements:
 
 ## Is the direction “correct”?
 
-**Yes, for this codebase.** The backlog explicitly rejects a **big-bang** rewrite in favor of **small, behavior-preserving extractions**. What has been shipped (Home chrome, PauseSession storage/scaffold, **`useHolzen` producer split** into `features/pause/presentation/` + pure helpers in feature modules, `use-companion-data` in `features/pause/presentation/` with use cases under `application/use-cases/companion/` → target `ritual/frame/`) matches that contract:
+**Yes, for this codebase.** The backlog explicitly rejects a **big-bang** rewrite in favor of **small, behavior-preserving extractions**. What has been shipped (Home chrome, PauseSession storage/scaffold, **`useHolzen` producer split** into `features/pause/presentation/` + pure helpers in feature modules, `use-companion-data` in `features/pause/presentation/` with use cases under `application/use-cases/ritual/frame/`) matches that contract:
 
 | Principle | How we’re applying it |
 |-----------|------------------------|
@@ -59,7 +59,7 @@ This aligns with **navigating-the-codebase §6.1**: not every concern needs `use
 
 ### 3. **Extract “glue” that crosses HTTP/storage boundaries**
 
-**What:** e.g. `features/pause/infrastructure/session/persisted-session-storage.ts`, `features/pause/application/use-cases/companion/orchestrate-slot-apply.ts`, reflection companion cache parsing.
+**What:** e.g. `features/pause/infrastructure/session/persisted-session-storage.ts`, `features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply.ts`, reflection companion cache parsing.
 
 **Why:** Isolates **side effects and serialization** from UI and from the main hook loop, so bugs are easier to localize (storage vs orchestrate vs render).
 
