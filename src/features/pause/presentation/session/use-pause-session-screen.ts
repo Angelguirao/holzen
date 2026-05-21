@@ -1,6 +1,6 @@
 import { usePauseSessionProviders } from './use-pause-session-providers-conductor';
 import { usePauseSessionFlow } from './use-pause-session-flow';
-import type { PauseScaffoldChromeRegistry } from './pause-session-scaffold-vm-types';
+import type { PauseScaffoldChromeRegistry } from './scaffold/pause-session-scaffold-vm-types';
 import type { PauseSessionProviders } from './pause-session-providers-types';
 import type { PauseSessionRitualSurfaceResult } from './use-pause-session-ritual-surface';
 

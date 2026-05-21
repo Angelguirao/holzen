@@ -2,11 +2,11 @@ import type { Entitlement } from '@/features/subscription/public';
 import type { PauseBreathSecondLabelVariant } from '@/features/pause/public-session';
 import type { PauseHolzenProvidersSlice } from '@/features/pause/public-session';
 import type { PauseSessionFlowCoreProvidersSlice } from './use-pause-session-flow-core';
-import type { PauseSessionScaffoldVmProvidersSlice } from './pause-session-scaffold-vm-types';
+import type { PauseSessionScaffoldVmProvidersSlice } from './scaffold/pause-session-scaffold-vm-types';
 import type { PauseSessionShellRitualProvidersSlice } from './use-pause-session-shell-ritual';
 
 export type { PauseSessionFlowCoreProvidersSlice } from './use-pause-session-flow-core';
-export type { PauseSessionScaffoldVmProvidersSlice } from './pause-session-scaffold-vm-types';
+export type { PauseSessionScaffoldVmProvidersSlice } from './scaffold/pause-session-scaffold-vm-types';
 
 /** Holzen home context fields required by `/pause` providers (injected from `useHolzen` in screens). */
 export type PauseSessionHolzenProvidersSlice = PauseHolzenProvidersSlice;

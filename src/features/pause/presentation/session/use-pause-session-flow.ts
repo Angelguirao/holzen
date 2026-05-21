@@ -1,12 +1,12 @@
 import { usePauseSessionFlowCore } from './use-pause-session-flow-core';
-import { usePauseSessionScaffoldVm } from './use-pause-session-scaffold-vm';
+import { usePauseSessionScaffoldVm } from './scaffold/use-pause-session-scaffold-vm';
 import { usePauseSessionRitualSurface } from './use-pause-session-ritual-surface';
-import { usePauseSessionScaffoldChromeSlots } from './use-pause-session-scaffold-chrome-slots';
+import { usePauseSessionScaffoldChromeSlots } from './scaffold/use-pause-session-scaffold-chrome-slots';
 import type { PauseSessionProviders } from './pause-session-providers-types';
 import type {
   PauseScaffoldChromeRegistry,
   PauseSessionScaffoldVmChromeSlots,
-} from './pause-session-scaffold-vm-types';
+} from './scaffold/pause-session-scaffold-vm-types';
 import type { PauseSessionStepHandlersResult } from './use-pause-session-step-handlers';
 import type { PauseSessionRitualSurfaceResult } from './use-pause-session-ritual-surface';
 
