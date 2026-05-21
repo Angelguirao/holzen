@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { companionSectionProFavoriteProps } from '@/screens/pause/lib/companion-section-pro-favorite';
+import { companionSectionProFavoriteProps } from './companion-section-pro-favorite';
 
 describe('companionSectionProFavoriteProps', () => {
   it('returns empty when not Pro', () => {

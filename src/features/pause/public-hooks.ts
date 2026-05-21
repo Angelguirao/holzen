@@ -58,6 +58,10 @@ export type {
   CompanionSlotRelaxations,
 } from './application/use-cases/ritual/frame/orchestrate-slot-apply';
 export {
+  companionSectionProFavoriteProps,
+  type CompanionSectionProFavoriteProps,
+} from './application/use-cases/ritual/frame/companion-section-pro-favorite';
+export {
   BRIEF_PAUSE_ORDER,
   computeBriefMacroProgressPosition,
 } from './domain/brief-ritual-steps';
