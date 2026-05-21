@@ -12674,4 +12674,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — ritual/reflect/flows cluster (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-reflect-and-decide-flow</code> under <code>application/use-cases/ritual/reflect/flows/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder move (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete. Pure view math stays in <code>domain/reflect/flows/pause-session-reflect-and-decide-view.ts</code>; application <code>flows/</code> exposes preflight vs post-generation entry points for the session reflect+decide conductor. <code>use-pause-session-reflect-and-decide</code> imports application flow helpers instead of domain directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; domain builder unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Thin wrappers only; avoids duplicating domain tests. <code>check:architecture-alignment</code> now requires <code>ritual/reflect/flows/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Phase B: subscription/auth <code>src/lib/*</code> shims using pause as template.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

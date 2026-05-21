@@ -45,6 +45,10 @@ for (const ctx of contexts) {
 
 mustExist('src/features/pause/application/use-cases/ritual/frame', 'pause/application/use-cases/ritual/frame/');
 mustExist('src/features/pause/application/use-cases/ritual/reflect', 'pause/application/use-cases/ritual/reflect/');
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/flows',
+  'pause/application/use-cases/ritual/reflect/flows/',
+);
 mustExist('src/features/pause/application/use-cases/session', 'pause/application/use-cases/session/');
 mustExist('src/features/pause/application/use-cases/ritual/brief', 'pause/application/use-cases/ritual/brief/');
 mustNotExist(
