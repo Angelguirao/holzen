@@ -101,9 +101,9 @@ export {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
 } from './application/use-cases/ritual/breathe/restored-breath-ritual-state';
+export { initialFrameDoneFromRestored } from './application/use-cases/ritual/frame/restored-frame-ritual-state';
 export {
   initialDecisionFromRestored,
-  initialFrameDoneFromRestored,
   initialPhaseFromRestored,
   mapPersistedStep,
 } from './application/use-cases/session/step-map';
