@@ -3,22 +3,37 @@ import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+import {
+  runInitialEmotionSelect,
+  runInitialEmotionSkip,
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
 import { usePauseSessionInitialMoodHandlers } from './use-pause-session-initial-mood-handlers';
 
-const { logStepMock, mockRepository, showPauseStepSyncFailedToast } = vi.hoisted(() => {
+const {
+  logStepMock,
+  mockRepository,
+  showPauseStepSyncFailedToast,
+  logPauseInitialEmotionSelect,
+  logPauseInitialEmotionSkip,
+} = vi.hoisted(() => {
   const logStepMock = vi.fn();
+  const mockRepository = { logStep: logStepMock } as unknown as PauseRepository;
   return {
     logStepMock,
-    mockRepository: { logStep: logStepMock } as unknown as PauseRepository,
+    mockRepository,
     showPauseStepSyncFailedToast: vi.fn(),
+    logPauseInitialEmotionSelect: vi.fn((input: Parameters<typeof runInitialEmotionSelect>[1]) =>
+      runInitialEmotionSelect(mockRepository, input),
+    ),
+    logPauseInitialEmotionSkip: vi.fn((input: Parameters<typeof runInitialEmotionSkip>[1]) =>
+      runInitialEmotionSkip(mockRepository, input),
+    ),
   };
 });
 
-vi.mock('@/features/pause/public-ports', () => ({
-  supabasePauseRepository: mockRepository,
-}));
-
 vi.mock('@/features/pause/public-rpc', () => ({
+  logPauseInitialEmotionSelect,
+  logPauseInitialEmotionSkip,
   showPauseStepSyncFailedToast,
 }));
 
