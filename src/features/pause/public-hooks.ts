@@ -263,6 +263,7 @@ export {
   resolvePauseReflectMessageView,
   type PauseReflectMessageView,
 } from './domain/reflect/generation/resolve-pause-reflect-message-view';
+export { buildReflectionShareText } from './domain/reflect/share/reflection-share-text';
 export { useCompanionSlotOrchestratePorts } from './presentation/companion/use-companion-slot-orchestrate-ports';
 export { usePauseReflectionStepLog } from './presentation/reflect/steps/use-pause-reflection-step-log';
 export {
