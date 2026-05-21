@@ -78,6 +78,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect ambience I/O direct domain bed helpers (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-ambience-io</code> off application <code>reflect-frame-focus-ambience</code> re-export</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no folder moves. Peel <code>pause-reflect-ambience-io</code> to <code>domain/ritual/breathe/reflect-frame-focus-ambience</code> instead of the application CI re-export (parity with mood/hub/generation direct-import peels; Web Audio implementation stays in domain).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>reflect-frame-focus-ambience.ts</code> application anchor remains for <code>check:architecture-alignment</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reconcile steps I/O flow-anchor vs direct-import pattern, or companion analytics flow anchor.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect steps I/O via steps flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
