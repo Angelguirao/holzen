@@ -7,16 +7,6 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabaseReflectGenerator: { port: 'reflectGenerator' },
 }));
 
-vi.mock('./pause-reflect-flows-io', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('./pause-reflect-flows-io')>();
-  return {
-    resolvePauseSessionReflectAndDecidePreflight:
-      actual.resolvePauseSessionReflectAndDecidePreflight,
-    resolvePauseSessionReflectAndDecideAfterGeneration:
-      actual.resolvePauseSessionReflectAndDecideAfterGeneration,
-  };
-});
-
 import { usePauseSessionReflectAndDecide } from './use-pause-session-reflect-and-decide';
 
 const {
@@ -59,7 +49,7 @@ vi.mock('./use-pause-session-decide-handler', () => ({
   usePauseSessionDecideHandler: usePauseSessionDecideHandlerMock,
 }));
 
-vi.mock('./pause-reflect-flows-io', async () => {
+vi.mock('@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow', async () => {
   const flow = await import(
     '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow'
   );

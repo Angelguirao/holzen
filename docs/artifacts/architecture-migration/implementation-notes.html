@@ -15258,4 +15258,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual-trigger start error mapping in domain</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up — map-manual-trigger-start-error → domain/reflect/generation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Colocate Home manual-trigger start error copy beside <code>map-manual-pause-open-error</code>; keep <code>public-trigger</code> re-export for presentation. Fix <code>use-pause-session-reflect-and-decide</code> test to mock domain flow module (hook imports domain directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Remaining <code>application/use-cases/trigger/</code> cooldown/navigation helpers stay until next slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move cooldown pure helpers to <code>domain/reflect/generation/</code> or peel <code>reflect-frame-focus-ambience</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
