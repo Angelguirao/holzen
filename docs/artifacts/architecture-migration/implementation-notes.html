@@ -4181,6 +4181,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate pause create-skipped copy under trigger/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; manual-open trigger cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code> (ReflectGenerator port landed on remote). Move <code>pauseCreateSkippedUserMessage</code> beside <code>open-manual-pause-from-home</code> under <code>application/use-cases/trigger/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>; single consumer import path updated.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flat <code>application/use-cases/</code> root now holds only <code>edge/</code> facade (shared edge error re-export).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>CompanionOrchestrator</code> port (backlog #4), or <code>ritual/brief/</code> + <code>ritual/deep/</code> consolidation per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
