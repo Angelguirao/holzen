@@ -4463,6 +4463,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation step gate in domain/ (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; holzen-reflect enabled steps colocated with other reflect domain rules</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move pure <code>isPauseReflectGenerationEnabled</code> to <code>domain/reflect-generation-enabled.ts</code> beside <code>reflect-generation-prerequisites</code>; <code>pause-session-reflect-decide-flow</code> imports domain.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>reflect-generation-hook-flow</code> and <code>run-reflect-generation</code> remain under <code>ritual/reflect/generation/</code> until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4), or peel <code>reflect-generation-hook-flow</code> if another reflect domain cluster is needed.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
