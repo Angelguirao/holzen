@@ -290,39 +290,30 @@ export {
   type ZenModeHomeRoutePropsProjection,
 } from './presentation/home/use-zen-mode-home-route-props';
 export {
-  usePauseReflectGeneration,
-  type UsePauseReflectGenerationParams,
-} from './presentation/reflect/generation/use-pause-reflect-generation';
-export {
-  usePauseArtifactHaiku,
-  type PauseArtifactHaikuFetchPhase,
-  type UsePauseArtifactHaikuParams,
-  type UsePauseArtifactHaikuResult,
-} from './presentation/reflect/generation/use-pause-artifact-haiku';
-export {
-  usePauseArtifactReflectionText,
-  type PauseArtifactReflectionTextFetchPhase,
-  type UsePauseArtifactReflectionTextParams,
-  type UsePauseArtifactReflectionTextResult,
-} from './presentation/reflect/generation/use-pause-artifact-reflection-text';
-export {
   buildReflectionShareText,
   resolveEffectiveReflectionCopy,
   resolveFrameHaikuDisplayBody,
   resolvePauseReflectMessageView,
   type PauseReflectMessageView,
-} from './public-ritual-reflect';
-export {
+  usePauseArtifactHaiku,
+  type PauseArtifactHaikuFetchPhase,
+  type UsePauseArtifactHaikuParams,
+  type UsePauseArtifactHaikuResult,
+  usePauseArtifactReflectionText,
+  type PauseArtifactReflectionTextFetchPhase,
+  type UsePauseArtifactReflectionTextParams,
+  type UsePauseArtifactReflectionTextResult,
+  usePauseReflectGeneration,
+  type UsePauseReflectGenerationParams,
+  usePauseReflectFrameFocusAmbience,
+  usePauseReflectNote,
+  usePauseReflectionStepLog,
+  usePauseReflectTags,
+  usePauseReflectUiTelemetry,
   useReflectionShareHandlers,
   type UseReflectionShareHandlersParams,
-} from './presentation/reflect/share/use-reflection-share-handlers';
+} from './public-ritual-reflect';
 export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/reflect/mood/pause-depth-picker-styles';
-export { usePauseReflectionStepLog } from './presentation/reflect/steps/use-pause-reflection-step-log';
-export {
-  usePauseReflectUiTelemetry,
-} from './presentation/reflect/telemetry/use-pause-reflect-ui-telemetry';
-export { usePauseReflectTags } from './presentation/reflect/steps/use-pause-reflect-tags';
-export { usePauseReflectNote } from './presentation/reflect/steps/use-pause-reflect-note';
 export {
   useCompanionHistoryThread,
   type HistoryThreadRow,
@@ -389,7 +380,6 @@ export {
   type FullviewCompanion,
 } from './presentation/companion/use-fullview-telemetry';
 export { usePauseFavoriteToggle } from './presentation/reflect/steps/use-pause-favorite-toggle';
-export { usePauseReflectFrameFocusAmbience } from './presentation/reflect/ambience/use-pause-reflect-frame-focus-ambience';
 export { usePauseFeelShiftLogDedupeRefs } from './presentation/reflect/mood/use-pause-feel-shift-log-dedupe-refs';
 export { usePauseBreathSegmentRpcLoggers } from './presentation/session/use-pause-breath-segment-rpc-loggers';
 export { usePauseSessionMountLog } from './presentation/session/use-pause-session-mount-log';

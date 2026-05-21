@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Pencil } from 'lucide-react';
-import { usePauseReflectNote } from '@/features/pause/public-hooks';
+import { usePauseReflectNote } from '@/features/pause/public-ritual-reflect';
 
 interface Props {
   pauseInstanceId: string;

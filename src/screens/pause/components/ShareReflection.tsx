@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useReflectionShareHandlers } from '@/features/pause/public-hooks';
+import { useReflectionShareHandlers } from '@/features/pause/public-ritual-reflect';
 
 interface Props {
   message: string;

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { usePauseArtifactHaiku } from '@/features/pause/public-hooks';
+import { usePauseArtifactHaiku } from '@/features/pause/public-ritual-reflect';
 import { PauseReflectFavoriteButton } from '@/screens/pause/components/pause-reflect-favorite-button';
 import { PauseReflectMessageBody } from '@/screens/pause/components/pause-reflect-message-body';
 import { PauseReflectPostItSection } from '@/screens/pause/components/pause-reflect-post-it-section';

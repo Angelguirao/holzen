@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { pauseStepLayout } from '@/features/pause/public-hooks';
-import { usePauseReflectionStepLog } from '@/features/pause/public-hooks';
+import { usePauseReflectionStepLog } from '@/features/pause/public-ritual-reflect';
 import { PauseReflectCard } from '@/screens/pause/components/pause-reflect-card';
 import { PauseReflectStepNav } from '@/screens/pause/components/pause-reflect-step-nav';
 

@@ -10356,4 +10356,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — public-ritual-reflect hooks (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; pause screens import reflect hooks from ritual barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — 14 use-case modules under <code>ritual/reflect/</code>, zero <code>application/use-cases/reflect/</code>. Extend <code>public-ritual-reflect.ts</code> with reflect presentation hooks (generation, steps, share, ambience, telemetry); <code>PauseReflect</code>, <code>PauseNote</code>, <code>PauseTags</code>, <code>PauseFrame</code>, share/telemetry components import the barrel; <code>public-hooks</code> re-exports for backward compatibility.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mirrors <code>public-ritual-brief.ts</code> pattern; no file moves under <code>application/</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mood/flow conductors still export from <code>public-hooks</code> until a later peel; <code>pauseStepLayout</code> stays on session barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: remaining <code>PauseRepository</code> stray call-site audit; optional <code>public-ritual-breathe</code> for timed-loop screens.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
