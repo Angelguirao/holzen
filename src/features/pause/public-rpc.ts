@@ -3,6 +3,7 @@
  * Import from here in hooks/tests — not from `public.ts`, which stays free of
  * infrastructure side effects. Query factories stay on `public-queries.ts`.
  */
+import type { PauseCreateOrReuseResult } from './domain/rpc-types';
 export type {
   PauseAdoptPendingResult,
   PauseCreateOrReuseResult,
@@ -33,11 +34,25 @@ export {
   type GroundingEnrichBody,
   type GroundingEnrichment,
 } from './infrastructure/edge/grounding-enrich-edge';
+import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
+import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
 import type { RunReflectGenerationInput } from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
 import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
+import type { PauseRepository } from './ports/pause-repository';
 import { showPauseStepSyncFailedToast } from './presentation/ritual/pause-step-sync-toast';
 
 export type { RunReflectGenerationInput, ReflectGenerationResult };
+
+/** Lifecycle: `pause_create_or_reuse` / `pause_dismiss_current` via wired `PauseRepository`. */
+export async function pauseCreateOrReuse(
+  params: Parameters<PauseRepository['createOrReuse']>[0],
+): Promise<PauseCreateOrReuseResult> {
+  return runPauseCreateOrReuse(supabasePauseRepository, params);
+}
+
+export async function pauseDismissCurrent(): Promise<PauseState | null> {
+  return runPauseDismissCurrent(supabasePauseRepository);
+}
 
 /** Lifecycle + ritual mutations — wired port adapters; no generic `pauseLogStep` export. */
 

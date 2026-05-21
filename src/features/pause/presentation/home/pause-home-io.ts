@@ -1,6 +1,10 @@
 import { dismissOpenPauseHome } from '@/features/pause/application/use-cases/home/dismiss-open-pause-home';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-import { supabasePauseRepository, supabaseReflectGenerator } from '@/features/pause/public-rpc';
+import {
+  pauseDismissCurrent,
+  supabasePauseRepository,
+  supabaseReflectGenerator,
+} from '@/features/pause/public-rpc';
 export {
   applyManualPauseOpenResult,
   buildManualPauseCreateOrReuseParams,
@@ -39,15 +43,18 @@ export const pauseHomeManualOpenPorts = {
   reflect: supabaseReflectGenerator,
 } as const;
 
-/** Default port + use case: clear Home preview and dismiss current pause instance. */
-export function pauseDismissOpenPauseHomePreview(ports: {
+/** Default facade: clear Home preview and dismiss current pause instance. */
+export async function pauseDismissOpenPauseHomePreview(ports: {
   hasUser: boolean;
   clearPreview: () => void;
-}): ReturnType<typeof dismissOpenPauseHome> {
-  return dismissOpenPauseHome(ports.hasUser, {
-    clearPreview: ports.clearPreview,
-    repository: supabasePauseRepository,
-  });
+}): Promise<void> {
+  ports.clearPreview();
+  if (!ports.hasUser) return;
+  try {
+    await pauseDismissCurrent();
+  } catch {
+    /* non-fatal — preview already cleared locally */
+  }
 }
 
 /** Test seam: inject a custom `PauseRepository` for Home dismiss. */
