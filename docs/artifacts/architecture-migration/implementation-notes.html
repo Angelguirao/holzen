@@ -11420,4 +11420,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel fullview page helpers off public-rpc (backlog #1 verified, backlog #3/#4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; frame fullview + section conductors bypass public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. After fullview telemetry peel (<code>7735f935</code>), point <code>use-companion-fullview-page</code> and <code>use-companion-section</code> at <code>ritual/frame/full-view-page-helpers</code> and <code>section-visibility</code>; drop pure-helper re-exports from <code>public-rpc</code>. Wired orchestrate/lifecycle facades stay on <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestrate cluster (<code>nextExpandedWithLazyFetch</code>, slot run-orchestrate, intervention bootstrap) still on <code>public-rpc</code> until a dedicated peel slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel orchestrate presentation hooks or audit <code>persistCompanionUiStepCompletion</code> / home facades.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
