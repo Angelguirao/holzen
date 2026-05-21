@@ -6,8 +6,10 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 import {
+  buildManualPauseCreateOrReuseParams,
   buildManualPauseMarketContext,
   buildManualPauseOpenParams,
+  MANUAL_PAUSE_VOLATILITY_TEMPLATE,
   pauseHomeManualOpenPorts,
 } from './pause-home-io';
 
@@ -26,6 +28,11 @@ describe('pause-home-io', () => {
     expect(market.assetId).toBe('bitcoin');
     expect(market.ctx.length).toBeGreaterThan(0);
     expect(market.silentMsg.length).toBeGreaterThan(0);
+  });
+
+  it('re-exports manual-open create-or-reuse builder for Home test seams', () => {
+    expect(typeof buildManualPauseCreateOrReuseParams).toBe('function');
+    expect(MANUAL_PAUSE_VOLATILITY_TEMPLATE).toBe('volatility_v1');
   });
 
   it('re-exports buildManualPauseOpenParams and default manual-open ports', () => {
