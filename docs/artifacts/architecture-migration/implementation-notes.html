@@ -8760,4 +8760,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — invokeCompanionSlotOrchestrate on public-rpc (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; slot lazy-fetch/regenerate wired facade</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no legacy reflect use-case paths. Add <code>invokeCompanionSlotOrchestrate</code> on <code>public-rpc</code> (wired <code>supabaseCompanionOrchestrator</code>); <code>use-companion-slot-run-orchestrate</code> imports facade instead of use case + ports hook. Remove <code>use-companion-slot-orchestrate-ports</code> and <code>public-hooks</code> re-export.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import surface only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other frame orchestration helpers still import <code>ritual/frame/*</code> directly until further thin facades land.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: intervention bootstrap thin runner on <code>public-rpc</code>, or audit stray mutations bypassing <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

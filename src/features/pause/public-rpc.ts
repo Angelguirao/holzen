@@ -34,6 +34,12 @@ export {
 export type { CompanionOrchestrateSessionContext } from './application/use-cases/ritual/frame/build-companion-orchestrate-body';
 export type { LoadCompanionOrchestrateSessionInput } from './application/use-cases/ritual/frame/load-companion-orchestrate-session';
 import {
+  runCompanionSlotOrchestrate,
+  type CompanionSlotOrchestrateMode,
+  type RunCompanionSlotOrchestrateResult,
+} from './application/use-cases/ritual/frame/run-companion-slot-orchestrate';
+import type { RegenerateCompanionSlot } from './domain/companion-orchestrate';
+import {
   loadCompanionOrchestrateSession as loadCompanionOrchestrateSessionUseCase,
   type LoadCompanionOrchestrateSessionInput,
 } from './application/use-cases/ritual/frame/load-companion-orchestrate-session';
@@ -271,6 +277,17 @@ export function loadPauseCompanionOrchestrateSession(input: LoadCompanionOrchest
   return loadCompanionOrchestrateSessionUseCase(input, {
     loadMoodHistory: loadMoodHistoryForOrchestrate,
   });
+}
+
+export type { CompanionSlotOrchestrateMode, RunCompanionSlotOrchestrateResult };
+
+/** Lazy-fetch / regenerate `companion-orchestrate` — wired `CompanionOrchestrator` (presentation). */
+export function invokeCompanionSlotOrchestrate(
+  mode: CompanionSlotOrchestrateMode,
+  slot: RegenerateCompanionSlot,
+  session: CompanionOrchestrateSessionContext,
+): Promise<RunCompanionSlotOrchestrateResult> {
+  return runCompanionSlotOrchestrate(mode, slot, session, supabaseCompanionOrchestrator);
 }
 
 /** Frame / companion UI — `pause_log_companion` via `PauseRepository` (wired for presentation). */
