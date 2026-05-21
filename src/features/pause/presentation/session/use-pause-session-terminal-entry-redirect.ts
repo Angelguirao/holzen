@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
-} from '@/features/pause/public-session';
+} from '@/features/pause/application/use-cases/session/terminal-entry-guard';
 import type { PauseState } from '@/features/pause/domain/pause-state';
 import type { FetchedPauseInstance, PersistedSession } from '@/features/pause/domain/session-model';
 import { getPauseTerminalEntryStateQueryOptions } from '@/features/pause/public-queries';
