@@ -17288,4 +17288,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — wire reflect steps I/O to run-* after anchor removal (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-io</code> imports sibling <code>run-pause-*</code> use cases directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Prior slice deleted <code>pause-reflect-steps-mutation-flow</code> but left presentation I/O importing the removed barrel — restore direct imports from <code>run-pause-favorite-toggle</code>, <code>run-pause-reflect-note-update</code>, <code>run-pause-reflect-tag-update</code>, and <code>run-pause-reflection-step-log</code>; domain gates stay on <code>domain/reflect/steps/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; fixes broken module resolution after orphan anchor deletion.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No application cluster anchor under <code>ritual/reflect/steps/</code>; presentation I/O is the conductor import surface (matches companion orchestration-io peel).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect mood I/O peel from <code>pause-reflect-mood-flow</code> to sibling mood modules, or reflect flows I/O anchor peel (preflight/post-generation).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
