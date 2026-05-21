@@ -11,9 +11,9 @@ export {
   initialPhaseFromRestored,
 } from '@/features/pause/application/use-cases/ritual/decide/restored-decide-ritual-state';
 export { initialFrameDoneFromRestored } from '@/features/pause/application/use-cases/ritual/frame/restored-frame-ritual-state';
-export { initialRitualEntry } from '@/features/pause/application/use-cases/session/initial-ritual-entry';
 export {
   initialBriefIntegrateDoneFromRestored,
   initialBriefPauseStepFromRestored,
+  initialRitualEntry,
   initialSelectedBriefFaceFromRestored,
-} from '@/features/pause/application/use-cases/session/restored-brief-ritual-state';
+} from '@/features/pause/presentation/session/pause-session-brief-io';
