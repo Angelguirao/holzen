@@ -1,4 +1,4 @@
 export {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
-} from '@/features/pause/application/use-cases/session/pending-pause-offer-telemetry';
+} from '@/features/pause/application/use-cases/session/pause-session-pending-offer-flow';
