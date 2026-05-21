@@ -310,6 +310,9 @@ export {
   type UseReflectionShareHandlersParams,
   usePauseFavoriteToggle,
   PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS,
+  applyBreathSegmentLogOutcome,
+  initialBreathSegmentRpcLoggedFlagsFromRestored,
+  usePauseBreathSegmentRpcLoggers,
 } from './public-ritual-reflect';
 export {
   useCompanionHistoryThread,
@@ -377,7 +380,6 @@ export {
   type FullviewCompanion,
 } from './presentation/companion/use-fullview-telemetry';
 export { usePauseFeelShiftLogDedupeRefs } from './presentation/reflect/mood/use-pause-feel-shift-log-dedupe-refs';
-export { usePauseBreathSegmentRpcLoggers } from './presentation/reflect/flows/use-pause-breath-segment-rpc-loggers';
 export { usePauseSessionMountLog } from './presentation/session/use-pause-session-mount-log';
 export { usePauseSessionGoBack } from './presentation/session/use-pause-session-go-back';
 export { usePauseSessionGoToStep } from './presentation/session/use-pause-session-go-to-step';

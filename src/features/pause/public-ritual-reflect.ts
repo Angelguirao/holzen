@@ -37,3 +37,7 @@ export { usePauseReflectNote } from './presentation/reflect/steps/use-pause-refl
 export { usePauseReflectFrameFocusAmbience } from './presentation/reflect/ambience/use-pause-reflect-frame-focus-ambience';
 export { usePauseFavoriteToggle } from './presentation/reflect/steps/use-pause-favorite-toggle';
 export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/reflect/mood/pause-depth-picker-styles';
+
+export { applyBreathSegmentLogOutcome } from './application/use-cases/ritual/reflect/flows/apply-breath-segment-log-outcome';
+export { initialBreathSegmentRpcLoggedFlagsFromRestored } from './application/use-cases/ritual/reflect/flows/initial-breath-segment-rpc-flags';
+export { usePauseBreathSegmentRpcLoggers } from './presentation/reflect/flows/use-pause-breath-segment-rpc-loggers';

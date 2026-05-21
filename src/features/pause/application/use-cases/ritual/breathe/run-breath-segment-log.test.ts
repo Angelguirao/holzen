@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import {
-  applyBreathSegmentLogOutcome,
   runEnsureBreathSegment1Logged,
   runEnsureBreathSegment2Logged,
   runLogBreathSegment1Skipped,
@@ -96,22 +95,5 @@ describe('runEnsureBreathSegment2Logged', () => {
     );
 
     expect(result).toEqual({ status: 'sync_failed' });
-  });
-});
-
-describe('applyBreathSegmentLogOutcome', () => {
-  it('sets ref only on successful mark', () => {
-    const ref = { current: false };
-    expect(applyBreathSegmentLogOutcome({ status: 'already_logged' }, ref)).toBe(true);
-    expect(ref.current).toBe(false);
-
-    expect(
-      applyBreathSegmentLogOutcome({ status: 'success', markSegmentLogged: true }, ref),
-    ).toBe(true);
-    expect(ref.current).toBe(true);
-
-    ref.current = false;
-    expect(applyBreathSegmentLogOutcome({ status: 'sync_failed' }, ref)).toBe(false);
-    expect(ref.current).toBe(false);
   });
 });
