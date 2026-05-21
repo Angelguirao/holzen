@@ -8186,7 +8186,26 @@
       <dt>Tradeoffs</dt>
       <dd>No <code>public-rpc</code> re-export — helpers are not cross-context; mood RPC stays on wired facades.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>use-pause-brief-done-check-in</code> → <code>logPostPauseEmotionIfDirty</code>, or port-backed companion feedback vote analytics read.</dd>
+      <dd>Next: breath segment RPC loggers → <code>ensureBreathSegment*</code> facades on <code>public-rpc</code>, or port-backed companion feedback vote analytics read.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath segment RPC loggers via public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-breath-segment-rpc-loggers</code> → wired breath facades</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Continue backlog #4: breath segment conductor imports <code>ensureBreathSegment*</code>, <code>logBreathSegment*Skipped</code>, <code>applyBreathSegmentLogOutcome</code>, and <code>showPauseStepSyncFailedToast</code> from <code>public-rpc.ts</code> instead of use cases + <code>supabasePauseRepository</code> from <code>public-ports</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; tests partial-mock <code>public-rpc</code> breath facades with stub <code>PauseRepository</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion UI completion and home preview dismiss still inject <code>public-ports</code> until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed companion feedback vote fetch query path, or <code>use-companion-ui-completion</code> → <code>persistCompanionUiStepCompletion</code> facade only.</dd>
     </dl>
   </article>
 
