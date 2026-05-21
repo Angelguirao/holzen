@@ -6198,6 +6198,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect tags hook test (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Add public-rpc-backed tags conductor test</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and frame-focus ambience peel via <code>public-rpc</code> were already on branch. Add <code>use-pause-reflect-tags.test.tsx</code> mocking <code>logPauseReflectTags</code>; use stable <code>emptyTags</code> in hoisted mock so <code>useQuery</code> does not return a fresh <code>[]</code> each render (infinite <code>useEffect</code> loop).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-reflect-and-decide</code> still imports <code>pause-session-reflect-decide-flow</code> from application until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel brief-to-deep / post-pause session hooks through <code>public-rpc</code>, or companion orchestrate hooks from <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect frame-focus ambience via public-rpc (backlog #1 done, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
