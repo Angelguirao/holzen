@@ -8,21 +8,14 @@ import {
 } from '@/features/pause/application/use-cases/trigger/pending-pause-offer-telemetry';
 import { usePendingPauseOfferMutations } from './use-pending-pause-offer-mutations';
 
-const { runAdoptPendingPauseOfferMock, runDeclinePendingPauseOfferMock } = vi.hoisted(() => ({
-  runAdoptPendingPauseOfferMock: vi.fn(),
-  runDeclinePendingPauseOfferMock: vi.fn(),
+const { adoptPendingPauseOfferMock, declinePendingPauseOfferMock } = vi.hoisted(() => ({
+  adoptPendingPauseOfferMock: vi.fn(),
+  declinePendingPauseOfferMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-ports', () => ({
-  supabasePauseRepository: {},
-}));
-
-vi.mock('@/features/pause/application/use-cases/pending-offer/run-adopt-pending-pause-offer', () => ({
-  runAdoptPendingPauseOffer: runAdoptPendingPauseOfferMock,
-}));
-
-vi.mock('@/features/pause/application/use-cases/pending-offer/run-decline-pending-pause-offer', () => ({
-  runDeclinePendingPauseOffer: runDeclinePendingPauseOfferMock,
+vi.mock('@/features/pause/public-rpc', () => ({
+  adoptPendingPauseOffer: adoptPendingPauseOfferMock,
+  declinePendingPauseOffer: declinePendingPauseOfferMock,
 }));
 
 vi.mock('sonner', () => ({
@@ -41,8 +34,8 @@ const t = ((k: string) => k) as TFunction;
 const pending = { id: 'offer-1' } as import('./use-pending-pause-offer').PendingPauseOfferRow;
 
 beforeEach(() => {
-  runAdoptPendingPauseOfferMock.mockReset();
-  runDeclinePendingPauseOfferMock.mockReset();
+  adoptPendingPauseOfferMock.mockReset();
+  declinePendingPauseOfferMock.mockReset();
   vi.mocked(toast.error).mockClear();
   vi.mocked(trackPausePendingAdopted).mockClear();
   vi.mocked(trackPausePendingDeclined).mockClear();
@@ -50,7 +43,7 @@ beforeEach(() => {
 
 describe('usePendingPauseOfferMutations', () => {
   it('adopts via pending-offer use case and navigates on success', async () => {
-    runAdoptPendingPauseOfferMock.mockResolvedValue({ status: 'ok', instanceId: 'inst-9' });
+    adoptPendingPauseOfferMock.mockResolvedValue({ status: 'ok', instanceId: 'inst-9' });
     const onAfterMutation = vi.fn().mockResolvedValue(undefined);
     const navigateAfterAdopt = vi.fn();
     const refreshPendingOffer = vi.fn().mockResolvedValue(undefined);
@@ -71,7 +64,7 @@ describe('usePendingPauseOfferMutations', () => {
     });
 
     expect(ok).toBe(true);
-    expect(runAdoptPendingPauseOfferMock).toHaveBeenCalledTimes(1);
+    expect(adoptPendingPauseOfferMock).toHaveBeenCalledTimes(1);
     expect(trackPausePendingAdopted).toHaveBeenCalledWith('inst-9');
     expect(onAfterMutation).toHaveBeenCalled();
     expect(navigateAfterAdopt).toHaveBeenCalledWith('inst-9');
@@ -79,7 +72,7 @@ describe('usePendingPauseOfferMutations', () => {
   });
 
   it('declines via pending-offer use case on success', async () => {
-    runDeclinePendingPauseOfferMock.mockResolvedValue({ status: 'ok' });
+    declinePendingPauseOfferMock.mockResolvedValue({ status: 'ok' });
     const onAfterMutation = vi.fn().mockResolvedValue(undefined);
     const refreshPendingOffer = vi.fn().mockResolvedValue(undefined);
 
@@ -98,14 +91,14 @@ describe('usePendingPauseOfferMutations', () => {
     });
 
     expect(ok).toBe(true);
-    expect(runDeclinePendingPauseOfferMock).toHaveBeenCalledTimes(1);
+    expect(declinePendingPauseOfferMock).toHaveBeenCalledTimes(1);
     expect(trackPausePendingDeclined).toHaveBeenCalledWith('offer-1');
     expect(onAfterMutation).toHaveBeenCalled();
     expect(refreshPendingOffer).toHaveBeenCalled();
   });
 
   it('toasts when adopt RPC returns not ok', async () => {
-    runAdoptPendingPauseOfferMock.mockResolvedValue({ status: 'failed' });
+    adoptPendingPauseOfferMock.mockResolvedValue({ status: 'failed' });
     const { result } = renderHook(() =>
       usePendingPauseOfferMutations({
         pending,
