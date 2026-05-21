@@ -57,3 +57,8 @@ export {
   persistedPauseSessionAllowsTerminalEntry,
   TERMINAL_PAUSE_DB_STATES,
 } from './application/use-cases/session/terminal-entry-guard';
+export { buildPauseSessionScaffoldRitualDerived } from './application/use-cases/session/scaffold-ritual-derived';
+export {
+  computePauseStorageRitualSyncPatch,
+  type PauseStorageRitualSyncPatch,
+} from './application/use-cases/session/storage-ritual-sync';

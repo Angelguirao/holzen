@@ -1,4 +1,4 @@
-import { buildPauseSessionScaffoldRitualDerived } from '@/features/pause/application/use-cases/session/scaffold-ritual-derived';
+import { buildPauseSessionScaffoldRitualDerived } from '@/features/pause/public-session';
 import {
   buildPauseSessionScaffoldRitualPayloads,
   type PauseSessionScaffoldRitualPayloadsParams,
