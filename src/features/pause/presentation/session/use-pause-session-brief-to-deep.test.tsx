@@ -1,18 +1,12 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
-const { logPauseRitualDepthUpgradedMock, mockRepository } = vi.hoisted(() => ({
+const { logPauseRitualDepthUpgradedMock } = vi.hoisted(() => ({
   logPauseRitualDepthUpgradedMock: vi.fn().mockResolvedValue(true),
-  mockRepository: { logStep: vi.fn() } as unknown as PauseRepository,
 }));
 
-vi.mock('@/features/pause/public-ports', () => ({
-  supabasePauseRepository: mockRepository,
-}));
-
-vi.mock('@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade', () => ({
-  logPauseRitualDepthUpgraded: (...args: unknown[]) => logPauseRitualDepthUpgradedMock(...args),
+vi.mock('@/features/pause/public-rpc', () => ({
+  logPauseRitualDepthUpgraded: logPauseRitualDepthUpgradedMock,
 }));
 
 import { usePauseSessionBriefToDeep } from './use-pause-session-brief-to-deep';
@@ -84,11 +78,7 @@ describe('usePauseSessionBriefToDeep', () => {
     await act(async () => {
       await result.current.handleBriefSwitchToDeepPause();
     });
-    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith(
-      mockRepository,
-      'pause-1',
-      expect.any(Function),
-    );
+    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith('pause-1', expect.any(Function));
     expect(setRitualEntry).toHaveBeenCalledWith('deep');
     expect(setStep).toHaveBeenCalledWith('reflect');
   });

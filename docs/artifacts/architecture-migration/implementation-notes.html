@@ -6290,4 +6290,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — brief-to-deep via public-rpc (backlog #1 done, #3/#4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel use-pause-session-brief-to-deep from application + public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> folder move is complete — no relocate. <code>use-pause-session-brief-to-deep</code> calls wired <code>logPauseRitualDepthUpgraded</code> on <code>public-rpc</code> instead of the use case + <code>supabasePauseRepository</code> from <code>public-ports</code>. Pure <code>briefSwitchToDeepPauseState</code> remains a direct application import (no I/O).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test mocks <code>public-rpc</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-brief-done-check-in</code> and breath segment RPC loggers still use <code>public-ports</code> + use cases.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-brief-done-check-in</code> via <code>logPostPauseEmotionIfDirty</code> or breath segment loggers through <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
