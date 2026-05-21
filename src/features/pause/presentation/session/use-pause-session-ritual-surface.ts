@@ -1,5 +1,5 @@
-import type { PauseSessionScaffoldVmResult } from './session/use-pause-session-scaffold-vm';
-import type { PauseSessionStepHandlersResult } from './session/use-pause-session-step-handlers';
+import type { PauseSessionScaffoldVmResult } from './use-pause-session-scaffold-vm';
+import type { PauseSessionStepHandlersResult } from './use-pause-session-step-handlers';
 
 export type PauseSessionRitualSurfaceMotionSlice = {
   prefersReducedMotion: boolean | null;

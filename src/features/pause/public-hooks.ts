@@ -377,13 +377,13 @@ export { usePauseSessionBreathReflectHandlers } from './presentation/reflect/use
 export { usePauseSessionEntryPresentationEffects } from './presentation/session/use-pause-session-entry-presentation-effects';
 export { usePauseSessionTerminalEntryRedirect } from './presentation/session/use-pause-session-terminal-entry-redirect';
 export { usePauseSessionStepTransition } from './presentation/session/use-pause-session-step-transition';
-export { usePauseSessionDepthAndBriefCopy } from './presentation/use-pause-session-depth-and-brief-copy';
+export { usePauseSessionDepthAndBriefCopy } from './presentation/session/use-pause-session-depth-and-brief-copy';
 export {
   usePauseSessionScaffoldRitual,
   type UsePauseSessionScaffoldRitualParams,
   type PauseSessionScaffoldRitualDerivedParams,
 } from './presentation/session/use-pause-session-scaffold-ritual';
-export { usePauseSessionBreathSecondLabelVariant } from './presentation/use-pause-session-breath-second-label-variant';
+export { usePauseSessionBreathSecondLabelVariant } from './presentation/session/use-pause-session-breath-second-label-variant';
 export { usePauseSessionFetch } from './presentation/session/use-pause-session-fetch';
 export {
   usePauseSessionBriefPastStep,
@@ -430,9 +430,9 @@ export {
   usePauseSessionRitualSurface,
   type PauseSessionRitualSurfaceMotionSlice,
   type PauseSessionRitualSurfaceResult,
-} from './presentation/use-pause-session-ritual-surface';
-export { usePauseSessionProviders } from './presentation/use-pause-session-providers-conductor';
-export { usePauseSessionProvidersFromHolzenSlice } from './presentation/use-pause-session-providers';
+} from './presentation/session/use-pause-session-ritual-surface';
+export { usePauseSessionProviders } from './presentation/session/use-pause-session-providers-conductor';
+export { usePauseSessionProvidersFromHolzenSlice } from './presentation/session/use-pause-session-providers';
 export type {
   PauseSessionFlowConductorProvidersSlice,
   PauseSessionHolzenProvidersSlice,
@@ -448,4 +448,4 @@ export {
   usePauseSessionScreen,
   usePauseSessionScreenViewModel,
   type PauseSessionScreenViewModel,
-} from './presentation/use-pause-session-screen';
+} from './presentation/session/use-pause-session-screen';

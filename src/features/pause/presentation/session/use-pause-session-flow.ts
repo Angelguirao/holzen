@@ -1,6 +1,6 @@
 import { usePauseSessionFlowCore } from './use-pause-session-flow-core';
 import { usePauseSessionScaffoldVm } from './use-pause-session-scaffold-vm';
-import { usePauseSessionRitualSurface } from '../use-pause-session-ritual-surface';
+import { usePauseSessionRitualSurface } from './use-pause-session-ritual-surface';
 import { usePauseSessionScaffoldChromeSlots } from './use-pause-session-scaffold-chrome-slots';
 import type { PauseSessionProviders } from './pause-session-providers-types';
 import type {
@@ -8,7 +8,7 @@ import type {
   PauseSessionScaffoldVmChromeSlots,
 } from './pause-session-scaffold-vm-types';
 import type { PauseSessionStepHandlersResult } from './use-pause-session-step-handlers';
-import type { PauseSessionRitualSurfaceResult } from '../use-pause-session-ritual-surface';
+import type { PauseSessionRitualSurfaceResult } from './use-pause-session-ritual-surface';
 
 /** `/pause` flow: core steps + chrome slots from route registry. */
 export function usePauseSessionFlow(
