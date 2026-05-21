@@ -7278,4 +7278,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect share canvas under ritual/reflect/share (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate PNG share renderer with reflect application cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder migration (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>reflection-share-canvas.ts</code> from <code>presentation/reflect/share/</code> to <code>application/use-cases/ritual/reflect/share/</code> beside <code>domain/reflect/share/reflection-share-text.ts</code> — browser canvas I/O is not a React conductor. <code>public-hooks</code> re-export path only; <code>ShareReflection</code> unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Module still uses <code>document</code> / canvas APIs (not pure domain); acceptable in application until a port abstraction is needed.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-open-pause-home-preview</code> / companion feedback vote off <code>public-rpc</code>, or backlog #4 remaining mutation call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
