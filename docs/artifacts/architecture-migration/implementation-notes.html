@@ -4238,6 +4238,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — ReflectGenerator fetchHaikuText (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; haiku artifact read on reflect port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>fetchHaikuText</code> to <code>ReflectGenerator</code>; default adapter delegates to <code>haiku-artifact-query</code>. <code>use-pause-artifact-haiku</code> calls <code>supabaseReflectGenerator.fetchHaikuText</code> instead of importing the query module directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>public-queries</code> still re-exports <code>fetchHaikuTextForPauseInstance</code> for docs/tests; presentation uses the port.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Thin adapter method today; keeps haiku lazy-hydrate on the same port as holzen-reflect generation.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>CompanionOrchestrator</code> port (backlog #4 remainder), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
