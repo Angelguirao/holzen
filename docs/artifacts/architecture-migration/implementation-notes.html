@@ -14222,7 +14222,7 @@
     <h3>Reflect ritual paths complete; HolzenProvider on public-home</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified — no legacy reflect use-case paths. Continue backlog #3 §6: export <code>useOpenPauseHomePreview</code>, <code>useManualPauseTrigger</code>, <code>useHolzenManualTriggerOrchestration</code>, and <code>useHolzenHomeContextState</code> from <code>public-home.ts</code>; <code>HolzenProvider</code> imports <code>public-home</code>; <code>public-hooks</code> re-exports for transitional callers.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified — no legacy reflect use-case paths; <code>check:architecture-alignment</code> enforces <code>ritual/reflect/</code> subclusters. Continue backlog #3 §6: export <code>useOpenPauseHomePreview</code>, <code>useManualPauseTrigger</code>, <code>useHolzenManualTriggerOrchestration</code>, and <code>useHolzenHomeContextState</code> from <code>public-home.ts</code>; <code>HolzenProvider</code> imports <code>public-home</code>; pause pending-offer read UI imports <code>public-home</code> (<code>docs/screens/pause.md</code> updated).</dd>
       <dt>Deviation</dt>
       <dd>None — import paths only.</dd>
       <dt>Tradeoffs</dt>
