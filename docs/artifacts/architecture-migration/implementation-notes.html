@@ -14194,4 +14194,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — backlog #1 verified; public-home cluster 2c</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect ritual paths complete; home action hooks on public-home</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified — zero legacy reflect use-case paths in active <code>src/</code>. Continue backlog #3 §6: export <code>useHomePauseActions</code> and <code>usePauseContextHomePreviews</code> from <code>public-home.ts</code>; <code>screens/home/HomeScreen</code> imports the home cluster from one barrel; pause pending-offer read helpers (<code>getPendingPauseOfferDisplay</code>, <code>usePendingPauseOffer</code>, types) import <code>public-home</code> in leave sheet + offer shell; mutations stay on <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>usePendingPauseOfferMutations</code> and <code>useHolzenManualTriggerOrchestration</code> remain on <code>public-hooks</code> until a follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: export manual-trigger orchestration on <code>public-home</code> or Phase B <code>holzen-query-client-ref</code> shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
