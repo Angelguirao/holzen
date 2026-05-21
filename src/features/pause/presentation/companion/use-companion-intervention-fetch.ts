@@ -7,7 +7,7 @@ import type {
 } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
 import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
 import { fetchParsedPauseArtifactCache } from '@/features/pause/public-queries';
-import { supabaseCompanionOrchestrator } from '@/features/pause/public-ports';
+import { supabaseCompanionOrchestrator } from '@/features/pause/public-rpc';
 
 export type UseCompanionInterventionFetchParams = {
   pauseInstanceId?: string | null;
