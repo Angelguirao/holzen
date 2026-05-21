@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for ritual reflect hub presentation I/O (§3 / check:architecture-alignment).
  * Pure shift-frame presentation mapping lives in domain; RPC use case in `run-shift-emotion-frame-hub-done`.
- * Presentation: `pause-reflect-hub-io.ts` imports through this anchor.
+ * Presentation: `pause-reflect-hub-io.ts` imports domain + `run-shift-emotion-frame-hub-done` directly.
  */
 export {
   resolveShiftFrameHubDonePresentation,
