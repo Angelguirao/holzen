@@ -1,25 +1,21 @@
 import { useCallback } from 'react';
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
-import { applyCompanionSlotOrchestrateOutcome } from '@/features/pause/application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome';
-import { logCompanionSlotOrchestrateInvoke } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry';
-import { trackCompanionGenerationInitiated } from '@/features/pause/application/use-cases/ritual/frame/companion-generation-telemetry';
-import type { ApplyCompanionSlotOrchestrateFailureUiPorts } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-failure-ui';
 import {
+  applyCompanionSlotOrchestrateOutcome,
+  companionOrchestrator,
+  logCompanionSlotOrchestrateInvoke,
+  runCompanionSlotOrchestrate,
   setCompanionSlotError,
   setCompanionSlotLoading,
+  trackCompanionGenerationInitiated,
+  type ApplyCompanionSlotOrchestrateFailureUiPorts,
+  type CompanionSlotCacheIds,
+  type CompanionSlotCommitters,
   type CompanionSlotErrorSetters,
   type CompanionSlotLoadingSetters,
-} from '@/features/pause/application/use-cases/ritual/frame/companion-slot-ui-state';
-import {
-  runCompanionSlotOrchestrate,
   type CompanionSlotOrchestrateMode,
-} from '@/features/pause/application/use-cases/ritual/frame/run-companion-slot-orchestrate';
-import type {
-  CompanionSlotCacheIds,
-  CompanionSlotCommitters,
-  CompanionSlotRelaxations,
-} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
-import { companionOrchestrator } from './pause-companion-orchestration-io';
+  type CompanionSlotRelaxations,
+} from './pause-companion-orchestrate-io';
 import { useCompanionOrchestrateSession } from './use-companion-orchestrate-session';
 
 export type UseCompanionSlotRunOrchestrateParams = {

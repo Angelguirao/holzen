@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import type { ApplyCompanionSlotOrchestrateFailureUiPorts } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-failure-ui';
+import type { ApplyCompanionSlotOrchestrateFailureUiPorts } from './pause-companion-orchestrate-io';
 import { useCompanionSlotRunOrchestrate } from './use-companion-slot-run-orchestrate';
 
 const {
@@ -36,37 +36,15 @@ vi.mock('./use-companion-orchestrate-session', () => ({
   useCompanionOrchestrateSession: () => buildOrchestrateSessionMock,
 }));
 
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/run-companion-slot-orchestrate',
-  () => ({
-    runCompanionSlotOrchestrate: runCompanionSlotOrchestrateMock,
-  }),
-);
-
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome',
-  () => ({
-    applyCompanionSlotOrchestrateOutcome: applyCompanionSlotOrchestrateOutcomeMock,
-  }),
-);
-
-vi.mock('./pause-companion-orchestration-io', () => ({
+vi.mock('./pause-companion-orchestrate-io', () => ({
+  runCompanionSlotOrchestrate: runCompanionSlotOrchestrateMock,
+  applyCompanionSlotOrchestrateOutcome: applyCompanionSlotOrchestrateOutcomeMock,
   companionOrchestrator: mockCompanionOrchestrator,
+  logCompanionSlotOrchestrateInvoke: vi.fn(),
+  trackCompanionGenerationInitiated: vi.fn(),
+  setCompanionSlotLoading: vi.fn(),
+  setCompanionSlotError: vi.fn(),
 }));
-
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry',
-  () => ({
-    logCompanionSlotOrchestrateInvoke: vi.fn(),
-  }),
-);
-
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/companion-generation-telemetry',
-  () => ({
-    trackCompanionGenerationInitiated: vi.fn(),
-  }),
-);
 
 const noop = vi.fn();
 
