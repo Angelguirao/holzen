@@ -1,5 +1,4 @@
-import { runFetchCompanionFeedbackVote } from '@/features/pause/application/use-cases/ritual/frame/run-fetch-companion-feedback-vote';
-import { supabasePauseAnalyticsRepository } from '@/features/pause/public-ports';
+import { fetchPauseCompanionFeedbackVote } from '@/features/pause/public-rpc';
 
 export const COMPANION_FEEDBACK_VOTE_QUERY_PREFIX = ['companion-feedback-vote'] as const;
 
@@ -23,11 +22,7 @@ export async function fetchCompanionFeedbackVote(
   pauseInstanceId: string,
   companionType: string,
 ): Promise<'up' | 'down' | null> {
-  return runFetchCompanionFeedbackVote(supabasePauseAnalyticsRepository, {
-    userId,
-    pauseInstanceId,
-    companionType,
-  });
+  return fetchPauseCompanionFeedbackVote(userId, pauseInstanceId, companionType);
 }
 
 export function getCompanionFeedbackVoteQueryOptions(
