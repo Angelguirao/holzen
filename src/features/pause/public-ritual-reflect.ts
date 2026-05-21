@@ -37,6 +37,10 @@ export { usePauseReflectNote } from './presentation/reflect/steps/use-pause-refl
 export { usePauseReflectFrameFocusAmbience } from './presentation/reflect/ambience/use-pause-reflect-frame-focus-ambience';
 export { usePauseFavoriteToggle } from './presentation/reflect/steps/use-pause-favorite-toggle';
 export { usePauseSessionMoodChromeHandlers } from './presentation/reflect/mood/use-pause-session-mood-chrome-handlers';
+export {
+  usePauseSessionMoodAndPersist,
+  type UsePauseSessionMoodAndPersistParams,
+} from './presentation/reflect/mood/use-pause-session-mood-and-persist';
 
 export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/reflect/mood/pause-depth-picker-styles';
 
