@@ -1,5 +1,7 @@
-import { getPendingPauseOfferDisplay } from '@/features/pause/public-hooks';
-import type { PendingPauseOfferRow } from '@/features/pause/public-hooks';
+import {
+  getPendingPauseOfferDisplay,
+  type PendingPauseOfferRow,
+} from '@/features/pause/public-home';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useTranslation } from 'react-i18next';

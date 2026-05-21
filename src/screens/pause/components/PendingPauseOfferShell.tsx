@@ -9,8 +9,11 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { getPendingPauseOfferDisplay } from '@/features/pause/public-hooks';
-import { usePendingPauseOffer, usePendingPauseOfferMutations } from '@/features/pause/public-hooks';
+import {
+  getPendingPauseOfferDisplay,
+  usePendingPauseOffer,
+} from '@/features/pause/public-home';
+import { usePendingPauseOfferMutations } from '@/features/pause/public-hooks';
 
 interface Props {
   /** After adopt or decline — e.g. resync `useHolzen` from `v_pause_current`. */
