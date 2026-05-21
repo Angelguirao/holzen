@@ -5055,4 +5055,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — shift-frame hub flow → ritual/reflect/flows (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-shift-frame-hub-flow</code> beside reflect/decide flow helpers</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Top-level <code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Pure shift-frame hub outcome mapping lived under <code>presentation/reflect/hub/</code> after an earlier peel; move it to <code>application/use-cases/ritual/reflect/flows/</code> beside <code>pause-session-reflect-decide-flow</code>. <code>use-pause-shift-frame-done-handler</code> imports the use-case module directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.1 / §10.1 (application flow helpers under <code>ritual/reflect/flows/</code>, React conductors stay in <code>presentation/reflect/hub/</code>).</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>presentation/reflect/hub/</code> now only hosts the shift-frame-done React hook (+ test).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire <code>use-pause-artifact-reflection-text</code> when Reflect session seed is empty, or backlog #4 stray <code>PauseRepository</code> audit.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
