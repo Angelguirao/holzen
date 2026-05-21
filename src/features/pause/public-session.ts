@@ -1,7 +1,8 @@
 /**
  * Tab session I/O barrel for cross-context callers (re-exports use case).
  * Feature presentation imports `presentation/session/pause-persisted-tab-session-io` (bound default port).
- * Layout tokens and ritual step types: `public-hooks`. Domain gates: import `domain/*` directly.
+ * Ritual step layout tokens: `pauseStepLayout` (screens may import here instead of `public-hooks`).
+ * Other session presentation: `public-hooks`. Domain gates: import `domain/*` directly.
  */
 import {
   clearPersistedTabSession,
@@ -17,3 +18,6 @@ export const loadSession = () => loadPersistedTabSession(persistedTabSessionStor
 export const saveSession = (data: Parameters<typeof savePersistedTabSession>[1]) =>
   savePersistedTabSession(persistedTabSessionStorage, data);
 export const clearSession = () => clearPersistedTabSession(persistedTabSessionStorage);
+
+/** Shared ritual step chrome class tokens (Feel / Reflect / Frame / Decide). */
+export { pauseStepLayout } from './presentation/session/pause-step-layout';
