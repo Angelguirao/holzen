@@ -4310,7 +4310,30 @@
       <dt>Tradeoffs</dt>
       <dd><code>runReflectGeneration</code> still does not call <code>loadRecencyHints</code> (only the edge path needs hints today).</dd>
       <dt>Open questions</dt>
+<<<<<<< HEAD
       <dd>Next: port-backed analytics read for companion feedback vote fetch, or wire remaining stray <code>PauseRepository</code> call sites.</dd>
+=======
+      <dd>Next: wire remaining stray <code>PauseRepository</code> call sites, or peel <code>fetchReflectionTextForPauseInstance</code> through <code>ReflectGenerator</code> only.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflection_step gate in domain/ (reflect Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; presentation no longer imports reflect use case for pure gate</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Move <code>shouldLogPauseReflectionStep</code>, <code>reflectionStepLoggedStorageKey</code>, and storage prefix from <code>ritual/reflect/steps/run-pause-reflection-step-log</code> to <code>domain/reflection-step-log.ts</code>. Use case keeps orchestration only; <code>use-pause-reflection-step-log</code> imports domain. Drop <code>ReflectionStepLogStoragePort</code> re-export from the use case.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Gate tests live in <code>domain/reflection-step-log.test.ts</code>; RPC dedupe tests stay on the use case.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed analytics read for companion feedback vote fetch, or peel <code>fetchReflectionTextForPauseInstance</code> exports through <code>ReflectGenerator</code> only.</dd>
+>>>>>>> 7375c748 (refactor(pause): move reflection_step gate to domain)
     </dl>
   </article>
 
