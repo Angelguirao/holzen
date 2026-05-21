@@ -10447,7 +10447,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>public-hooks</code> still re-exports step-map symbols for screens.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: unify <code>openManualPauseFromHome</code> to full <code>PauseRepository</code>; optional <code>initial-breath-segment-rpc-flags</code> import via <code>public-session</code>.</dd>
+      <dd>Next backlog #4: unify <code>OpenManualPauseFromHomePorts</code> to full <code>PauseRepository</code>; optional <code>initial-breath-segment-rpc-flags</code> import via <code>public-session</code>.</dd>
     </dl>
   </article>
 
@@ -10466,7 +10466,26 @@
       <dt>Tradeoffs</dt>
       <dd>Mood/flow conductors still on <code>public-hooks</code>; optional next peel groups <code>usePauseSessionMood*</code> when a screen needs them without the full hooks barrel.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: remaining <code>PauseRepository</code> partial-port shapes (e.g. manual trigger); optional orb/timed-loop cluster on <code>public-ritual-breathe</code>.</dd>
+      <dd>Next backlog #4: remaining <code>PauseRepository</code> partial-port shapes; optional orb/timed-loop cluster on <code>public-ritual-breathe</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual trigger via runPauseCreateOrReuse (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; home create path uses session lifecycle use case</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — 14 modules under <code>application/use-cases/ritual/reflect/</code>, zero <code>application/use-cases/reflect/</code>. Route <code>openManualPauseFromHome</code> through <code>runPauseCreateOrReuse</code> instead of calling <code>repository.createOrReuse</code> directly; <code>public-rpc</code> facade unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>Pick&lt;PauseRepository, 'createOrReuse'&gt;</code> port shape kept for tests and silent-mode reflect pairing.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Thin pass-through today; aligns manual trigger with <code>pauseCreateOrReuse</code> facade and future lifecycle validation in one module.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: unify <code>OpenManualPauseFromHomePorts</code> to full <code>PauseRepository</code> or audit analytics read adapters; optional orb cluster on <code>public-ritual-breathe</code>.</dd>
     </dl>
   </article>
 

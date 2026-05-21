@@ -1,7 +1,7 @@
 import { bucketChangePercent, computeContextFingerprint } from '@/features/pause/domain/pause-fingerprint';
 import { pauseCreateSkippedUserMessage } from '@/features/pause/application/use-cases/trigger/pause-create-skipped-user-message';
+import { runPauseCreateOrReuse } from '@/features/pause/application/use-cases/session/run-pause-create-or-reuse';
 import { reflectionPersistErrorMessage } from '@/features/pause/domain/pause-persist-error';
-import type { PauseCreateOrReuseResult } from '@/features/pause/domain/rpc-types';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 const VOLATILITY_TEMPLATE = 'volatility_v1';
@@ -101,7 +101,7 @@ export async function openManualPauseFromHome(
   };
 
   try {
-    const res = await ports.repository.createOrReuse(createParams);
+    const res = await runPauseCreateOrReuse(ports.repository, createParams);
     if (!res.instance_id) {
       return { outcome: 'idle', userMessage: pauseCreateSkippedUserMessage(res.reused_reason) };
     }
