@@ -188,7 +188,7 @@ Shared reads live in `infrastructure/queries/`, exported via **`public-queries`*
 |--------|---------|
 | `public.ts` | Types, constants, pure formatters — **no eager Supabase** |
 | `public-navigation.ts` | Router state for pause deep links (`NotificationNavigateState`, `parsePauseSessionLocationState`); Home → `/pause` helpers (`canNavigateToPauseSession`, `buildHomePauseSessionLocationState`, `shouldNavigateAfterManualTrigger`) |
-| `public-home.ts` | Home read-model helpers (`resolvePauseArrivalToneAction`, `buildHomePauseCardBodyProps`, `buildZenModeHomeRouteProps`, `pauseHomeError*` / snooze gate) — no Supabase |
+| `public-home.ts` | Home read-model helpers (`resolvePauseArrivalToneAction`, `buildHomePauseCardBodyProps`, `buildZenModeHomeRouteProps`, `pauseHomeError*` / snooze gate) + home presentation hooks (`usePauseCardProjection`, `useZenModeHomeRouteProps`, `usePauseArrivalAudio`) — no Supabase |
 | `public-scheduling.ts` | Quarter-hour scheduling math for Home context refresh (no Supabase) |
 | `public-session.ts` | Tab session I/O only — `loadSession`/`saveSession`/`clearSession` via `infrastructure/session/persisted-session-storage` + `PersistedSessionAnchor` type; no Supabase. **Layout** (`pauseStepLayout`) on `public-hooks` for screens; breath helpers on `public-ritual-breathe.ts`; gate predicates and persisted guards import from `domain/*` / `presentation/*` directly (May 2026 peels) |
 | `public-ritual-brief.ts` | Brief ritual pure helpers (integrate timer, `computePauseGoBackPlan`, `computeBriefPastStepClick`, `briefSwitchToDeepPauseState`) — no Supabase |

@@ -5,7 +5,7 @@ import { SnoozeToolbarControl } from '@/screens/home/components/SnoozeControl';
 import {
   usePauseCardProjection,
   type UsePauseCardProjectionParams,
-} from '@/features/pause/public-hooks';
+} from '@/features/pause/public-home';
 
 export type UseHomePauseCardProjectionParams = UsePauseCardProjectionParams;
 

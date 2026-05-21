@@ -231,17 +231,13 @@ export {
   type BulkHoldOutcomeChoice,
   type BulkHoldReviewSection,
 } from './domain/bulk-hold';
-export { usePauseArrivalAudio } from './presentation/home/use-pause-arrival-audio';
 export {
+  usePauseArrivalAudio,
   usePauseCardProjection,
+  useZenModeHomeRouteProps,
   type PauseCardProjection,
   type UsePauseCardProjectionParams,
-} from './presentation/home/use-pause-card-projection';
-export {
-  useZenModeHomeRouteProps,
-  type BuildZenModeHomeRoutePropsInput,
-  type ZenModeHomeRoutePropsProjection,
-} from './presentation/home/use-zen-mode-home-route-props';
+} from './public-home';
 export {
   buildReflectionShareText,
   resolveEffectiveReflectionCopy,

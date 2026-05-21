@@ -13947,4 +13947,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — reflect backlog #1 verified; public-home hooks peel (cluster 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; Home screens on public-home barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code> — CI forbids legacy paths. This slice extends §6 <code>public-home.ts</code> with <code>usePauseCardProjection</code>, <code>useZenModeHomeRouteProps</code>, and <code>usePauseArrivalAudio</code>; <code>HomeScreen</code>, <code>ZenModeHome</code>, <code>HomePauseCardBody</code>, and <code>use-home-pause-card-projection</code> import the home barrel (complements prior <code>ZenModeHome</code> frame types on <code>public-ritual-frame</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving re-exports; <code>public-hooks.ts</code> re-exports for cross-context callers.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Bulk-hold and manual-trigger home hooks remain on <code>public-hooks</code> until a follow-up home cluster peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>public-home</code> cluster 2 (bulk-hold + pending-offer hooks) or Phase B <code>holzen-query-client-ref</code> shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
