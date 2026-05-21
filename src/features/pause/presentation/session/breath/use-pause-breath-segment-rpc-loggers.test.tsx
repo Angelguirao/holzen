@@ -19,10 +19,14 @@ const {
 }));
 
 vi.mock('@/features/pause/presentation/session/breath/pause-session-breath-io', async () => {
-  const { applyBreathSegmentLogOutcome } = await import(
-    '@/features/pause/domain/ritual/breathe/apply-breath-segment-log-outcome'
-  );
+  const { initialBreathSegmentRpcLoggedFlagsFromRestored } = await vi.importActual<
+    typeof import('@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags')
+  >('@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags');
+  const { applyBreathSegmentLogOutcome } = await vi.importActual<
+    typeof import('@/features/pause/domain/ritual/breathe/apply-breath-segment-log-outcome')
+  >('@/features/pause/domain/ritual/breathe/apply-breath-segment-log-outcome');
   return {
+    initialBreathSegmentRpcLoggedFlagsFromRestored,
     applyBreathSegmentLogOutcome,
     pauseEnsureBreathSegment1Logged: pauseEnsureBreathSegment1LoggedMock,
     pauseEnsureBreathSegment2Logged: pauseEnsureBreathSegment2LoggedMock,

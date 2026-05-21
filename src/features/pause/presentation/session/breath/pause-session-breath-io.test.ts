@@ -5,8 +5,10 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 import {
+  applyBreathSegmentLogOutcome,
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
+  initialBreathSegmentRpcLoggedFlagsFromRestored,
 } from './pause-session-breath-io';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
@@ -20,5 +22,19 @@ describe('pause-session-breath-io', () => {
     expect(initialBreathingFirstCompletedFromRestored(restored)).toBe(true);
     expect(initialBreathingSecondCompletedFromRestored(restored)).toBe(false);
     expect(initialBreathingFirstCompletedFromRestored(null)).toBe(false);
+  });
+
+  it('re-exports breath segment RPC outcome + restored dedupe flags', () => {
+    const restored = makeTestPersistedPauseSession({ step: 'reflect' });
+    const ref = { current: false };
+
+    expect(initialBreathSegmentRpcLoggedFlagsFromRestored(restored)).toEqual({
+      segment1Logged: true,
+      segment2Logged: false,
+    });
+    expect(
+      applyBreathSegmentLogOutcome({ status: 'success', markSegmentLogged: true }, ref),
+    ).toBe(true);
+    expect(ref.current).toBe(true);
   });
 });

@@ -15936,7 +15936,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; import path only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Mood chrome and frame-focus ambience I/O were still on application anchors when this slice landed; follow-up peels completed on the same branch.</dd>
+      <dd>Holzen-reflect RPC use case still imports from application on generation I/O; mood chrome and frame-focus ambience peels completed on the same branch.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>pause-reflect-telemetry-io</code> presentation boundary, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
@@ -15983,38 +15983,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — breath segment log outcome via pause-session-breath-io (backlog #1 verified, Tier 4)</span>
+      <span>Phase A slice — breath segment RPC loggers via session breath I/O (backlog #1 verified; Tier 4)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Re-export <code>applyBreathSegmentLogOutcome</code> on session breath I/O</h3>
+    <h3>Segment RPC logger imports domain helpers only through pause-session-breath-io</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Re-export <code>applyBreathSegmentLogOutcome</code> on <code>pause-session-breath-io</code>; <code>use-pause-breath-segment-rpc-loggers</code> imports breath domain helpers only through the breath I/O barrel (follow-up to restored breath hydration peel).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no reflect folder moves. Re-export <code>applyBreathSegmentLogOutcome</code> and <code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> on <code>presentation/session/breath/pause-session-breath-io.ts</code>; <code>use-pause-breath-segment-rpc-loggers</code> imports segment RPC facades and pure outcome helpers from the breath I/O barrel only.</dd>
       <dt>Deviation</dt>
-      <dd>None — domain still owns the pure outcome helper; behavior parity.</dd>
+      <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> still imports domain directly in the segment RPC conductor — peel incrementally.</dd>
+      <dd>Phase-advance and ritual-audio helpers still re-export from application on the same breath I/O module until incremental peels.</dd>
       <dt>Open questions</dt>
-      <dd>Next: route decide/frame restore through session decide/frame I/O barrels, or Phase B cross-context Tier 1 shim.</dd>
-    </dl>
-  </article>
-
-  <article class="note">
-    <header>
-      <span>2026-05-21</span>
-      <span>Phase A slice — breath segment log outcome via pause-session-breath-io (backlog #1 verified, Tier 4)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3>Re-export <code>applyBreathSegmentLogOutcome</code> on session breath I/O</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Re-export <code>applyBreathSegmentLogOutcome</code> on <code>presentation/session/breath/pause-session-breath-io.ts</code>; <code>use-pause-breath-segment-rpc-loggers</code> imports breath domain helpers only through the breath I/O barrel (RPC facades unchanged).</dd>
-      <dt>Deviation</dt>
-      <dd>None — domain still owns pure outcome application; behavior parity.</dd>
-      <dt>Tradeoffs</dt>
-      <dd><code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> still imports domain directly in the breath loggers hook — peel incrementally if needed.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: route decide/frame restore helpers through session decide/frame I/O barrels, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: peel phase-advance helpers through breath I/O, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 

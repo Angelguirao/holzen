@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, type MutableRefObject } from 'react';
 import type { TFunction } from 'i18next';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
-import { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags';
 import {
   applyBreathSegmentLogOutcome,
+  initialBreathSegmentRpcLoggedFlagsFromRestored,
   pauseEnsureBreathSegment1Logged,
   pauseEnsureBreathSegment2Logged,
   pauseLogBreathSegment1Skipped,
