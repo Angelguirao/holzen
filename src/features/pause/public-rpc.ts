@@ -53,6 +53,16 @@ export {
 } from './application/use-cases/ritual/frame/section-visibility';
 export type { CompanionSectionVisibility } from './application/use-cases/ritual/frame/section-visibility';
 export { nextExpandedWithLazyFetch } from './application/use-cases/ritual/frame/next-expanded-with-lazy-fetch';
+export { applyCompanionSlotOrchestrateOutcome } from './application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome';
+export type { ApplyCompanionSlotOrchestrateFailureUiPorts } from './application/use-cases/ritual/frame/companion-slot-orchestrate-failure-ui';
+export { logCompanionSlotOrchestrateInvoke } from './application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry';
+export { trackCompanionGenerationInitiated } from './application/use-cases/ritual/frame/companion-generation-telemetry';
+export {
+  setCompanionSlotError,
+  setCompanionSlotLoading,
+  type CompanionSlotErrorSetters,
+  type CompanionSlotLoadingSetters,
+} from './application/use-cases/ritual/frame/companion-slot-ui-state';
 export type { LoadCompanionOrchestrateSessionInput } from './application/use-cases/ritual/frame/load-companion-orchestrate-session';
 import {
   runCompanionInterventionBootstrap as runCompanionInterventionBootstrapUseCase,
