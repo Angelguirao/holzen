@@ -408,7 +408,7 @@ export { usePauseSessionRitualStorageSync } from './presentation/session/use-pau
 export {
   usePauseSessionMoodAndPersist,
   type UsePauseSessionMoodAndPersistParams,
-} from './presentation/reflect/mood/use-pause-session-mood-and-persist';
+} from './public-ritual-reflect';
 export {
   usePauseSessionBreathNavigation,
   type UsePauseSessionBreathNavigationParams,

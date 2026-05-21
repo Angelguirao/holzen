@@ -10641,4 +10641,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — usePauseSessionMoodAndPersist on public-ritual-reflect (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; mood persist conductor on ritual reflect barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. Export <code>usePauseSessionMoodAndPersist</code> (+ params type) on <code>public-ritual-reflect.ts</code> beside mood chrome; <code>public-hooks</code> re-exports. <code>use-pause-session-mood-chrome-handlers</code> keeps sibling import for <code>usePauseSessionMoodAndPersist</code> (avoids barrel cycle with mood chrome).</dd>
+      <dt>Deviation</dt>
+      <dd>None — feel/mood RPC dedupe and depth-picker entry unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Leaf mood hooks (depth picker, feel tiles, initial mood) and breath/reflect flow conductors remain on <code>public-hooks</code> until next peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #3: optional <code>usePauseSessionDepthPickerHandlers</code> / breath reflect handlers on <code>public-ritual-reflect</code>; backlog #4 repository audit for any remaining direct RPC stubs.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
