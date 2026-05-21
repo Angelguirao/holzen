@@ -2,13 +2,13 @@ import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
 } from '@/features/pause/domain/manual-pause-trigger-result';
+import type { OpenManualPauseFromHomeResult } from './pause-home-reflect-io';
 import {
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
   type TrackManualPauseInstanceCreatedPayload,
   type TrackPauseManualCompletedPayload,
-} from '@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry';
-import type { OpenManualPauseFromHomeResult } from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home-types';
+} from './pause-home-telemetry-io';
 
 export type ManualPauseHomePreviewPorts = {
   setError: (message: string | null) => void;
