@@ -10,7 +10,7 @@ import {
   runInitialEmotionSelect,
   runInitialEmotionSkip,
 } from '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
-import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import { showPauseStepSyncFailedToast } from '@/features/pause/presentation/ritual/pause-step-sync-toast';
 import { hapticFeedback } from '@/lib/haptics';
 

@@ -15,7 +15,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-
   runInitialEmotionSkip: vi.fn(),
 }));
 
-vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: mockPauseRepository,
 }));
 

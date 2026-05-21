@@ -34,7 +34,7 @@ vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () 
   clearSession: () => clearSessionMock(),
 }));
 
-vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: mockPauseRepository,
 }));
 

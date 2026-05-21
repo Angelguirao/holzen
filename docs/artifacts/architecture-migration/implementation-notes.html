@@ -12503,4 +12503,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect presentation ports via public-rpc (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>PauseRepository + ReflectGenerator imports in <code>presentation/reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder moves. Align reflect/decide-adjacent conductors with §6 <code>public-rpc</code> barrel: default <code>supabasePauseRepository</code> and <code>supabaseReflectGenerator</code> imported from <code>public-rpc</code> (not <code>infrastructure/*</code>) in <code>presentation/reflect/</code> steps, mood, hub, flows, and generation hooks; tests mock <code>public-rpc</code> for port-lock parity.</dd>
+      <dt>Deviation</dt>
+      <dd>§10.1 still allows direct infrastructure adapter imports elsewhere (session breath loggers, home trigger, archive retrospective) — reflect cluster only in this slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Import-path hygiene only; use cases unchanged. Did not add <code>public-rpc</code> facades for individual reflect mutations (conductors still call <code>ritual/reflect/*</code> use cases directly).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: same <code>public-rpc</code> import pattern for session/home/archive conductors, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

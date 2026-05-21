@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { supabaseReflectGenerator } from '@/features/pause/infrastructure/supabase-reflect-generator';
+import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
 import type {
   PauseArtifactReflectionTextFetchPhase,
   UsePauseArtifactReflectionTextParams,

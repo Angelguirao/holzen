@@ -9,7 +9,7 @@ const { runPauseReflectionStepLogOnceMock, mockPauseRepository, mockReflectionSt
     mockReflectionStepStorage: { port: 'reflectionStepSessionStorage' },
   }));
 
-vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: mockPauseRepository,
 }));
 

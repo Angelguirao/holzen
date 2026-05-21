@@ -7,7 +7,7 @@ const { fetchReflectionTextMock, mockReflectGenerator } = vi.hoisted(() => ({
   mockReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
-vi.mock('@/features/pause/infrastructure/supabase-reflect-generator', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   supabaseReflectGenerator: {
     ...mockReflectGenerator,
     fetchReflectionText: fetchReflectionTextMock,

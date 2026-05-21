@@ -6,7 +6,7 @@ import { showPauseFavoriteProHintToast } from '@/features/pause/presentation/ref
 import { pauseArchiveListQueryPrefix } from '@/features/pause/public-queries';
 import { runPauseFavoriteToggle } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import { shouldShowFavoriteProHint } from '@/features/pause/domain/reflect/steps/favorite-toggle';
-import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import { hapticFeedback } from '@/lib/haptics';
 
 export function usePauseFavoriteToggle(input: {
