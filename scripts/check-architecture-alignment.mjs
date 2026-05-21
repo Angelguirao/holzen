@@ -53,6 +53,42 @@ mustExist(
   'src/features/pause/application/use-cases/ritual/reflect/ambience',
   'pause/application/use-cases/ritual/reflect/ambience/',
 );
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/share',
+  'pause/application/use-cases/ritual/reflect/share/',
+);
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/generation',
+  'pause/application/use-cases/ritual/reflect/generation/',
+);
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/steps',
+  'pause/application/use-cases/ritual/reflect/steps/',
+);
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/telemetry',
+  'pause/application/use-cases/ritual/reflect/telemetry/',
+);
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/hub',
+  'pause/application/use-cases/ritual/reflect/hub/',
+);
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/mood',
+  'pause/application/use-cases/ritual/reflect/mood/',
+);
+mustNotExist(
+  'src/features/pause/domain/reflect/share/reflection-share-canvas.ts',
+  'domain/reflect/share/reflection-share-canvas.ts (use application/use-cases/ritual/reflect/share/)',
+);
+mustNotExist(
+  'src/features/pause/domain/reflect/share/deliver-reflection-share-image.ts',
+  'domain/reflect/share/deliver-reflection-share-image.ts (use application/use-cases/ritual/reflect/share/)',
+);
+mustNotExist(
+  'src/features/pause/domain/reflect/ambience',
+  'domain/reflect/ambience/ (use application/use-cases/ritual/reflect/ambience/)',
+);
 mustExist('src/features/pause/application/use-cases/session', 'pause/application/use-cases/session/');
 mustExist('src/features/pause/application/use-cases/ritual/brief', 'pause/application/use-cases/ritual/brief/');
 mustNotExist(
