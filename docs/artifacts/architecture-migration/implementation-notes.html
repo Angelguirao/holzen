@@ -7791,4 +7791,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel companion slot orchestrate helpers off public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>presentation/companion → ritual/frame direct imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Continue backlog #3 §6 slim barrel: all companion orchestrate presentation hooks import slot helpers from <code>application/use-cases/ritual/frame/*</code>; remove presentation-only re-exports from <code>public-rpc.ts</code> (follow-up to section-expansion peel). Wired <code>loadPauseCompanionOrchestrateSession</code> facade stays on <code>public-rpc</code>; screen-facing slot types remain on <code>public-hooks.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Cross-context callers that needed slot orchestrate pure helpers must import <code>ritual/frame/*</code> or <code>public-hooks</code> types — none were on <code>public-rpc</code> outside <code>presentation/companion/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed analytics read for companion feedback vote fetch, or remaining wired <code>public-rpc</code> facades audit.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

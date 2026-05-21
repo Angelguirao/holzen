@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
+import { applyCompanionOrchestrateRetryReset } from '@/features/pause/application/use-cases/ritual/frame/apply-companion-orchestrate-retry-reset';
 import {
-  applyCompanionOrchestrateRetryReset,
   EMPTY_COMPANION_SLOT_RELAXATIONS,
-  resetInterventionIdempotency,
   type CompanionSlotRelaxations,
-} from '@/features/pause/public-rpc';
+} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
+import { resetInterventionIdempotency } from '@/features/pause/application/use-cases/ritual/frame/intervention-idempotency';
 
 export type UseCompanionOrchestrateRetryParams = {
   pauseInstanceId?: string | null;
