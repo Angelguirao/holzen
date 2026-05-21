@@ -8820,7 +8820,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
       <span>Phase A slice — fullview telemetry port-backed in presentation (backlog #1 done, #4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -8832,7 +8831,14 @@
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
       <dd>Presentation companion hook imports infrastructure adapter; screens still use <code>public-hooks</code> re-export only.</dd>
-=======
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: intervention bootstrap thin runner on <code>public-rpc</code>, or audit stray mutations bypassing <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — ritual audio context in domain (backlog #1 done, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -8844,7 +8850,6 @@
       <dd>Did not re-export on <code>public-rpc</code> — that barrel pulls infrastructure and breaks jsdom tests without env.</dd>
       <dt>Tradeoffs</dt>
       <dd>Reflect mood/hub still import <code>showPauseStepSyncFailedToast</code> from <code>ritual/step-sync-toast</code> directly (same test/isolation pattern).</dd>
->>>>>>> d820b602 (refactor(pause): move ritual audio context to domain (reflect follow-up))
       <dt>Open questions</dt>
       <dd>Next backlog #4: intervention bootstrap thin runner on <code>public-rpc</code>, or audit stray mutations bypassing <code>PauseRepository</code>.</dd>
     </dl>
