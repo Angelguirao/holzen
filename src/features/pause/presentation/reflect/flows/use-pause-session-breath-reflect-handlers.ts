@@ -1,4 +1,4 @@
-import { usePauseShiftFrameDoneHandler } from '../hub/use-pause-shift-frame-done-handler';
+import { usePauseShiftFrameDoneHandler } from '@/features/pause/public-ritual-reflect';
 import { usePauseSessionBreathHandlers } from './use-pause-session-breath-handlers';
 import { usePauseSessionReflectAndDecide } from './use-pause-session-reflect-and-decide';
 import type {

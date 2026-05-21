@@ -6,7 +6,7 @@ import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
-import { usePauseFeelShiftLogDedupeRefs } from './use-pause-feel-shift-log-dedupe-refs';
+import { usePauseFeelShiftLogDedupeRefs } from '@/features/pause/public-ritual-reflect';
 import { usePauseSessionDepthPickerHandlers } from './use-pause-session-depth-picker-handlers';
 import { usePauseSessionFeelTilesSelect } from './use-pause-session-feel-tiles-select';
 import { usePauseSessionInitialMoodHandlers } from './use-pause-session-initial-mood-handlers';
