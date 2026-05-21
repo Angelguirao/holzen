@@ -7601,4 +7601,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood chrome handler types (backlog #1 presentation)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Mood chrome slice types → <code>presentation/reflect/mood/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate <code>PauseSessionMoodChrome*</code> slice types with <code>use-pause-session-mood-chrome-handlers</code>; <code>pause-session-step-handler-types.ts</code> re-exports for <code>PauseSessionStepHandlersProvidersSlice</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; types-only move.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestrate hooks still import <code>public-rpc</code> session helpers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-orchestrate-session</code> off <code>public-rpc</code>, or backlog #4 remaining <code>PauseRepository</code> call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -9,7 +9,7 @@ import type {
   PauseSessionMoodChromeProvidersSlice,
   PauseSessionMoodChromeRitualSlice,
   PauseSessionMoodChromeShellSlice,
-} from '../../session/pause-session-step-handler-types';
+} from './pause-session-mood-chrome-handler-types';
 
 /** Mood persistence, favorite toggle, and pause chrome close for the session ritual. */
 export function usePauseSessionMoodChromeHandlers(
