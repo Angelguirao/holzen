@@ -3,8 +3,18 @@ import {
   buildManualPauseOpenParams,
   type BuildManualPauseOpenParamsInput,
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/build-manual-pause-open-params';
+import {
+  buildManualPauseMarketContext,
+  type ManualPauseMarketContext,
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/build-manual-pause-market-context';
 import { openManualPauseFromHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home';
 import type { OpenManualPauseFromHomeResult } from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home-types';
+import {
+  trackHomePendingPauseBannerPauseOpened,
+  trackPauseOpenDismissed,
+  type OpenPauseStateForAnalytics,
+  type PauseDismissAnalyticsSurface,
+} from '@/features/pause/application/use-cases/trigger/home-pause-actions-telemetry';
 import {
   markPauseManualStartedHomeOnce,
   trackManualPauseInstanceCreated,
@@ -22,15 +32,21 @@ import {
 
 export {
   applyManualPauseOpenResult,
+  buildManualPauseMarketContext,
   buildManualPauseOpenParams,
   openManualPauseFromHome,
   markPauseManualStartedHomeOnce,
+  trackHomePendingPauseBannerPauseOpened,
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
+  trackPauseOpenDismissed,
   type ApplyManualPauseOpenResultInput,
   type BuildManualPauseOpenParamsInput,
   type ManualPauseHomePreviewPorts,
+  type ManualPauseMarketContext,
   type OpenManualPauseFromHomeResult,
+  type OpenPauseStateForAnalytics,
+  type PauseDismissAnalyticsSurface,
   type TrackManualPauseInstanceCreatedPayload,
   type TrackPauseManualCompletedPayload,
 };

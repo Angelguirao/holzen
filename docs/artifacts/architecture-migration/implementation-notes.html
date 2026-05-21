@@ -14840,4 +14840,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — Home market context + actions telemetry on pause-home-io</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — manual-open cluster barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Re-export <code>buildManualPauseMarketContext</code> and Home dismiss/banner PostHog helpers on <code>presentation/home/pause-home-io.ts</code> so <code>use-home-pause-actions</code> has no deep <code>application/</code> imports. <code>build-manual-pause-open-params</code> keeps sibling import for market context.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; event names unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-home-io</code> is the single Home presentation seam for manual open, dismiss preview, and Home pause-card analytics.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B cross-context slice (<code>holzen-query-client-ref</code> shim) or re-export <code>buildManualPauseCreateOrReuseParams</code> on <code>pause-home-io</code> if Home tests need it.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

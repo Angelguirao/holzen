@@ -9,7 +9,7 @@ const { trackPauseOpenDismissedMock, trackHomePendingPauseBannerPauseOpenedMock 
   }),
 );
 
-vi.mock('@/features/pause/application/use-cases/trigger/home-pause-actions-telemetry', () => ({
+vi.mock('./pause-home-io', () => ({
   trackPauseOpenDismissed: trackPauseOpenDismissedMock,
   trackHomePendingPauseBannerPauseOpened: trackHomePendingPauseBannerPauseOpenedMock,
 }));
