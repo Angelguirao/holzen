@@ -1,11 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { buildFeelTilesMoodLogOptions } from '@/features/pause/domain/reflect/mood/pause-session-mood-chrome-flow';
 import { usePauseSessionFeelTilesSelect } from './use-pause-session-feel-tiles-select';
-
-vi.mock('@/features/pause/public-rpc', () => ({
-  buildFeelTilesMoodLogOptions,
-}));
 
 describe('usePauseSessionFeelTilesSelect', () => {
   it('brief: forwards mood, intensity, brief ritual + face tile', async () => {
