@@ -5,8 +5,12 @@ import { useBulkHoldApplyOutcomes } from './use-bulk-hold-apply-outcomes';
 
 const applyBulkHoldOutcomesMock = vi.hoisted(() => vi.fn());
 
-vi.mock('@/features/pause/public-rpc', () => ({
+vi.mock('@/features/pause/application/use-cases/home/bulk-hold/apply-bulk-hold-outcomes', () => ({
   applyBulkHoldOutcomes: applyBulkHoldOutcomesMock,
+}));
+
+vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+  supabasePauseRepository: {},
 }));
 
 vi.mock('@/features/pause/public-queries', () => ({
@@ -24,7 +28,7 @@ beforeEach(() => {
 });
 
 describe('useBulkHoldApplyOutcomes', () => {
-  it('applies outcomes via public-rpc facade', async () => {
+  it('applies outcomes via applyBulkHoldOutcomes + PauseRepository', async () => {
     const user = { id: 'user-1' } as User;
     const setPending = vi.fn();
     const bumpRefetchNonce = vi.fn();
@@ -51,7 +55,11 @@ describe('useBulkHoldApplyOutcomes', () => {
       await result.current.applyOutcomesAndFinish([row], () => 'held');
     });
 
-    expect(applyBulkHoldOutcomesMock).toHaveBeenCalledWith([row], expect.any(Function));
+    expect(applyBulkHoldOutcomesMock).toHaveBeenCalledWith(
+      expect.anything(),
+      [row],
+      expect.any(Function),
+    );
     expect(onSuccess).toHaveBeenCalledWith(1);
   });
 });

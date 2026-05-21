@@ -11553,4 +11553,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel home bulk-hold apply off public-rpc (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; Home bulk-hold conductor bypasses public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. After open-pause dismiss peel (<code>16192e15</code>), align <code>use-bulk-hold-apply-outcomes</code> with other home conductors: <code>applyBulkHoldOutcomes(supabasePauseRepository, …)</code>; remove <code>applyBulkHoldOutcomes</code> facade from <code>public-rpc</code> (no cross-context callers).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>openManualPauseFromHome</code> and pending-offer adopt/decline facades remain on <code>public-rpc</code> for cross-context / multi-port wiring.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-pending-pause-offer-mutations</code> or <code>use-manual-pause-trigger</code> off <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

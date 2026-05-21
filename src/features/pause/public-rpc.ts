@@ -39,13 +39,8 @@ import {
   runDeclinePendingPauseOffer,
   type RunDeclinePendingPauseOfferResult,
 } from './application/use-cases/pending-offer/run-decline-pending-pause-offer';
-import {
-  applyBulkHoldOutcomes as applyBulkHoldOutcomesUseCase,
-  type BulkHoldApplyResult,
-} from './application/use-cases/home/bulk-hold/apply-bulk-hold-outcomes';
 import { openManualPauseFromHome as openManualPauseFromHomeUseCase } from './application/use-cases/trigger/open-manual-pause-from-home';
 import type { OpenManualPauseFromHomeParams } from './application/use-cases/trigger/open-manual-pause-from-home';
-import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from './domain/bulk-hold';
 import type { PauseState } from './domain/pause-state';
 import type { PostPauseFeelSnapshot } from './domain/ritual/done/post-pause-emotion-log';
 import type { RunPauseFavoriteToggleResult } from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
@@ -119,7 +114,6 @@ export function declinePendingPauseOffer(): Promise<RunDeclinePendingPauseOfferR
   return runDeclinePendingPauseOffer(supabasePauseRepository);
 }
 
-export type { BulkHoldApplyResult };
 export type { PostPauseFeelSnapshot };
 export type { CompanionUiCompletionStep };
 export type { RunAdoptPendingPauseOfferResult, RunDeclinePendingPauseOfferResult };
@@ -134,13 +128,6 @@ export function openManualPauseFromHome(params: OpenManualPauseFromHomeParams) {
     },
     params,
   );
-}
-
-export function applyBulkHoldOutcomes(
-  rows: BulkHoldPendingPause[],
-  resolver: (p: BulkHoldPendingPause) => BulkHoldOutcomeChoice,
-): Promise<BulkHoldApplyResult> {
-  return applyBulkHoldOutcomesUseCase(supabasePauseRepository, rows, resolver);
 }
 
 export {
