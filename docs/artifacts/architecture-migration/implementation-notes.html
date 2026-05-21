@@ -12522,4 +12522,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect flows/steps off infrastructure barrels (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>reflectionStepSessionStorage</code> + decide <code>clearSession</code> via public barrels</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) complete — no folder moves. Finish reflect presentation infrastructure imports: re-export <code>reflectionStepSessionStorage</code> on <code>public-rpc</code>; re-export <code>clearSession</code> on <code>public-session</code> for <code>use-pause-session-decide-handler</code>. Tests mock the barrels (port-lock parity with prior slice).</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §6 / §10.1 reflect conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Two-file reflect cluster only; session/companion/home still import <code>infrastructure/session/*</code> directly until sliced.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: <code>public-rpc</code> / <code>public-session</code> for session breath loggers + home trigger, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

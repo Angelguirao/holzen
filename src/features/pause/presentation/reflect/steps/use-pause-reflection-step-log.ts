@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { runPauseReflectionStepLogOnce } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
 import { shouldLogPauseReflectionStep } from '@/features/pause/domain/reflect/steps/reflection-step-log';
-import { reflectionStepSessionStorage } from '@/features/pause/infrastructure/edge/reflect/reflection-step-session-storage';
-import { supabasePauseRepository } from '@/features/pause/public-rpc';
+import {
+  reflectionStepSessionStorage,
+  supabasePauseRepository,
+} from '@/features/pause/public-rpc';
 
 /** Records `reflection_step` once per pause instance after reflect copy settles. */
 export function usePauseReflectionStepLog(input: {
