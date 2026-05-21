@@ -7205,7 +7205,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
       <span>Phase A slice — drop dead reflect RPC facades from public-rpc (backlog #3)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -7238,21 +7237,25 @@
       <dd>Breath segment RPC loggers and pending-offer mutations still use <code>public-rpc</code> facades.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel breath segment RPC loggers or pending-offer mutations off <code>public-rpc</code>, or backlog #4 stray mutation call sites.</dd>
-=======
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — peel breath segment RPC loggers off public-rpc (backlog #1 done)</span>
       <span class="status resolved">resolved</span>
     </header>
     <h3>use-pause-breath-segment-rpc-loggers port-backed</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Align <code>use-pause-breath-segment-rpc-loggers</code> with decide/mood conductors: call <code>runEnsureBreathSegment*</code> / <code>runLogBreathSegment*Skipped</code> with <code>supabasePauseRepository</code> from <code>public-ports</code>; companion UI completion invalidation stays on <code>invalidateCompanionUiCompletionQuery</code>. <code>ensureBreathSegment*</code> facades on <code>public-rpc</code> unchanged for cross-context callers.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Align <code>use-pause-breath-segment-rpc-loggers</code> with decide/mood/brief-done conductors: call <code>runEnsureBreathSegment*</code> / <code>runLogBreathSegment*Skipped</code> with <code>supabasePauseRepository</code> from <code>public-ports</code>; companion UI completion invalidation stays on <code>invalidateCompanionUiCompletionQuery</code>. <code>ensureBreathSegment*</code> facades on <code>public-rpc</code> unchanged for cross-context callers.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>use-pause-brief-done-check-in</code> still imports <code>logPostPauseEmotionIfDirty</code> from <code>public-rpc</code> until a follow-up peel.</dd>
+      <dd>Pending-offer mutations and companion UI completion hooks still use <code>public-rpc</code> facades.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>use-pause-brief-done-check-in</code> off <code>public-rpc</code>, or backlog #4 companion feedback vote read adapter.</dd>
->>>>>>> 0298977e (refactor(pause): peel breath segment RPC loggers off public-rpc)
+      <dd>Next: peel pending-offer mutations off <code>public-rpc</code>, or backlog #4 companion feedback vote read adapter.</dd>
     </dl>
   </article>
 
