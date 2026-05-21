@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mapPersistedStep } from './step-map';
+import { mapPersistedStep } from './map-persisted-step';
 
 describe('mapPersistedStep', () => {
   it('maps legacy and empty keys to feel', () => {
