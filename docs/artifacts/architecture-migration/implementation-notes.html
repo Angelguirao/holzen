@@ -5017,4 +5017,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — backlog #1 verified complete (reflect → ritual/reflect)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>No folder move; verification + doc scorecard alignment</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog item #1 (<code>application/use-cases/reflect/*</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code> before this automation run. All reflect use cases live under <code>ritual/reflect/generation/</code>, <code>ritual/reflect/steps/</code>, and <code>ritual/reflect/flows/</code>; presentation imports <code>public-rpc</code> for mutations and generation.</dd>
+      <dt>Deviation</dt>
+      <dd>None — no code moves this session; doc scorecard rows updated so agents do not re-open finished reflect/frame folder work.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Updated <code>modern-react-practices-holzen.md</code> and <code>refactoring-strategy.md</code> paths that still referenced legacy <code>application/use-cases/reflect|companion/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next slice: backlog #4 — wire remaining <code>PauseRepository</code> stragglers or Phase B cross-context per scheduling table.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
