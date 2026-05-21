@@ -1,4 +1,7 @@
-import { generateReflectionAtReflectStep } from '@/features/pause/infrastructure/edge/reflect/reflection-artifact';
+import {
+  generateReflectionAtReflectStep,
+  persistReflectionArtifacts,
+} from '@/features/pause/infrastructure/edge/reflect/reflection-artifact';
 import { fetchLatestPauseReflectStepFromSupabase } from '@/features/pause/infrastructure/queries/reflect/fetch-latest-pause-reflect-step';
 import { fetchHaikuTextForPauseInstance } from '@/features/pause/infrastructure/queries/reflect/haiku-artifact-query';
 import { fetchReflectionTextForPauseInstance } from '@/features/pause/infrastructure/queries/reflect/reflection-text-artifact-query';
@@ -15,4 +18,5 @@ export const supabaseReflectGenerator: ReflectGenerator = {
     const { message } = await generateReflectionAtReflectStep({ ...params, recencyHints });
     return { message };
   },
+  persistReflectionArtifacts,
 };

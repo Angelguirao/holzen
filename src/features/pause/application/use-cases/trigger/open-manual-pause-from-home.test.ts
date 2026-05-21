@@ -5,14 +5,16 @@ describe('openManualPauseFromHome', () => {
   it('returns idle when RPC yields no instance', async () => {
     const result = await openManualPauseFromHome(
       {
-        createOrReuse: vi.fn().mockResolvedValue({
-          instance_id: null,
-          created: false,
-          reused_reason: 'fingerprint_match',
-          pending_offer: false,
-          prior_open_instance_id: null,
-        }),
-        persistReflectionArtifacts: vi.fn(),
+        repository: {
+          createOrReuse: vi.fn().mockResolvedValue({
+            instance_id: null,
+            created: false,
+            reused_reason: 'fingerprint_match',
+            pending_offer: false,
+            prior_open_instance_id: null,
+          }),
+        },
+        reflect: { persistReflectionArtifacts: vi.fn() },
       },
       {
         userId: 'u1',
@@ -34,14 +36,16 @@ describe('openManualPauseFromHome', () => {
     const persistReflectionArtifacts = vi.fn().mockResolvedValue(undefined);
     const result = await openManualPauseFromHome(
       {
-        createOrReuse: vi.fn().mockResolvedValue({
-          instance_id: 'pause-1',
-          created: true,
-          reused_reason: null,
-          pending_offer: false,
-          prior_open_instance_id: null,
-        }),
-        persistReflectionArtifacts,
+        repository: {
+          createOrReuse: vi.fn().mockResolvedValue({
+            instance_id: 'pause-1',
+            created: true,
+            reused_reason: null,
+            pending_offer: false,
+            prior_open_instance_id: null,
+          }),
+        },
+        reflect: { persistReflectionArtifacts },
       },
       {
         userId: 'u1',
@@ -73,14 +77,16 @@ describe('openManualPauseFromHome', () => {
     const persistReflectionArtifacts = vi.fn();
     const result = await openManualPauseFromHome(
       {
-        createOrReuse: vi.fn().mockResolvedValue({
-          instance_id: 'pause-2',
-          created: true,
-          reused_reason: null,
-          pending_offer: true,
-          prior_open_instance_id: null,
-        }),
-        persistReflectionArtifacts,
+        repository: {
+          createOrReuse: vi.fn().mockResolvedValue({
+            instance_id: 'pause-2',
+            created: true,
+            reused_reason: null,
+            pending_offer: true,
+            prior_open_instance_id: null,
+          }),
+        },
+        reflect: { persistReflectionArtifacts },
       },
       {
         userId: 'u1',
