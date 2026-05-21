@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import {
   buildPauseSessionPersistSnapshot,
   type PauseSessionPersistSnapshotInput,
-} from '@/features/pause/application/use-cases/session/persist-snapshot';
+} from '@/features/pause/presentation/session/scaffold/pause-session-scaffold-io';
 import { hasPersistablePauseSessionAnchor } from '@/features/pause/domain/session/persisted-session-guards';
 import { savePausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 

@@ -1,5 +1,5 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
-import { computePauseStorageRitualSyncPatch } from '@/features/pause/application/use-cases/session/storage-ritual-sync';
+import { computePauseStorageRitualSyncPatch } from '@/features/pause/presentation/session/scaffold/pause-session-scaffold-io';
 import { loadPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
