@@ -1,5 +1,8 @@
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+import type { ReflectionStepLogStoragePort } from '@/features/pause/ports/reflection-step-log-storage';
+
+export type { ReflectionStepLogStoragePort } from '@/features/pause/ports/reflection-step-log-storage';
 
 export const REFLECTION_STEP_LOGGED_STORAGE_PREFIX = 'holzen_reflect_step_logged:';
 
@@ -19,13 +22,6 @@ export function shouldLogPauseReflectionStep(input: {
   if (!input.reflectionMessage.trim() && !input.reflectionError) return false;
   return true;
 }
-
-export type ReflectionStepLogStoragePort = {
-  /** When false, skip logging (e.g. sessionStorage unavailable). */
-  canRead: () => boolean;
-  isLogged: (storageKey: string) => boolean;
-  markLogged: (storageKey: string) => void;
-};
 
 export type RunPauseReflectionStepLogResult =
   | { status: 'logged' }

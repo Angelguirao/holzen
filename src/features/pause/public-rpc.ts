@@ -21,8 +21,6 @@ export {
   type GroundingEnrichBody,
   type GroundingEnrichment,
 } from './infrastructure/edge/grounding-enrich-edge';
-export { invokeHolzenReflect, type HolzenReflectResponse } from './infrastructure/edge/reflect/holzen-reflect-edge';
-
 import { dismissOpenPauseHome } from './application/use-cases/dismiss/dismiss-open-pause-home';
 import { logRetrospectiveOutcome as logRetrospectiveOutcomeUseCase } from './application/use-cases/archive/log-retrospective-outcome';
 import {
