@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — session frame I/O direct restored-frame-ritual-state (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-frame-io</code> imports frame hydration from ritual/frame use case</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 remains complete. <code>pause-session-frame-io</code> re-exports <code>initialFrameDoneFromRestored</code> from <code>ritual/frame/restored-frame-ritual-state</code> instead of <code>pause-session-frame-flow</code> session CI anchor (parity with reflect presentation I/O peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-frame-flow.ts</code> remains for <code>check:architecture-alignment</code>; presentation no longer depends on it.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-home-reflect-telemetry-io</code> direct telemetry imports, or session conductor flow-anchor peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — unify reflect steps + ambience I/O (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
