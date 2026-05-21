@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — session shell bootstrap through pause-session-shell-io</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Extend <code>pause-session-shell-io</code> with mount log + shell view model</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder move remains complete. <code>use-pause-session-shell-bootstrap</code> and <code>use-pause-session-mount-log</code> import <code>buildPauseSessionMountLogParams</code> / <code>coalescePauseSessionShellViewModel</code> through <code>presentation/session/pause-session-shell-io.ts</code> instead of deep <code>application/use-cases/session/mount-log-params</code> and <code>shell-view-model</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; application modules remain for unit tests and alignment checks.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Single shell I/O barrel for header-back + bootstrap helpers; scaffold persist I/O remains a follow-up.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>presentation/session/scaffold/pause-session-scaffold-io.ts</code> for persist snapshot + scaffold derived props, or companion <code>load-companion-orchestrate-session</code> through orchestration-io.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect mood I/O pure helpers from domain (backlog #1 follow-up)</span>
       <span class="status resolved">resolved</span>
     </header>
