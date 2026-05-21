@@ -50,8 +50,8 @@ vi.mock(
   }),
 );
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabaseCompanionOrchestrator: mockCompanionOrchestrator,
+vi.mock('./pause-companion-orchestration-io', () => ({
+  companionOrchestrator: mockCompanionOrchestrator,
 }));
 
 vi.mock(

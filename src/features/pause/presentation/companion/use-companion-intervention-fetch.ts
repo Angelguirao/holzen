@@ -7,7 +7,7 @@ import type {
   CompanionSlotRelaxations,
 } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
 import { fetchParsedPauseArtifactCache } from '@/features/pause/public-queries';
-import { supabaseCompanionOrchestrator } from '@/features/pause/public-rpc';
+import { companionOrchestrator } from './pause-companion-orchestration-io';
 
 export type UseCompanionInterventionFetchParams = {
   pauseInstanceId?: string | null;
@@ -62,7 +62,7 @@ export function useCompanionInterventionFetch({
             fetchArtifactCache: fetchParsedPauseArtifactCache,
             loadOrchestrateSession,
             invokeIntervention: (session) =>
-              supabaseCompanionOrchestrator.invokeIntervention(session),
+              companionOrchestrator.invokeIntervention(session),
           },
         );
 
