@@ -1,15 +1,7 @@
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
+import { buildShiftEmotionFrameHubLogBundle } from '@/features/pause/domain/reflect/hub/shift-emotion-log';
 import type { ShiftEmotionFrameHubDoneOutcome } from '@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-
-/** RPC payload + dedupe key for Frame hub “I'm done” → `shift_emotion_logged`. */
-export function buildShiftEmotionFrameHubLogBundle(): {
-  payload: Record<string, unknown>;
-  logKey: string;
-} {
-  const payload: Record<string, unknown> = { from_frame_hub: true };
-  return { payload, logKey: JSON.stringify(payload) };
-}
 
 export type RunShiftEmotionFrameHubDoneResult = ShiftEmotionFrameHubDoneOutcome;
 

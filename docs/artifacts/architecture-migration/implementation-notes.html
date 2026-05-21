@@ -6556,4 +6556,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — shift-emotion log → domain/reflect/hub (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel Frame hub shift payload from ritual/feel use case</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Mirror initial-emotion peel: pure <code>shift-emotion-log</code> (payload + dedupe bundle) under <code>domain/reflect/hub/</code>; <code>run-shift-emotion-frame-hub-done</code> keeps RPC orchestration in <code>ritual/feel/</code>; <code>public-rpc</code> facades unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>Renamed use-case module from <code>shift-emotion-log.ts</code> to <code>run-shift-emotion-frame-hub-done.ts</code> for parity with <code>run-initial-emotion-log</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation mapping stays in <code>shift-frame-hub-done-presentation.ts</code>; mood chrome flow re-exported on <code>public-rpc</code> in a prior slice on this branch.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: export <code>PauseImpactData</code> for reflect/decide flow conductor, or backlog #4 stray mutation call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
