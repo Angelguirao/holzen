@@ -1,9 +1,9 @@
 import { buildManualPauseCreateOrReuseParams } from '@/features/pause/application/use-cases/ritual/reflect/generation/build-manual-pause-create-or-reuse-params';
-import { pauseCreateSkippedUserMessage } from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-create-skipped-user-message';
-import { runPauseCreateOrReuse } from '@/features/pause/application/use-cases/session/run-pause-create-or-reuse';
 import { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-open-manual-pause-silent-mode-after-create';
+import { mapManualPauseOpenError } from '@/features/pause/domain/reflect/generation/map-manual-pause-open-error';
+import { pauseCreateSkippedUserMessage } from '@/features/pause/domain/reflect/generation/pause-create-skipped-user-message';
+import { runPauseCreateOrReuse } from '@/features/pause/application/use-cases/session/run-pause-create-or-reuse';
 import type {
-  OpenManualPauseFromHomeError,
   OpenManualPauseFromHomeParams,
   OpenManualPauseFromHomePorts,
   OpenManualPauseFromHomeResult,
@@ -17,22 +17,6 @@ export type {
   OpenManualPauseFromHomeResult,
   OpenManualPauseFromHomeSuccess,
 } from './open-manual-pause-from-home-types';
-
-function mapCreateOrReuseError(e: unknown): OpenManualPauseFromHomeError {
-  const raw = e instanceof Error ? e.message : String(e);
-  if (raw.includes('fetch') || raw.includes('network') || raw.includes('Failed to fetch')) {
-    return {
-      outcome: 'error',
-      userMessage: 'Could not reach Holzen. Check your connection.',
-      isNetwork: true,
-    };
-  }
-  return {
-    outcome: 'error',
-    userMessage: 'Could not open a pause right now. Try again shortly.',
-    isNetwork: false,
-  };
-}
 
 /** Home "Need a moment": `pause_create_or_reuse` (+ silent reflection stub when enabled). */
 export async function openManualPauseFromHome(
@@ -68,6 +52,6 @@ export async function openManualPauseFromHome(
       silentStubPersisted: false,
     };
   } catch (e: unknown) {
-    return mapCreateOrReuseError(e);
+    return mapManualPauseOpenError(e);
   }
 }

@@ -14821,4 +14821,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual-open copy helpers in domain/reflect/generation</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — pure Home open messaging</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete. Move <code>pause-create-skipped-user-message</code> and <code>mapManualPauseOpenError</code> from <code>application/use-cases/ritual/reflect/generation/</code> to <code>domain/reflect/generation/</code>; <code>open-manual-pause-from-home</code> imports domain only for user-facing copy and error mapping.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; orchestration stays in application.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>OpenManualPauseFromHome*</code> result types remain in application until a domain-only manual-open contract peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: re-export <code>buildManualPauseMarketContext</code> on <code>pause-home-io</code>, or Phase B cross-context slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
