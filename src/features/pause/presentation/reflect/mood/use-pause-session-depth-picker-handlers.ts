@@ -2,7 +2,7 @@ import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import {
   applyBriefDepthPickerRitualEntry,
   applyDeepDepthPickerRitualEntry,
-} from '@/features/pause/application/use-cases/ritual/reflect/mood/apply-depth-picker-ritual-entry';
+} from '@/features/pause/domain/reflect/mood/apply-depth-picker-ritual-entry';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 
 /** `PauseDepthPicker` actions on `/pause` depth selection screen. */
