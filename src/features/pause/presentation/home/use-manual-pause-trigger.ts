@@ -31,7 +31,7 @@ export interface UseManualPauseTriggerParams {
 
 /**
  * Home manual “Need a moment”: market context → `openManualPauseFromHome` → Home preview state.
- * Called from `useHolzen` in screens; RPC + reflect I/O via `openManualPauseFromHome` on `public-rpc`.
+ * Called from `useHolzen` in screens; RPC + reflect I/O via wired `openManualPauseFromHome` on `public-rpc`.
  */
 export function useManualPauseTrigger({
   user,
