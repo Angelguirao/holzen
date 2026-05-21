@@ -6803,4 +6803,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood chrome domain peel from public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel depth-picker, mood-chrome close, and deep-picker pro gate off public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete. Smallest reflect presentation peel: pure helpers in <code>domain/reflect/mood/pause-session-mood-chrome-flow</code> (<code>BRIEF_DEPTH_PICKER_RITUAL_ENTRY</code>, <code>DEEP_DEPTH_PICKER_RITUAL_ENTRY</code>, chrome close resolve/run, <code>runDeepPausePickerEntryIfPro</code>) imported directly in <code>use-pause-session-depth-picker-handlers</code>, <code>use-pause-session-mood-chrome-handlers</code>, and <code>use-pause-session-mood-and-persist</code>; depth-picker test drops <code>public-rpc</code> mock.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-rpc</code> still re-exports the same helpers for external callers; initial-mood / frame-hub RPC facades remain on the barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion slot orchestrate presentation cluster through <code>public-rpc</code>, or backlog #4 stray mutation call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
