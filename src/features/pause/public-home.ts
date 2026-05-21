@@ -49,3 +49,19 @@ export {
   useBulkHoldApplyOutcomes,
   type UseBulkHoldApplyOutcomesParams,
 } from './presentation/home/use-bulk-hold-apply-outcomes';
+export {
+  useCompletedPauseCount,
+  COMPLETED_PAUSE_COUNT_QUERY_KEY,
+  fetchCompletedPauseCount,
+  getCompletedPauseCountQueryOptions,
+} from './presentation/home/use-completed-pause-count';
+export { useDismissOutletPauseReady } from './presentation/home/use-dismiss-outlet-pause-ready';
+export {
+  usePendingPauseOffer,
+  pendingPauseOfferQueryKey,
+  type PendingPauseOfferRow,
+} from './presentation/session/use-pending-pause-offer';
+export {
+  getPendingPauseOfferDisplay,
+  type PendingPauseOfferDisplay,
+} from './application/use-cases/pending-offer/pending-pause-offer-display';

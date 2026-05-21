@@ -52,7 +52,15 @@ export {
 export {
   getPendingPauseOfferDisplay,
   type PendingPauseOfferDisplay,
-} from './application/use-cases/pending-offer/pending-pause-offer-display';
+  useCompletedPauseCount,
+  COMPLETED_PAUSE_COUNT_QUERY_KEY,
+  fetchCompletedPauseCount,
+  getCompletedPauseCountQueryOptions,
+  useDismissOutletPauseReady,
+  usePendingPauseOffer,
+  pendingPauseOfferQueryKey,
+  type PendingPauseOfferRow,
+} from './public-home';
 export {
   BREATH_ORB_CX,
   BREATH_ORB_CY,
@@ -132,18 +140,6 @@ export type {
   PauseSessionBriefRitualBodyProps,
   PauseSessionDeepRitualBodyProps,
 } from './presentation/session/ritual-body-props';
-export {
-  useCompletedPauseCount,
-  COMPLETED_PAUSE_COUNT_QUERY_KEY,
-  fetchCompletedPauseCount,
-  getCompletedPauseCountQueryOptions,
-} from './presentation/home/use-completed-pause-count';
-export { useDismissOutletPauseReady } from './presentation/home/use-dismiss-outlet-pause-ready';
-export {
-  usePendingPauseOffer,
-  pendingPauseOfferQueryKey,
-  type PendingPauseOfferRow,
-} from './presentation/session/use-pending-pause-offer';
 export { usePendingPauseOfferMutations } from './presentation/session/use-pending-pause-offer-mutations';
 export {
   usePauseBriefDoneCheckIn,
