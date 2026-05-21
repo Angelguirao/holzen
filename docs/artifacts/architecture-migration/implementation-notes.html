@@ -15942,4 +15942,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect ambience I/O imports domain bed (backlog #1 verified; Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>pause-reflect-ambience-io stops deep-importing application ambience anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. <code>presentation/reflect/ambience/pause-reflect-ambience-io.ts</code> imports <code>startPauseReflectFrameFocusAmbience</code> / <code>stopPauseReflectFrameFocusAmbience</code> from <code>domain/ritual/breathe/reflect-frame-focus-ambience.ts</code>. Application <code>ritual/reflect/ambience/reflect-frame-focus-ambience.ts</code> stays as CI cluster anchor only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import path only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Generation I/O still imports <code>run-reflect-generation</code> from application; breath segment log outcome helpers still bypass session breath I/O.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>applyBreathSegmentLogOutcome</code> through <code>pause-session-breath-io</code>, or initial-emotion presentation through reflect mood I/O.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
