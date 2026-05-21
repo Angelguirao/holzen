@@ -9010,6 +9010,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect share delivery use cases (backlog #1 done, Tier 2)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/share/ orchestration beside domain canvas</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete. Extract native share vs download fallback from <code>use-reflection-share-handlers</code> into <code>deliver-reflection-share-image</code> + <code>run-reflection-share-image</code> under <code>application/use-cases/ritual/reflect/share/</code>; canvas render stays in <code>domain/reflect/share/reflection-share-canvas.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; download toast still only when fallback path runs.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Use cases depend on browser <code>navigator</code>/<code>document</code> (injectable deps for tests); presentation hook remains React + sonner.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit stray mutations bypassing <code>PauseRepository</code>, or peel remaining companion <code>ritual/frame/*</code> presentation imports.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — post-pause feel helpers in domain (backlog #1 done, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
