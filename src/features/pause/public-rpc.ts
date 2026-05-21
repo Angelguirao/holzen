@@ -308,7 +308,22 @@ export function loadPauseCompanionOrchestrateSession(input: LoadCompanionOrchest
 /** Inline companion card expand — lazy-fetch on first open (Pro gate). */
 export { nextExpandedWithLazyFetch } from './application/use-cases/ritual/frame/next-expanded-with-lazy-fetch';
 
-/** Companion slot orchestrate — presentation param types (no Supabase side effects). */
+/** Companion slot orchestrate — presentation helpers (no wired RPC facades). */
+export { applyCompanionSlotOrchestrateOutcome } from './application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome';
+export { logCompanionSlotOrchestrateInvoke } from './application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry';
+export type { ApplyCompanionSlotOrchestrateFailureUiPorts } from './application/use-cases/ritual/frame/companion-slot-orchestrate-failure-ui';
+export {
+  setCompanionSlotError,
+  setCompanionSlotLoading,
+  type CompanionSlotErrorSetters,
+  type CompanionSlotLoadingSetters,
+} from './application/use-cases/ritual/frame/companion-slot-ui-state';
+export { trackCompanionGenerationInitiated } from './application/use-cases/ritual/frame/companion-generation-telemetry';
+export {
+  runCompanionSlotOrchestrate,
+  type CompanionSlotOrchestrateMode,
+  type RunCompanionSlotOrchestratePorts,
+} from './application/use-cases/ritual/frame/run-companion-slot-orchestrate';
 export type {
   CompanionSlotCacheIds,
   CompanionSlotCommitters,
