@@ -8361,4 +8361,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home bulk-hold apply via public-rpc (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-bulk-hold-apply-outcomes → applyBulkHoldOutcomes facade</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Wire <code>use-bulk-hold-apply-outcomes</code> to existing <code>applyBulkHoldOutcomes</code> on <code>public-rpc</code> instead of use case + <code>supabasePauseRepository</code> from <code>public-ports</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; use-case unit tests unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-manual-pause-trigger</code> still injects <code>public-ports</code> for <code>openManualPauseFromHome</code> (reflect stub + repository).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>use-manual-pause-trigger</code> → <code>openManualPauseFromHome</code> on <code>public-rpc</code>, or <code>use-fullview-telemetry</code> analytics facade.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
