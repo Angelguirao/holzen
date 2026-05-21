@@ -62,3 +62,8 @@ export {
   computePauseStorageRitualSyncPatch,
   type PauseStorageRitualSyncPatch,
 } from './application/use-cases/session/storage-ritual-sync';
+export {
+  pickPauseHolzenProvidersSlice,
+  type PauseHolzenProvidersSlice,
+  type PickPauseHolzenProvidersSliceSource,
+} from './application/use-cases/session/pause-holzen-providers-slice';
