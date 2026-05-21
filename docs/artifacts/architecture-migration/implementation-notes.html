@@ -6077,7 +6077,26 @@
       <dt>Tradeoffs</dt>
       <dd>Hook imports use case + port adapter (matches <code>use-companion-feedback-vote</code>); no dedicated hook test.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel home <code>openManualPauseFromHome</code> / <code>dismissOpenPauseHomePreview</code> / <code>applyBulkHoldOutcomes</code> from <code>public-rpc</code>.</dd>
+      <dd>Next: peel reflect step conductors or companion orchestrate hooks from <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect step conductors via public-ports (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; peel reflect/steps from public-rpc in presentation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move. Wire <code>use-pause-reflect-note</code>, <code>use-pause-reflect-tags</code>, <code>use-pause-favorite-toggle</code>, and <code>use-pause-reflection-step-log</code> through <code>runPauseReflect*</code> + <code>supabasePauseRepository</code> / <code>reflectionStepSessionStorage</code> from <code>public-ports.ts</code> (same pattern as companion feedback vote). <code>public-rpc</code> facades unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; favorite-toggle test mocks use case + <code>public-ports</code> instead of <code>public-rpc</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestrate hooks still import <code>public-rpc</code> until peeled slice-by-slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel companion orchestrate hooks from <code>public-rpc</code> or wire reflect mood/hub through <code>public-ports</code>.</dd>
     </dl>
   </article>
 
