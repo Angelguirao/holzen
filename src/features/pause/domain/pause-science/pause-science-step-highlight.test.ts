@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { stepHighlightsScienceRow } from '@/screens/pause/lib/pause-science-step-highlight';
+import { stepHighlightsScienceRow } from './pause-science-step-highlight';
 
 describe('stepHighlightsScienceRow', () => {
   it('highlights only the matching step', () => {
