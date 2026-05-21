@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { buildFeelTilesMoodLogOptions } from '@/features/pause/application/use-cases/ritual/feel/pause-session-mood-chrome-flow';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
-import type { MoodValue } from '../../domain/mood-value';
+import type { MoodValue } from '../../../domain/mood-value';
 
 /**
  * Wraps `handleMoodSelect` for `PauseRitualFeelStep` (shared brief + deep Feel step).
