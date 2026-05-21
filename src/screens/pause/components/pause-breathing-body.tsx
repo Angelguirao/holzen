@@ -5,7 +5,10 @@ import { PauseBreathIntro } from '@/screens/pause/components/pause-breath-intro'
 import type { PauseBreathSegment } from '@/screens/pause/components/pause-breath-intro';
 import { PauseBreathTimedLoop } from '@/screens/pause/components/pause-breath-timed-loop';
 import { PauseBreathingCompletion } from '@/screens/pause/components/pause-breathing-completion';
-import type { PauseBreathingPhase, PauseBreathingTimedDisplay } from '@/screens/pause/lib/resolve-pause-breathing-timed-display';
+import type {
+  PauseBreathingPhase,
+  PauseBreathingTimedDisplay,
+} from '@/features/pause/public-hooks';
 
 export type PauseBreathingBodyProps = {
   started: boolean;

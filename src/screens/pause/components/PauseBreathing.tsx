@@ -6,11 +6,11 @@ import {
   parseTriangleRotatingKickersI18n,
   resolveBreathCycleTotal,
   resolvePauseBreathingPhases,
+  resolvePauseBreathingTimedDisplay,
   usePauseBreathingTimedLoop,
 } from '@/features/pause/public-hooks';
 import type { PauseBreathSegment } from '@/screens/pause/components/pause-breath-intro';
 import { PauseBreathingBody } from '@/screens/pause/components/pause-breathing-body';
-import { resolvePauseBreathingTimedDisplay } from '@/screens/pause/lib/resolve-pause-breathing-timed-display';
 
 /** i18n: `breathing.triangleRotatingKickers` — advances every 2s in `PauseBreathing`, not per phase. */
 const TRIANGLE_ROTATING_KICKERS_I18N_KEY = 'breathing.triangleRotatingKickers';

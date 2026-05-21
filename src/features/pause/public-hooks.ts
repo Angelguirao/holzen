@@ -98,6 +98,10 @@ export {
   resolveTriangleKickerDisplay,
   type TriangleKickerDisplay,
 } from './application/use-cases/ritual/breathe/resolve-triangle-kicker-display';
+export {
+  resolvePauseBreathingTimedDisplay,
+  type PauseBreathingTimedDisplay,
+} from './application/use-cases/ritual/breathe/resolve-pause-breathing-timed-display';
 export type { FeelStepTile } from './domain/feel-step-tile';
 export { PAUSE_FEEL_STEP_TILE_ROWS } from './domain/pause-feel-step-tiles';
 export {
