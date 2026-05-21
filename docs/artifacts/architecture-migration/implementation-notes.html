@@ -8456,4 +8456,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion orchestrate hooks import public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel companion presentation off public-ports barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. <code>use-companion-slot-orchestrate-ports</code> and <code>use-companion-intervention-fetch</code> import <code>supabaseCompanionOrchestrator</code> from <code>public-rpc</code> (re-export) instead of <code>public-ports</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — same adapter instance; import surface only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-ports</code> still used by infrastructure query modules at module scope.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed companion feedback vote read on <code>public-queries</code>, or thin orchestrator runner facades on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
