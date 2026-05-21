@@ -10,8 +10,8 @@ import type { PauseImpactData } from '@/features/pause/application/use-cases/rit
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { RitualDepth } from '@/features/pause/domain/ritual-types';
-import { usePauseReflectGeneration } from './generation/use-pause-reflect-generation';
-import { usePauseSessionDecideHandler } from '../decide/use-pause-session-decide-handler';
+import { usePauseReflectGeneration } from '../generation/use-pause-reflect-generation';
+import { usePauseSessionDecideHandler } from '../../decide/use-pause-session-decide-handler';
 
 export interface UsePauseSessionReflectAndDecideParams {
   t: TFunction;
