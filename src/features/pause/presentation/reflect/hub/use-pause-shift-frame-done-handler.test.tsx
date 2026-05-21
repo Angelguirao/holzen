@@ -7,22 +7,13 @@ import { usePauseShiftFrameDoneHandler } from './use-pause-shift-frame-done-hand
 
 const { logKey: SHIFT_LOG_KEY } = buildShiftEmotionFrameHubLogBundle();
 
-const { runShiftEmotionFrameHubDoneMock, showPauseStepSyncFailedToast, mockPauseRepository } =
-  vi.hoisted(() => ({
-    runShiftEmotionFrameHubDoneMock: vi.fn(),
-    showPauseStepSyncFailedToast: vi.fn(),
-    mockPauseRepository: { port: 'reflectPauseRepository' },
-  }));
-
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
-  () => ({
-    runShiftEmotionFrameHubDone: runShiftEmotionFrameHubDoneMock,
-  }),
-);
+const { pauseShiftEmotionFrameHubDoneMock, showPauseStepSyncFailedToast } = vi.hoisted(() => ({
+  pauseShiftEmotionFrameHubDoneMock: vi.fn(),
+  showPauseStepSyncFailedToast: vi.fn(),
+}));
 
 vi.mock('./pause-reflect-hub-io', () => ({
-  reflectPauseRepository: mockPauseRepository,
+  pauseShiftEmotionFrameHubDone: pauseShiftEmotionFrameHubDoneMock,
 }));
 
 vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
@@ -32,13 +23,13 @@ vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
 const t = ((k: string) => k) as TFunction;
 
 beforeEach(() => {
-  runShiftEmotionFrameHubDoneMock.mockReset();
+  pauseShiftEmotionFrameHubDoneMock.mockReset();
   vi.mocked(showPauseStepSyncFailedToast).mockClear();
 });
 
 describe('usePauseShiftFrameDoneHandler', () => {
   it('logs shift_emotion_logged once when logKey unchanged on second Im done', async () => {
-    runShiftEmotionFrameHubDoneMock.mockResolvedValue({
+    pauseShiftEmotionFrameHubDoneMock.mockResolvedValue({
       status: 'advance',
       logKey: SHIFT_LOG_KEY,
     });
@@ -60,16 +51,16 @@ describe('usePauseShiftFrameDoneHandler', () => {
     await act(async () => {
       await result.current.handleFrameImDone();
     });
-    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(1);
-    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledWith(mockPauseRepository, {
+    expect(pauseShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(1);
+    expect(pauseShiftEmotionFrameHubDoneMock).toHaveBeenCalledWith({
       pauseInstanceId: 'pi-1',
       lastShiftLogKey: null,
     });
     await act(async () => {
       await result.current.handleFrameImDone();
     });
-    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(2);
-    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenLastCalledWith(mockPauseRepository, {
+    expect(pauseShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(2);
+    expect(pauseShiftEmotionFrameHubDoneMock).toHaveBeenLastCalledWith({
       pauseInstanceId: 'pi-1',
       lastShiftLogKey: SHIFT_LOG_KEY,
     });
@@ -79,7 +70,7 @@ describe('usePauseShiftFrameDoneHandler', () => {
   });
 
   it('does not advance when RPC fails', async () => {
-    runShiftEmotionFrameHubDoneMock.mockResolvedValue({ status: 'sync_failed' });
+    pauseShiftEmotionFrameHubDoneMock.mockResolvedValue({ status: 'sync_failed' });
 
     const lastShiftLogKeyRef: MutableRefObject<string | null> = { current: null };
     const setFrameDone = vi.fn();
@@ -103,37 +94,8 @@ describe('usePauseShiftFrameDoneHandler', () => {
     expect(showPauseStepSyncFailedToast).toHaveBeenCalledWith(t);
   });
 
-  it('routes shift frame hub RPC through the default PauseRepository port adapter', async () => {
-    runShiftEmotionFrameHubDoneMock.mockResolvedValue({
-      status: 'advance',
-      logKey: SHIFT_LOG_KEY,
-    });
-
-    const lastShiftLogKeyRef: MutableRefObject<string | null> = { current: null };
-    const { result } = renderHook(() =>
-      usePauseShiftFrameDoneHandler({
-        pauseInstanceId: 'pi-1',
-        t,
-        lastShiftLogKeyRef,
-        setFrameDone: vi.fn(),
-        setMoodAfterDone: vi.fn(),
-        goToStep: vi.fn(),
-      }),
-    );
-
-    await act(async () => {
-      await result.current.handleFrameImDone();
-    });
-
-    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledWith(mockPauseRepository, {
-      pauseInstanceId: 'pi-1',
-      lastShiftLogKey: null,
-    });
-    expect(mockPauseRepository.port).toBe('reflectPauseRepository');
-  });
-
   it('advances without RPC when no pause instance id', async () => {
-    runShiftEmotionFrameHubDoneMock.mockResolvedValue({
+    pauseShiftEmotionFrameHubDoneMock.mockResolvedValue({
       status: 'advance',
       logKey: SHIFT_LOG_KEY,
     });
@@ -155,8 +117,8 @@ describe('usePauseShiftFrameDoneHandler', () => {
     await act(async () => {
       await result.current.handleFrameImDone();
     });
-    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(1);
-    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledWith(mockPauseRepository, {
+    expect(pauseShiftEmotionFrameHubDoneMock).toHaveBeenCalledTimes(1);
+    expect(pauseShiftEmotionFrameHubDoneMock).toHaveBeenCalledWith({
       pauseInstanceId: null,
       lastShiftLogKey: null,
     });
