@@ -6,3 +6,4 @@ export {
   applyBriefDepthPickerRitualEntry,
   applyDeepDepthPickerRitualEntry,
 } from '@/features/pause/domain/reflect/mood/apply-depth-picker-ritual-entry';
+export { resolvePauseDepthContextLineParams } from '@/features/pause/domain/reflect/mood/resolve-pause-depth-context-line-params';

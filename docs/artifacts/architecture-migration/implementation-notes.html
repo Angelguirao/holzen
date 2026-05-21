@@ -16094,4 +16094,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — initial-emotion presentation + depth-context mood anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-initial-emotion-presentation-flow</code> + depth-context on <code>pause-depth-picker-mood-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 remains complete — no folder moves. Add application cluster anchors for Feel-step rollback/reset UI and depth-picker market-context copy; <code>pause-reflect-mood-io</code> imports presentation helpers through anchors only (no direct <code>domain/reflect/mood/</code> on the I/O module). Co-located tests import UI helpers from <code>pause-reflect-mood-io</code> or mock the I/O barrel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — domain still owns pure helpers; behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>run-initial-emotion-log</code> still imported from application on <code>pause-reflect-mood-io</code> (RPC use case, not a domain re-export anchor).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B cross-context Tier 1 shim, or peel remaining session presentation clusters that deep-import application modules.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
