@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect flows I/O direct domain + decide modules (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-io</code> imports reflect-and-decide + decide helpers directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. <code>pause-reflect-flows-io</code> imports preflight/post-generation from <code>domain/reflect/flows/pause-session-reflect-and-decide-flow</code>, decide flow + quotes from <code>domain/decide/</code>, outcome toasts from <code>ritual/decide/outcome-toast</code>, and <code>runPauseOutcomeLog</code> from <code>run-pause-outcome-log</code> instead of <code>pause-reflect-flows-flow</code> CI anchor.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-flows-flow</code> remains the cluster anchor for <code>check:architecture-alignment</code>; companion orchestration-io may still re-export orchestrate session load until a follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion orchestration-io consolidate <code>load-companion-orchestrate-session</code> imports, or session pending-offer I/O peel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect hub I/O direct run-shift-emotion-frame-hub-done (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
