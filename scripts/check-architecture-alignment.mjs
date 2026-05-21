@@ -114,6 +114,10 @@ mustExist(
   'src/features/pause/presentation/session/breath',
   'pause/presentation/session/breath/',
 );
+mustExist(
+  'src/features/pause/presentation/session/scaffold',
+  'pause/presentation/session/scaffold/',
+);
 mustNotExist(
   'src/features/pause/domain/reflect/share/reflection-share-canvas.ts',
   'domain/reflect/share/reflection-share-canvas.ts (use application/use-cases/ritual/reflect/share/)',
@@ -225,6 +229,13 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_IMPORTS = [
   "from '../presentation/session/use-pause-session-breath-second-label-variant'",
 ];
 
+/** Flat presentation/session scaffold paths — use presentation/session/scaffold/. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_IMPORTS = [
+  '@/features/pause/presentation/session/scaffold-ritual-payloads',
+  "from './presentation/session/scaffold-ritual-payloads'",
+  "from '../presentation/session/scaffold-ritual-payloads'",
+];
+
 const PAUSE_RPC_CLIENT_ALLOWLIST = new Set([
   'src/features/pause/infrastructure/pause-rpc-client.ts',
   'src/features/pause/infrastructure/supabase-pause-repository.ts',
@@ -305,6 +316,11 @@ for (const file of walkTs(join(root, 'src'))) {
   for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_IMPORTS) {
     if (text.includes(needle)) {
       failures.push(`${rel}: legacy flat presentation/session breath import (${needle})`);
+    }
+  }
+  for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_IMPORTS) {
+    if (text.includes(needle)) {
+      failures.push(`${rel}: legacy flat presentation/session scaffold import (${needle})`);
     }
   }
   if (!PAUSE_RPC_CLIENT_ALLOWLIST.has(rel)) {
