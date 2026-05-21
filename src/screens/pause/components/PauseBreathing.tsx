@@ -7,8 +7,8 @@ import {
   resolveBreathCycleTotal,
   resolvePauseBreathingPhases,
   resolvePauseBreathingTimedDisplay,
+  usePauseBreathingTimedLoop,
 } from '@/features/pause/public-ritual-breathe';
-import { usePauseBreathingTimedLoop } from '@/features/pause/public-hooks';
 import type { PauseBreathSegment } from '@/screens/pause/components/pause-breath-intro';
 import { PauseBreathingBody } from '@/screens/pause/components/pause-breathing-body';
 
