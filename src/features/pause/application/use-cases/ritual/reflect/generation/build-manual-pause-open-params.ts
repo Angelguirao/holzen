@@ -2,7 +2,7 @@ import type { BtcPriceData } from '@/features/market/public';
 import {
   buildManualPauseMarketContext,
   type ManualPauseMarketContext,
-} from './build-manual-pause-market-context';
+} from '@/features/pause/domain/reflect/generation/build-manual-pause-market-context';
 import type { OpenManualPauseFromHomeParams } from './open-manual-pause-from-home-types';
 
 export type { ManualPauseMarketContext };

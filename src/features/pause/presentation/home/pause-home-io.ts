@@ -2,7 +2,7 @@ import { dismissOpenPauseHome } from '@/features/pause/application/use-cases/hom
 import {
   buildManualPauseMarketContext,
   type ManualPauseMarketContext,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/build-manual-pause-market-context';
+} from '@/features/pause/domain/reflect/generation/build-manual-pause-market-context';
 import {
   buildManualPauseOpenParams,
   type BuildManualPauseOpenParamsInput,
