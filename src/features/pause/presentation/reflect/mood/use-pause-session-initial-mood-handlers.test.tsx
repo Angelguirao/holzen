@@ -7,7 +7,7 @@ import {
   initialEmotionResetUi,
   runInitialEmotionSelect as runInitialEmotionSelectUseCase,
   runInitialEmotionSkip as runInitialEmotionSkipUseCase,
-} from '@/features/pause/application/use-cases/ritual/feel/run-initial-emotion-log';
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
 import { usePauseSessionInitialMoodHandlers } from './use-pause-session-initial-mood-handlers';
 
 const { logStepMock, mockRepository, showPauseStepSyncFailedToast } = vi.hoisted(() => {
