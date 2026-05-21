@@ -12,9 +12,19 @@ const { pauseShiftEmotionFrameHubDoneMock, showPauseStepSyncFailedToast } = vi.h
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 
-vi.mock('./pause-reflect-hub-io', () => ({
-  pauseShiftEmotionFrameHubDone: pauseShiftEmotionFrameHubDoneMock,
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
 }));
+
+vi.mock('./pause-reflect-hub-io', async () => {
+  const domain = await import(
+    '@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation'
+  );
+  return {
+    pauseShiftEmotionFrameHubDone: pauseShiftEmotionFrameHubDoneMock,
+    resolveShiftFrameHubDonePresentation: domain.resolveShiftFrameHubDonePresentation,
+  };
+});
 
 vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
   showPauseStepSyncFailedToast,
