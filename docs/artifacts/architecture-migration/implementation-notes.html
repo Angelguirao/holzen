@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — companion section expansion presentation I/O</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>nextExpandedWithLazyFetch</code> on orchestration-io</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1/#2 folder moves remain complete. Re-export lazy-expand helper on <code>pause-companion-orchestration-io.ts</code> so <code>use-companion-section-expansion</code> imports presentation I/O only (pure UI toggle math stays in <code>ritual/frame/</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>orchestration-io now mixes RPC/edge ports, favorites, UI completion, and pure expand helper — acceptable until companion conductors split further.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-orchestrate-session</code> or slot orchestrate hooks through orchestration-io only.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — companion library favorites presentation I/O</span>
       <span class="status resolved">resolved</span>
     </header>

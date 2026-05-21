@@ -1,5 +1,5 @@
 import { useCallback, useState, type Dispatch, type SetStateAction } from 'react';
-import { nextExpandedWithLazyFetch } from '@/features/pause/application/use-cases/ritual/frame/next-expanded-with-lazy-fetch';
+import { nextExpandedWithLazyFetch } from './pause-companion-orchestration-io';
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
 
 export type UseCompanionSectionExpansionParams = {
