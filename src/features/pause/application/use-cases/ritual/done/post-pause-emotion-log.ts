@@ -1,5 +1,5 @@
 import type { MoodValue } from '@/features/pause/domain/mood-value';
-import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
+import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
 /** Payload for `pause_log_step` with `stepType: 'post_pause_emotion_logged'` (after `outcome_logged`). */

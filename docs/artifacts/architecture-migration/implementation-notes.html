@@ -4101,7 +4101,26 @@
       <dt>Tradeoffs</dt>
       <dd>Breaking rename for any out-of-tree importers of the old export (none in active <code>src/</code>).</dd>
       <dt>Open questions</dt>
-      <dd>Next: backlog #4 remainder (ReflectGenerator port), or <code>ritual/brief/</code> beat consolidation per §10.1.</dd>
+      <dd>Next: colocate shared step-log use case or backlog #4 ReflectGenerator port.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate log-pause-step under ritual/log/ (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; shared ritual step-log use case</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>log-pause-step</code> (+ test) from <code>ritual/</code> root into <code>ritual/log/</code>; all beat use cases and <code>public-rpc</code> import the ritual path. Behavior unchanged — still delegates to <code>PauseRepository.logStep</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>ritual/deep/</code> remains a four-file cluster until a later brief/deep consolidation slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 ReflectGenerator / CompanionOrchestrator ports, or merge <code>ritual/deep/</code> under <code>ritual/brief/</code> per §10.1.</dd>
     </dl>
   </article>
 

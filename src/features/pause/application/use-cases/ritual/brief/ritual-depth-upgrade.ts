@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log-pause-step';
+import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
 import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/feedback/step-sync-toast';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { ritualDepthUpgradedPayload } from './ritual-depth-upgrade-payload';
