@@ -4184,6 +4184,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — colocate pause create-skipped copy under trigger/</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -4197,6 +4198,21 @@
       <dd>Flat <code>application/use-cases/</code> root now holds only <code>edge/</code> facade (shared edge error re-export).</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>CompanionOrchestrator</code> port (backlog #4), or <code>ritual/brief/</code> + <code>ritual/deep/</code> consolidation per §10.1.</dd>
+=======
+      <span>Phase A slice — merge ritual/deep into ritual/brief (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; brief↔deep navigation colocated</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> and <code>ReflectGenerator</code> port were already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>brief-switch-to-deep</code> and <code>deep-go-back</code> (+ tests) from <code>ritual/deep/</code> into <code>ritual/brief/</code>; session presentation and <code>go-back-plan</code> import paths updated. Empty <code>ritual/deep/</code> removed.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not rename modules to <code>brief-*</code> prefixes (filenames already describe cross-depth navigation).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>CompanionOrchestrator</code> port (backlog #4 remainder), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+>>>>>>> 06db6b2d (refactor(pause): colocate brief↔deep navigation under ritual/brief)
     </dl>
   </article>
 

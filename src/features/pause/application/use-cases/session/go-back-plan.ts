@@ -1,7 +1,7 @@
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import { computeBriefRitualGoBack } from '@/features/pause/application/use-cases/ritual/brief/brief-pause-go-back';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
-import { computeDeepRitualGoBackTarget } from '@/features/pause/application/use-cases/ritual/deep/deep-go-back';
+import { computeDeepRitualGoBackTarget } from '@/features/pause/application/use-cases/ritual/brief/deep-go-back';
 
 export type PauseGoBackPlan =
   | { kind: 'brief'; prev: BriefPauseStep; clearBriefIntegrateDone: boolean }
