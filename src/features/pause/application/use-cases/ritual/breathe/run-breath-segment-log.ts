@@ -109,15 +109,3 @@ export async function runLogBreathSegment2Skipped(
     return { status: 'sync_failed' };
   }
 }
-
-/** Maps use-case result to hook boolean + ref update. */
-export function applyBreathSegmentLogOutcome(
-  outcome: RunBreathSegmentLogResult,
-  segmentLoggedRef: { current: boolean },
-): boolean {
-  if (outcome.status === 'sync_failed') return false;
-  if (outcome.status === 'success' && outcome.markSegmentLogged) {
-    segmentLoggedRef.current = true;
-  }
-  return true;
-}

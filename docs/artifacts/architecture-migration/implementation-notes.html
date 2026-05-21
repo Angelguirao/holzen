@@ -10603,4 +10603,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect flows barrel: breath segment outcome + hooks (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/flows cluster; public-ritual-reflect owns breath-segment presentation exports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. Colocate <code>applyBreathSegmentLogOutcome</code> beside <code>initial-breath-segment-rpc-flags</code> under <code>ritual/reflect/flows/</code>. <code>use-pause-breath-segment-rpc-loggers</code> imports those pure modules directly (not <code>public-ritual-reflect</code> — avoids eager Supabase from favorite hook in jsdom). Export helpers + <code>usePauseBreathSegmentRpcLoggers</code> + <code>usePauseFavoriteToggle</code> on <code>public-ritual-reflect.ts</code> for screens; remove breath-segment exports from <code>public-session.ts</code>; <code>public-hooks</code> re-exports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — RPC dedupe and favorite toggle behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Breath segment RPC use cases remain under <code>ritual/breathe/</code>; only presentation-facing outcome mapping moved to reflect flows.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit remaining partial port stubs; optional mood/flow hooks on <code>public-ritual-reflect</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
