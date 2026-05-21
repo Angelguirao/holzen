@@ -7620,4 +7620,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel companion orchestrate session off public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-companion-orchestrate-session → ritual/frame use case</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. <code>use-companion-orchestrate-session</code> calls <code>loadCompanionOrchestrateSession</code> with <code>loadMoodHistoryForOrchestrate</code> from <code>public-queries</code>; <code>loadPauseCompanionOrchestrateSession</code> facade on <code>public-rpc.ts</code> unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Slot orchestrate action hooks still import other <code>public-rpc</code> presentation helpers (<code>nextExpandedWithLazyFetch</code>, failure UI types).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel remaining companion orchestrate <code>public-rpc</code> re-exports, or wire stray ritual log call sites through <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
