@@ -5131,4 +5131,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — Frame artifact reflection fallback (backlog #1 adjacent)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Compose <code>usePauseArtifactReflectionText</code> on Frame when session seed is empty</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no folder moves. When <code>reflectionMessage</code> prop is empty, <code>PauseFrame</code> fetches persisted <code>reflection_text</code> (<code>whenEnabled</code>) and uses <code>resolveEffectiveReflectionCopy</code> for haiku display-body fallback; haiku card visibility stays instance + profile toggle only (paired with prior slice). Haiku fetch stays deferred until the user expands the card.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mirrors Reflect generation prefetch; screen imports via <code>public-hooks</code> only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Extra artifact read on Frame mount when seed empty — acceptable for parity with Reflect card hydration.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 stray <code>PauseRepository</code> audit, or colocate flat <code>use-pause-session-shell</code> + pending-leave sheet under <code>presentation/session/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

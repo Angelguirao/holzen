@@ -4,7 +4,11 @@ import { motion } from 'framer-motion';
 import { Activity, ChevronRight, ZoomOut } from 'lucide-react';
 import { pauseStepLayout } from '@/features/pause/public-hooks';
 import { Button } from '@/components/ui/button';
-import { usePauseArtifactHaiku } from '@/features/pause/public-hooks';
+import {
+  usePauseArtifactHaiku,
+  usePauseArtifactReflectionText,
+} from '@/features/pause/public-hooks';
+import { resolveEffectiveReflectionCopy } from '@/features/pause/public-hooks';
 import { hapticFeedback } from '@/lib/haptics';
 import { PauseFrameHaikuCard } from '@/screens/pause/components/pause-frame-haiku-card';
 import { PauseFrameToolRow } from '@/screens/pause/components/pause-frame-tool-row';
@@ -35,6 +39,17 @@ export function PauseFrame({
   onImDone,
 }: PauseFrameProps) {
   const { t } = useTranslation();
+  const sessionSeedEmpty = !reflectionMessage.trim();
+  const { artifactReflectionText } = usePauseArtifactReflectionText({
+    pauseInstanceId,
+    trigger: 'whenEnabled',
+    fetchEnabled: sessionSeedEmpty,
+  });
+  const effectiveReflectionMessage = resolveEffectiveReflectionCopy(
+    reflectionMessage,
+    artifactReflectionText,
+  );
+
   /** Match Reflect companion pattern: collapsed until the user opens the card. */
   const [haikuOpen, setHaikuOpen] = useState(false);
   const { artifactHaiku, haikuFetch } = usePauseArtifactHaiku({
@@ -52,7 +67,7 @@ export function PauseFrame({
   const displayHaikuBody = resolveFrameHaikuDisplayBody({
     artifactHaiku,
     haikuFetch,
-    reflectionMessage,
+    reflectionMessage: effectiveReflectionMessage,
   });
 
   return (
