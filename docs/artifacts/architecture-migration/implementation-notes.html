@@ -15518,9 +15518,9 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; re-exports only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Session breath hooks (<code>pause-session-breath-io</code>, timed loop) still import <code>ritual/breathe/*</code> directly — peel in follow-up slices.</dd>
+      <dd>Timed-loop and second-label breath hooks peeled in a follow-up slice; restored-breath hydration still on <code>pause-session-ritual-restore-io</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next: lifecycle create/dismiss facades on <code>public-rpc</code>, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: merge breath restore helpers into <code>pause-session-breath-io</code>, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
