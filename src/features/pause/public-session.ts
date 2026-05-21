@@ -91,3 +91,15 @@ export {
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
 } from './application/use-cases/ritual/breathe/ritual-audio';
+export {
+  initialBreathingFirstCompletedFromRestored,
+  initialBreathingSecondCompletedFromRestored,
+  initialBriefIntegrateDoneFromRestored,
+  initialBriefPauseStepFromRestored,
+  initialDecisionFromRestored,
+  initialFrameDoneFromRestored,
+  initialPhaseFromRestored,
+  initialRitualEntry,
+  initialSelectedBriefFaceFromRestored,
+  mapPersistedStep,
+} from './application/use-cases/session/step-map';
