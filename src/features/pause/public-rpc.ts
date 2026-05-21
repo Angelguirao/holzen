@@ -61,6 +61,23 @@ import {
 import { runShiftEmotionFrameHubDone } from './application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
 import type { MoodValue } from './domain/mood-value';
 import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
+import {
+  runPauseFavoriteToggle,
+  type RunPauseFavoriteToggleResult,
+} from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
+import {
+  runPauseReflectNoteUpdate,
+  type RunPauseReflectNoteUpdateResult,
+} from './application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
+import {
+  runPauseReflectTagUpdate,
+  type RunPauseReflectTagUpdateResult,
+} from './application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
+import {
+  runPauseReflectionStepLogOnce,
+  type RunPauseReflectionStepLogResult,
+} from './application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
+import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
 import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from './application/use-cases/ritual/frame/persist-ui-step-completion';
 import type { CompanionUiCompletionStep } from './application/use-cases/ritual/frame/companion-ui-completion-types';
@@ -132,6 +149,12 @@ export type { PostPauseFeelSnapshot };
 export type { RunBreathSegmentLogResult };
 export type { CompanionUiCompletionStep };
 export type { RunAdoptPendingPauseOfferResult, RunDeclinePendingPauseOfferResult };
+export type {
+  RunPauseFavoriteToggleResult,
+  RunPauseReflectNoteUpdateResult,
+  RunPauseReflectTagUpdateResult,
+  RunPauseReflectionStepLogResult,
+};
 
 /** Frame companion UI step completion — wired with default `PauseRepository`. */
 export async function persistCompanionUiStepCompletion(
@@ -310,6 +333,36 @@ export function logPauseShiftEmotionFrameHubDone(
   input: Parameters<typeof runShiftEmotionFrameHubDone>[1],
 ) {
   return runShiftEmotionFrameHubDone(supabasePauseRepository, input);
+}
+
+/** Reflect heart toggle — `favorite_toggled` via `PauseRepository` (wired for presentation). */
+export function logPauseFavoriteToggle(
+  input: Parameters<typeof runPauseFavoriteToggle>[1],
+): Promise<RunPauseFavoriteToggleResult> {
+  return runPauseFavoriteToggle(supabasePauseRepository, input);
+}
+
+/** Reflect post-it note — `note_updated` via `PauseRepository` (wired for presentation). */
+export function logPauseReflectNoteUpdate(
+  input: Parameters<typeof runPauseReflectNoteUpdate>[1],
+): Promise<RunPauseReflectNoteUpdateResult> {
+  return runPauseReflectNoteUpdate(supabasePauseRepository, input);
+}
+
+/** Reflect tags — `tag_updated` via `PauseRepository` (wired for presentation). */
+export function logPauseReflectTagUpdate(
+  input: Parameters<typeof runPauseReflectTagUpdate>[1],
+): Promise<RunPauseReflectTagUpdateResult> {
+  return runPauseReflectTagUpdate(supabasePauseRepository, input);
+}
+
+/** Reflect copy settled — `reflection_step` once per tab via `PauseRepository` + session storage. */
+export function logPauseReflectionStepOnce(input: {
+  pauseInstanceId: string;
+}): Promise<RunPauseReflectionStepLogResult> {
+  return runPauseReflectionStepLogOnce(supabasePauseRepository, input, {
+    storage: reflectionStepSessionStorage,
+  });
 }
 
 export { applyBreathSegmentLogOutcome, initialBreathSegmentRpcLoggedFlagsFromRestored };
