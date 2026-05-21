@@ -9339,7 +9339,7 @@
     <h3>ritual/reflect/ complete; post-reflect ritual conductors import public-rpc only</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — zero legacy paths. This slice continues backlog #4 §6 peel: re-export decide outcome flow + toasts on <code>public-rpc</code>; <code>use-pause-session-decide-handler</code> imports the barrel only (mutation already via <code>logPauseOutcome</code>). <code>use-pause-breath-segment-rpc-loggers</code> imports <code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> from <code>public-rpc</code> (already exported with breath segment facades).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — zero legacy paths. This slice continues backlog #4 §6 peel: re-export decide outcome flow + toasts on <code>public-rpc</code>; <code>use-pause-session-decide-handler</code> imports the barrel only (mutation already via <code>logPauseOutcome</code>). <code>use-pause-breath-segment-rpc-loggers</code> imports <code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> from <code>public-rpc</code> (already exported with breath segment facades). Decide hook test uses <code>importActual</code> for flow + <code>wisdom-quotes</code>; breath hook test supplies <code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> in partial <code>public-rpc</code> mock.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>

@@ -23,13 +23,16 @@ vi.mock('@/features/pause/public-rpc', async () => {
   const decideFlow = await vi.importActual<
     typeof import('@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow')
   >('@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow');
+  const quotes = await vi.importActual<
+    typeof import('@/features/pause/application/use-cases/session/wisdom-quotes')
+  >('@/features/pause/application/use-cases/session/wisdom-quotes');
   return {
     logPauseOutcome: logPauseOutcomeMock,
     showPauseOutcomeSaveFailedToast,
     showPauseOutcomeNotCompletedToast,
     resolvePauseDecideOutcomeFlow: decideFlow.resolvePauseDecideOutcomeFlow,
     formatReinforcementQuoteFromSession: decideFlow.formatReinforcementQuoteFromSession,
-    getSessionQuote: () => ({ text: 'Q', author: 'A' }),
+    getSessionQuote: quotes.getSessionQuote,
   };
 });
 
