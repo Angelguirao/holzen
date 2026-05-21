@@ -27,3 +27,8 @@ export {
   type PersistSilentReflectionStubInput,
   type PersistSilentReflectionStubResult,
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-persist-silent-reflection-stub';
+export {
+  applyManualPauseOpenResult,
+  type ApplyManualPauseOpenResultInput,
+  type ManualPauseHomePreviewPorts,
+} from './apply-manual-pause-open-result';
