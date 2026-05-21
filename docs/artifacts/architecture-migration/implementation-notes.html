@@ -9368,4 +9368,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — pause_session_abandoned on public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; pending-leave sheet peels application telemetry</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no reflect folder moves. Re-export <code>trackPauseSessionAbandoned</code> on <code>public-rpc</code>; <code>use-pause-session-pending-leave-sheet</code> imports from the barrel (pending-offer telemetry peel landed separately).</dd>
+      <dt>Deviation</dt>
+      <dd>None — PostHog event unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>None — single-hook import path change.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>trackPauseOpenDismissed</code> / home trigger telemetry, or wire remaining analytics reads through <code>PauseAnalyticsRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

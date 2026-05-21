@@ -181,6 +181,7 @@ export {
   trackPauseOutcomeRetrospective,
   type PauseOutcomeRetrospectiveSurface,
 } from './application/use-cases/archive/archive-retrospective-telemetry';
+export { trackPauseSessionAbandoned } from './application/use-cases/session/pause-session-telemetry';
 export {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
