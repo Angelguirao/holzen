@@ -1,23 +1,8 @@
-import type { PersistedSession } from '@/features/pause/domain/session-model';
-
 /**
- * Breath ritual fields when hydrating `/pause` from local storage.
- *
- * **Persistence contract:** `docs/systems/pause-system.md` section 7.2 (hydration / local snapshot).
- * **Legacy v1:** `breathingCompleted` rolls into `breathingFirstCompleted` (matches `normalizePauseRitualFields`).
+ * CI cluster anchor for restored breath ritual hydration (§3 / check:architecture-alignment).
+ * Pure helpers live in domain; re-export for application-layer imports.
  */
-
-/**
- * First breath segment completion from local restore. Matches `normalizePauseRitualFields` in
- * `pause-session-storage.ts` (legacy v1 `breathingCompleted` rolls into `breathingFirstCompleted`).
- */
-export function initialBreathingFirstCompletedFromRestored(restored: PersistedSession | null): boolean {
-  if (!restored) return false;
-  return restored.breathingFirstCompleted ?? restored.breathingCompleted ?? false;
-}
-
-/** Second breath segment completion from local restore (matches `normalizePauseRitualFields`). */
-export function initialBreathingSecondCompletedFromRestored(restored: PersistedSession | null): boolean {
-  if (!restored) return false;
-  return restored.breathingSecondCompleted ?? false;
-}
+export {
+  initialBreathingFirstCompletedFromRestored,
+  initialBreathingSecondCompletedFromRestored,
+} from '@/features/pause/domain/ritual/breathe/restored-breath-ritual-state';

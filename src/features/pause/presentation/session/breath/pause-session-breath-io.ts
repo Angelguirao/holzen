@@ -7,13 +7,13 @@ export { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause
 export {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
-} from '@/features/pause/application/use-cases/ritual/breathe/restored-breath-ritual-state';
+} from '@/features/pause/domain/ritual/breathe/restored-breath-ritual-state';
 export {
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
   resolveBreathingPhaseAdvanceOutcome,
 } from '@/features/pause/domain/ritual/breathe/phase-advance';
-export type { PauseBreathingPhase } from '@/features/pause/application/use-cases/ritual/breathe/pause-breathing-phase';
+export type { PauseBreathingPhase } from '@/features/pause/domain/ritual/breathe/pause-breathing-phase';
 export {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,

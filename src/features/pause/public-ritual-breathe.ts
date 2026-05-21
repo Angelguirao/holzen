@@ -41,7 +41,7 @@ export {
   type StandaloneBreathSeverityRingColors,
   type StandaloneBreathingPhase,
 } from './application/use-cases/ritual/breathe/standalone-breathing-patterns';
-export type { PauseBreathingPhase } from './application/use-cases/ritual/breathe/pause-breathing-phase';
+export type { PauseBreathingPhase } from './domain/ritual/breathe/pause-breathing-phase';
 export {
   computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
