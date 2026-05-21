@@ -12,12 +12,9 @@ const { logPauseShiftEmotionFrameHubDoneMock, showPauseStepSyncFailedToast } = v
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 
-vi.mock('@/features/pause/application/use-cases/ritual/step-sync-toast', () => ({
-  showPauseStepSyncFailedToast,
-}));
-
 vi.mock('@/features/pause/public-rpc', () => ({
   logPauseShiftEmotionFrameHubDone: logPauseShiftEmotionFrameHubDoneMock,
+  showPauseStepSyncFailedToast,
 }));
 
 const t = ((k: string) => k) as TFunction;

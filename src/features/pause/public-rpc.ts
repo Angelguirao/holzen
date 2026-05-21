@@ -144,6 +144,13 @@ import {
   type RunReflectGenerationInput,
 } from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
 import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
+import { showPauseStepSyncFailedToast } from './application/use-cases/ritual/step-sync-toast';
+export {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from './domain/reflect/telemetry/pause-reflect-ui-telemetry';
+export type { PauseReflectTelemetrySurface } from './domain/reflect/telemetry/pause-reflect-ui-telemetry';
 
 export type {
   RunInitialEmotionSelectResult,
@@ -431,7 +438,11 @@ export function fetchHaikuTextForPauseInstance(pauseInstanceId: string): Promise
   return supabaseReflectGenerator.fetchHaikuText(pauseInstanceId);
 }
 
-export { applyBreathSegmentLogOutcome, initialBreathSegmentRpcLoggedFlagsFromRestored };
+export {
+  applyBreathSegmentLogOutcome,
+  initialBreathSegmentRpcLoggedFlagsFromRestored,
+  showPauseStepSyncFailedToast,
+};
 export type { RunBreathSegmentLogResult };
 
 const breathSegmentLogDeps = {
