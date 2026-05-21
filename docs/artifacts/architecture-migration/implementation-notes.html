@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect steps + hub I/O pure gates from domain (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Presentation I/O imports domain, not application anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. <code>pause-reflect-steps-io</code> and <code>pause-reflect-hub-io</code> import pure gates (<code>shouldShowFavoriteProHint</code>, <code>shouldLogPauseReflectionStep</code>, <code>resolveShiftFrameHubDonePresentation</code>) from <code>domain/reflect/</code> instead of application CI anchor re-exports. RPC use cases stay on application paths inside the same I/O modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>pause-*-flow.ts</code> anchors under <code>application/use-cases/ritual/reflect/</code> remain for <code>check:architecture-alignment</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Two presentation I/O files in one slice — both are import-path-only peels with no conductor changes.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-orchestrate-session</code> through orchestration-io, or generation/home manual-open conductors through cluster I/O only.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — companion section expansion presentation I/O</span>
       <span class="status resolved">resolved</span>
     </header>
