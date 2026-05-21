@@ -9178,4 +9178,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion slot orchestrate on public-rpc (backlog #4 §6 peel)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-companion-slot-run-orchestrate imports public-rpc only</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no reflect moves. Re-export slot orchestrate apply/telemetry/UI-state helpers on <code>public-rpc</code>; <code>use-companion-slot-run-orchestrate</code> and <code>use-companion-slot-orchestrate-failure-ports</code> import the barrel instead of <code>application/use-cases/ritual/frame/*</code> directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; wired <code>invokeCompanionSlotOrchestrate</code> unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Tests load the wider <code>public-rpc</code> barrel when mocking slot orchestrate — same pattern as fullview/section peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-signal-source-trusted-host</code> frame import, or wire remaining ritual mutations through <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
