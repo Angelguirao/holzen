@@ -12788,4 +12788,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — CI guard presentation/reflect subclusters (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Lock reflect conductor taxonomy after presentation grouping</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) and application subcluster <code>mustExist</code> guards are complete. Extend <code>check:architecture-alignment</code> with <code>mustExist</code> for <code>presentation/reflect/</code> subclusters <code>flows/</code>, <code>ambience/</code>, <code>share/</code>, <code>generation/</code>, <code>steps/</code>, <code>telemetry/</code>, <code>hub/</code>, <code>mood/</code>; forbid legacy flat <code>presentation/reflect/use-*</code> import strings.</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI-only; mirrors May 2026 application-layer guard slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Does not yet guard <code>presentation/session/</code> or <code>presentation/companion/</code> subfolders — optional follow-up.</dd>
+      <dt>Open questions</dt>
+      <dd>Phase B: subscription/auth <code>src/lib/*</code> shims using pause as template.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

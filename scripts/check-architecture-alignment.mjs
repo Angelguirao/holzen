@@ -77,6 +77,39 @@ mustExist(
   'src/features/pause/application/use-cases/ritual/reflect/mood',
   'pause/application/use-cases/ritual/reflect/mood/',
 );
+mustExist('src/features/pause/presentation/reflect', 'pause/presentation/reflect/');
+mustExist(
+  'src/features/pause/presentation/reflect/flows',
+  'pause/presentation/reflect/flows/',
+);
+mustExist(
+  'src/features/pause/presentation/reflect/ambience',
+  'pause/presentation/reflect/ambience/',
+);
+mustExist(
+  'src/features/pause/presentation/reflect/share',
+  'pause/presentation/reflect/share/',
+);
+mustExist(
+  'src/features/pause/presentation/reflect/generation',
+  'pause/presentation/reflect/generation/',
+);
+mustExist(
+  'src/features/pause/presentation/reflect/steps',
+  'pause/presentation/reflect/steps/',
+);
+mustExist(
+  'src/features/pause/presentation/reflect/telemetry',
+  'pause/presentation/reflect/telemetry/',
+);
+mustExist(
+  'src/features/pause/presentation/reflect/hub',
+  'pause/presentation/reflect/hub/',
+);
+mustExist(
+  'src/features/pause/presentation/reflect/mood',
+  'pause/presentation/reflect/mood/',
+);
 mustNotExist(
   'src/features/pause/domain/reflect/share/reflection-share-canvas.ts',
   'domain/reflect/share/reflection-share-canvas.ts (use application/use-cases/ritual/reflect/share/)',
@@ -107,6 +140,31 @@ const LEGACY_PAUSE_USE_CASE_IMPORTS = [
   "from './application/use-cases/companion/",
   "from '../application/use-cases/reflect/",
   "from '../application/use-cases/companion/",
+];
+
+/** Flat presentation/reflect paths — use subclusters (generation/, steps/, mood/, …). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS = [
+  '@/features/pause/presentation/reflect/use-pause-reflect-generation',
+  '@/features/pause/presentation/reflect/use-pause-artifact-haiku',
+  '@/features/pause/presentation/reflect/use-pause-artifact-reflection-text',
+  '@/features/pause/presentation/reflect/use-pause-reflection-step-log',
+  '@/features/pause/presentation/reflect/use-pause-reflect-ui-telemetry',
+  '@/features/pause/presentation/reflect/use-pause-reflect-tags',
+  '@/features/pause/presentation/reflect/use-pause-reflect-note',
+  '@/features/pause/presentation/reflect/use-pause-reflect-frame-focus-ambience',
+  '@/features/pause/presentation/reflect/use-pause-favorite-toggle',
+  '@/features/pause/presentation/reflect/use-pause-session-mood-chrome-handlers',
+  '@/features/pause/presentation/reflect/use-pause-session-mood-and-persist',
+  '@/features/pause/presentation/reflect/use-pause-session-depth-picker-handlers',
+  '@/features/pause/presentation/reflect/use-pause-session-feel-tiles-select',
+  '@/features/pause/presentation/reflect/use-pause-session-initial-mood-handlers',
+  '@/features/pause/presentation/reflect/use-pause-shift-frame-done-handler',
+  '@/features/pause/presentation/reflect/use-pause-session-reflect-and-decide',
+  '@/features/pause/presentation/reflect/use-pause-session-decide-handler',
+  '@/features/pause/presentation/reflect/use-reflection-share-handlers',
+  "from './presentation/reflect/use-pause-reflect-generation'",
+  "from './presentation/reflect/use-pause-favorite-toggle'",
+  "from '../presentation/reflect/use-pause-reflect-generation'",
 ];
 
 const PAUSE_RPC_CLIENT_ALLOWLIST = new Set([
@@ -179,6 +237,11 @@ for (const file of walkTs(join(root, 'src'))) {
   for (const needle of LEGACY_PAUSE_USE_CASE_IMPORTS) {
     if (text.includes(needle)) {
       failures.push(`${rel}: legacy pause use-case import (${needle})`);
+    }
+  }
+  for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS) {
+    if (text.includes(needle)) {
+      failures.push(`${rel}: legacy flat presentation/reflect import (${needle})`);
     }
   }
   if (!PAUSE_RPC_CLIENT_ALLOWLIST.has(rel)) {
