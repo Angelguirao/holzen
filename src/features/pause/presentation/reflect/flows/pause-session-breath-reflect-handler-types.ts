@@ -1,14 +1,11 @@
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/features/market/public';
-import type { PauseImpactData } from '@/features/pause/public-hooks';
+import type { PauseImpactData } from '@/features/pause/application/use-cases/ritual/decide/impact-data';
+import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
-import type {
-  BriefPauseStep,
-  CompanionData,
-  PauseStep,
-  RitualDepth,
-} from '@/features/pause/public-hooks';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
+import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 
 /** Subset of `usePauseSessionProviders` passed into breath/reflect handlers. */

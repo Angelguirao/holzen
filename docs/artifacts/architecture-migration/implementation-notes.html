@@ -7848,4 +7848,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect presentation types off public-hooks (backlog #1 presentation)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect flows/mood handler types → domain + decide/impact-data</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder migration is complete. Mirror decide-params peel: <code>presentation/reflect/flows</code> and <code>presentation/reflect/mood</code> import <code>PauseImpactData</code> from <code>ritual/decide/impact-data</code>, ritual/companion types from <code>domain/ritual-types</code>, <code>domain/pause-ritual-steps</code>, <code>domain/companion-card-types</code> — not <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — types-only import paths; behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Cross-context screens must still use <code>public-hooks</code>; internal presentation may import domain paths directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 remaining <code>PauseRepository</code> call sites or further companion <code>public-rpc</code> peels.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
