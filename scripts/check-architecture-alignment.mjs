@@ -122,6 +122,15 @@ mustNotExist(
   'src/features/pause/domain/reflect/ambience',
   'domain/reflect/ambience/ (use application/use-cases/ritual/reflect/ambience/)',
 );
+mustExist('src/features/pause/domain/reflect/flows', 'pause/domain/reflect/flows/');
+mustExist('src/features/pause/domain/reflect/generation', 'pause/domain/reflect/generation/');
+mustExist('src/features/pause/domain/reflect/steps', 'pause/domain/reflect/steps/');
+mustExist('src/features/pause/domain/reflect/hub', 'pause/domain/reflect/hub/');
+mustExist('src/features/pause/domain/reflect/mood', 'pause/domain/reflect/mood/');
+mustExist('src/features/pause/domain/reflect/share', 'pause/domain/reflect/share/');
+mustExist('src/features/pause/domain/reflect/scaffold', 'pause/domain/reflect/scaffold/');
+mustExist('src/features/pause/infrastructure/queries/reflect', 'pause/infrastructure/queries/reflect/');
+mustExist('src/features/pause/infrastructure/edge/reflect', 'pause/infrastructure/edge/reflect/');
 mustExist('src/features/pause/application/use-cases/session', 'pause/application/use-cases/session/');
 mustExist('src/features/pause/application/use-cases/ritual/brief', 'pause/application/use-cases/ritual/brief/');
 mustNotExist(
