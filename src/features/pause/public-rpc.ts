@@ -125,6 +125,7 @@ export type {
   InitialEmotionUiState,
   RunShiftEmotionFrameHubDoneResult,
 };
+export type { RunReflectGenerationInput, ReflectGenerationResult };
 export { initialEmotionResetUi };
 
 /** Lifecycle + ritual mutations — wired facades only; no generic `pauseLogStep` export. */
@@ -376,6 +377,13 @@ export function logPauseReflectionStepOnce(input: {
   });
 }
 
+/** Reflect-step holzen-reflect — nav seed → artifact cache → edge via `ReflectGenerator` (wired). */
+export function runPauseReflectGeneration(
+  input: RunReflectGenerationInput,
+): Promise<ReflectGenerationResult> {
+  return runReflectGeneration(input, supabaseReflectGenerator);
+}
+
 export { applyBreathSegmentLogOutcome, initialBreathSegmentRpcLoggedFlagsFromRestored };
 export type { RunBreathSegmentLogResult };
 
@@ -410,15 +418,6 @@ export function logBreathSegment2Skipped(
 ) {
   return runLogBreathSegment2Skipped(supabasePauseRepository, input, breathSegmentLogDeps);
 }
-
-/** Reflect step — nav seed → artifact cache → `holzen-reflect` (wired `ReflectGenerator`). */
-export function runPauseReflectGeneration(
-  input: RunReflectGenerationInput,
-): Promise<ReflectGenerationResult> {
-  return runReflectGeneration(input, supabaseReflectGenerator);
-}
-
-export type { RunReflectGenerationInput, ReflectGenerationResult };
 
 /** Brief done save — `post_pause_emotion_logged` when check-in differs from ritual snapshot. */
 /** Brief done “Save to journey” — `post_pause_emotion_logged` when feel changed. */
