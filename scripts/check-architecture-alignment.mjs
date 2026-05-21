@@ -3,8 +3,8 @@
  * See docs/decisions/2026-05-17-modular-monolith-hexagonal-client.md and
  * docs/fundamentals/frontend-module-layout.md §11.
  */
-import { existsSync, readFileSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
@@ -17,6 +17,24 @@ function mustExist(rel, label = rel) {
   if (!existsSync(p)) failures.push(`missing ${label}`);
 }
 
+function mustNotExist(rel, label = rel) {
+  const p = join(root, rel);
+  if (existsSync(p)) failures.push(`forbidden path still present: ${label}`);
+}
+
+function walkTs(dir, files = []) {
+  if (!existsSync(dir)) return files;
+  for (const name of readdirSync(dir)) {
+    const p = join(dir, name);
+    const st = statSync(p);
+    if (st.isDirectory()) {
+      if (name === 'node_modules' || name === 'dist' || name === 'legacy') continue;
+      walkTs(p, files);
+    } else if (/\.(tsx?)$/.test(name)) files.push(p);
+  }
+  return files;
+}
+
 for (const ctx of contexts) {
   const base = `src/features/${ctx}`;
   mustExist(`${base}/public.ts`, `${base}/public.ts`);
@@ -26,8 +44,37 @@ for (const ctx of contexts) {
 }
 
 mustExist('src/features/pause/application/use-cases/ritual/frame', 'pause/application/use-cases/ritual/frame/');
+mustExist('src/features/pause/application/use-cases/ritual/reflect', 'pause/application/use-cases/ritual/reflect/');
 mustExist('src/features/pause/application/use-cases/session', 'pause/application/use-cases/session/');
 mustExist('src/features/pause/application/use-cases/ritual/brief', 'pause/application/use-cases/ritual/brief/');
+mustNotExist(
+  'src/features/pause/application/use-cases/reflect',
+  'pause/application/use-cases/reflect/ (use ritual/reflect/)',
+);
+mustNotExist(
+  'src/features/pause/application/use-cases/companion',
+  'pause/application/use-cases/companion/ (use ritual/frame/)',
+);
+
+const LEGACY_PAUSE_USE_CASE_IMPORTS = [
+  '@/features/pause/application/use-cases/reflect/',
+  '@/features/pause/application/use-cases/companion/',
+  "from './application/use-cases/reflect/",
+  "from './application/use-cases/companion/",
+  "from '../application/use-cases/reflect/",
+  "from '../application/use-cases/companion/",
+];
+
+for (const file of walkTs(join(root, 'src'))) {
+  const rel = relative(root, file).replace(/\\/g, '/');
+  if (rel.startsWith('legacy/')) continue;
+  const text = readFileSync(file, 'utf8');
+  for (const needle of LEGACY_PAUSE_USE_CASE_IMPORTS) {
+    if (text.includes(needle)) {
+      failures.push(`${rel}: legacy pause use-case import (${needle})`);
+    }
+  }
+}
 mustExist('src/features/notifications/application/use-cases/delivery', 'notifications/application/use-cases/delivery/');
 mustExist('vite.config.ts', 'root vite.config.ts');
 mustExist('index.html', 'root index.html');

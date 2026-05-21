@@ -305,6 +305,8 @@ The repo is mid-migration. Expect:
 
 Do not big-bang rename folders; one vertical slice per commit ([refactoring-strategy.md](../fundamentals/refactoring-strategy.md)).
 
+**CI (May 2026):** `npm run check:architecture-alignment` requires `application/use-cases/ritual/reflect/` and forbids resurrecting `application/use-cases/reflect/` or `companion/` (plus legacy import strings in active `src/`).
+
 ---
 
 ## 11. Related docs

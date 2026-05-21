@@ -10568,6 +10568,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — usePauseFavoriteToggle on public-ritual-reflect (backlog #1 verified, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -10581,6 +10582,21 @@
       <dd>Mood/flow conductors (<code>usePauseSessionMood*</code>, breath handlers) remain on <code>public-hooks</code> until a later peel.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: pending-offer mutations via repository in presentation (optional §6 peel); group remaining breathe-only helpers on <code>public-ritual-breathe</code>.</dd>
+=======
+      <span>Phase A slice — CI guard for ritual/reflect + ritual/frame (backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; check:architecture-alignment blocks legacy reflect/companion paths</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect and companion application use cases already live under <code>ritual/reflect/</code> and <code>ritual/frame/</code> on <code>cursor/arch-migrate-src-ca70</code>. Extend <code>check:architecture-alignment</code> to require <code>ritual/reflect/</code>, forbid resurrecting <code>application/use-cases/reflect/</code> or <code>companion/</code>, and fail on legacy import strings in active <code>src/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — no file moves this slice; behavior parity unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Import-string scan may need allowlist if a doc-only reference appears in <code>src/</code>; rewrite script keeps old paths for one-off migrations only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional <code>pause-rpc-client</code> import guard outside <code>supabase-pause-repository</code>; §6 peel (orb helpers on <code>public-ritual-breathe</code>).</dd>
+>>>>>>> fcfe8a26 (chore(pause): guard ritual/reflect paths in architecture check)
     </dl>
   </article>
 
