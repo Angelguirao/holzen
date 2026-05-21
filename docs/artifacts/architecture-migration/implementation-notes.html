@@ -16721,4 +16721,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation I/O via pause-reflect-generation-hook-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-io</code> imports hook helpers through generation cluster anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-generation-io.ts</code> imports prefetch/commit/clear, prerequisite, error, and effective-copy helpers through <code>pause-reflect-generation-hook-flow</code> instead of deep <code>domain/reflect/generation/</code>; <code>runReflectGeneration</code> still binds via <code>pause-reflect-generation-run-flow</code>. <code>use-pause-reflect-generation</code> unchanged (imports I/O only).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; domain still owns pure helpers re-exported by the anchor.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flows and mood I/O anchors landed on remote in the same window; generation hook-flow peel closes the reflect presentation I/O cluster set for holzen-reflect.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session brief or scaffold presentation I/O flow anchors, share I/O anchor peel, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
