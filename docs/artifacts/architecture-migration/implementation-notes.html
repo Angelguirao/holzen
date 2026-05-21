@@ -7582,4 +7582,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — depth picker ritual entry under ritual/reflect/mood (backlog #1 incremental)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>apply-depth-picker-ritual-entry</code> beside depth context params</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder migration (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate brief/deep depth-picker state transitions with <code>resolve-pause-depth-context-line-params</code>; <code>use-pause-session-depth-picker-handlers</code> delegates to application helpers (no React types in application layer).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity with prior inline <code>BRIEF_DEPTH_PICKER_RITUAL_ENTRY</code> / <code>DEEP_DEPTH_PICKER_RITUAL_ENTRY</code> usage.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Domain constants remain in <code>pause-session-mood-chrome-flow.ts</code>; application layer applies them via setter ports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 peel <code>use-companion-orchestrate-session</code> off <code>public-rpc</code>, or port-backed analytics read for feedback vote fetch.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

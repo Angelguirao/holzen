@@ -1,8 +1,8 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import {
-  BRIEF_DEPTH_PICKER_RITUAL_ENTRY,
-  DEEP_DEPTH_PICKER_RITUAL_ENTRY,
-} from '@/features/pause/domain/reflect/mood/pause-session-mood-chrome-flow';
+  applyBriefDepthPickerRitualEntry,
+  applyDeepDepthPickerRitualEntry,
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/apply-depth-picker-ritual-entry';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 
 /** `PauseDepthPicker` actions on `/pause` depth selection screen. */
@@ -16,12 +16,11 @@ export function usePauseSessionDepthPickerHandlers(input: {
   const { setRitualEntry, setBriefStep } = input;
 
   const onBrief = useCallback(() => {
-    setRitualEntry(BRIEF_DEPTH_PICKER_RITUAL_ENTRY.ritualEntry);
-    setBriefStep(BRIEF_DEPTH_PICKER_RITUAL_ENTRY.briefStep);
+    applyBriefDepthPickerRitualEntry({ setRitualEntry, setBriefStep });
   }, [setRitualEntry, setBriefStep]);
 
   const onDeep = useCallback(() => {
-    setRitualEntry(DEEP_DEPTH_PICKER_RITUAL_ENTRY.ritualEntry);
+    applyDeepDepthPickerRitualEntry({ setRitualEntry });
   }, [setRitualEntry]);
 
   return { onBrief, onDeep };
