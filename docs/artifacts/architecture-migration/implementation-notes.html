@@ -4713,4 +4713,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect/decide flow helpers in presentation/reflect/flows (Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate <code>pause-session-reflect-decide-flow</code> beside reflect/decide conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 <code>ritual/reflect/</code> application move was already complete. Pure reflect/decide UI helpers (<code>resolveReflectGenerationSeverityAbsPct</code>, <code>resolveEffectiveReflectionMessage</code>, <code>shouldRunPauseReflectGeneration</code>) move from <code>application/.../reflect/flows/</code> to <code>presentation/reflect/flows/</code>; <code>use-pause-session-reflect-and-decide</code> imports sibling module. Empty application <code>reflect/flows/</code> removed.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; domain gate remains <code>reflect-generation-enabled.ts</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Application <code>ritual/reflect/</code> keeps I/O use cases only (generation, steps, hub mappers still split incrementally).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>reflect-frame-focus-ambience</code> or <code>pause-shift-frame-hub-flow</code> under <code>presentation/reflect/</code>, or wire remaining <code>PauseRepository</code> stragglers (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
