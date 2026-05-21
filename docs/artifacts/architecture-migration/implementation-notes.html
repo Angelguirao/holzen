@@ -78,6 +78,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A — Home pause-actions navigation via public-navigation (backlog #1 verified, Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>useHomePauseActions</code> imports <code>shouldNavigateAfterManualTrigger</code> from <code>public-navigation</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Route post-manual-trigger navigation gate off <code>pause-home-reflect-io</code>; <code>use-home-pause-actions</code> imports <code>shouldNavigateAfterManualTrigger</code> from <code>public-navigation.ts</code> (with session location helpers). Aggregate <code>pause-home-io</code> re-exports navigation + trigger barrels for legacy test seams.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Manual-open flow CI anchor still bundles <code>shouldNavigateAfterManualTrigger</code> for alignment; production Home conductors use slim barrels only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>mapManualTriggerStartError</code> off aggregate <code>pause-home-io</code> if unused, or Phase B subscription pricing lib shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A — Holzen manual-trigger orchestration via public-trigger (backlog #1 verified, Tier 1)</span>
       <span class="status resolved">resolved</span>
     </header>
