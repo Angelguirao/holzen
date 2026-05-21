@@ -6,7 +6,7 @@ export {
 export {
   buildManualPauseOpenParams,
   type BuildManualPauseOpenParamsInput,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/build-manual-pause-open-params';
+} from '@/features/pause/domain/reflect/generation/build-manual-pause-open-params';
 export {
   buildManualPauseMarketContext,
   type ManualPauseMarketContext,

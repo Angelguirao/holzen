@@ -15030,4 +15030,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual-open full params → domain/reflect/generation</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — Home open-params shaping in domain</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete. Move <code>buildManualPauseOpenParams</code> (+ test) from <code>application/use-cases/ritual/reflect/generation/</code> to <code>domain/reflect/generation/</code>; <code>pause-home-reflect-io</code> re-exports domain path. Application keeps <code>open-manual-pause-from-home</code> orchestration only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; completes prior note that left open-params in application.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Domain module depends on <code>@/features/market/public</code> for <code>BtcPriceData</code> (same as market-context helper).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion presentation I/O peels or <code>public-ritual-frame</code> barrel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
