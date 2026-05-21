@@ -12199,4 +12199,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — retrospective outcome_logged under ritual/decide (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>log-retrospective-outcome</code> off <code>application/use-cases/archive/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no reflect folder moves. Archive retrospective sheet still lives in <code>presentation/archive/</code>, but the <code>outcome_logged</code> mutation use case colocates with <code>run-pause-outcome-log</code> under <code>ritual/decide/</code> (shared <code>buildOutcomeLoggedPayload</code> + <code>PauseRepository</code>). PostHog telemetry stays in <code>application/use-cases/archive/archive-retrospective-telemetry</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Two files moved + presentation import path updates; archive folder keeps UI-only telemetry helpers until a later slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: companion orchestrate port-lock tests, optional analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

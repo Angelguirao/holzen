@@ -13,7 +13,7 @@ const {
   mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
-vi.mock('@/features/pause/application/use-cases/archive/log-retrospective-outcome', () => ({
+vi.mock('@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome', () => ({
   logRetrospectiveOutcome: logRetrospectiveOutcomeMock,
 }));
 
