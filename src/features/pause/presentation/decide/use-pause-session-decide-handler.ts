@@ -1,5 +1,4 @@
-import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
-import type { TFunction } from 'i18next';
+import { useCallback } from 'react';
 import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/features/auth/public';
 import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
@@ -13,31 +12,15 @@ import {
 } from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
 import { getSessionQuote } from '@/features/pause/application/use-cases/session/wisdom-quotes';
 import { supabasePauseRepository } from '@/features/pause/public-ports';
-import type { PauseImpactData, RitualDepth } from '@/features/pause/public-hooks';
 import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
-import type { MoodValue } from '../../domain/mood-value';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
+import type { UsePauseSessionDecideHandlerParams } from './pause-session-decide-handler-types';
 
-export function usePauseSessionDecideHandler(input: {
-  decidingRef: MutableRefObject<boolean>;
-  pauseInstanceId: string | null;
-  t: TFunction;
-  refreshSubscription: () => void | Promise<void>;
-  setDecision: Dispatch<SetStateAction<string | null>>;
-  dismissMessage: () => void | Promise<void>;
-  setPauseImpactData: Dispatch<SetStateAction<PauseImpactData | null>>;
-  setPhase: Dispatch<SetStateAction<'session' | 'done'>>;
-  context: string | null;
-  selectedMood: MoodValue | null;
-  selectedMoodAfter: MoodValue | null;
-  ritualEntry: RitualDepth | 'picker';
-  breathingFirstCompleted: boolean;
-  breathingSecondCompleted: boolean;
-  feelIntensity: number | null;
-  shiftIntensity: number | null;
-  reflectionMessage: string;
-  haiku: string | null;
-}): { handleDecide: (d: string) => Promise<void> } {
+export type { UsePauseSessionDecideHandlerParams } from './pause-session-decide-handler-types';
+
+export function usePauseSessionDecideHandler(
+  input: UsePauseSessionDecideHandlerParams,
+): { handleDecide: (d: string) => Promise<void> } {
   const { user } = useAuth();
   const {
     decidingRef,

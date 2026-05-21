@@ -9,6 +9,7 @@ import {
   resolvePauseDecideOutcomeFlow,
 } from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow';
 import { usePauseSessionDecideHandler } from './use-pause-session-decide-handler';
+import type { UsePauseSessionDecideHandlerParams } from './pause-session-decide-handler-types';
 
 const {
   logStepMock,
@@ -66,7 +67,7 @@ vi.mock('@/features/auth/public', () => ({
 
 const t = ((k: string) => k) as TFunction;
 
-function baseInput(overrides: Partial<Parameters<typeof usePauseSessionDecideHandler>[0]> = {}) {
+function baseInput(overrides: Partial<UsePauseSessionDecideHandlerParams> = {}) {
   const decidingRef: MutableRefObject<boolean> = { current: false };
   return {
     decidingRef,
