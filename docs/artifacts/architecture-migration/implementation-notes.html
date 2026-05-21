@@ -7753,4 +7753,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — step-handler provider types under presentation/reflect/flows (backlog #1 presentation)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>PauseSessionStepHandlersProvidersSlice colocated with reflect flows</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>pause-session-step-handler-types.ts</code> beside breath-reflect and mood chrome slice types under <code>presentation/reflect/flows/</code>; <code>public-hooks</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — types-only move; behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session scaffold VM still imports reflect types across folders (expected until a later session-only types module exists).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-slot-orchestrate-*</code> off <code>public-rpc</code> re-exports, or backlog #4 remaining analytics read port.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
