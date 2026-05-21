@@ -9843,4 +9843,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — public-session mount-log barrel (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; session mount diagnostics on public-session</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — no reflect moves. Extend <code>public-session.ts</code> with <code>buildPauseSessionMountLogParams</code>; mount-log hook and shell bootstrap import the barrel; <code>public-hooks</code> re-exports from <code>public-session</code> (composes with header-back exports from prior slice).</dd>
+      <dt>Deviation</dt>
+      <dd>None — mount-once diagnostic behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other session pure helpers (step-transition, persist snapshot, gate flags) remain on direct application imports until follow-up peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: extend <code>public-session</code> with step-transition / persist-snapshot cluster, or backlog #4 breath segment RPC audit via <code>public-rpc</code> only.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

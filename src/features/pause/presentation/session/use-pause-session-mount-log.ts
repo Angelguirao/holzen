@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { holzenLog } from '@/lib/holzen-console';
-import type { PauseSessionMountLogParams } from '@/features/pause/application/use-cases/session/mount-log-params';
+import type { PauseSessionMountLogParams } from '@/features/pause/public-session';
 
 /**
  * One-shot dev diagnostic when `/pause` mounts. Arguments are read from the **first** render only
