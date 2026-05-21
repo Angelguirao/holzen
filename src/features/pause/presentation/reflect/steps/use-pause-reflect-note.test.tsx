@@ -6,16 +6,16 @@ const { runPauseReflectNoteUpdateMock } = vi.hoisted(() => ({
   runPauseReflectNoteUpdateMock: vi.fn(),
 }));
 
+vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+  supabasePauseRepository: {},
+}));
+
 vi.mock(
   '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update',
   () => ({
     runPauseReflectNoteUpdate: runPauseReflectNoteUpdateMock,
   }),
 );
-
-vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
-  supabasePauseRepository: {},
-}));
 
 vi.mock('@/features/auth/public', () => ({
   useAuth: () => ({ user: null, loading: false }),
