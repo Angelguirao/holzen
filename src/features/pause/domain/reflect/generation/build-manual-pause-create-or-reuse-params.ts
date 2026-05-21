@@ -1,6 +1,6 @@
 import { bucketChangePercent, computeContextFingerprint } from '@/features/pause/domain/pause-fingerprint';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-import type { OpenManualPauseFromHomeParams } from './open-manual-pause-from-home-types';
+import type { OpenManualPauseFromHomeParams } from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-params';
 
 export const MANUAL_PAUSE_VOLATILITY_TEMPLATE = 'volatility_v1';
 

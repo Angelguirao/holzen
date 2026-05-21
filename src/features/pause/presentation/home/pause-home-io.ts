@@ -7,11 +7,15 @@ import {
   type ManualPauseHomePreviewPorts,
 } from './apply-manual-pause-open-result';
 export {
+  buildManualPauseCreateOrReuseParams,
   buildManualPauseMarketContext,
   buildManualPauseOpenParams,
   openManualPauseFromHome,
+  MANUAL_PAUSE_VOLATILITY_TEMPLATE,
   type BuildManualPauseOpenParamsInput,
+  type ManualPauseCreateOrReuseParams,
   type ManualPauseMarketContext,
+  type OpenManualPauseFromHomeParams,
   type OpenManualPauseFromHomeResult,
 } from './pause-home-reflect-io';
 export {

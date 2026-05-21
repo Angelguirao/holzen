@@ -3,7 +3,7 @@ import {
   buildManualPauseMarketContext,
   type ManualPauseMarketContext,
 } from '@/features/pause/domain/reflect/generation/build-manual-pause-market-context';
-import type { OpenManualPauseFromHomeParams } from './open-manual-pause-from-home-types';
+import type { OpenManualPauseFromHomeParams } from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-params';
 
 export type { ManualPauseMarketContext };
 

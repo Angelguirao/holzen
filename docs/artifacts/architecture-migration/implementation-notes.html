@@ -14938,6 +14938,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — manual-open create-or-reuse params → domain/reflect/generation</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — RPC input shaping in domain</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete. Move <code>buildManualPauseCreateOrReuseParams</code> (+ test) and <code>OpenManualPauseFromHomeParams</code> to <code>domain/reflect/generation/</code>; application <code>open-manual-pause-from-home-types</code> keeps result + port types. Re-export create-or-reuse on <code>pause-home-reflect-io</code> and aggregate <code>pause-home-io</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>openManualPauseFromHome</code> orchestration unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>build-manual-pause-open-params</code> stays in application (composes market context + domain params type).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion presentation I/O peels or <code>public-ritual-frame</code> barrel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — Home manual-open types + actions telemetry I/O</span>
       <span class="status resolved">resolved</span>
     </header>
