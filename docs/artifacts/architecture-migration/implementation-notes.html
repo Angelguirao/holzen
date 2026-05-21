@@ -13852,4 +13852,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — public-ritual-frame pure exports (cluster 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>§6 barrel peel — frame types and format helpers</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Phase A interior backlog (#1–#5) is complete. Add <code>public-ritual-frame.ts</code> for companion/frame pure exports (types, read-time, zoom-out payload types, regenerate/favorite helpers). <code>public-hooks.ts</code> re-exports for backward compatibility; eight pause screen modules import the ritual-frame barrel directly (mirrors <code>public-ritual-reflect</code> peel).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving re-exports only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestration hooks still live on <code>public-hooks.ts</code>; peel hook cluster in a follow-up slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move companion presentation hooks to <code>public-ritual-frame</code>, or Phase B <code>holzen-query-client-ref</code> shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
