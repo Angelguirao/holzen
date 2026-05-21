@@ -16173,6 +16173,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — reflect steps I/O via application flow anchors (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -16186,6 +16187,21 @@
       <dd>Share, hub, generation, and flows I/O modules still re-export some domain helpers directly — follow-up peels.</dd>
       <dt>Open questions</dt>
       <dd>Next: hub or share reflect I/O anchor peel, or Phase B cross-context Tier 1 shim.</dd>
+=======
+      <span>Phase A slice — ritual-audio breathe flow anchor (backlog #1 verified, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-ritual-audio-breathe-flow</code> on session breath I/O</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no reflect folder moves. Add <code>pause-ritual-audio-breathe-flow.ts</code> cluster anchor; <code>pause-session-breath-io</code> re-exports breath phase/pattern audio cues through the anchor instead of deep <code>ritual-audio</code> imports (follow-up to domain <code>phase-advance</code> peel on this branch).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>breath-second-label-variant</code> and <code>restored-breath-ritual-state</code> still re-export from application on breath I/O until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: second-label + restored-breath anchors on breath I/O, or Phase B cross-context Tier 1 shim.</dd>
+>>>>>>> 4aa458d3 (refactor(pause): add ritual-audio breathe flow anchor on breath I/O)
     </dl>
   </article>
 
