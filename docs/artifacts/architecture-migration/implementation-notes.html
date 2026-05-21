@@ -6132,7 +6132,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; favorite-toggle test mocks <code>public-rpc</code>; note test updated to mock <code>logPauseReflectNote</code>.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Frame-focus ambience and reflect-decide flows still deep-import use cases.</dd>
+      <dd>Reflect-decide flow still deep-imports use cases; ambience peeled in follow-up slice.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>use-pause-reflect-frame-focus-ambience</code> or brief-to-deep / post-pause hooks through <code>public-rpc</code>.</dd>
     </dl>
@@ -6151,7 +6151,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; events unchanged in <code>event-taxonomy.md</code>.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Frame-focus ambience hook still imports <code>ritual/reflect/ambience/</code> directly; feel-tiles / reflect-decide flows still deep-import use cases.</dd>
+      <dd>Frame-focus ambience hook peeled in a follow-up slice; feel-tiles / reflect-decide flows still deep-import use cases.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>use-pause-reflect-frame-focus-ambience</code> or brief-to-deep / post-pause hooks through <code>public-rpc</code>.</dd>
     </dl>
@@ -6192,6 +6192,25 @@
       <dd><code>use-bulk-hold-apply-outcomes</code> still imports <code>public-rpc</code> facades directly; no dedicated hook test for manual trigger.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel bulk-hold apply through <code>public-ports</code> or companion orchestrate hooks from <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect frame-focus ambience via public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel Web Audio bed conductor from application imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete — no folder move. <code>use-pause-reflect-frame-focus-ambience</code> imports <code>startPauseReflectFrameFocusAmbience</code> / <code>stopPauseReflectFrameFocusAmbience</code> from <code>public-rpc</code> re-exports (telemetry + step hooks peeled on prior commits).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; no co-located hook test.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-reflect-and-decide</code> still imports <code>pause-session-reflect-decide-flow</code> from application until peeled.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel brief-to-deep / post-pause session hooks through <code>public-rpc</code>, or companion orchestrate hooks from <code>public-rpc</code>.</dd>
     </dl>
   </article>
 
