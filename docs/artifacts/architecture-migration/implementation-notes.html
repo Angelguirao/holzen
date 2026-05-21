@@ -16759,4 +16759,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — unify reflect flows I/O on pause-reflect-flows-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-flow</code> single import on <code>pause-reflect-flows-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Follow-up to per-anchor flows peel on remote: add <code>pause-reflect-flows-flow.ts</code> as one application cluster re-export (reflect+decide preflight, outcome flow, quotes, toasts, <code>runPauseOutcomeLog</code>) so presentation I/O has a single import surface.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; consolidates existing application anchors only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit test mocks the unified anchor and overrides <code>runPauseOutcomeLog</code> only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session brief or scaffold presentation I/O flow anchors, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
