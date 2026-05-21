@@ -28,24 +28,17 @@ vi.mock('@/features/pause/presentation/session/pause-persisted-tab-session-io', 
   savePausePersistedTabSession: vi.fn(),
 }));
 
-vi.mock('@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry', () => ({
-  markPauseManualStartedHomeOnce: markPauseManualStartedHomeOnceMock,
-  trackManualPauseInstanceCreated: trackManualPauseInstanceCreatedMock,
-  trackPauseManualCompleted: trackPauseManualCompletedMock,
-}));
-
 vi.mock('./pause-home-io', () => ({
   pauseHomeManualOpenPorts: mockPauseHomeManualOpenPorts,
   pauseDismissOpenPauseHomePreview: vi.fn(),
+  markPauseManualStartedHomeOnce: markPauseManualStartedHomeOnceMock,
+  trackManualPauseInstanceCreated: trackManualPauseInstanceCreatedMock,
+  trackPauseManualCompleted: trackPauseManualCompletedMock,
   applyManualPauseOpenResult: async (
     _input: { result: { outcome: string; userMessage?: string } },
     _ports: unknown,
   ) => ({ opened: false as const }),
   openManualPauseFromHome: openManualPauseFromHomeMock,
-  applyManualPauseOpenResult: async (
-    _input: { result: { outcome: string; userMessage?: string } },
-    _ports: unknown,
-  ) => ({ opened: false as const }),
   buildManualPauseOpenParams: (input: {
     userId: string;
     silentMode: boolean;

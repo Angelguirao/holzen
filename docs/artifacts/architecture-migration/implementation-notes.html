@@ -14745,4 +14745,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual-pause telemetry on pause-home-io</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — Home conductor single barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Re-export <code>markPauseManualStartedHomeOnce</code> and related PostHog helpers on <code>presentation/home/pause-home-io.ts</code> so <code>use-manual-pause-trigger</code> has no deep <code>application/use-cases/trigger/</code> import. <code>apply-manual-pause-open-result</code> keeps direct telemetry imports to avoid a circular barrel with <code>pause-home-io</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; event names unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Telemetry modules stay under <code>application/use-cases/trigger/</code> until a dedicated <code>presentation/home/pause-home-telemetry-io.ts</code> peel is worth the extra file.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: re-export <code>build-manual-pause-market-context</code> on <code>pause-home-io</code>, or Phase B cross-context slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
