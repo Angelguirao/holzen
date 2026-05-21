@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect hub I/O via hub-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-io</code> imports shift-frame hub through <code>pause-reflect-hub-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route <code>pause-reflect-hub-io</code> through <code>pause-reflect-hub-flow</code> instead of deep <code>run-shift-emotion-frame-hub-done</code> and <code>domain/reflect/hub/shift-frame-hub-done-presentation</code> paths (parity with mood/share/flows presentation I/O anchors; steps and generation I/O use direct sibling imports off their CI anchors).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hub flow anchor stays a thin re-export barrel for <code>check:architecture-alignment</code> reflect hub cluster detection.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-telemetry-io</code> flow peel, <code>pause-reflect-steps-io</code> through <code>pause-reflect-steps-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect ambience I/O via application anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd>Application anchor remains a thin re-export for <code>check:architecture-alignment</code> ambience cluster detection.</dd>
       <dt>Open questions</dt>
-      <dd>Next: route <code>pause-reflect-hub-io</code> through <code>pause-reflect-hub-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: <code>pause-reflect-telemetry-io</code> flow peel, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
