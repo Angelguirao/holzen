@@ -9,3 +9,8 @@ export {
   type PauseHeaderBackIntentInput,
   type PauseSessionHeaderBackInput,
 } from './application/use-cases/session/header-back';
+export {
+  buildPauseSessionMountLogParams,
+  type BuildPauseSessionMountLogParamsInput,
+  type PauseSessionMountLogParams,
+} from './application/use-cases/session/mount-log-params';

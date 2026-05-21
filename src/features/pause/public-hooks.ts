@@ -15,7 +15,7 @@ export {
 export {
   buildPauseSessionMountLogParams,
   type PauseSessionMountLogParams,
-} from './application/use-cases/session/mount-log-params';
+} from './public-session';
 export {
   buildPauseSessionPersistSnapshot,
   type PauseSessionPersistSnapshotInput,
