@@ -3,7 +3,7 @@ import {
   deliverReflectionShareImage,
   type DeliverReflectionShareImageDeps,
   type DeliverReflectionShareImageOutcome,
-} from '@/features/pause/domain/reflect/share/deliver-reflection-share-image';
+} from './deliver-reflection-share-image';
 
 /** Branded PNG render + native share or download (browser APIs). */
 export async function runReflectionShareImage(

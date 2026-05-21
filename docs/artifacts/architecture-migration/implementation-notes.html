@@ -12731,4 +12731,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — deliver-reflection-share-image → ritual/reflect/share (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate native share/download with reflect share use case</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves were already complete. Move <code>deliver-reflection-share-image</code> (+ test) from <code>domain/reflect/share/</code> to <code>application/use-cases/ritual/reflect/share/</code> beside <code>run-reflection-share-image</code> — <code>navigator.share</code> / download anchor are browser I/O (same rationale as frame-focus ambience under <code>ritual/reflect/ambience/</code>). Canvas PNG render stays in <code>domain/reflect/share/reflection-share-canvas.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>Prior note (May 2026) placed deliver in domain beside canvas; application layer now owns all reflect share beat browser delivery.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move <code>reflection-share-canvas</code> in this commit — pure render helpers can stay domain until a dedicated canvas slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Phase B: subscription/auth <code>src/lib/*</code> shims using pause as template.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
