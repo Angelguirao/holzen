@@ -7259,4 +7259,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel pending-offer mutations off public-rpc (backlog #1 done, #3/#4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-pending-pause-offer-mutations → pending-offer use cases + public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. <code>use-pending-pause-offer-mutations</code> calls <code>runAdoptPendingPauseOffer</code> / <code>runDeclinePendingPauseOffer</code> with <code>supabasePauseRepository</code> from <code>public-ports.ts</code>; <code>adoptPendingPauseOffer</code> / <code>declinePendingPauseOffer</code> facades on <code>public-rpc.ts</code> unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Home preview dismiss and companion hooks still import <code>public-rpc</code> wired facades until follow-up peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-open-pause-home-preview</code> / companion feedback vote off <code>public-rpc</code>, or backlog #4 remaining mutation call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
