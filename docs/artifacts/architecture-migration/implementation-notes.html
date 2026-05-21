@@ -6904,16 +6904,27 @@
       <span>Phase A slice — reflection_step payload beside note/tag/favorite (backlog #1)</span>
       <span class="status resolved">resolved</span>
     </header>
+<<<<<<< HEAD
     <h3>Consolidate reflection_step RPC payload in reflect-note-tag-payload</h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Prior slice put <code>buildReflectReflectionStepPayload</code> in <code>reflection-step-log.ts</code>; this slice moves it beside <code>note_updated</code> / <code>tag_updated</code> / <code>favorite_toggled</code> in <code>reflect-note-tag-payload.ts</code>. <code>reflection-step-log.ts</code> keeps storage key + <code>shouldLogPauseReflectionStep</code> gate only.</dd>
+=======
+    <h3>Peel reflection_step step payload beside note/tag/favorite builders</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Smallest reflect domain peel after <code>favorite_toggled</code>: <code>buildReflectReflectionStepPayload</code> in <code>domain/reflect/steps/reflect-note-tag-payload.ts</code> (with note/tag/favorite); <code>reflection-step-log.ts</code> keeps gate + sessionStorage key only; <code>run-pause-reflection-step-log</code> keeps RPC + dedupe wiring.</dd>
+>>>>>>> 1539f6db (refactor(pause): peel reflection_step payload into domain reflect steps)
       <dt>Deviation</dt>
-      <dd>None — behavior parity.</dd>
+      <dd>Prior push briefly colocated payload in <code>reflection-step-log.ts</code>; consolidated to <code>reflect-note-tag-payload.ts</code> to match note/tag/favorite peel pattern.</dd>
       <dt>Tradeoffs</dt>
+<<<<<<< HEAD
       <dd>Module name still says note-tag; rename to <code>reflect-step-payloads</code> deferred. Follow-up on remote removed <code>logPauseReflectionStepOnce</code> from <code>public-rpc</code>; presentation calls use case + <code>public-ports</code> directly.</dd>
+=======
+      <dd>Module name still says note-tag; rename to <code>reflect-step-payloads.ts</code> deferred. <code>public-rpc</code> <code>logPauseReflectionStepOnce</code> facade unchanged.</dd>
+>>>>>>> 1539f6db (refactor(pause): peel reflection_step payload into domain reflect steps)
       <dt>Open questions</dt>
-      <dd>Next: peel shift-frame hub / feel-tiles conductors off <code>public-rpc</code>, or backlog #4 companion feedback vote read wiring.</dd>
+      <dd>Next: peel companion retry / intervention presentation cluster, or backlog #4 companion feedback vote read wiring.</dd>
     </dl>
   </article>
 
