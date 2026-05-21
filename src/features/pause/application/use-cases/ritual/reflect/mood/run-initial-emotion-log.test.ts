@@ -4,7 +4,6 @@ import {
   initialEmotionLogDedupeKey,
   initialEmotionSkippedLogDedupeKey,
 } from '@/features/pause/domain/reflect/mood/initial-emotion-log';
-import { initialEmotionResetUi } from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
 import {
   runInitialEmotionSelect,
   runInitialEmotionSkip,
@@ -110,16 +109,5 @@ describe('runInitialEmotionSkip', () => {
     const result = await runInitialEmotionSkip(repository, { pauseInstanceId: 'inst-1' });
 
     expect(result.status).toBe('sync_failed');
-  });
-});
-
-describe('initialEmotionResetUi', () => {
-  it('clears feel-step fields', () => {
-    expect(initialEmotionResetUi()).toEqual({
-      moodDone: false,
-      selectedMood: null,
-      feelIntensity: null,
-      selectedBriefFace: null,
-    });
   });
 });
