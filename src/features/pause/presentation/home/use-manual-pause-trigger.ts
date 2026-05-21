@@ -18,8 +18,7 @@ import {
   supabasePauseRepository,
   supabaseReflectGenerator,
 } from '@/features/pause/public-rpc';
-import { clearPersistedTabSession } from '@/features/pause/application/use-cases/session/persisted-tab-session';
-import { persistedTabSessionStorage } from '@/features/pause/public-rpc';
+import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import { holzenLog } from '@/lib/holzen-console';
 
 const manualPauseOpenPorts = {
@@ -87,7 +86,7 @@ export function useManualPauseTrigger({
 
       const previewPorts = {
         setError,
-        clearPauseSession: () => clearPersistedTabSession(persistedTabSessionStorage),
+        clearPauseSession: () => clearPausePersistedTabSession(),
         setLastPauseInstanceId,
         setMessage,
         setContext,

@@ -1,6 +1,6 @@
 /**
  * Tab session I/O barrel for cross-context callers (re-exports use case).
- * Feature presentation imports `application/use-cases/session/persisted-tab-session` directly.
+ * Feature presentation imports `presentation/session/pause-persisted-tab-session-io` (bound default port).
  * Layout tokens and ritual step types: `public-hooks`. Domain gates: import `domain/*` directly.
  */
 import {

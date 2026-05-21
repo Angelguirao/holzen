@@ -3,8 +3,7 @@ import type { User } from '@supabase/supabase-js';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import { dismissOpenPauseHome } from '@/features/pause/application/use-cases/home/dismiss-open-pause-home';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
-import { clearPersistedTabSession } from '@/features/pause/application/use-cases/session/persisted-tab-session';
-import { persistedTabSessionStorage } from '@/features/pause/public-rpc';
+import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import { fetchOpenPauseHomePreview } from '../../public-queries';
 import { DEFAULT_COMPANIONS } from '../../domain/session-model';
 import { usePauseInstancesRealtime } from '../realtime/use-pause-instances-realtime';
@@ -29,7 +28,7 @@ export function useOpenPauseHomePreview(user: User | null) {
     setMessage(null);
     setContext(null);
     setCompanions(DEFAULT_COMPANIONS);
-    clearPersistedTabSession(persistedTabSessionStorage);
+    clearPausePersistedTabSession();
   }, []);
 
   /** Re-read v_pause_current + artifacts so Home matches Library after completes / dismissals. */
