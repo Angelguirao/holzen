@@ -23,6 +23,10 @@ const REPLACEMENTS = [
   ['@/features/pause/application/use-cases/breathing/', '@/features/pause/application/use-cases/ritual/breathe/'],
   ['@/features/pause/application/use-cases/companion/', '@/features/pause/application/use-cases/ritual/frame/'],
   ['@/features/pause/application/use-cases/reflect/', '@/features/pause/application/use-cases/ritual/reflect/'],
+  [
+    '@/features/pause/application/use-cases/ritual/feel/run-shift-emotion-frame-hub-done',
+    '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
+  ],
   ['@/features/pause/application/use-cases/feedback/step-sync-toast', '@/features/pause/application/use-cases/ritual/step-sync-toast'],
   ['@/features/pause/application/use-cases/feedback/outcome-toast', '@/features/pause/application/use-cases/ritual/decide/outcome-toast'],
   ['@/features/pause/application/use-cases/feedback/', '@/features/pause/application/use-cases/ritual/'],
@@ -34,6 +38,10 @@ const REPLACEMENTS = [
   ['./application/use-cases/breathing/', './application/use-cases/ritual/breathe/'],
   ['./application/use-cases/companion/', './application/use-cases/ritual/frame/'],
   ['./application/use-cases/reflect/', './application/use-cases/ritual/reflect/'],
+  [
+    './application/use-cases/ritual/feel/run-shift-emotion-frame-hub-done',
+    './application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
+  ],
   ['./application/use-cases/feedback/step-sync-toast', './application/use-cases/ritual/step-sync-toast'],
   ['./application/use-cases/feedback/outcome-toast', './application/use-cases/ritual/decide/outcome-toast'],
   ['./application/use-cases/feedback/', './application/use-cases/ritual/'],
@@ -45,6 +53,10 @@ const REPLACEMENTS = [
   ['application/use-cases/breathing/', 'application/use-cases/ritual/breathe/'],
   ['application/use-cases/companion/', 'application/use-cases/ritual/frame/'],
   ['application/use-cases/reflect/', 'application/use-cases/ritual/reflect/'],
+  [
+    'application/use-cases/ritual/feel/run-shift-emotion-frame-hub-done',
+    'application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
+  ],
   ['application/use-cases/feedback/step-sync-toast', 'application/use-cases/ritual/step-sync-toast'],
   ['application/use-cases/feedback/outcome-toast', 'application/use-cases/ritual/decide/outcome-toast'],
   ['application/use-cases/feedback/', 'application/use-cases/ritual/'],
