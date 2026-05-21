@@ -59,6 +59,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — session shell I/O hydration + pending-offer test hygiene (Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -72,6 +73,21 @@
       <dd><code>pause-session-shell-flow.ts</code> remains for <code>check:architecture-alignment</code> shell cluster detection.</dd>
       <dt>Open questions</dt>
       <dd>Next: reflect flows I/O decide/toast anchor peel, or Phase B cross-context Tier 1 shim.</dd>
+=======
+      <span>Phase A slice — home + session reflect telemetry flow anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-telemetry-flow</code> + session telemetry I/O through flow anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-home-reflect-telemetry-flow</code> beside <code>pause-reflect-telemetry-flow</code>; <code>pause-home-reflect-telemetry-io</code> and <code>pause-reflect-telemetry-io</code> import PostHog trackers through their flow anchors instead of deep <code>home-pause-actions-telemetry</code> / <code>pause-reflect-session-ui-telemetry</code> paths.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flow anchors remain for <code>check:architecture-alignment</code> telemetry cluster detection (parity with mood/hub flow routing).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect flows I/O decide/toast anchor peel, companion orchestrate-io direct <code>ritual/frame/*</code> imports, or Phase B cross-context Tier 1 shim.</dd>
+>>>>>>> 1aa51c9ce (refactor(pause): peel reflect ambience I/O; align telemetry flow anchors)
     </dl>
   </article>
 
@@ -145,9 +161,9 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Mood I/O still imports <code>run-initial-emotion-log</code> and several domain mood modules directly until a follow-up peel through <code>pause-reflect-mood-flow</code>.</dd>
+      <dd><code>pause-reflect-hub-flow.ts</code> remains for <code>check:architecture-alignment</code> hub cluster detection.</dd>
       <dt>Open questions</dt>
-      <dd>Next: mood I/O through <code>pause-reflect-mood-flow</code>, reflect flows I/O decide/toast anchor, or companion orchestration-io peel.</dd>
+      <dd>Next: reflect flows I/O decide/toast anchor peel, or companion orchestration-io peel.</dd>
     </dl>
   </article>
 
