@@ -3,21 +3,32 @@ import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 import { openManualPauseFromHome } from './open-manual-pause-from-home';
 
+function mockPorts(overrides: {
+  createOrReuse?: PauseRepository['createOrReuse'];
+  persistReflectionArtifacts?: ReflectGenerator['persistReflectionArtifacts'];
+}): { repository: PauseRepository; reflect: ReflectGenerator } {
+  return {
+    repository: {
+      createOrReuse:
+        overrides.createOrReuse ??
+        vi.fn().mockResolvedValue({
+          instance_id: null,
+          created: false,
+          reused_reason: 'fingerprint_match',
+          pending_offer: false,
+          prior_open_instance_id: null,
+        }),
+    } as unknown as PauseRepository,
+    reflect: {
+      persistReflectionArtifacts: overrides.persistReflectionArtifacts ?? vi.fn(),
+    } as unknown as ReflectGenerator,
+  };
+}
+
 describe('openManualPauseFromHome', () => {
   it('returns idle when RPC yields no instance', async () => {
     const result = await openManualPauseFromHome(
-      {
-        repository: {
-          createOrReuse: vi.fn().mockResolvedValue({
-            instance_id: null,
-            created: false,
-            reused_reason: 'fingerprint_match',
-            pending_offer: false,
-            prior_open_instance_id: null,
-          }),
-        } as PauseRepository,
-        reflect: { persistReflectionArtifacts: vi.fn() } as ReflectGenerator,
-      },
+      mockPorts({}),
       {
         userId: 'u1',
         silentMode: false,
@@ -37,18 +48,16 @@ describe('openManualPauseFromHome', () => {
   it('persists silent stub when silentMode is on', async () => {
     const persistReflectionArtifacts = vi.fn().mockResolvedValue(undefined);
     const result = await openManualPauseFromHome(
-      {
-        repository: {
-          createOrReuse: vi.fn().mockResolvedValue({
-            instance_id: 'pause-1',
-            created: true,
-            reused_reason: null,
-            pending_offer: false,
-            prior_open_instance_id: null,
-          }),
-        } as PauseRepository,
-        reflect: { persistReflectionArtifacts } as ReflectGenerator,
-      },
+      mockPorts({
+        createOrReuse: vi.fn().mockResolvedValue({
+          instance_id: 'pause-1',
+          created: true,
+          reused_reason: null,
+          pending_offer: false,
+          prior_open_instance_id: null,
+        }),
+        persistReflectionArtifacts,
+      }),
       {
         userId: 'u1',
         silentMode: true,
@@ -78,18 +87,16 @@ describe('openManualPauseFromHome', () => {
   it('skips artifact persist for non-silent opens', async () => {
     const persistReflectionArtifacts = vi.fn();
     const result = await openManualPauseFromHome(
-      {
-        repository: {
-          createOrReuse: vi.fn().mockResolvedValue({
-            instance_id: 'pause-2',
-            created: true,
-            reused_reason: null,
-            pending_offer: true,
-            prior_open_instance_id: null,
-          }),
-        } as PauseRepository,
-        reflect: { persistReflectionArtifacts } as ReflectGenerator,
-      },
+      mockPorts({
+        createOrReuse: vi.fn().mockResolvedValue({
+          instance_id: 'pause-2',
+          created: true,
+          reused_reason: null,
+          pending_offer: true,
+          prior_open_instance_id: null,
+        }),
+        persistReflectionArtifacts,
+      }),
       {
         userId: 'u1',
         silentMode: false,
