@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect telemetry I/O flow binding test (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-telemetry-io.test</code> mocks flow anchor routing</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) and telemetry-flow routing were already on branch tip (<code>4822982f0</code>). Add unit test that mocks <code>pause-reflect-telemetry-flow</code> so presentation I/O binding is explicit (parity with <code>pause-companion-analytics-io.test</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test-only follow-up.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-client-architecture.md</code> §10 session row documents <code>pause-reflect-telemetry-io</code> → flow anchor import path.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-home-reflect-telemetry-io</code> flow anchor, or subscription Tier 1 shim following <code>holzen-query-client-ref</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect telemetry I/O via telemetry flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd>Flow anchor is a thin re-export barrel for <code>check:architecture-alignment</code> reflect telemetry cluster detection.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-home-reflect-telemetry-io</code> flow anchor, or subscription Tier 1 shim following <code>holzen-query-client-ref</code>.</dd>
+      <dd>Next: companion analytics flow peel (done on branch tip), or telemetry I/O flow binding test.</dd>
     </dl>
   </article>
 
