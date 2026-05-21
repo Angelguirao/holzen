@@ -14384,4 +14384,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual pause market context in ritual/reflect/generation</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect cluster — Home manual trigger market snapshot</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. Move <code>buildManualPauseMarketContext</code> (+ tests) from <code>trigger/build-manual-pause-open-params</code> to <code>ritual/reflect/generation/build-manual-pause-market-context</code>; trigger module keeps <code>buildManualPauseOpenParams</code> orchestration only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — pairs with <code>build-silent-reflection-stub-message</code> in domain/reflect/generation.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Trigger folder still owns telemetry, cooldown, and <code>openManualPauseFromHome</code> orchestration.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>holzen-query-client-ref</code> shim for pause query invalidation helpers.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
