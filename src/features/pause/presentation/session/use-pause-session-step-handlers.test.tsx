@@ -70,7 +70,7 @@ vi.mock('../reflect/mood/use-pause-session-mood-chrome-handlers', () => ({
   usePauseSessionMoodChromeHandlers: usePauseSessionMoodChromeHandlersMock,
 }));
 
-vi.mock('./use-pause-session-breath-reflect-handlers', () => ({
+vi.mock('./breath/use-pause-session-breath-reflect-handlers', () => ({
   usePauseSessionBreathReflectHandlers: usePauseSessionBreathReflectHandlersMock,
 }));
 

@@ -1,6 +1,6 @@
-import { usePauseSessionBreathHandlers } from './breath/use-pause-session-breath-handlers';
-import { usePauseSessionReflectAndDecide } from '../reflect/flows/use-pause-session-reflect-and-decide';
-import { usePauseShiftFrameDoneHandler } from '../reflect/hub/use-pause-shift-frame-done-handler';
+import { usePauseSessionBreathHandlers } from './use-pause-session-breath-handlers';
+import { usePauseSessionReflectAndDecide } from '../../reflect/flows/use-pause-session-reflect-and-decide';
+import { usePauseShiftFrameDoneHandler } from '../../reflect/hub/use-pause-shift-frame-done-handler';
 import type {
   PauseSessionBreathReflectMoodSlice,
   PauseSessionBreathReflectProvidersSlice,

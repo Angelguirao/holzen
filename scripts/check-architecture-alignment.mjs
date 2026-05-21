@@ -192,10 +192,19 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS = [
 const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_IMPORTS = [
   '@/features/pause/presentation/session/use-pause-breath-segment-rpc-loggers',
   '@/features/pause/presentation/session/use-pause-session-breath-handlers',
+  '@/features/pause/presentation/session/use-pause-session-breath-step-handlers',
+  '@/features/pause/presentation/session/use-pause-session-breath-reflect-handlers',
+  '@/features/pause/presentation/session/pause-session-breath-reflect-handler-types',
   "from './presentation/session/use-pause-breath-segment-rpc-loggers'",
   "from './presentation/session/use-pause-session-breath-handlers'",
+  "from './presentation/session/use-pause-session-breath-step-handlers'",
+  "from './presentation/session/use-pause-session-breath-reflect-handlers'",
+  "from './presentation/session/pause-session-breath-reflect-handler-types'",
   "from '../presentation/session/use-pause-breath-segment-rpc-loggers'",
   "from '../presentation/session/use-pause-session-breath-handlers'",
+  "from '../presentation/session/use-pause-session-breath-step-handlers'",
+  "from '../presentation/session/use-pause-session-breath-reflect-handlers'",
+  "from '../presentation/session/pause-session-breath-reflect-handler-types'",
 ];
 
 const PAUSE_RPC_CLIENT_ALLOWLIST = new Set([
