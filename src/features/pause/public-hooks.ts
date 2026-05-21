@@ -312,6 +312,7 @@ export {
   useReflectionShareHandlers,
   type UseReflectionShareHandlersParams,
   usePauseFavoriteToggle,
+  usePauseSessionMoodChromeHandlers,
   usePauseSessionMoodAndPersist,
   type UsePauseSessionMoodAndPersistParams,
   usePauseSessionDepthPickerHandlers,
@@ -321,6 +322,8 @@ export {
   applyBreathSegmentLogOutcome,
   initialBreathSegmentRpcLoggedFlagsFromRestored,
   usePauseBreathSegmentRpcLoggers,
+  usePauseFeelShiftLogDedupeRefs,
+  usePauseShiftFrameDoneHandler,
 } from './public-ritual-reflect';
 export {
   useCompanionHistoryThread,
@@ -387,7 +390,6 @@ export {
   useFullviewTelemetry,
   type FullviewCompanion,
 } from './presentation/companion/use-fullview-telemetry';
-export { usePauseFeelShiftLogDedupeRefs } from './presentation/reflect/mood/use-pause-feel-shift-log-dedupe-refs';
 export { usePauseSessionMountLog } from './presentation/session/use-pause-session-mount-log';
 export { usePauseSessionGoBack } from './presentation/session/use-pause-session-go-back';
 export { usePauseSessionGoToStep } from './presentation/session/use-pause-session-go-to-step';
@@ -416,7 +418,6 @@ export {
 export { usePauseSessionExitNavigation } from './presentation/session/use-pause-session-exit-navigation';
 export { usePauseSessionPendingPauseOfferNavigation } from './presentation/session/use-pause-session-pending-pause-offer-navigation';
 export { usePauseSessionPendingLeaveSheet } from './presentation/session/use-pause-session-pending-leave-sheet';
-export { usePauseSessionMoodChromeHandlers } from './public-ritual-reflect';
 export { usePauseSessionBreathReflectHandlers } from './presentation/reflect/flows/use-pause-session-breath-reflect-handlers';
 export { usePauseSessionEntryPresentationEffects } from './presentation/session/use-pause-session-entry-presentation-effects';
 export { usePauseSessionTerminalEntryRedirect } from './presentation/session/use-pause-session-terminal-entry-redirect';

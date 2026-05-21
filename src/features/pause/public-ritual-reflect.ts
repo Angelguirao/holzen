@@ -51,7 +51,8 @@ export {
 } from './presentation/reflect/flows/use-pause-session-reflect-and-decide';
 
 export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/reflect/mood/pause-depth-picker-styles';
-
+export { usePauseFeelShiftLogDedupeRefs } from './presentation/reflect/mood/use-pause-feel-shift-log-dedupe-refs';
+export { usePauseShiftFrameDoneHandler } from './presentation/reflect/hub/use-pause-shift-frame-done-handler';
 export { applyBreathSegmentLogOutcome } from './application/use-cases/ritual/reflect/flows/apply-breath-segment-log-outcome';
 export { initialBreathSegmentRpcLoggedFlagsFromRestored } from './application/use-cases/ritual/reflect/flows/initial-breath-segment-rpc-flags';
 export { usePauseBreathSegmentRpcLoggers } from './presentation/reflect/flows/use-pause-breath-segment-rpc-loggers';
