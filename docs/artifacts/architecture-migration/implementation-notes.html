@@ -13168,4 +13168,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — remove session step-map shim; domain owns mapPersistedStep</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up; persisted-step mapping in domain</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After ritual restore helpers left <code>session/step-map.ts</code> as a pass-through re-export, delete the application shim. Tests colocate on <code>domain/session/map-persisted-step.test.ts</code>; <code>public-session</code> exports <code>mapPersistedStep</code> from domain. Ritual restore pointers stay in domain module doc comment via owner docs.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving; <code>initial-breath-segment-rpc-flags</code> already imported domain path.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Historical notes referencing <code>session/step-map</code> remain as migration log only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription/auth <code>src/lib/*</code> shims, or wire <code>run-pause-create-or-reuse</code> / dismiss through <code>public-rpc</code> facades only.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
