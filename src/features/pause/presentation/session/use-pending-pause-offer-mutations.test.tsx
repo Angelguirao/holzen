@@ -26,7 +26,7 @@ vi.mock('@/features/pause/application/use-cases/session/pending-offer/run-declin
   runDeclinePendingPauseOffer: runDeclinePendingPauseOfferMock,
 }));
 
-vi.mock('@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io', () => ({
+vi.mock('./pause-session-pending-offer-telemetry-io', () => ({
   trackPausePendingAdopted: trackPausePendingAdoptedMock,
   trackPausePendingDeclined: trackPausePendingDeclinedMock,
 }));
