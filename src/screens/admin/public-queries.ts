@@ -34,7 +34,6 @@ export {
   getAdminStatsBundleQueryOptions,
   getProviderHealthQueryOptions,
   insertCompanionFallbackEntry,
-  logDevModeSetting,
   promoteCompanionCacheEntry,
   readLocalDevMode,
   setCompanionCacheSourceUntrusted as setCompanionCacheSourceUntrustedMutation,
@@ -46,6 +45,8 @@ export {
   PREGENERATE_CACHE_TOPUP_KEYS,
   mergePregenerateCacheTopup,
 } from '@/features/pause/public-queries';
+
+export { logDevModeSetting } from '@/features/pause/public-rpc';
 
 export {
   ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_KEY,

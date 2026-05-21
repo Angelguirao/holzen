@@ -284,6 +284,25 @@ export function fetchPauseDevModeSetting(userId: string): Promise<boolean | null
   return runFetchDevModeSetting(supabasePauseAnalyticsRepository, userId);
 }
 
+/** PWA install funnel — fire-and-forget screen helper (delegates to `logPausePwaInstallAnalyticsEvent`). */
+export function logPwaInstallAnalyticsEvent(
+  userId: string | undefined,
+  event: string,
+  metadata?: Record<string, unknown>,
+): void {
+  if (!userId) return;
+  void logPausePwaInstallAnalyticsEvent({
+    userId,
+    event,
+    metadata: metadata ?? {},
+  });
+}
+
+/** Admin rapid-testing toggle write — screen helper (delegates to `logPauseDevModeSetting`). */
+export async function logDevModeSetting(userId: string, enabled: boolean): Promise<void> {
+  await logPauseDevModeSetting({ userId, enabled });
+}
+
 /** Reflect progression — `reflection_step` once per instance (sessionStorage dedupe). */
 export function logPauseReflectionStepOnce(pauseInstanceId: string) {
   return runPauseReflectionStepLogOnce(

@@ -5720,4 +5720,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — PWA + dev-mode analytics writes via public-rpc only (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel analytics mutations off public-queries</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Route screen-facing <code>logPwaInstallAnalyticsEvent</code> and <code>logDevModeSetting</code> through <code>public-rpc.ts</code> only; remove write exports from <code>public-queries.ts</code> (reads stay on <code>public-queries</code> / <code>fetchPauseDevModeSetting</code> on <code>public-rpc</code>). <code>public-hooks</code> and <code>screens/admin/public-queries</code> re-export the screen helpers from <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; legacy function names kept for <code>InstallHolzenCard</code> and <code>DevModeToggle</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>infrastructure/queries/pwa-install-analytics.ts</code> and <code>dev-mode-analytics.ts</code> remain as thin internal modules until a follow-up deletes them if unused.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed read for companion feedback vote fetch only via <code>public-rpc</code>, or audit remaining direct <code>PauseRepository</code> / ritual-log imports in presentation.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

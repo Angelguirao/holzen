@@ -37,13 +37,6 @@ export {
   companionFeedbackVoteQueryKey,
   getCompanionFeedbackVoteQueryOptions,
 } from './infrastructure/queries/companion-feedback-vote-query';
-export { logPwaInstallAnalyticsEvent } from './infrastructure/queries/pwa-install-analytics';
-export { logDevModeSetting } from './infrastructure/queries/dev-mode-analytics';
-export {
-  logCompanionFullviewOpened,
-  type CompanionFullviewKind,
-  type LogCompanionFullviewOpenedInput,
-} from './infrastructure/queries/companion-fullview-analytics';
 export {
   demoteCompanionCacheEntry,
   promoteCompanionCacheEntry,
