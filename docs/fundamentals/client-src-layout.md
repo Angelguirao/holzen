@@ -103,7 +103,7 @@ Traces one **shipped** vertical slice: user starts a manual pause from Home and 
 | Step | Layer | Code |
 |------|-------|------|
 | Route | App | `App.tsx` lazy-loads `PauseSessionScreen` (full-screen, no `AppLayout`) |
-| Conductor | Feature `public-hooks` | `usePauseSessionScreen` (`presentation/`) + route chrome registry in `screens/pause/lib/` |
+| Conductor | Feature `public-hooks` | `usePauseSessionScreen` (`presentation/`) + route chrome registry in `screens/pause/components/` |
 | Subscription gate | Screen + feature | `useSubscription` / `useProGate`; blocks with `PauseEngagementBlocked` when `!canEngagePause` |
 | Hydration | Presentation + application | `usePauseSessionShellBootstrap`, location state (`public`), session fetch queries |
 | Ritual UI | Screen components | `PauseSessionGate` → depth picker or `PauseSessionScaffoldShell` → `PauseDecide`, etc. |

@@ -2,7 +2,7 @@
 
 **Pause-first shipped scope (2026-05):** full ritual on `/pause`; reflect artifact kind **`reflection_text`**; post-pause exits go Home/Archive (no Journey stats). Lapsed users see engagement block via entitlement. Manifest: [active-surface.md](../ops/active-surface.md).
 
-Authoritative orchestration: [`PauseSessionScreen.tsx`](../../src/screens/pause/PauseSessionScreen.tsx) → [`usePauseSessionScreen`](../../src/features/pause/public-hooks.ts) (presentation conductor + [`pause-scaffold-chrome-registry.tsx`](../../src/screens/pause/lib/pause-scaffold-chrome-registry.tsx) for route-only header slots).
+Authoritative orchestration: [`PauseSessionScreen.tsx`](../../src/screens/pause/PauseSessionScreen.tsx) → [`usePauseSessionScreen`](../../src/features/pause/public-hooks.ts) (presentation conductor + [`pause-scaffold-chrome-registry.tsx`](../../src/screens/pause/components/pause-scaffold-chrome-registry.tsx) for route-only header slots).
 
 **Cross-screen patterns:** the same **thin page + named hooks + feature/screen pure helpers** playbook as [Home](home.md) is spelled out in **[React screen orchestration](../fundamentals/react-screen-orchestration.md)**. Home **produces** navigation into this route; this doc is the **consumer** map for the full-screen volatility ritual.
 
@@ -21,7 +21,7 @@ Authoritative orchestration: [`PauseSessionScreen.tsx`](../../src/screens/pause/
 | Deep ritual beats                            | `[PauseSessionDeepRitualBody.tsx](../../src/screens/pause/components/PauseSessionDeepRitualBody.tsx)`     |
 | Brief macro stepper (read-only)              | `[PauseBriefProgress.tsx](../../src/screens/pause/components/PauseBriefProgress.tsx)`                     |
 | Header back visibility (pure)                | `[header-back.ts](../../src/features/pause/application/use-cases/session/header-back.ts)` (`isPauseSessionHeaderBackVisible` via `public`) |
-| Scaffold chrome registry (route JSX)         | `[pause-scaffold-chrome-registry.tsx](../../src/screens/pause/lib/pause-scaffold-chrome-registry.tsx)` |
+| Scaffold chrome registry (route JSX)         | `[pause-scaffold-chrome-registry.tsx](../../src/screens/pause/components/pause-scaffold-chrome-registry.tsx)` |
 
 
 **Feature module (representative):** pure hydration (`[hydration.ts](../../src/features/pause/application/use-cases/session/hydration.ts)`), shell bootstrap (`[use-pause-session-shell-bootstrap.ts](../../src/features/pause/presentation/session/use-pause-session-shell-bootstrap.ts)`), fetch (`[use-pause-session-fetch.ts](../../src/features/pause/presentation/session/use-pause-session-fetch.ts)`), fetched instance (`[fetched-instance-from-fetch.ts](../../src/features/pause/application/use-cases/session/fetched-instance-from-fetch.ts)`), coalesced shell (`[shell-view-model.ts](../../src/features/pause/application/use-cases/session/shell-view-model.ts)`), gate predicates (`[gate-flags.ts](../../src/features/pause/application/use-cases/session/gate-flags.ts)`), local restore / step hydrate (`[step-map.ts](../../src/features/pause/application/use-cases/session/step-map.ts)`), scaffold ritual payloads (`[scaffold-ritual-payloads.ts](../../src/features/pause/presentation/session/scaffold-ritual-payloads.ts)`), mount log (`[mount-log-params.ts](../../src/features/pause/application/use-cases/session/mount-log-params.ts)`, `[use-pause-session-mount-log.ts](../../src/features/pause/presentation/session/use-pause-session-mount-log.ts)`), navigation state (`parsePauseSessionLocationState` in `public`).

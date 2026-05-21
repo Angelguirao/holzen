@@ -23,7 +23,7 @@ export type UsePauseSessionScaffoldPresentationParams = Omit<
   swipeDirection: 'forward' | 'back';
   /** Framer Motion preference — coerced to boolean for ritual body props. */
   prefersReducedMotion: boolean | null;
-  /** Built via `PauseScaffoldChromeRegistry` from `screens/pause/lib/`; injected to avoid features → screens imports. */
+  /** Built via `PauseScaffoldChromeRegistry` from `screens/pause/components/`; injected to avoid features → screens imports. */
   briefStepperSlot: ReactNode;
   engagedOpenMaxCountdownSlot: ReactNode;
 };
