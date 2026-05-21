@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { buildPauseSessionReflectAndDecideView } from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-session-reflect-and-decide-view';
+import { buildPauseSessionReflectAndDecideView } from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-view';
 import { usePauseReflectGeneration } from '../generation/use-pause-reflect-generation';
 import { usePauseSessionDecideHandler } from '../../decide/use-pause-session-decide-handler';
 import type { UsePauseSessionReflectAndDecideParams } from './pause-session-reflect-and-decide-types';

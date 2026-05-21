@@ -7867,4 +7867,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect/decide view builder in domain/reflect/flows (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>buildPauseSessionReflectAndDecideView</code> → <code>domain/reflect/flows/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. <code>buildPauseSessionReflectAndDecideView</code> has no I/O — colocate beside other reflect generation gates in <code>domain/reflect/flows/</code>; <code>use-pause-session-reflect-and-decide</code> imports domain directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>ritual/reflect/flows/</code> application folder is now empty (removed); holzen-reflect orchestration stays in <code>ritual/reflect/generation/run-reflect-generation</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed analytics read for companion feedback vote fetch, or move <code>reflection-share-canvas</code> beside <code>domain/reflect/share/reflection-share-text</code> if we peel browser-only share I/O from application.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
