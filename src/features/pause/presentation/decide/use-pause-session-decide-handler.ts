@@ -8,8 +8,8 @@ import {
   resolvePauseDecideOutcomeFlow,
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
+  clearSession,
 } from '@/features/pause/public-rpc';
-import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
 import type { UsePauseSessionDecideHandlerParams } from './pause-session-decide-handler-types';
 

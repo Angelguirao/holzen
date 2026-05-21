@@ -538,3 +538,10 @@ export function logPostPauseEmotionIfDirty(params: {
 }) {
   return runPostPauseEmotionLogIfDirty(supabasePauseRepository, params);
 }
+
+/** Tab-local pause ritual snapshot (localStorage) — presentation imports via this barrel only. */
+export {
+  clearSession,
+  loadSession,
+  saveSession,
+} from './infrastructure/session/persisted-session-storage';

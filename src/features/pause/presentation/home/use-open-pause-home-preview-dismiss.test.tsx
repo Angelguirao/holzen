@@ -3,14 +3,14 @@ import { renderHook, act } from '@testing-library/react';
 import type { User } from '@supabase/supabase-js';
 import { useOpenPauseHomePreview } from './use-open-pause-home-preview';
 
-const dismissOpenPauseHomePreviewMock = vi.hoisted(() => vi.fn());
+const { dismissOpenPauseHomePreviewMock, clearSessionMock } = vi.hoisted(() => ({
+  dismissOpenPauseHomePreviewMock: vi.fn(),
+  clearSessionMock: vi.fn(),
+}));
 
 vi.mock('@/features/pause/public-rpc', () => ({
   dismissOpenPauseHomePreview: dismissOpenPauseHomePreviewMock,
-}));
-
-vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
-  clearSession: vi.fn(),
+  clearSession: clearSessionMock,
 }));
 
 vi.mock('../realtime/use-pause-instances-realtime', () => ({

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { saveSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
+import { saveSession } from '@/features/pause/public-rpc';
 import { hasPersistablePauseSessionAnchor } from '@/features/pause/application/use-cases/session/persisted-session-guards';
 import {
   buildPauseSessionPersistSnapshot,

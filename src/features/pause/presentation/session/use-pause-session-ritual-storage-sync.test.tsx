@@ -7,7 +7,7 @@ const { loadSessionMock } = vi.hoisted(() => ({
   loadSessionMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   clearSession: vi.fn(),
   loadSession: () => loadSessionMock(),
   saveSession: vi.fn(),

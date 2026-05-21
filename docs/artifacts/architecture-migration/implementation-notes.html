@@ -9390,6 +9390,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — archive retrospective eligibility in domain (backlog #1 done, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -9403,6 +9404,21 @@
       <dd><code>log-retrospective-outcome</code> use case stays in <code>application/use-cases/archive/</code> (port I/O).</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: port-backed companion feedback vote read, or move archive list UI helpers from application to domain when a second consumer appears.</dd>
+=======
+      <span>Phase A slice — persisted session storage on public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; presentation stops importing infrastructure/session directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no reflect folder moves. Re-export <code>clearSession</code>, <code>loadSession</code>, and <code>saveSession</code> from <code>infrastructure/session/persisted-session-storage.ts</code> on <code>public-rpc</code>; home/session/decide presentation hooks import the barrel only (matches §6 mutation/I/O peel).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; adapter implementation unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hook tests mock the wider <code>public-rpc</code> barrel when they need session helpers — same pattern as archive retrospective and manual trigger.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional <code>PauseSessionStorage</code> port split, or audit presentation hooks still importing <code>application/use-cases/*</code> for RPC-adjacent flows.</dd>
+>>>>>>> 03ccf89b (refactor(pause): re-export persisted session storage on public-rpc)
     </dl>
   </article>
 

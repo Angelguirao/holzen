@@ -6,10 +6,8 @@ const { clearSessionMock } = vi.hoisted(() => ({
   clearSessionMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   clearSession: () => clearSessionMock(),
-  loadSession: () => null,
-  saveSession: vi.fn(),
 }));
 
 describe('usePauseSessionExitNavigation', () => {

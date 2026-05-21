@@ -28,6 +28,7 @@ vi.mock('@/features/pause/public-rpc', async () => {
   >('@/features/pause/application/use-cases/session/wisdom-quotes');
   return {
     logPauseOutcome: logPauseOutcomeMock,
+    clearSession: () => clearSessionMock(),
     showPauseOutcomeSaveFailedToast,
     showPauseOutcomeNotCompletedToast,
     resolvePauseDecideOutcomeFlow: decideFlow.resolvePauseDecideOutcomeFlow,
@@ -42,12 +43,6 @@ vi.mock('@/lib/haptics', () => ({
 
 vi.mock('@/features/pause/public-queries', () => ({
   invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
-}));
-
-vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
-  clearSession: () => clearSessionMock(),
-  loadSession: () => null,
-  saveSession: vi.fn(),
 }));
 
 vi.mock('@/features/auth/public', () => ({

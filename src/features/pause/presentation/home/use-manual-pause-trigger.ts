@@ -4,7 +4,7 @@ import type { BtcPriceData } from '@/features/market/public';
 import { applyManualPauseOpenResult } from '@/features/pause/application/use-cases/trigger/apply-manual-pause-open-result';
 import { buildManualPauseOpenParams } from '@/features/pause/application/use-cases/trigger/build-manual-pause-open-params';
 import { markPauseManualStartedHomeOnce } from '@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry';
-import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
+import { clearSession } from '@/features/pause/public-rpc';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
