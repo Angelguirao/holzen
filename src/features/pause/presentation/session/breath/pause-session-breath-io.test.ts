@@ -9,6 +9,8 @@ import {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
   initialBreathSegmentRpcLoggedFlagsFromRestored,
+  playPauseBreathPhaseCue,
+  resumePauseAudioContext,
 } from './pause-session-breath-io';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
@@ -40,5 +42,10 @@ describe('pause-session-breath-io', () => {
       applyBreathSegmentLogOutcome({ status: 'success', markSegmentLogged: true }, ref),
     ).toBe(true);
     expect(ref.current).toBe(true);
+  });
+
+  it('re-exports ritual audio cue helpers for timed breathing UI', () => {
+    expect(typeof playPauseBreathPhaseCue).toBe('function');
+    expect(typeof resumePauseAudioContext).toBe('function');
   });
 });
