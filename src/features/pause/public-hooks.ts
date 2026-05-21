@@ -309,6 +309,8 @@ export {
   useReflectionShareHandlers,
   type UseReflectionShareHandlersParams,
   usePauseFavoriteToggle,
+  usePauseSessionMoodAndPersist,
+  type UsePauseSessionMoodAndPersistParams,
   PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS,
   applyBreathSegmentLogOutcome,
   initialBreathSegmentRpcLoggedFlagsFromRestored,
@@ -405,10 +407,6 @@ export { usePauseSessionFeelTilesSelect } from './presentation/reflect/mood/use-
 export { usePauseSessionInitialMoodHandlers } from './presentation/reflect/mood/use-pause-session-initial-mood-handlers';
 export { usePauseSessionPersistToStorage } from './presentation/session/use-pause-session-persist-to-storage';
 export { usePauseSessionRitualStorageSync } from './presentation/session/use-pause-session-ritual-storage-sync';
-export {
-  usePauseSessionMoodAndPersist,
-  type UsePauseSessionMoodAndPersistParams,
-} from './public-ritual-reflect';
 export {
   usePauseSessionBreathNavigation,
   type UsePauseSessionBreathNavigationParams,
