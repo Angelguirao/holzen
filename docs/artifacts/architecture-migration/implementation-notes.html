@@ -14013,13 +14013,13 @@
     <h3>Reflect backlog #1 verified; Breathe screens off public-hooks for pauseStepLayout</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. <code>pause-breathing-body</code>, <code>pause-breath-intro</code>, and <code>deep-breath-post-pattern-interstitial</code> import <code>pauseStepLayout</code> from <code>public-session</code> (same beat-local barrel pattern as Reflect/Frame/Decide).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. Breath ritual UI (<code>pause-breathing-body</code>, <code>pause-breath-intro</code>, <code>deep-breath-post-pattern-interstitial</code>, shared <code>pause-ritual-back-row</code>) imports <code>pauseStepLayout</code> from <code>public-session</code> (same beat-local barrel pattern as Reflect/Frame/Decide).</dd>
       <dt>Deviation</dt>
       <dd>None — import paths only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Brief integrate, done, and shared back-row still use <code>public-hooks</code> for layout; peel per ritual beat.</dd>
+      <dd>Brief integrate and done beats still use <code>public-hooks</code> for layout; peel per ritual beat.</dd>
       <dt>Open questions</dt>
-      <dd>Next: move <code>scaffold-ritual-derived</code> to <code>session/</code> or <code>public-home</code> cluster 2.</dd>
+      <dd>Next: done/brief layout peel, move <code>scaffold-ritual-derived</code> to <code>session/</code>, or <code>public-home</code> cluster 2 (bulk-hold + pending-offer).</dd>
     </dl>
   </article>
 
@@ -14036,7 +14036,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior-preserving import paths only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Brief, done, and shared chrome still import layout from <code>public-hooks</code>; peel per beat.</dd>
+      <dd>Brief and done beats still import layout from <code>public-hooks</code>; peel per beat (<code>pause-ritual-back-row</code> peeled with breath slice).</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>public-home</code> cluster 2 or Phase B <code>holzen-query-client-ref</code> shim.</dd>
     </dl>
