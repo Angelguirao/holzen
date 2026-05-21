@@ -16284,4 +16284,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect hub I/O via shift-frame hub flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-io</code> imports hub presentation through <code>pause-shift-frame-hub-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Existing hub anchor re-exports <code>resolveShiftFrameHubDonePresentation</code>; <code>pause-reflect-hub-io</code> stops deep-importing <code>domain/reflect/hub/shift-frame-hub-done-presentation</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>runShiftEmotionFrameHubDone</code> still imported from application on hub I/O; flows/generation I/O peel incrementally.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel reflect flows I/O decide helpers through ritual/decide anchors, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
