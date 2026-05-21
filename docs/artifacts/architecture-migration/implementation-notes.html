@@ -12389,4 +12389,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflection share handler params (backlog #1 follow-up, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>reflection-share-handler-types</code> beside share presentation hook</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) complete; <code>run-reflection-share-image</code> already under <code>application/use-cases/ritual/reflect/share/</code>. Colocate <code>UseReflectionShareHandlersParams</code> beside <code>use-reflection-share-handlers</code> (mirrors <code>pause-session-reflect-and-decide-types</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Types-only slice; <code>public-hooks</code> / <code>public-ritual-reflect</code> re-export paths unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog consolidation behind analytics port, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

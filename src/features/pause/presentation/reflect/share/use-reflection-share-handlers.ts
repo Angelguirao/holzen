@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import type { TFunction } from 'i18next';
 import { toast } from 'sonner';
 import { SITE_ORIGIN } from '@/config/site';
 import { buildReflectionShareText } from '@/features/pause/domain/reflect/share/reflection-share-text';
@@ -9,13 +8,9 @@ import {
   buildReflectionShareWhatsAppUrl,
 } from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';
 import { runReflectionShareImage } from '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image';
+import type { UseReflectionShareHandlersParams } from './reflection-share-handler-types';
 
-export type UseReflectionShareHandlersParams = {
-  message: string;
-  context?: string | null;
-  haiku?: string | null;
-  t: TFunction;
-};
+export type { UseReflectionShareHandlersParams } from './reflection-share-handler-types';
 
 /** Copy / image / social share actions for Reflect step share menu. */
 export function useReflectionShareHandlers({
