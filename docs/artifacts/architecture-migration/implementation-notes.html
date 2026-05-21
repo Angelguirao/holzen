@@ -9447,6 +9447,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — home pause-actions telemetry on public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; use-home-pause-actions peels application import</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no reflect folder moves. Re-export <code>trackPauseOpenDismissed</code>, <code>trackHomePendingPauseBannerPauseOpened</code>, and dismiss surface types on <code>public-rpc</code>; <code>use-home-pause-actions</code> imports telemetry from the barrel (session navigation helpers still from application until a later peel).</dd>
+      <dt>Deviation</dt>
+      <dd>None — PostHog events and properties unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-home-pause-actions</code> still imports session navigation use cases from <code>application/</code> — intentional narrow slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel manual-trigger telemetry cluster (<code>use-manual-pause-trigger</code>, <code>use-holzen-manual-trigger-orchestration</code>), or port-backed companion feedback vote read.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — archive list UI helpers in domain (backlog #1 verified)</span>
       <span class="status resolved">resolved</span>
     </header>
