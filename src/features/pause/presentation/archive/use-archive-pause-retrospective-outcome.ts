@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 import { toast } from 'sonner';
 import { hapticFeedback } from '@/lib/haptics';
 import { logRetrospectiveOutcome } from '@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome';
-import { trackPauseOutcomeRetrospective } from '@/features/pause/presentation/archive/archive-retrospective-telemetry';
+import { trackPauseOutcomeRetrospective } from '@/features/pause/application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry';
 import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
 

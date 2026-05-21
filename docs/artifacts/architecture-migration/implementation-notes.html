@@ -12427,4 +12427,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — retrospective PostHog under ritual/decide (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-outcome-retrospective-telemetry</code> off <code>presentation/archive/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no reflect moves. Pair <code>pause_outcome_retrospective</code> PostHog helper with <code>log-retrospective-outcome</code> under <code>ritual/decide/</code> (same pattern as <code>pending-pause-offer-telemetry</code> under <code>trigger/</code>). Archive presentation hook imports application module directly.</dd>
+      <dt>Deviation</dt>
+      <dd>Prior slice kept telemetry in <code>presentation/archive/</code> — reversed to match decide ritual-beat colocation.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Two files moved + hook/test import updates; PostHog stays direct <code>trackEvent</code> (not <code>PauseAnalyticsRepository</code> — that port is <code>analytics_events</code> table I/O only).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: dedicated reflect generation <code>*.port-lock.test.tsx</code> parity, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
