@@ -82,4 +82,18 @@ describe('usePauseSessionBriefToDeep', () => {
     expect(setRitualEntry).toHaveBeenCalledWith('deep');
     expect(setStep).toHaveBeenCalledWith('reflect');
   });
+
+  it('handleBriefSwitchToDeepPause bails when RPC facade returns false', async () => {
+    logPauseRitualDepthUpgradedMock.mockResolvedValueOnce(false);
+    const setStep = vi.fn();
+    const t = ((key: string) => key) as Parameters<typeof usePauseSessionBriefToDeep>[0]['t'];
+    const { result } = renderHook(() =>
+      usePauseSessionBriefToDeep(baseInput({ setStep, t })),
+    );
+    await act(async () => {
+      await result.current.handleBriefSwitchToDeepPause();
+    });
+    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith('pause-1', t);
+    expect(setStep).not.toHaveBeenCalled();
+  });
 });
