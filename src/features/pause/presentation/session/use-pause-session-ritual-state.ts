@@ -8,12 +8,12 @@ import {
   initialPhaseFromRestored,
 } from '@/features/pause/application/use-cases/ritual/decide/restored-decide-ritual-state';
 import { initialFrameDoneFromRestored } from '@/features/pause/application/use-cases/ritual/frame/restored-frame-ritual-state';
-import { initialRitualEntry } from '@/features/pause/application/use-cases/ritual/reflect/scaffold/initial-ritual-entry';
+import { initialRitualEntry } from '@/features/pause/application/use-cases/session/initial-ritual-entry';
 import {
   initialBriefIntegrateDoneFromRestored,
   initialBriefPauseStepFromRestored,
   initialSelectedBriefFaceFromRestored,
-} from '@/features/pause/application/use-cases/ritual/reflect/scaffold/restored-brief-ritual-state';
+} from '@/features/pause/application/use-cases/session/restored-brief-ritual-state';
 import type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
 import { mapPersistedStep } from '@/features/pause/domain/session/map-persisted-step';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
