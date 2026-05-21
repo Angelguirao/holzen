@@ -22,10 +22,6 @@ const {
   },
 }));
 
-vi.mock('./pause-home-io', () => ({
-  pauseHomeManualOpenPorts: mockPauseHomeManualOpenPorts,
-}));
-
 vi.mock('@/features/pause/presentation/session/pause-persisted-tab-session-io', () => ({
   clearPausePersistedTabSession: () => clearSessionMock(),
   loadPausePersistedTabSession: () => null,
@@ -42,7 +38,9 @@ vi.mock('@/features/pause/application/use-cases/trigger/manual-pause-trigger-tel
   trackPauseManualCompleted: trackPauseManualCompletedMock,
 }));
 
-vi.mock('@/features/pause/application/use-cases/ritual/reflect/generation/build-manual-pause-open-params', () => ({
+vi.mock('./pause-home-io', () => ({
+  pauseHomeManualOpenPorts: mockPauseHomeManualOpenPorts,
+  pauseDismissOpenPauseHomePreview: vi.fn(),
   buildManualPauseOpenParams: (input: {
     userId: string;
     silentMode: boolean;
@@ -61,6 +59,11 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/generation/build-
     ctx: 'ctx',
     severityBand: 'low',
     silentMsg: 'silent',
+    contextText: 'ctx',
+    silentMessage: 'silent',
+    cumulativeChangePercent: null,
+    fearGreedLabel: null,
+    onChainBand: null,
   }),
 }));
 

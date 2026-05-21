@@ -1,6 +1,12 @@
 import { dismissOpenPauseHome } from '@/features/pause/application/use-cases/home/dismiss-open-pause-home';
+import {
+  buildManualPauseOpenParams,
+  type BuildManualPauseOpenParamsInput,
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/build-manual-pause-open-params';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository, supabaseReflectGenerator } from '@/features/pause/public-rpc';
+
+export { buildManualPauseOpenParams, type BuildManualPauseOpenParamsInput };
 
 /** Default ports for `openManualPauseFromHome` (Home manual trigger). */
 export const pauseHomeManualOpenPorts = {
