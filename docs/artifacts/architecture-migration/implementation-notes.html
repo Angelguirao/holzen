@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — holzen-reflect generation hook-flow colocation (backlog #1, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-hook-flow</code> under <code>generation/holzen-reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no legacy folder moves. Colocate the generation CI cluster anchor beside <code>run-reflect-generation</code> in <code>generation/holzen-reflect/</code> (presentation I/O still imports domain + sibling use case directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; path colocation only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Anchor remains for <code>check:architecture-alignment</code>; not imported by presentation.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel preview dismiss off <code>pause-home-io</code>, or Phase B subscription pricing lib shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A — manual-open ports on Home reflect I/O (Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
