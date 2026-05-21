@@ -8494,4 +8494,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — reflect backlog verified + presentation test cluster (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect <code>ritual/reflect/</code> complete; mood/hub tests mock <code>public-rpc</code> only</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code> — no legacy reflect use-case paths under <code>src/</code>. This slice aligns <code>presentation/reflect/mood/</code> and <code>presentation/reflect/hub/</code> hook tests with step-hook pattern: mock <code>logPauseInitialEmotion*</code> / <code>logPauseShiftEmotionFrameHubDone</code> on <code>public-rpc</code> instead of delegating through use cases + <code>PauseRepository</code>. Also peels <code>use-manual-pause-trigger</code> to wired <code>openManualPauseFromHome</code> on <code>public-rpc</code> (home entry uses ReflectGenerator stub).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import and test surfaces only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mood/hub presentation tests no longer exercise use-case dedupe via a mock repository; dedupe remains covered in <code>run-initial-emotion-log</code> / <code>run-shift-emotion-frame-hub-done</code> unit tests.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: <code>use-fullview-telemetry</code> or companion orchestrate hooks still on <code>public-ports</code>; or batch <code>presentation/session/*</code> ritual type imports off <code>public-hooks</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
