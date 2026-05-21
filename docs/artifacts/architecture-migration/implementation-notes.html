@@ -10481,49 +10481,30 @@
       <dt>Design decision</dt>
       <dd>Backlog #1 verified — 14 modules under <code>application/use-cases/ritual/reflect/</code>, zero <code>application/use-cases/reflect/</code>. Route <code>openManualPauseFromHome</code> through <code>runPauseCreateOrReuse</code> instead of calling <code>repository.createOrReuse</code> directly; <code>public-rpc</code> facade unchanged.</dd>
       <dt>Deviation</dt>
-      <dd>None — <code>Pick&lt;PauseRepository, 'createOrReuse'&gt;</code> port shape kept for tests and silent-mode reflect pairing.</dd>
+      <dd>None — <code>OpenManualPauseFromHomePorts</code> uses full <code>PauseRepository</code> + <code>ReflectGenerator</code> (not <code>Pick</code> subsets).</dd>
       <dt>Tradeoffs</dt>
       <dd>Thin pass-through today; aligns manual trigger with <code>pauseCreateOrReuse</code> facade and future lifecycle validation in one module.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: unify <code>OpenManualPauseFromHomePorts</code> to full <code>PauseRepository</code> or audit analytics read adapters; optional orb cluster on <code>public-ritual-breathe</code>.</dd>
+      <dd>Next backlog #4: port-backed analytics read for companion feedback vote fetch; optional mood/flow hooks on <code>public-ritual-reflect</code>.</dd>
     </dl>
   </article>
 
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — openManualPauseFromHome full port types (backlog #1 verified, #4)</span>
+      <span>Phase A slice — openManualPauseFromHome test mockPorts helper (backlog #1 verified, #4)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>ritual/reflect/ complete; Home manual trigger ports use full interfaces</h3>
+    <h3>ritual/reflect/ complete; DRY partial port stubs in unit tests</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. <code>OpenManualPauseFromHomePorts</code> takes <code>PauseRepository</code> and <code>ReflectGenerator</code> (not <code>Pick</code> subsets); <code>public-rpc</code> still wires <code>supabasePauseRepository</code> + <code>supabaseReflectGenerator</code>. Unit tests cast minimal stubs.</dd>
+      <dd>Parallel pushes landed full port types + <code>runPauseCreateOrReuse</code> on remote first. This slice adds <code>mockPorts()</code> in <code>open-manual-pause-from-home.test.ts</code> so tests share one <code>as unknown as</code> stub pattern.</dd>
       <dt>Deviation</dt>
-      <dd>None — runtime calls unchanged (<code>createOrReuse</code>, <code>persistReflectionArtifacts</code> only).</dd>
+      <dd>None.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Tests use <code>as PauseRepository</code> / <code>as ReflectGenerator</code> for partial mocks; acceptable until a shared port mock factory exists.</dd>
+      <dd>No production code change beyond rebased history.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: audit other use cases still taking <code>Pick</code> port slices; optional <code>usePauseBreathingTimedLoop</code> on <code>public-ritual-breathe</code>.</dd>
-    </dl>
-  </article>
-
-  <article class="note">
-    <header>
-      <span>2026-05-21</span>
-      <span>Phase A slice — openManualPauseFromHome full ports (backlog #1 verified, #4)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3>ritual/reflect/ complete; manual trigger accepts full PauseRepository + ReflectGenerator</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. Replace <code>Pick&lt;PauseRepository, 'createOrReuse'&gt;</code> / <code>Pick&lt;ReflectGenerator, 'persistReflectionArtifacts'&gt;</code> on <code>OpenManualPauseFromHomePorts</code> with full port interfaces; <code>public-rpc</code> still wires <code>supabasePauseRepository</code> + <code>supabaseReflectGenerator</code>.</dd>
-      <dt>Deviation</dt>
-      <dd>None — Home silent-mode reflect stub and create-or-reuse RPC behavior unchanged.</dd>
-      <dt>Tradeoffs</dt>
-      <dd>Unit tests use <code>as unknown as</code> partial mocks; production wiring unchanged.</dd>
-      <dt>Open questions</dt>
-      <dd>Next backlog #4: port-backed analytics read for companion feedback vote fetch; optional mood/flow hooks on <code>public-ritual-reflect</code> when a screen needs them without <code>public-hooks</code>.</dd>
+      <dd>Next backlog #4: port-backed analytics read for companion feedback vote fetch; optional orb cluster on <code>public-ritual-breathe</code>.</dd>
     </dl>
   </article>
 
