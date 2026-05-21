@@ -7,9 +7,9 @@ import type {
   PauseStep,
   RitualDepth,
 } from '@/features/pause/public-hooks';
+import type { PauseSessionBreathReflectProvidersSlice } from '../reflect/flows/pause-session-breath-reflect-handler-types';
 import type { FeelStepTile } from '../../domain/feel-step-tile';
 import type { MoodValue } from '../../domain/mood-value';
-import type { PauseSessionBreathReflectProvidersSlice } from '../reflect/flows/pause-session-breath-reflect-handler-types';
 
 export type {
   PauseSessionBreathReflectMoodSlice,
