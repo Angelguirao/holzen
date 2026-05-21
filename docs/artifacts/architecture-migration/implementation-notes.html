@@ -16056,4 +16056,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — restored breath segment RPC flags via pause-session-breath-io (backlog #1 verified; Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Re-export <code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> on session breath I/O</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Re-export <code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> on <code>pause-session-breath-io</code>; <code>use-pause-breath-segment-rpc-loggers</code> imports all breath domain hydration helpers only through the breath I/O barrel (follow-up to <code>applyBreathSegmentLogOutcome</code> peel).</dd>
+      <dt>Deviation</dt>
+      <dd>None — domain still owns the pure helper; RPC facades unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-ritual-restore-io</code> still re-exports decide/frame restore helpers directly from application modules — peel in a follow-up slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: route decide/frame restore through <code>pause-session-decide-io</code> / <code>pause-session-frame-io</code> barrels, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
