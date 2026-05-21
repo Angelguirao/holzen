@@ -14045,19 +14045,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A — done beat layout on public-session</span>
+      <span>Phase A — done + brief integrate layout on public-session</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Reflect backlog #1 verified; Done screens off public-hooks for pauseStepLayout</h3>
+    <h3>Reflect backlog #1 verified; last ritual beats off public-hooks for pauseStepLayout</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. <code>pause-done-default</code> and <code>pause-done-brief</code> import <code>pauseStepLayout</code> from <code>public-session</code> (same beat-local barrel pattern as Reflect/Frame/Decide/Breathe).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. <code>pause-done-default</code>, <code>pause-done-brief</code>, and <code>PauseBriefIntegrate</code> import <code>pauseStepLayout</code> from <code>public-session</code> (same beat-local barrel pattern as Reflect/Frame/Decide/Breathe/Feel). Brief integrate countdown hook stays on <code>public-hooks</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — import paths only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Feel, brief integrate, and shared back-row still use <code>public-hooks</code> for layout; peel per ritual beat.</dd>
+      <dd>All shipped ritual step chrome now uses <code>public-session</code> for layout tokens; <code>public-hooks</code> still carries session conductors and brief integrate countdown.</dd>
       <dt>Open questions</dt>
-      <dd>Next: feel + brief integrate layout peel, or <code>public-home</code> cluster 2 (bulk-hold + pending-offer).</dd>
+      <dd>Next: <code>public-home</code> cluster 2 (bulk-hold + pending-offer) or Phase B <code>holzen-query-client-ref</code> shim.</dd>
     </dl>
   </article>
 
