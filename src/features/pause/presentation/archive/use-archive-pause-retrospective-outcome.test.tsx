@@ -17,7 +17,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/decide/log-retrospective-
   logRetrospectiveOutcome: logRetrospectiveOutcomeMock,
 }));
 
-vi.mock('@/features/pause/application/use-cases/archive/archive-retrospective-telemetry', () => ({
+vi.mock('@/features/pause/presentation/archive/archive-retrospective-telemetry', () => ({
   trackPauseOutcomeRetrospective: trackRetrospectiveMock,
 }));
 
@@ -70,6 +70,7 @@ describe('useArchivePauseRetrospectiveOutcome', () => {
       mockPauseRepository,
       { instanceId: 'inst-1', outcome: 'held' },
     );
+    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
     expect(trackRetrospectiveMock).toHaveBeenCalledWith({
       pauseInstanceId: 'inst-1',
       outcome: 'held',
