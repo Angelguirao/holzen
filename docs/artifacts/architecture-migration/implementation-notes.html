@@ -5644,4 +5644,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — backlog #1 verified complete; breathe type export hygiene</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>No further <code>application/use-cases/reflect/</code> moves on branch</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Automation session confirmed backlog #1 is done on <code>cursor/arch-migrate-src-ca70</code>: use cases under <code>ritual/reflect/</code>, <code>presentation/reflect/hub/</code> conductors only, <code>pause-session-reflect-decide-flow</code> in <code>ritual/reflect/flows/</code>, shift-frame hub mapping in <code>ritual/feel/pause-shift-frame-hub-flow.ts</code>, science sheet in <code>domain/pause-science/</code>, <code>screens/pause/lib/</code> removed. This slice drops redundant <code>PauseBreathingPhase</code> re-export from <code>resolve-pause-breathing-timed-display.ts</code> — canonical export stays <code>pause-breathing-phase.ts</code> via <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Concurrent pushes on the branch may land overlapping peels; rebase before push.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 audit remaining mutation/analytics stragglers outside port facades.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
