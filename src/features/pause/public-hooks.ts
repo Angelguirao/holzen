@@ -196,7 +196,7 @@ export {
   initialRitualEntry,
   initialSelectedBriefFaceFromRestored,
   mapPersistedStep,
-} from './application/use-cases/session/step-map';
+} from './public-session';
 export {
   useBulkHoldPending,
   bulkHoldPendingQueryKey,

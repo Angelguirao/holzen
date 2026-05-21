@@ -11,10 +11,12 @@ import {
   initialRitualEntry,
   initialSelectedBriefFaceFromRestored,
   mapPersistedStep,
-  type BriefPauseStep,
-  type PauseImpactData,
-  type PauseStep,
-  type RitualDepth,
+} from '@/features/pause/public-session';
+import type {
+  BriefPauseStep,
+  PauseImpactData,
+  PauseStep,
+  RitualDepth,
 } from '@/features/pause/public-hooks';
 import type { MoodValue } from '../../domain/mood-value';
 import { usePauseSessionEntryPresentationEffects } from './use-pause-session-entry-presentation-effects';
