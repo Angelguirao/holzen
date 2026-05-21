@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — home reflect telemetry I/O direct sibling modules (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-telemetry-io</code> imports Home PostHog helpers directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Peel <code>pause-home-reflect-telemetry-io</code> to <code>home-pause-actions-telemetry</code> and <code>manual-pause-trigger-telemetry</code> instead of <code>pause-home-reflect-telemetry-flow</code> CI anchor.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-home-reflect-telemetry-flow.ts</code> remains for <code>check:architecture-alignment</code>; session reflect UI telemetry I/O still binds <code>pause-reflect-ui-telemetry</code> directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session conductor flow-anchor peels outside shell/scaffold/brief I/O, or generation I/O peel from <code>pause-reflect-generation-hook-flow</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — companion orchestrate I/O direct frame modules (backlog #2 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-companion-orchestrate-flow</code> remains as application cluster anchor until unused.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-home-reflect-telemetry-io</code> direct telemetry imports, or delete unused frame/reflect flow anchors when alignment allows.</dd>
+      <dd>Next: delete unused frame/reflect flow anchors when alignment allows, or session conductor flow-anchor peels.</dd>
     </dl>
   </article>
 
@@ -90,7 +109,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-session-frame-flow.ts</code> remains for <code>check:architecture-alignment</code>; presentation no longer depends on it.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-home-reflect-telemetry-io</code> direct telemetry imports, or session conductor flow-anchor peels.</dd>
+      <dd>Next: session conductor flow-anchor peels, or generation I/O peel from hook-flow anchor.</dd>
     </dl>
   </article>
 
@@ -109,7 +128,7 @@
       <dt>Tradeoffs</dt>
       <dd>Replaces four direct presentation imports with one cluster anchor; application <code>reflect-frame-focus-ambience.ts</code> remains for <code>check:architecture-alignment</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-home-reflect-telemetry-io</code> direct telemetry imports, or session conductor flow-anchor peels.</dd>
+      <dd>Next: session conductor flow-anchor peels, or generation I/O peel from hook-flow anchor.</dd>
     </dl>
   </article>
 
