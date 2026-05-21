@@ -305,13 +305,13 @@ export {
   type UsePauseArtifactReflectionTextParams,
   type UsePauseArtifactReflectionTextResult,
 } from './presentation/reflect/generation/use-pause-artifact-reflection-text';
-export { resolveEffectiveReflectionCopy } from './domain/reflect/generation/resolve-effective-reflection-copy';
-export { resolveFrameHaikuDisplayBody } from './domain/reflect/generation/resolve-frame-haiku-display-body';
 export {
+  buildReflectionShareText,
+  resolveEffectiveReflectionCopy,
+  resolveFrameHaikuDisplayBody,
   resolvePauseReflectMessageView,
   type PauseReflectMessageView,
-} from './domain/reflect/generation/resolve-pause-reflect-message-view';
-export { buildReflectionShareText } from './domain/reflect/share/reflection-share-text';
+} from './public-ritual-reflect';
 export {
   useReflectionShareHandlers,
   type UseReflectionShareHandlersParams,

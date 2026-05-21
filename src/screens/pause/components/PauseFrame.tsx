@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import {
   resolveEffectiveReflectionCopy,
   resolveFrameHaikuDisplayBody,
+} from '@/features/pause/public-ritual-reflect';
+import {
   usePauseArtifactHaiku,
   usePauseArtifactReflectionText,
 } from '@/features/pause/public-hooks';
