@@ -14631,4 +14631,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — apply manual open result under presentation/home</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect cluster follow-up — Home preview mapping on pause-home-io</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. Move <code>applyManualPauseOpenResult</code> (+ test) from <code>application/use-cases/trigger/</code> to <code>presentation/home/</code>; re-export on <code>pause-home-io.ts</code> so <code>use-manual-pause-trigger</code> imports the full manual-open cluster from one barrel. Telemetry helpers stay in <code>trigger/manual-pause-trigger-telemetry</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; PostHog event names unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>trigger/</code> folder now holds telemetry only for Home manual open (orchestration lives in <code>ritual/reflect/generation/</code>).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: bind <code>use-pause-reflect-generation</code> through <code>pause-reflect-generation-io</code>, or Phase B cross-context slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
