@@ -11401,4 +11401,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel fullview telemetry off public-rpc (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; frame fullview write bypasses public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. After companion feedback vote peel (<code>dd1d45a2</code>), align <code>use-fullview-telemetry</code> with reflect step hooks: <code>runLogCompanionFullviewOpened(supabasePauseAnalyticsRepository, …)</code>; remove <code>logPauseCompanionFullviewOpened</code> from <code>public-rpc</code>. <code>FullviewCompanion</code> type still re-exported from the hook for <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-companion-fullview-page</code> still imports full-view helpers from <code>public-rpc</code> until a frame peel slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-companion-fullview-page</code> frame helpers off <code>public-rpc</code>, or audit remaining companion-only facades (<code>persistCompanionUiStepCompletion</code>, orchestrate cluster).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

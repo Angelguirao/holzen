@@ -109,7 +109,6 @@ import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUse
 import type { CompanionUiCompletionStep } from './application/use-cases/ritual/frame/companion-ui-completion-types';
 import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
 import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
-import { runLogCompanionFullviewOpened } from './application/use-cases/ritual/frame/run-log-companion-fullview-opened';
 import { logPauseCompanion as logPauseCompanionUseCase } from './application/use-cases/ritual/log/log-pause-companion';
 import { runToggleCompanionLibraryFavorite } from './application/use-cases/ritual/frame/run-toggle-companion-library-favorite';
 import {
@@ -248,18 +247,7 @@ export type {
   CompanionFeedbackVote,
   LogCompanionFeedbackVoteInput,
 } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
-export type {
-  CompanionFullviewKind,
-  LogCompanionFullviewOpenedInput,
-} from './application/use-cases/ritual/frame/log-companion-fullview-opened';
 export type { LogPwaInstallAnalyticsEventInput } from './application/use-cases/home/run-log-pwa-install-analytics-event';
-
-/** Companion fullview open — wired `PauseAnalyticsRepository.insertEvent` (observation only). */
-export function logPauseCompanionFullviewOpened(
-  input: LogCompanionFullviewOpenedInput,
-): Promise<{ ok: boolean }> {
-  return runLogCompanionFullviewOpened(supabasePauseAnalyticsRepository, input);
-}
 
 /** Frame slot orchestrate — ritual session payload + mood history (wired for presentation). */
 export function loadPauseCompanionOrchestrateSession(input: LoadCompanionOrchestrateSessionInput) {
