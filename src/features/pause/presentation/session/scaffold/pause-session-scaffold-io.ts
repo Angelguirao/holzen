@@ -4,9 +4,13 @@
  */
 export {
   buildPauseSessionPersistSnapshot,
-  buildPauseSessionScaffoldRitualDerived,
-  computePauseStorageRitualSyncPatch,
   type PauseSessionPersistSnapshotInput,
-  type PauseSessionScaffoldRitualDerived,
+} from '@/features/pause/application/use-cases/session/persist-snapshot';
+export {
+  computePauseStorageRitualSyncPatch,
   type PauseStorageRitualSyncPatch,
-} from '@/features/pause/application/use-cases/session/pause-session-scaffold-flow';
+} from '@/features/pause/application/use-cases/session/storage-ritual-sync';
+export {
+  buildPauseSessionScaffoldRitualDerived,
+  type PauseSessionScaffoldRitualDerived,
+} from '@/features/pause/application/use-cases/session/scaffold/scaffold-ritual-derived';
