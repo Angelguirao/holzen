@@ -3443,6 +3443,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — colocate reflect UI telemetry under presentation/reflect/telemetry/</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -3456,6 +3457,21 @@
       <dd>Session reflect/decide, frame-focus ambience, hub, and flows conductors remain at <code>presentation/reflect/</code> root until later peels (<code>ambience/</code>, <code>hub/</code>, <code>flows/</code>).</dd>
       <dt>Open questions</dt>
       <dd>Next: route <code>persistCompanionUiStepCompletion</code> through <code>public-rpc</code>, or colocate remaining flat cross-route presentation hooks.</dd>
+=======
+      <span>Phase A slice — wire persistCompanionUiStepCompletion on public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #4 — frame UI completion write via PauseRepository in public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 <code>ritual/reflect/</code> is complete. Route <code>persistCompanionUiStepCompletion</code> through <code>persist-ui-step-completion</code> + default <code>supabasePauseRepository</code> in <code>public-rpc.ts</code> (invalidate query there). <code>companion-ui-completion-sync.ts</code> keeps read path only. Resolved duplicate merge markers in implementation-notes from parallel agent commits.</dd>
+      <dt>Deviation</dt>
+      <dd>None — presentation already imported <code>public-rpc</code>; export name unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>loadCompanionUiCompletionState</code> still uses direct Supabase reads in infrastructure (query module unchanged).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-journey-pause-instances</code> under <code>presentation/archive/</code>, or port-back <code>insertPauseAnalyticsEvent</code> for PWA install analytics.</dd>
+>>>>>>> e8113e51 (refactor(pause): wire persistCompanionUiStepCompletion on public-rpc)
     </dl>
   </article>
 
