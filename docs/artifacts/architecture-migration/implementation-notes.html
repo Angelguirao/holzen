@@ -16876,6 +16876,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect steps I/O via flow + mutation anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-io</code> binds gates and RPC use cases through application cluster anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Route <code>shouldShowFavoriteProHint</code> and <code>shouldLogPauseReflectionStep</code> through <code>pause-favorite-toggle-flow</code> and <code>pause-reflection-step-flow</code>; route tag/note/favorite/<code>reflection_step</code> RPC use cases through <code>pause-reflect-steps-mutation-flow</code> instead of deep <code>domain/reflect/steps/</code> or sibling <code>run-*</code> modules on the presentation I/O module.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; domain still owns pure gates re-exported by flow anchors.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session brief/pending-offer presentation I/O still bind application paths directly until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session brief or pending-offer presentation I/O flow anchors, companion orchestration-io peel, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — session brief I/O via pause-session-brief-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
