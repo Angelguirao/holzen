@@ -9086,6 +9086,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — step-sync toast implementation under presentation/ritual (Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Sonner helper leaves application layer</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) already complete. Move <code>showPauseStepSyncFailedToast</code> implementation from <code>application/use-cases/ritual/step-sync-toast</code> to <code>presentation/ritual/pause-step-sync-toast</code>; <code>public-rpc</code> re-exports from presentation (reflect mood/hub import <code>public-rpc</code> only). Session breath/brief-done import presentation path directly to keep jsdom mocks narrow.</dd>
+      <dt>Deviation</dt>
+      <dd><code>logPauseRitualDepthUpgraded</code> (application) imports presentation toast — short-term cross-layer call within pause feature.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Split import surfaces: reflect via <code>public-rpc</code>, session via presentation — matches prior test-isolation notes.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-companion-slot-run-orchestrate</code> frame imports, or unify session hooks on <code>public-rpc</code> for step-sync toast.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect verified; related-biases in domain/companion (backlog #1 done, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
