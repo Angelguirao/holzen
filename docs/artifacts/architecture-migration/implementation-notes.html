@@ -4726,9 +4726,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; domain gate remains <code>reflect-generation-enabled.ts</code>.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Application <code>ritual/reflect/</code> keeps I/O use cases only (generation, steps, hub mappers still split incrementally).</dd>
+      <dd>Application <code>ritual/reflect/</code> keeps I/O use cases only (generation, steps; hub mappers moved to presentation incrementally).</dd>
       <dt>Open questions</dt>
-      <dd>Next: colocate <code>reflect-frame-focus-ambience</code> or <code>pause-shift-frame-hub-flow</code> under <code>presentation/reflect/</code>, or wire remaining <code>PauseRepository</code> stragglers (backlog #4).</dd>
+      <dd>Next: colocate <code>reflect-frame-focus-ambience</code> under <code>presentation/reflect/ambience/</code>, or wire remaining <code>PauseRepository</code> stragglers (backlog #4).</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — shift-frame hub flow in presentation/reflect/hub (Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; colocate pause-shift-frame-hub-flow with shift-frame-done conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move pure UI outcome mapping <code>pause-shift-frame-hub-flow</code> (+ test) from <code>application/.../ritual/reflect/hub/</code> to <code>presentation/reflect/hub/</code> beside <code>use-pause-shift-frame-done-handler</code>; RPC stays on <code>public-rpc</code> <code>runShiftEmotionFrameHubDone</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Empty <code>application/use-cases/ritual/reflect/hub/</code> removed; reflect/frame focus ambience remains in application until a dedicated slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining mutations bypassing <code>PauseRepository</code> (backlog #4), peel raw edge invokes from <code>public-rpc</code>, or colocate <code>reflect-frame-focus-ambience</code> under <code>presentation/reflect/ambience/</code>.</dd>
     </dl>
   </article>
 
