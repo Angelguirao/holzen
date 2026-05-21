@@ -14859,4 +14859,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A fix — add missing pause-home-telemetry-io module</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — Home telemetry I/O file</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Prior commit wired <code>pause-home-io</code> and <code>apply-manual-pause-open-result</code> to import <code>./pause-home-telemetry-io</code> but the module file was not committed. Add the I/O barrel re-exporting manual-open PostHog helpers from <code>application/use-cases/trigger/manual-pause-trigger-telemetry</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — completes intended presentation seam without changing telemetry behavior.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Home pause-card telemetry remains on <code>pause-home-io</code> re-exports from <code>home-pause-actions-telemetry</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B cross-context slice or companion presentation I/O peels.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
