@@ -19,7 +19,7 @@ const {
   runInitialEmotionSelectMock: vi.fn(),
   runInitialEmotionSkipMock: vi.fn(),
   showPauseStepSyncFailedToast: vi.fn(),
-  mockPauseRepository: { port: 'supabasePauseRepository' },
+  mockPauseRepository: { port: 'reflectPauseRepository' },
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log', () => ({
@@ -27,8 +27,8 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-
   runInitialEmotionSkip: runInitialEmotionSkipMock,
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: mockPauseRepository,
+vi.mock('./pause-reflect-mood-io', () => ({
+  reflectPauseRepository: mockPauseRepository,
 }));
 
 vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
@@ -195,7 +195,7 @@ describe('usePauseSessionInitialMoodHandlers', () => {
       opts: undefined,
       lastFeelLogKey: null,
     });
-    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
+    expect(mockPauseRepository.port).toBe('reflectPauseRepository');
   });
 
   it('handleMoodReset clears dedupe ref and mood fields', () => {

@@ -11,7 +11,7 @@ const { runShiftEmotionFrameHubDoneMock, showPauseStepSyncFailedToast, mockPause
   vi.hoisted(() => ({
     runShiftEmotionFrameHubDoneMock: vi.fn(),
     showPauseStepSyncFailedToast: vi.fn(),
-    mockPauseRepository: { port: 'supabasePauseRepository' },
+    mockPauseRepository: { port: 'reflectPauseRepository' },
   }));
 
 vi.mock(
@@ -21,8 +21,8 @@ vi.mock(
   }),
 );
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: mockPauseRepository,
+vi.mock('./pause-reflect-hub-io', () => ({
+  reflectPauseRepository: mockPauseRepository,
 }));
 
 vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
@@ -129,7 +129,7 @@ describe('usePauseShiftFrameDoneHandler', () => {
       pauseInstanceId: 'pi-1',
       lastShiftLogKey: null,
     });
-    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
+    expect(mockPauseRepository.port).toBe('reflectPauseRepository');
   });
 
   it('advances without RPC when no pause instance id', async () => {
