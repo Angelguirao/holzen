@@ -6746,4 +6746,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect note/tag payloads → domain/reflect/steps (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel note_updated and tag_updated step payloads from ritual/reflect use cases</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Mirror mood/hub peels: pure <code>buildReflectNoteUpdatedPayload</code> and <code>buildReflectTagUpdatedPayload</code> live under <code>domain/reflect/steps/reflect-note-tag-payload.ts</code>; <code>run-pause-reflect-note-update</code> and <code>run-pause-reflect-tag-update</code> keep RPC wiring in <code>ritual/reflect/steps/</code>; <code>public-rpc</code> facades unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>favorite_toggled</code> payload remains inline in <code>run-pause-favorite-toggle</code> until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 companion feedback vote read via <code>fetchPauseCompanionFeedbackVote</code>, or further frame conductor <code>public-rpc</code> peels.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

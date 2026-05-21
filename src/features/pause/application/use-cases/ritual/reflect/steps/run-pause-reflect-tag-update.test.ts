@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { buildReflectTagUpdatedPayload } from '@/features/pause/domain/reflect/steps/reflect-note-tag-payload';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { runPauseReflectTagUpdate } from './run-pause-reflect-tag-update';
 
@@ -16,7 +17,7 @@ describe('runPauseReflectTagUpdate', () => {
     expect(logStep).toHaveBeenCalledWith({
       instanceId: 'inst-1',
       stepType: 'tag_updated',
-      payload: { tags: ['fomo', 'calm'] },
+      payload: buildReflectTagUpdatedPayload(['fomo', 'calm']),
     });
   });
 });
