@@ -9387,4 +9387,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — archive retrospective eligibility in domain (backlog #1 done, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; pure archive CTA gate leaves application layer</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) has no remaining folder moves. Move <code>pauseArchiveRowAllowsRetrospectiveOutcome</code> to <code>domain/archive/retrospective-outcome-eligibility.ts</code>; export via <code>public-queries</code>; <code>ArchivePauseCard</code> imports query barrel; <code>public-hooks</code> re-exports for legacy call sites.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>log-retrospective-outcome</code> use case stays in <code>application/use-cases/archive/</code> (port I/O).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: port-backed companion feedback vote read, or move archive list UI helpers from application to domain when a second consumer appears.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

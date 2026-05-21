@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { pauseArchiveRowAllowsRetrospectiveOutcome } from './retrospective-outcome';
-import type { PauseArchiveRow } from '@/features/pause/public-queries';
+import type { PauseArchiveRetrospectiveRow } from '@/features/pause/domain/archive-row';
+import { pauseArchiveRowAllowsRetrospectiveOutcome } from './retrospective-outcome-eligibility';
 
-function row(partial: Partial<PauseArchiveRow>): PauseArchiveRow {
-  return partial as PauseArchiveRow;
+function row(partial: Partial<PauseArchiveRetrospectiveRow>): PauseArchiveRetrospectiveRow {
+  return partial as PauseArchiveRetrospectiveRow;
 }
 
 describe('pauseArchiveRowAllowsRetrospectiveOutcome', () => {

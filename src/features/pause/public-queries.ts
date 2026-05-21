@@ -166,6 +166,7 @@ export {
   buildPauseArchiveInfiniteInitialData,
   isPauseArchiveListInitialLoading,
 } from './application/use-cases/archive/pause-archive-list-ui-state';
+export { pauseArchiveRowAllowsRetrospectiveOutcome } from './domain/archive/retrospective-outcome-eligibility';
 export { invalidatePauseStatsDataForUser } from './application/queries/invalidate-pause-stats';
 export { PAUSE_QUERY_PREFIX } from './application/queries/pause-query-namespace';
 export {
