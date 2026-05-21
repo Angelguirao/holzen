@@ -8190,4 +8190,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect frame-focus ambience in presentation/reflect/ambience (backlog #1 hygiene, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Web Audio bed colocated with hook (P5)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. <code>reflect-frame-focus-ambience</code> uses <code>AudioContext</code> (browser I/O) — move from <code>application/.../ritual/reflect/ambience/</code> to <code>presentation/reflect/ambience/</code> beside <code>use-pause-reflect-frame-focus-ambience</code>; same pattern as <code>reflection-share-canvas</code>. Empty application <code>reflect/ambience/</code> removed.</dd>
+      <dt>Deviation</dt>
+      <dd>Corrects a prior slice that parked ambience under application use-cases; presentation may import <code>pause-ritual-audio-context</code> from breathe cluster.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Breath phase cues stay in <code>ritual/breathe/ritual-audio.ts</code>; shared <code>AudioContext</code> singleton unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed companion feedback vote write/read facades on <code>public-rpc</code> / <code>public-queries</code>, or wire <code>use-pause-reflect-generation</code> through a reflect-generator facade.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
