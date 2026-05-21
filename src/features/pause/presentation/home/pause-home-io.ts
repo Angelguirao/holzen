@@ -1,19 +1,17 @@
 import { dismissOpenPauseHome } from '@/features/pause/application/use-cases/home/dismiss-open-pause-home';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository, supabaseReflectGenerator } from '@/features/pause/public-rpc';
-import {
-  applyManualPauseOpenResult,
-  type ApplyManualPauseOpenResultInput,
-  type ManualPauseHomePreviewPorts,
-} from './apply-manual-pause-open-result';
 export {
+  applyManualPauseOpenResult,
   buildManualPauseCreateOrReuseParams,
   buildManualPauseMarketContext,
   buildManualPauseOpenParams,
   MANUAL_PAUSE_VOLATILITY_TEMPLATE,
   openManualPauseFromHome,
+  type ApplyManualPauseOpenResultInput,
   type BuildManualPauseOpenParamsInput,
   type ManualPauseCreateOrReuseParams,
+  type ManualPauseHomePreviewPorts,
   type ManualPauseMarketContext,
   type OpenManualPauseFromHomeParams,
   type OpenManualPauseFromHomePorts,
@@ -32,12 +30,6 @@ export {
   type TrackManualPauseInstanceCreatedPayload,
   type TrackPauseManualCompletedPayload,
 } from './pause-home-telemetry-io';
-
-export {
-  applyManualPauseOpenResult,
-  type ApplyManualPauseOpenResultInput,
-  type ManualPauseHomePreviewPorts,
-};
 
 /** Default ports for `openManualPauseFromHome` (Home manual trigger). */
 export const pauseHomeManualOpenPorts = {
