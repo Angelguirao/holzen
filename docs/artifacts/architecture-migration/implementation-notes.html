@@ -6227,9 +6227,9 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; test mocks <code>public-rpc</code> while delegating to use case with stub <code>PauseRepository</code>.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Brief done check-in, breath segment loggers, and home/bulk-hold conductors still use <code>public-ports</code> + use cases until peeled.</dd>
+      <dd>Brief done check-in and breath segment loggers still use <code>public-ports</code> + use cases until peeled.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>use-pause-brief-done-check-in</code> or breath segment RPC loggers through <code>public-rpc</code>.</dd>
+      <dd>Next: peel breath segment RPC loggers or pending-offer mutations through <code>public-rpc</code>.</dd>
     </dl>
   </article>
 
@@ -6249,6 +6249,25 @@
       <dd>No co-located hook test; brief-to-deep and reflect-decide flows still deep-import application modules.</dd>
       <dt>Open questions</dt>
       <dd>Next: add <code>use-pause-reflect-tags</code> test or peel <code>use-pause-session-brief-to-deep</code> through <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home bulk-hold + open-pause dismiss via public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; peel home presentation from public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> migration is complete on <code>cursor/arch-migrate-src-ca70</code>. <code>use-open-pause-home-preview</code> calls <code>dismissOpenPauseHomePreview</code> on <code>public-rpc</code>; <code>use-bulk-hold-apply-outcomes</code> calls wired <code>applyBulkHoldOutcomes</code> instead of use case + <code>supabasePauseRepository</code>. Dismiss test mocks <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-open-pause-home-preview-dismiss</code> no longer asserts repository <code>dismissCurrent</code> — asserts facade args (<code>hasUser</code>, <code>clearPreview</code>).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel breath segment RPC loggers, pending-offer mutations, or archive retrospective outcome through <code>public-rpc</code>.</dd>
     </dl>
   </article>
 
