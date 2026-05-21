@@ -10,7 +10,13 @@ export {
   type HomePauseCardBodyPropsProjection,
   type PauseContextHomePreview,
 } from './application/use-cases/home/home-pause-card-body-props';
-export { shouldShowHomePauseSectionSnooze } from './application/use-cases/home/pause-home-widget-error';
+export {
+  pauseHomeErrorKind,
+  pauseHomeErrorStrings,
+  shouldShowHomePauseSectionSnooze,
+  shouldSurfacePauseWidgetError,
+  type PauseHomeErrorKind,
+} from './application/use-cases/home/pause-home-widget-error';
 export {
   buildZenModeHomeRouteProps,
   type BuildZenModeHomeRoutePropsInput,
