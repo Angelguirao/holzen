@@ -144,6 +144,7 @@ export type {
   RunInitialEmotionSkipResult,
   RunShiftEmotionFrameHubDoneResult,
 };
+export { initialEmotionResetUi };
 export type { InitialEmotionLogOpts };
 export type { RunBreathSegmentLogResult };
 export type { CompanionUiCompletionStep };
