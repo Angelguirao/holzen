@@ -4,6 +4,14 @@ import {
   type BuildManualPauseOpenParamsInput,
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/build-manual-pause-open-params';
 import { openManualPauseFromHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home';
+import type { OpenManualPauseFromHomeResult } from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home-types';
+import {
+  markPauseManualStartedHomeOnce,
+  trackManualPauseInstanceCreated,
+  trackPauseManualCompleted,
+  type TrackManualPauseInstanceCreatedPayload,
+  type TrackPauseManualCompletedPayload,
+} from '@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository, supabaseReflectGenerator } from '@/features/pause/public-rpc';
 import {
@@ -11,6 +19,7 @@ import {
   type ApplyManualPauseOpenResultInput,
   type ManualPauseHomePreviewPorts,
 } from './apply-manual-pause-open-result';
+<<<<<<< HEAD
 
 export {
   applyManualPauseOpenResult,
@@ -19,6 +28,16 @@ export {
   type ApplyManualPauseOpenResultInput,
   type BuildManualPauseOpenParamsInput,
   type ManualPauseHomePreviewPorts,
+=======
+export { buildManualPauseOpenParams, openManualPauseFromHome, type BuildManualPauseOpenParamsInput };
+export type { OpenManualPauseFromHomeResult };
+export {
+  markPauseManualStartedHomeOnce,
+  trackManualPauseInstanceCreated,
+  trackPauseManualCompleted,
+  type TrackManualPauseInstanceCreatedPayload,
+  type TrackPauseManualCompletedPayload,
+>>>>>>> efc275e6 (refactor(pause): bind manual-pause telemetry on pause-home-io)
 };
 
 /** Default ports for `openManualPauseFromHome` (Home manual trigger). */

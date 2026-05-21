@@ -7,15 +7,13 @@ import {
 } from '@/features/pause/domain/manual-pause-trigger-result';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import {
-  markPauseManualStartedHomeOnce,
-  trackManualPauseInstanceCreated,
-  trackPauseManualCompleted,
-} from '@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry';
-import {
   applyManualPauseOpenResult,
   buildManualPauseOpenParams,
+  markPauseManualStartedHomeOnce,
   openManualPauseFromHome,
   pauseHomeManualOpenPorts,
+  trackManualPauseInstanceCreated,
+  trackPauseManualCompleted,
 } from './pause-home-io';
 import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import { holzenLog } from '@/lib/holzen-console';
