@@ -4656,4 +4656,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect PostHog UI telemetry in presentation/reflect/telemetry (Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; trackEvent helpers leave application use-cases</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>pause-reflect-ui-telemetry</code> (+ test) from <code>ritual/reflect/telemetry/</code> to <code>presentation/reflect/telemetry/</code>; <code>use-pause-reflect-ui-telemetry</code> imports sibling module. Empty <code>application/.../reflect/telemetry/</code> removed.</dd>
+      <dt>Deviation</dt>
+      <dd>None — PostHog event names and properties unchanged; behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect UI analytics stays presentation-local (like favorite pro-hint toast); application layer keeps I/O use cases only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining mutations bypassing <code>PauseRepository</code> (backlog #4), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
