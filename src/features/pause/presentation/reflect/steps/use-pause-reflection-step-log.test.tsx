@@ -2,16 +2,27 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { usePauseReflectionStepLog } from './use-pause-reflection-step-log';
 
-const { logPauseReflectionStepOnceMock } = vi.hoisted(() => ({
-  logPauseReflectionStepOnceMock: vi.fn(),
+const { runPauseReflectionStepLogOnceMock } = vi.hoisted(() => ({
+  runPauseReflectionStepLogOnceMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  logPauseReflectionStepOnce: logPauseReflectionStepOnceMock,
+vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+  supabasePauseRepository: {},
 }));
+
+vi.mock('@/features/pause/infrastructure/edge/reflect/reflection-step-session-storage', () => ({
+  reflectionStepSessionStorage: {},
+}));
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log',
+  () => ({
+    runPauseReflectionStepLogOnce: runPauseReflectionStepLogOnceMock,
+  }),
+);
 
 beforeEach(() => {
-  logPauseReflectionStepOnceMock.mockReset().mockResolvedValue({ status: 'logged' });
+  runPauseReflectionStepLogOnceMock.mockReset().mockResolvedValue({ status: 'logged' });
 });
 
 describe('usePauseReflectionStepLog', () => {
@@ -26,7 +37,11 @@ describe('usePauseReflectionStepLog', () => {
     );
 
     await waitFor(() => {
-      expect(logPauseReflectionStepOnceMock).toHaveBeenCalledWith('pause-1');
+      expect(runPauseReflectionStepLogOnceMock).toHaveBeenCalledWith(
+        {},
+        { pauseInstanceId: 'pause-1' },
+        { storage: {} },
+      );
     });
   });
 
@@ -43,7 +58,7 @@ describe('usePauseReflectionStepLog', () => {
       },
     );
 
-    expect(logPauseReflectionStepOnceMock).not.toHaveBeenCalled();
+    expect(runPauseReflectionStepLogOnceMock).not.toHaveBeenCalled();
 
     rerender({
       pauseInstanceId: 'pause-1',
@@ -52,6 +67,6 @@ describe('usePauseReflectionStepLog', () => {
       reflectionError: null,
     });
 
-    expect(logPauseReflectionStepOnceMock).not.toHaveBeenCalled();
+    expect(runPauseReflectionStepLogOnceMock).not.toHaveBeenCalled();
   });
 });
