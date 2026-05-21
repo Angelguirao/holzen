@@ -231,6 +231,11 @@ export {
   stopPauseReflectFrameFocusAmbience,
 } from './application/use-cases/ritual/reflect/ambience/reflect-frame-focus-ambience';
 
+export type { ShiftFrameHubDonePresentation } from './application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-flow';
+export { resolveShiftFrameHubDonePresentation } from './application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-flow';
+
+export { showPauseStepSyncFailedToast } from './application/use-cases/ritual/step-sync-toast';
+
 export type {
   CompanionFeedbackVote,
   LogCompanionFeedbackVoteInput,
