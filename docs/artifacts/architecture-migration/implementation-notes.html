@@ -14099,4 +14099,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — scaffold-ritual-derived to session/scaffold (backlog #1 incremental)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect scaffold cleanup — session shell owns macro derived props</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) remains complete. After persist/sync moved to <code>application/use-cases/session/</code>, <code>scaffold-ritual-derived</code> is cross-beat session chrome (brief + deep macro lines), not Reflect RPC — colocate under <code>application/use-cases/session/scaffold/</code>. Reflect/Frame sublines stay in <code>domain/reflect/scaffold/deep-reflect-frame-macro-subline.ts</code>. Export <code>buildPauseSessionPersistSnapshot</code> on <code>public-session</code>; persist conductor imports barrel. Remove empty <code>application/use-cases/ritual/reflect/scaffold/</code> and obsolete <code>presentation/reflect/scaffold/</code> CI requirement.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; <code>check:architecture-alignment</code> legacy strings inverted (session scaffold canonical).</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-scaffold-ritual</code> still imports derived builder from use-case path directly (not <code>public-session</code>) — acceptable until a typed re-export is needed cross-context.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>public-home</code> cluster 2 (bulk-hold + pending-offer) or peel duplicate <code>pauseStepLayout</code> off <code>public-hooks</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
