@@ -22,7 +22,11 @@ const baseInput = {
   signal: new AbortController().signal,
 };
 
-const noopReflectPortExtras = { fetchHaikuText: vi.fn(), loadRecencyHints: vi.fn() };
+const noopReflectPortExtras = {
+  fetchHaikuText: vi.fn(),
+  fetchLatestReflectStep: vi.fn(),
+  loadRecencyHints: vi.fn(),
+};
 
 describe('runReflectGeneration', () => {
   it('returns seed without calling ports', async () => {

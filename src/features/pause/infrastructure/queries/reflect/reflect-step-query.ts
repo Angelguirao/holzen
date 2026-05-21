@@ -1,10 +1,18 @@
-import { supabase } from '@/integrations/supabase/client';
+import {
+  PAUSE_REFLECT_STEP_NOTE,
+  PAUSE_REFLECT_STEP_TAGS,
+  type PauseReflectStepLatestRow,
+  type PauseReflectStepType,
+} from '@/features/pause/domain/reflect-step-latest';
+import { supabaseReflectGenerator } from '@/features/pause/infrastructure/supabase-reflect-generator';
 import { PAUSE_QUERY_PREFIX } from '@/features/pause/application/queries/pause-query-namespace';
 
-export const PAUSE_REFLECT_STEP_NOTE = 'note_updated' as const;
-export const PAUSE_REFLECT_STEP_TAGS = 'tag_updated' as const;
-
-export type PauseReflectStepType = typeof PAUSE_REFLECT_STEP_NOTE | typeof PAUSE_REFLECT_STEP_TAGS;
+export {
+  PAUSE_REFLECT_STEP_NOTE,
+  PAUSE_REFLECT_STEP_TAGS,
+  type PauseReflectStepLatestRow,
+  type PauseReflectStepType,
+};
 
 export const PAUSE_REFLECT_STEP_QUERY_PREFIX = [...PAUSE_QUERY_PREFIX, 'reflect-step', 'latest'] as const;
 
@@ -12,25 +20,11 @@ export function pauseReflectStepLatestQueryKey(pauseInstanceId: string, stepType
   return [...PAUSE_REFLECT_STEP_QUERY_PREFIX, pauseInstanceId, stepType] as const;
 }
 
-export type PauseReflectStepLatestRow = {
-  payload: Record<string, unknown>;
-  created_at: string;
-};
-
 export async function fetchLatestPauseReflectStep(
   pauseInstanceId: string,
   stepType: PauseReflectStepType,
 ): Promise<PauseReflectStepLatestRow | null> {
-  const { data, error } = await supabase
-    .from('pause_step_events' as never)
-    .select('payload, created_at')
-    .eq('pause_instance_id', pauseInstanceId)
-    .eq('step_type', stepType)
-    .order('created_at', { ascending: false })
-    .limit(1);
-  if (error) throw error;
-  const rows = (data ?? []) as PauseReflectStepLatestRow[];
-  return rows[0] ?? null;
+  return supabaseReflectGenerator.fetchLatestReflectStep(pauseInstanceId, stepType);
 }
 
 export function noteTextFromReflectRow(row: PauseReflectStepLatestRow | null | undefined): string {
