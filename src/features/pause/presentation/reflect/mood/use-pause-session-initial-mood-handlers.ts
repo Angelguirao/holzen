@@ -6,11 +6,11 @@ import {
   initialEmotionResetUi,
   type InitialEmotionUiState,
 } from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
+import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
 import { hapticFeedback } from '@/lib/haptics';
 import {
   logPauseInitialEmotionSelect,
   logPauseInitialEmotionSkip,
-  showPauseStepSyncFailedToast,
 } from '@/features/pause/public-rpc';
 
 export function usePauseSessionInitialMoodHandlers(input: {

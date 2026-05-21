@@ -20,11 +20,13 @@ const {
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 
+vi.mock('@/features/pause/application/use-cases/ritual/step-sync-toast', () => ({
+  showPauseStepSyncFailedToast,
+}));
+
 vi.mock('@/features/pause/public-rpc', () => ({
-  initialEmotionResetUi,
   logPauseInitialEmotionSelect: logPauseInitialEmotionSelectMock,
   logPauseInitialEmotionSkip: logPauseInitialEmotionSkipMock,
-  showPauseStepSyncFailedToast,
 }));
 
 vi.mock('@/lib/haptics', () => ({
