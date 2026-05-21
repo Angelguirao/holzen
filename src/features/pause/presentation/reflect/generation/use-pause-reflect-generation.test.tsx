@@ -10,8 +10,10 @@ const { pauseReflectGenerationMock, mockReflectGenerator } = vi.hoisted(() => ({
 
 vi.mock('./pause-reflect-generation-io', async () => {
   const hookFlow = await vi.importActual<
-    typeof import('@/features/pause/domain/reflect/generation/reflect-generation-hook-flow')
-  >('@/features/pause/domain/reflect/generation/reflect-generation-hook-flow');
+    typeof import('@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-hook-flow')
+  >(
+    '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-hook-flow',
+  );
   return {
     ...hookFlow,
     reflectGenerator: mockReflectGenerator,

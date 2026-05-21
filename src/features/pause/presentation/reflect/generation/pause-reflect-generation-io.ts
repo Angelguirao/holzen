@@ -4,6 +4,9 @@ import {
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation';
 export {
   messageFromReflectGenerationResult,
+  reflectGenerationPrerequisite,
+  reflectGenerationUserErrorMessage,
+  resolveEffectiveReflectionCopy,
   resolveReflectGenerationPrefetch,
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
