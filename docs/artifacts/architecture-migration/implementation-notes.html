@@ -16664,4 +16664,42 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect flows I/O via ritual flow anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-io</code> binds preflight/decide helpers through application anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Route <code>resolvePauseSessionReflectAndDecide*</code>, <code>resolvePauseDecideOutcomeFlow</code>, <code>formatReinforcementQuoteFromSession</code>, and <code>getSessionQuote</code> through <code>pause-session-reflect-and-decide-flow</code>, <code>pause-decide-outcome-flow</code>, and <code>wisdom-quotes</code> cluster anchors instead of deep <code>domain/reflect/flows</code> or <code>domain/decide</code> on the presentation I/O module (mirrors hub/steps mood anchors).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect mood I/O still deep-imported domain until the paired mood anchor peel in the same session.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: mood presentation I/O flow anchors, colocate <code>use-pause-shift-frame-done-handler</code> under <code>presentation/reflect/hub/</code> grouping, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood I/O via mood flow anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-io</code> binds domain mood helpers through mood cluster anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Route depth-picker, feel-tile, initial-emotion presentation, and session chrome helpers through <code>pause-depth-picker-mood-flow</code>, <code>pause-feel-tiles-mood-flow</code>, <code>pause-initial-emotion-presentation-flow</code>, and <code>pause-session-mood-chrome-flow</code> instead of deep <code>domain/reflect/mood/*</code> on the presentation I/O module (RPC use cases already on <code>pause-initial-emotion-log-flow</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session scaffold/brief presentation I/O still bind application paths directly until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session brief or scaffold presentation I/O flow anchors, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
