@@ -8,7 +8,7 @@ import {
 const runShiftEmotionFrameHubDoneMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
+  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-flow',
   () => ({
     runShiftEmotionFrameHubDone: runShiftEmotionFrameHubDoneMock,
   }),
