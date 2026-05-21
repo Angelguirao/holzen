@@ -9672,4 +9672,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — dedupe manual-trigger cooldown exports (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; cooldown helpers only on public-trigger</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder moves. Remove duplicate re-exports of manual-trigger cooldown helpers from <code>public-rpc.ts</code>; presentation imports <code>public-trigger.ts</code> only (mirrors <code>public-navigation.ts</code> split).</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>use-holzen-manual-trigger-orchestration</code> already used <code>public-trigger</code>; no call sites imported cooldown symbols from <code>public-rpc</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Manual-open telemetry + <code>openManualPauseFromHome</code> stay on <code>public-rpc</code>; next #3 peel may split trigger telemetry to a dedicated barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel one small home presentation cluster off direct <code>application/</code> imports (e.g. pause card projection) or port-backed analytics read for feedback vote fetch.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -188,6 +188,7 @@ Shared reads live in `infrastructure/queries/`, exported via **`public-queries`*
 |--------|---------|
 | `public.ts` | Types, constants, pure formatters — **no eager Supabase** |
 | `public-navigation.ts` | Router state for pause deep links (`NotificationNavigateState`, `parsePauseSessionLocationState`); Home → `/pause` helpers (`canNavigateToPauseSession`, `buildHomePauseSessionLocationState`, `shouldNavigateAfterManualTrigger`) |
+| `public-trigger.ts` | Home manual-trigger cooldown math, localStorage keys, error mapping (no Supabase) |
 | `public-queries.ts` | `get*QueryOptions` factories |
 | `public-hooks.ts` | Screen-facing conductors |
 | `public-rpc.ts` | Wired mutations, edge invoke facades, and default port adapters (`supabasePauseRepository`, `supabaseReflectGenerator`, …) |
