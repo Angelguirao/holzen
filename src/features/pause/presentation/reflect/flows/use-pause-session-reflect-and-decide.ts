@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
-} from './pause-reflect-session-flow-io';
+} from './pause-reflect-flows-io';
 import { usePauseReflectGeneration } from '../generation/use-pause-reflect-generation';
 import { usePauseSessionDecideHandler } from './use-pause-session-decide-handler';
 import type { UsePauseSessionReflectAndDecideParams } from './pause-session-reflect-and-decide-types';
