@@ -4618,6 +4618,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — trim public-queries analytics export (§6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; drop unused insertPauseAnalyticsEvent from public-queries</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Remove unused <code>insertPauseAnalyticsEvent</code> re-export from <code>public-queries.ts</code>; adapter wiring stays on <code>supabasePauseAnalyticsRepository</code> via <code>public-ports</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Admin/legacy callers must use port-backed query helpers or inject <code>PauseAnalyticsRepository</code> in tests.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
-</body>
-</html>
