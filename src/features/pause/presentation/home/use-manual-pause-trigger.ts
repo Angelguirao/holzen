@@ -9,12 +9,14 @@ import type { CompanionData } from '@/features/pause/domain/companion-card-types
 import {
   applyManualPauseOpenResult,
   buildManualPauseOpenParams,
-  markPauseManualStartedHomeOnce,
   openManualPauseFromHome,
-  pauseHomeManualOpenPorts,
+} from './pause-home-reflect-io';
+import {
+  markPauseManualStartedHomeOnce,
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
-} from './pause-home-io';
+} from './pause-home-reflect-telemetry-io';
+import { pauseHomeManualOpenPorts } from './pause-home-io';
 import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import { holzenLog } from '@/lib/holzen-console';
 
