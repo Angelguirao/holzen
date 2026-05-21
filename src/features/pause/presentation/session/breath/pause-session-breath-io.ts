@@ -22,10 +22,6 @@ export {
   viteWantsPauseBreathSecondLabelShift,
   type PauseBreathSecondLabelVariant,
 } from '@/features/pause/application/use-cases/ritual/breathe/breath-second-label-variant';
-export {
-  initialBreathingFirstCompletedFromRestored,
-  initialBreathingSecondCompletedFromRestored,
-} from '@/features/pause/application/use-cases/ritual/breathe/restored-breath-ritual-state';
 
 import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 import {
