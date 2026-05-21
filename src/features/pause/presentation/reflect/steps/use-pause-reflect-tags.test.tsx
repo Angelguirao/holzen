@@ -2,9 +2,10 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { usePauseReflectTags } from './use-pause-reflect-tags';
 
-const { runPauseReflectTagUpdateMock, emptyTags } = vi.hoisted(() => ({
+const { runPauseReflectTagUpdateMock, emptyTags, mockPauseRepository } = vi.hoisted(() => ({
   runPauseReflectTagUpdateMock: vi.fn(),
   emptyTags: [] as string[],
+  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
 vi.mock(
@@ -15,7 +16,7 @@ vi.mock(
 );
 
 vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
-  supabasePauseRepository: {},
+  supabasePauseRepository: mockPauseRepository,
 }));
 
 vi.mock('@/features/auth/public', () => ({
@@ -50,12 +51,9 @@ describe('usePauseReflectTags', () => {
       result.current.addDraft();
     });
 
-    expect(runPauseReflectTagUpdateMock).toHaveBeenCalledWith(
-      {},
-      {
-        pauseInstanceId: 'pause-1',
-        tags: ['calm'],
-      },
-    );
+    expect(runPauseReflectTagUpdateMock).toHaveBeenCalledWith(mockPauseRepository, {
+      pauseInstanceId: 'pause-1',
+      tags: ['calm'],
+    });
   });
 });

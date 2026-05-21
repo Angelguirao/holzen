@@ -10,16 +10,18 @@ const {
   runLogBreathSegment1SkippedMock,
   runLogBreathSegment2SkippedMock,
   showPauseStepSyncFailedToast,
+  mockPauseRepository,
 } = vi.hoisted(() => ({
   runEnsureBreathSegment1LoggedMock: vi.fn(),
   runEnsureBreathSegment2LoggedMock: vi.fn(),
   runLogBreathSegment1SkippedMock: vi.fn(),
   runLogBreathSegment2SkippedMock: vi.fn(),
   showPauseStepSyncFailedToast: vi.fn(),
+  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
 vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
-  supabasePauseRepository: {},
+  supabasePauseRepository: mockPauseRepository,
 }));
 
 vi.mock(
@@ -79,7 +81,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
       expect(ok).toBe(true);
     });
     expect(runEnsureBreathSegment1LoggedMock).toHaveBeenCalledWith(
-      expect.anything(),
+      mockPauseRepository,
       {
         pauseInstanceId: 'inst-1',
         segmentAlreadyLogged: true,
@@ -149,7 +151,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
       expect(await result.current.logBreathSegment1Skipped()).toBe(true);
     });
     expect(runLogBreathSegment1SkippedMock).toHaveBeenCalledWith(
-      expect.anything(),
+      mockPauseRepository,
       { pauseInstanceId: null, opts: undefined },
       expect.anything(),
     );
@@ -184,7 +186,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
       await result.current.logBreathSegment1Skipped({ briefRitual: true });
     });
     expect(runLogBreathSegment1SkippedMock).toHaveBeenCalledWith(
-      expect.anything(),
+      mockPauseRepository,
       {
         pauseInstanceId: 'inst-1',
         opts: { briefRitual: true },
@@ -220,7 +222,7 @@ describe('usePauseBreathSegmentRpcLoggers', () => {
       expect(await result.current.logBreathSegment2Skipped()).toBe(true);
     });
     expect(runLogBreathSegment2SkippedMock).toHaveBeenCalledWith(
-      expect.anything(),
+      mockPauseRepository,
       { pauseInstanceId: 'inst-1' },
       expect.anything(),
     );

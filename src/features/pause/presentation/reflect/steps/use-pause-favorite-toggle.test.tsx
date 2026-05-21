@@ -4,13 +4,14 @@ import type { TFunction } from 'i18next';
 import { usePauseFavoriteToggle } from './use-pause-favorite-toggle';
 import { showPauseFavoriteProHintToast } from '@/features/pause/presentation/reflect/steps/pause-favorite-pro-hint-toast';
 
-const { runPauseFavoriteToggleMock, invalidateQueriesMock } = vi.hoisted(() => ({
+const { runPauseFavoriteToggleMock, invalidateQueriesMock, mockPauseRepository } = vi.hoisted(() => ({
   runPauseFavoriteToggleMock: vi.fn(),
   invalidateQueriesMock: vi.fn(),
+  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
 vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
-  supabasePauseRepository: {},
+  supabasePauseRepository: mockPauseRepository,
 }));
 
 vi.mock(
@@ -86,13 +87,10 @@ describe('usePauseFavoriteToggle', () => {
       await result.current.toggleFavorite();
     });
     expect(setIsFavorite).toHaveBeenCalledWith(true);
-    expect(runPauseFavoriteToggleMock).toHaveBeenCalledWith(
-      {},
-      {
-        pauseInstanceId: 'pi-1',
-        isFavorite: false,
-      },
-    );
+    expect(runPauseFavoriteToggleMock).toHaveBeenCalledWith(mockPauseRepository, {
+      pauseInstanceId: 'pi-1',
+      isFavorite: false,
+    });
     expect(showPauseFavoriteProHintToast).toHaveBeenCalledWith(t);
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: archiveListPrefix('archive-user-1'),
