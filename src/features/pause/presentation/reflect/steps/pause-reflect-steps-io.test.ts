@@ -1,28 +1,25 @@
 import { describe, expect, it, vi } from 'vitest';
-import { shouldShowFavoriteProHint } from '@/features/pause/domain/reflect/steps/favorite-toggle';
-import { shouldLogPauseReflectionStep } from '@/features/pause/domain/reflect/steps/reflection-step-log';
-
-const runPauseReflectionStepLogOnceMock = vi.hoisted(() => vi.fn());
-const runPauseFavoriteToggleMock = vi.hoisted(() => vi.fn());
-
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log',
-  () => ({
-    runPauseReflectionStepLogOnce: runPauseReflectionStepLogOnceMock,
-  }),
-);
-
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle',
-  () => ({
-    runPauseFavoriteToggle: runPauseFavoriteToggleMock,
-  }),
-);
-
 import {
   pauseReflectFavoriteToggle,
   pauseReflectionStepLogOnce,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
 } from './pause-reflect-steps-io';
+
+const runPauseReflectionStepLogOnceMock = vi.hoisted(() => vi.fn());
+const runPauseFavoriteToggleMock = vi.hoisted(() => vi.fn());
+const shouldShowFavoriteProHintMock = vi.hoisted(() => vi.fn());
+const shouldLogPauseReflectionStepMock = vi.hoisted(() => vi.fn());
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow',
+  () => ({
+    runPauseReflectionStepLogOnce: runPauseReflectionStepLogOnceMock,
+    runPauseFavoriteToggle: runPauseFavoriteToggleMock,
+    shouldShowFavoriteProHint: shouldShowFavoriteProHintMock,
+    shouldLogPauseReflectionStep: shouldLogPauseReflectionStepMock,
+  }),
+);
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectStepsRepository' },
@@ -30,28 +27,9 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 describe('pause-reflect-steps-io', () => {
-  it('re-exports favorite pro-hint gate from domain', () => {
-    expect(shouldShowFavoriteProHint(true, false)).toBe(true);
-    expect(shouldShowFavoriteProHint(true, true)).toBe(false);
-  });
-
-  it('re-exports reflection_step gate from domain', () => {
-    expect(
-      shouldLogPauseReflectionStep({
-        pauseInstanceId: 'pi-1',
-        reflectionLoading: false,
-        reflectionMessage: 'Ready.',
-        reflectionError: null,
-      }),
-    ).toBe(true);
-    expect(
-      shouldLogPauseReflectionStep({
-        pauseInstanceId: null,
-        reflectionLoading: false,
-        reflectionMessage: 'Ready.',
-        reflectionError: null,
-      }),
-    ).toBe(false);
+  it('re-exports step gates from pause-reflect-steps-flow', () => {
+    expect(shouldShowFavoriteProHint).toBe(shouldShowFavoriteProHintMock);
+    expect(shouldLogPauseReflectionStep).toBe(shouldLogPauseReflectionStepMock);
   });
 
   it('routes reflection_step log through default repository + storage', async () => {
