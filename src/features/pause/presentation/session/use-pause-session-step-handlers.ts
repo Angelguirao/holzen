@@ -5,7 +5,7 @@ import {
 import type { PauseSessionShellRitualResult } from './use-pause-session-shell-ritual';
 import type { PauseSessionStepHandlersProvidersSlice } from './pause-session-step-handler-types';
 import { usePauseSessionBreathReflectHandlers } from '../reflect/flows/use-pause-session-breath-reflect-handlers';
-import { usePauseSessionMoodChromeHandlers } from '../reflect/steps/use-pause-session-mood-chrome-handlers';
+import { usePauseSessionMoodChromeHandlers } from '../reflect/feel/use-pause-session-mood-chrome-handlers';
 
 /** Mood, breath, reflect/decide, and chrome handlers (inputs for scaffold assembly). */
 export function usePauseSessionStepHandlers(

@@ -3706,6 +3706,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate feel/mood reflect conductors under presentation/reflect/feel/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 presentation peel — Tier 4 feel cluster (application already under ritual/reflect/)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate feel-step presentation hooks beside <code>ritual/feel/</code> under <code>presentation/reflect/feel/</code> (initial mood, feel tiles, depth picker, mood chrome, dedupe refs, mood-and-persist); <code>public-hooks</code> and <code>use-pause-session-step-handlers</code> import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>; mirrors §3 / §10.1 feel beat taxonomy.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Rebased over remote slice that had moved dedupe refs to <code>steps/</code> — kept under <code>feel/</code> with mood cluster. <code>use-pause-session-breath-reflect-handlers</code> stays in <code>reflect/flows/</code>; bulk-hold hooks remain flat.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-back PWA install analytics via <code>PauseAnalyticsRepository</code> (backlog #4), or colocate breath-reflect handlers.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
