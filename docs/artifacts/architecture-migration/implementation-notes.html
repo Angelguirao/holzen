@@ -9748,4 +9748,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home card projection on public-home (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; use-pause-card-projection peels application imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — zero legacy reflect paths. Add side-effect-free <code>public-home.ts</code> for Home card body projection + widget error/snooze helpers; <code>use-pause-card-projection</code> imports the barrel instead of <code>application/use-cases/home/*</code> (mirrors <code>public-trigger.ts</code> / <code>public-navigation.ts</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Pure helpers remain under <code>application/use-cases/home/</code>; <code>public-hooks</code> re-exports from <code>public-home</code> for screen-facing imports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #3: peel <code>use-zen-mode-home-route-props</code> or session scaffold <code>application/</code> imports; backlog #4: audit breath segment loggers calling <code>public-rpc</code> only.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

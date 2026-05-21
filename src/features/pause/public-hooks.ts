@@ -262,11 +262,16 @@ export {
   PAUSE_CRON_QUARTER_INTERVAL_MS,
 } from './public-scheduling';
 export {
+  buildHomePauseCardBodyProps,
   pauseHomeErrorKind,
   pauseHomeErrorStrings,
+  shouldShowHomePauseSectionSnooze,
   shouldSurfacePauseWidgetError,
+  type BuildHomePauseCardBodyPropsInput,
+  type HomePauseCardBodyPropsProjection,
+  type PauseContextHomePreview,
   type PauseHomeErrorKind,
-} from './application/use-cases/home/pause-home-widget-error';
+} from './public-home';
 export { groupBulkHoldByLocalDay } from './application/use-cases/home/bulk-hold/group-by-local-day';
 export {
   formatBulkHoldContextQuote,
