@@ -5,7 +5,7 @@ import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
 } from '@/features/pause/domain/manual-pause-trigger-result';
-import type { CompanionData } from '@/features/pause/public-hooks';
+import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import {
   applyManualPauseOpenResult,
   buildManualPauseOpenParams,

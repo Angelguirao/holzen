@@ -10831,4 +10831,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home presentation ritual types from domain (backlog #1 verified, §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; home conductors avoid public-hooks type cycle</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>presentation/session/</code> domain imports (parallel commit), align <code>presentation/home/</code> hooks (<code>useManualPauseTrigger</code>, <code>useHomePauseActions</code>, <code>useBulkHoldApplyOutcomes</code>) to import <code>CompanionData</code> / <code>CompanionPrefs</code> from <code>domain/companion-card-types</code> and bulk-hold types from <code>domain/bulk-hold</code> instead of <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Screens and <code>useHolzen</code> may still import ritual types via <code>public-hooks</code>; feature-internal home cluster only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: wire stray presentation mutations through <code>PauseRepository</code> audit; optional <code>analytics-events</code> import guard; Phase B subscription/auth shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
