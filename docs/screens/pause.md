@@ -30,7 +30,7 @@ Presentation hooks (`src/features/pause/presentation/session/`, `presentation/re
 
 ## Purpose
 
-`/pause` is the **full-screen** volatility ritual: choose **brief** vs **deep** (or resume from local storage), walk Feel → … → Decide, log steps through **`public-rpc`** (`pauseLogStep`, …), and finish on **Done** when Postgres reports **`completed`**. The page stays a **conductor**: props and callbacks are assembled from hooks and pure builders, not inlined business rules.
+`/pause` is the **full-screen** volatility ritual: choose **brief** vs **deep** (or resume from local storage), walk Feel → … → Decide, log steps through **`public-rpc`** wired facades (`runInitialEmotionSelect`, `logPauseOutcome`, `ensureBreathSegment1Logged`, …), and finish on **Done** when Postgres reports **`completed`**. The page stays a **conductor**: props and callbacks are assembled from hooks and pure builders, not inlined business rules.
 
 ## Major dependencies
 
@@ -40,7 +40,7 @@ Presentation hooks (`src/features/pause/presentation/session/`, `presentation/re
 | Reflection + open pause context | [`useHolzen`](../../src/app/components/HolzenProvider.tsx)                               | Message, companions, severity, `lastPauseInstanceId`, `dismissMessage`, `resyncOpenPauseFromDb`, etc.  |
 | Subscription / Pro              | `[useSubscription](../../src/features/subscription/public-hooks)`        | Decide path refresh; favorite toggle                                                                   |
 | Navigation in                   | `parsePauseSessionLocationState` ([`public`](../../src/features/pause/public.ts)) | `location.state` from Home / banners / manual flows — see [Home → Pause](home.md#navigation-to-pause) |
-| RPC mutations                   | [`public-rpc`](../../src/features/pause/public-rpc.ts) (`runInitialEmotionSelect`, `pauseDismissCurrent`, …) | `PauseRepository` → `pause-rpc-client.ts`; canonical SQL in [pause-system §4](../systems/pause-system.md) |
+| RPC mutations                   | [`public-rpc`](../../src/features/pause/public-rpc.ts) (`runInitialEmotionSelect`, `dismissOpenPauseHomePreview`, `logPauseOutcome`, …) | `PauseRepository` → use cases → `pause-rpc-client.ts`; canonical SQL in [pause-system §4](../systems/pause-system.md) |
 | Local resume                    | [`persisted-session-storage.ts`](../../src/features/pause/infrastructure/session/persisted-session-storage.ts) | `loadSession` / `saveSession`; hydrate helpers in `step-map.ts` |
 | Data + lifecycle contract       | [pause-system.md](../systems/pause-system.md)                              | Tables, state machine, `**v_pause_full`** / step events — **section 10** indexes this screen’s lib map |
 
