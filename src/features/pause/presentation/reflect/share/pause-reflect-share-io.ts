@@ -1,15 +1,15 @@
 import {
   buildReflectionShareTelegramUrl,
+  buildReflectionShareText,
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
-  buildReflectionShareText,
   runReflectionShareImage,
   type DeliverReflectionShareImageDeps,
 } from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-flow';
 
 export {
-  buildReflectionShareText,
   buildReflectionShareTelegramUrl,
+  buildReflectionShareText,
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
 };
