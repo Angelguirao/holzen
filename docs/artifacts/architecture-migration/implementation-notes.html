@@ -19375,9 +19375,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Hub and share presentation I/O still import run-* / domain builders directly; align in follow-up slices if drift reappears.</dd>
+      <dd>Hub and mood presentation I/O still import run-* / domain builders directly; align in follow-up slices if drift reappears.</dd>
       <dt>Open questions</dt>
-      <dd>Next: route <code>pause-reflect-hub-io</code> and <code>pause-reflect-share-io</code> through cluster flow anchors, or Phase B subscription Tier 1 shim.</dd>
+      <dd>Next: route <code>pause-reflect-hub-io</code> and <code>pause-reflect-mood-io</code> through cluster flow anchors, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — reflect share I/O via flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-share-io</code> imports through <code>pause-reflect-share-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no relocations. Route share text/channel builders and <code>runReflectionShareImage</code> through <code>pause-reflect-share-flow</code> instead of deep <code>domain/reflect/share/*</code> and <code>run-reflection-share-image</code> paths (parity with steps presentation I/O on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only. Resolved merge conflict markers in implementation-notes from parallel Home/generation slices.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit test mocks the flow anchor module; hub/mood I/O still use direct sibling imports until follow-up peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: route <code>pause-reflect-hub-io</code> through <code>pause-reflect-hub-flow</code>, or Phase B subscription Tier 1 shim.</dd>
     </dl>
   </article>
 
