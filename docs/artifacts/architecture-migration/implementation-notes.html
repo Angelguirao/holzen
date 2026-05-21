@@ -9789,6 +9789,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — home arrival tone in domain (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -9802,6 +9803,21 @@
       <dd>Other <code>public-home</code> symbols still live in <code>application/use-cases/home/</code>.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: colocate remaining home read-model pure helpers to <code>domain/home/</code> or session scaffold off <code>application/</code>.</dd>
+=======
+      <span>Phase A slice — session header-back on public-session (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; peel session shell navigation pure helpers</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder moves. Add <code>public-session.ts</code> for header-back visibility + intent; <code>use-pause-session-breath-navigation</code> and <code>use-pause-session-header-back-handler</code> import the barrel instead of <code>application/use-cases/session/header-back</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other session presentation hooks still import <code>application/use-cases/session/*</code> directly; extend <code>public-session</code> incrementally.</dd>
+      <dt>Open questions</dt>
+      <dd>Next #3 peel: <code>step-transition</code> / scaffold types on <code>public-session</code>; backlog #4: remaining ritual log call sites via <code>public-rpc</code> only.</dd>
+>>>>>>> 0e29fc1a (refactor(pause): add public-session barrel for header-back helpers)
     </dl>
   </article>
 
