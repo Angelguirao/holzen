@@ -9789,7 +9789,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
       <span>Phase A slice — home arrival tone in domain (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -9803,7 +9802,12 @@
       <dd>Other <code>public-home</code> symbols still live in <code>application/use-cases/home/</code>.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: colocate remaining home read-model pure helpers to <code>domain/home/</code> or session scaffold off <code>application/</code>.</dd>
-=======
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — session header-back on public-session (backlog #1 verified, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -9817,7 +9821,25 @@
       <dd>Other session presentation hooks still import <code>application/use-cases/session/*</code> directly; extend <code>public-session</code> incrementally.</dd>
       <dt>Open questions</dt>
       <dd>Next #3 peel: <code>step-transition</code> / scaffold types on <code>public-session</code>; backlog #4: remaining ritual log call sites via <code>public-rpc</code> only.</dd>
->>>>>>> 0e29fc1a (refactor(pause): add public-session barrel for header-back helpers)
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — HomePauseChrome scheduling comment (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; document public-scheduling vs public-home split</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — 14 modules under <code>ritual/reflect/</code>, zero legacy paths. <code>public-scheduling.ts</code> already owns quarter-hour math; align <code>HomePauseChrome</code> comment to reference <code>public-scheduling</code> (not <code>public-home</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — cadence math unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Comment-only slice after parallel automation landed scheduling barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #3: extend <code>public-session</code> for step-transition / scaffold types; backlog #4: session hooks via <code>public-rpc</code> only.</dd>
     </dl>
   </article>
 

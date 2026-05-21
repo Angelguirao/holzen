@@ -79,7 +79,7 @@ function writePersistedSnapshot(snap: CooldownSnapshot): void {
   } catch { void 0; }
 }
 
-/** Keep in sync with `PAUSE_CRON_QUARTER_INTERVAL_MS` (`public-hooks` / scheduling use case). */
+/** Keep in sync with `PAUSE_CRON_QUARTER_INTERVAL_MS` (`public-scheduling` / scheduling use case). */
 const CRON_INTERVAL_MS = 15 * 60_000;
 
 /**
