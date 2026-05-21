@@ -3443,7 +3443,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
       <span>Phase A slice — colocate reflect UI telemetry under presentation/reflect/telemetry/</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -3457,7 +3456,12 @@
       <dd>Session reflect/decide, frame-focus ambience, hub, and flows conductors remain at <code>presentation/reflect/</code> root until later peels (<code>ambience/</code>, <code>hub/</code>, <code>flows/</code>).</dd>
       <dt>Open questions</dt>
       <dd>Next: route <code>persistCompanionUiStepCompletion</code> through <code>public-rpc</code>, or colocate remaining flat cross-route presentation hooks.</dd>
-=======
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — wire persistCompanionUiStepCompletion on public-rpc (backlog #4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -3471,7 +3475,6 @@
       <dd><code>loadCompanionUiCompletionState</code> still uses direct Supabase reads in infrastructure (query module unchanged).</dd>
       <dt>Open questions</dt>
       <dd>Next: colocate <code>use-journey-pause-instances</code> under <code>presentation/archive/</code>, or port-back <code>insertPauseAnalyticsEvent</code> for PWA install analytics.</dd>
->>>>>>> e8113e51 (refactor(pause): wire persistCompanionUiStepCompletion on public-rpc)
     </dl>
   </article>
 
