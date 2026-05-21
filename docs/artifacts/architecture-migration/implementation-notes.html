@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect hub + generation I/O domain imports (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-io</code> and <code>pause-reflect-generation-io</code> import pure helpers from <code>domain/reflect/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Hub I/O imports <code>resolveShiftFrameHubDonePresentation</code> from <code>domain/reflect/hub/shift-frame-hub-done-presentation.ts</code> and RPC <code>runShiftEmotionFrameHubDone</code> from its use-case module. Generation I/O re-exports hook prefetch/commit/clear helpers, prerequisites, errors, and effective copy from <code>domain/reflect/generation/</code> instead of the application CI anchor <code>pause-reflect-generation-hook-flow</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; application anchor modules remain for <code>check:architecture-alignment</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Import-path-only peel — mirrors mood/share/steps/hub gate slices; holzen-reflect <code>runReflectGeneration</code> stays on application path.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion <code>load-companion-orchestrate-session</code> through orchestration-io, or steps I/O importing <code>run-*</code> modules directly instead of <code>pause-reflect-steps-mutation-flow</code> barrel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — session scaffold presentation I/O</span>
       <span class="status resolved">resolved</span>
     </header>
