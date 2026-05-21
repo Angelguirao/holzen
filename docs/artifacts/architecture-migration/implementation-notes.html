@@ -60,18 +60,18 @@
     <header>
       <span>2026-05-20</span>
       <span>Spec §3, §10 (transitional)</span>
-      <span class="status open">open</span>
+      <span class="status resolved">resolved</span>
     </header>
     <h3>Legacy use-case folder names still on disk</h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Incremental migration: new work uses <code>ritual/reflect/</code> and <code>ritual/frame/</code>; existing <code>application/use-cases/companion/</code> and <code>application/use-cases/reflect/</code> are moved slice-by-slice rather than a big-bang rename.</dd>
       <dt>Deviation</dt>
-      <dd>Tree on disk temporarily does not match spec §3 literally — spec §10 documents this as transitional.</dd>
+      <dd>Resolved May 2026 on <code>cursor/arch-migrate-src-ca70</code> — zero <code>application/use-cases/reflect/</code> or <code>companion/</code> paths remain; reflect/frame use cases live under <code>ritual/reflect/</code> and <code>ritual/frame/</code>.</dd>
       <dt>Tradeoffs</dt>
       <dd><strong>Big-bang rename</strong> — cleaner tree, huge diff, hard review. <strong>Incremental</strong> — slower convergence, safer merges. Picked incremental.</dd>
       <dt>Open questions</dt>
-      <dd>Should we add a CI warning when new files land in old top-level <code>companion/</code> or <code>reflect/</code> folders (not under <code>ritual/</code>)?</dd>
+      <dd>Optional: CI guard when new files land outside <code>ritual/reflect/</code> / <code>ritual/frame/</code> for reflect/frame concerns.</dd>
     </dl>
   </article>
 
@@ -9688,6 +9688,25 @@
       <dd>Manual-open telemetry + <code>openManualPauseFromHome</code> stay on <code>public-rpc</code>; next #3 peel may split trigger telemetry to a dedicated barrel.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: peel one small home presentation cluster off direct <code>application/</code> imports (e.g. pause card projection) or port-backed analytics read for feedback vote fetch.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — backlog #1 verified; home read-model on public-home (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; peel Home widget pure helpers</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — 14 use-case modules under <code>ritual/reflect/</code>, zero legacy paths. Add <code>public-home.ts</code> for arrival tone, pause card body projection, and zen route props; home presentation hooks import the barrel (supersedes interim <code>public.ts</code> re-export for arrival tone).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>public-trigger.ts</code> on branch for manual-trigger cooldown.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-holzen-home-context-state</code> still imports scheduling helpers from <code>application/use-cases/scheduling/</code> directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit ritual <code>logPauseStep</code> call sites still bypassing <code>public-rpc</code> facades, or peel <code>use-holzen-home-context-state</code> scheduling import.</dd>
     </dl>
   </article>
 

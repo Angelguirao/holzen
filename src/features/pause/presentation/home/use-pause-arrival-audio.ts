@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
-import { resolvePauseArrivalToneAction } from '@/features/pause/public';
+import { resolvePauseArrivalToneAction } from '@/features/pause/public-home';
 
 function readHolzenSoundEnabled(): boolean {
   try {

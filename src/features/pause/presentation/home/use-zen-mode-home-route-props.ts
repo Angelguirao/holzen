@@ -3,7 +3,7 @@ import {
   buildZenModeHomeRouteProps,
   type BuildZenModeHomeRoutePropsInput,
   type ZenModeHomeRoutePropsProjection,
-} from '@/features/pause/application/use-cases/home/build-zen-mode-home-route-props';
+} from '@/features/pause/public-home';
 
 /** Memoized zen route props for {@link HomeZenModeRoute} / {@link ZenModeHome}. */
 export function useZenModeHomeRouteProps(

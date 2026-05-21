@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 import {
   buildHomePauseCardBodyProps,
+  shouldShowHomePauseSectionSnooze,
   type BuildHomePauseCardBodyPropsInput,
   type HomePauseCardBodyPropsProjection,
-} from '@/features/pause/application/use-cases/home/home-pause-card-body-props';
-import { shouldShowHomePauseSectionSnooze } from '@/features/pause/application/use-cases/home/pause-home-widget-error';
+} from '@/features/pause/public-home';
 
 export type UsePauseCardProjectionParams = BuildHomePauseCardBodyPropsInput & {
   subscriptionReady: boolean;
