@@ -2,6 +2,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { usePauseSessionDepthPickerHandlers } from './use-pause-session-depth-picker-handlers';
 
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: {},
+}));
+
 describe('usePauseSessionDepthPickerHandlers', () => {
   it('onBrief selects brief ritual and resets brief step', () => {
     const setRitualEntry = vi.fn();
