@@ -13529,4 +13529,42 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — bind tab session I/O in presentation module</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; session peel follow-up</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Add <code>presentation/session/pause-persisted-tab-session-io.ts</code> as the single bound import for load/save/clear tab ritual snapshots; session shell, reflect scaffold, home manual trigger, and decide flow import it instead of wiring use case + <code>public-rpc</code> port in each hook.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving wiring only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>I/O module still binds <code>persistedTabSessionStorage</code> from <code>public-rpc</code> (same pattern as cross-context <code>public-session</code> adapter).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion analytics I/O module or Phase B <code>src/lib/*</code> shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — bind companion analytics I/O (backlog #1–#4 complete)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Frame presentation — feedback vote + fullview telemetry</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect and companion ritual folders are complete. Centralize <code>runLogCompanionFeedbackVote</code> and <code>runLogCompanionFullviewOpened</code> behind <code>presentation/companion/pause-companion-analytics-io.ts</code> so companion hooks share one bound <code>PauseAnalyticsRepository</code> import surface (mirrors tab session I/O).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving wiring only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other companion hooks still import orchestration ports from <code>public-rpc</code> directly until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>src/lib/holzen-query-client-ref</code> shim (pause query invalidation) or peel remaining per-hook <code>public-rpc</code> imports in companion orchestration.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

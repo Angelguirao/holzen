@@ -3,27 +3,14 @@ import { renderHook, act } from '@testing-library/react';
 import type { User } from '@supabase/supabase-js';
 import { useCompanionFeedbackVote } from './use-companion-feedback-vote';
 
-const {
-  runLogCompanionFeedbackVoteMock,
-  mockPauseAnalyticsRepository,
-  setQueryDataMock,
-  hapticFeedbackMock,
-} = vi.hoisted(() => ({
-  runLogCompanionFeedbackVoteMock: vi.fn().mockResolvedValue({ ok: true }),
-  mockPauseAnalyticsRepository: { port: 'supabasePauseAnalyticsRepository' },
+const { logCompanionFeedbackVoteMock, setQueryDataMock, hapticFeedbackMock } = vi.hoisted(() => ({
+  logCompanionFeedbackVoteMock: vi.fn().mockResolvedValue({ ok: true }),
   setQueryDataMock: vi.fn(),
   hapticFeedbackMock: vi.fn(),
 }));
 
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/run-log-companion-feedback-vote',
-  () => ({
-    runLogCompanionFeedbackVote: runLogCompanionFeedbackVoteMock,
-  }),
-);
-
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseAnalyticsRepository: mockPauseAnalyticsRepository,
+vi.mock('@/features/pause/presentation/companion/pause-companion-analytics-io', () => ({
+  logCompanionFeedbackVote: logCompanionFeedbackVoteMock,
 }));
 
 vi.mock('@/features/auth/public', () => ({
@@ -51,7 +38,7 @@ vi.mock('@tanstack/react-query', () => ({
 }));
 
 beforeEach(() => {
-  runLogCompanionFeedbackVoteMock.mockReset().mockResolvedValue({ ok: true });
+  logCompanionFeedbackVoteMock.mockReset().mockResolvedValue({ ok: true });
   setQueryDataMock.mockReset();
   hapticFeedbackMock.mockReset();
 });
@@ -70,10 +57,10 @@ describe('useCompanionFeedbackVote', () => {
       await result.current.handleVote('up');
     });
 
-    expect(runLogCompanionFeedbackVoteMock).not.toHaveBeenCalled();
+    expect(logCompanionFeedbackVoteMock).not.toHaveBeenCalled();
   });
 
-  it('persists vote via runLogCompanionFeedbackVote + PauseAnalyticsRepository', async () => {
+  it('persists vote via logCompanionFeedbackVote', async () => {
     const { result } = renderHook(() =>
       useCompanionFeedbackVote({
         pauseInstanceId: 'inst-1',
@@ -86,17 +73,14 @@ describe('useCompanionFeedbackVote', () => {
       await result.current.handleVote('down');
     });
 
-    expect(runLogCompanionFeedbackVoteMock).toHaveBeenCalledTimes(1);
-    expect(runLogCompanionFeedbackVoteMock).toHaveBeenCalledWith(
-      mockPauseAnalyticsRepository,
-      {
-        userId: 'user-1',
-        companionType: 'signal',
-        vote: 'down',
-        cacheId: 'cache-9',
-        pauseInstanceId: 'inst-1',
-      },
-    );
+    expect(logCompanionFeedbackVoteMock).toHaveBeenCalledTimes(1);
+    expect(logCompanionFeedbackVoteMock).toHaveBeenCalledWith({
+      userId: 'user-1',
+      companionType: 'signal',
+      vote: 'down',
+      cacheId: 'cache-9',
+      pauseInstanceId: 'inst-1',
+    });
     expect(setQueryDataMock).toHaveBeenCalled();
   });
 });
