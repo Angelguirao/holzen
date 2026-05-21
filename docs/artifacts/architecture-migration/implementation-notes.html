@@ -6309,4 +6309,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect/decide flow pure helpers → domain (backlog #1 done)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel pause-session-reflect-decide-flow from application</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Pure severity, effective-message, and generation-gate helpers moved to <code>domain/reflect/generation/</code>; <code>use-pause-session-reflect-and-decide</code> imports domain directly (no <code>application/.../flows/</code>). Removed redundant <code>shouldRunPauseReflectGeneration</code> alias — presentation uses <code>isPauseReflectGenerationEnabled</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; tests colocated with domain modules.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Empty <code>ritual/reflect/flows/</code> application folder may be removed on a later hygiene pass.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-brief-done-check-in</code> or breath segment RPC loggers through <code>public-rpc</code> (backlog #3/#4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

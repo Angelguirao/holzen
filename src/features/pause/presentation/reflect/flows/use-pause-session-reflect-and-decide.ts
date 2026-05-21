@@ -1,11 +1,9 @@
 import { useRef, type Dispatch, type SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/features/market/public';
-import {
-  resolveEffectiveReflectionMessage,
-  resolveReflectGenerationSeverityAbsPct,
-  shouldRunPauseReflectGeneration,
-} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-session-reflect-decide-flow';
+import { isPauseReflectGenerationEnabled } from '@/features/pause/domain/reflect/generation/reflect-generation-enabled';
+import { resolveEffectiveReflectionMessage } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-message';
+import { resolveReflectGenerationSeverityAbsPct } from '@/features/pause/domain/reflect/generation/reflect-generation-severity-abs-pct';
 import type { PauseImpactData } from '@/features/pause/application/use-cases/ritual/decide/impact-data';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
@@ -60,7 +58,7 @@ export function usePauseSessionReflectAndDecide({
   shiftIntensity,
 }: UsePauseSessionReflectAndDecideParams) {
   const decidingRef = useRef(false);
-  const reflectGenEnabled = shouldRunPauseReflectGeneration(ritualEntry, step);
+  const reflectGenEnabled = isPauseReflectGenerationEnabled(ritualEntry, step);
 
   const {
     reflectionMessage: generatedReflectionMessage,
