@@ -8076,4 +8076,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — remove dead companion analytics facades from public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>§6 slim barrel — unused feedback vote + fullview RPC wrappers</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Presentation and query modules already call analytics use cases with <code>supabasePauseAnalyticsRepository</code> from <code>public-ports</code>. Drop unused <code>fetchPauseCompanionFeedbackVote</code>, <code>logPauseCompanionFeedbackVote</code>, and <code>logPauseCompanionFullviewOpened</code> from <code>public-rpc.ts</code>; type re-exports remain for <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — no call sites removed (facades had zero imports).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Cross-context analytics should use <code>public-queries</code> + <code>public-ports</code>, not duplicate facades on <code>public-rpc</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: audit remaining lifecycle/ritual facades on <code>public-rpc</code>, or colocate breath-handlers conductor under <code>reflect/flows/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
