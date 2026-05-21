@@ -1,6 +1,7 @@
 /**
- * Pause RPC mutations (loads Supabase client). Import from here in hooks/tests —
- * not from `public.ts`, which stays free of infrastructure side effects.
+ * Pause RPC mutations and default port adapters (loads Supabase client).
+ * Import from here in hooks/tests — not from `public.ts`, which stays free of
+ * infrastructure side effects. Query factories stay on `public-queries.ts`.
  */
 export type {
   PauseAdoptPendingResult,
@@ -10,12 +11,26 @@ export type {
 export type { PauseCompanionAction, PauseState } from './domain/pause-state';
 import type { PauseCompanionAction } from './domain/pause-state';
 export type { OpenManualPauseFromHomeResult } from './application/use-cases/trigger/open-manual-pause-from-home';
+export type { ReflectGenerator } from './ports/reflect-generator';
+export type { PauseAnalyticsRepository } from './ports/pause-analytics-repository';
 
 export { ritualDepthUpgradedPayload } from './application/use-cases/ritual/brief/ritual-depth-upgrade';
-export { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
 export { invokeCompanionOrchestrate } from './infrastructure/edge/companion-orchestrate-edge';
 export type { CompanionOrchestrator } from './ports/companion-orchestrator';
-export { supabaseCompanionOrchestrator } from './infrastructure/supabase-companion-orchestrator';
+export { createCompanionSlotOrchestratePorts } from './infrastructure/supabase-companion-orchestrator';
+import { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
+import { supabaseCompanionOrchestrator } from './infrastructure/supabase-companion-orchestrator';
+import { supabasePauseAnalyticsRepository } from './infrastructure/supabase-pause-analytics-repository';
+import { supabaseReflectGenerator } from './infrastructure/supabase-reflect-generator';
+import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
+
+export {
+  supabasePauseRepository,
+  supabaseCompanionOrchestrator,
+  supabasePauseAnalyticsRepository,
+  supabaseReflectGenerator,
+  reflectionStepSessionStorage,
+};
 export type { CompanionOrchestrateSessionContext } from './application/use-cases/ritual/frame/build-companion-orchestrate-body';
 export type { LoadCompanionOrchestrateSessionInput } from './application/use-cases/ritual/frame/load-companion-orchestrate-session';
 import {
@@ -43,8 +58,6 @@ import {
   applyBulkHoldOutcomes as applyBulkHoldOutcomesUseCase,
   type BulkHoldApplyResult,
 } from './application/use-cases/home/bulk-hold/apply-bulk-hold-outcomes';
-import { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
-import { supabaseReflectGenerator } from './infrastructure/supabase-reflect-generator';
 import { openManualPauseFromHome as openManualPauseFromHomeUseCase } from './application/use-cases/trigger/open-manual-pause-from-home';
 import type { OpenManualPauseFromHomeParams } from './application/use-cases/trigger/open-manual-pause-from-home';
 import type { TFunction } from 'i18next';
@@ -72,7 +85,6 @@ import {
   runPauseReflectionStepLogOnce,
   type RunPauseReflectionStepLogResult,
 } from './application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
-import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
 import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from './application/use-cases/ritual/frame/persist-ui-step-completion';
 import type { CompanionUiCompletionStep } from './application/use-cases/ritual/frame/companion-ui-completion-types';
@@ -100,7 +112,6 @@ import {
   type LogDevModeSettingInput,
 } from './application/use-cases/admin/run-log-dev-mode-setting';
 import { runFetchDevModeSetting } from './application/use-cases/admin/run-fetch-dev-mode-setting';
-import { supabasePauseAnalyticsRepository } from './infrastructure/supabase-pause-analytics-repository';
 import {
   runInitialEmotionSelect,
   runInitialEmotionSkip,
