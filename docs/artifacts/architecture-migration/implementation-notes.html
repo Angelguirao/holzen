@@ -6119,4 +6119,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect UI telemetry via public-rpc (backlog #1 done, #3 peel)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel PostHog reflect UI conductor from application imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete — no folder move. <code>use-pause-reflect-ui-telemetry</code> imports <code>trackPauseReflect*</code> and <code>PauseReflectTelemetrySurface</code> from <code>public-rpc</code> re-exports; trackers stay in <code>ritual/reflect/telemetry/pause-reflect-ui-telemetry.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; events unchanged in <code>event-taxonomy.md</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Frame-focus ambience hook still imports <code>ritual/reflect/ambience/</code> directly; feel-tiles / reflect-decide flows still deep-import use cases.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-reflect-frame-focus-ambience</code> or brief-to-deep / post-pause hooks through <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
