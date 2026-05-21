@@ -7,7 +7,8 @@ export type {
   PauseCreateOrReuseResult,
   PauseLogCompanionResult,
 } from './domain/rpc-types';
-export type { PauseState } from './domain/pause-state';
+export type { PauseCompanionAction, PauseState } from './domain/pause-state';
+import type { PauseCompanionAction } from './domain/pause-state';
 export type { OpenManualPauseFromHomeResult } from './application/use-cases/trigger/open-manual-pause-from-home';
 export type { RunReflectGenerationInput };
 
@@ -87,6 +88,7 @@ import { runFetchCompanionFeedbackVote } from './application/use-cases/ritual/fr
 import { runLogCompanionFeedbackVote } from './application/use-cases/ritual/frame/run-log-companion-feedback-vote';
 import { runLogCompanionFullviewOpened } from './application/use-cases/ritual/frame/run-log-companion-fullview-opened';
 import type { LogCompanionFullviewOpenedInput } from './application/use-cases/ritual/frame/log-companion-fullview-opened';
+import { logPauseCompanion as logPauseCompanionUseCase } from './application/use-cases/ritual/log/log-pause-companion';
 import { supabasePauseAnalyticsRepository } from './infrastructure/supabase-pause-analytics-repository';
 
 /** Lifecycle + ritual mutations — wired facades only; no generic `pauseLogStep` export. */
@@ -242,6 +244,16 @@ export function logPauseCompanionFullviewOpened(
   input: LogCompanionFullviewOpenedInput,
 ): Promise<{ ok: boolean }> {
   return runLogCompanionFullviewOpened(supabasePauseAnalyticsRepository, input);
+}
+
+/** Frame / companion UI — `pause_log_companion` via `PauseRepository` (wired for presentation). */
+export function logPauseCompanion(params: {
+  instanceId: string | null;
+  companionType: string;
+  action: PauseCompanionAction;
+  entryPoint: string;
+}): Promise<PauseLogCompanionResult> {
+  return logPauseCompanionUseCase(supabasePauseRepository, params);
 }
 
 /** Reflect progression — `reflection_step` once per instance (sessionStorage dedupe). */

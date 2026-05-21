@@ -4960,4 +4960,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — logPauseCompanion facade on public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; pause_log_companion wired for presentation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> migration was already complete on <code>cursor/arch-migrate-src-ca70</code>. Export <code>logPauseCompanion</code> on <code>public-rpc.ts</code> (delegates to <code>log-pause-companion</code> + <code>supabasePauseRepository</code>); <code>persistCompanionUiStepCompletion</code> still uses the use case with injected repository — no behavior change.</dd>
+      <dt>Deviation</dt>
+      <dd>None — facade ready for frame presentation paths that should not import application modules directly.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No call sites switched this slice; PWA install + dev-mode analytics still on <code>public-ports</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>logPausePwaInstall*</code> / <code>logPauseDevModeSetting</code> facades, or <code>use-pause-artifact-reflection-text</code> hook using <code>fetchPauseReflectReflectionText</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
