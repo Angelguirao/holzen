@@ -8551,4 +8551,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — analytics query modules off public-ports (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect ritual/reflect/ complete; infrastructure queries import adapters directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no legacy reflect use-case paths. <code>infrastructure/queries/*-analytics*</code> and <code>dev-mode-admin-query</code> import <code>supabasePauseAnalyticsRepository</code> from <code>infrastructure/supabase-pause-analytics-repository</code> instead of <code>public-ports</code> (presentation-only barrel).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import layering only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-ports</code> remains the presentation injection surface for orchestrator + reflect generator + pause repository adapters.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: colocate <code>dismiss/</code> under <code>home/</code>, or peel any remaining direct <code>pause-rpc-client</code> call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
