@@ -3440,6 +3440,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate reflect UI telemetry under presentation/reflect/telemetry/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 reflect telemetry mirrors ritual/reflect/telemetry/</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Holzen-reflect + haiku hooks were already under <code>presentation/reflect/generation/</code> on remote. This slice adds <code>use-pause-reflect-ui-telemetry</code> under <code>presentation/reflect/telemetry/</code>; <code>public-hooks</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session reflect/decide, frame-focus ambience, hub, and flows conductors remain at <code>presentation/reflect/</code> root until later peels (<code>ambience/</code>, <code>hub/</code>, <code>flows/</code>).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: route <code>persistCompanionUiStepCompletion</code> through <code>public-rpc</code>, or colocate remaining flat cross-route presentation hooks.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
