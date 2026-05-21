@@ -7528,6 +7528,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — reflect flows types + companion analytics port peel (backlog #1 done, #3/#4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -7541,6 +7542,21 @@
       <dd>Companion orchestrate session/expansion hooks still import <code>public-rpc</code>; home manual trigger unchanged.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>use-manual-pause-trigger</code> or companion orchestrate hooks off <code>public-rpc</code>.</dd>
+=======
+      <span>Phase A slice — favorite pro-hint toast under presentation/reflect/steps (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Realign pro-hint toast with §10.1 presentation path</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder migration is complete. Prior slice colocated <code>pause-favorite-pro-hint-toast</code> under <code>application/use-cases/ritual/reflect/steps/</code>; §10.1 and conflict hierarchy place Sonner UI in <code>presentation/reflect/steps/</code>. Moved module + test back beside <code>use-pause-favorite-toggle</code>; <code>run-pause-favorite-toggle</code> stays in <code>ritual/reflect/steps/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Toast still calls Sonner directly (no notification port).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate mood chrome slice types or backlog #4 remaining <code>PauseRepository</code> / companion orchestrate <code>public-rpc</code> peels.</dd>
+>>>>>>> 21e758d5 (refactor(pause): move favorite pro-hint toast to presentation/reflect/steps)
     </dl>
   </article>
 
