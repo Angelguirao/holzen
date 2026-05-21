@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Tag, X } from 'lucide-react';
-import { usePauseReflectTags } from '@/features/pause/public-hooks';
+import { usePauseReflectTags } from '@/features/pause/public-ritual-reflect';
 
 interface Props {
   pauseInstanceId: string;

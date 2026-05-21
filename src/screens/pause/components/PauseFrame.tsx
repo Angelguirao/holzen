@@ -7,11 +7,9 @@ import { Button } from '@/components/ui/button';
 import {
   resolveEffectiveReflectionCopy,
   resolveFrameHaikuDisplayBody,
-} from '@/features/pause/public-ritual-reflect';
-import {
   usePauseArtifactHaiku,
   usePauseArtifactReflectionText,
-} from '@/features/pause/public-hooks';
+} from '@/features/pause/public-ritual-reflect';
 import { hapticFeedback } from '@/lib/haptics';
 import { PauseFrameHaikuCard } from '@/screens/pause/components/pause-frame-haiku-card';
 import { PauseFrameToolRow } from '@/screens/pause/components/pause-frame-tool-row';

@@ -1,5 +1,5 @@
 import { isPauseMoodValue } from '@/features/pause/public-hooks';
-import { usePauseReflectUiTelemetry } from '@/features/pause/public-hooks';
+import { usePauseReflectUiTelemetry } from '@/features/pause/public-ritual-reflect';
 import { ShareReflection } from '@/screens/pause/components/ShareReflection';
 
 export type PauseDoneReflectShareRowProps = {

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { CirclePlus } from 'lucide-react';
 import { PauseNote } from '@/screens/pause/components/PauseNote';
 import { PauseTags } from '@/screens/pause/components/PauseTags';
-import { usePauseReflectUiTelemetry } from '@/features/pause/public-hooks';
+import { usePauseReflectUiTelemetry } from '@/features/pause/public-ritual-reflect';
 import { Button } from '@/components/ui/button';
 import { hapticFeedback } from '@/lib/haptics';
 
