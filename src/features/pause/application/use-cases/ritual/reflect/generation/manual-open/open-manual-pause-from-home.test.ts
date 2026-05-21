@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 import { runPauseCreateOrReuse } from '@/features/pause/application/use-cases/session/run-pause-create-or-reuse';
-import { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-open-manual-pause-silent-mode-after-create';
+import { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-open-manual-pause-silent-mode-after-create';
 import { openManualPauseFromHome } from './open-manual-pause-from-home';
 
 vi.mock('@/features/pause/application/use-cases/session/run-pause-create-or-reuse', () => ({
@@ -10,7 +10,7 @@ vi.mock('@/features/pause/application/use-cases/session/run-pause-create-or-reus
 }));
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/generation/run-open-manual-pause-silent-mode-after-create',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-open-manual-pause-silent-mode-after-create',
   () => ({
     runOpenManualPauseSilentModeAfterCreate: vi.fn(),
   }),

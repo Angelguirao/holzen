@@ -59,7 +59,7 @@ application/use-cases/
   ritual/reflect/generation/run-reflect-generation.ts
   ritual/frame/run-companion-slot-orchestrate.ts
   ritual/decide/run-pause-outcome-log.ts
-  ritual/reflect/generation/open-manual-pause-from-home.ts
+  ritual/reflect/generation/manual-open/open-manual-pause-from-home.ts
 ```
 
 Other contexts: group by **system-doc vocabulary** ([pause-client-architecture.md](../systems/pause-client-architecture.md) §9) — e.g. `subscription/checkout/`, `auth/sign-in/`.
