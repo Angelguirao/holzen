@@ -7,11 +7,12 @@ import { reflectGenerationUserErrorMessage } from '@/features/pause/domain/refle
 import { resolveEffectiveReflectionCopy } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
 import {
   messageFromReflectGenerationResult,
+  pauseReflectGeneration,
+  reflectGenerator,
   resolveReflectGenerationPrefetch,
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/reflect-generation-hook-flow';
-import { pauseReflectGeneration, reflectGenerator } from './pause-reflect-generation-io';
+} from './pause-reflect-generation-io';
 import type { UsePauseReflectGenerationParams } from './use-pause-reflect-generation-types';
 import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-text';
 

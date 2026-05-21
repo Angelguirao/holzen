@@ -14612,4 +14612,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation hook-flow on pause-reflect-generation-io</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect cluster follow-up — single generation I/O import</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. After <code>pauseReflectGeneration</code> landed on remote, re-export hook-flow helpers from <code>pause-reflect-generation-io.ts</code> so <code>use-pause-reflect-generation</code> has no deep <code>application/</code> imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hook tests spread importActual hook-flow in the io mock (avoids eager Supabase from full io importActual).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: bind <code>apply-manual-pause-open-result</code> through <code>presentation/home/pause-home-io</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
