@@ -1,6 +1,6 @@
 /**
  * Post-pause done step — screen-facing helpers (brief check-in, wallpaper mood).
- * Mutations stay on `public-rpc.ts`; layout tokens on `public-session.ts`.
+ * Brief check-in uses `PauseRepository` via `ritual/done/` use case; layout tokens on `public-session.ts`.
  */
 export {
   resolveDoneWallpaperMood,
@@ -9,4 +9,4 @@ export {
 export {
   usePauseBriefDoneCheckIn,
   type UsePauseBriefDoneCheckInParams,
-} from './presentation/session/use-pause-brief-done-check-in';
+} from './presentation/ritual/done/use-pause-brief-done-check-in';
