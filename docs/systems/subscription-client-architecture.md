@@ -73,7 +73,7 @@ Group `use-cases/` by **billing lifecycle**, not route names.
 
 ## 6. Transitional state
 
-Partially aligned today — see [src/features/subscription/README.md](../../src/features/subscription/README.md). Expand this doc when a Phase B slice changes structure.
+Partially aligned today — see [src/features/subscription/README.md](../../src/features/subscription/README.md). **`App.tsx`** registers checkout guard cleanup via `@/lib/subscription-checkout-guard-ref` (re-exports `scheduleCheckoutGuardCleanup` from `public.ts`). Expand this doc when a Phase B slice changes structure.
 
 ---
 
