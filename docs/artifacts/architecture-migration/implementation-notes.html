@@ -15296,4 +15296,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — should-navigate-after-manual-trigger under ritual/reflect/generation</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up — Home manual-open navigation guard beside open-manual-pause</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. <code>map-manual-trigger-start-error</code> already lives in <code>domain/reflect/generation/</code> (parallel agent). Move <code>should-navigate-after-manual-trigger</code> (+ test) from <code>application/use-cases/trigger/</code> to <code>application/use-cases/ritual/reflect/generation/</code>; <code>pause-home-reflect-io</code> and <code>pause-home-io</code> re-export for Home conductors.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; no new PostHog events.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Cooldown math stays in <code>trigger/</code> (scheduling concern) on <code>public-trigger</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>use-companion-orchestrate-retry</code> through <code>pause-companion-orchestrate-io</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

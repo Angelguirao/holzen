@@ -35,3 +35,5 @@ export {
   type ApplyManualPauseOpenResultInput,
   type ManualPauseHomePreviewPorts,
 } from './apply-manual-pause-open-result';
+export { mapManualTriggerStartError } from '@/features/pause/domain/reflect/generation/map-manual-trigger-start-error';
+export { shouldNavigateAfterManualTrigger } from '@/features/pause/application/use-cases/ritual/reflect/generation/should-navigate-after-manual-trigger';

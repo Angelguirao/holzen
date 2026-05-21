@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import { shouldNavigateAfterManualTrigger } from '@/features/pause/application/use-cases/ritual/reflect/generation/should-navigate-after-manual-trigger';
 import { useHomePauseActions } from './use-home-pause-actions';
 
 const { trackPauseOpenDismissedMock, trackHomePendingPauseBannerPauseOpenedMock } = vi.hoisted(
@@ -10,6 +11,7 @@ const { trackPauseOpenDismissedMock, trackHomePendingPauseBannerPauseOpenedMock 
 );
 
 vi.mock('./pause-home-io', () => ({
+  shouldNavigateAfterManualTrigger,
   trackPauseOpenDismissed: trackPauseOpenDismissedMock,
   trackHomePendingPauseBannerPauseOpened: trackHomePendingPauseBannerPauseOpenedMock,
 }));

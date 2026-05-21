@@ -6,9 +6,9 @@ import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/comp
 import {
   buildHomePauseSessionLocationState,
   canNavigateToPauseSession,
-  shouldNavigateAfterManualTrigger,
 } from '@/features/pause/public-navigation';
 import {
+  shouldNavigateAfterManualTrigger,
   trackHomePendingPauseBannerPauseOpened,
   trackPauseOpenDismissed,
   type PauseDismissAnalyticsSurface,
