@@ -14650,4 +14650,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A fix — resolve pause-home-io merge conflict markers</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Automation follow-up — broken Home I/O barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Parallel pushes left git conflict markers in <code>presentation/home/pause-home-io.ts</code>. Unified exports: single barrel re-exports <code>applyManualPauseOpenResult</code>, manual-open params, ports, and types — no duplicate export blocks.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged from intended apply-manual-open slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>None.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>holzen-query-client-ref</code> shim or extract context fingerprint helpers beside manual-open generation cluster.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
