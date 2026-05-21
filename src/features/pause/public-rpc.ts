@@ -112,10 +112,6 @@ import type { MoodValue } from './domain/mood-value';
 import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
 import type { RunPauseFavoriteToggleResult } from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import type { RunPauseReflectTagUpdateResult } from './application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
-import {
-  runPauseReflectionStepLogOnce,
-  type RunPauseReflectionStepLogResult,
-} from './application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
 import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from './application/use-cases/ritual/frame/persist-ui-step-completion';
 import type { CompanionUiCompletionStep } from './application/use-cases/ritual/frame/companion-ui-completion-types';
@@ -228,11 +224,7 @@ export type { BulkHoldApplyResult };
 export type { PostPauseFeelSnapshot };
 export type { CompanionUiCompletionStep };
 export type { RunAdoptPendingPauseOfferResult, RunDeclinePendingPauseOfferResult };
-export type {
-  RunPauseFavoriteToggleResult,
-  RunPauseReflectTagUpdateResult,
-  RunPauseReflectionStepLogResult,
-};
+export type { RunPauseFavoriteToggleResult, RunPauseReflectTagUpdateResult };
 
 /** Frame companion UI step completion — wired with default `PauseRepository`. */
 export async function persistCompanionUiStepCompletion(
@@ -438,15 +430,6 @@ export function logPauseShiftEmotionFrameHubDone(
   input: Parameters<typeof runShiftEmotionFrameHubDone>[1],
 ): Promise<RunShiftEmotionFrameHubDoneResult> {
   return runShiftEmotionFrameHubDone(supabasePauseRepository, input);
-}
-
-/** Reflect copy settled — `reflection_step` once per tab via `PauseRepository` + session storage. */
-export function logPauseReflectionStepOnce(input: {
-  pauseInstanceId: string;
-}): Promise<RunPauseReflectionStepLogResult> {
-  return runPauseReflectionStepLogOnce(supabasePauseRepository, input, {
-    storage: reflectionStepSessionStorage,
-  });
 }
 
 /** Reflect-step holzen-reflect — nav seed → artifact cache → edge via `ReflectGenerator` (wired). */
