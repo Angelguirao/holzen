@@ -16246,4 +16246,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect steps RPC via mutation flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-mutation-flow</code> for post-it + favorite + reflection_step use cases</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add application cluster anchor beside <code>pause-reflection-step-flow</code> / <code>pause-favorite-toggle-flow</code>; <code>pause-reflect-steps-io</code> imports tag/note/favorite/<code>reflection_step</code> RPC use cases through the anchor instead of deep <code>run-*</code> modules. Unit tests mock the anchor.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hub, share, and generation presentation I/O modules still bind application use cases directly until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: hub or share reflect I/O flow anchors, or breath second-label + restored-state anchors on <code>pause-session-breath-io</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

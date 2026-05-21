@@ -1,10 +1,12 @@
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { shouldShowFavoriteProHint } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-favorite-toggle-flow';
 import { shouldLogPauseReflectionStep } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflection-step-flow';
-import { runPauseFavoriteToggle } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
-import { runPauseReflectNoteUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
-import { runPauseReflectTagUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
-import { runPauseReflectionStepLogOnce } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
+import {
+  runPauseFavoriteToggle,
+  runPauseReflectNoteUpdate,
+  runPauseReflectTagUpdate,
+  runPauseReflectionStepLogOnce,
+} from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-mutation-flow';
 import {
   reflectionStepSessionStorage,
   supabasePauseRepository,
