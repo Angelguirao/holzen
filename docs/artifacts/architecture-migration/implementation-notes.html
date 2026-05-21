@@ -16439,19 +16439,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect flows decide toasts via toast flow anchor (backlog #1 verified, Tier 5)</span>
+      <span>Phase A slice — decide outcome toasts via ritual/decide flow anchor (backlog #1 verified; Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-decide-outcome-toast-flow</code> on <code>pause-reflect-flows-io</code></h3>
+    <h3><code>pause-decide-outcome-toast-flow</code> on <code>pause-reflect-flows-io</code> + <code>public-rpc</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-decide-outcome-toast-flow</code> beside <code>pause-decide-outcome-log-flow</code>; <code>pause-reflect-flows-io</code> imports Sonner outcome toasts through the decide cluster anchor instead of deep <code>outcome-toast</code>. <code>pauseReflectOutcomeLog</code> facades unchanged.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-decide-outcome-toast-flow</code> beside <code>pause-decide-outcome-log-flow</code>; <code>pause-reflect-flows-io</code> and <code>public-rpc</code> import Sonner outcome toasts through the decide cluster anchor instead of deep <code>outcome-toast</code>. <code>pauseReflectOutcomeLog</code> facades unchanged.</dd>
       <dt>Deviation</dt>
-      <dd>None — behavior parity; <code>public-rpc</code> still re-exports toasts from <code>outcome-toast</code> for cross-context callers.</dd>
+      <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
       <dd>Reflect share I/O still binds <code>run-reflection-share-image</code> directly until a share flow anchor lands.</dd>
       <dt>Open questions</dt>
-      <dd>Next: reflect share I/O flow anchor, or session shell/scaffold presentation I/O peels.</dd>
+      <dd>Next: reflect share I/O flow anchor, home manual-open generation cluster anchor, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
