@@ -15201,4 +15201,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — pending-offer telemetry under ritual/reflect/telemetry/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up — session pending adopt/decline PostHog cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Move <code>pending-pause-offer-telemetry</code> (+ test) from <code>application/use-cases/trigger/</code> to <code>ritual/reflect/telemetry/</code> beside other pause-offer PostHog helpers; <code>pause-session-pending-offer-telemetry-io</code> re-exports for <code>use-pending-pause-offer-mutations</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; no new PostHog events.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Remaining <code>trigger/</code> modules (cooldowns, navigation guards, manual-trigger error mapping) stay until a later slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>reflect-frame-focus-ambience</code> domain peel, <code>use-companion-orchestrate-retry</code> through companion orchestrate I/O, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
