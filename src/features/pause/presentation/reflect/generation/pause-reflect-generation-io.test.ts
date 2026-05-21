@@ -4,7 +4,7 @@ import { pauseReflectGeneration, reflectGenerator } from './pause-reflect-genera
 const runReflectGenerationMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-run-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation',
   () => ({
     runReflectGeneration: runReflectGenerationMock,
   }),
