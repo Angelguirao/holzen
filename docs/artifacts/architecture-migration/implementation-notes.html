@@ -14938,6 +14938,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — Home manual-open types + actions telemetry I/O</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — apply off deep trigger imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Add <code>pause-home-manual-open-types.ts</code> and <code>pause-home-actions-telemetry-io.ts</code>; <code>apply-manual-pause-open-result</code> defaults through <code>pause-home-telemetry-io</code> with types from the manual-open types module (pairs with existing <code>pause-home-reflect-io</code> split).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Four Home presentation I/O/type modules vs one barrel; manual-open PostHog still reaches application trigger modules through telemetry I/O only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion presentation I/O peels or <code>public-ritual-frame</code> barrel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase B Tier 1 — App boot uses pause public-queries for QueryClient ref</span>
       <span class="status resolved">resolved</span>
     </header>

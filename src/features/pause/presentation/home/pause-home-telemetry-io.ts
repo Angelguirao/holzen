@@ -3,11 +3,14 @@ export {
   trackPauseOpenDismissed,
   type OpenPauseStateForAnalytics,
   type PauseDismissAnalyticsSurface,
-} from '@/features/pause/application/use-cases/trigger/home-pause-actions-telemetry';
+} from './pause-home-actions-telemetry-io';
 export {
   markPauseManualStartedHomeOnce,
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
-  type TrackManualPauseInstanceCreatedPayload,
-  type TrackPauseManualCompletedPayload,
 } from '@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry';
+
+export type {
+  TrackManualPauseInstanceCreatedPayload,
+  TrackPauseManualCompletedPayload,
+} from './pause-home-manual-open-types';
