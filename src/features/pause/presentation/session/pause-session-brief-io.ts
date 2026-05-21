@@ -1,14 +1,14 @@
 /**
  * Presentation I/O for `/pause` brief ritual depth upgrade RPC and brief hydration from storage.
- * Session brief hooks import here instead of deep `application/use-cases/*`.
+ * Imports restored brief fields from `session/` + `ritual/brief/` (off `pause-session-brief-flow` CI anchor).
  */
 import { logPauseRitualDepthUpgraded } from '@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade';
+import { initialRitualEntry } from '@/features/pause/application/use-cases/session/initial-ritual-entry';
 import {
   initialBriefIntegrateDoneFromRestored,
   initialBriefPauseStepFromRestored,
   initialSelectedBriefFaceFromRestored,
 } from '@/features/pause/application/use-cases/session/restored-brief-ritual-state';
-import { initialRitualEntry } from '@/features/pause/application/use-cases/session/initial-ritual-entry';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
