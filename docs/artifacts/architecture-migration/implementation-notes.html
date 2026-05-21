@@ -8279,9 +8279,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>use-pause-brief-done-check-in</code> and pending-offer mutations still inject <code>public-ports</code> until next peel slices.</dd>
+      <dd>Brief-done and pending-offer conductors peeled in follow-up commits on the same day.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>use-pause-brief-done-check-in</code> → <code>logPostPauseEmotionIfDirty</code>, or pending-offer adopt/decline facades on <code>public-rpc</code>.</dd>
+      <dd>Next: archive retrospective or bulk-hold on <code>public-rpc</code>, or colocate flat session hooks.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — wire pending-offer mutations through public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; presentation uses wired adopt/decline facades</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Route <code>usePendingPauseOfferMutations</code> through existing <code>adoptPendingPauseOffer</code> / <code>declinePendingPauseOffer</code> in <code>public-rpc</code> instead of injecting <code>supabasePauseRepository</code> from <code>public-ports</code>; tests mock <code>public-rpc</code> (same pattern as brief-done check-in).</dd>
+      <dt>Deviation</dt>
+      <dd>None — facades already delegated to <code>PauseRepository</code> since prior §6 peel.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Remaining <code>public-ports</code> repository imports: archive retrospective, bulk-hold, home preview dismiss (companion UI + breath segment + feedback vote peeled).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire archive retrospective or bulk-hold through <code>public-rpc</code>, or colocate <code>use-pause-session-shell-ritual</code> + pending-leave sheet.</dd>
     </dl>
   </article>
 
