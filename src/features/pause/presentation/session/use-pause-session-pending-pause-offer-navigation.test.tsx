@@ -4,10 +4,8 @@ import { usePauseSessionPendingPauseOfferNavigation } from './use-pause-session-
 
 const clearSessionMock = vi.fn();
 
-vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   clearSession: (...args: unknown[]) => clearSessionMock(...args),
-  loadSession: () => null,
-  saveSession: vi.fn(),
 }));
 
 describe('usePauseSessionPendingPauseOfferNavigation', () => {

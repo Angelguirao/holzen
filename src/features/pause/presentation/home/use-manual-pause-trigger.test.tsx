@@ -3,14 +3,14 @@ import { renderHook, act } from '@testing-library/react';
 import type { User } from '@supabase/supabase-js';
 import { useManualPauseTrigger } from './use-manual-pause-trigger';
 
-const openManualPauseFromHomeMock = vi.hoisted(() => vi.fn());
+const { openManualPauseFromHomeMock, clearSessionMock } = vi.hoisted(() => ({
+  openManualPauseFromHomeMock: vi.fn(),
+  clearSessionMock: vi.fn(),
+}));
 
 vi.mock('@/features/pause/public-rpc', () => ({
   openManualPauseFromHome: openManualPauseFromHomeMock,
-}));
-
-vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
-  clearSession: vi.fn(),
+  clearSession: clearSessionMock,
 }));
 
 vi.mock('@/lib/holzen-console', () => ({

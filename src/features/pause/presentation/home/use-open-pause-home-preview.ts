@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
+import { clearSession } from '@/features/pause/public-rpc';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import { dismissOpenPauseHomePreview } from '@/features/pause/public-rpc';
 import { fetchOpenPauseHomePreview } from '../../public-queries';
