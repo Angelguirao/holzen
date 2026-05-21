@@ -1,16 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/features/pause/presentation/session/breath/pause-session-breath-io', () => ({
+vi.mock('@/features/pause/domain/ritual/breathe/restored-breath-ritual-state', () => ({
   initialBreathingFirstCompletedFromRestored: vi.fn(),
   initialBreathingSecondCompletedFromRestored: vi.fn(),
 }));
 
-vi.mock('@/features/pause/presentation/session/pause-session-decide-io', () => ({
+vi.mock('@/features/pause/application/use-cases/ritual/decide/restored-decide-ritual-state', () => ({
   initialDecisionFromRestored: vi.fn(),
   initialPhaseFromRestored: vi.fn(),
 }));
 
-vi.mock('@/features/pause/presentation/session/pause-session-frame-io', () => ({
+vi.mock('@/features/pause/application/use-cases/ritual/frame/restored-frame-ritual-state', () => ({
   initialFrameDoneFromRestored: vi.fn(),
 }));
 
