@@ -271,11 +271,14 @@ export {
   type CompanionSlotOrchestrateMode,
   type RunCompanionSlotOrchestratePorts,
 } from './application/use-cases/ritual/frame/run-companion-slot-orchestrate';
-export type {
-  CompanionSlotCacheIds,
-  CompanionSlotCommitters,
-  CompanionSlotRelaxations,
+export {
+  EMPTY_COMPANION_SLOT_RELAXATIONS,
+  type CompanionSlotCacheIds,
+  type CompanionSlotCommitters,
+  type CompanionSlotRelaxations,
 } from './application/use-cases/ritual/frame/orchestrate-slot-apply';
+export { applyCompanionOrchestrateRetryReset } from './application/use-cases/ritual/frame/apply-companion-orchestrate-retry-reset';
+export { resetInterventionIdempotency } from './application/use-cases/ritual/frame/intervention-idempotency';
 
 /** Frame / companion UI — `pause_log_companion` via `PauseRepository` (wired for presentation). */
 export function logPauseCompanion(params: {

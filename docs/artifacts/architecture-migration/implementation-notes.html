@@ -7107,4 +7107,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion retry + failure ports via public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel companion orchestrate retry presentation imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Re-export retry reset + intervention idempotency + <code>EMPTY_COMPANION_SLOT_RELAXATIONS</code> on <code>public-rpc</code>; <code>use-companion-orchestrate-retry</code> and failure-port hook import the barrel only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Intervention fetch/bootstrap hooks still import <code>application/ritual/frame/*</code> until a follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel companion intervention presentation cluster, decide/brief session hooks off <code>public-rpc</code>, or backlog #4 stray mutation call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
