@@ -1,8 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { PauseStep } from '@/screens/pause/components/PauseProgress';
 import { PauseScienceStepRow } from '@/screens/pause/components/pause-science-step-row';
-import { stepHighlightsScienceRow } from '@/screens/pause/lib/pause-science-step-highlight';
-import { PAUSE_SCIENCE_STEPS } from '@/screens/pause/lib/pause-science-steps';
+import { PAUSE_SCIENCE_STEPS, stepHighlightsScienceRow } from '@/features/pause/public-hooks';
 
 interface PauseScienceScrollBodyProps {
   /** When set, the matching ritual step’s citations block is visually emphasized. */

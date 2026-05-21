@@ -1,5 +1,5 @@
-import type { PauseStep } from '@/features/pause/public-hooks';
-import type { PauseScienceStepKey } from '@/screens/pause/lib/pause-science-steps';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
+import type { PauseScienceStepKey } from './pause-science-steps';
 
 /** True when the science sheet should emphasize a ritual step’s citation block. */
 export function stepHighlightsScienceRow(

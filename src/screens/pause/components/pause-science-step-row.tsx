@@ -1,7 +1,7 @@
 import { Wind, Heart, BookOpen, Compass, Target, ExternalLink, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import type { PauseScienceStepConfig } from '@/screens/pause/lib/pause-science-steps';
+import type { PauseScienceStepConfig } from '@/features/pause/public-hooks';
 
 const STEP_ICONS: Record<PauseScienceStepConfig['key'], LucideIcon> = {
   feel: Heart,

@@ -103,6 +103,14 @@ export {
   type PauseBreathingPhase,
   type PauseBreathingTimedDisplay,
 } from './application/use-cases/ritual/breathe/resolve-pause-breathing-timed-display';
+export {
+  PAUSE_SCIENCE_STEP_KEYS,
+  PAUSE_SCIENCE_STEPS,
+  type PauseScienceSource,
+  type PauseScienceStepConfig,
+  type PauseScienceStepKey,
+} from './domain/pause-science/pause-science-steps';
+export { stepHighlightsScienceRow } from './domain/pause-science/pause-science-step-highlight';
 export type { FeelStepTile } from './domain/feel-step-tile';
 export { PAUSE_FEEL_STEP_TILE_ROWS } from './domain/pause-feel-step-tiles';
 export {
