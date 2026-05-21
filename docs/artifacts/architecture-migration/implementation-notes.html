@@ -12598,4 +12598,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — backlog #1 verified; session tab storage via public-session (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> already complete; session shell off infrastructure path</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder move was already complete on <code>cursor/arch-migrate-src-ca70</code> — zero legacy <code>application/use-cases/reflect/</code> paths; 18 modules under <code>ritual/reflect/</code>. This slice continues backlog #4 §6 barrel hygiene: export <code>loadSession</code> and <code>saveSession</code> on <code>public-session.ts</code> beside existing <code>clearSession</code>; all <code>presentation/session/</code> conductors import tab storage from <code>public-session</code> (tests mock the barrel).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged; import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No CI guard yet for direct <code>persisted-session-storage</code> imports outside the adapter module; optional follow-up like <code>pause-rpc-client</code> guard.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional <code>analytics-events</code> import guard; Phase B subscription/auth <code>src/lib/*</code> shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
