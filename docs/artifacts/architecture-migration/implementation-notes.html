@@ -7658,4 +7658,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect/decide conductor params under reflect/flows (backlog #1 presentation)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>UsePauseSessionReflectAndDecideParams</code> beside reflect+decide hook</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate reflect+decide hook params with <code>use-pause-session-reflect-and-decide</code> under <code>presentation/reflect/flows/</code>; <code>public-hooks</code> re-export path unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; types-only move.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hook still composes decide handler from <code>presentation/decide/</code>; no new slice types for decide-only fields this slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel remaining companion orchestrate <code>public-rpc</code> re-exports, or backlog #4 remaining <code>PauseRepository</code> call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
