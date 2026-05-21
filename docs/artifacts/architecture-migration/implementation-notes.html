@@ -5074,4 +5074,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation artifact prefetch (backlog #1 adjacent)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Compose <code>usePauseArtifactReflectionText</code> in <code>usePauseReflectGeneration</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder moves. When nav seed is empty, the generation conductor fetches persisted <code>reflection_text</code> via the artifact hook (<code>whenEnabled</code>) and surfaces copy before <code>holzen-reflect</code> returns; edge path unchanged (<code>runReflectGeneration</code> still checks cache then generates).</dd>
+      <dt>Deviation</dt>
+      <dd>None — mirrors haiku immediate read pattern; Frame screen still uses parent <code>reflectionMessage</code> prop.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>May duplicate artifact read with <code>runReflectGeneration</code> cache probe on the same instance — acceptable for faster Reflect card paint; Frame deferred read unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 stray RPC audit, or Frame haiku row when <code>reflectionMessage</code> prop is empty (deferred <code>whenEnabled</code> on screen).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
