@@ -20,6 +20,10 @@ const {
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 
+vi.mock('@/features/pause/application/use-cases/ritual/step-sync-toast', () => ({
+  showPauseStepSyncFailedToast,
+}));
+
 vi.mock('@/features/pause/public-rpc', () => ({
   ensureBreathSegment1Logged: ensureBreathSegment1LoggedMock,
   ensureBreathSegment2Logged: ensureBreathSegment2LoggedMock,
@@ -27,7 +31,6 @@ vi.mock('@/features/pause/public-rpc', () => ({
   logBreathSegment2Skipped: logBreathSegment2SkippedMock,
   applyBreathSegmentLogOutcome,
   initialBreathSegmentRpcLoggedFlagsFromRestored,
-  showPauseStepSyncFailedToast,
 }));
 
 const t = ((k: string) => k) as TFunction;

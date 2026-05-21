@@ -8779,4 +8779,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — session §6 peel step-sync toast (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 verified; session/brief conductors import ritual toast helper directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Complete the prior peel: <code>use-pause-breath-segment-rpc-loggers</code> and <code>use-pause-brief-done-check-in</code> import <code>showPauseStepSyncFailedToast</code> from <code>application/use-cases/ritual/step-sync-toast</code>; remove the last <code>public-rpc</code> re-export. RPC facades on <code>public-rpc</code> unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation + use-case callers import the ritual module directly; no cross-context screen needs the toast on <code>public-rpc</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: intervention bootstrap thin runner on <code>public-rpc</code>, or audit stray mutations bypassing <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
