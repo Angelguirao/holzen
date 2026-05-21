@@ -4,14 +4,14 @@ import {
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation';
 export {
   messageFromReflectGenerationResult,
-  reflectGenerationPrerequisite,
-  reflectGenerationUserErrorMessage,
-  resolveEffectiveReflectionCopy,
   resolveReflectGenerationPrefetch,
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
   type ReflectGenerationPrefetch,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-hook-flow';
+} from '@/features/pause/domain/reflect/generation/reflect-generation-hook-flow';
+export { reflectGenerationPrerequisite } from '@/features/pause/domain/reflect/generation/reflect-generation-prerequisites';
+export { reflectGenerationUserErrorMessage } from '@/features/pause/domain/reflect/generation/reflect-generation-errors';
+export { resolveEffectiveReflectionCopy } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
 
