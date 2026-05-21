@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
  * Reads persisted reflect-step copy (`pause_ai_artifacts.kind === 'reflection_text'`).
  * Used to lazy-hydrate ritual Reflect without depending on in-memory companion state.
  */
-export async function fetchOpeningMessageForPauseInstance(pauseInstanceId: string): Promise<string | null> {
+export async function fetchReflectionTextForPauseInstance(pauseInstanceId: string): Promise<string | null> {
   const { data, error } = await supabase
     .from('pause_ai_artifacts' as never)
     .select('content')

@@ -4086,6 +4086,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — align reflection_text fetch API names (reflect I/O)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 5 reflect query export rename</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. After <code>reflection-text-artifact-query.ts</code> module rename, rename <code>fetchOpeningMessageForPauseInstance</code> → <code>fetchReflectionTextForPauseInstance</code> and <code>RunReflectGenerationPorts.fetchReflectionText</code> to match shipped <code>reflection_text</code> artifact kind — no query or edge behavior change.</dd>
+      <dt>Deviation</dt>
+      <dd>None — symbol rename only; <code>public-queries</code> export updated.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Breaking rename for any out-of-tree importers of the old export (none in active <code>src/</code>).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 remainder (ReflectGenerator port), or <code>ritual/brief/</code> beat consolidation per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

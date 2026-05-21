@@ -12,7 +12,7 @@ import {
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/reflect-generation-hook-flow';
 import { runReflectGeneration } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation';
 import {
-  fetchOpeningMessageForPauseInstance,
+  fetchReflectionTextForPauseInstance,
   generateReflectionAtReflectStep,
 } from '../../../public-queries';
 
@@ -110,7 +110,7 @@ export function usePauseReflectGeneration({
           signal: ac.signal,
         },
         {
-          fetchOpeningMessage: fetchOpeningMessageForPauseInstance,
+          fetchReflectionText: fetchReflectionTextForPauseInstance,
           generateReflection: async (params) => {
             const { message } = await generateReflectionAtReflectStep(params);
             return { message };
