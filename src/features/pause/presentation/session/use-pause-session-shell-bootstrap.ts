@@ -4,7 +4,7 @@ import { buildPauseSessionMountLogParams } from '@/features/pause/application/us
 import {
   isPauseSessionWaitingForInstanceFetch,
 } from '@/features/pause/application/use-cases/session/gate-flags';
-import { parsePauseSessionLocationState } from '@/features/pause/application/use-cases/session/location-state';
+import { parsePauseSessionLocationState } from '@/features/pause/public-navigation';
 import { coalescePauseSessionShellViewModel } from '@/features/pause/application/use-cases/session/shell-view-model';
 import type { PauseSessionShellHolzen } from '@/features/pause/domain/pause-session-shell-holzen';
 import { usePauseSessionMountLog } from './use-pause-session-mount-log';
