@@ -1,15 +1,17 @@
 import {
   messageFromReflectGenerationResult,
-  reflectGenerationPrerequisite,
-  reflectGenerationUserErrorMessage,
-  resolveEffectiveReflectionCopy,
   resolveReflectGenerationPrefetch,
-  runReflectGeneration,
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
   type ReflectGenerationPrefetch,
+} from '@/features/pause/domain/reflect/generation/reflect-generation-hook-flow';
+import { reflectGenerationPrerequisite } from '@/features/pause/domain/reflect/generation/reflect-generation-prerequisites';
+import { reflectGenerationUserErrorMessage } from '@/features/pause/domain/reflect/generation/reflect-generation-errors';
+import { resolveEffectiveReflectionCopy } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
+import {
+  runReflectGeneration,
   type RunReflectGenerationInput,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-hook-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation';
 
 export {
   messageFromReflectGenerationResult,

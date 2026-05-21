@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation I/O direct domain + run-reflect-generation (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-io</code> imports hook helpers from domain and holzen-reflect use case directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Peel <code>pause-reflect-generation-io</code> to domain hook helpers and sibling <code>run-reflect-generation</code> instead of <code>pause-reflect-generation-hook-flow</code> CI anchor (parity with share and home telemetry I/O peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-generation-hook-flow.ts</code> remains for <code>check:architecture-alignment</code>; presentation no longer depends on it.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-reflect-steps-io</code> or <code>pause-reflect-mood-io</code> from flow anchors, or session conductor flow-anchor peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — home reflect telemetry I/O direct sibling modules (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
