@@ -10315,4 +10315,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — wisdom-quotes under ritual/decide (backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; colocate decide reinforcement quotes</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. Move <code>wisdom-quotes.ts</code> from <code>session/</code> to <code>ritual/decide/</code>; only consumers are <code>pause-decide-outcome-flow</code> and <code>getSessionQuote</code> on <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — quote selection seed and copy unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Quotes are shown during breathing in product copy but consumed at decide outcome; decide folder is the authority for reinforcement quote formatting.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: <code>PauseRepository</code> stray call-site audit.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
