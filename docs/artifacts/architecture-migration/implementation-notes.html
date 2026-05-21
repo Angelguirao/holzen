@@ -15337,6 +15337,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — pending-offer telemetry via reflect/telemetry I/O</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; §10.1 doc conflict resolved; reflect telemetry cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete on <code>cursor/arch-migrate-src-ca70</code>. Merge <code>pause-client-architecture.md</code> §10.1 conflict markers. Move <code>pending-pause-offer-telemetry</code> (+ test) from <code>application/use-cases/session/</code> to <code>ritual/reflect/telemetry/</code>; re-export via <code>presentation/reflect/telemetry/pause-reflect-telemetry-io.ts</code>; delete <code>pause-session-pending-offer-telemetry-io.ts</code>; <code>use-pending-pause-offer-mutations</code> imports reflect telemetry I/O.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; no new PostHog events.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session pending-offer mutations still live under <code>presentation/session/</code> (RPC use cases unchanged); only telemetry binding moved to reflect cluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: lifecycle create/dismiss thin use cases on <code>public-rpc</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — should-navigate-after-manual-trigger in domain</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -15349,7 +15368,7 @@
       <dt>Tradeoffs</dt>
       <dd>Holzen-reflect orchestration use cases remain under <code>ritual/reflect/generation/</code> until a later peel.</dd>
       <dt>Open questions</dt>
-      <dd>Next: wire <code>use-companion-orchestrate-retry</code> through <code>pause-companion-orchestrate-io</code> or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: lifecycle create/dismiss thin use cases on <code>public-rpc</code>, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
