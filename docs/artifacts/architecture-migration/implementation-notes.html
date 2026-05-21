@@ -12028,4 +12028,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock session reflect+decide conductor glue (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-session-reflect-and-decide</code> presentation port-lock</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Add tests on the session reflect+decide conductor asserting holzen-reflect generation gate (<code>enabled</code> for deep+reflect), effective reflection copy merge, and delegation to <code>usePauseSessionDecideHandler</code> (PauseRepository path already locked on the child hook).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Test-only — child hooks mocked; documents compose contract without re-testing RPC/edge adapters.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: <code>use-pause-reflect-frame-focus-ambience</code> domain delegate test, mood chrome composite hook, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
