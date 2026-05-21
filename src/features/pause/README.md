@@ -12,7 +12,7 @@ Companions, reflect, and breathing live **inside** this feature — not a separa
 features/pause/
   domain/                         # rules + vocabulary (no React, no Supabase); e.g. companion/related-biases
   application/use-cases/
-    trigger/ session/
+    session/
     ritual/
       feel/ breathe/ reflect/ frame/ decide/ done/
     archive/                      # Pauses + Echoes reads (not user collections — legacy)
