@@ -8,7 +8,7 @@ export {
   markPauseManualStartedHomeOnce,
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
-} from '@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry';
+} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/manual-pause-trigger-telemetry';
 
 export type {
   TrackManualPauseInstanceCreatedPayload,

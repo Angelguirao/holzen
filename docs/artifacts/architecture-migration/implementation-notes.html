@@ -15100,7 +15100,7 @@
       <dt>Deviation</dt>
       <dd>None — PostHog call sites unchanged; behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Telemetry trackers remain in <code>application/use-cases/trigger/</code> (PostHog side effects); only payload shapes moved to domain.</dd>
+      <dd>PostHog trackers moved to <code>ritual/reflect/telemetry/</code> in a follow-up slice; payload shapes live in domain.</dd>
       <dt>Open questions</dt>
       <dd>Next: silent-mode cluster on <code>pause-home-reflect-io</code> (landed same day).</dd>
     </dl>
@@ -15122,6 +15122,25 @@
       <dd>Thin re-export only; no new bound helpers.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>use-companion-orchestrate-retry</code> through <code>pause-companion-orchestrate-io</code> or <code>public-ritual-frame</code> barrel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual-open telemetry under ritual/reflect/telemetry/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up — Home manual-open PostHog cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. Move <code>manual-pause-trigger-telemetry</code> (+ test) from <code>application/use-cases/trigger/</code> to <code>ritual/reflect/telemetry/</code> beside <code>pause-reflect-ui-telemetry</code>; <code>pause-home-telemetry-io</code> imports the ritual path.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; no new PostHog events.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other <code>trigger/</code> modules (cooldowns, pending-offer telemetry, navigation) stay until a later slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>public-ritual-frame</code> barrel or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
