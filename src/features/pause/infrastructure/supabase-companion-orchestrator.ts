@@ -12,7 +12,7 @@ export const supabaseCompanionOrchestrator: CompanionOrchestrator = {
     invokeCompanionOrchestrate(buildInterventionOrchestrateBody(session)),
 };
 
-/** @deprecated Prefer `supabaseCompanionOrchestrator` from `public-queries`. */
+/** @deprecated Prefer `supabaseCompanionOrchestrator` from `public-ports`. */
 export function createCompanionSlotOrchestratePorts(): CompanionOrchestrator {
   return supabaseCompanionOrchestrator;
 }
