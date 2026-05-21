@@ -17956,7 +17956,26 @@
       <dt>Tradeoffs</dt>
       <dd>Smoke test on decide I/O re-exports (no RPC).</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-reflect-session-ui-telemetry-flow</code> on session reflect telemetry I/O, companion orchestrate-io peel, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: rename reflect telemetry CI anchor, companion orchestrate-io peel, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — rename reflect telemetry CI anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-ui-telemetry</code> → <code>pause-reflect-telemetry-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Rename CI cluster anchor after <code>pause-reflect-telemetry-io</code> peel to <code>pause-reflect-session-ui-telemetry</code>; presentation I/O keeps direct tracker import (same pattern as scaffold/share/home telemetry peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>pause-reflect-telemetry-flow.ts</code> is alignment-only (no presentation imports).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Supersedes planned <code>pause-reflect-session-ui-telemetry-flow</code> filename — single <code>pause-reflect-telemetry-flow</code> anchor for the telemetry subcluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-generation-io</code> peel from hook-flow anchor, <code>pause-session-brief-io</code> off brief-flow anchor, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 

@@ -1,3 +1,7 @@
+/**
+ * Session reflect beat PostHog helpers (post-it, share, wallpaper taps).
+ * Presentation imports here instead of deep `application/use-cases/ritual/reflect/telemetry/*`.
+ */
 export {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
