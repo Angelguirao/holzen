@@ -38,6 +38,13 @@ export {
   isPauseSessionWaitingForInstanceFetch,
 } from './application/use-cases/session/gate-flags';
 export {
+  computePauseSessionHydration,
+  computePauseSessionResolved,
+  type PauseSessionHydrationInput,
+  type PauseSessionHydrationReady,
+  type PauseSessionHydrationState,
+} from './application/use-cases/session/hydration';
+export {
   coalescePauseSessionShellViewModel,
   type PauseSessionShellViewModel,
 } from './application/use-cases/session/shell-view-model';

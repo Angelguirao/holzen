@@ -4,10 +4,10 @@ import type { FetchedPauseInstance, PersistedSession } from '@/features/pause/do
 import {
   computePauseSessionHydration,
   computePauseSessionResolved,
+  hasPersistedPauseSessionPayload,
   type PauseSessionHydrationReady,
   type PauseSessionHydrationState,
-} from '@/features/pause/application/use-cases/session/hydration';
-import { hasPersistedPauseSessionPayload } from '@/features/pause/public-session';
+} from '@/features/pause/public-session';
 import type { PauseSessionNavParsed } from '@/features/pause/public-navigation';
 import { usePauseSessionFetch } from './use-pause-session-fetch';
 import { loadSession } from '@/features/pause/public-rpc';

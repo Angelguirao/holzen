@@ -10033,4 +10033,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — shell hydration + view model on public-session (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; session shell merge helpers on session barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. After gate-flags peel, export <code>computePauseSessionHydration</code>, <code>computePauseSessionResolved</code>, hydration types, and <code>coalescePauseSessionShellViewModel</code> on <code>public-session.ts</code>; <code>use-pause-session-shell</code> and <code>use-pause-session-shell-bootstrap</code> import the barrel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — hydration branch order and shell field coalescing unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Step bundles, terminal guards, and ritual-storage sync remain on direct <code>application/use-cases/session/*</code> until next peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #3: step-bundle / terminal-entry cluster on <code>public-session</code>; backlog #4: audit any presentation hook still importing breath segment use cases outside <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
