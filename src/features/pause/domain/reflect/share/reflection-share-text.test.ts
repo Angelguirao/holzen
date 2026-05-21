@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildReflectionShareText } from '@/screens/pause/lib/reflection-share-text';
+import { buildReflectionShareText } from './reflection-share-text';
 
 describe('buildReflectionShareText', () => {
   it('appends Holzen attribution and site host', () => {

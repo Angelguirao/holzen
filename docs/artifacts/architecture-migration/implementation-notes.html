@@ -5222,7 +5222,26 @@
       <dt>Tradeoffs</dt>
       <dd>Screen component depends on pause <code>public-hooks</code> for a one-liner pure helper — acceptable per cross-context barrel rule.</dd>
       <dt>Open questions</dt>
-      <dd>Next: backlog #4 stray <code>PauseRepository</code> audit, or peel remaining reflect pure rules from <code>screens/pause/lib/</code> (e.g. <code>reflection-share-text</code>).</dd>
+      <dd>Next: backlog #4 stray <code>PauseRepository</code> audit, or peel remaining reflect pure rules from <code>screens/pause/lib/</code> (e.g. share canvas).</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect share text in domain (backlog #1 adjacent)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>buildReflectionShareText</code> → <code>domain/reflect/share/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> application moves) is complete. Move plain-text share attribution from <code>screens/pause/lib/</code> to <code>domain/reflect/share/reflection-share-text.ts</code>; <code>ShareReflection</code> imports via <code>public-hooks</code>. Canvas image generation stays route-local until a follow-up slice.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; tests colocated with domain module.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not move <code>reflection-share-canvas.ts</code> in the same commit — DOM/canvas concern remains in <code>screens/pause/lib/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 wire <code>infrastructure/queries/*</code> analytics through <code>PauseAnalyticsRepository</code> without <code>public-rpc</code> re-import, or move share canvas when product needs it in features.</dd>
     </dl>
   </article>
 
