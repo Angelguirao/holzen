@@ -6854,9 +6854,9 @@
       <dt>Deviation</dt>
       <dd>Prior slice briefly colocated payload with toggle math in <code>favorite-toggle.ts</code>; consolidated here to match note/tag peel pattern.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Module name still says note-tag; renaming to <code>reflect-step-payloads</code> deferred. <code>reflection_step</code> payload remains inline in <code>run-pause-reflection-step-log</code> until a later peel.</dd>
+      <dd>Module name still says note-tag; renaming to <code>reflect-step-payloads</code> deferred. <code>reflection_step</code> payload colocated in <code>reflection-step-log.ts</code> domain module.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>reflection_step</code> payload to domain, backlog #4 companion feedback vote read, or frame conductor <code>public-rpc</code> peels.</dd>
+      <dd>Next: peel reflect step presentation conductors off <code>public-rpc</code>, backlog #4 companion feedback vote read, or frame conductor <code>public-rpc</code> peels.</dd>
     </dl>
   </article>
 
@@ -6911,7 +6911,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>public-rpc</code> <code>logPauseReflectionStepOnce</code> facade unchanged for presentation.</dd>
+      <dd>Follow-up slice removed <code>logPauseReflectionStepOnce</code> from <code>public-rpc</code>; presentation calls use case + <code>public-ports</code> directly.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel shift-frame hub / feel-tiles conductors off <code>public-rpc</code>, or backlog #4 companion feedback vote read wiring.</dd>
     </dl>
@@ -6933,6 +6933,25 @@
       <dd><code>use-companion-orchestrate-retry</code> and failure-port hooks still import <code>ritual/frame/*</code> application paths until follow-up peels.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel companion retry / intervention presentation cluster, or backlog #4 stray <code>PauseRepository</code> call sites.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel reflect step conductors off public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect steps presentation imports ritual/reflect use cases + public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Mirror ambience/telemetry peel: <code>use-pause-reflect-note</code>, <code>use-pause-reflect-tags</code>, <code>use-pause-favorite-toggle</code>, and <code>use-pause-reflection-step-log</code> call <code>runPauseReflect*</code> use cases with <code>supabasePauseRepository</code> / <code>reflectionStepSessionStorage</code> from <code>public-ports</code>; remove wired facades from <code>public-rpc.ts</code>. Screens still use <code>public-hooks</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Step hook tests mock <code>public-ports</code> to avoid loading the Supabase client barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel reflect generation / shift-frame hub presentation hooks off <code>public-rpc</code>, or backlog #4 remaining mutation call sites.</dd>
     </dl>
   </article>
 

@@ -56,16 +56,11 @@ import {
   type PostPauseFeelSnapshot,
 } from './application/use-cases/ritual/done/post-pause-emotion-log';
 import type { MoodValue } from './domain/mood-value';
-import { runPauseReflectNoteUpdate } from './application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
-import { runPauseReflectTagUpdate } from './application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
-import { runPauseFavoriteToggle } from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
-import { runPauseReflectionStepLogOnce } from './application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
 import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
 import {
   runReflectGeneration as runReflectGenerationUseCase,
   type RunReflectGenerationInput,
 } from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
-import { reflectionStepSessionStorage } from './infrastructure/edge/reflect/reflection-step-session-storage';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
 import { persistCompanionUiStepCompletion as persistCompanionUiStepCompletionUseCase } from './application/use-cases/ritual/frame/persist-ui-step-completion';
 import type { CompanionUiCompletionStep } from './application/use-cases/ritual/frame/companion-ui-completion-types';
@@ -203,14 +198,6 @@ export function logRetrospectiveOutcome(params: {
   outcome: string;
 }): Promise<PauseState | null> {
   return logRetrospectiveOutcomeUseCase(supabasePauseRepository, params);
-}
-
-/** Reflect heart — `favorite_toggled` step. */
-export function logPauseFavoriteToggle(params: {
-  pauseInstanceId: string | null;
-  isFavorite: boolean;
-}) {
-  return runPauseFavoriteToggle(supabasePauseRepository, params);
 }
 
 /** Reflect holzen-reflect generation — wired with default `ReflectGenerator`. */
@@ -376,25 +363,6 @@ export function fetchPauseDevModeSetting(userId: string): Promise<boolean | null
 /** Admin rapid-testing toggle write — screen helper (delegates to `logPauseDevModeSetting`). */
 export async function logDevModeSetting(userId: string, enabled: boolean): Promise<void> {
   await logPauseDevModeSetting({ userId, enabled });
-}
-
-/** Reflect progression — `reflection_step` once per instance (sessionStorage dedupe). */
-export function logPauseReflectionStepOnce(pauseInstanceId: string) {
-  return runPauseReflectionStepLogOnce(
-    supabasePauseRepository,
-    { pauseInstanceId },
-    { storage: reflectionStepSessionStorage },
-  );
-}
-
-/** Reflect post-it note — `note_updated` step. */
-export function logPauseReflectNote(params: { pauseInstanceId: string; text: string }) {
-  return runPauseReflectNoteUpdate(supabasePauseRepository, params);
-}
-
-/** Reflect tags editor — `tag_updated` step. */
-export function logPauseReflectTags(params: { pauseInstanceId: string; tags: string[] }) {
-  return runPauseReflectTagUpdate(supabasePauseRepository, params);
 }
 
 /** Feel step mood select — wired with default `PauseRepository`. */
