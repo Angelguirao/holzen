@@ -6708,4 +6708,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — decide handler test mock without Supabase (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Simplify use-pause-session-decide-handler.test public-rpc mock</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Decide flow helpers were already on <code>public-rpc</code> from a prior slice. Replace <code>importActual('public-rpc')</code> (loads Supabase client) with hoisted mocks + explicit flow re-exports from application in the mock factory.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>None.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session storage I/O via port/facade from decide handler, or backlog #4 companion feedback vote read consolidation.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
