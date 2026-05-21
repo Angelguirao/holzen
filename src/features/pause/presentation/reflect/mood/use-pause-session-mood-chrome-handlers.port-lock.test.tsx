@@ -6,24 +6,18 @@ import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import { usePauseSessionMoodChromeHandlers } from './use-pause-session-mood-chrome-handlers';
 
 const {
-  runInitialEmotionSelectMock,
+  pauseInitialEmotionSelectMock,
   pauseReflectFavoriteToggleMock,
   invalidateQueriesMock,
-  mockPauseRepository,
 } = vi.hoisted(() => ({
-  runInitialEmotionSelectMock: vi.fn(),
+  pauseInitialEmotionSelectMock: vi.fn(),
   pauseReflectFavoriteToggleMock: vi.fn(),
   invalidateQueriesMock: vi.fn(),
-  mockPauseRepository: { port: 'reflectPauseRepository' },
-}));
-
-vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log', () => ({
-  runInitialEmotionSelect: runInitialEmotionSelectMock,
-  runInitialEmotionSkip: vi.fn(),
 }));
 
 vi.mock('./pause-reflect-mood-io', () => ({
-  reflectPauseRepository: mockPauseRepository,
+  pauseInitialEmotionSelect: pauseInitialEmotionSelectMock,
+  pauseInitialEmotionSkip: vi.fn(),
 }));
 
 vi.mock('../steps/pause-reflect-steps-io', () => ({
@@ -124,7 +118,7 @@ function baseRitual(
 }
 
 beforeEach(() => {
-  runInitialEmotionSelectMock.mockReset().mockResolvedValue({
+  pauseInitialEmotionSelectMock.mockReset().mockResolvedValue({
     status: 'synced',
     logKey: '{"mood":"calm","intensity":2}',
     ui: {
@@ -170,8 +164,7 @@ describe('usePauseSessionMoodChromeHandlers port-lock', () => {
       result.current.mood.onFeelTilesSelect('calm', 2, 'calm');
     });
 
-    expect(runInitialEmotionSelectMock).toHaveBeenCalledWith(
-      mockPauseRepository,
+    expect(pauseInitialEmotionSelectMock).toHaveBeenCalledWith(
       expect.objectContaining({
         pauseInstanceId: 'pi-1',
         mood: 'calm',
