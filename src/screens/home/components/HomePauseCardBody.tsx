@@ -11,7 +11,7 @@ import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
 import { shouldSurfacePauseWidgetError } from '@/features/pause/public-home';
 import type { BtcPriceData } from '@/features/market/public';
-import { usePendingPauseOffer } from '@/features/pause/public-hooks';
+import { usePendingPauseOffer } from '@/features/pause/public-home';
 import type { Entitlement } from '@/features/subscription/public';
 
 interface HomePauseCardBodyProps {
