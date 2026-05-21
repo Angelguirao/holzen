@@ -10,8 +10,11 @@ const { trackPauseOpenDismissedMock, trackHomePendingPauseBannerPauseOpenedMock 
   }),
 );
 
-vi.mock('./pause-home-io', () => ({
+vi.mock('./pause-home-reflect-io', () => ({
   shouldNavigateAfterManualTrigger,
+}));
+
+vi.mock('./pause-home-reflect-telemetry-io', () => ({
   trackPauseOpenDismissed: trackPauseOpenDismissedMock,
   trackHomePendingPauseBannerPauseOpened: trackHomePendingPauseBannerPauseOpenedMock,
 }));

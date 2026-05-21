@@ -7,12 +7,12 @@ import {
   buildHomePauseSessionLocationState,
   canNavigateToPauseSession,
 } from '@/features/pause/public-navigation';
+import { shouldNavigateAfterManualTrigger } from './pause-home-reflect-io';
 import {
-  shouldNavigateAfterManualTrigger,
   trackHomePendingPauseBannerPauseOpened,
   trackPauseOpenDismissed,
   type PauseDismissAnalyticsSurface,
-} from './pause-home-io';
+} from './pause-home-reflect-telemetry-io';
 import { holzenLog } from '@/lib/holzen-console';
 
 export type { PauseDismissAnalyticsSurface };

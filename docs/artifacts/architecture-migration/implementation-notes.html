@@ -59,9 +59,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-  <article class="note">
-    <header>
-      <span>2026-05-21</span>
       <span>Phase B slice — subscription checkout guard lib shim (Tier 1)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -75,6 +72,25 @@
       <dd>Other app/config call sites (e.g. <code>site-seo-defaults</code> <code>PRICING</code>) still import subscription <code>public</code> until a dedicated pricing shim slice.</dd>
       <dt>Open questions</dt>
       <dd>Next: subscription pricing/entitlement lib shim, or Phase B auth/market Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — Home reflect conductors import cluster I/O (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-manual-pause-trigger</code> + <code>use-home-pause-actions</code> import <code>pause-home-reflect-io</code> / <code>pause-home-reflect-telemetry-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no application path moves. Home manual-trigger and pause-action conductors import generation vs PostHog through sibling cluster I/O modules instead of the aggregate <code>pause-home-io</code> barrel (parity with <code>apply-manual-pause-open-result</code> and session reflect telemetry peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-home-io</code> stays the cross-hook aggregate for dismiss preview + manual-open ports; only reflect-cluster consumers peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: remove redundant <code>application/.../flows/pause-session-reflect-and-decide-flow</code> CI shim, or subscription pricing lib shim.</dd>
     </dl>
   </article>
 
