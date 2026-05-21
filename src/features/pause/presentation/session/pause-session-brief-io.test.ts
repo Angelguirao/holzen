@@ -1,7 +1,19 @@
 import { describe, expect, it, vi } from 'vitest';
 
+const logPauseRitualDepthUpgradedMock = vi.hoisted(() => vi.fn());
+
+vi.mock('@/features/pause/application/use-cases/session/pause-session-brief-flow', async (importOriginal) => {
+  const actual = await importOriginal<
+    typeof import('@/features/pause/application/use-cases/session/pause-session-brief-flow')
+  >();
+  return {
+    ...actual,
+    logPauseRitualDepthUpgraded: logPauseRitualDepthUpgradedMock,
+  };
+});
+
 vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: {},
+  supabasePauseRepository: { port: 'briefRepository' },
 }));
 
 import {
@@ -9,6 +21,7 @@ import {
   initialBriefPauseStepFromRestored,
   initialRitualEntry,
   initialSelectedBriefFaceFromRestored,
+  pauseBriefRitualDepthUpgraded,
 } from './pause-session-brief-io';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
@@ -27,5 +40,16 @@ describe('pause-session-brief-io', () => {
     expect(initialRitualEntry(restored)).toBe('brief');
     expect(initialBriefPauseStepFromRestored(null)).toBe('feel');
     expect(initialRitualEntry(null)).toBe('picker');
+  });
+
+  it('routes brief depth upgrade through default PauseRepository port', async () => {
+    logPauseRitualDepthUpgradedMock.mockResolvedValue({ status: 'success' });
+
+    await pauseBriefRitualDepthUpgraded('pi-brief');
+
+    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith(
+      { port: 'briefRepository' },
+      'pi-brief',
+    );
   });
 });
