@@ -1,4 +1,7 @@
-import { computeFavoriteToggleNext } from '@/features/pause/domain/reflect/steps/favorite-toggle';
+import {
+  buildReflectFavoriteToggledPayload,
+  computeFavoriteToggleNext,
+} from '@/features/pause/domain/reflect/steps/favorite-toggle';
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
@@ -21,7 +24,7 @@ export async function runPauseFavoriteToggle(
     await logPauseStep(repository, {
       instanceId: input.pauseInstanceId,
       stepType: 'favorite_toggled',
-      payload: { is_favorite: newValue },
+      payload: buildReflectFavoriteToggledPayload(newValue),
     });
     return { status: 'success', newValue };
   } catch {
