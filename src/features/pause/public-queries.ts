@@ -162,6 +162,10 @@ export {
   pauseArchiveListQueryPrefix,
   pauseArchiveStorageCacheKey,
 } from './infrastructure/queries/archive/archive-list-query';
+export {
+  buildPauseArchiveInfiniteInitialData,
+  isPauseArchiveListInitialLoading,
+} from './application/use-cases/archive/pause-archive-list-ui-state';
 export { invalidatePauseStatsDataForUser } from './application/queries/invalidate-pause-stats';
 export { PAUSE_QUERY_PREFIX } from './application/queries/pause-query-namespace';
 export {
