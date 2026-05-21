@@ -14,9 +14,15 @@ const { logStepMock, mockRepository, trackRetrospectiveMock, invalidateStatsMock
   },
 );
 
-vi.mock('@/features/pause/public-ports', () => ({
-  supabasePauseRepository: mockRepository,
-}));
+vi.mock('@/features/pause/public-rpc', async () => {
+  const { logRetrospectiveOutcome } = await import(
+    '@/features/pause/application/use-cases/archive/log-retrospective-outcome'
+  );
+  return {
+    logRetrospectiveOutcome: (params: { instanceId: string; outcome: string }) =>
+      logRetrospectiveOutcome(mockRepository, params),
+  };
+});
 
 vi.mock('@/features/pause/application/use-cases/archive/archive-retrospective-telemetry', () => ({
   trackPauseOutcomeRetrospective: trackRetrospectiveMock,
