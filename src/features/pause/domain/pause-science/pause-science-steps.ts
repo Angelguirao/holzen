@@ -1,13 +1,7 @@
-export const PAUSE_SCIENCE_STEP_KEYS = [
-  'feel',
-  'breathe',
-  'reflect',
-  'frame',
-  'breath2',
-  'decide',
-] as const;
+import type { PauseStep } from '../pause-ritual-steps';
 
-export type PauseScienceStepKey = (typeof PAUSE_SCIENCE_STEP_KEYS)[number];
+/** Science sheet rows align 1:1 with deep-ritual `PauseStep` beats. */
+export type PauseScienceStepKey = PauseStep;
 
 export type PauseScienceSource = {
   label: string;

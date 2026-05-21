@@ -104,7 +104,6 @@ export {
   type PauseBreathingTimedDisplay,
 } from './application/use-cases/ritual/breathe/resolve-pause-breathing-timed-display';
 export {
-  PAUSE_SCIENCE_STEP_KEYS,
   PAUSE_SCIENCE_STEPS,
   type PauseScienceSource,
   type PauseScienceStepConfig,
