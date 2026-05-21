@@ -17,9 +17,12 @@ const {
   trackPauseManualCompletedMock: vi.fn(),
 }));
 
+vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
+  clearSession: clearSessionMock,
+}));
+
 vi.mock('@/features/pause/public-rpc', () => ({
   openManualPauseFromHome: openManualPauseFromHomeMock,
-  clearSession: clearSessionMock,
   markPauseManualStartedHomeOnce: markPauseManualStartedHomeOnceMock,
   trackManualPauseInstanceCreated: trackManualPauseInstanceCreatedMock,
   trackPauseManualCompleted: trackPauseManualCompletedMock,

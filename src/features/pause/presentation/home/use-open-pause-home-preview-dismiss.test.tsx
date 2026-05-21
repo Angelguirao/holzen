@@ -10,6 +10,9 @@ const { dismissOpenPauseHomePreviewMock, clearSessionMock } = vi.hoisted(() => (
 
 vi.mock('@/features/pause/public-rpc', () => ({
   dismissOpenPauseHomePreview: dismissOpenPauseHomePreviewMock,
+}));
+
+vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
   clearSession: clearSessionMock,
 }));
 

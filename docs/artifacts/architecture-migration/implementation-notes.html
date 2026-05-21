@@ -11306,4 +11306,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel clearSession cluster off public-rpc (backlog #1 verified, #4 / §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Session/home clearSession → persisted-session-storage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move. Continue §6 after exit-navigation peel: providers, pending-offer navigation, home preview, and manual trigger import <code>clearSession</code> from <code>infrastructure/session/persisted-session-storage</code> (same adapter as decide handler + exit navigation). <code>public-rpc</code> still re-exports <code>loadSession</code> / <code>saveSession</code> for shell hydration and persist conductors.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>loadSession</code> / <code>saveSession</code> peels deferred to a follow-up slice to keep this commit under ~8 files.</dd>
+      <dt>Open questions</dt>
+      <dd>Next §6: peel <code>loadSession</code> / <code>saveSession</code> on shell + persist + ritual-storage-sync; backlog #4 archive retrospective or companion facade audit.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
