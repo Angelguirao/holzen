@@ -4865,4 +4865,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — wire companion orchestrator via public-rpc (backlog #3 §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; default CompanionOrchestrator on presentation hooks</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> use cases were already complete. Re-export <code>supabaseCompanionOrchestrator</code> from <code>public-rpc.ts</code> beside <code>invokeCompanionOrchestrate</code>; <code>use-companion-slot-orchestrate-ports</code> and <code>use-companion-intervention-fetch</code> import the default adapter via <code>public-rpc</code> (parity with haiku + holzen-reflect generation conductors).</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>public-ports.ts</code> still exports the adapter for infrastructure query modules; presentation frame hooks no longer import <code>public-ports</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Analytics reads/writes in <code>public-queries</code> still wire <code>supabasePauseAnalyticsRepository</code> via <code>public-ports</code> until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: expose <code>pauseCreateOrReuse</code> / <code>pauseDismissCurrent</code> facades on <code>public-rpc</code> for session presentation, or Phase B cross-context slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

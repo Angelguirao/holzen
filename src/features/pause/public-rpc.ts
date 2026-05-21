@@ -13,6 +13,8 @@ export type { RunReflectGenerationInput };
 export { ritualDepthUpgradedPayload } from './application/use-cases/ritual/brief/ritual-depth-upgrade';
 export { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
 export { invokeCompanionOrchestrate } from './infrastructure/edge/companion-orchestrate-edge';
+export type { CompanionOrchestrator } from './ports/companion-orchestrator';
+export { supabaseCompanionOrchestrator } from './infrastructure/supabase-companion-orchestrator';
 export {
   invokeGroundingEnrich,
   type GroundingEnrichBody,
