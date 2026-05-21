@@ -306,6 +306,9 @@ export {
   usePauseReflectionStepLog,
   usePauseReflectTags,
   usePauseReflectUiTelemetry,
+  usePauseSessionReflectAndDecide,
+  type UsePauseSessionReflectAndDecideParams,
+  usePauseShiftFrameDoneHandler,
   useReflectionShareHandlers,
   type UseReflectionShareHandlersParams,
   usePauseFavoriteToggle,
@@ -399,12 +402,7 @@ export {
   type UsePauseSessionBriefToDeepParams,
 } from './presentation/session/use-pause-session-brief-to-deep';
 export { usePauseSessionBreathStepHandlers } from './presentation/reflect/flows/use-pause-session-breath-step-handlers';
-export { usePauseShiftFrameDoneHandler } from './presentation/reflect/hub/use-pause-shift-frame-done-handler';
 export { usePauseSessionDecideHandler } from './presentation/decide/use-pause-session-decide-handler';
-export {
-  usePauseSessionReflectAndDecide,
-  type UsePauseSessionReflectAndDecideParams,
-} from './presentation/reflect/flows/use-pause-session-reflect-and-decide';
 export { usePauseSessionPersistToStorage } from './presentation/session/use-pause-session-persist-to-storage';
 export { usePauseSessionRitualStorageSync } from './presentation/session/use-pause-session-ritual-storage-sync';
 export {
