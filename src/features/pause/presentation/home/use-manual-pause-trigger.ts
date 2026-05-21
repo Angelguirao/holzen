@@ -10,7 +10,8 @@ import {
   type ManualPauseTriggerResult,
 } from '@/features/pause/domain/manual-pause-trigger-result';
 import type { CompanionData } from '@/features/pause/public-hooks';
-import { openManualPauseFromHome } from '@/features/pause/public-rpc';
+import { openManualPauseFromHome } from '@/features/pause/application/use-cases/trigger/open-manual-pause-from-home';
+import { supabasePauseRepository, supabaseReflectGenerator } from '@/features/pause/public-ports';
 import { holzenLog } from '@/lib/holzen-console';
 
 export interface UseManualPauseTriggerParams {
@@ -92,7 +93,10 @@ export function useManualPauseTrigger({
 
       if (silentMode) {
         holzenLog.manual('generateMessage: silent mode');
-        const result = await openManualPauseFromHome(openParams);
+        const result = await openManualPauseFromHome(
+          { repository: supabasePauseRepository, reflect: supabaseReflectGenerator },
+          openParams,
+        );
         if (result.outcome === 'error') {
           holzenLog.manual('generateMessage: silent pause create failed', {
             message: result.userMessage,
@@ -104,7 +108,10 @@ export function useManualPauseTrigger({
       setLoading(true);
       setError(null);
       try {
-        const result = await openManualPauseFromHome(openParams);
+        const result = await openManualPauseFromHome(
+          { repository: supabasePauseRepository, reflect: supabaseReflectGenerator },
+          openParams,
+        );
         if (result.outcome === 'idle') {
           holzenLog.manual('generateMessage: reuse/skip');
         }
