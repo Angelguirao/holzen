@@ -1,11 +1,11 @@
 /**
  * Session reflect beat PostHog helpers (post-it, share, wallpaper taps).
- * Imports trackers directly from `pause-reflect-session-ui-telemetry` (off
- * `pause-reflect-telemetry-flow` CI anchor; parity with mood/hub I/O peels).
+ * Imports trackers via `pause-reflect-telemetry-flow` CI anchor
+ * (parity with `pause-home-reflect-telemetry-io` → home telemetry flow).
  */
 export {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
   type PauseReflectTelemetrySurface,
-} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/session/pause-reflect-session-ui-telemetry';
+} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow';
