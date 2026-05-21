@@ -7,9 +7,10 @@ import {
   initialEmotionResetUi,
   runInitialEmotionSelect,
   runInitialEmotionSkip,
-  showPauseStepSyncFailedToast,
   type InitialEmotionUiState,
-} from '@/features/pause/public-rpc';
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
+import { showPauseStepSyncFailedToast } from '@/features/pause/application/use-cases/ritual/step-sync-toast';
+import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
 
 export function usePauseSessionInitialMoodHandlers(input: {
   pauseInstanceId: string | null;
@@ -55,7 +56,7 @@ export function usePauseSessionInitialMoodHandlers(input: {
       opts?: { briefRitual?: boolean; briefFace?: FeelStepTile },
     ) => {
       hapticFeedback('light');
-      const outcome = await runInitialEmotionSelect({
+      const outcome = await runInitialEmotionSelect(supabasePauseRepository, {
         pauseInstanceId,
         mood,
         intensity,
@@ -76,7 +77,7 @@ export function usePauseSessionInitialMoodHandlers(input: {
   );
 
   const handleMoodSkip = useCallback(async () => {
-    const outcome = await runInitialEmotionSkip({ pauseInstanceId });
+    const outcome = await runInitialEmotionSkip(supabasePauseRepository, { pauseInstanceId });
 
     if (outcome.status === 'sync_failed') {
       showPauseStepSyncFailedToast(t);

@@ -6806,6 +6806,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — peel initial-mood handlers off public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect mood conductor uses use case + repository directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and shift-frame hub RPC colocation were already complete on <code>cursor/arch-migrate-src-ca70</code>. Continue backlog #3 §6 slim barrel: <code>use-pause-session-initial-mood-handlers</code> imports <code>run-initial-emotion-log</code>, <code>step-sync-toast</code>, and <code>supabasePauseRepository</code> directly; <code>public-rpc</code> facades unchanged for screens and other callers. Tests mock the use-case module (no <code>importActual('public-rpc')</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation imports infrastructure adapter (same pattern as wiring tests with mocked repository).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel depth-picker / mood-chrome handlers from <code>public-rpc</code>, or companion frame presentation imports on <code>application/ritual/frame/*</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect mood chrome domain peel from public-rpc (backlog #1 done, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
