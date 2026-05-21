@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type {
   ReflectMoodHistoryEntry,
   ReflectRecencyHints,
-} from '@/features/pause/domain/reflect-recency-hints';
+} from '@/features/pause/domain/reflect/generation/reflect-recency-hints';
 
 export type { ReflectMoodHistoryEntry, ReflectRecencyHints };
 

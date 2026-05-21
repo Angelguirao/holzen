@@ -5,7 +5,7 @@ import {
   tagsFromReflectRow,
   type PauseReflectStepLatestRow,
   type PauseReflectStepType,
-} from '@/features/pause/domain/reflect-step-latest';
+} from '@/features/pause/domain/reflect/steps/reflect-step-latest';
 import { supabaseReflectGenerator } from '@/features/pause/infrastructure/supabase-reflect-generator';
 import { PAUSE_QUERY_PREFIX } from '@/features/pause/application/queries/pause-query-namespace';
 

@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type {
   PauseReflectStepLatestRow,
   PauseReflectStepType,
-} from '@/features/pause/domain/reflect-step-latest';
+} from '@/features/pause/domain/reflect/steps/reflect-step-latest';
 
 /** Supabase read for latest reflect note/tags step event — used by `ReflectGenerator` adapter. */
 export async function fetchLatestPauseReflectStepFromSupabase(
