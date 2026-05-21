@@ -3,16 +3,14 @@ import { renderHook, act } from '@testing-library/react';
 import { useCompanionUiCompletion } from './use-companion-ui-completion';
 
 const {
-  persistCompanionUiStepCompletionMock,
+  pauseCompanionUiStepCompletionMock,
   invalidateCompanionUiCompletionQueryMock,
-  mockPauseRepository,
   setQueryDataMock,
   getQueryDataMock,
   emptyCompletion,
 } = vi.hoisted(() => ({
-  persistCompanionUiStepCompletionMock: vi.fn(),
+  pauseCompanionUiStepCompletionMock: vi.fn(),
   invalidateCompanionUiCompletionQueryMock: vi.fn(),
-  mockPauseRepository: { port: 'supabasePauseRepository' },
   setQueryDataMock: vi.fn(),
   getQueryDataMock: vi.fn(),
   emptyCompletion: {
@@ -25,18 +23,8 @@ const {
   },
 }));
 
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/persist-ui-step-completion',
-  () => ({
-    persistCompanionUiStepCompletion: persistCompanionUiStepCompletionMock,
-  }),
-);
-
 vi.mock('./pause-companion-orchestration-io', () => ({
-  companionPauseRepository: mockPauseRepository,
-}));
-
-vi.mock('@/features/pause/application/queries/companion-ui-completion-query-key', () => ({
+  pauseCompanionUiStepCompletion: pauseCompanionUiStepCompletionMock,
   invalidateCompanionUiCompletionQuery: invalidateCompanionUiCompletionQueryMock,
 }));
 
@@ -62,7 +50,7 @@ vi.mock('@/lib/haptics', () => ({
 }));
 
 beforeEach(() => {
-  persistCompanionUiStepCompletionMock.mockReset().mockResolvedValue(undefined);
+  pauseCompanionUiStepCompletionMock.mockReset().mockResolvedValue(undefined);
   invalidateCompanionUiCompletionQueryMock.mockReset();
   setQueryDataMock.mockReset();
   getQueryDataMock.mockReset().mockReturnValue(emptyCompletion);
@@ -76,23 +64,18 @@ describe('useCompanionUiCompletion', () => {
       await result.current.markCompleted('haiku');
     });
 
-    expect(persistCompanionUiStepCompletionMock).not.toHaveBeenCalled();
+    expect(pauseCompanionUiStepCompletionMock).not.toHaveBeenCalled();
   });
 
-  it('persists via persistCompanionUiStepCompletion + PauseRepository', async () => {
+  it('persists via pauseCompanionUiStepCompletion (orchestration I/O)', async () => {
     const { result } = renderHook(() => useCompanionUiCompletion('inst-1'));
 
     await act(async () => {
       await result.current.markCompleted('haiku');
     });
 
-    expect(persistCompanionUiStepCompletionMock).toHaveBeenCalledTimes(1);
-    expect(persistCompanionUiStepCompletionMock).toHaveBeenCalledWith(
-      mockPauseRepository,
-      'inst-1',
-      'haiku',
-    );
-    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
+    expect(pauseCompanionUiStepCompletionMock).toHaveBeenCalledTimes(1);
+    expect(pauseCompanionUiStepCompletionMock).toHaveBeenCalledWith('inst-1', 'haiku');
     expect(invalidateCompanionUiCompletionQueryMock).toHaveBeenCalledWith('inst-1');
   });
 
@@ -108,6 +91,6 @@ describe('useCompanionUiCompletion', () => {
       await result.current.markCompleted('haiku');
     });
 
-    expect(persistCompanionUiStepCompletionMock).not.toHaveBeenCalled();
+    expect(pauseCompanionUiStepCompletionMock).not.toHaveBeenCalled();
   });
 });
