@@ -180,7 +180,7 @@ export {
 export {
   useJourneyPauseInstances,
   type JourneyPauseRow,
-} from './presentation/use-journey-pause-instances';
+} from './presentation/archive/use-journey-pause-instances';
 export { logPwaInstallAnalyticsEvent } from './presentation/log-pwa-install-analytics';
 export { useSignalSourceTrustedHost } from './presentation/use-signal-source-trusted-host';
 export { useStaggeredReveal } from './presentation/use-staggered-reveal';
