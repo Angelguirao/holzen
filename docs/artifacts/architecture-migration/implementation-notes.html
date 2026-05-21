@@ -15239,4 +15239,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — restore ritual/reflect/flows application cluster</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — CI anchor after domain peel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Preflight/post-generation helpers stay in <code>domain/reflect/flows/</code>; recreate <code>application/use-cases/ritual/reflect/flows/</code> with a thin re-export module so <code>check:architecture-alignment</code> passes. <code>presentation/reflect/flows/pause-reflect-flows-io.ts</code> keeps domain imports (presentation must not deep-import application).</dd>
+      <dt>Deviation</dt>
+      <dd>Fixes regression from domain-only move that removed the required application <code>flows/</code> directory.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Re-export only — no duplicated tests; future RPC orchestration can land in this cluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-orchestrate-retry</code> through <code>pause-companion-orchestrate-io</code> or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
