@@ -15691,7 +15691,26 @@
       <dt>Tradeoffs</dt>
       <dd><code>run-pause-create-or-reuse</code> / <code>run-pause-dismiss-current</code> remain under <code>session/</code> as shared lifecycle delegates.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>public-rpc</code> lifecycle facades, session breath timed-loop I/O peel, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: hub flow anchor under <code>ritual/reflect/hub/</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate pause-shift-frame-hub-flow under ritual/reflect/hub (backlog #1, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Hub flow anchor taxonomy fix</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder move remains complete. Move <code>pause-shift-frame-hub-flow.ts</code> from <code>ritual/reflect/flows/</code> to <code>ritual/reflect/hub/</code> beside <code>run-shift-emotion-frame-hub-done</code>; <code>pause-reflect-hub-io</code> import path only. Session reflect/decide anchor stays in <code>flows/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; file location only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Prior note placed hub mapping in <code>flows/</code> for parity with reflect/decide anchor — hub cluster is the canonical owner per §3.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel generation prerequisites/errors through <code>pause-reflect-generation-io</code>, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
