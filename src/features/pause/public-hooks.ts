@@ -140,7 +140,7 @@ export type {
   PauseSessionBriefRitualBodyProps,
   PauseSessionDeepRitualBodyProps,
 } from './presentation/session/ritual-body-props';
-export { usePendingPauseOfferMutations } from './presentation/session/use-pending-pause-offer-mutations';
+export { usePendingPauseOfferMutations } from './public-session';
 export {
   usePauseBriefDoneCheckIn,
   type UsePauseBriefDoneCheckInParams,

@@ -12,8 +12,8 @@ import { Button } from '@/components/ui/button';
 import {
   getPendingPauseOfferDisplay,
   usePendingPauseOffer,
-  usePendingPauseOfferMutations,
 } from '@/features/pause/public-home';
+import { usePendingPauseOfferMutations } from '@/features/pause/public-session';
 
 interface Props {
   /** After adopt or decline — e.g. resync `useHolzen` from `v_pause_current`. */

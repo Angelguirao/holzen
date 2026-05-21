@@ -3,7 +3,7 @@
  * Feature presentation imports `presentation/session/pause-persisted-tab-session-io` (bound default port).
  * Ritual step layout tokens: `pauseStepLayout` (screens may import here instead of `public-hooks`).
  * Persist snapshot builder: `buildPauseSessionPersistSnapshot` (session scaffold presentation may import here).
- * Other session presentation: `public-hooks`. Domain gates: import `domain/*` directly.
+ * Session mutations (pending-offer adopt/decline): `usePendingPauseOfferMutations`. Other session presentation: `public-hooks`. Domain gates: import `domain/*` directly.
  */
 import {
   clearPersistedTabSession,
@@ -28,3 +28,6 @@ export {
   buildPauseSessionPersistSnapshot,
   type PauseSessionPersistSnapshotInput,
 } from './application/use-cases/session/persist-snapshot';
+
+/** Pending-offer adopt/decline (session shell + blocking modal). */
+export { usePendingPauseOfferMutations } from './presentation/session/use-pending-pause-offer-mutations';
