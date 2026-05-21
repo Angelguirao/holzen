@@ -3782,6 +3782,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate feel-shift dedupe refs under presentation/reflect/mood/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 presentation peel — complete mood conductor cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>reflect/mood/</code> peel, <code>use-pause-feel-shift-log-dedupe-refs</code> remained in <code>reflect/steps/</code> while <code>use-pause-session-mood-and-persist</code> imported across folders. Colocate dedupe refs (+ test) under <code>mood/</code>; <code>public-hooks</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>Supersedes interim note that kept dedupe in <code>steps/</code> — mood cluster is the only consumer.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>None — two files + import paths.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-dismiss-outlet-pause-ready</code> or <code>use-staggered-reveal</code>, or backlog #4 analytics read port wiring.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
