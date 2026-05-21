@@ -10660,4 +10660,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood leaf hooks on public-ritual-reflect (backlog #1 verified, §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>depth-picker + feel-tiles + initial-mood on ritual reflect barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified. Export <code>usePauseSessionDepthPickerHandlers</code>, <code>usePauseSessionFeelTilesSelect</code>, and <code>usePauseSessionInitialMoodHandlers</code> on <code>public-ritual-reflect.ts</code>; <code>public-hooks</code> re-exports from the barrel. Mood-and-persist still composes these via sibling <code>presentation/reflect/mood/</code> imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — RPC paths unchanged (<code>public-rpc</code> facades).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Breath/reflect flow conductors and <code>usePauseFeelShiftLogDedupeRefs</code> remain on <code>public-hooks</code> until next peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>usePauseSessionBreathReflectHandlers</code> / <code>usePauseSessionReflectAndDecide</code> on <code>public-ritual-reflect</code>; backlog #4 <code>PauseRepository</code> presentation audit.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
