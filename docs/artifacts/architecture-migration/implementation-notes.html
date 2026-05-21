@@ -12047,4 +12047,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock mood-and-persist + reflection_step log to PauseRepository (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/mood + steps presentation port-lock</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Add <code>use-pause-session-mood-and-persist</code> tests asserting feel-tile selects call <code>runInitialEmotionSelect</code> with <code>supabasePauseRepository</code> (brief + deep opts). Name default adapters explicitly on <code>use-pause-reflection-step-log</code> (repository + reflection-step storage).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Test-only — mood chrome conductor still composes child hooks without a dedicated port-lock test (covered indirectly via mood-and-persist + favorite-toggle).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog analytics-port consolidation, companion feedback vote write path, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -46,6 +46,8 @@ describe('usePauseReflectionStepLog', () => {
         { storage: mockReflectionStepStorage },
       );
     });
+    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
+    expect(mockReflectionStepStorage.port).toBe('reflectionStepSessionStorage');
   });
 
   it('does not log while loading or without copy', async () => {
