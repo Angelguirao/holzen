@@ -9609,9 +9609,9 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Helpers remain under <code>application/</code> + <code>infrastructure/</code>; <code>public-rpc</code> still re-exports cooldown math until a dedupe slice.</dd>
+      <dd>Helpers remain under <code>application/</code> + <code>infrastructure/</code>; <code>public-rpc</code> re-exports from <code>public-trigger</code> for backward-compatible imports.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: point <code>public-rpc</code> cooldown re-exports at <code>public-trigger</code> or audit remaining presentation <code>application/</code> imports.</dd>
+      <dd>Next backlog #4: audit remaining presentation <code>application/</code> imports (session scaffold, home card projection).</dd>
     </dl>
   </article>
 
