@@ -12,3 +12,8 @@ export function buildReflectTagUpdatedPayload(tags: string[]): { tags: string[] 
 export function buildReflectFavoriteToggledPayload(isFavorite: boolean): { is_favorite: boolean } {
   return { is_favorite: isFavorite };
 }
+
+/** `reflection_step` progression payload — once per instance after reflect copy settles. */
+export function buildReflectReflectionStepPayload(): { surface: 'pause_reflect' } {
+  return { surface: 'pause_reflect' };
+}

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildReflectFavoriteToggledPayload,
   buildReflectNoteUpdatedPayload,
+  buildReflectReflectionStepPayload,
   buildReflectTagUpdatedPayload,
 } from './reflect-note-tag-payload';
 
@@ -18,5 +19,9 @@ describe('reflect-note-tag-payload', () => {
 
   it('builds favorite_toggled payload', () => {
     expect(buildReflectFavoriteToggledPayload(true)).toEqual({ is_favorite: true });
+  });
+
+  it('builds reflection_step payload', () => {
+    expect(buildReflectReflectionStepPayload()).toEqual({ surface: 'pause_reflect' });
   });
 });

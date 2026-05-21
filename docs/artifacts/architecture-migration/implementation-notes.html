@@ -6901,17 +6901,17 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflection_step payload → domain (backlog #1)</span>
+      <span>Phase A slice — reflection_step payload beside note/tag/favorite (backlog #1)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Peel reflection_step step payload from ritual/reflect use case</h3>
+    <h3>Consolidate reflection_step RPC payload in reflect-note-tag-payload</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Smallest reflect domain peel after <code>favorite_toggled</code>: <code>buildReflectReflectionStepPayload</code> in <code>domain/reflect/steps/reflection-step-log.ts</code>; <code>run-pause-reflection-step-log</code> keeps RPC + sessionStorage dedupe only.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Prior slice put <code>buildReflectReflectionStepPayload</code> in <code>reflection-step-log.ts</code>; this slice moves it beside <code>note_updated</code> / <code>tag_updated</code> / <code>favorite_toggled</code> in <code>reflect-note-tag-payload.ts</code>. <code>reflection-step-log.ts</code> keeps storage key + <code>shouldLogPauseReflectionStep</code> gate only.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Follow-up slice removed <code>logPauseReflectionStepOnce</code> from <code>public-rpc</code>; presentation calls use case + <code>public-ports</code> directly.</dd>
+      <dd>Module name still says note-tag; rename to <code>reflect-step-payloads</code> deferred. Follow-up on remote removed <code>logPauseReflectionStepOnce</code> from <code>public-rpc</code>; presentation calls use case + <code>public-ports</code> directly.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel shift-frame hub / feel-tiles conductors off <code>public-rpc</code>, or backlog #4 companion feedback vote read wiring.</dd>
     </dl>
