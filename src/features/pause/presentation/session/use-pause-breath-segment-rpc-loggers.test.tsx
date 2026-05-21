@@ -18,10 +18,6 @@ const {
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 
-vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
-  showPauseStepSyncFailedToast,
-}));
-
 vi.mock('@/features/pause/public-rpc', async () => {
   const breathLog = await vi.importActual<
     typeof import('@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log')
@@ -32,6 +28,7 @@ vi.mock('@/features/pause/public-rpc', async () => {
     ensureBreathSegment2Logged: ensureBreathSegment2LoggedMock,
     logBreathSegment1Skipped: logBreathSegment1SkippedMock,
     logBreathSegment2Skipped: logBreathSegment2SkippedMock,
+    showPauseStepSyncFailedToast,
   };
 });
 

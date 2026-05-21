@@ -8,12 +8,9 @@ const { logPostPauseEmotionIfDirtyMock, showPauseStepSyncFailedToast } = vi.hois
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 
-vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
-  showPauseStepSyncFailedToast,
-}));
-
 vi.mock('@/features/pause/public-rpc', () => ({
   logPostPauseEmotionIfDirty: logPostPauseEmotionIfDirtyMock,
+  showPauseStepSyncFailedToast,
 }));
 
 const t = ((k: string) => k) as TFunction;
