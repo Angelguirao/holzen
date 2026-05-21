@@ -31,17 +31,6 @@ export type {
   RunOpenManualPauseSilentModeAfterCreateOpened,
   RunOpenManualPauseSilentModeAfterCreateResult,
 } from '@/features/pause/domain/reflect/generation/open-manual-pause-silent-mode-after-create-types';
-export { mapManualTriggerStartError } from '@/features/pause/domain/reflect/generation/map-manual-trigger-start-error';
-export {
-  computeAutoCooldownRemainingMs,
-  computeManualCooldownRemainingMs,
-} from '@/features/pause/domain/reflect/generation/compute-pause-trigger-cooldowns';
-export {
-  buildManualTriggerCooldownStorageKey,
-  isManualTriggerBlockedByCooldown,
-  parseManualTriggerCooldownFromStorageEvent,
-  type ManualTriggerCooldownStorageEvent,
-} from '@/features/pause/domain/reflect/generation/manual-trigger-cooldown-flow';
 export { shouldNavigateAfterManualTrigger } from '@/features/pause/domain/reflect/generation/should-navigate-after-manual-trigger';
 export type {
   TrackManualPauseInstanceCreatedPayload,
