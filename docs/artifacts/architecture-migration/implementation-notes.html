@@ -9577,4 +9577,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home session navigation on public-navigation (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; use-home-pause-actions peels application imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no reflect folder moves. Re-export <code>buildHomePauseSessionLocationState</code>, <code>canNavigateToPauseSession</code>, and <code>shouldNavigateAfterManualTrigger</code> on <code>public-navigation</code>; <code>use-home-pause-actions</code> imports navigation + telemetry barrels only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — router state shape and navigate guards unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-holzen-manual-trigger-orchestration</code> still imports cooldown helpers from <code>application/use-cases/trigger/</code> and infrastructure storage directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #3/#4: peel manual-trigger cooldown cluster on <code>use-holzen-manual-trigger-orchestration</code> or wire stray ritual <code>logPauseStep</code> call sites through <code>public-rpc</code> only.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
