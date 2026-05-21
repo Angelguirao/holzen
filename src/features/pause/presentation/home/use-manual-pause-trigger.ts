@@ -6,16 +6,23 @@ import {
   type ManualPauseTriggerResult,
 } from '@/features/pause/domain/manual-pause-trigger-result';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
-import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
+import { applyManualPauseOpenResult } from '@/features/pause/application/use-cases/trigger/apply-manual-pause-open-result';
+import { buildManualPauseOpenParams } from '@/features/pause/application/use-cases/trigger/build-manual-pause-open-params';
 import {
-  applyManualPauseOpenResult,
-  buildManualPauseOpenParams,
   markPauseManualStartedHomeOnce,
-  openManualPauseFromHome,
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
-} from '@/features/pause/public-rpc';
+} from '@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry';
+import { openManualPauseFromHome } from '@/features/pause/application/use-cases/trigger/open-manual-pause-from-home';
+import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
+import { supabaseReflectGenerator } from '@/features/pause/infrastructure/supabase-reflect-generator';
+import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 import { holzenLog } from '@/lib/holzen-console';
+
+const manualPauseOpenPorts = {
+  repository: supabasePauseRepository,
+  reflect: supabaseReflectGenerator,
+} as const;
 
 export interface UseManualPauseTriggerParams {
   user: User | null;
@@ -35,7 +42,7 @@ export interface UseManualPauseTriggerParams {
 
 /**
  * Home manual “Need a moment”: market context → `openManualPauseFromHome` → Home preview state.
- * Called from `useHolzen` in screens; RPC + reflect I/O via wired `openManualPauseFromHome` on `public-rpc`.
+ * Called from `useHolzen` in screens; RPC + reflect I/O via `openManualPauseFromHome` + default port adapters.
  */
 export function useManualPauseTrigger({
   user,
@@ -98,7 +105,7 @@ export function useManualPauseTrigger({
 
       if (silentMode) {
         holzenLog.manual('generateMessage: silent mode');
-        const result = await openManualPauseFromHome(openParams);
+        const result = await openManualPauseFromHome(manualPauseOpenPorts, openParams);
         if (result.outcome === 'error') {
           holzenLog.manual('generateMessage: silent pause create failed', {
             message: result.userMessage,
@@ -110,7 +117,7 @@ export function useManualPauseTrigger({
       setLoading(true);
       setError(null);
       try {
-        const result = await openManualPauseFromHome(openParams);
+        const result = await openManualPauseFromHome(manualPauseOpenPorts, openParams);
         if (result.outcome === 'idle') {
           holzenLog.manual('generateMessage: reuse/skip');
         }

@@ -21,11 +21,25 @@ vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () 
   clearSession: clearSessionMock,
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
+vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
+  supabasePauseRepository: { repository: 'mock-repo' },
+}));
+
+vi.mock('@/features/pause/infrastructure/supabase-reflect-generator', () => ({
+  supabaseReflectGenerator: { reflect: 'mock-reflect' },
+}));
+
+vi.mock('@/features/pause/application/use-cases/trigger/open-manual-pause-from-home', () => ({
   openManualPauseFromHome: openManualPauseFromHomeMock,
+}));
+
+vi.mock('@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry', () => ({
   markPauseManualStartedHomeOnce: markPauseManualStartedHomeOnceMock,
   trackManualPauseInstanceCreated: trackManualPauseInstanceCreatedMock,
   trackPauseManualCompleted: trackPauseManualCompletedMock,
+}));
+
+vi.mock('@/features/pause/application/use-cases/trigger/build-manual-pause-open-params', () => ({
   buildManualPauseOpenParams: (input: {
     userId: string;
     silentMode: boolean;
@@ -45,6 +59,9 @@ vi.mock('@/features/pause/public-rpc', () => ({
     severityBand: 'low',
     silentMsg: 'silent',
   }),
+}));
+
+vi.mock('@/features/pause/application/use-cases/trigger/apply-manual-pause-open-result', () => ({
   applyManualPauseOpenResult: async (
     _input: { result: { outcome: string; userMessage?: string } },
     _ports: unknown,
@@ -66,7 +83,7 @@ beforeEach(() => {
 });
 
 describe('useManualPauseTrigger', () => {
-  it('opens manual pause via public-rpc facade', async () => {
+  it('opens manual pause via use case + default port adapters', async () => {
     const user = { id: 'user-1' } as User;
 
     const { result } = renderHook(() =>
@@ -94,6 +111,10 @@ describe('useManualPauseTrigger', () => {
     });
 
     expect(openManualPauseFromHomeMock).toHaveBeenCalledWith(
+      {
+        repository: { repository: 'mock-repo' },
+        reflect: { reflect: 'mock-reflect' },
+      },
       expect.objectContaining({
         userId: 'user-1',
         silentMode: true,

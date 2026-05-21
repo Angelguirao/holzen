@@ -10,7 +10,6 @@ export type {
 } from './domain/rpc-types';
 export type { PauseCompanionAction, PauseState } from './domain/pause-state';
 import type { PauseCompanionAction } from './domain/pause-state';
-export type { OpenManualPauseFromHomeResult } from './application/use-cases/trigger/open-manual-pause-from-home';
 export type { ReflectGenerator } from './ports/reflect-generator';
 export type { PauseAnalyticsRepository } from './ports/pause-analytics-repository';
 
@@ -31,15 +30,6 @@ export {
   type GroundingEnrichBody,
   type GroundingEnrichment,
 } from './infrastructure/edge/grounding-enrich-edge';
-import { openManualPauseFromHome as openManualPauseFromHomeUseCase } from './application/use-cases/trigger/open-manual-pause-from-home';
-import type { OpenManualPauseFromHomeParams } from './application/use-cases/trigger/open-manual-pause-from-home';
-import type { PauseState } from './domain/pause-state';
-import type { PostPauseFeelSnapshot } from './domain/ritual/done/post-pause-emotion-log';
-import type { RunPauseFavoriteToggleResult } from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
-import type { RunPauseReflectTagUpdateResult } from './application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
-import type { CompanionUiCompletionStep } from './application/use-cases/ritual/frame/companion-ui-completion-types';
-import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
-import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
 import { logPauseCompanion as logPauseCompanionUseCase } from './application/use-cases/ritual/log/log-pause-companion';
 import {
   runLogPwaInstallAnalyticsEvent,
@@ -60,52 +50,10 @@ export {
   type OpenPauseStateForAnalytics,
   type PauseDismissAnalyticsSurface,
 } from './application/use-cases/trigger/home-pause-actions-telemetry';
-export {
-  markPauseManualStartedHomeOnce,
-  trackManualPauseInstanceCreated,
-  trackPauseManualCompleted,
-  trackPauseManualStarted,
-  type PauseManualStartedSurface,
-  type TrackManualPauseInstanceCreatedPayload,
-  type TrackPauseManualCompletedPayload,
-} from './application/use-cases/trigger/manual-pause-trigger-telemetry';
-export {
-  applyManualPauseOpenResult,
-  type ApplyManualPauseOpenResultInput,
-  type ManualPauseHomePreviewPorts,
-} from './application/use-cases/trigger/apply-manual-pause-open-result';
-export { buildManualPauseOpenParams } from './application/use-cases/trigger/build-manual-pause-open-params';
 
 export type { RunReflectGenerationInput, ReflectGenerationResult };
 
 /** Lifecycle + ritual mutations — wired facades only; no generic `pauseLogStep` export. */
-
-/** Session lifecycle — `pause_create_or_reuse` via `PauseRepository` (wired for presentation). */
-export function pauseCreateOrReuse(
-  params: Parameters<typeof runPauseCreateOrReuse>[1],
-): Promise<PauseCreateOrReuseResult> {
-  return runPauseCreateOrReuse(supabasePauseRepository, params);
-}
-
-/** Session lifecycle — `pause_dismiss_current` via `PauseRepository` (wired for presentation). */
-export function pauseDismissCurrent(): Promise<PauseState | null> {
-  return runPauseDismissCurrent(supabasePauseRepository);
-}
-
-export type { PostPauseFeelSnapshot };
-export type { CompanionUiCompletionStep };
-export type { RunPauseFavoriteToggleResult, RunPauseReflectTagUpdateResult };
-
-/** Home manual trigger — `pause_create_or_reuse` (+ silent reflection stub). */
-export function openManualPauseFromHome(params: OpenManualPauseFromHomeParams) {
-  return openManualPauseFromHomeUseCase(
-    {
-      repository: supabasePauseRepository,
-      reflect: supabaseReflectGenerator,
-    },
-    params,
-  );
-}
 
 export {
   showPauseOutcomeNotCompletedToast,
