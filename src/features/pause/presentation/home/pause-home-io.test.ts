@@ -11,6 +11,8 @@ import {
   buildManualPauseOpenParams,
   MANUAL_PAUSE_VOLATILITY_TEMPLATE,
   pauseHomeManualOpenPorts,
+  runOpenManualPauseSilentModeAfterCreate,
+  runPersistSilentReflectionStub,
 } from './pause-home-io';
 
 describe('pause-home-io', () => {
@@ -52,5 +54,10 @@ describe('pause-home-io', () => {
     expect(params.trackedAssetId).toBe('bitcoin');
     expect(pauseHomeManualOpenPorts.repository).toBeDefined();
     expect(pauseHomeManualOpenPorts.reflect).toBeDefined();
+  });
+
+  it('re-exports silent-mode reflect use cases for Home test seams', () => {
+    expect(typeof runPersistSilentReflectionStub).toBe('function');
+    expect(typeof runOpenManualPauseSilentModeAfterCreate).toBe('function');
   });
 });

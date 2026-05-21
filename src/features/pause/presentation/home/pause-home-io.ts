@@ -16,7 +16,10 @@ export {
   type ManualPauseCreateOrReuseParams,
   type ManualPauseMarketContext,
   type OpenManualPauseFromHomeParams,
+  type OpenManualPauseFromHomePorts,
   type OpenManualPauseFromHomeResult,
+  runOpenManualPauseSilentModeAfterCreate,
+  runPersistSilentReflectionStub,
 } from './pause-home-reflect-io';
 export {
   markPauseManualStartedHomeOnce,
