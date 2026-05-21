@@ -8133,4 +8133,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath-handlers conductor under presentation/reflect/flows (backlog #1 presentation)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-pause-session-breath-handlers colocated with breath-reflect bundle</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Move <code>use-pause-session-breath-handlers</code> from <code>presentation/session/</code> to <code>presentation/reflect/flows/</code> beside <code>use-pause-session-breath-step-handlers</code> and <code>use-pause-session-breath-reflect-handlers</code>; session breath navigation/RPC loggers stay under <code>presentation/session/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flat breath navigation hooks (<code>use-pause-session-breath-navigation</code>, segment RPC loggers) remain under <code>presentation/session/</code> until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: batch remaining <code>presentation/session/*</code> ritual type imports off <code>public-hooks</code>, or <code>use-pause-brief-done-check-in</code> → <code>logPostPauseEmotionIfDirty</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

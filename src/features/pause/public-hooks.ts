@@ -430,7 +430,7 @@ export {
 export {
   usePauseSessionBreathHandlers,
   type UsePauseSessionBreathHandlersParams,
-} from './presentation/session/use-pause-session-breath-handlers';
+} from './presentation/reflect/flows/use-pause-session-breath-handlers';
 export { usePauseSessionExitNavigation } from './presentation/session/use-pause-session-exit-navigation';
 export { usePauseSessionPendingPauseOfferNavigation } from './presentation/session/use-pause-session-pending-pause-offer-navigation';
 export { usePauseSessionPendingLeaveSheet } from './presentation/session/use-pause-session-pending-leave-sheet';
