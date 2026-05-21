@@ -4561,6 +4561,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — CompanionOrchestrator adapter barrel (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>CompanionOrchestrator leaves public-queries</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 <code>ritual/reflect/</code> and reflect <code>public-ports</code> peel were already on <code>cursor/arch-migrate-src-ca70</code>. Export <code>supabaseCompanionOrchestrator</code> from <code>public-ports.ts</code>; remove from <code>public-queries.ts</code>. <code>use-companion-slot-orchestrate-ports</code> and <code>use-companion-intervention-fetch</code> import the default adapter via <code>public-ports</code> (artifact cache read stays on <code>public-queries</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>createCompanionSlotOrchestratePorts</code> deprecated helper remains on <code>public-rpc</code> for tests.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

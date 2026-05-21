@@ -4,3 +4,5 @@
  */
 export type { ReflectGenerator } from './ports/reflect-generator';
 export { supabaseReflectGenerator } from './infrastructure/supabase-reflect-generator';
+export type { CompanionOrchestrator } from './ports/companion-orchestrator';
+export { supabaseCompanionOrchestrator } from './infrastructure/supabase-companion-orchestrator';
