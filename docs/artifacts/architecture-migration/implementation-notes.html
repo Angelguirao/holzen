@@ -10675,7 +10675,26 @@
       <dt>Tradeoffs</dt>
       <dd>Breath/reflect flow conductors and <code>usePauseFeelShiftLogDedupeRefs</code> remain on <code>public-hooks</code> until next peel.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>usePauseSessionBreathReflectHandlers</code> / <code>usePauseSessionReflectAndDecide</code> on <code>public-ritual-reflect</code>; backlog #4 <code>PauseRepository</code> presentation audit.</dd>
+      <dd>Next: <code>usePauseSessionBreathReflectHandlers</code> on <code>public-ritual-reflect</code>; backlog #4 <code>PauseRepository</code> presentation audit.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect flow/hub on public-ritual-reflect (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; holzen-reflect + shift-frame hub on ritual reflect barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — no <code>application/use-cases/reflect/</code> paths remain. Export <code>usePauseShiftFrameDoneHandler</code> and <code>usePauseSessionReflectAndDecide</code> on <code>public-ritual-reflect.ts</code> beside breath-segment and mood hooks; <code>public-hooks</code> re-exports from the barrel only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — presentation modules unchanged; barrel paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>usePauseSessionBreathReflectHandlers</code> and breath step handlers remain on <code>public-hooks</code> direct paths until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: port-backed companion feedback vote read audit; optional orb geometry on <code>public-ritual-breathe</code>.</dd>
     </dl>
   </article>
 
