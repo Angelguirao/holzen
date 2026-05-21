@@ -40,11 +40,11 @@ vi.mock(
   }),
 );
 
-vi.mock('@/features/pause/infrastructure/supabase-companion-orchestrator', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   supabaseCompanionOrchestrator: mockCompanionOrchestrator,
 }));
 
-vi.mock('@/features/pause/infrastructure/queries/artifact-cache-query', () => ({
+vi.mock('@/features/pause/public-queries', () => ({
   fetchParsedPauseArtifactCache: vi.fn().mockResolvedValue({}),
 }));
 

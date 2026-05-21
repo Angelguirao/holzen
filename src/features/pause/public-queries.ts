@@ -200,6 +200,10 @@ export {
   type ParsedPauseArtifactCache,
 } from './infrastructure/queries/artifact-cache-query';
 export {
+  loadMoodHistoryForOrchestrate,
+  type MoodHistoryEntry,
+} from './infrastructure/companion/mood-history';
+export {
   COMPANION_UI_COMPLETION_NONE_QUERY_KEY,
   companionUiCompletionQueryKey,
   getCompanionUiCompletionQueryOptions,

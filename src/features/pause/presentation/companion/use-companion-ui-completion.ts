@@ -10,7 +10,7 @@ import {
 } from '@/features/pause/public-queries';
 import { persistCompanionUiStepCompletion } from '@/features/pause/application/use-cases/ritual/frame/persist-ui-step-completion';
 import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
-import { supabasePauseRepository } from '@/features/pause/infrastructure/supabase-pause-repository';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 /**
  * Per-pause-instance companion UI step completion (TanStack Query + RPC persist).

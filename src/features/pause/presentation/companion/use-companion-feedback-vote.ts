@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
 import { hapticFeedback } from '@/lib/haptics';
 import { runLogCompanionFeedbackVote } from '@/features/pause/application/use-cases/ritual/frame/run-log-companion-feedback-vote';
-import { supabasePauseAnalyticsRepository } from '@/features/pause/infrastructure/supabase-pause-analytics-repository';
+import { supabasePauseAnalyticsRepository } from '@/features/pause/public-rpc';
 import {
   companionFeedbackVoteQueryKey,
   getCompanionFeedbackVoteQueryOptions,

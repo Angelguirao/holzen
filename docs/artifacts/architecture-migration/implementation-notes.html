@@ -12579,4 +12579,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — backlog #1 verified; companion presentation ports via public barrels (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> already complete; companion hooks off <code>infrastructure/*</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder move was already complete on <code>cursor/arch-migrate-src-ca70</code> — zero legacy <code>application/use-cases/reflect/</code> paths. This slice continues backlog #4 §6 barrel hygiene: all <code>presentation/companion/</code> conductors import <code>supabasePauseRepository</code>, <code>supabaseCompanionOrchestrator</code>, and <code>supabasePauseAnalyticsRepository</code> from <code>public-rpc</code>; <code>fetchParsedPauseArtifactCache</code> and <code>loadMoodHistoryForOrchestrate</code> from <code>public-queries</code>. Tests mock barrels for port-lock parity.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged; import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session shell hooks still import <code>infrastructure/session/persisted-session-storage</code> directly until a dedicated <code>public-session</code> peel slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: session shell <code>loadSession</code> / <code>saveSession</code> / <code>clearSession</code> off <code>public-session</code> for remaining session hooks, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
