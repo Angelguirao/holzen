@@ -4048,6 +4048,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — port-backed dev-mode analytics read (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; admin dev-mode hydrate behind PauseAnalyticsRepository</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>fetchDevModeSetting</code> on <code>PauseAnalyticsRepository</code> + <code>run-fetch-dev-mode-setting</code>; Supabase read lives in <code>analytics-events.ts</code>; <code>dev-mode-admin-query</code> keeps localStorage fallback/sync when port returns <code>null</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>fetchDevModeFromAnalytics</code> export name unchanged for admin TanStack Query.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Write path was already port-backed; read path now matches companion feedback vote pattern.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: move <code>load-settings-data-export-bundle</code> under <code>presentation/settings/</code>, or <code>ritual/brief/</code> beat consolidation per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

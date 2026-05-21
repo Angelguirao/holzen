@@ -25,6 +25,24 @@ function voteFromCompanionFeedbackMetadata(metadata: Json | null | undefined): '
 }
 
 /** Latest companion thumbs vote for a pause instance + companion type (read path for TanStack Query). */
+/** Latest admin dev-mode toggle from `analytics_events`; `null` when none or on error. */
+export async function fetchDevModeSettingFromAnalytics(userId: string): Promise<boolean | null> {
+  try {
+    const { data, error } = await supabase
+      .from('analytics_events')
+      .select('metadata')
+      .eq('user_id', userId)
+      .eq('event', 'dev_mode_setting')
+      .order('created_at', { ascending: false })
+      .limit(1);
+    if (error || !data?.length) return null;
+    const metadata = data[0].metadata as { enabled?: boolean } | null;
+    return metadata?.enabled === true;
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchCompanionFeedbackVoteFromAnalytics(params: {
   userId: string;
   pauseInstanceId: string;

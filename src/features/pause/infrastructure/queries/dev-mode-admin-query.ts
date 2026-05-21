@@ -1,4 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
+import { runFetchDevModeSetting } from '@/features/pause/application/use-cases/admin/run-fetch-dev-mode-setting';
+import { supabasePauseAnalyticsRepository } from '@/features/pause/infrastructure/supabase-pause-analytics-repository';
 
 /** Matches `screens/admin/lib/admin-query-namespace` — keep in sync if the prefix changes. */
 const ADMIN_QUERY_PREFIX = ['admin'] as const;
@@ -26,18 +27,10 @@ export function adminDevModeSettingQueryKey(userId: string) {
 
 /** Admin: hydrate rapid-testing toggle from latest analytics_events row. */
 export async function fetchDevModeFromAnalytics(userId: string): Promise<boolean> {
-  const { data, error } = await supabase
-    .from('analytics_events')
-    .select('metadata')
-    .eq('user_id', userId)
-    .eq('event', 'dev_mode_setting')
-    .order('created_at', { ascending: false })
-    .limit(1);
-  if (error || !data?.length) {
+  const dbValue = await runFetchDevModeSetting(supabasePauseAnalyticsRepository, userId);
+  if (dbValue === null) {
     return readLocalDevMode();
   }
-  const metadata = data[0].metadata as { enabled?: boolean } | null;
-  const dbValue = metadata?.enabled === true;
   try {
     if (dbValue) localStorage.setItem('holzen_dev_mode', 'true');
     else localStorage.removeItem('holzen_dev_mode');

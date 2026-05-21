@@ -12,4 +12,6 @@ export interface PauseAnalyticsRepository {
     pauseInstanceId: string;
     companionType: string;
   }): Promise<CompanionFeedbackVote | null>;
+  /** Latest `dev_mode_setting` row for admin rapid-testing toggle; `null` when none or on error. */
+  fetchDevModeSetting(userId: string): Promise<boolean | null>;
 }
