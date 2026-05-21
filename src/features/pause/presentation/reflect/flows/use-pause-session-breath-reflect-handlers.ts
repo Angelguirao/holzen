@@ -1,4 +1,4 @@
-import { usePauseSessionBreathHandlers } from './use-pause-session-breath-handlers';
+import { usePauseSessionBreathHandlers } from '../../session/use-pause-session-breath-handlers';
 import { usePauseSessionReflectAndDecide } from './use-pause-session-reflect-and-decide';
 import { usePauseShiftFrameDoneHandler } from '../hub/use-pause-shift-frame-done-handler';
 import type {
