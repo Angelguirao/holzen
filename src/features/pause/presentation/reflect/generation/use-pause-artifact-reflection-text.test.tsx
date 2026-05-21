@@ -6,7 +6,7 @@ const { fetchReflectionTextMock } = vi.hoisted(() => ({
   fetchReflectionTextMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-queries', () => ({
+vi.mock('@/features/pause/public-rpc', () => ({
   fetchReflectionTextForPauseInstance: fetchReflectionTextMock,
 }));
 

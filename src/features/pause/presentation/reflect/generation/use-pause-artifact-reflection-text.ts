@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { fetchReflectionTextForPauseInstance } from '@/features/pause/public-queries';
+import { fetchReflectionTextForPauseInstance } from '@/features/pause/public-rpc';
 
 export type PauseArtifactReflectionTextFetchPhase = 'idle' | 'loading' | 'error' | 'done';
 
