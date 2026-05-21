@@ -12864,4 +12864,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate session breath conductors under presentation/session/breath/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 5 session breath subcluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code> (no legacy reflect use-case paths). Colocate <code>use-pause-breath-segment-rpc-loggers</code> and <code>use-pause-session-breath-handlers</code> (+ tests) under <code>presentation/session/breath/</code>; <code>use-pause-session-breath-reflect-handlers</code> imports sibling breath path; <code>public-hooks</code> / <code>public-ritual-reflect</code> re-export paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — breathe ritual stays under <code>ritual/breathe/</code> use cases; session grouping wins over <code>reflect/flows/</code> per §3.2.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other breath navigation/UI hooks remain flat under <code>presentation/session/</code> until a follow-up peel bundles them with <code>breath/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: optional <code>presentation/session/</code> CI subclusters for scaffold/shell, colocate archive query keys under <code>infrastructure/queries/archive/</code>, or Phase B subscription/auth shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -110,6 +110,10 @@ mustExist(
   'src/features/pause/presentation/reflect/mood',
   'pause/presentation/reflect/mood/',
 );
+mustExist(
+  'src/features/pause/presentation/session/breath',
+  'pause/presentation/session/breath/',
+);
 mustNotExist(
   'src/features/pause/domain/reflect/share/reflection-share-canvas.ts',
   'domain/reflect/share/reflection-share-canvas.ts (use application/use-cases/ritual/reflect/share/)',
@@ -182,6 +186,16 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS = [
   "from './presentation/reflect/use-pause-reflect-generation'",
   "from './presentation/reflect/use-pause-favorite-toggle'",
   "from '../presentation/reflect/use-pause-reflect-generation'",
+];
+
+/** Flat presentation/session breath paths — use presentation/session/breath/. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_IMPORTS = [
+  '@/features/pause/presentation/session/use-pause-breath-segment-rpc-loggers',
+  '@/features/pause/presentation/session/use-pause-session-breath-handlers',
+  "from './presentation/session/use-pause-breath-segment-rpc-loggers'",
+  "from './presentation/session/use-pause-session-breath-handlers'",
+  "from '../presentation/session/use-pause-breath-segment-rpc-loggers'",
+  "from '../presentation/session/use-pause-session-breath-handlers'",
 ];
 
 const PAUSE_RPC_CLIENT_ALLOWLIST = new Set([
@@ -259,6 +273,11 @@ for (const file of walkTs(join(root, 'src'))) {
   for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS) {
     if (text.includes(needle)) {
       failures.push(`${rel}: legacy flat presentation/reflect import (${needle})`);
+    }
+  }
+  for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_IMPORTS) {
+    if (text.includes(needle)) {
+      failures.push(`${rel}: legacy flat presentation/session breath import (${needle})`);
     }
   }
   if (!PAUSE_RPC_CLIENT_ALLOWLIST.has(rel)) {
