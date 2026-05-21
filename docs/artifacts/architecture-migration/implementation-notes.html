@@ -15638,4 +15638,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — favorite pro-hint gate via steps flow anchor (backlog #1, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-favorite-toggle-flow</code> in <code>ritual/reflect/steps/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder move remains complete — no relocations. Add <code>pause-favorite-toggle-flow.ts</code> beside <code>pause-reflection-step-flow</code>; <code>pause-reflect-steps-io</code> re-exports <code>shouldShowFavoriteProHint</code>; <code>use-pause-favorite-toggle</code> imports gate + RPC facade from steps I/O only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — domain still owns pure gate; behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Share handlers still import domain share builders directly — peel in follow-up slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session breath timed-loop through <code>pause-session-breath-io</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
