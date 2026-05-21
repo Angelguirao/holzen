@@ -2,23 +2,21 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-text';
 
-const { fetchReflectionTextMock } = vi.hoisted(() => ({
-  fetchReflectionTextMock: vi.fn(),
+const { fetchPauseReflectReflectionTextMock } = vi.hoisted(() => ({
+  fetchPauseReflectReflectionTextMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-ports', () => ({
-  supabaseReflectGenerator: {
-    fetchReflectionText: fetchReflectionTextMock,
-  },
+vi.mock('@/features/pause/public-rpc', () => ({
+  fetchPauseReflectReflectionText: fetchPauseReflectReflectionTextMock,
 }));
 
 describe('usePauseArtifactReflectionText', () => {
   afterEach(() => {
-    fetchReflectionTextMock.mockReset();
+    fetchPauseReflectReflectionTextMock.mockReset();
   });
 
   it('fetches immediately when pauseInstanceId is set', async () => {
-    fetchReflectionTextMock.mockResolvedValue('persisted copy');
+    fetchPauseReflectReflectionTextMock.mockResolvedValue('persisted copy');
 
     const { result } = renderHook(() =>
       usePauseArtifactReflectionText({
@@ -30,11 +28,11 @@ describe('usePauseArtifactReflectionText', () => {
     await waitFor(() => {
       expect(result.current.artifactReflectionText).toBe('persisted copy');
     });
-    expect(fetchReflectionTextMock).toHaveBeenCalledWith('pause-1');
+    expect(fetchPauseReflectReflectionTextMock).toHaveBeenCalledWith('pause-1');
   });
 
   it('defers fetch until whenEnabled is true', async () => {
-    fetchReflectionTextMock.mockResolvedValue('late read');
+    fetchPauseReflectReflectionTextMock.mockResolvedValue('late read');
 
     const { result, rerender } = renderHook(
       ({ fetchEnabled }: { fetchEnabled: boolean }) =>
@@ -46,7 +44,7 @@ describe('usePauseArtifactReflectionText', () => {
       { initialProps: { fetchEnabled: false } },
     );
 
-    expect(fetchReflectionTextMock).not.toHaveBeenCalled();
+    expect(fetchPauseReflectReflectionTextMock).not.toHaveBeenCalled();
 
     rerender({ fetchEnabled: true });
 
