@@ -4523,6 +4523,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect-step row projections in domain/ (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; note/tags hydrate projections beside PauseReflectStepLatestRow</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> and <code>domain/reflect-generation-enabled.ts</code> were already on <code>cursor/arch-migrate-src-ca70</code>. Move <code>noteTextFromReflectRow</code> / <code>tagsFromReflectRow</code> into <code>domain/reflect-step-latest.ts</code>; <code>reflect-step-query.ts</code> keeps TanStack wrappers; <code>public-queries</code> re-exports row types/projections from domain.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Query module still re-exports projections for callers that import infrastructure path; prefer domain via <code>public-queries</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>supabaseCompanionOrchestrator</code> to <code>public-ports</code>, wire remaining stray <code>PauseRepository</code> call sites (backlog #4), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

@@ -8,3 +8,13 @@ export type PauseReflectStepLatestRow = {
   payload: Record<string, unknown>;
   created_at: string;
 };
+
+export function noteTextFromReflectRow(row: PauseReflectStepLatestRow | null | undefined): string {
+  const text = row?.payload?.text;
+  return typeof text === 'string' ? text : '';
+}
+
+export function tagsFromReflectRow(row: PauseReflectStepLatestRow | null | undefined): string[] {
+  const arr = row?.payload?.tags;
+  return Array.isArray(arr) ? (arr as string[]).slice() : [];
+}

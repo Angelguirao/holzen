@@ -1,6 +1,8 @@
 import {
+  noteTextFromReflectRow,
   PAUSE_REFLECT_STEP_NOTE,
   PAUSE_REFLECT_STEP_TAGS,
+  tagsFromReflectRow,
   type PauseReflectStepLatestRow,
   type PauseReflectStepType,
 } from '@/features/pause/domain/reflect-step-latest';
@@ -27,15 +29,7 @@ export async function fetchLatestPauseReflectStep(
   return supabaseReflectGenerator.fetchLatestReflectStep(pauseInstanceId, stepType);
 }
 
-export function noteTextFromReflectRow(row: PauseReflectStepLatestRow | null | undefined): string {
-  const text = row?.payload?.text;
-  return typeof text === 'string' ? text : '';
-}
-
-export function tagsFromReflectRow(row: PauseReflectStepLatestRow | null | undefined): string[] {
-  const arr = row?.payload?.tags;
-  return Array.isArray(arr) ? (arr as string[]).slice() : [];
-}
+export { noteTextFromReflectRow, tagsFromReflectRow };
 
 export function getLatestPauseReflectNoteQueryOptions(pauseInstanceId: string) {
   return {

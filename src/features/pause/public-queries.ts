@@ -219,17 +219,19 @@ export {
   type PauseSessionSnapshot,
 } from './infrastructure/queries/companion-session-snapshot-query';
 export {
-  fetchLatestPauseReflectStep,
-  getLatestPauseReflectNoteQueryOptions,
-  getLatestPauseReflectTagsQueryOptions,
   noteTextFromReflectRow,
   PAUSE_REFLECT_STEP_NOTE,
-  PAUSE_REFLECT_STEP_QUERY_PREFIX,
   PAUSE_REFLECT_STEP_TAGS,
-  pauseReflectStepLatestQueryKey,
   tagsFromReflectRow,
   type PauseReflectStepLatestRow,
   type PauseReflectStepType,
+} from './domain/reflect-step-latest';
+export {
+  fetchLatestPauseReflectStep,
+  getLatestPauseReflectNoteQueryOptions,
+  getLatestPauseReflectTagsQueryOptions,
+  PAUSE_REFLECT_STEP_QUERY_PREFIX,
+  pauseReflectStepLatestQueryKey,
 } from './infrastructure/queries/reflect/reflect-step-query';
 export { supabaseCompanionOrchestrator } from './infrastructure/supabase-companion-orchestrator';
 export {
