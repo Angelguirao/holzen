@@ -15980,4 +15980,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breath segment log outcome via pause-session-breath-io (backlog #1 verified, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Re-export <code>applyBreathSegmentLogOutcome</code> on session breath I/O</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Re-export <code>applyBreathSegmentLogOutcome</code> on <code>presentation/session/breath/pause-session-breath-io.ts</code>; <code>use-pause-breath-segment-rpc-loggers</code> imports breath domain helpers only through the breath I/O barrel (RPC facades unchanged).</dd>
+      <dt>Deviation</dt>
+      <dd>None — domain still owns pure outcome application; behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> still imports domain directly in the breath loggers hook — peel incrementally if needed.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: route decide/frame restore helpers through session decide/frame I/O barrels, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
