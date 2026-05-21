@@ -16607,4 +16607,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — extend manual-open flow anchor with domain re-exports (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-manual-open-flow</code> domain bundle for <code>pause-home-reflect-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Extend existing manual-open anchor (use cases only) to re-export Home manual-open domain builders/types; <code>pause-home-reflect-io</code> imports through the anchor instead of scattered domain paths. Cooldown storage + <code>applyManualPauseOpenResult</code> stay on presentation I/O.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>PostHog manual-open telemetry remains on <code>pause-home-reflect-telemetry-io</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B cross-context Tier 1 shim, or optional legacy-stats strip on <code>public.ts</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

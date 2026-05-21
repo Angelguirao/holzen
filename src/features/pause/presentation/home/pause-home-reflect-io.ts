@@ -1,48 +1,35 @@
 export {
   buildManualPauseCreateOrReuseParams,
-  MANUAL_PAUSE_VOLATILITY_TEMPLATE,
-  type ManualPauseCreateOrReuseParams,
-} from '@/features/pause/domain/reflect/generation/build-manual-pause-create-or-reuse-params';
-export {
-  buildManualPauseOpenParams,
-  type BuildManualPauseOpenParamsInput,
-} from '@/features/pause/domain/reflect/generation/build-manual-pause-open-params';
-export {
   buildManualPauseMarketContext,
-  type ManualPauseMarketContext,
-} from '@/features/pause/domain/reflect/generation/build-manual-pause-market-context';
-export type {
-  OpenManualPauseFromHomeParams,
-  OpenManualPauseFromHomePorts,
-  OpenManualPauseFromHomeResult,
-} from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-types';
-export type {
-  PersistSilentReflectionStubInput,
-  PersistSilentReflectionStubResult,
-} from '@/features/pause/domain/reflect/generation/persist-silent-reflection-stub-types';
-export type {
-  RunOpenManualPauseSilentModeAfterCreateError,
-  RunOpenManualPauseSilentModeAfterCreateInput,
-  RunOpenManualPauseSilentModeAfterCreateOpened,
-  RunOpenManualPauseSilentModeAfterCreateResult,
-} from '@/features/pause/domain/reflect/generation/open-manual-pause-silent-mode-after-create-types';
-export {
-  dismissOpenPauseHome,
-  openManualPauseFromHome,
-  runOpenManualPauseSilentModeAfterCreate,
-  runPersistSilentReflectionStub,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-manual-open-flow';
-export { mapManualTriggerStartError } from '@/features/pause/domain/reflect/generation/map-manual-trigger-start-error';
-export {
+  buildManualPauseOpenParams,
+  buildManualTriggerCooldownStorageKey,
   computeAutoCooldownRemainingMs,
   computeManualCooldownRemainingMs,
-} from '@/features/pause/domain/reflect/generation/compute-pause-trigger-cooldowns';
-export {
-  buildManualTriggerCooldownStorageKey,
+  dismissOpenPauseHome,
   isManualTriggerBlockedByCooldown,
+  MANUAL_PAUSE_VOLATILITY_TEMPLATE,
+  mapManualTriggerStartError,
+  openManualPauseFromHome,
   parseManualTriggerCooldownFromStorageEvent,
+  runOpenManualPauseSilentModeAfterCreate,
+  runPersistSilentReflectionStub,
+  shouldNavigateAfterManualTrigger,
+  type BuildManualPauseOpenParamsInput,
+  type ManualPauseCreateOrReuseParams,
+  type ManualPauseMarketContext,
   type ManualTriggerCooldownStorageEvent,
-} from '@/features/pause/domain/reflect/generation/manual-trigger-cooldown-flow';
+  type OpenManualPauseFromHomeParams,
+  type OpenManualPauseFromHomePorts,
+  type OpenManualPauseFromHomeResult,
+  type PersistSilentReflectionStubInput,
+  type PersistSilentReflectionStubResult,
+  type RunOpenManualPauseSilentModeAfterCreateError,
+  type RunOpenManualPauseSilentModeAfterCreateInput,
+  type RunOpenManualPauseSilentModeAfterCreateOpened,
+  type RunOpenManualPauseSilentModeAfterCreateResult,
+  type TrackManualPauseInstanceCreatedPayload,
+  type TrackPauseManualCompletedPayload,
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-manual-open-flow';
 export {
   readManualTriggerCooldownAtMs,
   writeManualTriggerCooldownAtMs,
@@ -52,8 +39,3 @@ export {
   type ApplyManualPauseOpenResultInput,
   type ManualPauseHomePreviewPorts,
 } from './apply-manual-pause-open-result';
-export { shouldNavigateAfterManualTrigger } from '@/features/pause/domain/reflect/generation/should-navigate-after-manual-trigger';
-export type {
-  TrackManualPauseInstanceCreatedPayload,
-  TrackPauseManualCompletedPayload,
-} from '@/features/pause/domain/reflect/generation/manual-pause-home-telemetry-types';
