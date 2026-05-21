@@ -2,12 +2,26 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   companionPauseRepository,
   nextExpandedWithLazyFetch,
+  pauseLoadCompanionOrchestrateSession,
   pauseToggleCompanionLibraryFavorite,
 } from './pause-companion-orchestration-io';
 
-const { runToggleCompanionLibraryFavoriteMock } = vi.hoisted(() => ({
+const {
+  loadCompanionOrchestrateSessionMock,
+  loadMoodHistoryForOrchestrateMock,
+  runToggleCompanionLibraryFavoriteMock,
+} = vi.hoisted(() => ({
+  loadCompanionOrchestrateSessionMock: vi.fn(),
+  loadMoodHistoryForOrchestrateMock: vi.fn().mockResolvedValue([]),
   runToggleCompanionLibraryFavoriteMock: vi.fn(),
 }));
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session',
+  () => ({
+    loadCompanionOrchestrateSession: loadCompanionOrchestrateSessionMock,
+  }),
+);
 
 vi.mock(
   '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite',
@@ -16,12 +30,30 @@ vi.mock(
   }),
 );
 
+vi.mock('@/features/pause/public-queries', () => ({
+  loadMoodHistoryForOrchestrate: loadMoodHistoryForOrchestrateMock,
+}));
+
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'companionPauseRepository' },
   supabaseCompanionOrchestrator: { port: 'companionOrchestrator' },
 }));
 
 describe('pause-companion-orchestration-io', () => {
+  it('routes orchestrate session load through default mood-history query', async () => {
+    loadCompanionOrchestrateSessionMock.mockResolvedValue({ pauseInstanceId: 'pi-1' });
+
+    await pauseLoadCompanionOrchestrateSession({
+      pauseInstanceId: 'pi-1',
+      language: 'en',
+    });
+
+    expect(loadCompanionOrchestrateSessionMock).toHaveBeenCalledWith(
+      { pauseInstanceId: 'pi-1', language: 'en' },
+      { loadMoodHistory: loadMoodHistoryForOrchestrateMock },
+    );
+  });
+
   it('re-exports nextExpandedWithLazyFetch for section expansion conductors', () => {
     const fetch = vi.fn();
     expect(

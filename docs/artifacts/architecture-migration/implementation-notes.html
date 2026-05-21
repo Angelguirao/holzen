@@ -14992,4 +14992,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion orchestrate session I/O</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 verified — bind loadCompanionOrchestrateSession in orchestration I/O</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder move. Extend <code>presentation/companion/pause-companion-orchestration-io.ts</code> with <code>pauseLoadCompanionOrchestrateSession</code> (default <code>loadMoodHistoryForOrchestrate</code>); <code>use-companion-orchestrate-session</code> imports I/O only. Re-export <code>CompanionFullviewKind</code> on <code>pause-companion-analytics-io</code> so <code>use-fullview-telemetry</code> avoids deep application imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; mirrors reflect generation / home reflect I/O peels.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other companion hooks still import <code>ritual/frame/</code> use cases directly — peel incrementally (slot orchestrate cluster next).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-orchestrate-io</code> barrel for slot run-orchestrate + intervention fetch, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

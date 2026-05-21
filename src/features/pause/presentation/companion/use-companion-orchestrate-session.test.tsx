@@ -2,31 +2,21 @@ import { renderHook, act } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useCompanionOrchestrateSession } from './use-companion-orchestrate-session';
 
-const { loadCompanionOrchestrateSessionMock, loadMoodHistoryForOrchestrateMock, sessionFixture } =
-  vi.hoisted(() => ({
-    loadCompanionOrchestrateSessionMock: vi.fn(),
-    loadMoodHistoryForOrchestrateMock: vi.fn().mockResolvedValue([]),
-    sessionFixture: { pauseInstanceId: 'pause-1', language: 'en' },
-  }));
+const { loadCompanionOrchestrateSessionMock, sessionFixture } = vi.hoisted(() => ({
+  loadCompanionOrchestrateSessionMock: vi.fn(),
+  sessionFixture: { pauseInstanceId: 'pause-1', language: 'en' },
+}));
 
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session',
-  () => ({
-    loadCompanionOrchestrateSession: loadCompanionOrchestrateSessionMock,
-  }),
-);
-
-vi.mock('@/features/pause/public-queries', () => ({
-  loadMoodHistoryForOrchestrate: loadMoodHistoryForOrchestrateMock,
+vi.mock('@/features/pause/presentation/companion/pause-companion-orchestration-io', () => ({
+  pauseLoadCompanionOrchestrateSession: loadCompanionOrchestrateSessionMock,
 }));
 
 beforeEach(() => {
   loadCompanionOrchestrateSessionMock.mockReset().mockResolvedValue(sessionFixture);
-  loadMoodHistoryForOrchestrateMock.mockReset().mockResolvedValue([]);
 });
 
 describe('useCompanionOrchestrateSession', () => {
-  it('loads session via loadCompanionOrchestrateSession + mood-history port', async () => {
+  it('loads session via pauseLoadCompanionOrchestrateSession', async () => {
     const { result } = renderHook(() =>
       useCompanionOrchestrateSession({
         pauseInstanceId: 'pause-1',
@@ -44,17 +34,14 @@ describe('useCompanionOrchestrateSession', () => {
     });
 
     expect(loadCompanionOrchestrateSessionMock).toHaveBeenCalledOnce();
-    expect(loadCompanionOrchestrateSessionMock).toHaveBeenCalledWith(
-      {
-        pauseInstanceId: 'pause-1',
-        context: 'btc',
-        language: 'en',
-        reflectionMessage: 'reflect',
-        mood: 'calm',
-        severityNumber: 42,
-      },
-      { loadMoodHistory: loadMoodHistoryForOrchestrateMock },
-    );
+    expect(loadCompanionOrchestrateSessionMock).toHaveBeenCalledWith({
+      pauseInstanceId: 'pause-1',
+      context: 'btc',
+      language: 'en',
+      reflectionMessage: 'reflect',
+      mood: 'calm',
+      severityNumber: 42,
+    });
     expect(loaded).toEqual(sessionFixture);
   });
 

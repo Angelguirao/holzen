@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { useAuth } from '@/features/auth/public';
-import type { CompanionFullviewKind } from '@/features/pause/application/use-cases/ritual/frame/log-companion-fullview-opened';
-import { logCompanionFullviewOpened } from '@/features/pause/presentation/companion/pause-companion-analytics-io';
+import {
+  logCompanionFullviewOpened,
+  type CompanionFullviewKind,
+} from '@/features/pause/presentation/companion/pause-companion-analytics-io';
 
 export type { CompanionFullviewKind as FullviewCompanion };
 
