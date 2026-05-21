@@ -16265,4 +16265,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — shift-frame hub RPC via hub flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-shift-frame-hub-flow</code> for frame-hub shift_emotion_logged RPC</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend existing hub cluster anchor to re-export <code>runShiftEmotionFrameHubDone</code>; <code>pause-reflect-hub-io</code> imports RPC + presentation mapping through the anchor instead of deep <code>run-shift-emotion-frame-hub-done</code> / domain paths.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only (mirrors <code>pause-initial-emotion-log-flow</code>).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect steps/generation/share I/O modules still bind application use cases directly until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel reflect steps RPC through a steps flow anchor, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
