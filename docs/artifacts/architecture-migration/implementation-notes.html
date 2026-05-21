@@ -7006,9 +7006,9 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>use-pause-reflect-generation</code> still imports <code>public-rpc</code> until the next peel.</dd>
+      <dd><code>use-pause-reflect-generation</code> still imported <code>public-rpc</code> until the follow-up generation conductor peel on this branch.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel holzen-reflect generation conductor, or companion retry presentation cluster.</dd>
+      <dd>Next: peel holzen-reflect generation conductor (completed in follow-up slice below).</dd>
     </dl>
   </article>
 
@@ -7025,7 +7025,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>fetchPauseReflect*</code> and <code>runPauseReflectGeneration</code> facades remain on <code>public-rpc</code> for cross-context callers.</dd>
+      <dd><code>fetchPauseReflect*</code> and <code>runPauseReflectGeneration</code> facades remain on <code>public-rpc</code> for cross-context callers until generation conductor peel.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>use-pause-reflect-generation</code> off <code>public-rpc</code>, or backlog #4 stray mutation call sites.</dd>
     </dl>
@@ -7047,6 +7047,25 @@
       <dd><code>reflection_step</code> payload stays in <code>reflection-step-log.ts</code> (separate step type module).</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>use-pause-reflect-generation</code> off <code>public-rpc</code>, or companion retry presentation cluster.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel holzen-reflect generation off public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-pause-reflect-generation calls runReflectGeneration + ReflectGenerator port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Artifact hydrate hooks were already on <code>public-ports</code> on remote. This slice peels <code>use-pause-reflect-generation</code> to <code>runReflectGeneration(..., supabaseReflectGenerator)</code>; tests mock the use-case module. <code>runPauseReflectGeneration</code> / <code>fetchPauseReflect*</code> facades stay on <code>public-rpc</code> for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Decide handler and session brief hooks still import <code>public-rpc</code> facades until follow-up peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-session-decide-handler</code> or brief-to-deep hooks off <code>public-rpc</code>, or backlog #4 companion feedback vote write paths.</dd>
     </dl>
   </article>
 
