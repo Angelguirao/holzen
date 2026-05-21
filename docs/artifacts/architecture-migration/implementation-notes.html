@@ -3896,6 +3896,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate reflect favorite pro-hint toast under ritual/reflect/steps/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 tail — reflect-only feedback helper</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. <code>favorite-toast</code> had a single consumer (<code>use-pause-favorite-toggle</code>); move it from cross-beat <code>feedback/</code> into <code>ritual/reflect/steps/</code> beside <code>run-pause-favorite-toggle</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>step-sync-toast</code> and <code>outcome-toast</code> stay in <code>feedback/</code> (shared across feel, frame, breath, decide).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-dismiss-outlet-pause-ready</code> under <code>presentation/home/</code>, <code>use-staggered-reveal</code> under <code>presentation/companion/</code>, or backlog #4 analytics read port wiring.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
