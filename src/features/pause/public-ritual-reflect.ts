@@ -71,4 +71,4 @@ export {
   usePauseSessionBreathHandlers,
   type UsePauseSessionBreathHandlersParams,
 } from './presentation/session/use-pause-session-breath-handlers';
-export { usePauseSessionBreathReflectHandlers } from './presentation/reflect/flows/use-pause-session-breath-reflect-handlers';
+export { usePauseSessionBreathReflectHandlers } from './presentation/session/use-pause-session-breath-reflect-handlers';
