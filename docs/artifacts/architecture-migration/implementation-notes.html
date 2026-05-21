@@ -5020,6 +5020,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A — backlog #1 verified complete (reflect → ritual/reflect)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -5033,6 +5034,21 @@
       <dd>Updated <code>modern-react-practices-holzen.md</code> and <code>refactoring-strategy.md</code> paths that still referenced legacy <code>application/use-cases/reflect|companion/</code>.</dd>
       <dt>Open questions</dt>
       <dd>Next slice: backlog #4 — wire remaining <code>PauseRepository</code> stragglers or Phase B cross-context per scheduling table.</dd>
+=======
+      <span>Phase A slice — reflect artifact read hook (backlog #1 adjacent)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-artifact-reflection-text</code> beside haiku hook</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>After <code>pause-session-reflect-decide-flow</code> landed under <code>ritual/reflect/flows/</code>, add a presentation hook mirroring <code>use-pause-artifact-haiku</code> for persisted <code>reflection_text</code> reads via <code>fetchPauseReflectReflectionText</code> (<code>ReflectGenerator</code> port). Export from <code>public-hooks</code>; no screen wiring this slice — avoids changing Reflect generation prefetch.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3 / §10.1 generation cluster grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hook is available for Frame fallback / deferred hydration; consumers can adopt in a follow-up without touching <code>use-pause-reflect-generation</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire Frame or Reflect card to fall back to artifact text when session seed is empty, or backlog #4 stray RPC audit.</dd>
+>>>>>>> 9d698d77 (refactor(pause): add artifact reflection-text read hook)
     </dl>
   </article>
 
