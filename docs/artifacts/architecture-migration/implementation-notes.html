@@ -9989,9 +9989,28 @@
       <dt>Deviation</dt>
       <dd>None — gate spinner behavior unchanged.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Hydration and shell-view-model still import <code>application/use-cases/session/*</code> directly.</dd>
+      <dd>Hydration still imports <code>application/use-cases/session/*</code> directly until next peel.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: breath segment RPC loggers audit for <code>public-rpc</code>-only entry.</dd>
+      <dd>Next #3: <code>shell-view-model</code> on <code>public-session</code>; backlog #4: breath segment RPC loggers audit for <code>public-rpc</code>-only.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — shell-view-model on public-session (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; peel shell coalesce onto session barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — no reflect moves. After gate-flags peel on remote, export <code>coalescePauseSessionShellViewModel</code> on <code>public-session.ts</code>; <code>use-pause-session-shell-bootstrap</code> imports coalesce from the barrel (single import block with mount-log + fetch gate).</dd>
+      <dt>Deviation</dt>
+      <dd>None — shell field defaults and severity fallback unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hydration and scaffold-derived helpers remain on direct <code>application/use-cases/session/*</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next #3: hydration cluster on <code>public-session</code>; backlog #4: breath segment RPC presentation imports audit for <code>public-rpc</code>-only.</dd>
     </dl>
   </article>
 
