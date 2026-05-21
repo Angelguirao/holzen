@@ -5,6 +5,8 @@ import {
 import {
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
+  type TrackManualPauseInstanceCreatedPayload,
+  type TrackPauseManualCompletedPayload,
 } from './manual-pause-trigger-telemetry';
 import type { OpenManualPauseFromHomeResult } from './open-manual-pause-from-home';
 
@@ -18,6 +20,9 @@ export type ManualPauseHomePreviewPorts = {
   setNewPauseArrival: (value: boolean) => void;
   setLastTriggerAt: (iso: string) => void;
   syncOpenPauseFromDb: () => Promise<void>;
+  /** PostHog — wired from `public-rpc` in Home presentation; defaults for unit tests. */
+  trackInstanceCreated?: (payload: TrackManualPauseInstanceCreatedPayload) => void;
+  trackManualCompleted?: (payload: TrackPauseManualCompletedPayload) => void;
 };
 
 export type ApplyManualPauseOpenResultInput = {
@@ -35,6 +40,8 @@ export async function applyManualPauseOpenResult(
   ports: ManualPauseHomePreviewPorts,
 ): Promise<ManualPauseTriggerResult> {
   const { result, ctx, silentMsg, assetId, severityBand, startedAtMs } = input;
+  const trackCreated = ports.trackInstanceCreated ?? trackManualPauseInstanceCreated;
+  const trackCompleted = ports.trackManualCompleted ?? trackPauseManualCompleted;
 
   if (result.outcome === 'idle') {
     ports.setError(result.userMessage);
@@ -51,7 +58,7 @@ export async function applyManualPauseOpenResult(
     ports.setLastPauseInstanceId(result.instanceId);
   }
   if (result.created) {
-    trackManualPauseInstanceCreated({
+    trackCreated({
       pauseInstanceId: result.instanceId,
       severity: severityBand,
       pendingOffer: isPendingOffer,
@@ -63,7 +70,7 @@ export async function applyManualPauseOpenResult(
     ports.setCompanionsEmpty();
     ports.setNewPauseArrival(true);
     ports.setLastTriggerAt(new Date().toISOString());
-    trackPauseManualCompleted({
+    trackCompleted({
       durationS: Math.round((Date.now() - startedAtMs) / 1000),
       hadBitcoinContext: assetId === 'bitcoin',
       trackedAssetId: assetId,

@@ -9523,6 +9523,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — manual-trigger completion telemetry ports (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; applyManualPauseOpenResult wires PostHog via public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 complete — zero legacy <code>application/use-cases/reflect/</code> paths. Wire <code>trackManualPauseInstanceCreated</code> / <code>trackPauseManualCompleted</code> through optional <code>ManualPauseHomePreviewPorts</code> from <code>use-manual-pause-trigger</code> (imports <code>public-rpc</code>). Composes with <code>public-trigger</code> barrel for cooldown helpers (remote slice).</dd>
+      <dt>Deviation</dt>
+      <dd>None — PostHog payloads unchanged; use-case tests keep default telemetry when ports omit trackers.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Cooldown + storage re-exported on <code>public-trigger</code> (no Supabase); <code>public-rpc</code> re-exports trigger helpers for backward compatibility.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit ritual mutations outside <code>PauseRepository</code> facades or port-backed dev-mode analytics read.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — manual-trigger cooldown on public-rpc (backlog #1 verified, #3)</span>
       <span class="status resolved">resolved</span>
     </header>

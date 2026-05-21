@@ -12,6 +12,8 @@ import {
   clearSession,
   markPauseManualStartedHomeOnce,
   openManualPauseFromHome,
+  trackManualPauseInstanceCreated,
+  trackPauseManualCompleted,
 } from '@/features/pause/public-rpc';
 import { holzenLog } from '@/lib/holzen-console';
 
@@ -84,6 +86,8 @@ export function useManualPauseTrigger({
         setNewPauseArrival,
         setLastTriggerAt,
         syncOpenPauseFromDb,
+        trackInstanceCreated: trackManualPauseInstanceCreated,
+        trackManualCompleted: trackPauseManualCompleted,
       };
 
       const applyOpenResult = (result: Parameters<typeof applyManualPauseOpenResult>[0]['result']) =>
