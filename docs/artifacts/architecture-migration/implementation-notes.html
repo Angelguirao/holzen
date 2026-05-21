@@ -8687,9 +8687,8 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
       <span>Phase A slice — drop public-ports + unused vote read facade (backlog #1 done, #3)</span>
-      <span class="status resolved">resolved</status>
+      <span class="status resolved">resolved</span>
     </header>
     <h3>§6 peel: dead adapter barrel removed; vote read stays in query module</h3>
     <dl>
@@ -8701,7 +8700,12 @@
       <dd>Cross-context callers that need a vote read must use <code>public-queries</code> query options, not a removed RPC facade.</dd>
       <dt>Open questions</dt>
       <dd>Next backlog #4: companion orchestrate thin runners on <code>public-rpc</code>, or audit stray mutations bypassing <code>PauseRepository</code>.</dd>
-=======
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect §6 peel step-sync toast (backlog #1 done, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -8714,8 +8718,26 @@
       <dt>Tradeoffs</dt>
       <dd>Session hooks still import step-sync toast via <code>public-rpc</code> until a later session-cluster peel.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: fold <code>public-ports.ts</code> into <code>public-rpc</code>, or peel session/brief step-sync toast imports off <code>public-rpc</code>.</dd>
->>>>>>> 547518f9 (refactor(pause): peel reflect step-sync toast off public-rpc)
+      <dd>Next backlog #4: companion orchestrate thin runners on <code>public-rpc</code>, or audit stray mutations bypassing <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — reflect flows domain vocabulary (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect breath→decide transitions: <code>PauseImpactData</code> + breath step navigation in <code>domain/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) was already complete. This slice peels pure vocabulary used by <code>presentation/reflect/flows/</code> out of <code>application/use-cases/</code>: <code>PauseImpactData</code> → <code>domain/decide/pause-impact-data.ts</code>; breath segment step targets + integrate guard → <code>domain/ritual/breathe/pause-breath-step-navigation.ts</code> (tests colocated). <code>buildPauseImpactDataOnComplete</code> stays in <code>ritual/decide/impact-data.ts</code> and re-exports the type for use-case callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>reflect-frame-focus-ambience</code> still imports <code>runPauseRitualAudioWhenReady</code> from <code>ritual/breathe/</code> (shared AudioContext with breathing cues) — optional later peel via <code>public-rpc</code> re-export.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: companion orchestrate thin runners on <code>public-rpc</code>, or audit stray mutations bypassing <code>PauseRepository</code>.</dd>
     </dl>
   </article>
 

@@ -1,7 +1,7 @@
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/features/market/public';
-import type { PauseImpactData } from '@/features/pause/application/use-cases/ritual/decide/impact-data';
+import type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
