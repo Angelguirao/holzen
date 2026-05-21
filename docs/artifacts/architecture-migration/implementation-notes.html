@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect steps I/O off steps-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-io</code> imports run-* and domain gates directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Peel <code>pause-reflect-steps-io</code> to sibling <code>run-pause-*</code> and <code>domain/reflect/steps/*</code> instead of <code>pause-reflect-steps-flow</code> (parity with hub/mood/share direct-import peels on this branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-steps-flow.ts</code> remains for <code>check:architecture-alignment</code> steps cluster detection.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-telemetry-io</code> flow peel, or companion analytics I/O peel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase B slice — holzen QueryClient lib shim (Tier 1)</span>
       <span class="status resolved">resolved</span>
     </header>
