@@ -110,10 +110,8 @@ import { runPostPauseEmotionLogIfDirty } from './application/use-cases/ritual/do
 import type { PostPauseFeelSnapshot } from './domain/ritual/done/post-pause-emotion-log';
 import type { MoodValue } from './domain/mood-value';
 import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
-import {
-  runPauseFavoriteToggle,
-  type RunPauseFavoriteToggleResult,
-} from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
+import type { RunPauseFavoriteToggleResult } from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
+import type { RunPauseReflectTagUpdateResult } from './application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
 import {
   runPauseReflectionStepLogOnce,
   type RunPauseReflectionStepLogResult,
@@ -440,13 +438,6 @@ export function logPauseShiftEmotionFrameHubDone(
   input: Parameters<typeof runShiftEmotionFrameHubDone>[1],
 ): Promise<RunShiftEmotionFrameHubDoneResult> {
   return runShiftEmotionFrameHubDone(supabasePauseRepository, input);
-}
-
-/** Reflect heart toggle — `favorite_toggled` via `PauseRepository` (wired for presentation). */
-export function logPauseFavoriteToggle(
-  input: Parameters<typeof runPauseFavoriteToggle>[1],
-): Promise<RunPauseFavoriteToggleResult> {
-  return runPauseFavoriteToggle(supabasePauseRepository, input);
 }
 
 /** Reflect copy settled — `reflection_step` once per tab via `PauseRepository` + session storage. */

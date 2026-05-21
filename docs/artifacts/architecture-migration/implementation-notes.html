@@ -11116,4 +11116,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect favorite toggle off public-rpc (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>favorite_toggled: presentation → ritual/reflect/steps + PauseRepository</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no folder move. Continue backlog #4 / §6 slim <code>public-rpc</code>: <code>use-pause-favorite-toggle</code> imports <code>runPauseFavoriteToggle</code> with <code>supabasePauseRepository</code> (same pattern as note + tags). Removed <code>logPauseFavoriteToggle</code> facade; fixed <code>RunPauseReflectTagUpdateResult</code> type re-export import on <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-reflection-step-log</code> still uses <code>logPauseReflectionStepOnce</code> on <code>public-rpc</code> (session storage port).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-reflection-step-log</code> off <code>public-rpc</code> or port-backed companion feedback vote read.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
