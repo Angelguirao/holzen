@@ -18,7 +18,7 @@ import {
   supabasePauseRepository,
   supabaseReflectGenerator,
 } from '@/features/pause/public-rpc';
-import { clearSession } from '@/features/pause/public-session';
+import { clearSession } from '@/features/pause/infrastructure/session/persisted-session-storage';
 import { holzenLog } from '@/lib/holzen-console';
 
 const manualPauseOpenPorts = {

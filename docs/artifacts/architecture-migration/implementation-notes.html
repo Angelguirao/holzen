@@ -13491,4 +13491,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel session/home/decide presentation off public-session</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; §6 slim public-session follow-up</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. After scaffold persist/sync peeled, route remaining feature <code>presentation/</code> consumers (<code>session/</code>, <code>home/</code>, <code>reflect/flows/</code> decide handler) to <code>infrastructure/session/persisted-session-storage</code> directly. <code>public-session</code> stays the cross-context tab I/O barrel for non-pause imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving import path only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Cross-context code outside <code>features/pause/presentation/</code> may still import <code>public-session</code> until a Phase B shim peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>src/lib/*</code> shims (subscription/auth) or port-backed companion feedback vote write path.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

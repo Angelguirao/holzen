@@ -30,13 +30,9 @@ vi.mock('@/features/pause/application/use-cases/ritual/decide/outcome-toast', ()
   showPauseOutcomeNotCompletedToast,
 }));
 
-vi.mock('@/features/pause/public-session', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/pause/public-session')>();
-  return {
-    ...actual,
-    clearSession: () => clearSessionMock(),
-  };
-});
+vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
+  clearSession: clearSessionMock,
+}));
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: mockPauseRepository,
