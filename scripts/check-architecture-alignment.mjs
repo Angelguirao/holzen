@@ -115,6 +115,10 @@ mustExist(
   'pause/presentation/reflect/mood/',
 );
 mustExist(
+  'src/features/pause/presentation/reflect/scaffold',
+  'pause/presentation/reflect/scaffold/',
+);
+mustExist(
   'src/features/pause/presentation/session/breath',
   'pause/presentation/session/breath/',
 );
@@ -261,6 +265,13 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_IMPORTS = [
   "from '../presentation/session/pause-session-scaffold-vm-types'",
 ];
 
+/** Flat presentation/session ritual-storage-sync — use presentation/reflect/scaffold/. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_RITUAL_STORAGE_SYNC_IMPORTS = [
+  '@/features/pause/presentation/session/use-pause-session-ritual-storage-sync',
+  "from './presentation/session/use-pause-session-ritual-storage-sync'",
+  "from '../presentation/session/use-pause-session-ritual-storage-sync'",
+];
+
 const PAUSE_RPC_CLIENT_ALLOWLIST = new Set([
   'src/features/pause/infrastructure/pause-rpc-client.ts',
   'src/features/pause/infrastructure/supabase-pause-repository.ts',
@@ -346,6 +357,11 @@ for (const file of walkTs(join(root, 'src'))) {
   for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_IMPORTS) {
     if (text.includes(needle)) {
       failures.push(`${rel}: legacy flat presentation/session scaffold import (${needle})`);
+    }
+  }
+  for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_RITUAL_STORAGE_SYNC_IMPORTS) {
+    if (text.includes(needle)) {
+      failures.push(`${rel}: legacy flat presentation/session ritual-storage-sync import (${needle})`);
     }
   }
   if (!PAUSE_RPC_CLIENT_ALLOWLIST.has(rel)) {
