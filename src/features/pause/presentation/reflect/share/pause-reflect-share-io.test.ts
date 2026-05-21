@@ -8,16 +8,10 @@ import {
 const runReflectionShareImageMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-flow',
-  async (importOriginal) => {
-    const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-flow')
-    >();
-    return {
-      ...actual,
-      runReflectionShareImage: runReflectionShareImageMock,
-    };
-  },
+  '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image',
+  () => ({
+    runReflectionShareImage: runReflectionShareImageMock,
+  }),
 );
 
 describe('pause-reflect-share-io', () => {
