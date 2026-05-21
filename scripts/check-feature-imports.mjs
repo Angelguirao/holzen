@@ -75,7 +75,7 @@ const DEEP_FEATURE_IMPORT =
 
 const ALLOWED_DEEP_IMPORT_FILES = new Set([
   'src/screens/pause/lib/resolve-pause-breathing-timed-display.ts',
-  'src/features/pause/application/use-cases/apply-bulk-hold-outcomes.test.ts',
+  'src/features/pause/application/use-cases/home/bulk-hold/apply-bulk-hold-outcomes.test.ts',
   'src/features/subscription/presentation/CheckoutConfirmation.close-reopen.test.tsx',
   'src/features/subscription/presentation/CheckoutConfirmation.cross-tab.test.tsx',
   'src/features/subscription/presentation/CheckoutConfirmation.guard.test.tsx',

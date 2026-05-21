@@ -3820,6 +3820,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate bulk-hold use cases under application/use-cases/home/bulk-hold/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; home bulk-hold application cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> migration was already complete; presentation bulk-hold hooks already under <code>presentation/home/</code> on remote. Move <code>apply-bulk-hold-outcomes</code> (+ test) and <code>group-by-local-day</code> from <code>application/use-cases/</code> root and <code>bulk-hold/</code> into <code>home/bulk-hold/</code> beside Home conductors; <code>public-rpc</code> / <code>public-hooks</code> re-export paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not add <code>presentation/home/bulk-hold/</code> subfolder — presentation hooks stay flat under <code>home/</code> until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-dismiss-outlet-pause-ready</code> or <code>use-staggered-reveal</code>, or backlog #4 ritual log RPCs on <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

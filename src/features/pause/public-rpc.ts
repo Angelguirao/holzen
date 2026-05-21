@@ -37,7 +37,7 @@ import { logPauseRitualDepthUpgraded as logPauseRitualDepthUpgradedUseCase } fro
 import {
   applyBulkHoldOutcomes as applyBulkHoldOutcomesUseCase,
   type BulkHoldApplyResult,
-} from './application/use-cases/apply-bulk-hold-outcomes';
+} from './application/use-cases/home/bulk-hold/apply-bulk-hold-outcomes';
 import { supabasePauseRepository } from './infrastructure/supabase-pause-repository';
 import { openManualPauseFromHome as openManualPauseFromHomeUseCase } from './application/use-cases/trigger/open-manual-pause-from-home';
 import { persistReflectionArtifacts } from './infrastructure/edge/reflect/reflection-artifact';
