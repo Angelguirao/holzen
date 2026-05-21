@@ -3972,6 +3972,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate use-signal-source-trusted-host under presentation/companion/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 signal fullview trusted badge hook</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-signal-source-trusted-host</code> beside other companion fullview hooks; sole screen consumer is <code>CompanionSignalPage</code>; <code>public-hooks</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>; application import depth updated.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flat <code>presentation/</code> retains only cross-route helpers (<code>pause-step-layout</code>, settings export bundle).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 remainder (e.g. dev-mode / fullview analytics read adapters), or <code>ritual/brief/</code> beat consolidation per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
