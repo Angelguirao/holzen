@@ -11648,4 +11648,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel PWA install analytics off public-rpc (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; Home PWA funnel via public-queries</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. After unused-facade peel (<code>9369c55a</code>), align PWA install analytics with admin dev-mode pattern: <code>infrastructure/queries/pwa-install-analytics-query.ts</code> wires <code>runLogPwaInstallAnalyticsEvent</code> + default <code>supabasePauseAnalyticsRepository</code>; export via <code>public-queries</code>; <code>public-hooks</code> re-exports for <code>InstallHolzenCard</code>. Remove PWA helpers from <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-rpc</code> now holds default port adapters, grounding-enrich invoke, outcome toasts, and <code>showPauseStepSyncFailedToast</code> only (no analytics write facades).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit §10.1 stale <code>public-rpc</code> companion/intervention rows vs on-disk off-barrel wiring, or close backlog #4 when <code>PauseRepository</code> stragglers are zero.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

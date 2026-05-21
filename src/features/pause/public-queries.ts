@@ -73,6 +73,11 @@ export {
   readLocalDevMode,
 } from './infrastructure/queries/dev-mode-admin-query';
 export {
+  logPausePwaInstallAnalyticsEvent,
+  logPwaInstallAnalyticsEvent,
+  type LogPwaInstallAnalyticsEventInput,
+} from './infrastructure/queries/pwa-install-analytics-query';
+export {
   ADMIN_APPLIED_MIGRATIONS_QUERY_KEY,
   fetchAppliedMigrations,
   getAdminAppliedMigrationsQueryOptions,

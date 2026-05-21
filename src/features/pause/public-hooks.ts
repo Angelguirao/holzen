@@ -220,7 +220,7 @@ export {
   useJourneyPauseInstances,
   type JourneyPauseRow,
 } from './presentation/archive/use-journey-pause-instances';
-export { logPwaInstallAnalyticsEvent } from './public-rpc';
+export { logPwaInstallAnalyticsEvent } from './public-queries';
 export { useSignalSourceTrustedHost } from './presentation/companion/use-signal-source-trusted-host';
 export { useStaggeredReveal } from './presentation/companion/use-staggered-reveal';
 export {
