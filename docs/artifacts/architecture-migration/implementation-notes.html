@@ -8399,4 +8399,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — bulk-hold outcomes via public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-bulk-hold-apply-outcomes peels off public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. <code>use-bulk-hold-apply-outcomes</code> calls wired <code>applyBulkHoldOutcomes</code> on <code>public-rpc</code> instead of the use case + <code>supabasePauseRepository</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-manual-pause-trigger</code> still injects <code>public-ports</code> for repository + ReflectGenerator.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: batch <code>presentation/session/*</code> ritual type imports off <code>public-hooks</code>, or port-backed companion feedback vote analytics read.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
