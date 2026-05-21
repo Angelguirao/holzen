@@ -3,7 +3,12 @@
  * Manual-open cluster imports via `pause-reflect-generation-manual-open-flow` CI anchor.
  */
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-import { dismissOpenPauseHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-manual-open-flow';
+import {
+  dismissOpenPauseHome,
+  openManualPauseFromHome,
+  runOpenManualPauseSilentModeAfterCreate,
+  runPersistSilentReflectionStub,
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-manual-open-flow';
 import {
   supabasePauseRepository,
   supabaseReflectGenerator,
@@ -15,7 +20,6 @@ export {
   buildManualPauseOpenParams,
   dismissOpenPauseHome,
   MANUAL_PAUSE_VOLATILITY_TEMPLATE,
-  mapManualTriggerStartError,
   openManualPauseFromHome,
   runOpenManualPauseSilentModeAfterCreate,
   runPersistSilentReflectionStub,

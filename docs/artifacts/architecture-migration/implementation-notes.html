@@ -90,7 +90,26 @@
       <dt>Tradeoffs</dt>
       <dd>Anchor is a re-export barrel for alignment + <code>check:architecture-alignment</code> generation cluster detection; presentation still imports leaf modules off the anchor (parity with mood/steps/share I/O peels).</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>use-holzen-manual-trigger-orchestration</code> cooldown via <code>public-trigger</code> Tier 1 shim, or Phase B subscription pricing lib shim.</dd>
+      <dd>Superseded by <code>public-trigger</code> cooldown peel for <code>use-holzen-manual-trigger-orchestration</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — Holzen manual-trigger cooldown on public-trigger (backlog #1 verified, Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-holzen-manual-trigger-orchestration</code> imports <code>public-trigger</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Route Home manual-trigger cooldown math, localStorage keys, and start-error mapping through the Tier 1 <code>public-trigger</code> barrel instead of <code>pause-home-reflect-io</code> / manual-open flow anchor; trim duplicate re-exports from reflect I/O.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-home-reflect-io</code> keeps manual-open + dismiss + <code>shouldNavigateAfterManualTrigger</code>; cross-context consumers use <code>public-trigger</code> / <code>public-navigation</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>apply-manual-pause-open-result</code> telemetry-only deps, or Phase B subscription pricing lib shim.</dd>
     </dl>
   </article>
 
