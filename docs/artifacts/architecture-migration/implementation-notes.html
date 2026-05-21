@@ -14593,4 +14593,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation I/O binding (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>pauseReflectGeneration on pause-reflect-generation-io</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Mirror share/ambience pattern: <code>pause-reflect-generation-io.ts</code> wraps <code>runReflectGeneration</code> with default <code>reflectGenerator</code> port; <code>use-pause-reflect-generation</code> imports I/O only (+ unit test on io module). Hook-flow pure helpers still import <code>reflect-generation-hook-flow</code> directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Artifact haiku/reflection-text hooks still import <code>reflectGenerator</code> from the same I/O module without a separate fetch facade.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>apply-manual-pause-open-result</code> under <code>presentation/home/</code>, or extract context fingerprint helpers beside manual-open generation cluster.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

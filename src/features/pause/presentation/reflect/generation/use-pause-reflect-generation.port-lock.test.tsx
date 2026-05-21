@@ -3,20 +3,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { usePauseReflectGeneration } from './use-pause-reflect-generation';
 import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-text';
 
-const { runReflectGenerationMock, mockReflectGenerator } = vi.hoisted(() => ({
-  runReflectGenerationMock: vi.fn(),
+const { pauseReflectGenerationMock, mockReflectGenerator } = vi.hoisted(() => ({
+  pauseReflectGenerationMock: vi.fn(),
   mockReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation',
-  () => ({
-    runReflectGeneration: runReflectGenerationMock,
-  }),
-);
-
 vi.mock('./pause-reflect-generation-io', () => ({
   reflectGenerator: mockReflectGenerator,
+  pauseReflectGeneration: pauseReflectGenerationMock,
 }));
 
 vi.mock('./use-pause-artifact-reflection-text', () => ({
@@ -40,8 +34,8 @@ vi.mock('react-i18next', () => ({
 const usePauseArtifactReflectionTextMock = vi.mocked(usePauseArtifactReflectionText);
 
 beforeEach(() => {
-  runReflectGenerationMock.mockReset();
-  runReflectGenerationMock.mockResolvedValue({ status: 'generated', message: 'edge' });
+  pauseReflectGenerationMock.mockReset();
+  pauseReflectGenerationMock.mockResolvedValue({ status: 'generated', message: 'edge' });
   usePauseArtifactReflectionTextMock.mockReturnValue({
     artifactReflectionText: null,
     reflectionTextFetch: 'idle',
@@ -61,7 +55,7 @@ describe('usePauseReflectGeneration port-lock', () => {
     );
 
     await waitFor(() => {
-      expect(runReflectGenerationMock).toHaveBeenCalledWith(
+      expect(pauseReflectGenerationMock).toHaveBeenCalledWith(
         expect.objectContaining({
           pauseInstanceId: 'pause-1',
           userId: 'user-1',
