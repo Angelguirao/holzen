@@ -19,9 +19,21 @@ import {
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   resolvePauseDecideOutcomeFlow,
+  resolvePauseSessionReflectAndDecidePreflight,
 } from './pause-reflect-flows-io';
 
 describe('pause-reflect-flows-io', () => {
+  it('re-exports reflect-and-decide preflight helpers for presentation conductors', () => {
+    const view = resolvePauseSessionReflectAndDecidePreflight({
+      seedMessage: 'seed',
+      ritualEntry: 'deep',
+      step: 'reflect',
+      btcData: null,
+    });
+    expect(view.reflectGenEnabled).toBe(true);
+    expect(view.effectiveReflectionMessage).toBe('seed');
+  });
+
   it('re-exports decide flow helpers for presentation conductors', () => {
     const quote = getSessionQuote();
     expect(formatReinforcementQuoteFromSession(quote)).toContain(quote.author);

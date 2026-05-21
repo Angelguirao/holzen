@@ -14815,7 +14815,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Flows I/O now mixes pure view helpers (reflect-and-decide) with decide RPC + toast helpers; reflect-and-decide unit test mocks application flow module to avoid eager Supabase from <code>public-rpc</code>.</dd>
+      <dd>Flows I/O now mixes pure view helpers (reflect-and-decide) with decide RPC + toast helpers; reflect-and-decide unit test mocks <code>public-rpc</code> + partial <code>importOriginal</code> on flows I/O; flows-io unit test covers preflight re-export.</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B cross-context slice (e.g. <code>holzen-query-client-ref</code> shim) or re-export <code>buildManualPauseCreateOrReuseParams</code> on <code>pause-home-io</code> if Home tests need it.</dd>
     </dl>
