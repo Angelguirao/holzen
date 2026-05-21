@@ -307,12 +307,14 @@ export {
   usePauseSessionInitialMoodHandlers,
   PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS,
   usePauseFeelShiftLogDedupeRefs,
+  usePauseSessionDepthAndBriefCopy,
+} from './public-ritual-reflect';
+export {
   usePauseSessionBreathStepHandlers,
   usePauseSessionBreathHandlers,
   type UsePauseSessionBreathHandlersParams,
   usePauseSessionBreathReflectHandlers,
-  usePauseSessionDepthAndBriefCopy,
-} from './public-ritual-reflect';
+} from './public-ritual-breathe';
 export {
   useCompanionHistoryThread,
   type HistoryThreadRow,
