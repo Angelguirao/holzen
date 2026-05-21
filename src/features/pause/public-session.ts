@@ -11,11 +11,6 @@ export {
 export { isPauseSessionDepthPickerActive } from './domain/reflect/mood/pause-depth-picker-active';
 export { isPauseSessionWaitingForInstanceFetch } from './domain/session/waiting-for-instance-fetch';
 export {
-  isTerminalPauseDbState,
-  persistedPauseSessionAllowsTerminalEntry,
-  TERMINAL_PAUSE_DB_STATES,
-} from './application/use-cases/session/terminal-entry-guard';
-export {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
   type PauseBreathSecondLabelVariant,
