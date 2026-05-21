@@ -11,11 +11,6 @@ export {
   type PauseSessionHeaderBackInput,
 } from './application/use-cases/session/header-back';
 export {
-  buildPauseSessionMountLogParams,
-  type BuildPauseSessionMountLogParamsInput,
-  type PauseSessionMountLogParams,
-} from './application/use-cases/ritual/reflect/scaffold/mount-log-params';
-export {
   buildPauseSessionStepTransitionConfig,
   PAUSE_SESSION_STEP_SLIDE_OFFSET_PX,
   PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S,
