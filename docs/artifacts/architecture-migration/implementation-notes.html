@@ -3592,6 +3592,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate journey pause instances hook under presentation/archive/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Tier 4 — journey overview read conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect/decide flows conductor was already on <code>cursor/arch-migrate-src-ca70</code> (<code>1bf474f3</code>). Move <code>use-journey-pause-instances</code> beside archive list conductors under <code>presentation/archive/</code>; <code>public-hooks</code> re-export path only — <code>JourneyOverviewScreen</code> unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>; query options stay on <code>public-queries</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-breathing-timed-loop</code> and bulk-hold hooks remain flat under <code>presentation/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-pause-breathing-timed-loop</code>, or port-back PWA install analytics via <code>PauseAnalyticsRepository</code> (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

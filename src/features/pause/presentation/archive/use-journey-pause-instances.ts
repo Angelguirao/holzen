@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
-import { getJourneyPauseInstancesQueryOptions, type JourneyPauseRow } from '../public-queries';
+import { getJourneyPauseInstancesQueryOptions, type JourneyPauseRow } from '../../public-queries';
 
 export type { JourneyPauseRow };
 
