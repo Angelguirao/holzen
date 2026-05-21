@@ -24,16 +24,16 @@ const baseInput = {
 
 describe('runReflectGeneration', () => {
   it('returns seed without calling ports', async () => {
-    const fetchOpeningMessage = vi.fn();
+    const fetchReflectionText = vi.fn();
     const generateReflection = vi.fn();
 
     const result = await runReflectGeneration(
       { ...baseInput, initialReflectionMessage: '  seeded  ' },
-      { fetchOpeningMessage, generateReflection },
+      { fetchReflectionText, generateReflection },
     );
 
     expect(result).toEqual({ status: 'seed', message: 'seeded' });
-    expect(fetchOpeningMessage).not.toHaveBeenCalled();
+    expect(fetchReflectionText).not.toHaveBeenCalled();
     expect(generateReflection).not.toHaveBeenCalled();
   });
 
@@ -41,7 +41,7 @@ describe('runReflectGeneration', () => {
     const result = await runReflectGeneration(
       { ...baseInput, initialReflectionMessage: '' },
       {
-        fetchOpeningMessage: vi.fn().mockResolvedValue('from cache'),
+        fetchReflectionText: vi.fn().mockResolvedValue('from cache'),
         generateReflection: vi.fn(),
       },
     );
@@ -55,7 +55,7 @@ describe('runReflectGeneration', () => {
     const result = await runReflectGeneration(
       { ...baseInput, initialReflectionMessage: '' },
       {
-        fetchOpeningMessage: vi.fn().mockResolvedValue(null),
+        fetchReflectionText: vi.fn().mockResolvedValue(null),
         generateReflection,
       },
     );
@@ -77,7 +77,7 @@ describe('runReflectGeneration', () => {
     const result = await runReflectGeneration(
       { ...baseInput, initialReflectionMessage: '', signal: ac.signal },
       {
-        fetchOpeningMessage: vi.fn().mockResolvedValue(null),
+        fetchReflectionText: vi.fn().mockResolvedValue(null),
         generateReflection: vi.fn().mockRejectedValue(new DOMException('aborted', 'AbortError')),
       },
     );

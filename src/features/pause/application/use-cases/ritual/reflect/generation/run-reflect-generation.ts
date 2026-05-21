@@ -16,7 +16,7 @@ export type RunReflectGenerationInput = {
 };
 
 export type RunReflectGenerationPorts = {
-  fetchOpeningMessage: (pauseInstanceId: string) => Promise<string | null>;
+  fetchReflectionText: (pauseInstanceId: string) => Promise<string | null>;
   generateReflection: (params: ReflectGenerationEdgeInvokeInput) => Promise<{ message: string }>;
 };
 
@@ -39,7 +39,7 @@ export async function runReflectGeneration(
     return { status: 'seed', message: seed };
   }
 
-  const cached = await ports.fetchOpeningMessage(input.pauseInstanceId);
+  const cached = await ports.fetchReflectionText(input.pauseInstanceId);
   if (cached) {
     return { status: 'cached', message: cached };
   }
