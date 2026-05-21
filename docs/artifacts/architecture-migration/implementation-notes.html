@@ -12142,4 +12142,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock session step-handlers compose (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-session-step-handlers</code> presentation guardrail</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Add tests on the session step-handlers conductor asserting delegation to <code>usePauseSessionMoodChromeHandlers</code> then <code>usePauseSessionBreathReflectHandlers</code> (mood slice passed through) and shell/ritual bundles via <code>public-session</code> builders.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Test-only — child hooks mocked; documents top-level session compose contract without re-testing PauseRepository adapters.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog analytics-port consolidation, companion feedback vote write path lock, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
