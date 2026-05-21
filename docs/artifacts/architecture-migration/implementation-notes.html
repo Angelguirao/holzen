@@ -10160,9 +10160,9 @@
       <dt>Deviation</dt>
       <dd>None — PostHog flag + Vite override resolution unchanged.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>use-pause-breathing-timed-loop</code> still imports <code>phase-advance</code>, <code>ritual-audio</code>, and <code>pause-breathing-phase</code> from application.</dd>
+      <dd>Timed-loop breathe helpers peeled in a follow-up slice on <code>public-session</code> (same day).</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #3: breathe timed-loop cluster on <code>public-session</code> or a dedicated breathe barrel; backlog #4: optional <code>public-queries</code> wrappers for archive/realtime infrastructure imports.</dd>
+      <dd>None for this cluster — see timed-loop note below.</dd>
     </dl>
   </article>
 
@@ -10200,7 +10200,26 @@
       <dt>Tradeoffs</dt>
       <dd><code>public-queries</code> still loads Supabase client (existing contract). Session breathe helpers still import <code>application/use-cases/ritual/breathe/*</code> directly.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: optional <code>public-session</code> peel for breathe presentation imports; remaining <code>PauseRepository</code> stray call-site audit.</dd>
+      <dd>Next backlog #4: remaining <code>PauseRepository</code> stray call-site audit.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breathing timed-loop on public-session (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; peel phase-advance + ritual-audio onto session barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. Export <code>computeBreathingPhaseAdvance</code>, <code>resolveBreathingCompleted</code>, <code>resolveBreathingPhaseAdvanceOutcome</code>, breath cue helpers, and <code>PauseBreathingPhase</code> on <code>public-session.ts</code>; <code>use-pause-breathing-timed-loop</code> imports the barrel. Unit test mocks <code>public-session</code> for cues (not slim <code>public.ts</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tick interval, haptics, and phase-advance outcomes unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-hooks</code> still re-exports <code>PauseBreathingPhase</code> from application; screens may import ritual-pattern helpers via <code>public-hooks</code> until a dedicated breathe barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: remaining <code>PauseRepository</code> stray call-site audit.</dd>
     </dl>
   </article>
 
