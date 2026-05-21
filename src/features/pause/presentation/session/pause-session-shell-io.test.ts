@@ -1,10 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import {
   computePauseHeaderBackIntent,
+  computePauseSessionHydration,
+  computePauseSessionResolved,
   isPauseSessionHeaderBackVisible,
 } from './pause-session-shell-io';
 
 describe('pause-session-shell-io', () => {
+  it('re-exports hydration helpers for usePauseSessionShell', () => {
+    expect(typeof computePauseSessionHydration).toBe('function');
+    expect(typeof computePauseSessionResolved).toBe('function');
+  });
+
   it('re-exports header back visibility and intent helpers for session conductors', () => {
     expect(
       isPauseSessionHeaderBackVisible({

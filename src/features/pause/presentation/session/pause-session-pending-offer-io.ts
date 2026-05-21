@@ -1,3 +1,7 @@
+/**
+ * Presentation I/O for pending pause offer adopt/decline RPC.
+ * Imports pending-offer use cases directly instead of `pause-session-pending-offer-flow` CI anchor.
+ */
 import { runAdoptPendingPauseOffer } from '@/features/pause/application/use-cases/session/pending-offer/run-adopt-pending-pause-offer';
 import { runDeclinePendingPauseOffer } from '@/features/pause/application/use-cases/session/pending-offer/run-decline-pending-pause-offer';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
