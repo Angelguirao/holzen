@@ -3877,6 +3877,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate depth-picker copy hook under presentation/reflect/mood/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 presentation peel — depth context line with mood cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-pause-session-depth-and-brief-copy</code> (+ test) from <code>presentation/session/</code> beside depth-picker handlers under <code>reflect/mood/</code>; <code>public-hooks</code> and scaffold presentation import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>; hook only supplies depth-picker market context copy.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-staggered-reveal</code> remains flat under <code>presentation/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-staggered-reveal</code> under <code>presentation/companion/</code>, or backlog #4 optional analytics read port wiring.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
