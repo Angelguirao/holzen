@@ -11705,4 +11705,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home dismiss via runPauseDismissCurrent (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; dismissOpenPauseHome uses session dismiss use case</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Route <code>dismissOpenPauseHome</code> through <code>runPauseDismissCurrent</code> instead of calling <code>PauseRepository.dismissCurrent</code> directly so lifecycle dismiss matches <code>runPauseCreateOrReuse</code> pattern.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>runPauseDismissCurrent</code> remains a thin delegate; value is consistent call graph for agents and future dismiss side effects.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: wire any other application paths that call <code>repository.dismissCurrent</code> directly, or start Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
