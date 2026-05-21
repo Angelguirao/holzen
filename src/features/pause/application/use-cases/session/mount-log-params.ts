@@ -3,7 +3,7 @@ import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 import { initialRitualEntry } from '@/features/pause/application/use-cases/ritual/reflect/scaffold/initial-ritual-entry';
 import { initialBriefPauseStepFromRestored } from '@/features/pause/application/use-cases/ritual/reflect/scaffold/restored-brief-ritual-state';
-import { initialPhaseFromRestored } from './step-map';
+import { initialPhaseFromRestored } from '../ritual/decide/restored-decide-ritual-state';
 
 /**
  * First-paint snapshot for `[holzen:pause] mount` (see `usePauseSessionMountLog`).
