@@ -195,6 +195,7 @@ export {
 } from './infrastructure/queries/artifact-cache-query';
 export {
   COMPANION_UI_COMPLETION_NONE_QUERY_KEY,
+  companionUiCompletionQueryKey,
   getCompanionUiCompletionQueryOptions,
 } from './infrastructure/queries/companion-ui-completion-query';
 export {

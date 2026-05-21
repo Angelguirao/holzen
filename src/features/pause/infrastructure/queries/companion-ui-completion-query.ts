@@ -4,7 +4,10 @@ import {
   companionUiCompletionQueryKey,
 } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 
-export { COMPANION_UI_COMPLETION_NONE_QUERY_KEY };
+export {
+  COMPANION_UI_COMPLETION_NONE_QUERY_KEY,
+  companionUiCompletionQueryKey,
+};
 
 export function getCompanionUiCompletionQueryOptions(pauseInstanceId: string | null | undefined) {
   return {

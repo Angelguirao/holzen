@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
-import { pauseArchiveListQueryPrefix } from '@/features/pause/application/queries/archive-query-keys';
 import { logPauseReflectTags } from '@/features/pause/public-rpc';
 import {
   getLatestPauseReflectTagsQueryOptions,
   PAUSE_REFLECT_STEP_TAGS,
+  pauseArchiveListQueryPrefix,
   pauseReflectStepLatestQueryKey,
 } from '@/features/pause/public-queries';
 
