@@ -10793,4 +10793,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — pause-rpc-client import guard (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; CI enforces PauseRepository adapter boundary</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — use cases under <code>ritual/reflect/</code>. Extend <code>check:architecture-alignment</code> to fail when active <code>src/</code> imports <code>pause-rpc-client</code> outside <code>supabase-pause-repository.ts</code> and the client module itself. Presentation and use cases must use <code>public-rpc</code> facades or inject <code>PauseRepository</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — scan-only; no runtime change.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Import-string guard does not catch dynamic <code>import()</code>; current tree has zero stray call sites.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional analytics-repository import guard; Phase B subscription/auth <code>src/lib/*</code> shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
