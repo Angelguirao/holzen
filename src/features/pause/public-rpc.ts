@@ -43,13 +43,6 @@ import { runFetchDevModeSetting } from './application/use-cases/admin/run-fetch-
 import type { RunReflectGenerationInput } from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
 import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
 import { showPauseStepSyncFailedToast } from './presentation/ritual/pause-step-sync-toast';
-export { trackPauseSessionAbandoned } from './application/use-cases/session/pause-session-telemetry';
-export {
-  trackHomePendingPauseBannerPauseOpened,
-  trackPauseOpenDismissed,
-  type OpenPauseStateForAnalytics,
-  type PauseDismissAnalyticsSurface,
-} from './application/use-cases/trigger/home-pause-actions-telemetry';
 
 export type { RunReflectGenerationInput, ReflectGenerationResult };
 

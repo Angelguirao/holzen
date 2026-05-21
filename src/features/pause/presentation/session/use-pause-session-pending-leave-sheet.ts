@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import type { TFunction } from 'i18next';
-import { trackPauseSessionAbandoned } from '@/features/pause/public-rpc';
+import { trackPauseSessionAbandoned } from '@/features/pause/application/use-cases/session/pause-session-telemetry';
 import type { PendingPauseOfferRow } from './use-pending-pause-offer';
 import { usePendingPauseOfferMutations } from './use-pending-pause-offer-mutations';
 
