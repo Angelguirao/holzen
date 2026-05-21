@@ -37,10 +37,6 @@ export {
   TERMINAL_PAUSE_DB_STATES,
 } from './application/use-cases/session/terminal-entry-guard';
 export {
-  buildPauseSessionScaffoldRitualDerived,
-  type PauseSessionScaffoldRitualDerived,
-} from './application/use-cases/ritual/reflect/scaffold/scaffold-ritual-derived';
-export {
   pickPauseHolzenProvidersSlice,
   type PauseHolzenProvidersSlice,
   type PickPauseHolzenProvidersSliceSource,
