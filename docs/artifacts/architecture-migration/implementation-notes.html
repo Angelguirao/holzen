@@ -11287,4 +11287,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate brief done check-in in presentation/ritual/done/ (Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 verified; Tier 4 ritual/done conductor grouping</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete — no application reflect moves. Remote already peeled <code>use-pause-brief-done-check-in</code> off <code>public-rpc</code> (<code>58ee7350</code>). Colocate the hook (+ test) under <code>presentation/ritual/done/</code> beside <code>post-pause-emotion-log</code>; <code>public-hooks</code> and <code>public-ritual-done</code> re-export paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Brief integrate countdown and brief→deep hooks remain under <code>presentation/session/</code> until a later brief ritual bundle peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit companion presentation <code>public-rpc</code> imports for sole-consumer facades.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

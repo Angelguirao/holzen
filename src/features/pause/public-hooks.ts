@@ -179,7 +179,7 @@ export { usePendingPauseOfferMutations } from './presentation/session/use-pendin
 export {
   usePauseBriefDoneCheckIn,
   type UsePauseBriefDoneCheckInParams,
-} from './presentation/session/use-pause-brief-done-check-in';
+} from './presentation/ritual/done/use-pause-brief-done-check-in';
 export { usePauseBriefIntegrateCountdown } from './presentation/session/use-pause-brief-integrate-countdown';
 export {
   initialBreathingFirstCompletedFromRestored,
