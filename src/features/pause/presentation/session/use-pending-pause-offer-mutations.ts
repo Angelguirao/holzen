@@ -2,12 +2,10 @@ import { useCallback, useState } from 'react';
 import type { TFunction } from 'i18next';
 import { toast } from 'sonner';
 import {
-  trackPausePendingAdopted,
-  trackPausePendingDeclined,
-} from '@/features/pause/application/use-cases/trigger/pending-pause-offer-telemetry';
-import {
   adoptPendingPauseOffer,
   declinePendingPauseOffer,
+  trackPausePendingAdopted,
+  trackPausePendingDeclined,
 } from '@/features/pause/public-rpc';
 import type { PendingPauseOfferRow } from './use-pending-pause-offer';
 

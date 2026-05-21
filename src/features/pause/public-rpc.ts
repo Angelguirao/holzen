@@ -181,6 +181,10 @@ export {
   trackPauseOutcomeRetrospective,
   type PauseOutcomeRetrospectiveSurface,
 } from './application/use-cases/archive/archive-retrospective-telemetry';
+export {
+  trackPausePendingAdopted,
+  trackPausePendingDeclined,
+} from './application/use-cases/trigger/pending-pause-offer-telemetry';
 
 export type {
   RunInitialEmotionSelectResult,
