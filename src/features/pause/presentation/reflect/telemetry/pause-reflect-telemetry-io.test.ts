@@ -11,7 +11,7 @@ const trackPauseReflectShareTapMock = vi.hoisted(() => vi.fn());
 const trackPauseReflectWallpaperTapMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/telemetry/session/pause-reflect-session-ui-telemetry',
+  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow',
   () => ({
     trackPauseReflectPostItOpen: trackPauseReflectPostItOpenMock,
     trackPauseReflectShareTap: trackPauseReflectShareTapMock,
@@ -20,7 +20,7 @@ vi.mock(
 );
 
 describe('pause-reflect-telemetry-io', () => {
-  it('re-exports session reflect UI telemetry from the session-ui module', () => {
+  it('re-exports session reflect UI telemetry from pause-reflect-telemetry-flow', () => {
     expect(typeof trackPauseReflectPostItOpen).toBe('function');
     expect(typeof trackPauseReflectShareTap).toBe('function');
     expect(typeof trackPauseReflectWallpaperTap).toBe('function');
@@ -31,7 +31,7 @@ describe('pause-reflect-telemetry-io', () => {
     expect(trackPauseReflectWallpaperTap).toBe(trackPauseReflectWallpaperTapMock);
   });
 
-  it('routes post-it open through the session-ui telemetry module', () => {
+  it('routes post-it open through the telemetry flow anchor', () => {
     trackPauseReflectPostItOpen('pi-1');
     expect(trackPauseReflectPostItOpenMock).toHaveBeenCalledWith('pi-1');
   });
