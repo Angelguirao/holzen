@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { shouldLogPauseReflectionStep } from '@/features/pause/domain/reflection-step-log';
+import { shouldLogPauseReflectionStep } from '@/features/pause/domain/reflect/steps/reflection-step-log';
 import { logPauseReflectionStepOnce } from '@/features/pause/public-rpc';
 
 /** Records `reflection_step` once per pause instance after reflect copy settles. */

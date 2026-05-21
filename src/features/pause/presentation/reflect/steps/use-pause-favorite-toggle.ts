@@ -4,7 +4,7 @@ import type { TFunction } from 'i18next';
 import { useAuth } from '@/features/auth/public';
 import { showPauseFavoriteProHintToast } from './pause-favorite-pro-hint-toast';
 import { pauseArchiveListQueryPrefix } from '@/features/pause/public-queries';
-import { shouldShowFavoriteProHint } from '@/features/pause/domain/favorite-toggle';
+import { shouldShowFavoriteProHint } from '@/features/pause/domain/reflect/steps/favorite-toggle';
 import { logPauseFavoriteToggle } from '@/features/pause/public-rpc';
 import { hapticFeedback } from '@/lib/haptics';
 
