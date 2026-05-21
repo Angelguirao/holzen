@@ -1,4 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { COMPANION_SLOT_FAVORITES_METADATA_KEY } from '@/features/pause/domain/companion/companion-slot-favorites-metadata';
 
 const update = vi.fn(() => ({ eq: vi.fn(async () => ({ error: null })) }));
 const single = vi.fn(async () => ({
@@ -12,18 +13,16 @@ vi.mock('@/integrations/supabase/client', () => ({
   supabase: { from },
 }));
 
-describe('companion-library-favorites-query', () => {
+describe('pause-instance-metadata-client', () => {
   beforeEach(() => {
     from.mockClear();
     update.mockClear();
   });
 
-  it('toggleCompanionLibraryFavorite updates metadata and calls onBucketComputed', async () => {
-    const { toggleCompanionLibraryFavorite, COMPANION_SLOT_FAVORITES_METADATA_KEY } = await import(
-      './companion-library-favorites-query'
-    );
+  it('toggleCompanionSlotFavoriteOnInstance updates metadata and calls onBucketComputed', async () => {
+    const { toggleCompanionSlotFavoriteOnInstance } = await import('./pause-instance-metadata-client');
     const buckets: Record<string, boolean>[] = [];
-    const ok = await toggleCompanionLibraryFavorite('pause-1', 'signal', {
+    const ok = await toggleCompanionSlotFavoriteOnInstance('pause-1', 'signal', {
       onBucketComputed: (bucket) => buckets.push(bucket),
     });
     expect(ok).toBe(true);
