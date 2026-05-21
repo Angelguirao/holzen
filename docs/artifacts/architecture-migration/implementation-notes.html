@@ -4998,4 +4998,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect flows cluster (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-reflect-decide-flow</code> → <code>ritual/reflect/flows/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Top-level <code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete; the last pure reflect/decide flow helpers still lived under <code>presentation/reflect/flows/</code>. Move <code>pause-session-reflect-decide-flow</code> (+ test) to <code>application/use-cases/ritual/reflect/flows/</code>; <code>use-pause-session-reflect-and-decide</code> imports the use-case module directly (presentation conductor unchanged).</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.1 / §10.1 (application flow helpers under <code>ritual/reflect/flows/</code>, not presentation).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation <code>reflect/flows/</code> now only hosts React conductors; no new <code>public*</code> exports for the pure helpers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire stray <code>pause-rpc-client</code> call sites still bypassing <code>PauseRepository</code>, or <code>use-pause-artifact-reflection-text</code> beside haiku hook.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
