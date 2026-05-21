@@ -1,7 +1,12 @@
 /**
- * Breathe ritual beat — screen-facing pure helpers (no Supabase).
- * Hooks stay on `public-hooks.ts`; timed-loop phase advance on `public-session.ts`.
+ * Breathe ritual beat — screen-facing pure helpers and presentation hooks.
+ * Phase advance + segment RPC flags stay on `public-session.ts`; mutations on `public-rpc.ts`.
  */
+export {
+  usePauseBreathingTimedLoop,
+  type UsePauseBreathingTimedLoopInput,
+} from './presentation/session/use-pause-breathing-timed-loop';
+export { resolveBreathOrbVisualMetrics } from './application/use-cases/ritual/breathe/pause-breath-orb-metrics';
 export {
   resolvePauseBreathingTimedDisplay,
   type PauseBreathingTimedDisplay,

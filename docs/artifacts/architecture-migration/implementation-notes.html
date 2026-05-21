@@ -10527,4 +10527,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — breathe timed loop on public-ritual-breathe (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; PauseBreathing imports breathe barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. Export <code>usePauseBreathingTimedLoop</code> and <code>resolveBreathOrbVisualMetrics</code> on <code>public-ritual-breathe.ts</code>; <code>PauseBreathing</code> and <code>BreathingExercise</code> import the ritual barrel; <code>public-hooks</code> re-exports for backward compatibility.</dd>
+      <dt>Deviation</dt>
+      <dd>None — hook still lives under <code>presentation/session/</code>; barrel peel only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other session breath hooks remain on <code>public-hooks</code> until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit remaining presentation imports that bypass <code>public-rpc</code> facades; optional breath-orb geometry on <code>public-ritual-breathe</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

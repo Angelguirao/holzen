@@ -77,7 +77,6 @@ export {
   getPendingPauseOfferDisplay,
   type PendingPauseOfferDisplay,
 } from './application/use-cases/pending-offer/pending-pause-offer-display';
-export { resolveBreathOrbVisualMetrics } from './application/use-cases/ritual/breathe/pause-breath-orb-metrics';
 export {
   BREATH_ORB_CX,
   BREATH_ORB_CY,
@@ -116,6 +115,9 @@ export {
   type StandaloneBreathingPattern,
   type StandaloneBreathSeverityRingColors,
   type StandaloneBreathingPhase,
+  usePauseBreathingTimedLoop,
+  type UsePauseBreathingTimedLoopInput,
+  resolveBreathOrbVisualMetrics,
 } from './public-ritual-breathe';
 export {
   PAUSE_SCIENCE_STEPS,
@@ -381,10 +383,6 @@ export { usePauseSessionGoBack } from './presentation/session/use-pause-session-
 export { usePauseSessionGoToStep } from './presentation/session/use-pause-session-go-to-step';
 export { usePauseSessionHeaderBackHandler } from './presentation/session/use-pause-session-header-back-handler';
 export { usePauseSessionBreathTimedActiveReset } from './presentation/session/use-pause-session-breath-timed-active-reset';
-export {
-  usePauseBreathingTimedLoop,
-  type UsePauseBreathingTimedLoopInput,
-} from './presentation/session/use-pause-breathing-timed-loop';
 export {
   usePauseSessionBreathUi,
   type UsePauseSessionBreathUiParams,
