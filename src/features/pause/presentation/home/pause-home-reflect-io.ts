@@ -23,7 +23,6 @@ export {
   openManualPauseFromHome,
   runOpenManualPauseSilentModeAfterCreate,
   runPersistSilentReflectionStub,
-  shouldNavigateAfterManualTrigger,
   type BuildManualPauseOpenParamsInput,
   type ManualPauseCreateOrReuseParams,
   type ManualPauseMarketContext,

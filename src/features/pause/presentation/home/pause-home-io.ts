@@ -8,13 +8,11 @@ export {
   buildManualPauseMarketContext,
   buildManualPauseOpenParams,
   dismissOpenPauseHome,
-  mapManualTriggerStartError,
   MANUAL_PAUSE_VOLATILITY_TEMPLATE,
   openManualPauseFromHome,
   pauseDismissOpenPauseHomePreview,
   pauseDismissOpenPauseHomePreviewWithRepository,
   pauseHomeManualOpenPorts,
-  shouldNavigateAfterManualTrigger,
   type ApplyManualPauseOpenResultInput,
   type BuildManualPauseOpenParamsInput,
   type ManualPauseCreateOrReuseParams,
@@ -37,3 +35,5 @@ export {
   type OpenPauseStateForAnalytics,
   type PauseDismissAnalyticsSurface,
 } from './pause-home-reflect-telemetry-io';
+export { mapManualTriggerStartError } from '@/features/pause/public-trigger';
+export { shouldNavigateAfterManualTrigger } from '@/features/pause/public-navigation';
