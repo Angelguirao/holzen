@@ -251,6 +251,8 @@ export {
 } from './application/use-cases/ritual/decide/pause-decide-outcome-flow';
 export { getSessionQuote } from './application/use-cases/session/wisdom-quotes';
 export { initialEmotionResetUi };
+
+/** Feel / depth-picker / ritual chrome — pure helpers for reflect mood presentation. */
 export {
   BRIEF_DEPTH_PICKER_RITUAL_ENTRY,
   DEEP_DEPTH_PICKER_RITUAL_ENTRY,
