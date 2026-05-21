@@ -10,17 +10,17 @@ const runPauseReflectionStepLogOnceMock = vi.hoisted(() => vi.fn());
 const runPauseFavoriteToggleMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-mutation-flow',
-  async (importOriginal) => {
-    const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-mutation-flow')
-    >();
-    return {
-      ...actual,
-      runPauseReflectionStepLogOnce: runPauseReflectionStepLogOnceMock,
-      runPauseFavoriteToggle: runPauseFavoriteToggleMock,
-    };
-  },
+  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log',
+  () => ({
+    runPauseReflectionStepLogOnce: runPauseReflectionStepLogOnceMock,
+  }),
+);
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle',
+  () => ({
+    runPauseFavoriteToggle: runPauseFavoriteToggleMock,
+  }),
 );
 
 vi.mock('@/features/pause/public-rpc', () => ({
