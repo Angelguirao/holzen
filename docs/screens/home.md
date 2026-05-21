@@ -33,6 +33,7 @@ Home is the signed-in landing surface after onboarding: hero quote, optional ins
 | Area | Source | Notes |
 |------|--------|--------|
 | Open pause + market context | [`HolzenProvider`](../../src/app/components/HolzenProvider.tsx) (`useHolzenHomeContextState` in pause presentation) | `lastPauseInstanceId` / `hasOpenPause`, `context` (market line from `context_snapshot`), `message` only when a `reflection_text` artifact exists (post-Reflect or silent stub), `loading`, `error`, `btcData`, `manualTrigger`, cooldown helpers, companions; **`trackedAssetId`** is re-exported as `normalizeTrackedAssetId(profile.trackedAssetId)` (`TrackedAssetId`) |
+| Home pause widget hooks | [`public-home.ts`](../../src/features/pause/public-home.ts) | `screens/home/*` import pending-offer, completed count, dismiss-outlet, home pause actions, context previews, bulk-hold, and card projection from `public-home` — not `public-hooks` |
 | Subscription / Pro | [`useSubscription`](../../src/features/subscription/public-hooks) | `subscribed`, `monthlyRemaining`, `startCheckout`, `refresh` |
 | Layout + DnD order | [`useWidgetLayout`](../../src/screens/home/components/HomeWidget.tsx) | Section order persisted per user expectations |
 | Section visibility (Customize) | [`useHomeOptionalVisibility`](../../src/screens/home/hooks/use-home-optional-visibility.ts) | Toggles for legacy section ids still in storage keys — see **Layout section ids** below |
