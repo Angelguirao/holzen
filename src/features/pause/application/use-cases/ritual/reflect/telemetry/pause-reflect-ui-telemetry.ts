@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for ritual reflect telemetry (§3 / check:architecture-alignment).
  * PostHog trackers: `pause-reflect-session-ui-telemetry.ts`.
- * Presentation: `presentation/reflect/telemetry/pause-reflect-telemetry-io.ts`.
+ * Presentation: `presentation/reflect/telemetry/pause-reflect-telemetry-io.ts` imports `pause-reflect-session-ui-telemetry` directly.
  */
 export {
   trackPauseReflectPostItOpen,

@@ -17851,7 +17851,26 @@
       <dt>Tradeoffs</dt>
       <dd>CI cluster anchors stay thin re-export barrels; presentation hooks still import only presentation I/O modules.</dd>
       <dt>Open questions</dt>
-      <dd>Next: session <code>pause-reflect-telemetry-io</code> via a telemetry flow anchor, companion orchestrate-io peel, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: session <code>pause-reflect-telemetry-io</code> direct session-ui telemetry imports, companion orchestrate-io peel, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect telemetry I/O imports session-ui telemetry (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-telemetry-io</code> off <code>pause-reflect-ui-telemetry</code> anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align session reflect telemetry presentation I/O with hub/steps peel: PostHog trackers from <code>pause-reflect-session-ui-telemetry</code>; keep <code>pause-reflect-ui-telemetry.ts</code> as CI cluster anchor only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; conductors still import only <code>pause-reflect-telemetry-io</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hook unit tests continue mocking <code>pause-reflect-telemetry-io</code>; smoke test asserts re-exports bind session telemetry module.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-flows-io</code> reflect-and-decide domain import peel, companion orchestrate-io cluster anchors, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
