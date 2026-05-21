@@ -1,6 +1,22 @@
 import { renderHook, act } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TFunction } from 'i18next';
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
+  supabaseReflectGenerator: { port: 'reflectGenerator' },
+}));
+
+vi.mock('./pause-reflect-flows-io', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./pause-reflect-flows-io')>();
+  return {
+    resolvePauseSessionReflectAndDecidePreflight:
+      actual.resolvePauseSessionReflectAndDecidePreflight,
+    resolvePauseSessionReflectAndDecideAfterGeneration:
+      actual.resolvePauseSessionReflectAndDecideAfterGeneration,
+  };
+});
+
 import { usePauseSessionReflectAndDecide } from './use-pause-session-reflect-and-decide';
 
 const {
