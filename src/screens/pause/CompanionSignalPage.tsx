@@ -4,7 +4,7 @@ import { useHolzen } from '@/app/components/HolzenProvider';
 import {
   useCompanionFullViewPage,
   useSignalSourceTrustedHost,
-} from '@/features/pause/public-hooks';
+} from '@/features/pause/public-ritual-frame';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
 import { SignalFullView } from '@/screens/pause/components/companion/SignalFullView';

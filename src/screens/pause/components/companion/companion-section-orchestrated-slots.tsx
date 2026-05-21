@@ -4,8 +4,8 @@ import type {
   CompanionSlotCacheIds,
   CompanionSlotRelaxations,
   RegenerateCompanionSlot,
-} from '@/features/pause/public-hooks';
-import type { ZoomOutData } from '@/features/pause/public-hooks';
+} from '@/features/pause/public-ritual-frame';
+import type { ZoomOutData } from '@/features/pause/public-ritual-frame';
 import type {
   CompanionUiCompletionState,
   CompanionUiCompletionStep,
@@ -30,7 +30,7 @@ import { ZoomOutDisplay } from '@/screens/pause/components/ZoomOutDisplay';
 import { HistoricalInsightDisplay } from '@/screens/pause/components/HistoricalInsightDisplay';
 import { CompanionOrchestratedCard } from '@/screens/pause/components/companion/companion-orchestrated-card';
 import { COMPANION_SECTION_ICONS } from '@/screens/pause/components/companion/companion-section-icons';
-import type { CompanionSectionProFavoriteProps } from '@/features/pause/public-hooks';
+import type { CompanionSectionProFavoriteProps } from '@/features/pause/public-ritual-frame';
 
 export type CompanionSectionOrchestratedSlotsProps = {
   labels: {

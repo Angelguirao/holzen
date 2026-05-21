@@ -4,7 +4,7 @@ import { useHolzen } from '@/app/components/HolzenProvider';
 import {
   useCompanionFullViewPage,
   zoomOutTotalCharsForReadTime,
-} from '@/features/pause/public-hooks';
+} from '@/features/pause/public-ritual-frame';
 import { ZoomOutDisplay } from '@/screens/pause/components/ZoomOutDisplay';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';

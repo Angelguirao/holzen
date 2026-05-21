@@ -1,7 +1,7 @@
 import { useParams, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHolzen } from '@/app/components/HolzenProvider';
-import { useCompanionFullViewPage } from '@/features/pause/public-hooks';
+import { useCompanionFullViewPage } from '@/features/pause/public-ritual-frame';
 import { HistoricalInsightDisplay } from '@/screens/pause/components/HistoricalInsightDisplay';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
