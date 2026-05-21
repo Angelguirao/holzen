@@ -19,23 +19,12 @@ const {
   showPauseOutcomeNotCompletedToast: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-rpc', async () => {
-  const decideFlow = await vi.importActual<
-    typeof import('@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow')
-  >('@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow');
-  const quotes = await vi.importActual<
-    typeof import('@/features/pause/application/use-cases/ritual/decide/wisdom-quotes')
-  >('@/features/pause/application/use-cases/ritual/decide/wisdom-quotes');
-  return {
-    logPauseOutcome: logPauseOutcomeMock,
-    clearSession: () => clearSessionMock(),
-    showPauseOutcomeSaveFailedToast,
-    showPauseOutcomeNotCompletedToast,
-    resolvePauseDecideOutcomeFlow: decideFlow.resolvePauseDecideOutcomeFlow,
-    formatReinforcementQuoteFromSession: decideFlow.formatReinforcementQuoteFromSession,
-    getSessionQuote: quotes.getSessionQuote,
-  };
-});
+vi.mock('@/features/pause/public-rpc', () => ({
+  logPauseOutcome: logPauseOutcomeMock,
+  clearSession: () => clearSessionMock(),
+  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeNotCompletedToast,
+}));
 
 vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),
