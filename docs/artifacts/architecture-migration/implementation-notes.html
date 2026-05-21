@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect ambience I/O via application anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-ambience-io</code> imports frame-focus bed through <code>reflect-frame-focus-ambience</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route <code>pause-reflect-ambience-io</code> through <code>application/use-cases/ritual/reflect/ambience/reflect-frame-focus-ambience</code> instead of deep <code>domain/ritual/breathe/reflect-frame-focus-ambience</code> (parity with mood/flows presentation I/O; Web Audio implementation stays in domain).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Application anchor remains a thin re-export for <code>check:architecture-alignment</code> ambience cluster detection.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: route <code>pause-reflect-hub-io</code> through <code>pause-reflect-hub-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — companion frame UI I/O via frame-ui flow anchor (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
