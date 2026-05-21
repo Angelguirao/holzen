@@ -14,6 +14,29 @@ vi.mock('@/features/pause/public-rpc', () => ({
   openManualPauseFromHome: openManualPauseFromHomeMock,
   clearSession: clearSessionMock,
   markPauseManualStartedHomeOnce: markPauseManualStartedHomeOnceMock,
+  buildManualPauseOpenParams: (input: {
+    userId: string;
+    silentMode: boolean;
+    mood?: string;
+    data: { changePercent: number };
+    cumulativeThreshold: number;
+    profileTrackedAssetId: string;
+  }) => ({
+    userId: input.userId,
+    silentMode: input.silentMode,
+    mood: input.mood,
+    changePercent: input.data.changePercent,
+    cumulativeThreshold: input.cumulativeThreshold,
+    trackedAssetId: input.profileTrackedAssetId,
+    assetId: input.profileTrackedAssetId,
+    ctx: 'ctx',
+    severityBand: 'low',
+    silentMsg: 'silent',
+  }),
+  applyManualPauseOpenResult: async (
+    _input: { result: { outcome: string; userMessage?: string } },
+    _ports: unknown,
+  ) => ({ opened: false as const }),
 }));
 
 vi.mock('@/lib/holzen-console', () => ({

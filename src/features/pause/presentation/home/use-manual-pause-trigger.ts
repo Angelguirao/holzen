@@ -1,14 +1,14 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import type { User } from '@supabase/supabase-js';
 import type { BtcPriceData } from '@/features/market/public';
-import { applyManualPauseOpenResult } from '@/features/pause/application/use-cases/trigger/apply-manual-pause-open-result';
-import { buildManualPauseOpenParams } from '@/features/pause/application/use-cases/trigger/build-manual-pause-open-params';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
 } from '@/features/pause/domain/manual-pause-trigger-result';
 import type { CompanionData } from '@/features/pause/public-hooks';
 import {
+  applyManualPauseOpenResult,
+  buildManualPauseOpenParams,
   clearSession,
   markPauseManualStartedHomeOnce,
   openManualPauseFromHome,

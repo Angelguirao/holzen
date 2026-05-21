@@ -201,6 +201,12 @@ export {
   type TrackManualPauseInstanceCreatedPayload,
   type TrackPauseManualCompletedPayload,
 } from './application/use-cases/trigger/manual-pause-trigger-telemetry';
+export {
+  applyManualPauseOpenResult,
+  type ApplyManualPauseOpenResultInput,
+  type ManualPauseHomePreviewPorts,
+} from './application/use-cases/trigger/apply-manual-pause-open-result';
+export { buildManualPauseOpenParams } from './application/use-cases/trigger/build-manual-pause-open-params';
 
 export type {
   RunInitialEmotionSelectResult,
