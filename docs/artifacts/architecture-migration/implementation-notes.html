@@ -9520,4 +9520,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual-trigger telemetry on public-rpc (backlog #1 done, #4 §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; use-manual-pause-trigger imports public-rpc only</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no reflect folder moves. Re-export <code>markPauseManualStartedHomeOnce</code> on <code>public-rpc</code> beside <code>openManualPauseFromHome</code> / <code>clearSession</code>; <code>use-manual-pause-trigger</code> consolidates home manual I/O + telemetry on the barrel (follows home pause-actions telemetry peel).</dd>
+      <dt>Deviation</dt>
+      <dd>None — PostHog <code>pause.manual_started</code> unchanged; application <code>apply-manual-pause-open-result</code> still imports telemetry module directly.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hook test mocks the wider <code>public-rpc</code> barrel for open + session clear + manual-started marker.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-pending-pause-offer-mutations</code> trigger telemetry imports (already on barrel) or export home navigation helpers from <code>public-rpc</code> / domain.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
