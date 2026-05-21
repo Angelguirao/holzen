@@ -10622,4 +10622,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — usePauseSessionMoodChromeHandlers on public-ritual-reflect (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; mood chrome conductor on ritual reflect barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths; 14 modules under <code>ritual/reflect/</code>. Export <code>usePauseSessionMoodChromeHandlers</code> on <code>public-ritual-reflect.ts</code> beside favorite toggle and step hooks; <code>public-hooks</code> re-exports for backward compatibility. Session <code>use-pause-session-step-handlers</code> keeps direct <code>presentation/reflect/mood/</code> import (feature-internal).</dd>
+      <dt>Deviation</dt>
+      <dd>None — mood persist + chrome close behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other mood/flow conductors (<code>usePauseSessionMoodAndPersist</code>, breath handlers) remain on <code>public-hooks</code> until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: port-backed analytics read for companion feedback vote fetch; optional mood-and-persist cluster on <code>public-ritual-reflect</code> or breathe orb geometry on <code>public-ritual-breathe</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
