@@ -85,6 +85,28 @@ const PAUSE_ANALYTICS_EVENTS_IMPORT_NEEDLES = [
   "from '../analytics-events'",
 ];
 
+const PAUSE_ANALYTICS_REPOSITORY_ALLOWLIST = new Set([
+  'src/features/pause/infrastructure/supabase-pause-analytics-repository.ts',
+  'src/features/pause/public-rpc.ts',
+]);
+const PAUSE_ANALYTICS_REPOSITORY_IMPORT_NEEDLES = [
+  "from '@/features/pause/infrastructure/supabase-pause-analytics-repository",
+  "from './supabase-pause-analytics-repository'",
+  "from '../supabase-pause-analytics-repository'",
+];
+
+const PAUSE_PERSISTED_SESSION_STORAGE_ALLOWLIST = new Set([
+  'src/features/pause/infrastructure/session/persisted-session-storage.ts',
+  'src/features/pause/public-session.ts',
+]);
+const PAUSE_PERSISTED_SESSION_STORAGE_IMPORT_NEEDLES = [
+  "from '@/features/pause/infrastructure/session/persisted-session-storage",
+  "from './infrastructure/session/persisted-session-storage'",
+  "from '../infrastructure/session/persisted-session-storage'",
+  "from './session/persisted-session-storage'",
+  "from '../session/persisted-session-storage'",
+];
+
 for (const file of walkTs(join(root, 'src'))) {
   const rel = relative(root, file).replace(/\\/g, '/');
   if (rel.startsWith('legacy/')) continue;
@@ -109,6 +131,26 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: direct analytics-events import (${needle}) — use PauseAnalyticsRepository via supabase-pause-analytics-repository`,
+        );
+        break;
+      }
+    }
+  }
+  if (!PAUSE_ANALYTICS_REPOSITORY_ALLOWLIST.has(rel)) {
+    for (const needle of PAUSE_ANALYTICS_REPOSITORY_IMPORT_NEEDLES) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: direct supabase-pause-analytics-repository import (${needle}) — use public-rpc`,
+        );
+        break;
+      }
+    }
+  }
+  if (!PAUSE_PERSISTED_SESSION_STORAGE_ALLOWLIST.has(rel)) {
+    for (const needle of PAUSE_PERSISTED_SESSION_STORAGE_IMPORT_NEEDLES) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: direct persisted-session-storage import (${needle}) — use public-session`,
         );
         break;
       }

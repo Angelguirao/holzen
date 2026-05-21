@@ -1,6 +1,6 @@
 import { runFetchDevModeSetting } from '@/features/pause/application/use-cases/admin/run-fetch-dev-mode-setting';
 import { runLogDevModeSetting } from '@/features/pause/application/use-cases/admin/run-log-dev-mode-setting';
-import { supabasePauseAnalyticsRepository } from '@/features/pause/infrastructure/supabase-pause-analytics-repository';
+import { supabasePauseAnalyticsRepository } from '@/features/pause/public-rpc';
 
 /** Matches `screens/admin/lib/admin-query-namespace` — keep in sync if the prefix changes. */
 const ADMIN_QUERY_PREFIX = ['admin'] as const;

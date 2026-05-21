@@ -12617,4 +12617,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — backlog #1 verified; analytics queries + CI guards (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>ritual/reflect/</code> complete; infrastructure analytics reads via <code>public-rpc</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — 18 modules under <code>ritual/reflect/</code>, zero legacy paths. This slice continues backlog #4 §6: <code>pwa-install-analytics-query</code>, <code>dev-mode-admin-query</code>, and <code>companion-feedback-vote-query</code> import <code>supabasePauseAnalyticsRepository</code> from <code>public-rpc</code> (not the adapter path). <code>check:architecture-alignment</code> now forbids direct <code>supabase-pause-analytics-repository</code> and <code>persisted-session-storage</code> imports outside <code>public-rpc</code> / <code>public-session</code> and their adapter modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged; import paths and CI only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Infrastructure query modules import <code>public-rpc</code> (loads Supabase client) — acceptable because they already sat behind <code>public-queries</code> re-exports; presentation was already on barrels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: wire optional analytics-only helpers fully behind <code>PauseAnalyticsRepository</code> at remaining call sites, or Phase B subscription/auth <code>src/lib/*</code> shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
