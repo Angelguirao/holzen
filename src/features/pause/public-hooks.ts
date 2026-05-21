@@ -62,6 +62,10 @@ export {
   type CompanionSectionProFavoriteProps,
 } from './application/use-cases/ritual/frame/companion-section-pro-favorite';
 export {
+  resolveCompanionRegenerateClick,
+  type CompanionRegenerateClickResult,
+} from './application/use-cases/ritual/frame/companion-feedback-regenerate';
+export {
   BRIEF_PAUSE_ORDER,
   computeBriefMacroProgressPosition,
 } from './domain/brief-ritual-steps';

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveCompanionRegenerateClick } from '@/screens/pause/lib/companion-feedback-regenerate';
+import { resolveCompanionRegenerateClick } from './companion-feedback-regenerate';
 
 describe('resolveCompanionRegenerateClick', () => {
   it('noops when regenerate is unavailable or busy', () => {
