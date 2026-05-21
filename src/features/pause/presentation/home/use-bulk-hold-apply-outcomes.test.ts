@@ -3,17 +3,12 @@ import { renderHook, act } from '@testing-library/react';
 import type { User } from '@supabase/supabase-js';
 import { useBulkHoldApplyOutcomes } from './use-bulk-hold-apply-outcomes';
 
-const { applyBulkHoldOutcomesMock, mockPauseRepository } = vi.hoisted(() => ({
-  applyBulkHoldOutcomesMock: vi.fn(),
-  mockPauseRepository: { port: 'supabasePauseRepository' },
+const { pauseApplyBulkHoldOutcomesMock } = vi.hoisted(() => ({
+  pauseApplyBulkHoldOutcomesMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/application/use-cases/home/bulk-hold/apply-bulk-hold-outcomes', () => ({
-  applyBulkHoldOutcomes: applyBulkHoldOutcomesMock,
-}));
-
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: mockPauseRepository,
+vi.mock('@/features/pause/presentation/home/pause-home-bulk-hold-io', () => ({
+  pauseApplyBulkHoldOutcomes: pauseApplyBulkHoldOutcomesMock,
 }));
 
 vi.mock('@/features/pause/public-queries', () => ({
@@ -27,7 +22,7 @@ vi.mock('@/lib/haptics', () => ({
 const t = ((key: string) => key) as import('i18next').TFunction;
 
 beforeEach(() => {
-  applyBulkHoldOutcomesMock.mockReset().mockResolvedValue({ status: 'ok', count: 1 });
+  pauseApplyBulkHoldOutcomesMock.mockReset().mockResolvedValue({ status: 'success', count: 1 });
 });
 
 describe('useBulkHoldApplyOutcomes', () => {
@@ -58,11 +53,7 @@ describe('useBulkHoldApplyOutcomes', () => {
       await result.current.applyOutcomesAndFinish([row], () => 'held');
     });
 
-    expect(applyBulkHoldOutcomesMock).toHaveBeenCalledWith(
-      mockPauseRepository,
-      [row],
-      expect.any(Function),
-    );
+    expect(pauseApplyBulkHoldOutcomesMock).toHaveBeenCalledWith([row], expect.any(Function));
     expect(onSuccess).toHaveBeenCalledWith(1);
   });
 });

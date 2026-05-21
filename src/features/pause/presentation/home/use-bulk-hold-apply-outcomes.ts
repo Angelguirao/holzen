@@ -6,8 +6,7 @@ import type {
   BulkHoldOutcomeChoice,
   BulkHoldPendingPause,
 } from '@/features/pause/domain/bulk-hold';
-import { applyBulkHoldOutcomes } from '@/features/pause/application/use-cases/home/bulk-hold/apply-bulk-hold-outcomes';
-import { supabasePauseRepository } from '@/features/pause/public-rpc';
+import { pauseApplyBulkHoldOutcomes } from '@/features/pause/presentation/home/pause-home-bulk-hold-io';
 import { invalidatePauseStatsDataForUser } from '@/features/pause/public-queries';
 
 export type UseBulkHoldApplyOutcomesParams = {
@@ -39,7 +38,7 @@ export function useBulkHoldApplyOutcomes({
       setApplyError(null);
       hapticFeedback('medium');
 
-      const result = await applyBulkHoldOutcomes(supabasePauseRepository, rows, resolver);
+      const result = await pauseApplyBulkHoldOutcomes(rows, resolver);
 
       if (result.status === 'failed') {
         hapticFeedback('warning');
