@@ -16553,35 +16553,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
-      <span>Phase A slice — hub shift RPC via pause-shift-frame-hub-flow (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-reflect-hub-io</code> binds <code>runShiftEmotionFrameHubDone</code> through hub flow anchor</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Completes the hub peel started when domain presentation mapping moved onto <code>pause-shift-frame-hub-flow</code>: <code>pause-reflect-hub-io</code> and its unit test mock the hub cluster anchor for RPC instead of deep <code>run-shift-emotion-frame-hub-done</code> (mirrors <code>pause-initial-emotion-log-flow</code> + <code>pause-reflect-steps-mutation-flow</code>).</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior parity; import boundary only.</dd>
-      <dt>Tradeoffs</dt>
-      <dd>Reflect mood I/O still deep-imports domain mood helpers; share I/O domain peel landed on remote in parallel.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: peel mood presentation helpers through flow anchors, reflect flows I/O domain peel, or Phase B cross-context Tier 1 shim.</dd>
-=======
       <span>Phase A slice — reflect hub I/O via pause-shift-frame-hub-flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
     <h3><code>pause-reflect-hub-io</code> binds hub RPC + presentation through cluster anchor</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-hub-io.ts</code> imports <code>resolveShiftFrameHubDonePresentation</code> and <code>runShiftEmotionFrameHubDone</code> through <code>pause-shift-frame-hub-flow</code> instead of deep <code>domain/reflect/hub/</code> or <code>run-shift-emotion-frame-hub-done</code>. Bound <code>pauseShiftEmotionFrameHubDone</code> facade unchanged.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-hub-io.ts</code> imports <code>resolveShiftFrameHubDonePresentation</code> and <code>runShiftEmotionFrameHubDone</code> through <code>pause-shift-frame-hub-flow</code> instead of deep <code>domain/reflect/hub/</code> or <code>run-shift-emotion-frame-hub-done</code>; unit test uses partial mock on the anchor. Bound <code>pauseShiftEmotionFrameHubDone</code> facade unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
       <dd><code>pause-reflect-generation-io</code> still deep-imports domain hook-flow helpers until a follow-up routes through <code>pause-reflect-generation-hook-flow</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next: generation I/O hook-flow anchor on presentation module, home reflect telemetry cluster anchor, or Phase B cross-context Tier 1 shim.</dd>
->>>>>>> 1fb0d700 (refactor(pause): route reflect hub I/O through shift-frame flow anchor)
+      <dd>Next: generation I/O hook-flow anchor on presentation module, peel mood presentation helpers through flow anchors, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
