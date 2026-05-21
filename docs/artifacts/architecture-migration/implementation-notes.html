@@ -4428,6 +4428,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — favorite-toggle pure rules in domain/ (reflect Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; presentation no longer imports reflect use case for pro-hint gate</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>computeFavoriteToggleNext</code> and <code>shouldShowFavoriteProHint</code> from <code>run-pause-favorite-toggle</code> to <code>domain/favorite-toggle.ts</code>; use case keeps RPC orchestration; <code>use-pause-favorite-toggle</code> imports domain for the pro-hint gate.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>favorite-toast.ts</code> stays in <code>ritual/reflect/steps/</code> (Sonner side effect); peel to presentation if we split UI effects later.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>

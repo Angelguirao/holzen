@@ -1,25 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-import {
-  computeFavoriteToggleNext,
-  runPauseFavoriteToggle,
-  shouldShowFavoriteProHint,
-} from './run-pause-favorite-toggle';
-
-describe('computeFavoriteToggleNext', () => {
-  it('flips boolean', () => {
-    expect(computeFavoriteToggleNext(false)).toBe(true);
-    expect(computeFavoriteToggleNext(true)).toBe(false);
-  });
-});
-
-describe('shouldShowFavoriteProHint', () => {
-  it('shows only when favoriting while not subscribed', () => {
-    expect(shouldShowFavoriteProHint(true, false)).toBe(true);
-    expect(shouldShowFavoriteProHint(true, true)).toBe(false);
-    expect(shouldShowFavoriteProHint(false, false)).toBe(false);
-  });
-});
+import { runPauseFavoriteToggle } from './run-pause-favorite-toggle';
 
 describe('runPauseFavoriteToggle', () => {
   it('returns no_instance without RPC', async () => {

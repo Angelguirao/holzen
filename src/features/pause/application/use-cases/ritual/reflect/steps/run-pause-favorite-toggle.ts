@@ -1,11 +1,4 @@
-export function computeFavoriteToggleNext(isFavorite: boolean): boolean {
-  return !isFavorite;
-}
-
-export function shouldShowFavoriteProHint(newValue: boolean, subscribed: boolean): boolean {
-  return newValue && !subscribed;
-}
-
+import { computeFavoriteToggleNext } from '@/features/pause/domain/favorite-toggle';
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
