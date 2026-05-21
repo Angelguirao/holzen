@@ -78,8 +78,8 @@ mustExist(
   'pause/application/use-cases/ritual/reflect/mood/',
 );
 mustExist(
-  'src/features/pause/application/use-cases/ritual/reflect/scaffold',
-  'pause/application/use-cases/ritual/reflect/scaffold/',
+  'src/features/pause/application/use-cases/session/scaffold',
+  'pause/application/use-cases/session/scaffold/',
 );
 mustExist('src/features/pause/presentation/reflect', 'pause/presentation/reflect/');
 mustExist(
@@ -113,10 +113,6 @@ mustExist(
 mustExist(
   'src/features/pause/presentation/reflect/mood',
   'pause/presentation/reflect/mood/',
-);
-mustExist(
-  'src/features/pause/presentation/reflect/scaffold',
-  'pause/presentation/reflect/scaffold/',
 );
 mustExist(
   'src/features/pause/presentation/session/breath',
@@ -169,19 +165,19 @@ mustNotExist(
 const LEGACY_PAUSE_USE_CASE_IMPORTS = [
   '@/features/pause/application/use-cases/reflect/',
   '@/features/pause/application/use-cases/companion/',
-  '@/features/pause/application/use-cases/session/scaffold-ritual-derived',
+  '@/features/pause/application/use-cases/ritual/reflect/scaffold/scaffold-ritual-derived',
   '@/features/pause/application/use-cases/ritual/reflect/scaffold/storage-ritual-sync',
   '@/features/pause/application/use-cases/ritual/reflect/scaffold/persist-snapshot',
   '@/features/pause/application/use-cases/ritual/reflect/scaffold/migrate-persisted-session',
   "from './application/use-cases/reflect/",
   "from './application/use-cases/companion/",
-  "from './application/use-cases/session/scaffold-ritual-derived'",
+  "from './application/use-cases/ritual/reflect/scaffold/scaffold-ritual-derived'",
   "from './application/use-cases/ritual/reflect/scaffold/storage-ritual-sync'",
   "from './application/use-cases/ritual/reflect/scaffold/persist-snapshot'",
   "from './application/use-cases/ritual/reflect/scaffold/migrate-persisted-session'",
   "from '../application/use-cases/reflect/",
   "from '../application/use-cases/companion/",
-  "from '../application/use-cases/session/scaffold-ritual-derived'",
+  "from '../application/use-cases/ritual/reflect/scaffold/scaffold-ritual-derived'",
   "from '../application/use-cases/ritual/reflect/scaffold/storage-ritual-sync'",
   "from '../application/use-cases/ritual/reflect/scaffold/persist-snapshot'",
   "from '../application/use-cases/ritual/reflect/scaffold/migrate-persisted-session'",
