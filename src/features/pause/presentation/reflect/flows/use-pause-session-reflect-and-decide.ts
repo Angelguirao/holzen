@@ -4,7 +4,7 @@ import type { BtcPriceData } from '@/features/market/public';
 import { isPauseReflectGenerationEnabled } from '@/features/pause/domain/reflect/generation/reflect-generation-enabled';
 import { resolveEffectiveReflectionMessage } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-message';
 import { resolveReflectGenerationSeverityAbsPct } from '@/features/pause/domain/reflect/generation/reflect-generation-severity-abs-pct';
-import type { PauseImpactData } from '@/features/pause/application/use-cases/ritual/decide/impact-data';
+import type { PauseImpactData } from '@/features/pause/public-hooks';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { RitualDepth } from '@/features/pause/domain/ritual-types';

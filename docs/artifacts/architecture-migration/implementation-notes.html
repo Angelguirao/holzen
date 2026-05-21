@@ -6575,4 +6575,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — PauseImpactData via public-hooks (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect/decide presentation types stop importing application/decide/impact-data</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> folder move is complete. <code>PauseImpactData</code> was already re-exported on <code>public-hooks.ts</code>; session + reflect/decide + decide conductors now import the type from the barrel only (use cases keep direct <code>impact-data</code> imports).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; type-only change.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-decide-handler</code> still imports <code>pause-decide-outcome-flow</code> and outcome toasts from application until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel decide outcome flow helpers through <code>public-rpc</code>, or port-backed analytics read for companion feedback vote fetch (backlog #4).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
