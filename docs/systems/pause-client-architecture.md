@@ -305,7 +305,7 @@ The repo is mid-migration. Expect:
 
 Do not big-bang rename folders; one vertical slice per commit ([refactoring-strategy.md](../fundamentals/refactoring-strategy.md)).
 
-**CI (May 2026):** `npm run check:architecture-alignment` requires `application/use-cases/ritual/reflect/` and forbids resurrecting `application/use-cases/reflect/` or `companion/` (plus legacy import strings in active `src/`).
+**CI (May 2026):** `npm run check:architecture-alignment` requires `application/use-cases/ritual/reflect/` and forbids resurrecting `application/use-cases/reflect/` or `companion/` (plus legacy import strings in active `src/`). Direct `pause-rpc-client` imports are allowed only in `infrastructure/supabase-pause-repository.ts` (adapter) and `infrastructure/pause-rpc-client.ts`.
 
 ---
 

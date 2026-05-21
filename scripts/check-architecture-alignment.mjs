@@ -65,6 +65,16 @@ const LEGACY_PAUSE_USE_CASE_IMPORTS = [
   "from '../application/use-cases/companion/",
 ];
 
+const PAUSE_RPC_CLIENT_ALLOWLIST = new Set([
+  'src/features/pause/infrastructure/pause-rpc-client.ts',
+  'src/features/pause/infrastructure/supabase-pause-repository.ts',
+]);
+const PAUSE_RPC_CLIENT_IMPORT_NEEDLES = [
+  "from '@/features/pause/infrastructure/pause-rpc-client",
+  "from './pause-rpc-client'",
+  "from '../pause-rpc-client'",
+];
+
 for (const file of walkTs(join(root, 'src'))) {
   const rel = relative(root, file).replace(/\\/g, '/');
   if (rel.startsWith('legacy/')) continue;
@@ -72,6 +82,16 @@ for (const file of walkTs(join(root, 'src'))) {
   for (const needle of LEGACY_PAUSE_USE_CASE_IMPORTS) {
     if (text.includes(needle)) {
       failures.push(`${rel}: legacy pause use-case import (${needle})`);
+    }
+  }
+  if (!PAUSE_RPC_CLIENT_ALLOWLIST.has(rel)) {
+    for (const needle of PAUSE_RPC_CLIENT_IMPORT_NEEDLES) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: direct pause-rpc-client import (${needle}) — use PauseRepository via supabase-pause-repository`,
+        );
+        break;
+      }
     }
   }
 }
