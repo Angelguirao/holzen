@@ -1,5 +1,8 @@
 import { useRef } from 'react';
-import { buildPauseSessionReflectAndDecideView } from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-view';
+import {
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-session-reflect-and-decide-flow';
 import { usePauseReflectGeneration } from '../generation/use-pause-reflect-generation';
 import { usePauseSessionDecideHandler } from './use-pause-session-decide-handler';
 import type { UsePauseSessionReflectAndDecideParams } from './pause-session-reflect-and-decide-types';
@@ -31,11 +34,10 @@ export function usePauseSessionReflectAndDecide({
   shiftIntensity,
 }: UsePauseSessionReflectAndDecideParams) {
   const decidingRef = useRef(false);
-  const { reflectGenEnabled, severityAbsPct } = buildPauseSessionReflectAndDecideView({
+  const { reflectGenEnabled, severityAbsPct } = resolvePauseSessionReflectAndDecidePreflight({
     ritualEntry,
     step,
     seedMessage: message,
-    generatedReflectionMessage: message,
     btcData,
   });
 
@@ -52,7 +54,7 @@ export function usePauseSessionReflectAndDecide({
     enabled: reflectGenEnabled,
   });
 
-  const { effectiveReflectionMessage } = buildPauseSessionReflectAndDecideView({
+  const { effectiveReflectionMessage } = resolvePauseSessionReflectAndDecideAfterGeneration({
     ritualEntry,
     step,
     seedMessage: message,
