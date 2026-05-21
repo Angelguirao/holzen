@@ -11477,4 +11477,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel companion library favorites off public-rpc (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; frame slot heart conductor bypasses public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. After archive retrospective peel (<code>b74db0be</code>), align <code>use-companion-library-favorites</code> with reflect favorite toggle: <code>runToggleCompanionLibraryFavorite(supabasePauseRepository, …)</code>; remove <code>toggleCompanionLibraryFavorite</code> from <code>public-rpc</code>. Reads stay on <code>public-queries</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestrate cluster (<code>invokeCompanionSlotOrchestrate</code>, intervention bootstrap, slot run-orchestrate apply/telemetry) still on <code>public-rpc</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-companion-slot-run-orchestrate</code> / <code>use-companion-orchestrate-session</code> or home lifecycle facades on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
