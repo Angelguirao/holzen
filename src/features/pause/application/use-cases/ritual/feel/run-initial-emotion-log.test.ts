@@ -1,14 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import {
-  initialEmotionResetUi,
+  initialEmotionLogDedupeKey,
+  initialEmotionSkippedLogDedupeKey,
+} from '@/features/pause/domain/reflect/mood/initial-emotion-log';
+import { initialEmotionResetUi } from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
+import {
   runInitialEmotionSelect,
   runInitialEmotionSkip,
 } from './run-initial-emotion-log';
-import {
-  initialEmotionLogDedupeKey,
-  initialEmotionSkippedLogDedupeKey,
-} from './initial-emotion-log';
 
 describe('runInitialEmotionSelect', () => {
   it('returns deduped when log key matches', async () => {

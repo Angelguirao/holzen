@@ -1,41 +1,23 @@
-import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
-import type { MoodValue } from '@/features/pause/domain/mood-value';
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
-import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+import type { MoodValue } from '@/features/pause/domain/mood-value';
 import {
   buildInitialEmotionLoggedPayload,
   initialEmotionLogDedupeKey,
   initialEmotionSkippedLogDedupeKey,
   initialEmotionSkippedLoggedPayload,
   type InitialEmotionLogOpts,
-} from './initial-emotion-log';
+} from '@/features/pause/domain/reflect/mood/initial-emotion-log';
+import {
+  buildInitialEmotionSelectUi,
+  buildInitialEmotionSkipUi,
+  initialEmotionResetUi,
+  initialEmotionSelectRollbackUi,
+  type InitialEmotionUiState,
+} from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
-export type InitialEmotionUiState = {
-  moodDone: boolean;
-  selectedMood: MoodValue | null;
-  feelIntensity: number | null;
-  selectedBriefFace: FeelStepTile | null;
-};
-
-const ROLLBACK_UI: InitialEmotionUiState = {
-  moodDone: false,
-  selectedMood: null,
-  feelIntensity: null,
-  selectedBriefFace: null,
-};
-
-function selectUiState(
-  mood: MoodValue,
-  intensity: number | undefined,
-  opts?: InitialEmotionLogOpts,
-): InitialEmotionUiState {
-  return {
-    moodDone: true,
-    selectedMood: mood,
-    feelIntensity: typeof intensity === 'number' ? intensity : null,
-    selectedBriefFace: opts?.briefFace ?? null,
-  };
-}
+export type { InitialEmotionUiState };
+export { initialEmotionResetUi };
 
 export type RunInitialEmotionSelectResult =
   | { status: 'deduped'; ui: InitialEmotionUiState }
@@ -62,7 +44,7 @@ export async function runInitialEmotionSelect(
   const { pauseInstanceId, mood, intensity, opts, lastFeelLogKey } = input;
   const payload = buildInitialEmotionLoggedPayload(mood, intensity, opts);
   const logKey = initialEmotionLogDedupeKey(payload, opts?.briefFace);
-  const ui = selectUiState(mood, intensity, opts);
+  const ui = buildInitialEmotionSelectUi(mood, intensity, opts);
 
   if (pauseInstanceId && lastFeelLogKey === logKey) {
     return { status: 'deduped', ui };
@@ -80,7 +62,7 @@ export async function runInitialEmotionSelect(
     });
     return { status: 'synced', ui, logKey };
   } catch {
-    return { status: 'sync_failed', ui: ROLLBACK_UI };
+    return { status: 'sync_failed', ui: initialEmotionSelectRollbackUi() };
   }
 }
 
@@ -89,7 +71,7 @@ export async function runInitialEmotionSkip(
   repository: PauseRepository,
   input: { pauseInstanceId: string | null },
 ): Promise<RunInitialEmotionSkipResult> {
-  const ui = { moodDone: true, feelIntensity: null } as const;
+  const ui = buildInitialEmotionSkipUi();
 
   if (!input.pauseInstanceId) {
     return { status: 'local_only', ui };
@@ -105,9 +87,4 @@ export async function runInitialEmotionSkip(
   } catch {
     return { status: 'sync_failed' };
   }
-}
-
-/** Clears Feel-step UI + dedupe ref (hook applies `logKey` null separately). */
-export function initialEmotionResetUi(): InitialEmotionUiState {
-  return { ...ROLLBACK_UI };
 }
