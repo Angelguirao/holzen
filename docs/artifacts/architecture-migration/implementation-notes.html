@@ -12465,4 +12465,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect generation port-lock parity (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-reflect-generation.port-lock.test.tsx</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder moves. Extract holzen-reflect <code>ReflectGenerator</code> port-lock from the main generation hook test into a dedicated file (parity with <code>use-pause-session-mood-chrome-handlers.port-lock.test.tsx</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Test-only slice; artifact haiku/reflection-text hooks already assert port in their own tests.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: wire more pause mutations through <code>PauseRepository</code>, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

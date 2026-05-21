@@ -171,29 +171,6 @@ describe('usePauseReflectGeneration', () => {
     );
   });
 
-  it('routes holzen-reflect through the default ReflectGenerator port adapter', async () => {
-    runReflectGenerationMock.mockResolvedValue({ status: 'generated', message: 'edge' });
-    usePauseArtifactReflectionTextMock.mockReturnValue({
-      artifactReflectionText: null,
-      reflectionTextFetch: 'idle',
-    });
-
-    renderHook(() => usePauseReflectGeneration(baseParams()));
-
-    await waitFor(() => {
-      expect(runReflectGenerationMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          pauseInstanceId: 'pause-1',
-          userId: 'user-1',
-          context: 'btc',
-          severityAbsPct: 50,
-        }),
-        mockReflectGenerator,
-      );
-    });
-    expect(mockReflectGenerator.port).toBe('supabaseReflectGenerator');
-  });
-
   it('reports missing-context error without calling holzen-reflect', async () => {
     const { result } = renderHook(() =>
       usePauseReflectGeneration(baseParams({ context: '   ' })),
