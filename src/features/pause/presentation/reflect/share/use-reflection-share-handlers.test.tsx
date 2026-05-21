@@ -7,7 +7,7 @@ vi.mock('sonner', () => ({
   toast: Object.assign(vi.fn(), { error: vi.fn() }),
 }));
 
-vi.mock('@/features/pause/application/use-cases/ritual/reflect/share/reflection-share-canvas', () => ({
+vi.mock('@/features/pause/domain/reflect/share/reflection-share-canvas', () => ({
   generateReflectionShareImage: vi.fn(async () => new Blob(['png'], { type: 'image/png' })),
 }));
 

@@ -8015,7 +8015,26 @@
       <dt>Tradeoffs</dt>
       <dd>Presentation feel-tiles hook imports domain directly; <code>run-initial-emotion-log</code> unchanged.</dd>
       <dt>Open questions</dt>
-      <dd>Next: wired <code>runInitialEmotionSelect</code> / <code>runShiftEmotionFrameHubDone</code> facades on <code>public-rpc</code>, or port-backed analytics read for companion feedback vote fetch.</dd>
+      <dd>Next: wired facades for reflect note/tag/favorite/<code>reflection_step</code> step logs, or port-backed analytics read for companion feedback vote fetch.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflection-share-canvas in domain/reflect/share (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>generateReflectionShareImage</code> → <code>domain/reflect/share/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. Browser canvas PNG rendering has no RPC/repository I/O — colocate beside <code>reflection-share-text</code> and channel URL builders in <code>domain/reflect/share/</code>; <code>use-reflection-share-handlers</code> imports domain; <code>public-hooks</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>DOM/canvas code lives in domain for share beat cohesion; presentation conductor still owns navigator.share / download UX.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wired facades for reflect note/tag/favorite/<code>reflection_step</code> step logs, or port-backed analytics read for companion feedback vote fetch.</dd>
     </dl>
   </article>
 
