@@ -3,22 +3,21 @@ import { renderHook, act } from '@testing-library/react';
 import type { User } from '@supabase/supabase-js';
 import { useManualPauseTrigger } from './use-manual-pause-trigger';
 
-const { openManualPauseFromHomeMock, clearSessionMock } = vi.hoisted(() => ({
-  openManualPauseFromHomeMock: vi.fn(),
-  clearSessionMock: vi.fn(),
-}));
+const { openManualPauseFromHomeMock, clearSessionMock, markPauseManualStartedHomeOnceMock } =
+  vi.hoisted(() => ({
+    openManualPauseFromHomeMock: vi.fn(),
+    clearSessionMock: vi.fn(),
+    markPauseManualStartedHomeOnceMock: vi.fn(),
+  }));
 
 vi.mock('@/features/pause/public-rpc', () => ({
   openManualPauseFromHome: openManualPauseFromHomeMock,
   clearSession: clearSessionMock,
+  markPauseManualStartedHomeOnce: markPauseManualStartedHomeOnceMock,
 }));
 
 vi.mock('@/lib/holzen-console', () => ({
   holzenLog: { manual: vi.fn() },
-}));
-
-vi.mock('@/features/pause/application/use-cases/trigger/manual-pause-trigger-telemetry', () => ({
-  markPauseManualStartedHomeOnce: vi.fn(),
 }));
 
 const noopSet = vi.fn();
@@ -28,6 +27,7 @@ beforeEach(() => {
     outcome: 'idle',
     userMessage: 'Already open',
   });
+  markPauseManualStartedHomeOnceMock.mockReset();
 });
 
 describe('useManualPauseTrigger', () => {

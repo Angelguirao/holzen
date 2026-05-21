@@ -9501,4 +9501,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual-trigger telemetry on public-rpc (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; use-manual-pause-trigger imports public-rpc only</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no reflect folder moves. Re-export <code>markPauseManualStartedHomeOnce</code> on <code>public-rpc</code> beside <code>openManualPauseFromHome</code> and <code>clearSession</code>; <code>use-manual-pause-trigger</code> drops direct <code>application/use-cases/trigger/manual-pause-trigger-telemetry</code> import (home dismiss/banner telemetry peeled in prior slices).</dd>
+      <dt>Deviation</dt>
+      <dd>None — PostHog <code>pause.manual_started</code> unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>apply-manual-pause-open-result</code> still imports instance-created/completed trackers from application layer.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-holzen-manual-trigger-orchestration</code> cooldown helpers or re-export manual-trigger completion telemetry on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
