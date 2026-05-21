@@ -16531,4 +16531,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — hub shift RPC via pause-shift-frame-hub-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-io</code> binds <code>runShiftEmotionFrameHubDone</code> through hub flow anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Completes the hub peel started when domain presentation mapping moved onto <code>pause-shift-frame-hub-flow</code>: <code>pause-reflect-hub-io</code> and its unit test mock the hub cluster anchor for RPC instead of deep <code>run-shift-emotion-frame-hub-done</code> (mirrors <code>pause-initial-emotion-log-flow</code> + <code>pause-reflect-steps-mutation-flow</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect mood I/O still deep-imports domain mood helpers; share I/O domain peel landed on remote in parallel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel mood presentation helpers through flow anchors, reflect flows I/O domain peel, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
