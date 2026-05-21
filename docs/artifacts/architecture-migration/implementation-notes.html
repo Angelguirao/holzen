@@ -5530,4 +5530,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — scaffold chrome registry beside route components (Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-scaffold-chrome-registry</code> out of <code>screens/pause/lib/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code> — no further reflect folder moves. Last <code>screens/pause/lib/</code> file moves to <code>screens/pause/components/</code> (JSX registry for brief stepper + engaged countdown slots); injection into <code>usePauseSessionScreen</code> unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>; <code>screens/pause/lib/</code> directory removed.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Registry still imports route components (<code>PauseBriefProgress</code>, <code>PauseEngagedOpenMaxCountdown</code>) — features must not import it (DI from <code>PauseSessionScreen</code>).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 audit stray <code>PauseRepository</code> / <code>analytics_events</code> reads, or alias <code>resolvePauseBreathingPhases</code> return type to <code>PauseBreathingPhase</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

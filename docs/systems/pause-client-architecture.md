@@ -138,7 +138,7 @@ Companions stay **inside pause** ([holzen-application-architecture.md](../fundam
 |-------|----------|----------|
 | **Hooks / conductors** | `features/pause/presentation/` | `usePauseSessionScreen`, `useCompanionData`, … |
 | **JSX / layout** | `screens/pause/components/` | `PauseReflect`, `PauseFrame`, kebab leaf components |
-| **Pure UI rules** | `screens/pause/lib/` | chrome registry, `resolve-*-view.ts` + tests |
+| **Pure UI rules** | `screens/pause/components/` (route-only registry) | scaffold chrome registry; `resolve-*` helpers live in `domain/` / `presentation/` (peeled May 2026) |
 
 No `.tsx` under `application/` or `domain/`.
 
