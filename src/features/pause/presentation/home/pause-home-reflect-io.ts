@@ -13,4 +13,4 @@ export {
 } from '@/features/pause/domain/reflect/generation/build-manual-pause-market-context';
 export type { OpenManualPauseFromHomeParams } from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-params';
 export { openManualPauseFromHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home';
-export type { OpenManualPauseFromHomeResult } from './pause-home-manual-open-types';
+export type { OpenManualPauseFromHomeResult } from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-types';

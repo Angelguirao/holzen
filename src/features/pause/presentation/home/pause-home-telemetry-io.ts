@@ -13,4 +13,4 @@ export {
 export type {
   TrackManualPauseInstanceCreatedPayload,
   TrackPauseManualCompletedPayload,
-} from './pause-home-manual-open-types';
+} from '@/features/pause/domain/reflect/generation/manual-pause-home-telemetry-types';

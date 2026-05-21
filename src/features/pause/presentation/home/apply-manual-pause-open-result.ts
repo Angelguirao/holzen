@@ -2,11 +2,11 @@ import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
 } from '@/features/pause/domain/manual-pause-trigger-result';
+import type { OpenManualPauseFromHomeResult } from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-types';
 import type {
-  OpenManualPauseFromHomeResult,
   TrackManualPauseInstanceCreatedPayload,
   TrackPauseManualCompletedPayload,
-} from './pause-home-manual-open-types';
+} from '@/features/pause/domain/reflect/generation/manual-pause-home-telemetry-types';
 import {
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
