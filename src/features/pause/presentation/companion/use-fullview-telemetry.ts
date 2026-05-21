@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { useAuth } from '@/features/auth/public';
 import {
-  logCompanionFullviewOpened,
+  logPauseCompanionFullviewOpened,
   type CompanionFullviewKind,
-} from '@/features/pause/public-queries';
+} from '@/features/pause/public-rpc';
 
 export type { CompanionFullviewKind as FullviewCompanion };
 
@@ -25,7 +25,7 @@ export function useFullviewTelemetry(
     if (firedRef.current === key) return;
     firedRef.current = key;
 
-    void logCompanionFullviewOpened({
+    void logPauseCompanionFullviewOpened({
       userId,
       companion,
       pauseInstanceId,

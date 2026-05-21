@@ -85,6 +85,8 @@ import { runPauseDismissCurrent } from './application/use-cases/session/run-paus
 import type { LogCompanionFeedbackVoteInput } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
 import { runFetchCompanionFeedbackVote } from './application/use-cases/ritual/frame/run-fetch-companion-feedback-vote';
 import { runLogCompanionFeedbackVote } from './application/use-cases/ritual/frame/run-log-companion-feedback-vote';
+import { runLogCompanionFullviewOpened } from './application/use-cases/ritual/frame/run-log-companion-fullview-opened';
+import type { LogCompanionFullviewOpenedInput } from './application/use-cases/ritual/frame/log-companion-fullview-opened';
 import { supabasePauseAnalyticsRepository } from './infrastructure/supabase-pause-analytics-repository';
 
 /** Lifecycle + ritual mutations — wired facades only; no generic `pauseLogStep` export. */
@@ -210,6 +212,10 @@ export type {
   CompanionFeedbackVote,
   LogCompanionFeedbackVoteInput,
 } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
+export type {
+  CompanionFullviewKind,
+  LogCompanionFullviewOpenedInput,
+} from './application/use-cases/ritual/frame/log-companion-fullview-opened';
 
 /** Companion feedback vote read — wired `PauseAnalyticsRepository.fetchCompanionFeedbackVote`. */
 export function fetchPauseCompanionFeedbackVote(
@@ -229,6 +235,13 @@ export function logPauseCompanionFeedbackVote(
   input: LogCompanionFeedbackVoteInput,
 ): Promise<{ ok: boolean }> {
   return runLogCompanionFeedbackVote(supabasePauseAnalyticsRepository, input);
+}
+
+/** Companion fullview open — wired `PauseAnalyticsRepository.insertEvent` (presentation). */
+export function logPauseCompanionFullviewOpened(
+  input: LogCompanionFullviewOpenedInput,
+): Promise<{ ok: boolean }> {
+  return runLogCompanionFullviewOpened(supabasePauseAnalyticsRepository, input);
 }
 
 /** Reflect progression — `reflection_step` once per instance (sessionStorage dedupe). */
