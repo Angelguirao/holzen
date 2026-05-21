@@ -3,14 +3,10 @@ import { renderHook, act } from '@testing-library/react';
 import type { User } from '@supabase/supabase-js';
 import { useOpenPauseHomePreview } from './use-open-pause-home-preview';
 
-const dismissOpenPauseHomeMock = vi.hoisted(() => vi.fn());
+const dismissOpenPauseHomePreviewMock = vi.hoisted(() => vi.fn());
 
-vi.mock('@/features/pause/public-ports', () => ({
-  supabasePauseRepository: {},
-}));
-
-vi.mock('@/features/pause/application/use-cases/dismiss/dismiss-open-pause-home', () => ({
-  dismissOpenPauseHome: dismissOpenPauseHomeMock,
+vi.mock('@/features/pause/public-rpc', () => ({
+  dismissOpenPauseHomePreview: dismissOpenPauseHomePreviewMock,
 }));
 
 vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () => ({
@@ -26,11 +22,11 @@ vi.mock('../../public-queries', () => ({
 }));
 
 beforeEach(() => {
-  dismissOpenPauseHomeMock.mockReset().mockResolvedValue(undefined);
+  dismissOpenPauseHomePreviewMock.mockReset().mockResolvedValue(undefined);
 });
 
 describe('useOpenPauseHomePreview dismiss', () => {
-  it('dismisses via dismiss use case when user is signed in', async () => {
+  it('dismisses via public-rpc facade when user is signed in', async () => {
     const user = { id: 'user-1' } as User;
     const { result } = renderHook(() => useOpenPauseHomePreview(user));
 
@@ -38,10 +34,10 @@ describe('useOpenPauseHomePreview dismiss', () => {
       await result.current.dismissOpenPauseHome();
     });
 
-    expect(dismissOpenPauseHomeMock).toHaveBeenCalledWith(true, expect.objectContaining({
-      clearPreview: expect.any(Function),
-      dismissCurrent: expect.any(Function),
-    }));
+    expect(dismissOpenPauseHomePreviewMock).toHaveBeenCalledWith(
+      true,
+      expect.any(Function),
+    );
   });
 
   it('clears preview without RPC when user is null', async () => {
@@ -51,9 +47,9 @@ describe('useOpenPauseHomePreview dismiss', () => {
       await result.current.dismissOpenPauseHome();
     });
 
-    expect(dismissOpenPauseHomeMock).toHaveBeenCalledWith(false, expect.objectContaining({
-      clearPreview: expect.any(Function),
-      dismissCurrent: expect.any(Function),
-    }));
+    expect(dismissOpenPauseHomePreviewMock).toHaveBeenCalledWith(
+      false,
+      expect.any(Function),
+    );
   });
 });
