@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/features/market/public';
 import type { PauseBreathSecondLabelVariant } from '@/features/pause/public-session';
+import type { BriefPauseStep } from '@/features/pause/domain/ritual-types';
 import type { PauseSessionStepHandlersProvidersSlice } from '../reflect/flows/pause-session-step-handler-types';
 
 /** Provider fields for scaffold VM (subset of `usePauseSessionProviders`). */
@@ -21,6 +22,6 @@ export type PauseSessionScaffoldVmChromeSlots = {
 
 /** Route-owned React for scaffold header slots — injected from `screens/pause/components/`. */
 export type PauseScaffoldChromeRegistry = {
-  renderBriefStepper: (briefStep: import('@/features/pause/public-hooks').BriefPauseStep) => ReactNode;
+  renderBriefStepper: (briefStep: BriefPauseStep) => ReactNode;
   renderEngagedOpenMaxCountdown: (engagedAtIso: string) => ReactNode;
 };
