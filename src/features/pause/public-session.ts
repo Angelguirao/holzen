@@ -33,7 +33,7 @@ export {
   hasPersistablePauseSessionAnchor,
   hasPersistedPauseSessionPayload,
   type PersistedSessionAnchor,
-} from './application/use-cases/session/persisted-session-guards';
+} from './domain/session/persisted-session-guards';
 export {
   isPauseSessionDepthPickerActive,
   isPauseSessionWaitingForInstanceFetch,
