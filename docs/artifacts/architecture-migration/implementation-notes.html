@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect share I/O pure builders from domain (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-share-io</code> re-exports domain share text + channel URLs</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder move remains complete. Presentation share I/O imports <code>buildReflectionShareText</code> and channel URL builders from <code>domain/reflect/share/</code> instead of the application CI anchor <code>pause-reflection-share-flow</code>. Canvas + <code>runReflectionShareImage</code> stay on application paths.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>pause-reflection-share-flow.ts</code> anchor remains for <code>check:architecture-alignment</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Single I/O file — mirrors ambience and steps/hub domain gate peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion orchestrate-session through orchestration-io, or reflect flows decide helpers from domain where still on application anchors.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect steps + hub I/O pure gates from domain (backlog #1 follow-up)</span>
       <span class="status resolved">resolved</span>
     </header>
