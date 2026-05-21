@@ -8057,4 +8057,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood/hub RPC facades on public-rpc (backlog #4 partial, #3 §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>logPauseInitialEmotionSelect / logPauseShiftEmotionFrameHubDone wired</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Wire feel-step and frame-hub presentation conductors through <code>public-rpc</code> facades (<code>logPauseInitialEmotionSelect</code>, <code>logPauseInitialEmotionSkip</code>, <code>logPauseShiftEmotionFrameHubDone</code>) instead of importing use cases + <code>public-ports</code> repository; tests mock <code>supabase-pause-repository</code> and partial <code>public-rpc</code> for toast only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other reflect step hooks (note/tag/favorite/reflection-step-log) still call application use cases + <code>public-ports</code> directly until a follow-up batch.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: batch reflect step RPC facades on <code>public-rpc</code>, or port-backed analytics read for companion feedback vote fetch.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

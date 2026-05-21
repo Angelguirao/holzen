@@ -5,12 +5,10 @@ import type { MoodValue } from '@/features/pause/domain/mood-value';
 import { hapticFeedback } from '@/lib/haptics';
 import {
   initialEmotionResetUi,
-  type InitialEmotionUiState,
-} from '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
-import {
   logPauseInitialEmotionSelect,
   logPauseInitialEmotionSkip,
   showPauseStepSyncFailedToast,
+  type InitialEmotionUiState,
 } from '@/features/pause/public-rpc';
 
 export function usePauseSessionInitialMoodHandlers(input: {

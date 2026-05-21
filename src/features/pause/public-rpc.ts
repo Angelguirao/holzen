@@ -108,6 +108,26 @@ import {
 } from './application/use-cases/admin/run-log-dev-mode-setting';
 import { runFetchDevModeSetting } from './application/use-cases/admin/run-fetch-dev-mode-setting';
 import { supabasePauseAnalyticsRepository } from './infrastructure/supabase-pause-analytics-repository';
+import {
+  runInitialEmotionSelect,
+  runInitialEmotionSkip,
+  initialEmotionResetUi,
+  type RunInitialEmotionSelectResult,
+  type RunInitialEmotionSkipResult,
+  type InitialEmotionUiState,
+} from './application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
+import {
+  runShiftEmotionFrameHubDone,
+  type RunShiftEmotionFrameHubDoneResult,
+} from './application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
+
+export type {
+  RunInitialEmotionSelectResult,
+  RunInitialEmotionSkipResult,
+  InitialEmotionUiState,
+  RunShiftEmotionFrameHubDoneResult,
+};
+export { initialEmotionResetUi };
 
 /** Lifecycle + ritual mutations — wired facades only; no generic `pauseLogStep` export. */
 
@@ -317,21 +337,21 @@ export function logPauseOutcome(params: {
 /** Feel step — `initial_emotion_logged` on mood select (wired for presentation). */
 export function logPauseInitialEmotionSelect(
   input: Parameters<typeof runInitialEmotionSelect>[1],
-) {
+): Promise<RunInitialEmotionSelectResult> {
   return runInitialEmotionSelect(supabasePauseRepository, input);
 }
 
 /** Feel step — `initial_emotion_logged` with `{ skipped: true }` (wired for presentation). */
 export function logPauseInitialEmotionSkip(
   input: Parameters<typeof runInitialEmotionSkip>[1],
-) {
+): Promise<RunInitialEmotionSkipResult> {
   return runInitialEmotionSkip(supabasePauseRepository, input);
 }
 
 /** Frame hub “I'm done” — deduped `shift_emotion_logged` (wired for presentation). */
 export function logPauseShiftEmotionFrameHubDone(
   input: Parameters<typeof runShiftEmotionFrameHubDone>[1],
-) {
+): Promise<RunShiftEmotionFrameHubDoneResult> {
   return runShiftEmotionFrameHubDone(supabasePauseRepository, input);
 }
 

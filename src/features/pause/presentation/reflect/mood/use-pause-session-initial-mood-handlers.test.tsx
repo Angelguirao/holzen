@@ -4,6 +4,7 @@ import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import {
+  initialEmotionResetUi,
   runInitialEmotionSelect,
   runInitialEmotionSkip,
 } from '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
@@ -32,6 +33,7 @@ const {
 });
 
 vi.mock('@/features/pause/public-rpc', () => ({
+  initialEmotionResetUi,
   logPauseInitialEmotionSelect,
   logPauseInitialEmotionSkip,
   showPauseStepSyncFailedToast,
