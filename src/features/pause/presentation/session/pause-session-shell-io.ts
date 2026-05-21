@@ -3,14 +3,12 @@
  * Session shell bootstrap, breath navigation, and header-back handlers import here instead of deep `application/use-cases/session/*`.
  */
 export {
+  buildPauseSessionMountLogParams,
+  coalescePauseSessionShellViewModel,
   computePauseHeaderBackIntent,
   isPauseSessionHeaderBackVisible,
   type PauseHeaderBackIntent,
   type PauseHeaderBackIntentInput,
   type PauseSessionHeaderBackInput,
-} from '@/features/pause/application/use-cases/session/header-back';
-export {
-  buildPauseSessionMountLogParams,
   type PauseSessionMountLogParams,
-} from '@/features/pause/application/use-cases/session/mount-log-params';
-export { coalescePauseSessionShellViewModel } from '@/features/pause/application/use-cases/session/shell-view-model';
+} from '@/features/pause/application/use-cases/session/pause-session-shell-flow';
