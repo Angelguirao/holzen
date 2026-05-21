@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — companion orchestrate I/O direct frame modules (backlog #2 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestrate-io</code> imports slot orchestrate helpers directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete. <code>pause-companion-orchestrate-io</code> imports slot orchestrate, intervention bootstrap, retry reset, telemetry, and UI state from sibling <code>ritual/frame/*</code> modules instead of <code>pause-companion-orchestrate-flow</code> CI anchor (follows orchestration I/O peel).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-companion-orchestrate-flow</code> remains as application cluster anchor until unused.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-home-reflect-telemetry-io</code> direct telemetry imports, or delete unused frame/reflect flow anchors when alignment allows.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — session frame I/O direct restored-frame-ritual-state (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
