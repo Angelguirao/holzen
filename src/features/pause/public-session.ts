@@ -48,3 +48,7 @@ export {
   coalescePauseSessionShellViewModel,
   type PauseSessionShellViewModel,
 } from './application/use-cases/session/shell-view-model';
+export {
+  buildPauseSessionStepRitualBundle,
+  buildPauseSessionStepShellBundle,
+} from './application/use-cases/session/step-bundles';

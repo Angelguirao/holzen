@@ -9991,7 +9991,7 @@
       <dt>Tradeoffs</dt>
       <dd>Hydration still imports <code>application/use-cases/session/*</code> directly until next peel.</dd>
       <dt>Open questions</dt>
-      <dd>Next #3: <code>shell-view-model</code> on <code>public-session</code>; backlog #4: breath segment RPC loggers audit for <code>public-rpc</code>-only.</dd>
+      <dd>Next #3: <code>shell-view-model</code> on <code>public-session</code> (landed on remote); then step-bundles.</dd>
     </dl>
   </article>
 
@@ -10010,26 +10010,26 @@
       <dt>Tradeoffs</dt>
       <dd>Hydration and scaffold-derived helpers remain on direct <code>application/use-cases/session/*</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next #3: hydration cluster on <code>public-session</code>; backlog #4: breath segment RPC presentation imports audit for <code>public-rpc</code>-only.</dd>
+      <dd>Next #3: step-bundles on <code>public-session</code>; backlog #4: breath segment RPC presentation imports audit for <code>public-rpc</code>-only.</dd>
     </dl>
   </article>
 
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — shell-view-model on public-session (backlog #1 verified, #3)</span>
+      <span>Phase A slice — public-session step-bundles barrel (backlog #1 verified, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>ritual/reflect/ complete; coalesce shell VM on public-session barrel</h3>
+    <h3>ritual/reflect/ complete; step handler bundle builders on public-session</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 verified — no reflect moves. Export <code>coalescePauseSessionShellViewModel</code> + <code>PauseSessionShellViewModel</code> from <code>public-session.ts</code>; <code>use-pause-session-shell-bootstrap</code> imports gate flags + shell VM from one barrel (composes with persist-snapshot/guards peels).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no folder moves. Extend <code>public-session.ts</code> with <code>buildPauseSessionStepShellBundle</code> and <code>buildPauseSessionStepRitualBundle</code> (composes with gate-flag + shell-view-model exports from parallel automation); <code>use-pause-session-step-handlers</code> imports the barrel.</dd>
       <dt>Deviation</dt>
-      <dd>None — hydration coalesce defaults unchanged.</dd>
+      <dd>None — scaffold subset fields unchanged.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>hydration.ts</code> remains on direct application import in <code>use-pause-session-shell</code>; depth-picker gate still imported from domain in scaffold presentation.</dd>
+      <dd>Co-located <code>step-bundles.test.ts</code> still imports the use-case module directly.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: breath segment RPC presentation audit for <code>public-rpc</code>-only; optional <code>hydration</code> peel after gate cluster stabilizes.</dd>
+      <dd>Next #3: <code>hydration</code> on <code>public-session</code>; backlog #4: presentation ritual log imports audit for <code>public-rpc</code>-only.</dd>
     </dl>
   </article>
 

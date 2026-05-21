@@ -1,7 +1,7 @@
 import {
   buildPauseSessionStepRitualBundle,
   buildPauseSessionStepShellBundle,
-} from '@/features/pause/application/use-cases/session/step-bundles';
+} from '@/features/pause/public-session';
 import type { PauseSessionShellRitualResult } from './use-pause-session-shell-ritual';
 import type { PauseSessionStepHandlersProvidersSlice } from '../reflect/flows/pause-session-step-handler-types';
 import { usePauseSessionBreathReflectHandlers } from '../reflect/flows/use-pause-session-breath-reflect-handlers';
