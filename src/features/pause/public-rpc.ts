@@ -207,15 +207,6 @@ export {
   type ManualPauseHomePreviewPorts,
 } from './application/use-cases/trigger/apply-manual-pause-open-result';
 export { buildManualPauseOpenParams } from './application/use-cases/trigger/build-manual-pause-open-params';
-export {
-  computeAutoCooldownRemainingMs,
-  computeManualCooldownRemainingMs,
-  buildManualTriggerCooldownStorageKey,
-  isManualTriggerBlockedByCooldown,
-  parseManualTriggerCooldownFromStorageEvent,
-  mapManualTriggerStartError,
-  type ManualTriggerCooldownStorageEvent,
-} from './public-trigger';
 
 export type {
   RunInitialEmotionSelectResult,
