@@ -14441,4 +14441,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual pause open params in ritual/reflect/generation</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect cluster incremental — backlog #1 verified</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. Colocate <code>buildManualPauseOpenParams</code> (+ test) beside <code>build-manual-pause-market-context</code> under <code>ritual/reflect/generation/</code>; <code>use-manual-pause-trigger</code> imports generation path; <code>trigger/</code> keeps <code>openManualPauseFromHome</code> orchestration only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — pairs with domain <code>build-silent-reflection-stub-message</code> and existing generation use cases.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Open-params types still reference <code>trigger/open-manual-pause-from-home</code> until a later peel moves the orchestrator or shared types.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>holzen-query-client-ref</code> shim for pause query invalidation helpers, or peel <code>openManualPauseFromHome</code> types into a shared module.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
