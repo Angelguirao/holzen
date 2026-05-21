@@ -377,7 +377,7 @@ export { usePauseSessionBreathReflectHandlers } from './presentation/reflect/flo
 export { usePauseSessionEntryPresentationEffects } from './presentation/session/use-pause-session-entry-presentation-effects';
 export { usePauseSessionTerminalEntryRedirect } from './presentation/session/use-pause-session-terminal-entry-redirect';
 export { usePauseSessionStepTransition } from './presentation/session/use-pause-session-step-transition';
-export { usePauseSessionDepthAndBriefCopy } from './presentation/session/use-pause-session-depth-and-brief-copy';
+export { usePauseSessionDepthAndBriefCopy } from './presentation/reflect/mood/use-pause-session-depth-and-brief-copy';
 export {
   usePauseSessionScaffoldRitual,
   type UsePauseSessionScaffoldRitualParams,

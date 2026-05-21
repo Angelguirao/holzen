@@ -5,7 +5,7 @@ import { isPauseSessionDepthPickerActive } from '@/features/pause/application/us
 import type { FetchedPauseInstance } from '@/features/pause/domain/session-model';
 import type { RitualDepth } from '@/features/pause/public-hooks';
 import type { PauseSessionScaffoldRitualPayloadsParams } from './scaffold-ritual-payloads';
-import { usePauseSessionDepthAndBriefCopy } from './use-pause-session-depth-and-brief-copy';
+import { usePauseSessionDepthAndBriefCopy } from '../reflect/mood/use-pause-session-depth-and-brief-copy';
 import { usePauseSessionScaffoldRitual } from './use-pause-session-scaffold-ritual';
 import { usePauseSessionStepTransition } from './use-pause-session-step-transition';
 
