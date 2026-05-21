@@ -1,7 +1,7 @@
 import {
   buildPauseSessionReflectAndDecideView,
   type PauseSessionReflectAndDecideViewInput,
-} from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-view';
+} from './pause-session-reflect-and-decide-view';
 
 export type { PauseSessionReflectAndDecideViewInput };
 
