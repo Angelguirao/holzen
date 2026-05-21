@@ -3991,6 +3991,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate pause-step-layout under presentation/session/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 session ritual layout tokens</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move shared <code>/pause</code> step layout class map beside session conductors; <code>public-hooks</code> re-export path only — pause screen components unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>load-settings-data-export-bundle</code> remains flat (settings export re-export, not ritual session).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 remainder (analytics read adapters), or <code>ritual/brief/</code> beat consolidation per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
