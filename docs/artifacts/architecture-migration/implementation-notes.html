@@ -3383,6 +3383,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate companion snapshot hook under presentation/companion/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Tier 4 frame beat — full-view session hydrate conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1–#2 application ritual folders are complete. Move <code>use-pause-session-companion-snapshot</code> beside other companion conductors (full-view route hydrate); <code>public-hooks</code> and <code>use-companion-fullview-page</code> import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 frame presentation grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Journey/realtime/bulk-hold hooks remain flat under <code>presentation/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire <code>logDevModeSetting</code> via <code>PauseAnalyticsRepository</code> (backlog #4), or colocate journey/realtime hooks under <code>presentation/archive/</code> / <code>home/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
