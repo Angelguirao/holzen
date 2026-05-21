@@ -183,6 +183,7 @@ export {
   type UsePauseBriefDoneCheckInParams,
 } from './presentation/ritual/done/use-pause-brief-done-check-in';
 export { usePauseBriefIntegrateCountdown } from './presentation/session/use-pause-brief-integrate-countdown';
+export { usePauseBreathSegmentRpcLoggers } from './presentation/session/use-pause-breath-segment-rpc-loggers';
 export {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
@@ -321,7 +322,6 @@ export {
   usePauseSessionFeelTilesSelect,
   usePauseSessionInitialMoodHandlers,
   PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS,
-  usePauseBreathSegmentRpcLoggers,
   usePauseFeelShiftLogDedupeRefs,
   usePauseSessionBreathStepHandlers,
   usePauseSessionBreathHandlers,

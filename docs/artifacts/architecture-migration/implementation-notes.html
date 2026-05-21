@@ -11914,4 +11914,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate breath-segment RPC loggers in presentation/session/ (backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-breath-segment-rpc-loggers</code> off <code>presentation/reflect/flows/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no application folder move. After domain breath helpers moved to <code>domain/ritual/breathe/</code>, colocate the breath-segment RPC conductor beside other session hooks under <code>presentation/session/</code>; <code>public-hooks</code> re-export path only (removed from <code>public-ritual-reflect</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 session conductor grouping.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-breath-handlers</code> and related breath-reflect wrappers remain under <code>presentation/reflect/flows/</code> until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: <code>use-pause-reflect-generation</code> ReflectGenerator port sentinel, optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -4,7 +4,7 @@ import { mapPersistedStep } from '@/features/pause/domain/session/map-persisted-
 
 /**
  * When resuming from local storage past the first or second breath beat,
- * `use-pause-breath-segment-rpc-loggers` (reflect flows conductor) must treat `breath_completed`
+ * `use-pause-breath-segment-rpc-loggers` (session conductor) must treat `breath_completed`
  * segment RPCs as already satisfied (refs start `true`).
  * Uses the same `mapPersistedStep` + `STEPS` order as initial `step` state in `PauseSession.tsx`.
  */

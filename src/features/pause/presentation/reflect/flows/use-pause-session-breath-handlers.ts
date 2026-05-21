@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
-import { usePauseBreathSegmentRpcLoggers } from './use-pause-breath-segment-rpc-loggers';
+import { usePauseBreathSegmentRpcLoggers } from '@/features/pause/presentation/session/use-pause-breath-segment-rpc-loggers';
 import { usePauseSessionBreathNavigation } from '../../session/use-pause-session-breath-navigation';
 import { usePauseSessionBreathStepHandlers } from './use-pause-session-breath-step-handlers';
 import { usePauseSessionBriefToDeep } from '../../session/use-pause-session-brief-to-deep';
