@@ -3719,9 +3719,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior-preserving <code>git mv</code>; mirrors §3 / §10.1 feel beat taxonomy.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Rebased over remote slice that had moved dedupe refs to <code>steps/</code> — kept under <code>feel/</code> with mood cluster. <code>use-pause-session-breath-reflect-handlers</code> stays in <code>reflect/flows/</code>; bulk-hold hooks remain flat.</dd>
+      <dd>Rebased over remote slice that had moved dedupe refs to <code>steps/</code> — kept under <code>feel/</code> with mood cluster. <code>use-pause-session-breath-reflect-handlers</code> stays in <code>reflect/flows/</code>; bulk-hold hooks remain flat until home colocation slice below.</dd>
       <dt>Open questions</dt>
-      <dd>Next: port-back PWA install analytics via <code>PauseAnalyticsRepository</code> (backlog #4), or colocate breath-reflect handlers.</dd>
+      <dd>Resolved by bulk-hold home colocation slice.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate bulk-hold presentation hooks under presentation/home/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 home bulk-hold conductors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> and reflect presentation clusters were already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>use-bulk-hold-pending</code> and <code>use-bulk-hold-apply-outcomes</code> beside other Home conductors under <code>presentation/home/</code>; <code>public-hooks</code> re-export paths only — <code>applyBulkHoldOutcomes</code> stays on <code>public-rpc</code> (port-backed use case).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>apply-bulk-hold-outcomes</code> use case remains at <code>application/use-cases/</code> root until a home/ colocation slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate remaining flat presentation hooks (staggered-reveal, completed-pause-count, …), or backlog #4 port wiring for analytics reads.</dd>
     </dl>
   </article>
 

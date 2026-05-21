@@ -159,11 +159,11 @@ export {
   bulkHoldPendingQueryKey,
   type BulkHoldPendingPause,
   type UseBulkHoldPendingOptions,
-} from './presentation/use-bulk-hold-pending';
+} from './presentation/home/use-bulk-hold-pending';
 export {
   useBulkHoldApplyOutcomes,
   type UseBulkHoldApplyOutcomesParams,
-} from './presentation/use-bulk-hold-apply-outcomes';
+} from './presentation/home/use-bulk-hold-apply-outcomes';
 export {
   usePauseArchiveList,
   type PauseArchiveListSort,
