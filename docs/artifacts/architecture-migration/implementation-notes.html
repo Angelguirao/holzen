@@ -3934,6 +3934,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate staggered-reveal under presentation/companion/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; Tier 4 companion Full View pacing</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code> (no legacy path). Move <code>use-staggered-reveal</code> (+ test) beside grounding enrichment and fullview telemetry; <code>use-companion-fullview-page</code> imports sibling path; <code>public-hooks</code> re-export only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving <code>git mv</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flat <code>presentation/</code> now holds only shared layout helpers (e.g. <code>pause-step-layout</code>, <code>load-settings-data-export-bundle</code>).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 optional analytics read port wiring, or peel remaining flat presentation helpers.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
