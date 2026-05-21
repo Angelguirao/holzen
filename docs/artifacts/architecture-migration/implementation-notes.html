@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — re-apply reflect steps I/O direct run-* peel (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-io</code> binds sibling <code>run-pause-*</code> modules again</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. A parallel commit briefly routed steps presentation I/O through <code>pause-reflect-steps-mutation-flow</code>; this slice restores direct imports from <code>run-pause-*</code> and domain step gates (parity with share I/O on the same branch).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mutation-flow anchor kept for <code>check:architecture-alignment</code> only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-home-reflect-telemetry-io</code> direct telemetry imports, or reflect mood I/O peel from <code>pause-reflect-mood-flow</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — companion orchestration I/O direct frame modules (backlog #2 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
