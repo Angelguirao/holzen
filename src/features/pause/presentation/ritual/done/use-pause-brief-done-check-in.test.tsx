@@ -3,22 +3,13 @@ import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import { usePauseBriefDoneCheckIn } from './use-pause-brief-done-check-in';
 
-const {
-  runPostPauseEmotionLogIfDirtyMock,
-  showPauseStepSyncFailedToast,
-  mockPauseRepository,
-} = vi.hoisted(() => ({
-  runPostPauseEmotionLogIfDirtyMock: vi.fn(),
+const { pausePostPauseEmotionLogIfDirtyMock, showPauseStepSyncFailedToast } = vi.hoisted(() => ({
+  pausePostPauseEmotionLogIfDirtyMock: vi.fn(),
   showPauseStepSyncFailedToast: vi.fn(),
-  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
-vi.mock('@/features/pause/application/use-cases/ritual/done/post-pause-emotion-log', () => ({
-  runPostPauseEmotionLogIfDirty: runPostPauseEmotionLogIfDirtyMock,
-}));
-
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: mockPauseRepository,
+vi.mock('@/features/pause/presentation/ritual/done/pause-ritual-done-io', () => ({
+  pausePostPauseEmotionLogIfDirty: pausePostPauseEmotionLogIfDirtyMock,
 }));
 
 vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
@@ -28,14 +19,14 @@ vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
 const t = ((k: string) => k) as TFunction;
 
 beforeEach(() => {
-  runPostPauseEmotionLogIfDirtyMock.mockReset();
-  runPostPauseEmotionLogIfDirtyMock.mockResolvedValue({ status: 'logged' });
+  pausePostPauseEmotionLogIfDirtyMock.mockReset();
+  pausePostPauseEmotionLogIfDirtyMock.mockResolvedValue({ status: 'logged' });
   vi.mocked(showPauseStepSyncFailedToast).mockClear();
 });
 
 describe('usePauseBriefDoneCheckIn', () => {
   it('skips RPC when feel unchanged and still calls onSaveToJourney', async () => {
-    runPostPauseEmotionLogIfDirtyMock.mockResolvedValue({ status: 'skipped' });
+    pausePostPauseEmotionLogIfDirtyMock.mockResolvedValue({ status: 'skipped' });
     const onSaveToJourney = vi.fn();
     const { result } = renderHook(() =>
       usePauseBriefDoneCheckIn({
@@ -51,8 +42,7 @@ describe('usePauseBriefDoneCheckIn', () => {
       await result.current.handleSaveToJourney();
     });
 
-    expect(runPostPauseEmotionLogIfDirtyMock).toHaveBeenCalledWith(
-      mockPauseRepository,
+    expect(pausePostPauseEmotionLogIfDirtyMock).toHaveBeenCalledWith(
       expect.objectContaining({
         pauseInstanceId: 'inst-1',
         mood: 'calm',
@@ -64,7 +54,7 @@ describe('usePauseBriefDoneCheckIn', () => {
   });
 
   it('logs post_pause_emotion when feel changed and sync fails shows toast', async () => {
-    runPostPauseEmotionLogIfDirtyMock.mockResolvedValue({ status: 'sync_failed' });
+    pausePostPauseEmotionLogIfDirtyMock.mockResolvedValue({ status: 'sync_failed' });
     const onSaveToJourney = vi.fn();
     const { result } = renderHook(() =>
       usePauseBriefDoneCheckIn({
@@ -84,8 +74,7 @@ describe('usePauseBriefDoneCheckIn', () => {
       await result.current.handleSaveToJourney();
     });
 
-    expect(runPostPauseEmotionLogIfDirtyMock).toHaveBeenCalledWith(
-      mockPauseRepository,
+    expect(pausePostPauseEmotionLogIfDirtyMock).toHaveBeenCalledWith(
       expect.objectContaining({
         pauseInstanceId: 'inst-1',
         mood: 'anxious',

@@ -13738,4 +13738,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — bind ritual done post-pause emotion RPC I/O</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Ritual done — post_pause_emotion off public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>presentation/ritual/done/pause-ritual-done-io.ts</code> as the bound import for <code>runPostPauseEmotionLogIfDirty</code>; <code>use-pause-brief-done-check-in</code> imports the I/O module instead of <code>public-rpc</code> (mirrors <code>pause-session-breath-io.ts</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving wiring only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Pending-offer mutations, home manual trigger, open-pause dismiss, bulk-hold apply, and archive retrospective still import <code>public-rpc</code> directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>presentation/session/pause-pending-offer-io.ts</code>, <code>presentation/home/pause-home-io.ts</code>, or Phase B cross-context shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
