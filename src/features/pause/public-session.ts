@@ -61,7 +61,7 @@ export {
 export {
   buildPauseSessionScaffoldRitualDerived,
   type PauseSessionScaffoldRitualDerived,
-} from './application/use-cases/session/scaffold-ritual-derived';
+} from './application/use-cases/ritual/reflect/scaffold/scaffold-ritual-derived';
 export {
   computePauseStorageRitualSyncPatch,
   type PauseStorageRitualSyncPatch,

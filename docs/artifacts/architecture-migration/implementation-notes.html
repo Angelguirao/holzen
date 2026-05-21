@@ -12959,4 +12959,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate scaffold-ritual-derived under ritual/reflect/scaffold/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up; application reflect scaffold subcluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Legacy <code>application/use-cases/reflect/</code> paths were already under <code>ritual/reflect/</code> on <code>cursor/arch-migrate-src-ca70</code>. Move <code>scaffold-ritual-derived</code> (+ test) from <code>session/</code> to <code>ritual/reflect/scaffold/</code> beside <code>domain/reflect/scaffold/deep-reflect-frame-macro-subline</code>; <code>public-session</code> re-export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving move; presentation still imports via <code>public-session</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other session pure helpers remain under <code>application/use-cases/session/</code> until peeled to <code>public-session</code> or ritual folders.</dd>
+      <dt>Open questions</dt>
+      <dd>Phase B: subscription/auth <code>src/lib/*</code> shims using pause as template.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
