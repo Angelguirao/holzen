@@ -18,11 +18,11 @@ const {
   mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
-vi.mock('@/features/pause/application/use-cases/pending-offer/run-adopt-pending-pause-offer', () => ({
+vi.mock('@/features/pause/application/use-cases/session/pending-offer/run-adopt-pending-pause-offer', () => ({
   runAdoptPendingPauseOffer: runAdoptPendingPauseOfferMock,
 }));
 
-vi.mock('@/features/pause/application/use-cases/pending-offer/run-decline-pending-pause-offer', () => ({
+vi.mock('@/features/pause/application/use-cases/session/pending-offer/run-decline-pending-pause-offer', () => ({
   runDeclinePendingPauseOffer: runDeclinePendingPauseOfferMock,
 }));
 

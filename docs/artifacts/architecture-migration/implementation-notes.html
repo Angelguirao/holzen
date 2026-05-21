@@ -15448,4 +15448,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — pending-offer adopt/decline under session/pending-offer/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 follow-up — colocate pending-offer mutation cluster with session telemetry</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. After <code>pending-pause-offer-telemetry</code> moved to <code>application/use-cases/session/</code>, move adopt/decline use cases + display helper from top-level <code>application/use-cases/pending-offer/</code> to <code>application/use-cases/session/pending-offer/</code>; <code>pause-session-pending-offer-io</code> and <code>public-home</code> import paths only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; no new PostHog events.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-home</code> still re-exports display from application (Home read barrel); adopt/decline stay behind session presentation I/O.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: lifecycle create/dismiss thin use cases on <code>public-rpc</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

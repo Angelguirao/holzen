@@ -1,5 +1,5 @@
-import { runAdoptPendingPauseOffer } from '@/features/pause/application/use-cases/pending-offer/run-adopt-pending-pause-offer';
-import { runDeclinePendingPauseOffer } from '@/features/pause/application/use-cases/pending-offer/run-decline-pending-pause-offer';
+import { runAdoptPendingPauseOffer } from '@/features/pause/application/use-cases/session/pending-offer/run-adopt-pending-pause-offer';
+import { runDeclinePendingPauseOffer } from '@/features/pause/application/use-cases/session/pending-offer/run-decline-pending-pause-offer';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
