@@ -49,4 +49,4 @@ export {
   type ApplyManualPauseOpenResultInput,
   type ManualPauseHomePreviewPorts,
 } from './apply-manual-pause-open-result';
-export { shouldNavigateAfterManualTrigger } from '@/features/pause/application/use-cases/ritual/reflect/generation/should-navigate-after-manual-trigger';
+export { shouldNavigateAfterManualTrigger } from '@/features/pause/domain/reflect/generation/should-navigate-after-manual-trigger';
