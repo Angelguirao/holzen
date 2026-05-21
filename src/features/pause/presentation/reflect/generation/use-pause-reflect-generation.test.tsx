@@ -27,8 +27,12 @@ vi.mock('@/features/auth/public', () => ({
   useAuth: () => ({ user: { id: 'user-1' } }),
 }));
 
+const { profileFixture } = vi.hoisted(() => ({
+  profileFixture: { display_name: 'Test' },
+}));
+
 vi.mock('@/features/user/public-hooks', () => ({
-  useProfile: () => ({}),
+  useProfile: () => profileFixture,
 }));
 
 vi.mock('react-i18next', () => ({
@@ -156,6 +160,15 @@ describe('usePauseReflectGeneration', () => {
     await waitFor(() => {
       expect(result.current.reflectionMessage).toBe('edge copy');
     });
+    expect(runReflectGenerationMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pauseInstanceId: 'pause-1',
+        userId: 'user-1',
+        context: 'btc',
+        profile: profileFixture,
+      }),
+      mockReflectGenerator,
+    );
   });
 
   it('routes holzen-reflect through the default ReflectGenerator port adapter', async () => {
