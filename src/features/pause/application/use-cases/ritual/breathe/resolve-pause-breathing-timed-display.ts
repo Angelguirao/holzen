@@ -1,7 +1,8 @@
+import type { PauseBreathingPhase } from './pause-breathing-phase';
 import { resolveBreathOrbVisualMetrics } from './pause-breath-orb-metrics';
 import { resolveTriangleKickerDisplay } from './resolve-triangle-kicker-display';
 
-export type PauseBreathingPhase = { labelKey: string; duration: number };
+export type { PauseBreathingPhase };
 
 export type PauseBreathingTimedDisplay = ReturnType<typeof resolveBreathOrbVisualMetrics> & {
   triangleKickerLine: string;
