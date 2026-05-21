@@ -1,18 +1,13 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { usePauseReflectNote } from './use-pause-reflect-note';
 
-const { logStepMock, mockRepository } = vi.hoisted(() => {
-  const logStepMock = vi.fn();
-  return {
-    logStepMock,
-    mockRepository: { logStep: logStepMock } as unknown as PauseRepository,
-  };
-});
+const { logPauseReflectNoteMock } = vi.hoisted(() => ({
+  logPauseReflectNoteMock: vi.fn(),
+}));
 
-vi.mock('@/features/pause/public-ports', () => ({
-  supabasePauseRepository: mockRepository,
+vi.mock('@/features/pause/public-rpc', () => ({
+  logPauseReflectNote: logPauseReflectNoteMock,
 }));
 
 vi.mock('@/features/auth/public', () => ({
@@ -32,11 +27,11 @@ vi.mock('@/features/pause/public-queries', () => ({
 }));
 
 beforeEach(() => {
-  logStepMock.mockReset().mockResolvedValue(null);
+  logPauseReflectNoteMock.mockReset().mockResolvedValue({ status: 'success' });
 });
 
 describe('usePauseReflectNote', () => {
-  it('commits note blur via PauseRepository logStep', async () => {
+  it('commits note blur via logPauseReflectNote facade', async () => {
     const { result } = renderHook(() => usePauseReflectNote('pause-1'));
 
     act(() => {
@@ -48,10 +43,9 @@ describe('usePauseReflectNote', () => {
     });
 
     await waitFor(() => {
-      expect(logStepMock).toHaveBeenCalledWith({
-        instanceId: 'pause-1',
-        stepType: 'note_updated',
-        payload: { text: 'steady breath' },
+      expect(logPauseReflectNoteMock).toHaveBeenCalledWith({
+        pauseInstanceId: 'pause-1',
+        text: 'steady breath',
       });
     });
   });

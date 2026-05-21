@@ -6122,6 +6122,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — reflect step hooks via public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Align reflect/steps conductors with generation + mood facades</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. The four <code>presentation/reflect/steps/</code> conductors (note, tags, favorite, <code>reflection_step</code>) call wired <code>public-rpc</code> facades instead of deep <code>application/use-cases/ritual/reflect/steps/*</code> + <code>public-ports</code> adapters. Presentation RPC mutations stay on <code>public-rpc</code>; <code>public-ports</code> remains port adapters for infrastructure.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; favorite-toggle test mocks <code>public-rpc</code>; note test updated to mock <code>logPauseReflectNote</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Frame-focus ambience and reflect-decide flows still deep-import use cases.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-reflect-frame-focus-ambience</code> or brief-to-deep / post-pause hooks through <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect UI telemetry via public-rpc (backlog #1 done, #3 peel)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -6144,16 +6163,16 @@
       <span>Phase A slice — reflect note hook test (backlog #1 done, #4)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Add port-backed note conductor test</h3>
+    <h3>Add public-rpc-backed note conductor test</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>ritual/reflect/</code> migration and <code>use-pause-reflect-note</code> port wiring were already on <code>cursor/arch-migrate-src-ca70</code> (<code>77f501d6</code>). Add <code>use-pause-reflect-note.test.tsx</code> mirroring home dismiss / favorite-toggle patterns — mocks <code>public-ports</code> <code>PauseRepository.logStep</code>.</dd>
+      <dd>Add <code>use-pause-reflect-note.test.tsx</code> — mocks <code>logPauseReflectNote</code> on <code>public-rpc</code> (updated when step conductors peeled to facades).</dd>
       <dt>Deviation</dt>
-      <dd>None — no code path change.</dd>
+      <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
       <dd>Tags hook still has no dedicated test.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel companion orchestrate hooks from <code>public-rpc</code> or add tags hook test.</dd>
+      <dd>Next: add tags hook test or peel companion orchestrate hooks from <code>public-rpc</code>.</dd>
     </dl>
   </article>
 
