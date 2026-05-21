@@ -12347,7 +12347,26 @@
       <dt>Tradeoffs</dt>
       <dd>Did not add separate <code>*.port-lock.test.tsx</code> files for companion — extended existing hook tests to keep slice minimal.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: optional PostHog reads behind <code>PauseAnalyticsRepository</code>, or Phase B subscription/auth template slice.</dd>
+      <dd>Next backlog #4: <code>use-companion-orchestration</code> top-level compose guardrail, optional PostHog reads behind <code>PauseAnalyticsRepository</code>, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock companion orchestration top-level compose (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-companion-orchestration</code> presentation guardrail</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no reflect moves. After intervention-bootstrap compose tests, add guardrails on <code>useCompanionOrchestration</code> asserting slot UI refs flow into intervention bootstrap + slot orchestrate actions, and intervention bootstrap refs flow into orchestrate retry.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Test-only — documents frame conductor wiring without re-testing edge RPC or port adapters.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog consolidation behind <code>PauseAnalyticsRepository</code> (e.g. archive retrospective), or Phase B subscription/auth template slice.</dd>
     </dl>
   </article>
 
