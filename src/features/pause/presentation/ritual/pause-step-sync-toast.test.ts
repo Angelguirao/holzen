@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TFunction } from 'i18next';
 import { toast } from 'sonner';
-import { showPauseStepSyncFailedToast } from './step-sync-toast';
+import { showPauseStepSyncFailedToast } from './pause-step-sync-toast';
 
 vi.mock('sonner', () => ({
   toast: {

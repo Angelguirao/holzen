@@ -147,7 +147,7 @@ import {
   type RunReflectGenerationInput,
 } from './application/use-cases/ritual/reflect/generation/run-reflect-generation';
 import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
-import { showPauseStepSyncFailedToast } from './application/use-cases/ritual/step-sync-toast';
+import { showPauseStepSyncFailedToast } from './presentation/ritual/pause-step-sync-toast';
 export {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,

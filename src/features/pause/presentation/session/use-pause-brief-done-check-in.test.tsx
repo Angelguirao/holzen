@@ -8,7 +8,7 @@ const { logPostPauseEmotionIfDirtyMock, showPauseStepSyncFailedToast } = vi.hois
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 
-vi.mock('@/features/pause/application/use-cases/ritual/step-sync-toast', () => ({
+vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
   showPauseStepSyncFailedToast,
 }));
 
