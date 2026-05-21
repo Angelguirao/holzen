@@ -10964,4 +10964,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect share image off public-rpc (backlog #1 verified, §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Share PNG orchestration: presentation → domain/reflect/share</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) is complete on <code>cursor/arch-migrate-src-ca70</code>. Continue §6 slim <code>public-rpc</code>: <code>use-reflection-share-handlers</code> imports <code>runReflectionShareImage</code> from <code>domain/reflect/share/run-reflection-share-image.ts</code> (no RPC). Screens still use the hook via <code>public-ritual-reflect</code>. Removed <code>runReflectionShareImage</code> and <code>DeliverReflectionShareImageOutcome</code> re-exports from <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Share orchestration is not on <code>public-rpc</code>; cross-context consumers should use the hook or domain module.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: presentation <code>PauseRepository</code> audit; optional <code>analytics-events</code> import guard.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

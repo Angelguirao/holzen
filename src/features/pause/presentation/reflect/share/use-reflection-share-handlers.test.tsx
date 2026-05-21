@@ -7,7 +7,7 @@ vi.mock('sonner', () => ({
   toast: Object.assign(vi.fn(), { error: vi.fn() }),
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
+vi.mock('@/features/pause/domain/reflect/share/run-reflection-share-image', () => ({
   runReflectionShareImage: vi.fn(async () => 'downloaded' as const),
 }));
 
