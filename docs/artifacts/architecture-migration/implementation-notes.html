@@ -12750,4 +12750,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflection-share-canvas → ritual/reflect/share (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate canvas PNG render with reflect share use cases</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves were already complete. Move <code>reflection-share-canvas.ts</code> from <code>domain/reflect/share/</code> to <code>application/use-cases/ritual/reflect/share/</code> beside <code>run-reflection-share-image</code> and <code>deliver-reflection-share-image</code> — <code>document.createElement('canvas')</code> is browser I/O (same rationale as prior deliver/ambience peels). Plain-text + channel URL builders stay in <code>domain/reflect/share/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>Prior note (deliver slice) left canvas in domain as “pure render”; canvas API is environment-bound, not domain-pure.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No dedicated canvas unit test — orchestrator test mocks sibling <code>./reflection-share-canvas</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Phase B: subscription/auth <code>src/lib/*</code> shims using pause as template.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

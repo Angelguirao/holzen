@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { runReflectionShareImage } from './run-reflection-share-image';
 
-vi.mock('@/features/pause/domain/reflect/share/reflection-share-canvas', () => ({
+vi.mock('./reflection-share-canvas', () => ({
   generateReflectionShareImage: vi.fn(async () => new Blob(['png'], { type: 'image/png' })),
 }));
 
