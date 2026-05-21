@@ -11382,4 +11382,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion feedback vote off public-rpc (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; frame vote write bypasses public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. After reflection_step peel (<code>d78dbf4e</code>), align <code>use-companion-feedback-vote</code> with reflect step hooks: <code>runLogCompanionFeedbackVote(supabasePauseAnalyticsRepository, …)</code>; remove <code>logPauseCompanionFeedbackVote</code> and unused <code>reflectionStepSessionStorage</code> re-export from <code>public-rpc</code>. Read path unchanged on <code>companion-feedback-vote-query</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>logPauseCompanionFullviewOpened</code> remains on <code>public-rpc</code> until fullview telemetry peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-fullview-telemetry</code> or colocate <code>use-staggered-reveal</code>; audit remaining companion <code>public-rpc</code> facades.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
