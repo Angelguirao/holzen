@@ -11819,4 +11819,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock companion library favorites + home/archive/brief port tests (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; remaining PauseRepository presentation sentinels</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Add <code>use-companion-library-favorites</code> tests (<code>runToggleCompanionLibraryFavorite</code> + <code>supabasePauseRepository</code>); replace empty <code>{}</code> repository mocks in <code>use-pause-session-brief-to-deep</code>, <code>use-bulk-hold-apply-outcomes</code>, and <code>use-archive-pause-retrospective-outcome</code> with hoisted port sentinel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Four presentation test files in one commit — closes the weak-mock cluster called out after brief-done check-in slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
