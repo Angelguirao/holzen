@@ -19,6 +19,7 @@ export {
   getCurrentPauseQueryOptions,
   type CurrentPauseRow,
 } from './infrastructure/queries/current-pause-query';
+export { subscribePauseInstancesForUser } from './infrastructure/realtime/pause-instances-realtime';
 export {
   getPendingPauseOfferQueryOptions,
   pendingPauseOfferQueryKey,
