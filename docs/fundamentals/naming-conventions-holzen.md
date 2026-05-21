@@ -56,7 +56,7 @@ Keep each barrel **small** (on the order of tens of exports, not hundreds). Pref
 
 ```text
 application/use-cases/
-  ritual/reflect/generation/run-reflect-generation.ts
+  ritual/reflect/generation/holzen-reflect/run-reflect-generation.ts
   ritual/frame/run-companion-slot-orchestrate.ts
   ritual/decide/run-pause-outcome-log.ts
   ritual/reflect/generation/manual-open/open-manual-pause-from-home.ts

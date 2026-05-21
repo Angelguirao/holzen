@@ -15,4 +15,4 @@ export { resolveEffectiveReflectionCopy } from '@/features/pause/domain/reflect/
 export {
   runReflectGeneration,
   type RunReflectGenerationInput,
-} from './run-reflect-generation';
+} from './holzen-reflect/run-reflect-generation';
