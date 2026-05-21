@@ -4899,7 +4899,26 @@
       <dt>Tradeoffs</dt>
       <dd>Other analytics helpers (fullview, PWA install, dev-mode) still import <code>public-ports</code> until peeled.</dd>
       <dt>Open questions</dt>
-      <dd>Next: explicit <code>runPauseCreateOrReuse</code> / <code>runPauseDismissCurrent</code> facades on <code>public-rpc</code> (backlog #4), or Phase B cross-context slice.</dd>
+      <dd>Next: <code>fetchPauseReflectReflectionText</code> on <code>public-rpc</code>, or explicit lifecycle facades (backlog #4).</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — wire reflection_text read via public-rpc (backlog #3 §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; ReflectGenerator reflection_text read facade</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move this slice. Add <code>fetchPauseReflectReflectionText</code> beside <code>fetchPauseReflectHaiku</code> on <code>public-rpc.ts</code> for parity; <code>run-reflect-generation</code> still uses the port inside the use case.</dd>
+      <dt>Deviation</dt>
+      <dd>None — no presentation hook switched yet; facade ready for conductors that need a cached <code>reflection_text</code> without invoking holzen-reflect.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Latest reflect step-event reads remain on <code>public-queries</code> (TanStack factories); infrastructure query modules keep direct <code>supabaseReflectGenerator</code> to avoid <code>public-rpc</code> ↔ infrastructure cycles.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire remaining <code>PauseRepository</code> stragglers (backlog #4), or Phase B cross-context slice per scheduling table.</dd>
     </dl>
   </article>
 

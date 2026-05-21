@@ -185,6 +185,13 @@ export function fetchPauseReflectHaiku(pauseInstanceId: string): Promise<string 
   return supabaseReflectGenerator.fetchHaikuText(pauseInstanceId);
 }
 
+/** Persisted reflection_text artifact read — wired `ReflectGenerator.fetchReflectionText`. */
+export function fetchPauseReflectReflectionText(
+  pauseInstanceId: string,
+): Promise<string | null> {
+  return supabaseReflectGenerator.fetchReflectionText(pauseInstanceId);
+}
+
 export type {
   CompanionFeedbackVote,
   LogCompanionFeedbackVoteInput,
