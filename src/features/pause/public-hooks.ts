@@ -260,7 +260,7 @@ export { useHolzenHomeContextState } from './presentation/home/use-holzen-home-c
 export {
   millisecondsUntilNextQuarterHour,
   PAUSE_CRON_QUARTER_INTERVAL_MS,
-} from './application/use-cases/scheduling/milliseconds-until-next-quarter-hour';
+} from './public-scheduling';
 export {
   pauseHomeErrorKind,
   pauseHomeErrorStrings,

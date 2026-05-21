@@ -9723,9 +9723,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; <code>public-trigger.ts</code> on branch for manual-trigger cooldown.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>use-holzen-home-context-state</code> still imports scheduling helpers from <code>application/use-cases/scheduling/</code> directly.</dd>
+      <dd>Scheduling quarter-hour math peeled in follow-up slice via <code>public-scheduling.ts</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: audit ritual <code>logPauseStep</code> call sites still bypassing <code>public-rpc</code> facades, or peel <code>use-holzen-home-context-state</code> scheduling import.</dd>
+      <dd>Next backlog #4: audit ritual <code>logPauseStep</code> call sites still bypassing <code>public-rpc</code> facades.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — public-scheduling barrel (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; Holzen home context uses scheduling barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — no reflect moves. Add <code>public-scheduling.ts</code> for quarter-hour cron math so <code>use-holzen-home-context-state</code> avoids <code>application/use-cases/scheduling/*</code> (cannot import <code>public-hooks</code> — circular with <code>useHolzenHomeContextState</code> export).</dd>
+      <dt>Deviation</dt>
+      <dd>None — same helper surface on <code>public-hooks</code> via re-export.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Composes with <code>public-home</code> and <code>public-trigger</code> slim barrels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: session presentation hooks still on direct <code>application/use-cases/session/*</code> imports.</dd>
     </dl>
   </article>
 
