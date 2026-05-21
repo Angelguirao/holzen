@@ -9064,4 +9064,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect backlog verified; frame retry + lazy-expand on public-rpc (#1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>No reflect folder moves; companion presentation drops two ritual/frame imports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — zero legacy reflect use-case paths. Continue backlog #4 §6 peel: re-export <code>applyCompanionOrchestrateRetryReset</code>, <code>resetInterventionIdempotency</code>, and <code>nextExpandedWithLazyFetch</code> on <code>public-rpc.ts</code>; <code>use-companion-orchestrate-retry</code> and <code>use-companion-section-expansion</code> import the barrel only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; pure frame helpers colocated with other companion orchestration exports on <code>public-rpc</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-companion-slot-run-orchestrate</code> still imports apply/outcome/telemetry/UI modules from <code>ritual/frame/*</code> directly until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: peel <code>use-companion-slot-run-orchestrate</code> frame imports, or audit mutations bypassing <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
