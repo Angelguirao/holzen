@@ -4,22 +4,14 @@ import type { TFunction } from 'i18next';
 import { usePauseFavoriteToggle } from './use-pause-favorite-toggle';
 import { showPauseFavoriteProHintToast } from '@/features/pause/presentation/reflect/steps/pause-favorite-pro-hint-toast';
 
-const { runPauseFavoriteToggleMock, invalidateQueriesMock, mockPauseRepository } = vi.hoisted(() => ({
-  runPauseFavoriteToggleMock: vi.fn(),
+const { pauseReflectFavoriteToggleMock, invalidateQueriesMock } = vi.hoisted(() => ({
+  pauseReflectFavoriteToggleMock: vi.fn(),
   invalidateQueriesMock: vi.fn(),
-  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: mockPauseRepository,
+vi.mock('./pause-reflect-steps-io', () => ({
+  pauseReflectFavoriteToggle: pauseReflectFavoriteToggleMock,
 }));
-
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle',
-  () => ({
-    runPauseFavoriteToggle: runPauseFavoriteToggleMock,
-  }),
-);
 
 vi.mock('@/features/pause/public-queries', () => ({
   pauseArchiveListQueryPrefix: (userId: string) => ['pause-archive', userId] as const,
@@ -47,8 +39,8 @@ const archiveListPrefix = (userId: string) => ['pause-archive', userId] as const
 const t = ((k: string) => k) as TFunction;
 
 beforeEach(() => {
-  runPauseFavoriteToggleMock.mockReset();
-  runPauseFavoriteToggleMock.mockResolvedValue({ status: 'success', newValue: true });
+  pauseReflectFavoriteToggleMock.mockReset();
+  pauseReflectFavoriteToggleMock.mockResolvedValue({ status: 'success', newValue: true });
   invalidateQueriesMock.mockClear();
   vi.mocked(showPauseFavoriteProHintToast).mockClear();
 });
@@ -69,7 +61,7 @@ describe('usePauseFavoriteToggle', () => {
       await result.current.toggleFavorite();
     });
     expect(setIsFavorite).not.toHaveBeenCalled();
-    expect(runPauseFavoriteToggleMock).not.toHaveBeenCalled();
+    expect(pauseReflectFavoriteToggleMock).not.toHaveBeenCalled();
   });
 
   it('optimistic toggle, RPC payload, and Pro hint when favoriting while not subscribed', async () => {
@@ -87,11 +79,10 @@ describe('usePauseFavoriteToggle', () => {
       await result.current.toggleFavorite();
     });
     expect(setIsFavorite).toHaveBeenCalledWith(true);
-    expect(runPauseFavoriteToggleMock).toHaveBeenCalledWith(mockPauseRepository, {
+    expect(pauseReflectFavoriteToggleMock).toHaveBeenCalledWith({
       pauseInstanceId: 'pi-1',
       isFavorite: false,
     });
-    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
     expect(showPauseFavoriteProHintToast).toHaveBeenCalledWith(t);
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: archiveListPrefix('archive-user-1'),
@@ -119,7 +110,7 @@ describe('usePauseFavoriteToggle', () => {
   });
 
   it('rolls back optimistic favorite when RPC fails', async () => {
-    runPauseFavoriteToggleMock.mockResolvedValueOnce({
+    pauseReflectFavoriteToggleMock.mockResolvedValueOnce({
       status: 'sync_failed',
       attemptedValue: true,
     });

@@ -1,10 +1,6 @@
 import { useEffect } from 'react';
-import { runPauseReflectionStepLogOnce } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
 import { shouldLogPauseReflectionStep } from '@/features/pause/domain/reflect/steps/reflection-step-log';
-import {
-  reflectionStepSessionStorage,
-  supabasePauseRepository,
-} from '@/features/pause/public-rpc';
+import { pauseReflectionStepLogOnce } from './pause-reflect-steps-io';
 
 /** Records `reflection_step` once per pause instance after reflect copy settles. */
 export function usePauseReflectionStepLog(input: {
@@ -28,11 +24,7 @@ export function usePauseReflectionStepLog(input: {
     }
 
     let cancelled = false;
-    void runPauseReflectionStepLogOnce(
-      supabasePauseRepository,
-      { pauseInstanceId: pauseInstanceId! },
-      { storage: reflectionStepSessionStorage },
-    ).then(() => {
+    void pauseReflectionStepLogOnce({ pauseInstanceId: pauseInstanceId! }).then(() => {
       if (cancelled) return;
       /* non-fatal — user can revisit Reflect to retry on sync_failed */
     });

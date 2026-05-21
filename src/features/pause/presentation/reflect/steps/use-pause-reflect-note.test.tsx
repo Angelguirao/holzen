@@ -2,21 +2,13 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { usePauseReflectNote } from './use-pause-reflect-note';
 
-const { runPauseReflectNoteUpdateMock, mockPauseRepository } = vi.hoisted(() => ({
-  runPauseReflectNoteUpdateMock: vi.fn(),
-  mockPauseRepository: { port: 'supabasePauseRepository' },
+const { pauseReflectNoteUpdateMock } = vi.hoisted(() => ({
+  pauseReflectNoteUpdateMock: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: mockPauseRepository,
+vi.mock('./pause-reflect-steps-io', () => ({
+  pauseReflectNoteUpdate: pauseReflectNoteUpdateMock,
 }));
-
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update',
-  () => ({
-    runPauseReflectNoteUpdate: runPauseReflectNoteUpdateMock,
-  }),
-);
 
 vi.mock('@/features/auth/public', () => ({
   useAuth: () => ({ user: null, loading: false }),
@@ -35,11 +27,11 @@ vi.mock('@/features/pause/public-queries', () => ({
 }));
 
 beforeEach(() => {
-  runPauseReflectNoteUpdateMock.mockReset().mockResolvedValue({ status: 'success' });
+  pauseReflectNoteUpdateMock.mockReset().mockResolvedValue({ status: 'success' });
 });
 
 describe('usePauseReflectNote', () => {
-  it('commits note blur via runPauseReflectNoteUpdate + PauseRepository', async () => {
+  it('commits note blur via pauseReflectNoteUpdate I/O', async () => {
     const { result } = renderHook(() => usePauseReflectNote('pause-1'));
 
     act(() => {
@@ -51,11 +43,10 @@ describe('usePauseReflectNote', () => {
     });
 
     await waitFor(() => {
-      expect(runPauseReflectNoteUpdateMock).toHaveBeenCalledWith(mockPauseRepository, {
+      expect(pauseReflectNoteUpdateMock).toHaveBeenCalledWith({
         pauseInstanceId: 'pause-1',
         text: 'steady breath',
       });
     });
-    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
   });
 });

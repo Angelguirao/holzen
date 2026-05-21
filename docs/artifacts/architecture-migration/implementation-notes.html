@@ -13605,4 +13605,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — bind reflect step RPC I/O (ritual/reflect steps cluster)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect presentation — tags, note, favorite, reflection_step off public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Folder move <code>reflect/</code> → <code>ritual/reflect/</code> was already complete. Add <code>presentation/reflect/steps/pause-reflect-steps-io.ts</code> as the bound import for <code>runPauseReflectTagUpdate</code>, <code>runPauseReflectNoteUpdate</code>, <code>runPauseFavoriteToggle</code>, and <code>runPauseReflectionStepLogOnce</code> (mirrors <code>pause-companion-analytics-io.ts</code> and tab session I/O).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving wiring only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Reflect generation, mood, hub, flows, and decide hooks still import <code>public-rpc</code> directly until later peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>presentation/reflect/generation/*</code> bound <code>ReflectGenerator</code> I/O module, <code>public-ritual-frame</code> barrel peel, or Phase B <code>src/lib/holzen-query-client-ref</code> shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
