@@ -7693,4 +7693,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel section expansion off public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>use-companion-section-expansion → ritual/frame lazy-fetch helper</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. <code>use-companion-section-expansion</code> imports pure <code>nextExpandedWithLazyFetch</code> from <code>application/use-cases/ritual/frame/</code>; <code>public-rpc</code> re-export unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Slot orchestrate action/retry hooks still import other <code>public-rpc</code> presentation helpers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-companion-slot-orchestrate-*</code> off <code>public-rpc</code> re-exports, or backlog #4 stray ritual log <code>PauseRepository</code> call sites.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
