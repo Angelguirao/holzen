@@ -14492,9 +14492,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Use case module still uses absolute import for market-context sibling; only the conductor path goes through <code>pause-home-io</code>.</dd>
+      <dd>Use case module still uses sibling import for market-context; only the conductor path goes through <code>pause-home-io</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next: bind <code>use-reflection-share-handlers</code> or <code>use-pause-reflect-generation</code> through cluster I/O modules.</dd>
+      <dd>Next: bind <code>use-reflection-share-handlers</code> through cluster I/O.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect share I/O binding (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>pauseReflectionShareImage on pause-reflect-share-io</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Mirror hub/ambience pattern: <code>pause-reflect-share-io.ts</code> wraps <code>runReflectionShareImage</code>; <code>use-reflection-share-handlers</code> imports I/O only (+ unit test on io module).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; domain share URL/text helpers unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-reflect-generation</code> still deep-imports <code>runReflectGeneration</code> until a follow-up generation I/O facade.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: extract manual-open context fingerprint to <code>ritual/reflect/generation/</code>, or Phase B <code>holzen-query-client-ref</code> shim.</dd>
     </dl>
   </article>
 

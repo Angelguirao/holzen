@@ -7,7 +7,7 @@ import {
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
 } from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';
-import { runReflectionShareImage } from '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image';
+import { pauseReflectionShareImage } from './pause-reflect-share-io';
 import type { UseReflectionShareHandlersParams } from './reflection-share-handler-types';
 
 export type { UseReflectionShareHandlersParams } from './reflection-share-handler-types';
@@ -27,7 +27,7 @@ export function useReflectionShareHandlers({
 
   const shareImage = useCallback(async () => {
     try {
-      const outcome = await runReflectionShareImage(message, context, haiku);
+      const outcome = await pauseReflectionShareImage(message, context, haiku);
       if (outcome === 'downloaded') {
         toast(t('share.imageDownloaded'));
       }
