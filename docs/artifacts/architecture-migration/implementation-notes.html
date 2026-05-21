@@ -15558,7 +15558,26 @@
       <dt>Tradeoffs</dt>
       <dd>One extra Home presentation file vs the prior single-barrel consolidation — matches <code>presentation/reflect/telemetry/pause-reflect-telemetry-io.ts</code> cluster boundary.</dd>
       <dt>Open questions</dt>
-      <dd>Next: lifecycle create/dismiss use cases on <code>public-rpc</code>, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: lifecycle create/dismiss facades on <code>public-rpc</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — session breath timed loop via pause-session-breath-io (Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; breath presentation I/O peel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete on <code>cursor/arch-migrate-src-ca70</code> — no reflect folder moves. Extend <code>presentation/session/breath/pause-session-breath-io.ts</code> with phase-advance, breathing phase type, ritual-audio cues, and second-label variant helpers; <code>use-pause-breathing-timed-loop</code> and <code>use-pause-session-breath-second-label-variant</code> import I/O only (follow-up to ritual-restore-io).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; re-exports only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-ritual-restore-io</code> still re-exports <code>restored-breath-ritual-state</code> directly — optional merge into breath I/O later.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B cross-context Tier 1 shim, or merge breath restore helpers into <code>pause-session-breath-io</code>.</dd>
     </dl>
   </article>
 

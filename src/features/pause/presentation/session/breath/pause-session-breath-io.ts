@@ -1,3 +1,24 @@
+/**
+ * Presentation I/O for `/pause` breath segment RPC + timed breathing UI.
+ * Session breath hooks import here instead of deep `application/use-cases/ritual/breathe/*`.
+ */
+export {
+  computeBreathingPhaseAdvance,
+  resolveBreathingCompleted,
+  resolveBreathingPhaseAdvanceOutcome,
+} from '@/features/pause/application/use-cases/ritual/breathe/phase-advance';
+export type { PauseBreathingPhase } from '@/features/pause/application/use-cases/ritual/breathe/pause-breathing-phase';
+export {
+  playPauseBreathPatternCompleteCue,
+  playPauseBreathPhaseCue,
+  resumePauseAudioContext,
+} from '@/features/pause/application/use-cases/ritual/breathe/ritual-audio';
+export {
+  resolvePauseBreathSecondLabelVariant,
+  viteWantsPauseBreathSecondLabelShift,
+  type PauseBreathSecondLabelVariant,
+} from '@/features/pause/application/use-cases/ritual/breathe/breath-second-label-variant';
+
 import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 import {
   runEnsureBreathSegment1Logged,

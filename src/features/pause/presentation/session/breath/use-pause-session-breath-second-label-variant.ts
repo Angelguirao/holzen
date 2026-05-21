@@ -1,9 +1,9 @@
 import { useFeatureFlag } from '@/app/hooks/use-feature-flag';
 import {
   resolvePauseBreathSecondLabelVariant,
-  type PauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
-} from '@/features/pause/application/use-cases/ritual/breathe/breath-second-label-variant';
+  type PauseBreathSecondLabelVariant,
+} from './pause-session-breath-io';
 
 /** PostHog `pause.step5_breath_label_shift` + optional Vite override → scaffold breath label variant. */
 export function usePauseSessionBreathSecondLabelVariant(): PauseBreathSecondLabelVariant {

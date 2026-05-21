@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/features/market/public';
-import type { PauseBreathSecondLabelVariant } from '@/features/pause/application/use-cases/ritual/breathe/breath-second-label-variant';
+import type { PauseBreathSecondLabelVariant } from '@/features/pause/presentation/session/breath/pause-session-breath-io';
 import type { BriefPauseStep } from '@/features/pause/domain/ritual-types';
 import type { PauseSessionStepHandlersProvidersSlice } from '../pause-session-step-handler-types';
 
