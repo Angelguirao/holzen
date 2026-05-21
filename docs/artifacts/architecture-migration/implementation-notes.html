@@ -59,21 +59,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
-      <span>Phase A slice — session decide I/O direct restored-decide-ritual-state (backlog #1 follow-up, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-session-decide-io</code> imports decide hydration from ritual/decide use case</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. <code>pause-session-decide-io</code> imports <code>initialDecisionFromRestored</code> and <code>initialPhaseFromRestored</code> from <code>ritual/decide/restored-decide-ritual-state</code> instead of <code>pause-session-decide-flow</code> session CI anchor (parity with <code>pause-session-frame-io</code> peel).</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior parity; import boundary only.</dd>
-      <dt>Tradeoffs</dt>
-      <dd><code>pause-session-decide-flow.ts</code> remains for <code>check:architecture-alignment</code>; presentation no longer routes through it.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: peel <code>pause-session-scaffold-io</code> or <code>pause-session-brief-io</code> from session flow anchors.</dd>
-=======
       <span>Phase A slice — session scaffold I/O direct session use cases (Phase A follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -86,8 +71,26 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-session-scaffold-flow.ts</code> remains for <code>check:architecture-alignment</code> scaffold cluster detection.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-session-brief-io</code> or <code>pause-session-decide-io</code> peel from flow anchors, or Phase B cross-context Tier 1 shim.</dd>
->>>>>>> e75b78af (refactor(pause): peel session scaffold I/O off scaffold-flow anchor)
+      <dd>Next: <code>pause-session-brief-io</code> peel from flow anchor, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — session decide I/O direct restored-decide-ritual-state (backlog #1 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-decide-io</code> imports decide hydration from ritual/decide use case</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. <code>pause-session-decide-io</code> imports <code>initialDecisionFromRestored</code> and <code>initialPhaseFromRestored</code> from <code>ritual/decide/restored-decide-ritual-state</code> instead of <code>pause-session-decide-flow</code> session CI anchor (parity with <code>pause-session-frame-io</code> peel).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-decide-flow.ts</code> remains for <code>check:architecture-alignment</code>; presentation no longer routes through it.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-session-brief-io</code> from session flow anchors.</dd>
     </dl>
   </article>
 
