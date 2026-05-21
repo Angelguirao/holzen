@@ -12370,4 +12370,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect share image use case under ritual/reflect/share/ (backlog #1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>run-reflection-share-image</code> off <code>domain/reflect/share/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 legacy <code>application/use-cases/reflect/</code> was already complete. Browser share/download orchestration is an application use case (canvas render + delivery), not domain policy — colocate under <code>application/use-cases/ritual/reflect/share/</code>. Pure text/URL builders and canvas/delivery helpers stay in <code>domain/reflect/share/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Two files moved + presentation import updates; no <code>public-ritual-reflect</code> re-export (screens use <code>useReflectionShareHandlers</code> only).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional PostHog reads behind <code>PauseAnalyticsRepository</code>, reflect generation port-lock parity file, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
