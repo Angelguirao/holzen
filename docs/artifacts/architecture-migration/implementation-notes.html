@@ -8817,4 +8817,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — fullview telemetry port-backed in presentation (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; companion fullview hook uses analytics port directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no reflect folder moves. <code>use-fullview-telemetry</code> calls <code>runLogCompanionFullviewOpened</code> with <code>supabasePauseAnalyticsRepository</code> from <code>infrastructure/</code> (same pattern as <code>companion-feedback-vote-query</code> after <code>public-ports.ts</code> removal). <code>logPauseCompanionFullviewOpened</code> facade on <code>public-rpc</code> unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation companion hook imports infrastructure adapter; screens still use <code>public-hooks</code> re-export only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: intervention bootstrap thin runner on <code>public-rpc</code>, or audit stray mutations bypassing <code>PauseRepository</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
