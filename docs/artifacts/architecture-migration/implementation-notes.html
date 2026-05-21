@@ -4941,4 +4941,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion fullview analytics via public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; fullview telemetry on PauseAnalyticsRepository facade</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Add <code>logPauseCompanionFullviewOpened</code> on <code>public-rpc.ts</code> (parity with feedback vote); <code>use-fullview-telemetry</code> imports the facade; <code>companion-fullview-analytics.ts</code> delegates to <code>public-rpc</code> so <code>public-queries</code> re-export stays stable for admin.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; event name <code>companion_fullview_opened</code> unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>PWA install + dev-mode analytics still route through <code>public-ports</code> in infrastructure query modules until next peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>logPausePwaInstall*</code> / <code>logPauseDevModeSetting</code> facades on <code>public-rpc</code>, or <code>logPauseCompanion</code> export for frame paths outside <code>persistCompanionUiStepCompletion</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
