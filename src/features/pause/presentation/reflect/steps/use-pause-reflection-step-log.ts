@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { shouldLogPauseReflectionStep } from '@/features/pause/domain/reflect/steps/reflection-step-log';
 import { runPauseReflectionStepLogOnce } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
+import { shouldLogPauseReflectionStep } from '@/features/pause/domain/reflect/steps/reflection-step-log';
 import {
   reflectionStepSessionStorage,
   supabasePauseRepository,
