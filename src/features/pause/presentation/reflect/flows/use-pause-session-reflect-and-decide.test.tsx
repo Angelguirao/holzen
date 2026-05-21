@@ -39,7 +39,7 @@ vi.mock('../generation/use-pause-reflect-generation', () => ({
   usePauseReflectGeneration: usePauseReflectGenerationMock,
 }));
 
-vi.mock('../../decide/use-pause-session-decide-handler', () => ({
+vi.mock('./use-pause-session-decide-handler', () => ({
   usePauseSessionDecideHandler: usePauseSessionDecideHandlerMock,
 }));
 

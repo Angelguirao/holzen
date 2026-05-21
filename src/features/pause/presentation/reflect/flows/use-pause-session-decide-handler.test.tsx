@@ -101,6 +101,7 @@ describe('usePauseSessionDecideHandler', () => {
       mockPauseRepository,
       { pauseInstanceId: null, decision: 'hold' },
     );
+    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
     expect(invalidatePauseStatsMock).not.toHaveBeenCalled();
     expect(input.setDecision).toHaveBeenCalledWith('hold');
     expect(clearSessionMock).toHaveBeenCalled();
@@ -119,6 +120,7 @@ describe('usePauseSessionDecideHandler', () => {
       mockPauseRepository,
       { pauseInstanceId: 'pi-1', decision: 'hold' },
     );
+    expect(mockPauseRepository.port).toBe('supabasePauseRepository');
     expect(invalidatePauseStatsMock).not.toHaveBeenCalled();
     expect(input.refreshSubscription).toHaveBeenCalled();
     expect(input.setDecision).toHaveBeenCalledWith('hold');
