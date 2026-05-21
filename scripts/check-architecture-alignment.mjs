@@ -117,6 +117,17 @@ const PAUSE_INSTANCE_METADATA_CLIENT_IMPORT_NEEDLES = [
   "from '../pause-instance-metadata-client'",
 ];
 
+const PAUSE_RPC_LIFECYCLE_TELEMETRY_ALLOWLIST = new Set([
+  'src/features/pause/infrastructure/pause-rpc-lifecycle-telemetry.ts',
+  'src/features/pause/infrastructure/pause-rpc-lifecycle-telemetry.test.ts',
+  'src/features/pause/infrastructure/pause-rpc-client.ts',
+]);
+const PAUSE_RPC_LIFECYCLE_TELEMETRY_IMPORT_NEEDLES = [
+  "from '@/features/pause/infrastructure/pause-rpc-lifecycle-telemetry",
+  "from './pause-rpc-lifecycle-telemetry'",
+  "from '../pause-rpc-lifecycle-telemetry'",
+];
+
 for (const file of walkTs(join(root, 'src'))) {
   const rel = relative(root, file).replace(/\\/g, '/');
   if (rel.startsWith('legacy/')) continue;
@@ -171,6 +182,16 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: direct pause-instance-metadata-client import (${needle}) — use PauseRepository.toggleCompanionSlotFavorite via supabase-pause-repository`,
+        );
+        break;
+      }
+    }
+  }
+  if (!PAUSE_RPC_LIFECYCLE_TELEMETRY_ALLOWLIST.has(rel)) {
+    for (const needle of PAUSE_RPC_LIFECYCLE_TELEMETRY_IMPORT_NEEDLES) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: direct pause-rpc-lifecycle-telemetry import (${needle}) — keep PostHog RPC side effects inside pause-rpc-client`,
         );
         break;
       }
