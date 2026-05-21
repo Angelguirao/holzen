@@ -1,4 +1,4 @@
-import { useCallback, forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Share2, Copy, Image, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,9 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { toast } from 'sonner';
-import { SITE_ORIGIN } from '@/config/site';
-import { buildReflectionShareText, generateReflectionShareImage } from '@/features/pause/public-hooks';
+import { useReflectionShareHandlers } from '@/features/pause/public-hooks';
 
 interface Props {
   message: string;
@@ -24,56 +22,8 @@ interface Props {
 export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
   function ShareReflection({ message, context, haiku, onMenuOpen }, ref) {
     const { t } = useTranslation();
-
-    const copyText = useCallback(async () => {
-      const text = buildReflectionShareText(message);
-      await navigator.clipboard.writeText(text);
-      toast(t('share.copied'));
-    }, [message, t]);
-
-    const shareImage = useCallback(async () => {
-      try {
-        const blob = await generateReflectionShareImage(message, context, haiku);
-        const file = new File([blob], 'holzen-reflection.png', { type: 'image/png' });
-
-        if (navigator.share && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: 'Holzen Reflection',
-          });
-        } else {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'holzen-reflection.png';
-          a.click();
-          URL.revokeObjectURL(url);
-          toast(t('share.imageDownloaded'));
-        }
-      } catch (e: unknown) {
-        if (!(e instanceof DOMException && e.name === 'AbortError')) {
-          toast.error(t('share.couldNotShareImage'));
-        }
-      }
-    }, [message, context, haiku, t]);
-
-    const shareToX = useCallback(() => {
-      const text = buildReflectionShareText(message);
-      const url = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }, [message]);
-
-    const shareToWhatsApp = useCallback(() => {
-      const text = buildReflectionShareText(message);
-      const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }, [message]);
-
-    const shareToTelegram = useCallback(() => {
-      const text = buildReflectionShareText(message);
-      const url = `https://t.me/share/url?url=${encodeURIComponent(SITE_ORIGIN)}&text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }, [message]);
+    const { copyText, shareImage, shareToX, shareToWhatsApp, shareToTelegram } =
+      useReflectionShareHandlers({ message, context, haiku, t });
 
     return (
       <DropdownMenu

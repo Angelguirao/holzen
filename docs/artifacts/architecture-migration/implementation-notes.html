@@ -7392,4 +7392,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect share conductor under presentation/reflect/share (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Extract ShareReflection menu handlers; pure channel URLs in domain</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 application paths under <code>ritual/reflect/share/</code> were complete. Follow-up Tier 4: move copy/image/social handlers from <code>ShareReflection</code> screen into <code>presentation/reflect/share/use-reflection-share-handlers</code>; encode X/WhatsApp/Telegram URLs in <code>domain/reflect/share/reflection-share-channel-urls.ts</code>. Screen imports hook via <code>public-hooks</code>; canvas + plain-text helpers unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Screen remains responsible for dropdown chrome; hook owns clipboard, native share, and window.open flows.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 remaining <code>public-rpc</code> peels (e.g. home preview dismiss direct use-case import) or companion feedback vote write path audit.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
