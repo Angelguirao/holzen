@@ -1,5 +1,5 @@
 import { createContext, createElement, useContext, type ReactNode } from 'react';
-import { useHolzenHomeContextState } from '@/features/pause/public-hooks';
+import { useHolzenHomeContextState } from '@/features/pause/public-home';
 
 export type HolzenContextValue = ReturnType<typeof useHolzenHomeContextState>;
 

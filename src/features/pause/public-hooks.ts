@@ -186,21 +186,17 @@ export {
   currentPauseQueryKey,
   type CurrentPauseRow,
 } from './presentation/archive/use-current-pause';
-export { useOpenPauseHomePreview } from './presentation/home/use-open-pause-home-preview';
 export {
+  useOpenPauseHomePreview,
   useManualPauseTrigger,
   type UseManualPauseTriggerParams,
-} from './presentation/home/use-manual-pause-trigger';
-export {
   useHolzenManualTriggerOrchestration,
   type UseHolzenManualTriggerOrchestrationParams,
-} from './presentation/home/use-holzen-manual-trigger-orchestration';
-export {
   useHomePauseActions,
   type PauseDismissAnalyticsSurface,
   usePauseContextHomePreviews,
+  useHolzenHomeContextState,
 } from './public-home';
-export { useHolzenHomeContextState } from './presentation/home/use-holzen-home-context-state';
 export {
   millisecondsUntilNextQuarterHour,
   PAUSE_CRON_QUARTER_INTERVAL_MS,
