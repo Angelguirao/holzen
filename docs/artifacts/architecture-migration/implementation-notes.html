@@ -14289,4 +14289,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — backlog #1 verified; pending-offer mutations on public-session</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect → ritual/reflect/ complete; §6 session barrel peel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified — zero legacy reflect use-case paths; <code>run-persist-silent-reflection-stub</code> already under <code>ritual/reflect/generation/</code>. Continue backlog #3 §6: export <code>usePendingPauseOfferMutations</code> from <code>public-session.ts</code>; <code>PendingPauseOfferShell</code> imports <code>public-session</code>; <code>public-hooks</code> re-exports for transitional callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — import paths only; I/O still bound in <code>presentation/session/pause-session-pending-offer-io.ts</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Leave sheet conductor still imports the hook from a sibling presentation path (session-internal).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>holzen-query-client-ref</code> shim for pause query invalidation helpers.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
