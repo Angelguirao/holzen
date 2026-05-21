@@ -198,8 +198,8 @@ export {
 export {
   useHomePauseActions,
   type PauseDismissAnalyticsSurface,
-} from './presentation/home/use-home-pause-actions';
-export { usePauseContextHomePreviews } from './presentation/home/use-pause-context-home-previews';
+  usePauseContextHomePreviews,
+} from './public-home';
 export { useHolzenHomeContextState } from './presentation/home/use-holzen-home-context-state';
 export {
   millisecondsUntilNextQuarterHour,

@@ -1,7 +1,7 @@
 /**
  * Home pause widget read-model helpers (no Supabase).
  * Scheduling quarter-hour math: `public-scheduling`. Pending-offer read + completed count + dismiss outlet live here (§6 peel).
- * Presentation imports barrels, not `application/*`.
+ * Screens/home import here; pause/archive may use `public-hooks`. Presentation imports barrels, not `application/*`.
  */
 export {
   resolvePauseArrivalToneAction,
@@ -66,3 +66,8 @@ export {
   getPendingPauseOfferDisplay,
   type PendingPauseOfferDisplay,
 } from './application/use-cases/pending-offer/pending-pause-offer-display';
+export {
+  useHomePauseActions,
+  type PauseDismissAnalyticsSurface,
+} from './presentation/home/use-home-pause-actions';
+export { usePauseContextHomePreviews } from './presentation/home/use-pause-context-home-previews';

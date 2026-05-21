@@ -14159,19 +14159,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A — public-home cluster 2b (backlog #1 verified)</span>
+      <span>Phase A — public-home cluster 2b complete (backlog #1 verified)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Reflect ritual use cases complete; home pending-offer + counts on public-home</h3>
+    <h3>Reflect ritual use cases complete; home pause surface on public-home</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete on <code>cursor/arch-migrate-src-ca70</code> — no legacy reflect paths. Export <code>useCompletedPauseCount</code>, <code>useDismissOutletPauseReady</code>, <code>usePendingPauseOffer</code>, and <code>getPendingPauseOfferDisplay</code> from <code>public-home.ts</code>; <code>screens/home/*</code> and archive <code>CurrentPauseCard</code> import <code>public-home</code>; <code>public-hooks</code> re-exports for pause/archive/legacy callers.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete on <code>cursor/arch-migrate-src-ca70</code> — no legacy reflect paths. Export <code>useCompletedPauseCount</code>, <code>useDismissOutletPauseReady</code>, <code>usePendingPauseOffer</code>, <code>getPendingPauseOfferDisplay</code>, <code>useHomePauseActions</code>, and <code>usePauseContextHomePreviews</code> from <code>public-home.ts</code>; <code>screens/home/*</code> and archive <code>CurrentPauseCard</code> import <code>public-home</code>; <code>public-hooks</code> re-exports for pause shell and legacy callers.</dd>
       <dt>Deviation</dt>
       <dd>None — import paths only; pending-offer hooks stay under <code>presentation/session/</code> (session shell + home card share the query).</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>usePendingPauseOfferMutations</code> and session home conductors (<code>useHomePauseActions</code>, <code>usePauseContextHomePreviews</code>) remain on <code>public-hooks</code> until a follow-up peel.</dd>
+      <dd><code>usePendingPauseOfferMutations</code> stays on <code>public-hooks</code> (pause session shell only).</dd>
       <dt>Open questions</dt>
-      <dd>Next: export <code>useHomePauseActions</code> on <code>public-home</code>, Phase B <code>holzen-query-client-ref</code> shim, or companion feedback vote port path.</dd>
+      <dd>Next: Phase B <code>holzen-query-client-ref</code> shim, peel PWA install analytics for <code>InstallHolzenCard</code> → <code>public-queries</code>, or companion feedback vote port path.</dd>
     </dl>
   </article>
 
