@@ -9292,4 +9292,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — archive list UI helpers on public-queries (backlog #1 done, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ verified; use-pause-archive-list peels application import</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no reflect moves. Re-export pure infinite-query helpers (<code>buildPauseArchiveInfiniteInitialData</code>, <code>isPauseArchiveListInitialLoading</code>) on <code>public-queries</code> beside archive fetch keys; <code>use-pause-archive-list</code> imports query barrel only (matches retrospective outcome §6 peel).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Helpers remain in <code>application/use-cases/archive/</code> — barrel re-export only, no domain move (UI projection for TanStack infinite lists).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: port-backed analytics read for companion feedback vote fetch, or audit ritual mutations outside <code>public-rpc</code> facades.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

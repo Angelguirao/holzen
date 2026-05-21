@@ -3,17 +3,15 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/public';
 import {
-  buildPauseArchiveInfiniteInitialData,
-  isPauseArchiveListInitialLoading,
-} from '@/features/pause/application/use-cases/archive/pause-archive-list-ui-state';
-import {
   readJsonLocalStorage,
   writeJsonLocalStorage,
 } from '@/features/pause/infrastructure/json-local-storage';
 import {
   PAUSE_ARCHIVE_PAGE_SIZE,
+  buildPauseArchiveInfiniteInitialData,
   fetchPauseArchivePage,
   getPauseArchiveInfiniteQueryDefaults,
+  isPauseArchiveListInitialLoading,
   pauseArchiveInfiniteQueryKey,
   pauseArchiveStorageCacheKey,
   type PauseArchiveListSort,
