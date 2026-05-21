@@ -2,12 +2,14 @@ import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
 } from '@/features/pause/domain/manual-pause-trigger-result';
-import type { OpenManualPauseFromHomeResult } from './pause-home-reflect-io';
+import type {
+  OpenManualPauseFromHomeResult,
+  TrackManualPauseInstanceCreatedPayload,
+  TrackPauseManualCompletedPayload,
+} from './pause-home-manual-open-types';
 import {
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
-  type TrackManualPauseInstanceCreatedPayload,
-  type TrackPauseManualCompletedPayload,
 } from './pause-home-telemetry-io';
 
 export type ManualPauseHomePreviewPorts = {
