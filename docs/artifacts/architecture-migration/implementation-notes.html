@@ -6993,4 +6993,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel reflect artifact hydrate hooks off public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Artifact haiku + reflection_text reads via ReflectGenerator port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. After step conductors peeled (<code>a0fc8ba5</code>), <code>use-pause-artifact-haiku</code> and <code>use-pause-artifact-reflection-text</code> call <code>supabaseReflectGenerator.fetchHaikuText</code> / <code>fetchReflectionText</code> from <code>public-ports</code>; <code>fetchPauseReflect*</code> facades on <code>public-rpc</code> unchanged for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-reflect-generation</code> and <code>use-pause-shift-frame-done-handler</code> still import <code>public-rpc</code> until the next peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel holzen-reflect generation + frame-hub shift done conductors, or companion retry presentation cluster.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
