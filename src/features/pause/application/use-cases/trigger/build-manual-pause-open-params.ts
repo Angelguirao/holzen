@@ -5,6 +5,7 @@ import {
   severityFromBtcChangePercent,
   trackedAssetSymbol,
 } from '@/features/market/public';
+import { buildSilentReflectionStubMessage } from '@/features/pause/domain/reflect/generation/build-silent-reflection-stub-message';
 import type { OpenManualPauseFromHomeParams } from './open-manual-pause-from-home';
 
 export type ManualPauseMarketContext = {
@@ -31,7 +32,7 @@ export function buildManualPauseMarketContext(
           (x) => typeof x === 'number' && Number.isFinite(x),
         ) as number[]).join(':') || null
       : null;
-  const silentMsg = `${assetSym} moved.`;
+  const silentMsg = buildSilentReflectionStubMessage(assetSym);
 
   return { assetId, ctx, severityBand, onChainBand, silentMsg };
 }
