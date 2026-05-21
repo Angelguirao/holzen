@@ -1,18 +1,14 @@
-import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-log-flow';
 import {
   formatReinforcementQuoteFromSession,
+  getSessionQuote,
   resolvePauseDecideOutcomeFlow,
-} from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-flow';
-import {
-  showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
-} from '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-toast-flow';
-import { getSessionQuote } from '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes';
-import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
+  runPauseOutcomeLog,
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
   type PauseSessionReflectAndDecideViewInput,
-} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-session-reflect-and-decide-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
