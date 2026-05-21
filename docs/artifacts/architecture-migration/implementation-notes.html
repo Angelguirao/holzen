@@ -5264,4 +5264,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflection share canvas in presentation (backlog #1 adjacent, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>generateReflectionShareImage</code> → <code>presentation/reflect/share/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Follow-up to <code>domain/reflect/share/reflection-share-text</code>. Browser canvas PNG builder moves from <code>screens/pause/lib/</code> to <code>presentation/reflect/share/</code>; <code>ShareReflection</code> imports both share helpers via <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving file move only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Canvas stays presentation (DOM API), not domain — matches reflect beat grouping without polluting pure domain.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 wire remaining analytics/infrastructure reads through ports without bloating <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
