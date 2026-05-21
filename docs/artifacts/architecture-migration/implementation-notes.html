@@ -4399,7 +4399,7 @@
     <h3>Backlog #1 complete; holzen-reflect prerequisite gate colocated with domain reflect types</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move pure <code>reflectGenerationPrerequisite</code> to <code>domain/reflect-generation-prerequisites.ts</code>; <code>use-pause-reflect-generation</code> and <code>reflect-generation-hook-flow</code> import domain. Re-export <code>ReflectRecencyHints</code> types from <code>domain/reflect-recency-hints</code> on <code>public-queries</code> (replacing infrastructure query re-export).</dd>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move pure <code>reflectGenerationPrerequisite</code> to <code>domain/reflect-generation-prerequisites.ts</code>; <code>use-pause-reflect-generation</code> and <code>reflect-generation-hook-flow</code> import domain. <code>ReflectRecencyHints</code> types live in <code>domain/reflect-recency-hints</code> (no <code>public-queries</code> re-export).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
@@ -4501,6 +4501,25 @@
       <dd>Toast helper is presentation-only (Sonner + i18n); use cases stay free of UI dependencies.</dd>
       <dt>Open questions</dt>
       <dd>Next: wire remaining stray <code>PauseRepository</code> call sites (backlog #4 remainder), or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect port adapter barrel (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ReflectGenerator leaves public-queries</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 <code>ritual/reflect/</code> and prior peels were already on <code>cursor/arch-migrate-src-ca70</code>. Add <code>public-ports.ts</code> for <code>supabaseReflectGenerator</code>; remove reflect port adapter from <code>public-queries.ts</code>. <code>use-pause-reflect-generation</code> and <code>use-pause-artifact-haiku</code> import the default adapter via <code>public-ports</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>public-queries</code> stays query factories + <code>supabaseCompanionOrchestrator</code> until companion peel.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>One more in-feature public barrel; screens still use <code>public-hooks</code> only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>supabaseCompanionOrchestrator</code> to <code>public-ports</code>, or wire remaining stray <code>PauseRepository</code> call sites (backlog #4).</dd>
     </dl>
   </article>
 
