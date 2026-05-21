@@ -14102,7 +14102,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
       <span>Phase A slice — scaffold-ritual-derived to session/scaffold (backlog #1 incremental)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -14116,21 +14115,25 @@
       <dd><code>use-pause-session-scaffold-ritual</code> still imports derived builder from use-case path directly (not <code>public-session</code>) — acceptable until a typed re-export is needed cross-context.</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>public-home</code> cluster 2 (bulk-hold + pending-offer) or peel duplicate <code>pauseStepLayout</code> off <code>public-hooks</code>.</dd>
-=======
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A — public-home cluster 2 (bulk-hold)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Home bulk-hold reads off public-home; reflect scaffold presentation empty</h3>
+    <h3>Home bulk-hold reads off public-home</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Export bulk-hold hooks, domain formatters, and <code>groupBulkHoldByLocalDay</code> from <code>public-home.ts</code>; <code>screens/home/*</code> import <code>public-home</code>; <code>public-hooks</code> re-exports for transitional callers. Drop <code>mustExist</code> for <code>presentation/reflect/scaffold/</code> after persist/sync conductors moved to <code>presentation/session/scaffold/</code>.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Export bulk-hold hooks, domain formatters, and <code>groupBulkHoldByLocalDay</code> from <code>public-home.ts</code>; <code>screens/home/*</code> import <code>public-home</code>; <code>public-hooks</code> re-exports for transitional callers.</dd>
       <dt>Deviation</dt>
-      <dd>None — import paths + CI guard alignment only.</dd>
+      <dd>None — import paths only.</dd>
       <dt>Tradeoffs</dt>
       <dd><code>usePendingPauseOffer</code> and session home hooks still on <code>public-hooks</code>; next peel pending-offer for pause screens or a dedicated barrel.</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>public-home</code> cluster 2b (pending-offer + completed count + dismiss outlet) or Phase B <code>holzen-query-client-ref</code> shim.</dd>
->>>>>>> a9dfa2a6 (refactor(pause): export bulk-hold home surface on public-home)
     </dl>
   </article>
 
