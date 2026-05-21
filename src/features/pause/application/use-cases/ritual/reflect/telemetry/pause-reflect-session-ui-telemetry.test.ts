@@ -3,7 +3,7 @@ import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
-} from './pause-reflect-ui-telemetry';
+} from './pause-reflect-session-ui-telemetry';
 
 const trackEvent = vi.fn();
 
@@ -11,7 +11,7 @@ vi.mock('@/lib/posthog', () => ({
   trackEvent: (...args: unknown[]) => trackEvent(...args),
 }));
 
-describe('pause-reflect-ui-telemetry', () => {
+describe('pause-reflect-session-ui-telemetry', () => {
   beforeEach(() => {
     trackEvent.mockClear();
   });
