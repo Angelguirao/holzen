@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — companion orchestration I/O direct frame modules (backlog #2 follow-up, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestration-io</code> imports session load and favorites from sibling <code>ritual/frame/*</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>ritual/frame/</code>) remains complete on this branch. <code>pause-companion-orchestration-io</code> imports <code>loadCompanionOrchestrateSession</code>, <code>nextExpandedWithLazyFetch</code>, <code>persistCompanionUiStepCompletion</code>, and <code>runToggleCompanionLibraryFavorite</code> from sibling frame modules instead of <code>pause-companion-orchestration-flow</code> CI anchor. <code>pause-companion-orchestrate-io</code> already imports orchestrate/intervention helpers directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-companion-orchestration-flow.ts</code> remains for <code>check:architecture-alignment</code>; mirrors reflect steps/flows I/O peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect mood I/O peel from <code>pause-reflect-mood-flow</code> to domain + <code>run-initial-emotion-log</code>, or session conductor flow anchors outside shell/scaffold/brief I/O.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect share I/O direct domain + run-reflection-share-image (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-reflection-share-flow</code> remains for <code>check:architecture-alignment</code> share cluster detection.</dd>
       <dt>Open questions</dt>
-      <dd>Next: companion orchestration-io direct frame imports, or session conductor flow-anchor peels.</dd>
+      <dd>Next: session conductor flow-anchor peels outside shell/scaffold/brief I/O.</dd>
     </dl>
   </article>
 
