@@ -11667,4 +11667,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A — backlog #1 verified; §10.1 ports row reconciled (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete — no folder move; doc matches on-disk port wiring</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete on <code>cursor/arch-migrate-src-ca70</code> — CI forbids legacy paths; all reflect use cases live under <code>application/use-cases/ritual/reflect/</code> (generation, steps, mood, hub). No code move this slice.</dd>
+      <dt>Deviation</dt>
+      <dd>§10.1 <strong>Ports</strong> row had drifted (still claimed <code>logPauseCompanion</code>, companion orchestrate, and <code>loadSession</code> on <code>public-rpc</code>). Reconciled to on-disk: presentation → <code>infrastructure/supabase-*</code>; <code>public-rpc</code> = adapters + grounding-enrich + outcome/step-sync toasts only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Left <code>pause-rpc-lifecycle-telemetry</code> (PostHog dedupe inside <code>pause-rpc-client</code>) as optional backlog #4 — not a <code>PauseRepository</code> mutation.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4 slice: optional analytics-port consolidation, or touch <code>client-src-layout.md</code> § pause mutations table if a full-doc pass is scheduled.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
