@@ -1,0 +1,48 @@
+import { applyCompanionSlotOrchestrateOutcome } from '@/features/pause/application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome';
+import type { CompanionOrchestrateSessionContext } from '@/features/pause/application/use-cases/ritual/frame/build-companion-orchestrate-body';
+import { logCompanionSlotOrchestrateInvoke } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry';
+import { trackCompanionGenerationInitiated } from '@/features/pause/application/use-cases/ritual/frame/companion-generation-telemetry';
+import type { ApplyCompanionSlotOrchestrateFailureUiPorts } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-failure-ui';
+import {
+  setCompanionSlotError,
+  setCompanionSlotLoading,
+  type CompanionSlotErrorSetters,
+  type CompanionSlotLoadingSetters,
+} from '@/features/pause/application/use-cases/ritual/frame/companion-slot-ui-state';
+import type {
+  CompanionSlotAutosaveParams,
+  CompanionSlotCacheIds,
+  CompanionSlotCommitters,
+  CompanionSlotRelaxations,
+} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
+import {
+  runCompanionSlotOrchestrate,
+  type CompanionSlotOrchestrateMode,
+} from '@/features/pause/application/use-cases/ritual/frame/run-companion-slot-orchestrate';
+import { runCompanionInterventionBootstrap } from '@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
+import type { RunCompanionInterventionBootstrapPorts } from '@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
+
+export { companionOrchestrator } from './pause-companion-orchestration-io';
+
+export type {
+  ApplyCompanionSlotOrchestrateFailureUiPorts,
+  CompanionOrchestrateSessionContext,
+  CompanionSlotAutosaveParams,
+  CompanionSlotCacheIds,
+  CompanionSlotCommitters,
+  CompanionSlotErrorSetters,
+  CompanionSlotLoadingSetters,
+  CompanionSlotOrchestrateMode,
+  CompanionSlotRelaxations,
+  RunCompanionInterventionBootstrapPorts,
+};
+
+export {
+  applyCompanionSlotOrchestrateOutcome,
+  logCompanionSlotOrchestrateInvoke,
+  runCompanionInterventionBootstrap,
+  runCompanionSlotOrchestrate,
+  setCompanionSlotError,
+  setCompanionSlotLoading,
+  trackCompanionGenerationInitiated,
+};

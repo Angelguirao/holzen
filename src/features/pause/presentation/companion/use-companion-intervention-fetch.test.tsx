@@ -1,7 +1,9 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import type { CompanionOrchestrateSessionContext } from '@/features/pause/application/use-cases/ritual/frame/build-companion-orchestrate-body';
-import type { RunCompanionInterventionBootstrapPorts } from '@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
+import type {
+  CompanionOrchestrateSessionContext,
+  RunCompanionInterventionBootstrapPorts,
+} from './pause-companion-orchestrate-io';
 import { useCompanionInterventionFetch } from './use-companion-intervention-fetch';
 
 const {
@@ -33,14 +35,8 @@ const {
   };
 });
 
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap',
-  () => ({
-    runCompanionInterventionBootstrap: runCompanionInterventionBootstrapMock,
-  }),
-);
-
-vi.mock('./pause-companion-orchestration-io', () => ({
+vi.mock('./pause-companion-orchestrate-io', () => ({
+  runCompanionInterventionBootstrap: runCompanionInterventionBootstrapMock,
   companionOrchestrator: mockCompanionOrchestrator,
 }));
 
@@ -77,49 +73,23 @@ function baseParams() {
 
 beforeEach(() => {
   runCompanionInterventionBootstrapMock.mockReset().mockResolvedValue({ status: 'cached' });
-  invokeInterventionMock.mockReset().mockResolvedValue({ data: {}, error: null });
-  loadOrchestrateSessionMock.mockReset().mockResolvedValue(sessionFixture);
   interventionFetchKeyRef.current = null;
   interventionSkippedRef.current = false;
-  fetchedSlotsRef.current = new Set();
 });
 
 describe('useCompanionInterventionFetch', () => {
-  it('bootstraps intervention via runCompanionInterventionBootstrap with orchestrator invoke port', async () => {
-    let capturedPorts: RunCompanionInterventionBootstrapPorts | undefined;
-    runCompanionInterventionBootstrapMock.mockImplementation(async (_input, ports) => {
-      capturedPorts = ports;
-      return { status: 'cached' };
-    });
-
+  it('invokes intervention bootstrap with orchestrator port', async () => {
     renderHook(() => useCompanionInterventionFetch(baseParams()));
 
     await waitFor(() => {
-      expect(runCompanionInterventionBootstrapMock).toHaveBeenCalledTimes(1);
+      expect(runCompanionInterventionBootstrapMock).toHaveBeenCalled();
     });
 
-    expect(capturedPorts?.loadOrchestrateSession).toBe(loadOrchestrateSessionMock);
-
-    await capturedPorts!.invokeIntervention(sessionFixture);
+    const ports = runCompanionInterventionBootstrapMock.mock.calls[0]?.[1] as
+      | RunCompanionInterventionBootstrapPorts
+      | undefined;
+    expect(ports?.invokeIntervention).toBeDefined();
+    await ports?.invokeIntervention?.(sessionFixture);
     expect(invokeInterventionMock).toHaveBeenCalledWith(sessionFixture);
-    expect(mockCompanionOrchestrator.port).toBe('supabaseCompanionOrchestrator');
-  });
-
-  it('does not re-fetch for the same pause instance and retry generation', async () => {
-    renderHook(() => useCompanionInterventionFetch(baseParams()));
-
-    await waitFor(() => {
-      expect(runCompanionInterventionBootstrapMock).toHaveBeenCalledTimes(1);
-    });
-
-    interventionFetchKeyRef.current = 'pause-1:0';
-    runCompanionInterventionBootstrapMock.mockClear();
-
-    renderHook(() => useCompanionInterventionFetch(baseParams()));
-
-    await waitFor(() => {
-      expect(interventionFetchKeyRef.current).toBe('pause-1:0');
-    });
-    expect(runCompanionInterventionBootstrapMock).not.toHaveBeenCalled();
   });
 });

@@ -15049,4 +15049,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — companion slot + intervention presentation I/O</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 verified — pause-companion-orchestrate-io barrel</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder move. Add <code>presentation/companion/pause-companion-orchestrate-io.ts</code> as the slot-orchestrate + intervention-fetch seam; <code>use-companion-slot-run-orchestrate</code> and <code>use-companion-intervention-fetch</code> import I/O only (pairs with <code>pause-companion-orchestration-io</code> session load).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; thin re-export barrel (no new bound helpers).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other companion hooks still import <code>ritual/frame/</code> directly — peel retry/section/fullview incrementally.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>public-ritual-frame</code> barrel or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
