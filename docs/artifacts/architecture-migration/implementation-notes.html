@@ -59,7 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
+      <span>Phase A slice — reflect mood I/O via mood flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-io</code> → <code>pause-reflect-mood-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route mood presentation I/O through <code>pause-reflect-mood-flow</code> instead of deep <code>domain/reflect/mood/*</code> and <code>run-initial-emotion-log</code> imports (parity with hub/share/generation I/O peels on this branch).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Unit test mocks <code>pause-reflect-mood-flow</code>; subcluster mood flow anchors remain for CI.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect flows I/O decide/toast anchor peel, peel <code>pause-reflect-generation-io</code> off hook-flow to domain + <code>run-reflect-generation</code>, or companion orchestration-io peel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — reflect ambience I/O direct domain bed (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -92,21 +110,6 @@
       <dd><code>pause-ritual-audio-breathe-flow.ts</code> remains for <code>check:architecture-alignment</code> breathe audio cluster detection.</dd>
       <dt>Open questions</dt>
       <dd>Next: route <code>use-pause-session-shell</code> hydration through <code>pause-session-shell-io</code>, or companion orchestrate-io consolidate <code>ritual/frame/*</code> imports.</dd>
-=======
-      <span>Phase A slice — reflect mood I/O via mood flow anchor (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-reflect-mood-io</code> → <code>pause-reflect-mood-flow</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route mood presentation I/O through <code>pause-reflect-mood-flow</code> instead of deep <code>domain/reflect/mood/*</code> and <code>run-initial-emotion-log</code> imports (parity with hub/share/generation I/O peels on this branch).</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior parity; import boundary only.</dd>
-      <dt>Tradeoffs</dt>
-      <dd>Unit test mocks <code>pause-reflect-mood-flow</code>; subcluster mood flow anchors remain for CI.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: reflect flows I/O decide/toast anchor peel, peel <code>pause-reflect-generation-io</code> off hook-flow to domain + <code>run-reflect-generation</code>, or companion orchestration-io peel.</dd>
->>>>>>> 46f542a0 (refactor(pause): route reflect mood I/O through mood-flow anchor)
     </dl>
   </article>
 
