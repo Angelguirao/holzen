@@ -11971,4 +11971,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock companion slot orchestrate + intervention fetch to CompanionOrchestrator port (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/frame/ presentation port-lock (lazy_fetch + intervention bootstrap)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Add <code>use-companion-slot-run-orchestrate</code> and <code>use-companion-intervention-fetch</code> tests asserting <code>runCompanionSlotOrchestrate</code> / intervention bootstrap <code>invokeIntervention</code> receive <code>supabaseCompanionOrchestrator</code> sentinel (matches holzen-reflect + feedback vote patterns).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Test-only — closes weak <code>{}</code> orchestrator mocks on core Frame beat conductors.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: <code>use-fullview-telemetry</code> analytics port sentinel, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
