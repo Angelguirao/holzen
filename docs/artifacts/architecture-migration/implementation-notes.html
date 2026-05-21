@@ -4922,4 +4922,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lifecycle create/dismiss facades on public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; explicit PauseRepository lifecycle exports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>pauseCreateOrReuse</code> and <code>pauseDismissCurrent</code> on <code>public-rpc.ts</code> (delegate to <code>runPauseCreateOrReuse</code> / <code>runPauseDismissCurrent</code> + <code>supabasePauseRepository</code>); <code>dismissOpenPauseHomePreview</code> uses <code>pauseDismissCurrent()</code> for parity with other wired facades.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>openManualPauseFromHome</code> still injects <code>repository.createOrReuse</code> directly (same port).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No presentation call sites switched yet — facades are ready for session hooks that should not import use-case modules.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel fullview / PWA / dev-mode analytics from <code>public-ports</code> to <code>public-rpc</code>, or wire <code>logPauseCompanion</code> facade for frame paths still on repository internals.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

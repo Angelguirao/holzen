@@ -7,6 +7,7 @@ export type {
   PauseCreateOrReuseResult,
   PauseLogCompanionResult,
 } from './domain/rpc-types';
+export type { PauseState } from './domain/pause-state';
 export type { OpenManualPauseFromHomeResult } from './application/use-cases/trigger/open-manual-pause-from-home';
 export type { RunReflectGenerationInput };
 
@@ -79,13 +80,26 @@ import {
   type RunShiftEmotionFrameHubDoneResult,
 } from './application/use-cases/ritual/feel/shift-emotion-log';
 import type { InitialEmotionLogOpts } from './application/use-cases/ritual/feel/initial-emotion-log';
+import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
 import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
 import type { LogCompanionFeedbackVoteInput } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
 import { runFetchCompanionFeedbackVote } from './application/use-cases/ritual/frame/run-fetch-companion-feedback-vote';
 import { runLogCompanionFeedbackVote } from './application/use-cases/ritual/frame/run-log-companion-feedback-vote';
 import { supabasePauseAnalyticsRepository } from './infrastructure/supabase-pause-analytics-repository';
 
-/** Lifecycle + ritual mutations — wired facades only; no generic `pauseLogStep` / `pauseCreateOrReuse` exports. */
+/** Lifecycle + ritual mutations — wired facades only; no generic `pauseLogStep` export. */
+
+/** Session lifecycle — `pause_create_or_reuse` via `PauseRepository` (wired for presentation). */
+export function pauseCreateOrReuse(
+  params: Parameters<typeof runPauseCreateOrReuse>[1],
+): Promise<PauseCreateOrReuseResult> {
+  return runPauseCreateOrReuse(supabasePauseRepository, params);
+}
+
+/** Session lifecycle — `pause_dismiss_current` via `PauseRepository` (wired for presentation). */
+export function pauseDismissCurrent(): Promise<PauseState | null> {
+  return runPauseDismissCurrent(supabasePauseRepository);
+}
 
 /** Pending offer — adopt via `PauseRepository` (wired for presentation). */
 export function adoptPendingPauseOffer(): Promise<RunAdoptPendingPauseOfferResult> {
@@ -104,7 +118,7 @@ export function dismissOpenPauseHomePreview(
 ): Promise<void> {
   return dismissOpenPauseHome(hasUser, {
     clearPreview,
-    dismissCurrent: () => runPauseDismissCurrent(supabasePauseRepository),
+    dismissCurrent: () => pauseDismissCurrent(),
   });
 }
 
