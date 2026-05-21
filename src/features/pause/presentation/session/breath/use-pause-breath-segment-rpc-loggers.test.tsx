@@ -18,12 +18,18 @@ const {
   showPauseStepSyncFailedToast: vi.fn(),
 }));
 
-vi.mock('@/features/pause/presentation/session/breath/pause-session-breath-io', () => ({
-  pauseEnsureBreathSegment1Logged: pauseEnsureBreathSegment1LoggedMock,
-  pauseEnsureBreathSegment2Logged: pauseEnsureBreathSegment2LoggedMock,
-  pauseLogBreathSegment1Skipped: pauseLogBreathSegment1SkippedMock,
-  pauseLogBreathSegment2Skipped: pauseLogBreathSegment2SkippedMock,
-}));
+vi.mock('@/features/pause/presentation/session/breath/pause-session-breath-io', async () => {
+  const { applyBreathSegmentLogOutcome } = await import(
+    '@/features/pause/domain/ritual/breathe/apply-breath-segment-log-outcome'
+  );
+  return {
+    applyBreathSegmentLogOutcome,
+    pauseEnsureBreathSegment1Logged: pauseEnsureBreathSegment1LoggedMock,
+    pauseEnsureBreathSegment2Logged: pauseEnsureBreathSegment2LoggedMock,
+    pauseLogBreathSegment1Skipped: pauseLogBreathSegment1SkippedMock,
+    pauseLogBreathSegment2Skipped: pauseLogBreathSegment2SkippedMock,
+  };
+});
 
 vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
   showPauseStepSyncFailedToast,
