@@ -24,7 +24,9 @@ vi.mock('@/features/user/public-hooks', () => ({
 }));
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+  useTranslation: () => ({
+    t: (_key: string, opts?: { defaultValue?: string }) => opts?.defaultValue ?? _key,
+  }),
 }));
 
 const usePauseArtifactReflectionTextMock = vi.mocked(usePauseArtifactReflectionText);
@@ -98,6 +100,8 @@ describe('usePauseReflectGeneration', () => {
   });
 
   it('keeps nav seed when initialReflectionMessage is non-empty', async () => {
+    runPauseReflectGenerationMock.mockResolvedValue({ status: 'generated', message: 'edge' });
+
     usePauseArtifactReflectionTextMock.mockReturnValue({
       artifactReflectionText: 'artifact only',
       reflectionTextFetch: 'done',
@@ -110,5 +114,44 @@ describe('usePauseReflectGeneration', () => {
     await waitFor(() => {
       expect(result.current.reflectionMessage).toBe('nav seed');
     });
+    expect(runPauseReflectGenerationMock).not.toHaveBeenCalled();
+  });
+
+  it('commits holzen-reflect result after artifact hydrate when edge completes', async () => {
+    usePauseArtifactReflectionTextMock.mockReturnValue({
+      artifactReflectionText: 'from artifact row',
+      reflectionTextFetch: 'done',
+    });
+
+    let resolveEdge: (value: { status: 'generated'; message: string }) => void = () => {};
+    runPauseReflectGenerationMock.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveEdge = resolve;
+        }),
+    );
+
+    const { result } = renderHook(() => usePauseReflectGeneration(baseParams()));
+
+    await waitFor(() => {
+      expect(result.current.reflectionMessage).toBe('from artifact row');
+    });
+
+    resolveEdge({ status: 'generated', message: 'edge copy' });
+    await waitFor(() => {
+      expect(result.current.reflectionMessage).toBe('edge copy');
+    });
+  });
+
+  it('reports missing-context error without calling holzen-reflect', async () => {
+    const { result } = renderHook(() =>
+      usePauseReflectGeneration(baseParams({ context: '   ' })),
+    );
+
+    await waitFor(() => {
+      expect(result.current.error).toMatch(/missing market context/i);
+      expect(result.current.loading).toBe(false);
+    });
+    expect(runPauseReflectGenerationMock).not.toHaveBeenCalled();
   });
 });
