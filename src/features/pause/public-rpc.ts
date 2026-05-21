@@ -54,6 +54,11 @@ import {
   runPostPauseEmotionLogIfDirty,
   type PostPauseFeelSnapshot,
 } from './application/use-cases/ritual/done/post-pause-emotion-log';
+import {
+  runInitialEmotionSelect,
+  runInitialEmotionSkip,
+} from './application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
+import { runShiftEmotionFrameHubDone } from './application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
 import type { MoodValue } from './domain/mood-value';
 import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
 import { invalidateCompanionUiCompletionQuery } from './application/queries/companion-ui-completion-query-key';
@@ -284,6 +289,27 @@ export function logPauseOutcome(params: {
   decision: string;
 }) {
   return runPauseOutcomeLog(supabasePauseRepository, params);
+}
+
+/** Feel step — `initial_emotion_logged` on mood select (wired for presentation). */
+export function logPauseInitialEmotionSelect(
+  input: Parameters<typeof runInitialEmotionSelect>[1],
+) {
+  return runInitialEmotionSelect(supabasePauseRepository, input);
+}
+
+/** Feel step — `initial_emotion_logged` with `{ skipped: true }` (wired for presentation). */
+export function logPauseInitialEmotionSkip(
+  input: Parameters<typeof runInitialEmotionSkip>[1],
+) {
+  return runInitialEmotionSkip(supabasePauseRepository, input);
+}
+
+/** Frame hub “I'm done” — deduped `shift_emotion_logged` (wired for presentation). */
+export function logPauseShiftEmotionFrameHubDone(
+  input: Parameters<typeof runShiftEmotionFrameHubDone>[1],
+) {
+  return runShiftEmotionFrameHubDone(supabasePauseRepository, input);
 }
 
 export { applyBreathSegmentLogOutcome, initialBreathSegmentRpcLoggedFlagsFromRestored };

@@ -7981,4 +7981,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood/hub wired public-rpc facades (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel initial emotion + shift-frame hub mutations off public-ports in presentation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. Add <code>logPauseInitialEmotionSelect</code>, <code>logPauseInitialEmotionSkip</code>, and <code>logPauseShiftEmotionFrameHubDone</code> on <code>public-rpc</code> (wired <code>PauseRepository</code>); <code>use-pause-session-initial-mood-handlers</code> and <code>use-pause-shift-frame-done-handler</code> import facades + <code>showPauseStepSyncFailedToast</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>initialEmotionResetUi</code> stays imported from the ritual mood use-case module (pure UI reset, no I/O).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wired facades for reflect note/tag/favorite/<code>reflection_step</code> step logs, or port-backed analytics read for companion feedback vote fetch.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
