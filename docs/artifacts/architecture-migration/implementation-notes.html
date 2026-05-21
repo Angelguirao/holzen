@@ -4973,9 +4973,28 @@
       <dt>Deviation</dt>
       <dd>None — facade ready for frame presentation paths that should not import application modules directly.</dd>
       <dt>Tradeoffs</dt>
-      <dd>No call sites switched this slice; PWA install + dev-mode analytics still on <code>public-ports</code>.</dd>
+      <dd>No call sites switched this slice; PWA install + dev-mode analytics still on <code>public-ports</code> until the follow-up slice.</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>logPausePwaInstall*</code> / <code>logPauseDevModeSetting</code> facades, or <code>use-pause-artifact-reflection-text</code> hook using <code>fetchPauseReflectReflectionText</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — PWA + dev-mode analytics via public-rpc (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; PWA install + admin dev-mode on PauseAnalyticsRepository facades</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete — no folder move. Add <code>logPausePwaInstallAnalyticsEvent</code>, <code>logPauseDevModeSetting</code>, and <code>fetchPauseDevModeSetting</code> on <code>public-rpc.ts</code> (parity with fullview / feedback vote); <code>pwa-install-analytics</code>, <code>dev-mode-analytics</code>, and <code>dev-mode-admin-query</code> delegate so infrastructure stops importing <code>public-ports</code> for analytics writes/reads.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>public-queries</code> re-exports unchanged for Home and admin screens.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not switch <code>persistCompanionUiStepCompletion</code> to the <code>logPauseCompanion</code> facade in the same commit — keeps slice to analytics paths only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire stray <code>pause-rpc-client</code> call sites still bypassing <code>PauseRepository</code>, or Phase B cross-context slice per scheduling table.</dd>
     </dl>
   </article>
 
