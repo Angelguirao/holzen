@@ -13703,6 +13703,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — bind session breath RPC I/O (ritual/reflect verified)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -13716,6 +13717,21 @@
       <dd>Brief done check-in, pending-offer mutations, home manual trigger, and ritual done check-in still import <code>public-rpc</code> directly.</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>presentation/ritual/done/pause-ritual-done-io.ts</code>, <code>public-ritual-frame</code> barrel peel, or Phase B <code>src/lib/holzen-query-client-ref</code> shim.</dd>
+=======
+      <span>Phase A slice — reflect mood port-lock tests on presentation I/O</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 verified — port-lock mocks match pause-reflect-*-io boundaries</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Align <code>use-pause-session-mood-chrome-handlers.port-lock</code> and <code>use-pause-session-mood-and-persist</code> tests with bound I/O modules: mock <code>pause-reflect-mood-io</code> / <code>pause-reflect-steps-io</code> instead of <code>public-rpc</code> and direct use-case ports for favorite toggle.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only; production hooks unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Initial-emotion use case remains mocked at application layer (same as generation port-lock); documents repository injection via mood-io export.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>public-ritual-frame</code> barrel peel, home manual trigger bound <code>ReflectGenerator</code> I/O, or Phase B <code>src/lib/holzen-query-client-ref</code> shim.</dd>
+>>>>>>> 49261db4 (test(pause): align reflect mood port-lock mocks with presentation I/O)
     </dl>
   </article>
 
