@@ -16151,4 +16151,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — initial-emotion RPC via mood log flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-initial-emotion-log-flow</code> for Feel-step RPC use cases</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add application cluster anchor beside other mood flow modules; <code>pause-reflect-mood-io</code> imports <code>runInitialEmotionSelect</code> / <code>runInitialEmotionSkip</code> through the anchor instead of deep <code>run-initial-emotion-log</code>. RPC orchestration module unchanged; bound <code>pauseInitialEmotion*</code> facades unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other reflect presentation I/O modules (steps, flows, generation) still bind application use cases directly until incremental peels.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel remaining session presentation clusters off deep application imports, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
