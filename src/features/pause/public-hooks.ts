@@ -141,7 +141,7 @@ export {
   COMPLETED_PAUSE_COUNT_QUERY_KEY,
   fetchCompletedPauseCount,
   getCompletedPauseCountQueryOptions,
-} from './presentation/use-completed-pause-count';
+} from './presentation/home/use-completed-pause-count';
 export { useDismissOutletPauseReady } from './presentation/use-dismiss-outlet-pause-ready';
 export {
   usePendingPauseOffer,
