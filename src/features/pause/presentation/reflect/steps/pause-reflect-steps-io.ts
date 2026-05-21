@@ -1,6 +1,6 @@
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
-import { shouldShowFavoriteProHint } from '@/features/pause/domain/reflect/steps/favorite-toggle';
-import { shouldLogPauseReflectionStep } from '@/features/pause/domain/reflect/steps/reflection-step-log';
+import { shouldShowFavoriteProHint } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-favorite-toggle-flow';
+import { shouldLogPauseReflectionStep } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflection-step-flow';
 import {
   runPauseFavoriteToggle,
   runPauseReflectNoteUpdate,

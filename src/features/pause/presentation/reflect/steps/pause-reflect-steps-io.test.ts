@@ -23,12 +23,12 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 describe('pause-reflect-steps-io', () => {
-  it('re-exports favorite pro-hint gate from domain reflect steps', () => {
+  it('re-exports favorite pro-hint gate from application steps flow anchor', () => {
     expect(shouldShowFavoriteProHint(true, false)).toBe(true);
     expect(shouldShowFavoriteProHint(true, true)).toBe(false);
   });
 
-  it('re-exports reflection_step gate from domain reflect steps', () => {
+  it('re-exports reflection_step gate from application steps flow anchor', () => {
     expect(
       shouldLogPauseReflectionStep({
         pauseInstanceId: 'pi-1',
