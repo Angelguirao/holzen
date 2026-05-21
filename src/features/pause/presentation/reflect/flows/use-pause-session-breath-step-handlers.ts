@@ -8,7 +8,8 @@ import {
   DEEP_PAUSE_STEP_AFTER_SECOND_BREATH,
   shouldResetBriefIntegrateAdvanceGuard,
 } from '@/features/pause/domain/ritual/breathe/pause-breath-step-navigation';
-import type { BriefPauseStep, PauseStep, RitualDepth } from '@/features/pause/public-hooks';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
+import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 
 /**
  * Deep + brief ritual transitions around breath segments (`ensure` / skip RPCs) and brief integrate advance guard.
