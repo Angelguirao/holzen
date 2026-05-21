@@ -23,3 +23,4 @@ export {
   type PauseSessionStepTransitionConfig,
   type PauseSessionSwipeDirection,
 } from './application/use-cases/session/step-transition';
+export { pauseStepSwipeDirection } from './application/use-cases/session/step-swipe-direction';
