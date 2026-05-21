@@ -5568,4 +5568,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — resolvePauseBreathingPhases returns PauseBreathingPhase (Tier 5 breathe)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Breathing phase union shared with timed display</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>; science sheet + scaffold registry peels landed on remote. Alias <code>resolvePauseBreathingPhases</code> return type to <code>PauseBreathingPhase</code> from <code>resolve-pause-breathing-timed-display.ts</code> (canonical shape after prior unify slice).</dd>
+      <dt>Deviation</dt>
+      <dd>None — structural typing unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>ritual-pattern.ts</code> imports a type from a sibling breathe module; extract a <code>pause-breathing-phase.ts</code> if the folder grows more phase producers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 audit optional <code>PauseRepository</code> call sites outside use-case facades.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
