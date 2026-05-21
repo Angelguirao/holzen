@@ -10,7 +10,7 @@ import type {
 } from '@/features/pause/public-hooks';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
-import { usePauseFeelShiftLogDedupeRefs } from './use-pause-feel-shift-log-dedupe-refs';
+import { usePauseFeelShiftLogDedupeRefs } from '../steps/use-pause-feel-shift-log-dedupe-refs';
 import { usePauseSessionDepthPickerHandlers } from './use-pause-session-depth-picker-handlers';
 import { usePauseSessionFeelTilesSelect } from './use-pause-session-feel-tiles-select';
 import { usePauseSessionInitialMoodHandlers } from './use-pause-session-initial-mood-handlers';
