@@ -11803,19 +11803,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — lock decide outcome handler to PauseRepository (backlog #1 verified, backlog #4)</span>
+      <span>Phase A slice — lock brief-done check-in to PauseRepository (backlog #1 verified, backlog #4)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>ritual/reflect/ complete; decide presentation port assertion</h3>
+    <h3>ritual/reflect/ complete; brief done post-pause emotion port assertion</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move this session. Strengthen <code>use-pause-session-decide-handler</code> tests to assert <code>supabasePauseRepository</code> sentinel is passed into <code>runPauseOutcomeLog</code> (matches reflect-strip + pending-offer port-lock pattern).</dd>
+      <dd>Backlog #1 verified complete — no folder move. <code>use-pause-session-decide-handler</code> port sentinel landed on branch in prior slice; this slice adds <code>use-pause-brief-done-check-in</code> hoisted <code>supabasePauseRepository</code> sentinel + <code>runPostPauseEmotionLogIfDirty</code> assertions.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior unchanged.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Other presentation tests still use empty <code>{}</code> repository mocks (brief-to-deep, done check-in, bulk-hold, archive retrospective) — peel in follow-up slices.</dd>
+      <dd>Presentation tests for brief-to-deep, bulk-hold, and archive retrospective still use empty <code>{}</code> repository mocks — next backlog #4 peels.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: port assertions for brief-to-deep / post-pause emotion / bulk-hold / archive retrospective, optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+      <dd>Next backlog #4: home bulk-hold outcomes, archive retrospective, brief-to-deep depth upgrade, or optional PostHog analytics-port consolidation; then Phase B subscription/auth template slice.</dd>
     </dl>
   </article>
 
