@@ -12161,4 +12161,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — colocate session step-handler composite types (backlog #1 verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-step-handler-types</code> beside session step-handlers conductor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no use-case move. Move <code>pause-session-step-handler-types.ts</code> from <code>presentation/reflect/flows/</code> to <code>presentation/session/</code> beside <code>use-pause-session-step-handlers</code>; re-exports still pull mood + breath-reflect slice types from <code>reflect/mood/</code> and <code>reflect/flows/</code>. <code>public-hooks</code> export path only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3.2 / §10.1 session conductor grouping after breath-handlers colocation.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Composite type file lives in session; leaf slice types stay with their hooks in reflect subfolders.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: companion orchestrate/intervention CompanionOrchestrator port sentinels, optional PostHog analytics-port consolidation, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
