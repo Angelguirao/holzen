@@ -12769,4 +12769,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — CI guard ritual/reflect subclusters (backlog #1 follow-up)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Lock share / generation / steps taxonomy after browser-I/O peels</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves are complete on this branch. Extend <code>check:architecture-alignment</code> with <code>mustExist</code> for <code>share/</code>, <code>generation/</code>, <code>steps/</code>, <code>telemetry/</code>, <code>hub/</code>, <code>mood/</code> beside existing <code>flows/</code> and <code>ambience/</code>; <code>mustNotExist</code> for resurrected <code>domain/reflect/share/reflection-share-canvas.ts</code>, <code>deliver-reflection-share-image.ts</code>, and <code>domain/reflect/ambience/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — no runtime or import path changes.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>CI-only slice; does not add a dedicated <code>reflection-share-canvas</code> unit test (orchestrator test still mocks canvas).</dd>
+      <dt>Open questions</dt>
+      <dd>Phase B: subscription/auth <code>src/lib/*</code> shims using pause as template.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
