@@ -29,7 +29,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 describe('pause-reflect-steps-io', () => {
-  it('re-exports favorite pro-hint gate from domain', () => {
+  it('re-exports favorite pro-hint gate from application steps flow anchor', () => {
     expect(shouldShowFavoriteProHint(true, false)).toBe(true);
     expect(shouldShowFavoriteProHint(true, true)).toBe(false);
   });
