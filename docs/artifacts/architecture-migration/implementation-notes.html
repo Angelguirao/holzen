@@ -9786,4 +9786,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home arrival tone in domain (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; public-home re-exports domain/home</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no reflect folder moves. Colocate pure <code>resolvePauseArrivalToneAction</code> (+ test) under <code>domain/home/</code>; <code>public-home.ts</code> re-export path only (presentation unchanged).</dd>
+      <dt>Deviation</dt>
+      <dd>None — chime dedupe behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other <code>public-home</code> symbols still live in <code>application/use-cases/home/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: colocate remaining home read-model pure helpers to <code>domain/home/</code> or session scaffold off <code>application/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
