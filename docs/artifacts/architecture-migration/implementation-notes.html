@@ -10983,4 +10983,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect mood screens peel to public-ritual-reflect (backlog #1 verified, §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>MoodCheck and brief done check-in use reflect barrel for mood guards</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> use cases) is complete on <code>cursor/arch-migrate-src-ca70</code>. Continue §6: export <code>PAUSE_MOOD_GROUPS</code> on <code>public-ritual-reflect</code>; <code>MoodCheck</code>, <code>pause-done-brief-check-in-mood-row</code>, and <code>pause-done-brief-check-in-panel</code> import mood types/constants from the reflect barrel instead of <code>public-hooks</code>. <code>MoodCheck</code> still re-exports <code>MoodValue</code> / <code>PAUSE_MOOD_VALUES</code> for ritual body components that import from the screen module.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Feel-step tiles and intensity keys remain on <code>public-hooks</code> until a follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: bulk <code>pauseStepLayout</code> screen peel to <code>public-session</code>, feel-step constants to <code>public-ritual-reflect</code>, or backlog #4 presentation <code>PauseRepository</code> audit.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -4,6 +4,7 @@
  */
 export {
   isPauseMoodValue,
+  PAUSE_MOOD_GROUPS,
   PAUSE_MOOD_VALUES,
   type MoodValue,
 } from './domain/mood-value';
