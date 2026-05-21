@@ -11,12 +11,14 @@ const {
   invalidatePauseStatsMock,
   showPauseOutcomeSaveFailedToast,
   showPauseOutcomeNotCompletedToast,
+  mockPauseRepository,
 } = vi.hoisted(() => ({
   runPauseOutcomeLogMock: vi.fn(),
   clearSessionMock: vi.fn(),
   invalidatePauseStatsMock: vi.fn(),
   showPauseOutcomeSaveFailedToast: vi.fn(),
   showPauseOutcomeNotCompletedToast: vi.fn(),
+  mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log', () => ({
@@ -33,7 +35,7 @@ vi.mock('@/features/pause/infrastructure/session/persisted-session-storage', () 
 }));
 
 vi.mock('@/features/pause/infrastructure/supabase-pause-repository', () => ({
-  supabasePauseRepository: {},
+  supabasePauseRepository: mockPauseRepository,
 }));
 
 vi.mock('@/lib/haptics', () => ({
@@ -96,7 +98,7 @@ describe('usePauseSessionDecideHandler', () => {
       await result.current.handleDecide('hold');
     });
     expect(runPauseOutcomeLogMock).toHaveBeenCalledWith(
-      {},
+      mockPauseRepository,
       { pauseInstanceId: null, decision: 'hold' },
     );
     expect(invalidatePauseStatsMock).not.toHaveBeenCalled();
@@ -114,7 +116,7 @@ describe('usePauseSessionDecideHandler', () => {
       await result.current.handleDecide('hold');
     });
     expect(runPauseOutcomeLogMock).toHaveBeenCalledWith(
-      {},
+      mockPauseRepository,
       { pauseInstanceId: 'pi-1', decision: 'hold' },
     );
     expect(invalidatePauseStatsMock).not.toHaveBeenCalled();
