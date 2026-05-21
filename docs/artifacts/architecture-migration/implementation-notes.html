@@ -5583,7 +5583,7 @@
       <dt>Tradeoffs</dt>
       <dd>One extra file in <code>ritual/breathe/</code> vs importing the type from timed-display only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: move <code>pause-shift-frame-hub-flow</code> to application <code>ritual/reflect/</code> or <code>ritual/feel/</code>, or backlog #4 port audit.</dd>
+      <dd>Next: move <code>pause-shift-frame-hub-flow</code> to application <code>ritual/feel/</code>, or backlog #4 port audit.</dd>
     </dl>
   </article>
 
@@ -5602,7 +5602,26 @@
       <dt>Tradeoffs</dt>
       <dd>Brief science sheet callers can adopt <code>briefStepToPauseScienceStep</code> when wiring dynamic <code>currentStep</code>; depth picker still passes a literal <code>feel</code> key.</dd>
       <dt>Open questions</dt>
-      <dd>Next: backlog #4 audit remaining mutation/analytics stragglers, or move <code>pause-shift-frame-hub-flow</code> to <code>ritual/reflect/</code> or <code>ritual/feel/</code>.</dd>
+      <dd>Next: backlog #4 audit remaining mutation/analytics stragglers, or move <code>pause-shift-frame-hub-flow</code> to <code>ritual/feel/</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — shift-frame hub flow in ritual/feel (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Pure frame-hub outcome mapping beside shift-emotion-log</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>pause-shift-frame-hub-flow</code> (+ test) from <code>presentation/reflect/hub/</code> to <code>application/use-cases/ritual/feel/</code> beside <code>shift-emotion-log</code>; <code>use-pause-shift-frame-done-handler</code> imports the use-case module directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §3 application layer for pure ritual logic; presentation keeps React conductor only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Frame hub conductor stays under <code>presentation/reflect/hub/</code> (reflect route beat); RPC stays on <code>public-rpc</code> <code>runShiftEmotionFrameHubDone</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: backlog #4 audit stray <code>analytics_events</code> reads.</dd>
     </dl>
   </article>
 
