@@ -26,6 +26,7 @@ export type {
   RunOpenManualPauseSilentModeAfterCreateOpened,
   RunOpenManualPauseSilentModeAfterCreateResult,
 } from '@/features/pause/domain/reflect/generation/open-manual-pause-silent-mode-after-create-types';
+export { dismissOpenPauseHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/dismiss-open-pause-home';
 export { openManualPauseFromHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home';
 export { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-open-manual-pause-silent-mode-after-create';
 export { runPersistSilentReflectionStub } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-persist-silent-reflection-stub';

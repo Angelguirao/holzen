@@ -15657,4 +15657,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — dismiss-open-pause-home under ritual/reflect/generation (backlog #1 cluster)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Home manual dismiss use case colocated with open-manual-pause</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder move (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete. Colocate <code>dismiss-open-pause-home</code> (+ test) with <code>open-manual-pause-from-home</code> under <code>ritual/reflect/generation/</code>; <code>pause-home-reflect-io</code> re-exports the use case; <code>pause-home-io</code> binds <code>pauseDismissOpenPauseHomePreview</code> through the reflect I/O barrel only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import path change only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>run-pause-create-or-reuse</code> / <code>run-pause-dismiss-current</code> remain under <code>session/</code> as shared lifecycle delegates.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>public-rpc</code> lifecycle facades, session breath timed-loop I/O peel, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

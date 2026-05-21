@@ -1,4 +1,3 @@
-import { dismissOpenPauseHome } from '@/features/pause/application/use-cases/home/dismiss-open-pause-home';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import {
   pauseDismissCurrent,
@@ -7,6 +6,7 @@ import {
 } from '@/features/pause/public-rpc';
 export {
   applyManualPauseOpenResult,
+  dismissOpenPauseHome,
   buildManualPauseCreateOrReuseParams,
   buildManualPauseMarketContext,
   buildManualPauseOpenParams,
