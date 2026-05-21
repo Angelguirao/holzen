@@ -4276,6 +4276,25 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — CompanionOrchestrator invokeIntervention (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; intervention bootstrap on port</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> migration was already complete on <code>cursor/arch-migrate-src-ca70</code>. Extend <code>CompanionOrchestrator</code> with <code>invokeIntervention</code>; <code>supabaseCompanionOrchestrator</code> delegates to <code>invokeCompanionIntervention</code>; <code>use-companion-intervention-fetch</code> imports the default adapter via <code>public-queries</code> (no <code>public-rpc</code> edge import in presentation).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; slot orchestrate path unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>invokeCompanionIntervention</code> remains on <code>public-rpc</code> for tests and non-presentation call sites.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: port-backed analytics read for companion feedback vote fetch, or further <code>ritual/brief/</code> beat grouping per §10.1.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
 </body>
 </html>
