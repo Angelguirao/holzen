@@ -10416,6 +10416,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — home dismiss via PauseRepository (backlog #4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -10429,6 +10430,21 @@
       <dd>Other lifecycle use cases still wrap the port for single <code>public-rpc</code> entrypoints; further audit can inline where only one caller exists.</dd>
       <dt>Open questions</dt>
       <dd>Next #4: scan presentation for any remaining direct <code>pause-rpc-client</code> imports; optional <code>mapPersistedStep</code> import via <code>public-session</code> inside breathe helpers.</dd>
+=======
+      <span>Phase A slice — ritual-state types on public-session (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; session hydration types off public-hooks</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. Export <code>PauseStep</code>, <code>BriefPauseStep</code>, and <code>RitualDepth</code> on <code>public-session.ts</code> alongside existing <code>step-map</code> restore helpers; <code>use-pause-session-ritual-state</code> imports types from the session barrel and <code>PauseImpactData</code> from domain.</dd>
+      <dt>Deviation</dt>
+      <dd>None — hydration initial state unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-hooks</code> still re-exports step-map symbols for screens.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: unify <code>openManualPauseFromHome</code> to full <code>PauseRepository</code>; optional <code>initial-breath-segment-rpc-flags</code> import via <code>public-session</code>.</dd>
+>>>>>>> 2fabdf58 (refactor(pause): ritual-state types on public-session)
     </dl>
   </article>
 
