@@ -10470,4 +10470,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — openManualPauseFromHome full port types (backlog #1 verified, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; Home manual trigger ports use full interfaces</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths. <code>OpenManualPauseFromHomePorts</code> takes <code>PauseRepository</code> and <code>ReflectGenerator</code> (not <code>Pick</code> subsets); <code>public-rpc</code> still wires <code>supabasePauseRepository</code> + <code>supabaseReflectGenerator</code>. Unit tests cast minimal stubs.</dd>
+      <dt>Deviation</dt>
+      <dd>None — runtime calls unchanged (<code>createOrReuse</code>, <code>persistReflectionArtifacts</code> only).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Tests use <code>as PauseRepository</code> / <code>as ReflectGenerator</code> for partial mocks; acceptable until a shared port mock factory exists.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: audit other use cases still taking <code>Pick</code> port slices; optional <code>usePauseBreathingTimedLoop</code> on <code>public-ritual-breathe</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

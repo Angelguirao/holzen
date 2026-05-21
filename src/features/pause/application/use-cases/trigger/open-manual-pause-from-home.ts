@@ -47,8 +47,8 @@ export type OpenManualPauseFromHomeResult =
   | OpenManualPauseFromHomeError;
 
 export type OpenManualPauseFromHomePorts = {
-  repository: Pick<PauseRepository, 'createOrReuse'>;
-  reflect: Pick<ReflectGenerator, 'persistReflectionArtifacts'>;
+  repository: PauseRepository;
+  reflect: ReflectGenerator;
 };
 
 function mapCreateOrReuseError(e: unknown): OpenManualPauseFromHomeError {
