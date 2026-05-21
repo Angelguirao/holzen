@@ -8,7 +8,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-manual-open-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/dismiss-open-pause-home',
   () => ({
     dismissOpenPauseHome: dismissOpenPauseHomeMock,
   }),
