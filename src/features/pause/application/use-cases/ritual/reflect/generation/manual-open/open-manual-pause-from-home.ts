@@ -1,5 +1,5 @@
 import { buildManualPauseCreateOrReuseParams } from '@/features/pause/domain/reflect/generation/build-manual-pause-create-or-reuse-params';
-import { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-open-manual-pause-silent-mode-after-create';
+import { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-open-manual-pause-silent-mode-after-create';
 import { mapManualPauseOpenError } from '@/features/pause/domain/reflect/generation/map-manual-pause-open-error';
 import { pauseCreateSkippedUserMessage } from '@/features/pause/domain/reflect/generation/pause-create-skipped-user-message';
 import { runPauseCreateOrReuse } from '@/features/pause/application/use-cases/session/run-pause-create-or-reuse';

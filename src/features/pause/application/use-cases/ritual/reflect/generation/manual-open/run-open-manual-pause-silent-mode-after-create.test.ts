@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
-import { runPersistSilentReflectionStub } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-persist-silent-reflection-stub';
+import { runPersistSilentReflectionStub } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-persist-silent-reflection-stub';
 import { runOpenManualPauseSilentModeAfterCreate } from './run-open-manual-pause-silent-mode-after-create';
 
-vi.mock('@/features/pause/application/use-cases/ritual/reflect/generation/run-persist-silent-reflection-stub', () => ({
+vi.mock('@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-persist-silent-reflection-stub', () => ({
   runPersistSilentReflectionStub: vi.fn(),
 }));
 

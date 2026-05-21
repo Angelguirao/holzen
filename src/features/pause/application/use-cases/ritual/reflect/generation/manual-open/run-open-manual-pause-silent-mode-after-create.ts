@@ -1,4 +1,4 @@
-import { runPersistSilentReflectionStub } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-persist-silent-reflection-stub';
+import { runPersistSilentReflectionStub } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-persist-silent-reflection-stub';
 import type {
   RunOpenManualPauseSilentModeAfterCreateInput,
   RunOpenManualPauseSilentModeAfterCreateResult,

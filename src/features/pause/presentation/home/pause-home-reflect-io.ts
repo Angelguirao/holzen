@@ -42,10 +42,10 @@ export type {
   TrackManualPauseInstanceCreatedPayload,
   TrackPauseManualCompletedPayload,
 } from '@/features/pause/domain/reflect/generation/manual-pause-home-telemetry-types';
-export { dismissOpenPauseHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/dismiss-open-pause-home';
-export { openManualPauseFromHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/open-manual-pause-from-home';
-export { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-open-manual-pause-silent-mode-after-create';
-export { runPersistSilentReflectionStub } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-persist-silent-reflection-stub';
+export { dismissOpenPauseHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/dismiss-open-pause-home';
+export { openManualPauseFromHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/open-manual-pause-from-home';
+export { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-open-manual-pause-silent-mode-after-create';
+export { runPersistSilentReflectionStub } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-persist-silent-reflection-stub';
 export {
   readManualTriggerCooldownAtMs,
   writeManualTriggerCooldownAtMs,
