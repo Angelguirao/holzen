@@ -11743,4 +11743,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — lock reflect-strip companion UI completion to PauseRepository (backlog #1 verified, backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; companion chip persist tests</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no folder move. Add <code>use-companion-ui-completion</code> tests asserting <code>persistCompanionUiStepCompletion</code> receives <code>supabasePauseRepository</code>; strengthen Home open-pause dismiss presentation test to use the same sentinel (matches pending-offer + manual-trigger patterns).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion UI completion use case stays under <code>ritual/frame/persist-ui-step-completion</code> (reflect-strip chips, frame ritual beat).</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #4: optional analytics-port consolidation for remaining PostHog-only helpers, or Phase B subscription/auth template slice.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
