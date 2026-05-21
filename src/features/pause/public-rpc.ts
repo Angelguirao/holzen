@@ -106,9 +106,7 @@ import type { OpenManualPauseFromHomeParams } from './application/use-cases/trig
 import type { TFunction } from 'i18next';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from './domain/bulk-hold';
 import type { PauseState } from './domain/pause-state';
-import { runPostPauseEmotionLogIfDirty } from './application/use-cases/ritual/done/post-pause-emotion-log';
 import type { PostPauseFeelSnapshot } from './domain/ritual/done/post-pause-emotion-log';
-import type { MoodValue } from './domain/mood-value';
 import { runPauseOutcomeLog } from './application/use-cases/ritual/decide/run-pause-outcome-log';
 import type { RunPauseFavoriteToggleResult } from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import type { RunPauseReflectTagUpdateResult } from './application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
@@ -394,17 +392,6 @@ export function logPauseOutcome(params: {
 }
 
 export { showPauseStepSyncFailedToast };
-
-/** Brief done save — `post_pause_emotion_logged` when check-in differs from ritual snapshot. */
-/** Brief done “Save to journey” — `post_pause_emotion_logged` when feel changed. */
-export function logPostPauseEmotionIfDirty(params: {
-  pauseInstanceId: string | null;
-  mood: MoodValue | null;
-  intensity: number;
-  initialSnapshot: PostPauseFeelSnapshot | null;
-}) {
-  return runPostPauseEmotionLogIfDirty(supabasePauseRepository, params);
-}
 
 /** Tab-local pause ritual snapshot (localStorage) — presentation imports via this barrel only. */
 export {
