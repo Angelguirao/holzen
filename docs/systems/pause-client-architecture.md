@@ -117,7 +117,7 @@ features/pause/
   public-rpc.ts              # wired mutations + edge facades
 ```
 
-> **On disk (May 2026):** `ports/pause-repository.ts`, `ports/pause-analytics-repository.ts`, `ports/reflect-generator.ts`, `ports/companion-orchestrator.ts`, `ports/reflection-step-log-storage.ts`. Session persistence adapter: `infrastructure/session/persisted-session-storage.ts` — `clearSession` / `loadSession` / `saveSession` re-exported on `public-rpc` for presentation (`pause-session-storage.ts` port split optional). Presentation subfolders (`session/`, `companion/`, …) are largely grouped (§10.1).
+> **On disk (May 2026):** `ports/pause-repository.ts`, `ports/pause-analytics-repository.ts`, `ports/reflect-generator.ts`, `ports/companion-orchestrator.ts`, `ports/reflection-step-log-storage.ts`. Session persistence adapter: `infrastructure/session/persisted-session-storage.ts` — `clearSession` / `loadSession` / `saveSession` re-exported on `public-rpc` for remaining presentation hooks; exit navigation, pending-offer navigation, providers brief-save, home preview dismiss, manual trigger, and decide handler import `clearSession` from storage directly (May 2026). Presentation subfolders (`session/`, `companion/`, …) are largely grouped (§10.1).
 
 ### 3.1 Why `ritual/reflect/` and `ritual/frame/` — not top-level `reflect/` + `companion/`
 
