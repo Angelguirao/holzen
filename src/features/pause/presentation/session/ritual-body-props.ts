@@ -5,7 +5,7 @@ import type { BriefPauseStep } from '@/features/pause/domain/ritual-types';
 import type { FeelStepTile } from '../../domain/feel-step-tile';
 import type { MoodValue } from '../../domain/mood-value';
 import type { PauseSessionStepTransitionConfig } from '@/features/pause/public-session';
-import type { PauseBreathingHandle } from '@/features/pause/presentation/session/pause-breathing-handle';
+import type { PauseBreathingHandle } from '@/features/pause/presentation/session/breath/pause-breathing-handle';
 
 /** Props for `PauseSessionBriefRitualBody` (pause screen presentation). */
 export type PauseSessionBriefRitualBodyProps = {

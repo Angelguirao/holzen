@@ -3,9 +3,9 @@ import { isPauseSessionHeaderBackVisible } from '@/features/pause/public-session
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 import { usePauseSessionBreathUi } from './use-pause-session-breath-ui';
-import { usePauseSessionGoBack } from './use-pause-session-go-back';
-import { usePauseSessionGoToStep } from './use-pause-session-go-to-step';
-import { usePauseSessionHeaderBackHandler } from './use-pause-session-header-back-handler';
+import { usePauseSessionGoBack } from '../use-pause-session-go-back';
+import { usePauseSessionGoToStep } from '../use-pause-session-go-to-step';
+import { usePauseSessionHeaderBackHandler } from '../use-pause-session-header-back-handler';
 
 export type UsePauseSessionBreathNavigationParams = {
   phase: 'session' | 'done';

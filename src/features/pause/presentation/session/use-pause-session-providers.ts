@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useProGate } from '@/features/subscription/public-hooks';
 import { usePauseSessionExitNavigation } from './use-pause-session-exit-navigation';
-import { usePauseSessionBreathSecondLabelVariant } from './use-pause-session-breath-second-label-variant';
+import { usePauseSessionBreathSecondLabelVariant } from './breath/use-pause-session-breath-second-label-variant';
 import { JOURNEY_PREFIX } from '@/lib/app-routes';
 import { clearSession } from '@/features/pause/public-session';
 import type { PauseSessionShellHolzen } from '@/features/pause/domain/pause-session-shell-holzen';
