@@ -13662,4 +13662,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — bind reflect flows decide RPC I/O (ritual/reflect verified)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect presentation — outcome_logged off public-rpc in decide handler</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 <code>ritual/reflect/</code> was already complete. Add <code>presentation/reflect/flows/pause-reflect-flows-io.ts</code> with <code>pauseReflectOutcomeLog</code> for <code>use-pause-session-decide-handler</code> (mirrors <code>pause-reflect-steps-io.ts</code>). Steps, generation, mood, and hub I/O modules were already on remote.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving wiring only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Home manual trigger still binds <code>supabaseReflectGenerator</code> from <code>public-rpc</code>; mood-chrome still uses repository from <code>public-rpc</code> for favorite toggle.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>public-ritual-frame</code> barrel peel, extend I/O modules with use-case wrappers (vs export-only), or Phase B <code>src/lib/holzen-query-client-ref</code> shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
