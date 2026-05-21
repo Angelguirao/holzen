@@ -11496,4 +11496,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel orchestrate session load off public-rpc (backlog #1 verified, backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; companion session builder bypasses public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder move. After library favorites peel (<code>1a42edc6</code>), align <code>use-companion-orchestrate-session</code> with other frame conductors: <code>loadCompanionOrchestrateSession</code> + <code>loadMoodHistoryForOrchestrate</code>; remove <code>loadPauseCompanionOrchestrateSession</code> from <code>public-rpc</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Slot run-orchestrate apply/telemetry/UI setters and intervention bootstrap facades still on <code>public-rpc</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next backlog #3/#4: peel <code>use-companion-slot-run-orchestrate</code> cluster or home lifecycle facades on <code>public-rpc</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
