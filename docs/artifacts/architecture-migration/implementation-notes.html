@@ -5910,4 +5910,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — reflect artifact reads via ReflectGenerator (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; peel haiku + reflection_text hydrate hooks</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move this slice. <code>use-pause-artifact-haiku</code> and <code>use-pause-artifact-reflection-text</code> call <code>supabaseReflectGenerator.fetchHaikuText</code> / <code>fetchReflectionText</code> from <code>public-ports.ts</code>; <code>fetchPauseReflectHaiku</code> / <code>fetchPauseReflectReflectionText</code> on <code>public-rpc</code> unchanged for cross-context callers. Holzen-reflect conductor peeled in commit <code>07947131</code> (same backlog #4 pattern).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; reflection-text hook test mocks <code>public-ports</code> adapter.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation hooks import <code>public-ports</code> adapters directly; <code>public-rpc</code> facades remain for cross-context callers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>persistCompanionUiStepCompletion</code> in <code>use-companion-ui-completion</code> or port-backed companion feedback vote read.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
