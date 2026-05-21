@@ -307,6 +307,9 @@ export function loadPauseCompanionOrchestrateSession(input: LoadCompanionOrchest
   });
 }
 
+/** Inline companion card expand — lazy-fetch on first open (Pro gate). */
+export { nextExpandedWithLazyFetch } from './application/use-cases/ritual/frame/next-expanded-with-lazy-fetch';
+
 /** Frame / companion UI — `pause_log_companion` via `PauseRepository` (wired for presentation). */
 export function logPauseCompanion(params: {
   instanceId: string | null;
