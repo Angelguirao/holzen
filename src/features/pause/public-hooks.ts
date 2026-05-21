@@ -346,7 +346,7 @@ export {
   type UsePauseSessionBriefToDeepParams,
 } from './presentation/session/use-pause-session-brief-to-deep';
 export { usePauseSessionBreathStepHandlers } from './presentation/session/use-pause-session-breath-step-handlers';
-export { usePauseShiftFrameDoneHandler } from './presentation/reflect/use-pause-shift-frame-done-handler';
+export { usePauseShiftFrameDoneHandler } from './presentation/reflect/hub/use-pause-shift-frame-done-handler';
 export { usePauseSessionDecideHandler } from './presentation/decide/use-pause-session-decide-handler';
 export {
   usePauseSessionReflectAndDecide,
