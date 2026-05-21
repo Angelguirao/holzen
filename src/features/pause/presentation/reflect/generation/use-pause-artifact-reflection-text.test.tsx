@@ -71,5 +71,6 @@ describe('usePauseArtifactReflectionText', () => {
     await waitFor(() => {
       expect(fetchReflectionTextMock).toHaveBeenCalledWith('pause-3');
     });
+    expect(mockReflectGenerator.port).toBe('supabaseReflectGenerator');
   });
 });
