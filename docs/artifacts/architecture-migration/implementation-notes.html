@@ -7006,9 +7006,28 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>use-pause-reflect-generation</code> and <code>use-pause-shift-frame-done-handler</code> still import <code>public-rpc</code> until the next peel.</dd>
+      <dd><code>use-pause-reflect-generation</code> still imports <code>public-rpc</code> until the next peel.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel holzen-reflect generation + frame-hub shift done conductors, or companion retry presentation cluster.</dd>
+      <dd>Next: peel holzen-reflect generation conductor, or companion retry presentation cluster.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — drop dead mood/hub RPC facades from public-rpc (backlog #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Presentation conductors already port-backed; slim public-rpc re-exports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Remote already peeled <code>use-pause-shift-frame-done-handler</code> and reflect step hooks off <code>public-rpc</code>. This slice removes leftover wired facades (<code>runInitialEmotionSelect</code>, <code>runInitialEmotionSkip</code>, <code>runShiftEmotionFrameHubDone</code>) and mood-chrome pure-helper re-exports now imported from <code>domain/reflect/mood/</code> in presentation. <code>PauseStep</code> type on the hub conductor imports <code>domain/pause-ritual-steps</code> instead of <code>public-hooks</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>fetchPauseReflect*</code> and <code>runPauseReflectGeneration</code> facades remain on <code>public-rpc</code> for cross-context callers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>use-pause-reflect-generation</code> off <code>public-rpc</code>, or backlog #4 stray mutation call sites.</dd>
     </dl>
   </article>
 

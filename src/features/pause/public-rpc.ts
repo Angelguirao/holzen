@@ -73,19 +73,6 @@ import {
   type RunBreathSegmentLogResult,
 } from './application/use-cases/ritual/breathe/run-breath-segment-log';
 import { initialBreathSegmentRpcLoggedFlagsFromRestored } from './application/use-cases/session/step-map';
-import {
-  initialEmotionResetUi,
-  runInitialEmotionSelect as runInitialEmotionSelectUseCase,
-  runInitialEmotionSkip as runInitialEmotionSkipUseCase,
-  type InitialEmotionUiState,
-  type RunInitialEmotionSelectResult,
-  type RunInitialEmotionSkipResult,
-} from './application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
-import {
-  runShiftEmotionFrameHubDone as runShiftEmotionFrameHubDoneUseCase,
-  type RunShiftEmotionFrameHubDoneResult,
-} from './application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
-import type { InitialEmotionLogOpts } from './domain/reflect/mood/initial-emotion-log';
 import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
 import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
 import type { LogCompanionFeedbackVoteInput } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
@@ -142,14 +129,6 @@ export function dismissOpenPauseHomePreview(
 
 export type { BulkHoldApplyResult };
 export type { PostPauseFeelSnapshot };
-export type {
-  InitialEmotionUiState,
-  RunInitialEmotionSelectResult,
-  RunInitialEmotionSkipResult,
-  RunShiftEmotionFrameHubDoneResult,
-};
-export { initialEmotionResetUi };
-export type { InitialEmotionLogOpts };
 export type { RunBreathSegmentLogResult };
 export type { CompanionUiCompletionStep };
 export type { RunAdoptPendingPauseOfferResult, RunDeclinePendingPauseOfferResult };
@@ -217,12 +196,6 @@ export function fetchPauseReflectReflectionText(
   return supabaseReflectGenerator.fetchReflectionText(pauseInstanceId);
 }
 
-export type {
-  ShiftEmotionFrameHubDoneOutcome,
-  ShiftFrameHubDonePresentation,
-} from './domain/reflect/hub/shift-frame-hub-done-presentation';
-export { resolveShiftFrameHubDonePresentation } from './domain/reflect/hub/shift-frame-hub-done-presentation';
-
 export { showPauseStepSyncFailedToast } from './application/use-cases/ritual/step-sync-toast';
 export {
   showPauseOutcomeNotCompletedToast,
@@ -234,19 +207,6 @@ export {
   type PauseDecideOutcomeFlow,
 } from './application/use-cases/ritual/decide/pause-decide-outcome-flow';
 export { getSessionQuote } from './application/use-cases/session/wisdom-quotes';
-export { initialEmotionResetUi };
-
-/** Feel / ritual chrome — pure helpers for reflect mood presentation (depth-picker constants import domain directly). */
-export {
-  buildFeelTilesMoodLogOptions,
-  resolvePauseSessionChromeCloseAction,
-  runDeepPausePickerEntryIfPro,
-  runPauseSessionChromeCloseAction,
-} from './domain/reflect/mood/pause-session-mood-chrome-flow';
-export type {
-  PauseSessionChromeCloseAction,
-  PauseSessionPhase,
-} from './domain/reflect/mood/pause-session-mood-chrome-flow';
 
 export type {
   CompanionFeedbackVote,
@@ -363,27 +323,6 @@ export function fetchPauseDevModeSetting(userId: string): Promise<boolean | null
 /** Admin rapid-testing toggle write — screen helper (delegates to `logPauseDevModeSetting`). */
 export async function logDevModeSetting(userId: string, enabled: boolean): Promise<void> {
   await logPauseDevModeSetting({ userId, enabled });
-}
-
-/** Feel step mood select — wired with default `PauseRepository`. */
-export function runInitialEmotionSelect(
-  input: Parameters<typeof runInitialEmotionSelectUseCase>[1],
-): Promise<RunInitialEmotionSelectResult> {
-  return runInitialEmotionSelectUseCase(supabasePauseRepository, input);
-}
-
-/** Feel step skip — wired with default `PauseRepository`. */
-export function runInitialEmotionSkip(
-  input: Parameters<typeof runInitialEmotionSkipUseCase>[1],
-): Promise<RunInitialEmotionSkipResult> {
-  return runInitialEmotionSkipUseCase(supabasePauseRepository, input);
-}
-
-/** Frame hub “I'm done” shift emotion — wired with default `PauseRepository`. */
-export function runShiftEmotionFrameHubDone(
-  input: Parameters<typeof runShiftEmotionFrameHubDoneUseCase>[1],
-): Promise<RunShiftEmotionFrameHubDoneResult> {
-  return runShiftEmotionFrameHubDoneUseCase(supabasePauseRepository, input);
 }
 
 /** Decide step — `outcome_logged` via repository port (wired for presentation). */
