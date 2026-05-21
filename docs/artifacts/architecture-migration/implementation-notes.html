@@ -5723,6 +5723,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — PWA + dev-mode analytics writes via public-rpc only (backlog #4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -5755,6 +5756,21 @@
       <dd>Application module still depends on <code>ritual/breathe/pause-ritual-audio-context</code> for shared <code>AudioContext</code>; no new port.</dd>
       <dt>Open questions</dt>
       <dd>Next: backlog #4 peel reflect step hooks (note/tag/favorite) from <code>public-rpc</code> to <code>public-ports</code> + use cases, or colocate <code>use-pause-session-shell</code> under <code>presentation/session/</code>.</dd>
+=======
+      <span>Phase A slice — reflect step hooks via PauseRepository (backlog #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel note/tag/favorite/reflection_step conductors from public-rpc</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 complete; reflect PostHog trackers already in <code>ritual/reflect/telemetry/</code> on branch. Wire <code>use-pause-reflect-note</code>, <code>use-pause-reflect-tags</code>, <code>use-pause-favorite-toggle</code>, and <code>use-pause-reflection-step-log</code> through <code>runPauseReflect*</code> use cases + <code>supabasePauseRepository</code> / <code>reflectionStepSessionStorage</code> from <code>public-ports.ts</code> (same pattern as feel conductors). <code>public-rpc</code> facades remain for cross-context callers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; favorite toggle test mocks <code>public-ports</code> repository instead of <code>public-rpc</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Breath segment loggers and decide/outcome hooks still use <code>public-rpc</code> until peeled slice-by-slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel breath segment RPC loggers or audit remaining <code>analytics_events</code> reads outside port adapters.</dd>
+>>>>>>> c7e4d579 (refactor(pause): wire reflect step hooks through PauseRepository)
     </dl>
   </article>
 
