@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A slice — session brief I/O direct session + ritual/brief modules (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-brief-io</code> imports restored brief fields and depth-upgrade RPC from sibling modules</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-session-brief-io</code> imports <code>restored-brief-ritual-state</code>, <code>initial-ritual-entry</code>, and <code>ritual/brief/ritual-depth-upgrade</code> instead of <code>pause-session-brief-flow</code> CI anchor (parity with scaffold and decide I/O peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-brief-flow.ts</code> remains for <code>check:architecture-alignment</code> brief cluster detection.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion orchestrate-io direct <code>ritual/frame/*</code> imports, peel <code>pause-reflect-generation-io</code> off hook-flow, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — delete orphan reflect share-flow anchor (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -17857,7 +17876,11 @@
       <dt>Tradeoffs</dt>
       <dd>Unit test mocks <code>runReflectGeneration</code> on the hook-flow module path.</dd>
       <dt>Open questions</dt>
+<<<<<<< HEAD
       <dd>Next: <code>pause-session-brief-io</code> off brief-flow anchor, companion orchestration-io peel, or Phase B cross-context Tier 1 shim.</dd>
+=======
+      <dd>Next: companion orchestrate-io direct <code>ritual/frame/*</code> imports, peel <code>pause-reflect-generation-io</code> off hook-flow, or Phase B cross-context Tier 1 shim.</dd>
+>>>>>>> 14cc50d5f (refactor(pause): peel session brief I/O off brief-flow anchor)
     </dl>
   </article>
 
