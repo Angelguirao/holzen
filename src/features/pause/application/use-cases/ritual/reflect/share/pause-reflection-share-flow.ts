@@ -1,6 +1,7 @@
 /**
  * CI cluster anchor for ritual reflect share flows (§3 / check:architecture-alignment).
- * Pure share text + channel URL builders live in domain; re-export for application-layer imports.
+ * Pure share text + channel URL builders live in domain; orchestration in sibling `run-*` modules.
+ * Re-export for presentation I/O imports.
  */
 export { buildReflectionShareText } from '@/features/pause/domain/reflect/share/reflection-share-text';
 export {
@@ -8,5 +9,5 @@ export {
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
 } from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';
-export { runReflectionShareImage } from './run-reflection-share-image';
 export type { DeliverReflectionShareImageDeps } from './deliver-reflection-share-image';
+export { runReflectionShareImage } from './run-reflection-share-image';
