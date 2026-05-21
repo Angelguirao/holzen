@@ -35,3 +35,5 @@ export { usePauseReflectUiTelemetry } from './presentation/reflect/telemetry/use
 export { usePauseReflectTags } from './presentation/reflect/steps/use-pause-reflect-tags';
 export { usePauseReflectNote } from './presentation/reflect/steps/use-pause-reflect-note';
 export { usePauseReflectFrameFocusAmbience } from './presentation/reflect/ambience/use-pause-reflect-frame-focus-ambience';
+
+export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/reflect/mood/pause-depth-picker-styles';
