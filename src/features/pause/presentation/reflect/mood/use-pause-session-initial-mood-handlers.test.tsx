@@ -5,7 +5,7 @@ import type { MutableRefObject } from 'react';
 import {
   initialEmotionResetUi,
   initialEmotionSelectRollbackUi,
-} from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
+} from './pause-reflect-mood-io';
 import { usePauseSessionInitialMoodHandlers } from './use-pause-session-initial-mood-handlers';
 
 const CALM_LOG_KEY = '{"mood":"calm","intensity":3}';

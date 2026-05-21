@@ -12,14 +12,14 @@ import {
 import {
   applyBriefDepthPickerRitualEntry,
   applyDeepDepthPickerRitualEntry,
+  resolvePauseDepthContextLineParams,
 } from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow';
 import { buildFeelTilesMoodLogOptions } from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow';
 import {
   initialEmotionResetUi,
   initialEmotionSelectRollbackUi,
   type InitialEmotionUiState,
-} from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
-import { resolvePauseDepthContextLineParams } from '@/features/pause/domain/reflect/mood/resolve-pause-depth-context-line-params';
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 export {
