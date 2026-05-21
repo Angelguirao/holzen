@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveFrameHaikuDisplayBody } from '@/screens/pause/lib/resolve-frame-haiku-display-body';
+import { resolveFrameHaikuDisplayBody } from './resolve-frame-haiku-display-body';
 
 describe('resolveFrameHaikuDisplayBody', () => {
   it('prefers artifact haiku when present', () => {

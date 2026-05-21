@@ -10,6 +10,7 @@ import {
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
 } from '@/features/pause/domain/reflect/generation/reflect-generation-hook-flow';
+import { resolveEffectiveReflectionCopy } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
 import { runPauseReflectGeneration } from '@/features/pause/public-rpc';
 import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-text';
 
@@ -68,7 +69,9 @@ export function usePauseReflectGeneration({
   /** Show persisted `reflection_text` while holzen-reflect runs (nav seed empty). */
   useEffect(() => {
     if (!enabled || !navSeedEmpty || !artifactReflectionText) return;
-    setReflectionMessage((prev) => (prev.trim() ? prev : artifactReflectionText));
+    setReflectionMessage((prev) =>
+      resolveEffectiveReflectionCopy(prev, artifactReflectionText),
+    );
   }, [enabled, navSeedEmpty, artifactReflectionText]);
 
   const runGeneration = useCallback(async () => {
