@@ -1,6 +1,6 @@
 /**
  * Home pause widget read-model helpers (no Supabase).
- * Presentation hooks import from here instead of deep `application/use-cases/home/*`.
+ * Scheduling quarter-hour math: `public-scheduling`. Presentation imports barrels, not `application/*`.
  */
 export {
   resolvePauseArrivalToneAction,
