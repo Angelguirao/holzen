@@ -11,8 +11,7 @@ import {
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/reflect-generation-hook-flow';
-import { runReflectGeneration } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation';
-import { reflectGenerator } from './pause-reflect-generation-io';
+import { pauseReflectGeneration, reflectGenerator } from './pause-reflect-generation-io';
 import type { UsePauseReflectGenerationParams } from './use-pause-reflect-generation-types';
 import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-text';
 
@@ -102,7 +101,7 @@ export function usePauseReflectGeneration({
     setError(null);
 
     try {
-      const result = await runReflectGeneration(
+      const result = await pauseReflectGeneration(
         {
           pauseInstanceId: instanceForThisRun,
           userId: user!.id,

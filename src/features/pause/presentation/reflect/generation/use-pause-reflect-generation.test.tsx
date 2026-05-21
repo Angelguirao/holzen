@@ -3,20 +3,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { usePauseReflectGeneration } from './use-pause-reflect-generation';
 import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-text';
 
-const { runReflectGenerationMock, mockReflectGenerator } = vi.hoisted(() => ({
-  runReflectGenerationMock: vi.fn(),
+const { pauseReflectGenerationMock, mockReflectGenerator } = vi.hoisted(() => ({
+  pauseReflectGenerationMock: vi.fn(),
   mockReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/generation/run-reflect-generation',
-  () => ({
-    runReflectGeneration: runReflectGenerationMock,
-  }),
-);
-
 vi.mock('./pause-reflect-generation-io', () => ({
   reflectGenerator: mockReflectGenerator,
+  pauseReflectGeneration: pauseReflectGenerationMock,
 }));
 
 vi.mock('./use-pause-artifact-reflection-text', () => ({
@@ -57,8 +51,8 @@ function baseParams(
 }
 
 beforeEach(() => {
-  runReflectGenerationMock.mockReset();
-  runReflectGenerationMock.mockImplementation(
+  pauseReflectGenerationMock.mockReset();
+  pauseReflectGenerationMock.mockImplementation(
     () =>
       new Promise(() => {
         /* never resolves — isolate artifact hydrate */
@@ -108,7 +102,7 @@ describe('usePauseReflectGeneration', () => {
     await waitFor(() => {
       expect(result.current.reflectionMessage).toBe('persisted reflection');
     });
-    expect(runReflectGenerationMock).toHaveBeenCalledWith(
+    expect(pauseReflectGenerationMock).toHaveBeenCalledWith(
       expect.objectContaining({
         pauseInstanceId: 'pause-1',
         userId: 'user-1',
@@ -119,7 +113,7 @@ describe('usePauseReflectGeneration', () => {
   });
 
   it('keeps nav seed when initialReflectionMessage is non-empty', async () => {
-    runReflectGenerationMock.mockResolvedValue({ status: 'generated', message: 'edge' });
+    pauseReflectGenerationMock.mockResolvedValue({ status: 'generated', message: 'edge' });
 
     usePauseArtifactReflectionTextMock.mockReturnValue({
       artifactReflectionText: 'artifact only',
@@ -133,7 +127,7 @@ describe('usePauseReflectGeneration', () => {
     await waitFor(() => {
       expect(result.current.reflectionMessage).toBe('nav seed');
     });
-    expect(runReflectGenerationMock).not.toHaveBeenCalled();
+    expect(pauseReflectGenerationMock).not.toHaveBeenCalled();
   });
 
   it('commits holzen-reflect result after artifact hydrate when edge completes', async () => {
@@ -143,7 +137,7 @@ describe('usePauseReflectGeneration', () => {
     });
 
     let resolveEdge: (value: { status: 'generated'; message: string }) => void = () => {};
-    runReflectGenerationMock.mockImplementation(
+    pauseReflectGenerationMock.mockImplementation(
       () =>
         new Promise((resolve) => {
           resolveEdge = resolve;
@@ -160,7 +154,7 @@ describe('usePauseReflectGeneration', () => {
     await waitFor(() => {
       expect(result.current.reflectionMessage).toBe('edge copy');
     });
-    expect(runReflectGenerationMock).toHaveBeenCalledWith(
+    expect(pauseReflectGenerationMock).toHaveBeenCalledWith(
       expect.objectContaining({
         pauseInstanceId: 'pause-1',
         userId: 'user-1',
@@ -180,6 +174,6 @@ describe('usePauseReflectGeneration', () => {
       expect(result.current.error).toMatch(/missing market context/i);
       expect(result.current.loading).toBe(false);
     });
-    expect(runReflectGenerationMock).not.toHaveBeenCalled();
+    expect(pauseReflectGenerationMock).not.toHaveBeenCalled();
   });
 });
