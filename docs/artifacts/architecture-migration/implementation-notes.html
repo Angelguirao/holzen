@@ -13320,4 +13320,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — peel holzen providers slice from public-session</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; §6 slim public-session follow-up</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect/</code> migration was already complete. After <code>scaffold-ritual-derived</code> peeled, <code>use-pause-session-providers-conductor</code> and <code>pause-session-providers-types</code> import <code>pickPauseHolzenProvidersSlice</code> / <code>PauseHolzenProvidersSlice</code> from <code>application/use-cases/session/pause-holzen-providers-slice</code> directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving export peel only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Step bundles, header-back, and ritual restore helpers remain on <code>public-session</code> for screens and conductors that still use the barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel step-transition / header-back cluster when session conductors import use cases directly, or Phase B <code>src/lib/*</code> shims (subscription/auth).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
