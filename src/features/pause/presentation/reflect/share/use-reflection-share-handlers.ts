@@ -8,7 +8,7 @@ import {
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
 } from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';
-import { runReflectionShareImage } from '@/features/pause/public-rpc';
+import { runReflectionShareImage } from '@/features/pause/domain/reflect/share/run-reflection-share-image';
 
 export type UseReflectionShareHandlersParams = {
   message: string;
