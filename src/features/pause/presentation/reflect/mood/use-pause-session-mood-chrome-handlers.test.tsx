@@ -25,7 +25,7 @@ const {
   };
 });
 
-vi.mock('@/features/pause/domain/reflect/mood/pause-session-mood-chrome-flow', () => ({
+vi.mock('./pause-reflect-mood-io', () => ({
   resolvePauseSessionChromeCloseAction: resolvePauseSessionChromeCloseActionMock,
   runPauseSessionChromeCloseAction: runPauseSessionChromeCloseActionMock,
 }));
