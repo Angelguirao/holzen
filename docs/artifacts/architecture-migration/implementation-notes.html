@@ -3386,6 +3386,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+<<<<<<< HEAD
       <span>Phase A slice — colocate companion snapshot hook under presentation/companion/</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -3399,6 +3400,21 @@
       <dd>Journey/realtime/bulk-hold hooks remain flat under <code>presentation/</code>.</dd>
       <dt>Open questions</dt>
       <dd>Next: wire <code>logDevModeSetting</code> via <code>PauseAnalyticsRepository</code> (backlog #4), or colocate journey/realtime hooks under <code>presentation/archive/</code> / <code>home/</code>.</dd>
+=======
+      <span>Phase A slice — port-back dev_mode_setting via PauseAnalyticsRepository</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #4 — admin dev-mode analytics write</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Reflect presentation step-log hooks were already under <code>presentation/reflect/steps/</code> on remote. Route <code>logDevModeSetting</code> through <code>run-log-dev-mode-setting</code> + default <code>supabasePauseAnalyticsRepository</code>; facade in <code>infrastructure/queries/dev-mode-analytics.ts</code>. Admin screen still imports <code>screens/admin/public-queries</code> → pause <code>public-queries</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>Use case lives under <code>application/use-cases/admin/</code> (not <code>ritual/frame/</code>) — dev-mode is admin surface, not a ritual beat.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>insertPauseAnalyticsEvent</code> remains a direct infrastructure export for legacy/admin bulk paths until a later slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: route <code>persistCompanionUiStepCompletion</code> through <code>public-rpc</code> instead of infrastructure importing <code>supabasePauseRepository</code> directly, or colocate remaining flat presentation hooks.</dd>
+>>>>>>> 058a6648 (refactor(pause): port dev_mode_setting write through PauseAnalyticsRepository)
     </dl>
   </article>
 
