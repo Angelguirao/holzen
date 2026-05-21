@@ -10,7 +10,7 @@ Companions, reflect, and breathing live **inside** this feature — not a separa
 
 ```text
 features/pause/
-  domain/                         # rules + vocabulary (no React, no Supabase)
+  domain/                         # rules + vocabulary (no React, no Supabase); e.g. companion/related-biases
   application/use-cases/
     trigger/ session/
     ritual/

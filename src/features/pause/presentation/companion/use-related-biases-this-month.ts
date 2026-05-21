@@ -4,7 +4,7 @@ import { useAuth } from '@/features/auth/public';
 import {
   dedupeBiases,
   type RelatedBias,
-} from '@/features/pause/application/use-cases/ritual/frame/related-biases';
+} from '@/features/pause/domain/companion/related-biases';
 import { getRelatedBiasesGroundNudgeQueryOptions } from '../../public-queries';
 
 /** Grounding full view — distinct bias titles from recent `ground_nudge` artifacts. */
