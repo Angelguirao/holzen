@@ -9539,4 +9539,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — manual trigger telemetry on public-rpc (backlog #1 verified, #3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>ritual/reflect/</code> complete; <code>use-manual-pause-trigger</code> peels application telemetry</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — no reflect folder moves. Continue backlog #3 §6: re-export <code>markPauseManualStartedHomeOnce</code> (+ related manual-start PostHog helpers) on <code>public-rpc</code> beside <code>openManualPauseFromHome</code>; presentation hook imports the barrel only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — <code>apply-manual-pause-open-result</code> still imports telemetry from application (use-case layer).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hook test mocks the wider <code>public-rpc</code> barrel for open + session clear + manual-start telemetry.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: re-export <code>buildHomePauseSessionLocationState</code> / <code>canNavigateToPauseSession</code> on <code>public-navigation</code> for <code>use-home-pause-actions</code>, or audit archive presentation hooks still importing <code>application/use-cases/archive/*</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

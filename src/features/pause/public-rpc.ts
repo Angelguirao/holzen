@@ -192,7 +192,15 @@ export {
   type OpenPauseStateForAnalytics,
   type PauseDismissAnalyticsSurface,
 } from './application/use-cases/trigger/home-pause-actions-telemetry';
-export { markPauseManualStartedHomeOnce } from './application/use-cases/trigger/manual-pause-trigger-telemetry';
+export {
+  markPauseManualStartedHomeOnce,
+  trackManualPauseInstanceCreated,
+  trackPauseManualCompleted,
+  trackPauseManualStarted,
+  type PauseManualStartedSurface,
+  type TrackManualPauseInstanceCreatedPayload,
+  type TrackPauseManualCompletedPayload,
+} from './application/use-cases/trigger/manual-pause-trigger-telemetry';
 
 export type {
   RunInitialEmotionSelectResult,
