@@ -272,6 +272,13 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_RITUAL_STORAGE_SYNC_IMPORTS = [
   "from '../presentation/session/use-pause-session-ritual-storage-sync'",
 ];
 
+/** Flat presentation/session persist-to-storage — use presentation/reflect/scaffold/. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_PERSIST_TO_STORAGE_IMPORTS = [
+  '@/features/pause/presentation/session/use-pause-session-persist-to-storage',
+  "from './presentation/session/use-pause-session-persist-to-storage'",
+  "from '../presentation/session/use-pause-session-persist-to-storage'",
+];
+
 const PAUSE_RPC_CLIENT_ALLOWLIST = new Set([
   'src/features/pause/infrastructure/pause-rpc-client.ts',
   'src/features/pause/infrastructure/supabase-pause-repository.ts',
@@ -362,6 +369,11 @@ for (const file of walkTs(join(root, 'src'))) {
   for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_RITUAL_STORAGE_SYNC_IMPORTS) {
     if (text.includes(needle)) {
       failures.push(`${rel}: legacy flat presentation/session ritual-storage-sync import (${needle})`);
+    }
+  }
+  for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PERSIST_TO_STORAGE_IMPORTS) {
+    if (text.includes(needle)) {
+      failures.push(`${rel}: legacy flat presentation/session persist-to-storage import (${needle})`);
     }
   }
   if (!PAUSE_RPC_CLIENT_ALLOWLIST.has(rel)) {

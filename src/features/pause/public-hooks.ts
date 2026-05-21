@@ -408,7 +408,7 @@ export {
   type UsePauseSessionBriefToDeepParams,
 } from './presentation/session/use-pause-session-brief-to-deep';
 export { usePauseSessionDecideHandler } from './presentation/reflect/flows/use-pause-session-decide-handler';
-export { usePauseSessionPersistToStorage } from './presentation/session/use-pause-session-persist-to-storage';
+export { usePauseSessionPersistToStorage } from './presentation/reflect/scaffold/use-pause-session-persist-to-storage';
 export { usePauseSessionRitualStorageSync } from './presentation/reflect/scaffold/use-pause-session-ritual-storage-sync';
 export {
   usePauseSessionBreathNavigation,
