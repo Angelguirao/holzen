@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ChevronRight, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { pauseStepLayout } from '@/features/pause/public-hooks';
+import { pauseStepLayout } from '@/features/pause/public-session';
 import { Button } from '@/components/ui/button';
 import { hapticFeedback } from '@/lib/haptics';
 import { BreathOrbVisual } from '@/screens/pause/components/breath-orb-visual';
