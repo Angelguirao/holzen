@@ -1,7 +1,7 @@
 import { bucketChangePercent, computeContextFingerprint } from '@/features/pause/domain/pause-fingerprint';
 import { pauseCreateSkippedUserMessage } from '@/features/pause/application/use-cases/trigger/pause-create-skipped-user-message';
 import { runPauseCreateOrReuse } from '@/features/pause/application/use-cases/session/run-pause-create-or-reuse';
-import { runPersistSilentReflectionStub } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-persist-silent-reflection-stub';
+import { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/application/use-cases/ritual/reflect/generation/run-open-manual-pause-silent-mode-after-create';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 const VOLATILITY_TEMPLATE = 'volatility_v1';
@@ -109,27 +109,14 @@ export async function openManualPauseFromHome(
     const pendingOffer = res.pending_offer === true;
 
     if (params.silentMode) {
-      const persistResult = await runPersistSilentReflectionStub(ports.reflect, {
+      return runOpenManualPauseSilentModeAfterCreate(ports.reflect, {
         pauseInstanceId: res.instance_id,
         userId: params.userId,
-        context: params.contextText,
-        message: params.silentMessage,
-      });
-      if (persistResult.outcome === 'error') {
-        return {
-          outcome: 'error',
-          userMessage: persistResult.userMessage,
-          isNetwork: false,
-        };
-      }
-      return {
-        outcome: 'opened',
-        instanceId: res.instance_id,
-        context: params.contextText,
+        contextText: params.contextText,
+        silentMessage: params.silentMessage,
         pendingOffer,
         created: res.created,
-        silentStubPersisted: true,
-      };
+      });
     }
 
     return {

@@ -14342,6 +14342,25 @@
       <dt>Tradeoffs</dt>
       <dd>Market context builder still lives under <code>trigger/</code>; only silent-mode message vocabulary moved.</dd>
       <dt>Open questions</dt>
+      <dd>Next: compose silent opened payload in <code>ritual/reflect/generation</code> after create-or-reuse.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — Home silent open compose in ritual/reflect/generation</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect cluster incremental — backlog #1</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. After <code>run-persist-silent-reflection-stub</code>, extract silent-mode opened/error branch from <code>trigger/open-manual-pause-from-home</code> into <code>run-open-manual-pause-silent-mode-after-create</code> (+ test); trigger delegates post-create only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — matches §5.1 reflect generation cluster; trigger keeps create-or-reuse orchestration.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Trigger tests mock the compose use case (integration of stub + payload tested in ritual/reflect unit test).</dd>
+      <dt>Open questions</dt>
       <dd>Next: Phase B <code>holzen-query-client-ref</code> shim for pause query invalidation helpers.</dd>
     </dl>
   </article>
