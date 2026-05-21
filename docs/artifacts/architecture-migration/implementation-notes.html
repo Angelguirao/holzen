@@ -17237,7 +17237,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-<<<<<<< HEAD
       <span>Phase A slice — remove orphan reflect steps flow anchors (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -17251,7 +17250,12 @@
       <dd>Steps presentation I/O is the import surface; no application cluster anchor in <code>ritual/reflect/steps/</code> besides <code>run-*</code> use cases.</dd>
       <dt>Open questions</dt>
       <dd>Next: reflect flows I/O anchor peel (preflight/post-generation), session pending-offer I/O through <code>pause-session-pending-offer-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
-=======
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A slice — session decide I/O via decide flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -17265,7 +17269,6 @@
       <dd><code>mount-log-params</code> still imports <code>initialPhaseFromRestored</code> from <code>ritual/decide/</code> directly until a session application peel.</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>pause-companion-frame-ui-flow</code> / analytics flow anchors, or Phase B cross-context Tier 1 shim.</dd>
->>>>>>> 17fac6ee (refactor(pause): route session decide I/O through decide flow anchor)
     </dl>
   </article>
 
