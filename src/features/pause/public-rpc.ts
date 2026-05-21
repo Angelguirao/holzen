@@ -246,8 +246,12 @@ export {
   DEEP_DEPTH_PICKER_RITUAL_ENTRY,
   buildFeelTilesMoodLogOptions,
   resolvePauseSessionChromeCloseAction,
-  runPauseSessionChromeCloseAction,
   runDeepPausePickerEntryIfPro,
+  runPauseSessionChromeCloseAction,
+} from './application/use-cases/ritual/feel/pause-session-mood-chrome-flow';
+export type {
+  PauseSessionChromeCloseAction,
+  PauseSessionPhase,
 } from './application/use-cases/ritual/feel/pause-session-mood-chrome-flow';
 
 export type {
