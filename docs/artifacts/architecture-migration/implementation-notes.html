@@ -15277,4 +15277,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — frame-focus ambience bed in domain/ritual/breathe/</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect backlog #1 follow-up — peel Web Audio bed next to ritual AudioContext</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Move <code>startPauseReflectFrameFocusAmbience</code> / <code>stopPauseReflectFrameFocusAmbience</code> to <code>domain/ritual/breathe/reflect-frame-focus-ambience.ts</code> beside <code>pause-ritual-audio-context</code>; keep <code>application/use-cases/ritual/reflect/ambience/</code> as a thin re-export for CI. <code>presentation/reflect/ambience/pause-reflect-ambience-io.ts</code> imports domain (not application).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; tests colocated with domain module (not <code>domain/reflect/ambience/</code>, which CI forbids).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Application ambience cluster is re-export-only until a future slice removes the anchor if policy changes.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: wire <code>use-companion-orchestrate-retry</code> through <code>pause-companion-orchestrate-io</code> or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
