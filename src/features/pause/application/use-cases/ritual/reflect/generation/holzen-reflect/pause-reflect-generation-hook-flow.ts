@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for ritual reflect generation hook helpers (§3 / check:architecture-alignment).
  * Pure prefetch/commit/clear helpers live in domain; re-export for application-layer imports.
- * Presentation: `pause-reflect-generation-io.ts` imports through this anchor (off deep domain/run-* paths).
+ * Presentation: `pause-reflect-generation-io.ts` imports domain helpers and `run-reflect-generation` directly (off this CI anchor).
  */
 export {
   messageFromReflectGenerationResult,
