@@ -8380,4 +8380,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — home bulk-hold via public-rpc (backlog #1 done, #4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel use-bulk-hold-apply-outcomes off public-ports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. <code>useBulkHoldApplyOutcomes</code> calls existing <code>applyBulkHoldOutcomes</code> on <code>public-rpc</code> instead of the use case + <code>supabasePauseRepository</code> from <code>public-ports</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import surface only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-manual-pause-trigger</code> still injects <code>public-ports</code> for <code>openManualPauseFromHome</code> repository + reflect generator.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel manual trigger to <code>openManualPauseFromHome</code> on <code>public-rpc</code>, or colocate <code>dismiss/</code> use case under <code>home/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
