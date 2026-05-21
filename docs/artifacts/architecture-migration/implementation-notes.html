@@ -9330,4 +9330,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
+      <span>Phase A slice — backlog #1 verified; decide + breath public-rpc peel (backlog #4 §6)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>ritual/reflect/ complete; post-reflect ritual conductors import public-rpc only</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete — zero legacy paths. This slice continues backlog #4 §6 peel: re-export decide outcome flow + toasts on <code>public-rpc</code>; <code>use-pause-session-decide-handler</code> imports the barrel only (mutation already via <code>logPauseOutcome</code>). <code>use-pause-breath-segment-rpc-loggers</code> imports <code>initialBreathSegmentRpcLoggedFlagsFromRestored</code> from <code>public-rpc</code> (already exported with breath segment facades).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Decide flow pure helpers remain in <code>application/use-cases/ritual/decide/</code>; only presentation import path changes.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: audit remaining <code>presentation/*</code> → <code>application/</code> imports outside session/home clusters, or wire stray ritual mutations through <code>PauseRepository</code> facades.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -290,6 +290,14 @@ export function logRetrospectiveOutcome(params: {
 }
 
 export { getSessionQuote } from './application/use-cases/session/wisdom-quotes';
+export {
+  formatReinforcementQuoteFromSession,
+  resolvePauseDecideOutcomeFlow,
+} from './application/use-cases/ritual/decide/pause-decide-outcome-flow';
+export {
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
+} from './application/use-cases/ritual/decide/outcome-toast';
 
 export type {
   CompanionFeedbackVote,
