@@ -207,6 +207,16 @@ export {
   type ManualPauseHomePreviewPorts,
 } from './application/use-cases/trigger/apply-manual-pause-open-result';
 export { buildManualPauseOpenParams } from './application/use-cases/trigger/build-manual-pause-open-params';
+export {
+  computeAutoCooldownRemainingMs,
+  computeManualCooldownRemainingMs,
+} from './application/use-cases/trigger/compute-pause-trigger-cooldowns';
+export {
+  buildManualTriggerCooldownStorageKey,
+  isManualTriggerBlockedByCooldown,
+  parseManualTriggerCooldownFromStorageEvent,
+} from './application/use-cases/trigger/manual-trigger-cooldown-flow';
+export { mapManualTriggerStartError } from './application/use-cases/trigger/map-manual-trigger-start-error';
 
 export type {
   RunInitialEmotionSelectResult,

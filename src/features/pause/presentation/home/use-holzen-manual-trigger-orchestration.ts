@@ -5,15 +5,13 @@ import type { BtcPriceData } from '@/features/market/public';
 import { getHolzenMarketDisplayQueryOptions } from '@/features/market/public';
 import { isHolzenDevMode } from '@/features/market/public';
 import {
+  buildManualTriggerCooldownStorageKey,
   computeAutoCooldownRemainingMs,
   computeManualCooldownRemainingMs,
-} from '@/features/pause/application/use-cases/trigger/compute-pause-trigger-cooldowns';
-import {
-  buildManualTriggerCooldownStorageKey,
   isManualTriggerBlockedByCooldown,
+  mapManualTriggerStartError,
   parseManualTriggerCooldownFromStorageEvent,
-} from '@/features/pause/application/use-cases/trigger/manual-trigger-cooldown-flow';
-import { mapManualTriggerStartError } from '@/features/pause/application/use-cases/trigger/map-manual-trigger-start-error';
+} from '@/features/pause/public-rpc';
 import {
   readManualTriggerCooldownAtMs,
   writeManualTriggerCooldownAtMs,

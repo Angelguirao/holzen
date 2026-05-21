@@ -9523,19 +9523,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — manual-trigger telemetry on public-rpc (backlog #1 done, #4 §6)</span>
+      <span>Phase A slice — manual-trigger cooldown on public-rpc (backlog #1 verified, #3)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>ritual/reflect/ verified; use-manual-pause-trigger imports public-rpc only</h3>
+    <h3>ritual/reflect/ complete; use-holzen-manual-trigger-orchestration peels application imports</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) verified complete — no reflect folder moves. Re-export <code>markPauseManualStartedHomeOnce</code> on <code>public-rpc</code> beside <code>openManualPauseFromHome</code> / <code>clearSession</code>; <code>use-manual-pause-trigger</code> consolidates home manual I/O + telemetry on the barrel (follows home pause-actions telemetry peel).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) verified complete on <code>cursor/arch-migrate-src-ca70</code> — zero legacy paths; all use cases under <code>ritual/reflect/</code>. Continue backlog #3 §6 peel: re-export manual-trigger cooldown compute/flow helpers and <code>mapManualTriggerStartError</code> on <code>public-rpc</code>; <code>use-holzen-manual-trigger-orchestration</code> imports the barrel (localStorage adapter stays on <code>infrastructure/manual-trigger-cooldown-storage</code>).</dd>
       <dt>Deviation</dt>
-      <dd>None — PostHog <code>pause.manual_started</code> unchanged; application <code>apply-manual-pause-open-result</code> still imports telemetry module directly.</dd>
+      <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Hook test mocks the wider <code>public-rpc</code> barrel for open + session clear + manual-started marker.</dd>
+      <dd>Pure cooldown modules remain in <code>application/use-cases/trigger/</code>; only presentation import path changes.</dd>
       <dt>Open questions</dt>
-      <dd>Next backlog #4: peel <code>use-pending-pause-offer-mutations</code> trigger telemetry imports (already on barrel) or export home navigation helpers from <code>public-rpc</code> / domain.</dd>
+      <dd>Next backlog #4: peel home pause-actions session navigation helpers (<code>buildHomePauseSessionLocationState</code>, <code>canNavigateToPauseSession</code>) or audit ritual mutations outside <code>PauseRepository</code> facades.</dd>
     </dl>
   </article>
 
