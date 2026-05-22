@@ -15,6 +15,7 @@
  * application `pause-reflect-generation-hook-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-hook-flow`;
  * reciprocal inline pins: `pause-reflect-generation-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`,
  * `pause-reflect-telemetry-io.test.ts`;
+ * application flow umbrellas: `pause-reflect-generation-flow.test.ts` ↔ `pause-reflect-steps-flow.test.ts` (reciprocal inline).
  * inline pins: `pause-reflect-generation-io.test.ts`, `pause-reflect-ambience-io.test.ts`.
  */
 import {
