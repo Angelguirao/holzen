@@ -21436,6 +21436,7 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+<<<<<<< HEAD
       <span>Phase A — companion orchestration I/O via subcluster flows (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -21449,6 +21450,21 @@
       <dd><code>pause-companion-orchestration-flow</code> remains the compose anchor for other consumers; orchestration presentation I/O no longer depends on the umbrella barrel.</dd>
       <dt>Open questions</dt>
       <dd>Next: companion orchestrate-io subcluster peel (slot orchestrate vs intervention vs telemetry), Phase B subscription Tier 1 shim, or session shell I/O flow peels.</dd>
+=======
+      <span>Phase A — reflect share I/O via subcluster flows (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>pause-reflect-share-io</code> through share subcluster flow anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Peel <code>pause-reflect-share-io</code> off <code>pause-reflect-share-orchestration-flow</code> to import <code>pause-reflection-share-image-flow</code>, <code>pause-reflection-share-text-flow</code>, and <code>pause-reflection-share-channel-urls-flow</code> directly (parity with steps/mood/flows I/O peels). CI blocks orchestration umbrella imports in share I/O; share conductors still import share-io only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-share-orchestration-flow</code> remains the compose anchor for other consumers; share presentation I/O no longer depends on the orchestration barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim, or generation I/O subcluster peel if umbrella imports remain.</dd>
+>>>>>>> f7fa8f03d (refactor(pause): route reflect share-io via subcluster flow anchors)
     </dl>
   </article>
 
