@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { runReflectGeneration as runReflectGenerationDirect } from '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation';
+import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import { pauseReflectGeneration, reflectGenerator } from './pause-reflect-generation-io';
 
 const runReflectGenerationMock = vi.hoisted(() => vi.fn());
@@ -56,5 +60,13 @@ describe('pause-reflect-generation-io', () => {
     await pauseReflectGeneration(input, customGenerator);
 
     expect(runReflectGenerationMock).toHaveBeenCalledWith(input, customGenerator);
+  });
+
+  it('sibling cluster: generation-io exports stay distinct from ambience-io frame-focus bed', () => {
+    expect(pauseReflectGeneration).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseReflectGeneration).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(reflectGenerator).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(reflectGenerator).not.toBe(stopPauseReflectFrameFocusAmbience);
+    // Full cross-I/O pins: `pause-reflect-ambience-generation-io-sibling-parity.test.ts`.
   });
 });

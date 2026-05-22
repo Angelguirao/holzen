@@ -8,7 +8,8 @@
  * `pause-reflect-generation-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`;
  * `pause-reflect-generation-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`;
  * `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
- * `pause-reflect-ambience-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`.
+ * `pause-reflect-ambience-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`;
+ * inline pins: `pause-reflect-generation-io.test.ts`, `pause-reflect-ambience-io.test.ts`.
  */
 import {
   runReflectGeneration,
