@@ -3,6 +3,7 @@
  * Imports domain builders and `run-reflection-share-image` directly (parity with
  * `pause-reflect-pending-offer-io` → leaf RPC/display modules).
  * Parity pins: `pause-reflect-share-io.test.ts` (hub-io reciprocal inline pins).
+ * Flow↔I/O wrapper sibling: `pause-reflect-share-flow-io-wrapper-sibling-parity.test.ts` (application mirror beside `pause-reflect-share-flow.ts`).
  * Sibling parity: `pause-reflect-hub-share-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io` (application
  * `application/.../hub/pause-reflect-hub-share-io-sibling-parity.test.ts`);
  * `pause-reflect-share-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (application mirror:

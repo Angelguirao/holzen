@@ -73,8 +73,10 @@ describe('pause-reflect-share-flow ↔ pause-reflect-share-io wrapper sibling pa
 
   it('presentation share-io wrappers stay off share-flow leaf re-exports', () => {
     expect(pauseReflectionShareImage).not.toBe(runReflectionShareImage);
+    expect(pauseReflectionShareImage).not.toBe(trackPauseReflectPostItOpen);
     expect(pauseReflectionShareImage).not.toBe(trackPauseReflectShareTap);
     expect(pauseReflectionShareImage).not.toBe(trackPauseReflectWallpaperTap);
+    expect(pauseReflectionShareImage).not.toBe(buildReflectionShareText);
     expect(buildTextFromShareIo).not.toBe(runReflectionShareImage);
   });
 });
