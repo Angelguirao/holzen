@@ -10,6 +10,11 @@ import {
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
 } from './pause-pending-offer-telemetry-flow';
+import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from './pause-reflect-telemetry-flow';
 
 describe('pause-pending-offer-telemetry-flow', () => {
   it('re-exports pending-offer and session-abandoned telemetry trackers', () => {
@@ -20,5 +25,13 @@ describe('pause-pending-offer-telemetry-flow', () => {
     expect(trackPausePendingAdopted).toBe(trackAdoptedDirect);
     expect(trackPausePendingDeclined).toBe(trackDeclinedDirect);
     expect(trackPauseSessionAbandoned).toBe(trackAbandonedDirect);
+  });
+
+  it('sibling cluster: pending-offer-telemetry-flow exports stay distinct from session reflect UI telemetry-flow exports', () => {
+    expect(trackPausePendingAdopted).not.toBe(trackPauseReflectPostItOpen);
+    expect(trackPausePendingAdopted).not.toBe(trackPauseReflectShareTap);
+    expect(trackPausePendingAdopted).not.toBe(trackPauseReflectWallpaperTap);
+    expect(trackPausePendingDeclined).not.toBe(trackPauseReflectPostItOpen);
+    expect(trackPauseSessionAbandoned).not.toBe(trackPauseReflectWallpaperTap);
   });
 });
