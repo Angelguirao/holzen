@@ -1,9 +1,13 @@
+/**
+ * Presentation I/O for tab-local pause ritual snapshots.
+ * Imports `persisted-tab-session` use cases directly (parity with providers-io → holzen-providers-slice).
+ */
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 import {
   clearPersistedTabSession,
   loadPersistedTabSession,
   savePersistedTabSession,
-} from '@/features/pause/application/use-cases/session/pause-session-persisted-tab-session-flow';
+} from '@/features/pause/application/use-cases/session/persisted-tab-session';
 import { persistedTabSessionStorage } from '@/features/pause/public-rpc';
 
 /** Default port + use case: read tab-local pause ritual snapshot. */

@@ -9,21 +9,18 @@ const clearPersistedTabSessionMock = vi.hoisted(() => vi.fn());
 const loadPersistedTabSessionMock = vi.hoisted(() => vi.fn());
 const savePersistedTabSessionMock = vi.hoisted(() => vi.fn());
 
-vi.mock(
-  '@/features/pause/application/use-cases/session/pause-session-persisted-tab-session-flow',
-  () => ({
-    clearPersistedTabSession: clearPersistedTabSessionMock,
-    loadPersistedTabSession: loadPersistedTabSessionMock,
-    savePersistedTabSession: savePersistedTabSessionMock,
-  }),
-);
+vi.mock('@/features/pause/application/use-cases/session/persisted-tab-session', () => ({
+  clearPersistedTabSession: clearPersistedTabSessionMock,
+  loadPersistedTabSession: loadPersistedTabSessionMock,
+  savePersistedTabSession: savePersistedTabSessionMock,
+}));
 
 vi.mock('@/features/pause/public-rpc', () => ({
   persistedTabSessionStorage: { port: 'persistedTabSessionStorage' },
 }));
 
 describe('pause-persisted-tab-session-io', () => {
-  it('re-exports tab session helpers from pause-session-persisted-tab-session-flow', () => {
+  it('re-exports tab session helpers from persisted-tab-session use cases', () => {
     expect(typeof loadPausePersistedTabSession).toBe('function');
     expect(typeof savePausePersistedTabSession).toBe('function');
     expect(typeof clearPausePersistedTabSession).toBe('function');
