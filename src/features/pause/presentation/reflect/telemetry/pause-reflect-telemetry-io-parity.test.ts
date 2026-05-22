@@ -3,6 +3,7 @@
  * Imports `pause-reflect-telemetry-flow` CI umbrella for `.toBe` identity pins only — production telemetry I/O keeps `pause-reflect-session-ui-telemetry` leaf imports.
  * Application flow-cluster sibling pins: `pause-reflect-flows-flow`, `pause-reflect-steps-flow`, `pause-reflect-generation-flow`, `pause-reflect-share-flow`.
  * Mood-io sibling: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts` (application + presentation); reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts`.
+ * Hub-io sibling: `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` (application + presentation); reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts`.
  * Ambience-io sibling: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (application + presentation); reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts`.
  * Share-io sibling: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation); reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts`.
  * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts`, `pause-reflect-steps-io-parity.test.ts`, `pause-reflect-generation-io-parity.test.ts`.
@@ -97,6 +98,17 @@ import {
   runInitialEmotionSelect as runInitialEmotionSelectFromMoodFlow,
   runInitialEmotionSkip as runInitialEmotionSkipFromMoodFlow,
 } from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow';
+import {
+  buildShiftEmotionFrameHubLogBundle,
+  pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
+  resolveShiftFrameHubDonePresentation,
+} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
+  buildShiftEmotionFrameHubLogBundle as buildLogBundleFromHubFlow,
+  resolveShiftFrameHubDonePresentation as resolvePresentationFromHubFlow,
+  runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow';
 
 describe('pause-reflect-telemetry-io parity', () => {
   it('presentation I/O session reflect telemetry matches telemetry CI umbrella', () => {
@@ -250,6 +262,34 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackShareTapDirect).not.toBe(runInitialEmotionSelectFromMoodFlow);
     expect(trackWallpaperDirect).not.toBe(runInitialEmotionSkipFromMoodFlow);
     // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (session reflect telemetry vs shift-frame hub).
+   * Dedicated sibling file: `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: hub-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(trackPauseReflectShareTap).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(trackPauseReflectWallpaperTap).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(trackPostItFromTelemetryIo).not.toBe(resolveShiftFrameHubDonePresentation);
+    expect(trackShareTapFromTelemetryIo).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(trackWallpaperFromTelemetryIo).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    // Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts`.
+    // Full pins: `pause-reflect-hub-telemetry-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (application hub-flow CI anchor).
+   */
+  it('sibling cluster: hub-flow leaf exports stay distinct from session reflect telemetry umbrella', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(runShiftHubDoneFromHubFlow);
+    expect(trackPauseReflectShareTap).not.toBe(buildLogBundleFromHubFlow);
+    expect(trackPauseReflectWallpaperTap).not.toBe(resolvePresentationFromHubFlow);
+    expect(trackPostItDirect).not.toBe(runShiftHubDoneFromHubFlow);
+    expect(trackShareTapDirect).not.toBe(buildLogBundleFromHubFlow);
+    expect(trackWallpaperDirect).not.toBe(resolvePresentationFromHubFlow);
+    // Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts`.
   });
 
   /**

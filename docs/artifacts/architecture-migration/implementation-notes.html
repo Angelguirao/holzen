@@ -93,6 +93,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — application hub-io ↔ telemetry-io sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-telemetry-io-sibling-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation <code>pause-reflect-hub-telemetry-io-sibling-parity</code> at application layer so shift-frame hub I/O stays namespace-separated from session reflect UI PostHog telemetry I/O (parity with ambience-io ↔ telemetry-io application mirrors). Extend reciprocal inline pins on <code>pause-reflect-hub-io-parity</code> and presentation <code>pause-reflect-telemetry-io-parity</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + I/O header comment cross-links only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B Tier 1 shim scan (subscription/auth), or remaining session I/O colocation gaps.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — ritual-restore-io ↔ frame-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -154,7 +171,7 @@
       <dt>Deviation</dt>
       <dd>None — test-only; extended behavioral pin for <code>hasPersistedPauseSessionPayload</code> only at application layer.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B Tier 1 shim scan (subscription/auth), or application parity for remaining reflect I/O clusters (flows, hub, pending-offer).</dd>
+      <dd>Next: Phase B Tier 1 shim scan (subscription/auth), or application parity for remaining reflect I/O clusters (flows, pending-offer).</dd>
     </dl>
   </article>
 
@@ -252,7 +269,7 @@
     <h3><code>pause-reflect-mood-telemetry-io-sibling-parity.test.ts</code> (application)</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation <code>pause-reflect-mood-telemetry-io-sibling-parity</code> at application layer so feel-step mood RPC stays namespace-separated from session reflect PostHog telemetry I/O. Extend reciprocal inline pins on colocated <code>pause-reflect-telemetry-io-parity</code> (application + presentation).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation <code>pause-reflect-mood-telemetry-io-sibling-parity</code> at application layer so feel-step mood RPC stays namespace-separated from session reflect PostHog telemetry I/O. Extend reciprocal inline pins on presentation <code>pause-reflect-telemetry-io-parity</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — test-only; application sibling imports presentation I/O modules (same pattern as ambience↔telemetry application mirror).</dd>
       <dt>Open questions</dt>
@@ -269,7 +286,7 @@
     <h3><code>pause-reflect-ambience-telemetry-io-sibling-parity.test.ts</code> (application)</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation <code>pause-reflect-ambience-telemetry-io-sibling-parity</code> at application layer so frame-focus ambience I/O stays namespace-separated from session reflect UI PostHog telemetry I/O (parity with flows-io ↔ telemetry-io application mirrors; mood application sibling landed in prior slice). Extend reciprocal inline pins on <code>pause-reflect-ambience-io-parity</code> and <code>pause-reflect-telemetry-io-parity</code> (application + presentation).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation <code>pause-reflect-ambience-telemetry-io-sibling-parity</code> at application layer so frame-focus ambience I/O stays namespace-separated from session reflect UI PostHog telemetry I/O (parity with flows-io ↔ telemetry-io application mirrors; mood and hub application siblings landed in prior slices). Extend reciprocal inline pins on <code>pause-reflect-ambience-io-parity</code> and presentation <code>pause-reflect-telemetry-io-parity</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comment cross-links only.</dd>
       <dt>Open questions</dt>
