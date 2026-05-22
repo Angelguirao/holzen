@@ -99,4 +99,13 @@ describe('pause-reflect-pending-offer-flow', () => {
     expect(trackDeclinedFromFlow).not.toBe(dismissFromGenerationFlow);
     expect(trackAbandonedFromFlow).not.toBe(runReflectGenerationFromGenerationFlow);
   });
+
+  it('sibling cluster: rpc-flow subcluster shares adopt/decline only (not display or telemetry)', () => {
+    expect(runAdoptPendingPauseOffer).toBe(runAdoptFromRpcSubcluster);
+    expect(runDeclinePendingPauseOffer).toBe(runDeclineFromRpcSubcluster);
+    expect(getDisplayFromFlow).not.toBe(runAdoptFromRpcSubcluster);
+    expect(trackAdoptedFromFlow).not.toBe(runAdoptFromRpcSubcluster);
+    expect(trackDeclinedFromFlow).not.toBe(runDeclineFromRpcSubcluster);
+    expect(trackAbandonedFromFlow).not.toBe(runDeclineFromRpcSubcluster);
+  });
 });
