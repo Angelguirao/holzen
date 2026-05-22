@@ -63,6 +63,11 @@ import {
   shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
   shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
 } from '../steps/pause-reflect-steps-flow';
+import {
+  trackPauseReflectPostItOpen as trackPostItFromTelemetryFlow,
+  trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
+  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
+} from '../telemetry/pause-reflect-telemetry-flow';
 
 import {
   buildManualPauseCreateOrReuseParams as buildCreateOrReuseFromFlow,
@@ -170,5 +175,14 @@ describe('pause-reflect-generation-flow', () => {
     expect(runReflectGeneration).not.toBe(shouldShowFavoriteFromStepsFlow);
     expect(openManualFromFlow).not.toBe(shouldLogFromStepsFlow);
     expect(dismissFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+  });
+
+  it('sibling cluster: telemetry-flow exports stay distinct from generation umbrella exports', () => {
+    expect(runReflectGeneration).not.toBe(trackPostItFromTelemetryFlow);
+    expect(runReflectGeneration).not.toBe(trackShareTapFromTelemetryFlow);
+    expect(runReflectGeneration).not.toBe(trackWallpaperFromTelemetryFlow);
+    expect(openManualFromFlow).not.toBe(trackPostItFromTelemetryFlow);
+    expect(reflectGenerationPrerequisite).not.toBe(trackShareTapFromTelemetryFlow);
+    expect(shouldCommitReflectGeneration).not.toBe(trackWallpaperFromTelemetryFlow);
   });
 });

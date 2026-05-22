@@ -38,6 +38,10 @@ import {
   shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
   shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
 } from '../steps/pause-reflect-steps-flow';
+import {
+  openManualPauseFromHome as openManualFromGenerationFlow,
+  runReflectGeneration as runReflectGenerationFromGenerationFlow,
+} from '../generation/pause-reflect-generation-flow';
 
 describe('pause-reflect-telemetry-flow', () => {
   it('re-exports session reflect UI telemetry trackers from pause-reflect-session-ui-telemetry', () => {
@@ -88,5 +92,14 @@ describe('pause-reflect-telemetry-flow', () => {
     expect(trackPauseReflectWallpaperTap).not.toBe(shouldLogFromStepsFlow);
     expect(trackPauseReflectPostItOpen).not.toBe(shouldLogFromStepsFlow);
     expect(trackPauseReflectShareTap).not.toBe(runReflectionStepFromStepsFlow);
+  });
+
+  it('sibling cluster: session reflect UI telemetry-flow exports stay distinct from generation-flow exports', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(trackPauseReflectShareTap).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(trackPauseReflectWallpaperTap).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(trackPauseReflectPostItOpen).not.toBe(openManualFromGenerationFlow);
+    expect(trackPauseReflectShareTap).not.toBe(openManualFromGenerationFlow);
+    expect(trackPauseReflectWallpaperTap).not.toBe(openManualFromGenerationFlow);
   });
 });
