@@ -1,20 +1,22 @@
 /**
  * Reflect+decide flows presentation I/O (preflight, decide outcome RPC, outcome toasts).
- * Imports reflect/decide helpers from domain + ritual/decide leaf modules (parity with
- * `pause-reflect-pending-offer-io` → adopt/decline/display leaf use cases).
+ * Imports reflect/decide helpers from domain + ritual/decide leaf modules (score impacts
+ * from `score-impacts` / `score-impact-presentation`; parity with `pause-reflect-mood-io`).
  * `PauseImpactData` via `pause-session-decide-io` (session decide beat).
  */
 import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
 import {
   buildPauseScoreImpacts,
   parseScoreImpactVolatilityPct,
+  type PauseScoreImpactRow,
+} from '@/features/pause/application/use-cases/ritual/decide/score-impacts';
+import {
   resolveScoreImpactDisplayImpacts,
   resolveScoreImpactViewMode,
   scoreImpactMotionDelaySec,
-  type PauseScoreImpactRow,
   type ScoreImpactVariant,
   type ScoreImpactViewMode,
-} from '@/features/pause/application/use-cases/ritual/decide/pause-decide-score-impacts-flow';
+} from '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation';
 import {
   formatReinforcementQuoteFromSession,
   resolvePauseDecideOutcomeFlow,

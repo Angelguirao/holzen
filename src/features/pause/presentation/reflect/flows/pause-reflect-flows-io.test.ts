@@ -56,7 +56,7 @@ describe('pause-reflect-flows-io', () => {
     expect(view.effectiveReflectionMessage).toBe('seed');
   });
 
-  it('re-exports score-impact builders from ritual/decide score-impacts flow', () => {
+  it('re-exports score-impact builders from ritual/decide score-impacts leaf modules', () => {
     const impacts = buildPauseScoreImpacts(
       {
         mood: 'calm',
