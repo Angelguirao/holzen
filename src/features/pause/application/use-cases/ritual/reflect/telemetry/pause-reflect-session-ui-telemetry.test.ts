@@ -7,7 +7,7 @@ import {
 
 const trackEvent = vi.fn();
 
-vi.mock('@/features/pause/application/pause-product-analytics', () => ({
+vi.mock('./pause-reflect-product-telemetry', () => ({
   trackEvent: (...args: unknown[]) => trackEvent(...args),
 }));
 

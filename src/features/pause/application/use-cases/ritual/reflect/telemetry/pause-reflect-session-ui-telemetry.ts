@@ -1,4 +1,4 @@
-import { trackEvent } from '@/features/pause/application/pause-product-analytics';
+import { trackEvent } from './pause-reflect-product-telemetry';
 
 export type PauseReflectTelemetrySurface = 'pause_reflect' | 'pause_done';
 
