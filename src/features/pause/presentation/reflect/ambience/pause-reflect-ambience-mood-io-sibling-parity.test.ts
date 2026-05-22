@@ -22,7 +22,10 @@ import * as moodIo from '@/features/pause/presentation/reflect/mood/pause-reflec
 /**
  * Presentation sibling parity: ambience-io vs mood-io (parity with
  * `pause-reflect-ambience-hub-io-sibling-parity.test.ts` and
- * `pause-reflect-mood-hub-io-sibling-parity.test.ts`).
+ * `pause-reflect-mood-hub-io-sibling-parity.test.ts`; application mirror:
+ * `application/.../ambience/pause-reflect-ambience-mood-io-sibling-parity.test.ts`;
+ * reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts` ↔
+ * `pause-reflect-mood-io-parity.test.ts`).
  */
 describe('pause-reflect-ambience-io ↔ pause-reflect-mood-io sibling parity', () => {
   it('ambience-io and mood-io are distinct presentation I/O surfaces', () => {
