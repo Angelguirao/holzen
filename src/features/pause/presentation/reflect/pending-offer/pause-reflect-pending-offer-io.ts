@@ -19,14 +19,17 @@ export {
   type PendingPauseOfferDisplayInput,
 };
 
+/** Default `PauseRepository` for pending-offer presentation hooks. */
+export const reflectPauseRepository = supabasePauseRepository;
+
 /** Default port + use case: adopt the pending pause offer. */
 export function pauseAdoptPendingOffer(): ReturnType<typeof runAdoptPendingPauseOffer> {
-  return runAdoptPendingPauseOffer(supabasePauseRepository);
+  return runAdoptPendingPauseOffer(reflectPauseRepository);
 }
 
 /** Default port + use case: decline the pending pause offer. */
 export function pauseDeclinePendingOffer(): ReturnType<typeof runDeclinePendingPauseOffer> {
-  return runDeclinePendingPauseOffer(supabasePauseRepository);
+  return runDeclinePendingPauseOffer(reflectPauseRepository);
 }
 
 /** Test seam: inject a custom `PauseRepository` for adopt. */

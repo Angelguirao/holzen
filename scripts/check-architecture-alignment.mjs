@@ -2901,7 +2901,8 @@ for (const file of walkTs(join(root, 'src'))) {
   if (rel.startsWith('src/features/pause/presentation/reflect/pending-offer/')) {
     const pendingOfferIoAllowlisted =
       rel.endsWith('pause-reflect-pending-offer-io.ts') ||
-      rel.endsWith('pause-reflect-pending-offer-io.test.ts');
+      rel.endsWith('pause-reflect-pending-offer-io.test.ts') ||
+      rel.endsWith('pause-reflect-pending-offer-io.re-exports.test.ts');
     for (const needle of LEGACY_PAUSE_REFLECT_PENDING_OFFER_TELEMETRY_PATH_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy reflect/pending-offer telemetry import (${needle})`);
@@ -2936,7 +2937,8 @@ for (const file of walkTs(join(root, 'src'))) {
     }
     if (
       rel.endsWith('pause-reflect-pending-offer-io.ts') ||
-      rel.endsWith('pause-reflect-pending-offer-io.test.ts')
+      rel.endsWith('pause-reflect-pending-offer-io.test.ts') ||
+      rel.endsWith('pause-reflect-pending-offer-io.re-exports.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_RPC_FLOW_IMPORTS) {
         if (text.includes(needle)) {
