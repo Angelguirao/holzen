@@ -26,7 +26,8 @@
  * `pause-reflect-flows-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io` (application
  * `pause-reflect-flows-mood-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
  * `pause-reflect-flows-io-parity.test.ts` (application) ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`),
- * `pause-session-step-handlers-flows-io-sibling-parity.test.ts` ↔ `pause-session-step-handlers-io` (cross-surface).
+ * `pause-session-step-handlers-flows-io-sibling-parity.test.ts` ↔ `pause-session-step-handlers-io` (cross-surface;
+ * application mirror: `pause-session-step-handlers-flows-io-sibling-parity.test.ts` under `application/.../session/`).
  */
 import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
 import {
