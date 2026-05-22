@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for session shell chrome (§3 / check:architecture-alignment).
  * Use cases live in sibling modules; re-export for presentation I/O imports.
- * Presentation: `pause-session-shell-io.ts` imports through this anchor (off deep session modules).
+ * Presentation: `pause-session-shell-io.ts` imports sibling modules directly (not this umbrella).
  */
 export {
   computePauseSessionHydration,

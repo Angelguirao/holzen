@@ -506,6 +506,29 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_MAP_PERSISTED_STEP_IMPORTS = [
   "from '../domain/session/map-persisted-step'",
 ];
 
+/** Session shell I/O — import via session subcluster modules only (not pause-session-shell-flow umbrella). */
+const LEGACY_PAUSE_PRESENTATION_SESSION_SHELL_IO_UMBRELLA_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pause-session-shell-flow',
+  "from './application/use-cases/session/pause-session-shell-flow'",
+  "from '../application/use-cases/session/pause-session-shell-flow'",
+];
+
+/** Session presentation — import shell chrome use cases via pause-session-shell-io only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_SHELL_USE_CASE_IMPORTS = [
+  '@/features/pause/application/use-cases/session/hydration',
+  '@/features/pause/application/use-cases/session/header-back',
+  '@/features/pause/application/use-cases/session/mount-log-params',
+  '@/features/pause/application/use-cases/session/shell-view-model',
+  "from './application/use-cases/session/hydration'",
+  "from '../application/use-cases/session/hydration'",
+  "from './application/use-cases/session/header-back'",
+  "from '../application/use-cases/session/header-back'",
+  "from './application/use-cases/session/mount-log-params'",
+  "from '../application/use-cases/session/mount-log-params'",
+  "from './application/use-cases/session/shell-view-model'",
+  "from '../application/use-cases/session/shell-view-model'",
+];
+
 /** Session presentation — import persisted-session guards via shell/scaffold I/O only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_DOMAIN_GUARDS_IMPORTS = [
   '@/features/pause/domain/session/persisted-session-guards',
@@ -2212,9 +2235,31 @@ for (const file of walkTs(join(root, 'src'))) {
         }
       }
     }
+    const sessionShellIoAllowlisted =
+      rel.endsWith('pause-session-shell-io.ts') ||
+      rel.endsWith('pause-session-shell-io.test.ts');
+    if (!sessionShellIoAllowlisted) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_SHELL_USE_CASE_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy session shell use-case import (${needle})`);
+        }
+      }
+    }
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_DOMAIN_GUARDS_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session domain guard import (${needle})`);
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-session-shell-io.ts') ||
+    rel.endsWith('pause-session-shell-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_SHELL_IO_UMBRELLA_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: session shell I/O must import via session subcluster modules (${needle})`,
+        );
       }
     }
   }
