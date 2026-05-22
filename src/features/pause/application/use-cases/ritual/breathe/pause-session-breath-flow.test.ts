@@ -97,4 +97,24 @@ describe('pause-session-breath-flow', () => {
     expect(runLogBreathSegment1Skipped).toBe(runSegment1SkippedDirect);
     expect(runLogBreathSegment2Skipped).toBe(runSegment2SkippedDirect);
   });
+
+  it('umbrella bindings match ritual/breathe subcluster CI anchors (leaf parity)', () => {
+    expect(initialBreathingFirstCompletedFromRestored).toBe(firstCompletedFromRestoredModule);
+    expect(initialBreathingSecondCompletedFromRestored).toBe(secondCompletedFromRestoredModule);
+    expect(initialBreathSegmentRpcLoggedFlagsFromRestored).toBe(flagsDirect);
+    expect(computeBreathingPhaseAdvance).toBe(computeAdvanceFromPhaseAdvance);
+    expect(resolveBreathingCompleted).toBe(resolveCompletedDirect);
+    expect(resolveBreathingPhaseAdvanceOutcome).toBe(resolveOutcomeDirect);
+    expect(DEEP_PAUSE_STEP_AFTER_FIRST_BREATH).toBe(deepAfterFirstBreathDirect);
+    expect(DEEP_PAUSE_STEP_AFTER_SECOND_BREATH).toBe(deepAfterSecondBreathDirect);
+    expect(BRIEF_PAUSE_STEP_AFTER_BREATH).toBe(briefAfterBreathDirect);
+    expect(BRIEF_PAUSE_STEP_AFTER_INTEGRATE).toBe(briefAfterIntegrateDirect);
+    expect(BRIEF_FIRST_BREATH_SEGMENT_LOG).toBe(briefFirstSegmentDirect);
+    expect(shouldResetBriefIntegrateAdvanceGuard).toBe(shouldResetIntegrateGuardDirect);
+    expect(claimBriefIntegrateAdvance).toBe(claimIntegrateAdvanceDirect);
+    expect(runEnsureBreathSegment1Logged).toBe(runSegment1Direct);
+    expect(runEnsureBreathSegment2Logged).toBe(runSegment2Direct);
+    expect(runLogBreathSegment1Skipped).toBe(runSegment1SkippedDirect);
+    expect(runLogBreathSegment2Skipped).toBe(runSegment2SkippedDirect);
+  });
 });
