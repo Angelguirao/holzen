@@ -110,6 +110,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — application share-io parity colocated (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-share-io-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation <code>pause-reflect-share-io-parity</code> beside <code>pause-reflect-share-flow.ts</code> so share CI umbrella identity pins live at the application anchor (parity with steps/telemetry application mirrors). Presentation I/O stays off <code>deliverReflectionShareImage</code>; orchestration-flow owns deliver leaf.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only; imports presentation share-io for builder/orchestration namespace pins.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: application parity for flows/hub/mood I/O clusters, or Phase B Tier 1 shim scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — ritual-restore-io ↔ frame-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

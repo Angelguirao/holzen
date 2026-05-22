@@ -66,6 +66,8 @@ import {
 
 /**
  * Presentation-layer share I/O parity (colocated beside `pause-reflect-share-io.ts`).
+ * Application mirror: `application/use-cases/ritual/reflect/share/pause-reflect-share-io-parity.test.ts`
+ * (colocated beside `pause-reflect-share-flow.ts`; orchestration namespace pins stay split across surfaces).
  * Generation-io sibling: `pause-reflect-generation-share-io-sibling-parity.test.ts`.
  * Flows-io sibling: `pause-reflect-flows-share-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (colocated under `presentation/reflect/flows/`).
