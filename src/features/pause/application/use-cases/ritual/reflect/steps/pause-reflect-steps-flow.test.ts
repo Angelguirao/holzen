@@ -48,6 +48,7 @@ import {
   runAdoptPendingPauseOffer as runAdoptFromPendingOfferFlow,
   runDeclinePendingPauseOffer as runDeclineFromPendingOfferFlow,
   trackPausePendingAdopted as trackAdoptedFromPendingOfferFlow,
+  trackPausePendingDeclined as trackDeclinedFromPendingOfferFlow,
   trackPauseSessionAbandoned as trackAbandonedFromPendingOfferFlow,
 } from '../pending-offer/pause-reflect-pending-offer-flow';
 import {
@@ -106,7 +107,10 @@ describe('pause-reflect-steps-flow', () => {
     expect(runPauseReflectionStepLogOnce).not.toBe(runDeclineFromPendingOfferFlow);
     expect(shouldShowFavoriteFromFlow).not.toBe(getDisplayFromPendingOfferFlow);
     expect(shouldLogFromFlow).not.toBe(trackAdoptedFromPendingOfferFlow);
+    expect(shouldLogFromFlow).not.toBe(trackDeclinedFromPendingOfferFlow);
     expect(shouldLogFromFlow).not.toBe(trackAbandonedFromPendingOfferFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(trackDeclinedFromPendingOfferFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(trackDeclinedFromPendingOfferFlow);
   });
 
   it('sibling cluster: generation-flow exports stay distinct from steps umbrella exports', () => {

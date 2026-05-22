@@ -5,7 +5,7 @@
  * Wrapper delegation: pause-reflect-steps-io-parity.test.ts (presentation I/O → run-* leaves).
  * Sibling pins: pause-reflect-steps-flow.test.ts (umbrella vs steps subcluster flow anchors);
  * pause-reflect-steps-flow.test.ts ↔ pause-reflect-flows-flow.test.ts (inline);
- * pause-reflect-steps-flow.test.ts ↔ pause-reflect-pending-offer-flow.test.ts (inline sibling pins);
+ * pause-reflect-steps-flow.test.ts ↔ pause-reflect-pending-offer-flow.test.ts (inline sibling pins incl. declined telemetry);
  * pause-reflect-steps-hub-flow-sibling-parity.test.ts, pause-reflect-steps-mood-flow-sibling-parity.test.ts,
  * pause-reflect-steps-pending-offer-flow-sibling-parity.test.ts,
  * pause-reflect-steps-generation-flow-sibling-parity.test.ts, and
