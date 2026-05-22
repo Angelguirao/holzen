@@ -1,3 +1,8 @@
+/**
+ * Application sibling parity: pending-offer-flow CI umbrella vs presentation pending-offer-io wrappers.
+ * Presentation mirror: `presentation/reflect/pending-offer/pause-reflect-pending-offer-flow-io-wrapper-sibling-parity.test.ts`
+ * (colocated beside `pause-reflect-pending-offer-io.ts`).
+ */
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({

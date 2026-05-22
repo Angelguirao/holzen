@@ -30,6 +30,7 @@
  * ↔ `pause-reflect-pending-offer-telemetry-io.test.ts` (RPC vs pending-offer telemetry),
  * ↔ `pause-reflect-telemetry-io.test.ts` (session reflect UI telemetry),
  * ↔ `pause-reflect-steps-io.test.ts` (RPC vs post-it step mutations).
+ * Flow↔I/O wrapper distinctness: `pause-reflect-pending-offer-flow-io-wrapper-sibling-parity.test.ts` (presentation; application mirror under `application/.../pending-offer/`).
  */
 import {
   getPendingPauseOfferDisplay,
