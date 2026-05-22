@@ -1989,6 +1989,7 @@ for (const file of walkTs(join(root, 'src'))) {
       !rel.endsWith('pause-reflect-generation-io.ts') &&
       !rel.endsWith('pause-reflect-generation-io.test.ts') &&
       !rel.endsWith('pause-reflect-generation-io.re-exports.test.ts') &&
+      !rel.endsWith('pause-reflect-generation-io-parity.test.ts') &&
       !rel.endsWith('pause-reflect-generation-hook-io-sibling-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_HOOK_IMPORTS) {
@@ -2144,10 +2145,13 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-reflect-generation-io.ts') ||
     rel.endsWith('pause-reflect-generation-io.test.ts') ||
     rel.endsWith('pause-reflect-generation-io.re-exports.test.ts') ||
+    rel.endsWith('pause-reflect-generation-io-parity.test.ts') ||
     rel.endsWith('pause-reflect-generation-hook-io-sibling-parity.test.ts')
   ) {
+    const generationIoParityTest = rel.endsWith('pause-reflect-generation-io-parity.test.ts');
     if (
-      !rel.endsWith('pause-reflect-generation-io.re-exports.test.ts')
+      !rel.endsWith('pause-reflect-generation-io.re-exports.test.ts') &&
+      !generationIoParityTest
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IO_GENERATION_FLOW_IMPORTS) {
         if (text.includes(needle)) {
@@ -2157,18 +2161,20 @@ for (const file of walkTs(join(root, 'src'))) {
         }
       }
     }
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IO_HOOK_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: holzen-reflect generation I/O must import domain + run-reflect-generation directly (${needle})`,
-        );
+    if (!generationIoParityTest) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IO_HOOK_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: holzen-reflect generation I/O must import domain + run-reflect-generation directly (${needle})`,
+          );
+        }
       }
-    }
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IO_HOOK_FLOW_BUNDLE_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: holzen-reflect generation I/O must import domain hook leaf modules directly (${needle})`,
-        );
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IO_HOOK_FLOW_BUNDLE_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: holzen-reflect generation I/O must import domain hook leaf modules directly (${needle})`,
+          );
+        }
       }
     }
   }

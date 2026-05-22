@@ -140,7 +140,7 @@ describe('pause-reflect-share-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ application `pause-reflect-generation-io-parity.test.ts`.
+   * Reciprocal inline pins ↔ `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-generation-share-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: generation-io exports stay distinct from share-io wrappers', () => {

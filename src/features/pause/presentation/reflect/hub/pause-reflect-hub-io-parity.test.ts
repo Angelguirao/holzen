@@ -95,7 +95,7 @@ describe('pause-reflect-hub-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (shift-frame hub vs holzen-reflect).
+   * Reciprocal inline pins ↔ `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts` (shift-frame hub vs holzen-reflect).
    * Dedicated sibling file: `pause-reflect-generation-hub-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: generation-io holzen-reflect exports stay distinct from hub-io wrappers', () => {
@@ -106,7 +106,7 @@ describe('pause-reflect-hub-io parity', () => {
     expect(reflectPauseRepository).not.toBe(reflectGenerator);
     expect(pauseShiftEmotionFrameHubDone).not.toBe(messageFromReflectGenerationResult);
     expect(buildLogBundleFromHubIo).not.toBe(runReflectGeneration);
-    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
     // Full pins: `pause-reflect-generation-hub-io-sibling-parity.test.ts`.
   });
 

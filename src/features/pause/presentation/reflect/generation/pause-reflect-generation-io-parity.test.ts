@@ -92,7 +92,9 @@ import {
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 
 /**
- * Application-layer generation I/O parity. Hub-io sibling:
+ * Presentation I/O parity (colocated beside `pause-reflect-generation-io.ts`).
+ * Imports `pause-reflect-generation-flow` CI umbrella and domain hook bundle for `.toBe` identity pins only — production generation I/O keeps leaf imports.
+ * Hub-io sibling:
  * `pause-reflect-generation-hub-io-sibling-parity.test.ts` (application + presentation);
  * mood-io sibling: `pause-reflect-generation-mood-io-sibling-parity.test.ts` (application + presentation);
  * flows-io sibling: `pause-reflect-flows-generation-io-sibling-parity.test.ts`;
@@ -240,7 +242,7 @@ describe('pause-reflect-generation-io parity', () => {
     expect(reflectGenerator).not.toBe(trackPauseReflectPostItOpen);
     expect(runReflectGeneration).not.toBe(trackPauseReflectShareTap);
     expect(reflectGenerationPrerequisite).not.toBe(trackPauseReflectWallpaperTap);
-    // Reciprocal inline pins: `pause-reflect-telemetry-io-parity.test.ts`.
+    // Reciprocal inline pins: `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts`.
   });
 
   /**

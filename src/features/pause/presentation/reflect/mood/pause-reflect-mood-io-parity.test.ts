@@ -104,7 +104,7 @@ import {
  * Flows-io sibling pins: `pause-reflect-flows-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts`.
  * Generation-io sibling pins: `pause-reflect-generation-mood-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (application).
+ * reciprocal inline pins ↔ `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
  */
 describe('pause-reflect-mood-io parity', () => {
   it('mood CI umbrella composes the same domain mood leaves as presentation I/O', () => {
@@ -207,7 +207,7 @@ describe('pause-reflect-mood-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (application; mood RPC vs holzen-reflect).
+   * Reciprocal inline pins ↔ `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts` (mood RPC vs holzen-reflect).
    * Dedicated sibling file: `pause-reflect-generation-mood-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: generation-io exports stay distinct from mood-io wrappers', () => {
@@ -219,7 +219,7 @@ describe('pause-reflect-mood-io parity', () => {
     expect(applyBriefDepthPickerRitualEntry).not.toBe(messageFromReflectGenerationResult);
     expect(reflectPauseRepository).not.toBe(reflectGenerator);
     expect(pauseInitialEmotionSelect).not.toBe(runReflectGeneration);
-    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts` (application).
+    // Reciprocal inline pins: `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
     // Full pins: `pause-reflect-generation-mood-io-sibling-parity.test.ts`.
   });
 
