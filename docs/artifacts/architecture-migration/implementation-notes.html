@@ -69,7 +69,24 @@
       <dt>Deviation</dt>
       <dd>None — tests + comment only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: session step-handlers-io / scaffold-io / brief-io parity, or Tier 1 <code>holzen-query-client-ref</code> shim peel.</dd>
+      <dd>Next: session step-handlers-io / scaffold-io parity, or Tier 1 <code>holzen-query-client-ref</code> shim peel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session brief-io ↔ brief-flow application parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-brief-io-parity.test.ts</code> + re-exports identity pin</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add application-layer <code>pause-session-brief-io-parity.test.ts</code> and presentation <code>pause-session-brief-io.re-exports.test.ts</code> so <code>pause-session-brief-io</code> exports match <code>pause-session-brief-flow</code> CI umbrella and session + <code>ritual/brief/ritual-depth-upgrade</code> leaf modules (parity with frame-io / breath-io session pins). Production brief I/O keeps direct leaf import; depth upgrade via <code>pauseBriefRitualDepthUpgraded</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow/I/O comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: session shell-io / step-handlers-io / scaffold-io parity, or Phase B subscription Tier 1 shims.</dd>
     </dl>
   </article>
 
@@ -86,7 +103,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + flow comment only.</dd>
       <dt>Open question</dt>
-      <dd>Next: step-handlers-io / scaffold-io / brief-io parity, or Phase B subscription Tier 1 shims.</dd>
+      <dd>Next: step-handlers-io / scaffold-io parity, or Phase B subscription Tier 1 shims.</dd>
     </dl>
   </article>
 
