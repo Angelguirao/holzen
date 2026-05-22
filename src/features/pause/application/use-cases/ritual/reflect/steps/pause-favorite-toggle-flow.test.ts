@@ -31,6 +31,8 @@ describe('pause-favorite-toggle-flow', () => {
     expect(shouldShowFromFlow).not.toBe(shouldLogFromLogFlow);
     expect(runPauseFavoriteToggle).not.toBe(shouldLogFromLogFlow);
     expect(shouldShowFromFlow).not.toBe(runReflectionStepFromLogFlow);
+    // Full umbrella pins: reciprocal inline pins on `pause-reflect-steps-flow.test.ts`;
+    // `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: steps-flow exports stay distinct from favorite-toggle-flow export', () => {

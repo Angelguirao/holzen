@@ -95,6 +95,27 @@ describe('pause-reflect-steps-flow', () => {
     expect(shouldLogFromFlow).toBe(shouldLogFromLogFlow);
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-favorite-toggle-flow.test.ts` /
+   * `pause-reflection-step-log-flow.test.ts` (favorite vs reflection_step log subclusters).
+   * Dedicated sibling files: `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`,
+   * `pause-reflect-steps-favorite-reflection-step-log-flow-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: favorite-toggle-flow and reflection-step-log-flow stay distinct via steps umbrella', () => {
+    expect(runPauseFavoriteToggle).not.toBe(runReflectionStepFromLogFlow);
+    expect(runPauseFavoriteToggle).not.toBe(shouldLogFromLogFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(runReflectionStepFromLogFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(shouldLogFromLogFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(runFavoriteFromFavoriteFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(shouldShowFavoriteFromFavoriteFlow);
+    expect(shouldLogFromFlow).not.toBe(runFavoriteFromFavoriteFlow);
+    expect(shouldLogFromFlow).not.toBe(shouldShowFavoriteFromFavoriteFlow);
+    expect(runPauseFavoriteToggle).not.toBe(runPauseReflectionStepLogOnce);
+    expect(shouldShowFavoriteFromFlow).not.toBe(shouldLogFromFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(runReflectionStepFromLogFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(shouldLogFromLogFlow);
+  });
+
   it('sibling cluster: note-flow and tag-flow exports stay distinct from steps umbrella-only bindings', () => {
     expect(runPauseFavoriteToggle).not.toBe(runNoteFromNoteFlow);
     expect(runPauseFavoriteToggle).not.toBe(runTagFromTagFlow);
