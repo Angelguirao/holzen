@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — ritual/breathe session breath cluster marker (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-breath-cluster</code> + umbrella flow regression test</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add empty <code>pause-session-breath-cluster</code> beside <code>pause-session-breath-flow</code> (parity with session step-transition / step-handlers markers). Umbrella flow test asserts identity re-exports from restored breath, phase-advance, and segment-log siblings; <code>pause-session-breath-io</code> unchanged (imports leaf modules directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI/documentation slice only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Breath presentation I/O test already covers several re-exports; umbrella flow test locks CI anchor ↔ leaf bindings.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: further session I/O leaf peels, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session step-handlers cluster marker (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
