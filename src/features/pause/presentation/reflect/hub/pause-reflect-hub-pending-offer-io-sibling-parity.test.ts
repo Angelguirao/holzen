@@ -24,7 +24,9 @@ import {
 
 /**
  * Presentation sibling parity: hub-io vs pending-offer-io (parity with application
- * `pause-reflect-hub-pending-offer-flow-sibling-parity.test.ts`).
+ * `pause-reflect-hub-pending-offer-flow-sibling-parity.test.ts`; complements
+ * `pause-reflect-mood-hub-io-sibling-parity.test.ts` and
+ * `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`).
  */
 describe('pause-reflect-hub-io ↔ pause-reflect-pending-offer-io sibling parity', () => {
   it('hub-io and pending-offer-io are distinct presentation I/O surfaces', () => {
@@ -59,6 +61,7 @@ describe('pause-reflect-hub-io ↔ pause-reflect-pending-offer-io sibling parity
     expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseAdoptPendingOfferWithRepository);
     expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseDeclinePendingOfferWithRepository);
     expect(buildShiftEmotionFrameHubLogBundle).not.toBe(getPendingPauseOfferDisplay);
+    expect(resolveShiftFrameHubDonePresentation).not.toBe(getPendingPauseOfferDisplay);
     expect(resolveShiftFrameHubDonePresentation).not.toBe(pauseAdoptPendingOffer);
     expect(hubReflectPauseRepository).not.toBe(pauseAdoptPendingOffer);
   });
