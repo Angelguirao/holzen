@@ -65,6 +65,10 @@ import {
   runInitialEmotionSelect as runEmotionSelectFromMoodFlow,
   runInitialEmotionSkip as runEmotionSkipFromMoodFlow,
 } from '../mood/pause-reflect-mood-flow';
+import {
+  trackPauseReflectPostItOpen as trackPostItFromTelemetryFlow,
+  trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
+} from '../telemetry/pause-reflect-telemetry-flow';
 
 import {
   pauseReflectOutcomeLog,
@@ -164,6 +168,13 @@ describe('pause-reflect-flows-flow', () => {
     expect(formatQuoteFromFlow).not.toBe(buildFeelTilesFromMoodFlow);
     expect(resolveOutcomeFlowFromFlow).not.toBe(runEmotionSkipFromMoodFlow);
     expect(buildImpactsFromFlow).not.toBe(buildFeelTilesFromMoodFlow);
+  });
+
+  it('sibling cluster: telemetry-flow exports stay distinct from flows umbrella exports', () => {
+    expect(resolvePreflightFromFlow).not.toBe(trackPostItFromTelemetryFlow);
+    expect(resolveAfterGenFromFlow).not.toBe(trackShareTapFromTelemetryFlow);
+    expect(runOutcomeLogFromFlow).not.toBe(trackPostItFromTelemetryFlow);
+    expect(formatQuoteFromFlow).not.toBe(trackShareTapFromTelemetryFlow);
   });
 
   it('flows CI umbrella re-exports runPauseOutcomeLog as ritual/decide leaf (not presentation port wrappers)', () => {
