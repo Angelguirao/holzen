@@ -73,6 +73,14 @@ import {
   pauseShiftEmotionFrameHubDoneWithRepository,
   resolveShiftFrameHubDonePresentation,
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
@@ -153,5 +161,25 @@ describe('pause-reflect-flows-io parity', () => {
     expect(resolvePauseDecideOutcomeFlow).not.toBe(resolveShiftFrameHubDonePresentation);
     expect(buildPauseScoreImpacts).not.toBe(buildShiftEmotionFrameHubLogBundle);
     // Full pins: `pause-reflect-flows-hub-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (reflect+decide vs step RPC wrappers).
+   * Dedicated sibling file: `pause-reflect-flows-steps-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: steps-io exports stay distinct from flows-io', () => {
+    expect(pauseReflectOutcomeLog).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseReflectNoteUpdate);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseReflectTagUpdate);
+    expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseReflectionStepLogOnce);
+    expect(formatReinforcementQuoteFromSession).not.toBe(pauseReflectNoteUpdate);
+    expect(resolvePauseDecideOutcomeFlow).not.toBe(pauseReflectTagUpdate);
+    expect(buildPauseScoreImpacts).not.toBe(pauseReflectFavoriteToggle);
+    expect(getSessionQuote).not.toBe(pauseReflectTagUpdate);
+    expect(pauseReflectOutcomeLog).not.toBe(shouldLogPauseReflectionStep);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(shouldShowFavoriteProHint);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseReflectTagUpdate);
+    // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
+    // Full pins: `pause-reflect-flows-steps-io-sibling-parity.test.ts`.
   });
 });

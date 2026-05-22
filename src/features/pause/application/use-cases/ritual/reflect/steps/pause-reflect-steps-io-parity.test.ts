@@ -33,6 +33,8 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
  * (reciprocal inline: `pause-reflect-steps-io.test.ts`); flow umbrellas:
  * `pause-reflect-note-tag-flow-sibling-parity.test.ts`,
  * `pause-reflect-steps-note-tag-flow-sibling-parity.test.ts`.
+ * Flows-io cross-surface: `pause-reflect-flows-io-parity.test.ts` ↔ this file;
+ * `pause-reflect-flows-steps-io-sibling-parity.test.ts` (application + presentation).
  */
 import {
   runPauseFavoriteToggle,
@@ -65,6 +67,16 @@ import {
   pauseShiftEmotionFrameHubDoneWithRepository,
   resolveShiftFrameHubDonePresentation,
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
+  buildPauseScoreImpacts,
+  formatReinforcementQuoteFromSession,
+  getSessionQuote,
+  pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
+  resolvePauseDecideOutcomeFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   reflectionStepSessionStorage,
   supabasePauseRepository,
@@ -250,5 +262,24 @@ describe('pause-reflect-steps-io parity', () => {
     expect(shouldLogFromStepsIo).not.toBe(resolveShiftFrameHubDonePresentation);
     expect(pauseReflectFavoriteToggle).not.toBe(resolveShiftFrameHubDonePresentation);
     // Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (step RPC wrappers vs reflect+decide).
+   * Dedicated sibling file: `pause-reflect-flows-steps-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: flows-io exports stay distinct from steps-io wrappers', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(pauseReflectTagUpdate).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(pauseReflectionStepLogOnce).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
+    expect(shouldShowFromStepsIo).not.toBe(formatReinforcementQuoteFromSession);
+    expect(shouldLogFromStepsIo).not.toBe(resolvePauseDecideOutcomeFlow);
+    expect(pauseReflectFavoriteToggle).not.toBe(getSessionQuote);
+    expect(pauseReflectNoteUpdate).not.toBe(buildPauseScoreImpacts);
+    expect(pauseReflectTagUpdate).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseReflectTagUpdate);
+    // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts`.
+    // Full pins: `pause-reflect-flows-steps-io-sibling-parity.test.ts`.
   });
 });

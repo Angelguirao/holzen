@@ -23,8 +23,12 @@ import * as flowsIo from './pause-reflect-flows-io';
 import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
+  pauseReflectNoteUpdateWithRepository,
   pauseReflectTagUpdate,
+  pauseReflectTagUpdateWithRepository,
   pauseReflectionStepLogOnce,
+  pauseReflectFavoriteToggleWithRepository,
+  pauseReflectionStepLogOnceWithRepository,
   reflectPauseRepository as stepsReflectPauseRepository,
   shouldLogPauseReflectionStep,
   shouldShowFavoriteProHint,
@@ -81,5 +85,15 @@ describe('pause-reflect-flows-io ↔ pause-reflect-steps-io sibling parity', () 
     expect(pauseReflectNoteUpdate).not.toBe(buildPauseScoreImpacts);
     expect(pauseReflectTagUpdate).not.toBe(showPauseOutcomeNotCompletedToast);
     expect(pauseReflectionStepLogOnce).not.toBe(showPauseOutcomeSaveFailedToast);
+  });
+
+  it('note and tag step RPC wrappers stay distinct on steps-io (parity with steps-io-parity)', () => {
+    expect(pauseReflectNoteUpdate).not.toBe(pauseReflectTagUpdate);
+    expect(pauseReflectNoteUpdateWithRepository).not.toBe(pauseReflectTagUpdateWithRepository);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseReflectTagUpdate).not.toBe(pauseReflectionStepLogOnce);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseReflectTagUpdate).not.toBe(pauseReflectOutcomeLogWithRepository);
+    // Full pins: `pause-reflect-steps-note-tag-io-sibling-parity.test.ts`.
   });
 });
