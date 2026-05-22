@@ -76,6 +76,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase B — pause product-analytics shim (home-pause-actions telemetry, Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>application/pause-product-analytics.ts</code> → <code>home-pause-actions-telemetry</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Route <code>home-pause-actions-telemetry</code> + test mock through <code>pause-product-analytics</code> (bounded-context adapter; same delegate as reflect session UI telemetry cluster forwarder).</dd>
+      <dt>Deviation</dt>
+      <dd>Other pause application telemetry modules still import <code>@/lib/posthog</code> — incremental slices per cluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>manual-pause-trigger-telemetry</code>, pending-offer trackers, ritual/frame + decide telemetry, then <code>pause-rpc-lifecycle-telemetry</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase B — pause product-analytics shim (reflect session UI telemetry, Tier 1)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -86,7 +103,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity (same <code>trackEvent</code> delegate).</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel pending-offer / manual-open / frame telemetry onto <code>pause-product-analytics</code>, or subscription Tier 1 shim scan.</dd>
+      <dd>Superseded by cluster forwarder + home-pause-actions shim slices on same branch.</dd>
     </dl>
   </article>
 
@@ -103,6 +120,7 @@
       <dt>Deviation</dt>
       <dd>None — test relocation + import path updates only.</dd>
       <dt>Open questions</dt>
+<<<<<<< HEAD
       <dd>Next: route other reflect telemetry leaves through <code>pause-reflect-product-telemetry</code>, or peel <code>public.ts</code> follow-ups.</dd>
     </dl>
   </article>
@@ -121,6 +139,9 @@
       <dd>Thin forwarder — not a <code>PauseAnalyticsRepository</code> port (PostHog product events vs <code>analytics_events</code> table I/O).</dd>
       <dt>Open questions</dt>
       <dd>Next: peel remaining pause application <code>@/lib/posthog</code> imports through <code>pause-product-analytics</code> or cluster forwarders.</dd>
+=======
+      <dd>Superseded by product-analytics shim slices on same branch.</dd>
+>>>>>>> f97877ac1 (refactor(pause): home-pause-actions telemetry via pause-product-analytics)
     </dl>
   </article>
 
