@@ -1,6 +1,7 @@
 /**
  * Presentation I/O parity (colocated beside `pause-companion-orchestrate-io.ts`).
  * Imports `pause-companion-orchestrate-flow` CI umbrella for `.toBe` identity pins only — production orchestrate I/O keeps ritual/frame leaf imports.
+ * Application flow/sibling parity tests stay under `application/.../ritual/frame/`.
  */
 import { describe, expect, it, vi } from 'vitest';
 
