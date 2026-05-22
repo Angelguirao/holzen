@@ -4,6 +4,7 @@
  * not session decide-flow CI anchor).
  * Parity pins: `pause-session-decide-io.test.ts`, `pause-session-decide-io-parity.test.ts`,
  * `pause-session-decide-io.re-exports.test.ts`, and
- * `pause-reflect-flows-decide-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`.
+ * `pause-reflect-flows-decide-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (hydration
+ * pins import `pause-session-decide-flow`; decide-io stays type-only).
  */
 export type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
