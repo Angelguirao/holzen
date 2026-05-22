@@ -2,7 +2,7 @@
  * CI cluster anchor for ritual reflect generation presentation I/O (§3 / check:architecture-alignment).
  * Composes holzen-reflect hook + Home manual-open subcluster (PostHog stays on `pause-home-reflect-telemetry-flow`).
  * Presentation: `pause-reflect-generation-io.ts` imports domain hook helpers + `run-reflect-generation` directly;
- * `pause-home-reflect-io.ts` imports `pause-reflect-generation-manual-open-flow`;
+ * `pause-home-reflect-io.ts` imports manual-open sibling modules directly;
  * `pause-home-reflect-telemetry-io.ts` imports `home-pause-actions-telemetry` + `manual-pause-trigger-telemetry` directly.
  */
 export {
