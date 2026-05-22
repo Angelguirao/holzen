@@ -234,7 +234,8 @@ describe('pause-reflect-mood-io parity (application)', () => {
     expect(buildFeelTilesFromMoodIo).not.toBe(buildShiftEmotionFrameHubLogBundle);
     expect(resolveChromeCloseFromMoodIo).not.toBe(resolveShiftFrameHubDonePresentation);
     expect(reflectPauseRepository).not.toBe(pauseShiftEmotionFrameHubDone);
-    // Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts`.
+    // Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts` (application + presentation).
+    // Full pins: `pause-reflect-hub-mood-io-sibling-parity.test.ts`.
   });
 
   /**
