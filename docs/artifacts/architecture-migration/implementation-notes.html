@@ -20863,4 +20863,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — public-hooks PauseImpactData via session decide flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route screen-facing <code>PauseImpactData</code> off domain in <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Re-export <code>PauseImpactData</code> on <code>public-hooks</code> from <code>pause-session-decide-flow</code> (same anchor as <code>pause-session-decide-io</code>) so pause screens import the session decide beat, not <code>domain/decide/pause-impact-data</code> directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; barrel path only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Application and domain modules may still import <code>pause-impact-data</code> directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim (<code>subscription-checkout-guard-ref</code> in <code>App.tsx</code>) or peel <code>buildPauseScoreImpacts</code> through decide I/O.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
