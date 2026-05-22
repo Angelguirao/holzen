@@ -25,6 +25,12 @@ import {
   shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
   shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
 } from '../steps/pause-reflect-steps-flow';
+import {
+  dismissOpenPauseHome as dismissFromGenerationFlow,
+  openManualPauseFromHome as openManualFromGenerationFlow,
+  reflectGenerationPrerequisite as prerequisiteFromGenerationFlow,
+  runReflectGeneration as runReflectGenerationFromGenerationFlow,
+} from '../generation/pause-reflect-generation-flow';
 
 describe('pause-reflect-hub-flow', () => {
   it('re-exports hub helpers from domain + leaf RPC use case', () => {
@@ -66,5 +72,14 @@ describe('pause-reflect-hub-flow', () => {
     expect(buildLogBundleFromFlow).not.toBe(runReflectionStepFromStepsFlow);
     expect(buildLogBundleFromFlow).not.toBe(shouldShowFavoriteFromStepsFlow);
     expect(resolvePresentationFromFlow).not.toBe(shouldLogFromStepsFlow);
+  });
+
+  it('sibling cluster: generation-flow exports stay distinct from hub umbrella exports', () => {
+    expect(runShiftEmotionFrameHubDone).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(runShiftEmotionFrameHubDone).not.toBe(openManualFromGenerationFlow);
+    expect(buildLogBundleFromFlow).not.toBe(dismissFromGenerationFlow);
+    expect(buildLogBundleFromFlow).not.toBe(prerequisiteFromGenerationFlow);
+    expect(resolvePresentationFromFlow).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(runShiftEmotionFrameHubDone).not.toBe(prerequisiteFromGenerationFlow);
   });
 });
