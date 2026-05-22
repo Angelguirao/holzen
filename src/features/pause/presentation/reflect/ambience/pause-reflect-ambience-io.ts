@@ -1,9 +1,9 @@
 /**
  * Reflect/Frame focus-bed presentation I/O.
- * Imports Web Audio helpers via `pause-reflect-ambience-flow` CI anchor
- * (parity with `pause-reflect-generation-io` → hook-flow).
+ * Imports Web Audio helpers from domain directly (parity with
+ * `pause-reflect-generation-io` → domain + run-reflect-generation; not ambience-flow umbrella).
  */
 export {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
-} from '@/features/pause/application/use-cases/ritual/reflect/ambience/pause-reflect-ambience-flow';
+} from '@/features/pause/domain/ritual/breathe/reflect-frame-focus-ambience';
