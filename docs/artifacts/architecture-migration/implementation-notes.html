@@ -28395,4 +28395,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase B — delete subscription-checkout-guard-ref lib shim (Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>App.tsx</code> imports <code>scheduleCheckoutGuardCleanup</code> from <code>@/features/subscription/public</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Phase A reflect interior backlog remains complete. Remove <code>src/lib/subscription-checkout-guard-ref.ts</code> when the sole call site (<code>App.tsx</code>) imports <code>@/features/subscription/public</code> directly. Parity coverage moves to <code>features/subscription/application/checkout-guard-cleanup-public-parity.test.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — import path + test relocation only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: other Tier 1 lib shims (<code>holzen-query-client-ref</code> stays until pause invalidation paths peel), or subscription presentation slices per <code>subscription-client-architecture.md</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
