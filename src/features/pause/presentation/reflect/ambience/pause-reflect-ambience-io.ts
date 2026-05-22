@@ -10,7 +10,9 @@
  * `pause-reflect-ambience-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io` (application mirror:
  * `application/.../ambience/pause-reflect-ambience-mood-io-sibling-parity.test.ts`; reciprocal inline:
  * `pause-reflect-ambience-io-parity.test.ts` ↔ `pause-reflect-mood-io-parity.test.ts`);
- * `pause-reflect-ambience-share-io-sibling-parity.test.ts` + `share/pause-reflect-share-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`;
+ * `pause-reflect-ambience-share-io-sibling-parity.test.ts` + `share/pause-reflect-share-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io` (application mirrors:
+ * `application/.../ambience/pause-reflect-ambience-share-io-sibling-parity.test.ts`,
+ * `application/.../share/pause-reflect-share-ambience-io-sibling-parity.test.ts`);
  * `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (presentation + application);
  * presentation parity (colocated): `pause-reflect-ambience-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`,
  * `pause-reflect-hub-io-parity.test.ts`, `pause-reflect-generation-io-parity.test.ts`,
