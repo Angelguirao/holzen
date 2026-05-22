@@ -106,6 +106,10 @@ import {
   pauseInitialEmotionSkipWithRepository,
   resolvePauseSessionChromeCloseAction,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
@@ -223,6 +227,21 @@ describe('pause-reflect-flows-io parity', () => {
     expect(getSessionQuote).not.toBe(initialPhaseFromRestored);
     // Reciprocal inline pins: `pause-session-decide-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-decide-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (reflect+decide vs frame-focus bed).
+   * Dedicated sibling file: `pause-reflect-flows-ambience-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: ambience-io exports stay distinct from flows-io', () => {
+    expect(pauseReflectOutcomeLog).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(formatReinforcementQuoteFromSession).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(resolvePauseDecideOutcomeFlow).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(buildPauseScoreImpacts).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
+    // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
+    // Full pins: `pause-reflect-flows-ambience-io-sibling-parity.test.ts`.
   });
 
   /**
