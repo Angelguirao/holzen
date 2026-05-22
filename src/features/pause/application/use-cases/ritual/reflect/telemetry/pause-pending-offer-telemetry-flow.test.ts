@@ -11,6 +11,14 @@ import {
 } from './pending-pause-offer-telemetry';
 import { trackPauseSessionAbandoned as trackAbandonedDirect } from './pause-session-abandoned-telemetry';
 import {
+  getPendingPauseOfferDisplay,
+  runAdoptPendingPauseOffer,
+  runDeclinePendingPauseOffer,
+  trackPausePendingAdopted as trackAdoptedFromPendingOfferFlow,
+  trackPausePendingDeclined as trackDeclinedFromPendingOfferFlow,
+  trackPauseSessionAbandoned as trackAbandonedFromPendingOfferFlow,
+} from '../pending-offer/pause-reflect-pending-offer-flow';
+import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
@@ -37,5 +45,16 @@ describe('pause-pending-offer-telemetry-flow', () => {
     expect(trackPauseSessionAbandoned).not.toBe(trackPauseReflectPostItOpen);
     expect(trackPauseSessionAbandoned).not.toBe(trackPauseReflectShareTap);
     expect(trackPauseSessionAbandoned).not.toBe(trackPauseReflectWallpaperTap);
+  });
+
+  it('sibling cluster: telemetry-flow shares PostHog trackers only with pending-offer umbrella (not RPC or display)', () => {
+    expect(trackPausePendingAdopted).toBe(trackAdoptedFromPendingOfferFlow);
+    expect(trackPausePendingDeclined).toBe(trackDeclinedFromPendingOfferFlow);
+    expect(trackPauseSessionAbandoned).toBe(trackAbandonedFromPendingOfferFlow);
+    expect(trackPausePendingAdopted).not.toBe(runAdoptPendingPauseOffer);
+    expect(trackPausePendingDeclined).not.toBe(runDeclinePendingPauseOffer);
+    expect(trackPauseSessionAbandoned).not.toBe(getPendingPauseOfferDisplay);
+    expect(runAdoptPendingPauseOffer).not.toBe(getPendingPauseOfferDisplay);
+    expect(runDeclinePendingPauseOffer).not.toBe(getPendingPauseOfferDisplay);
   });
 });
