@@ -17,18 +17,22 @@ import {
   pauseStepSwipeDirection,
 } from '@/features/pause/application/use-cases/session/pause-session-step-transition-flow';
 import {
+  buildPauseSessionStepRitualBundle,
+  buildPauseSessionStepShellBundle,
+} from '@/features/pause/presentation/session/pause-session-step-handlers-io';
+import {
   buildPauseSessionStepTransitionConfig as buildConfigFromStepTransitionIo,
   PAUSE_SESSION_STEP_SLIDE_OFFSET_PX as slideOffsetFromStepTransitionIo,
   PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S as durationReducedFromStepTransitionIo,
   PAUSE_SESSION_STEP_TRANSITION_DURATION_S as durationFromStepTransitionIo,
   PAUSE_SESSION_STEP_TRANSITION_EASE as easeFromStepTransitionIo,
   pauseStepSwipeDirection as swipeFromStepTransitionIo,
-} from '@/features/pause/presentation/session/pause-session-step-transition-io';
-import {
-  buildPauseSessionStepRitualBundle,
-  buildPauseSessionStepShellBundle,
-} from '@/features/pause/presentation/session/pause-session-step-handlers-io';
+} from './pause-session-step-transition-io';
 
+/**
+ * Presentation I/O parity (colocated beside `pause-session-step-transition-io.ts`).
+ * Imports `pause-session-step-transition-flow` CI umbrella for `.toBe` identity pins only — production step-transition I/O keeps `step-transition` + `step-swipe-direction` leaf imports.
+ */
 describe('pause-session-step-transition-io parity', () => {
   it('presentation I/O step-transition exports match pause-session-step-transition-flow CI umbrella', () => {
     expect(buildPauseSessionStepTransitionConfig).toBe(buildConfigFromStepTransitionIo);
@@ -61,7 +65,7 @@ describe('pause-session-step-transition-io parity', () => {
     expect(pauseStepSwipeDirection).not.toBe(buildPauseSessionStepRitualBundle);
     expect(PAUSE_SESSION_STEP_SLIDE_OFFSET_PX).not.toBe(buildPauseSessionStepRitualBundle);
     expect(PAUSE_SESSION_STEP_TRANSITION_DURATION_S).not.toBe(buildPauseSessionStepShellBundle);
-    // Reciprocal inline pins: `pause-session-step-handlers-io-parity.test.ts`.
+    // Reciprocal inline pins: `application/.../session/pause-session-step-handlers-io-parity.test.ts`.
     // Full pins: `pause-session-step-handlers-step-transition-io-sibling-parity.test.ts`.
   });
 });

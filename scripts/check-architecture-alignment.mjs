@@ -3150,13 +3150,16 @@ for (const file of walkTs(join(root, 'src'))) {
     if (
       rel.endsWith('pause-session-step-transition-io.ts') ||
       rel.endsWith('pause-session-step-transition-io.test.ts') ||
-      rel.endsWith('pause-session-step-transition-io.re-exports.test.ts')
+      rel.endsWith('pause-session-step-transition-io.re-exports.test.ts') ||
+      rel.endsWith('pause-session-step-transition-io-parity.test.ts')
     ) {
-      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_STEP_TRANSITION_IO_FLOW_IMPORTS) {
-        if (text.includes(needle)) {
-          failures.push(
-            `${rel}: session step-transition I/O must import step-transition + step-swipe-direction directly (${needle})`,
-          );
+      if (!rel.endsWith('pause-session-step-transition-io-parity.test.ts')) {
+        for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_STEP_TRANSITION_IO_FLOW_IMPORTS) {
+          if (text.includes(needle)) {
+            failures.push(
+              `${rel}: session step-transition I/O must import step-transition + step-swipe-direction directly (${needle})`,
+            );
+          }
         }
       }
     }
