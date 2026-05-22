@@ -15,10 +15,6 @@ import {
   runLogCompanionFullviewOpened,
 } from '@/features/pause/application/use-cases/ritual/frame/pause-companion-analytics-flow';
 import {
-  runCompanionInterventionBootstrap,
-  runCompanionSlotOrchestrate,
-} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow';
-import {
   companionAnalyticsRepository,
   runLogCompanionFeedbackVote as runFeedbackVoteFromAnalyticsIo,
   runLogCompanionFullviewOpened as runFullviewOpenedFromAnalyticsIo,
@@ -30,9 +26,10 @@ import {
 import { supabasePauseAnalyticsRepository } from '@/features/pause/public-rpc';
 
 /**
- * Application-layer delegation parity for analytics-flow ↔ analytics-io (run-* leaves + repository).
- * Orchestrate distinctness sibling file: `pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts`;
- * presentation mirror: `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts`.
+ * Presentation I/O parity (colocated beside `pause-companion-analytics-io.ts`).
+ * Imports `pause-companion-analytics-flow` CI umbrella for `.toBe` identity pins only — production analytics I/O keeps ritual/frame leaf imports.
+ * Orchestrate distinctness sibling file: `application/.../frame/pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts`;
+ * presentation sibling: `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts`.
  */
 describe('pause-companion-analytics-io parity', () => {
   it('presentation I/O analytics exports match pause-companion-analytics-flow CI umbrella', () => {
@@ -44,12 +41,12 @@ describe('pause-companion-analytics-io parity', () => {
     expect(companionAnalyticsRepository).toBe(supabasePauseAnalyticsRepository);
   });
 
-  it('analytics-flow CI umbrella exports stay distinct from orchestrate-flow and orchestrate-io', () => {
-    expect(runLogCompanionFeedbackVote).not.toBe(runCompanionSlotOrchestrate);
-    expect(runLogCompanionFullviewOpened).not.toBe(runCompanionInterventionBootstrap);
+  it('analytics-flow CI umbrella exports stay distinct from orchestrate-io', () => {
+    expect(runLogCompanionFeedbackVote).not.toBe(runSlotOrchestrateFromOrchestrateIo);
+    expect(runLogCompanionFullviewOpened).not.toBe(runInterventionFromOrchestrateIo);
     expect(runFeedbackVoteFromAnalyticsIo).not.toBe(runSlotOrchestrateFromOrchestrateIo);
     expect(runFullviewOpenedFromAnalyticsIo).not.toBe(runInterventionFromOrchestrateIo);
-    expect(companionAnalyticsRepository).not.toBe(runCompanionSlotOrchestrate);
+    expect(companionAnalyticsRepository).not.toBe(runSlotOrchestrateFromOrchestrateIo);
     // Full pins: `pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts`.
   });
 });

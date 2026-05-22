@@ -1,7 +1,8 @@
 /**
  * Companion frame analytics presentation I/O (feedback vote + fullview opened).
  * Imports ritual/frame leaf modules directly (parity with orchestration/frame UI I/O peels).
- * Parity pins: `pause-companion-analytics-io.test.ts`, `pause-companion-analytics-io.re-exports.test.ts`,
+ * Parity pins: `pause-companion-analytics-io.test.ts`, colocated `pause-companion-analytics-io-parity.test.ts`,
+ * `pause-companion-analytics-io.re-exports.test.ts`,
  * `pause-companion-analytics-orchestration-io-sibling-parity.test.ts` ↔ `pause-companion-orchestration-io`,
  * `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts` ↔ `pause-companion-orchestrate-io`;
  * reciprocal inline pins: `pause-companion-analytics-io.test.ts` ↔ `pause-companion-orchestration-io.test.ts`,
