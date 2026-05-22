@@ -40,6 +40,10 @@ import {
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import * as pendingOfferTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
+import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 
 describe('pause-reflect-pending-offer-io parity', () => {
   it('presentation I/O pending-offer display matches pending-offer CI umbrella', () => {
@@ -120,14 +124,17 @@ describe('pause-reflect-pending-offer-io parity', () => {
     // dedicated sibling: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
   });
 
-  it('sibling cluster: ambience-io exports stay distinct from pending-offer-io', () => {
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (pending-offer RPC vs frame-focus bed).
+   * Dedicated sibling file: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: ambience-io frame-focus bed exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(pauseDeclinePendingOffer).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(pauseAdoptPendingOfferWithRepository).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(getPendingPauseOfferDisplay).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(reflectPauseRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
-    // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`;
-    // dedicated sibling: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` (application + presentation).
+    // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
   });
 });

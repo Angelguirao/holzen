@@ -21,7 +21,8 @@ import * as pendingOfferIo from '@/features/pause/presentation/reflect/pending-o
 
 /**
  * Application sibling parity: ambience-io vs pending-offer-io (parity with presentation
- * `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts`).
+ * `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` and
+ * `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`).
  * Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts` ↔
  * `pause-reflect-pending-offer-io-parity.test.ts`.
  */

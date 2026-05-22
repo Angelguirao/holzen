@@ -38,6 +38,10 @@ describe('pause-reflect-ambience-io parity', () => {
     expect(stopFromAmbienceIo).toBe(stopDirect);
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts` (frame-focus bed vs pending-offer RPC).
+   * Dedicated sibling file: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` (application + presentation).
+   */
   it('sibling cluster: pending-offer-io exports stay distinct from ambience-io frame-focus bed', () => {
     expect(startFromAmbienceIo).not.toBe(pauseAdoptPendingOffer);
     expect(stopFromAmbienceIo).not.toBe(pauseDeclinePendingOffer);
@@ -45,7 +49,6 @@ describe('pause-reflect-ambience-io parity', () => {
     expect(stopFromAmbienceIo).not.toBe(pauseDeclinePendingOfferWithRepository);
     expect(startFromAmbienceIo).not.toBe(getPendingPauseOfferDisplay);
     expect(stopFromAmbienceIo).not.toBe(reflectPauseRepository);
-    // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`;
-    // dedicated sibling: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` (application + presentation).
+    // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`.
   });
 });
