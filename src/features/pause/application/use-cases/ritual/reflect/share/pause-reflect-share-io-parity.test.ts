@@ -11,6 +11,8 @@
  * reciprocal inline pins ↔ `hub/pause-reflect-hub-io-parity.test.ts`.
  * Steps-io sibling: `pause-reflect-share-steps-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `steps/pause-reflect-steps-io-parity.test.ts`.
+ * Ambience-io sibling: `pause-reflect-share-ambience-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `ambience/pause-reflect-ambience-io-parity.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
 
@@ -77,13 +79,15 @@ import {
   reflectPauseRepository,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
-  buildReflectionShareTelegramUrl as buildTelegramFromShareIo,
-  buildReflectionShareText as buildTextFromShareIo,
-  buildReflectionShareTweetUrl as buildTweetFromShareIo,
-  buildReflectionShareWhatsAppUrl as buildWhatsAppFromShareIo,
-  pauseReflectionShareImage,
-} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
-import * as shareIo from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+import {
+  buildShiftEmotionFrameHubLogBundle,
+  pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
+  resolveShiftFrameHubDonePresentation,
+} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
   buildFeelTilesMoodLogOptions,
   pauseInitialEmotionSelect,
@@ -92,20 +96,25 @@ import {
   pauseInitialEmotionSkipWithRepository,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import {
-  buildShiftEmotionFrameHubLogBundle,
-  pauseShiftEmotionFrameHubDone,
-  pauseShiftEmotionFrameHubDoneWithRepository,
-  resolveShiftFrameHubDonePresentation,
-} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
-import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
   pauseReflectTagUpdate,
   pauseReflectionStepLogOnce,
   pauseReflectFavoriteToggleWithRepository,
   pauseReflectNoteUpdateWithRepository,
+  pauseReflectTagUpdateWithRepository,
   pauseReflectionStepLogOnceWithRepository,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
+  buildReflectionShareTelegramUrl as buildTelegramFromShareIo,
+  buildReflectionShareText as buildTextFromShareIo,
+  buildReflectionShareTweetUrl as buildTweetFromShareIo,
+  buildReflectionShareWhatsAppUrl as buildWhatsAppFromShareIo,
+  pauseReflectionShareImage,
+} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
+import * as shareIo from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 
 describe('pause-reflect-share-io parity (application)', () => {
   it('presentation I/O share builder exports match share CI umbrella', () => {
@@ -171,48 +180,6 @@ describe('pause-reflect-share-io parity (application)', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `mood/pause-reflect-mood-io-parity.test.ts` (application + presentation).
-   * Dedicated sibling file: `pause-reflect-share-mood-io-sibling-parity.test.ts`.
-   */
-  it('sibling cluster: mood-io exports stay distinct from share-io builders', () => {
-    expect(pauseReflectionShareImage).not.toBe(pauseInitialEmotionSelect);
-    expect(buildTextFromShareIo).not.toBe(pauseInitialEmotionSkip);
-    expect(buildTelegramFromShareIo).not.toBe(pauseInitialEmotionSelectWithRepository);
-    expect(buildTweetFromShareIo).not.toBe(pauseInitialEmotionSkipWithRepository);
-    expect(buildWhatsAppFromShareIo).not.toBe(buildFeelTilesMoodLogOptions);
-    expect(pauseReflectionShareImage).not.toBe(buildFeelTilesMoodLogOptions);
-    // Reciprocal inline pins: `mood/pause-reflect-mood-io-parity.test.ts`.
-  });
-
-  /**
-   * Reciprocal inline pins ↔ `hub/pause-reflect-hub-io-parity.test.ts` (application + presentation).
-   * Dedicated sibling file: `pause-reflect-hub-share-io-sibling-parity.test.ts`.
-   */
-  it('sibling cluster: hub-io exports stay distinct from share-io builders', () => {
-    expect(pauseReflectionShareImage).not.toBe(pauseShiftEmotionFrameHubDone);
-    expect(buildTextFromShareIo).not.toBe(buildShiftEmotionFrameHubLogBundle);
-    expect(buildTelegramFromShareIo).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
-    expect(buildTweetFromShareIo).not.toBe(resolveShiftFrameHubDonePresentation);
-    expect(pauseReflectionShareImage).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
-    // Reciprocal inline pins: `hub/pause-reflect-hub-io-parity.test.ts`.
-  });
-
-  /**
-   * Reciprocal inline pins ↔ `steps/pause-reflect-steps-io-parity.test.ts` (application + presentation).
-   * Dedicated sibling file: `pause-reflect-share-steps-io-sibling-parity.test.ts`.
-   */
-  it('sibling cluster: steps-io exports stay distinct from share-io builders', () => {
-    expect(pauseReflectionShareImage).not.toBe(pauseReflectFavoriteToggle);
-    expect(buildTextFromShareIo).not.toBe(pauseReflectNoteUpdate);
-    expect(buildTelegramFromShareIo).not.toBe(pauseReflectTagUpdate);
-    expect(buildTweetFromShareIo).not.toBe(pauseReflectionStepLogOnce);
-    expect(buildWhatsAppFromShareIo).not.toBe(pauseReflectFavoriteToggleWithRepository);
-    expect(pauseReflectionShareImage).not.toBe(pauseReflectNoteUpdateWithRepository);
-    expect(pauseReflectionShareImage).not.toBe(pauseReflectionStepLogOnceWithRepository);
-    // Reciprocal inline pins: `steps/pause-reflect-steps-io-parity.test.ts`.
-  });
-
-  /**
    * Reciprocal inline pins ↔ `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-flows-share-io-sibling-parity.test.ts` (application + presentation).
    */
@@ -268,5 +235,60 @@ describe('pause-reflect-share-io parity (application)', () => {
     expect(buildWhatsAppFromShareIo).not.toBe(pauseDeclinePendingOfferWithRepository);
     expect(pauseReflectionShareImage).not.toBe(reflectPauseRepository);
     // Reciprocal inline pins: `presentation/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `presentation/reflect/steps/pause-reflect-steps-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-share-steps-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: steps-io exports stay distinct from share-io builders', () => {
+    expect(pauseReflectionShareImage).not.toBe(pauseReflectFavoriteToggle);
+    expect(buildTextFromShareIo).not.toBe(pauseReflectNoteUpdate);
+    expect(buildTelegramFromShareIo).not.toBe(pauseReflectTagUpdate);
+    expect(buildTweetFromShareIo).not.toBe(pauseReflectionStepLogOnce);
+    expect(buildWhatsAppFromShareIo).not.toBe(pauseReflectFavoriteToggleWithRepository);
+    expect(pauseReflectionShareImage).not.toBe(pauseReflectNoteUpdateWithRepository);
+    expect(buildTextFromShareIo).not.toBe(pauseReflectTagUpdateWithRepository);
+    expect(buildTelegramFromShareIo).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    expect(buildTweetFromShareIo).not.toBe(shouldShowFavoriteProHint);
+    expect(buildWhatsAppFromShareIo).not.toBe(shouldLogPauseReflectionStep);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `presentation/reflect/hub/pause-reflect-hub-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-share-hub-flow-sibling-parity.test.ts` (flow anchors).
+   */
+  it('sibling cluster: hub-io exports stay distinct from share-io builders', () => {
+    expect(pauseReflectionShareImage).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(buildTextFromShareIo).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(buildTelegramFromShareIo).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(buildTweetFromShareIo).not.toBe(resolveShiftFrameHubDonePresentation);
+    expect(buildWhatsAppFromShareIo).not.toBe(pauseShiftEmotionFrameHubDone);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-share-mood-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: mood-io exports stay distinct from share-io builders', () => {
+    expect(pauseReflectionShareImage).not.toBe(pauseInitialEmotionSelect);
+    expect(buildTextFromShareIo).not.toBe(pauseInitialEmotionSkip);
+    expect(buildTelegramFromShareIo).not.toBe(pauseInitialEmotionSelectWithRepository);
+    expect(buildTweetFromShareIo).not.toBe(pauseInitialEmotionSkipWithRepository);
+    expect(buildWhatsAppFromShareIo).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(pauseReflectionShareImage).not.toBe(buildFeelTilesMoodLogOptions);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `application/.../ambience/pause-reflect-ambience-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-share-ambience-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: ambience-io exports stay distinct from share-io builders', () => {
+    expect(pauseReflectionShareImage).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(buildTextFromShareIo).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(buildTelegramFromShareIo).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(buildTweetFromShareIo).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(buildWhatsAppFromShareIo).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseReflectionShareImage).not.toBe(stopPauseReflectFrameFocusAmbience);
   });
 });
