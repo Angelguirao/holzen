@@ -19,15 +19,20 @@ import {
   pauseDeclinePendingOffer,
   getPendingPauseOfferDisplay,
   reflectPauseRepository,
-} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
-import * as pendingOfferIo from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+} from './pause-reflect-pending-offer-io';
+import * as pendingOfferIo from './pause-reflect-pending-offer-io';
 import {
   trackPausePendingAdopted as trackAdoptedFromPendingOfferTelemetryIo,
   trackPausePendingDeclined as trackDeclinedFromPendingOfferTelemetryIo,
   trackPauseSessionAbandoned as trackAbandonedFromPendingOfferTelemetryIo,
-} from './pause-reflect-pending-offer-telemetry-io';
-import * as pendingOfferTelemetryIo from './pause-reflect-pending-offer-telemetry-io';
+} from '../telemetry/pause-reflect-pending-offer-telemetry-io';
+import * as pendingOfferTelemetryIo from '../telemetry/pause-reflect-pending-offer-telemetry-io';
 
+/**
+ * Presentation pending-offer telemetry I/O parity (colocated beside `pause-reflect-pending-offer-io.ts`).
+ * Sibling pins: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` (presentation + application);
+ * reciprocal inline pins ↔ `pause-reflect-pending-offer-telemetry-io.test.ts` ↔ `pause-reflect-pending-offer-io.test.ts`.
+ */
 describe('pause-reflect-pending-offer-telemetry-io parity', () => {
   it('presentation I/O pending-offer telemetry matches pending-offer-telemetry-flow CI umbrella', () => {
     expect(trackPausePendingAdopted).toBe(trackAdoptedFromPendingOfferTelemetryIo);
