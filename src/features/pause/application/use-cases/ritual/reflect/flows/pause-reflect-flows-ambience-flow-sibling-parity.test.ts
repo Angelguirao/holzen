@@ -16,6 +16,9 @@ import {
 import * as ambienceFlow from '../ambience/pause-reflect-ambience-flow';
 import * as flowsFlow from './pause-reflect-flows-flow';
 
+/**
+ * Presentation mirror: `presentation/reflect/flows/pause-reflect-flows-ambience-flow-sibling-parity.test.ts`.
+ */
 describe('pause-reflect-flows-flow ↔ pause-reflect-ambience-flow sibling parity', () => {
   it('flows-flow and ambience-flow are distinct sibling CI anchors', () => {
     expect(typeof resolvePauseSessionReflectAndDecidePreflight).toBe('function');

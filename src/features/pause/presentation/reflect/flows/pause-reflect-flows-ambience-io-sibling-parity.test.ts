@@ -28,7 +28,7 @@ import * as flowsIo from './pause-reflect-flows-io';
  * `pause-reflect-ambience-flows-io-sibling-parity.test.ts` under `ambience/`, application
  * `pause-reflect-flows-ambience-io-sibling-parity.test.ts` and
  * `pause-reflect-ambience-flows-io-sibling-parity.test.ts`, and
- * `pause-reflect-flows-ambience-flow-sibling-parity.test.ts`).
+ * `pause-reflect-flows-ambience-flow-sibling-parity.test.ts` application + presentation).
  */
 describe('pause-reflect-flows-io ↔ pause-reflect-ambience-io sibling parity', () => {
   it('flows-io and ambience-io are distinct presentation I/O surfaces', () => {
