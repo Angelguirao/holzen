@@ -689,6 +689,19 @@ const LEGACY_PAUSE_PUBLIC_HOOKS_SCORE_IMPACT_IMPORTS = [
   "from './application/use-cases/ritual/decide/pause-decide-score-impacts-flow'",
 ];
 
+/** public-hooks — decide score-impact helpers via pause-session-decide-flow only. */
+const LEGACY_PAUSE_PUBLIC_HOOKS_SCORE_IMPACT_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/decide/score-impacts',
+  '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-score-impacts-flow',
+  "from './application/use-cases/ritual/decide/score-impacts'",
+  "from '../application/use-cases/ritual/decide/score-impacts'",
+  "from './application/use-cases/ritual/decide/score-impact-presentation'",
+  "from '../application/use-cases/ritual/decide/score-impact-presentation'",
+  "from './application/use-cases/ritual/decide/pause-decide-score-impacts-flow'",
+  "from '../application/use-cases/ritual/decide/pause-decide-score-impacts-flow'",
+];
+
 /** Reflect flows handler params — import PauseImpactData via pause-session-decide-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IMPACT_IMPORTS = [
   '@/features/pause/domain/decide/pause-impact-data',
@@ -1631,6 +1644,18 @@ if (
   !testCi.includes('check:feature-imports')
 ) {
   failures.push('test:ci must run check:architecture-alignment (or check:feature-imports)');
+}
+
+const pausePublicHooksPath = join(root, 'src/features/pause/public-hooks.ts');
+if (existsSync(pausePublicHooksPath)) {
+  const publicHooksText = readFileSync(pausePublicHooksPath, 'utf8');
+  for (const needle of LEGACY_PAUSE_PUBLIC_HOOKS_SCORE_IMPACT_IMPORTS) {
+    if (publicHooksText.includes(needle)) {
+      failures.push(
+        `src/features/pause/public-hooks.ts: score-impact helpers must import via pause-reflect-flows-flow (${needle})`,
+      );
+    }
+  }
 }
 
 if (failures.length) {

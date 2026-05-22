@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — CI guard public-hooks score-impact imports (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Lock <code>buildPauseScoreImpacts</code> on <code>pause-reflect-flows-flow</code> in <code>public-hooks</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. After <code>pause-decide-score-impacts-flow</code> composed on <code>pause-reflect-flows-flow</code>, add CI guard so <code>public-hooks</code> cannot import deep <code>score-impacts</code> / <code>score-impact-presentation</code> modules (screen <code>ScoreImpact</code> stays on the reflect+decide flows seam).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; enforcement only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Guard runs on <code>public-hooks.ts</code> only; presentation modules may still import decide domain types directly for hook params.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim (<code>App.tsx</code> checkout guard), or session scaffold I/O peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — compose pause-reflect-pending-offer-flow from RPC + telemetry subclusters (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
