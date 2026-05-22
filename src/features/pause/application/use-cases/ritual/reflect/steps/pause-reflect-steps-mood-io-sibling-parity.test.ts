@@ -33,7 +33,7 @@ import {
  * Application-layer sibling parity: presentation steps-io vs mood-io (parity with
  * `pause-reflect-steps-mood-flow-sibling-parity.test.ts` and presentation
  * `pause-reflect-steps-mood-io-sibling-parity.test.ts`; complements reciprocal inline pins on
- * `pause-reflect-steps-io-parity.test.ts` / `pause-reflect-mood-io-parity.test.ts`).
+ * `pause-reflect-steps-io-parity.test.ts` (application) / `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`).
  */
 describe('pause-reflect-steps-io ↔ pause-reflect-mood-io sibling parity (application)', () => {
   it('steps-io and mood-io are distinct presentation I/O surfaces', () => {

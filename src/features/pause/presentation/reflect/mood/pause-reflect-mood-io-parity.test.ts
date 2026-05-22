@@ -195,7 +195,7 @@ describe('pause-reflect-mood-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (mood RPC vs reflect+decide flows).
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (application; mood RPC vs reflect+decide).
    * Dedicated sibling file: `pause-reflect-flows-mood-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: flows-io exports stay distinct from mood-io wrappers', () => {
@@ -214,7 +214,7 @@ describe('pause-reflect-mood-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (mood RPC vs step mutations).
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application; mood RPC vs step mutations).
    * Dedicated sibling file: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: steps-io exports stay distinct from mood-io wrappers', () => {

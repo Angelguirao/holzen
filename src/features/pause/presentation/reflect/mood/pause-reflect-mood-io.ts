@@ -7,13 +7,13 @@
  * Sibling surface pins: `pause-reflect-steps-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`
  * (presentation + application `pause-reflect-steps-mood-io-sibling-parity.test.ts`);
  * reciprocal inline pins: `pause-reflect-mood-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`;
- * presentation parity (colocated): `pause-reflect-mood-io-parity.test.ts` ↔ `pause-reflect-steps-io-parity.test.ts` (application);
+ * presentation parity (colocated): `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts` ↔ `pause-reflect-steps-io-parity.test.ts` (application);
  * `pause-reflect-generation-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`,
  * `pause-reflect-mood-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
  * `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
  * `pause-reflect-flows-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (application
  * `pause-reflect-flows-mood-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
- * `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-mood-io-parity.test.ts`),
+ * `pause-reflect-flows-io-parity.test.ts` (application) ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`),
  * `pause-reflect-mood-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`, and
  * `pause-reflect-ambience-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`;
  * `pause-reflect-share-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`.
