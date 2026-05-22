@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — presentation reflect hub I/O repository pin (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-io</code> <code>reflectPauseRepository</code> identity regression</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-hub-io.re-exports.test.ts</code> with <code>reflectPauseRepository</code> ↔ <code>supabasePauseRepository</code> (parity with mood/steps/pending-offer I/O pins; domain helper identity pins already present).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; named port constant already exported on hub I/O module.</dd>
+      <dt>Open question</dt>
+      <dd>Next: session ritual-restore umbrella pins against leaf modules (not session *-flow), or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — presentation reflect pending-offer I/O identity (backlog #1 complete, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
