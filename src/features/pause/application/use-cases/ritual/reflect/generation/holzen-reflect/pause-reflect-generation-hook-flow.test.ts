@@ -31,6 +31,10 @@ import {
   shouldCommitReflectGeneration as shouldCommitFromFlow,
 } from './pause-reflect-generation-hook-flow';
 import { runReflectGeneration as runReflectGenerationDirect } from './run-reflect-generation';
+import {
+  dismissOpenPauseHome as dismissFromGenerationFlow,
+  openManualPauseFromHome as openManualFromGenerationFlow,
+} from '../pause-reflect-generation-flow';
 
 describe('pause-reflect-generation-hook-flow', () => {
   it('re-exports holzen-reflect domain helpers and run-reflect-generation', () => {
@@ -62,5 +66,12 @@ describe('pause-reflect-generation-hook-flow', () => {
     expect(userErrorFromFlow).toBe(userErrorFromGenerationFlow);
     expect(resolveCopyFromFlow).toBe(resolveCopyFromGenerationFlow);
     expect(runReflectGeneration).toBe(runReflectGenerationFromGenerationFlow);
+  });
+
+  it('sibling cluster: generation-flow manual-open exports stay off hook subcluster', () => {
+    expect(runReflectGeneration).not.toBe(openManualFromGenerationFlow);
+    expect(runReflectGeneration).not.toBe(dismissFromGenerationFlow);
+    expect(prerequisiteFromFlow).not.toBe(openManualFromGenerationFlow);
+    expect(resolvePrefetchFromFlow).not.toBe(dismissFromGenerationFlow);
   });
 });

@@ -11,6 +11,7 @@
  * `pause-reflect-flows-generation-flow-sibling-parity.test.ts` (flows-flow ↔ generation-flow);
  * `pause-reflect-ambience-generation-flow-sibling-parity.test.ts` (ambience-flow ↔ generation-flow);
  * `pause-reflect-generation-hub-flow-sibling-parity.test.ts` (generation-flow ↔ hub-flow);
+ * `pause-reflect-generation-hook-flow-sibling-parity.test.ts` (generation-flow ↔ holzen-reflect hook-flow);
  * `pause-reflect-generation-manual-open-flow-sibling-parity.test.ts` (generation-flow ↔ manual-open-flow);
  * `pause-reflect-generation-share-flow-sibling-parity.test.ts` (generation-flow ↔ share-flow);
  * `pause-reflect-generation-telemetry-flow-sibling-parity.test.ts` (generation-flow ↔ telemetry-flow);
