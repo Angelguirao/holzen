@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  persistedTabSessionStorage: { port: 'persistedTabSessionStorage' },
+}));
 
 import {
   isTerminalPauseDbState,
@@ -16,13 +20,15 @@ import {
   TERMINAL_PAUSE_DB_STATES as terminalStatesDirect,
 } from '@/features/pause/application/use-cases/session/terminal-entry-guard';
 import {
-  clearPausePersistedTabSession,
   isTerminalPauseDbState as isTerminalFromTerminalEntryIo,
-  loadPausePersistedTabSession,
   persistedPauseSessionAllowsTerminalEntry as persistedAllowsFromTerminalEntryIo,
-  savePausePersistedTabSession,
   TERMINAL_PAUSE_DB_STATES as terminalStatesFromTerminalEntryIo,
 } from '@/features/pause/presentation/session/pause-session-terminal-entry-io';
+import {
+  clearPausePersistedTabSession,
+  loadPausePersistedTabSession,
+  savePausePersistedTabSession,
+} from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
 describe('pause-session-terminal-entry-io parity', () => {
