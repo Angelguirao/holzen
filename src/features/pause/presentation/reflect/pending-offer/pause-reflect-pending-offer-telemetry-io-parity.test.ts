@@ -1,3 +1,7 @@
+/**
+ * Presentation I/O parity for pending-offer PostHog trackers (colocated beside
+ * `pause-reflect-pending-offer-io.ts`; production module stays under `reflect/telemetry/`).
+ */
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
@@ -28,11 +32,6 @@ import {
 } from '../telemetry/pause-reflect-pending-offer-telemetry-io';
 import * as pendingOfferTelemetryIo from '../telemetry/pause-reflect-pending-offer-telemetry-io';
 
-/**
- * Presentation pending-offer telemetry I/O parity (colocated beside `pause-reflect-pending-offer-io.ts`).
- * Sibling pins: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` (presentation + application);
- * reciprocal inline pins ↔ `pause-reflect-pending-offer-telemetry-io.test.ts` ↔ `pause-reflect-pending-offer-io.test.ts`.
- */
 describe('pause-reflect-pending-offer-telemetry-io parity', () => {
   it('presentation I/O pending-offer telemetry matches pending-offer-telemetry-flow CI umbrella', () => {
     expect(trackPausePendingAdopted).toBe(trackAdoptedFromPendingOfferTelemetryIo);
