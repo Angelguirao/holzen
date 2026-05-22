@@ -7,7 +7,8 @@
  * sibling pins: `pause-reflect-ambience-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts`
  * and `pause-reflect-flows-flow.test.ts`;
  * `pause-reflect-ambience-generation-flow-sibling-parity.test.ts` (ambience-flow ↔ generation-flow);
- * `pause-reflect-flows-ambience-flow-sibling-parity.test.ts` (ambience-flow ↔ flows-flow).
+ * `pause-reflect-flows-ambience-flow-sibling-parity.test.ts` (ambience-flow ↔ flows-flow);
+ * `pause-reflect-ambience-mood-flow-sibling-parity.test.ts` (ambience-flow ↔ mood-flow).
  */
 export {
   startPauseReflectFrameFocusAmbience,

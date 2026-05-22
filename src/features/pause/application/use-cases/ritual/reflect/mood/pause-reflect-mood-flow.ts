@@ -3,6 +3,7 @@
  * Composes domain mood helpers + `run-initial-emotion-log` leaf use case (not subcluster flow anchors).
  * Parity pins: `pause-reflect-mood-io-parity.test.ts` (presentation I/O ↔ umbrella + domain mood leaves + `reflectPauseRepository` ↔ `supabasePauseRepository`), `pause-reflect-mood-io.re-exports.test.ts`, `pause-reflect-flows-mood-flow-sibling-parity.test.ts`, `pause-reflect-hub-mood-flow-sibling-parity.test.ts`, `pause-reflect-steps-mood-flow-sibling-parity.test.ts`, `pause-reflect-generation-mood-flow-sibling-parity.test.ts` (generation-flow ↔ mood-flow);
  * `pause-reflect-mood-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-flow`;
+ * `pause-reflect-ambience-mood-flow-sibling-parity.test.ts` ↔ `pause-reflect-ambience-flow`;
  * `pause-reflect-mood-flow.test.ts` pins sibling-cluster separation from `pause-reflect-hub-flow` and `pause-reflect-generation-flow`.
  */
 export {
