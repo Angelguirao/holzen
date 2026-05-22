@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session breath segment-log flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-breath-io</code> binds segment RPC via <code>pause-session-breath-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no reflect folder moves. Add <code>pause-session-breath-flow</code> beside <code>run-breath-segment-log</code>; <code>presentation/session/breath/pause-session-breath-io.ts</code> imports ensure/skip use cases through the anchor (parity with <code>pause-ritual-audio-breathe-flow</code> for ritual audio cues). CI forbids deep <code>run-breath-segment-log</code> imports under <code>presentation/session/breath/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Phase-advance and second-label helpers still re-export from domain on the I/O module — optional follow-up to fold into the same flow anchor if the cluster grows.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: providers-conductor I/O peel or session scaffold I/O peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session step-handlers I/O via pause-session-step-handlers-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>use-pause-session-providers-conductor</code> and scaffold <code>step-transition</code> imports remain direct — peel in follow-up slices.</dd>
       <dt>Open questions</dt>
-      <dd>Next: providers-conductor I/O peel, breath segment-log flow anchor, or Phase B subscription Tier 1 shim.</dd>
+      <dd>Next: providers-conductor I/O peel or Phase B subscription Tier 1 shim.</dd>
     </dl>
   </article>
 

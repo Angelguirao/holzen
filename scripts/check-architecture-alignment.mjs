@@ -303,6 +303,13 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_AUDIO_IMPORTS = [
   "from '../application/use-cases/ritual/breathe/ritual-audio'",
 ];
 
+/** Deep breath segment log in session breath I/O — use pause-session-breath-flow anchor. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_SEGMENT_LOG_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log',
+  "from './application/use-cases/ritual/breathe/run-breath-segment-log'",
+  "from '../application/use-cases/ritual/breathe/run-breath-segment-log'",
+];
+
 /** Deep session telemetry in presentation/session — use pending-offer flow anchor via telemetry-io. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_TELEMETRY_IMPORTS = [
   '@/features/pause/application/use-cases/session/pause-session-telemetry',
@@ -441,6 +448,11 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_AUDIO_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session breath ritual-audio import (${needle})`);
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_SEGMENT_LOG_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy session breath segment-log import (${needle})`);
       }
     }
   }
