@@ -15,6 +15,12 @@ import {
   pauseReflectionShareImage,
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import {
+  buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
   reflectPauseRepository,
@@ -104,5 +110,14 @@ describe('pause-reflect-hub-io', () => {
     expect(resolveShiftFrameHubDonePresentation).not.toBe(pauseReflectionShareImage);
     expect(reflectPauseRepository).not.toBe(pauseReflectionShareImage);
     // Full cross-umbrella pins: `pause-reflect-hub-share-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: session reflect telemetry-io exports stay distinct from hub-io', () => {
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(trackPauseReflectPostItOpen);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(trackPauseReflectShareTap);
+    expect(buildShiftEmotionFrameHubLogBundle).not.toBe(trackPauseReflectWallpaperTap);
+    expect(resolveShiftFrameHubDonePresentation).not.toBe(trackPauseReflectPostItOpen);
+    expect(reflectPauseRepository).not.toBe(trackPauseReflectShareTap);
+    // Full cross-I/O pins: `pause-reflect-hub-telemetry-io-sibling-parity.test.ts`.
   });
 });
