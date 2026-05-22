@@ -75,11 +75,6 @@ import {
   runReflectionShareImage as runShareImageFromShareFlow,
   trackPauseReflectShareTap as trackShareTapFromShareFlow,
 } from '../share/pause-reflect-share-flow';
-import {
-  trackPauseReflectPostItOpen as trackPostItFromTelemetryFlow,
-  trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
-  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
-} from '../telemetry/pause-reflect-telemetry-flow';
 
 import {
   pauseReflectOutcomeLog,

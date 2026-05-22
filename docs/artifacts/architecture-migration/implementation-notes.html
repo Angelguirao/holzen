@@ -29451,4 +29451,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — pending-offer-io telemetry imports + favorite/log reciprocal pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-io.test.ts</code> + favorite/log flow unit tests</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Restore <code>pause-reflect-pending-offer-telemetry-io</code> imports on <code>pause-reflect-pending-offer-io.test.ts</code> (regression after application parity slice removed presentation imports). Extend reciprocal inline pins on <code>pause-favorite-toggle-flow.test.ts</code> ↔ <code>pause-reflection-step-log-flow.test.ts</code> (note/tag cross-guards). Remove duplicate telemetry-flow import block on <code>pause-reflect-flows-flow.test.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comment anchors only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or session step-handlers-io parity.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
