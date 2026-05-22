@@ -4,6 +4,18 @@
  */
 export { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags';
 export {
+  initialBreathingFirstCompletedFromRestored,
+  initialBreathingSecondCompletedFromRestored,
+} from './restored-breath-ritual-state';
+export {
+  computeBreathingPhaseAdvance,
+  resolveBreathingCompleted,
+  resolveBreathingPhaseAdvanceOutcome,
+  type BreathingPhaseAdvanceOutcome,
+  type BreathingPhaseAdvanceResult,
+  type BreathingTimedLoopState,
+} from './phase-advance';
+export {
   BRIEF_FIRST_BREATH_SEGMENT_LOG,
   BRIEF_PAUSE_STEP_AFTER_BREATH,
   BRIEF_PAUSE_STEP_AFTER_INTEGRATE,
