@@ -4,7 +4,10 @@
  * `pause-reflect-hub-io` → domain + leaf use case).
  * Wrapper delegation pins: pause-reflect-mood-io-parity.test.ts (default + *WithRepository seams;
  * flows-io + hub-io reciprocal inline pins).
- * Sibling surface pins: `pause-reflect-steps-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`,
+ * Sibling surface pins: `pause-reflect-steps-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`
+ * (presentation + application `pause-reflect-steps-mood-io-sibling-parity.test.ts`);
+ * reciprocal inline pins: `pause-reflect-mood-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`;
+ * application parity: `pause-reflect-mood-io-parity.test.ts` ↔ `pause-reflect-steps-io-parity.test.ts`;
  * `pause-reflect-generation-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`,
  * `pause-reflect-mood-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
  * `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;

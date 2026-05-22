@@ -31,7 +31,10 @@ import {
 
 /**
  * Presentation sibling parity: steps-io vs mood-io (parity with application
- * `pause-reflect-steps-mood-flow-sibling-parity.test.ts`).
+ * `pause-reflect-steps-mood-flow-sibling-parity.test.ts` and
+ * `pause-reflect-steps-mood-io-sibling-parity.test.ts` under `application/.../steps/`).
+ * Reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-mood-io.test.ts`;
+ * `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-mood-io-parity.test.ts`.
  */
 describe('pause-reflect-steps-io ↔ pause-reflect-mood-io sibling parity', () => {
   it('steps-io and mood-io are distinct presentation I/O surfaces', () => {

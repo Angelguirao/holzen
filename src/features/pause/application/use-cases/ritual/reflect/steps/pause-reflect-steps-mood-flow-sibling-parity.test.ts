@@ -16,6 +16,10 @@ import {
 import * as moodFlow from '../mood/pause-reflect-mood-flow';
 import * as stepsFlow from './pause-reflect-steps-flow';
 
+/**
+ * Flow-level sibling parity (presentation I/O mirror:
+ * `pause-reflect-steps-mood-io-sibling-parity.test.ts` application + presentation).
+ */
 describe('pause-reflect-steps-flow ↔ pause-reflect-mood-flow sibling parity', () => {
   it('steps-flow and mood-flow are distinct sibling CI anchors', () => {
     expect(typeof runPauseFavoriteToggle).toBe('function');
