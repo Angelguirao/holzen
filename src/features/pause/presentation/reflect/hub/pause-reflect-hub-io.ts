@@ -12,7 +12,8 @@
  * reciprocal inline pins: `pause-reflect-hub-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`;
  * application parity: `pause-reflect-hub-io-parity.test.ts` ↔ `pause-reflect-steps-io-parity.test.ts`;
  * `pause-reflect-ambience-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`;
- * `pause-reflect-flows-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`;
+ * `pause-reflect-flows-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (application
+ * `pause-reflect-flows-hub-io-sibling-parity.test.ts` under `application/.../flows/`);
  * `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`;
  * reciprocal inline pins: `pause-reflect-hub-io.test.ts` ↔ `pause-reflect-telemetry-io.test.ts`.
  */
