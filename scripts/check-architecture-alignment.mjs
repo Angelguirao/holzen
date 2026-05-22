@@ -553,6 +553,35 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BRIEF_IO_UMBRELLA_FLOW_IMPORTS = [
   "from '../application/use-cases/session/pause-session-brief-flow'",
 ];
 
+/** Session ritual-restore I/O — import via session + ritual subcluster modules only (not pause-session-ritual-restore-flow umbrella). */
+const LEGACY_PAUSE_PRESENTATION_SESSION_RITUAL_RESTORE_IO_UMBRELLA_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pause-session-ritual-restore-flow',
+  "from './application/use-cases/session/pause-session-ritual-restore-flow'",
+  "from '../application/use-cases/session/pause-session-ritual-restore-flow'",
+];
+
+/** Session presentation — import restored ritual hydration via pause-session-ritual-restore-io only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_RITUAL_RESTORE_USE_CASE_IMPORTS = [
+  '@/features/pause/domain/session/map-persisted-step',
+  '@/features/pause/application/use-cases/ritual/breathe/restored-breath-ritual-state',
+  '@/features/pause/application/use-cases/ritual/decide/restored-decide-ritual-state',
+  '@/features/pause/application/use-cases/ritual/frame/restored-frame-ritual-state',
+  '@/features/pause/application/use-cases/session/restored-brief-ritual-state',
+  '@/features/pause/application/use-cases/session/initial-ritual-entry',
+  "from './domain/session/map-persisted-step'",
+  "from '../domain/session/map-persisted-step'",
+  "from './application/use-cases/ritual/breathe/restored-breath-ritual-state'",
+  "from '../application/use-cases/ritual/breathe/restored-breath-ritual-state'",
+  "from './application/use-cases/ritual/decide/restored-decide-ritual-state'",
+  "from '../application/use-cases/ritual/decide/restored-decide-ritual-state'",
+  "from './application/use-cases/ritual/frame/restored-frame-ritual-state'",
+  "from '../application/use-cases/ritual/frame/restored-frame-ritual-state'",
+  "from './application/use-cases/session/restored-brief-ritual-state'",
+  "from '../application/use-cases/session/restored-brief-ritual-state'",
+  "from './application/use-cases/session/initial-ritual-entry'",
+  "from '../application/use-cases/session/initial-ritual-entry'",
+];
+
 /** Session presentation — import brief hydration + depth-upgrade via pause-session-brief-io only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_BRIEF_USE_CASE_IMPORTS = [
   '@/features/pause/application/use-cases/session/restored-brief-ritual-state',
@@ -2383,6 +2412,18 @@ for (const file of walkTs(join(root, 'src'))) {
         }
       }
     }
+    const sessionRitualRestoreIoAllowlisted =
+      rel.endsWith('pause-session-ritual-restore-io.ts') ||
+      rel.endsWith('pause-session-ritual-restore-io.test.ts') ||
+      rel.endsWith('pause-session-breath-io.ts') ||
+      rel.endsWith('pause-session-breath-io.test.ts');
+    if (!sessionRitualRestoreIoAllowlisted) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_RITUAL_RESTORE_USE_CASE_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy session ritual-restore use-case import (${needle})`);
+        }
+      }
+    }
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_DOMAIN_GUARDS_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session domain guard import (${needle})`);
@@ -2421,6 +2462,18 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: session brief I/O must import via session + ritual/brief modules (${needle})`,
+        );
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-session-ritual-restore-io.ts') ||
+    rel.endsWith('pause-session-ritual-restore-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_RITUAL_RESTORE_IO_UMBRELLA_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: session ritual-restore I/O must import via session + ritual subcluster modules (${needle})`,
         );
       }
     }

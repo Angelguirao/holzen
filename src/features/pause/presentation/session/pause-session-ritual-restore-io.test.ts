@@ -1,21 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
-
-vi.mock(
-  '@/features/pause/application/use-cases/session/pause-session-ritual-restore-flow',
-  async () => {
-    const actual = await vi.importActual<
-      typeof import('@/features/pause/application/use-cases/session/pause-session-ritual-restore-flow')
-    >('@/features/pause/application/use-cases/session/pause-session-ritual-restore-flow');
-    return {
-      ...actual,
-      initialBreathingFirstCompletedFromRestored: vi.fn(),
-      initialBreathingSecondCompletedFromRestored: vi.fn(),
-      initialDecisionFromRestored: vi.fn(),
-      initialPhaseFromRestored: vi.fn(),
-      initialFrameDoneFromRestored: vi.fn(),
-    };
-  },
-);
+import { describe, expect, it } from 'vitest';
 
 import {
   initialBriefIntegrateDoneFromRestored,
@@ -27,7 +10,7 @@ import {
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
 describe('pause-session-ritual-restore-io', () => {
-  it('re-exports restored brief ritual fields from pause-session-ritual-restore-flow', () => {
+  it('re-exports restored brief ritual fields from session + ritual subcluster modules', () => {
     const restored = makeTestPersistedPauseSession({
       ritualDepth: 'brief',
       briefStep: 'integrate',
@@ -43,7 +26,7 @@ describe('pause-session-ritual-restore-io', () => {
     expect(initialRitualEntry(null)).toBe('picker');
   });
 
-  it('re-exports mapPersistedStep from pause-session-ritual-restore-flow', () => {
+  it('re-exports mapPersistedStep from domain session mapper', () => {
     expect(mapPersistedStep('reflect')).toBe('reflect');
     expect(mapPersistedStep(undefined)).toBe('feel');
   });
