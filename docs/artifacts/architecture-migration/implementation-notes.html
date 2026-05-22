@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session frame umbrella flow regression (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-frame-flow</code> umbrella re-exports have unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-session-frame-flow.test.ts</code> beside the frame umbrella (parity with <code>pause-session-decide-flow.test.ts</code>, <code>pause-session-providers-flow.test.ts</code>, and existing <code>pause-session-frame-cluster</code>). <code>pause-session-frame-io</code> unchanged (imports <code>restored-frame-ritual-state</code> directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — regression test slice only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Leaf <code>restored-frame-ritual-state</code> already has dedicated tests; umbrella test guards CI re-export wiring only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-shell-flow.test.ts</code>, <code>pause-session-persisted-tab-session-flow</code> cluster marker, or colocate <code>application/queries/current-pause-keys</code> under <code>infrastructure/queries/</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session scaffold umbrella flow regression (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
