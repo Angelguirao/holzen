@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel pause-reflect-mood-flow off mood subcluster anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-flow</code> composes domain mood helpers + leaf RPC use case</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mood CI umbrella re-exports <code>domain/reflect/mood/</code> helpers and <code>run-initial-emotion-log</code> directly (parity with <code>pause-reflect-mood-io</code> leaf imports; subcluster flow anchors remain for CI only).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-*-mood-flow</code> subcluster anchors remain on disk; nothing imports them except optional future consumers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-reflect-flows-flow</code> off flows subcluster anchors, colocate remaining decide flow anchors, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect hub-flow cluster re-export test (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
