@@ -312,6 +312,7 @@ describe('pause-reflect-telemetry-io parity (application)', () => {
   });
 
   /**
+   * Reciprocal inline pins ↔ `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
    * Reciprocal inline pins ↔ `application/.../pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts`
    * (application + presentation).
@@ -323,6 +324,7 @@ describe('pause-reflect-telemetry-io parity (application)', () => {
     expect(trackPostItFromTelemetryIo).not.toBe(pauseAdoptPendingOffer);
     expect(trackShareTapFromTelemetryIo).not.toBe(pauseDeclinePendingOffer);
     expect(trackWallpaperFromTelemetryIo).not.toBe(getPendingPauseOfferDisplay);
+    // Reciprocal inline pins: `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
     // Reciprocal inline pins: `application/.../pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
   });
 
