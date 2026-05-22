@@ -62,6 +62,18 @@ import {
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import {
+  buildPauseScoreImpacts,
+  formatReinforcementQuoteFromSession,
+  getSessionQuote,
+  pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
+  resolvePauseDecideOutcomeFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
   pauseReflectTagUpdate,
@@ -78,6 +90,8 @@ import {
  * Application-layer mood I/O parity. Steps-io sibling pins:
  * `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts`.
+ * Flows-io sibling pins: `pause-reflect-flows-mood-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts`.
  */
 describe('pause-reflect-mood-io parity', () => {
   it('mood CI umbrella composes the same domain mood leaves as presentation I/O', () => {
@@ -193,5 +207,23 @@ describe('pause-reflect-mood-io parity', () => {
     expect(buildFeelTilesMoodLogOptions).not.toBe(shouldShowFavoriteProHint);
     expect(pauseInitialEmotionSkip).not.toBe(shouldLogPauseReflectionStep);
     // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (mood RPC vs reflect+decide).
+   * Dedicated sibling file: `pause-reflect-flows-mood-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: flows-io exports stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseInitialEmotionSkip).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(pauseInitialEmotionSelect).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
+    expect(pauseInitialEmotionSkipWithRepository).not.toBe(formatReinforcementQuoteFromSession);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(resolvePauseDecideOutcomeFlow);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(getSessionQuote);
+    expect(pauseInitialEmotionSkip).not.toBe(buildPauseScoreImpacts);
+    expect(resolvePauseSessionChromeCloseAction).not.toBe(showPauseOutcomeNotCompletedToast);
+    expect(pauseInitialEmotionSelect).not.toBe(showPauseOutcomeSaveFailedToast);
+    // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts`.
   });
 });
