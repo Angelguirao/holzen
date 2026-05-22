@@ -25,6 +25,13 @@ import {
   trackPausePendingDeclined as trackDeclinedFromPendingOfferFlow,
   trackPauseSessionAbandoned as trackAbandonedFromPendingOfferFlow,
 } from '../pending-offer/pause-reflect-pending-offer-flow';
+import {
+  buildReflectionShareText as buildShareTextFromShareFlow,
+  runReflectionShareImage as runShareImageFromShareFlow,
+  trackPauseReflectPostItOpen as trackPostItFromShareFlow,
+  trackPauseReflectShareTap as trackShareTapFromShareFlow,
+  trackPauseReflectWallpaperTap as trackWallpaperFromShareFlow,
+} from '../share/pause-reflect-share-flow';
 
 import {
   startPauseReflectFrameFocusAmbience,
@@ -73,5 +80,19 @@ describe('pause-reflect-ambience-flow', () => {
     expect(startPauseReflectFrameFocusAmbience).not.toBe(trackDeclinedFromPendingOfferFlow);
     expect(stopPauseReflectFrameFocusAmbience).not.toBe(trackAbandonedFromPendingOfferFlow);
     // Full cross-flow pins: `pause-reflect-ambience-pending-offer-flow-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-share-flow.test.ts` (ambience-flow cluster).
+   * Dedicated sibling file: `pause-reflect-ambience-share-flow-sibling-parity.test.ts`
+   * (+ presentation mirror under `presentation/reflect/ambience/`).
+   */
+  it('sibling cluster: share-flow exports stay distinct from ambience-flow exports', () => {
+    expect(startPauseReflectFrameFocusAmbience).not.toBe(runShareImageFromShareFlow);
+    expect(stopPauseReflectFrameFocusAmbience).not.toBe(buildShareTextFromShareFlow);
+    expect(startPauseReflectFrameFocusAmbience).not.toBe(trackPostItFromShareFlow);
+    expect(stopPauseReflectFrameFocusAmbience).not.toBe(trackShareTapFromShareFlow);
+    expect(startPauseReflectFrameFocusAmbience).not.toBe(trackWallpaperFromShareFlow);
+    // Full cross-flow pins: `pause-reflect-ambience-share-flow-sibling-parity.test.ts`.
   });
 });
