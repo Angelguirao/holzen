@@ -18,7 +18,8 @@ import * as sessionReflectTelemetryIo from '@/features/pause/presentation/reflec
 /**
  * Presentation sibling parity: session reflect telemetry-io vs Home manual-open telemetry-io
  * (colocated beside pause-home-reflect-io; parity with application
- * `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`).
+ * `application/.../manual-open/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`
+ * and `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`).
  */
 describe('pause-reflect-telemetry-io ↔ pause-home-reflect-telemetry-io sibling parity', () => {
   it('session reflect telemetry-io and Home manual-open telemetry-io are distinct presentation surfaces', () => {

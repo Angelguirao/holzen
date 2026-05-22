@@ -112,6 +112,13 @@ import {
   resolveShiftFrameHubDonePresentation as resolvePresentationFromHubFlow,
   runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
 } from '@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow';
+import {
+  markPauseManualStartedHomeOnce,
+  trackHomePendingPauseBannerPauseOpened,
+  trackManualPauseInstanceCreated,
+  trackPauseManualCompleted,
+  trackPauseOpenDismissed,
+} from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
 
 describe('pause-reflect-telemetry-io parity (application)', () => {
   it('presentation I/O session reflect telemetry matches telemetry CI umbrella', () => {
@@ -317,5 +324,19 @@ describe('pause-reflect-telemetry-io parity (application)', () => {
     expect(trackShareTapFromTelemetryIo).not.toBe(pauseDeclinePendingOffer);
     expect(trackWallpaperFromTelemetryIo).not.toBe(getPendingPauseOfferDisplay);
     // Reciprocal inline pins: `application/.../pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `application/.../manual-open/pause-home-reflect-telemetry-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`
+   * (application + presentation).
+   */
+  it('sibling cluster: Home manual-open telemetry-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(trackPauseOpenDismissed);
+    expect(trackPauseReflectShareTap).not.toBe(trackHomePendingPauseBannerPauseOpened);
+    expect(trackPauseReflectWallpaperTap).not.toBe(markPauseManualStartedHomeOnce);
+    expect(trackPostItFromTelemetryIo).not.toBe(trackManualPauseInstanceCreated);
+    expect(trackShareTapFromTelemetryIo).not.toBe(trackPauseManualCompleted);
+    expect(trackPostItDirect).not.toBe(trackPauseOpenDismissed);
   });
 });
