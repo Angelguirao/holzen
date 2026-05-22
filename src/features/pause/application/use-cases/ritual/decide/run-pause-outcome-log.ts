@@ -9,7 +9,7 @@ export type { RunPauseOutcomeLogResult } from '@/features/pause/domain/decide/pa
 /**
  * Decide step — `outcome_logged` RPC and completion state gate.
  * Reflect+decide presentation: `pause-reflect-flows-io.ts` imports this leaf directly
- * (not `pause-reflect-flows-flow`). Parity pins: `pause-reflect-flows-io-parity.test.ts`.
+ * (not `pause-reflect-flows-flow`). Parity pins: `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts`.
  */
 export async function runPauseOutcomeLog(
   repository: PauseRepository,

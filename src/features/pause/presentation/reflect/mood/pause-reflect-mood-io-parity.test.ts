@@ -102,7 +102,7 @@ import {
  * Steps-io sibling pins: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application).
  * Flows-io sibling pins: `pause-reflect-flows-mood-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (application).
+ * reciprocal inline pins ↔ `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts`.
  * Generation-io sibling pins: `pause-reflect-generation-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (application).
  */
