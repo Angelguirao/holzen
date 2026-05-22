@@ -98,6 +98,10 @@ mustExist(
   'pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow.ts',
 );
 mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow.ts',
+  'pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow.ts',
+);
+mustExist(
   'src/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow.ts',
   'pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow.ts',
 );
@@ -689,16 +693,6 @@ const LEGACY_PAUSE_PUBLIC_HOOKS_SCORE_IMPACT_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-score-impacts-flow',
   "from './application/use-cases/ritual/decide/score-impacts'",
-  "from './application/use-cases/ritual/decide/score-impact-presentation'",
-  "from './application/use-cases/ritual/decide/pause-decide-score-impacts-flow'",
-];
-
-/** public-hooks — decide score-impact helpers via pause-session-decide-flow only. */
-const LEGACY_PAUSE_PUBLIC_HOOKS_SCORE_IMPACT_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/decide/score-impacts',
-  '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation',
-  '@/features/pause/application/use-cases/ritual/decide/pause-decide-score-impacts-flow',
-  "from './application/use-cases/ritual/decide/score-impacts'",
   "from '../application/use-cases/ritual/decide/score-impacts'",
   "from './application/use-cases/ritual/decide/score-impact-presentation'",
   "from '../application/use-cases/ritual/decide/score-impact-presentation'",
@@ -942,6 +936,34 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_SUBCLUSTER_IMPOR
   "from '../application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow'",
 ];
 
+/** Reflect pending-offer presentation — import adopt/decline via pause-reflect-pending-offer-flow only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_RPC_SUBCLUSTER_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow',
+  "from './application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow'",
+];
+
+/** Reflect pending-offer presentation — import display via pause-reflect-pending-offer-flow only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_DISPLAY_SUBCLUSTER_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow',
+  "from './application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow'",
+];
+
+/** Pending-offer umbrella — compose RPC via pause-reflect-pending-offer-rpc-flow (not leaf use cases). */
+const LEGACY_PAUSE_REFLECT_PENDING_OFFER_FLOW_RPC_IMPORTS = [
+  "from './run-adopt-pending-pause-offer'",
+  "from './run-decline-pending-pause-offer'",
+  "from '../run-adopt-pending-pause-offer'",
+  "from '../run-decline-pending-pause-offer'",
+];
+
+/** Pending-offer umbrella — compose display via pause-pending-offer-display-flow (not leaf module). */
+const LEGACY_PAUSE_REFLECT_PENDING_OFFER_FLOW_DISPLAY_IMPORTS = [
+  "from './pending-pause-offer-display'",
+  "from '../pending-pause-offer-display'",
+];
+
 /** Session presentation — import pending-offer PostHog via pause-pending-offer-telemetry-flow (telemetry-io only). */
 const LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_TELEMETRY_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-telemetry',
@@ -963,12 +985,18 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_USE_CASE_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer',
   '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer',
   '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display',
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow',
   "from './application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer'",
   "from '../application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer'",
   "from './application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer'",
   "from '../application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer'",
   "from './application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display'",
   "from '../application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display'",
+  "from './application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow'",
+  "from './application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow'",
 ];
 
 /** Flat presentation/session scaffold paths — use presentation/session/scaffold/. */
@@ -1327,17 +1355,26 @@ for (const file of walkTs(join(root, 'src'))) {
         );
       }
     }
-    for (const needle of [
-      '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer',
-      '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer',
-      '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display',
-      "from './run-adopt-pending-pause-offer'",
-      "from './run-decline-pending-pause-offer'",
-      "from './pending-pause-offer-display'",
-    ]) {
+    for (const needle of LEGACY_PAUSE_REFLECT_PENDING_OFFER_FLOW_RPC_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: reflect pending-offer umbrella flow must compose RPC subcluster (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_REFLECT_PENDING_OFFER_FLOW_DISPLAY_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect pending-offer umbrella flow must compose display subcluster (${needle})`,
+        );
+      }
+    }
+  }
+  if (rel === 'src/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow.ts') {
+    for (const needle of LEGACY_PAUSE_REFLECT_PENDING_OFFER_FLOW_DISPLAY_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect pending-offer RPC flow must not import display leaf (${needle})`,
         );
       }
     }
@@ -1523,6 +1560,16 @@ for (const file of walkTs(join(root, 'src'))) {
           failures.push(`${rel}: legacy pending-offer telemetry subcluster import (${needle})`);
         }
       }
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_RPC_SUBCLUSTER_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy pending-offer RPC subcluster import (${needle})`);
+        }
+      }
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_DISPLAY_SUBCLUSTER_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy pending-offer display subcluster import (${needle})`);
+        }
+      }
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_USE_CASE_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy pending-offer use-case import (${needle})`);
@@ -1536,6 +1583,16 @@ for (const file of walkTs(join(root, 'src'))) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_SUBCLUSTER_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(`${rel}: pending-offer telemetry I/O must import via pause-reflect-pending-offer-flow (${needle})`);
+        }
+      }
+    }
+    if (
+      rel.endsWith('pause-reflect-pending-offer-io.ts') ||
+      rel.endsWith('pause-reflect-pending-offer-io.test.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_RPC_SUBCLUSTER_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: pending-offer RPC I/O must import via pause-reflect-pending-offer-flow (${needle})`);
         }
       }
     }
