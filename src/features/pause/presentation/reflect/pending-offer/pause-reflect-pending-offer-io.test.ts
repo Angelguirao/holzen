@@ -5,6 +5,11 @@ import {
   pauseReflectFavoriteToggle,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
+  trackPausePendingAdopted,
+  trackPausePendingDeclined,
+  trackPauseSessionAbandoned,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
+import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
@@ -123,6 +128,7 @@ describe('pause-reflect-pending-offer-io', () => {
     expect(pauseAdoptPendingOfferWithRepository).not.toBe(trackPauseSessionAbandoned);
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(trackPausePendingAdopted);
     expect(getPendingPauseOfferDisplay).not.toBe(trackPausePendingDeclined);
-    // Full cross-I/O pins: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
+    // Reciprocal inline pins: `pause-reflect-pending-offer-telemetry-io.test.ts`;
+    // dedicated sibling: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
   });
 });
