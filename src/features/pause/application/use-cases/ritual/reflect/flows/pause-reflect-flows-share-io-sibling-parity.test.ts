@@ -32,7 +32,7 @@ import {
  * `pause-reflect-flows-share-flow-sibling-parity.test.ts`; complements
  * `pause-reflect-flows-hub-io-sibling-parity.test.ts` and
  * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` (application + presentation)).
- * Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts` ↔
+ * Reciprocal inline pins: colocated `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts` ↔
  * `pause-reflect-share-io-parity.test.ts` and `pause-reflect-share-io.test.ts`.
  */
 describe('pause-reflect-flows-io ↔ pause-reflect-share-io sibling parity (application)', () => {

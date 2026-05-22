@@ -1,3 +1,7 @@
+/**
+ * Colocated with `pause-reflect-flows-io.ts` (Tier 5 presentation parity).
+ * May import flows CI umbrella + domain/decide leaves for identity pins (allowlisted in check:architecture-alignment).
+ */
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/integrations/supabase/client', () => ({
@@ -313,7 +317,7 @@ describe('pause-reflect-flows-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (reflect+decide vs session UI telemetry).
+   * Reciprocal inline pins ↔ `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts` (reflect+decide vs session UI telemetry).
    * Dedicated sibling file: `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: telemetry-io exports stay distinct from flows-io', () => {

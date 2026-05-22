@@ -13,7 +13,7 @@
  * `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
  * `pause-reflect-flows-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (application
  * `pause-reflect-flows-mood-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
- * `pause-reflect-flows-io-parity.test.ts` (application) ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`),
+ * colocated `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-mood-io-parity.test.ts`),
  * `pause-reflect-mood-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`, and
  * `pause-reflect-ambience-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`;
  * `pause-reflect-share-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`.
