@@ -6,6 +6,7 @@
  * RPC brief→deep stays on `pause-session-brief-io`.
  */
 export {
+  mapPersistedStep,
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
   initialBriefIntegrateDoneFromRestored,

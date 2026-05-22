@@ -9,9 +9,9 @@ import {
   initialPhaseFromRestored,
   initialRitualEntry,
   initialSelectedBriefFaceFromRestored,
+  mapPersistedStep,
 } from './pause-session-ritual-restore-io';
 import type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
-import { mapPersistedStep } from '@/features/pause/domain/session/map-persisted-step';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
