@@ -4,7 +4,7 @@
  * `pause-reflect-mood-io` leaf imports; not generation umbrella or hook-flow bundle).
  * Wrapper delegation pins: `pause-reflect-generation-io-parity.test.ts` (colocated; default generator + injected port).
  * Sibling parity: `pause-reflect-generation-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
- * `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` ↔ `pause-home-reflect-io`;
+ * `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` ↔ `pause-home-reflect-io` (presentation + application);
  * `pause-reflect-generation-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io` (presentation + application);
  * `pause-reflect-generation-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io` (presentation + application);
  * `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
