@@ -692,11 +692,20 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_HOOK_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation'",
 ];
 
-/** Reflect generation presentation (manual-open) — import use cases via pause-reflect-generation-flow only. */
+/** Reflect generation presentation (manual-open) — import use cases via pause-home-reflect-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_MANUAL_OPEN_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-reflect-generation-manual-open-flow',
-  "from './application/use-cases/ritual/reflect/generation/manual-open/pause-reflect-generation-manual-open-flow'",
-  "from '../application/use-cases/ritual/reflect/generation/manual-open/pause-reflect-generation-manual-open-flow'",
+  '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-manual-open-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/open-manual-pause-from-home',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/dismiss-open-pause-home',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-persist-silent-reflection-stub',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-open-manual-pause-silent-mode-after-create',
+  "from './application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow'",
+  "from '../application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow'",
+  "from './application/use-cases/ritual/reflect/generation/pause-reflect-generation-manual-open-flow'",
+  "from '../application/use-cases/ritual/reflect/generation/pause-reflect-generation-manual-open-flow'",
+  "from './application/use-cases/ritual/reflect/generation/manual-open/open-manual-pause-from-home'",
+  "from '../application/use-cases/ritual/reflect/generation/manual-open/open-manual-pause-from-home'",
 ];
 
 /** Reflect generation umbrella flow — compose holzen-reflect + manual-open subclusters only. */
@@ -737,6 +746,20 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_DOMAIN_IMPORTS = [
   "from '../domain/reflect/hub/",
   "from './application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done'",
   "from '../application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done'",
+];
+
+/** Reflect generation presentation (holzen-reflect) — import via pause-reflect-generation-io only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-hook-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/',
+  "from './application/use-cases/ritual/reflect/generation/holzen-reflect/",
+  "from '../application/use-cases/ritual/reflect/generation/holzen-reflect/",
+  "from './application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow'",
+  "from '../application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow'",
+  "from './application/use-cases/ritual/reflect/generation/pause-reflect-generation-hook-flow'",
+  "from '../application/use-cases/ritual/reflect/generation/pause-reflect-generation-hook-flow'",
 ];
 
 /** Reflect mood presentation — import domain mood helpers via pause-reflect-mood-flow only. */
@@ -957,7 +980,32 @@ for (const file of walkTs(join(root, 'src'))) {
       failures.push(`${rel}: legacy flat presentation/reflect import (${needle})`);
     }
   }
-  if (rel.startsWith('src/features/pause/presentation/reflect/generation/manual-open/')) {
+  if (
+    rel.startsWith('src/features/pause/presentation/reflect/generation/') &&
+    !rel.includes('/generation/manual-open/')
+  ) {
+    if (
+      !rel.endsWith('pause-reflect-generation-io.ts') &&
+      !rel.endsWith('pause-reflect-generation-io.test.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_HOOK_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy reflect generation hook import (${needle})`);
+        }
+      }
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy reflect generation import (${needle})`);
+        }
+      }
+    }
+  }
+  if (
+    rel.startsWith('src/features/pause/presentation/reflect/generation/manual-open/') &&
+    !rel.endsWith('-io.ts') &&
+    !rel.endsWith('.test.ts') &&
+    !rel.endsWith('.test.tsx')
+  ) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy reflect manual-open telemetry import (${needle})`);
@@ -965,17 +1013,7 @@ for (const file of walkTs(join(root, 'src'))) {
     }
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_MANUAL_OPEN_IMPORTS) {
       if (text.includes(needle)) {
-        failures.push(`${rel}: legacy reflect generation manual-open import (${needle})`);
-      }
-    }
-  }
-  if (
-    rel.startsWith('src/features/pause/presentation/reflect/generation/') &&
-    !rel.includes('/generation/manual-open/')
-  ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_HOOK_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(`${rel}: legacy reflect generation hook import (${needle})`);
+        failures.push(`${rel}: legacy reflect manual-open generation import (${needle})`);
       }
     }
   }
