@@ -31,6 +31,16 @@ import {
   pauseReflectionShareImage,
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
+  buildPauseScoreImpacts,
+  formatReinforcementQuoteFromSession,
+  getSessionQuote,
+  pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
+  resolvePauseDecideOutcomeFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
   pauseReflectFavoriteToggle,
   pauseReflectFavoriteToggleWithRepository,
   pauseReflectNoteUpdate,
@@ -250,5 +260,24 @@ describe('pause-reflect-steps-io', () => {
     expect(reflectPauseRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
     // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-ambience-io.test.ts`;
     // `pause-reflect-steps-ambience-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io.test.ts` (step RPC wrappers vs reflect+decide).
+   * Dedicated sibling file: `pause-reflect-flows-steps-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: flows-io exports stay distinct from steps-io', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(pauseReflectTagUpdate).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(pauseReflectionStepLogOnce).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
+    expect(reflectPauseRepository).not.toBe(buildPauseScoreImpacts);
+    expect(pauseReflectFavoriteToggleWithRepository).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseReflectNoteUpdateWithRepository).not.toBe(formatReinforcementQuoteFromSession);
+    expect(pauseReflectTagUpdateWithRepository).not.toBe(getSessionQuote);
+    expect(pauseReflectionStepLogOnceWithRepository).not.toBe(resolvePauseDecideOutcomeFlow);
+    expect(shouldShowFavoriteProHint).not.toBe(pauseReflectOutcomeLog);
+    expect(shouldLogPauseReflectionStep).not.toBe(pauseReflectOutcomeLogWithRepository);
+    // Reciprocal inline pins: `pause-reflect-flows-io.test.ts`.
   });
 });

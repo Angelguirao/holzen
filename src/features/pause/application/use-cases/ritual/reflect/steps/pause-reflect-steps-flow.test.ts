@@ -132,8 +132,9 @@ describe('pause-reflect-steps-flow', () => {
 
   /**
    * Reciprocal inline pins ↔ `pause-favorite-toggle-flow.test.ts` and
-   * `pause-reflection-step-log-flow.test.ts`. Dedicated sibling file:
-   * `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`.
+   * `pause-reflection-step-log-flow.test.ts`. Dedicated sibling files:
+   * `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`,
+   * `pause-reflect-steps-favorite-reflection-step-log-flow-sibling-parity.test.ts`.
    */
   it('sibling cluster: favorite-toggle-flow and reflection-step-log-flow stay distinct subcluster anchors', () => {
     expect(runFavoriteFromFavoriteFlow).not.toBe(runReflectionStepFromLogFlow);
@@ -144,6 +145,21 @@ describe('pause-reflect-steps-flow', () => {
     expect(shouldShowFavoriteFromFlow).not.toBe(runReflectionStepFromLogFlow);
     expect(shouldLogFromFlow).not.toBe(runFavoriteFromFavoriteFlow);
     expect(shouldLogFromFlow).not.toBe(shouldShowFavoriteFromFavoriteFlow);
+  });
+
+  it('sibling cluster: favorite-toggle-flow and reflection-step-log-flow exports stay distinct from steps umbrella exports', () => {
+    expect(runPauseFavoriteToggle).not.toBe(runReflectionStepFromLogFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(runFavoriteFromFavoriteFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(shouldLogFromLogFlow);
+    expect(shouldLogFromFlow).not.toBe(shouldShowFavoriteFromFavoriteFlow);
+    expect(runPauseFavoriteToggle).not.toBe(shouldLogFromLogFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(shouldShowFavoriteFromFavoriteFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(runReflectionStepFromLogFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(runFavoriteFromFavoriteFlow);
+    expect(runPauseFavoriteToggle).toBe(runFavoriteFromFavoriteFlow);
+    expect(runPauseReflectionStepLogOnce).toBe(runReflectionStepFromLogFlow);
+    expect(shouldShowFavoriteFromFlow).toBe(shouldShowFavoriteFromFavoriteFlow);
+    expect(shouldLogFromFlow).toBe(shouldLogFromLogFlow);
   });
 
   it('sibling cluster: flows-flow exports stay distinct from steps umbrella exports', () => {
