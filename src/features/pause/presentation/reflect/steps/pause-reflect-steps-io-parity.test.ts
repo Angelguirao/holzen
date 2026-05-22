@@ -296,7 +296,7 @@ describe('pause-reflect-steps-io parity', () => {
     expect(shouldLogFromStepsIo).not.toBe(buildPauseSessionStepRitualBundle);
     expect(reflectPauseRepository).not.toBe(buildPauseSessionStepShellBundle);
     expect(reflectPauseRepository).not.toBe(buildPauseSessionStepRitualBundle);
-    // Reciprocal inline pins: `pause-session-step-handlers-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/session/pause-session-step-handlers-io-parity.test.ts`.
   });
 
   /**

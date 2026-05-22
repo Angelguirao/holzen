@@ -19,7 +19,7 @@ import {
  * Application sibling parity: step-handlers-io vs step-transition-io (parity with
  * presentation `pause-session-step-handlers-step-transition-io-sibling-parity.test.ts` and
  * flow-level `pause-session-step-handlers-step-transition-flow-sibling-parity.test.ts`).
- * Reciprocal inline pins: `pause-session-step-handlers-io-parity.test.ts` ↔
+ * Reciprocal inline pins: `presentation/session/pause-session-step-handlers-io-parity.test.ts` ↔
  * `presentation/session/pause-session-step-transition-io-parity.test.ts`.
  */
 describe('pause-session-step-handlers-io ↔ pause-session-step-transition-io sibling parity (application)', () => {
