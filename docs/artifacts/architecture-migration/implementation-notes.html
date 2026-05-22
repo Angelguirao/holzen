@@ -21433,4 +21433,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — companion orchestration I/O via subcluster flows (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>pause-companion-orchestration-io</code> through orchestration subcluster flow anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and #2 (<code>ritual/frame/</code>) remain complete — no folder moves. Peel <code>pause-companion-orchestration-io</code> off <code>pause-companion-orchestration-flow</code> to import <code>pause-companion-orchestrate-session-flow</code>, <code>pause-companion-ui-completion-flow</code>, <code>pause-companion-library-favorite-flow</code>, and <code>pause-companion-section-expansion-flow</code> directly (parity with reflect steps/flows I/O peels). CI blocks umbrella imports on orchestration I/O; companion hooks still import orchestration-io only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-companion-orchestration-flow</code> remains the compose anchor for other consumers; orchestration presentation I/O no longer depends on the umbrella barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion orchestrate-io subcluster peel (slot orchestrate vs intervention vs telemetry), Phase B subscription Tier 1 shim, or session shell I/O flow peels.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

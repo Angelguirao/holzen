@@ -1,18 +1,20 @@
 /**
  * Companion orchestration presentation I/O (session load, UI completion, favorites, expansion).
- * Imports ritual/frame use cases via `pause-companion-orchestration-flow` CI anchor
- * (parity with `pause-companion-orchestrate-io` → orchestrate flow).
+ * Imports ritual/frame use cases via orchestration subcluster flow anchors
+ * (parity with `pause-reflect-steps-io` / `pause-reflect-flows-io` peels).
  */
 import {
-  invalidateCompanionUiCompletionQuery,
   loadCompanionOrchestrateSession,
-  nextExpandedWithLazyFetch,
-  persistCompanionUiStepCompletion,
-  runToggleCompanionLibraryFavorite,
-  type CompanionUiCompletionStep,
   type LoadCompanionOrchestrateSessionInput,
   type LoadCompanionOrchestrateSessionPorts,
-} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow';
+} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-session-flow';
+import { runToggleCompanionLibraryFavorite } from '@/features/pause/application/use-cases/ritual/frame/pause-companion-library-favorite-flow';
+import { nextExpandedWithLazyFetch } from '@/features/pause/application/use-cases/ritual/frame/pause-companion-section-expansion-flow';
+import {
+  invalidateCompanionUiCompletionQuery,
+  persistCompanionUiStepCompletion,
+  type CompanionUiCompletionStep,
+} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-ui-completion-flow';
 import { loadMoodHistoryForOrchestrate } from '@/features/pause/public-queries';
 import {
   supabaseCompanionOrchestrator,

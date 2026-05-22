@@ -792,6 +792,33 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_UMBRELLA_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow'",
 ];
 
+const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_IO_UMBRELLA_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow',
+  "from './application/use-cases/ritual/frame/pause-companion-orchestration-flow'",
+  "from '../application/use-cases/ritual/frame/pause-companion-orchestration-flow'",
+];
+
+/** Companion orchestration presentation — import via pause-companion-orchestration-io only. */
+const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_DOMAIN_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session',
+  '@/features/pause/application/use-cases/ritual/frame/persist-ui-step-completion',
+  '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite',
+  '@/features/pause/application/use-cases/ritual/frame/next-expanded-with-lazy-fetch',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-session-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-ui-completion-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-library-favorite-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-section-expansion-flow',
+  "from './load-companion-orchestrate-session'",
+  "from '../load-companion-orchestrate-session'",
+  "from './persist-ui-step-completion'",
+  "from '../persist-ui-step-completion'",
+  "from './run-toggle-companion-library-favorite'",
+  "from '../run-toggle-companion-library-favorite'",
+  "from './next-expanded-with-lazy-fetch'",
+  "from '../next-expanded-with-lazy-fetch'",
+];
+
 /** Reflect flows presentation — import reflect/decide helpers via pause-reflect-flows-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow',
@@ -1758,6 +1785,35 @@ for (const file of walkTs(join(root, 'src'))) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy reflect share telemetry import (${needle})`);
+        }
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-companion-orchestration-io.ts') ||
+    rel.endsWith('pause-companion-orchestration-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_IO_UMBRELLA_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: companion orchestration I/O must import via orchestration subcluster flows (${needle})`,
+        );
+      }
+    }
+  }
+  if (rel.startsWith('src/features/pause/presentation/companion/')) {
+    if (
+      !rel.endsWith('pause-companion-orchestration-io.ts') &&
+      !rel.endsWith('pause-companion-orchestration-io.test.ts') &&
+      !rel.endsWith('pause-companion-orchestrate-io.ts') &&
+      !rel.endsWith('pause-companion-orchestrate-io.test.ts') &&
+      !rel.endsWith('pause-companion-analytics-io.ts') &&
+      !rel.endsWith('pause-companion-analytics-io.test.ts') &&
+      !rel.endsWith('pause-companion-frame-ui-io.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_DOMAIN_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy companion orchestration import (${needle})`);
         }
       }
     }
