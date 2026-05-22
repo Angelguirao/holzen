@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — decide outcome log + score-impacts leaf identity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-decide-outcome-log-flow</code> and <code>pause-decide-score-impacts-flow</code> pin ritual/decide leaves</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add leaf flow tests beside outcome-log and score-impacts CI anchors with <code>.toBe(direct)</code> identity for <code>runPauseOutcomeLog</code>, score builders, and presentation helpers (parity with <code>pause-decide-outcome-view-flow</code> and toast/wisdom pins). <code>pause-reflect-flows-io</code> unchanged (imports decide leaf modules directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI slice only.</dd>
+      <dt>Tradeoff</dt>
+      <dd>Archive decide RPC/telemetry leaf anchors still lack dedicated identity pins.</dd>
+      <dt>Open question</dt>
+      <dd>Next: pin archive decide leaves, remaining <code>ritual/frame</code> typeof-only anchors, or Phase B subscription Tier 1 when pause Tier 5 is quiet.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — ritual/decide toast + wisdom per-flow tests (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,9 +88,9 @@
       <dt>Deviation</dt>
       <dd>None — CI slice only.</dd>
       <dt>Tradeoff</dt>
-      <dd><code>pause-decide-outcome-log-flow</code> and <code>pause-decide-score-impacts-flow</code> still lack dedicated identity pins until incremental slices.</dd>
+      <dd>Two flow test files replace one combined anchor (clearer CI mapping per leaf flow module).</dd>
       <dt>Open question</dt>
-      <dd>Next: pin decide outcome-log / score-impacts leaves, or Phase B subscription Tier 1 when pause Tier 5 is quiet.</dd>
+      <dd>Next: pin archive decide RPC/telemetry leaves, or Phase B subscription Tier 1 when pause Tier 5 is quiet.</dd>
     </dl>
   </article>
 
