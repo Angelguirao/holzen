@@ -29,8 +29,23 @@ import {
   loadPausePersistedTabSession,
   savePausePersistedTabSession,
 } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
+import {
+  buildPauseSessionMountLogParams,
+  coalescePauseSessionShellViewModel,
+  computePauseHeaderBackIntent,
+  computePauseSessionHydration,
+  computePauseSessionResolved,
+  hasPersistedPauseSessionPayload,
+  isPauseSessionHeaderBackVisible,
+  isPauseSessionWaitingForInstanceFetch,
+} from '@/features/pause/presentation/session/pause-session-shell-io';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
+/**
+ * Terminal-entry CI umbrella ↔ presentation I/O delegation parity.
+ * Shell-io sibling: `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins below ↔ `pause-session-shell-io-parity.test.ts`.
+ */
 describe('pause-session-terminal-entry-io parity', () => {
   it('presentation I/O terminal-entry exports match pause-session-terminal-entry-flow CI umbrella', () => {
     expect(TERMINAL_PAUSE_DB_STATES).toBe(terminalStatesFromTerminalEntryIo);
@@ -67,5 +82,20 @@ describe('pause-session-terminal-entry-io parity', () => {
     expect(persistedAllowsFromTerminalEntryIo(restored, 'inst-parity')).toBe(
       persistedAllowsDirect(restored, 'inst-parity'),
     );
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-shell-io-parity.test.ts` (terminal guards vs shell chrome).
+   * Dedicated sibling file: `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: shell-io exports stay distinct from terminal-entry-io guards', () => {
+    expect(isTerminalFromTerminalEntryIo).not.toBe(computePauseSessionHydration);
+    expect(isTerminalFromTerminalEntryIo).not.toBe(computePauseSessionResolved);
+    expect(persistedAllowsFromTerminalEntryIo).not.toBe(isPauseSessionHeaderBackVisible);
+    expect(terminalStatesFromTerminalEntryIo).not.toBe(coalescePauseSessionShellViewModel);
+    expect(isTerminalFromTerminalEntryIo).not.toBe(buildPauseSessionMountLogParams);
+    expect(persistedAllowsFromTerminalEntryIo).not.toBe(hasPersistedPauseSessionPayload);
+    expect(isTerminalFromTerminalEntryIo).not.toBe(isPauseSessionWaitingForInstanceFetch);
+    // Reciprocal inline pins: `pause-session-shell-io-parity.test.ts`.
   });
 });

@@ -67,6 +67,11 @@ import {
 } from '@/features/pause/presentation/session/pause-session-terminal-entry-io';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
+/**
+ * Shell CI umbrella ↔ presentation I/O delegation parity.
+ * Terminal-entry-io sibling: `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins below ↔ `pause-session-terminal-entry-io-parity.test.ts`.
+ */
 describe('pause-session-shell-io parity', () => {
   it('presentation I/O shell exports match pause-session-shell-flow CI umbrella', () => {
     expect(computePauseSessionHydration).toBe(computeHydrationFromShellIo);
@@ -99,6 +104,21 @@ describe('pause-session-shell-io parity', () => {
     expect(buildPauseSessionMountLogParams).not.toBe(savePersistedTabSession);
     expect(coalescePauseSessionShellViewModel).not.toBe(clearPersistedTabSession);
     expect(isPauseSessionWaitingForInstanceFetch).not.toBe(isTerminalPauseDbState);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-terminal-entry-io-parity.test.ts` (shell chrome vs terminal guards).
+   * Dedicated sibling file: `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: terminal-entry-io exports stay distinct from shell-io hydration and header-back', () => {
+    expect(computePauseSessionHydration).not.toBe(isTerminalFromTerminalEntryIo);
+    expect(computePauseSessionResolved).not.toBe(persistedAllowsFromTerminalEntryIo);
+    expect(isPauseSessionHeaderBackVisible).not.toBe(isTerminalFromTerminalEntryIo);
+    expect(computePauseHeaderBackIntent).not.toBe(terminalStatesFromTerminalEntryIo);
+    expect(buildPauseSessionMountLogParams).not.toBe(isTerminalFromTerminalEntryIo);
+    expect(hasPersistedPauseSessionPayload).not.toBe(persistedAllowsFromTerminalEntryIo);
+    expect(isPauseSessionWaitingForInstanceFetch).not.toBe(isTerminalFromTerminalEntryIo);
+    // Reciprocal inline pins: `pause-session-terminal-entry-io-parity.test.ts`.
   });
 
   it('sibling cluster: shell presentation exports stay distinct from scaffold, terminal-entry, and persisted-tab-session I/O', () => {

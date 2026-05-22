@@ -6,7 +6,7 @@
  * Parity: `pause-session-terminal-entry-io-parity.test.ts` (leaf + presentation sibling vs tab-session I/O) and `pause-session-terminal-entry-io.re-exports.test.ts` pin presentation ↔ this anchor.
  * Sibling cluster: `pause-session-terminal-entry-flow.test.ts` ↔ `pause-session-persisted-tab-session-flow` (distinct session CI umbrellas);
  * `pause-session-terminal-entry-shell-flow-sibling-parity.test.ts` ↔ `pause-session-shell-flow`;
- * `presentation/session/pause-session-terminal-entry-shell-io-sibling-parity.test.ts` ↔ `pause-session-shell-io` (presentation);
+ * `presentation/session/pause-session-terminal-entry-shell-io-sibling-parity.test.ts` ↔ `pause-session-shell-io` (application + presentation);
  * `presentation/session/pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` ↔ `pause-session-scaffold-io` (presentation).
  */
 export {

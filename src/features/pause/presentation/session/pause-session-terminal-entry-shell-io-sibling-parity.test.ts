@@ -19,10 +19,12 @@ import * as shellIo from './pause-session-shell-io';
 import * as terminalEntryIo from './pause-session-terminal-entry-io';
 
 /**
- * Dedicated presentation sibling guard (parity with
- * `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` and
- * `pause-session-shell-scaffold-io-sibling-parity.test.ts`.
- * Reciprocal inline pins: `pause-session-terminal-entry-io.test.ts`, `pause-session-shell-io.test.ts`.
+ * Dedicated presentation sibling guard (parity with application
+ * `pause-session-terminal-entry-shell-io-sibling-parity.test.ts`,
+ * `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts`, and
+ * `pause-session-shell-scaffold-io-sibling-parity.test.ts`).
+ * Reciprocal inline pins: `pause-session-terminal-entry-io.test.ts`, `pause-session-shell-io.test.ts`,
+ * `pause-session-terminal-entry-io-parity.test.ts` ↔ `pause-session-shell-io-parity.test.ts`.
  */
 describe('pause-session-terminal-entry-io ↔ pause-session-shell-io sibling parity', () => {
   it('terminal-entry-io and shell-io are distinct sibling presentation I/O anchors', () => {
