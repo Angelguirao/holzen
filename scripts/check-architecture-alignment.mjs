@@ -2023,13 +2023,19 @@ for (const file of walkTs(join(root, 'src'))) {
   }
   if (
     rel.endsWith('pause-home-reflect-telemetry-io.ts') ||
-    rel.endsWith('pause-home-reflect-telemetry-io.test.ts')
+    rel.endsWith('pause-home-reflect-telemetry-io.test.ts') ||
+    rel.endsWith('pause-home-reflect-telemetry-io-parity.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IO_HOME_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: manual-open telemetry I/O must import home/manual-open telemetry leaf modules directly (${needle})`,
-        );
+    const homeReflectTelemetryIoParityTest = rel.endsWith(
+      'pause-home-reflect-telemetry-io-parity.test.ts',
+    );
+    if (!homeReflectTelemetryIoParityTest) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IO_HOME_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: manual-open telemetry I/O must import home/manual-open telemetry leaf modules directly (${needle})`,
+          );
+        }
       }
     }
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IO_GENERATION_FLOW_IMPORTS) {
@@ -2043,20 +2049,24 @@ for (const file of walkTs(join(root, 'src'))) {
   if (
     rel.endsWith('pause-home-reflect-io.ts') ||
     rel.endsWith('pause-home-reflect-io.test.ts') ||
-    rel.endsWith('pause-home-reflect-io.re-exports.test.ts')
+    rel.endsWith('pause-home-reflect-io.re-exports.test.ts') ||
+    rel.endsWith('pause-home-reflect-io-parity.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_IO_GENERATION_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: manual-open reflect I/O must not import generation umbrella (${needle})`,
-        );
+    const homeReflectIoParityTest = rel.endsWith('pause-home-reflect-io-parity.test.ts');
+    if (!homeReflectIoParityTest) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_IO_GENERATION_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: manual-open reflect I/O must not import generation umbrella (${needle})`,
+          );
+        }
       }
-    }
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_IO_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: manual-open reflect I/O must import manual-open sibling modules directly (${needle})`,
-        );
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_IO_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: manual-open reflect I/O must import manual-open sibling modules directly (${needle})`,
+          );
+        }
       }
     }
   }

@@ -30913,4 +30913,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate home-reflect I/O parity beside presentation clusters (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-io-parity</code> + <code>pause-home-reflect-telemetry-io-parity</code> → presentation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no use-case folder moves. Colocate presentation I/O parity tests beside <code>pause-home-reflect-io.ts</code> and <code>pause-home-reflect-telemetry-io.ts</code> (parity with generation/mood/hub colocation). Allowlist parity tests in <code>check:architecture-alignment</code> for manual-open-flow and home-reflect-telemetry-flow CI umbrella imports.</dd>
+      <dt>Deviation</dt>
+      <dd>Application-layer manual-open sibling parity tests remain under <code>application/.../ritual/reflect/generation/manual-open/</code> when they assert flow umbrellas.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B Tier 1 lib shim scan, or remaining application-layer reflect I/O sibling parity under ritual/reflect subclusters.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
