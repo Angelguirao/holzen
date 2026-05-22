@@ -13,7 +13,8 @@ import * as handlersIo from '@/features/pause/presentation/session/pause-session
 
 /**
  * Cross-layer sibling parity: session step-handlers-flow CI umbrella vs presentation step-handlers-io.
- * Mirrors `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts` (reflect steps cluster).
+ * Mirrors `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts` (reflect steps cluster) and
+ * presentation `pause-session-step-handlers-flow-io-wrapper-sibling-parity.test.ts`.
  * Cross-surface flow distinctness: `pause-session-step-handlers-steps-flow-sibling-parity.test.ts`.
  */
 describe('pause-session-step-handlers-flow ↔ pause-session-step-handlers-io wrapper sibling parity', () => {
