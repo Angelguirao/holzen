@@ -16,8 +16,8 @@ import * as terminalEntryIo from './pause-session-terminal-entry-io';
 
 /**
  * Dedicated presentation sibling guard (parity with
- * `pause-session-terminal-entry-shell-flow-sibling-parity.test.ts` and
- * `pause-session-shell-scaffold-io-sibling-parity.test.ts`).
+ * `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` and
+ * `pause-session-shell-scaffold-io-sibling-parity.test.ts`.
  * Reciprocal inline pins: `pause-session-terminal-entry-io.test.ts`, `scaffold/pause-session-scaffold-io.test.ts`.
  */
 describe('pause-session-terminal-entry-io ↔ pause-session-scaffold-io sibling parity', () => {
