@@ -1,19 +1,21 @@
 /**
  * Holzen-reflect generation presentation I/O (bound ReflectGenerator port).
- * Imports domain hook helpers and `run-reflect-generation` directly (parity with
- * companion orchestrate-io leaf imports; not generation umbrella or hook-flow anchor).
+ * Imports domain hook leaf modules and `run-reflect-generation` directly (parity with
+ * `pause-reflect-mood-io` leaf imports; not generation umbrella or hook-flow bundle).
  */
 import {
   runReflectGeneration,
   type RunReflectGenerationInput,
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation';
+import { messageFromReflectGenerationResult } from '@/features/pause/domain/reflect/generation/message-from-reflect-generation-result';
 import {
-  messageFromReflectGenerationResult,
   resolveReflectGenerationPrefetch,
+  type ReflectGenerationPrefetch,
+} from '@/features/pause/domain/reflect/generation/resolve-reflect-generation-prefetch';
+import {
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
-  type ReflectGenerationPrefetch,
-} from '@/features/pause/domain/reflect/generation/reflect-generation-hook-flow';
+} from '@/features/pause/domain/reflect/generation/reflect-generation-run-guards';
 import { reflectGenerationPrerequisite } from '@/features/pause/domain/reflect/generation/reflect-generation-prerequisites';
 import { reflectGenerationUserErrorMessage } from '@/features/pause/domain/reflect/generation/reflect-generation-errors';
 import { resolveEffectiveReflectionCopy } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
