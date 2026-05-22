@@ -17,6 +17,15 @@ import {
 } from '@/features/pause/application/use-cases/session/storage-ritual-sync';
 import { hasPersistablePauseSessionAnchor as hasAnchorFromDomain } from '@/features/pause/domain/session/persisted-session-guards';
 import {
+  clearPersistedTabSession,
+  loadPersistedTabSession,
+  savePersistedTabSession,
+} from '@/features/pause/application/use-cases/session/pause-session-persisted-tab-session-flow';
+import {
+  computePauseSessionHydration,
+  hasPersistedPauseSessionPayload,
+} from '@/features/pause/presentation/session/pause-session-shell-io';
+import {
   buildPauseSessionPersistSnapshot as buildPersistFromScaffoldIo,
   buildPauseSessionScaffoldRitualDerived as buildDerivedFromScaffoldIo,
   computePauseStorageRitualSyncPatch as computeSyncFromScaffoldIo,
@@ -36,5 +45,35 @@ describe('pause-session-scaffold-io parity', () => {
     expect(computePauseStorageRitualSyncPatch).toBe(computeSyncFromStorageLeaf);
     expect(buildPauseSessionScaffoldRitualDerived).toBe(buildDerivedFromLeaf);
     expect(hasPersistablePauseSessionAnchor).toBe(hasAnchorFromDomain);
+  });
+
+  it('presentation I/O re-exports leaf helpers (not port-bound tab-session use cases)', () => {
+    expect(buildPauseSessionPersistSnapshot).toBe(buildPersistFromLeaf);
+    expect(buildPauseSessionPersistSnapshot).not.toBe(loadPersistedTabSession);
+    expect(computePauseStorageRitualSyncPatch).not.toBe(savePersistedTabSession);
+    expect(buildPauseSessionScaffoldRitualDerived).not.toBe(clearPersistedTabSession);
+    expect(hasPersistablePauseSessionAnchor).not.toBe(loadPersistedTabSession);
+  });
+
+  it('sibling cluster: scaffold presentation exports stay distinct from shell I/O and persisted-tab-session flow', () => {
+    expect(buildPauseSessionPersistSnapshot).not.toBe(computePauseSessionHydration);
+    expect(computePauseStorageRitualSyncPatch).not.toBe(computePauseSessionHydration);
+    expect(buildPauseSessionScaffoldRitualDerived).not.toBe(hasPersistedPauseSessionPayload);
+    expect(hasPersistablePauseSessionAnchor).not.toBe(hasPersistedPauseSessionPayload);
+    expect(hasPersistablePauseSessionAnchor).not.toBe(loadPersistedTabSession);
+    expect(buildPauseSessionPersistSnapshot).not.toBe(loadPersistedTabSession);
+    expect(computePauseStorageRitualSyncPatch).not.toBe(savePersistedTabSession);
+    expect(buildPauseSessionScaffoldRitualDerived).not.toBe(clearPersistedTabSession);
+    expect(hasAnchorFromDomain).not.toBe(computePauseSessionHydration);
+  });
+
+  it('persistable anchor guard matches leaf behavior (extended behavioral pin)', () => {
+    expect(hasPersistablePauseSessionAnchor('pi-parity', '')).toBe(true);
+    expect(hasPersistablePauseSessionAnchor(null, 'copy')).toBe(true);
+    expect(hasPersistablePauseSessionAnchor(null, '   ')).toBe(false);
+    expect(hasAnchorFromScaffoldIo('pi-parity', '')).toBe(
+      hasAnchorFromDomain('pi-parity', ''),
+    );
+    expect(hasAnchorFromScaffoldIo(null, 'copy')).toBe(hasAnchorFromDomain(null, 'copy'));
   });
 });
