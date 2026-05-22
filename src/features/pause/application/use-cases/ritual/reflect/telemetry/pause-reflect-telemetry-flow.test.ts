@@ -7,6 +7,11 @@ import {
 } from './pause-reflect-session-ui-telemetry';
 
 import {
+  trackPauseReflectPostItOpen as trackPostItFromShareFlow,
+  trackPauseReflectShareTap as trackShareTapFromShareFlow,
+  trackPauseReflectWallpaperTap as trackWallpaperFromShareFlow,
+} from '../share/pause-reflect-share-flow';
+import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
@@ -21,5 +26,11 @@ describe('pause-reflect-telemetry-flow', () => {
     expect(trackPauseReflectPostItOpen).toBe(trackPostItDirect);
     expect(trackPauseReflectShareTap).toBe(trackShareTapDirect);
     expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperDirect);
+  });
+
+  it('telemetry subcluster bindings match share presentation umbrella (cross-umbrella parity)', () => {
+    expect(trackPauseReflectPostItOpen).toBe(trackPostItFromShareFlow);
+    expect(trackPauseReflectShareTap).toBe(trackShareTapFromShareFlow);
+    expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperFromShareFlow);
   });
 });
