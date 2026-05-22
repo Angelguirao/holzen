@@ -28,7 +28,8 @@
  * reciprocal inline pins: `pause-reflect-ambience-io.test.ts` ↔ `pause-reflect-pending-offer-io.test.ts`,
  * `pause-reflect-ambience-io.re-exports.test.ts` ↔ `pause-reflect-pending-offer-io.re-exports.test.ts`,
  * `pause-reflect-steps-io.test.ts`, and `pause-reflect-telemetry-io.test.ts`;
- * inline pins: `pause-reflect-generation-io.test.ts`, `pause-reflect-flows-io.test.ts`.
+ * inline pins: `pause-reflect-generation-io.test.ts`, `pause-reflect-flows-io.test.ts`;
+ * flow↔io wrapper sibling: `pause-reflect-ambience-flow-io-wrapper-sibling-parity.test.ts` (application + presentation).
  */
 export {
   startPauseReflectFrameFocusAmbience,
