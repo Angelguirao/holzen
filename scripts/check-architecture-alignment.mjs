@@ -414,18 +414,21 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IMPORTS = [
   "from '../application/use-cases/session/persisted-tab-session'",
 ];
 
+/** Session presentation — import decide impact types via pause-session-decide-io only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_DECIDE_IMPACT_IMPORTS = [
+  '@/features/pause/domain/decide/pause-impact-data',
+  '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io',
+  "from './domain/decide/pause-impact-data",
+  "from '../domain/decide/pause-impact-data",
+  "from './presentation/reflect/flows/pause-reflect-flows-io'",
+  "from '../presentation/reflect/flows/pause-reflect-flows-io'",
+];
+
 /** Session presentation — import mapPersistedStep via ritual-restore I/O anchor only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_MAP_PERSISTED_STEP_IMPORTS = [
   '@/features/pause/domain/session/map-persisted-step',
   "from './domain/session/map-persisted-step'",
   "from '../domain/session/map-persisted-step'",
-];
-
-/** Session presentation — import decide impact types via pause-session-decide-io only. */
-const LEGACY_PAUSE_PRESENTATION_SESSION_DECIDE_IMPACT_IMPORTS = [
-  '@/features/pause/domain/decide/pause-impact-data',
-  "from './domain/decide/pause-impact-data",
-  "from '../domain/decide/pause-impact-data",
 ];
 
 /** Session presentation — import persisted-session guards via shell/scaffold I/O only. */
@@ -1175,14 +1178,14 @@ for (const file of walkTs(join(root, 'src'))) {
         failures.push(`${rel}: legacy session map-persisted-step import (${needle})`);
       }
     }
-    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_DOMAIN_GUARDS_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(`${rel}: legacy session domain guard import (${needle})`);
-      }
-    }
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_DECIDE_IMPACT_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session decide impact import (${needle})`);
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_DOMAIN_GUARDS_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy session domain guard import (${needle})`);
       }
     }
   }

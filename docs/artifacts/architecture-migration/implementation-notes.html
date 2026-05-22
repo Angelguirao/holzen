@@ -20825,4 +20825,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session ritual-state PauseImpactData via decide I/O (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>usePauseSessionRitualState</code> impact type through <code>pause-session-decide-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Re-export <code>PauseImpactData</code> on <code>pause-session-decide-flow</code> → <code>pause-session-decide-io</code> (session decide beat, not reflect flows I/O); <code>use-pause-session-ritual-state</code> and breath reflect handler types import via decide I/O. CI blocks deep decide-impact and <code>pause-reflect-flows-io</code> imports under <code>presentation/session/</code> except <code>*-io.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session decide flow owns a decide-domain type re-export (session beat holds impact snapshot state).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: compose <code>pause-reflect-generation-flow</code> umbrella, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
