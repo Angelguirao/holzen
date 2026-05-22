@@ -26169,4 +26169,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect generation ↔ ambience sibling pin (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-flow</code> sibling pin + ambience-io domain parity</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-generation-flow.test.ts</code> with sibling-cluster tests: generation umbrella exports stay distinct from <code>pause-reflect-ambience-flow</code>. Extend <code>pause-reflect-ambience-io-parity.test.ts</code> with domain <code>reflect-frame-focus-ambience</code> leaf composition (parity with <code>pause-reflect-generation-io-parity</code>). Document sibling anchors on generation-flow and ambience-flow modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comments only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without merging generation and ambience CI umbrellas or changing presentation I/O leaf imports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: remaining session presentation I/O parity (terminal-entry, step-handlers, scaffold, brief) or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

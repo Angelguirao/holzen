@@ -1,6 +1,7 @@
 /**
  * CI cluster anchor for ritual reflect ambience (§3 / check:architecture-alignment).
  * Web Audio bed implementation lives in domain; re-export for application-layer imports.
+ * Sibling cluster anchor to `pause-reflect-generation-flow` (holzen-reflect + manual-open umbrella).
  * Presentation: `pause-reflect-ambience-io.ts` imports domain directly (not this anchor).
  * `pause-reflect-ambience-io-parity.test.ts` may import this umbrella for presentation I/O ↔ flow parity.
  */
