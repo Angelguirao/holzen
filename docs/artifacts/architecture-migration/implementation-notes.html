@@ -26473,19 +26473,19 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-      <span>Phase A — session step-handlers-io re-exports (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — session step-handlers-io re-exports + step-transition sibling pin (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-session-step-handlers-io.re-exports.test.ts</code> presentation identity pins</h3>
+    <h3><code>pause-session-step-handlers-io.re-exports.test.ts</code> + reciprocal flow sibling cluster</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-session-step-handlers-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> identity against <code>step-bundles</code> and <code>pause-session-step-handlers-flow</code> (parity with <code>pause-session-shell-io.re-exports.test.ts</code> on branch tip). Application-layer <code>pause-session-step-handlers-io-parity.test.ts</code> already existed.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Presentation <code>pause-session-step-handlers-io.re-exports.test.ts</code> pins leaf + flow identity (parity with shell-io re-exports). Add reciprocal sibling-cluster tests on <code>pause-session-step-handlers-flow</code> / <code>pause-session-step-transition-flow</code> so step-handler and step-motion umbrellas stay distinct. Application <code>pause-session-step-handlers-io-parity.test.ts</code> already present.</dd>
       <dt>Deviation</dt>
-      <dd>None — tests + flow comment anchor only.</dd>
+      <dd>None — tests + comments only.</dd>
       <dt>Tradeoffs</dt>
       <dd>Re-exports test may import step-handlers-flow CI anchor; production I/O keeps <code>step-bundles</code> direct import.</dd>
       <dt>Open questions</dt>
-      <dd>Next: session terminal-entry-io extended parity pins, or Phase B subscription Tier 1 shims.</dd>
+      <dd>Next: session terminal-entry-io extended parity pins, <code>home/bulk-hold/group-by-local-day</code> colocation, or Phase B subscription Tier 1 shims.</dd>
     </dl>
   </article>
 
