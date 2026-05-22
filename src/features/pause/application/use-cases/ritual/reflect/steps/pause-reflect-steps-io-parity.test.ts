@@ -64,6 +64,17 @@ describe('pause-reflect-steps-io parity', () => {
     expect(runPauseReflectionStepLogOnce).toBe(runReflectionStepLogDirect);
   });
 
+  it('presentation I/O exports step RPC wrappers distinct from leaf use cases', () => {
+    expect(typeof pauseReflectTagUpdate).toBe('function');
+    expect(typeof pauseReflectNoteUpdate).toBe('function');
+    expect(typeof pauseReflectFavoriteToggle).toBe('function');
+    expect(typeof pauseReflectionStepLogOnce).toBe('function');
+    expect(pauseReflectFavoriteToggle).not.toBe(runFavoriteToggleDirect);
+    expect(pauseReflectNoteUpdate).not.toBe(runNoteUpdateDirect);
+    expect(pauseReflectTagUpdate).not.toBe(runTagUpdateDirect);
+    expect(pauseReflectionStepLogOnce).not.toBe(runReflectionStepLogDirect);
+  });
+
   it('pauseReflectTagUpdate delegates to run-pause-reflect-tag-update with default repository', async () => {
     const input = { pauseInstanceId: 'inst-tags', tags: ['focus'] };
 
