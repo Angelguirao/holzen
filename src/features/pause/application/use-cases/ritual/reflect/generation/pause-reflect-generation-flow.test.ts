@@ -225,4 +225,13 @@ describe('pause-reflect-generation-flow', () => {
     expect(resolveReflectGenerationPrefetch).not.toBe(trackDeclinedFromPendingOfferFlow);
     expect(runReflectGeneration).not.toBe(trackAbandonedFromPendingOfferFlow);
   });
+
+  it('sibling cluster: hook-flow exports stay distinct from generation manual-open exports', () => {
+    expect(runReflectGenerationFromHookFlow).not.toBe(openManualFromFlow);
+    expect(runReflectGenerationFromHookFlow).not.toBe(dismissFromFlow);
+    expect(messageFromResultFromHookFlow).not.toBe(openManualFromFlow);
+    expect(prerequisiteFromHookFlow).not.toBe(dismissFromFlow);
+    expect(runReflectGeneration).toBe(runReflectGenerationFromHookFlow);
+    expect(openManualFromFlow).not.toBe(runReflectGenerationFromHookFlow);
+  });
 });
