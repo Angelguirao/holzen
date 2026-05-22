@@ -1,5 +1,6 @@
 /**
  * Presentation I/O parity (colocated beside `pause-reflect-telemetry-io.ts`).
+ * Application mirror: `application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
  * Imports `pause-reflect-telemetry-flow` CI umbrella for `.toBe` identity pins only — production telemetry I/O keeps `pause-reflect-session-ui-telemetry` leaf imports.
  * Application flow-cluster sibling pins: `pause-reflect-flows-flow`, `pause-reflect-steps-flow`, `pause-reflect-generation-flow`, `pause-reflect-share-flow`.
  * Mood-io sibling: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts` (application + presentation); reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts`.
