@@ -3,7 +3,8 @@
  * Imports domain hub helpers and `run-shift-emotion-frame-hub-done` directly (parity with
  * `pause-reflect-share-io` → domain + leaf use case).
  * Wrapper delegation pins: pause-reflect-hub-io-parity.test.ts (default + *WithRepository seam).
- * Sibling parity: `pause-reflect-generation-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`.
+ * Sibling parity: `pause-reflect-generation-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`,
+ * `pause-reflect-hub-share-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`.
  */
 import { runShiftEmotionFrameHubDone } from '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
 import { buildShiftEmotionFrameHubLogBundle } from '@/features/pause/domain/reflect/hub/shift-emotion-log';
