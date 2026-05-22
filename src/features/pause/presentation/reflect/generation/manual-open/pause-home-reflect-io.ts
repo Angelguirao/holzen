@@ -5,7 +5,7 @@
  * (parity with `pause-home-reflect-telemetry-io` → leaf telemetry modules, not manual-open-flow umbrella).
  * Parity pins: `pause-home-reflect-io.test.ts`, `pause-home-reflect-io.re-exports.test.ts`,
  * `pause-home-reflect-io-parity.test.ts` (colocated in this folder).
- * Sibling parity: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io` (presentation + application);
+ * Sibling parity: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` (colocated) ↔ `pause-reflect-generation-io` (presentation + application);
  * reciprocal inline pins: `pause-home-reflect-io.test.ts` ↔ `pause-reflect-generation-io.test.ts`;
  * `presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts` ↔ `pause-home-reflect-telemetry-io`;
  * `pause-home-reflect-io-parity.test.ts` (colocated) ↔ `pause-reflect-generation-manual-open-flow`.

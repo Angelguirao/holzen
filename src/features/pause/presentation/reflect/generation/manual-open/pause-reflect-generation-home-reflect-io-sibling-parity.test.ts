@@ -28,13 +28,14 @@ import {
   runReflectGeneration,
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
-} from './pause-reflect-generation-io';
-import * as generationIo from './pause-reflect-generation-io';
+} from '../pause-reflect-generation-io';
+import * as generationIo from '../pause-reflect-generation-io';
 
 /**
- * Presentation sibling parity: generation-io vs home-reflect-io (parity with application
+ * Presentation sibling parity (colocated beside `pause-home-reflect-io.ts`): generation-io vs
+ * home-reflect-io. Parity with application
  * `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` and flow-level
- * `pause-reflect-generation-manual-open-flow-sibling-parity.test.ts`).
+ * `pause-reflect-generation-manual-open-flow-sibling-parity.test.ts`.
  * Reciprocal inline pins: `pause-reflect-generation-io.test.ts` ↔ `pause-home-reflect-io.test.ts`.
  */
 describe('pause-reflect-generation-io ↔ pause-home-reflect-io sibling parity', () => {
