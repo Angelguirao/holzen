@@ -59,21 +59,6 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
-      <span>Phase A — companion orchestrate umbrella subcluster identity pins (backlog #2 complete, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-companion-orchestrate-flow</code> re-exports match orchestrate subcluster CI anchors</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) and #2 (<code>companion/</code> → <code>ritual/frame/</code>) remain complete — no folder moves. Extend <code>pause-companion-orchestrate-flow.test.ts</code> with <code>.toBe(direct)</code> identity against slot run, intervention, retry, outcome, slot-apply, telemetry, and UI subcluster flow anchors (parity with <code>pause-session-ritual-restore-flow</code> session umbrella pins).</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior parity; <code>pause-companion-orchestrate-io</code> still imports leaf modules directly.</dd>
-      <dt>Tradeoff</dt>
-      <dd>Orchestrate umbrella documents composed ritual/frame subcluster surface without changing presentation import paths.</dd>
-      <dt>Open question</dt>
-      <dd>Next: remaining session umbrella pins (<code>pause-session-shell-flow</code>, <code>pause-session-step-handlers-flow</code>, …) or Phase B subscription Tier 1 shims.</dd>
-=======
       <span>Phase A — presentation reflect flows I/O identity pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -86,8 +71,26 @@
       <dt>Tradeoff</dt>
       <dd>Outcome-log wrappers (<code>pauseReflectOutcomeLog*</code>) stay in mocked I/O test only — not identity-pinned re-exports.</dd>
       <dt>Open question</dt>
-      <dd>Next: <code>pause-reflect-steps-io</code> / mood / pending-offer I/O re-export pins, companion orchestrate umbrella pins, or Phase B subscription Tier 1 shims.</dd>
->>>>>>> 57b3c6653 (test(pause): pin reflect flows-io re-exports and fix notes conflict)
+      <dd>Next: <code>pause-reflect-steps-io</code> / mood / pending-offer I/O re-export pins, remaining session umbrella pins, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — companion orchestrate umbrella subcluster identity pins (backlog #2 complete, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestrate-flow</code> re-exports match orchestrate subcluster CI anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) and #2 (<code>companion/</code> → <code>ritual/frame/</code>) remain complete — no folder moves. Extend <code>pause-companion-orchestrate-flow.test.ts</code> with <code>.toBe(direct)</code> identity against slot run, intervention, retry, outcome, slot-apply, telemetry, and UI subcluster flow anchors (parity with <code>pause-session-ritual-restore-flow</code> session umbrella pins).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>pause-companion-orchestrate-io</code> still imports leaf modules directly.</dd>
+      <dt>Tradeoff</dt>
+      <dd>Orchestrate umbrella documents composed ritual/frame subcluster surface without changing presentation import paths.</dd>
+      <dt>Open question</dt>
+      <dd>None — superseded by flows-io slice on branch tip.</dd>
     </dl>
   </article>
 
@@ -106,11 +109,7 @@
       <dt>Tradeoff</dt>
       <dd>Presentation I/O gains a dedicated identity test beside existing delegation mocks in <code>pause-reflect-generation-io.test.ts</code>.</dd>
       <dt>Open question</dt>
-<<<<<<< HEAD
-      <dd>Superseded by companion-orchestrate umbrella slice on branch tip.</dd>
-=======
       <dd>None — superseded by flows-io slice on branch tip.</dd>
->>>>>>> 57b3c6653 (test(pause): pin reflect flows-io re-exports and fix notes conflict)
     </dl>
   </article>
 
