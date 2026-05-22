@@ -1,16 +1,13 @@
 /**
  * Presentation I/O for `/pause` session scaffold (persist snapshot, storage ritual sync, derived VM).
- * Imports session scaffold use cases directly instead of `pause-session-scaffold-flow` CI anchor.
+ * Imports session scaffold use cases via `pause-session-scaffold-flow` CI anchor
+ * (parity with `pause-session-brief-io` → brief flow).
  */
 export {
   buildPauseSessionPersistSnapshot,
-  type PauseSessionPersistSnapshotInput,
-} from '@/features/pause/application/use-cases/session/persist-snapshot';
-export {
-  computePauseStorageRitualSyncPatch,
-  type PauseStorageRitualSyncPatch,
-} from '@/features/pause/application/use-cases/session/storage-ritual-sync';
-export {
   buildPauseSessionScaffoldRitualDerived,
+  computePauseStorageRitualSyncPatch,
+  type PauseSessionPersistSnapshotInput,
   type PauseSessionScaffoldRitualDerived,
-} from '@/features/pause/application/use-cases/session/scaffold/scaffold-ritual-derived';
+  type PauseStorageRitualSyncPatch,
+} from '@/features/pause/application/use-cases/session/pause-session-scaffold-flow';

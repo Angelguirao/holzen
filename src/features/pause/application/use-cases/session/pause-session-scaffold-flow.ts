@@ -1,6 +1,7 @@
 /**
- * CI cluster anchor for session scaffold I/O (§3 / check:architecture-alignment).
- * Use cases live in sibling modules; re-export for presentation I/O imports.
+ * CI cluster anchor for session scaffold presentation I/O (§3 / check:architecture-alignment).
+ * Re-exports persist snapshot, storage ritual sync, and scaffold derived VM helpers.
+ * Presentation: `pause-session-scaffold-io.ts` imports through this anchor (off deep session modules).
  */
 export {
   buildPauseSessionPersistSnapshot,
