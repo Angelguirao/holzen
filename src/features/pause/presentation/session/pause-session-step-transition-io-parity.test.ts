@@ -31,6 +31,7 @@ import {
 
 /**
  * Presentation I/O parity (colocated beside `pause-session-step-transition-io.ts`).
+ * Application mirror: `application/use-cases/session/pause-session-step-transition-io-parity.test.ts`.
  * Imports `pause-session-step-transition-flow` CI umbrella for `.toBe` identity pins only — production step-transition I/O keeps `step-transition` + `step-swipe-direction` leaf imports.
  */
 describe('pause-session-step-transition-io parity', () => {
