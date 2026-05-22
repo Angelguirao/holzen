@@ -4,7 +4,7 @@
  * Re-export parity: pause-reflect-steps-io.re-exports.test.ts may import this anchor (CI exempt).
  * Wrapper delegation: pause-reflect-steps-io-parity.test.ts (presentation I/O → run-* leaves).
  * Sibling pins: pause-reflect-steps-flow.test.ts (umbrella vs steps subcluster flow anchors);
- * pause-reflect-steps-flow.test.ts ↔ pause-reflect-flows-flow.test.ts (inline);
+ * pause-reflect-steps-flow.test.ts ↔ pause-reflect-flows-flow.test.ts (reciprocal inline pins);
  * pause-reflect-steps-flow.test.ts ↔ pause-reflect-pending-offer-flow.test.ts (inline sibling pins incl. declined telemetry);
  * pause-reflect-steps-flow.test.ts ↔ pause-reflect-telemetry-flow.test.ts (inline);
  * pause-reflect-steps-hub-flow-sibling-parity.test.ts, pause-reflect-steps-mood-flow-sibling-parity.test.ts,

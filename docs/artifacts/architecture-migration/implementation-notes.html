@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — application flows-flow ↔ steps-flow reciprocal inline pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-flow.test.ts</code> ↔ <code>pause-reflect-steps-flow.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Extend reciprocal inline <code>.not.toBe</code> pins on application flow umbrellas so reflect+decide preflight/outcome helpers stay namespace-separated from step mutation exports (parity with presentation <code>pause-reflect-flows-io</code> ↔ <code>pause-reflect-steps-io</code>; complements <code>pause-reflect-steps-flows-flow-sibling-parity.test.ts</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + header comment anchors only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or presentation steps-io note/tag reciprocal inline pin expansion.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reciprocal generation-io inline pins for hook ↔ manual-open (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
