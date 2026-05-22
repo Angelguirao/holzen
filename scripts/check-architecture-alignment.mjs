@@ -1098,6 +1098,16 @@ const LEGACY_PAUSE_PRESENTATION_COMPANION_FRAME_UI_IO_UMBRELLA_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/frame/pause-companion-frame-ui-flow'",
 ];
 
+/** Companion frame UI I/O — import ritual/frame leaf modules directly (not frame UI subcluster flow anchors). */
+const LEGACY_PAUSE_PRESENTATION_COMPANION_FRAME_UI_IO_SUBCLUSTER_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-full-view-ui-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-section-visibility-flow',
+  "from './application/use-cases/ritual/frame/pause-companion-full-view-ui-flow'",
+  "from '../application/use-cases/ritual/frame/pause-companion-full-view-ui-flow'",
+  "from './application/use-cases/ritual/frame/pause-companion-section-visibility-flow'",
+  "from '../application/use-cases/ritual/frame/pause-companion-section-visibility-flow'",
+];
+
 /** Companion frame UI presentation — import via pause-companion-frame-ui-io only. */
 const LEGACY_PAUSE_PRESENTATION_COMPANION_FRAME_UI_DOMAIN_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/frame/full-view-page-helpers',
@@ -2422,7 +2432,14 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_FRAME_UI_IO_UMBRELLA_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: companion frame UI I/O must import via frame UI subcluster flows (${needle})`,
+          `${rel}: companion frame UI I/O must not import frame UI umbrella (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_FRAME_UI_IO_SUBCLUSTER_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: companion frame UI I/O must import ritual/frame leaf modules directly (${needle})`,
         );
       }
     }
