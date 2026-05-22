@@ -56,6 +56,7 @@ import {
   pauseReflectGeneration,
   reflectGenerationPrerequisite,
   reflectGenerator,
+  resolveReflectGenerationPrefetch,
   runReflectGeneration,
   shouldCommitReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
@@ -154,10 +155,10 @@ describe('pause-reflect-ambience-io parity', () => {
     expect(startFromAmbienceIo).not.toBe(runReflectGeneration);
     expect(stopFromAmbienceIo).not.toBe(pauseReflectGeneration);
     expect(startFromAmbienceIo).not.toBe(reflectGenerationPrerequisite);
+    expect(stopFromAmbienceIo).not.toBe(messageFromReflectGenerationResult);
+    expect(startFromAmbienceIo).not.toBe(resolveReflectGenerationPrefetch);
     expect(stopFromAmbienceIo).not.toBe(shouldCommitReflectGeneration);
-    expect(startFromAmbienceIo).not.toBe(messageFromReflectGenerationResult);
-    expect(stopFromAmbienceIo).not.toBe(reflectGenerator);
-    expect(startFromAmbienceIo).not.toBe(pauseReflectGeneration);
+    expect(startFromAmbienceIo).not.toBe(reflectGenerator);
     // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
     // Full pins: `pause-reflect-ambience-generation-io-sibling-parity.test.ts`.
   });
