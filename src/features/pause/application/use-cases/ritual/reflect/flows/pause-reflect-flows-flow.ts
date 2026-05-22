@@ -13,7 +13,8 @@
  * `pause-reflect-flows-generation-flow-sibling-parity.test.ts` ↔ `pause-reflect-generation-flow`;
  * `pause-reflect-flows-mood-flow-sibling-parity.test.ts` ↔ `pause-reflect-mood-flow`;
  * `pause-reflect-flows-decide-flow-sibling-parity.test.ts` ↔ `pause-session-decide-flow`;
- * `pause-reflect-flows-telemetry-flow-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-flow`.
+ * `pause-reflect-flows-telemetry-flow-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-flow`;
+ * `pause-reflect-flows-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-share-flow`.
  * Outcome leaf vs presentation wrappers: flows umbrella re-exports `runPauseOutcomeLog` identity;
  * `pauseReflectOutcomeLog*` live on `pause-reflect-flows-io` only (pinned in flows-flow + flows-io-parity tests).
  */
