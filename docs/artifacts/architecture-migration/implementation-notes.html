@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — archive I/O ↔ archive-decide-flow application parity (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-archive-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Phase A backlog folder moves remain complete. Add application-layer <code>pause-archive-io-parity.test.ts</code> so presentation <code>pause-archive-io</code> retrospective telemetry and <code>archivePauseRepository</code> match <code>pause-archive-decide-flow</code> (presentation <code>pause-archive-io.re-exports.test.ts</code> already pins leaf + flow). Production archive I/O keeps ritual/decide leaf imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-analytics-io-parity.test.ts</code>, optional breath segment-log flow anchor, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect home manual-open I/O ↔ manual-open-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
