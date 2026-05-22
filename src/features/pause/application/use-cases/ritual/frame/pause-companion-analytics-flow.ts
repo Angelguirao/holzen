@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for companion frame analytics presentation I/O (§3 / check:architecture-alignment).
  * Feedback vote + fullview opened use cases live in sibling `ritual/frame/*` modules.
- * Presentation: `pause-companion-analytics-io.ts` imports run-* and types directly (CI anchor only).
+ * Presentation: `pause-companion-analytics-io.ts` imports through this anchor (off deep frame paths).
  */
 export type {
   CompanionFullviewKind,
