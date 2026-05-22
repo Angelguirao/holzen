@@ -34,6 +34,10 @@ vi.mock('./pause-companion-orchestration-io', () => ({
 }));
 
 import {
+  getCompanionSectionVisibility,
+  isCompanionSectionVisible,
+} from './pause-companion-frame-ui-io';
+import {
   EMPTY_COMPANION_SLOT_RELAXATIONS,
   runCompanionInterventionBootstrap,
   runCompanionSlotOrchestrate,
@@ -52,5 +56,12 @@ describe('pause-companion-orchestrate-io', () => {
   it('imports slot orchestrate and intervention bootstrap from ritual/frame leaf modules', () => {
     expect(runCompanionSlotOrchestrate).toBe(runCompanionSlotOrchestrateMock);
     expect(runCompanionInterventionBootstrap).toBe(runCompanionInterventionBootstrapMock);
+  });
+
+  it('sibling cluster: frame-ui-io exports stay distinct from orchestrate-io', () => {
+    expect(runCompanionSlotOrchestrate).not.toBe(getCompanionSectionVisibility);
+    expect(runCompanionInterventionBootstrap).not.toBe(isCompanionSectionVisible);
+    expect(EMPTY_COMPANION_SLOT_RELAXATIONS).not.toBe(getCompanionSectionVisibility);
+    // Full cross-I/O pins: `pause-companion-orchestrate-frame-ui-io-sibling-parity.test.ts`.
   });
 });
