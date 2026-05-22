@@ -23,7 +23,7 @@ vi.mock('@/integrations/supabase/client', () => ({
 vi.mock(
   '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image',
   () => ({
-    runReflectionShareImage: vi.fn(() => Promise.resolve({ status: 'shared' as const })),
+    runReflectionShareImage: vi.fn(() => Promise.resolve('downloaded' as const)),
   }),
 );
 
