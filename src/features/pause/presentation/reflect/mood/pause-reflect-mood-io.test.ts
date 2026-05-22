@@ -1,9 +1,37 @@
 import { describe, expect, it, vi } from 'vitest';
+
 import {
+  applyBriefDepthPickerRitualEntry as applyBriefDirect,
+  applyDeepDepthPickerRitualEntry as applyDeepDirect,
+} from '@/features/pause/domain/reflect/mood/apply-depth-picker-ritual-entry';
+import { buildFeelTilesMoodLogOptions as buildFeelTilesDirect } from '@/features/pause/domain/reflect/mood/build-feel-tiles-mood-log-options';
+import {
+  initialEmotionResetUi as initialEmotionResetUiDirect,
+  initialEmotionSelectRollbackUi as initialEmotionSelectRollbackUiDirect,
+} from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
+import { isPauseSessionDepthPickerActive as isDepthPickerActiveDirect } from '@/features/pause/domain/reflect/mood/pause-depth-picker-active';
+import {
+  resolvePauseSessionChromeCloseAction as resolveChromeCloseDirect,
+  runPauseSessionChromeCloseAction as runChromeCloseDirect,
+} from '@/features/pause/domain/reflect/mood/pause-session-chrome-close';
+import { resolvePauseDepthContextLineParams as resolveDepthContextDirect } from '@/features/pause/domain/reflect/mood/resolve-pause-depth-context-line-params';
+import { runDeepPausePickerEntryIfPro as runDeepPickerDirect } from '@/features/pause/domain/reflect/mood/run-deep-pause-picker-entry-if-pro';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
+
+import {
+  applyBriefDepthPickerRitualEntry,
+  applyDeepDepthPickerRitualEntry,
+  buildFeelTilesMoodLogOptions,
+  initialEmotionResetUi,
+  initialEmotionSelectRollbackUi,
   isPauseSessionDepthPickerActive,
   pauseInitialEmotionSelect,
   pauseInitialEmotionSkip,
   reflectPauseRepository,
+  resolvePauseDepthContextLineParams,
+  resolvePauseSessionChromeCloseAction,
+  runDeepPausePickerEntryIfPro,
+  runPauseSessionChromeCloseAction,
 } from './pause-reflect-mood-io';
 
 const runInitialEmotionSelectMock = vi.hoisted(() => vi.fn());
@@ -22,6 +50,20 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 describe('pause-reflect-mood-io', () => {
+  it('re-exports mood domain helpers with identity bindings to leaf modules', () => {
+    expect(applyBriefDepthPickerRitualEntry).toBe(applyBriefDirect);
+    expect(applyDeepDepthPickerRitualEntry).toBe(applyDeepDirect);
+    expect(buildFeelTilesMoodLogOptions).toBe(buildFeelTilesDirect);
+    expect(initialEmotionResetUi).toBe(initialEmotionResetUiDirect);
+    expect(initialEmotionSelectRollbackUi).toBe(initialEmotionSelectRollbackUiDirect);
+    expect(isPauseSessionDepthPickerActive).toBe(isDepthPickerActiveDirect);
+    expect(resolvePauseDepthContextLineParams).toBe(resolveDepthContextDirect);
+    expect(resolvePauseSessionChromeCloseAction).toBe(resolveChromeCloseDirect);
+    expect(runDeepPausePickerEntryIfPro).toBe(runDeepPickerDirect);
+    expect(runPauseSessionChromeCloseAction).toBe(runChromeCloseDirect);
+    expect(reflectPauseRepository).toBe(supabasePauseRepository);
+  });
+
   it('re-exports depth-picker active gate from domain mood helpers', () => {
     expect(
       isPauseSessionDepthPickerActive({
