@@ -25272,4 +25272,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect pending-offer-io ↔ pending-offer-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-io</code> display export pinned to <code>pause-reflect-pending-offer-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-pending-offer-io.re-exports.test.ts</code> with <code>.toBe</code> identity against <code>pause-reflect-pending-offer-flow</code> for display + adopt/decline leaf exports; add <code>pause-reflect-pending-offer-io-parity.test.ts</code> beside the pending-offer cluster (parity with generation-io). <code>check:architecture-alignment</code> exempts re-exports test from umbrella-import ban on production I/O only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + CI exemption only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without presentation I/O importing the pending-offer umbrella in production code.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-orchestration-flow</code> ↔ section-visibility sibling pin, session breath umbrella subcluster pin, or Tier 1 <code>holzen-query-client-ref</code> shim peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
