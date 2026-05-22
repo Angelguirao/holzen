@@ -27,6 +27,8 @@
  * reciprocal inline pins: `pause-reflect-share-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`;
  * presentation `pause-reflect-share-io-parity.test.ts` (colocated) pins share-io ↔ share-orchestration-flow (no `deliverReflectionShareImage` on presentation I/O;
  * `pauseReflectionShareImage` delegates to `run-reflection-share-image` leaf — application mirror beside `pause-reflect-share-flow`).
+ * Flow↔I/O wrapper: `pause-reflect-share-flow-io-wrapper-sibling-parity.test.ts` (application + presentation)
+ * ↔ `pause-reflect-share-flow` CI umbrella.
  */
 import {
   runReflectionShareImage,

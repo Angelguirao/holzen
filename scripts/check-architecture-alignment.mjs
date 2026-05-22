@@ -2769,7 +2769,8 @@ for (const file of walkTs(join(root, 'src'))) {
       rel.endsWith('pause-reflect-share-io.ts') ||
       rel.endsWith('pause-reflect-share-io.test.ts') ||
       rel.endsWith('pause-reflect-share-io.re-exports.test.ts') ||
-      rel.endsWith('pause-reflect-share-io-parity.test.ts');
+      rel.endsWith('pause-reflect-share-io-parity.test.ts') ||
+      rel.endsWith('pause-reflect-share-flow-io-wrapper-sibling-parity.test.ts');
     if (!shareIoAllowlisted) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {

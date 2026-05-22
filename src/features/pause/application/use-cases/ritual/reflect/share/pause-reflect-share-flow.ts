@@ -18,6 +18,8 @@
  * `pause-reflect-share-mood-flow-sibling-parity.test.ts` ↔ `pause-reflect-mood-flow`.
  * Colocated I/O parity inline pins (steps/hub/mood/ambience/pending-offer): `pause-reflect-share-io-parity.test.ts`
  * (application + presentation) ↔ respective `pause-reflect-*-io-parity.test.ts` clusters.
+ * Flow↔I/O wrapper: `pause-reflect-share-flow-io-wrapper-sibling-parity.test.ts` (application + presentation)
+ * ↔ `pause-reflect-share-io` (presentation wrappers off flow umbrella).
  */
 export type { DeliverReflectionShareImageDeps } from './deliver-reflection-share-image';
 export { runReflectionShareImage } from './run-reflection-share-image';
