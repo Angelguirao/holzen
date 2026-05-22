@@ -59,6 +59,7 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+<<<<<<< HEAD
       <span>Phase A — companion orchestrate umbrella flow identity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -72,6 +73,21 @@
       <dd>Other <code>ritual/frame</code> umbrellas already had full identity; orchestrate umbrella was the last partial pin set.</dd>
       <dt>Open question</dt>
       <dd>Next: Phase B subscription Tier 1 shims when pause Tier 5 identity pins are quiet.</dd>
+=======
+      <span>Phase A — ritual/reflect share orchestration flow leaf identity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-share-orchestration-flow</code> pins <code>deliverReflectionShareImage</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Re-export <code>deliverReflectionShareImage</code> (+ outcome type) on the share orchestration CI anchor and add <code>.toBe(direct)</code> identity beside existing <code>runReflectionShareImage</code> and domain channel builder pins. <code>pause-reflect-share-io</code> unchanged (imports leaf modules directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI slice only.</dd>
+      <dt>Tradeoff</dt>
+      <dd>Top-level <code>pause-reflect-share-flow</code> umbrella still omits deliver (orchestration subcluster owns it).</dd>
+      <dt>Open question</dt>
+      <dd>Next: remaining <code>ritual/frame</code> typeof-only anchors, or Phase B subscription Tier 1 when pause Tier 5 is quiet.</dd>
+>>>>>>> a50a87697 (test(pause): pin reflect share deliver flow re-export)
     </dl>
   </article>
 
