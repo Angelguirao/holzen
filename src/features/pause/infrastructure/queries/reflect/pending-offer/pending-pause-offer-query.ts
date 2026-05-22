@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   PENDING_PAUSE_OFFER_NONE_QUERY_KEY,
   pendingPauseOfferQueryKey,
-} from '@/features/pause/application/queries/pending-pause-offer-keys';
+} from './pending-pause-offer-query-key';
 
 export {
   PENDING_PAUSE_OFFER_DISABLED_USER_ID,
@@ -10,7 +10,7 @@ export {
   PENDING_PAUSE_OFFER_QUERY_LEAF,
   PENDING_PAUSE_OFFER_QUERY_PREFIX,
   pendingPauseOfferQueryKey,
-} from '@/features/pause/application/queries/pending-pause-offer-keys';
+} from './pending-pause-offer-query-key';
 
 export interface PendingPauseOfferRow {
   id: string;

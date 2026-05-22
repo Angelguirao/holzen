@@ -22896,4 +22896,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect pending-offer query keys under infrastructure/queries/reflect/pending-offer (backlog #1 verified, Tier 3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pending-pause-offer-query-key</code> colocated with TanStack query modules (§5.2)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no use-case folder moves. Move <code>pending-pause-offer-keys.ts</code> from <code>application/queries/</code> to <code>infrastructure/queries/reflect/pending-offer/pending-pause-offer-query-key.ts</code> (parity with companion UI completion keys and pending-offer query module). Move <code>invalidatePauseStatsDataForUser</code> to <code>infrastructure/queries/invalidate-pause-stats.ts</code> so application layer does not import infrastructure per <code>check:feature-imports</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>Archive/journey/current/completed key helpers stay in <code>application/queries/</code> this slice; <code>pause-query-namespace</code> unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other <code>application/queries/*-keys.ts</code> modules unchanged until dedicated colocation slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate remaining query key modules, session shell/scaffold I/O peels, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
