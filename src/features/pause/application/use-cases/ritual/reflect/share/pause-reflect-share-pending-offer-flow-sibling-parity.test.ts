@@ -47,10 +47,13 @@ describe('pause-reflect-share-flow ↔ pause-reflect-pending-offer-flow sibling 
     expect('trackPauseSessionAbandoned' in shareFlow).toBe(false);
     expect('runReflectionShareImage' in pendingOfferFlow).toBe(false);
     expect('buildReflectionShareText' in pendingOfferFlow).toBe(false);
+    expect('buildReflectionShareTelegramUrl' in pendingOfferFlow).toBe(false);
     expect('trackPauseReflectPostItOpen' in pendingOfferFlow).toBe(false);
+    expect('runReflectionShareImage' in shareFlow).toBe(true);
+    expect('buildReflectionShareText' in shareFlow).toBe(true);
   });
 
-  it('share orchestration exports stay off pending-offer RPC, display, and telemetry', () => {
+  it('share orchestration and channel builders stay off pending-offer RPC, display, and telemetry', () => {
     expect(runReflectionShareImage).not.toBe(runAdoptPendingPauseOffer);
     expect(runReflectionShareImage).not.toBe(runDeclinePendingPauseOffer);
     expect(buildReflectionShareText).not.toBe(getPendingPauseOfferDisplay);
@@ -59,16 +62,15 @@ describe('pause-reflect-share-flow ↔ pause-reflect-pending-offer-flow sibling 
     expect(buildReflectionShareWhatsAppUrl).not.toBe(trackPauseSessionAbandoned);
     expect(trackPauseReflectPostItOpen).not.toBe(runAdoptPendingPauseOffer);
     expect(trackPauseReflectShareTap).not.toBe(trackPausePendingAdopted);
+    expect(trackPauseReflectWallpaperTap).not.toBe(trackPausePendingDeclined);
   });
 
   it('pending-offer umbrella exports stay off share image, channel builders, and session UI telemetry', () => {
     expect(runAdoptPendingPauseOffer).not.toBe(runReflectionShareImage);
-    expect(runDeclinePendingPauseOffer).not.toBe(runReflectionShareImage);
-    expect(getPendingPauseOfferDisplay).not.toBe(buildReflectionShareText);
-    expect(trackPausePendingAdopted).not.toBe(buildReflectionShareTelegramUrl);
-    expect(trackPausePendingDeclined).not.toBe(buildReflectionShareTweetUrl);
-    expect(trackPauseSessionAbandoned).not.toBe(buildReflectionShareWhatsAppUrl);
-    expect(runAdoptPendingPauseOffer).not.toBe(trackPauseReflectPostItOpen);
-    expect(trackPausePendingAdopted).not.toBe(trackPauseReflectShareTap);
+    expect(runDeclinePendingPauseOffer).not.toBe(buildReflectionShareText);
+    expect(getPendingPauseOfferDisplay).not.toBe(buildReflectionShareTelegramUrl);
+    expect(trackPausePendingAdopted).not.toBe(trackPauseReflectPostItOpen);
+    expect(trackPausePendingDeclined).not.toBe(trackPauseReflectShareTap);
+    expect(trackPauseSessionAbandoned).not.toBe(trackPauseReflectWallpaperTap);
   });
 });
