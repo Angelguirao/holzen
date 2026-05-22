@@ -59,19 +59,6 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
-      <span>Phase A — bulk-hold outcomes use case → ritual/decide (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>apply-bulk-hold-outcomes</code> colocate with decide beat</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) folder moves remain complete. Move <code>apply-bulk-hold-outcomes</code> (+ test) from <code>application/use-cases/home/bulk-hold/</code> to <code>application/use-cases/ritual/decide/</code> — Home bulk-hold sheet still presents via <code>presentation/home/pause-home-bulk-hold-io</code>; use case logs <code>outcome_logged</code> via decide payload builders (same port path as archive retrospective). Keep <code>group-by-local-day</code> under <code>home/bulk-hold/</code> (read-model formatting only).</dd>
-      <dt>Deviation</dt>
-      <dd>None — mechanical move + import updates.</dd>
-      <dt>Open question</dt>
-      <dd>Next: <code>pause-home-bulk-hold-io-parity</code> application test or Phase B subscription Tier 1 shims.</dd>
-=======
       <span>Phase A — reflect telemetry I/O ↔ telemetry-flow + share-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -83,7 +70,23 @@
       <dd>None — tests only.</dd>
       <dt>Open question</dt>
       <dd>Next: Phase B subscription Tier 1 shims or ambience-io-parity leaf composition test.</dd>
->>>>>>> 3dea202ee (test(pause): extend telemetry-io parity with leaf and share-flow pins)
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — bulk-hold outcomes use case → ritual/decide (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>apply-bulk-hold-outcomes</code> colocate with decide beat</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) folder moves remain complete. Move <code>apply-bulk-hold-outcomes</code> (+ test) from <code>application/use-cases/home/bulk-hold/</code> to <code>application/use-cases/ritual/decide/</code> — Home bulk-hold sheet still presents via <code>presentation/home/pause-home-bulk-hold-io</code>; use case logs <code>outcome_logged</code> via decide payload builders (same port path as archive retrospective). Keep <code>group-by-local-day</code> under <code>home/bulk-hold/</code> (read-model formatting only).</dd>
+      <dt>Deviation</dt>
+      <dd>None — mechanical move + import updates.</dd>
+      <dt>Open question</dt>
+      <dd>Next: <code>pause-home-bulk-hold-io-parity</code> application test or Phase B subscription Tier 1 shims.</dd>
     </dl>
   </article>
 
