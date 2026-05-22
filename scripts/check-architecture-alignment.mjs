@@ -953,7 +953,14 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/share/pause-reflect-session-ui-telemetry'",
 ];
 
-/** Share telemetry I/O — import via pause-reflect-telemetry-flow only (not share umbrella). */
+/** Share telemetry I/O — import session UI telemetry directly (not telemetry-flow anchor). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IO_TELEMETRY_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow',
+  "from './application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow'",
+  "from '../application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow'",
+];
+
+/** Share telemetry I/O — import via pause-reflect-session-ui-telemetry only (not share umbrella). */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IO_SHARE_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow',
   "from './application/use-cases/ritual/reflect/share/pause-reflect-share-flow'",
@@ -1449,10 +1456,17 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-reflect-telemetry-io.ts') ||
     rel.endsWith('pause-reflect-telemetry-io.test.ts')
   ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IO_TELEMETRY_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: share telemetry I/O must import pause-reflect-session-ui-telemetry directly (${needle})`,
+        );
+      }
+    }
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IO_SHARE_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: share telemetry I/O must import via pause-reflect-telemetry-flow (${needle})`,
+          `${rel}: share telemetry I/O must not import share umbrella (${needle})`,
         );
       }
     }

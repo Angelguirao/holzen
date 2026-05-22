@@ -21543,7 +21543,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-companion-frame-ui-flow</code> remains the compose anchor for <code>check:architecture-alignment</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B subscription Tier 1 shim, reflect steps I/O umbrella peel, or session shell I/O flow peels.</dd>
+      <dd>Next: Phase B subscription Tier 1 shim, reflect share telemetry I/O leaf peel, or session shell I/O flow peels.</dd>
     </dl>
   </article>
 
@@ -21561,6 +21561,25 @@
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
       <dd><code>pause-reflect-ambience-flow</code> remains the compose anchor for application-layer re-exports; presentation no longer depends on the umbrella barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session scaffold/shell I/O subcluster peels, Phase B subscription Tier 1 shim, or ritual breathe presentation I/O alignment.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect share telemetry I/O leaf peel (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel <code>pause-reflect-telemetry-io</code> off <code>pause-reflect-telemetry-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-telemetry-io</code> imports PostHog trackers from <code>pause-reflect-session-ui-telemetry</code> directly (parity with <code>pause-reflect-generation-io</code> leaf imports on the same branch tip). CI blocks telemetry-flow and share umbrella imports on share telemetry I/O.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-telemetry-flow</code> remains the CI compose anchor for <code>pause-reflect-share-flow</code>; presentation no longer routes through it.</dd>
       <dt>Open questions</dt>
       <dd>Next: session scaffold/shell I/O subcluster peels, Phase B subscription Tier 1 shim, or ritual breathe presentation I/O alignment.</dd>
     </dl>
