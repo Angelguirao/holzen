@@ -81,6 +81,13 @@ import {
   pauseShiftEmotionFrameHubDoneWithRepository,
   resolveShiftFrameHubDonePresentation,
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
+  buildFeelTilesMoodLogOptions,
+  pauseInitialEmotionSelect,
+  pauseInitialEmotionSkip,
+  pauseInitialEmotionSelectWithRepository,
+  pauseInitialEmotionSkipWithRepository,
+} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 
 describe('pause-reflect-pending-offer-io parity', () => {
   it('presentation I/O pending-offer display matches pending-offer CI umbrella', () => {
@@ -214,6 +221,23 @@ describe('pause-reflect-pending-offer-io parity', () => {
     expect(pauseDeclinePendingOffer).not.toBe(resolveShiftFrameHubDonePresentation);
     // Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts`.
     // Full pins: `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (pending-offer RPC vs initial-emotion mood).
+   * Dedicated sibling file: `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: mood-io initial-emotion exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(pauseInitialEmotionSelect);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseInitialEmotionSkip);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseInitialEmotionSelectWithRepository);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(pauseInitialEmotionSkipWithRepository);
+    expect(getPendingPauseOfferDisplay).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(pauseAdoptPendingOffer).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseInitialEmotionSelect);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(pauseInitialEmotionSkipWithRepository);
+    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
+    // Full pins: `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts`.
   });
 
   /**

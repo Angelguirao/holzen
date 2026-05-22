@@ -77,6 +77,13 @@ import {
   shouldLogPauseReflectionStep,
   shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
+  pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
@@ -105,6 +112,8 @@ import {
  * reciprocal inline pins ↔ colocated `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts`.
  * Generation-io sibling pins: `pause-reflect-generation-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
+ * Pending-offer-io sibling pins: `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts`.
  */
 describe('pause-reflect-mood-io parity', () => {
   it('mood CI umbrella composes the same domain mood leaves as presentation I/O', () => {
@@ -256,5 +265,22 @@ describe('pause-reflect-mood-io parity', () => {
     expect(buildFeelTilesMoodLogOptions).not.toBe(shouldShowFavoriteProHint);
     expect(pauseInitialEmotionSkip).not.toBe(shouldLogPauseReflectionStep);
     // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts` (application).
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts` (mood RPC vs pending-offer adopt/decline).
+   * Dedicated sibling file: `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: pending-offer-io exports stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(pauseAdoptPendingOffer);
+    expect(pauseInitialEmotionSkip).not.toBe(pauseDeclinePendingOffer);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseAdoptPendingOfferWithRepository);
+    expect(pauseInitialEmotionSkipWithRepository).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(getPendingPauseOfferDisplay);
+    expect(pauseInitialEmotionSelect).not.toBe(getPendingPauseOfferDisplay);
+    expect(applyBriefDepthPickerRitualEntry).not.toBe(pauseAdoptPendingOffer);
+    expect(runPauseSessionChromeCloseAction).not.toBe(pauseDeclinePendingOffer);
+    // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`.
+    // Full pins: `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts`.
   });
 });

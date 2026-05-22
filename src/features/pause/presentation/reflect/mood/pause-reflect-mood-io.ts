@@ -10,7 +10,9 @@
  * presentation parity (colocated): `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts` ↔ `pause-reflect-steps-io-parity.test.ts` (application);
  * `pause-reflect-generation-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io` (presentation + application),
  * `pause-reflect-mood-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
- * `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
+ * `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (application mirror:
+ * `application/.../mood/pause-reflect-mood-pending-offer-io-sibling-parity.test.ts`; reciprocal inline:
+ * `pause-reflect-mood-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`);
  * `pause-reflect-flows-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (application
  * `pause-reflect-flows-mood-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
  * colocated `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-mood-io-parity.test.ts`),
