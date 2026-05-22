@@ -7,12 +7,15 @@ import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from '@/features/pau
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
+/** Default `PauseRepository` for Home bulk-hold presentation hooks. */
+export const homeBulkHoldPauseRepository = supabasePauseRepository;
+
 /** Default port + use case: Home bulk-hold retrospective `outcome_logged` logs. */
 export function pauseApplyBulkHoldOutcomes(
   rows: BulkHoldPendingPause[],
   resolver: (p: BulkHoldPendingPause) => BulkHoldOutcomeChoice,
 ): ReturnType<typeof applyBulkHoldOutcomes> {
-  return applyBulkHoldOutcomes(supabasePauseRepository, rows, resolver);
+  return applyBulkHoldOutcomes(homeBulkHoldPauseRepository, rows, resolver);
 }
 
 /** Test seam: inject a custom `PauseRepository`. */
