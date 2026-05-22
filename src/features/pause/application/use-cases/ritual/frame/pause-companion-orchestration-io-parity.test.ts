@@ -89,6 +89,8 @@ describe('pause-companion-orchestration-io parity (application)', () => {
     expect(pauseCompanionUiStepCompletion).not.toBe(persistDirect);
     expect(pauseToggleCompanionLibraryFavorite).not.toBe(toggleFavoriteDirect);
     expect(pauseLoadCompanionOrchestrateSession).not.toBe(loadSessionFromOrchestrationIo);
+    expect(pauseCompanionUiStepCompletion).not.toBe(pauseToggleCompanionLibraryFavorite);
+    // Reciprocal inline pins: `pause-companion-orchestrate-io-parity.test.ts`.
   });
 
   it('pauseCompanionUiStepCompletion delegates to persist-ui-step-completion with default repository', async () => {
@@ -117,7 +119,8 @@ describe('pause-companion-orchestration-io parity (application)', () => {
     expect(pauseCompanionUiStepCompletion).not.toBe(persistCompanionUiStepCompletion);
     expect(pauseToggleCompanionLibraryFavorite).not.toBe(runToggleCompanionLibraryFavorite);
     expect(pauseLoadCompanionOrchestrateSession).not.toBe(loadCompanionOrchestrateSession);
-    // Reciprocal inline pins: `presentation/companion/pause-companion-orchestration-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/companion/pause-companion-orchestration-io-parity.test.ts`,
+    // `pause-companion-orchestrate-io-parity.test.ts` (application + presentation).
     // Dedicated siblings (application + presentation):
     // `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts`,
     // `pause-companion-analytics-orchestration-io-sibling-parity.test.ts`.

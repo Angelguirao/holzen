@@ -1,8 +1,10 @@
 /**
  * Presentation I/O parity (colocated beside `pause-companion-orchestrate-io.ts`).
+ * Application mirror: `application/.../ritual/frame/pause-companion-orchestrate-io-parity.test.ts`
+ * (colocated beside `pause-companion-orchestrate-flow.ts` CI anchor).
  * Imports `pause-companion-orchestrate-flow` CI umbrella for `.toBe` identity pins only — production orchestrate I/O keeps ritual/frame leaf imports.
- * Application mirror: `application/use-cases/ritual/frame/pause-companion-orchestrate-io-parity.test.ts`.
- * Orchestration-io sibling: `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts` (application + presentation).
+ * Orchestration-io sibling: `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-companion-orchestration-io-parity.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
 

@@ -1,7 +1,7 @@
 /**
  * Application-layer I/O parity for companion slot orchestrate (colocated beside
- * `pause-companion-orchestrate-flow.ts`; presentation pins stay colocated beside
- * `pause-companion-orchestrate-io.ts`).
+ * `pause-companion-orchestrate-flow.ts` CI anchor — no application `pause-companion-orchestrate-io.ts`;
+ * presentation I/O pins stay colocated beside `presentation/companion/pause-companion-orchestrate-io.ts`).
  * Imports `pause-companion-orchestrate-flow` CI umbrella for `.toBe` identity pins only —
  * production orchestrate I/O keeps ritual/frame leaf imports.
  * Presentation mirror: `presentation/companion/pause-companion-orchestrate-io-parity.test.ts`.
