@@ -1,11 +1,10 @@
 /**
  * CI cluster anchor for ritual reflect steps presentation I/O (§3 / check:architecture-alignment).
- * Composes steps subcluster anchors; presentation imports via `pause-reflect-steps-io.ts`.
+ * Composes domain step gates + run-* leaf use cases (not steps subcluster flow anchors).
  */
-export { runPauseFavoriteToggle, shouldShowFavoriteProHint } from './pause-favorite-toggle-flow';
-export { runPauseReflectNoteUpdate } from './pause-reflect-note-flow';
-export { runPauseReflectTagUpdate } from './pause-reflect-tag-flow';
-export {
-  runPauseReflectionStepLogOnce,
-  shouldLogPauseReflectionStep,
-} from './pause-reflection-step-log-flow';
+export { runPauseFavoriteToggle } from './run-pause-favorite-toggle';
+export { shouldShowFavoriteProHint } from '@/features/pause/domain/reflect/steps/favorite-toggle';
+export { runPauseReflectNoteUpdate } from './run-pause-reflect-note-update';
+export { runPauseReflectTagUpdate } from './run-pause-reflect-tag-update';
+export { runPauseReflectionStepLogOnce } from './run-pause-reflection-step-log';
+export { shouldLogPauseReflectionStep } from '@/features/pause/domain/reflect/steps/reflection-step-log';

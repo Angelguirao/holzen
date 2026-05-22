@@ -918,12 +918,20 @@ const LEGACY_PAUSE_REFLECT_HUB_FLOW_SUBCLUSTER_IMPORTS = [
   "from '../pause-shift-emotion-frame-hub-done-flow'",
 ];
 
-/** Reflect steps umbrella flow — compose subcluster anchors only (no deep domain/reflect/steps or run-*). */
-const LEGACY_PAUSE_REFLECT_STEPS_FLOW_DOMAIN_IMPORTS = [
-  '@/features/pause/domain/reflect/steps/',
-  "from '@/features/pause/domain/reflect/steps/",
-  "from './domain/reflect/steps/",
-  "from '../domain/reflect/steps/",
+/** Reflect steps umbrella flow — compose domain + run-* leaf modules only (not steps subcluster anchors). */
+const LEGACY_PAUSE_REFLECT_STEPS_FLOW_SUBCLUSTER_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-favorite-toggle-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-note-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-tag-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflection-step-log-flow',
+  "from './pause-favorite-toggle-flow'",
+  "from '../pause-favorite-toggle-flow'",
+  "from './pause-reflect-note-flow'",
+  "from '../pause-reflect-note-flow'",
+  "from './pause-reflect-tag-flow'",
+  "from '../pause-reflect-tag-flow'",
+  "from './pause-reflection-step-log-flow'",
+  "from '../pause-reflection-step-log-flow'",
 ];
 
 /** Reflect share umbrella flow — compose subcluster anchors only (no deep domain/reflect/share or run-*). */
@@ -2138,23 +2146,11 @@ for (const file of walkTs(join(root, 'src'))) {
     }
   }
   if (rel === 'src/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow.ts') {
-    for (const needle of LEGACY_PAUSE_REFLECT_STEPS_FLOW_DOMAIN_IMPORTS) {
+    for (const needle of LEGACY_PAUSE_REFLECT_STEPS_FLOW_SUBCLUSTER_IMPORTS) {
       if (text.includes(needle)) {
-        failures.push(`${rel}: reflect steps umbrella flow must compose subcluster anchors (${needle})`);
-      }
-    }
-    for (const needle of [
-      '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle',
-      '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update',
-      '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update',
-      '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log',
-      "from './run-pause-favorite-toggle'",
-      "from './run-pause-reflect-note-update'",
-      "from './run-pause-reflect-tag-update'",
-      "from './run-pause-reflection-step-log'",
-    ]) {
-      if (text.includes(needle)) {
-        failures.push(`${rel}: reflect steps umbrella flow must not deep-import run-* use cases (${needle})`);
+        failures.push(
+          `${rel}: reflect steps umbrella flow must import domain + run-* leaf modules directly (${needle})`,
+        );
       }
     }
   }
