@@ -44,6 +44,15 @@ import {
   trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
   trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
 } from '../telemetry/pause-reflect-telemetry-flow';
+import {
+  trackPausePendingAdopted,
+  trackPausePendingDeclined,
+  trackPauseSessionAbandoned,
+} from '../telemetry/pause-pending-offer-telemetry-flow';
+import {
+  runAdoptPendingPauseOffer,
+  runDeclinePendingPauseOffer,
+} from '../pending-offer/pause-reflect-pending-offer-flow';
 
 describe('pause-reflect-share-flow', () => {
   it('re-exports share orchestration + domain builders + session UI telemetry from leaf modules', () => {
@@ -81,5 +90,24 @@ describe('pause-reflect-share-flow', () => {
     expect(buildTweetFromFlow).toBe(buildTweetFromOrchestrationFlow);
     expect(buildWhatsAppFromFlow).toBe(buildWhatsAppFromOrchestrationFlow);
     expect(runReflectionShareImage).toBe(runShareImageFromOrchestrationFlow);
+  });
+
+  it('sibling cluster: share-flow exports stay distinct from session reflect UI telemetry-flow exports', () => {
+    expect(runReflectionShareImage).not.toBe(trackPauseReflectPostItOpen);
+    expect(runReflectionShareImage).not.toBe(trackPauseReflectShareTap);
+    expect(runReflectionShareImage).not.toBe(trackPauseReflectWallpaperTap);
+    expect(buildTextFromFlow).not.toBe(trackPauseReflectPostItOpen);
+    expect(buildTelegramFromFlow).not.toBe(trackPauseReflectShareTap);
+    expect(buildWhatsAppFromFlow).not.toBe(trackPauseReflectWallpaperTap);
+  });
+
+  it('sibling cluster: share-flow exports stay distinct from pending-offer RPC and telemetry-flow exports', () => {
+    expect(runReflectionShareImage).not.toBe(runAdoptPendingPauseOffer);
+    expect(runReflectionShareImage).not.toBe(runDeclinePendingPauseOffer);
+    expect(buildTextFromFlow).not.toBe(trackPausePendingAdopted);
+    expect(buildTelegramFromFlow).not.toBe(trackPausePendingDeclined);
+    expect(buildWhatsAppFromFlow).not.toBe(trackPauseSessionAbandoned);
+    expect(trackPauseReflectPostItOpen).not.toBe(runAdoptPendingPauseOffer);
+    expect(trackPauseReflectShareTap).not.toBe(trackPausePendingAdopted);
   });
 });

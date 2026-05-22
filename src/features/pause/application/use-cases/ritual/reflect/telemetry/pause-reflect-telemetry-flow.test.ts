@@ -21,6 +21,10 @@ import {
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
 } from './pause-reflect-telemetry-flow';
+import {
+  buildReflectionShareText as buildShareTextFromShareFlow,
+  runReflectionShareImage as runShareImageFromShareFlow,
+} from '../share/pause-reflect-share-flow';
 
 describe('pause-reflect-telemetry-flow', () => {
   it('re-exports session reflect UI telemetry trackers from pause-reflect-session-ui-telemetry', () => {
@@ -43,5 +47,13 @@ describe('pause-reflect-telemetry-flow', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(trackPausePendingAdopted);
     expect(trackPauseReflectShareTap).not.toBe(trackPausePendingDeclined);
     expect(trackPauseReflectWallpaperTap).not.toBe(trackPauseSessionAbandoned);
+  });
+
+  it('sibling cluster: session reflect UI telemetry-flow exports stay distinct from share-flow exports', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(runShareImageFromShareFlow);
+    expect(trackPauseReflectShareTap).not.toBe(runShareImageFromShareFlow);
+    expect(trackPauseReflectWallpaperTap).not.toBe(runShareImageFromShareFlow);
+    expect(trackPauseReflectPostItOpen).not.toBe(buildShareTextFromShareFlow);
+    expect(trackPauseReflectShareTap).not.toBe(buildShareTextFromShareFlow);
   });
 });
