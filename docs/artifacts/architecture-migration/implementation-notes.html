@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — ScoreImpact screen imports via public-ritual-reflect (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Done score-impact builders on <code>public-ritual-reflect</code> (flows I/O seam)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Re-export <code>buildPauseScoreImpacts</code> and related decide display helpers from <code>presentation/reflect/flows/pause-reflect-flows-io</code> on <code>public-ritual-reflect</code>; <code>ScoreImpact</code> and <code>score-impact-row-list</code> import the ritual reflect barrel instead of <code>public-hooks</code>. <code>public-hooks</code> keeps backward-compatible re-exports via <code>public-ritual-reflect</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Cross-context consumers still use <code>public-hooks</code>; pause Done UI uses the reflect ritual barrel per §6.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim (<code>App.tsx</code> checkout guard), or session scaffold I/O peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — route holzen-reflect generation-io via hook-flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

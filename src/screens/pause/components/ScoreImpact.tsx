@@ -8,7 +8,7 @@ import {
   resolveScoreImpactViewMode,
   scoreImpactMotionDelaySec,
   type PauseImpactData,
-} from '@/features/pause/public-hooks';
+} from '@/features/pause/public-ritual-reflect';
 import { ScoreImpactBriefEmpty } from '@/screens/pause/components/score-impact-brief-empty';
 import { ScoreImpactRowList } from '@/screens/pause/components/score-impact-row-list';
 
