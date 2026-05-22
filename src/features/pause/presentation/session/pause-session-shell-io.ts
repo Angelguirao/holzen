@@ -2,6 +2,7 @@
  * Presentation I/O for `/pause` shell chrome (hydration, header back, mount log, shell VM).
  * Imports session shell use cases via sibling application modules
  * (parity with `pause-reflect-hub-io` → hub subcluster flows).
+ * Wrapper delegation pins: `pause-session-shell-io.test.ts` + `pause-session-shell-io.re-exports.test.ts`.
  */
 export {
   computePauseSessionHydration,

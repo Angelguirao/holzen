@@ -1,5 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import {
+  computePauseSessionHydration as computeHydrationFromLeaf,
+  computePauseSessionResolved as computeResolvedFromLeaf,
+} from '@/features/pause/application/use-cases/session/hydration';
+import {
+  computePauseHeaderBackIntent as computeHeaderBackFromLeaf,
+  isPauseSessionHeaderBackVisible as isHeaderBackVisibleFromLeaf,
+} from '@/features/pause/application/use-cases/session/header-back';
+import { buildPauseSessionMountLogParams as buildMountLogFromLeaf } from '@/features/pause/application/use-cases/session/mount-log-params';
+import { coalescePauseSessionShellViewModel as coalesceShellVmFromLeaf } from '@/features/pause/application/use-cases/session/shell-view-model';
+import { hasPersistedPauseSessionPayload as hasPersistedFromDomain } from '@/features/pause/domain/session/persisted-session-guards';
+import { isPauseSessionWaitingForInstanceFetch as isWaitingFromDomain } from '@/features/pause/domain/session/waiting-for-instance-fetch';
+import {
+  buildPauseSessionMountLogParams,
+  coalescePauseSessionShellViewModel,
   computePauseHeaderBackIntent,
   computePauseSessionHydration,
   computePauseSessionResolved,
@@ -41,5 +55,16 @@ describe('pause-session-shell-io', () => {
         breathingSecondCompleted: false,
       }),
     ).toEqual({ kind: 'go_back' });
+  });
+
+  it('presentation I/O re-exports match application leaf modules (direct re-export parity)', () => {
+    expect(computePauseSessionHydration).toBe(computeHydrationFromLeaf);
+    expect(computePauseSessionResolved).toBe(computeResolvedFromLeaf);
+    expect(isPauseSessionHeaderBackVisible).toBe(isHeaderBackVisibleFromLeaf);
+    expect(computePauseHeaderBackIntent).toBe(computeHeaderBackFromLeaf);
+    expect(buildPauseSessionMountLogParams).toBe(buildMountLogFromLeaf);
+    expect(coalescePauseSessionShellViewModel).toBe(coalesceShellVmFromLeaf);
+    expect(hasPersistedPauseSessionPayload).toBe(hasPersistedFromDomain);
+    expect(isPauseSessionWaitingForInstanceFetch).toBe(isWaitingFromDomain);
   });
 });
