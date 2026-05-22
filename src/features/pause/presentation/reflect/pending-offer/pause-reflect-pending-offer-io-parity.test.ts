@@ -89,6 +89,10 @@ import {
   pauseInitialEmotionSkipWithRepository,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 
+/**
+ * Presentation pending-offer I/O parity (colocated beside `pause-reflect-pending-offer-io.ts`).
+ * Application mirror: `application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+ */
 describe('pause-reflect-pending-offer-io parity', () => {
   it('presentation I/O pending-offer display matches pending-offer CI umbrella', () => {
     expect(getPendingPauseOfferDisplay).toBe(getDisplayFromPendingOfferIo);
