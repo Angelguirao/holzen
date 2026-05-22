@@ -9,7 +9,8 @@
  * `pause-session-step-handlers-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (cross-surface;
  * application mirror: `pause-session-step-handlers-steps-flow-sibling-parity.test.ts`);
  * `pause-session-step-handlers-flows-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (cross-surface;
- * application mirror: `pause-session-step-handlers-flows-flow-sibling-parity.test.ts`);
+ * application mirror: `pause-session-step-handlers-flows-io-sibling-parity.test.ts` under `application/.../session/`;
+ * flow-level: `pause-session-step-handlers-flows-flow-sibling-parity.test.ts`);
  * reciprocal inline pins: `pause-session-step-handlers-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`,
  * `pause-reflect-flows-io.test.ts`, and `pause-session-step-transition-io.test.ts` (extended motion-token pins).
  */

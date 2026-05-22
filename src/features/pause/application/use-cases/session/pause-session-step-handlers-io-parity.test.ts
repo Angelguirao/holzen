@@ -29,6 +29,10 @@ import {
   shouldLogPauseReflectionStep,
   shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
+  pauseReflectOutcomeLog,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 
 describe('pause-session-step-handlers-io parity', () => {
   it('presentation I/O bundle builders match step-handlers CI umbrella', () => {
@@ -58,5 +62,18 @@ describe('pause-session-step-handlers-io parity', () => {
     expect(buildPauseSessionStepShellBundle).not.toBe(pauseReflectNoteUpdateWithRepository);
     expect(buildPauseSessionStepRitualBundle).not.toBe(pauseReflectFavoriteToggleWithRepository);
     // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (session bundles vs reflect+decide).
+   * Dedicated sibling file: `pause-session-step-handlers-flows-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: reflect flows-io exports stay distinct from step-handlers-io', () => {
+    expect(buildPauseSessionStepShellBundle).not.toBe(pauseReflectOutcomeLog);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(buildPauseSessionStepShellBundle).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(pauseReflectOutcomeLog);
+    // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts`.
+    // Full pins: `pause-session-step-handlers-flows-io-sibling-parity.test.ts`.
   });
 });

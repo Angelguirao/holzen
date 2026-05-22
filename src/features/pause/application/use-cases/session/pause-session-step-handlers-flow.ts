@@ -9,7 +9,8 @@
  * `pause-session-step-handlers-steps-flow-sibling-parity.test.ts` ↔ `ritual/reflect/steps/pause-reflect-steps-flow`
  * (presentation cross-surface mirror: `pause-session-step-handlers-steps-io-sibling-parity.test.ts`);
  * `pause-session-step-handlers-flows-flow-sibling-parity.test.ts` ↔ `ritual/reflect/flows/pause-reflect-flows-flow`
- * (presentation cross-surface mirror: `pause-session-step-handlers-flows-io-sibling-parity.test.ts`).
+ * (presentation cross-surface mirror: `pause-session-step-handlers-flows-io-sibling-parity.test.ts`;
+ * application I/O mirror: `pause-session-step-handlers-flows-io-sibling-parity.test.ts` under `application/.../session/`).
  * Sibling pin: `pause-session-step-handlers-flow.test.ts` ↔ `pause-session-step-transition-flow.test.ts`.
  */
 export {
