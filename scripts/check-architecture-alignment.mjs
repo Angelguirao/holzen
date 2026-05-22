@@ -2984,11 +2984,13 @@ for (const file of walkTs(join(root, 'src'))) {
           );
         }
       }
-      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_UMBRELLA_FLOW_IMPORTS) {
-        if (text.includes(needle)) {
-          failures.push(
-            `${rel}: pending-offer RPC I/O must not import pending-offer umbrella (${needle})`,
-          );
+      if (!rel.endsWith('pause-reflect-pending-offer-io.re-exports.test.ts')) {
+        for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_UMBRELLA_FLOW_IMPORTS) {
+          if (text.includes(needle)) {
+            failures.push(
+              `${rel}: pending-offer RPC I/O must not import pending-offer umbrella (${needle})`,
+            );
+          }
         }
       }
     }

@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — pending-offer I/O ↔ pending-offer-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-io.re-exports.test.ts</code> pending-offer-flow parity</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-pending-offer-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> identity for <code>getPendingPauseOfferDisplay</code> against <code>pause-reflect-pending-offer-flow</code> (parity with telemetry I/O ↔ telemetry-flow pins; adopt/decline stay on presentation facades). Leaf imports on <code>pause-reflect-pending-offer-io.ts</code> unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd><code>pause-reflect-pending-offer-io.re-exports.test.ts</code> may import <code>pause-reflect-pending-offer-flow</code> for <code>.toBe</code> parity only — production I/O still imports leaf modules; <code>check:architecture-alignment</code> exempts the re-exports test file (same pattern as <code>pause-reflect-generation-io.re-exports.test.ts</code>).</dd>
+      <dt>Open question</dt>
+      <dd>Next: <code>pause-companion-frame-ui-io</code> ↔ <code>pause-companion-frame-ui-flow</code> umbrella pins, session breath umbrella consolidated subcluster pin test, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — Home reflect I/O ↔ manual-open generation-flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
       <dt>Open question</dt>
-      <dd>Next: <code>pause-reflect-generation-io</code> ↔ generation-flow umbrella parity, session breath umbrella consolidated subcluster pin test, or Phase B subscription Tier 1 shims.</dd>
+      <dd>Superseded by generation-io ↔ generation-flow parity slice (same day).</dd>
     </dl>
   </article>
 
