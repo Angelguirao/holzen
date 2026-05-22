@@ -316,7 +316,7 @@ describe('pause-reflect-flows-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` (reflect+decide vs reflection share).
+   * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` and `pause-reflect-share-io.test.ts`.
    * Dedicated sibling file: `pause-reflect-flows-share-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: share-io exports stay distinct from flows-io', () => {
@@ -330,7 +330,7 @@ describe('pause-reflect-flows-io parity', () => {
     expect(getSessionQuote).not.toBe(buildReflectionShareText);
     expect(showPauseOutcomeNotCompletedToast).not.toBe(pauseReflectionShareImage);
     expect(showPauseOutcomeSaveFailedToast).not.toBe(buildReflectionShareTelegramUrl);
-    // Reciprocal inline pins: `pause-reflect-share-io-parity.test.ts`.
+    // Reciprocal inline pins: `pause-reflect-share-io-parity.test.ts`, `pause-reflect-share-io.test.ts`.
     // Full pins: `pause-reflect-flows-share-io-sibling-parity.test.ts`.
   });
 
