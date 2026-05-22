@@ -10,6 +10,7 @@
  * `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
  * `pause-reflect-ambience-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`;
  * `pause-reflect-flows-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`;
+ * `pause-reflect-steps-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
  * inline pins: `pause-reflect-generation-io.test.ts`, `pause-reflect-ambience-io.test.ts`.
  */
 import {
