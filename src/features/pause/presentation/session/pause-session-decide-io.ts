@@ -3,6 +3,7 @@
  * Imports `PauseImpactData` from domain directly (parity with manual-open and generation I/O peels;
  * not session decide-flow CI anchor).
  * Parity pins: `pause-session-decide-io.test.ts`, `pause-session-decide-io-parity.test.ts`,
- * and `pause-session-decide-io.re-exports.test.ts`.
+ * `pause-session-decide-io.re-exports.test.ts`, and
+ * `pause-reflect-flows-decide-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`.
  */
 export type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
