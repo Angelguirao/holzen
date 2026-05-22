@@ -2,7 +2,7 @@
  * Presentation I/O for session step-handler bundle builders.
  * Imports `application/use-cases/session/step-bundles` directly (parity with step-transition and frame/breath I/O peels;
  * not `pause-session-step-handlers-flow` CI anchor).
- * Parity pins: `pause-session-step-handlers-io-parity.test.ts`, `pause-session-step-handlers-io.re-exports.test.ts`,
+ * Parity pins: `pause-session-step-handlers-io-parity.test.ts`, `pause-session-step-handlers-io.re-exports.test.ts` (reciprocal inline pins ↔ `pause-session-step-transition-io.re-exports.test.ts`),
  * `pause-session-step-handlers-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-session-step-handlers-flow` (application CI),
  * `pause-session-step-handlers-step-transition-io-sibling-parity.test.ts` ↔ `pause-session-step-transition-io`,
  * `pause-session-scaffold-step-handlers-io-sibling-parity.test.ts` ↔ `scaffold/pause-session-scaffold-io`;
