@@ -13,6 +13,7 @@ import {
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
 } from './pause-reflect-pending-offer-telemetry-io';
+import { pauseReflectionShareImage } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
@@ -63,5 +64,11 @@ describe('pause-reflect-telemetry-io', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(trackPausePendingAdopted);
     expect(trackPauseReflectShareTap).not.toBe(trackPausePendingDeclined);
     expect(trackPauseReflectWallpaperTap).not.toBe(trackPauseSessionAbandoned);
+  });
+
+  it('sibling cluster: share-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseReflectionShareImage);
+    expect(trackPauseReflectShareTap).not.toBe(pauseReflectionShareImage);
+    expect(trackPauseReflectWallpaperTap).not.toBe(pauseReflectionShareImage);
   });
 });

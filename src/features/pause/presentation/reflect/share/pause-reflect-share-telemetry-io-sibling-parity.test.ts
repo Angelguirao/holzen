@@ -13,6 +13,7 @@ import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
+  type PauseReflectTelemetrySurface,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 
 /**
@@ -30,10 +31,13 @@ describe('pause-reflect-share-io ↔ pause-reflect-telemetry-io sibling parity',
     expect(typeof trackPauseReflectPostItOpen).toBe('function');
     expect(typeof trackPauseReflectShareTap).toBe('function');
     expect(typeof trackPauseReflectWallpaperTap).toBe('function');
+    const surface: PauseReflectTelemetrySurface = 'pause_reflect';
+    expect(surface).toBe('pause_reflect');
 
     expect('trackPauseReflectPostItOpen' in shareIo).toBe(false);
     expect('trackPauseReflectShareTap' in shareIo).toBe(false);
     expect('trackPauseReflectWallpaperTap' in shareIo).toBe(false);
+    expect('PauseReflectTelemetrySurface' in shareIo).toBe(false);
 
     expect('buildReflectionShareText' in telemetryIo).toBe(false);
     expect('pauseReflectionShareImage' in telemetryIo).toBe(false);
