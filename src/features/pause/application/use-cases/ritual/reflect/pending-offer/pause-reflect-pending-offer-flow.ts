@@ -15,7 +15,8 @@
  * `pause-reflect-share-flow.test.ts` (inline share ↔ pending-offer pins);
  * `pause-reflect-pending-offer-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (presentation wrappers off flow umbrella);
  * `pause-reflect-pending-offer-flow-rpc-flow-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-rpc-flow` (RPC-only subcluster vs presentation umbrella);
- * `pause-reflect-pending-offer-flow-display-flow-sibling-parity.test.ts` ↔ `pause-pending-offer-display-flow` (display-only subcluster vs presentation umbrella).
+ * `pause-reflect-pending-offer-flow-display-flow-sibling-parity.test.ts` ↔ `pause-pending-offer-display-flow` (display-only subcluster vs presentation umbrella);
+ * `pause-reflect-pending-offer-flow-telemetry-flow-sibling-parity.test.ts` ↔ `pause-pending-offer-telemetry-flow` (PostHog-only subcluster vs presentation umbrella).
  */
 export { runAdoptPendingPauseOffer } from './run-adopt-pending-pause-offer';
 export { runDeclinePendingPauseOffer } from './run-decline-pending-pause-offer';
