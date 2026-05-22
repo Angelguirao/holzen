@@ -16,8 +16,9 @@ import {
 
 /**
  * Presentation sibling parity: ambience-io vs share-io (parity with
- * `pause-reflect-ambience-mood-io-sibling-parity.test.ts` and
- * `pause-reflect-hub-share-io-sibling-parity.test.ts`).
+ * `pause-reflect-ambience-mood-io-sibling-parity.test.ts`,
+ * `pause-reflect-hub-share-io-sibling-parity.test.ts`, and application
+ * `pause-reflect-ambience-share-io-sibling-parity.test.ts` under `application/.../ambience/`).
  */
 describe('pause-reflect-ambience-io ↔ pause-reflect-share-io sibling parity', () => {
   it('ambience-io and share-io are distinct presentation I/O surfaces', () => {

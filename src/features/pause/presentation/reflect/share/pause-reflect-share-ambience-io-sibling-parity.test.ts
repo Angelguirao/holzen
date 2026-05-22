@@ -16,7 +16,8 @@ import {
 
 /**
  * Share-anchored presentation sibling parity; ambience-anchored mirror:
- * `ambience/pause-reflect-ambience-share-io-sibling-parity.test.ts`.
+ * `ambience/pause-reflect-ambience-share-io-sibling-parity.test.ts` (application mirrors under
+ * `application/.../share/` and `application/.../ambience/`).
  */
 describe('pause-reflect-share-io ↔ pause-reflect-ambience-io sibling parity', () => {
   it('share-io and ambience-io are distinct presentation I/O surfaces', () => {

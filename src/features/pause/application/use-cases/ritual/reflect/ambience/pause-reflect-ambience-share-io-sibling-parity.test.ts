@@ -16,9 +16,12 @@ import {
 
 /**
  * Application sibling parity: ambience-io vs share-io (parity with presentation
- * `pause-reflect-ambience-share-io-sibling-parity.test.ts` and share↔ambience siblings).
+ * `pause-reflect-ambience-share-io-sibling-parity.test.ts`, flow-level
+ * `pause-reflect-ambience-share-flow-sibling-parity.test.ts`, and share-anchored
+ * `application/.../share/pause-reflect-share-ambience-io-sibling-parity.test.ts`).
  * Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts` ↔
- * `pause-reflect-share-io-parity.test.ts`.
+ * `pause-reflect-share-io-parity.test.ts` and `pause-reflect-ambience-io.test.ts` ↔
+ * `pause-reflect-share-io.test.ts`.
  */
 describe('pause-reflect-ambience-io ↔ pause-reflect-share-io sibling parity (application)', () => {
   it('ambience-io and share-io are distinct presentation I/O surfaces', () => {
