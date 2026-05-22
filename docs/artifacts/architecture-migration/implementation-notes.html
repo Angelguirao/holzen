@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — ritual done-io ↔ ritual-done-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-ritual-done-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Re-export <code>runPostPauseEmotionLogIfDirty</code> on <code>pause-ritual-done-io.ts</code> (facade unchanged). Add application-layer <code>pause-ritual-done-io-parity.test.ts</code> pinning presentation export + repository binding to <code>pause-ritual-done-flow</code> (presentation <code>pause-ritual-done-io.re-exports.test.ts</code> keeps repository-only pin — CI excludes <code>*.re-exports.test.ts</code> from ritual-done leaf import allowlist).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior-preserving re-export + tests only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect share-io ↔ share + orchestration flow anchors (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + flow comment only.</dd>
       <dt>Open question</dt>
-      <dd>Next: Phase B subscription Tier 1 shims.</dd>
+      <dd>Superseded by ritual done-io parity slice (same day).</dd>
     </dl>
   </article>
 
@@ -137,7 +154,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + CI guard only.</dd>
       <dt>Open question</dt>
-      <dd>Superseded by share-io orchestration parity slice (same day).</dd>
+      <dd>Superseded by ritual done-io parity slice (same day).</dd>
     </dl>
   </article>
 

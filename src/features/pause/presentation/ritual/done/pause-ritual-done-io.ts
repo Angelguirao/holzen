@@ -10,6 +10,7 @@ import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 export type { PostPauseFeelSnapshot };
+export { runPostPauseEmotionLogIfDirty };
 
 /** Default `PauseRepository` for ritual done presentation hooks. */
 export const reflectPauseRepository = supabasePauseRepository;
