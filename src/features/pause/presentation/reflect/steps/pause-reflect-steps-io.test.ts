@@ -227,6 +227,18 @@ describe('pause-reflect-steps-io', () => {
     // reciprocal inline pins: `pause-reflect-generation-io.test.ts`.
   });
 
+  it('sibling cluster: favorite and reflection_step log wrappers stay distinct on steps-io', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseReflectionStepLogOnce);
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    expect(pauseReflectFavoriteToggleWithRepository).not.toBe(pauseReflectionStepLogOnce);
+    expect(shouldShowFavoriteProHint).not.toBe(shouldLogPauseReflectionStep);
+    expect(pauseReflectFavoriteToggle).not.toBe(shouldLogPauseReflectionStep);
+    expect(pauseReflectionStepLogOnce).not.toBe(shouldShowFavoriteProHint);
+    expect(pauseReflectionStepLogOnce).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseReflectionStepLogOnceWithRepository).not.toBe(pauseReflectFavoriteToggleWithRepository);
+    // Full pins: `pause-reflect-steps-favorite-reflection-step-log-io-sibling-parity.test.ts`.
+  });
+
   it('sibling cluster: note and tag wrappers stay distinct on steps-io', () => {
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectTagUpdate);
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectFavoriteToggle);
