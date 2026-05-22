@@ -21490,4 +21490,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — companion orchestrate I/O via frame leaf modules (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>pause-companion-orchestrate-io</code> through ritual/frame leaf use cases</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Peel <code>pause-companion-orchestrate-io</code> off <code>pause-companion-orchestrate-flow</code> to import slot orchestrate, intervention bootstrap, retry reset, telemetry, and UI-state modules directly (parity with reflect I/O subcluster peels; orchestration-io already uses frame subcluster flows). CI blocks orchestrate umbrella imports on orchestrate-io; slot hooks still import orchestrate-io only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-companion-orchestrate-flow</code> remains the CI compose anchor for <code>check:architecture-alignment</code>; orchestrate presentation I/O no longer depends on the umbrella barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-generation-io</code> direct domain + <code>run-reflect-generation</code> peel, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
