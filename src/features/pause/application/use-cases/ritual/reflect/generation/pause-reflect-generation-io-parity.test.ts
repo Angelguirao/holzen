@@ -95,6 +95,8 @@ import {
   runOpenManualPauseSilentModeAfterCreate,
   runPersistSilentReflectionStub,
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
+import * as generationIo from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import * as homeReflectIo from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 
 import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
 
@@ -262,7 +264,21 @@ describe('pause-reflect-generation-io parity (application)', () => {
     expect(messageFromReflectGenerationResult).not.toBe(pauseDismissOpenPauseHomePreviewWithRepository);
     expect(messageFromReflectGenerationResult).not.toBe(openManualPauseFromHome);
     expect(pauseReflectGeneration).not.toBe(dismissOpenPauseHome);
+    expect(pauseHomeManualOpenPorts.reflect).toBe(reflectGenerator);
     // Reciprocal inline pins: `generation/manual-open/pause-home-reflect-io-parity.test.ts`.
     // Full pins: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
+   */
+  it('application mirror: generation-io stays off home-reflect-io manual-open wrappers', () => {
+    expect('openManualPauseFromHome' in generationIo).toBe(false);
+    expect('pauseDismissOpenPauseHomePreview' in generationIo).toBe(false);
+    expect('pauseHomeManualOpenPorts' in generationIo).toBe(false);
+    expect('runReflectGeneration' in homeReflectIo).toBe(false);
+    expect('pauseReflectGeneration' in homeReflectIo).toBe(false);
+    expect('pauseHomeManualOpenPorts' in homeReflectIo).toBe(true);
+    expect('reflectGenerator' in generationIo).toBe(true);
   });
 });
