@@ -7,7 +7,8 @@
  * Sibling parity: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`;
  * `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
  * `pause-reflect-share-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`;
- * `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-telemetry-io`.
+ * `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-telemetry-io`,
+ * `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`.
  */
 import {
   getPendingPauseOfferDisplay,

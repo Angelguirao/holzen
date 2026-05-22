@@ -5,9 +5,10 @@
  * Wrapper delegation pins: `pause-reflect-steps-io.test.ts` (default + *WithRepository seams incl. reflection_step log);
  * `pause-reflect-steps-io-parity.test.ts` (flow umbrella + application layer).
  * Sibling surfaces: `pause-reflect-flows-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`;
- * `pause-reflect-steps-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`;
- * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
- * `pause-reflect-share-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`;
+ * `pause-reflect-steps-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`,
+ * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`,
+ * `pause-reflect-share-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`,
+ * `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
  * `pause-reflect-steps-flow-steps-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow`.
  */
 import { runPauseFavoriteToggle } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';

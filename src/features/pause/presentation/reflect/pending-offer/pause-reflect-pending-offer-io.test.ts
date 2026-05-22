@@ -2,6 +2,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { runAdoptPendingPauseOffer as runAdoptDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer';
 import { runDeclinePendingPauseOffer as runDeclineDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer';
 import {
+  pauseReflectFavoriteToggle,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
   pauseAdoptPendingOfferWithRepository,
@@ -60,6 +63,8 @@ describe('pause-reflect-pending-offer-io', () => {
     expect(pauseAdoptPendingOfferWithRepository).not.toBe(runAdoptDirect);
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(runDeclineDirect);
     expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseReflectFavoriteToggle);
   });
 
   it('routes adopt through the leaf use case with the default repository', () => {
