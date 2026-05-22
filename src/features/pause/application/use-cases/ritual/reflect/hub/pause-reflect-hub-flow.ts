@@ -5,6 +5,7 @@
  * `pause-reflect-hub-mood-flow-sibling-parity.test.ts`,
  * `pause-reflect-hub-pending-offer-flow-sibling-parity.test.ts` (hub-flow ↔ pending-offer-flow),
  * `pause-reflect-share-hub-flow-sibling-parity.test.ts` + `pause-reflect-hub-share-flow-sibling-parity.test.ts` (share-flow ↔ hub-flow),
+ * `pause-reflect-hub-share-io-sibling-parity.test.ts` (hub-io ↔ share-io presentation I/O; application mirror of presentation sibling),
  * `pause-reflect-steps-hub-flow-sibling-parity.test.ts`,
  * `pause-reflect-steps-hub-io-sibling-parity.test.ts` (application + presentation steps-io ↔ hub-io), and
  * `pause-reflect-flows-hub-flow-sibling-parity.test.ts` may import this umbrella for parity;
