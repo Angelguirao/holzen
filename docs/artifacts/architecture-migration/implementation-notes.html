@@ -30644,7 +30644,6 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
       <span>Phase A — colocate pending-offer-telemetry-io parity beside pending-offer-io (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -30656,7 +30655,12 @@
       <dd>Production <code>pause-reflect-pending-offer-telemetry-io.ts</code> stays under <code>presentation/reflect/telemetry/</code>; only the parity test moves to the pending-offer cluster.</dd>
       <dt>Open questions</dt>
       <dd>Next: colocate <code>pause-reflect-telemetry-io-parity</code> or <code>pause-reflect-generation-io-parity</code>, or Phase B <code>subscription-checkout-guard-ref</code> shim peel.</dd>
-=======
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — colocate flows-io parity beside presentation cluster (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -30667,8 +30671,7 @@
       <dt>Deviation</dt>
       <dd>Parity test still imports <code>pause-reflect-flows-flow</code> CI umbrella from application (intentional cluster guard).</dd>
       <dt>Open questions</dt>
-      <dd>Next: colocate <code>pause-reflect-ambience-io-parity</code> or <code>pause-reflect-generation-io-parity</code> under presentation subclusters, or Phase B Tier 1 shim scan.</dd>
->>>>>>> 69817a6c6 (refactor(pause): colocate flows-io parity test under presentation/reflect/flows)
+      <dd>Next: colocate <code>pause-reflect-generation-io-parity</code> or <code>pause-reflect-telemetry-io-parity</code> under presentation subclusters, or Phase B Tier 1 shim scan.</dd>
     </dl>
   </article>
 
