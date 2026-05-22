@@ -22,7 +22,8 @@
  * `pause-reflect-share-ambience-io-sibling-parity.test.ts` + `ambience/pause-reflect-ambience-share-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io` (application mirrors:
  * `application/.../share/pause-reflect-share-ambience-io-sibling-parity.test.ts`,
  * `application/.../ambience/pause-reflect-ambience-share-io-sibling-parity.test.ts`);
- * `pause-reflect-share-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`;
+ * `pause-reflect-share-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io` (application mirror:
+ * `application/.../share/pause-reflect-share-mood-io-sibling-parity.test.ts`);
  * reciprocal inline pins: `pause-reflect-share-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`;
  * presentation `pause-reflect-share-io-parity.test.ts` (colocated) pins share-io ↔ share-orchestration-flow (no `deliverReflectionShareImage` on presentation I/O).
  */
