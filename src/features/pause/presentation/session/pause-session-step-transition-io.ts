@@ -1,7 +1,8 @@
 /**
  * Presentation I/O for `/pause` Framer step-panel motion.
  * Imports session step-transition leaf modules directly (parity with ritual done I/O peels).
- * Parity pins: `pause-session-step-transition-io-parity.test.ts`, `pause-session-step-transition-io.re-exports.test.ts`.
+ * Parity pins: `pause-session-step-transition-io-parity.test.ts`, `pause-session-step-transition-io.re-exports.test.ts`,
+ * `pause-session-step-transition-io.test.ts`, `pause-session-step-handlers-step-transition-io-sibling-parity.test.ts` ↔ `pause-session-step-handlers-io`.
  */
 export {
   buildPauseSessionStepTransitionConfig,

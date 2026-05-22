@@ -48,6 +48,7 @@ describe('pause-session-step-transition-flow', () => {
   });
 
   it('sibling cluster: step-handlers-flow exports stay distinct from step-transition umbrella exports', () => {
+    // Full cross-flow pins: `pause-session-step-handlers-step-transition-flow-sibling-parity.test.ts`.
     expect(buildPauseSessionStepTransitionConfig).not.toBe(buildPauseSessionStepShellBundle);
     expect(buildPauseSessionStepTransitionConfig).not.toBe(buildPauseSessionStepRitualBundle);
     expect(pauseStepSwipeDirection).not.toBe(buildPauseSessionStepShellBundle);
