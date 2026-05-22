@@ -7,6 +7,15 @@ vi.mock('@/features/pause/public-rpc', () => ({
 
 import { dismissOpenPauseHome as dismissDirect } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/dismiss-open-pause-home';
 import { openManualPauseFromHome as openDirect } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/open-manual-pause-from-home';
+import {
+  buildManualPauseCreateOrReuseParams as buildCreateOrReuseFromManualOpenFlow,
+  buildManualPauseMarketContext as buildMarketFromManualOpenFlow,
+  buildManualPauseOpenParams as buildOpenParamsFromManualOpenFlow,
+  dismissOpenPauseHome as dismissFromManualOpenFlow,
+  openManualPauseFromHome as openFromManualOpenFlow,
+  runOpenManualPauseSilentModeAfterCreate as silentAfterCreateFromManualOpenFlow,
+  runPersistSilentReflectionStub as persistStubFromManualOpenFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-reflect-generation-manual-open-flow';
 import { runOpenManualPauseSilentModeAfterCreate as silentAfterCreateDirect } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-open-manual-pause-silent-mode-after-create';
 import { runPersistSilentReflectionStub as persistStubDirect } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-persist-silent-reflection-stub';
 import { buildManualPauseCreateOrReuseParams as buildCreateOrReuseDirect } from '@/features/pause/domain/reflect/generation/build-manual-pause-create-or-reuse-params';
@@ -51,5 +60,15 @@ describe('pause-home-reflect-io re-exports', () => {
   it('binds default pauseHomeManualOpenPorts to public-rpc adapters', () => {
     expect(pauseHomeManualOpenPorts.repository).toBe(supabasePauseRepository);
     expect(pauseHomeManualOpenPorts.reflect).toBe(supabaseReflectGenerator);
+  });
+
+  it('presentation I/O bindings match pause-reflect-generation-manual-open-flow CI anchor (leaf parity)', () => {
+    expect(openManualPauseFromHome).toBe(openFromManualOpenFlow);
+    expect(dismissOpenPauseHome).toBe(dismissFromManualOpenFlow);
+    expect(runPersistSilentReflectionStub).toBe(persistStubFromManualOpenFlow);
+    expect(runOpenManualPauseSilentModeAfterCreate).toBe(silentAfterCreateFromManualOpenFlow);
+    expect(buildManualPauseMarketContext).toBe(buildMarketFromManualOpenFlow);
+    expect(buildManualPauseOpenParams).toBe(buildOpenParamsFromManualOpenFlow);
+    expect(buildManualPauseCreateOrReuseParams).toBe(buildCreateOrReuseFromManualOpenFlow);
   });
 });
