@@ -59,35 +59,19 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
-      <span>Phase A — ritual/frame slot-orchestrate leaf identity (backlog #2 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-companion-slot-orchestrate-flow</code> pins direct re-export</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Strengthen slot-orchestrate CI anchor with <code>.toBe(direct)</code> identity for <code>runCompanionSlotOrchestrate</code> (parity with reflect share/mood leaf pins). <code>pause-companion-orchestrate-io</code> unchanged (imports <code>ritual/frame/*</code> leaf modules directly).</dd>
-      <dt>Deviation</dt>
-      <dd>None — CI slice only.</dd>
-      <dt>Tradeoffs</dt>
-      <dd>Other frame orchestrate subcluster leaf flows still use typeof-only checks until incremental slices.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: pin retry/outcome/intervention/session frame leaf flows, or Phase B subscription Tier 1.</dd>
-=======
       <span>Phase A — ritual/frame orchestrate leaf flow identity (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
     <h3>Companion orchestrate subcluster leaf CI anchors pin direct re-exports</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #2 (<code>application/use-cases/companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Extend orchestrate subcluster leaf flows (session, slot run, outcome, retry, intervention, telemetry, UI) and <code>pause-companion-orchestrate-flow</code> umbrella with <code>.toBe(direct)</code> identity (parity with reflect share/mood/hub leaf pins). Presentation <code>pause-companion-orchestrate-io</code> unchanged (imports leaf modules directly).</dd>
+      <dd>Backlog #2 (<code>application/use-cases/companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Extend orchestrate subcluster leaf flows (session, slot run, outcome, retry, intervention, telemetry, UI) and <code>pause-companion-orchestrate-flow</code> umbrella with <code>.toBe(direct)</code> identity (parity with reflect share/mood/hub leaf pins). Slot-orchestrate anchor may have been pinned in a parallel slice; this commit completes the rest of the subcluster. Presentation <code>pause-companion-orchestrate-io</code> unchanged (imports leaf modules directly).</dd>
       <dt>Deviation</dt>
       <dd>None — CI slice only.</dd>
       <dt>Tradeoff</dt>
       <dd>Other <code>ritual/frame</code> leaf flows (orchestration umbrella, section visibility, analytics) still use typeof-only checks until a follow-up slice.</dd>
       <dt>Open question</dt>
       <dd>Next: pin remaining <code>ritual/frame</code> non-orchestrate leaf flows, or Phase B subscription Tier 1 when pause Tier 5 is quiet.</dd>
->>>>>>> f62ce4e95 (test(pause): pin ritual/frame orchestrate leaf flow re-exports)
     </dl>
   </article>
 
