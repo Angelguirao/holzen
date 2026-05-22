@@ -66,11 +66,14 @@ import {
 import {
   buildPauseScoreImpacts,
   formatReinforcementQuoteFromSession,
+  getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
@@ -159,7 +162,7 @@ describe('pause-reflect-pending-offer-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (pending-offer RPC vs reflect+decide).
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` and `pause-reflect-flows-io.test.ts`.
    * Dedicated sibling file: `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: flows-io exports stay distinct from pending-offer-io', () => {
@@ -172,8 +175,11 @@ describe('pause-reflect-pending-offer-io parity', () => {
     expect(pauseDeclinePendingOffer).not.toBe(buildPauseScoreImpacts);
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(getPendingPauseOfferDisplay).not.toBe(formatReinforcementQuoteFromSession);
+    expect(getPendingPauseOfferDisplay).not.toBe(getSessionQuote);
     expect(pauseAdoptPendingOffer).not.toBe(pauseReflectOutcomeLog);
-    // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts`.
+    expect(pauseDeclinePendingOffer).not.toBe(showPauseOutcomeNotCompletedToast);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(showPauseOutcomeSaveFailedToast);
+    // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts`, `pause-reflect-flows-io.test.ts`.
     // Full pins: `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts`.
   });
 
