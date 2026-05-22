@@ -14,6 +14,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/pending-offer/run
 
 import { runAdoptPendingPauseOffer as runAdoptDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer';
 import { runDeclinePendingPauseOffer as runDeclineDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer';
+import { getPendingPauseOfferDisplay as getDisplayFromDisplayFlow } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow';
 import {
   getPendingPauseOfferDisplay,
   runAdoptPendingPauseOffer,
@@ -32,6 +33,11 @@ import { supabasePauseRepository } from '@/features/pause/public-rpc';
 describe('pause-reflect-pending-offer-io parity', () => {
   it('presentation I/O pending-offer display matches pending-offer CI umbrella', () => {
     expect(getPendingPauseOfferDisplay).toBe(getDisplayFromPendingOfferIo);
+  });
+
+  it('presentation I/O display matches pause-pending-offer-display-flow CI anchor', () => {
+    expect(getPendingPauseOfferDisplay).toBe(getDisplayFromDisplayFlow);
+    expect(getDisplayFromPendingOfferIo).toBe(getDisplayFromDisplayFlow);
   });
 
   it('pending-offer CI umbrella composes the same run-* leaf use cases as presentation I/O', () => {

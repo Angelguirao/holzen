@@ -7,6 +7,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
 import { getPendingPauseOfferDisplay as getDisplayDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display';
 import { runAdoptPendingPauseOffer as runAdoptDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer';
 import { runDeclinePendingPauseOffer as runDeclineDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer';
+import { getPendingPauseOfferDisplay as getDisplayFromDisplayFlow } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow';
 import {
   getPendingPauseOfferDisplay as getDisplayFromPendingOfferFlow,
   runAdoptPendingPauseOffer as runAdoptFromPendingOfferFlow,
@@ -37,6 +38,12 @@ describe('pause-reflect-pending-offer-io re-exports', () => {
     expect(getPendingPauseOfferDisplay).toBe(getDisplayFromPendingOfferFlow);
     expect(runAdoptFromPendingOfferFlow).toBe(runAdoptDirect);
     expect(runDeclineFromPendingOfferFlow).toBe(runDeclineDirect);
+  });
+
+  it('presentation I/O display binding matches pause-pending-offer-display-flow CI anchor', () => {
+    expect(getPendingPauseOfferDisplay).toBe(getDisplayFromDisplayFlow);
+    expect(getDisplayFromDisplayFlow).toBe(getDisplayDirect);
+    expect(getDisplayFromDisplayFlow).toBe(getDisplayFromPendingOfferFlow);
   });
 
   it('presentation port-bound wrappers stay off pending-offer-flow CI umbrella exports', () => {
