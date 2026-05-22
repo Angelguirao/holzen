@@ -15,9 +15,10 @@ import {
 
 /**
  * Presentation sibling parity: ambience-io vs telemetry-io (parity with
- * `pause-reflect-ambience-share-io-sibling-parity.test.ts` and
- * `pause-reflect-share-telemetry-io-sibling-parity.test.ts`; complements
- * `pause-reflect-flows-telemetry-io-sibling-parity.test.ts`).
+ * `pause-reflect-ambience-share-io-sibling-parity.test.ts`,
+ * `pause-reflect-share-telemetry-io-sibling-parity.test.ts`, and application
+ * `application/.../ambience/pause-reflect-ambience-telemetry-io-sibling-parity.test.ts`;
+ * complements `pause-reflect-flows-telemetry-io-sibling-parity.test.ts`).
  */
 describe('pause-reflect-ambience-io ↔ pause-reflect-telemetry-io sibling parity', () => {
   it('ambience-io and telemetry-io are distinct presentation I/O surfaces', () => {
