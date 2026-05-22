@@ -29961,4 +29961,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session step-handlers-flow ↔ step-handlers-io cross-layer wrapper parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-step-handlers-flow-io-wrapper-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete — no moves. Mirror <code>pause-reflect-steps-flow-io-wrapper-sibling-parity</code> for session step-handlers: application <code>pause-session-step-handlers-flow</code> CI umbrella vs presentation <code>pause-session-step-handlers-io</code> share <code>step-bundles</code> leaves but stay distinct module anchors. Complements <code>pause-session-step-handlers-steps-flow-sibling-parity</code> (cross-surface vs reflect steps-flow).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comment anchors only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or cross-layer session↔reflect steps flow/io four-way parity if a gap remains.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

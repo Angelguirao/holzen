@@ -17,7 +17,8 @@ import * as stepsFlow from '@/features/pause/application/use-cases/ritual/reflec
 
 /**
  * Cross-surface application sibling parity: session step-handlers-flow vs reflect steps-flow.
- * Presentation mirror: `pause-session-step-handlers-steps-io-sibling-parity.test.ts`.
+ * Presentation cross-surface mirror: `pause-session-step-handlers-steps-io-sibling-parity.test.ts`.
+ * Session flow↔I/O wrapper: `pause-session-step-handlers-flow-io-wrapper-sibling-parity.test.ts`.
  * Reciprocal inline pins: `pause-session-step-handlers-flow.test.ts` ↔ `pause-reflect-steps-flow.test.ts`.
  */
 describe('pause-session-step-handlers-flow ↔ pause-reflect-steps-flow sibling parity', () => {
