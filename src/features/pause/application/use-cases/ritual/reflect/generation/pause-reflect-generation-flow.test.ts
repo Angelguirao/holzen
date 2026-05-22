@@ -21,6 +21,16 @@ import { openManualPauseFromHome } from './manual-open/open-manual-pause-from-ho
 import { runOpenManualPauseSilentModeAfterCreate } from './manual-open/run-open-manual-pause-silent-mode-after-create';
 import { runPersistSilentReflectionStub } from './manual-open/run-persist-silent-reflection-stub';
 import { runReflectGeneration as runReflectGenerationDirect } from './holzen-reflect/run-reflect-generation';
+import {
+  messageFromReflectGenerationResult as messageFromResultFromHookFlow,
+  reflectGenerationPrerequisite as prerequisiteFromHookFlow,
+  reflectGenerationUserErrorMessage as userErrorFromHookFlow,
+  resolveEffectiveReflectionCopy as resolveCopyFromHookFlow,
+  resolveReflectGenerationPrefetch as resolvePrefetchFromHookFlow,
+  runReflectGeneration as runReflectGenerationFromHookFlow,
+  shouldClearReflectGenerationLoading as shouldClearLoadingFromHookFlow,
+  shouldCommitReflectGeneration as shouldCommitFromHookFlow,
+} from './holzen-reflect/pause-reflect-generation-hook-flow';
 
 import {
   buildManualPauseCreateOrReuseParams as buildCreateOrReuseFromFlow,
@@ -75,5 +85,16 @@ describe('pause-reflect-generation-flow', () => {
     expect(dismissFromFlow).toBe(dismissOpenPauseHome);
     expect(runSilentModeFromFlow).toBe(runOpenManualPauseSilentModeAfterCreate);
     expect(runPersistStubFromFlow).toBe(runPersistSilentReflectionStub);
+  });
+
+  it('umbrella bindings match holzen-reflect hook-flow subcluster CI anchor (leaf parity)', () => {
+    expect(resolvePrefetchFromFlow).toBe(resolvePrefetchFromHookFlow);
+    expect(shouldClearLoadingFromFlow).toBe(shouldClearLoadingFromHookFlow);
+    expect(shouldCommitFromFlow).toBe(shouldCommitFromHookFlow);
+    expect(messageFromResultFromFlow).toBe(messageFromResultFromHookFlow);
+    expect(prerequisiteFromFlow).toBe(prerequisiteFromHookFlow);
+    expect(userErrorFromFlow).toBe(userErrorFromHookFlow);
+    expect(resolveCopyFromFlow).toBe(resolveCopyFromHookFlow);
+    expect(runReflectGeneration).toBe(runReflectGenerationFromHookFlow);
   });
 });
