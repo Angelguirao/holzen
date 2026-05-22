@@ -3004,7 +3004,8 @@ for (const file of walkTs(join(root, 'src'))) {
       rel.endsWith('pause-reflect-pending-offer-io.ts') ||
       rel.endsWith('pause-reflect-pending-offer-io.test.ts') ||
       rel.endsWith('pause-reflect-pending-offer-io.re-exports.test.ts') ||
-      rel.endsWith('pause-reflect-pending-offer-io-parity.test.ts');
+      rel.endsWith('pause-reflect-pending-offer-io-parity.test.ts') ||
+      rel.endsWith('pause-reflect-pending-offer-telemetry-io-parity.test.ts');
     for (const needle of LEGACY_PAUSE_REFLECT_PENDING_OFFER_TELEMETRY_PATH_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy reflect/pending-offer telemetry import (${needle})`);
