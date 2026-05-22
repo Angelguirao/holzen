@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — Home reflect I/O ↔ manual-open generation-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-io.re-exports.test.ts</code> manual-open-flow parity</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend Home manual-open presentation I/O re-export test with <code>.toBe(direct)</code> identity against <code>pause-reflect-generation-manual-open-flow</code> (parity with <code>pause-home-reflect-telemetry-io</code> ↔ <code>pause-home-reflect-telemetry-flow</code>; generation umbrella must not compose manual-open use cases). Leaf imports on <code>pause-home-reflect-io.ts</code> unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: <code>pause-reflect-generation-io</code> ↔ generation-flow umbrella parity, session breath umbrella consolidated subcluster pin test, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — pending-offer telemetry I/O ↔ telemetry-flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
       <dt>Open question</dt>
-      <dd>Next: <code>pause-home-reflect-io</code> ↔ <code>pause-reflect-generation-manual-open-flow</code> presentation parity, <code>pause-reflect-generation-io</code> ↔ generation-flow umbrella parity, or Phase B subscription Tier 1 shims.</dd>
+      <dd>Superseded by Home reflect I/O manual-open-flow parity slice (same day).</dd>
     </dl>
   </article>
 
