@@ -3,6 +3,7 @@
  * Imports domain step gates and `run-pause-*` use cases directly (parity with
  * `pause-reflect-hub-io` → domain + leaf use case).
  * Wrapper delegation pins: `pause-reflect-steps-io.test.ts` (default + *WithRepository seams incl. reflection_step log);
+ * `pause-reflect-steps-io-parity.test.ts` (flow umbrella + application layer).
  * Sibling surfaces: `pause-reflect-flows-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`;
  * `pause-reflect-steps-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`;
  * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
