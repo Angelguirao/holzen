@@ -17,6 +17,8 @@ function rowFailed(result: PromiseSettledResult<unknown>): boolean {
 /**
  * Calls `pause_log_step` with `outcome_logged` for each row. Intended for expired instances
  * after DB allows retrospective outcomes (see pause migration expired rescue).
+ * Home presentation: `pause-home-bulk-hold-io.ts` imports this leaf directly (not decide-flow umbrellas).
+ * Parity pins: `pause-home-bulk-hold-io-parity.test.ts`.
  */
 export async function applyBulkHoldOutcomes(
   repository: PauseRepository,

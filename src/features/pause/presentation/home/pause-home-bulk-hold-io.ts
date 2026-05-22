@@ -1,3 +1,7 @@
+/**
+ * Home bulk-hold sheet RPC I/O — binds `apply-bulk-hold-outcomes` (ritual/decide) to `PauseRepository`.
+ * Parity pins: `pause-home-bulk-hold-io-parity.test.ts`.
+ */
 import { applyBulkHoldOutcomes } from '@/features/pause/application/use-cases/ritual/decide/apply-bulk-hold-outcomes';
 import type { BulkHoldOutcomeChoice, BulkHoldPendingPause } from '@/features/pause/domain/bulk-hold';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
