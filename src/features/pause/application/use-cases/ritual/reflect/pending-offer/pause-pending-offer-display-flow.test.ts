@@ -11,7 +11,7 @@ import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
-} from '../telemetry/pause-pending-offer-telemetry-flow';
+} from './pause-pending-offer-telemetry-flow';
 
 describe('pause-pending-offer-display-flow', () => {
   it('re-exports pending pause offer display projection', () => {

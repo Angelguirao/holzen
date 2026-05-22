@@ -30,10 +30,10 @@ vi.mock(
 );
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pending-pause-offer-telemetry',
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-telemetry',
   async (importOriginal) => {
     const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/reflect/telemetry/pending-pause-offer-telemetry')
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-telemetry')
     >();
     return {
       ...actual,
@@ -44,10 +44,10 @@ vi.mock(
 );
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-session-abandoned-telemetry',
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-session-abandoned-telemetry',
   async (importOriginal) => {
     const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-session-abandoned-telemetry')
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-session-abandoned-telemetry')
     >();
     return {
       ...actual,

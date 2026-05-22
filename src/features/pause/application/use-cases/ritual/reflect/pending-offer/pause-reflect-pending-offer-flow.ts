@@ -30,5 +30,5 @@ export {
 export {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
-} from '../telemetry/pending-pause-offer-telemetry';
-export { trackPauseSessionAbandoned } from '../telemetry/pause-session-abandoned-telemetry';
+} from './pending-pause-offer-telemetry';
+export { trackPauseSessionAbandoned } from './pause-session-abandoned-telemetry';

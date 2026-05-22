@@ -99,8 +99,8 @@ mustExist(
   'pause/application/use-cases/ritual/reflect/pending-offer/',
 );
 mustExist(
-  'src/features/pause/application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow.ts',
-  'pause/application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow.ts',
+  'src/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow.ts',
+  'pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow.ts',
 );
 mustExist(
   'src/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow.ts',
@@ -1723,17 +1723,17 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_TELEMETRY_IMPORTS = [
   "from '../application/use-cases/session/pause-session-telemetry'",
 ];
 
-/** Pending-offer PostHog — colocated under ritual/reflect/telemetry/ (not pending-offer/). */
+/** Pending-offer PostHog — colocated under ritual/reflect/pending-offer/ (not legacy telemetry/). */
 const LEGACY_PAUSE_REFLECT_PENDING_OFFER_TELEMETRY_PATH_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-telemetry',
-  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-session-abandoned-telemetry',
-  "from './application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow'",
-  "from '../application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow'",
-  "from './application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-telemetry'",
-  "from '../application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-telemetry'",
-  "from './application/use-cases/ritual/reflect/pending-offer/pause-session-abandoned-telemetry'",
-  "from '../application/use-cases/ritual/reflect/pending-offer/pause-session-abandoned-telemetry'",
+  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pending-pause-offer-telemetry',
+  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-session-abandoned-telemetry',
+  "from './application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow'",
+  "from '../application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow'",
+  "from './application/use-cases/ritual/reflect/telemetry/pending-pause-offer-telemetry'",
+  "from '../application/use-cases/ritual/reflect/telemetry/pending-pause-offer-telemetry'",
+  "from './application/use-cases/ritual/reflect/telemetry/pause-session-abandoned-telemetry'",
+  "from '../application/use-cases/ritual/reflect/telemetry/pause-session-abandoned-telemetry'",
 ];
 
 /** Reflect pending-offer I/O — import via subcluster flows only (not pause-reflect-pending-offer-flow umbrella). */
@@ -1759,16 +1759,16 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_DISPLAY_FLOW_IMPORTS = 
 
 /** Reflect pending-offer presentation — import PostHog via pause-reflect-pending-offer-telemetry-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_SUBCLUSTER_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow',
-  "from './application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow'",
-  "from '../application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow'",
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow',
+  "from './application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow'",
 ];
 
 /** Pending-offer telemetry I/O — import leaf trackers only (not pause-pending-offer-telemetry-flow). */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_IO_TELEMETRY_FLOW_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow',
-  "from './application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow'",
-  "from '../application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow'",
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow',
+  "from './application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow'",
 ];
 
 /** Reflect pending-offer presentation — import adopt/decline via pause-reflect-pending-offer-flow only. */
@@ -1789,7 +1789,7 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_DISPLAY_SUBCLUSTER_IMPORTS
 const LEGACY_PAUSE_REFLECT_PENDING_OFFER_FLOW_SUBCLUSTER_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow',
   '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow',
   "from './pause-reflect-pending-offer-rpc-flow'",
   "from '../pause-reflect-pending-offer-rpc-flow'",
   "from './pause-pending-offer-display-flow'",
@@ -1801,12 +1801,12 @@ const LEGACY_PAUSE_REFLECT_PENDING_OFFER_FLOW_SUBCLUSTER_IMPORTS = [
 
 /** Session presentation — import pending-offer PostHog leaf trackers via telemetry-io only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_TELEMETRY_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pending-pause-offer-telemetry',
-  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-session-abandoned-telemetry',
-  "from './application/use-cases/ritual/reflect/telemetry/pending-pause-offer-telemetry'",
-  "from '../application/use-cases/ritual/reflect/telemetry/pending-pause-offer-telemetry'",
-  "from './application/use-cases/ritual/reflect/telemetry/pause-session-abandoned-telemetry'",
-  "from '../application/use-cases/ritual/reflect/telemetry/pause-session-abandoned-telemetry'",
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-telemetry',
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-session-abandoned-telemetry',
+  "from './application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-telemetry'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-telemetry'",
+  "from './application/use-cases/ritual/reflect/pending-offer/pause-session-abandoned-telemetry'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pause-session-abandoned-telemetry'",
 ];
 
 /** Session presentation — adopt/decline/display via pause-reflect-pending-offer-flow (pending-offer-io only). */
@@ -2092,7 +2092,7 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_REFLECT_PENDING_OFFER_TELEMETRY_PATH_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: pending-offer telemetry I/O must import telemetry/ leaf modules (${needle})`,
+          `${rel}: pending-offer telemetry I/O must import pending-offer/ leaf modules (${needle})`,
         );
       }
     }
@@ -2429,7 +2429,7 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_REFLECT_PENDING_OFFER_TELEMETRY_PATH_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: reflect pending-offer umbrella flow must not import legacy pending-offer/ telemetry paths (${needle})`,
+          `${rel}: reflect pending-offer umbrella flow must not import legacy telemetry/ paths (${needle})`,
         );
       }
     }
@@ -2455,11 +2455,11 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
-  if (rel === 'src/features/pause/application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow.ts') {
+  if (rel === 'src/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow.ts') {
     for (const needle of LEGACY_PAUSE_REFLECT_PENDING_OFFER_TELEMETRY_PATH_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: pending-offer telemetry flow must not import legacy pending-offer/ paths (${needle})`,
+          `${rel}: pending-offer telemetry flow must not import legacy telemetry/ paths (${needle})`,
         );
       }
     }

@@ -4,6 +4,6 @@
  * subcluster flow anchors remain CI-only. Presentation parity: `pause-reflect-pending-offer-io-parity.test.ts`
  * (display + run-* + repository binding + `pauseAdoptPendingOffer` / `pauseDeclinePendingOffer` wrappers),
  * `pause-reflect-pending-offer-telemetry-io-parity.test.ts`
- * (beside `telemetry/pause-pending-offer-telemetry-flow`).
+ * (beside `pause-pending-offer-telemetry-flow` in this cluster).
  */
 export {};
