@@ -79,7 +79,8 @@ describe('pause-home-reflect-telemetry-io parity (application)', () => {
     expect(trackPauseManualCompleted).not.toBe(pauseDismissOpenPauseHomePreview);
     expect(trackOpenDismissedFromHomeTelemetryIo).not.toBe(pauseHomeManualOpenPorts);
     // Reciprocal inline pins: `presentation/reflect/telemetry/pause-home-reflect-telemetry-io-parity.test.ts`.
-    // Dedicated sibling: `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`.
+    // Dedicated siblings: `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`;
+    // `pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts` (application + presentation).
     // Presentation sibling: `presentation/reflect/generation/manual-open/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`.
   });
 
