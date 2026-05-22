@@ -23,7 +23,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
 
 /**
  * Application-layer delegation parity for steps-flow ↔ steps-io (run-* leaves + repository).
- * Wrapper distinctness sibling file: `pause-reflect-steps-flow-steps-io-wrapper-sibling-parity.test.ts`.
+ * Wrapper distinctness sibling file: `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts`.
  */
 import {
   runPauseFavoriteToggle,

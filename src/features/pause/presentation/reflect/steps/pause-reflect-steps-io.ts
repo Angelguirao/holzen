@@ -9,7 +9,7 @@
  * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`,
  * `pause-reflect-share-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`,
  * `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
- * `pause-reflect-steps-flow-steps-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow`.
+ * `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow` (application CI umbrella).
  */
 import { runPauseFavoriteToggle } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import { runPauseReflectNoteUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
