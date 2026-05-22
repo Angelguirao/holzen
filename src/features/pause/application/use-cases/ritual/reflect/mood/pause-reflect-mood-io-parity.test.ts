@@ -4,9 +4,14 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'supabasePauseRepository' },
 }));
 
+vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log', () => ({
+  runInitialEmotionSelect: vi.fn(() => Promise.resolve({ status: 'local_only' as const, ui: {} })),
+  runInitialEmotionSkip: vi.fn(() => Promise.resolve({ status: 'local_only' as const, ui: {} })),
+}));
+
 import {
-  runInitialEmotionSelect as runInitialEmotionSelectDirect,
-  runInitialEmotionSkip as runInitialEmotionSkipDirect,
+  runInitialEmotionSelect,
+  runInitialEmotionSkip,
 } from '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
 import {
   applyBriefDepthPickerRitualEntry,
@@ -18,8 +23,8 @@ import {
   resolvePauseDepthContextLineParams,
   resolvePauseSessionChromeCloseAction,
   runDeepPausePickerEntryIfPro,
-  runInitialEmotionSelect,
-  runInitialEmotionSkip,
+  runInitialEmotionSelect as runInitialEmotionSelectFromFlow,
+  runInitialEmotionSkip as runInitialEmotionSkipFromFlow,
   runPauseSessionChromeCloseAction,
 } from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow';
 import {
@@ -29,6 +34,8 @@ import {
   initialEmotionResetUi as resetUiFromMoodIo,
   initialEmotionSelectRollbackUi as rollbackUiFromMoodIo,
   isPauseSessionDepthPickerActive as isDepthPickerActiveFromMoodIo,
+  pauseInitialEmotionSelect,
+  pauseInitialEmotionSkip,
   reflectPauseRepository,
   resolvePauseDepthContextLineParams as resolveDepthLineFromMoodIo,
   resolvePauseSessionChromeCloseAction as resolveChromeCloseFromMoodIo,
@@ -49,11 +56,31 @@ describe('pause-reflect-mood-io parity', () => {
     expect(resolvePauseSessionChromeCloseAction).toBe(resolveChromeCloseFromMoodIo);
     expect(runDeepPausePickerEntryIfPro).toBe(runDeepPickerFromMoodIo);
     expect(runPauseSessionChromeCloseAction).toBe(runChromeCloseFromMoodIo);
-    expect(runInitialEmotionSelect).toBe(runInitialEmotionSelectDirect);
-    expect(runInitialEmotionSkip).toBe(runInitialEmotionSkipDirect);
+    expect(runInitialEmotionSelectFromFlow).toBe(runInitialEmotionSelect);
+    expect(runInitialEmotionSkipFromFlow).toBe(runInitialEmotionSkip);
   });
 
   it('presentation I/O binds reflectPauseRepository to public-rpc supabasePauseRepository', () => {
     expect(reflectPauseRepository).toBe(supabasePauseRepository);
+  });
+
+  it('pauseInitialEmotionSelect delegates to run-initial-emotion-log with default repository', async () => {
+    const input = {
+      pauseInstanceId: 'inst-1',
+      mood: 'calm' as const,
+      lastFeelLogKey: null,
+    };
+
+    await pauseInitialEmotionSelect(input);
+
+    expect(runInitialEmotionSelect).toHaveBeenCalledWith(supabasePauseRepository, input);
+  });
+
+  it('pauseInitialEmotionSkip delegates to run-initial-emotion-log with default repository', async () => {
+    const input = { pauseInstanceId: 'inst-2' };
+
+    await pauseInitialEmotionSkip(input);
+
+    expect(runInitialEmotionSkip).toHaveBeenCalledWith(supabasePauseRepository, input);
   });
 });
