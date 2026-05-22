@@ -1,7 +1,7 @@
 /**
  * Holzen-reflect generation presentation I/O (bound ReflectGenerator port).
  * Imports domain hook helpers and `run-reflect-generation` via
- * `pause-reflect-generation-flow` CI anchor (parity with mood/hub/steps I/O).
+ * `pause-reflect-generation-flow` CI anchor (parity with mood/hub/share I/O).
  */
 import {
   messageFromReflectGenerationResult,

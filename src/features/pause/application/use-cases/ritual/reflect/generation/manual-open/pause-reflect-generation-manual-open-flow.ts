@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for Home manual-open reflect generation (§3 / check:architecture-alignment).
  * Domain builders/types and manual-open use cases live in sibling modules.
- * Presentation: `pause-home-reflect-io.ts` imports through `pause-reflect-generation-flow` umbrella (this subcluster anchor).
+ * Presentation: `pause-home-reflect-io.ts` imports through `pause-reflect-generation-flow` (generation umbrella).
  */
 export {
   buildManualPauseCreateOrReuseParams,
