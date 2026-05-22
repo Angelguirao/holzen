@@ -28,6 +28,10 @@ import {
   runLogCompanionFullviewOpened as runFullviewOpenedFromAnalyticsIo,
 } from '@/features/pause/presentation/companion/pause-companion-analytics-io';
 import {
+  loadCompanionOrchestrateSession as loadSessionFromOrchestrationIo,
+  pauseLoadCompanionOrchestrateSession,
+} from '@/features/pause/presentation/companion/pause-companion-orchestration-io';
+import {
   runCompanionInterventionBootstrap as runInterventionFromOrchestrateIo,
   runCompanionSlotOrchestrate as runSlotOrchestrateFromOrchestrateIo,
 } from '@/features/pause/presentation/companion/pause-companion-orchestrate-io';
@@ -51,7 +55,8 @@ describe('pause-companion-analytics-io parity (application)', () => {
   /**
    * Reciprocal inline pins ↔ presentation `pause-companion-analytics-io-parity.test.ts`.
    * Dedicated sibling files: `pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts`,
-   * `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts`.
+   * `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts`,
+   * `pause-companion-analytics-orchestration-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: analytics-flow exports stay distinct from orchestrate-io', () => {
     expect(runLogCompanionFeedbackVote).not.toBe(runSlotOrchestrateFromOrchestrateIo);
@@ -59,6 +64,14 @@ describe('pause-companion-analytics-io parity (application)', () => {
     expect(runFeedbackVoteFromAnalyticsIo).not.toBe(runSlotOrchestrateFromOrchestrateIo);
     expect(runFullviewOpenedFromAnalyticsIo).not.toBe(runInterventionFromOrchestrateIo);
     expect(companionAnalyticsRepository).not.toBe(runSlotOrchestrateFromOrchestrateIo);
+    // Reciprocal inline pins: `presentation/companion/pause-companion-analytics-io-parity.test.ts`.
+  });
+
+  it('sibling cluster: analytics-io exports stay distinct from orchestration-io', () => {
+    expect(runLogCompanionFeedbackVote).not.toBe(loadSessionFromOrchestrationIo);
+    expect(runLogCompanionFullviewOpened).not.toBe(pauseLoadCompanionOrchestrateSession);
+    expect(runFeedbackVoteFromAnalyticsIo).not.toBe(pauseLoadCompanionOrchestrateSession);
+    expect(companionAnalyticsRepository).not.toBe(loadSessionFromOrchestrationIo);
     // Reciprocal inline pins: `presentation/companion/pause-companion-analytics-io-parity.test.ts`.
   });
 });
