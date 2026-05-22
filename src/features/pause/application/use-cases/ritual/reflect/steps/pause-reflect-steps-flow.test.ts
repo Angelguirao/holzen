@@ -105,6 +105,22 @@ describe('pause-reflect-steps-flow', () => {
     // Full cross-flow pins: `pause-reflect-steps-note-tag-flow-sibling-parity.test.ts`.
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-favorite-toggle-flow.test.ts` and
+   * `pause-reflection-step-log-flow.test.ts`. Dedicated sibling file:
+   * `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: favorite-toggle-flow and reflection-step-log-flow stay distinct subcluster anchors', () => {
+    expect(runFavoriteFromFavoriteFlow).not.toBe(runReflectionStepFromLogFlow);
+    expect(shouldShowFavoriteFromFavoriteFlow).not.toBe(shouldLogFromLogFlow);
+    expect(runPauseFavoriteToggle).not.toBe(runReflectionStepFromLogFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(runFavoriteFromFavoriteFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(shouldLogFromLogFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(runReflectionStepFromLogFlow);
+    expect(shouldLogFromFlow).not.toBe(runFavoriteFromFavoriteFlow);
+    expect(shouldLogFromFlow).not.toBe(shouldShowFavoriteFromFavoriteFlow);
+  });
+
   it('sibling cluster: flows-flow exports stay distinct from steps umbrella exports', () => {
     expect(runPauseFavoriteToggle).not.toBe(resolvePreflightFromFlowsFlow);
     expect(runPauseFavoriteToggle).not.toBe(runOutcomeLogFromFlowsFlow);
