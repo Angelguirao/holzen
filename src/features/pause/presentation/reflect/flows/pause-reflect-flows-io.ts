@@ -7,6 +7,7 @@
  * `pause-reflect-flows-io-parity.test.ts` (colocated in this folder; application mirror
  * `application/.../flows/pause-reflect-flows-io-parity.test.ts` beside `pause-reflect-flows-flow`),
  * `pause-reflect-flows-io-flow-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow`,
+ * `pause-reflect-flows-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow` (application + presentation),
  * `pause-reflect-flows-decide-io-sibling-parity.test.ts` ↔ `pause-session-decide-io` (application
  * `pause-reflect-flows-decide-flow-sibling-parity.test.ts` ↔ `pause-session-decide-flow`),
  * `pause-reflect-flows-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (application
