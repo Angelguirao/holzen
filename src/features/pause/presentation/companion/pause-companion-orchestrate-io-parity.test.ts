@@ -175,7 +175,7 @@ describe('pause-companion-orchestrate-io parity', () => {
     expect(trackCompanionGenerationInitiated).not.toBe(runFeedbackVoteFromAnalyticsIo);
     expect(logCompanionSlotOrchestrateInvoke).not.toBe(runFullviewOpenedFromAnalyticsIo);
     expect(runSlotOrchestrateFromOrchestrateIo).not.toBe(runFeedbackVoteFromAnalyticsIo);
-    // Reciprocal inline pins: `pause-companion-analytics-io-parity.test.ts` (presentation).
-    // Dedicated sibling: `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts` (presentation).
+    // Reciprocal inline pins: `pause-companion-analytics-io-parity.test.ts` (application + presentation).
+    // Dedicated sibling: `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts`.
   });
 });
