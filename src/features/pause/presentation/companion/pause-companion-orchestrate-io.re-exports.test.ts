@@ -23,6 +23,18 @@ import {
 } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
 import { runCompanionInterventionBootstrap as runInterventionDirect } from '@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
 import { runCompanionSlotOrchestrate as runSlotOrchestrateDirect } from '@/features/pause/application/use-cases/ritual/frame/run-companion-slot-orchestrate';
+import {
+  applyCompanionOrchestrateRetryReset as applyRetryResetFromOrchestrateFlow,
+  applyCompanionSlotOrchestrateOutcome as applyOutcomeFromOrchestrateFlow,
+  EMPTY_COMPANION_SLOT_RELAXATIONS as emptyRelaxationsFromOrchestrateFlow,
+  logCompanionSlotOrchestrateInvoke as logInvokeFromOrchestrateFlow,
+  resetInterventionIdempotency as resetInterventionFromOrchestrateFlow,
+  runCompanionInterventionBootstrap as runInterventionFromOrchestrateFlow,
+  runCompanionSlotOrchestrate as runSlotOrchestrateFromOrchestrateFlow,
+  setCompanionSlotError as setErrorFromOrchestrateFlow,
+  setCompanionSlotLoading as setLoadingFromOrchestrateFlow,
+  trackCompanionGenerationInitiated as trackGenerationFromOrchestrateFlow,
+} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow';
 import { companionOrchestrator as companionOrchestratorDirect } from './pause-companion-orchestration-io';
 
 import {
@@ -55,5 +67,18 @@ describe('pause-companion-orchestrate-io re-exports', () => {
 
   it('re-exports companionOrchestrator from orchestration I/O', () => {
     expect(companionOrchestrator).toBe(companionOrchestratorDirect);
+  });
+
+  it('presentation I/O orchestrate bindings match pause-companion-orchestrate-flow CI umbrella (leaf parity)', () => {
+    expect(applyCompanionOrchestrateRetryReset).toBe(applyRetryResetFromOrchestrateFlow);
+    expect(applyCompanionSlotOrchestrateOutcome).toBe(applyOutcomeFromOrchestrateFlow);
+    expect(EMPTY_COMPANION_SLOT_RELAXATIONS).toBe(emptyRelaxationsFromOrchestrateFlow);
+    expect(logCompanionSlotOrchestrateInvoke).toBe(logInvokeFromOrchestrateFlow);
+    expect(resetInterventionIdempotency).toBe(resetInterventionFromOrchestrateFlow);
+    expect(runCompanionInterventionBootstrap).toBe(runInterventionFromOrchestrateFlow);
+    expect(runCompanionSlotOrchestrate).toBe(runSlotOrchestrateFromOrchestrateFlow);
+    expect(setCompanionSlotError).toBe(setErrorFromOrchestrateFlow);
+    expect(setCompanionSlotLoading).toBe(setLoadingFromOrchestrateFlow);
+    expect(trackCompanionGenerationInitiated).toBe(trackGenerationFromOrchestrateFlow);
   });
 });
