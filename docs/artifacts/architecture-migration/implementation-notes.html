@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — compose pause-reflect-steps-flow from steps subclusters (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Steps umbrella flow composes favorite / note / tag / reflection_step anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-favorite-toggle-flow</code>, <code>pause-reflect-note-flow</code>, <code>pause-reflect-tag-flow</code>, and <code>pause-reflection-step-log-flow</code>; <code>pause-reflect-steps-flow</code> re-exports only through those anchors. CI guards block deep <code>domain/reflect/steps</code> and <code>run-pause-*</code> on the umbrella flow and legacy step imports in <code>presentation/reflect/steps/</code> (except <code>*-io.ts</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Four thin subcluster anchors for four mutations + two domain gates; mirrors hub/mood/flows umbrella pattern.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: compose <code>pause-reflect-share-flow</code> subclusters the same way, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — pending-offer presentation under reflect/pending-offer (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
