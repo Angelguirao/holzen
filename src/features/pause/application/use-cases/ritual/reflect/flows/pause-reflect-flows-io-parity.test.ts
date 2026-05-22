@@ -8,6 +8,10 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
 }));
 
+vi.mock('@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log', () => ({
+  runPauseOutcomeLog: vi.fn(() => Promise.resolve({ status: 'no_instance' as const })),
+}));
+
 import {
   formatReinforcementQuoteFromSession as formatQuoteDirect,
   resolvePauseDecideOutcomeFlow as resolveOutcomeDirect,
@@ -51,6 +55,8 @@ import {
   formatReinforcementQuoteFromSession as formatQuoteFromFlowsIo,
   getSessionQuote as getQuoteFromFlowsIo,
   parseScoreImpactVolatilityPct as parseVolatilityFromFlowsIo,
+  pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
   reflectPauseRepository,
   resolvePauseDecideOutcomeFlow as resolveOutcomeFromFlowsIo,
   resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromFlowsIo,
@@ -99,5 +105,22 @@ describe('pause-reflect-flows-io parity', () => {
 
   it('presentation I/O binds reflectPauseRepository to public-rpc supabasePauseRepository', () => {
     expect(reflectPauseRepository).toBe(supabasePauseRepository);
+  });
+
+  it('presentation I/O delegates decide outcome RPC to ritual/decide leaf with default repository', async () => {
+    const input = { pauseInstanceId: 'inst-1', decision: 'held' };
+
+    await pauseReflectOutcomeLog(input);
+
+    expect(runPauseOutcomeLog).toHaveBeenCalledWith(supabasePauseRepository, input);
+  });
+
+  it('pauseReflectOutcomeLogWithRepository forwards injected PauseRepository', async () => {
+    const customRepo = { port: 'injected' } as unknown as typeof supabasePauseRepository;
+    const input = { pauseInstanceId: 'inst-2', decision: 'sold' };
+
+    await pauseReflectOutcomeLogWithRepository(customRepo, input);
+
+    expect(runPauseOutcomeLog).toHaveBeenCalledWith(customRepo, input);
   });
 });

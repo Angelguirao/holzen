@@ -26137,4 +26137,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect flows-io outcome RPC delegation (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-io-parity</code> pins <code>pauseReflectOutcomeLog</code> → <code>run-pause-outcome-log</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-flows-io-parity.test.ts</code> with mocked delegation tests for <code>pauseReflectOutcomeLog</code> / <code>pauseReflectOutcomeLogWithRepository</code> (parity with <code>pause-home-bulk-hold-io-parity</code> and archive/ritual-done I/O). Document leaf import on <code>run-pause-outcome-log.ts</code> and presentation I/O header.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comments only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without session decide hooks importing flows-flow CI umbrella for RPC.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-brief-io-parity</code>, or move <code>home/bulk-hold/group-by-local-day</code> under <code>ritual/decide/</code> or <code>presentation/home/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
