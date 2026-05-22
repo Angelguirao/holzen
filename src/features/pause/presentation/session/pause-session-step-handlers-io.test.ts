@@ -18,6 +18,10 @@ import {
   computePauseStorageRitualSyncPatch,
 } from './scaffold/pause-session-scaffold-io';
 import {
+  buildPauseSessionStepRitualBundle as buildRitualFromLeaf,
+  buildPauseSessionStepShellBundle as buildShellFromLeaf,
+} from '@/features/pause/application/use-cases/session/step-bundles';
+import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
   pauseReflectTagUpdate,
@@ -29,10 +33,6 @@ import {
   shouldLogPauseReflectionStep,
   shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
-import {
-  buildPauseSessionStepRitualBundle as buildRitualFromLeaf,
-  buildPauseSessionStepShellBundle as buildShellFromLeaf,
-} from '@/features/pause/application/use-cases/session/step-bundles';
 
 describe('pause-session-step-handlers-io', () => {
   it('re-exports bundle builders from step-bundles', () => {
@@ -73,6 +73,6 @@ describe('pause-session-step-handlers-io', () => {
     expect(buildPauseSessionStepRitualBundle).not.toBe(shouldLogPauseReflectionStep);
     expect(buildPauseSessionStepShellBundle).not.toBe(pauseReflectNoteUpdateWithRepository);
     expect(buildPauseSessionStepRitualBundle).not.toBe(pauseReflectFavoriteToggleWithRepository);
-    // Reciprocal inline pins: `pause-reflect-steps-io.test.ts`.
+    // Full cross-I/O pins: `pause-session-step-handlers-steps-io-sibling-parity.test.ts`.
   });
 });

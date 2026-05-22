@@ -38,6 +38,10 @@ import {
   pauseReflectionShareImage,
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
+  buildPauseSessionStepRitualBundle,
+  buildPauseSessionStepShellBundle,
+} from '@/features/pause/presentation/session/pause-session-step-handlers-io';
+import {
   buildPauseScoreImpacts,
   formatReinforcementQuoteFromSession,
   getSessionQuote,
@@ -356,4 +360,5 @@ describe('pause-reflect-steps-io', () => {
     expect(shouldLogPauseReflectionStep).not.toBe(pauseReflectOutcomeLogWithRepository);
     // Reciprocal inline pins: `pause-reflect-flows-io.test.ts`.
   });
+
 });
