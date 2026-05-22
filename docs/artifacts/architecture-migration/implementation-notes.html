@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
+      <span>Phase A — companion orchestrate I/O via frame flow anchor (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestrate-io</code> imports slot orchestrate + intervention via <code>pause-companion-orchestrate-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>ritual/frame/</code> folder move) remains complete. Route companion orchestrate presentation I/O through <code>pause-companion-orchestrate-flow</code> instead of scattered deep <code>ritual/frame/*</code> imports (parity with reflect mood/generation/flows I/O peels on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only. <code>companionOrchestrator</code> still re-exported from <code>pause-companion-orchestration-io</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flow anchor remains a re-export barrel for <code>check:architecture-alignment</code> frame orchestrate cluster detection; I/O test mocks the anchor for the two primary use-case entrypoints.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel remaining session I/O off zero-import flow anchors when safe, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-21</span>
       <span>Phase A — reflect generation + ambience I/O via application anchors (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
