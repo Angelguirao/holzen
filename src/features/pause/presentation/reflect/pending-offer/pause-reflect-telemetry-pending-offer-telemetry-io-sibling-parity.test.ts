@@ -1,21 +1,22 @@
 import { describe, expect, it } from 'vitest';
 
-import * as pendingOfferTelemetryIo from './pause-reflect-pending-offer-telemetry-io';
+import * as pendingOfferTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
-} from './pause-reflect-telemetry-io';
-import * as sessionReflectTelemetryIo from './pause-reflect-telemetry-io';
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import * as sessionReflectTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
-} from './pause-reflect-pending-offer-telemetry-io';
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 
 /**
  * Presentation sibling parity: session reflect UI telemetry-io vs pending-offer telemetry-io
- * (parity with application `pause-reflect-telemetry-pending-offer-flow-sibling-parity.test.ts`).
+ * (colocated beside pending-offer-io; parity with application
+ * `pause-reflect-telemetry-pending-offer-flow-sibling-parity.test.ts`).
  */
 describe('pause-reflect-telemetry-io ↔ pause-reflect-pending-offer-telemetry-io sibling parity', () => {
   it('session reflect telemetry-io and pending-offer telemetry-io are distinct presentation surfaces', () => {

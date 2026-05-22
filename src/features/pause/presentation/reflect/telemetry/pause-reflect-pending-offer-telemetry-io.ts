@@ -5,7 +5,7 @@
  * Parity pins: `presentation/reflect/pending-offer/pause-reflect-pending-offer-telemetry-io-parity.test.ts` (colocated beside pending-offer-io).
  * Sibling cluster: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
  * reciprocal inline pins: `pause-reflect-pending-offer-telemetry-io.test.ts` ↔ `pause-reflect-pending-offer-io.test.ts`;
- * session reflect UI: `pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`.
+ * session reflect UI: `presentation/reflect/pending-offer/pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`.
  */
 export {
   trackPausePendingAdopted,
