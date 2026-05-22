@@ -24,13 +24,14 @@ import {
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
   trackPauseOpenDismissed,
-} from './pause-home-reflect-telemetry-io';
-import * as homeReflectTelemetryIo from './pause-home-reflect-telemetry-io';
+} from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
+import * as homeReflectTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
 
 /**
  * Presentation sibling parity: home-reflect-telemetry-io vs home-reflect-io (manual-open
- * cluster; parity with `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`
- * separating holzen-reflect generation from manual-open I/O).
+ * cluster; colocated beside pause-home-reflect-io; parity with
+ * `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` separating holzen-reflect
+ * generation from manual-open I/O).
  */
 describe('pause-home-reflect-telemetry-io ↔ pause-home-reflect-io sibling parity', () => {
   it('home-reflect-telemetry-io and home-reflect-io are distinct presentation I/O surfaces', () => {

@@ -5,8 +5,8 @@
  * Imports trackers from leaf modules directly (not generation umbrella or telemetry-flow anchor).
  * Parity pins: `pause-home-reflect-telemetry-io.test.ts`, `pause-home-reflect-telemetry-io.re-exports.test.ts`,
  * `pause-home-reflect-telemetry-io-parity.test.ts` (colocated).
- * Sibling parity: `pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`;
- * `pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts` ↔ `pause-home-reflect-io`.
+ * Sibling parity: `presentation/reflect/generation/manual-open/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`;
+ * `presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts` ↔ `pause-home-reflect-io`.
  */
 export {
   trackHomePendingPauseBannerPauseOpened,

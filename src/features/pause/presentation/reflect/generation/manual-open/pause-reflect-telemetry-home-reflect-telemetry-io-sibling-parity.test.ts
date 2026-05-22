@@ -6,18 +6,19 @@ import {
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
   trackPauseOpenDismissed,
-} from './pause-home-reflect-telemetry-io';
-import * as homeReflectTelemetryIo from './pause-home-reflect-telemetry-io';
+} from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
+import * as homeReflectTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
-} from './pause-reflect-telemetry-io';
-import * as sessionReflectTelemetryIo from './pause-reflect-telemetry-io';
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import * as sessionReflectTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 
 /**
  * Presentation sibling parity: session reflect telemetry-io vs Home manual-open telemetry-io
- * (parity with application `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`).
+ * (colocated beside pause-home-reflect-io; parity with application
+ * `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`).
  */
 describe('pause-reflect-telemetry-io ↔ pause-home-reflect-telemetry-io sibling parity', () => {
   it('session reflect telemetry-io and Home manual-open telemetry-io are distinct presentation surfaces', () => {
