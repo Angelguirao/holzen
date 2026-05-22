@@ -59,19 +59,6 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
-      <span>Phase A — hub-flow ↔ mood-flow sibling cluster pins (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-reflect-hub-flow.test.ts</code> + <code>pause-reflect-mood-flow.test.ts</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add reciprocal sibling-cluster <code>.not.toBe</code> pins so hub CI umbrella exports (<code>buildShiftEmotionFrameHubLogBundle</code>, <code>runShiftEmotionFrameHubDone</code>, …) stay distinct from mood umbrella exports (<code>runInitialEmotionSelect</code>, <code>buildFeelTilesMoodLogOptions</code>, …), matching generation↔ambience and restore↔brief-flow patterns.</dd>
-      <dt>Deviation</dt>
-      <dd>None — tests only.</dd>
-      <dt>Open question</dt>
-      <dd>Next: Tier 1 <code>holzen-query-client-ref</code> lib shim for <code>App.tsx</code>, or Phase B subscription Tier 1 shims.</dd>
-=======
       <span>Phase B — holzen-query-client-ref lib shim (Tier 1)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -82,8 +69,24 @@
       <dt>Deviation</dt>
       <dd>None — import path only; behavior parity.</dd>
       <dt>Open question</dt>
-      <dd>Next: subscription Tier 1 shim following the same pattern, or hub-flow ↔ mood-flow sibling cluster pins.</dd>
->>>>>>> b97365ed3 (refactor(app): add holzen-query-client-ref lib shim for App boot)
+      <dd>Next: Phase B subscription Tier 1 shim following the same pattern.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — hub-flow ↔ mood-flow sibling cluster pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-flow.test.ts</code> + <code>pause-reflect-mood-flow.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add reciprocal sibling-cluster <code>.not.toBe</code> pins so hub CI umbrella exports (<code>buildShiftEmotionFrameHubLogBundle</code>, <code>runShiftEmotionFrameHubDone</code>, …) stay distinct from mood umbrella exports (<code>runInitialEmotionSelect</code>, <code>buildFeelTilesMoodLogOptions</code>, …), matching generation↔ambience and restore↔brief-flow patterns.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription Tier 1 shims, or session step-transition ↔ step-handlers sibling pin.</dd>
     </dl>
   </article>
 
@@ -151,11 +154,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + flow/I/O comments only.</dd>
       <dt>Open question</dt>
-<<<<<<< HEAD
-      <dd>Next: Phase B subscription Tier 1 shims, or Tier 1 <code>holzen-query-client-ref</code> lib shim for <code>App.tsx</code>.</dd>
-=======
-      <dd>Next: hub-flow ↔ mood-flow sibling cluster pins, or Phase B subscription Tier 1 shims.</dd>
->>>>>>> b97365ed3 (refactor(app): add holzen-query-client-ref lib shim for App boot)
+      <dd>Next: Phase B subscription Tier 1 shims, or extend <code>group-bulk-hold-by-local-day.test.ts</code> coverage.</dd>
     </dl>
   </article>
 
