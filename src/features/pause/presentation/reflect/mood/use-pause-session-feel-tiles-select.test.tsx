@@ -5,13 +5,6 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 import { renderHook, act } from '@testing-library/react';
 
-vi.mock('./pause-reflect-mood-io', async () => {
-  const { buildFeelTilesMoodLogOptions } = await import(
-    '@/features/pause/domain/reflect/mood/build-feel-tiles-mood-log-options'
-  );
-  return { buildFeelTilesMoodLogOptions };
-});
-
 import { usePauseSessionFeelTilesSelect } from './use-pause-session-feel-tiles-select';
 
 describe('usePauseSessionFeelTilesSelect', () => {

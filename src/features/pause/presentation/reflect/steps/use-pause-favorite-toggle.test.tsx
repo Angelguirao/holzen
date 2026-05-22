@@ -13,12 +13,16 @@ const {
   invalidateQueriesMock: vi.fn(),
 }));
 
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectStepsRepository' },
+}));
+
 vi.mock('./pause-reflect-steps-io', async () => {
-  const { shouldShowFavoriteProHint } = await import(
-    '@/features/pause/domain/reflect/steps/favorite-toggle'
+  const actual = await vi.importActual<typeof import('./pause-reflect-steps-io')>(
+    './pause-reflect-steps-io',
   );
   return {
-    shouldShowFavoriteProHint,
+    ...actual,
     pauseReflectFavoriteToggle: pauseReflectFavoriteToggleMock,
     showPauseFavoriteProHintToast: showPauseFavoriteProHintToastMock,
   };

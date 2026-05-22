@@ -20388,4 +20388,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect steps/mood tests via presentation I/O (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route reflect hook tests through <code>pause-reflect-steps-io</code> / <code>pause-reflect-mood-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>use-pause-reflection-step-log</code>, <code>use-pause-favorite-toggle</code>, and mood chrome port-lock tests mock <code>pause-reflect-steps-io</code> with <code>importActual</code> (real <code>shouldLog*</code> gates off the flow anchor) instead of deep <code>domain/reflect/steps/*</code> imports. <code>use-pause-session-feel-tiles-select</code> test drops redundant mood-io mock — production already imports <code>buildFeelTilesMoodLogOptions</code> from <code>pause-reflect-mood-io</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Tests exercise real domain gates via presentation I/O re-exports (slightly heavier mocks than stubbing pure functions).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim, or archive decide I/O peel when pause Tier 5 is clean.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

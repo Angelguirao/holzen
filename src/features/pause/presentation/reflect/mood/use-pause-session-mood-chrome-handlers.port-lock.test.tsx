@@ -28,12 +28,10 @@ vi.mock('./pause-reflect-mood-io', async (importOriginal) => {
   };
 });
 
-vi.mock('../steps/pause-reflect-steps-io', async () => {
-  const { shouldShowFavoriteProHint } = await import(
-    '@/features/pause/domain/reflect/steps/favorite-toggle'
-  );
+vi.mock('../steps/pause-reflect-steps-io', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../steps/pause-reflect-steps-io')>();
   return {
-    shouldShowFavoriteProHint,
+    ...actual,
     pauseReflectFavoriteToggle: pauseReflectFavoriteToggleMock,
     showPauseFavoriteProHintToast: vi.fn(),
   };
