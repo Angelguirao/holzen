@@ -19998,13 +19998,15 @@
     <h3><code>presentation/reflect/telemetry/home/</code> owns <code>pause-home-reflect-telemetry-io</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Flip canonical Home PostHog I/O to <code>presentation/reflect/telemetry/home/</code>; add <code>generation/manual-open/pause-home-reflect-telemetry-io.ts</code> barrel so <code>apply-manual-pause-open-result</code> sibling imports resolve (fixes broken <code>./pause-home-reflect-telemetry-io</code> after manual-open I/O colocation). <code>presentation/home/manual-open/</code> keeps a deprecated re-export for <code>use-manual-pause-trigger</code>.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Canonical Home PostHog I/O lives at <code>presentation/reflect/telemetry/home/</code> (parity with session telemetry); removed duplicate under <code>generation/manual-open/</code> and legacy <code>home/manual-open/</code> paths. <code>apply-manual-pause-open-result</code> and Home conductors import <code>@/features/pause/presentation/reflect/telemetry/home/pause-home-reflect-telemetry-io</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import paths only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Three presentation surfaces (telemetry/home, generation/manual-open barrel, home/manual-open shim) until Home conductors import telemetry/home directly.</dd>
+      <dd>Generation/manual-open cluster imports telemetry across sibling subtrees (generation → telemetry/home).</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B cross-context Tier 1 shim, or peel archive decide I/O when pause Tier 5 is clean.</dd>
+    </dl>
+  </article>
 
   <article class="note">
     <header>
@@ -20015,11 +20017,11 @@
     <h3><code>use-manual-pause-trigger</code> under <code>presentation/reflect/generation/manual-open/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Completes presentation colocation on branch tip. Move <code>use-manual-pause-trigger</code> + test beside <code>pause-home-reflect-io</code>, telemetry I/O, and <code>use-open-pause-home-preview</code> under <code>reflect/generation/manual-open/</code>. Update <code>public-home</code> and <code>use-holzen-home-context-state</code> import paths; telemetry imports use <code>reflect/telemetry/home/</code> or generation/manual-open barrel per branch tip.</dd>
+      <dd>Completes presentation colocation on branch tip. <code>use-manual-pause-trigger</code> + test live beside <code>pause-home-reflect-io</code> and <code>use-open-pause-home-preview</code> under <code>reflect/generation/manual-open/</code>; PostHog via <code>reflect/telemetry/home/pause-home-reflect-telemetry-io</code>. <code>public-home</code> and <code>use-holzen-home-context-state</code> import paths updated; <code>presentation/home/manual-open/</code> removed.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; path only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Removes <code>presentation/home/manual-open/</code> shim for the conductor (remote had deprecated re-export until this slice).</dd>
+      <dd>Home route conductors import across reflect presentation subtrees (generation/manual-open + telemetry/home).</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B subscription Tier 1 shim, or archive decide I/O peel.</dd>
     </dl>
