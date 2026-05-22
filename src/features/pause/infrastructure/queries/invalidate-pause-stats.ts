@@ -1,6 +1,6 @@
 import { pauseArchiveListQueryPrefix } from '@/features/pause/infrastructure/queries/archive/archive-query-keys';
 import { journeyPauseInstancesQueryKey } from './journey-pause-instances-query-key';
-import { COMPLETED_PAUSE_COUNT_QUERY_KEY } from '@/features/pause/application/queries/completed-pause-count-keys';
+import { COMPLETED_PAUSE_COUNT_QUERY_KEY } from './completed-pause-count-query-key';
 import { currentPauseQueryKey } from './current-pause-query-key';
 import { pendingPauseOfferQueryKey } from '@/features/pause/infrastructure/queries/reflect/pending-offer/pending-pause-offer-query-key';
 import { getHolzenQueryClient } from '../holzen-query-client-ref';

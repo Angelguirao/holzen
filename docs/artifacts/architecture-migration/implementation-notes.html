@@ -23352,4 +23352,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate completed-pause-count query keys (backlog #1 verified, Tier 3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>completed-pause-count-query-key</code> colocated with TanStack query module (§5.2)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no use-case folder moves. Move <code>completed-pause-count-keys.ts</code> from <code>application/queries/</code> to <code>infrastructure/queries/completed-pause-count-query-key.ts</code> (parity with <code>journey-pause-instances-query-key</code> and <code>current-pause-query-key</code>). <code>completed-pause-count-query.ts</code> and <code>invalidate-pause-stats.ts</code> import the colocated module; <code>public-queries</code> re-exports unchanged via query module.</dd>
+      <dt>Deviation</dt>
+      <dd><code>pause-query-namespace</code> and <code>pause-instance-query-prefix</code> stay in <code>application/queries/</code> (shared TanStack prefixes).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mechanical colocation only; presentation hooks still import keys via <code>public-queries</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>pause-instance-query-prefix</code> or session umbrella flow/cluster markers still missing on shell / step-transition / step-handlers / terminal-entry; or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
