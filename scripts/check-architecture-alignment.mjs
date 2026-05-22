@@ -530,7 +530,14 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IMPORTS = [
   "from '../application/use-cases/session/pause-session-persisted-tab-session-flow'",
 ];
 
-/** Session persisted-tab I/O — import leaf use cases only (not persisted-tab-session-flow umbrella). */
+/** Session presentation (non-I/O) — import persisted tab session via pause-persisted-tab-session-io only (not flow anchor). */
+const LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pause-session-persisted-tab-session-flow',
+  "from './application/use-cases/session/pause-session-persisted-tab-session-flow'",
+  "from '../application/use-cases/session/pause-session-persisted-tab-session-flow'",
+];
+
+/** Persisted tab session I/O — import persisted-tab-session directly (not flow umbrella). */
 const LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IO_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/session/pause-session-persisted-tab-session-flow',
   "from './application/use-cases/session/pause-session-persisted-tab-session-flow'",
@@ -2920,12 +2927,10 @@ for (const file of walkTs(join(root, 'src'))) {
         }
       }
     }
-    if (persistedTabIoAllowlisted) {
-      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IO_FLOW_IMPORTS) {
+    if (!persistedTabIoAllowlisted) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_FLOW_IMPORTS) {
         if (text.includes(needle)) {
-          failures.push(
-            `${rel}: session persisted-tab I/O must import persisted-tab-session directly (${needle})`,
-          );
+          failures.push(`${rel}: legacy session persisted-tab-session-flow import (${needle})`);
         }
       }
     }
@@ -3049,6 +3054,18 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: session ritual-restore I/O must import via session + ritual subcluster modules (${needle})`,
+        );
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-persisted-tab-session-io.ts') ||
+    rel.endsWith('pause-persisted-tab-session-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IO_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: persisted tab session I/O must import persisted-tab-session directly (${needle})`,
         );
       }
     }
