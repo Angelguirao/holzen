@@ -164,4 +164,11 @@ describe('pause-reflect-steps-io', () => {
     expect(shouldShowFavoriteProHint).not.toBe(buildReflectionShareText);
     expect(shouldLogPauseReflectionStep).not.toBe(pauseReflectionShareImage);
   });
+
+  it('sibling cluster: note and tag wrappers stay distinct on steps-io', () => {
+    expect(pauseReflectNoteUpdate).not.toBe(pauseReflectTagUpdate);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseReflectTagUpdate).not.toBe(pauseReflectionStepLogOnce);
+    // Full pins: `pause-reflect-steps-note-tag-io-sibling-parity.test.ts`.
+  });
 });
