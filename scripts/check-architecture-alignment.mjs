@@ -689,29 +689,40 @@ const LEGACY_PAUSE_DECIDE_APPLICATION_IMPACT_TYPE_IMPORTS = [
   "from '../domain/decide/pause-impact-data",
 ];
 
-/** Screen-facing score impact — import via public-hooks (reflect flows anchor) only. */
+/** Screen-facing score impact — no deep decide/flows paths (use public-ritual-reflect for builders). */
 const LEGACY_PAUSE_SCREEN_SCORE_IMPACT_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/decide/score-impacts',
   '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-score-impacts-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow',
+  '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io',
   "from '@/features/pause/application/use-cases/ritual/decide/score-impacts'",
   "from '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation'",
   "from '@/features/pause/application/use-cases/ritual/decide/pause-decide-score-impacts-flow'",
   "from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow'",
+  "from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io'",
 ];
 
-/** public-hooks — score impact exports via pause-reflect-flows-flow only. */
+const LEGACY_PAUSE_SCREEN_SCORE_IMPACT_PUBLIC_HOOKS_IMPORTS = [
+  '@/features/pause/public-hooks',
+  "from '@/features/pause/public-hooks'",
+];
+
+/** public-hooks — score impact exports via public-ritual-reflect (flows I/O) only. */
 const LEGACY_PAUSE_PUBLIC_HOOKS_SCORE_IMPACT_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/decide/score-impacts',
   '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-score-impacts-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow',
+  '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io',
   "from './application/use-cases/ritual/decide/score-impacts'",
   "from '../application/use-cases/ritual/decide/score-impacts'",
   "from './application/use-cases/ritual/decide/score-impact-presentation'",
   "from '../application/use-cases/ritual/decide/score-impact-presentation'",
   "from './application/use-cases/ritual/decide/pause-decide-score-impacts-flow'",
   "from '../application/use-cases/ritual/decide/pause-decide-score-impacts-flow'",
+  "from './application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow'",
+  "from './presentation/reflect/flows/pause-reflect-flows-io'",
 ];
 
 /** Reflect flows I/O — import PauseImpactData via pause-session-decide-io only (not session decide-flow). */
@@ -1438,14 +1449,23 @@ for (const file of walkTs(join(root, 'src'))) {
   if (rel === 'src/features/pause/public-hooks.ts') {
     for (const needle of LEGACY_PAUSE_PUBLIC_HOOKS_SCORE_IMPACT_IMPORTS) {
       if (text.includes(needle)) {
-        failures.push(`${rel}: public-hooks score impact must import pause-reflect-flows-flow (${needle})`);
+        failures.push(`${rel}: public-hooks score impact must import public-ritual-reflect (${needle})`);
       }
     }
   }
   if (rel.startsWith('src/screens/')) {
     for (const needle of LEGACY_PAUSE_SCREEN_SCORE_IMPACT_IMPORTS) {
       if (text.includes(needle)) {
-        failures.push(`${rel}: pause score impact must import public-hooks (${needle})`);
+        failures.push(`${rel}: pause score impact must import public-ritual-reflect (${needle})`);
+      }
+    }
+    if (text.includes('buildPauseScoreImpacts')) {
+      for (const needle of LEGACY_PAUSE_SCREEN_SCORE_IMPACT_PUBLIC_HOOKS_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: ScoreImpact builders must import public-ritual-reflect, not public-hooks (${needle})`,
+          );
+        }
       }
     }
   }

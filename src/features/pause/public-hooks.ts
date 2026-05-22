@@ -132,7 +132,7 @@ export {
   type PauseScoreImpactRow,
   type ScoreImpactVariant,
   type ScoreImpactViewMode,
-} from './application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
+} from './public-ritual-reflect';
 export type { PauseBreathingHandle } from './presentation/session/breath/pause-breathing-handle';
 export type {
   PauseSessionBriefRitualBodyProps,

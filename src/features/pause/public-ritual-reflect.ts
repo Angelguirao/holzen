@@ -60,6 +60,16 @@ export {
 } from './presentation/reflect/flows/use-pause-session-reflect-and-decide';
 export { usePauseSessionDecideHandler } from './presentation/reflect/flows/use-pause-session-decide-handler';
 export { usePauseSessionDepthAndBriefCopy } from './presentation/reflect/mood/use-pause-session-depth-and-brief-copy';
+export {
+  buildPauseScoreImpacts,
+  resolveScoreImpactDisplayImpacts,
+  resolveScoreImpactViewMode,
+  scoreImpactMotionDelaySec,
+  type PauseImpactData,
+  type PauseScoreImpactRow,
+  type ScoreImpactVariant,
+  type ScoreImpactViewMode,
+} from './presentation/reflect/flows/pause-reflect-flows-io';
 export { usePauseSessionPersistToStorage } from './presentation/session/scaffold/use-pause-session-persist-to-storage';
 export { usePauseSessionRitualStorageSync } from './presentation/session/scaffold/use-pause-session-ritual-storage-sync';
 

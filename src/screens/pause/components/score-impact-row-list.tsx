@@ -1,5 +1,5 @@
 import { TrendingUp, Minus } from 'lucide-react';
-import type { PauseScoreImpactRow } from '@/features/pause/public-hooks';
+import type { PauseScoreImpactRow } from '@/features/pause/public-ritual-reflect';
 
 export type ScoreImpactRowListProps = {
   impacts: PauseScoreImpactRow[];
