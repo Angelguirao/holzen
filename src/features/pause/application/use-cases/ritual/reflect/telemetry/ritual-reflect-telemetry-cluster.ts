@@ -1,7 +1,7 @@
 /**
  * CI cluster marker for `application/use-cases/ritual/reflect/telemetry/` (§3 / check:architecture-alignment).
  * PostHog flow anchors colocate with tracker modules:
- * - Home manual-open: `generation/manual-open/pause-home-reflect-telemetry-flow`
+ * - Home manual-open: `generation/manual-open/pause-home-reflect-telemetry-flow` (composed on `generation/pause-reflect-generation-flow`)
  * - Session reflect UI: `share/pause-reflect-telemetry-flow`
  * Pending pause offer + session abandoned PostHog: `pending-offer/pause-pending-offer-telemetry-flow` (see pending-offer cluster).
  */

@@ -14,7 +14,7 @@ const trackPauseManualCompletedMock = vi.hoisted(() => vi.fn());
 const trackPauseOpenDismissedMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow',
   () => ({
     markPauseManualStartedHomeOnce: markPauseManualStartedHomeOnceMock,
     trackHomePendingPauseBannerPauseOpened: trackHomePendingPauseBannerPauseOpenedMock,
@@ -25,7 +25,7 @@ vi.mock(
 );
 
 describe('pause-home-reflect-telemetry-io (generation/manual-open cluster)', () => {
-  it('re-exports Home reflect PostHog helpers from pause-home-reflect-telemetry-flow', () => {
+  it('re-exports Home reflect PostHog helpers from pause-reflect-generation-flow', () => {
     expect(typeof markPauseManualStartedHomeOnce).toBe('function');
     expect(typeof trackHomePendingPauseBannerPauseOpened).toBe('function');
     expect(typeof trackManualPauseInstanceCreated).toBe('function');

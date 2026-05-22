@@ -20834,11 +20834,11 @@
     <h3>Umbrella <code>pause-reflect-generation-flow</code> composes holzen-reflect + manual-open subclusters</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add generation umbrella at <code>application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow.ts</code> re-exporting <code>pause-reflect-generation-hook-flow</code> and <code>pause-reflect-generation-manual-open-flow</code>. <code>pause-reflect-generation-io</code> and <code>pause-home-reflect-io</code> import through the umbrella (parity with hub/mood/steps/share). Home manual-open PostHog stays on <code>pause-home-reflect-telemetry-flow</code> via telemetry-io only.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Generation umbrella at <code>application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow.ts</code> composes <code>pause-reflect-generation-hook-flow</code>, <code>pause-reflect-generation-manual-open-flow</code>, and <code>pause-home-reflect-telemetry-flow</code>. <code>pause-reflect-generation-io</code>, <code>pause-home-reflect-io</code>, and <code>pause-home-reflect-telemetry-io</code> import through the umbrella (parity with <code>pause-reflect-share-flow</code> + telemetry subcluster). CI blocks deep generation imports under <code>presentation/reflect/generation/</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Presentation generation hooks still import holzen-reflect I/O directly; only application use-case paths route through the umbrella.</dd>
+      <dd>One more application flow module vs split presentation imports across hook-flow and manual-open-flow.</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B subscription Tier 1 shim or archive decide I/O peel.</dd>
     </dl>

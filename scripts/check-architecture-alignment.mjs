@@ -171,6 +171,10 @@ mustExist(
   'pause/presentation/reflect/generation/manual-open/',
 );
 mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow.ts',
+  'pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow.ts',
+);
+mustExist(
   'src/features/pause/presentation/reflect/steps',
   'pause/presentation/reflect/steps/',
 );
@@ -667,6 +671,50 @@ const LEGACY_PAUSE_REFLECT_SHARE_FLOW_TELEMETRY_IMPORTS = [
   "from '../pause-reflect-session-ui-telemetry'",
 ];
 
+/** Reflect generation presentation (holzen-reflect) — import via pause-reflect-generation-flow only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_HOOK_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/pause-reflect-generation-hook-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation',
+  "from './application/use-cases/ritual/reflect/generation/holzen-reflect/pause-reflect-generation-hook-flow'",
+  "from '../application/use-cases/ritual/reflect/generation/holzen-reflect/pause-reflect-generation-hook-flow'",
+  "from './application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation'",
+  "from '../application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation'",
+];
+
+/** Reflect generation presentation (manual-open) — import use cases via pause-reflect-generation-flow only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_MANUAL_OPEN_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-reflect-generation-manual-open-flow',
+  "from './application/use-cases/ritual/reflect/generation/manual-open/pause-reflect-generation-manual-open-flow'",
+  "from '../application/use-cases/ritual/reflect/generation/manual-open/pause-reflect-generation-manual-open-flow'",
+];
+
+/** Reflect generation umbrella flow — compose holzen-reflect + manual-open subclusters only. */
+const LEGACY_PAUSE_REFLECT_GENERATION_FLOW_HOOK_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation',
+  "from './holzen-reflect/run-reflect-generation'",
+  "from '../holzen-reflect/run-reflect-generation'",
+];
+
+const LEGACY_PAUSE_REFLECT_GENERATION_FLOW_MANUAL_OPEN_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/open-manual-pause-from-home',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/dismiss-open-pause-home',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-persist-silent-reflection-stub',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-open-manual-pause-silent-mode-after-create',
+  "from './manual-open/open-manual-pause-from-home'",
+  "from '../manual-open/open-manual-pause-from-home'",
+  "from './manual-open/dismiss-open-pause-home'",
+  "from '../manual-open/dismiss-open-pause-home'",
+];
+
+const LEGACY_PAUSE_REFLECT_GENERATION_FLOW_TELEMETRY_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/home-pause-actions-telemetry',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/manual-pause-trigger-telemetry',
+  "from './manual-open/home-pause-actions-telemetry'",
+  "from '../manual-open/home-pause-actions-telemetry'",
+  "from './manual-open/manual-pause-trigger-telemetry'",
+  "from '../manual-open/manual-pause-trigger-telemetry'",
+];
+
 /** Reflect hub presentation — import domain hub helpers via pause-reflect-hub-flow only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/hub/',
@@ -891,15 +939,25 @@ for (const file of walkTs(join(root, 'src'))) {
       failures.push(`${rel}: legacy flat presentation/reflect import (${needle})`);
     }
   }
-  if (
-    rel.startsWith('src/features/pause/presentation/reflect/generation/manual-open/') &&
-    !rel.endsWith('-io.ts') &&
-    !rel.endsWith('.test.ts') &&
-    !rel.endsWith('.test.tsx')
-  ) {
+  if (rel.startsWith('src/features/pause/presentation/reflect/generation/manual-open/')) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy reflect manual-open telemetry import (${needle})`);
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_MANUAL_OPEN_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy reflect generation manual-open import (${needle})`);
+      }
+    }
+  }
+  if (
+    rel.startsWith('src/features/pause/presentation/reflect/generation/') &&
+    !rel.includes('/generation/manual-open/')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_HOOK_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy reflect generation hook import (${needle})`);
       }
     }
   }
@@ -996,6 +1054,23 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_REFLECT_SHARE_FLOW_TELEMETRY_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: reflect share umbrella flow must compose telemetry subcluster (${needle})`);
+      }
+    }
+  }
+  if (rel === 'src/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow.ts') {
+    for (const needle of LEGACY_PAUSE_REFLECT_GENERATION_FLOW_HOOK_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect generation umbrella flow must compose holzen-reflect subcluster (${needle})`);
+      }
+    }
+    for (const needle of LEGACY_PAUSE_REFLECT_GENERATION_FLOW_MANUAL_OPEN_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect generation umbrella flow must compose manual-open subcluster (${needle})`);
+      }
+    }
+    for (const needle of LEGACY_PAUSE_REFLECT_GENERATION_FLOW_TELEMETRY_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect generation umbrella flow must compose manual-open telemetry subcluster (${needle})`);
       }
     }
   }
