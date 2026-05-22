@@ -21528,4 +21528,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — companion frame UI I/O via subcluster flows (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>pause-companion-frame-ui-io</code> through frame UI subcluster flow anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>ritual/frame/</code>) remains complete — no folder moves. Peel <code>pause-companion-frame-ui-io</code> off <code>pause-companion-frame-ui-flow</code> to import <code>pause-companion-full-view-ui-flow</code> and <code>pause-companion-section-visibility-flow</code> directly (parity with orchestrate-io subcluster peels). CI blocks umbrella and leaf imports on frame-ui I/O; section/full-view hooks still import frame-ui-io only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-companion-frame-ui-flow</code> remains the compose anchor for <code>check:architecture-alignment</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim, reflect steps I/O umbrella peel, or session shell I/O flow peels.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
