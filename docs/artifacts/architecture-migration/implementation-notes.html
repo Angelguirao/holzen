@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — colocate ritual-restore-io parity beside presentation cluster (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-ritual-restore-io-parity.test.ts</code> → <code>presentation/session/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Colocate ritual-restore I/O parity beside <code>pause-session-ritual-restore-io.ts</code> (parity with step-handlers, decide, and other session I/O colocation slices).</dd>
+      <dt>Deviation</dt>
+      <dd>None — file move + comment anchors only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>pause-session-persisted-tab-session-io-parity.test.ts</code> under <code>presentation/session/</code>, or Phase B Tier 1 shim scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — colocate session step-handlers I/O parity beside presentation cluster (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

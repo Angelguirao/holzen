@@ -3,7 +3,7 @@
  * Cluster marker: `pause-session-ritual-restore-cluster.ts` (empty export; unit-tested).
  * Composes breath/decide/frame/brief restore helpers for presentation I/O (leaf modules, not session *-flow umbrellas).
  * Presentation: `pause-session-ritual-restore-io.ts` imports sibling subcluster modules directly (not this umbrella).
- * Parity pins: `pause-session-ritual-restore-io.re-exports.test.ts` and `pause-session-ritual-restore-io-parity.test.ts`.
+ * Parity pins: `pause-session-ritual-restore-io.re-exports.test.ts` and colocated `presentation/session/pause-session-ritual-restore-io-parity.test.ts`.
  */
 export { mapPersistedStep } from '@/features/pause/domain/session/map-persisted-step';
 export {
