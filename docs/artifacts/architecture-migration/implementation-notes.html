@@ -31443,4 +31443,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate companion frame-ui-io parity beside presentation cluster (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-frame-ui-io-parity.test.ts</code> → <code>presentation/companion/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) folder moves remain complete. Colocate frame UI I/O parity beside <code>pause-companion-frame-ui-io.ts</code> (parity with session breath-io and reflect ambience-io colocation). Imports <code>pause-companion-frame-ui-flow</code> CI umbrella for <code>.toBe</code> identity pins only; production frame UI I/O keeps ritual/frame leaf imports. Application analytics/orchestrate/orchestration-io parity tests remain under <code>application/.../ritual/frame/</code> until next slice.</dd>
+      <dt>Deviation</dt>
+      <dd>None — file move + comment anchors only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>pause-companion-orchestrate-io-parity</code>, <code>pause-companion-orchestration-io-parity</code>, or <code>pause-companion-analytics-io-parity</code> under <code>presentation/companion/</code>, or Phase B Tier 1 shim scan.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

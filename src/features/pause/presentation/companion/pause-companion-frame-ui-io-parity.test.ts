@@ -1,3 +1,8 @@
+/**
+ * Presentation I/O parity (colocated beside `pause-companion-frame-ui-io.ts`).
+ * Imports `pause-companion-frame-ui-flow` CI umbrella for `.toBe` identity pins only — production frame UI I/O keeps ritual/frame leaf imports.
+ * Application flow/sibling parity tests stay under `application/.../ritual/frame/`.
+ */
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -15,7 +20,7 @@ import {
   isCompanionFullViewSlotSettled as isSettledFromFrameUiIo,
   isCompanionSectionVisible as isVisibleFromFrameUiIo,
   pauseSeverityToOrchestrateNumber as severityToOrchestrateFromFrameUiIo,
-} from '@/features/pause/presentation/companion/pause-companion-frame-ui-io';
+} from './pause-companion-frame-ui-io';
 
 describe('pause-companion-frame-ui-io parity', () => {
   it('presentation I/O frame UI exports match frame-ui-flow CI umbrella', () => {
