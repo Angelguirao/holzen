@@ -50,6 +50,11 @@ import {
   resolvePauseSessionReflectAndDecidePreflight,
   runPauseOutcomeLog,
 } from '../flows/pause-reflect-flows-flow';
+import {
+  runPauseFavoriteToggle as runFavoriteFromStepsFlow,
+  runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
+  shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
+} from '../steps/pause-reflect-steps-flow';
 
 import {
   buildManualPauseCreateOrReuseParams as buildCreateOrReuseFromFlow,
@@ -139,5 +144,12 @@ describe('pause-reflect-generation-flow', () => {
     expect(runReflectGeneration).not.toBe(runPauseOutcomeLog);
     expect(openManualFromFlow).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(dismissFromFlow).not.toBe(runPauseOutcomeLog);
+  });
+
+  it('sibling cluster: steps-flow exports stay distinct from generation umbrella exports', () => {
+    expect(runReflectGeneration).not.toBe(runFavoriteFromStepsFlow);
+    expect(runReflectGeneration).not.toBe(runReflectionStepFromStepsFlow);
+    expect(openManualFromFlow).not.toBe(runFavoriteFromStepsFlow);
+    expect(dismissFromFlow).not.toBe(shouldLogFromStepsFlow);
   });
 });

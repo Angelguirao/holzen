@@ -5,7 +5,8 @@
  * Sibling cluster anchor: `pause-reflect-ambience-flow` (frame-focus bed; presentation via `pause-reflect-ambience-io`).
  * Presentation: `pause-reflect-generation-io.ts` and `pause-home-reflect-io.ts` import leaf modules directly.
  * `pause-reflect-generation-io.re-exports.test.ts` and `pause-reflect-generation-io-parity.test.ts`;
- * sibling pins: `pause-reflect-ambience-flow.test.ts`, `pause-reflect-generation-flow.test.ts` ↔ `pause-reflect-flows-flow.test.ts`.
+ * sibling pins: `pause-reflect-ambience-flow.test.ts`, `pause-reflect-generation-flow.test.ts` ↔ `pause-reflect-flows-flow.test.ts`;
+ * `pause-reflect-steps-generation-flow-sibling-parity.test.ts` (steps-flow ↔ generation-flow).
  * may import this umbrella for parity; production generation I/O keeps leaf imports.
  */
 export {
