@@ -8,6 +8,10 @@ import { buildPauseSessionScaffoldRitualDerived as buildDerivedFromLeaf } from '
 import { computePauseStorageRitualSyncPatch as computeSyncFromLeaf } from '@/features/pause/application/use-cases/session/storage-ritual-sync';
 import { hasPersistablePauseSessionAnchor as hasAnchorFromDomain } from '@/features/pause/domain/session/persisted-session-guards';
 import {
+  buildPauseSessionStepRitualBundle,
+  buildPauseSessionStepShellBundle,
+} from '@/features/pause/presentation/session/pause-session-step-handlers-io';
+import {
   buildPauseSessionPersistSnapshot,
   buildPauseSessionScaffoldRitualDerived,
   computePauseStorageRitualSyncPatch,
@@ -89,5 +93,15 @@ describe('pause-session-scaffold-io', () => {
     expect(buildPauseSessionScaffoldRitualDerived).not.toBe(computeHydrationFromShellIo);
     expect(hasPersistablePauseSessionAnchor).not.toBe(computeHydrationFromShellIo);
     expect(hasPersistablePauseSessionAnchor).not.toBe(hasPersistedFromShellIo);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-step-handlers-io.test.ts` (scaffold-io cluster).
+   * Dedicated sibling file: `pause-session-scaffold-step-handlers-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: step-handlers-io exports stay distinct from scaffold-io', () => {
+    expect(buildPauseSessionPersistSnapshot).not.toBe(buildPauseSessionStepShellBundle);
+    expect(computePauseStorageRitualSyncPatch).not.toBe(buildPauseSessionStepRitualBundle);
+    // Full cross-I/O pins: `pause-session-scaffold-step-handlers-io-sibling-parity.test.ts`.
   });
 });
