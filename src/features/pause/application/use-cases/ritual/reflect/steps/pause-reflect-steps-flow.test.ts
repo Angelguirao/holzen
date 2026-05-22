@@ -74,6 +74,10 @@ import {
   startPauseReflectFrameFocusAmbience as startAmbienceFromAmbienceFlow,
   stopPauseReflectFrameFocusAmbience as stopAmbienceFromAmbienceFlow,
 } from '../ambience/pause-reflect-ambience-flow';
+import {
+  buildPauseSessionStepRitualBundle as buildRitualBundleFromHandlersFlow,
+  buildPauseSessionStepShellBundle as buildShellBundleFromHandlersFlow,
+} from '@/features/pause/application/use-cases/session/pause-session-step-handlers-flow';
 
 describe('pause-reflect-steps-flow', () => {
   it('re-exports step mutations and domain gates from leaf modules', () => {
@@ -278,5 +282,19 @@ describe('pause-reflect-steps-flow', () => {
     expect(runPauseReflectTagUpdate).not.toBe(stopAmbienceFromAmbienceFlow);
     expect(shouldShowFavoriteFromFlow).not.toBe(stopAmbienceFromAmbienceFlow);
     // Full cross-flow pins: `pause-reflect-steps-ambience-flow-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-step-handlers-flow.test.ts` (reflect step RPC vs session bundles).
+   * Dedicated sibling file: `pause-session-step-handlers-steps-flow-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: step-handlers-flow exports stay distinct from steps umbrella exports', () => {
+    expect(runPauseFavoriteToggle).not.toBe(buildShellBundleFromHandlersFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(buildRitualBundleFromHandlersFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(buildShellBundleFromHandlersFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(buildRitualBundleFromHandlersFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(buildShellBundleFromHandlersFlow);
+    expect(shouldLogFromFlow).not.toBe(buildRitualBundleFromHandlersFlow);
+    // Reciprocal inline pins: `pause-session-step-handlers-flow.test.ts`.
   });
 });
