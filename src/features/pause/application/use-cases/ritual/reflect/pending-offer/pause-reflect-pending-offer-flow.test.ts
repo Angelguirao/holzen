@@ -4,8 +4,8 @@ import { getPendingPauseOfferDisplay } from './pending-pause-offer-display';
 import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
-} from './pending-pause-offer-telemetry';
-import { trackPauseSessionAbandoned } from './pause-session-abandoned-telemetry';
+} from '../telemetry/pending-pause-offer-telemetry';
+import { trackPauseSessionAbandoned } from '../telemetry/pause-session-abandoned-telemetry';
 import {
   getPendingPauseOfferDisplay as getDisplayFromFlow,
   runAdoptPendingPauseOffer,

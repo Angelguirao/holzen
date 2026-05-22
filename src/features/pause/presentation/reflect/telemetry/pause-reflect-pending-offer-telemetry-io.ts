@@ -6,5 +6,5 @@
 export {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
-} from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-telemetry';
-export { trackPauseSessionAbandoned } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-session-abandoned-telemetry';
+} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pending-pause-offer-telemetry';
+export { trackPauseSessionAbandoned } from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-session-abandoned-telemetry';
