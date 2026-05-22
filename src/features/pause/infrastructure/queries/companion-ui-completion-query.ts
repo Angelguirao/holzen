@@ -2,7 +2,7 @@ import { loadCompanionUiCompletionState } from '@/features/pause/infrastructure/
 import {
   COMPANION_UI_COMPLETION_NONE_QUERY_KEY,
   companionUiCompletionQueryKey,
-} from '@/features/pause/application/queries/companion-ui-completion-query-key';
+} from '@/features/pause/infrastructure/queries/companion/companion-ui-completion-query-key';
 
 export {
   COMPANION_UI_COMPLETION_NONE_QUERY_KEY,

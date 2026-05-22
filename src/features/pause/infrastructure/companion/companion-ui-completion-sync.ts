@@ -11,7 +11,7 @@ export { EMPTY_COMPANION_UI_COMPLETION } from '@/features/pause/application/use-
 export {
   companionUiCompletionQueryKey,
   invalidateCompanionUiCompletionQuery,
-} from '@/features/pause/application/queries/companion-ui-completion-query-key';
+} from '@/features/pause/infrastructure/queries/companion/companion-ui-completion-query-key';
 
 export async function loadCompanionUiCompletionState(
   pauseInstanceId: string,

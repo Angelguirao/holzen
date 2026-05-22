@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { invalidateCompanionUiCompletionQuery } from '@/features/pause/infrastructure/queries/companion/companion-ui-completion-query-key';
 import {
-  invalidateCompanionUiCompletionQuery,
   loadCompanionOrchestrateSession,
   nextExpandedWithLazyFetch,
   persistCompanionUiStepCompletion,

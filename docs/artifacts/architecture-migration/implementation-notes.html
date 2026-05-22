@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — companion UI completion query keys under infrastructure/queries/companion (Tier 3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>companion-ui-completion-query-key</code> colocated with TanStack query modules (§5.2)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1–#2 folder moves remain complete. Move <code>companion-ui-completion-query-key.ts</code> from <code>application/queries/</code> to <code>infrastructure/queries/companion/</code> (parity with <code>infrastructure/queries/archive/</code> and <code>reflect/pending-offer/</code> keys). <code>pause-query-namespace</code> stays in <code>application/queries/</code> until a dedicated namespace slice.</dd>
+      <dt>Deviation</dt>
+      <dd>Frame flow CI anchors no longer re-export <code>invalidateCompanionUiCompletionQuery</code> (application cannot import infrastructure per <code>check:feature-imports</code>); unit tests import the key module directly; presentation/RPC I/O import infrastructure directly.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other <code>application/queries/*-keys.ts</code> modules unchanged this slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate remaining query key modules under <code>infrastructure/queries/</code>, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — frame orchestration/session/section leaf flow regression tests (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

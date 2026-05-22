@@ -2,7 +2,7 @@
  * Companion orchestration presentation I/O (session load, UI completion, favorites, expansion).
  * Imports ritual/frame leaf modules directly (parity with `pause-companion-orchestrate-io` peel).
  */
-import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
+import { invalidateCompanionUiCompletionQuery } from '@/features/pause/infrastructure/queries/companion/companion-ui-completion-query-key';
 import {
   loadCompanionOrchestrateSession,
   type LoadCompanionOrchestrateSessionInput,
