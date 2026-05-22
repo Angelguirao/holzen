@@ -98,6 +98,10 @@ mustExist(
   'pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow.ts',
 );
 mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow.ts',
+  'pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow.ts',
+);
+mustExist(
   'src/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow.ts',
   'pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow.ts',
 );
@@ -746,11 +750,31 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/share/pause-reflect-session-ui-telemetry'",
 ];
 
+/** Reflect share umbrella flow — compose orchestration subcluster only (no deep image/text/channel flows). */
+const LEGACY_PAUSE_REFLECT_SHARE_FLOW_ORCHESTRATION_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-image-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-text-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-channel-urls-flow',
+  "from './pause-reflection-share-image-flow'",
+  "from '../pause-reflection-share-image-flow'",
+  "from './pause-reflection-share-text-flow'",
+  "from '../pause-reflection-share-text-flow'",
+  "from './pause-reflection-share-channel-urls-flow'",
+  "from '../pause-reflection-share-channel-urls-flow'",
+];
+
 /** Reflect share umbrella flow — compose telemetry subcluster only (no deep session-ui tracker). */
 const LEGACY_PAUSE_REFLECT_SHARE_FLOW_TELEMETRY_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-session-ui-telemetry',
   "from './pause-reflect-session-ui-telemetry'",
   "from '../pause-reflect-session-ui-telemetry'",
+];
+
+/** Reflect share presentation — import PostHog via pause-reflect-share-flow only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_SUBCLUSTER_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow',
+  "from './application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow'",
+  "from '../application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow'",
 ];
 
 /** Reflect generation presentation (holzen-reflect) — import via pause-reflect-generation-flow only. */
@@ -1178,6 +1202,11 @@ for (const file of walkTs(join(root, 'src'))) {
         failures.push(`${rel}: reflect share umbrella flow must compose subcluster anchors (${needle})`);
       }
     }
+    for (const needle of LEGACY_PAUSE_REFLECT_SHARE_FLOW_ORCHESTRATION_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect share umbrella flow must compose orchestration subcluster (${needle})`);
+      }
+    }
     for (const needle of [
       '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image',
       '@/features/pause/application/use-cases/ritual/reflect/share/deliver-reflection-share-image',
@@ -1354,6 +1383,16 @@ for (const file of walkTs(join(root, 'src'))) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy reflect share telemetry import (${needle})`);
+        }
+      }
+    }
+    if (
+      rel.endsWith('pause-reflect-telemetry-io.ts') ||
+      rel.endsWith('pause-reflect-telemetry-io.test.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_SUBCLUSTER_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: share telemetry I/O must import via pause-reflect-share-flow (${needle})`);
         }
       }
     }
