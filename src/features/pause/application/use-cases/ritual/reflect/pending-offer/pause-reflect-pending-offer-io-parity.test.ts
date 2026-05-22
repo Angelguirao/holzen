@@ -22,7 +22,9 @@ import {
 import {
   getPendingPauseOfferDisplay as getDisplayFromPendingOfferIo,
   pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
   pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
   reflectPauseRepository,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
@@ -39,6 +41,14 @@ describe('pause-reflect-pending-offer-io parity', () => {
 
   it('presentation I/O binds reflectPauseRepository to public-rpc supabasePauseRepository', () => {
     expect(reflectPauseRepository).toBe(supabasePauseRepository);
+  });
+
+  it('presentation I/O exports adopt/decline port wrappers distinct from leaf use cases', () => {
+    expect(typeof pauseAdoptPendingOfferWithRepository).toBe('function');
+    expect(typeof pauseDeclinePendingOfferWithRepository).toBe('function');
+    expect(pauseAdoptPendingOffer).not.toBe(runAdoptDirect);
+    expect(pauseDeclinePendingOffer).not.toBe(runDeclineDirect);
+    expect(pauseAdoptPendingOffer).not.toBe(pauseDeclinePendingOffer);
   });
 
   it('pauseAdoptPendingOffer delegates to run-adopt-pending-pause-offer with default repository', async () => {
