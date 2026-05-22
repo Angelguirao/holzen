@@ -5,6 +5,7 @@
  * Imports `pause-reflect-mood-flow` CI umbrella for `.toBe` identity pins only —
  * production mood I/O keeps domain mood helpers + `run-initial-emotion-log` leaf imports.
  * Presentation mirror: `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
+ * Telemetry-io sibling: reciprocal inline pins ↔ `telemetry/pause-reflect-telemetry-io-parity.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
 
@@ -79,21 +80,36 @@ import {
 import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
   pauseReflectionStepLogOnce,
+  pauseReflectFavoriteToggleWithRepository,
+  pauseReflectNoteUpdateWithRepository,
+  pauseReflectionStepLogOnceWithRepository,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   formatReinforcementQuoteFromSession,
   pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
+  pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
+  resolveShiftFrameHubDonePresentation,
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
@@ -204,13 +220,17 @@ describe('pause-reflect-mood-io parity (application)', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (application).
+   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-hub-mood-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: hub-io shift-frame exports stay distinct from mood-io wrappers', () => {
     expect(pauseInitialEmotionSelect).not.toBe(pauseShiftEmotionFrameHubDone);
     expect(pauseInitialEmotionSkip).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
     expect(buildFeelTilesFromMoodIo).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(resolveChromeCloseFromMoodIo).not.toBe(resolveShiftFrameHubDonePresentation);
     expect(reflectPauseRepository).not.toBe(pauseShiftEmotionFrameHubDone);
+    // Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts`.
   });
 
   /**
@@ -225,29 +245,57 @@ describe('pause-reflect-mood-io parity (application)', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application).
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-steps-mood-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: steps-io exports stay distinct from mood-io wrappers', () => {
     expect(pauseInitialEmotionSelect).not.toBe(pauseReflectFavoriteToggle);
     expect(pauseInitialEmotionSkip).not.toBe(pauseReflectNoteUpdate);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseReflectFavoriteToggleWithRepository);
+    expect(pauseInitialEmotionSkipWithRepository).not.toBe(pauseReflectNoteUpdateWithRepository);
     expect(buildFeelTilesMoodLogOptions).not.toBe(pauseReflectionStepLogOnce);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(pauseReflectTagUpdate);
+    expect(pauseInitialEmotionSelect).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (application).
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-flows-mood-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: flows-io reflect+decide exports stay distinct from mood-io wrappers', () => {
     expect(pauseInitialEmotionSelect).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(pauseInitialEmotionSkip).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseReflectOutcomeLogWithRepository);
     expect(buildFeelTilesMoodLogOptions).not.toBe(formatReinforcementQuoteFromSession);
+    expect(pauseInitialEmotionSkip).not.toBe(pauseReflectOutcomeLogWithRepository);
+    // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts`.
   });
 
   /**
-   * Reciprocal inline pins ↔ `presentation/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+   * Reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: pending-offer-io exports stay distinct from mood-io wrappers', () => {
     expect(pauseInitialEmotionSelect).not.toBe(pauseAdoptPendingOffer);
+    expect(pauseInitialEmotionSkip).not.toBe(pauseDeclinePendingOffer);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseAdoptPendingOfferWithRepository);
+    expect(pauseInitialEmotionSkipWithRepository).not.toBe(pauseDeclinePendingOfferWithRepository);
     expect(buildFeelTilesMoodLogOptions).not.toBe(getPendingPauseOfferDisplay);
+    // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: session reflect telemetry-io exports stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(trackPauseReflectPostItOpen);
+    expect(pauseInitialEmotionSkip).not.toBe(trackPauseReflectShareTap);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(trackPauseReflectWallpaperTap);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(trackPauseReflectPostItOpen);
+    expect(reflectPauseRepository).not.toBe(trackPauseReflectShareTap);
+    // Reciprocal inline pins: `pause-reflect-telemetry-io-parity.test.ts`.
   });
 
   /**
