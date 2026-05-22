@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
+  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
 import {
@@ -43,10 +44,29 @@ import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
+  buildShiftEmotionFrameHubLogBundle,
+  pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
+  reflectPauseRepository as hubReflectPauseRepository,
+  resolveShiftFrameHubDonePresentation,
+} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
+  messageFromReflectGenerationResult,
+  pauseReflectGeneration,
+  reflectGenerationPrerequisite,
+  reflectGenerator,
+  runReflectGeneration,
+  shouldCommitReflectGeneration,
+} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 
 /**
  * Presentation I/O parity (colocated beside `pause-reflect-ambience-io.ts`).
  * Imports `pause-reflect-ambience-flow` CI umbrella for `.toBe` identity pins only — production ambience I/O keeps domain leaf imports.
+ * Hub-io sibling pins: `pause-reflect-ambience-hub-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (hub cluster).
+ * Generation-io sibling pins: `pause-reflect-ambience-generation-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (generation cluster).
  * Steps-io cross-surface: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application).
  * Pending-offer cross-surface: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` (application + presentation);
@@ -109,5 +129,36 @@ describe('pause-reflect-ambience-io parity', () => {
     expect(startFromAmbienceIo).not.toBe(getPendingPauseOfferDisplay);
     expect(stopFromAmbienceIo).not.toBe(reflectPauseRepository);
     // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (frame-focus bed vs shift-frame hub).
+   * Dedicated sibling file: `pause-reflect-ambience-hub-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: hub-io exports stay distinct from ambience-io frame-focus bed', () => {
+    expect(startFromAmbienceIo).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(stopFromAmbienceIo).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(startFromAmbienceIo).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(stopFromAmbienceIo).not.toBe(resolveShiftFrameHubDonePresentation);
+    expect(startFromAmbienceIo).not.toBe(hubReflectPauseRepository);
+    expect(stopFromAmbienceIo).not.toBe(pauseShiftEmotionFrameHubDone);
+    // Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts`.
+    // Full pins: `pause-reflect-ambience-hub-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (frame-focus bed vs holzen-reflect).
+   * Dedicated sibling file: `pause-reflect-ambience-generation-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: generation-io exports stay distinct from ambience-io frame-focus bed', () => {
+    expect(startFromAmbienceIo).not.toBe(runReflectGeneration);
+    expect(stopFromAmbienceIo).not.toBe(pauseReflectGeneration);
+    expect(startFromAmbienceIo).not.toBe(reflectGenerationPrerequisite);
+    expect(stopFromAmbienceIo).not.toBe(shouldCommitReflectGeneration);
+    expect(startFromAmbienceIo).not.toBe(messageFromReflectGenerationResult);
+    expect(stopFromAmbienceIo).not.toBe(reflectGenerator);
+    expect(startFromAmbienceIo).not.toBe(pauseReflectGeneration);
+    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
+    // Full pins: `pause-reflect-ambience-generation-io-sibling-parity.test.ts`.
   });
 });

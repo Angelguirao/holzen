@@ -21,7 +21,9 @@ import {
 /**
  * Presentation sibling parity: ambience-io vs hub-io (parity with
  * `pause-reflect-ambience-generation-io-sibling-parity.test.ts` and
- * `pause-reflect-mood-hub-io-sibling-parity.test.ts`).
+ * `pause-reflect-mood-hub-io-sibling-parity.test.ts`;
+ * complements reciprocal inline pins on `pause-reflect-ambience-io-parity.test.ts` ↔
+ * `pause-reflect-hub-io-parity.test.ts`).
  */
 describe('pause-reflect-ambience-io ↔ pause-reflect-hub-io sibling parity', () => {
   it('ambience-io and hub-io are distinct presentation I/O surfaces', () => {
