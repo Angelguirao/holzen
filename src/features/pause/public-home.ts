@@ -24,7 +24,7 @@ export {
   buildZenModeHomeRouteProps,
   type BuildZenModeHomeRoutePropsInput,
   type ZenModeHomeRoutePropsProjection,
-} from './application/use-cases/home/build-zen-mode-home-route-props';
+} from './presentation/home/zen-mode/build-zen-mode-home-route-props';
 export { usePauseArrivalAudio } from './presentation/home/use-pause-arrival-audio';
 export {
   usePauseCardProjection,

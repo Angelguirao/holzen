@@ -1,6 +1,6 @@
 import type { CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import { DEFAULT_COMPANIONS } from '@/features/pause/domain/session-model';
-import type { PauseSeverity } from '../session/location-state';
+import type { PauseSeverity } from '@/features/pause/application/use-cases/session/location-state';
 
 /**
  * Companion prefs for Zen reflection Home — breathing only; other slots off until `/pause`.
