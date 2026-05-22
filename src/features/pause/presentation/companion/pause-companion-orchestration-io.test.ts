@@ -45,8 +45,11 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabaseCompanionOrchestrator: { port: 'companionOrchestrator' },
 }));
 
+import { loadCompanionOrchestrateSession as loadSessionDirect } from '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session';
+import { runToggleCompanionLibraryFavorite as toggleFavoriteDirect } from '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite';
 import {
   companionPauseRepository,
+  loadCompanionOrchestrateSession,
   nextExpandedWithLazyFetch,
   pauseLoadCompanionOrchestrateSession,
   pauseToggleCompanionLibraryFavorite,
@@ -101,5 +104,12 @@ describe('pause-companion-orchestration-io', () => {
       },
     );
     expect(companionPauseRepository).toEqual({ port: 'companionPauseRepository' });
+  });
+
+  it('exports orchestration port-bound wrappers distinct from ritual/frame leaf use cases', () => {
+    expect(pauseLoadCompanionOrchestrateSession).not.toBe(loadSessionDirect);
+    expect(pauseLoadCompanionOrchestrateSession).not.toBe(loadCompanionOrchestrateSession);
+    expect(pauseToggleCompanionLibraryFavorite).not.toBe(toggleFavoriteDirect);
+    expect(nextExpandedWithLazyFetch).toBeDefined();
   });
 });

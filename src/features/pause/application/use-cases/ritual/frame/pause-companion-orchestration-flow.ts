@@ -3,7 +3,8 @@
  * Composes ritual/frame leaf modules (not orchestration subcluster flow anchors).
  * Sibling CI anchor: `pause-companion-section-visibility-flow` (visibility only; composed by frame-ui-flow).
  * Presentation: `pause-companion-orchestration-io.ts` imports leaf modules directly.
- * Parity: `pause-companion-orchestration-section-visibility-sibling-parity.test.ts`.
+ * Parity: `pause-companion-orchestration-section-visibility-sibling-parity.test.ts`;
+ * `pause-companion-orchestrate-orchestration-flow-sibling-parity.test.ts` ↔ `pause-companion-orchestrate-flow`.
  */
 import {
   loadCompanionOrchestrateSession,
