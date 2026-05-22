@@ -98,6 +98,10 @@ import {
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import {
+  buildReflectionShareText,
+  pauseReflectionShareImage,
+} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 describe('pause-reflect-hub-io parity (application)', () => {
@@ -234,5 +238,17 @@ describe('pause-reflect-hub-io parity (application)', () => {
     expect(reflectPauseRepository).not.toBe(trackPauseReflectShareTap);
     expect(pauseShiftEmotionFrameHubDone).not.toBe(trackPauseReflectWallpaperTap);
     // Reciprocal inline pins: `pause-reflect-telemetry-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `share/pause-reflect-share-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-hub-share-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: share-io builders stay distinct from hub-io wrappers', () => {
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseReflectionShareImage);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(buildReflectionShareText);
+    expect(buildLogBundleFromHubIo).not.toBe(pauseReflectionShareImage);
+    expect(resolvePresentationFromHubIo).not.toBe(buildReflectionShareText);
+    // Reciprocal inline pins: `share/pause-reflect-share-io-parity.test.ts`.
   });
 });

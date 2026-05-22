@@ -100,6 +100,10 @@ import {
   buildPauseSessionStepShellBundle,
 } from '@/features/pause/presentation/session/pause-session-step-handlers-io';
 import {
+  buildReflectionShareText,
+  pauseReflectionShareImage,
+} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
+import {
   reflectionStepSessionStorage,
   supabasePauseRepository,
 } from '@/features/pause/public-rpc';
@@ -347,5 +351,17 @@ describe('pause-reflect-steps-io parity (application)', () => {
     expect(pauseReflectionStepLogOnce).not.toBe(buildPauseSessionStepShellBundle);
     expect(reflectPauseRepository).not.toBe(buildPauseSessionStepRitualBundle);
     // Reciprocal inline pins: `presentation/session/pause-session-step-handlers-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `share/pause-reflect-share-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-share-steps-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: share-io builders stay distinct from steps-io wrappers', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseReflectionShareImage);
+    expect(pauseReflectNoteUpdate).not.toBe(buildReflectionShareText);
+    expect(pauseReflectionStepLogOnce).not.toBe(pauseReflectionShareImage);
+    expect(pauseReflectFavoriteToggleWithRepository).not.toBe(buildReflectionShareText);
+    // Reciprocal inline pins: `share/pause-reflect-share-io-parity.test.ts`.
   });
 });
