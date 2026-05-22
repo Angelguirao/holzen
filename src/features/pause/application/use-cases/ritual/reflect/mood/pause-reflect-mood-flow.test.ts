@@ -60,6 +60,12 @@ import {
   resolveShiftFrameHubDonePresentation as resolveHubPresentationFromHubFlow,
   runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
 } from '../hub/pause-reflect-hub-flow';
+import {
+  formatReinforcementQuoteFromSession as formatQuoteFromFlowsFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromFlowsFlow,
+  resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
+  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
+} from '../flows/pause-reflect-flows-flow';
 
 describe('pause-reflect-mood-flow', () => {
   it('re-exports mood helpers from domain + run-initial-emotion-log leaf module', () => {
@@ -112,5 +118,14 @@ describe('pause-reflect-mood-flow', () => {
     expect(buildFeelTilesFromFlow).not.toBe(resolveHubPresentationFromHubFlow);
     expect(runChromeCloseFromFlow).not.toBe(runShiftHubDoneFromHubFlow);
     expect(applyBriefFromFlow).not.toBe(resolveHubPresentationFromHubFlow);
+  });
+
+  it('sibling cluster: flows-flow exports stay distinct from mood umbrella exports', () => {
+    expect(runInitialEmotionSelect).not.toBe(resolvePreflightFromFlowsFlow);
+    expect(runInitialEmotionSkip).not.toBe(resolveAfterGenFromFlowsFlow);
+    expect(runInitialEmotionSelect).not.toBe(runOutcomeLogFromFlowsFlow);
+    expect(buildFeelTilesFromFlow).not.toBe(formatQuoteFromFlowsFlow);
+    expect(runChromeCloseFromFlow).not.toBe(runOutcomeLogFromFlowsFlow);
+    expect(applyBriefFromFlow).not.toBe(resolvePreflightFromFlowsFlow);
   });
 });

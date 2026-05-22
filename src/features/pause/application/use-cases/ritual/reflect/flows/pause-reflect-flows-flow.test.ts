@@ -60,6 +60,11 @@ import {
   runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
   shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
 } from '../steps/pause-reflect-steps-flow';
+import {
+  buildFeelTilesMoodLogOptions as buildFeelTilesFromMoodFlow,
+  runInitialEmotionSelect as runEmotionSelectFromMoodFlow,
+  runInitialEmotionSkip as runEmotionSkipFromMoodFlow,
+} from '../mood/pause-reflect-mood-flow';
 
 import {
   pauseReflectOutcomeLog,
@@ -150,6 +155,15 @@ describe('pause-reflect-flows-flow', () => {
     expect(runOutcomeLogFromFlow).not.toBe(runReflectionStepFromStepsFlow);
     expect(formatQuoteFromFlow).not.toBe(shouldLogFromStepsFlow);
     expect(resolveAfterGenFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+  });
+
+  it('sibling cluster: mood-flow exports stay distinct from flows umbrella exports', () => {
+    expect(resolvePreflightFromFlow).not.toBe(runEmotionSelectFromMoodFlow);
+    expect(resolveAfterGenFromFlow).not.toBe(runEmotionSkipFromMoodFlow);
+    expect(runOutcomeLogFromFlow).not.toBe(runEmotionSelectFromMoodFlow);
+    expect(formatQuoteFromFlow).not.toBe(buildFeelTilesFromMoodFlow);
+    expect(resolveOutcomeFlowFromFlow).not.toBe(runEmotionSkipFromMoodFlow);
+    expect(buildImpactsFromFlow).not.toBe(buildFeelTilesFromMoodFlow);
   });
 
   it('flows CI umbrella re-exports runPauseOutcomeLog as ritual/decide leaf (not presentation port wrappers)', () => {
