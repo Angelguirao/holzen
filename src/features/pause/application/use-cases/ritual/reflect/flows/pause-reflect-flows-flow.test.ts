@@ -10,6 +10,23 @@ import {
 } from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow';
 
 import {
+  formatReinforcementQuoteFromSession as formatQuoteFromOutcomeViewFlow,
+  resolvePauseDecideOutcomeFlow as resolveOutcomeFlowFromOutcomeViewFlow,
+} from '../../decide/pause-decide-outcome-view-flow';
+import { runPauseOutcomeLog as runOutcomeLogFromOutcomeLogFlow } from '../../decide/pause-decide-outcome-log-flow';
+import {
+  showPauseOutcomeNotCompletedToast as showNotCompletedFromOutcomeToastFlow,
+  showPauseOutcomeSaveFailedToast as showSaveFailedFromOutcomeToastFlow,
+} from '../../decide/pause-decide-outcome-toast-flow';
+import {
+  buildPauseScoreImpacts as buildImpactsFromScoreImpactsFlow,
+  parseScoreImpactVolatilityPct as parseVolatilityFromScoreImpactsFlow,
+  resolveScoreImpactDisplayImpacts as resolveDisplayImpactsFromScoreImpactsFlow,
+  resolveScoreImpactViewMode as resolveViewModeFromScoreImpactsFlow,
+  scoreImpactMotionDelaySec as motionDelayFromScoreImpactsFlow,
+} from '../../decide/pause-decide-score-impacts-flow';
+import { getSessionQuote as getQuoteFromWisdomQuotesFlow } from '../../decide/pause-decide-wisdom-quotes-flow';
+import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
 } from '../../decide/outcome-toast';
@@ -24,6 +41,11 @@ import {
   scoreImpactMotionDelaySec,
 } from '../../decide/score-impact-presentation';
 import { getSessionQuote } from '../../decide/wisdom-quotes';
+
+import {
+  resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromAndDecideViewFlow,
+  resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromAndDecideViewFlow,
+} from './pause-reflect-and-decide-view-flow';
 
 import {
   buildPauseScoreImpacts as buildImpactsFromFlow,
@@ -70,5 +92,21 @@ describe('pause-reflect-flows-flow', () => {
     expect(resolveDisplayImpactsFromFlow).toBe(resolveScoreImpactDisplayImpacts);
     expect(resolveViewModeFromFlow).toBe(resolveScoreImpactViewMode);
     expect(motionDelayFromFlow).toBe(scoreImpactMotionDelaySec);
+  });
+
+  it('umbrella bindings match flows subcluster CI anchors (domain leaf parity)', () => {
+    expect(resolvePreflightFromFlow).toBe(resolvePreflightFromAndDecideViewFlow);
+    expect(resolveAfterGenFromFlow).toBe(resolveAfterGenFromAndDecideViewFlow);
+    expect(formatQuoteFromFlow).toBe(formatQuoteFromOutcomeViewFlow);
+    expect(resolveOutcomeFlowFromFlow).toBe(resolveOutcomeFlowFromOutcomeViewFlow);
+    expect(runOutcomeLogFromFlow).toBe(runOutcomeLogFromOutcomeLogFlow);
+    expect(showNotCompletedFromFlow).toBe(showNotCompletedFromOutcomeToastFlow);
+    expect(showSaveFailedFromFlow).toBe(showSaveFailedFromOutcomeToastFlow);
+    expect(getQuoteFromFlow).toBe(getQuoteFromWisdomQuotesFlow);
+    expect(buildImpactsFromFlow).toBe(buildImpactsFromScoreImpactsFlow);
+    expect(parseVolatilityFromFlow).toBe(parseVolatilityFromScoreImpactsFlow);
+    expect(resolveDisplayImpactsFromFlow).toBe(resolveDisplayImpactsFromScoreImpactsFlow);
+    expect(resolveViewModeFromFlow).toBe(resolveViewModeFromScoreImpactsFlow);
+    expect(motionDelayFromFlow).toBe(motionDelayFromScoreImpactsFlow);
   });
 });

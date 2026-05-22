@@ -24283,4 +24283,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect flows umbrella ↔ subcluster anchor parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-flow</code> pins umbrella exports to flows/decide CI anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-flows-flow.test.ts</code> with <code>.toBe</code> identity against <code>pause-reflect-and-decide-view-flow</code> and decide subcluster anchors (<code>pause-decide-outcome-view-flow</code>, outcome-log/toast/wisdom-quotes, score-impacts). Umbrella still imports domain + ritual/decide leaves directly per <code>check:architecture-alignment</code>; presentation <code>pause-reflect-flows-io</code> unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without rewiring umbrella imports (CI forbids umbrella → subcluster flow imports).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim, or <code>ritual/frame</code> cluster-marker / orchestration umbrella pins.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
