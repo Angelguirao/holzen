@@ -648,13 +648,21 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_DOMAIN_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/share/reflection-share-canvas'",
 ];
 
-/** Reflect steps presentation — import step mutations/gates via pause-reflect-steps-flow only. */
+/** Reflect steps I/O — import via steps subcluster flows only (not pause-reflect-steps-flow umbrella). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_IO_UMBRELLA_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow',
+  "from './application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow'",
+  "from '../application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow'",
+];
+
+/** Reflect steps presentation — import step mutations/gates via pause-reflect-steps-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/steps/',
   '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle',
   '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update',
   '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update',
   '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow',
   '@/features/pause/application/use-cases/ritual/reflect/steps/pause-favorite-toggle-flow',
   '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-note-flow',
   '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-tag-flow',
@@ -1657,6 +1665,18 @@ for (const file of walkTs(join(root, 'src'))) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy reflect hub import (${needle})`);
         }
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-reflect-steps-io.ts') ||
+    rel.endsWith('pause-reflect-steps-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_IO_UMBRELLA_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect steps I/O must import via steps subcluster flows (${needle})`,
+        );
       }
     }
   }

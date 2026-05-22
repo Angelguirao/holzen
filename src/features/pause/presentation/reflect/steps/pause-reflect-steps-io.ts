@@ -1,16 +1,18 @@
 /**
  * Reflect step mutation presentation I/O (bound PauseRepository + step storage).
- * Imports run-* use cases and domain step gates via `pause-reflect-steps-flow` CI anchor
- * (parity with `pause-reflect-telemetry-io` → telemetry flow).
+ * Imports steps subcluster flow anchors directly (parity with
+ * `pause-reflect-mood-io` → mood subcluster flows).
  */
 import {
   runPauseFavoriteToggle,
-  runPauseReflectNoteUpdate,
-  runPauseReflectTagUpdate,
+  shouldShowFavoriteProHint,
+} from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-favorite-toggle-flow';
+import { runPauseReflectNoteUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-note-flow';
+import { runPauseReflectTagUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-tag-flow';
+import {
   runPauseReflectionStepLogOnce,
   shouldLogPauseReflectionStep,
-  shouldShowFavoriteProHint,
-} from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflection-step-log-flow';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import {
   reflectionStepSessionStorage,
