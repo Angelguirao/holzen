@@ -19,6 +19,14 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabaseReflectGenerator: { port: 'reflectGenerator' },
 }));
 
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/dismiss-open-pause-home',
+  () => ({
+    dismissOpenPauseHome: vi.fn(() => Promise.resolve()),
+  }),
+);
+
+import { dismissOpenPauseHome as dismissDirect } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/dismiss-open-pause-home';
 import {
   buildManualPauseCreateOrReuseParams,
   buildManualPauseMarketContext,
@@ -40,6 +48,8 @@ import {
   dismissOpenPauseHome as dismissFromHomeIo,
   MANUAL_PAUSE_VOLATILITY_TEMPLATE as volatilityFromHomeIo,
   openManualPauseFromHome as openFromHomeIo,
+  pauseDismissOpenPauseHomePreview,
+  pauseDismissOpenPauseHomePreviewWithRepository,
   pauseHomeManualOpenPorts,
   runOpenManualPauseSilentModeAfterCreate as silentAfterCreateFromHomeIo,
   runPersistSilentReflectionStub as persistStubFromHomeIo,
@@ -76,6 +86,47 @@ describe('pause-home-reflect-io parity (application)', () => {
     expect(pauseHomeManualOpenPorts.reflect).toBe(supabaseReflectGenerator);
   });
 
+  it('presentation I/O exports dismiss preview wrappers distinct from manual-open leaf', () => {
+    expect(typeof pauseDismissOpenPauseHomePreview).toBe('function');
+    expect(typeof pauseDismissOpenPauseHomePreviewWithRepository).toBe('function');
+    expect(pauseDismissOpenPauseHomePreview).not.toBe(dismissDirect);
+    expect(pauseDismissOpenPauseHomePreview).not.toBe(dismissFromHomeIo);
+    expect(pauseDismissOpenPauseHomePreviewWithRepository).not.toBe(dismissDirect);
+    expect(pauseDismissOpenPauseHomePreview).not.toBe(pauseDismissOpenPauseHomePreviewWithRepository);
+  });
+
+  it('pauseDismissOpenPauseHomePreview delegates to dismiss-open-pause-home with default repository', async () => {
+    const clearPreview = vi.fn();
+
+    await pauseDismissOpenPauseHomePreview({ hasUser: true, clearPreview });
+
+    expect(dismissDirect).toHaveBeenCalledWith(true, {
+      clearPreview,
+      repository: pauseHomeManualOpenPorts.repository,
+    });
+  });
+
+  it('pauseDismissOpenPauseHomePreviewWithRepository forwards injected PauseRepository', async () => {
+    const clearPreview = vi.fn();
+    const customRepo = { port: 'injected-app' } as unknown as typeof supabasePauseRepository;
+
+    await pauseDismissOpenPauseHomePreviewWithRepository(customRepo, {
+      hasUser: false,
+      clearPreview,
+    });
+
+    expect(dismissDirect).toHaveBeenCalledWith(false, {
+      clearPreview,
+      repository: customRepo,
+    });
+  });
+
+  it('home-reflect-io dismiss wrappers stay distinct from manual-open-flow leaf exports', () => {
+    expect(pauseDismissOpenPauseHomePreview).not.toBe(dismissOpenPauseHome);
+    expect(pauseDismissOpenPauseHomePreviewWithRepository).not.toBe(dismissOpenPauseHome);
+    // Reciprocal inline pins: `presentation/reflect/generation/manual-open/pause-home-reflect-io-parity.test.ts`.
+  });
+
   /**
    * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`.
@@ -88,6 +139,7 @@ describe('pause-home-reflect-io parity (application)', () => {
     expect(buildCreateOrReuseFromHomeIo).not.toBe(messageFromReflectGenerationResult);
     expect(pauseHomeManualOpenPorts).not.toBe(reflectGenerator);
     expect(persistStubFromHomeIo).not.toBe(shouldCommitReflectGeneration);
+    expect(pauseDismissOpenPauseHomePreview).not.toBe(pauseReflectGeneration);
     // Reciprocal inline pins: `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
   });
 });
