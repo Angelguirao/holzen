@@ -3,6 +3,7 @@
  * Colocated under `presentation/reflect/telemetry/` (parity with application `ritual/reflect/telemetry/pause-reflect-session-ui-telemetry`).
  * Imports trackers from `pause-reflect-session-ui-telemetry` directly (parity with
  * `pause-reflect-generation-io` leaf imports; not share umbrella or telemetry-flow anchor).
+ * Sibling parity: `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`.
  */
 export {
   trackPauseReflectPostItOpen,
