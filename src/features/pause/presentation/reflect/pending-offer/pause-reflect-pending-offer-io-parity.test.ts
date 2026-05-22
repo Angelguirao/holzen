@@ -22,6 +22,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/pending-offer/run
   runDeclinePendingPauseOffer: vi.fn(() => Promise.resolve({ status: 'ok' as const })),
 }));
 
+import { getPendingPauseOfferDisplay as getDisplayDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display';
 import { runAdoptPendingPauseOffer as runAdoptDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer';
 import { runDeclinePendingPauseOffer as runDeclineDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer';
 import { getPendingPauseOfferDisplay as getDisplayFromDisplayFlow } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow';
@@ -48,8 +49,10 @@ import * as pendingOfferTelemetryIo from '@/features/pause/presentation/reflect/
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import {
   pauseReflectGeneration,
+  reflectGenerator,
   runReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import * as generationIo from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   dismissOpenPauseHome,
   openManualPauseFromHome,
@@ -124,6 +127,8 @@ describe('pause-reflect-pending-offer-io parity', () => {
   it('pending-offer CI umbrella composes the same run-* leaf use cases as presentation I/O', () => {
     expect(runAdoptPendingPauseOffer).toBe(runAdoptDirect);
     expect(runDeclinePendingPauseOffer).toBe(runDeclineDirect);
+    expect(getPendingPauseOfferDisplay).toBe(getDisplayDirect);
+    expect(getDisplayFromPendingOfferIo).toBe(getDisplayDirect);
   });
 
   it('presentation I/O binds reflectPauseRepository to public-rpc supabasePauseRepository', () => {
@@ -188,6 +193,21 @@ describe('pause-reflect-pending-offer-io parity', () => {
     expect(reflectPauseRepository).not.toBe(trackAbandonedFromPendingOfferTelemetryIo);
     // Reciprocal inline pins: `pause-reflect-pending-offer-io.test.ts`;
     // dedicated sibling: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
+  });
+
+  it('presentation pending-offer-io stays off generation-io holzen-reflect exports', () => {
+    expect('runReflectGeneration' in pendingOfferIo).toBe(false);
+    expect('pauseReflectGeneration' in pendingOfferIo).toBe(false);
+    expect('reflectGenerator' in pendingOfferIo).toBe(false);
+    expect('pauseAdoptPendingOffer' in generationIo).toBe(false);
+    expect('pauseDeclinePendingOffer' in generationIo).toBe(false);
+    expect('getPendingPauseOfferDisplay' in generationIo).toBe(false);
+    expect('reflectPauseRepository' in generationIo).toBe(false);
+    expect(pauseAdoptPendingOffer).not.toBe(runReflectGeneration);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseReflectGeneration);
+    expect(reflectPauseRepository).not.toBe(reflectGenerator);
+    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts` (application + presentation).
+    // Dedicated sibling: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`.
   });
 
   /**
