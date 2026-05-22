@@ -48,6 +48,9 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
  * reciprocal inline pins ↔ `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
  * Steps-io ↔ pending-offer-io: `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+ * Steps-io ↔ share-io: `pause-reflect-share-steps-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` and `pause-reflect-steps-io.test.ts` ↔
+ * `pause-reflect-share-io.test.ts`.
  */
 import {
   runPauseFavoriteToggle,

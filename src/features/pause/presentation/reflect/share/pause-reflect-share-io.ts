@@ -7,7 +7,10 @@
  * `pause-reflect-share-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (application mirror:
  * `application/.../share/pause-reflect-share-pending-offer-io-sibling-parity.test.ts`; reciprocal inline:
  * `pause-reflect-share-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`);
- * `pause-reflect-share-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
+ * `pause-reflect-share-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (application mirror:
+ * `application/.../share/pause-reflect-share-steps-io-sibling-parity.test.ts`; reciprocal inline:
+ * `pause-reflect-share-io-parity.test.ts` ↔ `pause-reflect-steps-io-parity.test.ts` and
+ * `pause-reflect-share-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`);
  * `pause-reflect-share-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io` (application mirror:
  * `application/.../share/pause-reflect-share-telemetry-io-sibling-parity.test.ts`; reciprocal inline:
  * `pause-reflect-share-io-parity.test.ts` ↔ `pause-reflect-telemetry-io-parity.test.ts`);

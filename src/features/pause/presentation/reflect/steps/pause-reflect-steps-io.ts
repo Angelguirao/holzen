@@ -13,7 +13,8 @@
  * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-hub-io.test.ts`;
  * presentation parity: `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-hub-io-parity.test.ts` (hub cluster);
- * `pause-reflect-share-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`;
+ * `pause-reflect-share-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io` (application mirror:
+ * `application/.../share/pause-reflect-share-steps-io-sibling-parity.test.ts`);
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-share-io.test.ts`,
  * `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-generation-io.test.ts`,
  * `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-pending-offer-io.test.ts`,

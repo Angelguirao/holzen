@@ -28,6 +28,7 @@ import {
 
 /**
  * Presentation sibling parity: share-io vs steps-io (parity with application
+ * `pause-reflect-share-steps-io-sibling-parity.test.ts` and flow-level
  * `pause-reflect-steps-share-flow-sibling-parity.test.ts`).
  */
 describe('pause-reflect-share-io ↔ pause-reflect-steps-io sibling parity', () => {
