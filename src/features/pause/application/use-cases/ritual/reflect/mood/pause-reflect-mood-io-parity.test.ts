@@ -61,7 +61,24 @@ import {
   runPauseSessionChromeCloseAction as runChromeCloseFromMoodIo,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
+import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
+  pauseReflectFavoriteToggleWithRepository,
+  pauseReflectNoteUpdateWithRepository,
+  pauseReflectTagUpdateWithRepository,
+  pauseReflectionStepLogOnceWithRepository,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 
+/**
+ * Application-layer mood I/O parity. Steps-io sibling pins:
+ * `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts`.
+ */
 describe('pause-reflect-mood-io parity', () => {
   it('mood CI umbrella composes the same domain mood leaves as presentation I/O', () => {
     expect(buildFeelTilesMoodLogOptions).toBe(buildFeelTilesDirect);
@@ -160,5 +177,21 @@ describe('pause-reflect-mood-io parity', () => {
     );
 
     expect(runInitialEmotionSkip).toHaveBeenCalledWith(customRepository, input);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (mood RPC vs step mutations).
+   * Dedicated sibling file: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: steps-io exports stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseInitialEmotionSkip).not.toBe(pauseReflectNoteUpdate);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(pauseReflectTagUpdate);
+    expect(pauseInitialEmotionSelect).not.toBe(pauseReflectionStepLogOnce);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseReflectFavoriteToggleWithRepository);
+    expect(pauseInitialEmotionSkipWithRepository).not.toBe(pauseReflectNoteUpdateWithRepository);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(shouldShowFavoriteProHint);
+    expect(pauseInitialEmotionSkip).not.toBe(shouldLogPauseReflectionStep);
+    // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
   });
 });

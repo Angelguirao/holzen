@@ -35,6 +35,8 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
  * `pause-reflect-steps-note-tag-flow-sibling-parity.test.ts`.
  * Flows-io cross-surface: `pause-reflect-flows-io-parity.test.ts` ↔ this file;
  * `pause-reflect-flows-steps-io-sibling-parity.test.ts` (application + presentation).
+ * Steps-io ↔ mood-io: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts`.
  */
 import {
   runPauseFavoriteToggle,
@@ -61,6 +63,13 @@ import {
   shouldLogPauseReflectionStep as shouldLogFromStepsIo,
   shouldShowFavoriteProHint as shouldShowFromStepsIo,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
+  buildFeelTilesMoodLogOptions,
+  pauseInitialEmotionSelect,
+  pauseInitialEmotionSkip,
+  pauseInitialEmotionSelectWithRepository,
+  pauseInitialEmotionSkipWithRepository,
+} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
@@ -262,6 +271,23 @@ describe('pause-reflect-steps-io parity', () => {
     expect(shouldLogFromStepsIo).not.toBe(resolveShiftFrameHubDonePresentation);
     expect(pauseReflectFavoriteToggle).not.toBe(resolveShiftFrameHubDonePresentation);
     // Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (step RPC wrappers vs initial-emotion mood).
+   * Dedicated sibling file: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: mood-io exports stay distinct from steps-io wrappers', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseInitialEmotionSelect);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseInitialEmotionSkip);
+    expect(pauseReflectTagUpdate).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(pauseReflectionStepLogOnce).not.toBe(pauseInitialEmotionSelect);
+    expect(pauseReflectFavoriteToggleWithRepository).not.toBe(pauseInitialEmotionSelectWithRepository);
+    expect(pauseReflectNoteUpdateWithRepository).not.toBe(pauseInitialEmotionSkipWithRepository);
+    expect(pauseReflectionStepLogOnceWithRepository).not.toBe(pauseInitialEmotionSkip);
+    expect(shouldShowFromStepsIo).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(shouldLogFromStepsIo).not.toBe(pauseInitialEmotionSkip);
+    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
   });
 
   /**
