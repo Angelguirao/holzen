@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
+import { runShiftEmotionFrameHubDone as runShiftHubDoneDirect } from '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
 import {
   pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
   reflectPauseRepository,
   resolveShiftFrameHubDonePresentation,
 } from './pause-reflect-hub-io';
@@ -44,5 +46,26 @@ describe('pause-reflect-hub-io', () => {
       lastShiftLogKey: null,
     });
     expect(reflectPauseRepository).toEqual({ port: 'reflectPauseRepository' });
+  });
+
+  it('exports hub RPC wrapper distinct from leaf use case', () => {
+    expect(typeof pauseShiftEmotionFrameHubDone).toBe('function');
+    expect(typeof pauseShiftEmotionFrameHubDoneWithRepository).toBe('function');
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(runShiftHubDoneDirect);
+  });
+
+  it('pauseShiftEmotionFrameHubDoneWithRepository forwards injected repository', async () => {
+    const customRepo = { port: 'injected-hub' };
+    runShiftEmotionFrameHubDoneMock.mockResolvedValue({ status: 'advance', logKey: 'k2' });
+
+    await pauseShiftEmotionFrameHubDoneWithRepository(customRepo as never, {
+      pauseInstanceId: 'pi-custom',
+      lastShiftLogKey: 'prev',
+    });
+
+    expect(runShiftEmotionFrameHubDoneMock).toHaveBeenCalledWith(customRepo, {
+      pauseInstanceId: 'pi-custom',
+      lastShiftLogKey: 'prev',
+    });
   });
 });

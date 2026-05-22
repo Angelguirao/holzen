@@ -17,6 +17,7 @@ import {
 import {
   buildShiftEmotionFrameHubLogBundle as buildLogBundleFromHubIo,
   pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
   reflectPauseRepository,
   resolveShiftFrameHubDonePresentation as resolvePresentationFromHubIo,
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
@@ -33,11 +34,29 @@ describe('pause-reflect-hub-io parity', () => {
     expect(reflectPauseRepository).toBe(supabasePauseRepository);
   });
 
+  it('presentation I/O exports hub RPC wrapper distinct from leaf use case', () => {
+    expect(typeof pauseShiftEmotionFrameHubDone).toBe('function');
+    expect(typeof pauseShiftEmotionFrameHubDoneWithRepository).toBe('function');
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(runShiftHubDoneDirect);
+  });
+
   it('pauseShiftEmotionFrameHubDone delegates to run-shift-emotion-frame-hub-done with default repository', async () => {
     const input = { pauseInstanceId: 'inst-hub', lastShiftLogKey: null };
 
     await pauseShiftEmotionFrameHubDone(input);
 
     expect(runShiftHubDoneDirect).toHaveBeenCalledWith(supabasePauseRepository, input);
+  });
+
+  it('pauseShiftEmotionFrameHubDoneWithRepository delegates with injected repository', async () => {
+    const customRepository = { port: 'customPauseRepository' };
+    const input = { pauseInstanceId: 'inst-hub-custom', lastShiftLogKey: 'key-1' };
+
+    await pauseShiftEmotionFrameHubDoneWithRepository(
+      customRepository as unknown as typeof supabasePauseRepository,
+      input,
+    );
+
+    expect(runShiftHubDoneDirect).toHaveBeenCalledWith(customRepository, input);
   });
 });
