@@ -48,6 +48,11 @@ vi.mock('@/features/pause/public-rpc', () => ({
 import { loadCompanionOrchestrateSession as loadSessionDirect } from '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session';
 import { runToggleCompanionLibraryFavorite as toggleFavoriteDirect } from '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite';
 import {
+  COMPANION_FULL_VIEW_BREATHING_ROOM_MS,
+  getCompanionSectionVisibility,
+  isCompanionSectionVisible,
+} from './pause-companion-frame-ui-io';
+import {
   companionPauseRepository,
   loadCompanionOrchestrateSession,
   nextExpandedWithLazyFetch,
@@ -111,5 +116,13 @@ describe('pause-companion-orchestration-io', () => {
     expect(pauseLoadCompanionOrchestrateSession).not.toBe(loadCompanionOrchestrateSession);
     expect(pauseToggleCompanionLibraryFavorite).not.toBe(toggleFavoriteDirect);
     expect(nextExpandedWithLazyFetch).toBeDefined();
+  });
+
+  it('sibling cluster: frame-ui-io exports stay distinct from orchestration-io', () => {
+    expect(pauseLoadCompanionOrchestrateSession).not.toBe(getCompanionSectionVisibility);
+    expect(pauseToggleCompanionLibraryFavorite).not.toBe(isCompanionSectionVisible);
+    expect(nextExpandedWithLazyFetch).not.toBe(COMPANION_FULL_VIEW_BREATHING_ROOM_MS);
+    // Reciprocal inline pins: `pause-companion-frame-ui-io.test.ts`;
+    // dedicated sibling: `pause-companion-frame-ui-orchestration-io-sibling-parity.test.ts`.
   });
 });
