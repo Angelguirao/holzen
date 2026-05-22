@@ -3,7 +3,7 @@
  * Composes domain step gates + run-* leaf use cases (not steps subcluster flow anchors).
  * Re-export parity: pause-reflect-steps-io.re-exports.test.ts may import this anchor (CI exempt).
  * Wrapper delegation: `pause-reflect-steps-io-parity.test.ts` (presentation I/O → run-* leaves);
- * application mirror: colocated `pause-reflect-steps-io-parity.test.ts` (umbrella + sibling pins; delegation stays presentation-only).
+ * application mirror: colocated `pause-reflect-steps-io-parity.test.ts` (umbrella + sibling pins + default/*WithRepository delegation).
  * Sibling pins: pause-reflect-steps-flow.test.ts (umbrella vs steps subcluster flow anchors);
  * pause-reflect-steps-flow.test.ts ↔ pause-reflect-flows-flow.test.ts (reciprocal inline pins);
  * pause-reflect-steps-flow.test.ts ↔ pause-reflect-pending-offer-flow.test.ts (inline sibling pins incl. declined telemetry);
