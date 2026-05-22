@@ -46,6 +46,7 @@ import {
   shouldClearReflectGenerationLoading as shouldClearLoadingFromGenerationIo,
   shouldCommitReflectGeneration as shouldCommitFromGenerationIo,
 } from './pause-reflect-generation-io';
+import * as generationIo from './pause-reflect-generation-io';
 
 import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
 import {
@@ -104,8 +105,12 @@ import {
   dismissOpenPauseHome,
   openManualPauseFromHome,
   pauseDismissOpenPauseHomePreview,
+  pauseDismissOpenPauseHomePreviewWithRepository,
   pauseHomeManualOpenPorts,
+  runOpenManualPauseSilentModeAfterCreate,
+  runPersistSilentReflectionStub,
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
+import * as homeReflectIo from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
@@ -316,19 +321,34 @@ describe('pause-reflect-generation-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `manual-open/pause-home-reflect-io-parity.test.ts`.
+   * Reciprocal inline pins ↔ `generation/manual-open/pause-home-reflect-io-parity.test.ts` (application + presentation).
    * Dedicated sibling file: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: home-reflect-io exports stay distinct from generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(openManualPauseFromHome);
     expect(runReflectGeneration).not.toBe(dismissOpenPauseHome);
     expect(reflectGenerator).not.toBe(pauseHomeManualOpenPorts);
+    expect(reflectGenerationPrerequisite).not.toBe(runOpenManualPauseSilentModeAfterCreate);
     expect(reflectGenerationPrerequisite).not.toBe(buildManualPauseMarketContext);
+    expect(resolveReflectGenerationPrefetch).not.toBe(runPersistSilentReflectionStub);
     expect(resolveReflectGenerationPrefetch).not.toBe(buildManualPauseOpenParams);
-    expect(messageFromReflectGenerationResult).not.toBe(openManualPauseFromHome);
     expect(shouldCommitReflectGeneration).not.toBe(pauseDismissOpenPauseHomePreview);
-    // Reciprocal inline pins: `presentation/reflect/generation/manual-open/pause-home-reflect-io-parity.test.ts`,
-    // `application/.../manual-open/pause-home-reflect-io-parity.test.ts`.
+    expect(messageFromReflectGenerationResult).not.toBe(pauseDismissOpenPauseHomePreviewWithRepository);
+    expect(messageFromReflectGenerationResult).not.toBe(openManualPauseFromHome);
+    expect(pauseReflectGeneration).not.toBe(dismissOpenPauseHome);
+    expect(pauseHomeManualOpenPorts.reflect).toBe(reflectGenerator);
+    // Reciprocal inline pins: `generation/manual-open/pause-home-reflect-io-parity.test.ts`.
+    // Full pins: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`.
+  });
+
+  it('presentation generation-io stays off home-reflect-io manual-open wrappers', () => {
+    expect('openManualPauseFromHome' in generationIo).toBe(false);
+    expect('pauseDismissOpenPauseHomePreview' in generationIo).toBe(false);
+    expect('pauseHomeManualOpenPorts' in generationIo).toBe(false);
+    expect('runReflectGeneration' in homeReflectIo).toBe(false);
+    expect('pauseReflectGeneration' in homeReflectIo).toBe(false);
+    expect('pauseHomeManualOpenPorts' in homeReflectIo).toBe(true);
+    expect('reflectGenerator' in generationIo).toBe(true);
   });
 
   /**
