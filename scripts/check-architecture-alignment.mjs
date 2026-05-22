@@ -46,6 +46,10 @@ for (const ctx of contexts) {
 mustExist('src/features/pause/application/use-cases/ritual/frame', 'pause/application/use-cases/ritual/frame/');
 mustExist('src/features/pause/application/use-cases/ritual/done', 'pause/application/use-cases/ritual/done/');
 mustExist(
+  'src/features/pause/application/use-cases/ritual/done/pause-post-pause-emotion-log-flow.ts',
+  'pause/application/use-cases/ritual/done/pause-post-pause-emotion-log-flow.ts',
+);
+mustExist(
   'src/features/pause/application/use-cases/ritual/done/pause-ritual-done-flow.ts',
   'pause/application/use-cases/ritual/done/pause-ritual-done-flow.ts',
 );
@@ -972,11 +976,14 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_UMBRELLA_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow'",
 ];
 
-/** Ritual done presentation I/O — import via pause-ritual-done-flow only (not post-pause-emotion-log). */
+/** Ritual done presentation I/O — import via pause-ritual-done-flow only (not done subcluster flows). */
 const LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_IO_USE_CASE_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/done/post-pause-emotion-log',
+  '@/features/pause/application/use-cases/ritual/done/pause-post-pause-emotion-log-flow',
   "from './application/use-cases/ritual/done/post-pause-emotion-log'",
   "from '../application/use-cases/ritual/done/post-pause-emotion-log'",
+  "from './application/use-cases/ritual/done/pause-post-pause-emotion-log-flow'",
+  "from '../application/use-cases/ritual/done/pause-post-pause-emotion-log-flow'",
 ];
 
 /** Ritual done presentation — import domain done helpers via pause-ritual-done-io only. */
@@ -1439,6 +1446,17 @@ for (const file of walkTs(join(root, 'src'))) {
     ]) {
       if (text.includes(needle)) {
         failures.push(`${rel}: reflect steps umbrella flow must not deep-import run-* use cases (${needle})`);
+      }
+    }
+  }
+  if (rel === 'src/features/pause/application/use-cases/ritual/done/pause-ritual-done-flow.ts') {
+    for (const needle of [
+      '@/features/pause/application/use-cases/ritual/done/post-pause-emotion-log',
+      "from './post-pause-emotion-log'",
+      "from '../post-pause-emotion-log'",
+    ]) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: ritual done umbrella flow must compose subcluster anchors (${needle})`);
       }
     }
   }

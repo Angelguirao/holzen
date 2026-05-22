@@ -1,6 +1,6 @@
 /**
  * Ritual done presentation I/O (brief post-pause emotion log when feel changed).
- * Imports done use cases via `pause-ritual-done-flow` CI anchor (parity with reflect mood I/O peels).
+ * Imports done use cases via `pause-ritual-done-flow` CI anchor (parity with reflect hub/steps I/O).
  */
 import { runPostPauseEmotionLogIfDirty } from '@/features/pause/application/use-cases/ritual/done/pause-ritual-done-flow';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
