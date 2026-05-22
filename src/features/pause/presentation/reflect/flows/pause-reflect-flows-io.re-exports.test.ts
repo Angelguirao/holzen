@@ -44,6 +44,8 @@ import {
   showPauseOutcomeSaveFailedToast as showSaveFailedDirect,
 } from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
 import { getSessionQuote as getQuoteDirect } from '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes';
+import { runPauseOutcomeLog as runOutcomeLogDirect } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
+import { runPauseOutcomeLog as runOutcomeLogFromFlowsFlow } from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
 
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
@@ -94,6 +96,11 @@ describe('pause-reflect-flows-io re-exports', () => {
 
   it('binds default reflectPauseRepository to public-rpc supabasePauseRepository', () => {
     expect(reflectPauseRepository).toBe(supabasePauseRepository);
+  });
+
+  it('flows CI anchor exports same runPauseOutcomeLog leaf as presentation I/O', () => {
+    expect(typeof runOutcomeLogFromFlowsFlow).toBe('function');
+    expect(runOutcomeLogFromFlowsFlow).toBe(runOutcomeLogDirect);
   });
 
   it('presentation I/O bindings match pause-reflect-flows-flow CI anchor (leaf parity)', () => {

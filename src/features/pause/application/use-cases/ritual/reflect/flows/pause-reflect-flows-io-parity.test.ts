@@ -18,10 +18,12 @@ import {
   resolvePauseSessionReflectAndDecidePreflight,
   resolveScoreImpactDisplayImpacts,
   resolveScoreImpactViewMode,
+  runPauseOutcomeLog,
   scoreImpactMotionDelaySec,
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
 } from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
+import { runPauseOutcomeLog as runOutcomeLogDirect } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
 import {
   buildPauseScoreImpacts as buildImpactsFromFlowsIo,
   formatReinforcementQuoteFromSession as formatQuoteFromFlowsIo,
@@ -51,5 +53,6 @@ describe('pause-reflect-flows-io parity', () => {
     expect(scoreImpactMotionDelaySec).toBe(motionDelayFromFlowsIo);
     expect(showPauseOutcomeNotCompletedToast).toBe(showNotCompletedFromFlowsIo);
     expect(showPauseOutcomeSaveFailedToast).toBe(showSaveFailedFromFlowsIo);
+    expect(runPauseOutcomeLog).toBe(runOutcomeLogDirect);
   });
 });
