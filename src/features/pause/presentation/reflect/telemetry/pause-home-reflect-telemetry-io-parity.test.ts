@@ -88,7 +88,9 @@ describe('pause-home-reflect-telemetry-io parity', () => {
     expect('trackPauseOpenDismissed' in homeReflectIo).toBe(false);
     expect('trackHomePendingPauseBannerPauseOpened' in homeReflectIo).toBe(false);
     expect('markPauseManualStartedHomeOnce' in homeReflectIo).toBe(false);
-    // Application mirror: `application/.../telemetry/pause-home-reflect-telemetry-io-parity.test.ts`.
+    expect('trackManualPauseInstanceCreated' in homeReflectIo).toBe(false);
+    expect('trackPauseManualCompleted' in homeReflectIo).toBe(false);
+    // Reciprocal inline pins: `application/.../telemetry/pause-home-reflect-telemetry-io-parity.test.ts`.
   });
 
   it('home-reflect-telemetry-io trackers stay distinct from home-reflect-io manual-open RPC wrappers', () => {
