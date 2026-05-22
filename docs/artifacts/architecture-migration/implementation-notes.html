@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session terminal-entry-io ↔ terminal-entry-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-terminal-entry-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add application-layer <code>pause-session-terminal-entry-io-parity.test.ts</code> and presentation <code>pause-session-terminal-entry-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> identity for <code>TERMINAL_PAUSE_DB_STATES</code>, <code>isTerminalPauseDbState</code>, and <code>persistedPauseSessionAllowsTerminalEntry</code> (parity with providers-io / shell-io; behavioral smoke stays in <code>pause-session-terminal-entry-io.test.ts</code>). Production terminal-entry I/O keeps leaf import from <code>terminal-entry-guard</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow comment only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: step-handlers-io / scaffold-io / brief-io parity, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session frame-io ↔ frame-flow application parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -26074,6 +26091,7 @@
       <dt>Tradeoffs</dt>
       <dd>Regression guard without merging orchestration and visibility CI umbrellas or changing presentation I/O leaf imports.</dd>
       <dt>Open questions</dt>
+<<<<<<< HEAD
       <dd>Next: Tier 1 <code>holzen-query-client-ref</code> shim peel (<code>App.tsx</code> → <code>public-queries</code>), or Phase B cross-context Tier 1 scan.</dd>
     </dl>
   </article>
@@ -26094,6 +26112,9 @@
       <dd>Named repository export keeps Home bulk-hold parity consistent with reflect/archive presentation I/O without a decide-flow CI umbrella for bulk-hold.</dd>
       <dt>Open questions</dt>
       <dd>Next: Tier 1 <code>holzen-query-client-ref</code> shim peel or Phase B subscription Tier 1 shims.</dd>
+=======
+      <dd>Next: extend <code>pause-reflect-telemetry-io-parity</code>, Tier 1 <code>holzen-query-client-ref</code> shim peel (<code>App.tsx</code> → <code>public-queries</code>), or Phase B cross-context Tier 1 scan.</dd>
+>>>>>>> bf87ed8c2 (test(pause): add session terminal-entry-io parity pins)
     </dl>
   </article>
 
