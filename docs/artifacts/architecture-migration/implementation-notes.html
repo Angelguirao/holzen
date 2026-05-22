@@ -93,6 +93,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — presentation flows-io↔steps-io sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-steps-io-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Mirror application <code>pause-reflect-steps-flows-flow-sibling-parity</code> at presentation: <code>pause-reflect-flows-io</code> (reflect+decide) vs <code>pause-reflect-steps-io</code> (step RPC wrappers) stay distinct surfaces; shared <code>reflectPauseRepository</code> binding must not collapse wrappers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + I/O header comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or presentation flows-io ↔ telemetry-io sibling parity.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — providers-io ↔ scaffold-io presentation sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
