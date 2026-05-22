@@ -23,7 +23,7 @@ const TABLE: Record<PauseArchiveSegment, 'v_pause_archive_pauses' | 'v_pause_arc
 export {
   PAUSE_ARCHIVE_LIST_QUERY_PREFIX,
   pauseArchiveListQueryPrefix,
-} from '@/features/pause/application/queries/archive-query-keys';
+} from './archive-query-keys';
 
 export function pauseArchiveInfiniteQueryKey(
   userId: string,

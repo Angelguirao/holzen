@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   ARCHIVE_PAUSES_TAB_HAS_ROWS_OFF_QUERY_KEY,
   archivePausesTabHasRowsQueryKey,
-} from '@/features/pause/application/queries/archive-pauses-tab-keys';
+} from './archive-pauses-tab-keys';
 
 export {
   ARCHIVE_PAUSES_TAB_HAS_ROWS_OFF_QUERY_KEY,
@@ -10,7 +10,7 @@ export {
   ARCHIVE_PAUSES_TAB_HAS_ROWS_QUERY_PREFIX,
   archivePausesTabHasRowsQueryKey,
   archivePausesTabHasRowsQueryPrefix,
-} from '@/features/pause/application/queries/archive-pauses-tab-keys';
+} from './archive-pauses-tab-keys';
 
 export async function fetchArchivePausesTabHasRows(userId: string): Promise<boolean> {
   const { count, error } = await supabase
