@@ -1189,17 +1189,39 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_AMBIENCE_IO_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/ambience/pause-reflect-ambience-flow'",
 ];
 
-/** Reflect hub I/O — import via hub subcluster flows only (not pause-reflect-hub-flow umbrella). */
+/** Reflect hub I/O — import via hub umbrella only (not hub subcluster flow anchors). */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_UMBRELLA_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow',
   "from './application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow'",
   "from '../application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow'",
 ];
 
+/** Reflect hub I/O — import shift-frame done RPC via leaf module only (not pause-shift-emotion-frame-hub-done-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_DONE_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow',
+  "from './application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow'",
+  "from '../application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow'",
+];
+
+/** Reflect hub I/O — import presentation mapping via domain only (not pause-shift-frame-hub-presentation-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_PRESENTATION_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-presentation-flow',
+  "from './application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-presentation-flow'",
+  "from '../application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-presentation-flow'",
+];
+
+/** Reflect hub I/O — import log bundle via domain only (not pause-shift-emotion-log-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_LOG_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-log-flow',
+  "from './application/use-cases/ritual/reflect/hub/pause-shift-emotion-log-flow'",
+  "from '../application/use-cases/ritual/reflect/hub/pause-shift-emotion-log-flow'",
+];
+
 /** Reflect hub presentation — import domain hub helpers via pause-reflect-hub-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/hub/',
   '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
+  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow',
   '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-presentation-flow',
   '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-log-flow',
   '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow',
@@ -1207,6 +1229,14 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_DOMAIN_IMPORTS = [
   "from '../domain/reflect/hub/",
   "from './application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done'",
   "from '../application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done'",
+  "from './application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow'",
+  "from '../application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow'",
+  "from './application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-presentation-flow'",
+  "from '../application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-presentation-flow'",
+  "from './application/use-cases/ritual/reflect/hub/pause-shift-emotion-log-flow'",
+  "from '../application/use-cases/ritual/reflect/hub/pause-shift-emotion-log-flow'",
+  "from './application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow'",
+  "from '../application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow'",
 ];
 
 /** Reflect generation presentation (holzen-reflect) — import via pause-reflect-generation-io only. */
@@ -2032,7 +2062,28 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_UMBRELLA_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: reflect hub I/O must import via hub subcluster flows (${needle})`,
+          `${rel}: reflect hub I/O must not import hub umbrella (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_DONE_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect hub I/O must import run-shift-emotion-frame-hub-done directly (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_PRESENTATION_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect hub I/O must import domain shift-frame-hub-done-presentation directly (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_LOG_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect hub I/O must import domain shift-emotion-log directly (${needle})`,
         );
       }
     }

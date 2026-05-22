@@ -21775,4 +21775,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect hub I/O leaf peel (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel <code>pause-reflect-hub-io</code> off hub subcluster flow anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-hub-io</code> imports shift-frame presentation + log bundle from <code>domain/reflect/hub/</code> and RPC from <code>run-shift-emotion-frame-hub-done</code> directly (parity with <code>pause-reflect-share-io</code> leaf imports on the same branch tip). CI blocks hub subcluster flow anchors and umbrella imports on hub I/O.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-shift-emotion-*-flow</code> and <code>pause-reflect-hub-flow</code> remain CI compose anchors; presentation no longer routes through them on hub I/O.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect steps/mood I/O leaf peels, companion orchestrate-io telemetry peel, or session step-transition-io peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
