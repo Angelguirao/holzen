@@ -76,6 +76,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — application shell-io ↔ terminal-entry-io reciprocal pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-shell-io-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no relocations. Application <code>pause-session-terminal-entry-io-parity</code> already on branch; extend reciprocal inline pins on application <code>pause-session-shell-io-parity</code> so shell hydration/header-back exports stay distinct from terminal-entry guard exports (parity with presentation shell-io parity).</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: extend <code>pause-companion-orchestration-io-parity</code> persist/favorite leaf delegation pins, or Phase B Tier 1 lib shim scan (subscription/auth).</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — presentation home-reflect-io ↔ session telemetry-io reciprocal pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
