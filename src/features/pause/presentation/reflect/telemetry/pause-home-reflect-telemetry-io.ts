@@ -4,8 +4,9 @@
  * (`pause-reflect-telemetry-io`); application trackers stay in `ritual/reflect/generation/manual-open/`.
  * Imports trackers from leaf modules directly (not generation umbrella or telemetry-flow anchor).
  * Parity pins: `pause-home-reflect-telemetry-io.test.ts`, `pause-home-reflect-telemetry-io.re-exports.test.ts`,
- * `pause-home-reflect-telemetry-io-parity.test.ts` (application), and
- * `pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`.
+ * `pause-home-reflect-telemetry-io-parity.test.ts` (application).
+ * Sibling parity: `pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`;
+ * `pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts` ↔ `pause-home-reflect-io`.
  */
 export {
   trackHomePendingPauseBannerPauseOpened,
