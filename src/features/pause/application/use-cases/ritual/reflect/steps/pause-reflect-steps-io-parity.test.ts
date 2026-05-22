@@ -289,7 +289,8 @@ describe('pause-reflect-steps-io parity (application)', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts`.
+   * Reciprocal inline pins ↔ `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts` and
+   * `application/.../flows/pause-reflect-flows-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-flows-steps-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: flows-io exports stay distinct from steps-io wrappers', () => {
