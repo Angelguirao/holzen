@@ -146,7 +146,8 @@ import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 /**
  * Presentation reflect+decide flows I/O parity (colocated beside `pause-reflect-flows-io.ts`).
- * Application mirror: `application/.../ritual/reflect/flows/pause-reflect-flows-io-parity.test.ts`.
+ * Application mirror: `application/.../ritual/reflect/flows/pause-reflect-flows-io-parity.test.ts`
+ * (identity + sibling pins; RPC delegation async tests stay here only).
  * Flows CI umbrella: `pause-reflect-flows-flow` (application). Sibling pins under
  * `application/.../ritual/reflect/flows/*-sibling-parity.test.ts` and this folder.
  * Reciprocal inline pins ↔ cluster `pause-reflect-*-io-parity.test.ts` files in other reflect subclusters.
