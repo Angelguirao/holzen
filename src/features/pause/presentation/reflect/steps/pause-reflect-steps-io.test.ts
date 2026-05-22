@@ -13,12 +13,18 @@ const shouldLogPauseReflectionStepMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
   '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow',
-  () => ({
-    runPauseReflectionStepLogOnce: runPauseReflectionStepLogOnceMock,
-    runPauseFavoriteToggle: runPauseFavoriteToggleMock,
-    shouldShowFavoriteProHint: shouldShowFavoriteProHintMock,
-    shouldLogPauseReflectionStep: shouldLogPauseReflectionStepMock,
-  }),
+  async (importOriginal) => {
+    const actual = await importOriginal<
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow')
+    >();
+    return {
+      ...actual,
+      runPauseReflectionStepLogOnce: runPauseReflectionStepLogOnceMock,
+      runPauseFavoriteToggle: runPauseFavoriteToggleMock,
+      shouldShowFavoriteProHint: shouldShowFavoriteProHintMock,
+      shouldLogPauseReflectionStep: shouldLogPauseReflectionStepMock,
+    };
+  },
 );
 
 vi.mock('@/features/pause/public-rpc', () => ({

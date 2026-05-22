@@ -6,9 +6,18 @@ const { pauseReflectNoteUpdateMock } = vi.hoisted(() => ({
   pauseReflectNoteUpdateMock: vi.fn(),
 }));
 
-vi.mock('./pause-reflect-steps-io', () => ({
-  pauseReflectNoteUpdate: pauseReflectNoteUpdateMock,
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectStepsRepository' },
+  reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' },
 }));
+
+vi.mock('./pause-reflect-steps-io', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./pause-reflect-steps-io')>();
+  return {
+    ...actual,
+    pauseReflectNoteUpdate: pauseReflectNoteUpdateMock,
+  };
+});
 
 vi.mock('@/features/auth/public', () => ({
   useAuth: () => ({ user: null, loading: false }),

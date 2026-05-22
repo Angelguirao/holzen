@@ -12,11 +12,17 @@ const trackPauseReflectWallpaperTapMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
   '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow',
-  () => ({
-    trackPauseReflectPostItOpen: trackPauseReflectPostItOpenMock,
-    trackPauseReflectShareTap: trackPauseReflectShareTapMock,
-    trackPauseReflectWallpaperTap: trackPauseReflectWallpaperTapMock,
-  }),
+  async (importOriginal) => {
+    const actual = await importOriginal<
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow')
+    >();
+    return {
+      ...actual,
+      trackPauseReflectPostItOpen: trackPauseReflectPostItOpenMock,
+      trackPauseReflectShareTap: trackPauseReflectShareTapMock,
+      trackPauseReflectWallpaperTap: trackPauseReflectWallpaperTapMock,
+    };
+  },
 );
 
 describe('pause-reflect-telemetry-io', () => {

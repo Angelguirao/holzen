@@ -9,13 +9,15 @@ const runReflectionShareImageMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
   '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow',
-  () => ({
-    runReflectionShareImage: runReflectionShareImageMock,
-    buildReflectionShareText: (message: string) => message,
-    buildReflectionShareTweetUrl: (text: string) => `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`,
-    buildReflectionShareTelegramUrl: () => 'https://t.me/share/url',
-    buildReflectionShareWhatsAppUrl: () => 'https://wa.me/',
-  }),
+  async (importOriginal) => {
+    const actual = await importOriginal<
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow')
+    >();
+    return {
+      ...actual,
+      runReflectionShareImage: runReflectionShareImageMock,
+    };
+  },
 );
 
 describe('pause-reflect-share-io', () => {
