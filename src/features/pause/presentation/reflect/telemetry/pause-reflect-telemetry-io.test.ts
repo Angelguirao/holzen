@@ -1,4 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
+}));
+
+import {
+  pauseReflectOutcomeLog,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
@@ -35,6 +44,9 @@ describe('pause-reflect-telemetry-io', () => {
     expect(trackPauseReflectPostItOpen).toBe(trackPauseReflectPostItOpenMock);
     expect(trackPauseReflectShareTap).toBe(trackPauseReflectShareTapMock);
     expect(trackPauseReflectWallpaperTap).toBe(trackPauseReflectWallpaperTapMock);
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseReflectOutcomeLog);
+    expect(trackPauseReflectShareTap).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(trackPauseReflectWallpaperTap).not.toBe(pauseReflectOutcomeLog);
   });
 
   it('routes post-it open through the session UI telemetry module', () => {

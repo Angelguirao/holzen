@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
 const runPauseOutcomeLogMock = vi.hoisted(() => vi.fn());
+const trackPauseReflectPostItOpenMock = vi.hoisted(() => vi.fn());
+const trackPauseReflectShareTapMock = vi.hoisted(() => vi.fn());
+const trackPauseReflectWallpaperTapMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
   '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log',
@@ -18,6 +21,15 @@ vi.mock(
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
 }));
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-session-ui-telemetry',
+  () => ({
+    trackPauseReflectPostItOpen: trackPauseReflectPostItOpenMock,
+    trackPauseReflectShareTap: trackPauseReflectShareTapMock,
+    trackPauseReflectWallpaperTap: trackPauseReflectWallpaperTapMock,
+  }),
+);
 
 import { runPauseOutcomeLog as runPauseOutcomeLogDirect } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
@@ -117,6 +129,9 @@ describe('pause-reflect-flows-io', () => {
     expect(pauseReflectOutcomeLog).not.toBe(runPauseOutcomeLogDirect);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(runPauseOutcomeLogDirect);
     expect(pauseReflectOutcomeLog).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(pauseReflectOutcomeLog).not.toBe(trackPauseReflectPostItOpen);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(trackPauseReflectShareTap);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(trackPauseReflectWallpaperTap);
   });
 
   it('routes decide outcome log through the default PauseRepository port adapter', async () => {

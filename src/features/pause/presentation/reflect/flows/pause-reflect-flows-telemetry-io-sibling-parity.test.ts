@@ -23,6 +23,7 @@ import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
+  type PauseReflectTelemetrySurface,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 
 describe('pause-reflect-flows-io ↔ pause-reflect-telemetry-io sibling parity', () => {
@@ -42,6 +43,8 @@ describe('pause-reflect-flows-io ↔ pause-reflect-telemetry-io sibling parity',
     expect(typeof trackPauseReflectPostItOpen).toBe('function');
     expect(typeof trackPauseReflectShareTap).toBe('function');
     expect(typeof trackPauseReflectWallpaperTap).toBe('function');
+    const surface: PauseReflectTelemetrySurface = 'pause_reflect';
+    expect(surface).toBe('pause_reflect');
 
     expect('trackPauseReflectPostItOpen' in flowsIo).toBe(false);
     expect('trackPauseReflectShareTap' in flowsIo).toBe(false);
