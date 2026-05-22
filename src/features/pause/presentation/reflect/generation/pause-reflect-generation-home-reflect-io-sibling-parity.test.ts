@@ -34,6 +34,7 @@ import * as generationIo from './pause-reflect-generation-io';
 /**
  * Presentation sibling parity: generation-io vs home-reflect-io (parity with application
  * `pause-reflect-generation-manual-open-flow-sibling-parity.test.ts`).
+ * Reciprocal inline pins: `pause-reflect-generation-io.test.ts` ↔ `pause-home-reflect-io.test.ts`.
  */
 describe('pause-reflect-generation-io ↔ pause-home-reflect-io sibling parity', () => {
   it('generation-io and home-reflect-io are distinct presentation I/O surfaces', () => {

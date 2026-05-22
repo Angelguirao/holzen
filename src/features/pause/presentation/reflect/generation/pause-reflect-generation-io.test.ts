@@ -24,8 +24,11 @@ import {
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
+  buildManualPauseOpenParams,
   dismissOpenPauseHome,
   openManualPauseFromHome,
+  pauseDismissOpenPauseHomePreview,
+  pauseHomeManualOpenPorts,
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 import {
   messageFromReflectGenerationResult,
@@ -162,10 +165,11 @@ describe('pause-reflect-generation-io', () => {
   it('sibling cluster: home-reflect-io manual-open exports stay distinct from generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(openManualPauseFromHome);
     expect(pauseReflectGeneration).not.toBe(dismissOpenPauseHome);
+    expect(reflectGenerator).not.toBe(pauseHomeManualOpenPorts);
+    expect(reflectGenerationPrerequisite).not.toBe(pauseDismissOpenPauseHomePreview);
+    expect(shouldCommitReflectGeneration).not.toBe(buildManualPauseOpenParams);
     expect(runReflectGenerationDirect).not.toBe(openManualPauseFromHome);
     expect(reflectGenerationPrerequisite).not.toBe(dismissOpenPauseHome);
-    expect(reflectGenerator).not.toBe(openManualPauseFromHome);
-    expect(shouldCommitReflectGeneration).not.toBe(dismissOpenPauseHome);
     expect(resolveReflectGenerationPrefetch).not.toBe(openManualPauseFromHome);
     expect(messageFromReflectGenerationResult).not.toBe(dismissOpenPauseHome);
     // Reciprocal inline pins: `pause-home-reflect-io.test.ts`.

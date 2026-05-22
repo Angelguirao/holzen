@@ -4,6 +4,7 @@
  * Imports manual-open use cases and domain builders from sibling modules directly
  * (parity with `pause-home-reflect-telemetry-io` → leaf telemetry modules, not manual-open-flow umbrella).
  * Sibling parity: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`;
+ * reciprocal inline pins: `pause-home-reflect-io.test.ts` ↔ `pause-reflect-generation-io.test.ts`;
  * `pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts` ↔ `pause-home-reflect-telemetry-io`.
  */
 import { dismissOpenPauseHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/dismiss-open-pause-home';
