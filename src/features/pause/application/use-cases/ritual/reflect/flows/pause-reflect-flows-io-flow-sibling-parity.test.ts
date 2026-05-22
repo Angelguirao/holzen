@@ -44,9 +44,9 @@ import {
 import * as flowsIo from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 
 /**
- * Presentation ↔ application sibling parity: flows-io vs flows-flow CI umbrella
- * (parity with `pause-reflect-generation-hook-io-sibling-parity.test.ts` ↔ hook-flow;
- * complements `pause-reflect-flows-io-parity.test.ts` identity pins).
+ * Application flows-io ↔ flows-flow sibling parity (colocated beside `pause-reflect-flows-flow.ts`).
+ * Presentation mirror: `presentation/reflect/flows/pause-reflect-flows-io-flow-sibling-parity.test.ts`
+ * (complements colocated `pause-reflect-flows-flow-io-wrapper-sibling-parity.test.ts`).
  */
 describe('pause-reflect-flows-io ↔ pause-reflect-flows-flow sibling parity', () => {
   it('flows-io and flows-flow are distinct presentation I/O vs application CI surfaces', () => {
