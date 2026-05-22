@@ -17,7 +17,8 @@
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-share-io.test.ts`,
  * `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-generation-io.test.ts`,
  * `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-pending-offer-io.test.ts`,
- * `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
+ * `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (presentation + application);
+ * reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`;
  * `pause-reflect-steps-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`;
  * `pause-reflect-steps-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io` (presentation + application);
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-ambience-io.test.ts`;

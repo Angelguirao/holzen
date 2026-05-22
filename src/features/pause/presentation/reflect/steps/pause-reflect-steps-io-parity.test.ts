@@ -46,6 +46,8 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
  * reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts`.
  * Steps-io ↔ generation-io: `pause-reflect-steps-generation-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts`.
+ * Steps-io ↔ pending-offer-io: `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `presentation/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
  */
 import {
   runPauseFavoriteToggle,
@@ -125,6 +127,13 @@ import {
   runReflectGeneration,
   shouldCommitReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
+  pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 
 /** Presentation-layer steps I/O parity (colocated beside `pause-reflect-steps-io.ts`). */
 describe('pause-reflect-steps-io parity', () => {
@@ -395,5 +404,23 @@ describe('pause-reflect-steps-io parity', () => {
     expect(reflectPauseRepository).not.toBe(reflectGenerator);
     // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
     // Full pins: `pause-reflect-steps-generation-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `presentation/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: pending-offer-io exports stay distinct from steps-io wrappers', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseAdoptPendingOffer);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseDeclinePendingOffer);
+    expect(pauseReflectTagUpdate).not.toBe(pauseAdoptPendingOffer);
+    expect(pauseReflectionStepLogOnce).not.toBe(pauseDeclinePendingOffer);
+    expect(pauseReflectFavoriteToggleWithRepository).not.toBe(pauseAdoptPendingOfferWithRepository);
+    expect(pauseReflectNoteUpdateWithRepository).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(pauseReflectionStepLogOnceWithRepository).not.toBe(getPendingPauseOfferDisplay);
+    expect(shouldShowFromStepsIo).not.toBe(getPendingPauseOfferDisplay);
+    expect(shouldLogFromStepsIo).not.toBe(pauseDeclinePendingOffer);
+    // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`.
+    // Full pins: `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts`.
   });
 });
