@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — providers-flow ↔ shell-flow sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-providers-shell-flow-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated sibling-parity test so <code>pause-session-providers-flow</code> (Holzen slice picker) cannot merge with <code>pause-session-shell-flow</code> hydration/header-back exports; reciprocal inline pin on <code>pause-session-providers-flow.test.ts</code> (commit <code>d39b70ba0</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow comment anchors only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shims, or terminal-entry ↔ scaffold sibling pins.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — steps-flow ↔ flows-flow sibling pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
