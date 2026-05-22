@@ -2,6 +2,7 @@
  * CI cluster anchor for session decide ritual hydration (§3 / check:architecture-alignment).
  * Cluster marker: `pause-session-decide-cluster.ts` (empty export; unit-tested).
  * Use cases live in `ritual/decide/`; presentation decide I/O imports leaf modules (CI anchor only).
+ * Parity pins: `pause-session-decide-io.test.ts` and `pause-session-decide-io-parity.test.ts`.
  */
 export {
   initialDecisionFromRestored,
