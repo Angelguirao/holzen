@@ -76,6 +76,13 @@ import {
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
+  applyBriefDepthPickerRitualEntry,
+  buildFeelTilesMoodLogOptions,
+  pauseInitialEmotionSelect,
+  pauseInitialEmotionSkip,
+  pauseInitialEmotionSelectWithRepository,
+} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
   pauseReflectTagUpdate,
@@ -87,6 +94,7 @@ import {
 /**
  * Application-layer generation I/O parity. Hub-io sibling:
  * `pause-reflect-generation-hub-io-sibling-parity.test.ts` (application + presentation);
+ * mood-io sibling: `pause-reflect-generation-mood-io-sibling-parity.test.ts` (application + presentation);
  * flows-io sibling: `pause-reflect-flows-generation-io-sibling-parity.test.ts`;
  * telemetry-io sibling: `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`;
  * share-io sibling: `pause-reflect-generation-share-io-sibling-parity.test.ts`;
@@ -156,6 +164,23 @@ describe('pause-reflect-generation-io parity', () => {
     await pauseReflectGeneration(input, customGenerator as typeof supabaseReflectGenerator);
 
     expect(runReflectGenerationDirect).toHaveBeenCalledWith(input, customGenerator);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (holzen-reflect vs initial-emotion RPC).
+   * Dedicated sibling file: `pause-reflect-generation-mood-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: mood-io exports stay distinct from generation-io', () => {
+    expect(pauseReflectGeneration).not.toBe(pauseInitialEmotionSelect);
+    expect(runReflectGeneration).not.toBe(pauseInitialEmotionSkip);
+    expect(reflectGenerationPrerequisite).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(resolveReflectGenerationPrefetch).not.toBe(pauseInitialEmotionSelectWithRepository);
+    expect(shouldCommitReflectGeneration).not.toBe(pauseInitialEmotionSelect);
+    expect(messageFromReflectGenerationResult).not.toBe(applyBriefDepthPickerRitualEntry);
+    expect(reflectGenerator).not.toBe(pauseInitialEmotionSelect);
+    expect(pauseReflectGeneration).not.toBe(buildFeelTilesMoodLogOptions);
+    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
+    // Full pins: `pause-reflect-generation-mood-io-sibling-parity.test.ts`.
   });
 
   /**

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'supabasePauseRepository' },
+  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log', () => ({
@@ -43,6 +44,15 @@ import {
   runInitialEmotionSkip as runInitialEmotionSkipFromFlow,
   runPauseSessionChromeCloseAction,
 } from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow';
+import {
+  messageFromReflectGenerationResult,
+  pauseReflectGeneration,
+  reflectGenerationPrerequisite,
+  reflectGenerator,
+  resolveReflectGenerationPrefetch,
+  runReflectGeneration,
+  shouldCommitReflectGeneration,
+} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   buildPauseScoreImpacts,
   formatReinforcementQuoteFromSession,
@@ -93,6 +103,8 @@ import {
  * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application).
  * Flows-io sibling pins: `pause-reflect-flows-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (application).
+ * Generation-io sibling pins: `pause-reflect-generation-mood-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (application).
  */
 describe('pause-reflect-mood-io parity', () => {
   it('mood CI umbrella composes the same domain mood leaves as presentation I/O', () => {
@@ -192,6 +204,23 @@ describe('pause-reflect-mood-io parity', () => {
     );
 
     expect(runInitialEmotionSkip).toHaveBeenCalledWith(customRepository, input);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (application; mood RPC vs holzen-reflect).
+   * Dedicated sibling file: `pause-reflect-generation-mood-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: generation-io exports stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(pauseReflectGeneration);
+    expect(pauseInitialEmotionSkip).not.toBe(runReflectGeneration);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(reflectGenerationPrerequisite);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(resolveReflectGenerationPrefetch);
+    expect(pauseInitialEmotionSkip).not.toBe(shouldCommitReflectGeneration);
+    expect(applyBriefDepthPickerRitualEntry).not.toBe(messageFromReflectGenerationResult);
+    expect(reflectPauseRepository).not.toBe(reflectGenerator);
+    expect(pauseInitialEmotionSelect).not.toBe(runReflectGeneration);
+    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts` (application).
+    // Full pins: `pause-reflect-generation-mood-io-sibling-parity.test.ts`.
   });
 
   /**
