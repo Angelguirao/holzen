@@ -33,6 +33,15 @@ vi.mock(
 import { persistCompanionUiStepCompletion as persistDirect } from '@/features/pause/application/use-cases/ritual/frame/persist-ui-step-completion';
 import { runToggleCompanionLibraryFavorite as toggleFavoriteDirect } from '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite';
 import {
+  applyCompanionSlotOrchestrateOutcome,
+  logCompanionSlotOrchestrateInvoke,
+  resetInterventionIdempotency,
+  runCompanionInterventionBootstrap,
+  runCompanionSlotOrchestrate,
+  setCompanionSlotLoading,
+  trackCompanionGenerationInitiated,
+} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow';
+import {
   loadCompanionOrchestrateSession,
   nextExpandedWithLazyFetch,
   persistCompanionUiStepCompletion,
@@ -54,6 +63,8 @@ import {
 
 /**
  * Application mirror: `presentation/companion/pause-companion-orchestration-io-parity.test.ts`.
+ * Orchestrate-io sibling: reciprocal inline pins ↔ `pause-companion-orchestrate-io-parity.test.ts`;
+ * dedicated `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts`.
  */
 describe('pause-companion-orchestration-io parity (application)', () => {
   it('presentation I/O orchestration exports match pause-companion-orchestration-flow CI umbrella', () => {
@@ -110,5 +121,19 @@ describe('pause-companion-orchestration-io parity (application)', () => {
     // Dedicated siblings (application + presentation):
     // `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts`,
     // `pause-companion-analytics-orchestration-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-companion-orchestrate-io-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: orchestrate-io slot/intervention exports stay distinct from orchestration-io', () => {
+    expect(pauseLoadCompanionOrchestrateSession).not.toBe(runCompanionSlotOrchestrate);
+    expect(pauseToggleCompanionLibraryFavorite).not.toBe(runCompanionInterventionBootstrap);
+    expect(pauseCompanionUiStepCompletion).not.toBe(applyCompanionSlotOrchestrateOutcome);
+    expect(loadCompanionOrchestrateSession).not.toBe(logCompanionSlotOrchestrateInvoke);
+    expect(nextExpandedWithLazyFetch).not.toBe(trackCompanionGenerationInitiated);
+    expect(pauseLoadCompanionOrchestrateSession).not.toBe(setCompanionSlotLoading);
+    expect(pauseToggleCompanionLibraryFavorite).not.toBe(resetInterventionIdempotency);
+    expect(companionOrchestrator).not.toBe(runCompanionSlotOrchestrate);
   });
 });
