@@ -1,3 +1,4 @@
+/** Home pause card body read-model (presentation projection for {@link HomePauseCardBody}). */
 import type { BtcPriceData } from '@/features/market/public';
 import type { Entitlement } from '@/features/subscription/public';
 import type { ManualPauseTriggerResult } from '@/features/pause/domain/manual-pause-trigger-result';
