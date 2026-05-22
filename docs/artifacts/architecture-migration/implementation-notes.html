@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — companion frame UI I/O identity (backlog #2 complete, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-frame-ui-io.re-exports.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Add unmocked <code>.toBe(direct)</code> identity for <code>full-view-page-helpers</code> + <code>section-visibility</code> re-exports on <code>pause-companion-frame-ui-io</code> (parity with reflect/session I/O re-export pins). Allowlist re-exports test beside frame UI I/O in <code>check:architecture-alignment</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + CI allowlist only. <code>pause-companion-analytics-io</code> has no re-exports (wrappers only) — defer separate delegation pin slice.</dd>
+      <dt>Open question</dt>
+      <dd>Next: <code>pause-companion-orchestrate-io</code> / orchestration-io re-export pins, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session ritual-restore presentation I/O identity (backlog #1 complete, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
