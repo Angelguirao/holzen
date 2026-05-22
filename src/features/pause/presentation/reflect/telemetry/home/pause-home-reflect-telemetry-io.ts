@@ -1,8 +1,8 @@
 /**
  * Home manual-open PostHog helpers (manual open + dismiss/banner).
- * Colocated under `presentation/home/manual-open/`.
+ * Colocated under `presentation/reflect/telemetry/home/` (mirrors application `telemetry/home/`).
  * Imports trackers via `pause-home-reflect-telemetry-flow` CI anchor
- * (parity with `pause-reflect-generation-io` → hook-flow anchor).
+ * (parity with `pause-reflect-telemetry-io` → session telemetry flow).
  */
 export {
   markPauseManualStartedHomeOnce,
