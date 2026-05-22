@@ -13,15 +13,9 @@ const {
 }));
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome',
+  '@/features/pause/application/use-cases/ritual/decide/pause-archive-decide-flow',
   () => ({
     logRetrospectiveOutcome: logRetrospectiveOutcomeMock,
-  }),
-);
-
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry',
-  () => ({
     trackPauseOutcomeRetrospective: trackPauseOutcomeRetrospectiveMock,
   }),
 );

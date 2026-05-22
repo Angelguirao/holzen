@@ -221,9 +221,11 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS = [
   '@/features/pause/presentation/reflect/use-reflection-share-handlers',
   '@/features/pause/presentation/home/manual-open/pause-home-reflect-io',
   '@/features/pause/presentation/home/manual-open/apply-manual-pause-open-result',
+  '@/features/pause/presentation/home/manual-open/pause-home-reflect-telemetry-io',
   "from './presentation/reflect/use-pause-reflect-generation'",
   "from './presentation/home/manual-open/pause-home-reflect-io'",
   "from './presentation/home/manual-open/apply-manual-pause-open-result'",
+  "from './presentation/home/manual-open/pause-home-reflect-telemetry-io'",
   "from './presentation/reflect/use-pause-favorite-toggle'",
   "from '../presentation/reflect/use-pause-reflect-generation'",
 ];
@@ -263,6 +265,16 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_IMPORTS = [
   "from '../presentation/session/use-pause-session-breath-ui'",
   "from '../presentation/session/use-pause-session-breath-timed-active-reset'",
   "from '../presentation/session/use-pause-session-breath-second-label-variant'",
+];
+
+/** Archive presentation I/O — import retrospective decide helpers via flow anchor only. */
+const LEGACY_PAUSE_PRESENTATION_ARCHIVE_DECIDE_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome',
+  '@/features/pause/application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry',
+  "from './application/use-cases/ritual/decide/log-retrospective-outcome'",
+  "from './application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry'",
+  "from '../application/use-cases/ritual/decide/log-retrospective-outcome'",
+  "from '../application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry'",
 ];
 
 /** Flat presentation/session scaffold paths — use presentation/session/scaffold/. */
@@ -383,6 +395,13 @@ for (const file of walkTs(join(root, 'src'))) {
   for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS) {
     if (text.includes(needle)) {
       failures.push(`${rel}: legacy flat presentation/reflect import (${needle})`);
+    }
+  }
+  if (rel.startsWith('src/features/pause/presentation/archive/')) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_ARCHIVE_DECIDE_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy archive decide import (${needle})`);
+      }
     }
   }
   for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_IMPORTS) {
