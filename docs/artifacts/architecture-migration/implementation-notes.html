@@ -26723,11 +26723,19 @@
     <h3><code>pause-reflect-steps-io-parity</code> tag/note/favorite/reflection_step wrappers</h3>
     <dl>
       <dt>Design decision</dt>
+<<<<<<< HEAD
       <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-steps-io-parity.test.ts</code> with mocked leaf delegation for all four presentation RPC wrappers (parity with <code>pause-reflect-mood-io-parity</code> / <code>pause-reflect-pending-offer-io-parity</code>). Production <code>pause-reflect-steps-io</code> unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + cluster comments only.</dd>
       <dt>Open questions</dt>
       <dd>Next: session terminal-entry-io extended parity pins, <code>home/bulk-hold/group-by-local-day</code> colocation, or Phase B subscription Tier 1 shims.</dd>
+=======
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-steps-io-parity.test.ts</code> with mocked delegation for <code>pauseReflectTagUpdate</code>, <code>pauseReflectNoteUpdate</code>, <code>pauseReflectFavoriteToggle</code>, and <code>pauseReflectionStepLogOnce</code> (parity with pending-offer-io and mood-io wrapper pins). Production steps I/O unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session terminal-entry-io extended parity pins, Phase B subscription Tier 1 shims (<code>subscription-checkout-guard-ref</code>), or extend <code>pause-reflect-steps-io.re-exports.test.ts</code> if added.</dd>
+>>>>>>> 2e0cbdefc (test(pause): add reflect steps-io RPC wrapper delegation parity)
     </dl>
   </article>
 
