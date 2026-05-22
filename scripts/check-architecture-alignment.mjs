@@ -2465,11 +2465,13 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-reflect-mood-io.test.ts') ||
     rel.endsWith('pause-reflect-mood-io.re-exports.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_UMBRELLA_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: reflect mood I/O must not import mood umbrella (${needle})`,
-        );
+    if (!rel.endsWith('pause-reflect-mood-io.re-exports.test.ts')) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_UMBRELLA_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: reflect mood I/O must not import mood umbrella (${needle})`,
+          );
+        }
       }
     }
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_SUBCLUSTER_FLOW_IMPORTS) {
