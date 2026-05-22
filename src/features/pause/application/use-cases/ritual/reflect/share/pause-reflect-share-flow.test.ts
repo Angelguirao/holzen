@@ -17,6 +17,13 @@ import {
 } from './pause-reflection-share-channel-urls-flow';
 import { runReflectionShareImage as runShareImageFromImageFlow } from './pause-reflection-share-image-flow';
 import {
+  buildReflectionShareTelegramUrl as buildTelegramFromOrchestrationFlow,
+  buildReflectionShareText as buildTextFromOrchestrationFlow,
+  buildReflectionShareTweetUrl as buildTweetFromOrchestrationFlow,
+  buildReflectionShareWhatsAppUrl as buildWhatsAppFromOrchestrationFlow,
+  runReflectionShareImage as runShareImageFromOrchestrationFlow,
+} from './pause-reflect-share-orchestration-flow';
+import {
   buildReflectionShareText as buildTextFromFlow,
   buildReflectionShareTelegramUrl as buildTelegramFromFlow,
   buildReflectionShareTweetUrl as buildTweetFromFlow,
@@ -68,5 +75,11 @@ describe('pause-reflect-share-flow', () => {
     expect(buildTweetFromFlow).toBe(buildTweetFromChannelFlow);
     expect(buildWhatsAppFromFlow).toBe(buildWhatsAppFromChannelFlow);
     expect(runReflectionShareImage).toBe(runShareImageFromImageFlow);
+
+    expect(buildTextFromFlow).toBe(buildTextFromOrchestrationFlow);
+    expect(buildTelegramFromFlow).toBe(buildTelegramFromOrchestrationFlow);
+    expect(buildTweetFromFlow).toBe(buildTweetFromOrchestrationFlow);
+    expect(buildWhatsAppFromFlow).toBe(buildWhatsAppFromOrchestrationFlow);
+    expect(runReflectionShareImage).toBe(runShareImageFromOrchestrationFlow);
   });
 });
