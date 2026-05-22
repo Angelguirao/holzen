@@ -114,6 +114,7 @@ import {
 
 /**
  * Presentation mood I/O parity (colocated beside `pause-reflect-mood-io.ts`).
+ * Application mirror: `application/use-cases/ritual/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
  * Ambience-io sibling pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (presentation);
  * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (ambience cluster).
  * Steps-io sibling pins: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
