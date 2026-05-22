@@ -20670,6 +20670,28 @@
       <dd>Presentation type modules may still import <code>domain/decide/pause-impact-data</code> types directly; functional helpers route through flows I/O.</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B subscription Tier 1 shim, or session step-transition I/O peel.</dd>
+<<<<<<< HEAD
+=======
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate pending-offer PostHog under ritual/reflect/pending-offer (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Move <code>pause-pending-offer-telemetry-flow</code> + trackers into <code>pending-offer/</code> cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. Colocate pending-offer PostHog (<code>pending-pause-offer-telemetry</code>, <code>pause-session-abandoned-telemetry</code>, flow anchor) under <code>application/use-cases/ritual/reflect/pending-offer/</code> beside adopt/decline RPC use cases. <code>pause-reflect-pending-offer-flow</code> composes RPC + telemetry subclusters (parity with hub/mood umbrella flows). Presentation <code>pause-reflect-pending-offer-telemetry-io</code> imports from <code>pending-offer/</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; path colocation only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>ritual/reflect/telemetry/</code> cluster marker no longer lists pending-offer trackers — session/share/home manual-open anchors remain there.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: compose <code>pause-reflect-generation-flow</code> umbrella, Phase B subscription Tier 1 shim, or archive decide I/O peel.</dd>
+>>>>>>> 7c8ae6d29 (refactor(pause): colocate pending-offer PostHog under ritual/reflect/pending-offer)
     </dl>
   </article>
 

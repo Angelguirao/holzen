@@ -1,6 +1,6 @@
 /**
- * CI cluster anchor for pending pause offer adopt/decline + display (§3 / check:architecture-alignment).
- * Reflect presentation: `pause-reflect-pending-offer-io` imports through this anchor only.
+ * CI cluster anchor for ritual reflect pending-offer presentation I/O (§3 / check:architecture-alignment).
+ * Composes RPC/display and PostHog subcluster anchors; presentation imports via *-io modules.
  */
 export { runAdoptPendingPauseOffer } from './run-adopt-pending-pause-offer';
 export { runDeclinePendingPauseOffer } from './run-decline-pending-pause-offer';
@@ -9,3 +9,8 @@ export {
   type PendingPauseOfferDisplay,
   type PendingPauseOfferDisplayInput,
 } from './pending-pause-offer-display';
+export {
+  trackPausePendingAdopted,
+  trackPausePendingDeclined,
+  trackPauseSessionAbandoned,
+} from './pause-pending-offer-telemetry-flow';
