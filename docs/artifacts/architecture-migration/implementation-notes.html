@@ -110,6 +110,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — ambience-flow ↔ generation-flow sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-ambience-generation-flow-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend dedicated sibling-parity test with namespace <code>in</code> checks and extra generation export pins (parity with flows↔generation dedicated test; complements inline pins in cluster <code>*.test.ts</code> files). Resolved stray merge-conflict markers at the top of this HTML log.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + doc hygiene + comment anchors only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: flows↔telemetry sibling parity, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — strengthen share↔pending-offer sibling parity pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -138,23 +155,6 @@
       <dd>None — tests + flow comment anchors only.</dd>
       <dt>Open questions</dt>
       <dd>Next: flows↔telemetry sibling parity, Phase B subscription Tier 1 shims, or session shell-io extended delegation pins.</dd>
-    </dl>
-  </article>
-
-  <article class="note">
-    <header>
-      <span>2026-05-22</span>
-      <span>Phase A — ambience-flow ↔ generation-flow sibling parity (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-reflect-ambience-generation-flow-sibling-parity.test.ts</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated sibling-parity test so <code>pause-reflect-ambience-flow</code> and <code>pause-reflect-generation-flow</code> CI anchors stay namespace-separated (parity with flows↔hub and steps↔generation pins; complements inline pins in cluster <code>*.test.ts</code> files).</dd>
-      <dt>Deviation</dt>
-      <dd>None — tests + flow comments only.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: Phase B subscription/auth Tier 1 shims, or flows↔ambience dedicated sibling parity if still inline-only.</dd>
     </dl>
   </article>
 

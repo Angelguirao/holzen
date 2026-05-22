@@ -4,8 +4,8 @@
  * Sibling cluster anchor to `pause-reflect-generation-flow` (holzen-reflect + manual-open umbrella).
  * Presentation: `pause-reflect-ambience-io.ts` imports domain directly (not this anchor).
  * Parity: `pause-reflect-ambience-io-parity.test.ts` + `pause-reflect-ambience-io.re-exports.test.ts`;
- * Sibling parity: `pause-reflect-ambience-generation-flow-sibling-parity.test.ts` ↔ `pause-reflect-generation-flow`;
- * inline pins: `pause-reflect-ambience-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts`.
+ * sibling pins: `pause-reflect-ambience-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts`;
+ * `pause-reflect-ambience-generation-flow-sibling-parity.test.ts` (ambience-flow ↔ generation-flow).
  */
 export {
   startPauseReflectFrameFocusAmbience,

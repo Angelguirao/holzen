@@ -8,7 +8,8 @@
  * Sibling parity: `pause-reflect-ambience-generation-flow-sibling-parity.test.ts` ↔ `pause-reflect-ambience-flow`;
  * inline pins: `pause-reflect-ambience-flow.test.ts`, `pause-reflect-generation-flow.test.ts` ↔ `pause-reflect-flows-flow.test.ts`;
  * `pause-reflect-steps-generation-flow-sibling-parity.test.ts` (steps-flow ↔ generation-flow);
- * `pause-reflect-flows-generation-flow-sibling-parity.test.ts` (flows-flow ↔ generation-flow).
+ * `pause-reflect-flows-generation-flow-sibling-parity.test.ts` (flows-flow ↔ generation-flow);
+ * `pause-reflect-ambience-generation-flow-sibling-parity.test.ts` (ambience-flow ↔ generation-flow).
  * may import this umbrella for parity; production generation I/O keeps leaf imports.
  */
 export {
