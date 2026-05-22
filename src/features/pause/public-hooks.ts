@@ -126,15 +126,13 @@ export {
 export type { PauseImpactData } from './application/use-cases/session/pause-session-decide-flow';
 export {
   buildPauseScoreImpacts,
-  type PauseScoreImpactRow,
-} from './application/use-cases/ritual/decide/score-impacts';
-export {
   resolveScoreImpactDisplayImpacts,
   resolveScoreImpactViewMode,
   scoreImpactMotionDelaySec,
+  type PauseScoreImpactRow,
   type ScoreImpactVariant,
   type ScoreImpactViewMode,
-} from './application/use-cases/ritual/decide/score-impact-presentation';
+} from './application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
 export type { PauseBreathingHandle } from './presentation/session/breath/pause-breathing-handle';
 export type {
   PauseSessionBriefRitualBodyProps,
