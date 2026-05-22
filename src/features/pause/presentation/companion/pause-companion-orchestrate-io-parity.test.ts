@@ -1,3 +1,7 @@
+/**
+ * Presentation I/O parity (colocated beside `pause-companion-orchestrate-io.ts`).
+ * Imports `pause-companion-orchestrate-flow` CI umbrella for `.toBe` identity pins only — production orchestrate I/O keeps ritual/frame leaf imports.
+ */
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/integrations/supabase/client', () => ({
@@ -48,7 +52,7 @@ import {
   setCompanionSlotError as setErrorFromOrchestrateIo,
   setCompanionSlotLoading as setLoadingFromOrchestrateIo,
   trackCompanionGenerationInitiated as trackGenerationFromOrchestrateIo,
-} from '@/features/pause/presentation/companion/pause-companion-orchestrate-io';
+} from './pause-companion-orchestrate-io';
 
 describe('pause-companion-orchestrate-io parity', () => {
   it('presentation I/O orchestrate exports match pause-companion-orchestrate-flow CI umbrella', () => {
