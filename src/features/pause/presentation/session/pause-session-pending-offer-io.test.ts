@@ -10,7 +10,7 @@ const runAdoptPendingPauseOfferMock = vi.hoisted(() => vi.fn());
 const runDeclinePendingPauseOfferMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/session/pause-session-pending-offer-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow',
   () => ({
     runAdoptPendingPauseOffer: runAdoptPendingPauseOfferMock,
     runDeclinePendingPauseOffer: runDeclinePendingPauseOfferMock,
@@ -22,7 +22,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 describe('pause-session-pending-offer-io', () => {
-  it('re-exports adopt/decline use cases from pause-session-pending-offer-flow', () => {
+  it('re-exports adopt/decline use cases from pause-reflect-pending-offer-flow', () => {
     expect(typeof pauseAdoptPendingOffer).toBe('function');
     expect(typeof pauseDeclinePendingOffer).toBe('function');
     expect(typeof pauseAdoptPendingOfferWithRepository).toBe('function');
