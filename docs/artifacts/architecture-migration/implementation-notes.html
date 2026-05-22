@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — companion orchestration presentation I/O identity (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestration-io.re-exports.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) and #2 (<code>companion/</code> → <code>ritual/frame/</code>) remain complete — no folder moves. Add unmocked <code>.toBe(direct)</code> identity for orchestration I/O re-exports (session load, lazy expansion, UI-completion query invalidation, <code>companionOrchestrator</code> / <code>companionPauseRepository</code> ↔ <code>public-rpc</code> — not <code>pause-companion-orchestration-flow</code> umbrella). Mocked <code>pause-companion-orchestration-io.test.ts</code> keeps delegation behavior.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + CI allowlist only (re-exports test path already listed in <code>check:architecture-alignment</code>).</dd>
+      <dt>Open question</dt>
+      <dd>Next: <code>pause-companion-analytics-io</code> delegation pin if wrappers gain re-exports, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session breath presentation I/O identity (backlog #1 complete, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
