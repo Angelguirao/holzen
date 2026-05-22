@@ -36,7 +36,8 @@ import {
 
 /**
  * Application sibling parity: flows-io vs steps-io presentation I/O (parity with
- * `pause-reflect-steps-flows-flow-sibling-parity.test.ts` and presentation
+ * `pause-reflect-steps-flows-flow-sibling-parity.test.ts`,
+ * `pause-reflect-steps-flows-io-sibling-parity.test.ts` (steps-colocated), and presentation
  * `pause-reflect-flows-steps-io-sibling-parity.test.ts`).
  * Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-steps-io-parity.test.ts`.
  */

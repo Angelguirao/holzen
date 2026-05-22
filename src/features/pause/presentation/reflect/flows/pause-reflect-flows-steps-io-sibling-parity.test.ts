@@ -34,6 +34,10 @@ import {
   shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 
+/**
+ * Flows-colocated presentation sibling parity (parity with steps-colocated
+ * `pause-reflect-steps-flows-io-sibling-parity.test.ts` and application mirrors).
+ */
 describe('pause-reflect-flows-io ↔ pause-reflect-steps-io sibling parity', () => {
   it('flows-io and steps-io are distinct presentation I/O surfaces', () => {
     expect(typeof resolvePauseSessionReflectAndDecidePreflight).toBe('function');

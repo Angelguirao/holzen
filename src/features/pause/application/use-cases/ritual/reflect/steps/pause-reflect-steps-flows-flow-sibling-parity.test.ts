@@ -22,6 +22,10 @@ import {
 } from './pause-reflect-steps-flow';
 import * as stepsFlow from './pause-reflect-steps-flow';
 
+/**
+ * Flow-level sibling parity (parity with `pause-reflect-steps-flows-io-sibling-parity.test.ts`
+ * and `pause-reflect-flows-steps-io-sibling-parity.test.ts`).
+ */
 describe('pause-reflect-steps-flow ↔ pause-reflect-flows-flow sibling parity', () => {
   it('steps-flow and flows-flow are distinct sibling CI anchors', () => {
     expect(typeof runPauseFavoriteToggle).toBe('function');

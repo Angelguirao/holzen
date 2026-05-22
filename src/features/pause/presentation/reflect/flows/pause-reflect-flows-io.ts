@@ -8,7 +8,8 @@
  * `pause-reflect-flows-decide-io-sibling-parity.test.ts` ↔ `pause-session-decide-io` (application
  * `pause-reflect-flows-decide-flow-sibling-parity.test.ts` ↔ `pause-session-decide-flow`),
  * `pause-reflect-flows-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (application
- * `pause-reflect-flows-steps-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
+ * `pause-reflect-flows-steps-io-sibling-parity.test.ts` under `application/.../flows/`; steps-colocated
+ * `pause-reflect-steps-flows-io-sibling-parity.test.ts` application + presentation; reciprocal inline pins in
  * `pause-reflect-flows-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`; application `pause-reflect-flows-io-parity.test.ts`
  * ↔ `pause-reflect-steps-io-parity.test.ts`),
  * `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io` (application
