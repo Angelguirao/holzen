@@ -25396,6 +25396,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect flows-io re-exports ↔ flows-flow umbrella (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-io.re-exports.test.ts</code> pins presentation exports to flows CI umbrella</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-flows-io.re-exports.test.ts</code> with <code>.toBe</code> identity against <code>pause-reflect-flows-flow</code> (parity with <code>pause-reflect-steps-io.re-exports.test.ts</code>). Exempt the re-exports test from the flows-umbrella import ban in <code>check:architecture-alignment</code>; production <code>pause-reflect-flows-io.ts</code> still imports leaf modules only. Application-layer <code>pause-reflect-flows-io-parity.test.ts</code> unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + CI exemption only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Two parity surfaces (application io-parity + presentation re-exports ↔ umbrella) guard drift without presentation I/O importing the umbrella in production code.</dd>
+      <dt>Open question</dt>
+      <dd>Next: extend <code>pause-reflect-pending-offer-io-parity.test.ts</code> for adopt/decline + repository binding, <code>pause-run-breath-segment-log-flow</code> CI anchor, or Phase B Tier 1 <code>holzen-query-client-ref</code> shim peel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect ambience-io ↔ ambience-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
