@@ -117,6 +117,13 @@ import {
   shouldCommitReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
+  pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import {
   buildReflectionShareTelegramUrl,
   buildReflectionShareText,
   buildReflectionShareTweetUrl,
@@ -316,7 +323,29 @@ describe('pause-reflect-flows-io parity', () => {
   });
 
   /**
+<<<<<<< HEAD
    * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` and `pause-reflect-share-io.test.ts`.
+=======
+   * Reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts` (reflect+decide vs pending-offer RPC).
+   * Dedicated sibling file: `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: pending-offer-io exports stay distinct from flows-io', () => {
+    expect(pauseReflectOutcomeLog).not.toBe(pauseAdoptPendingOffer);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseDeclinePendingOffer);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseAdoptPendingOfferWithRepository);
+    expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(buildPauseScoreImpacts).not.toBe(getPendingPauseOfferDisplay);
+    expect(formatReinforcementQuoteFromSession).not.toBe(pauseAdoptPendingOffer);
+    expect(getSessionQuote).not.toBe(pauseDeclinePendingOffer);
+    expect(showPauseOutcomeNotCompletedToast).not.toBe(getPendingPauseOfferDisplay);
+    expect(showPauseOutcomeSaveFailedToast).not.toBe(pauseAdoptPendingOffer);
+    // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`.
+    // Full pins: `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` (reflect+decide vs reflection share).
+>>>>>>> 641409678 (test(pause): application flows-io ↔ pending-offer-io sibling parity)
    * Dedicated sibling file: `pause-reflect-flows-share-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: share-io exports stay distinct from flows-io', () => {

@@ -16,6 +16,10 @@ import {
 import * as flowsFlow from './pause-reflect-flows-flow';
 import * as pendingOfferFlow from '../pending-offer/pause-reflect-pending-offer-flow';
 
+/**
+ * Flow-level sibling parity (presentation I/O mirror:
+ * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` application + presentation).
+ */
 describe('pause-reflect-flows-flow ↔ pause-reflect-pending-offer-flow sibling parity', () => {
   it('flows-flow and pending-offer-flow are distinct sibling CI anchors', () => {
     expect(typeof resolvePauseSessionReflectAndDecidePreflight).toBe('function');
