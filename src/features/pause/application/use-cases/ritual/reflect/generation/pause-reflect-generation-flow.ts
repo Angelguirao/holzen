@@ -1,43 +1,53 @@
 /**
  * CI cluster anchor for ritual reflect generation presentation I/O (§3 / check:architecture-alignment).
- * Composes holzen-reflect hook + Home manual-open subcluster (PostHog stays on `pause-home-reflect-telemetry-flow`).
- * Presentation: `pause-reflect-generation-io.ts` imports domain hook helpers + `run-reflect-generation` directly;
- * `pause-home-reflect-io.ts` imports manual-open sibling modules directly;
- * `pause-home-reflect-telemetry-io.ts` imports `home-pause-actions-telemetry` + `manual-pause-trigger-telemetry` directly.
+ * Composes holzen-reflect domain helpers + `run-reflect-generation` + manual-open leaf use cases
+ * (not holzen-reflect / manual-open subcluster flow anchors; PostHog stays on telemetry-flow modules).
+ * Presentation: `pause-reflect-generation-io.ts` and `pause-home-reflect-io.ts` import leaf modules directly.
  */
 export {
   messageFromReflectGenerationResult,
-  reflectGenerationPrerequisite,
-  reflectGenerationUserErrorMessage,
-  resolveEffectiveReflectionCopy,
   resolveReflectGenerationPrefetch,
-  runReflectGeneration,
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
   type ReflectGenerationPrefetch,
-  type RunReflectGenerationInput,
-} from './holzen-reflect/pause-reflect-generation-hook-flow';
+} from '@/features/pause/domain/reflect/generation/reflect-generation-hook-flow';
+export { reflectGenerationPrerequisite } from '@/features/pause/domain/reflect/generation/reflect-generation-prerequisites';
+export { reflectGenerationUserErrorMessage } from '@/features/pause/domain/reflect/generation/reflect-generation-errors';
+export { resolveEffectiveReflectionCopy } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
+export { runReflectGeneration, type RunReflectGenerationInput } from './holzen-reflect/run-reflect-generation';
 export {
   buildManualPauseCreateOrReuseParams,
-  buildManualPauseMarketContext,
-  buildManualPauseOpenParams,
-  dismissOpenPauseHome,
   MANUAL_PAUSE_VOLATILITY_TEMPLATE,
-  openManualPauseFromHome,
-  runOpenManualPauseSilentModeAfterCreate,
-  runPersistSilentReflectionStub,
-  type BuildManualPauseOpenParamsInput,
   type ManualPauseCreateOrReuseParams,
+} from '@/features/pause/domain/reflect/generation/build-manual-pause-create-or-reuse-params';
+export {
+  buildManualPauseOpenParams,
+  type BuildManualPauseOpenParamsInput,
+} from '@/features/pause/domain/reflect/generation/build-manual-pause-open-params';
+export {
+  buildManualPauseMarketContext,
   type ManualPauseMarketContext,
-  type OpenManualPauseFromHomeParams,
-  type OpenManualPauseFromHomePorts,
-  type OpenManualPauseFromHomeResult,
-  type PersistSilentReflectionStubInput,
-  type PersistSilentReflectionStubResult,
-  type RunOpenManualPauseSilentModeAfterCreateError,
-  type RunOpenManualPauseSilentModeAfterCreateInput,
-  type RunOpenManualPauseSilentModeAfterCreateOpened,
-  type RunOpenManualPauseSilentModeAfterCreateResult,
-  type TrackManualPauseInstanceCreatedPayload,
-  type TrackPauseManualCompletedPayload,
-} from './manual-open/pause-reflect-generation-manual-open-flow';
+} from '@/features/pause/domain/reflect/generation/build-manual-pause-market-context';
+export type {
+  OpenManualPauseFromHomeParams,
+  OpenManualPauseFromHomePorts,
+  OpenManualPauseFromHomeResult,
+} from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-types';
+export type {
+  PersistSilentReflectionStubInput,
+  PersistSilentReflectionStubResult,
+} from '@/features/pause/domain/reflect/generation/persist-silent-reflection-stub-types';
+export type {
+  RunOpenManualPauseSilentModeAfterCreateError,
+  RunOpenManualPauseSilentModeAfterCreateInput,
+  RunOpenManualPauseSilentModeAfterCreateOpened,
+  RunOpenManualPauseSilentModeAfterCreateResult,
+} from '@/features/pause/domain/reflect/generation/open-manual-pause-silent-mode-after-create-types';
+export type {
+  TrackManualPauseInstanceCreatedPayload,
+  TrackPauseManualCompletedPayload,
+} from '@/features/pause/domain/reflect/generation/manual-pause-home-telemetry-types';
+export { dismissOpenPauseHome } from './manual-open/dismiss-open-pause-home';
+export { openManualPauseFromHome } from './manual-open/open-manual-pause-from-home';
+export { runOpenManualPauseSilentModeAfterCreate } from './manual-open/run-open-manual-pause-silent-mode-after-create';
+export { runPersistSilentReflectionStub } from './manual-open/run-persist-silent-reflection-stub';

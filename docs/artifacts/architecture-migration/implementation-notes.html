@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel pause-reflect-generation-flow off generation subcluster anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-flow</code> composes domain holzen-reflect helpers + manual-open leaf use cases</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Generation CI umbrella re-exports the same paths as <code>pause-reflect-generation-io</code> + <code>pause-home-reflect-io</code> (domain hook helpers, <code>run-reflect-generation</code>, manual-open use cases); <code>pause-reflect-generation-hook-flow</code> and <code>pause-reflect-generation-manual-open-flow</code> remain CI-only subcluster anchors.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>PostHog trackers stay off the generation umbrella; presentation unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion <code>pause-companion-frame-ui-io</code> leaf peel, <code>pause-ritual-done-flow</code> peel, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-reflect-share-flow off share subcluster anchors (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

@@ -1423,21 +1423,17 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_MANUAL_OPEN_IMPORTS = [
 ];
 
 /** Reflect generation umbrella flow — compose holzen-reflect + manual-open subclusters only. */
-const LEGACY_PAUSE_REFLECT_GENERATION_FLOW_HOOK_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation',
-  "from './holzen-reflect/run-reflect-generation'",
-  "from '../holzen-reflect/run-reflect-generation'",
-];
-
-const LEGACY_PAUSE_REFLECT_GENERATION_FLOW_MANUAL_OPEN_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/open-manual-pause-from-home',
-  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/dismiss-open-pause-home',
-  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-persist-silent-reflection-stub',
-  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-open-manual-pause-silent-mode-after-create',
-  "from './manual-open/open-manual-pause-from-home'",
-  "from '../manual-open/open-manual-pause-from-home'",
-  "from './manual-open/dismiss-open-pause-home'",
-  "from '../manual-open/dismiss-open-pause-home'",
+/** Reflect generation umbrella flow — compose domain + leaf modules only (not generation subcluster anchors). */
+const LEGACY_PAUSE_REFLECT_GENERATION_FLOW_SUBCLUSTER_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/pause-reflect-generation-hook-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-reflect-generation-manual-open-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow',
+  "from './holzen-reflect/pause-reflect-generation-hook-flow'",
+  "from '../holzen-reflect/pause-reflect-generation-hook-flow'",
+  "from './manual-open/pause-reflect-generation-manual-open-flow'",
+  "from '../manual-open/pause-reflect-generation-manual-open-flow'",
+  "from './manual-open/pause-home-reflect-telemetry-flow'",
+  "from '../manual-open/pause-home-reflect-telemetry-flow'",
 ];
 
 const LEGACY_PAUSE_REFLECT_GENERATION_FLOW_TELEMETRY_IMPORTS = [
@@ -2122,20 +2118,6 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
-  if (rel === 'src/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow.ts') {
-    for (const needle of [
-      '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation',
-      '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/open-manual-pause-from-home',
-      "from './holzen-reflect/run-reflect-generation'",
-      "from './manual-open/open-manual-pause-from-home'",
-    ]) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: reflect generation umbrella flow must compose subcluster anchors (${needle})`,
-        );
-      }
-    }
-  }
   if (rel === 'src/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow.ts') {
     for (const needle of LEGACY_PAUSE_REFLECT_STEPS_FLOW_SUBCLUSTER_IMPORTS) {
       if (text.includes(needle)) {
@@ -2175,21 +2157,14 @@ for (const file of walkTs(join(root, 'src'))) {
     }
   }
   if (rel === 'src/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow.ts') {
-    for (const needle of LEGACY_PAUSE_REFLECT_GENERATION_FLOW_HOOK_IMPORTS) {
+    for (const needle of LEGACY_PAUSE_REFLECT_GENERATION_FLOW_SUBCLUSTER_IMPORTS) {
       if (text.includes(needle)) {
-        failures.push(`${rel}: reflect generation umbrella flow must compose holzen-reflect subcluster (${needle})`);
+        failures.push(
+          `${rel}: reflect generation umbrella flow must import domain + leaf modules directly (${needle})`,
+        );
       }
     }
-    for (const needle of LEGACY_PAUSE_REFLECT_GENERATION_FLOW_MANUAL_OPEN_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(`${rel}: reflect generation umbrella flow must compose manual-open subcluster (${needle})`);
-      }
-    }
-    for (const needle of [
-      '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow',
-      "from './manual-open/pause-home-reflect-telemetry-flow'",
-      ...LEGACY_PAUSE_REFLECT_GENERATION_FLOW_TELEMETRY_IMPORTS,
-    ]) {
+    for (const needle of LEGACY_PAUSE_REFLECT_GENERATION_FLOW_TELEMETRY_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: reflect generation umbrella flow must not compose PostHog (${needle})`);
       }
