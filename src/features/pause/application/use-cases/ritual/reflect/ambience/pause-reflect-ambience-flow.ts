@@ -5,6 +5,7 @@
  * Presentation: `pause-reflect-ambience-io.ts` imports domain directly (not this anchor).
  * Parity: `pause-reflect-ambience-io-parity.test.ts` + `pause-reflect-ambience-io.re-exports.test.ts`;
  * Sibling I/O: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (application + presentation);
+ * `pause-reflect-ambience-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-flow` (flow CI anchors);
  * sibling pins: `pause-reflect-ambience-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts`
  * and `pause-reflect-flows-flow.test.ts`;
  * `pause-reflect-ambience-generation-flow-sibling-parity.test.ts` (ambience-flow ↔ generation-flow);

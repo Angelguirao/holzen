@@ -17,6 +17,14 @@ import {
   openManualPauseFromHome,
   runReflectGeneration,
 } from '../generation/pause-reflect-generation-flow';
+import {
+  getPendingPauseOfferDisplay as getDisplayFromPendingOfferFlow,
+  runAdoptPendingPauseOffer as runAdoptFromPendingOfferFlow,
+  runDeclinePendingPauseOffer as runDeclineFromPendingOfferFlow,
+  trackPausePendingAdopted as trackAdoptedFromPendingOfferFlow,
+  trackPausePendingDeclined as trackDeclinedFromPendingOfferFlow,
+  trackPauseSessionAbandoned as trackAbandonedFromPendingOfferFlow,
+} from '../pending-offer/pause-reflect-pending-offer-flow';
 
 import {
   startPauseReflectFrameFocusAmbience,
@@ -51,5 +59,19 @@ describe('pause-reflect-ambience-flow', () => {
     expect(stopPauseReflectFrameFocusAmbience).not.toBe(shouldLogFromStepsFlow);
     expect(startPauseReflectFrameFocusAmbience).not.toBe(runReflectGeneration);
     // Full cross-flow pins: `pause-reflect-steps-ambience-flow-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-pending-offer-flow.test.ts` (ambience-flow cluster).
+   * Dedicated sibling file: `pause-reflect-ambience-pending-offer-flow-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: pending-offer-flow exports stay distinct from ambience-flow exports', () => {
+    expect(startPauseReflectFrameFocusAmbience).not.toBe(runAdoptFromPendingOfferFlow);
+    expect(stopPauseReflectFrameFocusAmbience).not.toBe(runDeclineFromPendingOfferFlow);
+    expect(startPauseReflectFrameFocusAmbience).not.toBe(getDisplayFromPendingOfferFlow);
+    expect(stopPauseReflectFrameFocusAmbience).not.toBe(trackAdoptedFromPendingOfferFlow);
+    expect(startPauseReflectFrameFocusAmbience).not.toBe(trackDeclinedFromPendingOfferFlow);
+    expect(stopPauseReflectFrameFocusAmbience).not.toBe(trackAbandonedFromPendingOfferFlow);
+    // Full cross-flow pins: `pause-reflect-ambience-pending-offer-flow-sibling-parity.test.ts`.
   });
 });

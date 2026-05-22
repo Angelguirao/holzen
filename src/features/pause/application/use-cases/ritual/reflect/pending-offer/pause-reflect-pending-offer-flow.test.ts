@@ -59,6 +59,10 @@ import {
   resolveShiftFrameHubDonePresentation as resolvePresentationFromHubFlow,
   runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
 } from '../hub/pause-reflect-hub-flow';
+import {
+  startPauseReflectFrameFocusAmbience as startAmbienceFromAmbienceFlow,
+  stopPauseReflectFrameFocusAmbience as stopAmbienceFromAmbienceFlow,
+} from '../ambience/pause-reflect-ambience-flow';
 
 describe('pause-reflect-pending-offer-flow', () => {
   it('re-exports pending-offer RPC use cases, display projection, and telemetry trackers from leaf modules', () => {
@@ -165,5 +169,20 @@ describe('pause-reflect-pending-offer-flow', () => {
     expect(runAdoptPendingPauseOffer).not.toBe(resolveOutcomeFromFlowsFlow);
     expect(runDeclinePendingPauseOffer).not.toBe(runOutcomeLogFromFlowsFlow);
     // Reciprocal inline pins: `pause-reflect-flows-flow.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-ambience-flow.test.ts` (pending-offer vs frame-focus bed).
+   * Dedicated sibling file: `pause-reflect-ambience-pending-offer-flow-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: ambience-flow exports stay distinct from pending-offer umbrella exports', () => {
+    expect(runAdoptPendingPauseOffer).not.toBe(startAmbienceFromAmbienceFlow);
+    expect(runDeclinePendingPauseOffer).not.toBe(stopAmbienceFromAmbienceFlow);
+    expect(getDisplayFromFlow).not.toBe(startAmbienceFromAmbienceFlow);
+    expect(getDisplayFromFlow).not.toBe(stopAmbienceFromAmbienceFlow);
+    expect(trackAdoptedFromFlow).not.toBe(startAmbienceFromAmbienceFlow);
+    expect(trackDeclinedFromFlow).not.toBe(stopAmbienceFromAmbienceFlow);
+    expect(trackAbandonedFromFlow).not.toBe(startAmbienceFromAmbienceFlow);
+    // Reciprocal inline pins: `pause-reflect-ambience-flow.test.ts`.
   });
 });
