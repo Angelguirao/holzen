@@ -269,6 +269,13 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_IMPORTS = [
   "from '../presentation/session/use-pause-session-breath-second-label-variant'",
 ];
 
+/** Session presentation — import terminal-entry guards via flow anchor only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_TERMINAL_ENTRY_IMPORTS = [
+  '@/features/pause/application/use-cases/session/terminal-entry-guard',
+  "from './application/use-cases/session/terminal-entry-guard'",
+  "from '../application/use-cases/session/terminal-entry-guard'",
+];
+
 /** Archive presentation I/O — import retrospective decide helpers via flow anchor only. */
 const LEGACY_PAUSE_PRESENTATION_ARCHIVE_DECIDE_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome',
@@ -435,6 +442,18 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_TELEMETRY_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session telemetry import (${needle})`);
+      }
+    }
+  }
+  if (
+    rel.startsWith('src/features/pause/presentation/session/') &&
+    !rel.endsWith('-io.ts') &&
+    !rel.endsWith('.test.ts') &&
+    !rel.endsWith('.test.tsx')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_TERMINAL_ENTRY_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy session terminal-entry import (${needle})`);
       }
     }
   }

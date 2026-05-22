@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session terminal-entry I/O via pause-session-terminal-entry-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-session-terminal-entry-redirect</code> imports guards through presentation I/O</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-session-terminal-entry-flow</code> beside <code>terminal-entry-guard</code>; <code>presentation/session/pause-session-terminal-entry-io.ts</code> re-exports for the redirect conductor (parity with <code>pause-session-ritual-restore-io</code>). CI forbids deep <code>terminal-entry-guard</code> imports under <code>presentation/session/</code> except <code>*-io.ts</code> modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other session conductors still import <code>step-bundles</code>, <code>step-transition</code>, and telemetry directly — peel in follow-up slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-step-handlers</code> → step-bundles flow anchor, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session breath audio + pending-leave telemetry I/O anchors (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
