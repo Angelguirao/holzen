@@ -5,7 +5,8 @@
  * CI: `pause-session-scaffold-io-parity.test.ts` (umbrella/leaf identity + sibling distinctness vs
  * `pause-session-shell-io` / persisted-tab-session flow), `pause-session-scaffold-io.re-exports.test.ts`,
  * `pause-session-scaffold-io.test.ts` (presentation smoke + leaf identity),
- * `pause-session-scaffold-shell-io-sibling-parity.test.ts` (sibling vs shell-io).
+ * `pause-session-scaffold-shell-io-sibling-parity.test.ts` (sibling vs shell-io),
+ * `pause-session-providers-scaffold-io-sibling-parity.test.ts` (sibling vs providers-io).
  */
 export {
   buildPauseSessionPersistSnapshot,
