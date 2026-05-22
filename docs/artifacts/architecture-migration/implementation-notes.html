@@ -144,6 +144,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — steps-flow ↔ pending-offer-flow sibling cluster pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-flow.test.ts</code> ↔ <code>pause-reflect-pending-offer-flow.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add reciprocal sibling-cluster <code>.not.toBe</code> pins so steps CI umbrella exports stay distinct from pending-offer umbrella exports (parity with steps↔flows and telemetry↔pending-offer sibling pins).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow comment only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: <code>*WithRepository</code> delegation on steps-io parity, or Phase B app-shell boot import scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — home pwa-install analytics subcluster (backlog #1 verified, Tier 4)</span>
       <span class="status resolved">resolved</span>
     </header>

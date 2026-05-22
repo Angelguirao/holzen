@@ -26,6 +26,12 @@ import {
 } from './pause-reflect-pending-offer-flow';
 import { runAdoptPendingPauseOffer as runAdoptDirect } from './run-adopt-pending-pause-offer';
 import { runDeclinePendingPauseOffer as runDeclineDirect } from './run-decline-pending-pause-offer';
+import {
+  runPauseFavoriteToggle as runFavoriteFromStepsFlow,
+  runPauseReflectNoteUpdate as runNoteFromStepsFlow,
+  runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
+  shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
+} from '../steps/pause-reflect-steps-flow';
 
 describe('pause-reflect-pending-offer-flow', () => {
   it('re-exports pending-offer RPC use cases, display projection, and telemetry trackers from leaf modules', () => {
@@ -51,5 +57,14 @@ describe('pause-reflect-pending-offer-flow', () => {
     expect(trackAdoptedFromFlow).toBe(trackAdoptedFromTelemetryFlow);
     expect(trackDeclinedFromFlow).toBe(trackDeclinedFromTelemetryFlow);
     expect(trackAbandonedFromFlow).toBe(trackAbandonedFromTelemetryFlow);
+  });
+
+  it('sibling cluster: steps-flow exports stay distinct from pending-offer umbrella exports', () => {
+    expect(runAdoptPendingPauseOffer).not.toBe(runFavoriteFromStepsFlow);
+    expect(runDeclinePendingPauseOffer).not.toBe(runNoteFromStepsFlow);
+    expect(getDisplayFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+    expect(trackAdoptedFromFlow).not.toBe(runFavoriteFromStepsFlow);
+    expect(trackDeclinedFromFlow).not.toBe(runNoteFromStepsFlow);
+    expect(trackAbandonedFromFlow).not.toBe(shouldLogFromStepsFlow);
   });
 });
