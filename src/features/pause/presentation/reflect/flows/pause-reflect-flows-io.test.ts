@@ -44,6 +44,10 @@ import {
   pauseShiftEmotionFrameHubDoneWithRepository,
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
+  pauseInitialEmotionSelect,
+  pauseInitialEmotionSkip,
+} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
@@ -199,5 +203,12 @@ describe('pause-reflect-flows-io', () => {
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseReflectionShareImage);
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseReflectionShareImage);
     expect(buildPauseScoreImpacts).not.toBe(pauseReflectionShareImage);
+  });
+
+  it('sibling cluster: mood-io exports stay distinct from flows-io', () => {
+    expect(pauseReflectOutcomeLog).not.toBe(pauseInitialEmotionSelect);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseInitialEmotionSkip);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseInitialEmotionSelect);
+    expect(buildPauseScoreImpacts).not.toBe(pauseInitialEmotionSkip);
   });
 });

@@ -23,6 +23,10 @@ import { runDeepPausePickerEntryIfPro as runDeepPickerDirect } from '@/features/
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
+  pauseReflectOutcomeLog,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
@@ -166,5 +170,11 @@ describe('pause-reflect-mood-io', () => {
     expect(runInitialEmotionSkipMock).toHaveBeenCalledWith(customRepo, {
       pauseInstanceId: 'pi-skip-custom',
     });
+  });
+
+  it('sibling cluster: flows-io exports stay distinct from mood-io', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseInitialEmotionSkip).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(pauseInitialEmotionSelect).not.toBe(pauseShiftEmotionFrameHubDone);
   });
 });
