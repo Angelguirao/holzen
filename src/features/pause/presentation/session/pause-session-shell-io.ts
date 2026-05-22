@@ -2,7 +2,12 @@
  * Presentation I/O for `/pause` shell chrome (hydration, header back, mount log, shell VM).
  * Imports session shell use cases via sibling application modules
  * (parity with `pause-reflect-hub-io` → hub subcluster flows).
+<<<<<<< HEAD
  * Wrapper delegation pins: `pause-session-shell-io.test.ts` + `pause-session-shell-io.re-exports.test.ts`.
+=======
+ * CI: `pause-session-shell-io-parity.test.ts`, `pause-session-shell-io.re-exports.test.ts`,
+ * `pause-session-shell-io.test.ts`, `pause-session-scaffold-shell-io-sibling-parity.test.ts`.
+>>>>>>> afa183fa3 (test(pause): pin scaffold-io vs shell-io presentation siblings)
  */
 export {
   computePauseSessionHydration,
