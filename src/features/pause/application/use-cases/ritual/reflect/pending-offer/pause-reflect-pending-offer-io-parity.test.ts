@@ -28,44 +28,10 @@ import {
   runAdoptPendingPauseOffer,
   runDeclinePendingPauseOffer,
 } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow';
-import * as pendingOfferIo from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
-import {
-  getPendingPauseOfferDisplay as getDisplayFromPendingOfferIo,
-  pauseAdoptPendingOffer,
-  pauseAdoptPendingOfferWithRepository,
-  pauseDeclinePendingOffer,
-  pauseDeclinePendingOfferWithRepository,
-  reflectPauseRepository,
-} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
-import * as pendingOfferTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
-import {
-  trackPausePendingAdopted as trackAdoptedFromTelemetryIo,
-  trackPausePendingDeclined as trackDeclinedFromTelemetryIo,
-  trackPauseSessionAbandoned as trackAbandonedFromTelemetryIo,
-} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
-import {
-  buildReflectionShareTelegramUrl,
-  buildReflectionShareText,
-  buildReflectionShareTweetUrl,
-  buildReflectionShareWhatsAppUrl,
-  pauseReflectionShareImage,
-} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
-import {
-  pauseReflectFavoriteToggle,
-  pauseReflectNoteUpdate,
-  pauseReflectTagUpdate,
-  pauseReflectionStepLogOnce,
-  pauseReflectFavoriteToggleWithRepository,
-  pauseReflectNoteUpdateWithRepository,
-  pauseReflectTagUpdateWithRepository,
-  pauseReflectionStepLogOnceWithRepository,
-  shouldLogPauseReflectionStep,
-  shouldShowFavoriteProHint,
-} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   buildPauseScoreImpacts,
   formatReinforcementQuoteFromSession,
@@ -91,6 +57,40 @@ import {
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import * as pendingOfferIo from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import {
+  getPendingPauseOfferDisplay as getDisplayFromPendingOfferIo,
+  pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
+  pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
+  reflectPauseRepository,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import {
+  buildReflectionShareTelegramUrl,
+  buildReflectionShareText,
+  buildReflectionShareTweetUrl,
+  buildReflectionShareWhatsAppUrl,
+  pauseReflectionShareImage,
+} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
+import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
+  pauseReflectFavoriteToggleWithRepository,
+  pauseReflectNoteUpdateWithRepository,
+  pauseReflectTagUpdateWithRepository,
+  pauseReflectionStepLogOnceWithRepository,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import * as pendingOfferTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
+import {
+  trackPausePendingAdopted as trackAdoptedFromTelemetryIo,
+  trackPausePendingDeclined as trackDeclinedFromTelemetryIo,
+  trackPauseSessionAbandoned as trackAbandonedFromTelemetryIo,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
@@ -182,19 +182,32 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
     expect(reflectPauseRepository).not.toBe(trackAbandonedFromTelemetryIo);
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts`.
+   */
   it('sibling cluster: flows-io exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(pauseDeclinePendingOffer).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
     expect(getPendingPauseOfferDisplay).not.toBe(pauseReflectOutcomeLog);
     expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
     expect(pauseDeclinePendingOffer).not.toBe(buildPauseScoreImpacts);
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(getPendingPauseOfferDisplay).not.toBe(formatReinforcementQuoteFromSession);
     expect(getPendingPauseOfferDisplay).not.toBe(getSessionQuote);
-    expect(pauseAdoptPendingOfferWithRepository).not.toBe(showPauseOutcomeSaveFailedToast);
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectOutcomeLog);
     expect(pauseDeclinePendingOffer).not.toBe(showPauseOutcomeNotCompletedToast);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(showPauseOutcomeSaveFailedToast);
+    // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts`.
+    // Full pins: `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts`.
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts`.
+   */
   it('sibling cluster: steps-io exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(pauseReflectFavoriteToggle);
     expect(pauseDeclinePendingOffer).not.toBe(pauseReflectNoteUpdate);
@@ -204,8 +217,14 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
     expect(pauseAdoptPendingOffer).not.toBe(shouldShowFavoriteProHint);
     expect(pauseDeclinePendingOffer).not.toBe(shouldLogPauseReflectionStep);
     expect(pauseAdoptPendingOffer).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
+    // Full pins: `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts`.
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts`.
+   */
   it('sibling cluster: hub-io shift-frame exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(pauseShiftEmotionFrameHubDone);
     expect(pauseDeclinePendingOffer).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
@@ -213,8 +232,15 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(buildShiftEmotionFrameHubLogBundle);
     expect(getPendingPauseOfferDisplay).not.toBe(resolveShiftFrameHubDonePresentation);
     expect(pauseAdoptPendingOffer).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(pauseDeclinePendingOffer).not.toBe(resolveShiftFrameHubDonePresentation);
+    // Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts`.
+    // Full pins: `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts`.
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts`.
+   */
   it('sibling cluster: mood-io initial-emotion exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(pauseInitialEmotionSelect);
     expect(pauseDeclinePendingOffer).not.toBe(pauseInitialEmotionSkip);
@@ -222,8 +248,16 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(pauseInitialEmotionSkipWithRepository);
     expect(getPendingPauseOfferDisplay).not.toBe(buildFeelTilesMoodLogOptions);
     expect(pauseAdoptPendingOffer).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseInitialEmotionSelect);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(pauseInitialEmotionSkipWithRepository);
+    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
+    // Full pins: `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts`.
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-share-pending-offer-io-sibling-parity.test.ts`.
+   */
   it('sibling cluster: share-io exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(pauseReflectionShareImage);
     expect(pauseDeclinePendingOffer).not.toBe(buildReflectionShareText);
@@ -231,8 +265,13 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(buildReflectionShareWhatsAppUrl);
     expect(getPendingPauseOfferDisplay).not.toBe(buildReflectionShareTelegramUrl);
     expect(reflectPauseRepository).not.toBe(pauseReflectionShareImage);
+    // Full pins: `pause-reflect-share-pending-offer-io-sibling-parity.test.ts`.
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts`.
+   */
   it('sibling cluster: ambience-io frame-focus bed exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(pauseDeclinePendingOffer).not.toBe(stopPauseReflectFrameFocusAmbience);
@@ -240,6 +279,7 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(getPendingPauseOfferDisplay).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(reflectPauseRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
+    // Reciprocal inline pins: `presentation/reflect/ambience/pause-reflect-ambience-io-parity.test.ts`.
   });
 
   /**
