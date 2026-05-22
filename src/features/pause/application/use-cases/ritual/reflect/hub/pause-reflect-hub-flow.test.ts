@@ -15,6 +15,7 @@ import { runShiftEmotionFrameHubDone as runShiftHubDoneDirect } from './run-shif
 import {
   buildFeelTilesMoodLogOptions as buildFeelTilesFromMoodFlow,
   runInitialEmotionSelect as runInitialEmotionSelectFromMoodFlow,
+  runInitialEmotionSkip as runInitialEmotionSkipFromMoodFlow,
 } from '../mood/pause-reflect-mood-flow';
 
 describe('pause-reflect-hub-flow', () => {
@@ -42,9 +43,11 @@ describe('pause-reflect-hub-flow', () => {
   });
 
   it('sibling cluster: mood-flow exports stay distinct from hub umbrella exports', () => {
-    expect(buildLogBundleFromFlow).not.toBe(runInitialEmotionSelectFromMoodFlow);
     expect(buildLogBundleFromFlow).not.toBe(buildFeelTilesFromMoodFlow);
+    expect(buildLogBundleFromFlow).not.toBe(runInitialEmotionSelectFromMoodFlow);
+    expect(buildLogBundleFromFlow).not.toBe(runInitialEmotionSkipFromMoodFlow);
     expect(runShiftEmotionFrameHubDone).not.toBe(runInitialEmotionSelectFromMoodFlow);
+    expect(runShiftEmotionFrameHubDone).not.toBe(runInitialEmotionSkipFromMoodFlow);
     expect(resolvePresentationFromFlow).not.toBe(buildFeelTilesFromMoodFlow);
   });
 });
