@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — scaffold-flow ↔ shell-flow sibling pins + scaffold-io presentation parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-scaffold-shell-flow-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no reflect moves. Add dedicated scaffold↔shell sibling parity test (parity with terminal-entry↔shell) and extend <code>pause-session-scaffold-io.test.ts</code> with <code>hasPersistablePauseSessionAnchor</code> smoke + direct leaf <code>.toBe</code> identity pins.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B app-shell boot import scan, or shell-io presentation wrapper delegation tests.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect steps-io reflection_step WithRepository seam (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — presentation I/O test seam only; default <code>pauseReflectionStepLogOnce</code> behavior unchanged.</dd>
       <dt>Open questions</dt>
-      <dd>Next: session shell-io ↔ scaffold-io sibling parity file, or Phase B app-shell boot import scan.</dd>
+      <dd>Next: Phase B app-shell boot import scan, or shell-io presentation wrapper delegation tests.</dd>
     </dl>
   </article>
 
@@ -86,7 +103,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + flow anchor comments only.</dd>
       <dt>Open question</dt>
-      <dd>Superseded by steps-io WithRepository slice for “next” ordering; see latest note.</dd>
+      <dd>Superseded by scaffold↔shell slice for “next” ordering; see latest note.</dd>
     </dl>
   </article>
 

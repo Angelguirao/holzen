@@ -3,7 +3,8 @@
  * Use cases live in sibling modules; re-export for presentation I/O imports.
  * Presentation: `pause-session-shell-io.ts` imports sibling modules directly (not this umbrella).
  * Parity pins: `pause-session-shell-io.re-exports.test.ts` and `pause-session-shell-io-parity.test.ts`.
- * Sibling cluster: `pause-session-terminal-entry-shell-flow-sibling-parity.test.ts` ↔ `pause-session-terminal-entry-flow`.
+ * Sibling cluster: `pause-session-terminal-entry-shell-flow-sibling-parity.test.ts` ↔ `pause-session-terminal-entry-flow`;
+ * `pause-session-scaffold-shell-flow-sibling-parity.test.ts` ↔ `pause-session-scaffold-flow`.
  */
 export {
   computePauseSessionHydration,
