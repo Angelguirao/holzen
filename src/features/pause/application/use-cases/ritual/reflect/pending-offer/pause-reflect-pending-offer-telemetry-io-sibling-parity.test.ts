@@ -45,6 +45,8 @@ describe('pause-reflect-pending-offer-io ↔ pause-reflect-pending-offer-telemet
     expect('getPendingPauseOfferDisplay' in pendingOfferTelemetryIo).toBe(false);
     expect('pauseAdoptPendingOffer' in pendingOfferTelemetryIo).toBe(false);
     expect('pauseDeclinePendingOffer' in pendingOfferTelemetryIo).toBe(false);
+    expect('pauseAdoptPendingOfferWithRepository' in pendingOfferTelemetryIo).toBe(false);
+    expect('pauseDeclinePendingOfferWithRepository' in pendingOfferTelemetryIo).toBe(false);
     expect('reflectPauseRepository' in pendingOfferTelemetryIo).toBe(false);
   });
 
@@ -55,5 +57,15 @@ describe('pause-reflect-pending-offer-io ↔ pause-reflect-pending-offer-telemet
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(trackPausePendingAdopted);
     expect(getPendingPauseOfferDisplay).not.toBe(trackPausePendingDeclined);
     expect(reflectPauseRepository).not.toBe(trackPauseSessionAbandoned);
+  });
+
+  it('pending-offer telemetry I/O keeps PostHog trackers off RPC and display helpers', () => {
+    expect(trackPausePendingAdopted).not.toBe(pauseAdoptPendingOffer);
+    expect(trackPausePendingDeclined).not.toBe(pauseDeclinePendingOffer);
+    expect(trackPauseSessionAbandoned).not.toBe(pauseAdoptPendingOfferWithRepository);
+    expect(trackPausePendingAdopted).not.toBe(getPendingPauseOfferDisplay);
+    expect(trackPausePendingDeclined).not.toBe(reflectPauseRepository);
+    expect(trackPauseSessionAbandoned).not.toBe(pauseDeclinePendingOfferWithRepository);
+    // Reciprocal inline pins: `presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
   });
 });

@@ -38,7 +38,7 @@ import {
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 
 /**
- * Application mirror: `presentation/reflect/pending-offer/pause-reflect-pending-offer-telemetry-io-parity.test.ts`.
+ * Application mirror: `presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io-parity.test.ts`.
  */
 describe('pause-reflect-pending-offer-telemetry-io parity (application)', () => {
   it('presentation I/O pending-offer telemetry matches pending-offer-telemetry-flow CI umbrella', () => {
@@ -63,7 +63,7 @@ describe('pause-reflect-pending-offer-telemetry-io parity (application)', () => 
     expect(trackAdoptedFromPendingOfferTelemetryIo).not.toBe(pauseDeclinePendingOffer);
     expect(trackDeclinedFromPendingOfferTelemetryIo).not.toBe(getPendingPauseOfferDisplay);
     expect(trackAbandonedFromPendingOfferTelemetryIo).not.toBe(reflectPauseRepository);
-    // Reciprocal inline pins: `presentation/reflect/pending-offer/pause-reflect-pending-offer-telemetry-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io-parity.test.ts`.
     // Dedicated sibling: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` (application + presentation).
   });
 });

@@ -16,7 +16,8 @@ import {
 /**
  * Presentation sibling parity: session reflect UI telemetry-io vs pending-offer telemetry-io
  * (colocated beside pending-offer-io; parity with application
- * `pause-reflect-telemetry-pending-offer-flow-sibling-parity.test.ts`).
+ * `application/.../pending-offer/pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts`
+ * and flow-level `pause-reflect-telemetry-pending-offer-flow-sibling-parity.test.ts`).
  */
 describe('pause-reflect-telemetry-io ↔ pause-reflect-pending-offer-telemetry-io sibling parity', () => {
   it('session reflect telemetry-io and pending-offer telemetry-io are distinct presentation surfaces', () => {
