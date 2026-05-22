@@ -15,6 +15,7 @@ import {
   loadPersistedTabSession,
   savePersistedTabSession,
 } from './pause-session-persisted-tab-session-flow';
+import { computePauseSessionHydration as computeHydrationFromShellFlow } from './pause-session-shell-flow';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
 describe('pause-session-terminal-entry-flow', () => {
@@ -38,5 +39,11 @@ describe('pause-session-terminal-entry-flow', () => {
     expect(isTerminalPauseDbState).not.toBe(clearPersistedTabSession);
     expect(persistedPauseSessionAllowsTerminalEntry).not.toBe(loadPersistedTabSession);
     expect(TERMINAL_PAUSE_DB_STATES).not.toBe(loadPersistedTabSession);
+  });
+
+  it('sibling cluster: terminal-entry-flow exports stay distinct from shell-flow exports', () => {
+    expect(isTerminalPauseDbState).not.toBe(computeHydrationFromShellFlow);
+    expect(persistedPauseSessionAllowsTerminalEntry).not.toBe(computeHydrationFromShellFlow);
+    expect(TERMINAL_PAUSE_DB_STATES).not.toBe(computeHydrationFromShellFlow);
   });
 });

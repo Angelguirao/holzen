@@ -28,6 +28,11 @@ import {
   computePauseStorageRitualSyncPatch as computeSyncFromScaffoldFlow,
   hasPersistablePauseSessionAnchor as hasAnchorFromScaffoldFlow,
 } from './pause-session-scaffold-flow';
+import {
+  isTerminalPauseDbState as isTerminalFromTerminalEntryFlow,
+  persistedPauseSessionAllowsTerminalEntry as persistedAllowsFromTerminalEntryFlow,
+  TERMINAL_PAUSE_DB_STATES as terminalStatesFromTerminalEntryFlow,
+} from './pause-session-terminal-entry-flow';
 
 describe('pause-session-shell-flow', () => {
   it('re-exports hydration helpers from hydration', () => {
@@ -91,5 +96,13 @@ describe('pause-session-shell-flow', () => {
     expect(coalescePauseSessionShellViewModel).not.toBe(buildDerivedFromScaffoldFlow);
     expect(hasPersistedPauseSessionPayload).not.toBe(hasAnchorFromScaffoldFlow);
     expect(buildPauseSessionMountLogParams).not.toBe(buildPersistFromScaffoldFlow);
+  });
+
+  it('sibling cluster: terminal-entry-flow exports stay distinct from shell umbrella exports', () => {
+    expect(computePauseSessionHydration).not.toBe(isTerminalFromTerminalEntryFlow);
+    expect(computePauseSessionResolved).not.toBe(persistedAllowsFromTerminalEntryFlow);
+    expect(isPauseSessionHeaderBackVisible).not.toBe(isTerminalFromTerminalEntryFlow);
+    expect(hasPersistedPauseSessionPayload).not.toBe(terminalStatesFromTerminalEntryFlow);
+    expect(coalescePauseSessionShellViewModel).not.toBe(persistedAllowsFromTerminalEntryFlow);
   });
 });

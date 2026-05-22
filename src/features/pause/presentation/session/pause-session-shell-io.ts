@@ -6,7 +6,8 @@
  * `pause-session-shell-io.re-exports.test.ts`, `pause-session-shell-io.test.ts` (wrapper delegation pins),
  * `pause-session-scaffold-shell-io-sibling-parity.test.ts` (application sibling vs scaffold-io),
  * `pause-session-shell-scaffold-io-sibling-parity.test.ts` (presentation sibling vs scaffold-io),
- * `pause-session-providers-shell-io-sibling-parity.test.ts` (sibling vs providers-io).
+ * `pause-session-providers-shell-io-sibling-parity.test.ts` (sibling vs providers-io),
+ * `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` (sibling vs terminal-entry-io).
  */
 export {
   computePauseSessionHydration,
