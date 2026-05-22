@@ -38,15 +38,16 @@ import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
-import { pauseReflectionShareImage } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
+  buildFeelTilesMoodLogOptions,
   pauseInitialEmotionSelect,
   pauseInitialEmotionSkip,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import { pauseReflectionShareImage } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
@@ -210,5 +211,6 @@ describe('pause-reflect-flows-io', () => {
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseInitialEmotionSkip);
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseInitialEmotionSelect);
     expect(buildPauseScoreImpacts).not.toBe(pauseInitialEmotionSkip);
+    expect(buildPauseScoreImpacts).not.toBe(buildFeelTilesMoodLogOptions);
   });
 });

@@ -83,6 +83,14 @@ describe('pause-reflect-mood-io', () => {
     expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
   });
 
+  it('sibling cluster: flows-io exports stay distinct from mood-io', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(pauseInitialEmotionSkip).not.toBe(pauseReflectOutcomeLog);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseInitialEmotionSelect).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseInitialEmotionSkip).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+  });
+
   it('re-exports depth-picker active gate from domain mood helpers', () => {
     expect(
       isPauseSessionDepthPickerActive({
@@ -172,12 +180,6 @@ describe('pause-reflect-mood-io', () => {
     expect(runInitialEmotionSkipMock).toHaveBeenCalledWith(customRepo, {
       pauseInstanceId: 'pi-skip-custom',
     });
-  });
-
-  it('sibling cluster: flows-io exports stay distinct from mood-io', () => {
-    expect(pauseInitialEmotionSelect).not.toBe(pauseReflectOutcomeLog);
-    expect(pauseInitialEmotionSkip).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
-    expect(pauseInitialEmotionSelect).not.toBe(pauseShiftEmotionFrameHubDone);
   });
 
   it('sibling cluster: hub-io exports stay distinct from mood-io', () => {
