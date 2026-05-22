@@ -30148,4 +30148,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate providers-shell presentation sibling parity under presentation/session (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-providers-shell-io-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Move presentation I/O sibling parity for providers-io ↔ shell-io from <code>application/use-cases/session/</code> to <code>presentation/session/</code> (parity with terminal-entry↔shell/scaffold colocation). Add reciprocal inline pins on <code>pause-session-providers-io.test.ts</code> and <code>pause-session-shell-io.test.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test colocation + comment anchors only; application flow-level sibling tests unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B <code>subscription-checkout-guard-ref</code> lib shim for <code>App.tsx</code> boot seam.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
