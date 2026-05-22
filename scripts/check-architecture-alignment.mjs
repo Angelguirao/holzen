@@ -908,7 +908,14 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/generation/pause-reflect-generation-hook-flow'",
 ];
 
-/** Reflect mood presentation — import domain mood helpers via pause-reflect-mood-flow only. */
+/** Reflect mood I/O — import via mood subcluster flows only (not pause-reflect-mood-flow umbrella). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_UMBRELLA_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow',
+  "from './application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow'",
+  "from '../application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow'",
+];
+
+/** Reflect mood presentation — import domain mood helpers via pause-reflect-mood-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/mood/',
   '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log',
@@ -1496,6 +1503,18 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_SESSION_RITUAL_RESTORE_BREATH_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: session ritual restore must import breath hydration via pause-session-breath-flow (${needle})`);
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-reflect-mood-io.ts') ||
+    rel.endsWith('pause-reflect-mood-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_UMBRELLA_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect mood I/O must import via mood subcluster flows (${needle})`,
+        );
       }
     }
   }

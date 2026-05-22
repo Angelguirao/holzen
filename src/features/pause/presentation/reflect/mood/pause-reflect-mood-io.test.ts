@@ -10,10 +10,10 @@ const runInitialEmotionSelectMock = vi.hoisted(() => vi.fn());
 const runInitialEmotionSkipMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow',
   async (importOriginal) => {
     const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow')
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow')
     >();
     return {
       ...actual,
@@ -28,7 +28,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 describe('pause-reflect-mood-io', () => {
-  it('re-exports depth-picker active gate from pause-reflect-mood-flow subclusters', () => {
+  it('re-exports depth-picker active gate from mood subcluster flows', () => {
     expect(
       isPauseSessionDepthPickerActive({
         phase: 'session',

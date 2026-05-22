@@ -1,25 +1,31 @@
 /**
  * Reflect mood beat presentation I/O (feel tiles, depth picker, chrome close, initial emotion RPC).
- * Imports domain mood helpers and run-* use cases via `pause-reflect-mood-flow` CI anchor
- * (parity with `pause-reflect-hub-io` → hub flow).
+ * Imports mood subcluster flow anchors directly (parity with
+ * `pause-reflect-hub-io` → hub subcluster flows).
  */
 import {
   applyBriefDepthPickerRitualEntry,
   applyDeepDepthPickerRitualEntry,
-  buildFeelTilesMoodLogOptions,
-  initialEmotionResetUi,
-  initialEmotionSelectRollbackUi,
   isPauseSessionDepthPickerActive,
   resolvePauseDepthContextLineParams,
-  resolvePauseSessionChromeCloseAction,
-  runDeepPausePickerEntryIfPro,
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow';
+import { buildFeelTilesMoodLogOptions } from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow';
+import {
+  initialEmotionResetUi,
+  initialEmotionSelectRollbackUi,
+  type InitialEmotionUiState,
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow';
+import {
   runInitialEmotionSelect,
   runInitialEmotionSkip,
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow';
+import {
+  resolvePauseSessionChromeCloseAction,
+  runDeepPausePickerEntryIfPro,
   runPauseSessionChromeCloseAction,
-  type InitialEmotionUiState,
   type PauseSessionChromeCloseAction,
   type PauseSessionPhase,
-} from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 export {
