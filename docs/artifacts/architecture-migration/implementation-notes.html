@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — pending-offer PostHog under application/ritual/reflect/telemetry/ (backlog #1, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate pending-offer trackers + <code>pause-pending-offer-telemetry-flow</code> in reflect telemetry cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Pair with presentation slice: move <code>pending-pause-offer-telemetry</code>, <code>pause-session-abandoned-telemetry</code>, and CI anchor <code>pause-pending-offer-telemetry-flow</code> from <code>application/.../pending-offer/</code> to <code>application/.../reflect/telemetry/</code> (§3). <code>pause-reflect-pending-offer-flow</code> re-exports trackers via <code>../telemetry/</code>; presentation <code>pause-reflect-pending-offer-telemetry-io</code> imports leaf modules from telemetry cluster.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; RPC/display use cases stay in <code>pending-offer/</code>.</dd>
+      <dt>Tradeoff</dt>
+      <dd>Pending-offer subcluster keeps RPC/display only; all reflect PostHog application modules live under <code>telemetry/</code>.</dd>
+      <dt>Open question</dt>
+      <dd>Next: remaining session flow identity pins or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — Home reflect telemetry I/O under presentation/reflect/telemetry/ (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

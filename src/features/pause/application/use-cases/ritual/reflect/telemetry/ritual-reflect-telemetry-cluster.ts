@@ -3,6 +3,6 @@
  * PostHog flow anchors colocate with tracker modules:
  * - Home manual-open: `generation/manual-open/pause-home-reflect-telemetry-flow` (presentation via `presentation/reflect/telemetry/pause-home-reflect-telemetry-io` → leaf trackers)
  * - Session reflect UI: `telemetry/pause-reflect-telemetry-flow`
- * Pending pause offer + session abandoned PostHog: `pending-offer/pause-pending-offer-telemetry-flow` (see pending-offer cluster).
+ * Pending pause offer + session abandoned PostHog: `telemetry/pause-pending-offer-telemetry-flow` (leaf trackers colocated in this cluster).
  */
 export {};
