@@ -111,14 +111,6 @@ mustExist(
   'pause/presentation/reflect/steps/',
 );
 mustExist(
-  'src/features/pause/presentation/reflect/telemetry',
-  'pause/presentation/reflect/telemetry/',
-);
-mustExist(
-  'src/features/pause/presentation/reflect/telemetry/home',
-  'pause/presentation/reflect/telemetry/home/',
-);
-mustExist(
   'src/features/pause/presentation/reflect/hub',
   'pause/presentation/reflect/hub/',
 );
@@ -230,12 +222,13 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS = [
   '@/features/pause/presentation/home/manual-open/pause-home-reflect-io',
   '@/features/pause/presentation/home/manual-open/apply-manual-pause-open-result',
   '@/features/pause/presentation/home/manual-open/pause-home-reflect-telemetry-io',
-  '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io',
+  '@/features/pause/presentation/reflect/telemetry/home/',
   "from './presentation/reflect/use-pause-reflect-generation'",
   "from './presentation/home/manual-open/pause-home-reflect-io'",
   "from './presentation/home/manual-open/apply-manual-pause-open-result'",
   "from './presentation/home/manual-open/pause-home-reflect-telemetry-io'",
-  "from './presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io'",
+  "from './presentation/reflect/telemetry/home/",
+  "from '../presentation/reflect/telemetry/home/",
   "from './presentation/reflect/use-pause-favorite-toggle'",
   "from '../presentation/reflect/use-pause-reflect-generation'",
 ];
