@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — terminal-entry-io ↔ scaffold-io sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no reflect moves. Add presentation I/O sibling parity so <code>pause-session-terminal-entry-io</code> and <code>pause-session-scaffold-io</code> stay namespace-separated (parity with terminal-entry↔shell flow sibling test and providers↔scaffold-io pins).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + I/O header comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shims, or terminal-entry-io ↔ shell-io dedicated sibling file if still inline-only.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — companion orchestrate ↔ orchestration sibling parity (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
