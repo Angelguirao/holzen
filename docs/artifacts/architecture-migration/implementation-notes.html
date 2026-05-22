@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect share application cluster marker (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>ritual/reflect/share/</code> CI cluster marker has unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder move remains complete. Add empty <code>ritual-reflect-share-cluster</code> + regression test beside <code>pause-reflect-share-flow</code> (parity with flows, hub, generation cluster markers). Umbrella flow still composes domain share + orchestration leaves; <code>pause-reflect-share-io</code> and <code>pause-reflect-telemetry-io</code> unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — marker documents existing I/O boundaries only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>All <code>ritual/reflect/</code> application subclusters now have cluster markers; next slices are session I/O peels or Phase B.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session shell/scaffold I/O peels, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect flows application cluster marker (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
