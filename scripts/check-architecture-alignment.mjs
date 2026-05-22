@@ -227,10 +227,7 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS = [
   "from './presentation/home/manual-open/pause-home-reflect-io'",
   "from './presentation/home/manual-open/apply-manual-pause-open-result'",
   "from './presentation/home/manual-open/pause-home-reflect-telemetry-io'",
-<<<<<<< HEAD
-=======
   "from './presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io'",
->>>>>>> dbc769caa (refactor(pause): colocate Home manual-open telemetry under reflect/telemetry/home)
   "from './presentation/reflect/use-pause-favorite-toggle'",
   "from '../presentation/reflect/use-pause-reflect-generation'",
 ];
