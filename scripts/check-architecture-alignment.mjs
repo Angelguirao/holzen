@@ -44,6 +44,11 @@ for (const ctx of contexts) {
 }
 
 mustExist('src/features/pause/application/use-cases/ritual/frame', 'pause/application/use-cases/ritual/frame/');
+mustExist('src/features/pause/application/use-cases/ritual/done', 'pause/application/use-cases/ritual/done/');
+mustExist(
+  'src/features/pause/application/use-cases/ritual/done/pause-ritual-done-flow.ts',
+  'pause/application/use-cases/ritual/done/pause-ritual-done-flow.ts',
+);
 mustExist('src/features/pause/application/use-cases/ritual/reflect', 'pause/application/use-cases/ritual/reflect/');
 mustExist(
   'src/features/pause/application/use-cases/ritual/reflect/flows',
@@ -1109,6 +1114,13 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_USE_CASE_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow'",
 ];
 
+/** Ritual done presentation — post-pause emotion log via pause-ritual-done-flow (done-io only). */
+const LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_USE_CASE_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/done/post-pause-emotion-log',
+  "from './application/use-cases/ritual/done/post-pause-emotion-log'",
+  "from '../application/use-cases/ritual/done/post-pause-emotion-log'",
+];
+
 /** public-home — pending-offer display copy via pause-reflect-pending-offer-io only. */
 const LEGACY_PAUSE_PUBLIC_HOME_PENDING_OFFER_DISPLAY_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow',
@@ -1342,6 +1354,26 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_ARCHIVE_DECIDE_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy archive decide import (${needle})`);
+      }
+    }
+  }
+  if (
+    rel.startsWith('src/features/pause/presentation/ritual/done/') &&
+    !rel.endsWith('-io.ts') &&
+    !rel.endsWith('-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_USE_CASE_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy ritual done use-case import (${needle})`);
+      }
+    }
+  }
+  if (rel.endsWith('pause-ritual-done-io.ts') || rel.endsWith('pause-ritual-done-io.test.ts')) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_USE_CASE_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: ritual done I/O must import via pause-ritual-done-flow (${needle})`,
+        );
       }
     }
   }

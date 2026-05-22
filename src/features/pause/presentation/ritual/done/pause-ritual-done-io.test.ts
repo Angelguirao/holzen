@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   pausePostPauseEmotionLogIfDirty,
+  pausePostPauseEmotionLogIfDirtyWithRepository,
   reflectPauseRepository,
 } from './pause-ritual-done-io';
 
@@ -35,5 +36,21 @@ describe('pause-ritual-done-io', () => {
       initialSnapshot: null,
     });
     expect(reflectPauseRepository).toEqual({ port: 'reflectPauseRepository' });
+  });
+
+  it('routes post-pause emotion log through pause-ritual-done-flow with injected repository', () => {
+    const repository = { kind: 'test' };
+    pausePostPauseEmotionLogIfDirtyWithRepository(repository as never, {
+      pauseInstanceId: 'inst-2',
+      mood: 'anxious',
+      intensity: 5,
+      initialSnapshot: { mood: 'calm', intensity: 2 },
+    });
+    expect(runPostPauseEmotionLogIfDirtyMock).toHaveBeenCalledWith(repository, {
+      pauseInstanceId: 'inst-2',
+      mood: 'anxious',
+      intensity: 5,
+      initialSnapshot: { mood: 'calm', intensity: 2 },
+    });
   });
 });

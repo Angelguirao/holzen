@@ -1,6 +1,7 @@
 /**
  * CI cluster anchor for ritual done presentation I/O (§3 / check:architecture-alignment).
- * Composes done subcluster use cases; presentation imports via `pause-ritual-done-io.ts`.
+ * Use case: `runPostPauseEmotionLogIfDirty` (brief Done “Save to journey”).
+ * Presentation: `pause-ritual-done-io.ts` imports through this anchor.
  */
 export {
   runPostPauseEmotionLogIfDirty,
