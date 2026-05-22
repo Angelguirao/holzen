@@ -10,7 +10,8 @@
  * `pause-reflect-flows-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`,
  * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`,
  * `pause-reflect-flows-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`,
- * `pause-reflect-flows-share-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`.
+ * `pause-reflect-flows-share-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`,
+ * `pause-reflect-flows-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`.
  */
 import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
 import {
