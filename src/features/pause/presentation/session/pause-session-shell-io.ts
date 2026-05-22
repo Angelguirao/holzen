@@ -4,7 +4,6 @@
  * (parity with `pause-reflect-hub-io` → hub subcluster flows).
  * CI: `pause-session-shell-io-parity.test.ts` (umbrella/leaf identity),
  * `pause-session-shell-io.re-exports.test.ts`, `pause-session-shell-io.test.ts` (wrapper delegation pins),
- * `pause-session-scaffold-shell-io-sibling-parity.test.ts` (application sibling vs scaffold-io),
  * `pause-session-shell-scaffold-io-sibling-parity.test.ts` (presentation sibling vs scaffold-io),
  * `presentation/session/pause-session-providers-shell-io-sibling-parity.test.ts` (sibling vs providers-io),
  * `presentation/session/pause-session-terminal-entry-shell-io-sibling-parity.test.ts` (sibling vs terminal-entry-io; application + presentation;

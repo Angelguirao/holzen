@@ -20,8 +20,10 @@ import {
 
 /**
  * Presentation sibling parity: favorite toggle vs reflection_step log wrappers on
- * steps-io (parity with application `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`
- * and `pause-reflect-steps-favorite-reflection-step-log-flow-sibling-parity.test.ts`;
+ * steps-io (parity with application
+ * `pause-reflect-steps-favorite-reflection-step-log-io-sibling-parity.test.ts`,
+ * `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`, and
+ * `pause-reflect-steps-favorite-reflection-step-log-flow-sibling-parity.test.ts`;
  * complements `pause-reflect-steps-note-tag-io-sibling-parity.test.ts`).
  * Application delegation mirror: `pause-reflect-steps-io-parity.test.ts`.
  */

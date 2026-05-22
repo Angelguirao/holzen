@@ -18,7 +18,8 @@ import {
 
 /**
  * Presentation sibling parity: note vs tag wrappers on steps-io (parity with application
- * `pause-reflect-note-tag-flow-sibling-parity.test.ts` and `pause-reflect-steps-io-parity.test.ts`;
+ * `pause-reflect-steps-note-tag-io-sibling-parity.test.ts`, `pause-reflect-note-tag-flow-sibling-parity.test.ts`,
+ * and `pause-reflect-steps-io-parity.test.ts`;
  * reciprocal inline: `pause-reflect-steps-io.test.ts` and application
  * `pause-reflect-note-flow.test.ts` ↔ `pause-reflect-tag-flow.test.ts`; complements
  * `pause-reflect-steps-favorite-reflection-step-log-io-sibling-parity.test.ts` and

@@ -18,7 +18,7 @@ import * as tagFlow from './pause-reflect-tag-flow';
  * Application sibling parity: steps umbrella vs note/tag subcluster CI anchors (parity with
  * `pause-reflect-steps-generation-flow-sibling-parity.test.ts`; complements
  * `pause-reflect-note-tag-flow-sibling-parity.test.ts` and presentation
- * `pause-reflect-steps-note-tag-io-sibling-parity.test.ts`).
+ * `pause-reflect-steps-note-tag-io-sibling-parity.test.ts` (application + presentation).
  */
 describe('pause-reflect-steps-flow ↔ pause-reflect-note-flow / pause-reflect-tag-flow sibling parity', () => {
   it('steps-flow, note-flow, and tag-flow are distinct sibling CI anchors', () => {
