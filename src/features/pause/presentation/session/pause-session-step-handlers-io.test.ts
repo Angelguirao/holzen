@@ -40,11 +40,17 @@ describe('pause-session-step-handlers-io', () => {
     expect(buildPauseSessionStepRitualBundle).toBe(buildRitualFromLeaf);
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-session-step-transition-io.test.ts` (bundle builders vs motion I/O).
+   * Dedicated sibling file: `pause-session-step-handlers-step-transition-io-sibling-parity.test.ts`.
+   */
   it('sibling cluster: step-transition-io exports stay distinct from step-handlers-io', () => {
     expect(buildPauseSessionStepShellBundle).not.toBe(buildPauseSessionStepTransitionConfig);
     expect(buildPauseSessionStepRitualBundle).not.toBe(buildPauseSessionStepTransitionConfig);
     expect(buildPauseSessionStepShellBundle).not.toBe(pauseStepSwipeDirection);
     expect(buildPauseSessionStepRitualBundle).not.toBe(pauseStepSwipeDirection);
+    expect(buildPauseSessionStepShellBundle).not.toBe(buildPauseSessionStepRitualBundle);
+    // Reciprocal inline pins: `pause-session-step-transition-io.test.ts`.
     // Full cross-I/O pins: `pause-session-step-handlers-step-transition-io-sibling-parity.test.ts`.
   });
 
