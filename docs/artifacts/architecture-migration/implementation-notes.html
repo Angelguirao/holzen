@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — frame orchestration/session/section leaf flow regression tests (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Non-orchestrate <code>ritual/frame/</code> leaf CI anchors have unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>application/use-cases/companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Add leaf flow tests beside: <code>pause-companion-library-favorite-flow</code>, <code>pause-companion-orchestrate-session-flow</code>, <code>pause-companion-section-visibility-flow</code>, <code>pause-companion-section-expansion-flow</code>, <code>pause-companion-ui-completion-flow</code>, <code>pause-companion-full-view-ui-flow</code>, and <code>pause-companion-orchestrate-slot-apply-flow</code> (parity with orchestrate subcluster leaf tests). <code>pause-companion-orchestration-io</code> unchanged (imports leaf modules directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test-only slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No CI guard change; leaf anchors remain CI-only; umbrella <code>pause-companion-orchestration-flow.test.ts</code> already covers aggregate re-exports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim, or pause Tier 2 god-hook peels outside ritual folders.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect generation manual-open leaf flow regression tests (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
