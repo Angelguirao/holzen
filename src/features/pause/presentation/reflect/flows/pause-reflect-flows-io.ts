@@ -3,6 +3,7 @@
  * Imports reflect/decide helpers from domain + ritual/decide leaf modules (score impacts
  * from `score-impacts` / `score-impact-presentation`; parity with `pause-reflect-mood-io`).
  * `PauseImpactData` via `pause-session-decide-io` (session decide beat).
+ * Parity pins: `pause-reflect-flows-io-parity.test.ts`.
  */
 import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
 import {
