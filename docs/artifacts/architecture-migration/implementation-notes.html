@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel pause-companion-frame-ui-io to ritual/frame leaf modules (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-frame-ui-io</code> imports full-view + section visibility from leaf modules</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Route <code>pause-companion-frame-ui-io</code> through <code>full-view-page-helpers</code> and <code>section-visibility</code> instead of frame UI subcluster flow anchors (follows orchestration-io and orchestrate-io peels on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-companion-frame-ui-flow.ts</code> and subcluster <code>*-flow</code> anchors remain for cluster detection.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-companion-analytics-io</code> off subcluster flow anchors, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-companion-orchestration-io to ritual/frame leaf modules (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
