@@ -5,7 +5,8 @@
  * Wrapper delegation pins: `pause-reflect-hub-io.test.ts` (default + *WithRepository seam;
  * mood-io, flows-io, and share-io reciprocal inline pins).
  * Sibling parity: `pause-reflect-generation-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`,
- * `pause-reflect-hub-share-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`,
+ * `pause-reflect-hub-share-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io` (application
+ * `application/.../hub/pause-reflect-hub-share-io-sibling-parity.test.ts`),
  * `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (application
  * `application/.../hub/pause-reflect-hub-pending-offer-io-sibling-parity.test.ts`; reciprocal inline:
  * `pause-reflect-hub-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`),

@@ -22,8 +22,9 @@ import {
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 
 /**
- * Sibling parity: hub-io vs share-io presentation I/O (parity with
- * `pause-reflect-share-hub-flow-sibling-parity.test.ts` and
+ * Presentation sibling parity: hub-io vs share-io (parity with application
+ * `application/.../hub/pause-reflect-hub-share-io-sibling-parity.test.ts`,
+ * `pause-reflect-share-hub-flow-sibling-parity.test.ts`, and
  * `pause-reflect-generation-hub-io-sibling-parity.test.ts`;
  * complements reciprocal inline pins on `pause-reflect-hub-io.test.ts` and
  * `pause-reflect-share-io.test.ts`).
