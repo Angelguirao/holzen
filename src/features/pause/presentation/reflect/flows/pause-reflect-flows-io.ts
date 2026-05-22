@@ -4,6 +4,7 @@
  * from `score-impacts` / `score-impact-presentation`; parity with `pause-reflect-mood-io`).
  * `PauseImpactData` via `pause-session-decide-io` (session decide beat).
  * Parity pins: `pause-reflect-flows-io.test.ts` (outcome wrapper distinctness + RPC delegation; ambience-io + pending-offer-io reciprocal inline pins),
+ * `pause-reflect-flows-io-parity.test.ts`, `pause-reflect-flows-io-flow-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow`,
  * `pause-reflect-flows-decide-io-sibling-parity.test.ts` ↔ `pause-session-decide-io` (application
  * `pause-reflect-flows-decide-flow-sibling-parity.test.ts` ↔ `pause-session-decide-flow`),
  * `pause-reflect-flows-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (reciprocal inline pins in

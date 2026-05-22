@@ -241,6 +241,10 @@ describe('pause-reflect-flows-flow', () => {
     // Reciprocal inline pins: `pause-reflect-pending-offer-flow.test.ts`.
   });
 
+  /**
+   * Reciprocal pins ↔ `pause-reflect-flows-io.test.ts`. Full cross-layer pins:
+   * `pause-reflect-flows-io-flow-sibling-parity.test.ts`.
+   */
   it('flows CI umbrella re-exports runPauseOutcomeLog as ritual/decide leaf (not presentation port wrappers)', () => {
     expect(runOutcomeLogFromFlow).toBe(runPauseOutcomeLog);
     expect(runOutcomeLogFromFlow).not.toBe(pauseReflectOutcomeLog);
