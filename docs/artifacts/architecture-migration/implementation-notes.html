@@ -20084,4 +20084,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A slice — hub shift-frame test bundle via pause-reflect-hub-io (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>use-pause-shift-frame-done-handler</code> test through hub presentation I/O</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Re-export <code>buildShiftEmotionFrameHubLogBundle</code> on <code>pause-reflect-hub-io</code>; <code>use-pause-shift-frame-done-handler.test.tsx</code> imports log bundle and mocks RPC via <code>importActual</code> on the I/O module instead of deep <code>pause-reflect-hub-flow</code> / domain presentation paths.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>run-shift-emotion-frame-hub-done</code> use-case tests still import <code>buildShiftEmotionFrameHubLogBundle</code> from <code>pause-reflect-hub-flow</code> (application layer). Fixed stale <code>./pause-home-reflect-telemetry-io</code> import on colocated <code>apply-manual-pause-open-result</code> (→ telemetry flow anchor).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim, or companion orchestration-io peel if drift appears.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

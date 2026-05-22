@@ -2,29 +2,30 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
-import { buildShiftEmotionFrameHubLogBundle } from '@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow';
+import { buildShiftEmotionFrameHubLogBundle } from './pause-reflect-hub-io';
 import { usePauseShiftFrameDoneHandler } from './use-pause-shift-frame-done-handler';
 
 const { logKey: SHIFT_LOG_KEY } = buildShiftEmotionFrameHubLogBundle();
 
-const { pauseShiftEmotionFrameHubDoneMock, showPauseStepSyncFailedToast } = vi.hoisted(() => ({
-  pauseShiftEmotionFrameHubDoneMock: vi.fn(),
-  showPauseStepSyncFailedToast: vi.fn(),
-}));
+const pauseShiftEmotionFrameHubDoneMock = vi.hoisted(() => vi.fn());
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
 }));
 
 vi.mock('./pause-reflect-hub-io', async () => {
-  const domain = await import(
-    '@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation'
+  const actual = await vi.importActual<typeof import('./pause-reflect-hub-io')>(
+    './pause-reflect-hub-io',
   );
   return {
+    ...actual,
     pauseShiftEmotionFrameHubDone: pauseShiftEmotionFrameHubDoneMock,
-    resolveShiftFrameHubDonePresentation: domain.resolveShiftFrameHubDonePresentation,
   };
 });
+
+const { showPauseStepSyncFailedToast } = vi.hoisted(() => ({
+  showPauseStepSyncFailedToast: vi.fn(),
+}));
 
 vi.mock('@/features/pause/presentation/ritual/pause-step-sync-toast', () => ({
   showPauseStepSyncFailedToast,
