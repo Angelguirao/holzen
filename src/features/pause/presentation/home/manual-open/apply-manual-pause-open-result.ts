@@ -6,7 +6,7 @@ import type {
   OpenManualPauseFromHomeResult,
   TrackManualPauseInstanceCreatedPayload,
   TrackPauseManualCompletedPayload,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-manual-open-flow';
+} from './pause-home-reflect-io';
 import {
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
