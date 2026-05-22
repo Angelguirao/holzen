@@ -24,6 +24,7 @@ import {
 
 /**
  * Presentation I/O parity (colocated beside `pause-session-providers-io.ts`).
+ * Application mirror: `application/use-cases/session/pause-session-providers-io-parity.test.ts`.
  * Imports `pause-session-providers-flow` CI umbrella for `.toBe` identity pins only — production providers I/O keeps `pause-holzen-providers-slice` leaf import.
  * Shell-io / scaffold-io sibling pins: `pause-session-providers-shell-io-sibling-parity.test.ts`
  * and `pause-session-providers-scaffold-io-sibling-parity.test.ts` (application + presentation);
