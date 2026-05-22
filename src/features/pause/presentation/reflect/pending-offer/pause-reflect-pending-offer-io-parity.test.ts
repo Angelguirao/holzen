@@ -118,6 +118,8 @@ import {
 /**
  * Presentation pending-offer I/O parity (colocated beside `pause-reflect-pending-offer-io.ts`).
  * Application mirror: `application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+ * Session telemetry-io sibling: `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
  */
 describe('pause-reflect-pending-offer-io parity', () => {
   it('presentation I/O pending-offer display matches pending-offer CI umbrella', () => {
