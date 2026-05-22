@@ -25,3 +25,4 @@ export {
   type PauseSessionPhase,
 } from '@/features/pause/domain/reflect/mood/pause-session-mood-chrome-flow';
 export { resolvePauseDepthContextLineParams } from '@/features/pause/domain/reflect/mood/resolve-pause-depth-context-line-params';
+export { isPauseSessionDepthPickerActive } from '@/features/pause/domain/reflect/mood/pause-depth-picker-active';
