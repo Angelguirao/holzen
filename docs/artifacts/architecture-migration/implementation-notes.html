@@ -59,19 +59,6 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
-      <span>Phase A — hub/mood/share-io reciprocal namespace guards (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3>Colocated parity <code>in</code> namespace pins (hub ↔ mood ↔ share)</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no relocations. Extend application + presentation <code>pause-reflect-hub-io-parity</code>, <code>pause-reflect-mood-io-parity</code>, and <code>pause-reflect-share-io-parity</code> with reciprocal <code>in hubIo/moodIo/shareIo</code> namespace guards so shift-frame hub, initial-emotion mood, and share PNG builders cannot merge across presentation I/O modules (complements dedicated sibling-parity files).</dd>
-      <dt>Deviation</dt>
-      <dd>None — test-only.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: ambience flow↔io wrapper mirrors, or Phase B Tier 1 lib shim scan.</dd>
-=======
       <span>Phase A — reflect telemetry flow↔io wrapper sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -83,7 +70,23 @@
       <dd>None — test-only.</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B Tier 1 lib shim scan (<code>@/lib/posthog</code> in ritual reflect telemetry), or companion frame I/O colocation.</dd>
->>>>>>> c63ba3543 (test(pause): reflect telemetry flow↔io wrapper sibling parity)
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — hub/mood/share-io reciprocal namespace guards (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocated parity <code>in</code> namespace pins (hub ↔ mood ↔ share)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no relocations. Extend application + presentation <code>pause-reflect-hub-io-parity</code>, <code>pause-reflect-mood-io-parity</code>, and <code>pause-reflect-share-io-parity</code> with reciprocal <code>in hubIo/moodIo/shareIo</code> namespace guards so shift-frame hub, initial-emotion mood, and share PNG builders cannot merge across presentation I/O modules (complements dedicated sibling-parity files).</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B Tier 1 lib shim scan.</dd>
     </dl>
   </article>
 
