@@ -36,7 +36,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
  * `pause-reflect-steps-io.test.ts`); flow umbrellas:
  * `pause-reflect-note-tag-flow-sibling-parity.test.ts`,
  * `pause-reflect-steps-note-tag-flow-sibling-parity.test.ts`.
- * Flows-io cross-surface: `pause-reflect-flows-io-parity.test.ts` ↔ this file;
+ * Flows-io cross-surface: colocated `pause-reflect-flows-io-parity.test.ts` ↔ this file;
  * `pause-reflect-flows-steps-io-sibling-parity.test.ts` (application + presentation).
  * Steps-io ↔ mood-io: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
@@ -368,7 +368,7 @@ describe('pause-reflect-steps-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (step RPC wrappers vs reflect+decide).
+   * Reciprocal inline pins ↔ `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts` (step RPC wrappers vs reflect+decide).
    * Dedicated sibling file: `pause-reflect-flows-steps-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: flows-io exports stay distinct from steps-io wrappers', () => {
@@ -382,7 +382,7 @@ describe('pause-reflect-steps-io parity', () => {
     expect(pauseReflectNoteUpdate).not.toBe(buildPauseScoreImpacts);
     expect(pauseReflectTagUpdate).not.toBe(pauseReflectOutcomeLog);
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectTagUpdate);
-    // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-steps-io-sibling-parity.test.ts`.
   });
 

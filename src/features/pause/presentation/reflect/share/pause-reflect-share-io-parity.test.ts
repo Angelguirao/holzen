@@ -68,7 +68,7 @@ import {
  * Presentation-layer share I/O parity (colocated beside `pause-reflect-share-io.ts`).
  * Generation-io sibling: `pause-reflect-generation-share-io-sibling-parity.test.ts`.
  * Flows-io sibling: `pause-reflect-flows-share-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (application).
+ * reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (colocated under `presentation/reflect/flows/`).
  * Telemetry-io sibling: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
  */
@@ -125,7 +125,7 @@ describe('pause-reflect-share-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ application `pause-reflect-flows-io-parity.test.ts`.
+   * Reciprocal inline pins ↔ `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-flows-share-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: flows-io exports stay distinct from share-io wrappers', () => {

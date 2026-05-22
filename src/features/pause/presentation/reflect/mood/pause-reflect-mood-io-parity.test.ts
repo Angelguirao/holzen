@@ -102,7 +102,7 @@ import {
  * Steps-io sibling pins: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application).
  * Flows-io sibling pins: `pause-reflect-flows-mood-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts`.
+ * reciprocal inline pins ↔ colocated `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts`.
  * Generation-io sibling pins: `pause-reflect-generation-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
  */
@@ -224,7 +224,7 @@ describe('pause-reflect-mood-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (application; mood RPC vs reflect+decide).
+   * Reciprocal inline pins ↔ `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts` (mood RPC vs reflect+decide).
    * Dedicated sibling file: `pause-reflect-flows-mood-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: flows-io exports stay distinct from mood-io wrappers', () => {
@@ -238,7 +238,7 @@ describe('pause-reflect-mood-io parity', () => {
     expect(pauseInitialEmotionSkip).not.toBe(buildPauseScoreImpacts);
     expect(buildFeelTilesMoodLogOptions).not.toBe(showPauseOutcomeNotCompletedToast);
     expect(resolvePauseSessionChromeCloseAction).not.toBe(showPauseOutcomeSaveFailedToast);
-    // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts` (application).
+    // Reciprocal inline pins: `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-mood-io-sibling-parity.test.ts`.
   });
 
