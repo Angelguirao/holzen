@@ -3071,7 +3071,8 @@ for (const file of walkTs(join(root, 'src'))) {
     }
     if (
       rel.endsWith('pause-session-step-transition-io.ts') ||
-      rel.endsWith('pause-session-step-transition-io.test.ts')
+      rel.endsWith('pause-session-step-transition-io.test.ts') ||
+      rel.endsWith('pause-session-step-transition-io.re-exports.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_STEP_TRANSITION_IO_FLOW_IMPORTS) {
         if (text.includes(needle)) {

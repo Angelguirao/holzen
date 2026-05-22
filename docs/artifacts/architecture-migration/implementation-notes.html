@@ -79,12 +79,12 @@
       <span>Phase A — session step-transition-io ↔ step-transition-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-session-step-transition-io-parity.test.ts</code></h3>
+    <h3><code>pause-session-step-transition-io-parity.test.ts</code> + re-exports identity pin</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add application-layer <code>pause-session-step-transition-io-parity.test.ts</code> so presentation <code>pause-session-step-transition-io</code> exports match <code>pause-session-step-transition-flow</code> CI umbrella and <code>step-transition</code> + <code>step-swipe-direction</code> leaf modules (parity with shell-io / scaffold-io session pins). Production step-transition I/O keeps direct leaf imports.</dd>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add application-layer <code>pause-session-step-transition-io-parity.test.ts</code> and presentation <code>pause-session-step-transition-io.re-exports.test.ts</code> so <code>pause-session-step-transition-io</code> exports match <code>pause-session-step-transition-flow</code> CI umbrella and <code>step-transition</code> + <code>step-swipe-direction</code> leaf modules (parity with shell-io / scaffold-io session pins). Production step-transition I/O keeps direct leaf imports.</dd>
       <dt>Deviation</dt>
-      <dd>None — tests only.</dd>
+      <dd>None — tests + flow/I/O comments only.</dd>
       <dt>Open question</dt>
       <dd>Next: Phase B subscription Tier 1 shims, <code>home/bulk-hold/group-by-local-day</code> colocation, or persisted-tab-session I/O peel.</dd>
     </dl>
