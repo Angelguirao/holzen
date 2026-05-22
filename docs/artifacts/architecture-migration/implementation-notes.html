@@ -21110,4 +21110,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — pending-offer display on public-home via pending-offer I/O (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>getPendingPauseOfferDisplay</code> on <code>public-home</code> through <code>pause-reflect-pending-offer-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. After <code>pause-reflect-pending-offer-flow</code> composes the RPC subcluster, re-export display helpers on <code>pause-reflect-pending-offer-io</code>; <code>public-home</code> imports pending-offer read copy through presentation I/O (parity with adopt/decline RPC on the same module). CI blocks deep pending-offer display imports on <code>public-home.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; barrel path only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-home</code> still exports other Home read-model helpers from <code>application/use-cases/home/*</code> until a later peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim (<code>subscription-checkout-guard-ref</code> in <code>App.tsx</code>) or archive decide RPC/telemetry subcluster compose.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

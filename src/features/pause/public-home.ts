@@ -65,7 +65,8 @@ export {
 export {
   getPendingPauseOfferDisplay,
   type PendingPauseOfferDisplay,
-} from './application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow';
+  type PendingPauseOfferDisplayInput,
+} from './presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 export {
   useHomePauseActions,
   type PauseDismissAnalyticsSurface,

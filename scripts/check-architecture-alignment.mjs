@@ -999,6 +999,16 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_USE_CASE_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow'",
 ];
 
+/** public-home — pending-offer display copy via pause-reflect-pending-offer-io only. */
+const LEGACY_PAUSE_PUBLIC_HOME_PENDING_OFFER_DISPLAY_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display',
+  "from './application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow'",
+  "from './application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display'",
+];
+
 /** Flat presentation/session scaffold paths — use presentation/session/scaffold/. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_IMPORTS = [
   '@/features/pause/presentation/session/scaffold-ritual-payloads',
@@ -1384,6 +1394,15 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: pending-offer telemetry flow must not import legacy telemetry/ paths (${needle})`,
+        );
+      }
+    }
+  }
+  if (rel === 'src/features/pause/public-home.ts') {
+    for (const needle of LEGACY_PAUSE_PUBLIC_HOME_PENDING_OFFER_DISPLAY_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: pending-offer display must import via pause-reflect-pending-offer-io (${needle})`,
         );
       }
     }
