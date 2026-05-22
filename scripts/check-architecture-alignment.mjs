@@ -3080,6 +3080,7 @@ for (const file of walkTs(join(root, 'src'))) {
       rel.endsWith('pause-reflect-pending-offer-io.test.ts') ||
       rel.endsWith('pause-reflect-pending-offer-io.re-exports.test.ts') ||
       rel.endsWith('pause-reflect-pending-offer-io-parity.test.ts') ||
+      rel.endsWith('pause-reflect-pending-offer-flow-io-wrapper-sibling-parity.test.ts') ||
       rel.endsWith('pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts') ||
       rel.endsWith('pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts');
     for (const needle of LEGACY_PAUSE_REFLECT_PENDING_OFFER_TELEMETRY_PATH_IMPORTS) {
