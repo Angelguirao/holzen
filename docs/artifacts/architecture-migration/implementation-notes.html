@@ -21300,4 +21300,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — archive decide RPC + telemetry subclusters (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Compose <code>pause-archive-decide-flow</code> from RPC + telemetry flow anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-archive-decide-rpc-flow</code> and <code>pause-archive-decide-telemetry-flow</code>; umbrella re-exports adopt/decline-style composition (parity with pending-offer and share subclusters). <code>pause-archive-io</code> still imports the umbrella anchor only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Archive presentation I/O unchanged; CI blocks deep leaf imports on the umbrella flow and deep decide paths under <code>presentation/archive/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-ritual-done-flow</code> anchor for brief done I/O, or Phase B cross-context Tier 1 shims beyond subscription checkout guard.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
