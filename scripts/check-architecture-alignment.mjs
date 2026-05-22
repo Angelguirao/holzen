@@ -936,20 +936,11 @@ const LEGACY_PAUSE_REFLECT_GENERATION_FLOW_TELEMETRY_IMPORTS = [
   "from '../manual-open/manual-pause-trigger-telemetry'",
 ];
 
-/** Reflect hub presentation — hub I/O via pause-reflect-hub-flow only (not hub subcluster flows). */
-const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_SUBCLUSTER_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
-  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-presentation-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-log-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow',
-  "from './application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done'",
-  "from '../application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done'",
-  "from './application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-presentation-flow'",
-  "from '../application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-presentation-flow'",
-  "from './application/use-cases/ritual/reflect/hub/pause-shift-emotion-log-flow'",
-  "from '../application/use-cases/ritual/reflect/hub/pause-shift-emotion-log-flow'",
-  "from './application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow'",
-  "from '../application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow'",
+/** Reflect hub I/O — import via hub subcluster flows only (not pause-reflect-hub-flow umbrella). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_UMBRELLA_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow',
+  "from './application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow'",
+  "from '../application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow'",
 ];
 
 /** Reflect hub presentation — import domain hub helpers via pause-reflect-hub-io only. */
@@ -1708,10 +1699,10 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-reflect-hub-io.ts') ||
     rel.endsWith('pause-reflect-hub-io.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_SUBCLUSTER_IMPORTS) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_UMBRELLA_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: reflect hub I/O must import via pause-reflect-hub-flow (${needle})`,
+          `${rel}: reflect hub I/O must import via hub subcluster flows (${needle})`,
         );
       }
     }
