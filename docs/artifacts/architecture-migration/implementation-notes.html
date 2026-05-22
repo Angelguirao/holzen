@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — presentation reflect mood I/O identity pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-io.test.ts</code> pins mood domain helper re-exports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend allowlisted <code>pause-reflect-mood-io.test.ts</code> with <code>.toBe(direct)</code> identity for domain mood helpers and <code>reflectPauseRepository</code> ↔ <code>supabasePauseRepository</code> (parity with generation-io and share-io presentation I/O pins). Mood hooks still import <code>pause-reflect-mood-io</code> only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; no separate <code>*.re-exports.test.ts</code> (mood presentation folder allowlists only <code>pause-reflect-mood-io.ts</code> + <code>.test.ts</code>).</dd>
+      <dt>Tradeoff</dt>
+      <dd>Identity pins live in the existing I/O test file beside RPC delegation mocks so CI import guards stay satisfied.</dd>
+      <dt>Open question</dt>
+      <dd>Next: steps/pending-offer I/O re-export pins, remaining session umbrella pins, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — presentation reflect flows I/O identity pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoff</dt>
       <dd>Outcome-log wrappers (<code>pauseReflectOutcomeLog*</code>) stay in mocked I/O test only — not identity-pinned re-exports.</dd>
       <dt>Open question</dt>
-      <dd>Next: <code>pause-reflect-steps-io</code> / mood / pending-offer I/O re-export pins, remaining session umbrella pins, or Phase B subscription Tier 1 shims.</dd>
+      <dd>Superseded by mood-io slice on branch tip.</dd>
     </dl>
   </article>
 
@@ -90,7 +109,7 @@
       <dt>Tradeoff</dt>
       <dd>Orchestrate umbrella documents composed ritual/frame subcluster surface without changing presentation import paths.</dd>
       <dt>Open question</dt>
-      <dd>None — superseded by flows-io slice on branch tip.</dd>
+      <dd>Superseded by flows-io and mood-io slices on branch tip.</dd>
     </dl>
   </article>
 
@@ -109,7 +128,7 @@
       <dt>Tradeoff</dt>
       <dd>Presentation I/O gains a dedicated identity test beside existing delegation mocks in <code>pause-reflect-generation-io.test.ts</code>.</dd>
       <dt>Open question</dt>
-      <dd>None — superseded by flows-io slice on branch tip.</dd>
+      <dd>Superseded by flows-io and mood-io slices on branch tip.</dd>
     </dl>
   </article>
 
