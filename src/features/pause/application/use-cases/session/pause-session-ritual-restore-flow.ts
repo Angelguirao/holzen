@@ -7,7 +7,7 @@ export { mapPersistedStep } from '@/features/pause/domain/session/map-persisted-
 export {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
-} from '@/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow';
+} from '@/features/pause/application/use-cases/ritual/breathe/restored-breath-ritual-state';
 export {
   initialDecisionFromRestored,
   initialPhaseFromRestored,

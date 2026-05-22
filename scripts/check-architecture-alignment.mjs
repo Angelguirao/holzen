@@ -793,14 +793,11 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_IO_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/breathe/pause-session-breath-flow'",
 ];
 
-/** Session ritual restore — import restored breath hydration via pause-session-breath-flow only. */
+/** Session ritual restore flow — import restored breath hydration via restored-breath-ritual-state only (not breath-flow). */
 const LEGACY_PAUSE_SESSION_RITUAL_RESTORE_BREATH_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/breathe/restored-breath-ritual-state',
-  '@/features/pause/domain/ritual/breathe/restored-breath-ritual-state',
-  "from './application/use-cases/ritual/breathe/restored-breath-ritual-state'",
-  "from '../application/use-cases/ritual/breathe/restored-breath-ritual-state'",
-  "from './domain/ritual/breathe/restored-breath-ritual-state'",
-  "from '../domain/ritual/breathe/restored-breath-ritual-state'",
+  '@/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow',
+  "from './application/use-cases/ritual/breathe/pause-session-breath-flow'",
+  "from '../application/use-cases/ritual/breathe/pause-session-breath-flow'",
 ];
 
 /** Reflect mood umbrella flow — compose subcluster anchors only (no deep domain/reflect/mood). */
@@ -2276,7 +2273,7 @@ for (const file of walkTs(join(root, 'src'))) {
   if (rel === 'src/features/pause/application/use-cases/session/pause-session-ritual-restore-flow.ts') {
     for (const needle of LEGACY_PAUSE_SESSION_RITUAL_RESTORE_BREATH_IMPORTS) {
       if (text.includes(needle)) {
-        failures.push(`${rel}: session ritual restore must import breath hydration via pause-session-breath-flow (${needle})`);
+        failures.push(`${rel}: session ritual restore must import breath hydration via restored-breath-ritual-state (${needle})`);
       }
     }
   }
