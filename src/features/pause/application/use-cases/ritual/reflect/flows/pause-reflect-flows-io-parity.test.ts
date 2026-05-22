@@ -67,6 +67,12 @@ import {
   showPauseOutcomeNotCompletedToast as showNotCompletedFromFlowsIo,
   showPauseOutcomeSaveFailedToast as showSaveFailedFromFlowsIo,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
+  buildShiftEmotionFrameHubLogBundle,
+  pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
+  resolveShiftFrameHubDonePresentation,
+} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
@@ -132,5 +138,20 @@ describe('pause-reflect-flows-io parity', () => {
     expect(pauseReflectOutcomeLog).not.toBe(runPauseOutcomeLog);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(runPauseOutcomeLog);
     expect(pauseReflectOutcomeLog).not.toBe(pauseReflectOutcomeLogWithRepository);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (reflect+decide vs shift-frame hub).
+   * Dedicated sibling file: `pause-reflect-flows-hub-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: hub-io shift-frame exports stay distinct from flows-io', () => {
+    expect(pauseReflectOutcomeLog).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(formatReinforcementQuoteFromSession).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(resolvePauseDecideOutcomeFlow).not.toBe(resolveShiftFrameHubDonePresentation);
+    expect(buildPauseScoreImpacts).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    // Full pins: `pause-reflect-flows-hub-io-sibling-parity.test.ts`.
   });
 });

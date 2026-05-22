@@ -29,7 +29,8 @@ import {
 
 /**
  * Presentation sibling parity: flows-io vs hub-io (parity with application
- * `pause-reflect-flows-hub-flow-sibling-parity.test.ts`; complements
+ * `pause-reflect-flows-hub-flow-sibling-parity.test.ts` and application
+ * `pause-reflect-flows-hub-io-sibling-parity.test.ts`; complements
  * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts`).
  */
 describe('pause-reflect-flows-io ↔ pause-reflect-hub-io sibling parity', () => {
