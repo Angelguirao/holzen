@@ -41,6 +41,10 @@ import { openManualPauseFromHome } from './manual-open/open-manual-pause-from-ho
 import { runOpenManualPauseSilentModeAfterCreate } from './manual-open/run-open-manual-pause-silent-mode-after-create';
 import { runPersistSilentReflectionStub } from './manual-open/run-persist-silent-reflection-stub';
 import { runReflectGeneration as runReflectGenerationDirect } from './holzen-reflect/run-reflect-generation';
+import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '../ambience/pause-reflect-ambience-flow';
 
 import {
   buildManualPauseCreateOrReuseParams as buildCreateOrReuseFromFlow,
@@ -115,5 +119,12 @@ describe('pause-reflect-generation-flow', () => {
     expect(dismissFromFlow).toBe(dismissFromManualOpenFlow);
     expect(runSilentModeFromFlow).toBe(runSilentModeFromManualOpenFlow);
     expect(runPersistStubFromFlow).toBe(runPersistStubFromManualOpenFlow);
+  });
+
+  it('sibling cluster: ambience-flow exports stay distinct from generation umbrella exports', () => {
+    expect(runReflectGeneration).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(runReflectGeneration).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(openManualFromFlow).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(dismissFromFlow).not.toBe(stopPauseReflectFrameFocusAmbience);
   });
 });
