@@ -52,9 +52,15 @@ import {
   buildReflectionShareWhatsAppUrl,
   pauseReflectionShareImage,
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
+import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 
 /**
  * Presentation-layer telemetry I/O parity (colocated beside `pause-reflect-telemetry-io.ts`).
+ * Ambience-io sibling: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (presentation);
+ * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (ambience cluster).
  * Share-io sibling: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
  */
@@ -137,5 +143,20 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackShareTapFromTelemetryIo).not.toBe(buildReflectionShareWhatsAppUrl);
     expect(trackWallpaperFromTelemetryIo).not.toBe(pauseReflectionShareImage);
     // Reciprocal inline pins: `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (session reflect telemetry vs frame-focus bed).
+   * Dedicated sibling file: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (presentation).
+   */
+  it('sibling cluster: ambience-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(trackPauseReflectShareTap).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(trackPauseReflectWallpaperTap).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(trackPostItFromTelemetryIo).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(trackShareTapFromTelemetryIo).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(trackWallpaperFromTelemetryIo).not.toBe(stopPauseReflectFrameFocusAmbience);
+    // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
+    // Full pins: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts`.
   });
 });

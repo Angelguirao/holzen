@@ -12,7 +12,8 @@
  * `presentation/reflect/pending-offer/pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ pending-offer telemetry-io,
  * `pause-reflect-share-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io` (application mirror:
  * `application/.../share/pause-reflect-share-telemetry-io-sibling-parity.test.ts`; reciprocal inline:
- * `pause-reflect-telemetry-io-parity.test.ts` (colocated) ↔ `pause-reflect-share-io-parity.test.ts`), and
+ * `pause-reflect-telemetry-io-parity.test.ts` (colocated) ↔ `pause-reflect-share-io-parity.test.ts` and
+ * `pause-reflect-ambience-io-parity.test.ts`), and
  * `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`, and
  * `presentation/reflect/generation/manual-open/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts` ↔ `pause-home-reflect-telemetry-io`,
  * `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (presentation + application;

@@ -103,9 +103,15 @@ import {
   runDeepPausePickerEntryIfPro as runDeepPickerFromMoodIo,
   runPauseSessionChromeCloseAction as runChromeCloseFromMoodIo,
 } from './pause-reflect-mood-io';
+import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 
 /**
  * Presentation mood I/O parity (colocated beside `pause-reflect-mood-io.ts`).
+ * Ambience-io sibling pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (presentation);
+ * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (ambience cluster).
  * Steps-io sibling pins: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application).
  * Flows-io sibling pins: `pause-reflect-flows-mood-io-sibling-parity.test.ts` (application + presentation);
@@ -282,5 +288,21 @@ describe('pause-reflect-mood-io parity', () => {
     expect(runPauseSessionChromeCloseAction).not.toBe(pauseDeclinePendingOffer);
     // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`.
     // Full pins: `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (mood RPC vs frame-focus bed).
+   * Dedicated sibling file: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (presentation).
+   */
+  it('sibling cluster: ambience-io exports stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseInitialEmotionSkip).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseInitialEmotionSkipWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(reflectPauseRepository).not.toBe(startPauseReflectFrameFocusAmbience);
+    // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
+    // Full pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts`.
   });
 });

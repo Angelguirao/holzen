@@ -60,6 +60,18 @@ import {
   runReflectGeneration,
   shouldCommitReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import {
+  buildFeelTilesMoodLogOptions,
+  pauseInitialEmotionSelect,
+  pauseInitialEmotionSkip,
+  pauseInitialEmotionSelectWithRepository,
+  pauseInitialEmotionSkipWithRepository,
+} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 
 /**
  * Presentation I/O parity (colocated beside `pause-reflect-ambience-io.ts`).
@@ -68,6 +80,10 @@ import {
  * reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (hub cluster).
  * Generation-io sibling pins: `pause-reflect-ambience-generation-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (generation cluster).
+ * Mood-io sibling pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (presentation);
+ * reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (mood cluster).
+ * Telemetry-io sibling pins: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (presentation);
+ * reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (telemetry cluster).
  * Steps-io cross-surface: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application).
  * Pending-offer cross-surface: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` (application + presentation);
@@ -161,5 +177,33 @@ describe('pause-reflect-ambience-io parity', () => {
     expect(startFromAmbienceIo).not.toBe(reflectGenerator);
     // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
     // Full pins: `pause-reflect-ambience-generation-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (frame-focus bed vs mood RPC).
+   * Dedicated sibling file: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (presentation).
+   */
+  it('sibling cluster: mood-io exports stay distinct from ambience-io frame-focus bed', () => {
+    expect(startFromAmbienceIo).not.toBe(pauseInitialEmotionSelect);
+    expect(stopFromAmbienceIo).not.toBe(pauseInitialEmotionSkip);
+    expect(startFromAmbienceIo).not.toBe(pauseInitialEmotionSelectWithRepository);
+    expect(stopFromAmbienceIo).not.toBe(pauseInitialEmotionSkipWithRepository);
+    expect(startFromAmbienceIo).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(stopFromAmbienceIo).not.toBe(buildFeelTilesMoodLogOptions);
+    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
+    // Full pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (frame-focus bed vs session reflect telemetry).
+   * Dedicated sibling file: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (presentation).
+   */
+  it('sibling cluster: telemetry-io exports stay distinct from ambience-io frame-focus bed', () => {
+    expect(startFromAmbienceIo).not.toBe(trackPauseReflectPostItOpen);
+    expect(stopFromAmbienceIo).not.toBe(trackPauseReflectShareTap);
+    expect(startFromAmbienceIo).not.toBe(trackPauseReflectWallpaperTap);
+    expect(stopFromAmbienceIo).not.toBe(trackPauseReflectPostItOpen);
+    // Reciprocal inline pins: `pause-reflect-telemetry-io-parity.test.ts`.
+    // Full pins: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts`.
   });
 });
