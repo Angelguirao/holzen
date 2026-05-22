@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — steps-flow ↔ pending-offer-flow sibling pins + steps-io WithRepository (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-pending-offer-flow-sibling-parity.test.ts</code> + steps-io parity</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add reciprocal sibling-cluster test so <code>pause-reflect-steps-flow</code> and <code>pause-reflect-pending-offer-flow</code> CI anchors stay namespace-separated (parity with steps↔hub and hub↔mood pins). Extend <code>pause-reflect-steps-io-parity.test.ts</code> with <code>*WithRepository</code> delegation to injected <code>PauseRepository</code> (parity with pending-offer-io test seams).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow-module cross-references only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B app-shell boot import scan, or session shell-io / scaffold-io presentation parity extensions.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — home pause card body props → presentation/home (backlog #1 verified, Tier 4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — mechanical relocation; no behavior change.</dd>
       <dt>Open question</dt>
-      <dd>Next: steps-flow ↔ pending-offer-flow sibling pins or Phase B app-shell boot import scan.</dd>
+      <dd>Superseded by steps↔pending-offer slice for “next”; see latest note.</dd>
     </dl>
   </article>
 

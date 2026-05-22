@@ -116,4 +116,40 @@ describe('pause-reflect-steps-io parity', () => {
       { storage: reflectionStepSessionStorage },
     );
   });
+
+  it('pauseReflectTagUpdateWithRepository delegates to run-pause-reflect-tag-update with injected repository', async () => {
+    const customRepository = { port: 'customPauseRepository' };
+    const input = { pauseInstanceId: 'inst-tags-custom', tags: ['calm'] };
+
+    await pauseReflectTagUpdateWithRepository(
+      customRepository as unknown as typeof supabasePauseRepository,
+      input,
+    );
+
+    expect(runTagUpdateDirect).toHaveBeenCalledWith(customRepository, input);
+  });
+
+  it('pauseReflectNoteUpdateWithRepository delegates to run-pause-reflect-note-update with injected repository', async () => {
+    const customRepository = { port: 'customPauseRepository' };
+    const input = { pauseInstanceId: 'inst-note-custom', text: 'ground' };
+
+    await pauseReflectNoteUpdateWithRepository(
+      customRepository as unknown as typeof supabasePauseRepository,
+      input,
+    );
+
+    expect(runNoteUpdateDirect).toHaveBeenCalledWith(customRepository, input);
+  });
+
+  it('pauseReflectFavoriteToggleWithRepository delegates to run-pause-favorite-toggle with injected repository', async () => {
+    const customRepository = { port: 'customPauseRepository' };
+    const input = { pauseInstanceId: 'inst-fav-custom', isFavorite: false };
+
+    await pauseReflectFavoriteToggleWithRepository(
+      customRepository as unknown as typeof supabasePauseRepository,
+      input,
+    );
+
+    expect(runFavoriteToggleDirect).toHaveBeenCalledWith(customRepository, input);
+  });
 });
