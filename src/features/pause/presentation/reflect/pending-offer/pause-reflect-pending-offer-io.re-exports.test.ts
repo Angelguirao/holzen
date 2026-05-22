@@ -14,6 +14,10 @@ import {
   runDeclinePendingPauseOffer as runDeclineFromPendingOfferFlow,
 } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
+import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 
 import {
   getPendingPauseOfferDisplay,
@@ -54,5 +58,19 @@ describe('pause-reflect-pending-offer-io re-exports', () => {
     expect(pauseAdoptPendingOfferWithRepository).not.toBe(runAdoptFromPendingOfferFlow);
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(runDeclineFromPendingOfferFlow);
     expect(reflectPauseRepository).not.toBe(getDisplayFromPendingOfferFlow);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-ambience-io.re-exports.test.ts` (pending-offer RPC vs frame-focus bed).
+   * Dedicated sibling file: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` (presentation + application).
+   */
+  it('sibling cluster: ambience-io re-exports stay distinct from pending-offer-io re-exports', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseDeclinePendingOffer).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(getPendingPauseOfferDisplay).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(reflectPauseRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
+    // Reciprocal inline pins: `pause-reflect-ambience-io.re-exports.test.ts`.
   });
 });
