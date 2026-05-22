@@ -32055,4 +32055,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — application home-reflect-io parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-io-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no reflect moves. Mirror presentation colocated <code>pause-home-reflect-io-parity</code> at <code>application/use-cases/ritual/reflect/generation/manual-open/</code> beside <code>pause-reflect-generation-manual-open-flow</code> CI umbrella (parity with home-reflect-telemetry-io application mirror). Identity pins: presentation home reflect I/O ↔ manual-open-flow leaf re-exports + <code>pauseHomeManualOpenPorts</code> adapter binding.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test + comment cross-links only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: remaining presentation I/O parity colocations, or Phase B Tier 1 lib shim scan.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
