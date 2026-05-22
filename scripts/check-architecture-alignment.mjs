@@ -852,7 +852,14 @@ const LEGACY_PAUSE_REFLECT_GENERATION_FLOW_TELEMETRY_IMPORTS = [
   "from '../manual-open/manual-pause-trigger-telemetry'",
 ];
 
-/** Reflect hub presentation — import domain hub helpers via pause-reflect-hub-flow only. */
+/** Reflect hub I/O — import via hub subcluster flows only (not pause-reflect-hub-flow umbrella). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_UMBRELLA_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow',
+  "from './application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow'",
+  "from '../application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow'",
+];
+
+/** Reflect hub presentation — import domain hub helpers via pause-reflect-hub-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/hub/',
   '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
@@ -1451,6 +1458,18 @@ for (const file of walkTs(join(root, 'src'))) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy reflect mood import (${needle})`);
         }
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-reflect-hub-io.ts') ||
+    rel.endsWith('pause-reflect-hub-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_UMBRELLA_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect hub I/O must import via hub subcluster flows (${needle})`,
+        );
       }
     }
   }
