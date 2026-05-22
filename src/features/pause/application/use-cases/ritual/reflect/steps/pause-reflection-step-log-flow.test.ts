@@ -8,6 +8,12 @@ import {
 } from './pause-reflection-step-log-flow';
 import { runPauseReflectionStepLogOnce as runReflectionStepDirect } from './run-pause-reflection-step-log';
 import {
+  runPauseReflectNoteUpdate as runNoteFromNoteFlow,
+} from './pause-reflect-note-flow';
+import {
+  runPauseReflectTagUpdate as runTagFromTagFlow,
+} from './pause-reflect-tag-flow';
+import {
   runPauseFavoriteToggle as runFavoriteFromToggleFlow,
   shouldShowFavoriteProHint as shouldShowFromToggleFlow,
 } from './pause-favorite-toggle-flow';
@@ -29,13 +35,21 @@ describe('pause-reflection-step-log-flow', () => {
     expect(shouldLogFromFlow).toBe(shouldLogPauseReflectionStep);
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-favorite-toggle-flow.test.ts` (reflection_step log vs favorite).
+   * Dedicated sibling files: `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`,
+   * `pause-reflect-steps-favorite-reflection-step-log-flow-sibling-parity.test.ts`.
+   */
   it('sibling cluster: favorite-toggle-flow exports stay distinct from reflection-step-log-flow exports', () => {
     expect(runPauseReflectionStepLogOnce).not.toBe(runFavoriteFromToggleFlow);
     expect(shouldLogFromFlow).not.toBe(shouldShowFromToggleFlow);
     expect(runPauseReflectionStepLogOnce).not.toBe(shouldShowFromToggleFlow);
     expect(shouldLogFromFlow).not.toBe(runFavoriteFromToggleFlow);
-    // Full umbrella pins: reciprocal inline pins on `pause-reflect-steps-flow.test.ts`;
-    // `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`.
+    expect(runPauseReflectionStepLogOnce).not.toBe(runNoteFromNoteFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(runTagFromTagFlow);
+    expect(shouldLogFromFlow).not.toBe(runFavoriteFromToggleFlow);
+    expect(shouldLogFromFlow).not.toBe(shouldShowFromToggleFlow);
+    // Full umbrella pins: `pause-reflect-steps-flow.test.ts`.
   });
 
   it('sibling cluster: steps-flow exports stay distinct from reflection-step-log-flow export', () => {

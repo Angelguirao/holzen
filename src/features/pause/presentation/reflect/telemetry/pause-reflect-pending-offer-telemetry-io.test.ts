@@ -96,6 +96,9 @@ describe('pause-reflect-pending-offer-telemetry-io', () => {
     expect(trackPauseSessionAbandoned).not.toBe(pauseAdoptPendingOfferWithRepository);
     expect(trackPausePendingAdopted).not.toBe(getPendingPauseOfferDisplay);
     expect(trackPausePendingDeclined).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(trackPauseSessionAbandoned).not.toBe(pauseDeclinePendingOffer);
+    expect(trackPausePendingAdopted).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(trackPausePendingDeclined).not.toBe(pauseAdoptPendingOfferWithRepository);
     // Reciprocal inline pins: `pause-reflect-pending-offer-io.test.ts`;
     // dedicated sibling: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
   });
