@@ -51,6 +51,29 @@ import {
   runOpenManualPauseSilentModeAfterCreate as silentAfterCreateFromHomeIo,
   runPersistSilentReflectionStub as persistStubFromHomeIo,
 } from './pause-home-reflect-io';
+import * as homeReflectIo from './pause-home-reflect-io';
+import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
+  pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import * as pendingOfferIo from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import {
+  markPauseManualStartedHomeOnce,
+  trackHomePendingPauseBannerPauseOpened,
+  trackManualPauseInstanceCreated,
+  trackPauseManualCompleted,
+  trackPauseOpenDismissed,
+} from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
+import * as homeReflectTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
+import {
+  trackPausePendingAdopted,
+  trackPausePendingDeclined,
+  trackPauseSessionAbandoned,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
+import * as pendingOfferTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 import {
   messageFromReflectGenerationResult,
   pauseReflectGeneration,
@@ -125,6 +148,63 @@ describe('pause-home-reflect-io parity', () => {
     // sibling: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`.
   });
 
+  it('presentation home-reflect-io stays off home-reflect-telemetry-io exports', () => {
+    expect('trackHomePendingPauseBannerPauseOpened' in homeReflectIo).toBe(false);
+    expect('trackPauseOpenDismissed' in homeReflectIo).toBe(false);
+    expect('markPauseManualStartedHomeOnce' in homeReflectIo).toBe(false);
+    expect('trackManualPauseInstanceCreated' in homeReflectIo).toBe(false);
+    expect('trackPauseManualCompleted' in homeReflectIo).toBe(false);
+    expect('openManualPauseFromHome' in homeReflectTelemetryIo).toBe(false);
+    expect('pauseDismissOpenPauseHomePreview' in homeReflectTelemetryIo).toBe(false);
+    expect('pauseHomeManualOpenPorts' in homeReflectTelemetryIo).toBe(false);
+  });
+
+  it('presentation home-reflect-io stays off pending-offer-io RPC wrappers', () => {
+    expect('pauseAdoptPendingOffer' in homeReflectIo).toBe(false);
+    expect('pauseDeclinePendingOffer' in homeReflectIo).toBe(false);
+    expect('getPendingPauseOfferDisplay' in homeReflectIo).toBe(false);
+    expect('openManualPauseFromHome' in pendingOfferIo).toBe(false);
+    expect('pauseDismissOpenPauseHomePreview' in pendingOfferIo).toBe(false);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-home-reflect-telemetry-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling: `pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: home-reflect-telemetry-io exports stay distinct from home-reflect-io', () => {
+    expect(openFromHomeIo).not.toBe(trackPauseOpenDismissed);
+    expect(dismissFromHomeIo).not.toBe(trackHomePendingPauseBannerPauseOpened);
+    expect(pauseDismissOpenPauseHomePreview).not.toBe(markPauseManualStartedHomeOnce);
+    expect(pauseHomeManualOpenPorts).not.toBe(trackManualPauseInstanceCreated);
+    expect(buildMarketFromHomeIo).not.toBe(trackPauseManualCompleted);
+    expect(pauseDismissOpenPauseHomePreviewWithRepository).not.toBe(trackPauseOpenDismissed);
+    // Reciprocal inline pins: `application/.../manual-open/pause-home-reflect-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts`.
+   * Dedicated sibling: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: pending-offer-io exports stay distinct from home-reflect-io', () => {
+    expect(openFromHomeIo).not.toBe(pauseAdoptPendingOffer);
+    expect(dismissFromHomeIo).not.toBe(pauseDeclinePendingOffer);
+    expect(pauseDismissOpenPauseHomePreview).not.toBe(pauseAdoptPendingOfferWithRepository);
+    expect(pauseDismissOpenPauseHomePreviewWithRepository).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(pauseHomeManualOpenPorts).not.toBe(getPendingPauseOfferDisplay);
+    expect(buildOpenParamsFromHomeIo).not.toBe(pauseAdoptPendingOffer);
+    expect(buildCreateOrReuseFromHomeIo).not.toBe(pauseDeclinePendingOffer);
+    // Reciprocal inline pins: `application/.../manual-open/pause-home-reflect-io-parity.test.ts`.
+  });
+
+  it('home-reflect-io manual-open wrappers stay distinct from pending-offer-telemetry-io trackers', () => {
+    expect(openFromHomeIo).not.toBe(trackPausePendingAdopted);
+    expect(dismissFromHomeIo).not.toBe(trackPausePendingDeclined);
+    expect(pauseDismissOpenPauseHomePreview).not.toBe(trackPauseSessionAbandoned);
+    expect('trackPausePendingAdopted' in homeReflectIo).toBe(false);
+    expect('openManualPauseFromHome' in pendingOfferTelemetryIo).toBe(false);
+    expect('pauseDismissOpenPauseHomePreview' in pendingOfferTelemetryIo).toBe(false);
+  });
+
   /**
    * Reciprocal inline pins ↔ `application/.../manual-open/pause-home-reflect-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`.
@@ -137,5 +217,8 @@ describe('pause-home-reflect-io parity', () => {
     expect(buildCreateOrReuseFromHomeIo).not.toBe(messageFromReflectGenerationResult);
     expect(pauseHomeManualOpenPorts).not.toBe(reflectGenerator);
     expect(persistStubFromHomeIo).not.toBe(shouldCommitReflectGeneration);
+    expect(pauseDismissOpenPauseHomePreview).not.toBe(pauseReflectGeneration);
+    expect(pauseHomeManualOpenPorts.reflect).toBe(reflectGenerator);
+    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
   });
 });
