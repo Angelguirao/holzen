@@ -84,6 +84,10 @@ import {
   pauseDeclinePendingOffer,
   pauseDeclinePendingOfferWithRepository,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
@@ -120,6 +124,8 @@ import {
  * reciprocal inline pins ↔ `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
  * Pending-offer-io sibling pins: `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts`.
+ * Ambience-io sibling pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts`.
  */
 describe('pause-reflect-mood-io parity', () => {
   it('mood CI umbrella composes the same domain mood leaves as presentation I/O', () => {
@@ -271,6 +277,23 @@ describe('pause-reflect-mood-io parity', () => {
     expect(buildFeelTilesMoodLogOptions).not.toBe(shouldShowFavoriteProHint);
     expect(pauseInitialEmotionSkip).not.toBe(shouldLogPauseReflectionStep);
     // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts` (application).
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (mood RPC vs frame-focus ambience bed).
+   * Dedicated sibling file: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: ambience-io exports stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseInitialEmotionSkip).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseInitialEmotionSkipWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(buildFeelTilesFromMoodIo).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(buildFeelTilesFromMoodIo).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(applyBriefFromMoodIo).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(runChromeCloseFromMoodIo).not.toBe(stopPauseReflectFrameFocusAmbience);
+    // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
+    // Full pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts`.
   });
 
   /**

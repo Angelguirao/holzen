@@ -66,6 +66,7 @@ import {
   pauseInitialEmotionSkip,
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
+  reflectPauseRepository as moodReflectPauseRepository,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import {
   trackPauseReflectPostItOpen,
@@ -80,7 +81,7 @@ import {
  * reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (hub cluster).
  * Generation-io sibling pins: `pause-reflect-ambience-generation-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (generation cluster).
- * Mood-io sibling pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (presentation);
+ * Mood-io sibling pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (mood cluster).
  * Telemetry-io sibling pins: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (presentation);
  * reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (telemetry cluster).
@@ -180,8 +181,8 @@ describe('pause-reflect-ambience-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (frame-focus bed vs mood RPC).
-   * Dedicated sibling file: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (presentation).
+   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (frame-focus bed vs initial-emotion RPC).
+   * Dedicated sibling file: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: mood-io exports stay distinct from ambience-io frame-focus bed', () => {
     expect(startFromAmbienceIo).not.toBe(pauseInitialEmotionSelect);
@@ -190,6 +191,7 @@ describe('pause-reflect-ambience-io parity', () => {
     expect(stopFromAmbienceIo).not.toBe(pauseInitialEmotionSkipWithRepository);
     expect(startFromAmbienceIo).not.toBe(buildFeelTilesMoodLogOptions);
     expect(stopFromAmbienceIo).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(startFromAmbienceIo).not.toBe(moodReflectPauseRepository);
     // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
     // Full pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts`.
   });
