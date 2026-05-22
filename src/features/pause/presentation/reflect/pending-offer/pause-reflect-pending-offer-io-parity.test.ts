@@ -269,8 +269,13 @@ describe('pause-reflect-pending-offer-io parity', () => {
     expect(pauseAdoptPendingOffer).not.toBe(runReflectGeneration);
     expect(pauseDeclinePendingOffer).not.toBe(pauseReflectGeneration);
     expect(getPendingPauseOfferDisplay).not.toBe(runReflectGeneration);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseReflectGeneration);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(runReflectGeneration);
     expect(reflectPauseRepository).not.toBe(pauseReflectGeneration);
-    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectGeneration);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(pauseAdoptPendingOfferWithRepository);
+    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts` (application + presentation).
+    // Full pins: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`.
   });
 
   /**
