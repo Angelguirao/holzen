@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — colocate decide outcome-log flow anchor under ritual/decide (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-decide-outcome-log-flow</code> lives in <code>ritual/decide/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. Move the decide <code>outcome_logged</code> CI anchor from <code>ritual/reflect/flows/pause-reflect-decide-outcome-log-flow</code> to <code>ritual/decide/pause-decide-outcome-log-flow</code>; <code>pause-reflect-flows-flow</code> composes the decide anchor. <code>pause-reflect-flows-io</code> still imports <code>run-pause-outcome-log</code> directly (leaf peel unchanged).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; path taxonomy only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Toast and wisdom-quotes decide anchors remain under <code>ritual/reflect/flows/</code> until a follow-up slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate remaining decide flow anchors (<code>pause-decide-outcome-view-flow</code>, toast, quotes) or session mount-log I/O peel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-reflect-hub-flow off hub subcluster anchors (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
