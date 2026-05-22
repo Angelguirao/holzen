@@ -523,6 +523,13 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_SHELL_IO_UMBRELLA_FLOW_IMPORTS = [
   "from '../application/use-cases/session/pause-session-shell-flow'",
 ];
 
+/** Session scaffold I/O — import via session subcluster modules only (not pause-session-scaffold-flow umbrella). */
+const LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_IO_UMBRELLA_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pause-session-scaffold-flow',
+  "from './application/use-cases/session/pause-session-scaffold-flow'",
+  "from '../application/use-cases/session/pause-session-scaffold-flow'",
+];
+
 /** Session presentation — import shell chrome use cases via pause-session-shell-io only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_SHELL_USE_CASE_IMPORTS = [
   '@/features/pause/application/use-cases/session/hydration',
@@ -537,6 +544,19 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_SHELL_USE_CASE_IMPORTS = [
   "from '../application/use-cases/session/mount-log-params'",
   "from './application/use-cases/session/shell-view-model'",
   "from '../application/use-cases/session/shell-view-model'",
+];
+
+/** Session presentation — import scaffold persist/sync/derived via pause-session-scaffold-io only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_USE_CASE_IMPORTS = [
+  '@/features/pause/application/use-cases/session/persist-snapshot',
+  '@/features/pause/application/use-cases/session/storage-ritual-sync',
+  '@/features/pause/application/use-cases/session/scaffold/scaffold-ritual-derived',
+  "from './application/use-cases/session/persist-snapshot'",
+  "from '../application/use-cases/session/persist-snapshot'",
+  "from './application/use-cases/session/storage-ritual-sync'",
+  "from '../application/use-cases/session/storage-ritual-sync'",
+  "from './application/use-cases/session/scaffold/scaffold-ritual-derived'",
+  "from '../application/use-cases/session/scaffold/scaffold-ritual-derived'",
 ];
 
 /** Session presentation — import persisted-session guards via shell/scaffold I/O only. */
@@ -2262,6 +2282,16 @@ for (const file of walkTs(join(root, 'src'))) {
         }
       }
     }
+    const sessionScaffoldIoAllowlisted =
+      rel.endsWith('pause-session-scaffold-io.ts') ||
+      rel.endsWith('pause-session-scaffold-io.test.ts');
+    if (!sessionScaffoldIoAllowlisted) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_USE_CASE_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy session scaffold use-case import (${needle})`);
+        }
+      }
+    }
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_DOMAIN_GUARDS_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session domain guard import (${needle})`);
@@ -2276,6 +2306,18 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: session shell I/O must import via session subcluster modules (${needle})`,
+        );
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-session-scaffold-io.ts') ||
+    rel.endsWith('pause-session-scaffold-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_IO_UMBRELLA_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: session scaffold I/O must import via session subcluster modules (${needle})`,
         );
       }
     }
