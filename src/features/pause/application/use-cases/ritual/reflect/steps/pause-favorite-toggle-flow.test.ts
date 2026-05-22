@@ -8,6 +8,14 @@ import {
   runPauseReflectionStepLogOnce as runReflectionStepFromLogFlow,
   shouldLogPauseReflectionStep as shouldLogFromLogFlow,
 } from './pause-reflection-step-log-flow';
+import {
+  runPauseReflectNoteUpdate as runNoteFromStepsFlow,
+  runPauseReflectTagUpdate as runTagFromStepsFlow,
+  runPauseFavoriteToggle as runFavoriteFromStepsFlow,
+  runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
+  shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
+  shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
+} from './pause-reflect-steps-flow';
 
 describe('pause-favorite-toggle-flow', () => {
   it('re-exports favorite toggle use case and domain pro-hint gate', () => {
@@ -23,5 +31,15 @@ describe('pause-favorite-toggle-flow', () => {
     expect(shouldShowFromFlow).not.toBe(shouldLogFromLogFlow);
     expect(runPauseFavoriteToggle).not.toBe(shouldLogFromLogFlow);
     expect(shouldShowFromFlow).not.toBe(runReflectionStepFromLogFlow);
+  });
+
+  it('sibling cluster: steps-flow exports stay distinct from favorite-toggle-flow export', () => {
+    expect(runPauseFavoriteToggle).not.toBe(runNoteFromStepsFlow);
+    expect(runPauseFavoriteToggle).not.toBe(runTagFromStepsFlow);
+    expect(runPauseFavoriteToggle).not.toBe(runReflectionStepFromStepsFlow);
+    expect(shouldShowFromFlow).not.toBe(shouldLogFromStepsFlow);
+    expect(runPauseFavoriteToggle).toBe(runFavoriteFromStepsFlow);
+    expect(shouldShowFromFlow).toBe(shouldShowFavoriteFromStepsFlow);
+    // Full cross-flow pins: `pause-reflect-steps-favorite-reflection-step-log-flow-sibling-parity.test.ts`.
   });
 });

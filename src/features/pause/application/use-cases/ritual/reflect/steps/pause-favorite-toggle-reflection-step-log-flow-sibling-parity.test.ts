@@ -11,6 +11,12 @@ import {
 import * as favoriteFlow from './pause-favorite-toggle-flow';
 import * as reflectionStepLogFlow from './pause-reflection-step-log-flow';
 
+/**
+ * Favorite-toggle ↔ reflection_step log subcluster anchors only. Steps umbrella parity:
+ * `pause-reflect-steps-favorite-reflection-step-log-flow-sibling-parity.test.ts` (reciprocal
+ * inline pins on `pause-reflect-steps-flow.test.ts`, `pause-favorite-toggle-flow.test.ts`,
+ * `pause-reflection-step-log-flow.test.ts`).
+ */
 describe('pause-favorite-toggle-flow ↔ pause-reflection-step-log-flow sibling parity', () => {
   it('favorite-toggle-flow and reflection-step-log-flow are distinct sibling CI anchors', () => {
     expect(typeof runPauseFavoriteToggle).toBe('function');
