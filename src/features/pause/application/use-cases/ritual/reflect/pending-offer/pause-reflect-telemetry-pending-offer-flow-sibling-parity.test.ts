@@ -16,7 +16,7 @@ import * as pendingOfferTelemetryFlow from './pause-pending-offer-telemetry-flow
 /**
  * Application sibling parity: session reflect telemetry-flow vs pending-offer telemetry-flow
  * (colocated under pending-offer/; parity with presentation
- * `pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts`).
+ * `pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts` — application + presentation).
  */
 describe('pause-reflect-telemetry-flow ↔ pause-pending-offer-telemetry-flow sibling parity', () => {
   it('session reflect telemetry-flow and pending-offer telemetry-flow are distinct sibling CI anchors', () => {
