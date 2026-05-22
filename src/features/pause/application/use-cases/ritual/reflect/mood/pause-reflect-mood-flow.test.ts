@@ -35,6 +35,26 @@ import {
   runInitialEmotionSelect as runSelectDirect,
   runInitialEmotionSkip as runSkipDirect,
 } from './run-initial-emotion-log';
+import {
+  runInitialEmotionSelect as runSelectFromLogFlow,
+  runInitialEmotionSkip as runSkipFromLogFlow,
+} from './pause-initial-emotion-log-flow';
+import {
+  initialEmotionResetUi as resetUiFromPresentationFlow,
+  initialEmotionSelectRollbackUi as rollbackUiFromPresentationFlow,
+} from './pause-initial-emotion-presentation-flow';
+import { buildFeelTilesMoodLogOptions as buildFeelTilesFromFeelTilesFlow } from './pause-feel-tiles-mood-flow';
+import {
+  applyBriefDepthPickerRitualEntry as applyBriefFromDepthFlow,
+  applyDeepDepthPickerRitualEntry as applyDeepFromDepthFlow,
+  isPauseSessionDepthPickerActive as isDepthPickerActiveFromDepthFlow,
+  resolvePauseDepthContextLineParams as resolveDepthContextFromDepthFlow,
+} from './pause-depth-picker-mood-flow';
+import {
+  resolvePauseSessionChromeCloseAction as resolveChromeCloseFromChromeFlow,
+  runDeepPausePickerEntryIfPro as runDeepPickerFromChromeFlow,
+  runPauseSessionChromeCloseAction as runChromeCloseFromChromeFlow,
+} from './pause-session-mood-chrome-flow';
 
 describe('pause-reflect-mood-flow', () => {
   it('re-exports mood helpers from domain + run-initial-emotion-log leaf module', () => {
@@ -63,5 +83,20 @@ describe('pause-reflect-mood-flow', () => {
     expect(resolveChromeCloseFromFlow).toBe(resolvePauseSessionChromeCloseAction);
     expect(runChromeCloseFromFlow).toBe(runPauseSessionChromeCloseAction);
     expect(runDeepPickerFromFlow).toBe(runDeepPausePickerEntryIfPro);
+  });
+
+  it('umbrella bindings match mood subcluster CI anchors (domain leaf parity)', () => {
+    expect(runInitialEmotionSelect).toBe(runSelectFromLogFlow);
+    expect(runInitialEmotionSkip).toBe(runSkipFromLogFlow);
+    expect(buildFeelTilesFromFlow).toBe(buildFeelTilesFromFeelTilesFlow);
+    expect(isDepthPickerActiveFromFlow).toBe(isDepthPickerActiveFromDepthFlow);
+    expect(applyBriefFromFlow).toBe(applyBriefFromDepthFlow);
+    expect(applyDeepFromFlow).toBe(applyDeepFromDepthFlow);
+    expect(resolveDepthContextFromFlow).toBe(resolveDepthContextFromDepthFlow);
+    expect(resetUiFromFlow).toBe(resetUiFromPresentationFlow);
+    expect(rollbackUiFromFlow).toBe(rollbackUiFromPresentationFlow);
+    expect(resolveChromeCloseFromFlow).toBe(resolveChromeCloseFromChromeFlow);
+    expect(runChromeCloseFromFlow).toBe(runChromeCloseFromChromeFlow);
+    expect(runDeepPickerFromFlow).toBe(runDeepPickerFromChromeFlow);
   });
 });
