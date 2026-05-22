@@ -24,7 +24,9 @@ import {
 /**
  * Sibling parity: hub-io vs share-io presentation I/O (parity with
  * `pause-reflect-share-hub-flow-sibling-parity.test.ts` and
- * `pause-reflect-generation-hub-io-sibling-parity.test.ts`).
+ * `pause-reflect-generation-hub-io-sibling-parity.test.ts`;
+ * complements reciprocal inline pins on `pause-reflect-hub-io.test.ts` and
+ * `pause-reflect-share-io.test.ts`).
  */
 describe('pause-reflect-hub-io ↔ pause-reflect-share-io sibling parity', () => {
   it('hub-io and share-io are distinct presentation I/O surfaces', () => {

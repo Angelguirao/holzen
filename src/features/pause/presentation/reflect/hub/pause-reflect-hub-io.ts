@@ -2,8 +2,8 @@
  * Reflect hub presentation I/O (shift-frame done RPC + presentation mapping).
  * Imports domain hub helpers and `run-shift-emotion-frame-hub-done` directly (parity with
  * `pause-reflect-share-io` → domain + leaf use case).
- * Wrapper delegation pins: pause-reflect-hub-io-parity.test.ts (default + *WithRepository seam;
- * mood-io + flows-io reciprocal inline pins).
+ * Wrapper delegation pins: `pause-reflect-hub-io.test.ts` (default + *WithRepository seam;
+ * mood-io, flows-io, and share-io reciprocal inline pins).
  * Sibling parity: `pause-reflect-generation-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`,
  * `pause-reflect-hub-share-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`,
  * `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`,

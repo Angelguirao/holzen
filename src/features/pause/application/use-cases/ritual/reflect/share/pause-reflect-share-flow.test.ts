@@ -146,5 +146,6 @@ describe('pause-reflect-share-flow', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(runShiftHubDoneFromHubFlow);
     expect(trackPauseReflectShareTap).not.toBe(buildLogBundleFromHubFlow);
     expect(trackPauseReflectWallpaperTap).not.toBe(resolvePresentationFromHubFlow);
+    // Full cross-umbrella pins: `pause-reflect-hub-share-flow-sibling-parity.test.ts`.
   });
 });
