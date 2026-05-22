@@ -127,6 +127,8 @@ describe('pause-reflect-flows-io parity', () => {
   it('presentation I/O exports outcome RPC wrappers distinct from run-pause-outcome-log leaf', () => {
     expect(typeof pauseReflectOutcomeLog).toBe('function');
     expect(typeof pauseReflectOutcomeLogWithRepository).toBe('function');
+    expect(pauseReflectOutcomeLog).not.toBe(runOutcomeLogDirect);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(runOutcomeLogDirect);
     expect(pauseReflectOutcomeLog).not.toBe(runPauseOutcomeLog);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(runPauseOutcomeLog);
   });
