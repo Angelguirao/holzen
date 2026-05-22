@@ -12,6 +12,12 @@ import { coalescePauseSessionShellViewModel as coalesceShellVmFromLeaf } from '@
 import { hasPersistedPauseSessionPayload as hasPersistedFromDomain } from '@/features/pause/domain/session/persisted-session-guards';
 import { isPauseSessionWaitingForInstanceFetch as isWaitingFromDomain } from '@/features/pause/domain/session/waiting-for-instance-fetch';
 import {
+  buildPauseSessionPersistSnapshot as buildPersistFromScaffoldIo,
+  buildPauseSessionScaffoldRitualDerived as buildDerivedFromScaffoldIo,
+  computePauseStorageRitualSyncPatch as computeSyncFromScaffoldIo,
+  hasPersistablePauseSessionAnchor as hasAnchorFromScaffoldIo,
+} from './scaffold/pause-session-scaffold-io';
+import {
   buildPauseSessionMountLogParams,
   coalescePauseSessionShellViewModel,
   computePauseHeaderBackIntent,
@@ -66,5 +72,13 @@ describe('pause-session-shell-io', () => {
     expect(coalescePauseSessionShellViewModel).toBe(coalesceShellVmFromLeaf);
     expect(hasPersistedPauseSessionPayload).toBe(hasPersistedFromDomain);
     expect(isPauseSessionWaitingForInstanceFetch).toBe(isWaitingFromDomain);
+  });
+
+  it('sibling cluster: scaffold-io exports stay distinct from shell-io re-exports', () => {
+    expect(computePauseSessionHydration).not.toBe(buildPersistFromScaffoldIo);
+    expect(computePauseSessionResolved).not.toBe(computeSyncFromScaffoldIo);
+    expect(coalescePauseSessionShellViewModel).not.toBe(buildDerivedFromScaffoldIo);
+    expect(hasPersistedPauseSessionPayload).not.toBe(hasAnchorFromScaffoldIo);
+    expect(buildPauseSessionMountLogParams).not.toBe(buildPersistFromScaffoldIo);
   });
 });
