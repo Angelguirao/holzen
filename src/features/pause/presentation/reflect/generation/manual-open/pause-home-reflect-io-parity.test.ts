@@ -3,7 +3,7 @@
  * `pause-home-reflect-io.ts`; application `pause-reflect-generation-manual-open-flow` stays CI umbrella).
  * Application mirror: `application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-io-parity.test.ts`.
  * Sibling parity: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts`.
+ * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (presentation + application).
  */
 import { describe, expect, it, vi } from 'vitest';
 
@@ -206,7 +206,8 @@ describe('pause-home-reflect-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `application/.../manual-open/pause-home-reflect-io-parity.test.ts`.
+   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (presentation + application)
+   * and `application/.../manual-open/pause-home-reflect-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: generation-io exports stay distinct from home-reflect-io', () => {
@@ -219,6 +220,8 @@ describe('pause-home-reflect-io parity', () => {
     expect(persistStubFromHomeIo).not.toBe(shouldCommitReflectGeneration);
     expect(pauseDismissOpenPauseHomePreview).not.toBe(pauseReflectGeneration);
     expect(pauseHomeManualOpenPorts.reflect).toBe(reflectGenerator);
-    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`,
+    // `application/.../generation/pause-reflect-generation-io-parity.test.ts`,
+    // `application/.../manual-open/pause-home-reflect-io-parity.test.ts`.
   });
 });
