@@ -47,6 +47,7 @@ import {
 
 /**
  * Ritual-restore CI umbrella ↔ presentation I/O delegation parity (colocated beside `pause-session-ritual-restore-io.ts`).
+ * Sibling pins: `pause-session-ritual-restore-frame-io-sibling-parity.test.ts` ↔ `pause-session-frame-io-parity.test.ts`.
  */
 describe('pause-session-ritual-restore-io parity', () => {
   it('presentation I/O ritual restore exports match session-ritual-restore-flow CI umbrella', () => {

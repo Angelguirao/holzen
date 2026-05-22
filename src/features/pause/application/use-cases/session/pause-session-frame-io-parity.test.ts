@@ -9,6 +9,7 @@ import { initialFrameDoneFromRestored as initialFrameDoneFromFrameIo } from '@/f
  * Presentation mirror: `presentation/session/pause-session-frame-io-parity.test.ts`.
  * Imports frame-flow CI umbrella for `.toBe` identity pins only — production frame I/O keeps
  * `restored-frame-ritual-state` leaf import.
+ * Sibling pins: `pause-session-ritual-restore-frame-io-sibling-parity.test.ts` ↔ `pause-session-ritual-restore-io-parity.test.ts`.
  */
 describe('pause-session-frame-io parity (application)', () => {
   it('presentation frame I/O matches session frame-flow CI umbrella', () => {

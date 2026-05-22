@@ -4,6 +4,7 @@
  * `pause-session-ritual-restore-io.ts`).
  * Imports `pause-session-ritual-restore-flow` CI umbrella for `.toBe` identity pins only —
  * production restore I/O keeps sibling subcluster leaf imports.
+ * Sibling pins: `pause-session-ritual-restore-frame-io-sibling-parity.test.ts` ↔ `pause-session-frame-io-parity.test.ts`.
  */
 import { describe, expect, it } from 'vitest';
 
