@@ -6,8 +6,9 @@
  * Parity pins: `pause-reflect-flows-io.test.ts` (outcome wrapper distinctness + RPC delegation),
  * `pause-reflect-flows-decide-io-sibling-parity.test.ts` ↔ `pause-session-decide-io`,
  * `pause-reflect-flows-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`, and
- * `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`, and
- * `pause-reflect-flows-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`.
+ * `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`,
+ * `pause-reflect-flows-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`,
+ * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`.
  */
 import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
 import {

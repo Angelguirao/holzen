@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — presentation flows-io ↔ pending-offer-io sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-pending-offer-io-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mirror application <code>pause-reflect-flows-pending-offer-flow-sibling-parity</code> at presentation: <code>pause-reflect-flows-io</code> (reflect+decide preflight/outcome RPC) vs <code>pause-reflect-pending-offer-io</code> (adopt/decline + display) stay namespace-separated (parity with flows↔steps and steps↔pending-offer presentation pins).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + I/O header comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or remaining presentation I/O sibling gaps (e.g. flows↔share).</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — presentation share-io ↔ telemetry-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
