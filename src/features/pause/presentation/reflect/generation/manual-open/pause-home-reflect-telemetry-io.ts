@@ -1,13 +1,13 @@
 /**
  * Home manual-open PostHog helpers (manual open + dismiss/banner).
- * Colocated under `presentation/reflect/telemetry/` beside session reflect UI telemetry
- * (`pause-reflect-telemetry-io`); application trackers stay in `ritual/reflect/generation/manual-open/`.
+ * Colocated under `presentation/reflect/generation/manual-open/` beside `pause-home-reflect-io`;
+ * application trackers stay in `ritual/reflect/generation/manual-open/`.
  * Imports trackers from leaf modules directly (not generation umbrella or telemetry-flow anchor).
- * Parity pins: `pause-home-reflect-telemetry-io.test.ts`, `pause-home-reflect-telemetry-io.re-exports.test.ts`,
- * colocated `pause-home-reflect-telemetry-io-parity.test.ts` (leaf + home-reflect-io distinctness pins),
+ * External consumers import `presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io` (telemetry cluster is session UI only).
+ * Parity pins: colocated `pause-home-reflect-telemetry-io-parity.test.ts` (leaf + home-reflect-io distinctness);
  * application mirror `application/.../manual-open/pause-home-reflect-telemetry-io-parity.test.ts`.
- * Sibling parity: `presentation/reflect/telemetry/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`;
- * `presentation/reflect/telemetry/pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts` ↔ `pause-home-reflect-io`.
+ * Sibling parity: `pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts` ↔ session `pause-reflect-telemetry-io`;
+ * `pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts` ↔ `pause-home-reflect-io`.
  */
 export {
   trackHomePendingPauseBannerPauseOpened,
