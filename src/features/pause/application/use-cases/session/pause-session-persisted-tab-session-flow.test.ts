@@ -5,6 +5,11 @@ import {
   loadPersistedTabSession,
   savePersistedTabSession,
 } from './pause-session-persisted-tab-session-flow';
+import {
+  clearPersistedTabSession as clearDirect,
+  loadPersistedTabSession as loadDirect,
+  savePersistedTabSession as saveDirect,
+} from './persisted-tab-session';
 import type { PersistedTabSessionStoragePort } from '@/features/pause/ports/persisted-tab-session-storage';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
@@ -20,5 +25,8 @@ describe('pause-session-persisted-tab-session-flow', () => {
     expect(loadPersistedTabSession(storage)).toEqual(snapshot);
     expect(typeof savePersistedTabSession).toBe('function');
     expect(typeof clearPersistedTabSession).toBe('function');
+    expect(loadPersistedTabSession).toBe(loadDirect);
+    expect(savePersistedTabSession).toBe(saveDirect);
+    expect(clearPersistedTabSession).toBe(clearDirect);
   });
 });

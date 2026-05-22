@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session persisted-tab cluster marker (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-persisted-tab-session</code> CI cluster marker + umbrella identity checks</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add empty <code>pause-session-persisted-tab-session-cluster</code> beside existing <code>pause-session-persisted-tab-session-flow</code> (parity with <code>pause-session-decide-cluster</code> / <code>pause-session-providers-cluster</code>). Strengthen flow test with direct <code>persisted-tab-session</code> identity assertions. <code>pause-persisted-tab-session-io</code> unchanged (imports leaf module directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI marker + regression test slice only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>persisted-tab-session.test.ts</code> already covers port behavior; cluster marker documents alignment intent without new runtime surface.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-terminal-entry-flow</code> cluster + umbrella flow test, or colocate <code>completed-pause-count-keys</code> under <code>infrastructure/queries/</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session shell umbrella flow regression (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
