@@ -93,6 +93,13 @@ import {
   shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
+  dismissOpenPauseHome,
+  openManualPauseFromHome,
+  pauseDismissOpenPauseHomePreview,
+  pauseDismissOpenPauseHomePreviewWithRepository,
+  pauseHomeManualOpenPorts,
+} from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
+import {
   buildReflectionShareTelegramUrl as buildTelegramFromShareIo,
   buildReflectionShareText as buildTextFromShareIo,
   buildReflectionShareTweetUrl as buildTweetFromShareIo,
@@ -109,8 +116,8 @@ import {
  * reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (colocated under `presentation/reflect/flows/`).
  * Telemetry-io sibling: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
- * Steps/hub/mood/ambience siblings: dedicated `pause-reflect-share-*-io-sibling-parity.test.ts` files;
- * reciprocal inline pins ↔ colocated `pause-reflect-*-io-parity.test.ts` clusters.
+ * Steps/hub/mood/ambience/home-reflect siblings: dedicated `pause-reflect-share-*-io-sibling-parity.test.ts` files;
+ * reciprocal inline pins ↔ colocated `pause-reflect-*-io-parity.test.ts` clusters (incl. manual-open `pause-home-reflect-io-parity`).
  */
 describe('pause-reflect-share-io parity', () => {
   it('presentation I/O share builder exports match share CI umbrella', () => {
@@ -289,6 +296,21 @@ describe('pause-reflect-share-io parity', () => {
     expect(buildTweetFromShareIo).not.toBe(pauseInitialEmotionSkipWithRepository);
     expect(buildWhatsAppFromShareIo).not.toBe(buildFeelTilesMoodLogOptions);
     expect(pauseReflectionShareImage).not.toBe(buildFeelTilesMoodLogOptions);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `generation/manual-open/pause-home-reflect-io-parity.test.ts`
+   * (application + presentation).
+   */
+  it('sibling cluster: home-reflect-io exports stay distinct from share-io builders', () => {
+    expect(pauseReflectionShareImage).not.toBe(openManualPauseFromHome);
+    expect(buildTextFromShareIo).not.toBe(dismissOpenPauseHome);
+    expect(buildTelegramFromShareIo).not.toBe(pauseDismissOpenPauseHomePreview);
+    expect(buildTweetFromShareIo).not.toBe(pauseDismissOpenPauseHomePreviewWithRepository);
+    expect(buildWhatsAppFromShareIo).not.toBe(pauseHomeManualOpenPorts);
+    expect(pauseReflectionShareImage).not.toBe(pauseHomeManualOpenPorts);
+    // Reciprocal inline pins: `generation/manual-open/pause-home-reflect-io-parity.test.ts`,
+    // `application/.../manual-open/pause-home-reflect-io-parity.test.ts`.
   });
 
   /**
