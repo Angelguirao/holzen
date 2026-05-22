@@ -6,15 +6,16 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 import {
-  pauseReflectOutcomeLog,
-  resolvePauseSessionReflectAndDecidePreflight,
-} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
-import {
+  buildFeelTilesMoodLogOptions,
   pauseInitialEmotionSelect,
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkip,
   pauseInitialEmotionSkipWithRepository,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import {
+  pauseReflectOutcomeLog,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
