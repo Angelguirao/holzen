@@ -868,6 +868,19 @@ const LEGACY_PAUSE_REFLECT_HUB_FLOW_DOMAIN_IMPORTS = [
   "from '../domain/reflect/hub/",
 ];
 
+/** Reflect hub umbrella flow — compose domain + leaf use case only (not hub subcluster flow anchors). */
+const LEGACY_PAUSE_REFLECT_HUB_FLOW_SUBCLUSTER_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-presentation-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-log-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow',
+  "from './pause-shift-frame-hub-presentation-flow'",
+  "from '../pause-shift-frame-hub-presentation-flow'",
+  "from './pause-shift-emotion-log-flow'",
+  "from '../pause-shift-emotion-log-flow'",
+  "from './pause-shift-emotion-frame-hub-done-flow'",
+  "from '../pause-shift-emotion-frame-hub-done-flow'",
+];
+
 /** Reflect steps umbrella flow — compose subcluster anchors only (no deep domain/reflect/steps or run-*). */
 const LEGACY_PAUSE_REFLECT_STEPS_FLOW_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/steps/',
@@ -2074,17 +2087,11 @@ for (const file of walkTs(join(root, 'src'))) {
     }
   }
   if (rel === 'src/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow.ts') {
-    for (const needle of LEGACY_PAUSE_REFLECT_HUB_FLOW_DOMAIN_IMPORTS) {
+    for (const needle of LEGACY_PAUSE_REFLECT_HUB_FLOW_SUBCLUSTER_IMPORTS) {
       if (text.includes(needle)) {
-        failures.push(`${rel}: reflect hub umbrella flow must compose subcluster anchors (${needle})`);
-      }
-    }
-    for (const needle of [
-      '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
-      "from './run-shift-emotion-frame-hub-done'",
-    ]) {
-      if (text.includes(needle)) {
-        failures.push(`${rel}: reflect hub umbrella flow must not deep-import run-shift-emotion-frame-hub-done (${needle})`);
+        failures.push(
+          `${rel}: reflect hub umbrella flow must import domain + run-shift-emotion-frame-hub-done directly (${needle})`,
+        );
       }
     }
   }

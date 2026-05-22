@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel pause-reflect-hub-flow off hub subcluster anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-flow</code> composes domain hub helpers + leaf RPC use case</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Hub CI umbrella re-exports <code>domain/reflect/hub/</code> presentation + log bundle and <code>run-shift-emotion-frame-hub-done</code> directly (parity with <code>pause-reflect-hub-io</code> leaf imports; subcluster flow anchors remain for CI only).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-shift-emotion-*-flow</code> and <code>pause-shift-frame-hub-presentation-flow</code> remain on disk as CI subcluster anchors; nothing imports them except optional future consumers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion orchestrate-io telemetry leaf peel, reflect flows/mood umbrella flow peels, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-persisted-tab-session-io to persisted-tab-session (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
