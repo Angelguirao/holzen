@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
+import { runReflectionShareImage as runReflectionShareImageDirect } from '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image';
+import {
+  buildReflectionShareTelegramUrl as buildTelegramFromShareFlow,
+  buildReflectionShareText as buildTextFromShareFlow,
+  buildReflectionShareTweetUrl as buildTweetFromShareFlow,
+  buildReflectionShareWhatsAppUrl as buildWhatsAppFromShareFlow,
+  runReflectionShareImage as runReflectionShareImageFromShareFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow';
 import {
   buildReflectionShareTelegramUrl as buildTelegramDirect,
   buildReflectionShareTweetUrl as buildTweetDirect,
@@ -20,5 +28,17 @@ describe('pause-reflect-share-io re-exports', () => {
     expect(buildReflectionShareTweetUrl).toBe(buildTweetDirect);
     expect(buildReflectionShareTelegramUrl).toBe(buildTelegramDirect);
     expect(buildReflectionShareWhatsAppUrl).toBe(buildWhatsAppDirect);
+  });
+
+  it('presentation I/O bindings match pause-reflect-share-flow CI anchor (leaf parity)', () => {
+    expect(buildReflectionShareText).toBe(buildTextFromShareFlow);
+    expect(buildReflectionShareText).toBe(buildTextDirect);
+    expect(buildReflectionShareTweetUrl).toBe(buildTweetFromShareFlow);
+    expect(buildReflectionShareTweetUrl).toBe(buildTweetDirect);
+    expect(buildReflectionShareTelegramUrl).toBe(buildTelegramFromShareFlow);
+    expect(buildReflectionShareTelegramUrl).toBe(buildTelegramDirect);
+    expect(buildReflectionShareWhatsAppUrl).toBe(buildWhatsAppFromShareFlow);
+    expect(buildReflectionShareWhatsAppUrl).toBe(buildWhatsAppDirect);
+    expect(runReflectionShareImageFromShareFlow).toBe(runReflectionShareImageDirect);
   });
 });

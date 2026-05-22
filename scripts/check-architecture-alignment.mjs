@@ -2101,11 +2101,13 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-reflect-share-io.test.ts') ||
     rel.endsWith('pause-reflect-share-io.re-exports.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_IO_ORCHESTRATION_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: reflect share I/O must not import share umbrella (${needle})`,
-        );
+    if (!rel.endsWith('pause-reflect-share-io.re-exports.test.ts')) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_IO_ORCHESTRATION_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: reflect share I/O must not import share umbrella (${needle})`,
+          );
+        }
       }
     }
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_IO_IMAGE_FLOW_IMPORTS) {

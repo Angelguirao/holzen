@@ -25450,4 +25450,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect share-io ↔ share-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-share-io</code> share builders pinned to <code>pause-reflect-share-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-share-io.re-exports.test.ts</code> with <code>.toBe</code> identity against <code>pause-reflect-share-flow</code> for domain share builders and <code>runReflectionShareImage</code> leaf; add <code>pause-reflect-share-io-parity.test.ts</code> beside the share cluster (parity with steps-io / ambience-io). <code>check:architecture-alignment</code> exempts re-exports test from share-flow import ban on production I/O only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + CI exemption only. <code>pauseReflectionShareImage</code> stays a presentation wrapper over the leaf orchestrator (not re-exported on the I/O module).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without presentation I/O importing the share umbrella in production code.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-flows-io</code> ↔ flows-flow umbrella pins, <code>pause-companion-orchestration-flow</code> ↔ section-visibility sibling pin, or Tier 1 <code>holzen-query-client-ref</code> shim peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
