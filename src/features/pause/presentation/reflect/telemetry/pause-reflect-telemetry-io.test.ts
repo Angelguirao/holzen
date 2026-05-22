@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
+  supabaseReflectGenerator: { port: 'reflectGenerator' },
 }));
 
 import {
@@ -25,6 +26,10 @@ import {
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
 } from './pause-reflect-pending-offer-telemetry-io';
+import {
+  pauseReflectGeneration,
+  reflectGenerator,
+} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import { pauseReflectionShareImage } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   trackPauseReflectPostItOpen,
@@ -103,5 +108,14 @@ describe('pause-reflect-telemetry-io', () => {
     expect(trackPauseReflectShareTap).not.toBe(pauseShiftEmotionFrameHubDone);
     // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-hub-io.test.ts`;
     // hub RPC vs session UI telemetry: `pause-reflect-hub-telemetry-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: generation-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseReflectGeneration);
+    expect(trackPauseReflectShareTap).not.toBe(pauseReflectGeneration);
+    expect(trackPauseReflectWallpaperTap).not.toBe(reflectGenerator);
+    expect(trackPauseReflectPostItOpen).not.toBe(reflectGenerator);
+    // Full cross-I/O pins: `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`;
+    // reciprocal inline pins on `pause-reflect-generation-io.test.ts`.
   });
 });
