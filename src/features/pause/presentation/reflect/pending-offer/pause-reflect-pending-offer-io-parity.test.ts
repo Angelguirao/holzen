@@ -29,7 +29,7 @@ import {
   trackPausePendingDeclined as trackDeclinedFromPendingOfferTelemetryIo,
   trackPauseSessionAbandoned as trackAbandonedFromPendingOfferTelemetryIo,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
-import * as pendingOfferIo from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import * as pendingOfferIo from './pause-reflect-pending-offer-io';
 import {
   getPendingPauseOfferDisplay as getDisplayFromPendingOfferIo,
   pauseAdoptPendingOffer,
@@ -37,7 +37,7 @@ import {
   pauseDeclinePendingOffer,
   pauseDeclinePendingOfferWithRepository,
   reflectPauseRepository,
-} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+} from './pause-reflect-pending-offer-io';
 import * as pendingOfferTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import {
