@@ -1,8 +1,8 @@
 /**
  * Home manual-open reflect cluster I/O (use cases, domain builders, dismiss preview, default ports).
  * Colocated under `presentation/reflect/generation/manual-open/` (parity with application `generation/manual-open/` cluster).
- * Imports manual-open use cases and domain builders via `pause-reflect-generation-flow` CI anchor
- * (parity with `pause-reflect-generation-io` → generation umbrella).
+ * Imports manual-open use cases and domain builders via `pause-reflect-generation-manual-open-flow`
+ * CI anchor (parity with `pause-home-reflect-telemetry-io` → telemetry-flow, not generation umbrella).
  */
 import {
   buildManualPauseCreateOrReuseParams,
@@ -27,7 +27,7 @@ import {
   type RunOpenManualPauseSilentModeAfterCreateResult,
   type TrackManualPauseInstanceCreatedPayload,
   type TrackPauseManualCompletedPayload,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-reflect-generation-manual-open-flow';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import {
   supabasePauseRepository,
