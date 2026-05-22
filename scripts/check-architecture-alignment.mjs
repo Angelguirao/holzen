@@ -520,11 +520,21 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_HOLZEN_PROVIDERS_IMPORTS = [
   "from '../application/use-cases/session/pause-holzen-providers-slice'",
 ];
 
-/** Session presentation — import persisted tab session use cases via I/O anchor only. */
+/** Session presentation (non-I/O) — import persisted tab session via pause-persisted-tab-session-io only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IMPORTS = [
   '@/features/pause/application/use-cases/session/persisted-tab-session',
+  '@/features/pause/application/use-cases/session/pause-session-persisted-tab-session-flow',
   "from './application/use-cases/session/persisted-tab-session'",
   "from '../application/use-cases/session/persisted-tab-session'",
+  "from './application/use-cases/session/pause-session-persisted-tab-session-flow'",
+  "from '../application/use-cases/session/pause-session-persisted-tab-session-flow'",
+];
+
+/** Session persisted-tab I/O — import leaf use cases only (not persisted-tab-session-flow umbrella). */
+const LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IO_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pause-session-persisted-tab-session-flow',
+  "from './application/use-cases/session/pause-session-persisted-tab-session-flow'",
+  "from '../application/use-cases/session/pause-session-persisted-tab-session-flow'",
 ];
 
 /** Session presentation — import decide impact types via pause-session-decide-io only. */
@@ -2900,9 +2910,23 @@ for (const file of walkTs(join(root, 'src'))) {
         failures.push(`${rel}: legacy session holzen-providers import (${needle})`);
       }
     }
-    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(`${rel}: legacy session persisted-tab-session import (${needle})`);
+    const persistedTabIoAllowlisted =
+      rel.endsWith('pause-persisted-tab-session-io.ts') ||
+      rel.endsWith('pause-persisted-tab-session-io.test.ts');
+    if (!persistedTabIoAllowlisted) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy session persisted-tab-session import (${needle})`);
+        }
+      }
+    }
+    if (persistedTabIoAllowlisted) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IO_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: session persisted-tab I/O must import persisted-tab-session directly (${needle})`,
+          );
+        }
       }
     }
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_MAP_PERSISTED_STEP_IMPORTS) {

@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel pause-persisted-tab-session-io to persisted-tab-session (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-persisted-tab-session-io</code> imports tab snapshot use cases from leaf module</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route load/save/clear through <code>application/use-cases/session/persisted-tab-session</code> instead of <code>pause-session-persisted-tab-session-flow</code> CI anchor (parity with <code>pause-session-providers-io</code> → <code>pause-holzen-providers-slice</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-persisted-tab-session-flow</code> remains application cluster re-export for CI; session/reflect/home conductors still import <code>pause-persisted-tab-session-io</code> only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session shell or scaffold subcluster I/O peels (header-back, mount log, persist-snapshot siblings).</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel run-shift-emotion-frame-hub-done off hub log flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-shift-emotion-log-flow.ts</code> remains application cluster re-export for CI; <code>pause-reflect-hub-flow</code> still composes subcluster anchors.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>pause-persisted-tab-session-io</code> to <code>persisted-tab-session</code>, or session shell/scaffold subcluster peels.</dd>
+      <dd>Next: session shell or scaffold subcluster I/O peels (header-back, mount log, persist-snapshot siblings).</dd>
     </dl>
   </article>
 
@@ -90,7 +109,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-session-brief-flow</code> remains for brief→deep RPC cluster detection; CI blocks brief-flow imports on ritual-restore-flow.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>pause-persisted-tab-session-io</code> to <code>persisted-tab-session</code>, or session shell/scaffold subcluster peels.</dd>
+      <dd>Next: session shell or scaffold subcluster I/O peels (header-back, mount log, persist-snapshot siblings).</dd>
     </dl>
   </article>
 
