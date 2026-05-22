@@ -1,6 +1,6 @@
 /**
  * Presentation I/O for `/pause` breath segment RPC, timed breathing UI, and breath hydration.
- * Ritual audio cues import from `ritual-audio` (off `pause-ritual-audio-breathe-flow` CI anchor).
+ * Segment RPC use cases import via `pause-session-breath-flow`; audio cues via `pause-ritual-audio-breathe-flow`.
  */
 export { applyBreathSegmentLogOutcome } from '@/features/pause/domain/ritual/breathe/apply-breath-segment-log-outcome';
 export { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags';
@@ -32,7 +32,7 @@ import {
   runLogBreathSegment1Skipped,
   runLogBreathSegment2Skipped,
   type BreathSegmentLogDeps,
-} from '@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log';
+} from '@/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
