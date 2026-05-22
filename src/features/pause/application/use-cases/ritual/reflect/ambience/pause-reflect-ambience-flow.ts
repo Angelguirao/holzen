@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for ritual reflect ambience (§3 / check:architecture-alignment).
  * Web Audio bed implementation lives in domain; re-export for application-layer imports.
- * Presentation: `pause-reflect-ambience-io.ts` imports via `reflect-frame-focus-ambience`.
+ * Presentation: `pause-reflect-ambience-io.ts` imports via this CI anchor.
  */
 export {
   startPauseReflectFrameFocusAmbience,
