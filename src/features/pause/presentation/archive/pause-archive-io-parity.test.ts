@@ -1,3 +1,8 @@
+/**
+ * Presentation I/O parity (colocated beside `pause-archive-io.ts`).
+ * Imports `pause-archive-decide-flow` CI umbrella for `.toBe` identity pins only — production archive I/O keeps ritual/decide leaf imports.
+ * Leaf + flow re-export pins also live in `pause-archive-io.re-exports.test.ts`.
+ */
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({

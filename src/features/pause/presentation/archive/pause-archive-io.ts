@@ -1,3 +1,7 @@
+/**
+ * Archive retrospective RPC I/O — binds ritual/decide leaves to `PauseRepository`.
+ * Parity pins: `pause-archive-io-parity.test.ts` (colocated); `pause-archive-io.re-exports.test.ts`.
+ */
 import { logRetrospectiveOutcome } from '@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome';
 import {
   trackPauseOutcomeRetrospective,

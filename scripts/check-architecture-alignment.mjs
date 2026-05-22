@@ -2220,9 +2220,13 @@ for (const file of walkTs(join(root, 'src'))) {
   if (
     rel.endsWith('pause-archive-io.ts') ||
     rel.endsWith('pause-archive-io.test.ts') ||
-    rel.endsWith('pause-archive-io.re-exports.test.ts')
+    rel.endsWith('pause-archive-io.re-exports.test.ts') ||
+    rel.endsWith('pause-archive-io-parity.test.ts')
   ) {
-    if (!rel.endsWith('pause-archive-io.re-exports.test.ts')) {
+    if (
+      !rel.endsWith('pause-archive-io.re-exports.test.ts') &&
+      !rel.endsWith('pause-archive-io-parity.test.ts')
+    ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_ARCHIVE_IO_UMBRELLA_FLOW_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(
@@ -2243,7 +2247,8 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.startsWith('src/features/pause/presentation/archive/') &&
     !rel.endsWith('pause-archive-io.ts') &&
     !rel.endsWith('pause-archive-io.test.ts') &&
-    !rel.endsWith('pause-archive-io.re-exports.test.ts')
+    !rel.endsWith('pause-archive-io.re-exports.test.ts') &&
+    !rel.endsWith('pause-archive-io-parity.test.ts')
   ) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_ARCHIVE_DECIDE_IMPORTS) {
       if (text.includes(needle)) {
