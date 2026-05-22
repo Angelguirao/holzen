@@ -14,7 +14,7 @@ import * as scaffoldIo from '@/features/pause/presentation/session/scaffold/paus
  * Application sibling parity: providers-io vs scaffold-io (parity with presentation
  * `pause-session-providers-scaffold-io-sibling-parity.test.ts` and flow umbrellas
  * `pause-session-providers-scaffold-flow-sibling-parity.test.ts`).
- * Reciprocal inline pins: `pause-session-providers-io-parity.test.ts` ↔
+ * Reciprocal inline pins: `presentation/session/pause-session-providers-io-parity.test.ts` ↔
  * `pause-session-scaffold-io-parity.test.ts`.
  */
 describe('pause-session-providers-io ↔ pause-session-scaffold-io sibling parity (application)', () => {

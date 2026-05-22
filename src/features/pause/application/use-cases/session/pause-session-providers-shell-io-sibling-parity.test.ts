@@ -18,7 +18,7 @@ import * as shellIo from '@/features/pause/presentation/session/pause-session-sh
  * Application sibling parity: providers-io vs shell-io (parity with presentation
  * `pause-session-providers-shell-io-sibling-parity.test.ts` and flow umbrellas
  * `pause-session-providers-shell-flow-sibling-parity.test.ts`).
- * Reciprocal inline pins: `pause-session-providers-io-parity.test.ts` ↔
+ * Reciprocal inline pins: `presentation/session/pause-session-providers-io-parity.test.ts` ↔
  * `pause-session-shell-io-parity.test.ts`.
  */
 describe('pause-session-providers-io ↔ pause-session-shell-io sibling parity (application)', () => {

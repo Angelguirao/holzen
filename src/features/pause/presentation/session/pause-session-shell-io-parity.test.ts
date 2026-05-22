@@ -126,7 +126,7 @@ describe('pause-session-shell-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-session-providers-io-parity.test.ts` (shell chrome vs Holzen slice).
+   * Reciprocal inline pins ↔ `pause-session-providers-io-parity.test.ts` (colocated beside providers-io; shell chrome vs Holzen slice).
    * Dedicated sibling file: `pause-session-providers-shell-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: providers-io export stays distinct from shell-io hydration and header-back', () => {

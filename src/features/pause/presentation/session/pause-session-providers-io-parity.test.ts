@@ -3,11 +3,14 @@ import { describe, expect, it } from 'vitest';
 import { pickPauseHolzenProvidersSlice as pickSliceDirect } from '@/features/pause/application/use-cases/session/pause-holzen-providers-slice';
 import { pickPauseHolzenProvidersSlice } from '@/features/pause/application/use-cases/session/pause-session-providers-flow';
 import {
+  pickPauseHolzenProvidersSlice as pickSliceFromProvidersIo,
+} from './pause-session-providers-io';
+import {
   buildPauseSessionPersistSnapshot,
   buildPauseSessionScaffoldRitualDerived,
   computePauseStorageRitualSyncPatch,
   hasPersistablePauseSessionAnchor,
-} from '@/features/pause/presentation/session/scaffold/pause-session-scaffold-io';
+} from './scaffold/pause-session-scaffold-io';
 import {
   buildPauseSessionMountLogParams,
   coalescePauseSessionShellViewModel,
@@ -17,8 +20,7 @@ import {
   hasPersistedPauseSessionPayload,
   isPauseSessionHeaderBackVisible,
   isPauseSessionWaitingForInstanceFetch,
-} from '@/features/pause/presentation/session/pause-session-shell-io';
-import { pickPauseHolzenProvidersSlice as pickSliceFromProvidersIo } from './pause-session-providers-io';
+} from './pause-session-shell-io';
 
 /**
  * Presentation I/O parity (colocated beside `pause-session-providers-io.ts`).
