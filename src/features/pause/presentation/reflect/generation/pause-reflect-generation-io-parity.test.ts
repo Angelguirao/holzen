@@ -110,6 +110,7 @@ import {
 
 /**
  * Presentation I/O parity (colocated beside `pause-reflect-generation-io.ts`).
+ * Application mirror: `application/.../generation/pause-reflect-generation-io-parity.test.ts` (colocated beside `pause-reflect-generation-flow.ts`).
  * Imports `pause-reflect-generation-flow` CI umbrella and domain hook bundle for `.toBe` identity pins only — production generation I/O keeps leaf imports.
  * Application-layer sibling parity tests remain under `application/.../ritual/reflect/generation/` when they assert flow umbrellas.
  * Hub-io sibling: `pause-reflect-generation-hub-io-sibling-parity.test.ts` (application + presentation);

@@ -4,7 +4,7 @@
  * (not holzen-reflect / manual-open subcluster flow anchors; PostHog stays on telemetry-flow modules).
  * Sibling cluster anchor: `pause-reflect-ambience-flow` (frame-focus bed; presentation via `pause-reflect-ambience-io`).
  * Presentation: `pause-reflect-generation-io.ts` and `pause-home-reflect-io.ts` import leaf modules directly.
- * `pause-reflect-generation-io.re-exports.test.ts` and `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts` (incl. `pauseReflectGeneration` wrapper delegation);
+ * `pause-reflect-generation-io.re-exports.test.ts`, `pause-reflect-generation-io-parity.test.ts` (application, colocated), and `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts` (incl. `pauseReflectGeneration` wrapper delegation);
  * Sibling parity: `pause-reflect-ambience-generation-flow-sibling-parity.test.ts` ↔ `pause-reflect-ambience-flow`;
  * inline pins: `pause-reflect-ambience-flow.test.ts`, `pause-reflect-generation-flow.test.ts` ↔ `pause-reflect-flows-flow.test.ts`;
  * `pause-reflect-steps-generation-flow-sibling-parity.test.ts` (steps-flow ↔ generation-flow; reciprocal inline pins in `pause-reflect-steps-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts`);
