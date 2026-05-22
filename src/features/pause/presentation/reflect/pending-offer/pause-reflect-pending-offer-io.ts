@@ -1,17 +1,15 @@
 /**
  * Presentation I/O for pending pause offer RPC + display copy.
- * Imports adopt/decline via `pause-reflect-pending-offer-rpc-flow` and display via
- * `pause-pending-offer-display-flow` (parity with hub/steps I/O subcluster peels).
+ * Imports adopt/decline and display from leaf modules directly (parity with
+ * `pause-reflect-pending-offer-telemetry-io` → pending-offer telemetry leaf trackers).
  */
 import {
   getPendingPauseOfferDisplay,
   type PendingPauseOfferDisplay,
   type PendingPauseOfferDisplayInput,
-} from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow';
-import {
-  runAdoptPendingPauseOffer,
-  runDeclinePendingPauseOffer,
-} from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display';
+import { runAdoptPendingPauseOffer } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer';
+import { runDeclinePendingPauseOffer } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
