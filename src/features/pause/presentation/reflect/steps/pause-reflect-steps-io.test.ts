@@ -11,9 +11,13 @@ import {
   pauseDeclinePendingOfferWithRepository,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
+  messageFromReflectGenerationResult,
   pauseReflectGeneration,
+  reflectGenerationPrerequisite,
   reflectGenerator,
+  resolveReflectGenerationPrefetch,
   runReflectGeneration,
+  shouldCommitReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   buildReflectionShareTelegramUrl,
@@ -195,7 +199,18 @@ describe('pause-reflect-steps-io', () => {
     expect(pauseReflectTagUpdate).not.toBe(pauseReflectGeneration);
     expect(pauseReflectionStepLogOnce).not.toBe(runReflectGeneration);
     expect(reflectPauseRepository).not.toBe(reflectGenerator);
-    // Full cross-I/O pins: `pause-reflect-steps-generation-io-sibling-parity.test.ts`.
+    expect(pauseReflectFavoriteToggle).not.toBe(reflectGenerationPrerequisite);
+    expect(pauseReflectNoteUpdate).not.toBe(shouldCommitReflectGeneration);
+    expect(pauseReflectTagUpdate).not.toBe(resolveReflectGenerationPrefetch);
+    expect(pauseReflectionStepLogOnce).not.toBe(messageFromReflectGenerationResult);
+    expect(pauseReflectFavoriteToggleWithRepository).not.toBe(pauseReflectGeneration);
+    expect(pauseReflectNoteUpdateWithRepository).not.toBe(runReflectGeneration);
+    expect(pauseReflectTagUpdateWithRepository).not.toBe(reflectGenerationPrerequisite);
+    expect(pauseReflectionStepLogOnceWithRepository).not.toBe(shouldCommitReflectGeneration);
+    expect(shouldShowFavoriteProHint).not.toBe(messageFromReflectGenerationResult);
+    expect(shouldLogPauseReflectionStep).not.toBe(reflectGenerationPrerequisite);
+    // Full cross-I/O pins: `pause-reflect-steps-generation-io-sibling-parity.test.ts`;
+    // reciprocal inline pins: `pause-reflect-generation-io.test.ts`.
   });
 
   it('sibling cluster: note and tag wrappers stay distinct on steps-io', () => {
