@@ -18,3 +18,13 @@ export {
   showPauseOutcomeSaveFailedToast,
 } from './pause-reflect-decide-outcome-toast-flow';
 export { getSessionQuote } from './pause-reflect-decide-wisdom-quotes-flow';
+export {
+  buildPauseScoreImpacts,
+  parseScoreImpactVolatilityPct,
+  resolveScoreImpactDisplayImpacts,
+  resolveScoreImpactViewMode,
+  scoreImpactMotionDelaySec,
+  type PauseScoreImpactRow,
+  type ScoreImpactVariant,
+  type ScoreImpactViewMode,
+} from '../../decide/pause-decide-score-impacts-flow';
