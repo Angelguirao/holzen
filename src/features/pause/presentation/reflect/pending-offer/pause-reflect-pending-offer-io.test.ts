@@ -1,4 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
+import { runAdoptPendingPauseOffer as runAdoptDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer';
+import { runDeclinePendingPauseOffer as runDeclineDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer';
 import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
@@ -49,6 +51,14 @@ describe('pause-reflect-pending-offer-io', () => {
     expect(typeof pauseDeclinePendingOffer).toBe('function');
     expect(typeof pauseAdoptPendingOfferWithRepository).toBe('function');
     expect(typeof pauseDeclinePendingOfferWithRepository).toBe('function');
+  });
+
+  it('exports pending-offer RPC wrappers distinct from leaf use cases', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(runAdoptDirect);
+    expect(pauseDeclinePendingOffer).not.toBe(runDeclineDirect);
+    expect(pauseAdoptPendingOffer).not.toBe(pauseDeclinePendingOffer);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(runAdoptDirect);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(runDeclineDirect);
   });
 
   it('routes adopt through the leaf use case with the default repository', () => {
