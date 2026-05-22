@@ -33552,4 +33552,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — presentation flows↔decide flow sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-decide-flow-sibling-parity.test.ts</code> (presentation)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no relocations. Mirror application <code>pause-reflect-flows-decide-flow-sibling-parity</code> under <code>presentation/reflect/flows/</code> (CI flow anchors only; production I/O unchanged). Allowlist new parity file in <code>check:architecture-alignment</code> so flow-level pins may import application <code>pause-reflect-flows-flow</code> and <code>pause-session-decide-flow</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + allowlist only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: presentation mirrors for remaining application-only flows flow siblings (generation, hub, mood, pending-offer, share, telemetry), or Phase B Tier 1 lib shim scan.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -2978,7 +2978,8 @@ for (const file of walkTs(join(root, 'src'))) {
       !rel.endsWith('pause-reflect-flows-io-parity.test.ts') &&
       !rel.endsWith('pause-reflect-flows-flow-io-wrapper-sibling-parity.test.ts') &&
       !rel.endsWith('pause-reflect-flows-io-flow-sibling-parity.test.ts') &&
-      !rel.endsWith('pause-reflect-flows-ambience-flow-sibling-parity.test.ts')
+      !rel.endsWith('pause-reflect-flows-ambience-flow-sibling-parity.test.ts') &&
+      !rel.endsWith('pause-reflect-flows-decide-flow-sibling-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {
