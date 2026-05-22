@@ -61,6 +61,10 @@ import {
   runReflectGeneration,
   shouldCommitReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 /**
@@ -71,6 +75,8 @@ import { supabasePauseRepository } from '@/features/pause/public-rpc';
  * reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (flows cluster).
  * Generation-io sibling pins: `pause-reflect-generation-hub-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (generation cluster).
+ * Ambience-io sibling pins: `pause-reflect-ambience-hub-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (ambience cluster).
  */
 describe('pause-reflect-hub-io parity', () => {
   it('presentation I/O hub exports match pause-reflect-hub-flow CI umbrella', () => {
@@ -175,5 +181,21 @@ describe('pause-reflect-hub-io parity', () => {
     expect(resolvePresentationFromHubIo).not.toBe(pauseDeclinePendingOffer);
     // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`.
     // Full pins: `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (shift-frame hub vs frame-focus bed).
+   * Dedicated sibling file: `pause-reflect-ambience-hub-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: ambience-io frame-focus bed exports stay distinct from hub-io wrappers', () => {
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(buildLogBundleFromHubIo).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(resolvePresentationFromHubIo).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(reflectPauseRepository).not.toBe(startPauseReflectFrameFocusAmbience);
+    // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
+    // Full pins: `pause-reflect-ambience-hub-io-sibling-parity.test.ts`.
   });
 });
