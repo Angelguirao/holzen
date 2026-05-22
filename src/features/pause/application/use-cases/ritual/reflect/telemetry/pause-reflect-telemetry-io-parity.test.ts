@@ -45,6 +45,8 @@ import {
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   pauseInitialEmotionSelect,
+  pauseInitialEmotionSelectWithRepository,
+  pauseInitialEmotionSkipWithRepository,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import {
   startPauseReflectFrameFocusAmbience,
@@ -110,7 +112,9 @@ describe('pause-reflect-telemetry-io parity (application)', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(pauseInitialEmotionSelect);
     expect(trackPauseReflectShareTap).not.toBe(pauseShiftEmotionFrameHubDone);
     expect(trackPauseReflectWallpaperTap).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseInitialEmotionSelectWithRepository);
+    expect(trackPauseReflectShareTap).not.toBe(pauseInitialEmotionSkipWithRepository);
     expect(trackPostItDirect).not.toBe(runReflectGeneration);
-    // Reciprocal inline pins: `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
+    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts` (application + presentation).
   });
 });
