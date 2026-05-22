@@ -54,7 +54,7 @@ import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persist
 /**
  * Terminal-entry CI umbrella ↔ presentation I/O delegation parity.
  * Shell-io sibling: `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins below ↔ `pause-session-shell-io-parity.test.ts`.
+ * reciprocal inline pins below ↔ `pause-session-shell-io-parity.test.ts` and `pause-session-persisted-tab-session-io-parity.test.ts`.
  */
 describe('pause-session-terminal-entry-io parity', () => {
   it('presentation I/O terminal-entry exports match pause-session-terminal-entry-flow CI umbrella', () => {

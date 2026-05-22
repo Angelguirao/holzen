@@ -1,3 +1,8 @@
+/**
+ * Presentation I/O parity (colocated beside `pause-persisted-tab-session-io.ts`).
+ * Imports `pause-session-persisted-tab-session-flow` CI umbrella + `persisted-tab-session` leaf for `.toBe` identity pins only — production tab-session I/O keeps direct leaf import.
+ * Reciprocal inline pins ↔ `pause-session-terminal-entry-io-parity.test.ts` (terminal-entry vs tab-session wrappers).
+ */
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
@@ -24,17 +29,18 @@ import {
   savePersistedTabSession as saveFromFlow,
 } from '@/features/pause/application/use-cases/session/pause-session-persisted-tab-session-flow';
 import {
+  isTerminalPauseDbState,
+  persistedPauseSessionAllowsTerminalEntry,
+  TERMINAL_PAUSE_DB_STATES,
+} from '@/features/pause/presentation/session/pause-session-terminal-entry-io';
+import type { PersistedSession } from '@/features/pause/domain/session-model';
+import { persistedTabSessionStorage } from '@/features/pause/public-rpc';
+import {
   clearPausePersistedTabSession,
   loadPausePersistedTabSession,
   savePausePersistedTabSession,
 } from './pause-persisted-tab-session-io';
-import { persistedTabSessionStorage } from '@/features/pause/public-rpc';
-import type { PersistedSession } from '@/features/pause/domain/session-model';
 
-/**
- * Presentation I/O parity (colocated beside `pause-persisted-tab-session-io.ts`).
- * Imports `pause-session-persisted-tab-session-flow` CI umbrella + `persisted-tab-session` leaf for `.toBe` identity pins only — production tab-session I/O keeps direct leaf import.
- */
 describe('pause-session-persisted-tab-session-io parity', () => {
   it('presentation I/O delegates tab session load/save/clear to persisted-tab-session with default port', () => {
     const data = { step: 'brief' } as unknown as PersistedSession;
@@ -67,5 +73,15 @@ describe('pause-session-persisted-tab-session-io parity', () => {
     expect(savePausePersistedTabSession).not.toBe(saveDirect);
     expect(clearPausePersistedTabSession).not.toBe(clearDirect);
     expect(loadPausePersistedTabSession).not.toBe(loadPersistedTabSession);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-terminal-entry-io-parity.test.ts` (tab-session wrappers vs terminal-entry guards).
+   */
+  it('sibling cluster: persisted-tab-session presentation exports stay distinct from terminal-entry presentation exports', () => {
+    expect(loadPausePersistedTabSession).not.toBe(isTerminalPauseDbState);
+    expect(savePausePersistedTabSession).not.toBe(persistedPauseSessionAllowsTerminalEntry);
+    expect(clearPausePersistedTabSession).not.toBe(TERMINAL_PAUSE_DB_STATES);
+    expect(loadPausePersistedTabSession).not.toBe(persistedPauseSessionAllowsTerminalEntry);
   });
 });
