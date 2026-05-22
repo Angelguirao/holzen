@@ -181,6 +181,17 @@ describe('pause-reflect-share-io parity', () => {
     expect(trackPauseReflectWallpaperTap).not.toBe(runReflectionShareImageFromOrchestration);
   });
 
+  it('presentation I/O share PNG wrapper delegates to run-reflection-share-image leaf', async () => {
+    const message = 'breathe';
+    const context = 'btc';
+    const haiku = 'still water';
+    const deps = { share: vi.fn() };
+
+    await pauseReflectionShareImage(message, context, haiku, deps);
+
+    expect(runReflectionShareImageDirect).toHaveBeenCalledWith(message, context, haiku, deps);
+  });
+
   /**
    * Reciprocal inline pins ↔ `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-flows-share-io-sibling-parity.test.ts` (application + presentation).
