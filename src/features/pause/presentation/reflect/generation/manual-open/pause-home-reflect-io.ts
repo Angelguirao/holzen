@@ -9,7 +9,8 @@
  * Sibling parity: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` (colocated) ↔ `pause-reflect-generation-io` (presentation + application);
  * reciprocal inline pins: `pause-home-reflect-io.test.ts` ↔ `pause-reflect-generation-io.test.ts`;
  * `presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts` ↔ `pause-home-reflect-telemetry-io`;
- * `pause-home-reflect-io-parity.test.ts` (colocated) ↔ `pause-reflect-generation-manual-open-flow`.
+ * `pause-home-reflect-io-parity.test.ts` (colocated) ↔ `pause-reflect-generation-manual-open-flow`;
+ * application mirror: `application/.../manual-open/pause-home-reflect-io-parity.test.ts`.
  */
 import { dismissOpenPauseHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/dismiss-open-pause-home';
 import { openManualPauseFromHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/open-manual-pause-from-home';
