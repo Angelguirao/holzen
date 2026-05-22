@@ -24,7 +24,9 @@ import * as moodIo from './pause-reflect-mood-io';
 
 /**
  * Presentation sibling parity: mood-io vs hub-io (parity with application
- * `pause-reflect-hub-mood-flow-sibling-parity.test.ts`; complements
+ * `pause-reflect-hub-mood-flow-sibling-parity.test.ts`, mood-anchored
+ * `application/.../mood/pause-reflect-mood-hub-io-sibling-parity.test.ts`, and hub-anchored
+ * `application/.../hub/pause-reflect-hub-mood-io-sibling-parity.test.ts`; complements
  * `pause-reflect-steps-mood-io-sibling-parity.test.ts`).
  */
 describe('pause-reflect-mood-io ↔ pause-reflect-hub-io sibling parity', () => {
