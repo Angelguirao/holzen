@@ -1,30 +1,33 @@
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: { port: 'reflectPauseRepository' },
-}));
-
-import {
-  getPendingPauseOfferDisplay,
-  pauseAdoptPendingOffer,
-  pauseAdoptPendingOfferWithRepository,
-  pauseDeclinePendingOffer,
-  pauseDeclinePendingOfferWithRepository,
-} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
-import {
-  trackPauseReflectPostItOpen,
-  trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
-} from './pause-reflect-telemetry-io';
-import {
-  trackPausePendingAdopted,
-  trackPausePendingDeclined,
-  trackPauseSessionAbandoned,
-} from './pause-reflect-pending-offer-telemetry-io';
-
 const trackPausePendingAdoptedMock = vi.hoisted(() => vi.fn());
 const trackPausePendingDeclinedMock = vi.hoisted(() => vi.fn());
 const trackPauseSessionAbandonedMock = vi.hoisted(() => vi.fn());
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { kind: 'supabase' },
+}));
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer',
+  () => ({
+    runAdoptPendingPauseOffer: vi.fn(),
+  }),
+);
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer',
+  () => ({
+    runDeclinePendingPauseOffer: vi.fn(),
+  }),
+);
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display',
+  () => ({
+    getPendingPauseOfferDisplay: vi.fn(),
+  }),
+);
 
 vi.mock(
   '@/features/pause/application/use-cases/ritual/reflect/telemetry/pending-pause-offer-telemetry',
@@ -53,6 +56,24 @@ vi.mock(
   },
 );
 
+import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
+  pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from './pause-reflect-telemetry-io';
+import {
+  trackPausePendingAdopted,
+  trackPausePendingDeclined,
+  trackPauseSessionAbandoned,
+} from './pause-reflect-pending-offer-telemetry-io';
+
 describe('pause-reflect-pending-offer-telemetry-io', () => {
   it('re-exports adopt, decline, and abandoned from pending-offer telemetry leaf modules', () => {
     expect(typeof trackPausePendingAdopted).toBe('function');
@@ -75,6 +96,7 @@ describe('pause-reflect-pending-offer-telemetry-io', () => {
     expect(trackPauseSessionAbandoned).not.toBe(pauseAdoptPendingOfferWithRepository);
     expect(trackPausePendingAdopted).not.toBe(getPendingPauseOfferDisplay);
     expect(trackPausePendingDeclined).not.toBe(pauseDeclinePendingOfferWithRepository);
-    // Full cross-I/O pins: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
+    // Reciprocal inline pins: `pause-reflect-pending-offer-io.test.ts`;
+    // dedicated sibling: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
   });
 });
