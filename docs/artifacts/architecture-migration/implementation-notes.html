@@ -26610,4 +26610,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session terminal-entry ↔ persisted-tab-session sibling pin (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-terminal-entry-flow</code> ↔ <code>pause-session-persisted-tab-session-flow</code> sibling cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend application flow tests with reciprocal sibling-cluster guards so terminal-entry guards and persisted-tab-session load/save/clear CI umbrellas cannot be merged accidentally (parity with step-handlers ↔ step-transition pins). Document cross-test reference on both flow modules and <code>pause-session-terminal-entry-io.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comments only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without presentation importing both session flow umbrellas outside allowlisted re-exports tests.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shims, or reflect telemetry ↔ pending-offer extended cross-umbrella pins if drift appears.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
