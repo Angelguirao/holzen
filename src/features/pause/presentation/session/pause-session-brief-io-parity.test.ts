@@ -36,6 +36,7 @@ import {
 
 /**
  * Presentation I/O parity (colocated beside `pause-session-brief-io.ts`).
+ * Application mirror: `application/.../session/pause-session-brief-io-parity.test.ts` (colocated beside brief-flow).
  * Imports `pause-session-brief-flow` CI umbrella for `.toBe` identity pins only — production brief I/O keeps session + ritual/brief leaf imports.
  */
 describe('pause-session-brief-io parity', () => {
