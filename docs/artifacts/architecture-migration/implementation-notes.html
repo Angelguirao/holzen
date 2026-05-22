@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect hub I/O via pause-reflect-hub-flow umbrella (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-io</code> imports hub helpers through <code>pause-reflect-hub-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Route <code>pause-reflect-hub-io</code> through the hub umbrella CI anchor instead of three hub subcluster flows (parity with <code>pause-reflect-mood-io</code> → <code>pause-reflect-mood-flow</code> and <code>pause-reflect-steps-io</code>). CI blocks deep hub subcluster imports on hub I/O modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Share orchestration still peels off the share umbrella to <code>pause-reflect-share-orchestration-flow</code> (telemetry sibling) — hub stays on a single umbrella like mood/steps.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim (<code>App.tsx</code> checkout guard), or session scaffold I/O peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — ScoreImpact screen imports via public-ritual-reflect (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

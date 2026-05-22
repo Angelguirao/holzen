@@ -8,10 +8,10 @@ import {
 const runShiftEmotionFrameHubDoneMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow',
   async (importOriginal) => {
     const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow')
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow')
     >();
     return {
       ...actual,
@@ -25,7 +25,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 describe('pause-reflect-hub-io', () => {
-  it('re-exports shift-frame hub presentation mapping from hub subcluster flows', () => {
+  it('re-exports shift-frame hub presentation mapping from pause-reflect-hub-flow', () => {
     expect(
       resolveShiftFrameHubDonePresentation({ status: 'sync_failed' }),
     ).toEqual({ kind: 'abort_sync_failed' });
