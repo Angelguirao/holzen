@@ -105,7 +105,7 @@ describe('pause-session-scaffold-io parity', () => {
     expect(buildPauseSessionScaffoldRitualDerived).not.toBe(pickPauseHolzenProvidersSlice);
     expect(hasPersistablePauseSessionAnchor).not.toBe(pickPauseHolzenProvidersSlice);
     expect(buildPersistFromScaffoldIo).not.toBe(pickPauseHolzenProvidersSlice);
-    // Reciprocal inline pins: `pause-session-providers-io-parity.test.ts`.
+    // Reciprocal inline pins: `pause-session-providers-io-parity.test.ts` (colocated beside providers-io).
     // Full pins: `pause-session-providers-scaffold-io-sibling-parity.test.ts`.
   });
 
