@@ -9,6 +9,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-
   runInitialEmotionSkip: vi.fn(() => Promise.resolve({ status: 'local_only' as const, ui: {} })),
 }));
 
+import { buildFeelTilesMoodLogOptions as buildFeelTilesDirect } from '@/features/pause/domain/reflect/mood/build-feel-tiles-mood-log-options';
 import {
   runInitialEmotionSelect,
   runInitialEmotionSkip,
@@ -45,6 +46,11 @@ import {
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 describe('pause-reflect-mood-io parity', () => {
+  it('mood CI umbrella composes the same domain feel-tiles leaf as presentation I/O', () => {
+    expect(buildFeelTilesMoodLogOptions).toBe(buildFeelTilesDirect);
+    expect(buildFeelTilesFromMoodIo).toBe(buildFeelTilesDirect);
+  });
+
   it('presentation I/O mood exports match pause-reflect-mood-flow CI umbrella', () => {
     expect(applyBriefDepthPickerRitualEntry).toBe(applyBriefFromMoodIo);
     expect(applyDeepDepthPickerRitualEntry).toBe(applyDeepFromMoodIo);
