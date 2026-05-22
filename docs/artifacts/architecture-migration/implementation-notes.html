@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel pause-companion-analytics-io to ritual/frame leaf modules (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-analytics-io</code> imports feedback vote + fullview opened from leaf modules</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>application/use-cases/companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Route <code>pause-companion-analytics-io</code> through <code>run-log-companion-feedback-vote</code>, <code>run-log-companion-fullview-opened</code>, and sibling input types instead of <code>pause-companion-analytics-flow</code> CI anchor (parity with orchestration/frame UI I/O peels on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-companion-analytics-flow.ts</code> remains for cluster detection and umbrella composition.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B cross-context Tier 1 shim (auth/subscription/market) or session breath/ritual-done I/O peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-companion-frame-ui-io to ritual/frame leaf modules (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

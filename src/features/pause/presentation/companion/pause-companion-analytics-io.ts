@@ -1,16 +1,15 @@
 /**
  * Companion frame analytics presentation I/O (feedback vote + fullview opened).
- * Imports `run-log-companion-*` and input types via `pause-companion-analytics-flow` CI anchor
- * (parity with orchestration/orchestrate I/O peels).
+ * Imports ritual/frame leaf modules directly (parity with orchestration/frame UI I/O peels).
  */
 import type { PauseAnalyticsRepository } from '@/features/pause/ports/pause-analytics-repository';
-import {
-  runLogCompanionFeedbackVote,
-  runLogCompanionFullviewOpened,
-  type CompanionFullviewKind,
-  type LogCompanionFeedbackVoteInput,
-  type LogCompanionFullviewOpenedInput,
-} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-analytics-flow';
+import type {
+  CompanionFullviewKind,
+  LogCompanionFullviewOpenedInput,
+} from '@/features/pause/application/use-cases/ritual/frame/log-companion-fullview-opened';
+import type { LogCompanionFeedbackVoteInput } from '@/features/pause/application/use-cases/ritual/frame/log-companion-feedback-vote';
+import { runLogCompanionFeedbackVote } from '@/features/pause/application/use-cases/ritual/frame/run-log-companion-feedback-vote';
+import { runLogCompanionFullviewOpened } from '@/features/pause/application/use-cases/ritual/frame/run-log-companion-fullview-opened';
 import { supabasePauseAnalyticsRepository } from '@/features/pause/public-rpc';
 
 export type {
