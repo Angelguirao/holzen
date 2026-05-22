@@ -736,11 +736,18 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_RPC_FLAGS_IMPORTS = [
   "from '../domain/ritual/breathe/initial-breath-segment-rpc-flags'",
 ];
 
-/** Session breath presentation — import step navigation via breath-flow anchor only. */
+/** Session breath presentation — import step navigation via step-navigation-io only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_STEP_NAV_IMPORTS = [
   '@/features/pause/domain/ritual/breathe/pause-breath-step-navigation',
   "from './domain/ritual/breathe/pause-breath-step-navigation'",
   "from '../domain/ritual/breathe/pause-breath-step-navigation'",
+];
+
+/** Session breath step-navigation I/O — import domain leaf directly (not pause-session-breath-flow). */
+const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_STEP_NAV_IO_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow',
+  "from './application/use-cases/ritual/breathe/pause-session-breath-flow'",
+  "from '../application/use-cases/ritual/breathe/pause-session-breath-flow'",
 ];
 
 /** Session breath presentation — import hydration + phase advance via breath-io anchor only. */
@@ -2676,6 +2683,18 @@ for (const file of walkTs(join(root, 'src'))) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_FLOW_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy session breath-flow import (${needle})`);
+        }
+      }
+    }
+    if (
+      rel.endsWith('pause-session-breath-step-navigation-io.ts') ||
+      rel.endsWith('pause-session-breath-step-navigation-io.test.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_STEP_NAV_IO_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: session breath step-navigation I/O must import pause-breath-step-navigation domain leaf directly (${needle})`,
+          );
         }
       }
     }
