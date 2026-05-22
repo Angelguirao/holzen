@@ -114,6 +114,15 @@ describe('pause-reflect-pending-offer-flow', () => {
     expect(trackAbandonedFromFlow).not.toBe(runDeclineFromRpcSubcluster);
   });
 
+  it('sibling cluster: display-flow subcluster shares display projection only (not RPC or telemetry)', () => {
+    expect(getDisplayFromFlow).toBe(getDisplayFromDisplayFlow);
+    expect(runAdoptPendingPauseOffer).not.toBe(getDisplayFromDisplayFlow);
+    expect(runDeclinePendingPauseOffer).not.toBe(getDisplayFromDisplayFlow);
+    expect(trackAdoptedFromFlow).not.toBe(getDisplayFromDisplayFlow);
+    expect(trackDeclinedFromFlow).not.toBe(getDisplayFromDisplayFlow);
+    expect(trackAbandonedFromFlow).not.toBe(getDisplayFromDisplayFlow);
+  });
+
   it('sibling cluster: hub-flow exports stay distinct from pending-offer umbrella exports', () => {
     expect(runAdoptPendingPauseOffer).not.toBe(runShiftHubDoneFromHubFlow);
     expect(runDeclinePendingPauseOffer).not.toBe(runShiftHubDoneFromHubFlow);
