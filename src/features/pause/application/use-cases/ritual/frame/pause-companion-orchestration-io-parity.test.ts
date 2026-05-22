@@ -14,13 +14,24 @@ import {
   nextExpandedWithLazyFetch,
 } from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow';
 import {
+  companionOrchestrator,
+  companionPauseRepository,
   loadCompanionOrchestrateSession as loadSessionFromOrchestrationIo,
   nextExpandedWithLazyFetch as nextExpandedFromOrchestrationIo,
 } from '@/features/pause/presentation/companion/pause-companion-orchestration-io';
+import {
+  supabaseCompanionOrchestrator,
+  supabasePauseRepository,
+} from '@/features/pause/public-rpc';
 
 describe('pause-companion-orchestration-io parity', () => {
   it('presentation I/O orchestration exports match pause-companion-orchestration-flow CI umbrella', () => {
     expect(loadCompanionOrchestrateSession).toBe(loadSessionFromOrchestrationIo);
     expect(nextExpandedWithLazyFetch).toBe(nextExpandedFromOrchestrationIo);
+  });
+
+  it('presentation I/O binds companion ports to public-rpc adapters', () => {
+    expect(companionOrchestrator).toBe(supabaseCompanionOrchestrator);
+    expect(companionPauseRepository).toBe(supabasePauseRepository);
   });
 });

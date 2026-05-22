@@ -26042,4 +26042,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — companion orchestration ↔ section-visibility sibling pin (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestration-flow</code> sibling pin + orchestration-io port parity</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and #2 (<code>ritual/frame/</code>) folder moves remain complete — no relocations. Extend <code>pause-companion-orchestration-flow.test.ts</code> with sibling-cluster tests: orchestration umbrella exports stay distinct from <code>pause-companion-section-visibility-flow</code>; <code>pause-companion-frame-ui-flow</code> composes the visibility sibling (cross-pin). Extend <code>pause-companion-orchestration-io-parity.test.ts</code> with <code>companionOrchestrator</code> / <code>companionPauseRepository</code> ↔ <code>public-rpc</code> adapters. Document sibling anchors on orchestration-flow and section-visibility-flow modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comments only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without merging orchestration and visibility CI umbrellas or changing presentation I/O leaf imports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: extend <code>pause-reflect-telemetry-io-parity</code>, Tier 1 <code>holzen-query-client-ref</code> shim peel (<code>App.tsx</code> → <code>public-queries</code>), or Phase B cross-context Tier 1 scan.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
