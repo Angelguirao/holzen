@@ -26,7 +26,11 @@ import {
 import * as pendingOfferFlow from './pause-reflect-pending-offer-flow';
 import * as pendingOfferIo from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 
-describe('pause-reflect-pending-offer-flow ↔ pause-reflect-pending-offer-io wrapper sibling parity', () => {
+/**
+ * Application sibling parity: pending-offer-flow CI umbrella vs pending-offer-io port-bound wrappers.
+ * Presentation mirror: `presentation/reflect/pending-offer/pause-reflect-pending-offer-flow-io-wrapper-sibling-parity.test.ts`.
+ */
+describe('pause-reflect-pending-offer-flow ↔ pause-reflect-pending-offer-io wrapper sibling parity (application)', () => {
   it('pending-offer-flow CI umbrella and presentation I/O are distinct anchors', () => {
     expect(typeof runAdoptPendingPauseOffer).toBe('function');
     expect(typeof runDeclinePendingPauseOffer).toBe('function');
