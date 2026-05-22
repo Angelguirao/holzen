@@ -3,16 +3,59 @@ import { describe, expect, it } from 'vitest';
 import {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
+} from '@/features/pause/application/use-cases/ritual/breathe/restored-breath-ritual-state';
+import {
+  initialDecisionFromRestored,
+  initialPhaseFromRestored,
+} from '@/features/pause/application/use-cases/ritual/decide/restored-decide-ritual-state';
+import { initialFrameDoneFromRestored } from '@/features/pause/application/use-cases/ritual/frame/restored-frame-ritual-state';
+import { mapPersistedStep } from '@/features/pause/domain/session/map-persisted-step';
+
+import {
   initialBriefIntegrateDoneFromRestored,
   initialBriefPauseStepFromRestored,
-  initialDecisionFromRestored,
-  initialFrameDoneFromRestored,
-  initialPhaseFromRestored,
   initialSelectedBriefFaceFromRestored,
+} from './restored-brief-ritual-state';
+import { initialRitualEntry } from './initial-ritual-entry';
+import {
+  initialBreathingFirstCompletedFromRestored as initialBreathFirstFromFlow,
+  initialBreathingSecondCompletedFromRestored as initialBreathSecondFromFlow,
+  initialBriefIntegrateDoneFromRestored as initialBriefIntegrateDoneFromFlow,
+  initialBriefPauseStepFromRestored as initialBriefPauseStepFromFlow,
+  initialDecisionFromRestored as initialDecisionFromFlow,
+  initialFrameDoneFromRestored as initialFrameDoneFromFlow,
+  initialPhaseFromRestored as initialPhaseFromFlow,
+  initialRitualEntry as initialRitualEntryFromFlow,
+  initialSelectedBriefFaceFromRestored as initialSelectedBriefFaceFromFlow,
+  mapPersistedStep as mapPersistedStepFromFlow,
 } from './pause-session-ritual-restore-flow';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
 describe('pause-session-ritual-restore-flow', () => {
+  it('re-exports ritual restore helpers from domain + ritual/session siblings', () => {
+    expect(typeof mapPersistedStepFromFlow).toBe('function');
+    expect(typeof initialBreathFirstFromFlow).toBe('function');
+    expect(typeof initialBreathSecondFromFlow).toBe('function');
+    expect(typeof initialDecisionFromFlow).toBe('function');
+    expect(typeof initialPhaseFromFlow).toBe('function');
+    expect(typeof initialFrameDoneFromFlow).toBe('function');
+    expect(typeof initialBriefPauseStepFromFlow).toBe('function');
+    expect(typeof initialBriefIntegrateDoneFromFlow).toBe('function');
+    expect(typeof initialSelectedBriefFaceFromFlow).toBe('function');
+    expect(typeof initialRitualEntryFromFlow).toBe('function');
+
+    expect(mapPersistedStepFromFlow).toBe(mapPersistedStep);
+    expect(initialBreathFirstFromFlow).toBe(initialBreathingFirstCompletedFromRestored);
+    expect(initialBreathSecondFromFlow).toBe(initialBreathingSecondCompletedFromRestored);
+    expect(initialDecisionFromFlow).toBe(initialDecisionFromRestored);
+    expect(initialPhaseFromFlow).toBe(initialPhaseFromRestored);
+    expect(initialFrameDoneFromFlow).toBe(initialFrameDoneFromRestored);
+    expect(initialBriefPauseStepFromFlow).toBe(initialBriefPauseStepFromRestored);
+    expect(initialBriefIntegrateDoneFromFlow).toBe(initialBriefIntegrateDoneFromRestored);
+    expect(initialSelectedBriefFaceFromFlow).toBe(initialSelectedBriefFaceFromRestored);
+    expect(initialRitualEntryFromFlow).toBe(initialRitualEntry);
+  });
+
   it('re-exports restored breath hydration from restored-breath-ritual-state', () => {
     const restored = makeTestPersistedPauseSession({
       breathingFirstCompleted: true,
