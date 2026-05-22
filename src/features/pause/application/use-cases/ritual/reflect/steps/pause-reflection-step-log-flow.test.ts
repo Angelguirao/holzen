@@ -34,6 +34,8 @@ describe('pause-reflection-step-log-flow', () => {
     expect(shouldLogFromFlow).not.toBe(shouldShowFromToggleFlow);
     expect(runPauseReflectionStepLogOnce).not.toBe(shouldShowFromToggleFlow);
     expect(shouldLogFromFlow).not.toBe(runFavoriteFromToggleFlow);
+    // Full umbrella pins: reciprocal inline pins on `pause-reflect-steps-flow.test.ts`;
+    // `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: steps-flow exports stay distinct from reflection-step-log-flow export', () => {
