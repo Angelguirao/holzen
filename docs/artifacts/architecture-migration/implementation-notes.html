@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — persisted tab session via pause-session-persisted-tab-session-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-persisted-tab-session-io</code> imports use cases through session flow anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-session-persisted-tab-session-flow</code> beside <code>persisted-tab-session</code>; presentation I/O binds the default <code>persistedTabSessionStorage</code> port through the anchor (parity with providers and shell I/O peels). Add explicit I/O tests for providers and persisted-tab bindings.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-session.ts</code> may still import <code>persisted-tab-session</code> directly for cross-context re-exports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: remaining session presentation deep imports or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — Holzen providers slice via pause-session-providers-io (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
