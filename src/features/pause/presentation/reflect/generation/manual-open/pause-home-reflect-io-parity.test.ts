@@ -1,6 +1,7 @@
 /**
  * Presentation I/O parity for Home manual-open reflect cluster (colocated beside
  * `pause-home-reflect-io.ts`; application `pause-reflect-generation-manual-open-flow` stays CI umbrella).
+ * Application mirror: `application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-io-parity.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
 
