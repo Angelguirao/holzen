@@ -121,13 +121,19 @@ describe('pause-home-reflect-io', () => {
     expect(typeof dismissOpenPauseHome).toBe('function');
     expect(openManualPauseFromHome).not.toBe(pauseReflectGeneration);
     expect(dismissOpenPauseHome).not.toBe(runReflectGeneration);
+    expect(pauseDismissOpenPauseHomePreview).not.toBe(pauseReflectGeneration);
+    expect(pauseHomeManualOpenPorts).not.toBe(reflectGenerator);
+    expect(runPersistSilentReflectionStub).not.toBe(runReflectGeneration);
+    expect(runOpenManualPauseSilentModeAfterCreate).not.toBe(reflectGenerationPrerequisite);
     expect(openManualPauseFromHome).not.toBe(reflectGenerationPrerequisite);
     expect(dismissOpenPauseHome).not.toBe(shouldCommitReflectGeneration);
     expect(openManualPauseFromHome).not.toBe(reflectGenerator);
     expect(dismissOpenPauseHome).not.toBe(resolveReflectGenerationPrefetch);
     expect(pauseHomeManualOpenPorts.reflect).toBe(reflectGenerator);
     expect(pauseHomeManualOpenPorts.reflect).not.toBe(pauseReflectGeneration);
-    expect(buildManualPauseOpenParams).not.toBe(messageFromReflectGenerationResult);
+    expect(buildManualPauseOpenParams).not.toBe(shouldCommitReflectGeneration);
+    expect(buildManualPauseMarketContext).not.toBe(messageFromReflectGenerationResult);
+    expect(buildManualPauseCreateOrReuseParams).not.toBe(resolveReflectGenerationPrefetch);
     // Reciprocal inline pins: `pause-reflect-generation-io.test.ts`.
   });
 });
