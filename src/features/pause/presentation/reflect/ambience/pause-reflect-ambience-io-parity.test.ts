@@ -83,7 +83,7 @@ import {
  * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (generation cluster).
  * Mood-io sibling pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (mood cluster).
- * Telemetry-io sibling pins: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (presentation);
+ * Telemetry-io sibling pins: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (telemetry cluster).
  * Steps-io cross-surface: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application).
