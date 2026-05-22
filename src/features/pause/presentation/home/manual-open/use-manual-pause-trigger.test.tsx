@@ -34,7 +34,7 @@ vi.mock('@/features/pause/presentation/reflect/telemetry/home/pause-home-reflect
   trackPauseManualCompleted: trackPauseManualCompletedMock,
 }));
 
-vi.mock('./pause-home-reflect-io', () => ({
+vi.mock('@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io', () => ({
   pauseHomeManualOpenPorts: mockPauseHomeManualOpenPorts,
   applyManualPauseOpenResult: async (
     _input: { result: { outcome: string; userMessage?: string } },

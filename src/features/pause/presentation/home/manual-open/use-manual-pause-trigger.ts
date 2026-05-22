@@ -11,7 +11,7 @@ import {
   buildManualPauseOpenParams,
   openManualPauseFromHome,
   pauseHomeManualOpenPorts,
-} from './pause-home-reflect-io';
+} from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 import {
   markPauseManualStartedHomeOnce,
   trackManualPauseInstanceCreated,
