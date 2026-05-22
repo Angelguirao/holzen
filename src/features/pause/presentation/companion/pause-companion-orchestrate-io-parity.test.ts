@@ -113,7 +113,8 @@ describe('pause-companion-orchestrate-io parity', () => {
     expect(trackCompanionGenerationInitiated).not.toBe(pauseCompanionUiStepCompletion);
     expect(setCompanionSlotLoading).not.toBe(invalidateCompanionUiCompletionQuery);
     expect(resetInterventionIdempotency).not.toBe(pauseLoadCompanionOrchestrateSession);
-    // Reciprocal pins: `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts`.
+    // Reciprocal inline pins: `application/.../ritual/frame/pause-companion-orchestrate-io-parity.test.ts`.
+    // Dedicated siblings: `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts` (application + presentation).
   });
 
   it('presentation orchestrate-io stays off orchestration-io session/favorite wrappers', () => {
@@ -122,6 +123,5 @@ describe('pause-companion-orchestrate-io parity', () => {
     expect('nextExpandedWithLazyFetch' in orchestrateIo).toBe(false);
     expect('invalidateCompanionUiCompletionQuery' in orchestrateIo).toBe(false);
     expect('companionOrchestrator' in orchestrateIo).toBe(true);
-    // Reciprocal inline pins: `application/.../ritual/frame/pause-companion-orchestrate-io-parity.test.ts`.
   });
 });
