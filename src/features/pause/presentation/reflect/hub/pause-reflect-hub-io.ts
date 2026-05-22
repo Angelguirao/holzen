@@ -4,6 +4,7 @@
  * (parity with `pause-reflect-steps-io` → steps flow).
  */
 import {
+  buildShiftEmotionFrameHubLogBundle,
   runShiftEmotionFrameHubDone,
   resolveShiftFrameHubDonePresentation,
   type ShiftFrameHubDonePresentation,
@@ -11,6 +12,7 @@ import {
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 export {
+  buildShiftEmotionFrameHubLogBundle,
   resolveShiftFrameHubDonePresentation,
   type ShiftFrameHubDonePresentation,
 };
