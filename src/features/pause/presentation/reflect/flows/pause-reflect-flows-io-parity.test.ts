@@ -262,7 +262,7 @@ describe('pause-reflect-flows-io parity', () => {
     expect(resolvePauseDecideOutcomeFlow).not.toBe(initialPhaseFromRestored);
     expect(buildPauseScoreImpacts).not.toBe(initialDecisionFromRestored);
     expect(getSessionQuote).not.toBe(initialPhaseFromRestored);
-    // Reciprocal inline pins: `application/.../session/pause-session-decide-io-parity.test.ts`.
+    // Reciprocal inline pins: `pause-session-decide-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-decide-io-sibling-parity.test.ts`.
   });
 

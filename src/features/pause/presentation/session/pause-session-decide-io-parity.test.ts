@@ -18,16 +18,16 @@ import {
 } from '@/features/pause/application/use-cases/session/pause-session-decide-flow';
 import type { PauseImpactData as PauseImpactDataFromDecideFlow } from '@/features/pause/application/use-cases/session/pause-session-decide-flow';
 import type { PauseImpactData as PauseImpactDataFromDomain } from '@/features/pause/domain/decide/pause-impact-data';
-import type { PauseImpactData as PauseImpactDataFromDecideIo } from '@/features/pause/presentation/session/pause-session-decide-io';
-import * as pauseSessionDecideIo from '@/features/pause/presentation/session/pause-session-decide-io';
 import {
   pauseReflectOutcomeLog,
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import type { PauseImpactData as PauseImpactDataFromDecideIo } from './pause-session-decide-io';
+import * as pauseSessionDecideIo from './pause-session-decide-io';
 
 /** Compile-time: presentation decide-io type peel matches flow + domain. */
-type AssertIoMatchesFlow = PauseImpactDataFromIo extends PauseImpactDataFromDecideFlow
-  ? PauseImpactDataFromDecideFlow extends PauseImpactDataFromIo
+type AssertIoMatchesFlow = PauseImpactDataFromDecideIo extends PauseImpactDataFromDecideFlow
+  ? PauseImpactDataFromDecideFlow extends PauseImpactDataFromDecideIo
     ? true
     : false
   : false;
@@ -37,6 +37,10 @@ type AssertFlowMatchesDomain = PauseImpactDataFromDecideFlow extends PauseImpact
     : false
   : false;
 
+/**
+ * Presentation I/O parity (colocated beside `pause-session-decide-io.ts`).
+ * Imports `pause-session-decide-flow` CI umbrella and reflect flows-io for sibling distinctness pins only — production decide-io stays type-only from domain.
+ */
 describe('pause-session-decide-io parity', () => {
   it('PauseImpactData type peel matches pause-session-decide-flow and domain', () => {
     const ioMatchesFlow: AssertIoMatchesFlow = true;
