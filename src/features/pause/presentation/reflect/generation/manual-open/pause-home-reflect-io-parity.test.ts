@@ -51,6 +51,15 @@ import {
   runOpenManualPauseSilentModeAfterCreate as silentAfterCreateFromHomeIo,
   runPersistSilentReflectionStub as persistStubFromHomeIo,
 } from './pause-home-reflect-io';
+import {
+  messageFromReflectGenerationResult,
+  pauseReflectGeneration,
+  reflectGenerationPrerequisite,
+  reflectGenerator,
+  resolveReflectGenerationPrefetch,
+  runReflectGeneration,
+  shouldCommitReflectGeneration,
+} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 
 import { supabasePauseRepository, supabaseReflectGenerator } from '@/features/pause/public-rpc';
 
@@ -114,5 +123,19 @@ describe('pause-home-reflect-io parity', () => {
     expect(pauseDismissOpenPauseHomePreviewWithRepository).not.toBe(dismissOpenPauseHome);
     // Reciprocal inline pins: `pause-home-reflect-io.test.ts`;
     // sibling: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `application/.../manual-open/pause-home-reflect-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: generation-io exports stay distinct from home-reflect-io', () => {
+    expect(openFromHomeIo).not.toBe(runReflectGeneration);
+    expect(dismissFromHomeIo).not.toBe(pauseReflectGeneration);
+    expect(buildMarketFromHomeIo).not.toBe(reflectGenerationPrerequisite);
+    expect(buildOpenParamsFromHomeIo).not.toBe(resolveReflectGenerationPrefetch);
+    expect(buildCreateOrReuseFromHomeIo).not.toBe(messageFromReflectGenerationResult);
+    expect(pauseHomeManualOpenPorts).not.toBe(reflectGenerator);
+    expect(persistStubFromHomeIo).not.toBe(shouldCommitReflectGeneration);
   });
 });
