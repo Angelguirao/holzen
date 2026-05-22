@@ -22,7 +22,7 @@ import {
 
 /**
  * Application-layer cross-surface parity: pending-offer-io vs pending-offer-telemetry-io.
- * Mirrors presentation `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`;
+ * Mirrors presentation `presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` (colocated beside pending-offer telemetry I/O);
  * complements colocated `presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io-parity.test.ts`.
  */
 describe('pause-reflect-pending-offer-io ↔ pause-reflect-pending-offer-telemetry-io sibling parity (application)', () => {

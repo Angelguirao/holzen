@@ -2105,11 +2105,13 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-reflect-pending-offer-telemetry-io.ts') ||
     rel.endsWith('pause-reflect-pending-offer-telemetry-io.test.ts') ||
     rel.endsWith('pause-reflect-pending-offer-telemetry-io.re-exports.test.ts') ||
-    rel.endsWith('pause-reflect-pending-offer-telemetry-io-parity.test.ts')
+    rel.endsWith('pause-reflect-pending-offer-telemetry-io-parity.test.ts') ||
+    rel.endsWith('pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts')
   ) {
     const pendingOfferTelemetryIoParityOrReexports =
       rel.endsWith('pause-reflect-pending-offer-telemetry-io-parity.test.ts') ||
-      rel.endsWith('pause-reflect-pending-offer-telemetry-io.re-exports.test.ts');
+      rel.endsWith('pause-reflect-pending-offer-telemetry-io.re-exports.test.ts') ||
+      rel.endsWith('pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts');
     if (!pendingOfferTelemetryIoParityOrReexports) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_IO_TELEMETRY_FLOW_IMPORTS) {
       if (text.includes(needle)) {
@@ -3075,8 +3077,7 @@ for (const file of walkTs(join(root, 'src'))) {
       rel.endsWith('pause-reflect-pending-offer-io.re-exports.test.ts') ||
       rel.endsWith('pause-reflect-pending-offer-io-parity.test.ts') ||
       rel.endsWith('pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts') ||
-      rel.endsWith('pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts') ||
-      rel.endsWith('pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts');
+      rel.endsWith('pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts');
     for (const needle of LEGACY_PAUSE_REFLECT_PENDING_OFFER_TELEMETRY_PATH_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy reflect/pending-offer telemetry import (${needle})`);

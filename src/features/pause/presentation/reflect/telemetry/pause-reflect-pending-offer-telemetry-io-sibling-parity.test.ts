@@ -1,10 +1,16 @@
+/**
+ * Presentation sibling parity (colocated beside `pause-reflect-pending-offer-telemetry-io.ts`):
+ * pending-offer RPC I/O vs pending-offer PostHog telemetry I/O stay namespace-separated.
+ * Application mirror: `application/.../pending-offer/pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
+ * Distinct from `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts` (pending-offer-io ↔ session telemetry-io).
+ */
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
 }));
 
-import * as pendingOfferTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
+import * as pendingOfferTelemetryIo from './pause-reflect-pending-offer-telemetry-io';
 import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
@@ -12,13 +18,13 @@ import {
   pauseDeclinePendingOffer,
   pauseDeclinePendingOfferWithRepository,
   reflectPauseRepository,
-} from './pause-reflect-pending-offer-io';
-import * as pendingOfferIo from './pause-reflect-pending-offer-io';
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import * as pendingOfferIo from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
-} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
+} from './pause-reflect-pending-offer-telemetry-io';
 
 describe('pause-reflect-pending-offer-io ↔ pause-reflect-pending-offer-telemetry-io sibling parity', () => {
   it('pending-offer-io and pending-offer-telemetry-io are distinct presentation I/O surfaces', () => {
