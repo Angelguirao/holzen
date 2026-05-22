@@ -7,4 +7,4 @@ export {
   initialDecisionFromRestored,
   initialPhaseFromRestored,
 } from '../ritual/decide/restored-decide-ritual-state';
-export type { PauseImpactData } from '../ritual/reflect/flows/pause-decide-outcome-view-flow';
+export type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
