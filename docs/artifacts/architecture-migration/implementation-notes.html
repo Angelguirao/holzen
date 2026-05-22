@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase B — subscription-checkout-guard-ref parity test (Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>subscription-checkout-guard-ref-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Lib shim already on branch; add <code>src/lib/subscription-checkout-guard-ref-parity.test.ts</code> with <code>.toBe</code> identity against <code>@/features/subscription/public</code> (parity with <code>holzen-query-client-ref-parity.test.ts</code>). No behavior change.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comment only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: colocate <code>home-pause-card-body-props</code> under <code>presentation/home/</code>, or scan app shell for remaining deep <code>public</code> boot imports.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase B — subscription-checkout-guard-ref lib shim (Tier 1)</span>
       <span class="status resolved">resolved</span>
     </header>
