@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { pickPauseHolzenProvidersSlice } from '@/features/pause/presentation/session/pause-session-providers-io';
+import { pickPauseHolzenProvidersSlice } from './pause-session-providers-io';
 import {
   buildPauseSessionMountLogParams,
   coalescePauseSessionShellViewModel,
@@ -10,15 +10,16 @@ import {
   hasPersistedPauseSessionPayload,
   isPauseSessionHeaderBackVisible,
   isPauseSessionWaitingForInstanceFetch,
-} from '@/features/pause/presentation/session/pause-session-shell-io';
-import * as providersIo from '@/features/pause/presentation/session/pause-session-providers-io';
-import * as shellIo from '@/features/pause/presentation/session/pause-session-shell-io';
+} from './pause-session-shell-io';
+import * as providersIo from './pause-session-providers-io';
+import * as shellIo from './pause-session-shell-io';
 
 /**
- * Sibling parity: providers-io vs shell-io presentation I/O (parity with
+ * Dedicated presentation sibling guard (parity with
  * `pause-session-providers-scaffold-io-sibling-parity.test.ts`,
- * `pause-session-scaffold-shell-io-sibling-parity.test.ts`, and
- * `pause-session-providers-shell-flow-sibling-parity.test.ts`).
+ * `pause-session-shell-scaffold-io-sibling-parity.test.ts`, and
+ * application `pause-session-providers-shell-flow-sibling-parity.test.ts`).
+ * Reciprocal inline pins: `pause-session-providers-io.test.ts`, `pause-session-shell-io.test.ts`.
  */
 describe('pause-session-providers-io ↔ pause-session-shell-io sibling parity', () => {
   it('providers-io and shell-io are distinct sibling presentation I/O anchors', () => {

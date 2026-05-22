@@ -11,6 +11,7 @@ import { buildPauseSessionMountLogParams as buildMountLogFromLeaf } from '@/feat
 import { coalescePauseSessionShellViewModel as coalesceShellVmFromLeaf } from '@/features/pause/application/use-cases/session/shell-view-model';
 import { hasPersistedPauseSessionPayload as hasPersistedFromDomain } from '@/features/pause/domain/session/persisted-session-guards';
 import { isPauseSessionWaitingForInstanceFetch as isWaitingFromDomain } from '@/features/pause/domain/session/waiting-for-instance-fetch';
+import { pickPauseHolzenProvidersSlice } from './pause-session-providers-io';
 import {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
@@ -97,5 +98,20 @@ describe('pause-session-shell-io', () => {
     expect(coalescePauseSessionShellViewModel).not.toBe(TERMINAL_PAUSE_DB_STATES);
     expect(buildPauseSessionMountLogParams).not.toBe(isTerminalPauseDbState);
     // Reciprocal inline pins: `pause-session-terminal-entry-io.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-providers-io.test.ts`.
+   * Dedicated sibling file: `pause-session-providers-shell-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: providers-io Holzen slice picker stays distinct from shell-io', () => {
+    expect(computePauseSessionHydration).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(computePauseSessionResolved).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(isPauseSessionHeaderBackVisible).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(computePauseHeaderBackIntent).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(buildPauseSessionMountLogParams).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(coalescePauseSessionShellViewModel).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(hasPersistedPauseSessionPayload).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(isPauseSessionWaitingForInstanceFetch).not.toBe(pickPauseHolzenProvidersSlice);
   });
 });

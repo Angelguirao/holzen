@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildPauseSessionMountLogParams,
+  coalescePauseSessionShellViewModel,
+  computePauseHeaderBackIntent,
+  computePauseSessionHydration,
+  computePauseSessionResolved,
+  hasPersistedPauseSessionPayload,
+  isPauseSessionHeaderBackVisible,
+  isPauseSessionWaitingForInstanceFetch,
+} from './pause-session-shell-io';
+import {
   pickPauseHolzenProvidersSlice,
   type PauseHolzenProvidersSlice,
 } from './pause-session-providers-io';
@@ -30,5 +40,20 @@ describe('pause-session-providers-io', () => {
 
     expect(slice.mantra).toBe('');
     expect(slice.message).toBe('Take a breath.');
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-shell-io.test.ts`.
+   * Dedicated sibling file: `pause-session-providers-shell-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: shell-io exports stay distinct from providers-io Holzen slice picker', () => {
+    expect(pickPauseHolzenProvidersSlice).not.toBe(computePauseSessionHydration);
+    expect(pickPauseHolzenProvidersSlice).not.toBe(computePauseSessionResolved);
+    expect(pickPauseHolzenProvidersSlice).not.toBe(isPauseSessionHeaderBackVisible);
+    expect(pickPauseHolzenProvidersSlice).not.toBe(computePauseHeaderBackIntent);
+    expect(pickPauseHolzenProvidersSlice).not.toBe(buildPauseSessionMountLogParams);
+    expect(pickPauseHolzenProvidersSlice).not.toBe(coalescePauseSessionShellViewModel);
+    expect(pickPauseHolzenProvidersSlice).not.toBe(hasPersistedPauseSessionPayload);
+    expect(pickPauseHolzenProvidersSlice).not.toBe(isPauseSessionWaitingForInstanceFetch);
   });
 });
