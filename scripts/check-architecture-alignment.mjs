@@ -2787,9 +2787,13 @@ for (const file of walkTs(join(root, 'src'))) {
   if (
     rel.endsWith('pause-companion-orchestrate-io.ts') ||
     rel.endsWith('pause-companion-orchestrate-io.test.ts') ||
-    rel.endsWith('pause-companion-orchestrate-io.re-exports.test.ts')
+    rel.endsWith('pause-companion-orchestrate-io.re-exports.test.ts') ||
+    rel.endsWith('pause-companion-orchestrate-io-parity.test.ts')
   ) {
-    if (!rel.endsWith('pause-companion-orchestrate-io.re-exports.test.ts')) {
+    if (
+      !rel.endsWith('pause-companion-orchestrate-io.re-exports.test.ts') &&
+      !rel.endsWith('pause-companion-orchestrate-io-parity.test.ts')
+    ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATE_IO_UMBRELLA_FLOW_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(
@@ -2854,6 +2858,7 @@ for (const file of walkTs(join(root, 'src'))) {
       !rel.endsWith('pause-companion-orchestrate-io.ts') &&
       !rel.endsWith('pause-companion-orchestrate-io.test.ts') &&
       !rel.endsWith('pause-companion-orchestrate-io.re-exports.test.ts') &&
+      !rel.endsWith('pause-companion-orchestrate-io-parity.test.ts') &&
       !rel.endsWith('pause-companion-analytics-io.ts') &&
       !rel.endsWith('pause-companion-analytics-io.test.ts') &&
       !rel.endsWith('pause-companion-analytics-io.re-exports.test.ts') &&
