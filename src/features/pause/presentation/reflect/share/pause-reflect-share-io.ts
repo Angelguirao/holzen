@@ -6,7 +6,9 @@
  * Sibling parity: `pause-reflect-hub-share-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
  * `pause-reflect-share-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
  * `pause-reflect-share-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
- * `pause-reflect-share-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`;
+ * `pause-reflect-share-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io` (application mirror:
+ * `application/.../share/pause-reflect-share-telemetry-io-sibling-parity.test.ts`; reciprocal inline:
+ * `pause-reflect-share-io-parity.test.ts` ↔ `pause-reflect-telemetry-io-parity.test.ts`);
  * `pause-reflect-flows-share-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`, and
  * `pause-reflect-generation-share-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`;
  * `pause-reflect-share-ambience-io-sibling-parity.test.ts` + `ambience/pause-reflect-ambience-share-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`;

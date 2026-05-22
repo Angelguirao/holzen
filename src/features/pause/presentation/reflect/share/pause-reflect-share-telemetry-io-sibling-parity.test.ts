@@ -18,7 +18,8 @@ import {
 
 /**
  * Presentation sibling parity: share-io vs telemetry-io (parity with application
- * `pause-reflect-share-telemetry-flow-sibling-parity.test.ts`).
+ * `pause-reflect-share-telemetry-flow-sibling-parity.test.ts` and
+ * `pause-reflect-share-telemetry-io-sibling-parity.test.ts`).
  */
 describe('pause-reflect-share-io ↔ pause-reflect-telemetry-io sibling parity', () => {
   it('share-io and telemetry-io are distinct presentation I/O surfaces', () => {
