@@ -1,6 +1,6 @@
 /**
  * Presentation I/O for `/pause` breath segment RPC, timed breathing UI, and breath hydration.
- * Segment RPC use cases import via `pause-session-breath-flow`; audio cues via `pause-ritual-audio-breathe-flow`.
+ * Segment RPC + phase advance import sibling ritual/breathe modules; audio via `pause-ritual-audio-breathe-flow`.
  */
 export { applyBreathSegmentLogOutcome } from '@/features/pause/domain/ritual/breathe/apply-breath-segment-log-outcome';
 export {
@@ -12,14 +12,16 @@ export {
   DEEP_PAUSE_STEP_AFTER_SECOND_BREATH,
   shouldResetBriefIntegrateAdvanceGuard,
 } from './pause-session-breath-step-navigation-io';
+export { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags';
 export {
-  computeBreathingPhaseAdvance,
-  initialBreathSegmentRpcLoggedFlagsFromRestored,
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
+} from '@/features/pause/application/use-cases/ritual/breathe/restored-breath-ritual-state';
+export {
+  computeBreathingPhaseAdvance,
   resolveBreathingCompleted,
   resolveBreathingPhaseAdvanceOutcome,
-} from '@/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow';
+} from '@/features/pause/application/use-cases/ritual/breathe/phase-advance';
 export type { PauseBreathingPhase } from '@/features/pause/domain/ritual/breathe/pause-breathing-phase';
 export {
   playPauseBreathPatternCompleteCue,
@@ -39,7 +41,7 @@ import {
   runLogBreathSegment1Skipped,
   runLogBreathSegment2Skipped,
   type BreathSegmentLogDeps,
-} from '@/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow';
+} from '@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
