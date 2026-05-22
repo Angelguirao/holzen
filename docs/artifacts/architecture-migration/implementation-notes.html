@@ -30409,4 +30409,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate pending-offer-telemetry-io parity under presentation/reflect/telemetry (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-telemetry-io-parity.test.ts</code> → <code>presentation/reflect/telemetry/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves remain complete — no use-case moves. Colocate presentation I/O parity beside <code>pause-reflect-pending-offer-telemetry-io.ts</code> (parity with <code>pause-reflect-pending-offer-io-parity</code> under <code>presentation/reflect/pending-offer/</code> and <code>pause-reflect-mood-io-parity</code> under <code>presentation/reflect/mood/</code>). Pending-offer PostHog presentation I/O stays under <code>telemetry/</code> per §10.1 — not <code>pending-offer/</code> (CI blocks resurrecting that path).</dd>
+      <dt>Deviation</dt>
+      <dd>Application-layer pending-offer sibling parity tests remain under <code>application/.../pending-offer/</code> when they assert flow umbrellas.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>pause-reflect-hub-io-parity</code> under <code>presentation/reflect/hub/</code>, or Phase B <code>subscription-checkout-guard-ref</code> lib shim peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

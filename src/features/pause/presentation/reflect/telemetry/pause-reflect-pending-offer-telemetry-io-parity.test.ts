@@ -25,8 +25,8 @@ import {
   trackPausePendingAdopted as trackAdoptedFromPendingOfferTelemetryIo,
   trackPausePendingDeclined as trackDeclinedFromPendingOfferTelemetryIo,
   trackPauseSessionAbandoned as trackAbandonedFromPendingOfferTelemetryIo,
-} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
-import * as pendingOfferTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
+} from './pause-reflect-pending-offer-telemetry-io';
+import * as pendingOfferTelemetryIo from './pause-reflect-pending-offer-telemetry-io';
 
 describe('pause-reflect-pending-offer-telemetry-io parity', () => {
   it('presentation I/O pending-offer telemetry matches pending-offer-telemetry-flow CI umbrella', () => {
