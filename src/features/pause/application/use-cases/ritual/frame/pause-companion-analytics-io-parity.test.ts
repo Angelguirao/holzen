@@ -46,6 +46,8 @@ describe('pause-companion-analytics-io parity (application)', () => {
   it('analytics-flow CI umbrella composes the same leaf modules as presentation I/O', () => {
     expect(runLogCompanionFeedbackVote).toBe(runFeedbackVoteDirect);
     expect(runLogCompanionFullviewOpened).toBe(runFullviewOpenedDirect);
+    expect(runFeedbackVoteFromAnalyticsIo).toBe(runFeedbackVoteDirect);
+    expect(runFullviewOpenedFromAnalyticsIo).toBe(runFullviewOpenedDirect);
   });
 
   it('presentation I/O binds companionAnalyticsRepository to public-rpc supabasePauseAnalyticsRepository', () => {
