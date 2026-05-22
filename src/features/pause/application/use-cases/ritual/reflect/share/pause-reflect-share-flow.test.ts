@@ -23,6 +23,11 @@ import {
   trackPauseReflectShareTap as trackShareTapDirect,
   trackPauseReflectWallpaperTap as trackWallpaperDirect,
 } from '../telemetry/pause-reflect-session-ui-telemetry';
+import {
+  trackPauseReflectPostItOpen as trackPostItFromTelemetryFlow,
+  trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
+  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
+} from '../telemetry/pause-reflect-telemetry-flow';
 
 describe('pause-reflect-share-flow', () => {
   it('re-exports share orchestration + domain builders + session UI telemetry from leaf modules', () => {
@@ -43,5 +48,8 @@ describe('pause-reflect-share-flow', () => {
     expect(trackPauseReflectPostItOpen).toBe(trackPostItDirect);
     expect(trackPauseReflectShareTap).toBe(trackShareTapDirect);
     expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperDirect);
+    expect(trackPauseReflectPostItOpen).toBe(trackPostItFromTelemetryFlow);
+    expect(trackPauseReflectShareTap).toBe(trackShareTapFromTelemetryFlow);
+    expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperFromTelemetryFlow);
   });
 });
