@@ -3,7 +3,7 @@
  * Colocated under `presentation/reflect/telemetry/` (parity with `pause-reflect-telemetry-io`).
  * Imports trackers from leaf application modules directly (not telemetry-flow anchor).
  * Parity pins: colocated `pause-reflect-pending-offer-telemetry-io-parity.test.ts` (parity with `pause-reflect-telemetry-io-parity`).
- * Sibling cluster: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
+ * Sibling cluster: colocated `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (RPC I/O under `reflect/pending-offer/`);
  * reciprocal inline pins: `pause-reflect-pending-offer-telemetry-io.test.ts` ↔ `pause-reflect-pending-offer-io.test.ts`;
  * session reflect UI: `presentation/reflect/pending-offer/pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`.
  */
