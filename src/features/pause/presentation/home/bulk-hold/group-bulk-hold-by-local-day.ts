@@ -22,6 +22,7 @@ function formatDaySectionLabel(iso: string, language: string, t: TFunction): str
   return d.toLocaleDateString(language, { day: '2-digit', month: '2-digit', year: '2-digit' });
 }
 
+/** Home bulk-hold sheet — group pending pauses by local calendar day for section headers. */
 export function groupBulkHoldByLocalDay(
   items: BulkHoldPendingPause[],
   language: string,
