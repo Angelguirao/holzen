@@ -3194,13 +3194,16 @@ for (const file of walkTs(join(root, 'src'))) {
   }
   if (
     rel.endsWith('pause-session-scaffold-io.ts') ||
-    rel.endsWith('pause-session-scaffold-io.test.ts')
+    rel.endsWith('pause-session-scaffold-io.test.ts') ||
+    rel.endsWith('pause-session-scaffold-io.re-exports.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_IO_UMBRELLA_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: session scaffold I/O must import via session subcluster modules (${needle})`,
-        );
+    if (!rel.endsWith('pause-session-scaffold-io.re-exports.test.ts')) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_IO_UMBRELLA_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: session scaffold I/O must import via session subcluster modules (${needle})`,
+          );
+        }
       }
     }
   }
