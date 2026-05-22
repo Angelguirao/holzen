@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for pending pause offer + session-abandoned PostHog (§3 / check:architecture-alignment).
  * Trackers: `pending-pause-offer-telemetry.ts` (adopt/decline), `pause-session-abandoned-telemetry.ts`.
- * Reflect presentation: `pause-reflect-pending-offer-telemetry-io.ts` imports this anchor directly.
+ * Reflect presentation: `pause-reflect-pending-offer-telemetry-io.ts` imports leaf tracker modules directly.
  */
 export {
   trackPausePendingAdopted,
