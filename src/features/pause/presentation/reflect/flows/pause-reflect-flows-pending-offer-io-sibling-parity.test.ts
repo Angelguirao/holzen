@@ -30,7 +30,7 @@ import {
 
 /**
  * Presentation sibling parity: flows-io vs pending-offer-io (parity with application
- * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` and flow-level
+ * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` under `application/.../flows/` and flow-level
  * `pause-reflect-flows-pending-offer-flow-sibling-parity.test.ts`; complements
  * `pause-reflect-flows-steps-io-sibling-parity.test.ts`).
  * Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts` ↔
