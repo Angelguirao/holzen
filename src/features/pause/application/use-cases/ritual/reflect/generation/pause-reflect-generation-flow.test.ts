@@ -188,6 +188,9 @@ describe('pause-reflect-generation-flow', () => {
     expect(runReflectGeneration).not.toBe(shouldShowFavoriteFromStepsFlow);
     expect(openManualFromFlow).not.toBe(shouldLogFromStepsFlow);
     expect(dismissFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+    expect(messageFromResultFromFlow).not.toBe(runNoteFromStepsFlow);
+    expect(shouldCommitFromFlow).not.toBe(runTagFromStepsFlow);
+    // Full cross-umbrella pins: `pause-reflect-steps-generation-flow-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: mood-flow exports stay distinct from generation umbrella exports', () => {
