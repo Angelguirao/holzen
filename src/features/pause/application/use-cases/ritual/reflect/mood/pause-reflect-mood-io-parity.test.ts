@@ -9,7 +9,22 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-
   runInitialEmotionSkip: vi.fn(() => Promise.resolve({ status: 'local_only' as const, ui: {} })),
 }));
 
+import {
+  applyBriefDepthPickerRitualEntry as applyBriefDirect,
+  applyDeepDepthPickerRitualEntry as applyDeepDirect,
+} from '@/features/pause/domain/reflect/mood/apply-depth-picker-ritual-entry';
 import { buildFeelTilesMoodLogOptions as buildFeelTilesDirect } from '@/features/pause/domain/reflect/mood/build-feel-tiles-mood-log-options';
+import {
+  initialEmotionResetUi as resetUiDirect,
+  initialEmotionSelectRollbackUi as rollbackUiDirect,
+} from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
+import { isPauseSessionDepthPickerActive as isDepthPickerActiveDirect } from '@/features/pause/domain/reflect/mood/pause-depth-picker-active';
+import {
+  resolvePauseSessionChromeCloseAction as resolveChromeCloseDirect,
+  runPauseSessionChromeCloseAction as runChromeCloseDirect,
+} from '@/features/pause/domain/reflect/mood/pause-session-chrome-close';
+import { runDeepPausePickerEntryIfPro as runDeepPickerDirect } from '@/features/pause/domain/reflect/mood/run-deep-pause-picker-entry-if-pro';
+import { resolvePauseDepthContextLineParams as resolveDepthLineDirect } from '@/features/pause/domain/reflect/mood/resolve-pause-depth-context-line-params';
 import {
   runInitialEmotionSelect,
   runInitialEmotionSkip,
@@ -46,9 +61,27 @@ import {
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 describe('pause-reflect-mood-io parity', () => {
-  it('mood CI umbrella composes the same domain feel-tiles leaf as presentation I/O', () => {
+  it('mood CI umbrella composes the same domain mood leaves as presentation I/O', () => {
     expect(buildFeelTilesMoodLogOptions).toBe(buildFeelTilesDirect);
     expect(buildFeelTilesFromMoodIo).toBe(buildFeelTilesDirect);
+    expect(applyBriefDepthPickerRitualEntry).toBe(applyBriefDirect);
+    expect(applyBriefFromMoodIo).toBe(applyBriefDirect);
+    expect(applyDeepDepthPickerRitualEntry).toBe(applyDeepDirect);
+    expect(applyDeepFromMoodIo).toBe(applyDeepDirect);
+    expect(initialEmotionResetUi).toBe(resetUiDirect);
+    expect(resetUiFromMoodIo).toBe(resetUiDirect);
+    expect(initialEmotionSelectRollbackUi).toBe(rollbackUiDirect);
+    expect(rollbackUiFromMoodIo).toBe(rollbackUiDirect);
+    expect(isPauseSessionDepthPickerActive).toBe(isDepthPickerActiveDirect);
+    expect(isDepthPickerActiveFromMoodIo).toBe(isDepthPickerActiveDirect);
+    expect(resolvePauseDepthContextLineParams).toBe(resolveDepthLineDirect);
+    expect(resolveDepthLineFromMoodIo).toBe(resolveDepthLineDirect);
+    expect(resolvePauseSessionChromeCloseAction).toBe(resolveChromeCloseDirect);
+    expect(resolveChromeCloseFromMoodIo).toBe(resolveChromeCloseDirect);
+    expect(runPauseSessionChromeCloseAction).toBe(runChromeCloseDirect);
+    expect(runChromeCloseFromMoodIo).toBe(runChromeCloseDirect);
+    expect(runDeepPausePickerEntryIfPro).toBe(runDeepPickerDirect);
+    expect(runDeepPickerFromMoodIo).toBe(runDeepPickerDirect);
   });
 
   it('presentation I/O mood exports match pause-reflect-mood-flow CI umbrella', () => {
