@@ -102,6 +102,7 @@ import {
   runPersistSilentReflectionStub,
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 import * as generationIo from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import * as hubIo from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import * as homeReflectIo from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 
 import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
@@ -198,6 +199,18 @@ describe('pause-reflect-generation-io parity (application)', () => {
     expect(pauseReflectGeneration).not.toBe(pauseShiftEmotionFrameHubDone);
     expect(runReflectGeneration).not.toBe(buildShiftEmotionFrameHubLogBundle);
     expect(reflectGenerator).not.toBe(pauseShiftEmotionFrameHubDone);
+  });
+
+  it('presentation generation-io and hub-io I/O namespaces stay separated (reciprocal inline)', () => {
+    expect('pauseShiftEmotionFrameHubDone' in generationIo).toBe(false);
+    expect('pauseShiftEmotionFrameHubDoneWithRepository' in generationIo).toBe(false);
+    expect('buildShiftEmotionFrameHubLogBundle' in generationIo).toBe(false);
+    expect('resolveShiftFrameHubDonePresentation' in generationIo).toBe(false);
+
+    expect('runReflectGeneration' in hubIo).toBe(false);
+    expect('pauseReflectGeneration' in hubIo).toBe(false);
+    expect('reflectGenerator' in hubIo).toBe(false);
+    // Reciprocal inline pins: `hub/pause-reflect-hub-io-parity.test.ts` (application + presentation).
   });
 
   /**
