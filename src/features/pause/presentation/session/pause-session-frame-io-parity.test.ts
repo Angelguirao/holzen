@@ -6,6 +6,7 @@ import { initialFrameDoneFromRestored as initialFrameDoneFromFrameIo } from '@/f
 
 /**
  * Presentation I/O parity (colocated beside `pause-session-frame-io.ts`).
+ * Application mirror: `application/.../session/pause-session-frame-io-parity.test.ts`.
  * Imports `pause-session-frame-flow` CI umbrella for `.toBe` identity pins only — production frame I/O keeps `restored-frame-ritual-state` leaf import.
  */
 describe('pause-session-frame-io parity', () => {
