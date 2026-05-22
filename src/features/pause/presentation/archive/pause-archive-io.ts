@@ -1,10 +1,13 @@
-import { logRetrospectiveOutcome } from '@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome';
-import { trackPauseOutcomeRetrospective } from '@/features/pause/application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry';
+import {
+  logRetrospectiveOutcome,
+  trackPauseOutcomeRetrospective,
+  type PauseOutcomeRetrospectiveSurface,
+} from '@/features/pause/application/use-cases/ritual/decide/pause-archive-decide-flow';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 export { trackPauseOutcomeRetrospective };
-export type { PauseOutcomeRetrospectiveSurface } from '@/features/pause/application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry';
+export type { PauseOutcomeRetrospectiveSurface };
 
 /** Default port + use case: archive retrospective `outcome_logged` RPC. */
 export function pauseArchiveLogRetrospectiveOutcome(
