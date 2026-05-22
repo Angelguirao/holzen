@@ -27,10 +27,14 @@ import {
   clearPausePersistedTabSession,
   loadPausePersistedTabSession,
   savePausePersistedTabSession,
-} from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
+} from './pause-persisted-tab-session-io';
 import { persistedTabSessionStorage } from '@/features/pause/public-rpc';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 
+/**
+ * Presentation I/O parity (colocated beside `pause-persisted-tab-session-io.ts`).
+ * Imports `pause-session-persisted-tab-session-flow` CI umbrella + `persisted-tab-session` leaf for `.toBe` identity pins only — production tab-session I/O keeps direct leaf import.
+ */
 describe('pause-session-persisted-tab-session-io parity', () => {
   it('presentation I/O delegates tab session load/save/clear to persisted-tab-session with default port', () => {
     const data = { step: 'brief' } as unknown as PersistedSession;

@@ -3180,7 +3180,8 @@ for (const file of walkTs(join(root, 'src'))) {
     const persistedTabIoAllowlisted =
       rel.endsWith('pause-persisted-tab-session-io.ts') ||
       rel.endsWith('pause-persisted-tab-session-io.test.ts') ||
-      rel.endsWith('pause-persisted-tab-session-io.re-exports.test.ts');
+      rel.endsWith('pause-persisted-tab-session-io.re-exports.test.ts') ||
+      rel.endsWith('pause-session-persisted-tab-session-io-parity.test.ts');
     if (!persistedTabIoAllowlisted) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IMPORTS) {
         if (text.includes(needle)) {
@@ -3345,9 +3346,13 @@ for (const file of walkTs(join(root, 'src'))) {
   if (
     rel.endsWith('pause-persisted-tab-session-io.ts') ||
     rel.endsWith('pause-persisted-tab-session-io.test.ts') ||
-    rel.endsWith('pause-persisted-tab-session-io.re-exports.test.ts')
+    rel.endsWith('pause-persisted-tab-session-io.re-exports.test.ts') ||
+    rel.endsWith('pause-session-persisted-tab-session-io-parity.test.ts')
   ) {
-    if (!rel.endsWith('pause-persisted-tab-session-io.re-exports.test.ts')) {
+    if (
+      !rel.endsWith('pause-persisted-tab-session-io.re-exports.test.ts') &&
+      !rel.endsWith('pause-session-persisted-tab-session-io-parity.test.ts')
+    ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IO_FLOW_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(
