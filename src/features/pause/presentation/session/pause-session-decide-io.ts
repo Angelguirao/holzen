@@ -1,8 +1,5 @@
 /**
- * Presentation I/O for `/pause` decide ritual hydration from `PersistedSession`.
- * Imports restored decide fields from `ritual/decide/` (off `pause-session-decide-flow` CI anchor).
+ * Session presentation I/O for decide outcome impact types (ritual state, step bundles).
+ * Re-exports `PauseImpactData` via reflect+decide flows I/O (parity with reflect flows cluster).
  */
-export {
-  initialDecisionFromRestored,
-  initialPhaseFromRestored,
-} from '@/features/pause/application/use-cases/session/pause-session-decide-flow';
+export type { PauseImpactData } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';

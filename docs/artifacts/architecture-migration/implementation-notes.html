@@ -20724,9 +20724,9 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>use-pause-session-ritual-state</code> still imports <code>PauseImpactData</code> from domain (session-owned state); cross-cluster breath types import reflect flows I/O.</dd>
+      <dd>Session ritual-state still imported impact types from domain until the follow-up <code>pause-session-decide-io</code> peel; breath cluster imports reflect flows I/O directly.</dd>
       <dt>Open questions</dt>
-      <dd>Next: session ritual-state impact type via session decide I/O, Phase B subscription Tier 1 shim, or session step-transition dedicated I/O peel.</dd>
+      <dd>Next: session decide I/O for ritual-state and session step-transition I/O (both done on branch tip), compose <code>pause-reflect-generation-flow</code> umbrella, or Phase B subscription Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -20745,7 +20745,7 @@
       <dt>Tradeoffs</dt>
       <dd>One more session I/O module vs overloaded shell I/O cluster.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B subscription Tier 1 shim, or session ritual-state impact type via session decide I/O.</dd>
+      <dd>Next: session ritual-state impact via session decide I/O (done in follow-up slice), compose <code>pause-reflect-generation-flow</code> umbrella, or Phase B subscription Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -20765,6 +20765,25 @@
       <dd>None.</dd>
       <dt>Open questions</dt>
       <dd>Next: compose <code>pause-reflect-generation-flow</code> umbrella, session ritual-state impact via session decide I/O, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session decide I/O for ritual-state impact (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>use-pause-session-ritual-state</code> impact type through <code>pause-session-decide-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>presentation/session/pause-session-decide-io.ts</code> re-exporting <code>PauseImpactData</code> from <code>pause-reflect-flows-io</code>; <code>use-pause-session-ritual-state</code> imports the session I/O barrel. CI forbids deep <code>domain/decide/pause-impact-data</code> under <code>presentation/session/</code> (breath reflect handler types keep reflect flows I/O).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Application <code>step-bundle-types</code> and <code>public-hooks</code> may still import domain impact types directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: compose <code>pause-reflect-generation-flow</code> umbrella, Phase B subscription Tier 1 shim, or archive decide I/O peel.</dd>
     </dl>
   </article>
 
