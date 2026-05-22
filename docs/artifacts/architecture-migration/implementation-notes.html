@@ -59,6 +59,7 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+<<<<<<< HEAD
       <span>Phase A — bulk-hold outcomes use case → ritual/decide (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -70,6 +71,19 @@
       <dd>None — mechanical move + import updates.</dd>
       <dt>Open question</dt>
       <dd>Next: <code>pause-home-bulk-hold-io-parity</code> application test or Phase B subscription Tier 1 shims.</dd>
+=======
+      <span>Phase A — reflect telemetry I/O ↔ telemetry-flow + share-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-telemetry-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend application-layer <code>pause-reflect-telemetry-io-parity.test.ts</code> with <code>.toBe(direct)</code> identity against <code>pause-reflect-session-ui-telemetry</code> leaf and <code>pause-reflect-share-flow</code> cross-cluster trackers (parity with generation-io and share-io parity depth; re-exports test already pins presentation ↔ leaf/flow).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription Tier 1 shims or ambience-io-parity leaf composition test.</dd>
+>>>>>>> 3dea202ee (test(pause): extend telemetry-io parity with leaf and share-flow pins)
     </dl>
   </article>
 
