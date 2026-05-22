@@ -6,7 +6,7 @@ import {
 } from './pause-session-scaffold-io';
 
 describe('pause-session-scaffold-io', () => {
-  it('re-exports persist snapshot builder for scaffold conductors', () => {
+  it('re-exports persist snapshot builder from pause-session-scaffold-flow', () => {
     const snapshot = buildPauseSessionPersistSnapshot({
       message: 'm',
       context: null,
@@ -43,14 +43,14 @@ describe('pause-session-scaffold-io', () => {
     expect(snapshot.step).toBe('reflect');
   });
 
-  it('re-exports storage ritual sync patch helper', () => {
+  it('re-exports storage ritual sync patch helper from pause-session-scaffold-flow', () => {
     const patch = computePauseStorageRitualSyncPatch('pi-1', null);
     expect(patch).not.toBeNull();
     expect(patch!.ritualEntry).toBe('picker');
     expect(patch!.briefStep).toBe('feel');
   });
 
-  it('re-exports scaffold ritual derived builder', () => {
+  it('re-exports scaffold ritual derived builder from pause-session-scaffold-flow', () => {
     const derived = buildPauseSessionScaffoldRitualDerived({
       ritualEntry: 'deep',
       step: 'reflect',
