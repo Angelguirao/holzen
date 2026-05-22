@@ -38,6 +38,14 @@ import {
   trackPauseReflectShareTap as trackShareTapFromShareFlow,
   trackPauseReflectWallpaperTap as trackWallpaperFromShareFlow,
 } from '../share/pause-reflect-share-flow';
+import {
+  getPendingPauseOfferDisplay as getDisplayFromPendingOfferFlow,
+  runAdoptPendingPauseOffer as runAdoptFromPendingOfferFlow,
+  runDeclinePendingPauseOffer as runDeclineFromPendingOfferFlow,
+  trackPausePendingAdopted as trackAdoptedFromPendingOfferFlow,
+  trackPausePendingDeclined as trackDeclinedFromPendingOfferFlow,
+  trackPauseSessionAbandoned as trackAbandonedFromPendingOfferFlow,
+} from '../pending-offer/pause-reflect-pending-offer-flow';
 
 describe('pause-reflect-hub-flow', () => {
   it('re-exports hub helpers from domain + leaf RPC use case', () => {
@@ -97,5 +105,14 @@ describe('pause-reflect-hub-flow', () => {
     expect(buildLogBundleFromFlow).not.toBe(trackShareTapFromShareFlow);
     expect(resolvePresentationFromFlow).not.toBe(trackWallpaperFromShareFlow);
     expect(runShiftEmotionFrameHubDone).not.toBe(buildShareTextFromShareFlow);
+  });
+
+  it('sibling cluster: pending-offer-flow exports stay distinct from hub umbrella exports', () => {
+    expect(runShiftEmotionFrameHubDone).not.toBe(runAdoptFromPendingOfferFlow);
+    expect(runShiftEmotionFrameHubDone).not.toBe(runDeclineFromPendingOfferFlow);
+    expect(buildLogBundleFromFlow).not.toBe(getDisplayFromPendingOfferFlow);
+    expect(buildLogBundleFromFlow).not.toBe(trackAdoptedFromPendingOfferFlow);
+    expect(resolvePresentationFromFlow).not.toBe(trackDeclinedFromPendingOfferFlow);
+    expect(resolvePresentationFromFlow).not.toBe(trackAbandonedFromPendingOfferFlow);
   });
 });
