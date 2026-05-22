@@ -28786,4 +28786,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase B — App boot imports pause query-client via public-queries (Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>App.tsx</code> → <code>@/features/pause/public-queries</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Phase A backlog #1 (<code>ritual/reflect/</code>) remains complete. Route app-shell TanStack <code>setHolzenQueryClient</code> registration through <code>public-queries</code> instead of <code>@/lib/holzen-query-client-ref</code> at boot. Keep lib shim + parity tests for callers that still use the Tier 1 re-export path.</dd>
+      <dt>Deviation</dt>
+      <dd>None — import path only; implementation unchanged in pause infrastructure.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: scan remaining <code>app/</code> boot imports for deep feature paths, or delete lib shim when no non-test callers remain.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createHolzenQueryClient } from "@/lib/query-client";
-import { setHolzenQueryClient } from "@/lib/holzen-query-client-ref";
+import { setHolzenQueryClient } from "@/features/pause/public-queries";
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { reactRouterFutureFlags } from "@/lib/router-future";
 import { AuthProvider, useAuth } from "@/features/auth/public";
