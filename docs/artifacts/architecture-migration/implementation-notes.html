@@ -20882,4 +20882,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session decide-flow chains PauseImpactData via reflect decide view (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>pause-session-decide-flow</code> impact type through <code>pause-decide-outcome-view-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. After ritual-state and <code>public-hooks</code> peeled to <code>pause-session-decide-io</code> / <code>pause-session-decide-flow</code>, re-export <code>PauseImpactData</code> on the session decide anchor from <code>pause-decide-outcome-view-flow</code> (not domain direct). CI allowlists <code>pause-session-decide-io</code> and forbids deep impact imports under <code>presentation/session/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import chain only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Application <code>step-bundle-types</code> and decide use cases may still import <code>domain/decide/pause-impact-data</code> directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim or peel <code>buildPauseScoreImpacts</code> through decide I/O.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -417,9 +417,12 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IMPORTS = [
 /** Session presentation — import decide impact types via pause-session-decide-io only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_DECIDE_IMPACT_IMPORTS = [
   '@/features/pause/domain/decide/pause-impact-data',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow',
   '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io',
   "from './domain/decide/pause-impact-data",
   "from '../domain/decide/pause-impact-data",
+  "from './application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
+  "from '../application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
   "from './presentation/reflect/flows/pause-reflect-flows-io'",
   "from '../presentation/reflect/flows/pause-reflect-flows-io'",
 ];
@@ -1234,9 +1237,13 @@ for (const file of walkTs(join(root, 'src'))) {
         failures.push(`${rel}: legacy session map-persisted-step import (${needle})`);
       }
     }
-    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_DECIDE_IMPACT_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(`${rel}: legacy session decide impact import (${needle})`);
+    const sessionDecideIoAllowlisted =
+      rel.endsWith('pause-session-decide-io.ts') || rel.endsWith('pause-session-decide-io.test.ts');
+    if (!sessionDecideIoAllowlisted) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_DECIDE_IMPACT_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy session decide impact import (${needle})`);
+        }
       }
     }
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_DOMAIN_GUARDS_IMPORTS) {
