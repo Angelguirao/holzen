@@ -54,8 +54,8 @@ import {
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 
 /**
- * Application-layer telemetry I/O parity. Share-io sibling:
- * `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation);
+ * Presentation-layer telemetry I/O parity (colocated beside `pause-reflect-telemetry-io.ts`).
+ * Share-io sibling: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
  */
 describe('pause-reflect-telemetry-io parity', () => {

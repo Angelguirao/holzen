@@ -70,7 +70,7 @@ import {
  * Flows-io sibling: `pause-reflect-flows-share-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (application).
  * Telemetry-io sibling: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ application `pause-reflect-telemetry-io-parity.test.ts`.
+ * reciprocal inline pins ↔ `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
  */
 describe('pause-reflect-share-io parity', () => {
   it('presentation I/O share builder exports match share CI umbrella', () => {
@@ -155,7 +155,7 @@ describe('pause-reflect-share-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ application `pause-reflect-telemetry-io-parity.test.ts`.
+   * Reciprocal inline pins ↔ `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-share-telemetry-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: telemetry-io exports stay distinct from share-io builders', () => {
