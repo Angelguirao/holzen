@@ -30,8 +30,11 @@ import {
 
 /**
  * Presentation sibling parity: steps-io vs hub-io (parity with application
- * `pause-reflect-steps-hub-flow-sibling-parity.test.ts`; complements reciprocal
- * inline pins on `pause-reflect-steps-io.test.ts` / `pause-reflect-hub-io.test.ts`).
+ * `pause-reflect-steps-hub-flow-sibling-parity.test.ts` and
+ * `pause-reflect-steps-hub-io-sibling-parity.test.ts` under application/steps/;
+ * complements reciprocal inline pins on `pause-reflect-steps-io.test.ts` /
+ * `pause-reflect-hub-io.test.ts` and `pause-reflect-steps-io-parity.test.ts` /
+ * `pause-reflect-hub-io-parity.test.ts`).
  */
 describe('pause-reflect-steps-io ↔ pause-reflect-hub-io sibling parity', () => {
   it('steps-io and hub-io are distinct presentation I/O surfaces', () => {

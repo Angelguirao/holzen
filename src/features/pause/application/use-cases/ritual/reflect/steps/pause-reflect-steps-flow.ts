@@ -7,7 +7,9 @@
  * pause-reflect-steps-flow.test.ts ↔ pause-reflect-flows-flow.test.ts (reciprocal inline pins);
  * pause-reflect-steps-flow.test.ts ↔ pause-reflect-pending-offer-flow.test.ts (inline sibling pins incl. declined telemetry);
  * pause-reflect-steps-flow.test.ts ↔ pause-reflect-telemetry-flow.test.ts (inline);
- * pause-reflect-steps-hub-flow-sibling-parity.test.ts, pause-reflect-steps-mood-flow-sibling-parity.test.ts,
+ * pause-reflect-steps-hub-flow-sibling-parity.test.ts,
+ * pause-reflect-steps-hub-io-sibling-parity.test.ts (presentation steps-io ↔ hub-io),
+ * pause-reflect-steps-mood-flow-sibling-parity.test.ts,
  * pause-reflect-steps-pending-offer-flow-sibling-parity.test.ts, pause-reflect-steps-share-flow-sibling-parity.test.ts,
  * pause-reflect-steps-telemetry-flow-sibling-parity.test.ts,
  * pause-reflect-steps-generation-flow-sibling-parity.test.ts (dedicated + reciprocal inline pins in `pause-reflect-steps-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts`),
