@@ -59,6 +59,7 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+<<<<<<< HEAD
       <span>Phase A — hub-flow ↔ mood-flow sibling cluster pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -70,6 +71,19 @@
       <dd>None — tests only.</dd>
       <dt>Open question</dt>
       <dd>Next: Tier 1 <code>holzen-query-client-ref</code> lib shim for <code>App.tsx</code>, or Phase B subscription Tier 1 shims.</dd>
+=======
+      <span>Phase B — holzen-query-client-ref lib shim (Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>src/lib/holzen-query-client-ref.ts</code> app boot seam</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no pause interior moves. Add Tier 1 <code>@/lib/holzen-query-client-ref</code> re-exporting <code>setHolzenQueryClient</code> / <code>getHolzenQueryClient</code> from <code>@/features/pause/public-queries</code>; <code>App.tsx</code> registers the TanStack client via the lib shim instead of deep feature import at boot (implementation stays in pause infrastructure).</dd>
+      <dt>Deviation</dt>
+      <dd>None — import path only; behavior parity.</dd>
+      <dt>Open question</dt>
+      <dd>Next: subscription Tier 1 shim following the same pattern, or hub-flow ↔ mood-flow sibling cluster pins.</dd>
+>>>>>>> b97365ed3 (refactor(app): add holzen-query-client-ref lib shim for App boot)
     </dl>
   </article>
 
@@ -86,7 +100,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + decide-io comment + alignment allowlist only.</dd>
       <dt>Open question</dt>
-      <dd>Next: Phase B subscription Tier 1 shims or Tier 1 <code>holzen-query-client-ref</code> lib shim for <code>App.tsx</code>.</dd>
+      <dd>Next: Phase B subscription Tier 1 shims, or hub-flow ↔ mood-flow sibling cluster pins.</dd>
     </dl>
   </article>
 
@@ -103,7 +117,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + flow comment only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Tier 1 <code>holzen-query-client-ref</code> lib shim for <code>App.tsx</code>, or Phase B subscription Tier 1 shims.</dd>
+      <dd>Next: Phase B subscription Tier 1 shims, or hub-flow ↔ mood-flow sibling cluster pins.</dd>
     </dl>
   </article>
 
@@ -120,7 +134,11 @@
       <dt>Deviation</dt>
       <dd>None — tests + flow/I/O comments only.</dd>
       <dt>Open question</dt>
+<<<<<<< HEAD
       <dd>Next: Phase B subscription Tier 1 shims, or Tier 1 <code>holzen-query-client-ref</code> lib shim for <code>App.tsx</code>.</dd>
+=======
+      <dd>Next: hub-flow ↔ mood-flow sibling cluster pins, or Phase B subscription Tier 1 shims.</dd>
+>>>>>>> b97365ed3 (refactor(app): add holzen-query-client-ref lib shim for App boot)
     </dl>
   </article>
 
