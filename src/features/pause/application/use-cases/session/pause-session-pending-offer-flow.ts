@@ -7,5 +7,5 @@ export { runDeclinePendingPauseOffer } from './pending-offer/run-decline-pending
 export {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
-} from './pending-pause-offer-telemetry';
+} from '../ritual/reflect/telemetry/pending-pause-offer-telemetry';
 export { trackPauseSessionAbandoned } from './pause-session-telemetry';

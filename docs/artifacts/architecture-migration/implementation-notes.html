@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — colocate pending-offer PostHog under ritual/reflect/telemetry (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pending-pause-offer-telemetry</code> beside reflect telemetry cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. Move <code>pending-pause-offer-telemetry</code> (+ test) from <code>application/use-cases/session/</code> to <code>ritual/reflect/telemetry/</code>; <code>pause-session-pending-offer-flow</code> re-exports adopt/decline trackers for <code>pause-session-pending-offer-telemetry-io</code>. <code>trackPauseSessionAbandoned</code> stays on <code>pause-session-telemetry</code> (session beat).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session presentation still imports pending-offer PostHog via session I/O anchor (not reflect presentation I/O) to avoid cross-cluster churn in one slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-session-pending-offer-telemetry-io</code> to reflect share/generation cluster or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — breath segment RPC flags via pause-session-breath-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
