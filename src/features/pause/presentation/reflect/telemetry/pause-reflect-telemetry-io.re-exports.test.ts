@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
+  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
 import {
@@ -21,6 +22,15 @@ import {
   pauseReflectOutcomeLog,
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
+  messageFromReflectGenerationResult,
+  pauseReflectGeneration,
+  reflectGenerationPrerequisite,
+  reflectGenerator,
+  resolveReflectGenerationPrefetch,
+  runReflectGeneration,
+  shouldCommitReflectGeneration,
+} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
@@ -49,5 +59,20 @@ describe('pause-reflect-telemetry-io re-exports', () => {
     expect(trackPauseReflectShareTap).not.toBe(pauseReflectOutcomeLog);
     expect(trackPauseReflectWallpaperTap).not.toBe(buildPauseScoreImpacts);
     expect(trackPauseReflectPostItOpen).not.toBe(getSessionQuote);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-generation-io.re-exports.test.ts` (session reflect PostHog vs holzen-reflect generation).
+   * Dedicated sibling file: `pause-reflect-generation-telemetry-io-sibling-parity.test.ts` (presentation + application).
+   */
+  it('sibling cluster: generation-io re-exports stay distinct from telemetry-io re-exports', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(resolveReflectGenerationPrefetch);
+    expect(trackPauseReflectShareTap).not.toBe(runReflectGeneration);
+    expect(trackPauseReflectWallpaperTap).not.toBe(pauseReflectGeneration);
+    expect(trackPauseReflectPostItOpen).not.toBe(reflectGenerationPrerequisite);
+    expect(trackPauseReflectShareTap).not.toBe(reflectGenerator);
+    expect(trackPauseReflectWallpaperTap).not.toBe(shouldCommitReflectGeneration);
+    expect(trackPauseReflectPostItOpen).not.toBe(messageFromReflectGenerationResult);
+    // Reciprocal inline pins: `pause-reflect-generation-io.re-exports.test.ts`.
   });
 });

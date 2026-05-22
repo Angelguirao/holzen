@@ -25,6 +25,11 @@ import {
   shouldCommitReflectGeneration as shouldCommitFromGenerationFlow,
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow';
 import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
+import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 
 import {
   messageFromReflectGenerationResult,
@@ -78,5 +83,19 @@ describe('pause-reflect-generation-io re-exports', () => {
     expect(reflectGenerationUserErrorMessage).toBe(userErrorFromGenerationFlow);
     expect(resolveEffectiveReflectionCopy).toBe(resolveCopyFromGenerationFlow);
     expect(runReflectGeneration).toBe(runReflectGenerationFromGenerationFlow);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-telemetry-io.re-exports.test.ts` (holzen-reflect generation vs session reflect PostHog).
+   * Dedicated sibling file: `pause-reflect-generation-telemetry-io-sibling-parity.test.ts` (presentation + application).
+   */
+  it('sibling cluster: telemetry-io re-exports stay distinct from generation-io re-exports', () => {
+    expect(resolveReflectGenerationPrefetch).not.toBe(trackPauseReflectPostItOpen);
+    expect(runReflectGeneration).not.toBe(trackPauseReflectShareTap);
+    expect(pauseReflectGeneration).not.toBe(trackPauseReflectWallpaperTap);
+    expect(reflectGenerationPrerequisite).not.toBe(trackPauseReflectPostItOpen);
+    expect(reflectGenerator).not.toBe(trackPauseReflectShareTap);
+    expect(shouldCommitReflectGeneration).not.toBe(trackPauseReflectWallpaperTap);
+    // Reciprocal inline pins: `pause-reflect-telemetry-io.re-exports.test.ts`.
   });
 });
