@@ -24188,4 +24188,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — presentation reflect telemetry I/O identity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-telemetry-io</code> unmocked re-export regression</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-reflect-telemetry-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> identity against <code>pause-reflect-session-ui-telemetry</code> (existing mocked <code>pause-reflect-telemetry-io.test.ts</code> keeps behavior coverage). Completes presentation <code>reflect/telemetry/</code> peel started when I/O + hook left <code>share/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Split identity vs mocked behavior tests so Vitest mocks do not mask re-export parity.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim (<code>App.tsx</code> → <code>features/subscription/public</code>), or pause Tier 2–4 scan.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
