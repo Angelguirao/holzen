@@ -23,6 +23,7 @@ import {
   trackPauseReflectShareTap as trackShareTapFromTelemetryIo,
   trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryIo,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import * as shareIo from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   buildReflectionShareTelegramUrl as buildTelegramFromShareIo,
   buildReflectionShareText as buildTextFromShareIo,
@@ -58,5 +59,14 @@ describe('pause-reflect-share-io parity', () => {
     expect(trackPauseReflectPostItOpen).toBe(trackPostItFromTelemetryIo);
     expect(trackPauseReflectShareTap).toBe(trackShareTapFromTelemetryIo);
     expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperFromTelemetryIo);
+  });
+
+  it('presentation share-io stays off deliver-reflection-share-image (orchestration-flow sibling parity)', () => {
+    expect('deliverReflectionShareImage' in shareIo).toBe(false);
+    expect('runReflectionShareImage' in shareIo).toBe(false);
+    expect(pauseReflectionShareImage).not.toBe(deliverReflectionShareImage);
+    expect(pauseReflectionShareImage).not.toBe(deliverReflectionShareImageDirect);
+    expect(pauseReflectionShareImage).not.toBe(runReflectionShareImageFromOrchestration);
+    expect(typeof pauseReflectionShareImage).toBe('function');
   });
 });
