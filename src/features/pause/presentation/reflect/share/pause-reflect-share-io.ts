@@ -7,7 +7,8 @@
  * `pause-reflect-share-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
  * `pause-reflect-share-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`;
  * `pause-reflect-flows-share-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`, and
- * `pause-reflect-generation-share-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`.
+ * `pause-reflect-generation-share-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`;
+ * `pause-reflect-share-ambience-io-sibling-parity.test.ts` + `ambience/pause-reflect-ambience-share-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`.
  */
 import {
   runReflectionShareImage,
