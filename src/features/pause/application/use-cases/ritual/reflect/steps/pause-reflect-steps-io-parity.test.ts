@@ -24,13 +24,14 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
 /**
  * Application-layer delegation parity for steps-flow ↔ steps-io (run-* leaves + repository).
  * Wrapper distinctness sibling file: `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts`.
- * Favorite ↔ reflection_step log wrapper pins: presentation
- * `pause-reflect-steps-favorite-reflection-step-log-io-sibling-parity.test.ts` (reciprocal inline:
- * `pause-reflect-steps-io.test.ts`); flow umbrellas:
+ * Favorite ↔ reflection_step log wrapper pins: presentation +
+ * application `pause-reflect-steps-favorite-reflection-step-log-io-sibling-parity.test.ts`
+ * (reciprocal inline: `pause-reflect-steps-io.test.ts`); flow umbrellas:
  * `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`,
  * `pause-reflect-steps-favorite-reflection-step-log-flow-sibling-parity.test.ts`.
- * Note ↔ tag wrapper pins: presentation `pause-reflect-steps-note-tag-io-sibling-parity.test.ts`
- * (reciprocal inline: `pause-reflect-steps-io.test.ts`); flow umbrellas:
+ * Note ↔ tag wrapper pins: presentation + application
+ * `pause-reflect-steps-note-tag-io-sibling-parity.test.ts` (reciprocal inline:
+ * `pause-reflect-steps-io.test.ts`); flow umbrellas:
  * `pause-reflect-note-tag-flow-sibling-parity.test.ts`,
  * `pause-reflect-steps-note-tag-flow-sibling-parity.test.ts`.
  * Flows-io cross-surface: `pause-reflect-flows-io-parity.test.ts` ↔ this file;
@@ -142,14 +143,14 @@ describe('pause-reflect-steps-io parity', () => {
     expect(shouldShowFromStepsIo).not.toBe(shouldLogFromStepsIo);
     expect(pauseReflectFavoriteToggle).not.toBe(shouldLogFromStepsIo);
     expect(pauseReflectionStepLogOnce).not.toBe(shouldShowFromStepsIo);
-    // Full pins: `pause-reflect-steps-favorite-reflection-step-log-io-sibling-parity.test.ts`.
+    // Full pins: `pause-reflect-steps-favorite-reflection-step-log-io-sibling-parity.test.ts` (application + presentation).
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectTagUpdate);
     expect(pauseReflectNoteUpdateWithRepository).not.toBe(pauseReflectTagUpdateWithRepository);
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectFavoriteToggle);
     expect(pauseReflectTagUpdate).not.toBe(pauseReflectionStepLogOnce);
     expect(pauseReflectNoteUpdateWithRepository).not.toBe(pauseReflectFavoriteToggleWithRepository);
     expect(pauseReflectTagUpdateWithRepository).not.toBe(pauseReflectionStepLogOnceWithRepository);
-    // Full pins: `pause-reflect-steps-note-tag-io-sibling-parity.test.ts`.
+    // Full pins: `pause-reflect-steps-note-tag-io-sibling-parity.test.ts` (application + presentation).
   });
 
   it('pauseReflectTagUpdate delegates to run-pause-reflect-tag-update with default repository', async () => {

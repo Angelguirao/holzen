@@ -25,10 +25,12 @@
  * `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow` (application CI umbrella),
  * `pause-reflect-steps-note-tag-io-sibling-parity.test.ts` (note vs tag wrappers on this module;
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-steps-note-tag-io-sibling-parity.test.ts`;
- * application: `pause-reflect-note-flow.test.ts` ↔ `pause-reflect-tag-flow.test.ts` and
+ * application: `pause-reflect-steps-note-tag-io-sibling-parity.test.ts`,
+ * `pause-reflect-note-flow.test.ts` ↔ `pause-reflect-tag-flow.test.ts`, and
  * `pause-reflect-steps-note-tag-flow-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow`).
  * `pause-reflect-steps-favorite-reflection-step-log-io-sibling-parity.test.ts` (favorite vs reflection_step log wrappers;
- * application: `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`,
+ * application: `pause-reflect-steps-favorite-reflection-step-log-io-sibling-parity.test.ts`,
+ * `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`, and
  * `pause-reflect-steps-favorite-reflection-step-log-flow-sibling-parity.test.ts`).
  * `pause-session-step-handlers-steps-io-sibling-parity.test.ts` ↔ `pause-session-step-handlers-io` (session bundle builders;
  * application mirror: `application/.../session/pause-session-step-handlers-steps-io-sibling-parity.test.ts`;
