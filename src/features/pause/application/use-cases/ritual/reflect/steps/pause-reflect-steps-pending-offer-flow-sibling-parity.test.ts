@@ -33,12 +33,14 @@ describe('pause-reflect-steps-flow ↔ pause-reflect-pending-offer-flow sibling 
     expect(typeof getPendingPauseOfferDisplay).toBe('function');
     expect(typeof trackPausePendingAdopted).toBe('function');
     expect(typeof trackPausePendingDeclined).toBe('function');
+    expect(typeof trackPauseSessionAbandoned).toBe('function');
 
     expect('runAdoptPendingPauseOffer' in stepsFlow).toBe(false);
     expect('runDeclinePendingPauseOffer' in stepsFlow).toBe(false);
     expect('getPendingPauseOfferDisplay' in stepsFlow).toBe(false);
     expect('trackPausePendingAdopted' in stepsFlow).toBe(false);
     expect('trackPausePendingDeclined' in stepsFlow).toBe(false);
+    expect('trackPauseSessionAbandoned' in stepsFlow).toBe(false);
     expect('runPauseFavoriteToggle' in pendingOfferFlow).toBe(false);
     expect('runPauseReflectNoteUpdate' in pendingOfferFlow).toBe(false);
     expect('runPauseReflectTagUpdate' in pendingOfferFlow).toBe(false);
@@ -47,14 +49,19 @@ describe('pause-reflect-steps-flow ↔ pause-reflect-pending-offer-flow sibling 
     expect('shouldLogPauseReflectionStep' in pendingOfferFlow).toBe(false);
   });
 
-  it('steps umbrella exports stay off pending-offer adopt/decline and display', () => {
+  it('steps umbrella exports stay off pending-offer adopt/decline, display, and telemetry', () => {
     expect(runPauseFavoriteToggle).not.toBe(runAdoptPendingPauseOffer);
     expect(runPauseReflectNoteUpdate).not.toBe(runDeclinePendingPauseOffer);
     expect(runPauseReflectTagUpdate).not.toBe(runAdoptPendingPauseOffer);
     expect(runPauseReflectionStepLogOnce).not.toBe(runDeclinePendingPauseOffer);
     expect(shouldShowFavoriteProHint).not.toBe(getPendingPauseOfferDisplay);
+    expect(shouldShowFavoriteProHint).not.toBe(trackPausePendingAdopted);
+    expect(shouldShowFavoriteProHint).not.toBe(trackPausePendingDeclined);
     expect(shouldLogPauseReflectionStep).not.toBe(trackPausePendingAdopted);
+    expect(shouldLogPauseReflectionStep).not.toBe(trackPausePendingDeclined);
     expect(shouldLogPauseReflectionStep).not.toBe(trackPauseSessionAbandoned);
+    expect(runPauseFavoriteToggle).not.toBe(trackPauseSessionAbandoned);
+    expect(runPauseReflectTagUpdate).not.toBe(trackPausePendingDeclined);
   });
 
   it('pending-offer umbrella exports stay off reflect step mutations and step gates', () => {
@@ -63,6 +70,10 @@ describe('pause-reflect-steps-flow ↔ pause-reflect-pending-offer-flow sibling 
     expect(getPendingPauseOfferDisplay).not.toBe(runPauseReflectTagUpdate);
     expect(trackPausePendingAdopted).not.toBe(runPauseReflectionStepLogOnce);
     expect(trackPausePendingDeclined).not.toBe(shouldShowFavoriteProHint);
+    expect(trackPausePendingDeclined).not.toBe(runPauseFavoriteToggle);
     expect(trackPauseSessionAbandoned).not.toBe(shouldLogPauseReflectionStep);
+    expect(trackPauseSessionAbandoned).not.toBe(runPauseReflectNoteUpdate);
+    expect(runAdoptPendingPauseOffer).not.toBe(runPauseReflectTagUpdate);
+    expect(runDeclinePendingPauseOffer).not.toBe(runPauseReflectionStepLogOnce);
   });
 });
