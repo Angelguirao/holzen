@@ -26311,4 +26311,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session shell-io ↔ shell-flow re-exports (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-shell-io.re-exports.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add presentation <code>pause-session-shell-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> identity for hydration, header back, mount log, shell VM, and persisted/waiting guards (parity with scaffold-io / brief-io re-exports pins; application <code>pause-session-shell-io-parity.test.ts</code> already landed). Allowlist re-exports test for shell-flow import in <code>check:architecture-alignment</code>. Production shell I/O keeps leaf imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + alignment allowlist only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Tier 1 <code>holzen-query-client-ref</code> lib shim (<code>App.tsx</code> → <code>@/lib/holzen-query-client-ref</code>), or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

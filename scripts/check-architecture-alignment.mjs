@@ -3182,13 +3182,16 @@ for (const file of walkTs(join(root, 'src'))) {
   }
   if (
     rel.endsWith('pause-session-shell-io.ts') ||
-    rel.endsWith('pause-session-shell-io.test.ts')
+    rel.endsWith('pause-session-shell-io.test.ts') ||
+    rel.endsWith('pause-session-shell-io.re-exports.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_SHELL_IO_UMBRELLA_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: session shell I/O must import via session subcluster modules (${needle})`,
-        );
+    if (!rel.endsWith('pause-session-shell-io.re-exports.test.ts')) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_SHELL_IO_UMBRELLA_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: session shell I/O must import via session subcluster modules (${needle})`,
+          );
+        }
       }
     }
   }
