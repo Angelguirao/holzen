@@ -28,7 +28,7 @@ import {
 import * as homeReflectTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
 
 /**
- * Application mirror: `presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts`.
+ * Presentation mirror: `presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts`.
  * Reciprocal inline pins: `pause-home-reflect-telemetry-io-parity.test.ts` (application + presentation).
  */
 describe('pause-home-reflect-telemetry-io ↔ pause-home-reflect-io sibling parity (application)', () => {

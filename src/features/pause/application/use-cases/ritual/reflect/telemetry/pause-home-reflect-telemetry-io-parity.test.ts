@@ -1,7 +1,7 @@
 /**
  * Application-layer I/O parity for Home manual-open PostHog telemetry (colocated beside
- * `pause-home-reflect-telemetry-flow.ts`; presentation pins stay colocated beside
- * `presentation/reflect/telemetry/pause-home-reflect-telemetry-io.ts`).
+ * `generation/manual-open/pause-home-reflect-telemetry-flow.ts`; presentation pins stay colocated beside
+ * `presentation/reflect/telemetry/pause-home-reflect-telemetry-io.ts`; colocated in this folder).
  * Imports `pause-home-reflect-telemetry-flow` CI umbrella for `.toBe` identity pins only —
  * production Home telemetry I/O keeps leaf tracker modules under `manual-open/`.
  */
@@ -19,19 +19,19 @@ vi.mock('@/features/pause/public-rpc', () => ({
 import {
   trackHomePendingPauseBannerPauseOpened as trackBannerOpenedDirect,
   trackPauseOpenDismissed as trackOpenDismissedDirect,
-} from './home-pause-actions-telemetry';
+} from '../generation/manual-open/home-pause-actions-telemetry';
 import {
   markPauseManualStartedHomeOnce as markManualStartedDirect,
   trackManualPauseInstanceCreated as trackInstanceCreatedDirect,
   trackPauseManualCompleted as trackManualCompletedDirect,
-} from './manual-pause-trigger-telemetry';
+} from '../generation/manual-open/manual-pause-trigger-telemetry';
 import {
   markPauseManualStartedHomeOnce,
   trackHomePendingPauseBannerPauseOpened,
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
   trackPauseOpenDismissed,
-} from './pause-home-reflect-telemetry-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
@@ -40,7 +40,7 @@ import {
 import {
   dismissOpenPauseHome,
   openManualPauseFromHome,
-} from './pause-reflect-generation-manual-open-flow';
+} from '../generation/manual-open/pause-reflect-generation-manual-open-flow';
 import {
   markPauseManualStartedHomeOnce as markManualStartedFromHomeTelemetryIo,
   trackHomePendingPauseBannerPauseOpened as trackBannerOpenedFromHomeTelemetryIo,

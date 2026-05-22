@@ -6,8 +6,8 @@ import {
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
   trackPauseOpenDismissed,
-} from './pause-home-reflect-telemetry-flow';
-import * as homeReflectTelemetryFlow from './pause-home-reflect-telemetry-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow';
+import * as homeReflectTelemetryFlow from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow';
 import {
   buildManualPauseCreateOrReuseParams,
   buildManualPauseMarketContext,
@@ -16,8 +16,8 @@ import {
   openManualPauseFromHome,
   runOpenManualPauseSilentModeAfterCreate,
   runPersistSilentReflectionStub,
-} from './pause-reflect-generation-manual-open-flow';
-import * as manualOpenFlow from './pause-reflect-generation-manual-open-flow';
+} from '../generation/manual-open/pause-reflect-generation-manual-open-flow';
+import * as manualOpenFlow from '../generation/manual-open/pause-reflect-generation-manual-open-flow';
 
 /**
  * Application sibling parity: Home manual-open telemetry-flow vs manual-open-flow CI anchors.

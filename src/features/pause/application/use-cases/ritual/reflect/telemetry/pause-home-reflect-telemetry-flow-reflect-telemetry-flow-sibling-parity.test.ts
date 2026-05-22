@@ -6,14 +6,14 @@ import {
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
   trackPauseOpenDismissed,
-} from './pause-home-reflect-telemetry-flow';
-import * as homeReflectTelemetryFlow from './pause-home-reflect-telemetry-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow';
+import * as homeReflectTelemetryFlow from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
-} from '../../telemetry/pause-reflect-telemetry-flow';
-import * as sessionReflectTelemetryFlow from '../../telemetry/pause-reflect-telemetry-flow';
+} from './pause-reflect-telemetry-flow';
+import * as sessionReflectTelemetryFlow from './pause-reflect-telemetry-flow';
 
 /**
  * Application sibling parity: Home manual-open telemetry-flow vs session reflect telemetry-flow.
