@@ -65,7 +65,7 @@ describe('pause-session-step-transition-io parity', () => {
     expect(pauseStepSwipeDirection).not.toBe(buildPauseSessionStepRitualBundle);
     expect(PAUSE_SESSION_STEP_SLIDE_OFFSET_PX).not.toBe(buildPauseSessionStepRitualBundle);
     expect(PAUSE_SESSION_STEP_TRANSITION_DURATION_S).not.toBe(buildPauseSessionStepShellBundle);
-    // Reciprocal inline pins: `application/.../session/pause-session-step-handlers-io-parity.test.ts`.
+    // Reciprocal inline pins: `pause-session-step-handlers-io-parity.test.ts` (presentation/session).
     // Full pins: `pause-session-step-handlers-step-transition-io-sibling-parity.test.ts`.
   });
 });
