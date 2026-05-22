@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — companion frame UI I/O ↔ section-visibility-flow (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-frame-ui-io.re-exports.test.ts</code> section-visibility-flow parity</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Extend companion frame UI presentation I/O re-export test with <code>.toBe(direct)</code> identity against <code>pause-companion-section-visibility-flow</code> for section visibility helpers (parity with <code>pause-reflect-ambience-io</code> ↔ <code>pause-reflect-ambience-flow</code>). Allowlist subcluster flow import on <code>pause-companion-frame-ui-io.re-exports.test.ts</code> only; production I/O still imports <code>section-visibility</code> leaf directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + CI allowlist only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: <code>pause-companion-orchestration-flow</code> ↔ orchestrate umbrella sibling pins, optional <code>pause-run-breath-segment-log-flow</code> CI anchor, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect flows I/O ↔ flows-flow + session breath umbrella pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

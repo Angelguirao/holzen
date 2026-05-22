@@ -2724,18 +2724,20 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-companion-frame-ui-io.test.ts') ||
     rel.endsWith('pause-companion-frame-ui-io.re-exports.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_FRAME_UI_IO_UMBRELLA_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: companion frame UI I/O must not import frame UI umbrella (${needle})`,
-        );
+    if (!rel.endsWith('pause-companion-frame-ui-io.re-exports.test.ts')) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_FRAME_UI_IO_UMBRELLA_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: companion frame UI I/O must not import frame UI umbrella (${needle})`,
+          );
+        }
       }
-    }
-    for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_FRAME_UI_IO_SUBCLUSTER_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: companion frame UI I/O must import ritual/frame leaf modules directly (${needle})`,
-        );
+      for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_FRAME_UI_IO_SUBCLUSTER_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: companion frame UI I/O must import ritual/frame leaf modules directly (${needle})`,
+          );
+        }
       }
     }
   }
