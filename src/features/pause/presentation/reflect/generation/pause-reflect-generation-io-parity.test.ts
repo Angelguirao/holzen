@@ -322,10 +322,15 @@ describe('pause-reflect-generation-io parity', () => {
     expect(runReflectGeneration).not.toBe(getPendingPauseOfferDisplay);
     expect(reflectGenerator).not.toBe(pauseAdoptPendingOffer);
     expect(reflectGenerator).not.toBe(getPendingPauseOfferDisplay);
+    expect(reflectGenerationPrerequisite).not.toBe(pauseAdoptPendingOffer);
+    expect(resolveReflectGenerationPrefetch).not.toBe(getPendingPauseOfferDisplay);
     expect(pauseReflectGeneration).not.toBe(pauseAdoptPendingOfferWithRepository);
     expect(runReflectGeneration).not.toBe(pauseDeclinePendingOfferWithRepository);
     expect(reflectGenerator).not.toBe(reflectPauseRepository);
+    expect(shouldCommitReflectGeneration).not.toBe(pauseAdoptPendingOffer);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseDeclinePendingOfferWithRepository);
     // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts` (application + presentation).
+    // Full pins: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`.
   });
 
   /**
@@ -358,21 +363,5 @@ describe('pause-reflect-generation-io parity', () => {
     expect('pauseReflectGeneration' in homeReflectIo).toBe(false);
     expect('pauseHomeManualOpenPorts' in homeReflectIo).toBe(true);
     expect('reflectGenerator' in generationIo).toBe(true);
-  });
-
-  /**
-   * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (holzen-reflect vs frame-focus bed).
-   * Dedicated sibling file: `pause-reflect-ambience-generation-io-sibling-parity.test.ts` (application + presentation).
-   */
-  it('sibling cluster: ambience-io frame-focus bed exports stay distinct from generation-io', () => {
-    expect(pauseReflectGeneration).not.toBe(startPauseReflectFrameFocusAmbience);
-    expect(runReflectGeneration).not.toBe(stopPauseReflectFrameFocusAmbience);
-    expect(reflectGenerationPrerequisite).not.toBe(startPauseReflectFrameFocusAmbience);
-    expect(shouldCommitReflectGeneration).not.toBe(stopPauseReflectFrameFocusAmbience);
-    expect(messageFromReflectGenerationResult).not.toBe(startPauseReflectFrameFocusAmbience);
-    expect(reflectGenerator).not.toBe(stopPauseReflectFrameFocusAmbience);
-    expect(pauseReflectGeneration).not.toBe(stopPauseReflectFrameFocusAmbience);
-    // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
-    // Full pins: `pause-reflect-ambience-generation-io-sibling-parity.test.ts`.
   });
 });
