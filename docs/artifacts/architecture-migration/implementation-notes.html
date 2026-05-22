@@ -19688,21 +19688,6 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
-      <span>Phase A — applyManualPauseOpenResult telemetry via home reflect telemetry I/O (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>apply-manual-pause-open-result</code> default trackers import <code>pause-home-reflect-telemetry-io</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route default PostHog trackers through <code>pause-home-reflect-telemetry-io</code> instead of deep <code>pause-home-reflect-telemetry-flow</code> (parity with <code>pause-home-reflect-telemetry-io</code> consumers and prior manual-open type peel via <code>pause-reflect-generation-manual-open-flow</code>).</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior parity; import boundary only.</dd>
-      <dt>Tradeoffs</dt>
-      <dd>Open-result payload types stay on manual-open CI anchor; telemetry-io re-exports trackers only.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: <code>pause-session-pending-offer-io</code> flow anchor, companion orchestrate-session import consolidate, or Phase B subscription Tier 1 shim.</dd>
-=======
       <span>Phase A — session scaffold depth-picker via mood flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -19715,8 +19700,26 @@
       <dt>Tradeoffs</dt>
       <dd>Session presentation imports reflect mood I/O for one pure gate helper; did not add a session-scaffold-specific re-export layer.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B subscription Tier 1 shim (<code>subscription-checkout-guard-ref</code>), or companion frame UI-io peel through flow anchor.</dd>
->>>>>>> e48b9c298 (refactor(pause): route session scaffold depth-picker via mood flow)
+      <dd>Next: <code>pause-session-ritual-restore-io</code> through restore-flow anchor, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session ritual-restore I/O via restore-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-ritual-restore-io</code> imports through <code>pause-session-ritual-restore-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add session restore-flow CI anchor composing breath/decide/frame/brief hydration; route <code>pause-session-ritual-restore-io</code> through it instead of deep session/ritual siblings. Align <code>pause-session-frame-io</code> and <code>pause-session-decide-io</code> with existing <code>pause-session-frame-flow</code> / <code>pause-session-decide-flow</code> anchors.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Breath restore helpers re-export from domain (not breath presentation I/O) — domain is the allowed home for pure hydration projections.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion frame-ui/analytics I/O peels, or Phase B subscription Tier 1 shim.</dd>
     </dl>
   </article>
 

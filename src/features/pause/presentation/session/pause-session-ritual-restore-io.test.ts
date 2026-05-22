@@ -1,18 +1,21 @@
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/features/pause/domain/ritual/breathe/restored-breath-ritual-state', () => ({
-  initialBreathingFirstCompletedFromRestored: vi.fn(),
-  initialBreathingSecondCompletedFromRestored: vi.fn(),
-}));
-
-vi.mock('@/features/pause/application/use-cases/ritual/decide/restored-decide-ritual-state', () => ({
-  initialDecisionFromRestored: vi.fn(),
-  initialPhaseFromRestored: vi.fn(),
-}));
-
-vi.mock('@/features/pause/application/use-cases/ritual/frame/restored-frame-ritual-state', () => ({
-  initialFrameDoneFromRestored: vi.fn(),
-}));
+vi.mock(
+  '@/features/pause/application/use-cases/session/pause-session-ritual-restore-flow',
+  async () => {
+    const actual = await vi.importActual<
+      typeof import('@/features/pause/application/use-cases/session/pause-session-ritual-restore-flow')
+    >('@/features/pause/application/use-cases/session/pause-session-ritual-restore-flow');
+    return {
+      ...actual,
+      initialBreathingFirstCompletedFromRestored: vi.fn(),
+      initialBreathingSecondCompletedFromRestored: vi.fn(),
+      initialDecisionFromRestored: vi.fn(),
+      initialPhaseFromRestored: vi.fn(),
+      initialFrameDoneFromRestored: vi.fn(),
+    };
+  },
+);
 
 import {
   initialBriefIntegrateDoneFromRestored,
@@ -23,7 +26,7 @@ import {
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
 describe('pause-session-ritual-restore-io', () => {
-  it('re-exports restored brief ritual fields from session use-case siblings', () => {
+  it('re-exports restored brief ritual fields from pause-session-ritual-restore-flow', () => {
     const restored = makeTestPersistedPauseSession({
       ritualDepth: 'brief',
       briefStep: 'integrate',
