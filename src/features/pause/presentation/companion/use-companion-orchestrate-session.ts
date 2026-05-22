@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { pauseLoadCompanionOrchestrateSession } from '@/features/pause/presentation/companion/pause-companion-orchestration-io';
+import { pauseLoadCompanionOrchestrateSession } from './pause-companion-orchestration-io';
 
 export type UseCompanionOrchestrateSessionParams = {
   pauseInstanceId?: string | null;
