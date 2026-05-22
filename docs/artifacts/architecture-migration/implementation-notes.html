@@ -23314,4 +23314,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate journey pause-instances query keys (backlog #1 verified, Tier 3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>journey-pause-instances-query-key</code> colocated with TanStack query module (§5.2)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no use-case folder moves. Move <code>journey-pause-instances-keys.ts</code> from <code>application/queries/</code> to <code>infrastructure/queries/journey-pause-instances-query-key.ts</code> (parity with <code>current-pause-query-key</code>). <code>journey-pause-instances-query.ts</code> and <code>invalidate-pause-stats.ts</code> import the colocated module; <code>public-queries</code> re-exports unchanged via query module.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mechanical colocation only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>completed-pause-count-keys</code> remains in <code>application/queries/</code> until the next sibling slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>completed-pause-count-keys</code>, or session umbrella flow/cluster markers still missing on shell / step-transition / step-handlers / terminal-entry.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
