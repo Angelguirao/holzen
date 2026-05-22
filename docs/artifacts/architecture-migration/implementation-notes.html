@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session decide-io type peel parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-decide-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on this branch — no folder moves. Add application-layer <code>pause-session-decide-io-parity.test.ts</code> to assert <code>PauseImpactData</code> type alignment across presentation <code>pause-session-decide-io</code>, <code>pause-session-decide-flow</code>, and <code>domain/decide/pause-impact-data</code>, and that decide I/O intentionally exports no runtime hydration helpers (those stay on <code>pause-session-decide-flow</code> / ritual restore paths). Production reflect flows import <code>PauseImpactData</code> via decide-io only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow/I/O comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription Tier 1 shims, or colocate <code>home/bulk-hold/group-by-local-day</code> under decide/home presentation.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session scaffold-io ↔ scaffold-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
