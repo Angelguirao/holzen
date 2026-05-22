@@ -638,9 +638,21 @@ const LEGACY_PAUSE_REFLECT_SHARE_FLOW_DOMAIN_IMPORTS = [
   "from '../domain/reflect/share/",
 ];
 
-/** Reflect share presentation — import share builders/orchestration via pause-reflect-share-flow only. */
+/** Reflect share I/O — import via share subcluster flows only (not pause-reflect-share-orchestration-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_IO_ORCHESTRATION_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow',
+  "from './application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow'",
+  "from '../application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow'",
+  "from './application/use-cases/ritual/reflect/share/pause-reflect-share-flow'",
+  "from '../application/use-cases/ritual/reflect/share/pause-reflect-share-flow'",
+];
+
+/** Reflect share presentation — import share builders via pause-reflect-share-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/share/',
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow',
   '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image',
   '@/features/pause/application/use-cases/ritual/reflect/share/deliver-reflection-share-image',
   '@/features/pause/application/use-cases/ritual/reflect/share/reflection-share-canvas',
@@ -655,6 +667,10 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_DOMAIN_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/share/deliver-reflection-share-image'",
   "from './application/use-cases/ritual/reflect/share/reflection-share-canvas'",
   "from '../application/use-cases/ritual/reflect/share/reflection-share-canvas'",
+  "from './application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow'",
+  "from '../application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow'",
+  "from './application/use-cases/ritual/reflect/share/pause-reflect-share-flow'",
+  "from '../application/use-cases/ritual/reflect/share/pause-reflect-share-flow'",
 ];
 
 /** Reflect steps I/O — import via steps subcluster flows only (not pause-reflect-steps-flow umbrella). */
@@ -904,12 +920,6 @@ const LEGACY_PAUSE_REFLECT_SHARE_FLOW_TELEMETRY_IMPORTS = [
 ];
 
 /** Reflect share presentation — orchestration I/O via pause-reflect-share-orchestration-flow only. */
-const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_ORCHESTRATION_UMBRELLA_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow',
-  "from './application/use-cases/ritual/reflect/share/pause-reflect-share-flow'",
-  "from '../application/use-cases/ritual/reflect/share/pause-reflect-share-flow'",
-];
-
 /** Reflect generation presentation (holzen-reflect) — import via pause-reflect-generation-flow only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_HOOK_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/pause-reflect-generation-hook-flow',
@@ -1365,10 +1375,10 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-reflect-share-io.ts') ||
     rel.endsWith('pause-reflect-share-io.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_ORCHESTRATION_UMBRELLA_IMPORTS) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_IO_ORCHESTRATION_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: share orchestration I/O must import via pause-reflect-share-orchestration-flow (${needle})`,
+          `${rel}: reflect share I/O must import via share subcluster flows (${needle})`,
         );
       }
     }
