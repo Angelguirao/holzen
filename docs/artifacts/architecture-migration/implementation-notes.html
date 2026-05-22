@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — Holzen providers slice via pause-session-providers-io (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Providers conductor imports Holzen slice through presentation I/O</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-session-providers-flow</code> beside <code>pause-holzen-providers-slice</code>; <code>use-pause-session-providers-conductor</code> and <code>pause-session-providers-types</code> import <code>pickPauseHolzenProvidersSlice</code> / <code>PauseHolzenProvidersSlice</code> via <code>pause-session-providers-io</code> (parity with terminal-entry and shell I/O peels). CI forbids deep <code>pause-holzen-providers-slice</code> imports under <code>presentation/session/</code> except <code>*-io.ts</code> modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flow anchor is thin re-export only; picker logic stays in <code>pause-holzen-providers-slice.ts</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: other session presentation deep imports (e.g. <code>step-map</code>) or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — colocate session reflect UI PostHog under share/ (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd>Session reflect UI PostHog lives beside share PNG/delivery use cases; application <code>telemetry/session/</code> removed. Presentation <code>telemetry/session/</code> I/O shim remains for <code>usePauseReflectUiTelemetry</code> and <code>public-ritual-reflect</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next: session providers-conductor I/O peel, or Phase B subscription Tier 1 shim.</dd>
+      <dd>Next: other session presentation deep imports (e.g. <code>step-map</code>) or Phase B subscription Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -88,9 +107,9 @@
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>use-pause-session-providers-conductor</code> still imports <code>pause-holzen-providers-slice</code> directly — peel in a follow-up slice.</dd>
+      <dd>Providers-conductor Holzen slice peel landed in a follow-up slice (<code>pause-session-providers-io</code>).</dd>
       <dt>Open questions</dt>
-      <dd>Next: providers-conductor I/O peel or Phase B subscription Tier 1 shim.</dd>
+      <dd>Next: other session presentation deep imports or Phase B subscription Tier 1 shim.</dd>
     </dl>
   </article>
 
