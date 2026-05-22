@@ -88,6 +88,10 @@ import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+import {
+  buildReflectionShareText,
+  pauseReflectionShareImage,
+} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
@@ -107,10 +111,6 @@ import {
   runDeepPausePickerEntryIfPro as runDeepPickerFromMoodIo,
   runPauseSessionChromeCloseAction as runChromeCloseFromMoodIo,
 } from './pause-reflect-mood-io';
-import {
-  startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
-} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 
 /**
  * Presentation mood I/O parity (colocated beside `pause-reflect-mood-io.ts`).
@@ -127,6 +127,8 @@ import {
  * reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts`.
  * Ambience-io sibling pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts`.
+ * Share-io sibling pins: `pause-reflect-share-mood-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
  */
 describe('pause-reflect-mood-io parity', () => {
   it('mood CI umbrella composes the same domain mood leaves as presentation I/O', () => {
@@ -328,5 +330,21 @@ describe('pause-reflect-mood-io parity', () => {
     expect(reflectPauseRepository).not.toBe(startPauseReflectFrameFocusAmbience);
     // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
     // Full pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts` (mood RPC vs share builders).
+   * Dedicated sibling file: `pause-reflect-share-mood-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: share-io builders stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(pauseReflectionShareImage);
+    expect(pauseInitialEmotionSkip).not.toBe(buildReflectionShareText);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseReflectionShareImage);
+    expect(pauseInitialEmotionSkipWithRepository).not.toBe(buildReflectionShareText);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(pauseReflectionShareImage);
+    expect(buildFeelTilesFromMoodIo).not.toBe(buildReflectionShareText);
+    expect(reflectPauseRepository).not.toBe(pauseReflectionShareImage);
+    // Reciprocal inline pins: `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
+    // Full pins: `pause-reflect-share-mood-io-sibling-parity.test.ts`.
   });
 });

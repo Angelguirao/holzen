@@ -268,6 +268,7 @@ describe('pause-reflect-share-io parity', () => {
 
   /**
    * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (colocated under `presentation/reflect/hub/`).
+   * Dedicated sibling file: `pause-reflect-hub-share-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: hub-io exports stay distinct from share-io builders', () => {
     expect(pauseReflectionShareImage).not.toBe(pauseShiftEmotionFrameHubDone);
@@ -279,7 +280,7 @@ describe('pause-reflect-share-io parity', () => {
 
   /**
    * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (colocated under `presentation/reflect/mood/`).
-   * Dedicated sibling file: `pause-reflect-share-mood-io-sibling-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-share-mood-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: mood-io exports stay distinct from share-io builders', () => {
     expect(pauseReflectionShareImage).not.toBe(pauseInitialEmotionSelect);
