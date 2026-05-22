@@ -155,6 +155,7 @@ describe('pause-companion-orchestration-io parity', () => {
 
   /**
    * Reciprocal inline pins ↔ `pause-companion-orchestrate-io-parity.test.ts` (application + presentation).
+   * Persist/favorite leaf pins: orchestrate-io parity `sibling cluster: orchestration-io persist/favorite wrappers…`.
    */
   it('sibling cluster: orchestrate-io slot/intervention exports stay distinct from orchestration-io', () => {
     expect(pauseLoadCompanionOrchestrateSession).not.toBe(runCompanionSlotOrchestrate);
