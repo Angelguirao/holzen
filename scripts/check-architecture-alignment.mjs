@@ -2547,7 +2547,8 @@ for (const file of walkTs(join(root, 'src'))) {
   if (rel.startsWith('src/features/pause/presentation/reflect/hub/')) {
     if (
       !rel.endsWith('pause-reflect-hub-io.ts') &&
-      !rel.endsWith('pause-reflect-hub-io.test.ts')
+      !rel.endsWith('pause-reflect-hub-io.test.ts') &&
+      !rel.endsWith('pause-reflect-hub-io.re-exports.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {
