@@ -1,6 +1,6 @@
 /**
  * Reflect mood beat presentation I/O (feel tiles, depth picker, chrome close, initial emotion RPC).
- * Imports domain mood helpers and `run-initial-emotion-log` directly (parity with
+ * Imports domain mood leaf modules and `run-initial-emotion-log` directly (parity with
  * `pause-reflect-hub-io` → domain + leaf use case).
  */
 import {
@@ -20,11 +20,11 @@ import {
 import { isPauseSessionDepthPickerActive } from '@/features/pause/domain/reflect/mood/pause-depth-picker-active';
 import {
   resolvePauseSessionChromeCloseAction,
-  runDeepPausePickerEntryIfPro,
   runPauseSessionChromeCloseAction,
   type PauseSessionChromeCloseAction,
   type PauseSessionPhase,
-} from '@/features/pause/domain/reflect/mood/pause-session-mood-chrome-flow';
+} from '@/features/pause/domain/reflect/mood/pause-session-chrome-close';
+import { runDeepPausePickerEntryIfPro } from '@/features/pause/domain/reflect/mood/run-deep-pause-picker-entry-if-pro';
 import { resolvePauseDepthContextLineParams } from '@/features/pause/domain/reflect/mood/resolve-pause-depth-context-line-params';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
