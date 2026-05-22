@@ -1,33 +1,45 @@
 /**
  * Home manual-open reflect cluster I/O (use cases, domain builders, dismiss preview, default ports).
  * Colocated under `presentation/reflect/generation/manual-open/` (parity with application `generation/manual-open/` cluster).
- * Imports manual-open use cases and domain builders via `pause-reflect-generation-manual-open-flow`
- * CI anchor (parity with `pause-home-reflect-telemetry-io` → leaf telemetry modules, not generation umbrella).
+ * Imports manual-open use cases and domain builders from sibling modules directly
+ * (parity with `pause-home-reflect-telemetry-io` → leaf telemetry modules, not manual-open-flow umbrella).
  */
+import { dismissOpenPauseHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/dismiss-open-pause-home';
+import { openManualPauseFromHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/open-manual-pause-from-home';
+import { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-open-manual-pause-silent-mode-after-create';
+import { runPersistSilentReflectionStub } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-persist-silent-reflection-stub';
 import {
   buildManualPauseCreateOrReuseParams,
-  buildManualPauseMarketContext,
-  buildManualPauseOpenParams,
-  dismissOpenPauseHome,
   MANUAL_PAUSE_VOLATILITY_TEMPLATE,
-  openManualPauseFromHome,
-  runOpenManualPauseSilentModeAfterCreate,
-  runPersistSilentReflectionStub,
-  type BuildManualPauseOpenParamsInput,
   type ManualPauseCreateOrReuseParams,
+} from '@/features/pause/domain/reflect/generation/build-manual-pause-create-or-reuse-params';
+import {
+  buildManualPauseMarketContext,
   type ManualPauseMarketContext,
-  type OpenManualPauseFromHomeParams,
-  type OpenManualPauseFromHomePorts,
-  type OpenManualPauseFromHomeResult,
-  type PersistSilentReflectionStubInput,
-  type PersistSilentReflectionStubResult,
-  type RunOpenManualPauseSilentModeAfterCreateError,
-  type RunOpenManualPauseSilentModeAfterCreateInput,
-  type RunOpenManualPauseSilentModeAfterCreateOpened,
-  type RunOpenManualPauseSilentModeAfterCreateResult,
-  type TrackManualPauseInstanceCreatedPayload,
-  type TrackPauseManualCompletedPayload,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-reflect-generation-manual-open-flow';
+} from '@/features/pause/domain/reflect/generation/build-manual-pause-market-context';
+import {
+  buildManualPauseOpenParams,
+  type BuildManualPauseOpenParamsInput,
+} from '@/features/pause/domain/reflect/generation/build-manual-pause-open-params';
+import type {
+  TrackManualPauseInstanceCreatedPayload,
+  TrackPauseManualCompletedPayload,
+} from '@/features/pause/domain/reflect/generation/manual-pause-home-telemetry-types';
+import type {
+  OpenManualPauseFromHomeParams,
+  OpenManualPauseFromHomePorts,
+  OpenManualPauseFromHomeResult,
+} from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-types';
+import type {
+  PersistSilentReflectionStubInput,
+  PersistSilentReflectionStubResult,
+} from '@/features/pause/domain/reflect/generation/persist-silent-reflection-stub-types';
+import type {
+  RunOpenManualPauseSilentModeAfterCreateError,
+  RunOpenManualPauseSilentModeAfterCreateInput,
+  RunOpenManualPauseSilentModeAfterCreateOpened,
+  RunOpenManualPauseSilentModeAfterCreateResult,
+} from '@/features/pause/domain/reflect/generation/open-manual-pause-silent-mode-after-create-types';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import {
   supabasePauseRepository,

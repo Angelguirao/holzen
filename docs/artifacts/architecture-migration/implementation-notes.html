@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — Home manual-open I/O direct sibling modules (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-io</code> imports manual-open use cases + domain builders directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-home-reflect-io</code> imports <code>dismiss-open-pause-home</code>, <code>open-manual-pause-from-home</code>, silent-mode runners, and domain builders/types from sibling modules instead of <code>pause-reflect-generation-manual-open-flow</code> CI anchor (parity with ritual-restore and ambience I/O peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-generation-manual-open-flow.ts</code> remains for generation umbrella compose + <code>check:architecture-alignment</code>; manual-open presentation hooks still import only <code>pause-home-reflect-io</code>. CI legacy paths updated from stale <code>presentation/home/manual-open/</code> to <code>presentation/reflect/generation/manual-open/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-reflect-generation-io</code> off hook-flow anchor, session frame/decide I/O off flow umbrellas, or companion orchestrate-io consolidate.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session ritual-restore I/O direct subcluster modules (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

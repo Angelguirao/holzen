@@ -334,14 +334,8 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS = [
   '@/features/pause/presentation/reflect/use-pause-session-reflect-and-decide',
   '@/features/pause/presentation/reflect/use-pause-session-decide-handler',
   '@/features/pause/presentation/reflect/use-reflection-share-handlers',
-  '@/features/pause/presentation/home/manual-open/pause-home-reflect-io',
-  '@/features/pause/presentation/home/manual-open/apply-manual-pause-open-result',
-  '@/features/pause/presentation/home/manual-open/pause-home-reflect-telemetry-io',
   '@/features/pause/presentation/reflect/telemetry/home/',
   "from './presentation/reflect/use-pause-reflect-generation'",
-  "from './presentation/home/manual-open/pause-home-reflect-io'",
-  "from './presentation/home/manual-open/apply-manual-pause-open-result'",
-  "from './presentation/home/manual-open/pause-home-reflect-telemetry-io'",
   "from './presentation/reflect/telemetry/home/",
   "from '../presentation/reflect/telemetry/home/",
   "from './presentation/reflect/use-pause-favorite-toggle'",
@@ -426,11 +420,17 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IO_HOME_FLOW_IMPOR
   "from '../manual-open/pause-home-reflect-telemetry-flow'",
 ];
 
-/** Manual-open reflect I/O — import via pause-reflect-generation-manual-open-flow only (not generation umbrella). */
+/** Manual-open reflect I/O — import sibling modules directly (not manual-open-flow or generation umbrella). */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_IO_GENERATION_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow',
   "from './application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow'",
   "from '../application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow'",
+];
+
+const LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_IO_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-manual-open-flow',
+  "from './application/use-cases/ritual/reflect/generation/pause-reflect-generation-manual-open-flow'",
+  "from '../application/use-cases/ritual/reflect/generation/pause-reflect-generation-manual-open-flow'",
 ];
 
 /** Holzen-reflect generation I/O — import via pause-reflect-generation-hook-flow only (not generation umbrella). */
@@ -1605,7 +1605,14 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_IO_GENERATION_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: manual-open reflect I/O must import via pause-reflect-generation-manual-open-flow (${needle})`,
+          `${rel}: manual-open reflect I/O must not import generation umbrella (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_IO_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: manual-open reflect I/O must import manual-open sibling modules directly (${needle})`,
         );
       }
     }
