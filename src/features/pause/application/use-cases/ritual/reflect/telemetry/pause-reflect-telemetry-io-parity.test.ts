@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  trackPauseReflectPostItOpen as trackPostItDirect,
+  trackPauseReflectShareTap as trackShareTapDirect,
+  trackPauseReflectWallpaperTap as trackWallpaperDirect,
+} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-session-ui-telemetry';
+import {
+  trackPauseReflectPostItOpen as trackPostItFromShareFlow,
+  trackPauseReflectShareTap as trackShareTapFromShareFlow,
+  trackPauseReflectWallpaperTap as trackWallpaperFromShareFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow';
+import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
@@ -16,5 +26,17 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackPauseReflectPostItOpen).toBe(trackPostItFromTelemetryIo);
     expect(trackPauseReflectShareTap).toBe(trackShareTapFromTelemetryIo);
     expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperFromTelemetryIo);
+  });
+
+  it('telemetry CI umbrella composes the same session UI telemetry leaf as presentation I/O', () => {
+    expect(trackPauseReflectPostItOpen).toBe(trackPostItDirect);
+    expect(trackPauseReflectShareTap).toBe(trackShareTapDirect);
+    expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperDirect);
+  });
+
+  it('presentation I/O session reflect telemetry matches share CI umbrella (cross-cluster parity)', () => {
+    expect(trackPauseReflectPostItOpen).toBe(trackPostItFromShareFlow);
+    expect(trackPauseReflectShareTap).toBe(trackShareTapFromShareFlow);
+    expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperFromShareFlow);
   });
 });
