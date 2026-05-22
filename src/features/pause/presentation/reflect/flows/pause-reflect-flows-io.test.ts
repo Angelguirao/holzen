@@ -111,6 +111,7 @@ describe('pause-reflect-flows-io', () => {
     expect(typeof pauseReflectOutcomeLogWithRepository).toBe('function');
     expect(pauseReflectOutcomeLog).not.toBe(runPauseOutcomeLogDirect);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(runPauseOutcomeLogDirect);
+    expect(pauseReflectOutcomeLog).not.toBe(pauseReflectOutcomeLogWithRepository);
   });
 
   it('routes decide outcome log through the default PauseRepository port adapter', async () => {

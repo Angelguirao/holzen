@@ -54,6 +54,8 @@ import {
   formatReinforcementQuoteFromSession,
   getSessionQuote,
   parseScoreImpactVolatilityPct,
+  pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
   reflectPauseRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
@@ -101,6 +103,15 @@ describe('pause-reflect-flows-io re-exports', () => {
   it('flows CI anchor exports same runPauseOutcomeLog leaf as presentation I/O', () => {
     expect(typeof runOutcomeLogFromFlowsFlow).toBe('function');
     expect(runOutcomeLogFromFlowsFlow).toBe(runOutcomeLogDirect);
+  });
+
+  it('presentation outcome wrappers stay distinct from runPauseOutcomeLog leaf and each other', () => {
+    expect(typeof pauseReflectOutcomeLog).toBe('function');
+    expect(typeof pauseReflectOutcomeLogWithRepository).toBe('function');
+    expect(pauseReflectOutcomeLog).not.toBe(runOutcomeLogDirect);
+    expect(pauseReflectOutcomeLog).not.toBe(runOutcomeLogFromFlowsFlow);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(runOutcomeLogDirect);
+    expect(pauseReflectOutcomeLog).not.toBe(pauseReflectOutcomeLogWithRepository);
   });
 
   it('presentation I/O bindings match pause-reflect-flows-flow CI anchor (leaf parity)', () => {

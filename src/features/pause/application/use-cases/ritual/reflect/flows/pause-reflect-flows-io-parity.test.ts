@@ -131,5 +131,6 @@ describe('pause-reflect-flows-io parity', () => {
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(runOutcomeLogDirect);
     expect(pauseReflectOutcomeLog).not.toBe(runPauseOutcomeLog);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(runPauseOutcomeLog);
+    expect(pauseReflectOutcomeLog).not.toBe(pauseReflectOutcomeLogWithRepository);
   });
 });
