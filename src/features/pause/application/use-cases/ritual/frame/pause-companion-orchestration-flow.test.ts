@@ -18,6 +18,13 @@ import {
   persistCompanionUiStepCompletion as persistFromUiCompletionFlow,
 } from './pause-companion-ui-completion-flow';
 import {
+  getCompanionSectionVisibility,
+  isCompanionSectionVisible,
+} from './pause-companion-section-visibility-flow';
+import {
+  getCompanionSectionVisibility as getVisibilityFromFrameUiFlow,
+} from './pause-companion-frame-ui-flow';
+import {
   loadCompanionOrchestrateSession,
   nextExpandedWithLazyFetch,
   persistCompanionUiStepCompletion,
@@ -42,5 +49,16 @@ describe('pause-companion-orchestration-flow', () => {
     expect(nextExpandedWithLazyFetch).toBe(nextExpandedFromExpansionFlow);
     expect(persistCompanionUiStepCompletion).toBe(persistFromUiCompletionFlow);
     expect(runToggleCompanionLibraryFavorite).toBe(toggleFavoriteFromLibraryFlow);
+  });
+
+  it('sibling cluster: section-visibility-flow is distinct from orchestration umbrella exports', () => {
+    expect(loadCompanionOrchestrateSession).not.toBe(getCompanionSectionVisibility);
+    expect(loadCompanionOrchestrateSession).not.toBe(isCompanionSectionVisible);
+    expect(nextExpandedWithLazyFetch).not.toBe(getCompanionSectionVisibility);
+    expect(persistCompanionUiStepCompletion).not.toBe(isCompanionSectionVisible);
+  });
+
+  it('frame-ui-flow composes section-visibility sibling cluster anchor (cross-pin)', () => {
+    expect(getVisibilityFromFrameUiFlow).toBe(getCompanionSectionVisibility);
   });
 });
