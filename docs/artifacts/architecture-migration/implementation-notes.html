@@ -59,21 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-      <span>Phase A — CI guard session breath hydration imports (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — session breath CI guards + step-navigation I/O test (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Forbid deep phase-advance / restored-breath imports under <code>presentation/session/breath/</code></h3>
+    <h3>Forbid deep breathe imports under <code>presentation/session/breath/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>check:architecture-alignment</code> so <code>presentation/session/breath/</code> (except <code>pause-session-breath-io</code>) cannot import domain or application <code>phase-advance</code> / <code>restored-breath-ritual-state</code> directly (follow-up to breath-flow peel and <code>importOriginal</code> hook tests on branch tip).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>check:architecture-alignment</code> so <code>presentation/session/breath/</code> hooks import hydration, phase-advance, domain aux helpers, and <code>pause-session-breath-flow</code> only through <code>pause-session-breath-io</code> / <code>pause-session-breath-step-navigation-io</code> (plus their tests). Add <code>pause-session-breath-step-navigation-io.test.ts</code> for step-target re-exports.</dd>
       <dt>Deviation</dt>
-      <dd>None — guard only.</dd>
+      <dd>None — guard + test only.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>pause-session-breath-io</code> remains the sole presentation entry for breath hydration and phase advance.</dd>
+      <dd><code>pause-session-breath-io.ts</code> remains the allowlisted barrel for domain aux re-exports; hook <code>*.test.tsx</code> files are guarded like conductors.</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B subscription Tier 1 shim (<code>src/lib/subscription-*</code> → <code>features/subscription/public*</code>).</dd>
     </dl>
   </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
 
   <article class="note">
     <header>

@@ -426,6 +426,26 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_HYDRATION_IMPORTS = [
   "from '../application/use-cases/ritual/breathe/phase-advance'",
 ];
 
+/** Session breath presentation — import breathe domain helpers via breath I/O only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_DOMAIN_AUX_IMPORTS = [
+  '@/features/pause/domain/ritual/breathe/apply-breath-segment-log-outcome',
+  '@/features/pause/domain/ritual/breathe/pause-breathing-phase',
+  '@/features/pause/domain/ritual/breathe/breath-second-label-variant',
+  "from './domain/ritual/breathe/apply-breath-segment-log-outcome'",
+  "from '../domain/ritual/breathe/apply-breath-segment-log-outcome'",
+  "from './domain/ritual/breathe/pause-breathing-phase'",
+  "from '../domain/ritual/breathe/pause-breathing-phase'",
+  "from './domain/ritual/breathe/breath-second-label-variant'",
+  "from '../domain/ritual/breathe/breath-second-label-variant'",
+];
+
+/** Session breath presentation — import breath-flow cluster via *-io modules only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow',
+  "from './application/use-cases/ritual/breathe/pause-session-breath-flow'",
+  "from '../application/use-cases/ritual/breathe/pause-session-breath-flow'",
+];
+
 /** Session ritual restore — import restored breath hydration via pause-session-breath-flow only. */
 const LEGACY_PAUSE_SESSION_RITUAL_RESTORE_BREATH_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/breathe/restored-breath-ritual-state',
@@ -681,12 +701,12 @@ for (const file of walkTs(join(root, 'src'))) {
         failures.push(`${rel}: legacy session breath segment-log import (${needle})`);
       }
     }
-    if (
-      !rel.endsWith('pause-session-breath-io.ts') &&
-      !rel.endsWith('pause-session-breath-io.test.ts') &&
-      !rel.endsWith('pause-session-breath-step-navigation-io.ts') &&
-      !rel.endsWith('.test.tsx')
-    ) {
+    const breathIoAllowlisted =
+      rel.endsWith('pause-session-breath-io.ts') ||
+      rel.endsWith('pause-session-breath-io.test.ts') ||
+      rel.endsWith('pause-session-breath-step-navigation-io.ts') ||
+      rel.endsWith('pause-session-breath-step-navigation-io.test.ts');
+    if (!breathIoAllowlisted) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_RPC_FLAGS_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy session breath rpc-flags import (${needle})`);
@@ -700,6 +720,16 @@ for (const file of walkTs(join(root, 'src'))) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_HYDRATION_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy session breath hydration import (${needle})`);
+        }
+      }
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_DOMAIN_AUX_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy session breath domain aux import (${needle})`);
+        }
+      }
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy session breath-flow import (${needle})`);
         }
       }
     }
