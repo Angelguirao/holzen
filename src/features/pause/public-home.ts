@@ -32,7 +32,7 @@ export {
   type UsePauseCardProjectionParams,
 } from './presentation/home/use-pause-card-projection';
 export { useZenModeHomeRouteProps } from './presentation/home/use-zen-mode-home-route-props';
-export { groupBulkHoldByLocalDay } from './application/use-cases/home/bulk-hold/group-by-local-day';
+export { groupBulkHoldByLocalDay } from './presentation/home/bulk-hold/group-bulk-hold-by-local-day';
 export {
   formatBulkHoldContextQuote,
   formatBulkHoldLocalTime,

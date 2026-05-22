@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — home bulk-hold day grouping → presentation (Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>groupBulkHoldByLocalDay</code> colocated with Home bulk-hold I/O</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no reflect moves. Move read-model formatter from <code>application/use-cases/home/bulk-hold/group-by-local-day.ts</code> to <code>presentation/home/bulk-hold/group-bulk-hold-by-local-day.ts</code> beside <code>pause-home-bulk-hold-io.ts</code>; <code>apply-bulk-hold-outcomes</code> stays in <code>ritual/decide/</code>. <code>public-home</code> / <code>public-hooks</code> export paths unchanged for <code>BulkHoldCard</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mechanical relocation; no behavior change.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Tier 1 <code>holzen-query-client-ref</code> lib shim for <code>App.tsx</code>, or extend <code>pause-reflect-pending-offer-io-parity</code> adopt/decline pins.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — persisted-tab-session-io ↔ persisted-tab-session-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + flow comment only.</dd>
       <dt>Open question</dt>
-      <dd>Next: Phase B subscription Tier 1 shims or <code>home/bulk-hold/group-by-local-day</code> colocation.</dd>
+      <dd>Next: Phase B subscription Tier 1 shims.</dd>
     </dl>
   </article>
 
@@ -86,7 +103,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + flow/I/O comments only.</dd>
       <dt>Open question</dt>
-      <dd>Next: Phase B subscription Tier 1 shims, <code>home/bulk-hold/group-by-local-day</code> colocation, or persisted-tab-session I/O peel.</dd>
+      <dd>Next: Phase B subscription Tier 1 shims or persisted-tab-session I/O peel.</dd>
     </dl>
   </article>
 
