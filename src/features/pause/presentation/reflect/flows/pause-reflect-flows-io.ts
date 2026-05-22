@@ -6,6 +6,8 @@
  * Parity pins: `pause-reflect-flows-io.test.ts` (outcome wrapper distinctness + RPC delegation; ambience-io + pending-offer-io reciprocal inline pins),
  * `pause-reflect-flows-io-parity.test.ts` (colocated in this folder; application mirror
  * `application/.../flows/pause-reflect-flows-io-parity.test.ts` beside `pause-reflect-flows-flow`),
+ * `pause-reflect-flows-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow` (colocated wrapper parity;
+ * application mirror beside `pause-reflect-flows-flow.ts`),
  * `pause-reflect-flows-io-flow-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow`,
  * `pause-reflect-flows-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow` (application + presentation),
  * `pause-reflect-flows-decide-io-sibling-parity.test.ts` ↔ `pause-session-decide-io` (application
