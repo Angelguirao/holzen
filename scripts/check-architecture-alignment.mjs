@@ -487,14 +487,25 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IO_HOOK_FLOW_BUNDLE_IMPORTS =
   "from '../domain/reflect/generation/reflect-generation-hook-flow'",
 ];
 
-/** Application reflect telemetry/ — flow anchors live in generation/manual-open/ and share/. */
+/** Application reflect telemetry/ — Home manual-open flow stays in generation/manual-open/ (not telemetry/). */
 const LEGACY_PAUSE_APPLICATION_REFLECT_TELEMETRY_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow',
   "from './application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow'",
   "from '../application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow'",
-  "from './application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow'",
-  "from '../application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow'",
+];
+
+/** Session reflect UI telemetry — colocated under ritual/reflect/telemetry/ (not share/). */
+const LEGACY_PAUSE_APPLICATION_REFLECT_SHARE_SESSION_TELEMETRY_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-session-ui-telemetry',
+  "from './application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow'",
+  "from '../application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow'",
+  "from './application/use-cases/ritual/reflect/share/pause-reflect-session-ui-telemetry'",
+  "from '../application/use-cases/ritual/reflect/share/pause-reflect-session-ui-telemetry'",
+  "from '../share/pause-reflect-telemetry-flow'",
+  "from '../share/pause-reflect-session-ui-telemetry'",
+  "from './share/pause-reflect-telemetry-flow'",
+  "from './share/pause-reflect-session-ui-telemetry'",
 ];
 
 /** Session presentation (non-I/O) — import step motion via pause-session-step-transition-io only. */
@@ -940,7 +951,6 @@ const LEGACY_PAUSE_REFLECT_SHARE_FLOW_SUBCLUSTER_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-image-flow',
   '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-text-flow',
   '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-channel-urls-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow',
   "from './pause-reflect-share-orchestration-flow'",
   "from '../pause-reflect-share-orchestration-flow'",
   "from './pause-reflection-share-image-flow'",
@@ -949,8 +959,6 @@ const LEGACY_PAUSE_REFLECT_SHARE_FLOW_SUBCLUSTER_IMPORTS = [
   "from '../pause-reflection-share-text-flow'",
   "from './pause-reflection-share-channel-urls-flow'",
   "from '../pause-reflection-share-channel-urls-flow'",
-  "from './pause-reflect-telemetry-flow'",
-  "from '../pause-reflect-telemetry-flow'",
 ];
 
 /** Reflect share orchestration umbrella — compose leaf modules only (not share subcluster flow anchors). */
@@ -1439,6 +1447,9 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IMPORTS = [
 
 /** Share telemetry I/O — import session UI telemetry directly (not telemetry-flow anchor). */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IO_TELEMETRY_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow',
+  "from './application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow'",
+  "from '../application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow'",
   '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow',
   "from './application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow'",
   "from '../application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow'",
@@ -1932,6 +1943,11 @@ for (const file of walkTs(join(root, 'src'))) {
   for (const needle of LEGACY_PAUSE_APPLICATION_REFLECT_TELEMETRY_FLOW_IMPORTS) {
     if (text.includes(needle)) {
       failures.push(`${rel}: legacy application reflect telemetry flow import (${needle})`);
+    }
+  }
+  for (const needle of LEGACY_PAUSE_APPLICATION_REFLECT_SHARE_SESSION_TELEMETRY_IMPORTS) {
+    if (text.includes(needle)) {
+      failures.push(`${rel}: legacy application reflect share session telemetry import (${needle})`);
     }
   }
   for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS) {

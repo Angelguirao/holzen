@@ -11,10 +11,10 @@ const trackPauseReflectShareTapMock = vi.hoisted(() => vi.fn());
 const trackPauseReflectWallpaperTapMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-session-ui-telemetry',
+  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-session-ui-telemetry',
   async (importOriginal) => {
     const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-session-ui-telemetry')
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-session-ui-telemetry')
     >();
     return {
       ...actual,
