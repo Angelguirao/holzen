@@ -115,10 +115,6 @@ import {
   runPersistSilentReflectionStub,
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 import * as homeReflectIo from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
-import {
-  startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
-} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 
 /**
  * Presentation I/O parity (colocated beside `pause-reflect-generation-io.ts`).
@@ -235,22 +231,6 @@ describe('pause-reflect-generation-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (holzen-reflect vs frame-focus bed).
-   * Dedicated sibling file: `pause-reflect-ambience-generation-io-sibling-parity.test.ts` (application + presentation).
-   */
-  it('sibling cluster: ambience-io frame-focus bed exports stay distinct from generation-io', () => {
-    expect(pauseReflectGeneration).not.toBe(startPauseReflectFrameFocusAmbience);
-    expect(runReflectGeneration).not.toBe(stopPauseReflectFrameFocusAmbience);
-    expect(reflectGenerationPrerequisite).not.toBe(startPauseReflectFrameFocusAmbience);
-    expect(resolveReflectGenerationPrefetch).not.toBe(stopPauseReflectFrameFocusAmbience);
-    expect(shouldCommitReflectGeneration).not.toBe(startPauseReflectFrameFocusAmbience);
-    expect(messageFromReflectGenerationResult).not.toBe(stopPauseReflectFrameFocusAmbience);
-    expect(reflectGenerator).not.toBe(startPauseReflectFrameFocusAmbience);
-    // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
-    // Full pins: `pause-reflect-ambience-generation-io-sibling-parity.test.ts`.
-  });
-
-  /**
    * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (holzen-reflect vs reflect+decide flows).
    * Dedicated sibling file: `pause-reflect-flows-generation-io-sibling-parity.test.ts` (application + presentation).
    */
@@ -363,5 +343,23 @@ describe('pause-reflect-generation-io parity', () => {
     expect('pauseReflectGeneration' in homeReflectIo).toBe(false);
     expect('pauseHomeManualOpenPorts' in homeReflectIo).toBe(true);
     expect('reflectGenerator' in generationIo).toBe(true);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (holzen-reflect vs frame-focus bed).
+   * Dedicated sibling file: `pause-reflect-ambience-generation-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: ambience-io frame-focus bed exports stay distinct from generation-io', () => {
+    expect(pauseReflectGeneration).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(runReflectGeneration).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(reflectGenerationPrerequisite).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(resolveReflectGenerationPrefetch).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(shouldCommitReflectGeneration).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(messageFromReflectGenerationResult).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(reflectGenerator).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(reflectGenerator).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(pauseReflectGeneration).not.toBe(stopPauseReflectFrameFocusAmbience);
+    // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
+    // Full pins: `pause-reflect-ambience-generation-io-sibling-parity.test.ts`.
   });
 });
