@@ -22,6 +22,12 @@ import {
   isCompanionSectionVisible as isVisibleFromSectionFlow,
 } from './pause-companion-section-visibility-flow';
 import {
+  loadCompanionOrchestrateSession as loadSessionFromOrchestrationFlow,
+  nextExpandedWithLazyFetch as nextExpandedFromOrchestrationFlow,
+  persistCompanionUiStepCompletion as persistFromOrchestrationFlow,
+  runToggleCompanionLibraryFavorite as toggleFavoriteFromOrchestrationFlow,
+} from './pause-companion-orchestration-flow';
+import {
   COMPANION_FULL_VIEW_BREATHING_ROOM_MS,
   companionPrefsForFullViewSlot,
   getCompanionSectionVisibility,
@@ -54,5 +60,19 @@ describe('pause-companion-frame-ui-flow', () => {
     expect(companionPrefsForFullViewSlot).toBe(prefsForSlotFromFullViewFlow);
     expect(isCompanionFullViewSlotSettled).toBe(isSlotSettledFromFullViewFlow);
     expect(pauseSeverityToOrchestrateNumber).toBe(severityToNumberFromFullViewFlow);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-companion-orchestration-flow.test.ts` (frame UI vs session orchestration).
+   * Dedicated sibling file: `pause-companion-frame-ui-orchestration-flow-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: orchestration-flow exports stay distinct from frame-ui-flow', () => {
+    expect(getCompanionSectionVisibility).not.toBe(loadSessionFromOrchestrationFlow);
+    expect(isCompanionSectionVisible).not.toBe(nextExpandedFromOrchestrationFlow);
+    expect(companionPrefsForFullViewSlot).not.toBe(persistFromOrchestrationFlow);
+    expect(isCompanionFullViewSlotSettled).not.toBe(toggleFavoriteFromOrchestrationFlow);
+    expect(pauseSeverityToOrchestrateNumber).not.toBe(loadSessionFromOrchestrationFlow);
+    expect(COMPANION_FULL_VIEW_BREATHING_ROOM_MS).not.toBe(nextExpandedFromOrchestrationFlow);
+    // Reciprocal inline pins: `pause-companion-orchestration-flow.test.ts`.
   });
 });

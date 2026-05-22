@@ -4,7 +4,8 @@
  * Sibling CI anchor: `pause-companion-section-visibility-flow` (visibility only; composed by frame-ui-flow).
  * Presentation: `pause-companion-orchestration-io.ts` imports leaf modules directly.
  * Parity: `pause-companion-orchestration-section-visibility-sibling-parity.test.ts`;
- * `pause-companion-orchestrate-orchestration-flow-sibling-parity.test.ts` ↔ `pause-companion-orchestrate-flow`.
+ * `pause-companion-orchestrate-orchestration-flow-sibling-parity.test.ts` ↔ `pause-companion-orchestrate-flow`;
+ * `pause-companion-frame-ui-orchestration-flow-sibling-parity.test.ts` ↔ `pause-companion-frame-ui-flow`.
  */
 import {
   loadCompanionOrchestrateSession,
