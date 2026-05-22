@@ -1296,6 +1296,22 @@ const LEGACY_PAUSE_COMPANION_FRAME_UI_FLOW_SUBCLUSTER_IMPORTS = [
   "from '../pause-companion-section-visibility-flow'",
 ];
 
+/** Companion orchestration umbrella — compose leaf modules only (not orchestration subcluster flow anchors). */
+const LEGACY_PAUSE_COMPANION_ORCHESTRATION_FLOW_SUBCLUSTER_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-session-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-section-expansion-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-ui-completion-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-library-favorite-flow',
+  "from './pause-companion-orchestrate-session-flow'",
+  "from '../pause-companion-orchestrate-session-flow'",
+  "from './pause-companion-section-expansion-flow'",
+  "from '../pause-companion-section-expansion-flow'",
+  "from './pause-companion-ui-completion-flow'",
+  "from '../pause-companion-ui-completion-flow'",
+  "from './pause-companion-library-favorite-flow'",
+  "from '../pause-companion-library-favorite-flow'",
+];
+
 /** Companion orchestration presentation — import via pause-companion-orchestration-io only. */
 const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_DOMAIN_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session',
@@ -2571,6 +2587,15 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: companion frame UI umbrella flow must import leaf modules directly (${needle})`,
+        );
+      }
+    }
+  }
+  if (rel === 'src/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow.ts') {
+    for (const needle of LEGACY_PAUSE_COMPANION_ORCHESTRATION_FLOW_SUBCLUSTER_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: companion orchestration umbrella flow must import leaf modules directly (${needle})`,
         );
       }
     }
