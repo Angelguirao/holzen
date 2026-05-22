@@ -814,6 +814,13 @@ const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_IO_UMBRELLA_FLOW_IMPORTS
   "from '../application/use-cases/ritual/frame/pause-companion-orchestration-flow'",
 ];
 
+/** Companion orchestrate I/O — import frame leaf modules only (not pause-companion-orchestrate-flow umbrella). */
+const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATE_IO_UMBRELLA_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow',
+  "from './application/use-cases/ritual/frame/pause-companion-orchestrate-flow'",
+  "from '../application/use-cases/ritual/frame/pause-companion-orchestrate-flow'",
+];
+
 /** Companion orchestration presentation — import via pause-companion-orchestration-io only. */
 const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_DOMAIN_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session',
@@ -825,6 +832,16 @@ const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_DOMAIN_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-ui-completion-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-library-favorite-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-section-expansion-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow',
+  '@/features/pause/application/use-cases/ritual/frame/run-companion-slot-orchestrate',
+  '@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap',
+  '@/features/pause/application/use-cases/ritual/frame/apply-companion-orchestrate-retry-reset',
+  '@/features/pause/application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome',
+  '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry',
+  '@/features/pause/application/use-cases/ritual/frame/companion-generation-telemetry',
+  '@/features/pause/application/use-cases/ritual/frame/companion-slot-ui-state',
+  '@/features/pause/application/use-cases/ritual/frame/intervention-idempotency',
+  '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply',
   "from './load-companion-orchestrate-session'",
   "from '../load-companion-orchestrate-session'",
   "from './persist-ui-step-completion'",
@@ -1814,6 +1831,18 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: companion orchestration I/O must import via orchestration subcluster flows (${needle})`,
+        );
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-companion-orchestrate-io.ts') ||
+    rel.endsWith('pause-companion-orchestrate-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATE_IO_UMBRELLA_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: companion orchestrate I/O must import frame leaf modules (${needle})`,
         );
       }
     }
