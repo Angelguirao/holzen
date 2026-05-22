@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — generation↔share dedicated sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-share-flow-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated sibling parity test so <code>pause-reflect-generation-flow</code> and <code>pause-reflect-share-flow</code> CI anchors stay namespace-separated (parity with flows↔share and share↔telemetry; complements inline pins in cluster <code>*.test.ts</code> files).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow header comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: hub↔share dedicated sibling file, generation↔telemetry dedicated sibling file, or Phase B subscription/auth Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — flows↔share inline sibling pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

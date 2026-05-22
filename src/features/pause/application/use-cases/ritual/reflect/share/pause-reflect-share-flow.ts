@@ -6,7 +6,8 @@
  * `pause-reflect-share-telemetry-flow-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-flow`;
  * `pause-reflect-share-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-flow`;
  * `pause-reflect-flows-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow`;
- * `pause-reflect-steps-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow`.
+ * `pause-reflect-steps-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow`;
+ * `pause-reflect-generation-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-generation-flow`.
  */
 export type { DeliverReflectionShareImageDeps } from './deliver-reflection-share-image';
 export { runReflectionShareImage } from './run-reflection-share-image';
