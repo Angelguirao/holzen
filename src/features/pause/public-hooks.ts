@@ -354,7 +354,7 @@ export {
   type UsePauseSessionBreathNavigationParams,
 } from './presentation/session/breath/use-pause-session-breath-navigation';
 export { usePauseSessionExitNavigation } from './presentation/session/use-pause-session-exit-navigation';
-export { usePauseSessionPendingPauseOfferNavigation } from './presentation/session/use-pause-session-pending-pause-offer-navigation';
+export { usePauseSessionPendingPauseOfferNavigation } from './presentation/reflect/pending-offer/use-pause-session-pending-pause-offer-navigation';
 export { usePauseSessionPendingLeaveSheet } from './presentation/reflect/pending-offer/use-pause-session-pending-leave-sheet';
 export { usePauseSessionEntryPresentationEffects } from './presentation/session/use-pause-session-entry-presentation-effects';
 export { usePauseSessionTerminalEntryRedirect } from './presentation/session/use-pause-session-terminal-entry-redirect';
