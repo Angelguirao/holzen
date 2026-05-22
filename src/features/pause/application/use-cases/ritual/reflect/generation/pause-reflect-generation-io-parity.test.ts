@@ -71,10 +71,15 @@ import {
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   getPendingPauseOfferDisplay,
@@ -218,35 +223,51 @@ describe('pause-reflect-generation-io parity (application)', () => {
    */
   it('sibling cluster: session reflect telemetry-io exports stay distinct from generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(trackPauseReflectPostItOpen);
-    expect(runReflectGeneration).not.toBe(trackPauseReflectShareTap);
+    expect(pauseReflectGeneration).not.toBe(trackPauseReflectShareTap);
+    expect(pauseReflectGeneration).not.toBe(trackPauseReflectWallpaperTap);
     expect(reflectGenerator).not.toBe(trackPauseReflectPostItOpen);
+    expect(runReflectGeneration).not.toBe(trackPauseReflectShareTap);
+    expect(reflectGenerationPrerequisite).not.toBe(trackPauseReflectWallpaperTap);
+    // Reciprocal inline pins: `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
   });
 
   /**
    * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (presentation).
+   * Dedicated sibling file: `pause-reflect-steps-generation-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: steps-io exports stay distinct from generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(pauseReflectFavoriteToggle);
     expect(runReflectGeneration).not.toBe(pauseReflectNoteUpdate);
+    expect(reflectGenerationPrerequisite).not.toBe(pauseReflectTagUpdate);
+    expect(resolveReflectGenerationPrefetch).not.toBe(pauseReflectionStepLogOnce);
+    expect(shouldCommitReflectGeneration).not.toBe(shouldShowFavoriteProHint);
+    expect(messageFromReflectGenerationResult).not.toBe(shouldLogPauseReflectionStep);
     expect(reflectGenerator).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseReflectGeneration).not.toBe(pauseReflectTagUpdate);
+    // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
+    // Full pins: `pause-reflect-steps-generation-io-sibling-parity.test.ts`.
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts` (presentation).
+   * Reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: pending-offer-io exports stay distinct from generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(pauseAdoptPendingOffer);
     expect(runReflectGeneration).not.toBe(pauseDeclinePendingOffer);
+    expect(runReflectGeneration).not.toBe(getPendingPauseOfferDisplay);
+    expect(reflectGenerator).not.toBe(pauseAdoptPendingOffer);
     expect(reflectGenerator).not.toBe(getPendingPauseOfferDisplay);
     expect(reflectGenerationPrerequisite).not.toBe(pauseAdoptPendingOffer);
     expect(resolveReflectGenerationPrefetch).not.toBe(getPendingPauseOfferDisplay);
     expect(pauseReflectGeneration).not.toBe(pauseAdoptPendingOfferWithRepository);
     expect(runReflectGeneration).not.toBe(pauseDeclinePendingOfferWithRepository);
     expect(reflectGenerator).not.toBe(reflectPauseRepository);
+    expect(shouldCommitReflectGeneration).not.toBe(pauseAdoptPendingOffer);
     expect(shouldCommitReflectGeneration).not.toBe(pauseAdoptPendingOfferWithRepository);
-    expect(runReflectGeneration).not.toBe(getPendingPauseOfferDisplay);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseDeclinePendingOfferWithRepository);
     // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts` (application + presentation).
-    // Dedicated sibling: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`.
+    // Full pins: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`.
   });
 
   /**
