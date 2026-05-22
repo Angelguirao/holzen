@@ -14,7 +14,15 @@ import {
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
   runReflectionShareImage,
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
 } from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow';
+import {
+  trackPauseReflectPostItOpen as trackPostItFromTelemetryIo,
+  trackPauseReflectShareTap as trackShareTapFromTelemetryIo,
+  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryIo,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   buildReflectionShareTelegramUrl as buildTelegramFromShareIo,
   buildReflectionShareText as buildTextFromShareIo,
@@ -29,6 +37,9 @@ describe('pause-reflect-share-io parity', () => {
     expect(buildReflectionShareTweetUrl).toBe(buildTweetFromShareIo);
     expect(buildReflectionShareTelegramUrl).toBe(buildTelegramFromShareIo);
     expect(buildReflectionShareWhatsAppUrl).toBe(buildWhatsAppFromShareIo);
+  });
+
+  it('share CI umbrella composes the same run-reflection-share-image leaf as presentation I/O', () => {
     expect(runReflectionShareImage).toBe(runReflectionShareImageDirect);
   });
 
@@ -41,5 +52,11 @@ describe('pause-reflect-share-io parity', () => {
   it('share orchestration CI umbrella composes deliver + run leaf modules', () => {
     expect(deliverReflectionShareImage).toBe(deliverReflectionShareImageDirect);
     expect(runReflectionShareImageFromOrchestration).toBe(runReflectionShareImageDirect);
+  });
+
+  it('share CI umbrella session UI telemetry matches presentation telemetry I/O', () => {
+    expect(trackPauseReflectPostItOpen).toBe(trackPostItFromTelemetryIo);
+    expect(trackPauseReflectShareTap).toBe(trackShareTapFromTelemetryIo);
+    expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperFromTelemetryIo);
   });
 });
