@@ -31953,4 +31953,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate companion analytics-io parity (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-analytics-io-parity.test.ts</code> → <code>presentation/companion/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) folder moves remain complete. Colocate analytics I/O parity beside <code>pause-companion-analytics-io.ts</code> (parity with orchestrate-io and orchestration-io colocation). Imports <code>pause-companion-analytics-flow</code> CI umbrella for <code>.toBe</code> identity pins only; production analytics I/O keeps ritual/frame leaf imports. Application orchestrate distinctness sibling tests stay under <code>application/.../ritual/frame/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — file move + comment anchors only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: extend <code>pause-companion-orchestration-io-parity</code> persist/favorite leaf pins, or Phase B Tier 1 lib shim scan.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
