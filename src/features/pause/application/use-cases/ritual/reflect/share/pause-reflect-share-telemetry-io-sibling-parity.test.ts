@@ -21,7 +21,8 @@ import {
  * `pause-reflect-share-telemetry-io-sibling-parity.test.ts` and flow-level
  * `pause-reflect-share-telemetry-flow-sibling-parity.test.ts`).
  * Reciprocal inline pins: `pause-reflect-share-io-parity.test.ts` ↔
- * `pause-reflect-telemetry-io-parity.test.ts`.
+ * `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts` ↔
+ * `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts`.
  */
 describe('pause-reflect-share-io ↔ pause-reflect-telemetry-io sibling parity (application)', () => {
   it('share-io and telemetry-io are distinct presentation I/O surfaces', () => {

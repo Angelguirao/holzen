@@ -3,7 +3,7 @@
  * Colocated under `presentation/reflect/telemetry/` (parity with application `ritual/reflect/telemetry/pause-reflect-session-ui-telemetry`).
  * Imports trackers from `pause-reflect-session-ui-telemetry` directly (parity with
  * `pause-reflect-generation-io` leaf imports; not share umbrella or telemetry-flow anchor).
- * Parity pins: `pause-reflect-telemetry-io.test.ts` (reciprocal pending-offer + generation-io sibling pins),
+ * Parity pins: `pause-reflect-telemetry-io.test.ts` (reciprocal pending-offer + generation-io sibling pins), `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts` (application I/O ↔ umbrella + leaf + share-flow),
  * `pause-reflect-telemetry-io.re-exports.test.ts` ↔ `pause-reflect-generation-io.re-exports.test.ts` (reciprocal inline pins),
  * `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (application
  * `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
