@@ -108,6 +108,7 @@ import {
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import * as hubIo from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import * as moodIo from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import * as shareIo from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
@@ -254,6 +255,22 @@ describe('pause-reflect-mood-io parity (application)', () => {
     expect('buildFeelTilesMoodLogOptions' in hubIo).toBe(false);
     expect('resolvePauseSessionChromeCloseAction' in hubIo).toBe(false);
     // Reciprocal inline pins: `hub/pause-reflect-hub-io-parity.test.ts` (application + presentation).
+  });
+
+  it('presentation mood-io and share-io I/O namespaces stay separated (reciprocal inline)', () => {
+    expect('pauseReflectionShareImage' in moodIo).toBe(false);
+    expect('buildReflectionShareText' in moodIo).toBe(false);
+    expect('buildReflectionShareTweetUrl' in moodIo).toBe(false);
+    expect('buildReflectionShareTelegramUrl' in moodIo).toBe(false);
+    expect('buildReflectionShareWhatsAppUrl' in moodIo).toBe(false);
+
+    expect('pauseInitialEmotionSelect' in shareIo).toBe(false);
+    expect('pauseInitialEmotionSkip' in shareIo).toBe(false);
+    expect('pauseInitialEmotionSelectWithRepository' in shareIo).toBe(false);
+    expect('pauseInitialEmotionSkipWithRepository' in shareIo).toBe(false);
+    expect('buildFeelTilesMoodLogOptions' in shareIo).toBe(false);
+    expect('resolvePauseSessionChromeCloseAction' in shareIo).toBe(false);
+    // Reciprocal inline pins: `share/pause-reflect-share-io-parity.test.ts` (application + presentation).
   });
 
   /**

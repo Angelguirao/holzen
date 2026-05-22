@@ -114,6 +114,7 @@ import {
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import * as hubIo from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import * as moodIo from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import * as shareIo from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 describe('pause-reflect-hub-io parity (application)', () => {
@@ -284,6 +285,20 @@ describe('pause-reflect-hub-io parity (application)', () => {
     expect('buildShiftEmotionFrameHubLogBundle' in moodIo).toBe(false);
     expect('resolveShiftFrameHubDonePresentation' in moodIo).toBe(false);
     // Reciprocal inline pins: `mood/pause-reflect-mood-io-parity.test.ts` (application + presentation).
+  });
+
+  it('presentation hub-io and share-io I/O namespaces stay separated (reciprocal inline)', () => {
+    expect('pauseReflectionShareImage' in hubIo).toBe(false);
+    expect('buildReflectionShareText' in hubIo).toBe(false);
+    expect('buildReflectionShareTweetUrl' in hubIo).toBe(false);
+    expect('buildReflectionShareTelegramUrl' in hubIo).toBe(false);
+    expect('buildReflectionShareWhatsAppUrl' in hubIo).toBe(false);
+
+    expect('pauseShiftEmotionFrameHubDone' in shareIo).toBe(false);
+    expect('pauseShiftEmotionFrameHubDoneWithRepository' in shareIo).toBe(false);
+    expect('buildShiftEmotionFrameHubLogBundle' in shareIo).toBe(false);
+    expect('resolveShiftFrameHubDonePresentation' in shareIo).toBe(false);
+    // Reciprocal inline pins: `share/pause-reflect-share-io-parity.test.ts` (application + presentation).
   });
 
   /**
