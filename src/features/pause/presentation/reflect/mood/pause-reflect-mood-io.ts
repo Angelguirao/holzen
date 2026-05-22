@@ -8,9 +8,11 @@
  * `pause-reflect-generation-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`,
  * `pause-reflect-mood-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
  * `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
- * `pause-reflect-flows-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`, and
- * `pause-reflect-ambience-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`;
- * `pause-reflect-mood-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`.
+ * `pause-reflect-flows-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`,
+ * `pause-reflect-mood-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`, and
+ * `pause-reflect-ambience-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`.
+ * Reciprocal inline pins: `pause-reflect-mood-io.test.ts` ↔ `pause-reflect-flows-io.test.ts` and
+ * `pause-reflect-telemetry-io.test.ts`.
  */
 import {
   runInitialEmotionSelect,

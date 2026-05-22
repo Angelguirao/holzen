@@ -23,14 +23,16 @@ import { runDeepPausePickerEntryIfPro as runDeepPickerDirect } from '@/features/
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
+  buildPauseScoreImpacts,
+  pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
-import {
-  pauseReflectOutcomeLog,
-  resolvePauseSessionReflectAndDecidePreflight,
-} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
@@ -195,6 +197,16 @@ describe('pause-reflect-mood-io', () => {
     expect(buildFeelTilesMoodLogOptions).not.toBe(buildShiftEmotionFrameHubLogBundle);
     expect(buildFeelTilesMoodLogOptions).not.toBe(resolveShiftFrameHubDonePresentation);
     // Full cross-I/O pins: `pause-reflect-mood-hub-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: flows-io exports stay distinct from mood-io', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(pauseInitialEmotionSkip).not.toBe(pauseReflectOutcomeLog);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseInitialEmotionSelect);
+    expect(buildPauseScoreImpacts).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(buildPauseScoreImpacts).not.toBe(pauseInitialEmotionSkip);
+    // Full cross-I/O pins: `pause-reflect-flows-mood-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: session reflect telemetry-io exports stay distinct from mood-io', () => {

@@ -212,5 +212,6 @@ describe('pause-reflect-flows-io', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseInitialEmotionSelect);
     expect(buildPauseScoreImpacts).not.toBe(pauseInitialEmotionSkip);
     expect(buildPauseScoreImpacts).not.toBe(buildFeelTilesMoodLogOptions);
+    // Reciprocal inline pins: `pause-reflect-mood-io.test.ts`.
   });
 });
