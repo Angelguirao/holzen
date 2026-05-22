@@ -140,6 +140,7 @@ describe('pause-home-reflect-io parity (application)', () => {
     expect(pauseHomeManualOpenPorts).not.toBe(reflectGenerator);
     expect(persistStubFromHomeIo).not.toBe(shouldCommitReflectGeneration);
     expect(pauseDismissOpenPauseHomePreview).not.toBe(pauseReflectGeneration);
-    // Reciprocal inline pins: `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
+    // Reciprocal inline pins: `application/.../generation/pause-reflect-generation-io-parity.test.ts`,
+    // `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
   });
 });
