@@ -523,6 +523,7 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_CLUSTER_IMPORTS = [
   '@/features/pause/presentation/session/use-pending-pause-offer',
   '@/features/pause/presentation/session/use-pending-pause-offer-mutations',
   '@/features/pause/presentation/session/use-pause-session-pending-leave-sheet',
+  '@/features/pause/presentation/session/use-pause-session-pending-pause-offer-navigation',
   "from './presentation/session/pause-session-pending-offer-io'",
   "from './presentation/session/pause-session-pending-offer-telemetry-io'",
   "from './presentation/session/use-pending-pause-offer'",
@@ -533,6 +534,8 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_CLUSTER_IMPORTS = [
   "from '../presentation/session/use-pending-pause-offer'",
   "from '../presentation/session/use-pending-pause-offer-mutations'",
   "from '../presentation/session/use-pause-session-pending-leave-sheet'",
+  "from './presentation/session/use-pause-session-pending-pause-offer-navigation'",
+  "from '../presentation/session/use-pause-session-pending-pause-offer-navigation'",
 ];
 
 /** Deep session telemetry in presentation/session — use telemetry-io only. */

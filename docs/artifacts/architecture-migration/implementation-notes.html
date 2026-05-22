@@ -20635,4 +20635,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — pending-offer navigation into reflect/pending-offer (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate <code>use-pause-session-pending-pause-offer-navigation</code> with pending-offer cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no application folder moves. Completes the prior pending-offer presentation slice: move adopt/resync navigation hook (+ test) from <code>presentation/session/</code> to <code>presentation/reflect/pending-offer/</code>; <code>public-hooks</code> and session shell bootstrap import paths only. Hook still clears tab session via <code>pause-persisted-tab-session-io</code> (session-scoped port).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; path colocation only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session shell imports pending-offer navigation from reflect presentation (cross-subfolder within session bootstrap).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim, or archive decide I/O peel when pause Tier 5 is clean.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

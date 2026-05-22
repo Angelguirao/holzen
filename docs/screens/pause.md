@@ -59,7 +59,7 @@ Presentation hooks (`src/features/pause/presentation/session/`, `presentation/re
 
 ## Navigation out
 
-[`usePauseSessionExitNavigation`](../../src/features/pause/presentation/session/use-pause-session-exit-navigation.ts) (`public-hooks`) provides close/return handlers consumed by the gate and scaffold. Pending-offer **read** + display copy: [`public-home`](../../src/features/pause/public-home.ts) (`usePendingPauseOffer`, `getPendingPauseOfferDisplay`) in `PendingPauseOfferShell`; **mutations**: [`public-session`](../../src/features/pause/public-session.ts) (`usePendingPauseOfferMutations`; `public-hooks` re-exports). `PauseLeaveWithPendingSheet` uses a presentation-local mutation hook. Adopt/resync navigation: [`usePauseSessionPendingPauseOfferNavigation`](../../src/features/pause/presentation/session/use-pause-session-pending-pause-offer-navigation.ts).
+[`usePauseSessionExitNavigation`](../../src/features/pause/presentation/session/use-pause-session-exit-navigation.ts) (`public-hooks`) provides close/return handlers consumed by the gate and scaffold. Pending-offer **read** + display copy: [`public-home`](../../src/features/pause/public-home.ts) (`usePendingPauseOffer`, `getPendingPauseOfferDisplay`) in `PendingPauseOfferShell`; **mutations**: [`public-session`](../../src/features/pause/public-session.ts) (`usePendingPauseOfferMutations`; `public-hooks` re-exports). `PauseLeaveWithPendingSheet` uses a presentation-local mutation hook. Adopt/resync navigation: [`usePauseSessionPendingPauseOfferNavigation`](../../src/features/pause/presentation/reflect/pending-offer/use-pause-session-pending-pause-offer-navigation.ts) (`public-hooks`).
 
 ## Analytics
 

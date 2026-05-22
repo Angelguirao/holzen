@@ -9,7 +9,7 @@ import { parsePauseSessionLocationState } from '@/features/pause/public-navigati
 import type { PauseSessionShellHolzen } from '@/features/pause/domain/pause-session-shell-holzen';
 import { usePauseSessionMountLog } from './use-pause-session-mount-log';
 import { usePauseSessionPendingLeaveSheet } from '@/features/pause/presentation/reflect/pending-offer/use-pause-session-pending-leave-sheet';
-import { usePauseSessionPendingPauseOfferNavigation } from './use-pause-session-pending-pause-offer-navigation';
+import { usePauseSessionPendingPauseOfferNavigation } from '@/features/pause/presentation/reflect/pending-offer/use-pause-session-pending-pause-offer-navigation';
 import { usePauseSessionShell } from './use-pause-session-shell';
 import { usePendingPauseOffer } from '@/features/pause/presentation/reflect/pending-offer/use-pending-pause-offer';
 
