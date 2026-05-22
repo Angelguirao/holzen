@@ -509,6 +509,28 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_DECIDE_IMPACT_IMPORTS = [
   "from '../presentation/reflect/flows/pause-reflect-flows-io'",
 ];
 
+/** Session application — import PauseImpactData from domain only (not session decide-flow). */
+const LEGACY_PAUSE_SESSION_APPLICATION_DECIDE_FLOW_IMPACT_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pause-session-decide-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow',
+  '@/features/pause/application/use-cases/ritual/decide/impact-data',
+  "from '@/features/pause/application/use-cases/session/pause-session-decide-flow'",
+  "from '../application/use-cases/session/pause-session-decide-flow'",
+  "from './application/use-cases/session/pause-session-decide-flow'",
+  "from './application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
+  "from '../application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
+  "from './application/use-cases/ritual/decide/impact-data'",
+  "from '../application/use-cases/ritual/decide/impact-data'",
+];
+
+/** public-hooks — export PauseImpactData from domain only (not session decide-flow). */
+const LEGACY_PAUSE_PUBLIC_HOOKS_IMPACT_TYPE_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pause-session-decide-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow',
+  "from './application/use-cases/session/pause-session-decide-flow'",
+  "from '../application/use-cases/session/pause-session-decide-flow'",
+];
+
 /** Session decide I/O — import PauseImpactData from domain only (not session decide-flow). */
 const LEGACY_PAUSE_SESSION_DECIDE_IO_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/session/pause-session-decide-flow',
@@ -2042,6 +2064,20 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PUBLIC_HOOKS_SCORE_IMPACT_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: public-hooks score impact must import public-ritual-reflect (${needle})`);
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PUBLIC_HOOKS_IMPACT_TYPE_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: public-hooks PauseImpactData must export domain/pause-impact-data (${needle})`);
+      }
+    }
+  }
+  if (rel === 'src/features/pause/application/use-cases/session/step-bundle-types.ts') {
+    for (const needle of LEGACY_PAUSE_SESSION_APPLICATION_DECIDE_FLOW_IMPACT_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: session step bundles must import PauseImpactData from domain/pause-impact-data (${needle})`,
+        );
       }
     }
   }
