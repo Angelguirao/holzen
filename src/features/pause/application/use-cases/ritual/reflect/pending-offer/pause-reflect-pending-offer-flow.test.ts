@@ -34,6 +34,11 @@ import {
   shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
   shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
 } from '../steps/pause-reflect-steps-flow';
+import {
+  buildReflectionShareText as buildShareTextFromShareFlow,
+  runReflectionShareImage as runShareImageFromShareFlow,
+  trackPauseReflectPostItOpen as trackPostItFromShareFlow,
+} from '../share/pause-reflect-share-flow';
 
 describe('pause-reflect-pending-offer-flow', () => {
   it('re-exports pending-offer RPC use cases, display projection, and telemetry trackers from leaf modules', () => {
@@ -69,5 +74,14 @@ describe('pause-reflect-pending-offer-flow', () => {
     expect(trackAdoptedFromFlow).not.toBe(runReflectionStepFromStepsFlow);
     expect(trackDeclinedFromFlow).not.toBe(shouldShowFavoriteFromStepsFlow);
     expect(trackAbandonedFromFlow).not.toBe(shouldLogFromStepsFlow);
+  });
+
+  it('sibling cluster: share-flow exports stay distinct from pending-offer umbrella exports', () => {
+    expect(runAdoptPendingPauseOffer).not.toBe(runShareImageFromShareFlow);
+    expect(runDeclinePendingPauseOffer).not.toBe(buildShareTextFromShareFlow);
+    expect(getDisplayFromFlow).not.toBe(trackPostItFromShareFlow);
+    expect(trackAdoptedFromFlow).not.toBe(runShareImageFromShareFlow);
+    expect(trackDeclinedFromFlow).not.toBe(buildShareTextFromShareFlow);
+    expect(trackAbandonedFromFlow).not.toBe(trackPostItFromShareFlow);
   });
 });
