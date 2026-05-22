@@ -38,7 +38,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
  * Flows-io cross-surface: `pause-reflect-flows-io-parity.test.ts` ↔ this file;
  * `pause-reflect-flows-steps-io-sibling-parity.test.ts` (application + presentation).
  * Steps-io ↔ mood-io: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts`.
+ * reciprocal inline pins ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
  * Steps-io ↔ ambience-io: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts`.
  * Steps-io ↔ telemetry-io: `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` (application + presentation);
@@ -304,7 +304,7 @@ describe('pause-reflect-steps-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (step RPC wrappers vs initial-emotion mood).
+   * Reciprocal inline pins ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts` (step RPC wrappers vs initial-emotion mood).
    * Dedicated sibling file: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: mood-io exports stay distinct from steps-io wrappers', () => {
@@ -317,7 +317,7 @@ describe('pause-reflect-steps-io parity', () => {
     expect(pauseReflectionStepLogOnceWithRepository).not.toBe(pauseInitialEmotionSkip);
     expect(shouldShowFromStepsIo).not.toBe(buildFeelTilesMoodLogOptions);
     expect(shouldLogFromStepsIo).not.toBe(pauseInitialEmotionSkip);
-    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
   });
 
   /**

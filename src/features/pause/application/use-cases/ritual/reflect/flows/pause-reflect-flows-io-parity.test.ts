@@ -245,7 +245,7 @@ describe('pause-reflect-flows-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (reflect+decide vs initial-emotion mood).
+   * Reciprocal inline pins ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts` (reflect+decide vs initial-emotion mood).
    * Dedicated sibling file: `pause-reflect-flows-mood-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: mood-io exports stay distinct from flows-io', () => {
@@ -259,7 +259,7 @@ describe('pause-reflect-flows-io parity', () => {
     expect(getSessionQuote).not.toBe(pauseInitialEmotionSkip);
     expect(showPauseOutcomeNotCompletedToast).not.toBe(buildFeelTilesMoodLogOptions);
     expect(showPauseOutcomeSaveFailedToast).not.toBe(resolvePauseSessionChromeCloseAction);
-    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-mood-io-sibling-parity.test.ts`.
   });
 
