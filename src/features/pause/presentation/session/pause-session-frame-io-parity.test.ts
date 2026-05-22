@@ -4,6 +4,10 @@ import { initialFrameDoneFromRestored as initialFrameDoneDirect } from '@/featur
 import { initialFrameDoneFromRestored } from '@/features/pause/application/use-cases/session/pause-session-frame-flow';
 import { initialFrameDoneFromRestored as initialFrameDoneFromFrameIo } from '@/features/pause/presentation/session/pause-session-frame-io';
 
+/**
+ * Presentation I/O parity (colocated beside `pause-session-frame-io.ts`).
+ * Imports `pause-session-frame-flow` CI umbrella for `.toBe` identity pins only — production frame I/O keeps `restored-frame-ritual-state` leaf import.
+ */
 describe('pause-session-frame-io parity', () => {
   it('presentation I/O frame exports match pause-session-frame-flow CI umbrella', () => {
     expect(initialFrameDoneFromRestored).toBe(initialFrameDoneFromFrameIo);

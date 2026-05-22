@@ -3289,13 +3289,16 @@ for (const file of walkTs(join(root, 'src'))) {
   if (
     rel.endsWith('pause-session-frame-io.ts') ||
     rel.endsWith('pause-session-frame-io.test.ts') ||
-    rel.endsWith('pause-session-frame-io.re-exports.test.ts')
+    rel.endsWith('pause-session-frame-io.re-exports.test.ts') ||
+    rel.endsWith('pause-session-frame-io-parity.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_FRAME_IO_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: session frame I/O must import restored-frame-ritual-state directly (${needle})`,
-        );
+    if (!rel.endsWith('pause-session-frame-io-parity.test.ts')) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_FRAME_IO_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: session frame I/O must import restored-frame-ritual-state directly (${needle})`,
+          );
+        }
       }
     }
   }
