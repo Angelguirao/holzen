@@ -124,6 +124,13 @@ import {
   runReflectGeneration,
   shouldCommitReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import {
+  buildReflectionShareTelegramUrl,
+  buildReflectionShareText,
+  buildReflectionShareTweetUrl,
+  buildReflectionShareWhatsAppUrl,
+  pauseReflectionShareImage,
+} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
@@ -308,6 +315,25 @@ describe('pause-reflect-flows-io parity', () => {
     expect(buildPauseScoreImpacts).not.toBe(trackPauseReflectShareTap);
     // Reciprocal inline pins: `pause-reflect-telemetry-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-telemetry-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` (reflect+decide vs reflection share).
+   * Dedicated sibling file: `pause-reflect-flows-share-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: share-io exports stay distinct from flows-io', () => {
+    expect(pauseReflectOutcomeLog).not.toBe(pauseReflectionShareImage);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseReflectionShareImage);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(buildReflectionShareText);
+    expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(buildReflectionShareTelegramUrl);
+    expect(formatReinforcementQuoteFromSession).not.toBe(buildReflectionShareTweetUrl);
+    expect(resolvePauseDecideOutcomeFlow).not.toBe(buildReflectionShareWhatsAppUrl);
+    expect(buildPauseScoreImpacts).not.toBe(pauseReflectionShareImage);
+    expect(getSessionQuote).not.toBe(buildReflectionShareText);
+    expect(showPauseOutcomeNotCompletedToast).not.toBe(pauseReflectionShareImage);
+    expect(showPauseOutcomeSaveFailedToast).not.toBe(buildReflectionShareTelegramUrl);
+    // Reciprocal inline pins: `pause-reflect-share-io-parity.test.ts`.
+    // Full pins: `pause-reflect-flows-share-io-sibling-parity.test.ts`.
   });
 
   /**
