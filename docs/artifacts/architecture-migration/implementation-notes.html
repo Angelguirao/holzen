@@ -30015,19 +30015,6 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
-      <span>Phase B — peel dead holzen-query-client-ref lib shim (Tier 1)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>src/lib/holzen-query-client-ref*</code> removal</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Phase A pause interior backlog complete. <code>App.tsx</code> already registers TanStack <code>QueryClient</code> via <code>@/features/pause/public-queries</code>; delete unused <code>src/lib/holzen-query-client-ref*</code> re-export shim and lib parity tests. Implementation stays in <code>features/pause/infrastructure/holzen-query-client-ref.ts</code> with infrastructure parity pin.</dd>
-      <dt>Deviation</dt>
-      <dd>None — dead shim removal only.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: <code>subscription-checkout-guard-ref</code> lib shim for <code>App.tsx</code> checkout cleanup.</dd>
-=======
       <span>Phase A — application ambience-flow ↔ pending-offer-flow sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -30039,7 +30026,23 @@
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B subscription/auth Tier 1 shim scan, or session presentation I/O re-exports parity gaps (e.g. providers-io).</dd>
->>>>>>> b1a2297ec (test(pause): application ambience-flow ↔ pending-offer-flow sibling parity)
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase B — peel dead holzen-query-client-ref lib shim (Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>src/lib/holzen-query-client-ref*</code> removal</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Phase A pause interior backlog complete. <code>App.tsx</code> already registers TanStack <code>QueryClient</code> via <code>@/features/pause/public-queries</code>; delete unused <code>src/lib/holzen-query-client-ref*</code> re-export shim and lib parity tests. Implementation stays in <code>features/pause/infrastructure/holzen-query-client-ref.ts</code> with infrastructure parity pin.</dd>
+      <dt>Deviation</dt>
+      <dd>None — dead shim removal only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>subscription-checkout-guard-ref</code> lib shim for <code>App.tsx</code> checkout cleanup.</dd>
     </dl>
   </article>
 
