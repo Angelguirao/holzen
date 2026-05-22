@@ -91,4 +91,5 @@ describe('pause-session-breath-io re-exports', () => {
     expect(resolvePauseBreathSecondLabelVariant).toBe(resolveSecondLabelDirect);
     expect(viteWantsPauseBreathSecondLabelShift).toBe(viteWantsShiftDirect);
   });
+
 });

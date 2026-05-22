@@ -86,7 +86,24 @@
       <dt>Deviation</dt>
       <dd><code>check:architecture-alignment</code> allowlists <code>pause-reflect-steps-io.re-exports.test.ts</code> to import <code>pause-reflect-steps-flow</code> for parity pins only (parity with <code>pause-reflect-generation-io.re-exports.test.ts</code>).</dd>
       <dt>Open question</dt>
-      <dd>Superseded by flows-io parity + session breath umbrella pins (same day).</dd>
+      <dd>Superseded by flows-io parity + session breath cluster pin slice (same day).</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session breath cluster subcluster pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-breath-cluster.test.ts</code> + breath I/O ↔ breath-flow parity</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Extend session breath cluster marker test with consolidated <code>.toBe(direct)</code> pins for <code>pause-session-breath-flow</code> and <code>pause-ritual-audio-breathe-flow</code> subcluster anchors (parity with <code>pause-reflect-steps-flow</code> umbrella ↔ steps subclusters). Extend <code>pause-session-breath-flow.test.ts</code> with reverse parity against <code>pause-session-breath-io</code> for hydration + phase advance (CI forbids breath-flow import on presentation I/O modules; segment RPC stays on <code>run-breath-segment-log</code> directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription Tier 1 shims, or companion presentation I/O ↔ frame orchestration-flow pins.</dd>
     </dl>
   </article>
 

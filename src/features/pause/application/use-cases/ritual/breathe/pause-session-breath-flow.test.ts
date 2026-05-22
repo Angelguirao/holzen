@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'breathFlowTestRepository' },
+}));
 
 import { initialBreathSegmentRpcLoggedFlagsFromRestored as flagsDirect } from '@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags';
 import {
@@ -50,6 +54,14 @@ import {
   runLogBreathSegment1Skipped as runSegment1SkippedDirect,
   runLogBreathSegment2Skipped as runSegment2SkippedDirect,
 } from './run-breath-segment-log';
+import {
+  computeBreathingPhaseAdvance as computeAdvanceFromIo,
+  initialBreathSegmentRpcLoggedFlagsFromRestored as flagsFromIo,
+  initialBreathingFirstCompletedFromRestored as firstCompletedFromIo,
+  initialBreathingSecondCompletedFromRestored as secondCompletedFromIo,
+  resolveBreathingCompleted as resolveCompletedFromIo,
+  resolveBreathingPhaseAdvanceOutcome as resolveOutcomeFromIo,
+} from '@/features/pause/presentation/session/breath/pause-session-breath-io';
 
 describe('pause-session-breath-flow', () => {
   it('re-exports restored breath hydration helpers', () => {
@@ -116,5 +128,14 @@ describe('pause-session-breath-flow', () => {
     expect(runEnsureBreathSegment2Logged).toBe(runSegment2Direct);
     expect(runLogBreathSegment1Skipped).toBe(runSegment1SkippedDirect);
     expect(runLogBreathSegment2Skipped).toBe(runSegment2SkippedDirect);
+  });
+
+  it('presentation breath I/O overlaps match breath-flow umbrella (leaf parity)', () => {
+    expect(firstCompletedFromIo).toBe(initialBreathingFirstCompletedFromRestored);
+    expect(secondCompletedFromIo).toBe(initialBreathingSecondCompletedFromRestored);
+    expect(flagsFromIo).toBe(initialBreathSegmentRpcLoggedFlagsFromRestored);
+    expect(computeAdvanceFromIo).toBe(computeBreathingPhaseAdvance);
+    expect(resolveCompletedFromIo).toBe(resolveBreathingCompleted);
+    expect(resolveOutcomeFromIo).toBe(resolveBreathingPhaseAdvanceOutcome);
   });
 });
