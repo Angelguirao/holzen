@@ -1985,6 +1985,7 @@ for (const file of walkTs(join(root, 'src'))) {
       !rel.endsWith('pause-reflect-generation-io.test.ts') &&
       !rel.endsWith('pause-reflect-generation-io.re-exports.test.ts') &&
       !rel.endsWith('pause-reflect-generation-io-parity.test.ts') &&
+      !rel.endsWith('pause-reflect-generation-flow-io-wrapper-sibling-parity.test.ts') &&
       !rel.endsWith('pause-reflect-generation-hook-io-sibling-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_HOOK_IMPORTS) {

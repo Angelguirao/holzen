@@ -21,6 +21,7 @@
  * `pause-reflect-generation-io.re-exports.test.ts` ↔ `pause-reflect-telemetry-io.re-exports.test.ts`;
  * application flow umbrellas: `pause-reflect-generation-flow.test.ts` ↔ `pause-reflect-steps-flow.test.ts` (reciprocal inline).
  * inline pins: `pause-reflect-generation-io.test.ts`, `pause-reflect-ambience-io.test.ts`.
+ * `pause-reflect-generation-flow-io-wrapper-sibling-parity.test.ts` beside this module (flow umbrella vs port-bound wrappers; application mirror under `application/.../generation/`).
  */
 import {
   runReflectGeneration,
