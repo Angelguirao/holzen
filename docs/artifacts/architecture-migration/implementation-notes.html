@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — route holzen-reflect generation-io via hook-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-io</code> imports via <code>pause-reflect-generation-hook-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Peel <code>pause-reflect-generation-io</code> off <code>pause-reflect-generation-flow</code> umbrella onto <code>holzen-reflect/pause-reflect-generation-hook-flow</code> (parity with manual-open I/O → <code>pause-reflect-generation-manual-open-flow</code>). CI blocks generation umbrella imports on generation I/O modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Generation umbrella remains for CI composition only; holzen-reflect hooks and artifact reads still bind via <code>pause-reflect-generation-io</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim (<code>App.tsx</code> checkout guard), or session scaffold I/O peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect flows I/O impact type via session decide I/O (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
