@@ -44,6 +44,18 @@ import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
+  pauseReflectFavoriteToggleWithRepository,
+  pauseReflectNoteUpdateWithRepository,
+  pauseReflectTagUpdateWithRepository,
+  pauseReflectionStepLogOnceWithRepository,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 
 describe('pause-reflect-pending-offer-io parity', () => {
   it('presentation I/O pending-offer display matches pending-offer CI umbrella', () => {
@@ -122,6 +134,23 @@ describe('pause-reflect-pending-offer-io parity', () => {
     expect(reflectPauseRepository).not.toBe(trackAbandonedFromPendingOfferTelemetryIo);
     // Reciprocal inline pins: `pause-reflect-pending-offer-io.test.ts`;
     // dedicated sibling: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (pending-offer RPC vs post-it step wrappers).
+   * Dedicated sibling file: `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: steps-io exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseReflectNoteUpdate);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseReflectTagUpdateWithRepository);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(pauseReflectFavoriteToggleWithRepository);
+    expect(getPendingPauseOfferDisplay).not.toBe(pauseReflectionStepLogOnce);
+    expect(pauseAdoptPendingOffer).not.toBe(shouldShowFavoriteProHint);
+    expect(pauseDeclinePendingOffer).not.toBe(shouldLogPauseReflectionStep);
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
+    // Full pins: `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts`.
   });
 
   /**

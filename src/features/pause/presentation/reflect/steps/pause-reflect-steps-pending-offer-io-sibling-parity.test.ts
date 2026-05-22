@@ -31,7 +31,8 @@ import {
 
 /**
  * Presentation sibling parity: steps-io vs pending-offer-io (parity with application
- * `pause-reflect-steps-pending-offer-flow-sibling-parity.test.ts`).
+ * `pause-reflect-steps-pending-offer-flow-sibling-parity.test.ts` and
+ * `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts` under `application/.../steps/`).
  */
 describe('pause-reflect-steps-io ↔ pause-reflect-pending-offer-io sibling parity', () => {
   it('steps-io and pending-offer-io are distinct presentation I/O surfaces', () => {
