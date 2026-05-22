@@ -19,10 +19,16 @@ const getPendingPauseOfferDisplayMock = vi.hoisted(() =>
 );
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow',
   () => ({
     runAdoptPendingPauseOffer: runAdoptPendingPauseOfferMock,
     runDeclinePendingPauseOffer: runDeclinePendingPauseOfferMock,
+  }),
+);
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow',
+  () => ({
     getPendingPauseOfferDisplay: getPendingPauseOfferDisplayMock,
   }),
 );
@@ -32,24 +38,24 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 describe('pause-reflect-pending-offer-io', () => {
-  it('re-exports adopt/decline use cases from pause-reflect-pending-offer-flow', () => {
+  it('re-exports adopt/decline use cases from pending-offer RPC flow anchor', () => {
     expect(typeof pauseAdoptPendingOffer).toBe('function');
     expect(typeof pauseDeclinePendingOffer).toBe('function');
     expect(typeof pauseAdoptPendingOfferWithRepository).toBe('function');
     expect(typeof pauseDeclinePendingOfferWithRepository).toBe('function');
   });
 
-  it('routes adopt through the flow anchor with the default repository', () => {
+  it('routes adopt through the RPC flow anchor with the default repository', () => {
     pauseAdoptPendingOffer();
     expect(runAdoptPendingPauseOfferMock).toHaveBeenCalledWith({ kind: 'supabase' });
   });
 
-  it('routes decline through the flow anchor with the default repository', () => {
+  it('routes decline through the RPC flow anchor with the default repository', () => {
     pauseDeclinePendingOffer();
     expect(runDeclinePendingPauseOfferMock).toHaveBeenCalledWith({ kind: 'supabase' });
   });
 
-  it('re-exports getPendingPauseOfferDisplay from pause-reflect-pending-offer-flow', () => {
+  it('re-exports getPendingPauseOfferDisplay from pending-offer display flow anchor', () => {
     const display: PendingPauseOfferDisplay = getPendingPauseOfferDisplay({
       context: 'btc',
       preview_message: 'Take a breath',

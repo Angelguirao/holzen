@@ -1089,7 +1089,14 @@ const LEGACY_PAUSE_REFLECT_PENDING_OFFER_TELEMETRY_PATH_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/telemetry/pause-session-abandoned-telemetry'",
 ];
 
-/** Reflect pending-offer presentation — import PostHog via pause-reflect-pending-offer-flow only. */
+/** Reflect pending-offer I/O — import via subcluster flows only (not pause-reflect-pending-offer-flow umbrella). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_UMBRELLA_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow',
+  "from './application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow'",
+];
+
+/** Reflect pending-offer presentation — import PostHog via pause-reflect-pending-offer-telemetry-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_SUBCLUSTER_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow',
   "from './application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow'",
@@ -1967,9 +1974,11 @@ for (const file of walkTs(join(root, 'src'))) {
       rel.endsWith('pause-reflect-pending-offer-telemetry-io.ts') ||
       rel.endsWith('pause-reflect-pending-offer-telemetry-io.test.ts')
     ) {
-      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_SUBCLUSTER_IMPORTS) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_UMBRELLA_FLOW_IMPORTS) {
         if (text.includes(needle)) {
-          failures.push(`${rel}: pending-offer telemetry I/O must import via pause-reflect-pending-offer-flow (${needle})`);
+          failures.push(
+            `${rel}: pending-offer telemetry I/O must import via pending-offer telemetry subcluster (${needle})`,
+          );
         }
       }
     }
@@ -1977,9 +1986,11 @@ for (const file of walkTs(join(root, 'src'))) {
       rel.endsWith('pause-reflect-pending-offer-io.ts') ||
       rel.endsWith('pause-reflect-pending-offer-io.test.ts')
     ) {
-      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_RPC_SUBCLUSTER_IMPORTS) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_UMBRELLA_FLOW_IMPORTS) {
         if (text.includes(needle)) {
-          failures.push(`${rel}: pending-offer RPC I/O must import via pause-reflect-pending-offer-flow (${needle})`);
+          failures.push(
+            `${rel}: pending-offer RPC I/O must import via pending-offer RPC + display subclusters (${needle})`,
+          );
         }
       }
     }

@@ -3,7 +3,7 @@
  * Colocated under `presentation/reflect/generation/manual-open/` beside
  * `pause-home-reflect-io` and application `ritual/reflect/generation/manual-open/` trackers.
  * Imports trackers via `pause-home-reflect-telemetry-flow` CI anchor
- * (parity with `pause-reflect-pending-offer-telemetry-io` → pending-offer umbrella).
+ * (parity with `pause-reflect-pending-offer-telemetry-io` → pending-offer telemetry flow).
  */
 export {
   markPauseManualStartedHomeOnce,

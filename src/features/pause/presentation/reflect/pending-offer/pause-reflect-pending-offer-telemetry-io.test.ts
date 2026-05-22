@@ -10,10 +10,10 @@ const trackPausePendingDeclinedMock = vi.hoisted(() => vi.fn());
 const trackPauseSessionAbandonedMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow',
   async (importOriginal) => {
     const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow')
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow')
     >();
     return {
       ...actual,
@@ -25,7 +25,7 @@ vi.mock(
 );
 
 describe('pause-reflect-pending-offer-telemetry-io', () => {
-  it('re-exports adopt, decline, and abandoned from pause-reflect-pending-offer-flow', () => {
+  it('re-exports adopt, decline, and abandoned from pause-pending-offer-telemetry-flow', () => {
     expect(typeof trackPausePendingAdopted).toBe('function');
     expect(typeof trackPausePendingDeclined).toBe('function');
     expect(typeof trackPauseSessionAbandoned).toBe('function');
