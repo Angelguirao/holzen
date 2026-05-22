@@ -78,6 +78,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel ritual-restore decide/frame hydration off session flow umbrellas (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-ritual-restore-flow</code> imports restored decide/frame leaf modules</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route restored decide + frame hydration on <code>pause-session-ritual-restore-flow</code> through <code>restored-decide-ritual-state</code> and <code>restored-frame-ritual-state</code> instead of <code>pause-session-decide-flow</code> / <code>pause-session-frame-flow</code> (parity with breath peel and <code>pause-session-ritual-restore-io</code>; <code>pause-session-frame-io</code> already on leaf module).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session <code>*-flow</code> CI anchors still re-export decide/frame helpers for cluster detection; brief restore still on <code>pause-session-brief-flow</code> until a brief leaf peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel brief restored fields off <code>pause-session-brief-flow</code>, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-session-terminal-entry-io to terminal-entry-guard (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -90,7 +109,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-session-terminal-entry-flow</code> remains application cluster anchor for CI; redirect hook imports I/O only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: align <code>pause-session-frame-io</code> with documented direct <code>restored-frame-ritual-state</code> import, or Phase B Tier 1 shim.</dd>
+      <dd>Next: peel brief restored fields off <code>pause-session-brief-flow</code>, or session shell-io / scaffold-io subcluster peels.</dd>
     </dl>
   </article>
 
