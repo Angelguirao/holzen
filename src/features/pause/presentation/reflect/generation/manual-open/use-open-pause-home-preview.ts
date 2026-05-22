@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
-import { pauseDismissOpenPauseHomePreview } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
+import { DEFAULT_COMPANIONS } from '@/features/pause/domain/session-model';
+import { fetchOpenPauseHomePreview } from '@/features/pause/public-queries';
+import { pauseDismissOpenPauseHomePreview } from './pause-home-reflect-io';
 import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
-import { fetchOpenPauseHomePreview } from '../../public-queries';
-import { DEFAULT_COMPANIONS } from '../../domain/session-model';
-import { usePauseInstancesRealtime } from '../realtime/use-pause-instances-realtime';
+import { usePauseInstancesRealtime } from '@/features/pause/presentation/realtime/use-pause-instances-realtime';
 
 /**
  * Home open-pause preview from `v_pause_current` + reflection/companion artifacts.

@@ -71,7 +71,7 @@ export {
   type PauseDismissAnalyticsSurface,
 } from './presentation/home/use-home-pause-actions';
 export { usePauseContextHomePreviews } from './presentation/home/use-pause-context-home-previews';
-export { useOpenPauseHomePreview } from './presentation/home/use-open-pause-home-preview';
+export { useOpenPauseHomePreview } from './presentation/reflect/generation/manual-open/use-open-pause-home-preview';
 export {
   useManualPauseTrigger,
   type UseManualPauseTriggerParams,

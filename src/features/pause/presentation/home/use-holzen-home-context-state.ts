@@ -9,7 +9,7 @@ import {
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
 import { millisecondsUntilNextQuarterHour } from '@/features/pause/public-scheduling';
-import { useOpenPauseHomePreview } from './use-open-pause-home-preview';
+import { useOpenPauseHomePreview } from '@/features/pause/presentation/reflect/generation/manual-open/use-open-pause-home-preview';
 import { useHolzenManualTriggerOrchestration } from './use-holzen-manual-trigger-orchestration';
 import { useManualPauseTrigger } from './manual-open/use-manual-pause-trigger';
 
