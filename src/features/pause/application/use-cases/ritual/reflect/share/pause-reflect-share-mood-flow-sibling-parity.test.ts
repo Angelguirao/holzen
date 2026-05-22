@@ -20,7 +20,10 @@ import {
 } from '../mood/pause-reflect-mood-flow';
 import * as moodFlow from '../mood/pause-reflect-mood-flow';
 
-/** Share-anchored sibling parity; closes share-flow ↔ mood-flow application gap. */
+/**
+ * Share-anchored flow sibling parity; I/O mirror:
+ * `pause-reflect-share-mood-io-sibling-parity.test.ts` (application + presentation).
+ */
 describe('pause-reflect-share-flow ↔ pause-reflect-mood-flow sibling parity', () => {
   it('share-flow and mood-flow are distinct sibling CI anchors', () => {
     expect(typeof runReflectionShareImage).toBe('function');

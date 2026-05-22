@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — application share↔mood I/O sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-share-mood-io-sibling-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete. Add share-anchored application mirror for presentation <code>pause-reflect-share-mood-io-sibling-parity</code> (hub↔share application mirror landed in prior slice) so reflection share builders stay namespace-separated from initial-emotion RPC at application CI layer.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only; reciprocal docblocks on share-io and share-mood-flow sibling tests.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: application <code>pause-reflect-flows-io-parity</code> beside flows-flow, or Phase B Tier 1 shim scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — application hub-anchored share-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — test-only; reciprocal docblocks on hub-flow, hub-io, share-io, and presentation sibling test.</dd>
       <dt>Open questions</dt>
-      <dd>Next: application mirror for mood↔hub presentation sibling, or remaining session I/O sibling parity gaps.</dd>
+      <dd>Next: application <code>pause-reflect-flows-io-parity</code> beside flows-flow, or remaining session I/O sibling parity gaps.</dd>
     </dl>
   </article>
 
@@ -104,6 +121,23 @@
       <dd>None — file move + allowlist + comment anchors only.</dd>
       <dt>Open questions</dt>
       <dd>Next: colocate remaining frame application <code>*-io-parity.test.ts</code> under <code>presentation/companion/</code> (orchestration, frame-ui, analytics), or Phase B Tier 1 shim scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — application session decide-io parity beside decide-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-decide-io-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation <code>pause-session-decide-io-parity</code> beside <code>pause-session-decide-flow</code> for <code>PauseImpactData</code> type peel + restored-decide hydration pins (decide-io stays type-only at runtime).</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only; flows-io sibling pins remain in existing sibling parity tests.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: application <code>pause-session-brief-io-parity</code> beside <code>pause-session-brief-flow</code>, or Phase B Tier 1 shim scan.</dd>
     </dl>
   </article>
 

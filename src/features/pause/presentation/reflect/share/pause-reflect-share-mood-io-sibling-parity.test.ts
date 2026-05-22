@@ -24,6 +24,7 @@ import * as moodIo from '@/features/pause/presentation/reflect/mood/pause-reflec
 
 /**
  * Presentation sibling parity: share-io vs mood-io (parity with application
+ * `pause-reflect-share-mood-io-sibling-parity.test.ts` and flow-level
  * `pause-reflect-share-mood-flow-sibling-parity.test.ts`).
  */
 describe('pause-reflect-share-io ↔ pause-reflect-mood-io sibling parity', () => {
