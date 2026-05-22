@@ -1,7 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import type { BtcPriceData } from '@/features/market/public';
-import type { PauseImpactData } from './pause-reflect-flows-io';
+import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { RitualDepth } from '@/features/pause/domain/ritual-types';
