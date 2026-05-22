@@ -196,7 +196,7 @@ describe('pause-reflect-hub-io parity (application)', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `presentation/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+   * Reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts` (application + presentation).
    * Dedicated sibling file: `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: pending-offer-io exports stay distinct from hub-io wrappers', () => {
@@ -206,7 +206,7 @@ describe('pause-reflect-hub-io parity (application)', () => {
     expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseDeclinePendingOfferWithRepository);
     expect(buildLogBundleFromHubIo).not.toBe(getPendingPauseOfferDisplay);
     expect(resolvePresentationFromHubIo).not.toBe(getPendingPauseOfferDisplay);
-    // Reciprocal inline pins: `presentation/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+    // Reciprocal inline pins: `pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
   });
 
   /**
