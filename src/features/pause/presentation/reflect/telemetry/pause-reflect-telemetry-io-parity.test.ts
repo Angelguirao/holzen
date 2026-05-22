@@ -60,7 +60,7 @@ import {
 /**
  * Presentation-layer telemetry I/O parity (colocated beside `pause-reflect-telemetry-io.ts`).
  * Application mirror: `application/.../ritual/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
- * Ambience-io sibling: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (presentation);
+ * Ambience-io sibling: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (ambience cluster).
  * Share-io sibling: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.

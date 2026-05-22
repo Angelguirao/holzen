@@ -19,6 +19,8 @@ import {
  * `pause-reflect-share-telemetry-io-sibling-parity.test.ts`, and application
  * `application/.../ambience/pause-reflect-ambience-telemetry-io-sibling-parity.test.ts`;
  * complements `pause-reflect-flows-telemetry-io-sibling-parity.test.ts`).
+ * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` and
+ * `pause-reflect-telemetry-io-parity.test.ts` (application + presentation).
  */
 describe('pause-reflect-ambience-io ↔ pause-reflect-telemetry-io sibling parity', () => {
   it('ambience-io and telemetry-io are distinct presentation I/O surfaces', () => {

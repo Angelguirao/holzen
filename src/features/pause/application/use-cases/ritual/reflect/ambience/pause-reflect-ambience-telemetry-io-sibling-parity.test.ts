@@ -15,9 +15,10 @@ import {
 
 /**
  * Application sibling parity: ambience-io vs telemetry-io (parity with presentation
- * `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` and share↔telemetry siblings).
+ * `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts`, share↔telemetry siblings, and
+ * `pause-reflect-flows-telemetry-io-sibling-parity.test.ts`).
  * Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts` ↔
- * `pause-reflect-telemetry-io-parity.test.ts` (presentation + application).
+ * `pause-reflect-telemetry-io-parity.test.ts` (application + presentation).
  */
 describe('pause-reflect-ambience-io ↔ pause-reflect-telemetry-io sibling parity (application)', () => {
   it('ambience-io and telemetry-io are distinct presentation I/O surfaces', () => {

@@ -25,6 +25,7 @@ import * as moodIo from '@/features/pause/presentation/reflect/mood/pause-reflec
  * `pause-reflect-ambience-mood-flow-sibling-parity.test.ts`).
  * Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts` ↔
  * `pause-reflect-mood-io-parity.test.ts`.
+ * Telemetry-io sibling: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (application + presentation).
  */
 describe('pause-reflect-ambience-io ↔ pause-reflect-mood-io sibling parity (application)', () => {
   it('ambience-io and mood-io are distinct presentation I/O surfaces', () => {
