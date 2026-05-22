@@ -124,6 +124,40 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect steps↔generation sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-generation-flow-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend steps↔generation inline pins; align <code>pause-reflect-steps-pending-offer-flow-sibling-parity.test.ts</code> abandoned/tag/decline/favorite pins with inline flow tests (dedicated steps↔generation sibling file already on branch).</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only guardrails on CI cluster anchors.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: flows↔steps dedicated sibling parity file, or Phase B subscription/auth Tier 1 shim scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — scaffold-flow ↔ shell-flow sibling pins + scaffold-io presentation parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-scaffold-shell-flow-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no reflect moves. Add dedicated scaffold↔shell sibling parity test (parity with terminal-entry↔shell) and extend <code>pause-session-scaffold-io.test.ts</code> with <code>hasPersistablePauseSessionAnchor</code> smoke + direct leaf <code>.toBe</code> identity pins.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B app-shell boot import scan, or shell-io presentation wrapper delegation tests.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — flows-io outcome wrapper cross-distinctness (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
