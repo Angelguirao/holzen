@@ -24,6 +24,7 @@ import {
 } from '@/features/pause/domain/reflect/mood/pause-session-chrome-close';
 import { runDeepPausePickerEntryIfPro as runDeepPickerDirect } from '@/features/pause/domain/reflect/mood/run-deep-pause-picker-entry-if-pro';
 import { resolvePauseDepthContextLineParams as resolveDepthLineDirect } from '@/features/pause/domain/reflect/mood/resolve-pause-depth-context-line-params';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
   applyBriefDepthPickerRitualEntry,
@@ -32,6 +33,7 @@ import {
   initialEmotionResetUi,
   initialEmotionSelectRollbackUi,
   isPauseSessionDepthPickerActive,
+  reflectPauseRepository,
   resolvePauseDepthContextLineParams,
   resolvePauseSessionChromeCloseAction,
   runDeepPausePickerEntryIfPro,
@@ -61,5 +63,9 @@ describe('pause-reflect-mood-io re-exports', () => {
     expect(resolvePauseSessionChromeCloseAction).toBe(resolveChromeCloseDirect);
     expect(runDeepPausePickerEntryIfPro).toBe(runDeepPickerDirect);
     expect(runPauseSessionChromeCloseAction).toBe(runChromeCloseDirect);
+  });
+
+  it('binds default reflectPauseRepository to public-rpc supabasePauseRepository', () => {
+    expect(reflectPauseRepository).toBe(supabasePauseRepository);
   });
 });
