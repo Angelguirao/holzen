@@ -78,6 +78,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect share image flow anchor deliver re-export (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflection-share-image-flow</code> pins <code>deliverReflectionShareImage</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Re-export <code>deliverReflectionShareImage</code> (+ outcome type) on the share <em>image</em> subcluster CI anchor with <code>.toBe(direct)</code> identity (orchestration anchor already had deliver; top-level <code>pause-reflect-share-flow</code> still omits deliver by design). Corrected <code>pause-home-reflect-telemetry-flow</code> comment: generation umbrella must not compose PostHog.</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI slice only.</dd>
+      <dt>Tradeoff</dt>
+      <dd>Share orchestration and image subcluster anchors both expose deliver; presentation I/O still imports leaf modules directly.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription Tier 1 shims when pause Tier 5 identity pins are quiet.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — ritual/frame cluster marker (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
