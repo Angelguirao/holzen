@@ -9,6 +9,7 @@ import {
   pauseReflectOutcomeLog,
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import { pauseReflectionShareImage } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   pauseReflectGeneration,
   runReflectGeneration,
@@ -36,5 +37,12 @@ describe('pause-reflect-ambience-io', () => {
     expect(startPauseReflectFrameFocusAmbience).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(stopPauseReflectFrameFocusAmbience).not.toBe(pauseReflectOutcomeLog);
     // Full cross-I/O pins: `pause-reflect-flows-ambience-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: share-io exports stay distinct from ambience-io frame-focus bed', () => {
+    expect(startPauseReflectFrameFocusAmbience).not.toBe(pauseReflectionShareImage);
+    expect(stopPauseReflectFrameFocusAmbience).not.toBe(pauseReflectionShareImage);
+    // Full cross-I/O pins: `pause-reflect-share-ambience-io-sibling-parity.test.ts` and
+    // `pause-reflect-ambience-share-io-sibling-parity.test.ts`.
   });
 });
