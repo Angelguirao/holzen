@@ -21366,7 +21366,7 @@
     <h3>Route <code>pause-reflect-steps-io</code> through steps subcluster flow anchors</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Peel <code>pause-reflect-steps-io</code> off <code>pause-reflect-steps-flow</code> to import <code>pause-favorite-toggle-flow</code>, <code>pause-reflect-note-flow</code>, <code>pause-reflect-tag-flow</code>, and <code>pause-reflection-step-log-flow</code> directly (parity with <code>pause-reflect-mood-io</code> → mood subclusters). CI blocks umbrella imports in steps I/O; step conductors still import steps-io only.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Peel <code>pause-reflect-steps-io</code> off <code>pause-reflect-steps-flow</code> to import <code>pause-favorite-toggle-flow</code>, <code>pause-reflect-note-flow</code>, <code>pause-reflect-tag-flow</code>, and <code>pause-reflection-step-log-flow</code> directly (parity with <code>pause-reflect-mood-io</code> → mood subclusters). CI blocks umbrella imports on steps I/O; step conductors still import steps-io only.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
