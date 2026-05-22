@@ -76,6 +76,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — generation-io ↔ hook-flow + share-io orchestration parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-hook-io-sibling-parity.test.ts</code> + extended <code>pause-reflect-share-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no reflect folder moves. Add application-layer <code>pause-reflect-generation-hook-io-sibling-parity</code> so presentation <code>pause-reflect-generation-io</code> bindings stay aligned with <code>pause-reflect-generation-hook-flow</code> and off generation-flow manual-open exports. Extend <code>pause-reflect-share-io-parity</code> with share-flow vs orchestration-flow namespace pins (presentation share folder cannot import application flow modules per <code>check:architecture-alignment</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>Share orchestration presentation sibling test lives in application <code>pause-reflect-share-io-parity.test.ts</code>, not under <code>presentation/reflect/share/</code> — CI forbids presentation share tests from importing orchestration-flow anchors.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or presentation generation-io ↔ manual-open-io sibling parity.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — application steps-flow ↔ generation-flow reciprocal inline pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -29084,7 +29101,7 @@
     <h3><code>pause-reflect-pending-offer-io.test.ts</code> + <code>pause-reflect-pending-offer-telemetry-io.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts</code> on branch; reciprocal inline sibling-cluster pins on pending-offer-io and pending-offer-telemetry-io unit tests (parity with flows-io ↔ mood-io). Session reflect telemetry pins on pending-offer-io ↔ <code>pause-reflect-telemetry-io</code> stay separate.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts</code> on branch; reciprocal inline sibling-cluster pins on both pending-offer-io and pending-offer-telemetry-io unit tests (session reflect telemetry pins on pending-offer-io ↔ <code>pause-reflect-telemetry-io</code> stay separate; parity with flows-io ↔ mood-io).</dd>
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comments only.</dd>
       <dt>Tradeoff</dt>
