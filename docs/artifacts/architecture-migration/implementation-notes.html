@@ -28915,7 +28915,7 @@
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: presentation steps-io ↔ share-io reciprocal inline pins, or Phase B subscription Tier 1 shims.</dd>
+      <dd>Next: presentation steps-io ↔ share-io reciprocal inline pins (landed on branch), or Phase B subscription Tier 1 shims.</dd>
     </dl>
   </article>
 
@@ -28932,7 +28932,24 @@
       <dt>Deviation</dt>
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: presentation pending-offer-io ↔ telemetry-io reciprocal inline pins, or Phase B subscription Tier 1 shims.</dd>
+      <dd>Next: presentation pending-offer-io ↔ telemetry-io reciprocal inline pins (landed same session), or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — presentation pending-offer-io ↔ telemetry-io reciprocal inline pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-io.test.ts</code> + <code>pause-reflect-telemetry-io.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add reciprocal inline sibling-cluster pins so pending-offer RPC/display I/O stays distinct from session reflect UI telemetry I/O (parity with hub-io ↔ mood-io inline pins). Dedicated pending-offer ↔ pending-offer-telemetry and telemetry ↔ pending-offer-telemetry sibling files unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + pending-offer-io header comment only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: scan remaining <code>app/</code> boot imports for deep feature paths, or application steps-io ↔ pending-offer-io dedicated sibling file if gaps remain.</dd>
     </dl>
   </article>
 

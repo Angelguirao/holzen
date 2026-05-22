@@ -9,6 +9,13 @@ import {
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
+  pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
@@ -70,5 +77,15 @@ describe('pause-reflect-telemetry-io', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(pauseReflectionShareImage);
     expect(trackPauseReflectShareTap).not.toBe(pauseReflectionShareImage);
     expect(trackPauseReflectWallpaperTap).not.toBe(pauseReflectionShareImage);
+  });
+
+  it('sibling cluster: pending-offer-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseAdoptPendingOffer);
+    expect(trackPauseReflectShareTap).not.toBe(pauseDeclinePendingOffer);
+    expect(trackPauseReflectWallpaperTap).not.toBe(getPendingPauseOfferDisplay);
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseAdoptPendingOfferWithRepository);
+    expect(trackPauseReflectShareTap).not.toBe(pauseDeclinePendingOfferWithRepository);
+    // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-pending-offer-io.test.ts`;
+    // pending-offer RPC vs pending-offer telemetry: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
   });
 });
