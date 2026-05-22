@@ -3,13 +3,13 @@
  * Composes RPC/display and PostHog subcluster anchors.
  * Presentation: `pause-reflect-pending-offer-io.ts` and `pause-reflect-pending-offer-telemetry-io.ts` import through this anchor.
  */
-export { runAdoptPendingPauseOffer } from './run-adopt-pending-pause-offer';
-export { runDeclinePendingPauseOffer } from './run-decline-pending-pause-offer';
 export {
   getPendingPauseOfferDisplay,
+  runAdoptPendingPauseOffer,
+  runDeclinePendingPauseOffer,
   type PendingPauseOfferDisplay,
   type PendingPauseOfferDisplayInput,
-} from './pending-pause-offer-display';
+} from './pause-reflect-pending-offer-rpc-flow';
 export {
   trackPausePendingAdopted,
   trackPausePendingDeclined,

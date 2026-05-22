@@ -94,6 +94,10 @@ mustExist(
   'pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow.ts',
 );
 mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow.ts',
+  'pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow.ts',
+);
+mustExist(
   'src/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow.ts',
   'pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow.ts',
 );
@@ -1154,6 +1158,20 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: reflect pending-offer umbrella flow must compose telemetry subcluster (${needle})`,
+        );
+      }
+    }
+    for (const needle of [
+      '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer',
+      '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer',
+      '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display',
+      "from './run-adopt-pending-pause-offer'",
+      "from './run-decline-pending-pause-offer'",
+      "from './pending-pause-offer-display'",
+    ]) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect pending-offer umbrella flow must compose RPC subcluster (${needle})`,
         );
       }
     }
