@@ -4,6 +4,10 @@ import { runPauseReflectNoteUpdate as runNoteUpdateDirect } from '@/features/pau
 import { runPauseReflectTagUpdate as runTagUpdateDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
 import { runPauseReflectionStepLogOnce as runReflectionStepLogDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
 import {
+  pauseAdoptPendingOffer,
+  pauseDeclinePendingOffer,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
   pauseReflectTagUpdate,
@@ -143,5 +147,7 @@ describe('pause-reflect-steps-io', () => {
     expect(pauseReflectNoteUpdate).not.toBe(runNoteUpdateDirect);
     expect(pauseReflectTagUpdate).not.toBe(runTagUpdateDirect);
     expect(pauseReflectionStepLogOnce).not.toBe(runReflectionStepLogDirect);
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseAdoptPendingOffer);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseDeclinePendingOffer);
   });
 });
