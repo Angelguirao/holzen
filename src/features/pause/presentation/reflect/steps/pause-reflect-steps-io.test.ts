@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
+import { runPauseFavoriteToggle as runFavoriteToggleDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
+import { runPauseReflectNoteUpdate as runNoteUpdateDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
+import { runPauseReflectTagUpdate as runTagUpdateDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
+import { runPauseReflectionStepLogOnce as runReflectionStepLogDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
 import {
   pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
   pauseReflectionStepLogOnce,
   reflectPauseRepository,
   shouldLogPauseReflectionStep,
@@ -9,6 +15,8 @@ import {
 
 const runPauseReflectionStepLogOnceMock = vi.hoisted(() => vi.fn());
 const runPauseFavoriteToggleMock = vi.hoisted(() => vi.fn());
+const runPauseReflectNoteUpdateMock = vi.hoisted(() => vi.fn());
+const runPauseReflectTagUpdateMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
   '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle',
@@ -32,6 +40,32 @@ vi.mock(
     return {
       ...actual,
       runPauseReflectionStepLogOnce: runPauseReflectionStepLogOnceMock,
+    };
+  },
+);
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update',
+  async (importOriginal) => {
+    const actual = await importOriginal<
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update')
+    >();
+    return {
+      ...actual,
+      runPauseReflectNoteUpdate: runPauseReflectNoteUpdateMock,
+    };
+  },
+);
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update',
+  async (importOriginal) => {
+    const actual = await importOriginal<
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update')
+    >();
+    return {
+      ...actual,
+      runPauseReflectTagUpdate: runPauseReflectTagUpdateMock,
     };
   },
 );
@@ -80,5 +114,34 @@ describe('pause-reflect-steps-io', () => {
       pauseInstanceId: 'pi-1',
       isFavorite: true,
     });
+  });
+
+  it('routes reflect tag update through the default PauseRepository port adapter', async () => {
+    runPauseReflectTagUpdateMock.mockResolvedValue({ status: 'success' });
+
+    await pauseReflectTagUpdate({ pauseInstanceId: 'pi-tags', tags: ['calm'] });
+
+    expect(runPauseReflectTagUpdateMock).toHaveBeenCalledWith(reflectPauseRepository, {
+      pauseInstanceId: 'pi-tags',
+      tags: ['calm'],
+    });
+  });
+
+  it('routes reflect note update through the default PauseRepository port adapter', async () => {
+    runPauseReflectNoteUpdateMock.mockResolvedValue({ status: 'success' });
+
+    await pauseReflectNoteUpdate({ pauseInstanceId: 'pi-note', text: 'breathe' });
+
+    expect(runPauseReflectNoteUpdateMock).toHaveBeenCalledWith(reflectPauseRepository, {
+      pauseInstanceId: 'pi-note',
+      text: 'breathe',
+    });
+  });
+
+  it('exports step RPC wrappers distinct from leaf use cases', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(runFavoriteToggleDirect);
+    expect(pauseReflectNoteUpdate).not.toBe(runNoteUpdateDirect);
+    expect(pauseReflectTagUpdate).not.toBe(runTagUpdateDirect);
+    expect(pauseReflectionStepLogOnce).not.toBe(runReflectionStepLogDirect);
   });
 });

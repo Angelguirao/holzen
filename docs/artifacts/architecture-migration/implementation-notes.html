@@ -26865,4 +26865,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect steps-io presentation wrapper delegation (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-io.test.ts</code> tag/note + wrapper distinctness</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend presentation <code>pause-reflect-steps-io.test.ts</code> with mocked delegation for <code>pauseReflectTagUpdate</code> and <code>pauseReflectNoteUpdate</code> plus <code>not.toBe</code> distinctness vs leaf <code>run-pause-*</code> exports (parity with application <code>pause-reflect-steps-io-parity.test.ts</code> after branch-tip RPC wrapper pins). Production <code>pause-reflect-steps-io</code> unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shims or session terminal-entry-io extended parity pins.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
