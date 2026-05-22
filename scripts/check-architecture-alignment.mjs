@@ -183,12 +183,20 @@ mustNotExist(
   'pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow.ts (use ritual/decide/pause-decide-outcome-log-flow.ts)',
 );
 mustExist(
+  'src/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-toast-flow.ts',
+  'pause/application/use-cases/ritual/decide/pause-decide-outcome-toast-flow.ts',
+);
+mustNotExist(
   'src/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow.ts',
-  'pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow.ts',
+  'pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow.ts (use ritual/decide/pause-decide-outcome-toast-flow.ts)',
 );
 mustExist(
+  'src/features/pause/application/use-cases/ritual/decide/pause-decide-wisdom-quotes-flow.ts',
+  'pause/application/use-cases/ritual/decide/pause-decide-wisdom-quotes-flow.ts',
+);
+mustNotExist(
   'src/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow.ts',
-  'pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow.ts',
+  'pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow.ts (use ritual/decide/pause-decide-wisdom-quotes-flow.ts)',
 );
 mustExist(
   'src/features/pause/application/use-cases/session/scaffold',
@@ -1047,7 +1055,9 @@ const LEGACY_PAUSE_REFLECT_FLOWS_FLOW_SUBCLUSTER_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-view-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-toast-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-wisdom-quotes-flow',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-log-flow',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-score-impacts-flow',
   "from './pause-reflect-and-decide-view-flow'",
@@ -1057,8 +1067,10 @@ const LEGACY_PAUSE_REFLECT_FLOWS_FLOW_SUBCLUSTER_IMPORTS = [
   "from '../pause-reflect-decide-outcome-log-flow'",
   "from './pause-reflect-decide-outcome-toast-flow'",
   "from '../pause-reflect-decide-outcome-toast-flow'",
+  "from '../../decide/pause-decide-outcome-toast-flow'",
   "from './pause-reflect-decide-wisdom-quotes-flow'",
   "from '../pause-reflect-decide-wisdom-quotes-flow'",
+  "from '../../decide/pause-decide-wisdom-quotes-flow'",
   "from '../../decide/pause-decide-outcome-log-flow'",
   "from '../../decide/pause-decide-score-impacts-flow'",
 ];
@@ -1149,7 +1161,9 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_SUBCLUSTER_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-log-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-toast-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-wisdom-quotes-flow',
   "from './application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow'",
   "from '../application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow'",
   "from './application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
@@ -1162,8 +1176,12 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_SUBCLUSTER_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/decide/pause-decide-outcome-log-flow'",
   "from './application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow'",
   "from '../application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow'",
+  "from './application/use-cases/ritual/decide/pause-decide-outcome-toast-flow'",
+  "from '../application/use-cases/ritual/decide/pause-decide-outcome-toast-flow'",
   "from './application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow'",
   "from '../application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow'",
+  "from './application/use-cases/ritual/decide/pause-decide-wisdom-quotes-flow'",
+  "from '../application/use-cases/ritual/decide/pause-decide-wisdom-quotes-flow'",
 ];
 
 const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_IO_UMBRELLA_FLOW_IMPORTS = [
@@ -1313,7 +1331,9 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-log-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-toast-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-wisdom-quotes-flow',
   "from './domain/reflect/flows/",
   "from '../domain/reflect/flows/",
   "from './domain/decide/pause-impact-data",
