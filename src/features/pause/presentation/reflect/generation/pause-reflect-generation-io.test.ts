@@ -12,6 +12,11 @@ import {
   pauseReflectTagUpdate,
   reflectPauseRepository,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import { pauseReflectGeneration, reflectGenerator } from './pause-reflect-generation-io';
 
 const runReflectGenerationMock = vi.hoisted(() => vi.fn());
@@ -93,5 +98,13 @@ describe('pause-reflect-generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(pauseReflectionStepLogOnce);
     expect(reflectGenerator).not.toBe(reflectPauseRepository);
     // Full cross-I/O pins: `pause-reflect-steps-generation-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: session reflect telemetry-io exports stay distinct from generation-io', () => {
+    expect(pauseReflectGeneration).not.toBe(trackPauseReflectPostItOpen);
+    expect(pauseReflectGeneration).not.toBe(trackPauseReflectShareTap);
+    expect(pauseReflectGeneration).not.toBe(trackPauseReflectWallpaperTap);
+    expect(reflectGenerator).not.toBe(trackPauseReflectPostItOpen);
+    // Full cross-I/O pins: `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`.
   });
 });
