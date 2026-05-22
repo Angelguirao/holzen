@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — flows-io ↔ ambience-io reciprocal inline pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-io.test.ts</code> + <code>pause-reflect-ambience-io.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Dedicated <code>pause-reflect-flows-ambience-io-sibling-parity.test.ts</code> already on branch; add reciprocal <code>.not.toBe</code> blocks on both I/O unit tests (parity with hub/pending-offer and share/telemetry presentation slices).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + header comment touch only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or flows-io ↔ share-io presentation sibling parity.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — presentation flows-io ↔ pending-offer-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

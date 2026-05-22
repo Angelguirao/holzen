@@ -35,6 +35,10 @@ import { runPauseOutcomeLog as runPauseOutcomeLogDirect } from '@/features/pause
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
@@ -170,5 +174,12 @@ describe('pause-reflect-flows-io', () => {
     expect(buildPauseScoreImpacts).not.toBe(trackPauseReflectWallpaperTap);
     expect(getSessionQuote).not.toBe(trackPauseReflectPostItOpen);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(trackPauseReflectShareTap);
+  });
+
+  it('sibling cluster: ambience-io exports stay distinct from flows-io re-exports', () => {
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseReflectOutcomeLog).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(buildPauseScoreImpacts).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(formatReinforcementQuoteFromSession).not.toBe(stopPauseReflectFrameFocusAmbience);
   });
 });
