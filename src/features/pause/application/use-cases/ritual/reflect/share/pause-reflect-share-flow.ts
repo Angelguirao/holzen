@@ -2,7 +2,7 @@
  * CI cluster anchor for ritual reflect share presentation I/O (§3 / check:architecture-alignment).
  * Composes orchestration + session reflect UI PostHog subclusters.
  * Presentation: `pause-reflect-share-io.ts` → orchestration subcluster;
- * `pause-reflect-telemetry-io.ts` uses `pause-reflect-telemetry-flow`.
+ * `pause-reflect-telemetry-io.ts` imports `pause-reflect-session-ui-telemetry` directly (not this umbrella).
  */
 export type { DeliverReflectionShareImageDeps } from './pause-reflect-share-orchestration-flow';
 export { runReflectionShareImage } from './pause-reflect-share-orchestration-flow';
