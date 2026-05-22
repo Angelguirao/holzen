@@ -417,6 +417,13 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_MAP_PERSISTED_STEP_IMPORTS = [
   "from '../domain/session/map-persisted-step'",
 ];
 
+/** Session presentation — import decide impact types via pause-session-decide-io only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_DECIDE_IMPACT_IMPORTS = [
+  '@/features/pause/domain/decide/pause-impact-data',
+  "from './domain/decide/pause-impact-data",
+  "from '../domain/decide/pause-impact-data",
+];
+
 /** Session presentation — import persisted-session guards via shell/scaffold I/O only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_DOMAIN_GUARDS_IMPORTS = [
   '@/features/pause/domain/session/persisted-session-guards',
@@ -1122,6 +1129,11 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_DOMAIN_GUARDS_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session domain guard import (${needle})`);
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_DECIDE_IMPACT_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy session decide impact import (${needle})`);
       }
     }
   }
