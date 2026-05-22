@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: { port: 'supabasePauseRepository' },
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
   supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
@@ -61,6 +61,14 @@ import {
   pauseReflectionShareImage,
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
+  buildPauseScoreImpacts,
+  formatReinforcementQuoteFromSession,
+  pauseReflectOutcomeLog,
+  resolvePauseDecideOutcomeFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
   pauseReflectTagUpdate,
@@ -70,7 +78,8 @@ import {
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 
 /**
- * Application-layer generation I/O parity. Telemetry-io sibling:
+ * Application-layer generation I/O parity. Flows-io sibling:
+ * `pause-reflect-flows-generation-io-sibling-parity.test.ts`; telemetry-io sibling:
  * `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`; share-io sibling:
  * `pause-reflect-generation-share-io-sibling-parity.test.ts` (reciprocal inline pins below).
  * Steps-io sibling: `pause-reflect-steps-generation-io-sibling-parity.test.ts` (reciprocal inline pins below).
@@ -139,6 +148,21 @@ describe('pause-reflect-generation-io parity', () => {
     await pauseReflectGeneration(input, customGenerator as typeof supabaseReflectGenerator);
 
     expect(runReflectGenerationDirect).toHaveBeenCalledWith(input, customGenerator);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (holzen-reflect vs reflect+decide flows).
+   * Dedicated sibling file: `pause-reflect-flows-generation-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: flows-io exports stay distinct from generation-io', () => {
+    expect(pauseReflectGeneration).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(runReflectGeneration).not.toBe(pauseReflectOutcomeLog);
+    expect(reflectGenerationPrerequisite).not.toBe(formatReinforcementQuoteFromSession);
+    expect(resolveReflectGenerationPrefetch).not.toBe(resolvePauseDecideOutcomeFlow);
+    expect(shouldCommitReflectGeneration).not.toBe(buildPauseScoreImpacts);
+    expect(messageFromReflectGenerationResult).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
+    // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts`.
+    // Full pins: `pause-reflect-flows-generation-io-sibling-parity.test.ts`.
   });
 
   /**

@@ -6,6 +6,7 @@ vi.mock('@/integrations/supabase/client', () => ({
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
+  supabaseReflectGenerator: { port: 'reflectGenerator' },
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log', () => ({
@@ -114,6 +115,15 @@ import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+import {
+  messageFromReflectGenerationResult,
+  pauseReflectGeneration,
+  reflectGenerationPrerequisite,
+  reflectGenerator,
+  resolveReflectGenerationPrefetch,
+  runReflectGeneration,
+  shouldCommitReflectGeneration,
+} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
@@ -231,6 +241,22 @@ describe('pause-reflect-flows-io parity', () => {
     expect(getSessionQuote).not.toBe(initialPhaseFromRestored);
     // Reciprocal inline pins: `pause-session-decide-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-decide-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (reflect+decide vs holzen-reflect).
+   * Dedicated sibling file: `pause-reflect-flows-generation-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: generation-io exports stay distinct from flows-io', () => {
+    expect(pauseReflectOutcomeLog).not.toBe(runReflectGeneration);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseReflectGeneration);
+    expect(formatReinforcementQuoteFromSession).not.toBe(reflectGenerationPrerequisite);
+    expect(resolvePauseDecideOutcomeFlow).not.toBe(resolveReflectGenerationPrefetch);
+    expect(buildPauseScoreImpacts).not.toBe(shouldCommitReflectGeneration);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseReflectGeneration);
+    expect(reflectPauseRepository).not.toBe(reflectGenerator);
+    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
+    // Full pins: `pause-reflect-flows-generation-io-sibling-parity.test.ts`.
   });
 
   /**

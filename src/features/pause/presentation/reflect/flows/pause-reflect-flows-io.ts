@@ -22,7 +22,9 @@
  * `pause-reflect-flows-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io` (application
  * `pause-reflect-flows-hub-io-sibling-parity.test.ts` under `application/.../flows/`),
  * `pause-reflect-flows-share-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`,
- * `pause-reflect-flows-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`, and
+ * `pause-reflect-flows-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io` (application
+ * `pause-reflect-flows-generation-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
+ * `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-generation-io-parity.test.ts`), and
  * `pause-reflect-flows-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io` (application
  * `pause-reflect-flows-mood-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
  * `pause-reflect-flows-io-parity.test.ts` (application) ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`),
