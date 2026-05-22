@@ -19818,4 +19818,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — companion analytics I/O via analytics-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-analytics-io</code> imports through <code>pause-companion-analytics-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no reflect relocations. Route <code>pause-companion-analytics-io</code> through <code>pause-companion-analytics-flow</code> instead of deep <code>run-log-companion-*</code> paths (restores flow-anchor peel after May 2026 direct-import experiment; parity with orchestration/orchestrate I/O). Unit test mocks the flow anchor.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-companion-frame-ui-io</code> still imports ritual/frame siblings directly (frame-ui-flow remains CI anchor only).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-frame-ui-io</code> through <code>pause-companion-frame-ui-flow</code>, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
