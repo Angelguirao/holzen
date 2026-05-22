@@ -13,24 +13,24 @@ import {
   pauseDeclinePendingOfferWithRepository,
   reflectPauseRepository,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
-import * as telemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import * as sessionReflectTelemetryFlow from '../telemetry/pause-reflect-telemetry-flow';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
   type PauseReflectTelemetrySurface,
-} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+} from '../telemetry/pause-reflect-telemetry-flow';
 
 /**
- * Application sibling parity: pending-offer-io vs session reflect telemetry-io
+ * Application sibling parity: pending-offer-io vs session reflect telemetry-flow
  * (parity with presentation
  * `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts`; distinct from
  * `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ pending-offer telemetry-io).
  * Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts` ↔
  * `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts`.
  */
-describe('pause-reflect-pending-offer-io ↔ pause-reflect-telemetry-io sibling parity (application)', () => {
-  it('pending-offer-io and session reflect telemetry-io are distinct presentation I/O surfaces', () => {
+describe('pause-reflect-pending-offer-io ↔ pause-reflect-telemetry-flow session sibling parity (application)', () => {
+  it('pending-offer-io and session reflect telemetry-flow are distinct surfaces', () => {
     expect(typeof getPendingPauseOfferDisplay).toBe('function');
     expect(typeof pauseAdoptPendingOffer).toBe('function');
     expect(typeof pauseDeclinePendingOffer).toBe('function');
@@ -49,10 +49,10 @@ describe('pause-reflect-pending-offer-io ↔ pause-reflect-telemetry-io sibling 
     expect('trackPauseReflectWallpaperTap' in pendingOfferIo).toBe(false);
     expect('PauseReflectTelemetrySurface' in pendingOfferIo).toBe(false);
 
-    expect('pauseAdoptPendingOffer' in telemetryIo).toBe(false);
-    expect('pauseDeclinePendingOffer' in telemetryIo).toBe(false);
-    expect('getPendingPauseOfferDisplay' in telemetryIo).toBe(false);
-    expect('reflectPauseRepository' in telemetryIo).toBe(false);
+    expect('pauseAdoptPendingOffer' in sessionReflectTelemetryFlow).toBe(false);
+    expect('pauseDeclinePendingOffer' in sessionReflectTelemetryFlow).toBe(false);
+    expect('getPendingPauseOfferDisplay' in sessionReflectTelemetryFlow).toBe(false);
+    expect('reflectPauseRepository' in sessionReflectTelemetryFlow).toBe(false);
   });
 
   it('pending-offer-io exports stay off session reflect UI PostHog trackers', () => {
@@ -64,7 +64,7 @@ describe('pause-reflect-pending-offer-io ↔ pause-reflect-telemetry-io sibling 
     expect(reflectPauseRepository).not.toBe(trackPauseReflectWallpaperTap);
   });
 
-  it('session reflect telemetry-io exports stay off pending-offer adopt/decline RPC and display', () => {
+  it('session reflect telemetry-flow exports stay off pending-offer adopt/decline RPC and display', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(pauseAdoptPendingOffer);
     expect(trackPauseReflectShareTap).not.toBe(pauseDeclinePendingOffer);
     expect(trackPauseReflectWallpaperTap).not.toBe(getPendingPauseOfferDisplay);
