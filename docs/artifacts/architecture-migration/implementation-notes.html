@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — companion orchestrate-io ↔ orchestrate-flow anchor (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestrate-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Add application-layer <code>pause-companion-orchestrate-io-parity.test.ts</code> (parity with reflect hub/steps/share I/O cluster tests; presentation <code>pause-companion-orchestrate-io</code> cannot import <code>pause-companion-orchestrate-flow</code> except allowlisted <code>pause-companion-orchestrate-io.re-exports.test.ts</code>). Document orchestrate-flow comment for re-exports parity. Production orchestrate I/O keeps leaf imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + CI allowlist only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: <code>pause-reflect-flows-io</code> ↔ <code>pause-reflect-flows-flow</code> presentation parity, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — archive decide I/O ↔ archive-decide-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
