@@ -9,6 +9,10 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'companionPauseRepository' },
 }));
 
+import {
+  loadCompanionOrchestrateSession as loadSessionFromOrchestrationFlow,
+  nextExpandedWithLazyFetch as nextExpandedFromOrchestrationFlow,
+} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow';
 import { applyCompanionOrchestrateRetryReset as applyRetryResetDirect } from '@/features/pause/application/use-cases/ritual/frame/apply-companion-orchestrate-retry-reset';
 import { applyCompanionSlotOrchestrateOutcome as applyOutcomeDirect } from '@/features/pause/application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome';
 import { logCompanionSlotOrchestrateInvoke as logInvokeDirect } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry';
@@ -69,5 +73,13 @@ describe('pause-companion-orchestrate-io parity', () => {
     expect(setCompanionSlotError).toBe(setErrorDirect);
     expect(setCompanionSlotLoading).toBe(setLoadingDirect);
     expect(trackCompanionGenerationInitiated).toBe(trackGenerationDirect);
+  });
+
+  it('orchestrate I/O exports stay distinct from orchestration-flow session load and expansion siblings', () => {
+    expect(runCompanionSlotOrchestrate).not.toBe(loadSessionFromOrchestrationFlow);
+    expect(runCompanionInterventionBootstrap).not.toBe(nextExpandedFromOrchestrationFlow);
+    expect(applyCompanionSlotOrchestrateOutcome).not.toBe(loadSessionFromOrchestrationFlow);
+    expect(logCompanionSlotOrchestrateInvoke).not.toBe(nextExpandedFromOrchestrationFlow);
+    expect(trackCompanionGenerationInitiated).not.toBe(loadSessionFromOrchestrationFlow);
   });
 });
