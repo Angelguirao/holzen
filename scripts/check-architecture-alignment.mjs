@@ -99,6 +99,10 @@ mustExist(
   'pause/presentation/reflect/generation/',
 );
 mustExist(
+  'src/features/pause/presentation/reflect/generation/manual-open',
+  'pause/presentation/reflect/generation/manual-open/',
+);
+mustExist(
   'src/features/pause/presentation/reflect/steps',
   'pause/presentation/reflect/steps/',
 );
