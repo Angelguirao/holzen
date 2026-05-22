@@ -1,6 +1,7 @@
 /**
  * Presentation I/O parity (colocated beside `pause-archive-io.ts`).
- * Imports `pause-archive-decide-flow` CI umbrella for `.toBe` identity pins only — production archive I/O keeps ritual/decide leaf imports.
+ * Imports `pause-archive-decide-flow` CI umbrella for `.toBe` identity pins only —
+ * production archive I/O keeps ritual/decide leaf imports.
  * Leaf + flow re-export pins also live in `pause-archive-io.re-exports.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
@@ -13,7 +14,7 @@ import { trackPauseOutcomeRetrospective } from '@/features/pause/application/use
 import {
   archivePauseRepository,
   trackPauseOutcomeRetrospective as trackRetrospectiveFromArchiveIo,
-} from '@/features/pause/presentation/archive/pause-archive-io';
+} from './pause-archive-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 describe('pause-archive-io parity', () => {
