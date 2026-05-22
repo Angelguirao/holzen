@@ -25,6 +25,7 @@ import {
  * Presentation sibling parity: pending-offer-io vs session reflect telemetry-io
  * (parity with `pause-reflect-share-telemetry-io-sibling-parity.test.ts`; distinct from
  * `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ pending-offer telemetry-io).
+ * Application mirror: `application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts`.
  */
 describe('pause-reflect-pending-offer-io ↔ pause-reflect-telemetry-io sibling parity', () => {
   it('pending-offer-io and session reflect telemetry-io are distinct presentation I/O surfaces', () => {

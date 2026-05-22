@@ -54,6 +54,11 @@ import {
 import {
   pauseShiftEmotionFrameHubDone,
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseDeclinePendingOffer,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 
 /**
  * Application mirror: `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
@@ -116,5 +121,19 @@ describe('pause-reflect-telemetry-io parity (application)', () => {
     expect(trackPauseReflectShareTap).not.toBe(pauseInitialEmotionSkipWithRepository);
     expect(trackPostItDirect).not.toBe(runReflectGeneration);
     // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts` (application + presentation).
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `application/.../pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts`
+   * (application + presentation).
+   */
+  it('sibling cluster: pending-offer-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseAdoptPendingOffer);
+    expect(trackPauseReflectShareTap).not.toBe(pauseDeclinePendingOffer);
+    expect(trackPauseReflectWallpaperTap).not.toBe(getPendingPauseOfferDisplay);
+    expect(trackPostItFromTelemetryIo).not.toBe(pauseAdoptPendingOffer);
+    expect(trackShareTapFromTelemetryIo).not.toBe(pauseDeclinePendingOffer);
+    expect(trackWallpaperFromTelemetryIo).not.toBe(getPendingPauseOfferDisplay);
   });
 });

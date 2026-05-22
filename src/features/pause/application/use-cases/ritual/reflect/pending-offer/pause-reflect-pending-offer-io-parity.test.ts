@@ -59,10 +59,17 @@ import {
   pauseReflectFavoriteToggle,
   pauseReflectionStepLogOnce,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 /**
  * Application mirror: `presentation/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+ * Session telemetry-io sibling: `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts`.
  */
 describe('pause-reflect-pending-offer-io parity (application)', () => {
   it('presentation I/O pending-offer display matches pending-offer CI umbrella', () => {
@@ -176,5 +183,19 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
     expect(pauseAdoptPendingOffer).not.toBe(pauseReflectFavoriteToggle);
     expect(pauseDeclinePendingOffer).not.toBe(pauseReflectionStepLogOnce);
     expect(getPendingPauseOfferDisplay).not.toBe(pauseReflectFavoriteToggle);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts`
+   * (application + presentation).
+   */
+  it('sibling cluster: session reflect telemetry-io exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(trackPauseReflectPostItOpen);
+    expect(pauseDeclinePendingOffer).not.toBe(trackPauseReflectShareTap);
+    expect(getPendingPauseOfferDisplay).not.toBe(trackPauseReflectWallpaperTap);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(trackPauseReflectPostItOpen);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(trackPauseReflectShareTap);
+    expect(reflectPauseRepository).not.toBe(trackPauseReflectWallpaperTap);
   });
 });
