@@ -19,6 +19,7 @@
  * `pause-reflect-pending-offer-flow-rpc-flow-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-rpc-flow` (RPC-only subcluster vs presentation umbrella);
  * `pause-reflect-pending-offer-flow-display-flow-sibling-parity.test.ts` ↔ `pause-pending-offer-display-flow` (display-only subcluster vs presentation umbrella);
  * `pause-reflect-pending-offer-flow-telemetry-flow-sibling-parity.test.ts` ↔ `pause-pending-offer-telemetry-flow` (PostHog-only subcluster vs presentation umbrella).
+ * Session telemetry-io sibling: `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts` (application + presentation) ↔ `pause-reflect-telemetry-io` (distinct from pending-offer-telemetry-io sibling).
  */
 export { runAdoptPendingPauseOffer } from './run-adopt-pending-pause-offer';
 export { runDeclinePendingPauseOffer } from './run-decline-pending-pause-offer';
