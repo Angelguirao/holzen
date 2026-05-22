@@ -33,7 +33,9 @@ import {
 import { EMPTY_COMPANION_SLOT_RELAXATIONS as emptyRelaxationsDirect } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
 import { resetInterventionIdempotency as resetInterventionDirect } from '@/features/pause/application/use-cases/ritual/frame/intervention-idempotency';
 import { runCompanionInterventionBootstrap as runInterventionDirect } from '@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
+import { persistCompanionUiStepCompletion as persistDirect } from '@/features/pause/application/use-cases/ritual/frame/persist-ui-step-completion';
 import { runCompanionSlotOrchestrate as runSlotOrchestrateDirect } from '@/features/pause/application/use-cases/ritual/frame/run-companion-slot-orchestrate';
+import { runToggleCompanionLibraryFavorite as toggleFavoriteDirect } from '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite';
 import {
   applyCompanionOrchestrateRetryReset,
   applyCompanionSlotOrchestrateOutcome,
@@ -77,8 +79,10 @@ import {
   loadCompanionOrchestrateSession,
   nextExpandedWithLazyFetch,
   pauseCompanionUiStepCompletion,
+  pauseCompanionUiStepCompletionWithRepository,
   pauseLoadCompanionOrchestrateSession,
   pauseToggleCompanionLibraryFavorite,
+  pauseToggleCompanionLibraryFavoriteWithRepository,
 } from './pause-companion-orchestration-io';
 
 describe('pause-companion-orchestrate-io parity', () => {
@@ -178,5 +182,24 @@ describe('pause-companion-orchestrate-io parity', () => {
     expect(runSlotOrchestrateFromOrchestrateIo).not.toBe(runFeedbackVoteFromAnalyticsIo);
     // Reciprocal inline pins: `pause-companion-analytics-io-parity.test.ts` (application + presentation).
     // Dedicated sibling: `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts` (presentation).
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-companion-orchestration-io-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: orchestration-io persist/favorite wrappers stay distinct from orchestrate-io', () => {
+    expect(pauseCompanionUiStepCompletion).not.toBe(runCompanionSlotOrchestrate);
+    expect(pauseToggleCompanionLibraryFavorite).not.toBe(runCompanionInterventionBootstrap);
+    expect(pauseCompanionUiStepCompletion).not.toBe(applyCompanionSlotOrchestrateOutcome);
+    expect(pauseToggleCompanionLibraryFavorite).not.toBe(logCompanionSlotOrchestrateInvoke);
+    expect(pauseCompanionUiStepCompletionWithRepository).not.toBe(runSlotOrchestrateFromOrchestrateIo);
+    expect(pauseToggleCompanionLibraryFavoriteWithRepository).not.toBe(runInterventionFromOrchestrateIo);
+    expect(persistDirect).not.toBe(runSlotOrchestrateDirect);
+    expect(toggleFavoriteDirect).not.toBe(logInvokeDirect);
+    expect(persistDirect).not.toBe(trackGenerationDirect);
+    expect(toggleFavoriteDirect).not.toBe(applyOutcomeDirect);
+    expect(persistDirect).not.toBe(toggleFavoriteDirect);
+    expect(pauseCompanionUiStepCompletion).not.toBe(pauseToggleCompanionLibraryFavorite);
+    // Reciprocal inline pins: `pause-companion-orchestration-io-parity.test.ts`.
   });
 });
