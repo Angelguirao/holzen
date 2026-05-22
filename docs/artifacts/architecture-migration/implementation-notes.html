@@ -59,19 +59,6 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
-      <span>Phase A — session providers-io ↔ providers-flow (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-session-providers-io-parity.test.ts</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add application-layer <code>pause-session-providers-io-parity.test.ts</code> and presentation <code>pause-session-providers-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> identity for <code>pickPauseHolzenProvidersSlice</code> (parity with shell-io / ritual-restore-io; behavioral smoke stays in <code>pause-session-providers-io.test.ts</code>). Production providers I/O keeps leaf import from <code>pause-holzen-providers-slice</code>.</dd>
-      <dt>Deviation</dt>
-      <dd>None — tests + flow comment only.</dd>
-      <dt>Open question</dt>
-      <dd>Next: remaining session I/O parity (terminal-entry, step-handlers, scaffold, brief, frame, decide) or Phase B subscription Tier 1 shims.</dd>
-=======
       <span>Phase A — home bulk-hold-io ↔ apply-bulk-hold-outcomes (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -83,7 +70,23 @@
       <dd>None — tests + comments only.</dd>
       <dt>Open question</dt>
       <dd>Next: Phase B subscription interior slices or remaining session presentation I/O parity gaps.</dd>
->>>>>>> 25a52b5bf (test(pause): add home bulk-hold-io parity after decide colocation)
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session providers-io ↔ providers-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-providers-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add application-layer <code>pause-session-providers-io-parity.test.ts</code> and presentation <code>pause-session-providers-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> identity for <code>pickPauseHolzenProvidersSlice</code> (parity with shell-io / ritual-restore-io; behavioral smoke stays in <code>pause-session-providers-io.test.ts</code>). Production providers I/O keeps leaf import from <code>pause-holzen-providers-slice</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow comment only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: remaining session I/O parity (terminal-entry, step-handlers, scaffold, brief, frame, decide) or Phase B subscription Tier 1 shims.</dd>
     </dl>
   </article>
 
