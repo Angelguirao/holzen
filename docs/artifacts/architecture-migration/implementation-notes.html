@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase B — pause product-analytics shim (reflect session UI telemetry, Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>application/pause-product-analytics.ts</code> → <code>pause-reflect-session-ui-telemetry</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Phase A backlog #1 (<code>ritual/reflect/</code> moves) remains complete. Start Tier 1 lib shim scan pause-first: pause application adapter re-exports <code>trackEvent</code> (application layer cannot import <code>features/pause/infrastructure/</code> per <code>check:feature-imports</code>) so <code>pause-reflect-session-ui-telemetry</code> no longer imports <code>@/lib/posthog</code> directly. Other pause telemetry leaves remain on <code>@/lib/posthog</code> for follow-up slices.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity (same <code>trackEvent</code> delegate).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel pending-offer / manual-open / frame telemetry onto <code>pause-product-analytics</code>, or subscription Tier 1 shim scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — colocate session↔pending-offer telemetry-io sibling under reflect/telemetry (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — test relocation + import path updates only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B Tier 1 lib shim scan (<code>@/lib/posthog</code> in ritual reflect telemetry), or peel <code>public.ts</code> follow-ups.</dd>
+      <dd>Superseded by product-analytics shim slice for lib posthog follow-up ordering.</dd>
     </dl>
   </article>
 
