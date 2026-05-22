@@ -10,7 +10,7 @@ import type {
 import {
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
-} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow';
+} from './pause-home-reflect-telemetry-io';
 
 export type ManualPauseHomePreviewPorts = {
   setError: (message: string | null) => void;

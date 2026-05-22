@@ -6,8 +6,8 @@ import {
   type ManualPauseTriggerResult,
 } from '@/features/pause/domain/manual-pause-trigger-result';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
-import { applyManualPauseOpenResult } from './manual-open/apply-manual-pause-open-result';
 import {
+  applyManualPauseOpenResult,
   buildManualPauseOpenParams,
   openManualPauseFromHome,
   pauseHomeManualOpenPorts,
