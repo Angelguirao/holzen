@@ -93,6 +93,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — steps-flow ↔ generation-flow sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-generation-flow-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated sibling-parity test so <code>pause-reflect-steps-flow</code> and <code>pause-reflect-generation-flow</code> CI anchors stay namespace-separated (parity with steps↔hub, steps↔pending-offer, and generation↔flows pins). Document cross-test reference on both flow modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow comments only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session shell-io presentation wrapper delegation tests, or Phase B app-shell boot import scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — scaffold↔shell sibling pins + scaffold-io extended parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
