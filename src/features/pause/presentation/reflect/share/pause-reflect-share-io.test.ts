@@ -1,5 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
+}));
+
+import {
+  pauseReflectOutcomeLog,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
@@ -40,5 +48,10 @@ describe('pause-reflect-share-io', () => {
     expect(pauseReflectionShareImage).not.toBe(trackPauseReflectPostItOpen);
     expect(pauseReflectionShareImage).not.toBe(trackPauseReflectShareTap);
     expect(pauseReflectionShareImage).not.toBe(trackPauseReflectWallpaperTap);
+  });
+
+  it('sibling cluster: flows-io exports stay distinct from share-io', () => {
+    expect(pauseReflectionShareImage).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(pauseReflectionShareImage).not.toBe(pauseReflectOutcomeLog);
   });
 });

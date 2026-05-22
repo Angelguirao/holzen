@@ -28,7 +28,8 @@ import {
 /**
  * Presentation sibling parity: flows-io vs share-io (parity with application
  * `pause-reflect-flows-share-flow-sibling-parity.test.ts`; complements
- * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` and
+ * `pause-reflect-flows-hub-io-sibling-parity.test.ts`,
+ * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts`, and
  * `pause-reflect-share-steps-io-sibling-parity.test.ts`).
  */
 describe('pause-reflect-flows-io ↔ pause-reflect-share-io sibling parity', () => {
