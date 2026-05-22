@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect generation I/O holzen-reflect leaf pin (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-io</code> exports <code>runReflectGeneration</code> leaf identity</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Re-export <code>runReflectGeneration</code> on <code>pause-reflect-generation-io.ts</code> and extend <code>pause-reflect-generation-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> against <code>holzen-reflect/run-reflect-generation</code> (parity with mood/hub/steps I/O leaf pins; not <code>pause-reflect-generation-flow</code> umbrella).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + named re-export only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation I/O still imports holzen-reflect leaf directly per CI; re-export is for regression identity only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-telemetry-flow</code> umbrella pins, <code>pause-companion-orchestration-flow</code> ↔ orchestration subcluster pins, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect share orchestration-flow subcluster pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

@@ -13,6 +13,7 @@ import {
 import { reflectGenerationPrerequisite as prerequisiteDirect } from '@/features/pause/domain/reflect/generation/reflect-generation-prerequisites';
 import { resolveEffectiveReflectionCopy as resolveCopyDirect } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
 import { resolveReflectGenerationPrefetch as resolvePrefetchDirect } from '@/features/pause/domain/reflect/generation/resolve-reflect-generation-prefetch';
+import { runReflectGeneration as runReflectGenerationDirect } from '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation';
 import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
 
 import {
@@ -22,6 +23,7 @@ import {
   reflectGenerator,
   resolveEffectiveReflectionCopy,
   resolveReflectGenerationPrefetch,
+  runReflectGeneration,
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
 } from './pause-reflect-generation-io';
@@ -47,5 +49,10 @@ describe('pause-reflect-generation-io re-exports', () => {
 
   it('binds default reflectGenerator to public-rpc supabaseReflectGenerator', () => {
     expect(reflectGenerator).toBe(supabaseReflectGenerator);
+  });
+
+  it('re-exports runReflectGeneration from holzen-reflect leaf (not generation umbrella)', () => {
+    expect(typeof runReflectGeneration).toBe('function');
+    expect(runReflectGeneration).toBe(runReflectGenerationDirect);
   });
 });
