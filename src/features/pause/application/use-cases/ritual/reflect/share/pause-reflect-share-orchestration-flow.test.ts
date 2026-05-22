@@ -13,6 +13,19 @@ import {
 import { runReflectionShareImage as runShareImageDirect } from './run-reflection-share-image';
 
 import {
+  buildReflectionShareTelegramUrl as buildTelegramFromChannelFlow,
+  buildReflectionShareTweetUrl as buildTweetFromChannelFlow,
+  buildReflectionShareWhatsAppUrl as buildWhatsAppFromChannelFlow,
+} from './pause-reflection-share-channel-urls-flow';
+import {
+  deliverReflectionShareImage as deliverShareImageFromImageFlow,
+  runReflectionShareImage as runShareImageFromImageFlow,
+} from './pause-reflection-share-image-flow';
+import {
+  buildReflectionShareText as buildTextFromTextFlow,
+} from './pause-reflection-share-text-flow';
+
+import {
   deliverReflectionShareImage,
   buildReflectionShareTelegramUrl as buildTelegramFromFlow,
   buildReflectionShareText as buildTextFromFlow,
@@ -36,5 +49,14 @@ describe('pause-reflect-share-orchestration-flow', () => {
     expect(buildTelegramFromFlow).toBe(buildReflectionShareTelegramUrl);
     expect(buildTweetFromFlow).toBe(buildReflectionShareTweetUrl);
     expect(buildWhatsAppFromFlow).toBe(buildReflectionShareWhatsAppUrl);
+  });
+
+  it('orchestration bindings match share subcluster CI anchors (leaf parity)', () => {
+    expect(buildTextFromFlow).toBe(buildTextFromTextFlow);
+    expect(buildTelegramFromFlow).toBe(buildTelegramFromChannelFlow);
+    expect(buildTweetFromFlow).toBe(buildTweetFromChannelFlow);
+    expect(buildWhatsAppFromFlow).toBe(buildWhatsAppFromChannelFlow);
+    expect(runReflectionShareImage).toBe(runShareImageFromImageFlow);
+    expect(deliverReflectionShareImage).toBe(deliverShareImageFromImageFlow);
   });
 });
