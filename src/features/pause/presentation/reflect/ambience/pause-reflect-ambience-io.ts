@@ -6,6 +6,7 @@
  * `pause-reflect-ambience-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
  * `pause-reflect-flows-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`;
  * `pause-reflect-ambience-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`;
+ * `pause-reflect-ambience-share-io-sibling-parity.test.ts` + `share/pause-reflect-share-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`;
  * inline pins: `pause-reflect-ambience-io.test.ts`, `pause-reflect-generation-io.test.ts`, `pause-reflect-flows-io.test.ts`.
  */
 export {
