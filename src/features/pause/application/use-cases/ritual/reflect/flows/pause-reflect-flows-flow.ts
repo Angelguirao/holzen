@@ -2,7 +2,7 @@
  * CI cluster anchor for ritual reflect+decide flows presentation I/O (§3 / check:architecture-alignment).
  * Cluster markers: `ritual-reflect-flows-cluster.ts`, `ritual/decide/ritual-decide-cluster.ts` (empty exports; unit-tested).
  * Composes domain reflect/decide helpers + ritual/decide leaf modules (not subcluster flow anchors).
- * `pause-reflect-flows-io.re-exports.test.ts`, `pause-reflect-flows-io-parity.test.ts`, and
+ * `pause-reflect-flows-io.re-exports.test.ts`, `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts`, and
  * `pause-reflect-flows-io-flow-sibling-parity.test.ts` may import this umbrella for parity;
  * production flows I/O keeps leaf imports.
  * Sibling pins: `pause-reflect-flows-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts` (inline),

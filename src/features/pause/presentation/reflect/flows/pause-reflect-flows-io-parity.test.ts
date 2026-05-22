@@ -67,7 +67,7 @@ import {
   scoreImpactMotionDelaySec as motionDelayFromFlowsIo,
   showPauseOutcomeNotCompletedToast as showNotCompletedFromFlowsIo,
   showPauseOutcomeSaveFailedToast as showSaveFailedFromFlowsIo,
-} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+} from './pause-reflect-flows-io';
 import {
   buildPauseSessionStepRitualBundle,
   buildPauseSessionStepShellBundle,
@@ -104,14 +104,6 @@ import {
   initialPhaseFromRestored,
 } from '@/features/pause/application/use-cases/session/pause-session-decide-flow';
 import {
-  buildFeelTilesMoodLogOptions,
-  pauseInitialEmotionSelect,
-  pauseInitialEmotionSelectWithRepository,
-  pauseInitialEmotionSkip,
-  pauseInitialEmotionSkipWithRepository,
-  resolvePauseSessionChromeCloseAction,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
-import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
@@ -134,6 +126,12 @@ import {
 
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
+/**
+ * Presentation reflect+decide flows I/O parity (colocated beside `pause-reflect-flows-io.ts`).
+ * Flows CI umbrella: `pause-reflect-flows-flow` (application). Sibling pins under
+ * `application/.../ritual/reflect/flows/*-sibling-parity.test.ts` and this folder.
+ * Reciprocal inline pins ↔ cluster `pause-reflect-*-io-parity.test.ts` files in other reflect subclusters.
+ */
 describe('pause-reflect-flows-io parity', () => {
   it('presentation I/O reflect+decide exports match flows CI umbrella', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).toBe(resolvePreflightFromFlowsIo);
@@ -199,7 +197,7 @@ describe('pause-reflect-flows-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (reflect+decide vs shift-frame hub).
+   * Reciprocal inline pins ↔ `presentation/reflect/hub/pause-reflect-hub-io-parity.test.ts` (reflect+decide vs shift-frame hub).
    * Dedicated sibling file: `pause-reflect-flows-hub-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: hub-io shift-frame exports stay distinct from flows-io', () => {
@@ -229,7 +227,7 @@ describe('pause-reflect-flows-io parity', () => {
     expect(pauseReflectOutcomeLog).not.toBe(shouldLogPauseReflectionStep);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(shouldShowFavoriteProHint);
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectTagUpdate);
-    // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
+    // Reciprocal inline pins: `application/.../steps/pause-reflect-steps-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-steps-io-sibling-parity.test.ts`.
   });
 
@@ -246,7 +244,7 @@ describe('pause-reflect-flows-io parity', () => {
     expect(resolvePauseDecideOutcomeFlow).not.toBe(initialPhaseFromRestored);
     expect(buildPauseScoreImpacts).not.toBe(initialDecisionFromRestored);
     expect(getSessionQuote).not.toBe(initialPhaseFromRestored);
-    // Reciprocal inline pins: `pause-session-decide-io-parity.test.ts`.
+    // Reciprocal inline pins: `application/.../session/pause-session-decide-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-decide-io-sibling-parity.test.ts`.
   });
 
@@ -313,7 +311,7 @@ describe('pause-reflect-flows-io parity', () => {
     expect(resolvePauseDecideOutcomeFlow).not.toBe(trackPauseReflectWallpaperTap);
     expect(getSessionQuote).not.toBe(trackPauseReflectPostItOpen);
     expect(buildPauseScoreImpacts).not.toBe(trackPauseReflectShareTap);
-    // Reciprocal inline pins: `pause-reflect-telemetry-io-parity.test.ts`.
+    // Reciprocal inline pins: `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-telemetry-io-sibling-parity.test.ts`.
   });
 
@@ -349,7 +347,7 @@ describe('pause-reflect-flows-io parity', () => {
     expect(formatReinforcementQuoteFromSession).not.toBe(buildPauseSessionStepRitualBundle);
     expect(getSessionQuote).not.toBe(buildPauseSessionStepShellBundle);
     expect(reflectPauseRepository).not.toBe(buildPauseSessionStepRitualBundle);
-    // Reciprocal inline pins: `pause-session-step-handlers-io-parity.test.ts`.
+    // Reciprocal inline pins: `application/.../session/pause-session-step-handlers-io-parity.test.ts`.
     // Full pins: `pause-session-step-handlers-flows-io-sibling-parity.test.ts`.
   });
 });

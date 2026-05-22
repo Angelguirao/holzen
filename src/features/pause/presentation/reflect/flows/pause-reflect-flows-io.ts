@@ -4,20 +4,20 @@
  * from `score-impacts` / `score-impact-presentation`; parity with `pause-reflect-mood-io`).
  * `PauseImpactData` via `pause-session-decide-io` (session decide beat).
  * Parity pins: `pause-reflect-flows-io.test.ts` (outcome wrapper distinctness + RPC delegation; ambience-io + pending-offer-io reciprocal inline pins),
- * `pause-reflect-flows-io-parity.test.ts`, `pause-reflect-flows-io-flow-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow`,
+ * `pause-reflect-flows-io-parity.test.ts` (colocated in this folder), `pause-reflect-flows-io-flow-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow`,
  * `pause-reflect-flows-decide-io-sibling-parity.test.ts` ↔ `pause-session-decide-io` (application
  * `pause-reflect-flows-decide-flow-sibling-parity.test.ts` ↔ `pause-session-decide-flow`),
  * `pause-reflect-flows-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (application
  * `pause-reflect-flows-steps-io-sibling-parity.test.ts` under `application/.../flows/`; steps-colocated
  * `pause-reflect-steps-flows-io-sibling-parity.test.ts` application + presentation; reciprocal inline pins in
- * `pause-reflect-flows-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`; application `pause-reflect-flows-io-parity.test.ts`
- * ↔ `pause-reflect-steps-io-parity.test.ts`),
+ * `pause-reflect-flows-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`; `pause-reflect-flows-io-parity.test.ts`
+ * ↔ `application/.../steps/pause-reflect-steps-io-parity.test.ts`),
  * `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io` (application
  * `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
- * `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-telemetry-io-parity.test.ts`),
+ * `pause-reflect-flows-io-parity.test.ts` ↔ `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts`),
  * `pause-reflect-flows-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io` (application
  * `pause-reflect-flows-ambience-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
- * `pause-reflect-flows-io-parity.test.ts` (application) ↔ `pause-reflect-ambience-io-parity.test.ts` (presentation)),
+ * `pause-reflect-flows-io-parity.test.ts` ↔ `presentation/reflect/ambience/pause-reflect-ambience-io-parity.test.ts`),
  * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`,
  * `pause-reflect-flows-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io` (application
  * `pause-reflect-flows-hub-io-sibling-parity.test.ts` under `application/.../flows/`),
@@ -29,7 +29,7 @@
  * `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-generation-io-parity.test.ts`), and
  * `pause-reflect-flows-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io` (application
  * `pause-reflect-flows-mood-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
- * `pause-reflect-flows-io-parity.test.ts` (application) ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`),
+ * `pause-reflect-flows-io-parity.test.ts` ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`),
  * `pause-session-step-handlers-flows-io-sibling-parity.test.ts` ↔ `pause-session-step-handlers-io` (cross-surface;
  * application mirror: `pause-session-step-handlers-flows-io-sibling-parity.test.ts` under `application/.../session/`).
  */
