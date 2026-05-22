@@ -3,6 +3,8 @@
  * Composes holzen-reflect domain helpers + `run-reflect-generation` + manual-open leaf use cases
  * (not holzen-reflect / manual-open subcluster flow anchors; PostHog stays on telemetry-flow modules).
  * Presentation: `pause-reflect-generation-io.ts` and `pause-home-reflect-io.ts` import leaf modules directly.
+ * `pause-reflect-generation-io.re-exports.test.ts` and `pause-reflect-generation-io-parity.test.ts`
+ * may import this umbrella for parity; production generation I/O keeps leaf imports.
  */
 export {
   messageFromReflectGenerationResult,
