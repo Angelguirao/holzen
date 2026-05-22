@@ -1,7 +1,8 @@
 /**
  * Presentation I/O parity (colocated beside `pause-companion-orchestrate-io.ts`).
  * Imports `pause-companion-orchestrate-flow` CI umbrella for `.toBe` identity pins only — production orchestrate I/O keeps ritual/frame leaf imports.
- * Application flow/sibling parity tests stay under `application/.../ritual/frame/`.
+ * Application mirror: `application/use-cases/ritual/frame/pause-companion-orchestrate-io-parity.test.ts`.
+ * Orchestration-io sibling: `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts` (application + presentation).
  */
 import { describe, expect, it, vi } from 'vitest';
 
@@ -42,6 +43,7 @@ import {
   setCompanionSlotLoading,
   trackCompanionGenerationInitiated,
 } from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow';
+import * as orchestrateFlow from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow';
 import {
   applyCompanionOrchestrateRetryReset as applyRetryResetFromOrchestrateIo,
   applyCompanionSlotOrchestrateOutcome as applyOutcomeFromOrchestrateIo,
@@ -54,6 +56,15 @@ import {
   setCompanionSlotLoading as setLoadingFromOrchestrateIo,
   trackCompanionGenerationInitiated as trackGenerationFromOrchestrateIo,
 } from './pause-companion-orchestrate-io';
+import * as orchestrateIo from './pause-companion-orchestrate-io';
+import {
+  invalidateCompanionUiCompletionQuery,
+  loadCompanionOrchestrateSession,
+  nextExpandedWithLazyFetch,
+  pauseCompanionUiStepCompletion,
+  pauseLoadCompanionOrchestrateSession,
+  pauseToggleCompanionLibraryFavorite,
+} from './pause-companion-orchestration-io';
 
 describe('pause-companion-orchestrate-io parity', () => {
   it('presentation I/O orchestrate exports match pause-companion-orchestrate-flow CI umbrella', () => {
@@ -80,11 +91,37 @@ describe('pause-companion-orchestrate-io parity', () => {
     expect(trackCompanionGenerationInitiated).toBe(trackGenerationDirect);
   });
 
+  it('orchestrate-flow CI umbrella composes ritual/frame leaf modules (presentation I/O matches)', () => {
+    expect('loadCompanionOrchestrateSession' in orchestrateFlow).toBe(false);
+    expect('nextExpandedWithLazyFetch' in orchestrateFlow).toBe(false);
+    expect('runCompanionSlotOrchestrate' in orchestrateFlow).toBe(true);
+    expect('runCompanionInterventionBootstrap' in orchestrateFlow).toBe(true);
+    expect('applyCompanionSlotOrchestrateOutcome' in orchestrateFlow).toBe(true);
+    expect('trackCompanionGenerationInitiated' in orchestrateFlow).toBe(true);
+  });
+
   it('orchestrate I/O exports stay distinct from orchestration-flow session load and expansion siblings', () => {
     expect(runCompanionSlotOrchestrate).not.toBe(loadSessionFromOrchestrationFlow);
     expect(runCompanionInterventionBootstrap).not.toBe(nextExpandedFromOrchestrationFlow);
     expect(applyCompanionSlotOrchestrateOutcome).not.toBe(loadSessionFromOrchestrationFlow);
     expect(logCompanionSlotOrchestrateInvoke).not.toBe(nextExpandedFromOrchestrationFlow);
     expect(trackCompanionGenerationInitiated).not.toBe(loadSessionFromOrchestrationFlow);
+    expect(runCompanionSlotOrchestrate).not.toBe(loadCompanionOrchestrateSession);
+    expect(runCompanionInterventionBootstrap).not.toBe(nextExpandedWithLazyFetch);
+    expect(applyCompanionSlotOrchestrateOutcome).not.toBe(pauseLoadCompanionOrchestrateSession);
+    expect(logCompanionSlotOrchestrateInvoke).not.toBe(pauseToggleCompanionLibraryFavorite);
+    expect(trackCompanionGenerationInitiated).not.toBe(pauseCompanionUiStepCompletion);
+    expect(setCompanionSlotLoading).not.toBe(invalidateCompanionUiCompletionQuery);
+    expect(resetInterventionIdempotency).not.toBe(pauseLoadCompanionOrchestrateSession);
+    // Reciprocal pins: `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts`.
+  });
+
+  it('presentation orchestrate-io stays off orchestration-io session/favorite wrappers', () => {
+    expect('pauseLoadCompanionOrchestrateSession' in orchestrateIo).toBe(false);
+    expect('pauseToggleCompanionLibraryFavorite' in orchestrateIo).toBe(false);
+    expect('nextExpandedWithLazyFetch' in orchestrateIo).toBe(false);
+    expect('invalidateCompanionUiCompletionQuery' in orchestrateIo).toBe(false);
+    expect('companionOrchestrator' in orchestrateIo).toBe(true);
+    // Reciprocal inline pins: `application/.../ritual/frame/pause-companion-orchestrate-io-parity.test.ts`.
   });
 });
