@@ -86,7 +86,7 @@ import {
  * Telemetry-io sibling pins: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `telemetry/pause-reflect-telemetry-io-parity.test.ts` (application + presentation).
  * Steps-io cross-surface: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (presentation).
+ * reciprocal inline pins ↔ `steps/pause-reflect-steps-io-parity.test.ts` (application + presentation).
  * Pending-offer cross-surface: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts` (presentation).
  */
