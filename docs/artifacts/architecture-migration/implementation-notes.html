@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session ritual-restore presentation I/O identity (backlog #1 complete, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-ritual-restore-io.re-exports.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 remains complete — no folder moves. Add unmocked <code>.toBe(direct)</code> identity for all ritual-restore I/O re-exports (domain <code>mapPersistedStep</code> + <code>restored-*-ritual-state</code> + <code>initial-ritual-entry</code>); flow leaf pins already on branch tip. Allowlist re-exports test beside ritual-restore I/O in <code>check:architecture-alignment</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + CI allowlist only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: companion presentation I/O re-export pins, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — presentation reflect mood I/O repository pin (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
