@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel pause-session-step-handlers-io to step-bundles (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-step-handlers-io</code> imports <code>step-bundles</code> directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Route step-handler bundle builders through <code>step-bundles</code> instead of <code>pause-session-step-handlers-flow</code> CI anchor (parity with <code>pause-session-frame-io</code> → <code>restored-frame-ritual-state</code> and breath I/O leaf peels on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-step-handlers-flow</code> remains application cluster anchor for CI; <code>use-pause-session-step-handlers</code> still imports via I/O only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-session-providers-io</code> and <code>pause-persisted-tab-session-io</code> to leaf modules, or session shell/scaffold subcluster peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-session-breath-io ritual-audio to leaf module (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
