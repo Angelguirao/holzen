@@ -20,7 +20,7 @@ import {
   pauseShiftEmotionFrameHubDoneWithRepository,
   reflectPauseRepository,
   resolveShiftFrameHubDonePresentation as resolvePresentationFromHubIo,
-} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+} from './pause-reflect-hub-io';
 import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
@@ -47,6 +47,7 @@ import {
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
+/** Presentation-layer hub I/O parity (colocated beside `pause-reflect-hub-io.ts`). */
 describe('pause-reflect-hub-io parity', () => {
   it('presentation I/O hub exports match pause-reflect-hub-flow CI umbrella', () => {
     expect(buildShiftEmotionFrameHubLogBundle).toBe(buildLogBundleFromHubIo);
