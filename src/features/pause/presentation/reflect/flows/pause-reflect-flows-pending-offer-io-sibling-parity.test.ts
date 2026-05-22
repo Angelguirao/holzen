@@ -30,8 +30,11 @@ import {
 
 /**
  * Presentation sibling parity: flows-io vs pending-offer-io (parity with application
+ * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` and flow-level
  * `pause-reflect-flows-pending-offer-flow-sibling-parity.test.ts`; complements
  * `pause-reflect-flows-steps-io-sibling-parity.test.ts`).
+ * Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts` ↔
+ * `pause-reflect-pending-offer-io-parity.test.ts`.
  */
 describe('pause-reflect-flows-io ↔ pause-reflect-pending-offer-io sibling parity', () => {
   it('flows-io and pending-offer-io are distinct presentation I/O surfaces', () => {

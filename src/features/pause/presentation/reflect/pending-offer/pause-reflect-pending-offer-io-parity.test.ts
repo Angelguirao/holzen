@@ -56,6 +56,13 @@ import {
   shouldLogPauseReflectionStep,
   shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
+  buildPauseScoreImpacts,
+  pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 
 describe('pause-reflect-pending-offer-io parity', () => {
   it('presentation I/O pending-offer display matches pending-offer CI umbrella', () => {
@@ -134,6 +141,22 @@ describe('pause-reflect-pending-offer-io parity', () => {
     expect(reflectPauseRepository).not.toBe(trackAbandonedFromPendingOfferTelemetryIo);
     // Reciprocal inline pins: `pause-reflect-pending-offer-io.test.ts`;
     // dedicated sibling: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (pending-offer RPC vs reflect+decide flows).
+   * Dedicated sibling file: `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: flows-io exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
+    expect(getPendingPauseOfferDisplay).not.toBe(buildPauseScoreImpacts);
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseDeclinePendingOffer).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts` (application).
+    // Full pins: `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts`.
   });
 
   /**
