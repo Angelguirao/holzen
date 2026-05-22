@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect flows flow↔io wrapper sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-flow-io-wrapper-sibling-parity.test.ts</code> (application + presentation)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no relocations. Mirror application + presentation <code>pause-reflect-flows-flow-io-wrapper-sibling-parity</code> beside <code>pause-reflect-flows-io.ts</code> so <code>pause-reflect-flows-flow</code> CI umbrella exports stay namespace-separated from port-bound <code>pauseReflectOutcomeLog*</code> wrappers (parity with steps/pending-offer/share flow↔io wrapper mirrors). Allowlist wrapper test in <code>check:architecture-alignment</code> for flows-flow CI umbrella import under <code>presentation/reflect/flows/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B Tier 1 lib shim scan (<code>@/lib/posthog</code> in ritual reflect telemetry), or extend generation/hub wrapper parity pins.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — application home-reflect-telemetry-io namespace pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — test-only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: presentation <code>pause-reflect-flows-flow-io-wrapper-sibling-parity</code> beside <code>pause-reflect-flows-io</code>, or Phase B Tier 1 lib shim scan (<code>@/lib/posthog</code> in ritual reflect telemetry).</dd>
+      <dd>Superseded by flows flow↔io wrapper slice on same branch.</dd>
     </dl>
   </article>
 
@@ -86,7 +103,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + comment cross-links only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: presentation <code>pause-reflect-flows-flow-io-wrapper-sibling-parity</code> beside <code>pause-reflect-flows-io</code>, or Phase B Tier 1 lib shim scan.</dd>
+      <dd>Superseded by flows flow↔io wrapper slice on same branch.</dd>
     </dl>
   </article>
 

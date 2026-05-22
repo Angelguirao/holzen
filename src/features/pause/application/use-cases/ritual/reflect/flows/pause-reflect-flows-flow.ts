@@ -25,6 +25,8 @@
  * and `pause-reflect-share-io.test.ts`.
  * Outcome leaf vs presentation wrappers: flows umbrella re-exports `runPauseOutcomeLog` identity;
  * `pauseReflectOutcomeLog*` live on `pause-reflect-flows-io` only (pinned in flows-flow + flows-io-parity tests).
+ * Flow↔I/O wrapper: `pause-reflect-flows-flow-io-wrapper-sibling-parity.test.ts` (application + presentation)
+ * ↔ `pause-reflect-flows-io` (colocated beside presentation I/O).
  */
 export {
   resolvePauseSessionReflectAndDecideAfterGeneration,
