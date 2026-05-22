@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — companion analytics-io ↔ analytics-flow (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-analytics-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Add application-layer <code>pause-companion-analytics-io-parity.test.ts</code> so presentation <code>pause-companion-analytics-io</code> run-log exports match <code>pause-companion-analytics-flow</code> (parity with orchestration-io parity; presentation re-exports test already pins leaf + flow + repository). Production analytics I/O keeps direct leaf imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: optional <code>pause-run-breath-segment-log-flow</code> CI anchor or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — archive I/O ↔ archive-decide-flow application parity (Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-companion-analytics-io-parity.test.ts</code>, optional breath segment-log flow anchor, or Phase B subscription Tier 1 shims.</dd>
+      <dd>Superseded by companion analytics-io parity slice (same day).</dd>
     </dl>
   </article>
 
