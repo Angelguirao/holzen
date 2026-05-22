@@ -2557,7 +2557,8 @@ for (const file of walkTs(join(root, 'src'))) {
       !rel.endsWith('pause-reflect-mood-io.ts') &&
       !rel.endsWith('pause-reflect-mood-io.test.ts') &&
       !rel.endsWith('pause-reflect-mood-io.re-exports.test.ts') &&
-      !rel.endsWith('pause-reflect-mood-io-parity.test.ts')
+      !rel.endsWith('pause-reflect-mood-io-parity.test.ts') &&
+      !rel.endsWith('pause-reflect-mood-flow-io-wrapper-sibling-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {

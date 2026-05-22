@@ -27,6 +27,9 @@
  * `pause-reflect-share-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`.
  * Reciprocal inline pins: `pause-reflect-mood-io.test.ts` ↔ `pause-reflect-flows-io.test.ts` and
  * `pause-reflect-telemetry-io.test.ts`.
+ * `pause-reflect-mood-flow-io-wrapper-sibling-parity.test.ts` beside this module (mood-flow CI umbrella vs
+ * `pauseInitialEmotionSelect*` / `reflectPauseRepository`; application mirror under `application/.../mood/`),
+ * parity with steps/flows/share/generation/pending-offer flow↔io wrapper mirrors.
  */
 import {
   runInitialEmotionSelect,
