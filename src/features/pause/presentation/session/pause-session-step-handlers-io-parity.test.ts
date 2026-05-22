@@ -1,3 +1,8 @@
+/**
+ * Presentation I/O parity (colocated beside `pause-session-step-handlers-io.ts`).
+ * Imports `pause-session-step-handlers-flow` CI umbrella for `.toBe` identity pins only — production step-handlers I/O keeps `step-bundles` leaf import.
+ * Application flow/sibling parity tests stay under `application/.../session/`.
+ */
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
@@ -14,9 +19,9 @@ import {
   buildPauseSessionStepShellBundle,
 } from '@/features/pause/application/use-cases/session/pause-session-step-handlers-flow';
 import {
-  buildPauseSessionStepRitualBundle as buildRitualFromStepHandlersIo,
-  buildPauseSessionStepShellBundle as buildShellFromStepHandlersIo,
-} from '@/features/pause/presentation/session/pause-session-step-handlers-io';
+  pauseReflectOutcomeLog,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
@@ -30,21 +35,21 @@ import {
   shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
-  pauseReflectOutcomeLog,
-  resolvePauseSessionReflectAndDecidePreflight,
-} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+  buildPauseSessionStepRitualBundle as buildRitualFromStepHandlersIo,
+  buildPauseSessionStepShellBundle as buildShellFromStepHandlersIo,
+} from './pause-session-step-handlers-io';
 import {
   buildPauseSessionStepTransitionConfig,
   PAUSE_SESSION_STEP_SLIDE_OFFSET_PX,
   PAUSE_SESSION_STEP_TRANSITION_DURATION_S,
   pauseStepSwipeDirection,
-} from '@/features/pause/presentation/session/pause-session-step-transition-io';
+} from './pause-session-step-transition-io';
 import {
   buildPauseSessionPersistSnapshot,
   buildPauseSessionScaffoldRitualDerived,
   computePauseStorageRitualSyncPatch,
   hasPersistablePauseSessionAnchor,
-} from '@/features/pause/presentation/session/scaffold/pause-session-scaffold-io';
+} from './scaffold/pause-session-scaffold-io';
 
 describe('pause-session-step-handlers-io parity', () => {
   it('presentation I/O bundle builders match step-handlers CI umbrella', () => {
@@ -100,7 +105,7 @@ describe('pause-session-step-handlers-io parity', () => {
     expect(buildPauseSessionStepRitualBundle).not.toBe(pauseStepSwipeDirection);
     expect(buildPauseSessionStepShellBundle).not.toBe(PAUSE_SESSION_STEP_SLIDE_OFFSET_PX);
     expect(buildPauseSessionStepRitualBundle).not.toBe(PAUSE_SESSION_STEP_TRANSITION_DURATION_S);
-    // Reciprocal inline pins: `pause-session-step-transition-io-parity.test.ts`.
+    // Reciprocal inline pins: `pause-session-step-transition-io-parity.test.ts` (application).
     // Full pins: `pause-session-step-handlers-step-transition-io-sibling-parity.test.ts`.
   });
 

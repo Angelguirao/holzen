@@ -389,7 +389,7 @@ describe('pause-reflect-flows-io parity', () => {
     expect(formatReinforcementQuoteFromSession).not.toBe(buildPauseSessionStepRitualBundle);
     expect(getSessionQuote).not.toBe(buildPauseSessionStepShellBundle);
     expect(reflectPauseRepository).not.toBe(buildPauseSessionStepRitualBundle);
-    // Reciprocal inline pins: `application/.../session/pause-session-step-handlers-io-parity.test.ts`.
+    // Reciprocal inline pins: `pause-session-step-handlers-io-parity.test.ts` (presentation/session).
     // Full pins: `pause-session-step-handlers-flows-io-sibling-parity.test.ts`.
   });
 });
