@@ -1,7 +1,7 @@
 /**
  * Application-layer I/O parity for ritual reflect pending-offer PostHog telemetry
  * (parity with `pause-reflect-telemetry-io-parity.test.ts`; presentation pins stay
- * colocated beside `pause-reflect-pending-offer-io.ts`).
+ * colocated beside `pause-reflect-pending-offer-telemetry-io.ts` under `presentation/reflect/telemetry/`).
  * Imports `pause-pending-offer-telemetry-flow` CI umbrella for `.toBe` identity pins only —
  * production pending-offer telemetry I/O keeps leaf tracker modules under `pending-offer/`.
  */

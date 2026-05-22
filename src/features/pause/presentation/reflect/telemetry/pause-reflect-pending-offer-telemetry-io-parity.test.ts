@@ -1,6 +1,6 @@
 /**
  * Presentation I/O parity for pending-offer PostHog trackers (colocated beside
- * `pause-reflect-pending-offer-io.ts`; production module stays under `reflect/telemetry/`).
+ * `pause-reflect-pending-offer-telemetry-io.ts`; RPC I/O stays under `reflect/pending-offer/`).
  * Application mirror: `application/.../pending-offer/pause-reflect-pending-offer-telemetry-io-parity.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
@@ -24,14 +24,14 @@ import {
   pauseDeclinePendingOffer,
   getPendingPauseOfferDisplay,
   reflectPauseRepository,
-} from './pause-reflect-pending-offer-io';
-import * as pendingOfferIo from './pause-reflect-pending-offer-io';
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import * as pendingOfferIo from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   trackPausePendingAdopted as trackAdoptedFromPendingOfferTelemetryIo,
   trackPausePendingDeclined as trackDeclinedFromPendingOfferTelemetryIo,
   trackPauseSessionAbandoned as trackAbandonedFromPendingOfferTelemetryIo,
-} from '../telemetry/pause-reflect-pending-offer-telemetry-io';
-import * as pendingOfferTelemetryIo from '../telemetry/pause-reflect-pending-offer-telemetry-io';
+} from './pause-reflect-pending-offer-telemetry-io';
+import * as pendingOfferTelemetryIo from './pause-reflect-pending-offer-telemetry-io';
 
 describe('pause-reflect-pending-offer-telemetry-io parity', () => {
   it('presentation I/O pending-offer telemetry matches pending-offer-telemetry-flow CI umbrella', () => {
