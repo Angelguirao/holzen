@@ -8,6 +8,8 @@
  * `pause-reflect-ambience-mood-flow-sibling-parity.test.ts` ↔ `pause-reflect-ambience-flow`;
  * `pause-reflect-share-mood-flow-sibling-parity.test.ts` ↔ `pause-reflect-share-flow`;
  * `pause-reflect-mood-flow.test.ts` pins sibling-cluster separation from `pause-reflect-hub-flow` and `pause-reflect-generation-flow`.
+ * Flow↔I/O wrapper: `pause-reflect-mood-flow-io-wrapper-sibling-parity.test.ts` (application + presentation)
+ * ↔ `pause-reflect-mood-io` (presentation wrappers off mood-flow CI umbrella; parity with steps/flows/share/generation).
  */
 export {
   runInitialEmotionSelect,

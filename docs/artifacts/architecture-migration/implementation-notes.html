@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect mood flow↔io wrapper sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</status>
+    </header>
+    <h3><code>pause-reflect-mood-flow-io-wrapper-sibling-parity.test.ts</code> (application + presentation)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no relocations. Mirror application + presentation <code>pause-reflect-mood-flow-io-wrapper-sibling-parity</code> beside <code>pause-reflect-mood-io.ts</code> so mood-flow CI umbrella exports stay namespace-separated from <code>pauseInitialEmotionSelect*</code> / <code>reflectPauseRepository</code>. Allowlist mood-flow umbrella import on wrapper parity test under <code>presentation/reflect/mood/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: ambience flow↔io wrapper mirrors, hub wrapper, or Phase B Tier 1 lib shim scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect generation flow↔io wrapper sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
