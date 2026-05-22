@@ -18,7 +18,7 @@ import * as sessionReflectTelemetryIo from '@/features/pause/presentation/reflec
 /**
  * Application sibling parity: session reflect telemetry-io vs Home manual-open telemetry-io
  * (parity with presentation
- * `presentation/reflect/generation/manual-open/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`;
+ * `presentation/reflect/telemetry/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`;
  * Colocated under `application/.../telemetry/` beside session telemetry-io parity cluster.
  * flow-level mirror: `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`).
  * Reciprocal inline pins: `pause-home-reflect-telemetry-io-parity.test.ts`,

@@ -101,7 +101,7 @@ describe('pause-home-reflect-telemetry-io parity', () => {
     // Reciprocal inline pins: `application/.../manual-open/pause-home-reflect-telemetry-io-parity.test.ts`.
     // Dedicated siblings: `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`;
     // `pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts` (application + presentation).
-    // Presentation sibling: `presentation/reflect/generation/manual-open/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`.
+    // Presentation sibling: `presentation/reflect/telemetry/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`.
   });
 
   it('home-reflect-telemetry-io trackers stay distinct from session reflect UI telemetry-flow', () => {

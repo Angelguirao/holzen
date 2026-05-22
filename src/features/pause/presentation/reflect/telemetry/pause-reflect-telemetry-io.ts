@@ -17,7 +17,7 @@
  * `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io` (application mirror:
  * `application/.../ambience/pause-reflect-ambience-telemetry-io-sibling-parity.test.ts`; reciprocal inline:
  * `pause-reflect-telemetry-io-parity.test.ts` ↔ `pause-reflect-ambience-io-parity.test.ts`), and
- * `presentation/reflect/generation/manual-open/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts` ↔ `pause-home-reflect-telemetry-io`,
+ * `presentation/reflect/telemetry/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts` ↔ `pause-home-reflect-telemetry-io`,
  * `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (presentation + application;
  * reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-telemetry-io-parity.test.ts`), and
  * `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io` (application mirror:
