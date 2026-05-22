@@ -2800,11 +2800,13 @@ for (const file of walkTs(join(root, 'src'))) {
         );
       }
     }
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_UMBRELLA_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: reflect flows I/O must not import flows umbrella (${needle})`,
-        );
+    if (!rel.endsWith('pause-reflect-flows-io.re-exports.test.ts')) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_UMBRELLA_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: reflect flows I/O must not import flows umbrella (${needle})`,
+          );
+        }
       }
     }
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_SCORE_IMPACTS_FLOW_IMPORTS) {

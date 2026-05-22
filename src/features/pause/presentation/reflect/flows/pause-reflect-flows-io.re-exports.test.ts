@@ -17,6 +17,20 @@ import {
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightDirect,
 } from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow';
 import {
+  buildPauseScoreImpacts as buildImpactsFromFlowsFlow,
+  formatReinforcementQuoteFromSession as formatQuoteFromFlowsFlow,
+  getSessionQuote as getQuoteFromFlowsFlow,
+  parseScoreImpactVolatilityPct as parseVolatilityFromFlowsFlow,
+  resolvePauseDecideOutcomeFlow as resolveOutcomeFromFlowsFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromFlowsFlow,
+  resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
+  resolveScoreImpactDisplayImpacts as resolveDisplayImpactsFromFlowsFlow,
+  resolveScoreImpactViewMode as resolveViewModeFromFlowsFlow,
+  scoreImpactMotionDelaySec as motionDelayFromFlowsFlow,
+  showPauseOutcomeNotCompletedToast as showNotCompletedFromFlowsFlow,
+  showPauseOutcomeSaveFailedToast as showSaveFailedFromFlowsFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
+import {
   buildPauseScoreImpacts as buildImpactsDirect,
   parseScoreImpactVolatilityPct as parseVolatilityDirect,
 } from '@/features/pause/application/use-cases/ritual/decide/score-impacts';
@@ -80,5 +94,20 @@ describe('pause-reflect-flows-io re-exports', () => {
 
   it('binds default reflectPauseRepository to public-rpc supabasePauseRepository', () => {
     expect(reflectPauseRepository).toBe(supabasePauseRepository);
+  });
+
+  it('presentation I/O bindings match pause-reflect-flows-flow CI anchor (leaf parity)', () => {
+    expect(resolvePauseSessionReflectAndDecidePreflight).toBe(resolvePreflightFromFlowsFlow);
+    expect(resolvePauseSessionReflectAndDecideAfterGeneration).toBe(resolveAfterGenFromFlowsFlow);
+    expect(formatReinforcementQuoteFromSession).toBe(formatQuoteFromFlowsFlow);
+    expect(resolvePauseDecideOutcomeFlow).toBe(resolveOutcomeFromFlowsFlow);
+    expect(getSessionQuote).toBe(getQuoteFromFlowsFlow);
+    expect(buildPauseScoreImpacts).toBe(buildImpactsFromFlowsFlow);
+    expect(parseScoreImpactVolatilityPct).toBe(parseVolatilityFromFlowsFlow);
+    expect(resolveScoreImpactDisplayImpacts).toBe(resolveDisplayImpactsFromFlowsFlow);
+    expect(resolveScoreImpactViewMode).toBe(resolveViewModeFromFlowsFlow);
+    expect(scoreImpactMotionDelaySec).toBe(motionDelayFromFlowsFlow);
+    expect(showPauseOutcomeNotCompletedToast).toBe(showNotCompletedFromFlowsFlow);
+    expect(showPauseOutcomeSaveFailedToast).toBe(showSaveFailedFromFlowsFlow);
   });
 });
