@@ -1,5 +1,5 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
-import { pauseStepSwipeDirection } from './pause-session-shell-io';
+import { pauseStepSwipeDirection } from './pause-session-step-transition-io';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import { hapticFeedback } from '@/lib/haptics';
 

@@ -374,11 +374,26 @@ const LEGACY_PAUSE_APPLICATION_REFLECT_TELEMETRY_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow'",
 ];
 
-/** Session presentation — import step-transition via shell I/O anchor only. */
+/** Session presentation — import step-transition via dedicated I/O anchor only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_STEP_TRANSITION_IMPORTS = [
   '@/features/pause/application/use-cases/session/step-transition',
+  '@/features/pause/application/use-cases/session/step-swipe-direction',
   "from './application/use-cases/session/step-transition'",
   "from '../application/use-cases/session/step-transition'",
+  "from './application/use-cases/session/step-swipe-direction'",
+  "from '../application/use-cases/session/step-swipe-direction'",
+];
+
+/** Session presentation — step motion must not import via shell I/O (use step-transition-io). */
+const LEGACY_PAUSE_PRESENTATION_SESSION_STEP_TRANSITION_SHELL_IO_IMPORTS = [
+  'buildPauseSessionStepTransitionConfig',
+  'pauseStepSwipeDirection',
+  'type PauseSessionStepTransitionConfig',
+  'type PauseSessionSwipeDirection',
+  'PAUSE_SESSION_STEP_SLIDE_OFFSET_PX',
+  'PAUSE_SESSION_STEP_TRANSITION_DURATION_S',
+  'PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S',
+  'PAUSE_SESSION_STEP_TRANSITION_EASE',
 ];
 
 /** Session presentation — import Holzen provider slice via providers I/O anchor only. */
@@ -1014,6 +1029,15 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_STEP_TRANSITION_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session step-transition import (${needle})`);
+      }
+    }
+    if (text.includes('pause-session-shell-io')) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_STEP_TRANSITION_SHELL_IO_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: session step-transition via pause-session-shell-io (${needle}) — use pause-session-step-transition-io`,
+          );
+        }
       }
     }
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_HOLZEN_PROVIDERS_IMPORTS) {

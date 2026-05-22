@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createRef } from 'react';
 import { buildPauseSessionScaffoldRitualPayloads } from './scaffold-ritual-payloads';
-import { buildPauseSessionStepTransitionConfig } from '../pause-session-shell-io';
+import { buildPauseSessionStepTransitionConfig } from '../pause-session-step-transition-io';
 import type { PauseBreathingHandle } from '@/features/pause/presentation/session/breath/pause-breathing-handle';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 

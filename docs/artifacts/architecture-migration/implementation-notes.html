@@ -20708,6 +20708,28 @@
       <dd><code>use-pause-session-ritual-state</code> still imports <code>PauseImpactData</code> from domain (session-owned state); cross-cluster breath types import reflect flows I/O.</dd>
       <dt>Open questions</dt>
       <dd>Next: session ritual-state impact type via session decide I/O, Phase B subscription Tier 1 shim, or session step-transition dedicated I/O peel.</dd>
+<<<<<<< HEAD
+=======
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session step-transition I/O peel (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Dedicated <code>pause-session-step-transition-flow</code> + <code>pause-session-step-transition-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no reflect folder moves. Peel Framer step motion off <code>pause-session-shell-flow</code>: new flow anchor re-exports <code>step-transition</code> + <code>step-swipe-direction</code>; <code>use-pause-session-step-transition</code>, <code>use-pause-session-go-to-step</code>, and scaffold ritual payloads import via <code>pause-session-step-transition-io</code>. <code>public-hooks</code> still re-exports motion constants for pause screens (direct application import).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>One more session I/O module vs overloaded shell I/O cluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim, or session ritual-state impact type via session decide I/O.</dd>
+>>>>>>> 5f69ed489 (refactor(pause): peel session step-transition into dedicated I/O anchor)
     </dl>
   </article>
 
