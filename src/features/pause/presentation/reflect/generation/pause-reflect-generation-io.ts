@@ -3,7 +3,8 @@
  * Imports domain hook leaf modules and `run-reflect-generation` directly (parity with
  * `pause-reflect-mood-io` leaf imports; not generation umbrella or hook-flow bundle).
  * Wrapper delegation pins: pause-reflect-generation-io-parity.test.ts (default generator + injected port).
- * Sibling parity: `pause-reflect-generation-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`.
+ * Sibling parity: `pause-reflect-generation-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
+ * `pause-reflect-generation-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`.
  */
 import {
   runReflectGeneration,
