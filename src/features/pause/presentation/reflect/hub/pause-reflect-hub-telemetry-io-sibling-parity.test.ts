@@ -22,9 +22,11 @@ import {
 
 /**
  * Presentation sibling parity: hub-io vs telemetry-io (parity with application
+ * `application/.../hub/pause-reflect-hub-telemetry-io-sibling-parity.test.ts`;
  * share-hub flow pins for hub vs session UI telemetry; complements
  * `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` and reciprocal inline
- * pins on `pause-reflect-hub-io.test.ts` / `pause-reflect-telemetry-io.test.ts`).
+ * pins on `pause-reflect-hub-io.test.ts` / `pause-reflect-telemetry-io.test.ts` and
+ * `pause-reflect-hub-io-parity.test.ts` ↔ `pause-reflect-telemetry-io-parity.test.ts`).
  */
 describe('pause-reflect-hub-io ↔ pause-reflect-telemetry-io sibling parity', () => {
   it('hub-io and telemetry-io are distinct presentation I/O surfaces', () => {

@@ -20,7 +20,9 @@
  * `presentation/reflect/generation/manual-open/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts` ↔ `pause-home-reflect-telemetry-io`,
  * `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (presentation + application;
  * reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-telemetry-io-parity.test.ts`), and
- * `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`, and
+ * `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io` (application mirror:
+ * `application/.../hub/pause-reflect-hub-telemetry-io-sibling-parity.test.ts`; reciprocal inline:
+ * `pause-reflect-hub-io-parity.test.ts` ↔ `pause-reflect-telemetry-io-parity.test.ts` presentation colocated), and
  * `pause-reflect-mood-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`.
  */
 export {

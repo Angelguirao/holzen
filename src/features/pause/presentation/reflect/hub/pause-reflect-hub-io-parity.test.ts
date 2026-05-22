@@ -65,6 +65,11 @@ import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 /**
@@ -77,6 +82,8 @@ import { supabasePauseRepository } from '@/features/pause/public-rpc';
  * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (generation cluster).
  * Ambience-io sibling pins: `pause-reflect-ambience-hub-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (ambience cluster).
+ * Telemetry-io sibling pins: `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (telemetry cluster).
  */
 describe('pause-reflect-hub-io parity', () => {
   it('presentation I/O hub exports match pause-reflect-hub-flow CI umbrella', () => {
@@ -197,5 +204,20 @@ describe('pause-reflect-hub-io parity', () => {
     expect(reflectPauseRepository).not.toBe(startPauseReflectFrameFocusAmbience);
     // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
     // Full pins: `pause-reflect-ambience-hub-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (shift-frame hub vs session reflect telemetry).
+   * Dedicated sibling file: `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: session reflect telemetry-io exports stay distinct from hub-io wrappers', () => {
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(trackPauseReflectPostItOpen);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(trackPauseReflectShareTap);
+    expect(buildLogBundleFromHubIo).not.toBe(trackPauseReflectWallpaperTap);
+    expect(resolvePresentationFromHubIo).not.toBe(trackPauseReflectPostItOpen);
+    expect(reflectPauseRepository).not.toBe(trackPauseReflectShareTap);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(trackPauseReflectWallpaperTap);
+    // Reciprocal inline pins: `pause-reflect-telemetry-io-parity.test.ts`.
+    // Full pins: `pause-reflect-hub-telemetry-io-sibling-parity.test.ts`.
   });
 });
