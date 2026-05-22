@@ -59,19 +59,6 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
-      <span>Phase A — application mood-io ↔ pending-offer-io sibling parity (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-reflect-mood-pending-offer-io-sibling-parity.test.ts</code> (application)</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete — no moves. Mirror presentation <code>pause-reflect-mood-pending-offer-io-sibling-parity</code> at application layer so initial-emotion mood RPC stays namespace-separated from pending-offer adopt/decline/display I/O (parity with flow-level <code>pause-reflect-mood-pending-offer-flow-sibling-parity.test.ts</code>). Extend reciprocal inline pins on <code>pause-reflect-mood-io-parity</code> and <code>pause-reflect-pending-offer-io-parity</code>.</dd>
-      <dt>Deviation</dt>
-      <dd>None — tests + I/O header comments only.</dd>
-      <dt>Open question</dt>
-      <dd>Next: remaining presentation-only reflect I/O sibling mirrors (generation-home-reflect, telemetry cross-links), colocate session application <code>*-io-parity.test.ts</code> under <code>presentation/session/</code>, or Phase B subscription/auth Tier 1 shim scan.</dd>
-=======
       <span>Phase A — colocate generation↔home-reflect sibling parity beside manual-open I/O (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -83,7 +70,23 @@
       <dd>Test still imports holzen-reflect <code>pause-reflect-generation-io</code> from parent <code>generation/</code> folder — intentional cross-surface binding guard.</dd>
       <dt>Open questions</dt>
       <dd>Next: colocate remaining session presentation <code>*-io-parity.test.ts</code> files, ambience/generation sibling mirrors, or Phase B Tier 1 shim scan.</dd>
->>>>>>> 96ad8c2c0 (refactor(pause): colocate generation-home-reflect sibling parity beside manual-open I/O)
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — application mood-io ↔ pending-offer-io sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-pending-offer-io-sibling-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete — no moves. Mirror presentation <code>pause-reflect-mood-pending-offer-io-sibling-parity</code> at application layer so initial-emotion mood RPC stays namespace-separated from pending-offer adopt/decline/display I/O (parity with flow-level <code>pause-reflect-mood-pending-offer-flow-sibling-parity.test.ts</code>). Extend reciprocal inline pins on <code>pause-reflect-mood-io-parity</code> and <code>pause-reflect-pending-offer-io-parity</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + I/O header comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: remaining presentation-only reflect I/O sibling mirrors (telemetry cross-links), colocate session application <code>*-io-parity.test.ts</code> under <code>presentation/session/</code>, or Phase B subscription/auth Tier 1 shim scan.</dd>
     </dl>
   </article>
 
