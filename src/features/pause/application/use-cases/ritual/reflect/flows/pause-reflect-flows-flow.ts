@@ -6,10 +6,12 @@
  * may import this umbrella for parity; production flows I/O keeps leaf imports.
  * Sibling pins: `pause-reflect-flows-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts`,
  * `pause-reflect-ambience-flow.test.ts`, and `pause-reflect-steps-flow.test.ts` (inline);
+ * dedicated: `pause-reflect-flows-ambience-flow-sibling-parity.test.ts` ↔ `pause-reflect-ambience-flow`;
  * `pause-reflect-steps-flows-flow-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow`;
  * `pause-reflect-flows-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-flow`;
  * `pause-reflect-flows-hub-flow-sibling-parity.test.ts` ↔ `pause-reflect-hub-flow`;
  * `pause-reflect-flows-generation-flow-sibling-parity.test.ts` ↔ `pause-reflect-generation-flow`;
+ * `pause-reflect-flows-ambience-flow-sibling-parity.test.ts` ↔ `pause-reflect-ambience-flow`;
  * `pause-reflect-flows-mood-flow-sibling-parity.test.ts` ↔ `pause-reflect-mood-flow`;
  * `pause-reflect-flows-decide-flow-sibling-parity.test.ts` ↔ `pause-session-decide-flow`.
  * Outcome leaf vs presentation wrappers: flows umbrella re-exports `runPauseOutcomeLog` identity;
