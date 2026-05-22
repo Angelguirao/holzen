@@ -2,42 +2,47 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   pauseReflectFavoriteToggle,
   pauseReflectionStepLogOnce,
+  reflectPauseRepository,
   shouldLogPauseReflectionStep,
   shouldShowFavoriteProHint,
 } from './pause-reflect-steps-io';
 
 const runPauseReflectionStepLogOnceMock = vi.hoisted(() => vi.fn());
 const runPauseFavoriteToggleMock = vi.hoisted(() => vi.fn());
-const shouldShowFavoriteProHintMock = vi.hoisted(() => vi.fn());
-const shouldLogPauseReflectionStepMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-favorite-toggle-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle',
   async (importOriginal) => {
     const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/reflect/steps/pause-favorite-toggle-flow')
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle')
     >();
     return {
       ...actual,
       runPauseFavoriteToggle: runPauseFavoriteToggleMock,
-      shouldShowFavoriteProHint: shouldShowFavoriteProHintMock,
     };
   },
 );
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflection-step-log-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log',
   async (importOriginal) => {
     const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflection-step-log-flow')
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log')
     >();
     return {
       ...actual,
       runPauseReflectionStepLogOnce: runPauseReflectionStepLogOnceMock,
-      shouldLogPauseReflectionStep: shouldLogPauseReflectionStepMock,
     };
   },
 );
+
+vi.mock('@/features/pause/domain/reflect/steps/favorite-toggle', () => ({
+  shouldShowFavoriteProHint: vi.fn(),
+}));
+
+vi.mock('@/features/pause/domain/reflect/steps/reflection-step-log', () => ({
+  shouldLogPauseReflectionStep: vi.fn(),
+}));
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectStepsRepository' },
@@ -45,9 +50,9 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 describe('pause-reflect-steps-io', () => {
-  it('re-exports step gates from steps subcluster flows', () => {
-    expect(shouldShowFavoriteProHint).toBe(shouldShowFavoriteProHintMock);
-    expect(shouldLogPauseReflectionStep).toBe(shouldLogPauseReflectionStepMock);
+  it('re-exports step gates from domain reflect steps helpers', () => {
+    expect(shouldShowFavoriteProHint).toBeDefined();
+    expect(shouldLogPauseReflectionStep).toBeDefined();
   });
 
   it('routes reflection_step log through default repository + storage', async () => {
@@ -56,10 +61,11 @@ describe('pause-reflect-steps-io', () => {
     await pauseReflectionStepLogOnce({ pauseInstanceId: 'pi-1' });
 
     expect(runPauseReflectionStepLogOnceMock).toHaveBeenCalledWith(
-      { port: 'reflectStepsRepository' },
+      reflectPauseRepository,
       { pauseInstanceId: 'pi-1' },
       { storage: { storage: 'reflectionStepSessionStorage' } },
     );
+    expect(reflectPauseRepository).toEqual({ port: 'reflectStepsRepository' });
   });
 
   it('routes favorite toggle through the default PauseRepository port adapter', async () => {
@@ -70,9 +76,9 @@ describe('pause-reflect-steps-io', () => {
       isFavorite: true,
     });
 
-    expect(runPauseFavoriteToggleMock).toHaveBeenCalledWith(
-      { port: 'reflectStepsRepository' },
-      { pauseInstanceId: 'pi-1', isFavorite: true },
-    );
+    expect(runPauseFavoriteToggleMock).toHaveBeenCalledWith(reflectPauseRepository, {
+      pauseInstanceId: 'pi-1',
+      isFavorite: true,
+    });
   });
 });

@@ -813,11 +813,39 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_DOMAIN_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/share/pause-reflect-share-flow'",
 ];
 
-/** Reflect steps I/O — import via steps subcluster flows only (not pause-reflect-steps-flow umbrella). */
+/** Reflect steps I/O — import via steps umbrella only (not steps subcluster flow anchors). */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_IO_UMBRELLA_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow',
   "from './application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow'",
   "from '../application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow'",
+];
+
+/** Reflect steps I/O — import favorite toggle via leaf module only (not pause-favorite-toggle-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_IO_FAVORITE_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-favorite-toggle-flow',
+  "from './application/use-cases/ritual/reflect/steps/pause-favorite-toggle-flow'",
+  "from '../application/use-cases/ritual/reflect/steps/pause-favorite-toggle-flow'",
+];
+
+/** Reflect steps I/O — import note update via leaf module only (not pause-reflect-note-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_IO_NOTE_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-note-flow',
+  "from './application/use-cases/ritual/reflect/steps/pause-reflect-note-flow'",
+  "from '../application/use-cases/ritual/reflect/steps/pause-reflect-note-flow'",
+];
+
+/** Reflect steps I/O — import tag update via leaf module only (not pause-reflect-tag-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_IO_TAG_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-tag-flow',
+  "from './application/use-cases/ritual/reflect/steps/pause-reflect-tag-flow'",
+  "from '../application/use-cases/ritual/reflect/steps/pause-reflect-tag-flow'",
+];
+
+/** Reflect steps I/O — import reflection_step log via leaf module only (not pause-reflection-step-log-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_IO_REFLECTION_STEP_LOG_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflection-step-log-flow',
+  "from './application/use-cases/ritual/reflect/steps/pause-reflection-step-log-flow'",
+  "from '../application/use-cases/ritual/reflect/steps/pause-reflection-step-log-flow'",
 ];
 
 /** Reflect steps presentation — import step mutations/gates via pause-reflect-steps-io only. */
@@ -2126,7 +2154,35 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_IO_UMBRELLA_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: reflect steps I/O must import via steps subcluster flows (${needle})`,
+          `${rel}: reflect steps I/O must not import steps umbrella (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_IO_FAVORITE_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect steps I/O must import run-pause-favorite-toggle and domain favorite-toggle directly (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_IO_NOTE_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect steps I/O must import run-pause-reflect-note-update directly (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_IO_TAG_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect steps I/O must import run-pause-reflect-tag-update directly (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_IO_REFLECTION_STEP_LOG_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect steps I/O must import run-pause-reflection-step-log and domain reflection-step-log directly (${needle})`,
         );
       }
     }

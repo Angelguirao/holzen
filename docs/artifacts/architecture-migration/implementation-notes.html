@@ -21813,4 +21813,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect steps I/O leaf peel (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel <code>pause-reflect-steps-io</code> off steps subcluster flow anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-steps-io</code> imports step gates from <code>domain/reflect/steps/</code> and RPC use cases from sibling <code>run-pause-*</code> modules directly (parity with <code>pause-reflect-hub-io</code> leaf imports on the same branch tip). CI blocks steps subcluster flow anchors and umbrella imports on steps I/O.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-favorite-toggle-flow</code>, <code>pause-reflect-note-flow</code>, <code>pause-reflect-tag-flow</code>, <code>pause-reflection-step-log-flow</code>, and <code>pause-reflect-steps-flow</code> remain CI compose anchors; presentation no longer routes through them on steps I/O.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect mood I/O leaf peel, companion orchestrate-io telemetry peel, or session step-transition-io peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
