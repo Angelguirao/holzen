@@ -5,7 +5,7 @@
  * Parity pins: `pause-session-shell-io.re-exports.test.ts` and `pause-session-shell-io-parity.test.ts`
  * (presentation I/O ↔ umbrella + leaf distinctness vs scaffold-io / terminal-entry / persisted-tab-session + behavioral pin).
  * Sibling cluster: `pause-session-terminal-entry-shell-flow-sibling-parity.test.ts` ↔ `pause-session-terminal-entry-flow`;
- * `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` ↔ `pause-session-terminal-entry-io` (presentation).
+ * `presentation/session/pause-session-terminal-entry-shell-io-sibling-parity.test.ts` ↔ `pause-session-terminal-entry-io` (presentation).
  * `pause-session-scaffold-shell-flow-sibling-parity.test.ts` ↔ `pause-session-scaffold-flow`;
  * `pause-session-providers-shell-flow-sibling-parity.test.ts` ↔ `pause-session-providers-flow`.
  * Reciprocal pins: `pause-session-shell-flow.test.ts` ↔ `pause-session-scaffold-flow.test.ts`.

@@ -7,7 +7,7 @@
  * `pause-session-scaffold-shell-io-sibling-parity.test.ts` (application sibling vs scaffold-io),
  * `pause-session-shell-scaffold-io-sibling-parity.test.ts` (presentation sibling vs scaffold-io),
  * `pause-session-providers-shell-io-sibling-parity.test.ts` (sibling vs providers-io),
- * `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` (sibling vs terminal-entry-io).
+ * `presentation/session/pause-session-terminal-entry-shell-io-sibling-parity.test.ts` (sibling vs terminal-entry-io; reciprocal inline pins in `pause-session-shell-io.test.ts`).
  */
 export {
   computePauseSessionHydration,

@@ -5,6 +5,14 @@ import {
   TERMINAL_PAUSE_DB_STATES as terminalStatesFromLeaf,
 } from '@/features/pause/application/use-cases/session/terminal-entry-guard';
 import {
+  buildPauseSessionMountLogParams,
+  computePauseSessionHydration,
+} from './pause-session-shell-io';
+import {
+  buildPauseSessionPersistSnapshot,
+  computePauseStorageRitualSyncPatch,
+} from './scaffold/pause-session-scaffold-io';
+import {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
   TERMINAL_PAUSE_DB_STATES,
@@ -28,5 +36,22 @@ describe('pause-session-terminal-entry-io', () => {
     expect(isTerminalPauseDbState).toBe(isTerminalFromLeaf);
     expect(persistedPauseSessionAllowsTerminalEntry).toBe(persistedAllowsFromLeaf);
     expect(TERMINAL_PAUSE_DB_STATES).toBe(terminalStatesFromLeaf);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-shell-io.test.ts` and `scaffold/pause-session-scaffold-io.test.ts`.
+   * Dedicated sibling files: `pause-session-terminal-entry-shell-io-sibling-parity.test.ts`,
+   * `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: shell-io exports stay distinct from terminal-entry-io', () => {
+    expect(isTerminalPauseDbState).not.toBe(computePauseSessionHydration);
+    expect(persistedPauseSessionAllowsTerminalEntry).not.toBe(buildPauseSessionMountLogParams);
+    expect(TERMINAL_PAUSE_DB_STATES).not.toBe(computePauseSessionHydration);
+  });
+
+  it('sibling cluster: scaffold-io exports stay distinct from terminal-entry-io', () => {
+    expect(isTerminalPauseDbState).not.toBe(buildPauseSessionPersistSnapshot);
+    expect(persistedPauseSessionAllowsTerminalEntry).not.toBe(computePauseStorageRitualSyncPatch);
+    expect(TERMINAL_PAUSE_DB_STATES).not.toBe(buildPauseSessionPersistSnapshot);
   });
 });
