@@ -546,6 +546,26 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_SHELL_USE_CASE_IMPORTS = [
   "from '../application/use-cases/session/shell-view-model'",
 ];
 
+/** Session brief I/O — import via session + ritual/brief modules only (not pause-session-brief-flow umbrella). */
+const LEGACY_PAUSE_PRESENTATION_SESSION_BRIEF_IO_UMBRELLA_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pause-session-brief-flow',
+  "from './application/use-cases/session/pause-session-brief-flow'",
+  "from '../application/use-cases/session/pause-session-brief-flow'",
+];
+
+/** Session presentation — import brief hydration + depth-upgrade via pause-session-brief-io only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_BRIEF_USE_CASE_IMPORTS = [
+  '@/features/pause/application/use-cases/session/restored-brief-ritual-state',
+  '@/features/pause/application/use-cases/session/initial-ritual-entry',
+  '@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade',
+  "from './application/use-cases/session/restored-brief-ritual-state'",
+  "from '../application/use-cases/session/restored-brief-ritual-state'",
+  "from './application/use-cases/session/initial-ritual-entry'",
+  "from '../application/use-cases/session/initial-ritual-entry'",
+  "from './application/use-cases/ritual/brief/ritual-depth-upgrade'",
+  "from '../application/use-cases/ritual/brief/ritual-depth-upgrade'",
+];
+
 /** Session presentation — import scaffold persist/sync/derived via pause-session-scaffold-io only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_USE_CASE_IMPORTS = [
   '@/features/pause/application/use-cases/session/persist-snapshot',
@@ -2325,6 +2345,16 @@ for (const file of walkTs(join(root, 'src'))) {
         }
       }
     }
+    const sessionBriefIoAllowlisted =
+      rel.endsWith('pause-session-brief-io.ts') ||
+      rel.endsWith('pause-session-brief-io.test.ts');
+    if (!sessionBriefIoAllowlisted) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BRIEF_USE_CASE_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy session brief use-case import (${needle})`);
+        }
+      }
+    }
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_DOMAIN_GUARDS_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session domain guard import (${needle})`);
@@ -2351,6 +2381,18 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: session scaffold I/O must import via session subcluster modules (${needle})`,
+        );
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-session-brief-io.ts') ||
+    rel.endsWith('pause-session-brief-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BRIEF_IO_UMBRELLA_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: session brief I/O must import via session + ritual/brief modules (${needle})`,
         );
       }
     }

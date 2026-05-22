@@ -21680,4 +21680,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session brief I/O via subcluster modules (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>pause-session-brief-io</code> through session + ritual/brief modules</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Peel <code>pause-session-brief-io</code> off <code>pause-session-brief-flow</code> to import <code>restored-brief-ritual-state</code>, <code>initial-ritual-entry</code>, and <code>ritual/brief/ritual-depth-upgrade</code> directly (parity with <code>pause-session-scaffold-io</code> subcluster peel). CI blocks umbrella imports on brief I/O; brief conductors still import brief-io only. <code>pause-session-ritual-restore-io</code> keeps restore-flow anchor for cross-ritual hydration.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-brief-flow</code> remains the compose anchor for <code>pause-session-ritual-restore-flow</code> and <code>check:architecture-alignment</code>; brief presentation I/O no longer depends on the umbrella barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect pending-offer I/O leaf peel, Phase B subscription Tier 1 shim, or session breath I/O direct ritual-audio imports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
