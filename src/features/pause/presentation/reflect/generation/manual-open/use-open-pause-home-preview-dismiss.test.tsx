@@ -18,11 +18,11 @@ vi.mock('@/features/pause/presentation/session/pause-persisted-tab-session-io', 
   savePausePersistedTabSession: vi.fn(),
 }));
 
-vi.mock('../realtime/use-pause-instances-realtime', () => ({
+vi.mock('@/features/pause/presentation/realtime/use-pause-instances-realtime', () => ({
   usePauseInstancesRealtime: vi.fn(),
 }));
 
-vi.mock('../../public-queries', () => ({
+vi.mock('@/features/pause/public-queries', () => ({
   fetchOpenPauseHomePreview: vi.fn().mockResolvedValue(null),
 }));
 
