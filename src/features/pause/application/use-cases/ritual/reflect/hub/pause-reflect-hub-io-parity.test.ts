@@ -21,6 +21,18 @@ import {
   reflectPauseRepository,
   resolveShiftFrameHubDonePresentation as resolvePresentationFromHubIo,
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
+  pauseReflectFavoriteToggleWithRepository,
+  pauseReflectNoteUpdateWithRepository,
+  pauseReflectTagUpdateWithRepository,
+  pauseReflectionStepLogOnceWithRepository,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 describe('pause-reflect-hub-io parity', () => {
@@ -58,5 +70,23 @@ describe('pause-reflect-hub-io parity', () => {
     );
 
     expect(runShiftHubDoneDirect).toHaveBeenCalledWith(customRepository, input);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (shift-frame hub RPC vs step wrappers).
+   * Dedicated sibling file: `pause-reflect-steps-hub-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: steps-io exports stay distinct from hub-io wrappers', () => {
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseReflectNoteUpdate);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseReflectTagUpdate);
+    expect(buildLogBundleFromHubIo).not.toBe(pauseReflectionStepLogOnce);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseReflectFavoriteToggleWithRepository);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseReflectNoteUpdateWithRepository);
+    expect(resolvePresentationFromHubIo).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    expect(buildLogBundleFromHubIo).not.toBe(shouldShowFavoriteProHint);
+    expect(resolvePresentationFromHubIo).not.toBe(shouldLogPauseReflectionStep);
+    expect(reflectPauseRepository).not.toBe(pauseReflectFavoriteToggle);
+    // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
   });
 });

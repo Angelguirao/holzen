@@ -56,6 +56,12 @@ import {
   shouldShowFavoriteProHint as shouldShowFromStepsIo,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
+  buildShiftEmotionFrameHubLogBundle,
+  pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
+  resolveShiftFrameHubDonePresentation,
+} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
   reflectionStepSessionStorage,
   supabasePauseRepository,
 } from '@/features/pause/public-rpc';
@@ -190,5 +196,23 @@ describe('pause-reflect-steps-io parity', () => {
     expect(runReflectionStepLogDirect).toHaveBeenCalledWith(customRepository, input, {
       storage: customStorage,
     });
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (step RPC wrappers vs hub done RPC).
+   * Dedicated sibling file: `pause-reflect-steps-hub-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: hub-io exports stay distinct from steps-io wrappers', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(pauseReflectTagUpdate).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseReflectionStepLogOnce).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(pauseReflectFavoriteToggleWithRepository).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(pauseReflectNoteUpdateWithRepository).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseReflectionStepLogOnceWithRepository).not.toBe(resolveShiftFrameHubDonePresentation);
+    expect(shouldShowFromStepsIo).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(shouldLogFromStepsIo).not.toBe(resolveShiftFrameHubDonePresentation);
+    expect(pauseReflectFavoriteToggle).not.toBe(resolveShiftFrameHubDonePresentation);
+    // Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts`.
   });
 });

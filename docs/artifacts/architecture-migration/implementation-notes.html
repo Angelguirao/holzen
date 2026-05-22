@@ -29618,4 +29618,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — application steps-io ↔ hub-io parity reciprocal pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-io-parity.test.ts</code> + <code>pause-reflect-hub-io-parity.test.ts</code> + <code>pause-reflect-steps-hub-io-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Presentation steps-io ↔ hub-io reciprocal pins were already on branch; extend the same namespace guard to application <code>*-io-parity</code> tests and add dedicated application-layer sibling parity under <code>application/.../steps/</code> (mirror of <code>pause-reflect-steps-hub-flow-sibling-parity.test.ts</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comment anchors only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session step-handlers-io ↔ step-transition-io reciprocal inline pins on unit tests, or Phase B subscription Tier 1 shim scan.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
