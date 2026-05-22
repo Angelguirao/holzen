@@ -86,6 +86,26 @@ mustExist(
   'pause/application/use-cases/ritual/reflect/pending-offer/',
 );
 mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow.ts',
+  'pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow.ts',
+);
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow.ts',
+  'pause/application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow.ts',
+);
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow.ts',
+  'pause/application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow.ts',
+);
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow.ts',
+  'pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow.ts',
+);
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow.ts',
+  'pause/application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow.ts',
+);
+mustExist(
   'src/features/pause/application/use-cases/session/scaffold',
   'pause/application/use-cases/session/scaffold/',
 );
@@ -390,6 +410,46 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_STEP_NAV_IMPORTS = [
   "from '../domain/ritual/breathe/pause-breath-step-navigation'",
 ];
 
+/** Session breath presentation — import phase-advance via pause-session-breath-flow anchor only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_PHASE_ADVANCE_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/breathe/phase-advance',
+  "from './application/use-cases/ritual/breathe/phase-advance'",
+  "from '../application/use-cases/ritual/breathe/phase-advance'",
+];
+
+/** Session ritual restore — import restored breath hydration via pause-session-breath-flow only. */
+const LEGACY_PAUSE_SESSION_RITUAL_RESTORE_BREATH_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/breathe/restored-breath-ritual-state',
+  '@/features/pause/domain/ritual/breathe/restored-breath-ritual-state',
+  "from './application/use-cases/ritual/breathe/restored-breath-ritual-state'",
+  "from '../application/use-cases/ritual/breathe/restored-breath-ritual-state'",
+  "from './domain/ritual/breathe/restored-breath-ritual-state'",
+  "from '../domain/ritual/breathe/restored-breath-ritual-state'",
+];
+
+/** Reflect mood umbrella flow — compose subcluster anchors only (no deep domain/reflect/mood). */
+const LEGACY_PAUSE_REFLECT_MOOD_FLOW_DOMAIN_IMPORTS = [
+  '@/features/pause/domain/reflect/mood/',
+  "from '@/features/pause/domain/reflect/mood/",
+  "from './domain/reflect/mood/",
+  "from '../domain/reflect/mood/",
+];
+
+/** Reflect mood presentation — import domain mood helpers via pause-reflect-mood-flow only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_DOMAIN_IMPORTS = [
+  '@/features/pause/domain/reflect/mood/',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow',
+  "from './domain/reflect/mood/",
+  "from '../domain/reflect/mood/",
+  "from './application/use-cases/ritual/reflect/mood/run-initial-emotion-log'",
+  "from '../application/use-cases/ritual/reflect/mood/run-initial-emotion-log'",
+];
+
 /** Deep session telemetry in presentation/session — use telemetry-io only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_TELEMETRY_IMPORTS = [
   '@/features/pause/application/use-cases/session/pause-session-telemetry',
@@ -567,6 +627,40 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
+  if (rel === 'src/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow.ts') {
+    for (const needle of LEGACY_PAUSE_REFLECT_MOOD_FLOW_DOMAIN_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect mood umbrella flow must compose subcluster anchors (${needle})`);
+      }
+    }
+    for (const needle of [
+      '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log',
+      "from './run-initial-emotion-log'",
+    ]) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect mood umbrella flow must not deep-import run-initial-emotion-log (${needle})`);
+      }
+    }
+  }
+  if (rel === 'src/features/pause/application/use-cases/session/pause-session-ritual-restore-flow.ts') {
+    for (const needle of LEGACY_PAUSE_SESSION_RITUAL_RESTORE_BREATH_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: session ritual restore must import breath hydration via pause-session-breath-flow (${needle})`);
+      }
+    }
+  }
+  if (rel.startsWith('src/features/pause/presentation/reflect/mood/')) {
+    if (
+      !rel.endsWith('pause-reflect-mood-io.ts') &&
+      !rel.endsWith('pause-reflect-mood-io.test.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_DOMAIN_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy reflect mood import (${needle})`);
+        }
+      }
+    }
+  }
   if (rel.startsWith('src/features/pause/presentation/session/breath/')) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_AUDIO_IMPORTS) {
       if (text.includes(needle)) {
@@ -581,7 +675,8 @@ for (const file of walkTs(join(root, 'src'))) {
     if (
       !rel.endsWith('pause-session-breath-io.ts') &&
       !rel.endsWith('pause-session-breath-io.test.ts') &&
-      !rel.endsWith('pause-session-breath-step-navigation-io.ts')
+      !rel.endsWith('pause-session-breath-step-navigation-io.ts') &&
+      !rel.endsWith('.test.tsx')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_RPC_FLAGS_IMPORTS) {
         if (text.includes(needle)) {
@@ -591,6 +686,11 @@ for (const file of walkTs(join(root, 'src'))) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_STEP_NAV_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy session breath step-navigation import (${needle})`);
+        }
+      }
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_PHASE_ADVANCE_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy session breath phase-advance import (${needle})`);
         }
       }
     }
