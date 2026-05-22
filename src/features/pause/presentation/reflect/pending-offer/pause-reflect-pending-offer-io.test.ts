@@ -61,6 +61,18 @@ describe('pause-reflect-pending-offer-io', () => {
     expect(runDeclinePendingPauseOfferMock).toHaveBeenCalledWith({ kind: 'supabase' });
   });
 
+  it('pauseAdoptPendingOfferWithRepository forwards injected repository', () => {
+    const customRepo = { kind: 'injected-adopt' };
+    pauseAdoptPendingOfferWithRepository(customRepo as never);
+    expect(runAdoptPendingPauseOfferMock).toHaveBeenCalledWith(customRepo);
+  });
+
+  it('pauseDeclinePendingOfferWithRepository forwards injected repository', () => {
+    const customRepo = { kind: 'injected-decline' };
+    pauseDeclinePendingOfferWithRepository(customRepo as never);
+    expect(runDeclinePendingPauseOfferMock).toHaveBeenCalledWith(customRepo);
+  });
+
   it('re-exports getPendingPauseOfferDisplay from pending-pause-offer-display leaf module', () => {
     const display: PendingPauseOfferDisplay = getPendingPauseOfferDisplay({
       context: 'btc',
