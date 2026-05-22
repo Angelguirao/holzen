@@ -2094,7 +2094,8 @@ for (const file of walkTs(join(root, 'src'))) {
   }
   if (
     rel.endsWith('pause-reflect-share-io.ts') ||
-    rel.endsWith('pause-reflect-share-io.test.ts')
+    rel.endsWith('pause-reflect-share-io.test.ts') ||
+    rel.endsWith('pause-reflect-share-io.re-exports.test.ts')
   ) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_IO_ORCHESTRATION_FLOW_IMPORTS) {
       if (text.includes(needle)) {
@@ -2640,7 +2641,8 @@ for (const file of walkTs(join(root, 'src'))) {
   if (rel.startsWith('src/features/pause/presentation/reflect/share/')) {
     const shareIoAllowlisted =
       rel.endsWith('pause-reflect-share-io.ts') ||
-      rel.endsWith('pause-reflect-share-io.test.ts');
+      rel.endsWith('pause-reflect-share-io.test.ts') ||
+      rel.endsWith('pause-reflect-share-io.re-exports.test.ts');
     if (!shareIoAllowlisted) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {
