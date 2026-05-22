@@ -19932,4 +19932,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — CI guard manual-open reflect subclusters (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>check:architecture-alignment</code> forbids legacy Home manual-open I/O import paths</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and manual-open colocation are complete on branch tip. <code>mustExist</code> for application + presentation <code>generation/manual-open/</code> landed in the prior slice; this slice adds forbidden import strings for <code>presentation/home/manual-open/pause-home-reflect-io</code> and <code>apply-manual-pause-open-result</code> so regressions fail CI.</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI-only; no runtime behavior change.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Home <code>use-manual-pause-trigger</code> remains under <code>presentation/home/manual-open/</code> by design (route conductor).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B cross-context slice, or archive decide I/O peel when pause Tier 5 is clean.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

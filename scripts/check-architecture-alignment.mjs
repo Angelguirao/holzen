@@ -62,6 +62,10 @@ mustExist(
   'pause/application/use-cases/ritual/reflect/generation/',
 );
 mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/generation/manual-open',
+  'pause/application/use-cases/ritual/reflect/generation/manual-open/',
+);
+mustExist(
   'src/features/pause/application/use-cases/ritual/reflect/steps',
   'pause/application/use-cases/ritual/reflect/steps/',
 );
@@ -215,7 +219,11 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS = [
   '@/features/pause/presentation/reflect/use-pause-session-reflect-and-decide',
   '@/features/pause/presentation/reflect/use-pause-session-decide-handler',
   '@/features/pause/presentation/reflect/use-reflection-share-handlers',
+  '@/features/pause/presentation/home/manual-open/pause-home-reflect-io',
+  '@/features/pause/presentation/home/manual-open/apply-manual-pause-open-result',
   "from './presentation/reflect/use-pause-reflect-generation'",
+  "from './presentation/home/manual-open/pause-home-reflect-io'",
+  "from './presentation/home/manual-open/apply-manual-pause-open-result'",
   "from './presentation/reflect/use-pause-favorite-toggle'",
   "from '../presentation/reflect/use-pause-reflect-generation'",
 ];
