@@ -3,6 +3,7 @@
  * Composes breath/decide/frame/brief restore helpers for presentation I/O.
  * Presentation: `pause-session-ritual-restore-io.ts` imports through this anchor.
  */
+export { mapPersistedStep } from '@/features/pause/domain/session/map-persisted-step';
 export {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,

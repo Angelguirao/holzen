@@ -319,6 +319,13 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IMPORTS = [
   "from '../application/use-cases/session/persisted-tab-session'",
 ];
 
+/** Session presentation — import mapPersistedStep via ritual-restore I/O anchor only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_MAP_PERSISTED_STEP_IMPORTS = [
+  '@/features/pause/domain/session/map-persisted-step',
+  "from './domain/session/map-persisted-step'",
+  "from '../domain/session/map-persisted-step'",
+];
+
 /** Archive presentation I/O — import retrospective decide helpers via flow anchor only. */
 const LEGACY_PAUSE_PRESENTATION_ARCHIVE_DECIDE_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome',
@@ -541,6 +548,11 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session persisted-tab-session import (${needle})`);
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_MAP_PERSISTED_STEP_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy session map-persisted-step import (${needle})`);
       }
     }
   }

@@ -22,6 +22,7 @@ import {
   initialBriefPauseStepFromRestored,
   initialRitualEntry,
   initialSelectedBriefFaceFromRestored,
+  mapPersistedStep,
 } from './pause-session-ritual-restore-io';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
@@ -40,5 +41,10 @@ describe('pause-session-ritual-restore-io', () => {
     expect(initialRitualEntry(restored)).toBe('brief');
     expect(initialBriefPauseStepFromRestored(null)).toBe('feel');
     expect(initialRitualEntry(null)).toBe('picker');
+  });
+
+  it('re-exports mapPersistedStep from pause-session-ritual-restore-flow', () => {
+    expect(mapPersistedStep('reflect')).toBe('reflect');
+    expect(mapPersistedStep(undefined)).toBe('feel');
   });
 });
