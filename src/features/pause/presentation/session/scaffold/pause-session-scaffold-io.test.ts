@@ -1,4 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import {
+  computePauseSessionHydration as computeHydrationFromShellIo,
+  hasPersistedPauseSessionPayload as hasPersistedFromShellIo,
+} from '@/features/pause/presentation/session/pause-session-shell-io';
 import { buildPauseSessionPersistSnapshot as buildPersistFromLeaf } from '@/features/pause/application/use-cases/session/persist-snapshot';
 import { buildPauseSessionScaffoldRitualDerived as buildDerivedFromLeaf } from '@/features/pause/application/use-cases/session/scaffold/scaffold-ritual-derived';
 import { computePauseStorageRitualSyncPatch as computeSyncFromLeaf } from '@/features/pause/application/use-cases/session/storage-ritual-sync';
@@ -77,5 +81,13 @@ describe('pause-session-scaffold-io', () => {
     expect(buildPauseSessionPersistSnapshot).toBe(buildPersistFromLeaf);
     expect(computePauseStorageRitualSyncPatch).toBe(computeSyncFromLeaf);
     expect(buildPauseSessionScaffoldRitualDerived).toBe(buildDerivedFromLeaf);
+  });
+
+  it('sibling cluster: shell-io exports stay distinct from scaffold-io re-exports', () => {
+    expect(buildPauseSessionPersistSnapshot).not.toBe(computeHydrationFromShellIo);
+    expect(computePauseStorageRitualSyncPatch).not.toBe(computeHydrationFromShellIo);
+    expect(buildPauseSessionScaffoldRitualDerived).not.toBe(computeHydrationFromShellIo);
+    expect(hasPersistablePauseSessionAnchor).not.toBe(computeHydrationFromShellIo);
+    expect(hasPersistablePauseSessionAnchor).not.toBe(hasPersistedFromShellIo);
   });
 });
