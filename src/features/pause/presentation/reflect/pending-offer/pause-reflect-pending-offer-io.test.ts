@@ -10,6 +10,11 @@ import {
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
+  trackPausePendingAdopted,
+  trackPausePendingDeclined,
+  trackPauseSessionAbandoned,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
+import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
   pauseAdoptPendingOfferWithRepository,
@@ -103,13 +108,21 @@ describe('pause-reflect-pending-offer-io', () => {
     expect(display.contextText).toBe('mock-context');
   });
 
-  it('sibling cluster: telemetry-io exports stay distinct from pending-offer-io', () => {
+  it('sibling cluster: session reflect telemetry-io exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(trackPauseReflectPostItOpen);
     expect(pauseDeclinePendingOffer).not.toBe(trackPauseReflectShareTap);
     expect(pauseAdoptPendingOfferWithRepository).not.toBe(trackPauseReflectWallpaperTap);
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(trackPauseReflectPostItOpen);
     expect(getPendingPauseOfferDisplay).not.toBe(trackPauseReflectShareTap);
-    // Full cross-I/O pins: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` (RPC vs pending-offer telemetry);
-    // session reflect telemetry: `pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts`.
+    // Session reflect UI: `pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: pending-offer-telemetry-io exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(trackPausePendingAdopted);
+    expect(pauseDeclinePendingOffer).not.toBe(trackPausePendingDeclined);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(trackPauseSessionAbandoned);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(trackPausePendingAdopted);
+    expect(getPendingPauseOfferDisplay).not.toBe(trackPausePendingDeclined);
+    // Full cross-I/O pins: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
   });
 });
