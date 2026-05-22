@@ -28917,8 +28917,8 @@
       <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Extend presentation re-exports and application io-parity tests with <code>.toBe</code> identity against <code>pause-pending-offer-display-flow</code> (parity with umbrella-flow pins). Allowlist re-exports test for display-flow import in <code>check:architecture-alignment</code>; production <code>pause-reflect-pending-offer-io.ts</code> still imports <code>pending-pause-offer-display</code> leaf only.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + CI allowlist only.</dd>
-      <dt>Open question</dt>
-      <dd>Next: Phase B subscription Tier 1 shims, or application rpc-flow ↔ display-flow dedicated sibling file if not already on branch.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: application rpc-flow ↔ display-flow dedicated sibling file (landed later on branch); presentation pending-offer-io ↔ telemetry-io reciprocal inline pins (landed same session).</dd>
     </dl>
   </article>
 
@@ -29054,7 +29054,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comments only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: application <code>pause-reflect-pending-offer-rpc-flow</code> ↔ <code>pause-pending-offer-display-flow</code> dedicated sibling file, <code>pause-reflect-hub-share-flow-sibling-parity</code> colocated reciprocal file, or Phase B subscription/auth Tier 1 shim scan.</dd>
+      <dd>Next: application <code>pause-reflect-pending-offer-rpc-flow</code> ↔ <code>pause-pending-offer-display-flow</code> dedicated sibling file (landed same session); <code>pause-reflect-pending-offer-session-telemetry-io-sibling-parity</code> (landed same session).</dd>
     </dl>
   </article>
 
@@ -29072,6 +29072,23 @@
       <dd>None — tests + comment anchor fixes only (header comments referenced this file before it existed on branch).</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B subscription/auth Tier 1 shim scan, or ambience-io ↔ pending-offer-io dedicated sibling file.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — pending-offer rpc-flow ↔ display-flow sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-rpc-flow-display-flow-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add application-layer rpc-flow ↔ display-flow dedicated sibling parity (complements umbrella↔display and umbrella↔rpc pins). Presentation pending-offer I/O reciprocal pins landed in parallel commits on branch.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow header comments only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim scan, or presentation steps-io ↔ generation-io gaps if any remain.</dd>
     </dl>
   </article>
 

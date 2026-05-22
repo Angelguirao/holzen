@@ -5,11 +5,6 @@ import {
   pauseReflectFavoriteToggle,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
-  trackPausePendingAdopted,
-  trackPausePendingDeclined,
-  trackPauseSessionAbandoned,
-} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
-import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
