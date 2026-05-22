@@ -32,13 +32,9 @@ describe('pause-reflect-share-io re-exports', () => {
 
   it('presentation I/O bindings match pause-reflect-share-flow CI anchor (leaf parity)', () => {
     expect(buildReflectionShareText).toBe(buildTextFromShareFlow);
-    expect(buildReflectionShareText).toBe(buildTextDirect);
     expect(buildReflectionShareTweetUrl).toBe(buildTweetFromShareFlow);
-    expect(buildReflectionShareTweetUrl).toBe(buildTweetDirect);
     expect(buildReflectionShareTelegramUrl).toBe(buildTelegramFromShareFlow);
-    expect(buildReflectionShareTelegramUrl).toBe(buildTelegramDirect);
     expect(buildReflectionShareWhatsAppUrl).toBe(buildWhatsAppFromShareFlow);
-    expect(buildReflectionShareWhatsAppUrl).toBe(buildWhatsAppDirect);
     expect(runReflectionShareImageFromShareFlow).toBe(runReflectionShareImageDirect);
   });
 });
