@@ -3,6 +3,7 @@
  * Cluster marker: `pause-session-step-transition-cluster.ts` (empty export; unit-tested).
  * Re-exports pure helpers; presentation imports leaf modules via `pause-session-step-transition-io.ts` (not this umbrella).
  * Parity pins: `pause-session-step-transition-io-parity.test.ts`, `pause-session-step-transition-io.re-exports.test.ts`.
+ * Sibling pin: `pause-session-step-transition-flow.test.ts` ↔ `pause-session-step-handlers-flow.test.ts`.
  */
 export {
   buildPauseSessionStepTransitionConfig,
