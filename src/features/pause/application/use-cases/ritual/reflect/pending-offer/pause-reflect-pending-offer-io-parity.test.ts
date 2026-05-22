@@ -21,6 +21,12 @@ import {
   runDeclinePendingPauseOffer,
 } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow';
 import {
+  trackPausePendingAdopted as trackAdoptedFromPendingOfferTelemetryIo,
+  trackPausePendingDeclined as trackDeclinedFromPendingOfferTelemetryIo,
+  trackPauseSessionAbandoned as trackAbandonedFromPendingOfferTelemetryIo,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
+import * as pendingOfferIo from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import {
   getPendingPauseOfferDisplay as getDisplayFromPendingOfferIo,
   pauseAdoptPendingOffer,
   pauseAdoptPendingOfferWithRepository,
@@ -28,6 +34,7 @@ import {
   pauseDeclinePendingOfferWithRepository,
   reflectPauseRepository,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import * as pendingOfferTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 describe('pause-reflect-pending-offer-io parity', () => {
@@ -86,5 +93,26 @@ describe('pause-reflect-pending-offer-io parity', () => {
     await pauseDeclinePendingOfferWithRepository(customRepo);
 
     expect(runDeclineDirect).toHaveBeenCalledWith(customRepo);
+  });
+
+  it('presentation pending-offer-io stays off pending-offer-telemetry-io exports', () => {
+    expect('trackPausePendingAdopted' in pendingOfferIo).toBe(false);
+    expect('trackPausePendingDeclined' in pendingOfferIo).toBe(false);
+    expect('trackPauseSessionAbandoned' in pendingOfferIo).toBe(false);
+    expect('pauseAdoptPendingOffer' in pendingOfferTelemetryIo).toBe(false);
+    expect('pauseDeclinePendingOffer' in pendingOfferTelemetryIo).toBe(false);
+    expect('getPendingPauseOfferDisplay' in pendingOfferTelemetryIo).toBe(false);
+    expect('reflectPauseRepository' in pendingOfferTelemetryIo).toBe(false);
+  });
+
+  it('pending-offer-io RPC wrappers stay distinct from pending-offer-telemetry-io trackers', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(trackAdoptedFromPendingOfferTelemetryIo);
+    expect(pauseDeclinePendingOffer).not.toBe(trackDeclinedFromPendingOfferTelemetryIo);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(trackAbandonedFromPendingOfferTelemetryIo);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(trackAdoptedFromPendingOfferTelemetryIo);
+    expect(getPendingPauseOfferDisplay).not.toBe(trackDeclinedFromPendingOfferTelemetryIo);
+    expect(reflectPauseRepository).not.toBe(trackAbandonedFromPendingOfferTelemetryIo);
+    // Reciprocal inline pins: `pause-reflect-pending-offer-io.test.ts`;
+    // dedicated sibling: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
   });
 });
