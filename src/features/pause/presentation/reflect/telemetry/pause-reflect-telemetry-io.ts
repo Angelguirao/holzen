@@ -6,7 +6,7 @@
  * Parity pins: `pause-reflect-telemetry-io.test.ts` (reciprocal pending-offer + generation-io sibling pins),
  * `pause-reflect-telemetry-io.re-exports.test.ts`,
  * `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`, and
- * `pause-reflect-generation-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`, and
+ * `pause-reflect-generation-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io` (presentation + application), and
  * `pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ pending-offer telemetry-io,
  * `pause-reflect-share-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`, and
  * `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`, and

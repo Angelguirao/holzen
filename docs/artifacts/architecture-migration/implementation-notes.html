@@ -59,6 +59,7 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+<<<<<<< HEAD
       <span>Phase A — application step-handlers-flow ↔ reflect steps-flow cross-surface parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -70,6 +71,19 @@
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open question</dt>
       <dd>Next: reflect generation↔telemetry cross-layer application pins (if any gap remains), or Phase B subscription/auth Tier 1 shim scan.</dd>
+=======
+      <span>Phase A — application generation-io ↔ telemetry-io sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-telemetry-io-sibling-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Mirror presentation <code>pause-reflect-generation-telemetry-io-sibling-parity</code> at application layer so holzen-reflect <code>pause-reflect-generation-io</code> stays namespace-separated from session reflect PostHog <code>pause-reflect-telemetry-io</code> (parity with flow-level <code>pause-reflect-generation-telemetry-flow-sibling-parity</code>). Extend reciprocal inline pins on application <code>pause-reflect-generation-io-parity</code> and <code>pause-reflect-telemetry-io-parity</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + I/O header comments only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: application ambience-io ↔ pending-offer-io sibling parity, or Phase B subscription/auth Tier 1 shim scan.</dd>
+>>>>>>> 673c13808 (test(pause): application generation-io ↔ telemetry-io sibling parity)
     </dl>
   </article>
 
