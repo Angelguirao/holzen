@@ -5,7 +5,15 @@ vi.mock('@/features/pause/public-rpc', () => ({
   reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' },
 }));
 
+import { runPauseFavoriteToggle as runFavoriteToggleDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
+import { runPauseReflectNoteUpdate as runNoteUpdateDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
+import { runPauseReflectTagUpdate as runTagUpdateDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
+import { runPauseReflectionStepLogOnce as runReflectionStepLogDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
 import {
+  runPauseFavoriteToggle,
+  runPauseReflectNoteUpdate,
+  runPauseReflectTagUpdate,
+  runPauseReflectionStepLogOnce,
   shouldLogPauseReflectionStep,
   shouldShowFavoriteProHint,
 } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow';
@@ -18,5 +26,12 @@ describe('pause-reflect-steps-io parity', () => {
   it('presentation I/O step gate re-exports match steps CI umbrella', () => {
     expect(shouldShowFavoriteProHint).toBe(shouldShowFromStepsIo);
     expect(shouldLogPauseReflectionStep).toBe(shouldLogFromStepsIo);
+  });
+
+  it('steps CI umbrella composes the same run-* leaf use cases as presentation I/O', () => {
+    expect(runPauseFavoriteToggle).toBe(runFavoriteToggleDirect);
+    expect(runPauseReflectNoteUpdate).toBe(runNoteUpdateDirect);
+    expect(runPauseReflectTagUpdate).toBe(runTagUpdateDirect);
+    expect(runPauseReflectionStepLogOnce).toBe(runReflectionStepLogDirect);
   });
 });
