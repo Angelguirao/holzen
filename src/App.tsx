@@ -12,7 +12,7 @@ import { HolzenProvider } from "@/app/components/HolzenProvider";
 import { isAppShellPath } from "@/lib/app-routes";
 import { holzenLog } from "@/lib/holzen-console";
 import { attachHolzenQueryLogging } from "@/lib/holzen-query-logging";
-import { scheduleCheckoutGuardCleanup } from "@/features/subscription/public";
+import { scheduleCheckoutGuardCleanup } from "@/lib/subscription-checkout-guard-ref";
 import { ErrorBoundary } from "@/app/components/ErrorBoundary";
 import { OfflineBanner } from "@/app/components/OfflineBanner";
 import { CookieConsent } from "@/app/components/CookieConsent";

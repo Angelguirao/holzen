@@ -59,6 +59,7 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+<<<<<<< HEAD
       <span>Phase A — zen-mode Home read-model → presentation/home (backlog #1 verified, Tier 4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -70,6 +71,19 @@
       <dd>None — mechanical relocation; no behavior change.</dd>
       <dt>Open questions</dt>
       <dd>Next: colocate <code>home-pause-card-body-props</code> or <code>run-log-pwa-install-analytics-event</code>, or Phase B subscription Tier 1 checkout-guard shim.</dd>
+=======
+      <span>Phase B — subscription-checkout-guard-ref lib shim (Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>src/lib/subscription-checkout-guard-ref.ts</code> app boot seam</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Phase A pause interior backlog remains complete. Add Tier 1 <code>@/lib/subscription-checkout-guard-ref</code> re-exporting <code>scheduleCheckoutGuardCleanup</code> from <code>@/features/subscription/public</code>; <code>App.tsx</code> schedules Stripe-return guard cleanup via the lib shim instead of a deep feature import at boot (implementation stays in subscription application).</dd>
+      <dt>Deviation</dt>
+      <dd>None — import path only; behavior parity.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: additional Phase B Tier 1 shims only where app shell still deep-imports feature <code>public</code> at boot.</dd>
+>>>>>>> 0bbf9de8a (refactor(subscription): add checkout-guard lib shim for App boot)
     </dl>
   </article>
 
