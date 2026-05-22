@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import {
+  runLogCompanionFeedbackVote,
+  runLogCompanionFullviewOpened,
+} from './pause-companion-analytics-flow';
 import { applyCompanionOrchestrateRetryReset as applyRetryResetDirect } from './apply-companion-orchestrate-retry-reset';
 import { applyCompanionSlotOrchestrateOutcome as applyOutcomeDirect } from './apply-companion-slot-orchestrate-outcome';
 import { logCompanionSlotOrchestrateInvoke as logInvokeDirect } from './companion-slot-orchestrate-telemetry';
@@ -84,5 +88,21 @@ describe('pause-companion-orchestrate-flow', () => {
     expect(setCompanionSlotError).toBe(setErrorDirect);
     expect(setCompanionSlotLoading).toBe(setLoadingDirect);
     expect(trackCompanionGenerationInitiated).toBe(trackGenerationDirect);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-companion-analytics-flow.test.ts`.
+   * Dedicated sibling file: `pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: analytics-flow exports stay distinct from orchestrate-flow', () => {
+    expect(runCompanionSlotOrchestrate).not.toBe(runLogCompanionFeedbackVote);
+    expect(runCompanionInterventionBootstrap).not.toBe(runLogCompanionFullviewOpened);
+    expect(applyCompanionOrchestrateRetryReset).not.toBe(runLogCompanionFeedbackVote);
+    expect(logCompanionSlotOrchestrateInvoke).not.toBe(runLogCompanionFullviewOpened);
+    expect(trackCompanionGenerationInitiated).not.toBe(runLogCompanionFeedbackVote);
+    expect(setCompanionSlotError).not.toBe(runLogCompanionFullviewOpened);
+    expect(resetInterventionIdempotency).not.toBe(runLogCompanionFeedbackVote);
+    expect(EMPTY_COMPANION_SLOT_RELAXATIONS).not.toBe(runLogCompanionFullviewOpened);
+    // Full cross-flow pins: `pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts`.
   });
 });

@@ -3,7 +3,8 @@
  * Composes ritual/frame leaf modules directly (not orchestrate subcluster flow anchors).
  * `pause-companion-orchestrate-io.re-exports.test.ts` and `pause-companion-orchestrate-io-parity.test.ts`
  * may import this umbrella for parity; production orchestrate I/O keeps leaf imports.
- * Sibling cluster: `pause-companion-orchestrate-orchestration-flow-sibling-parity.test.ts` ↔ `pause-companion-orchestration-flow`.
+ * Sibling cluster: `pause-companion-orchestrate-orchestration-flow-sibling-parity.test.ts` ↔ `pause-companion-orchestration-flow`;
+ * `pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts` ↔ `pause-companion-analytics-flow`.
  */
 export {
   applyCompanionOrchestrateRetryReset,
