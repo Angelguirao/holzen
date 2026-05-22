@@ -54,6 +54,14 @@ import {
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
   buildPauseScoreImpacts,
   formatReinforcementQuoteFromSession,
   getSessionQuote,
@@ -61,6 +69,7 @@ import {
   pauseReflectOutcomeLogWithRepository,
   reflectPauseRepository,
   resolvePauseDecideOutcomeFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   type PauseImpactData,
 } from './pause-reflect-flows-io';
@@ -213,5 +222,24 @@ describe('pause-reflect-flows-io', () => {
     expect(buildPauseScoreImpacts).not.toBe(pauseInitialEmotionSkip);
     expect(buildPauseScoreImpacts).not.toBe(buildFeelTilesMoodLogOptions);
     // Reciprocal inline pins: `pause-reflect-mood-io.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io.test.ts` (reflect+decide vs step RPC wrappers).
+   * Dedicated sibling file: `pause-reflect-flows-steps-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: steps-io exports stay distinct from flows-io', () => {
+    expect(pauseReflectOutcomeLog).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseReflectNoteUpdate);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseReflectTagUpdate);
+    expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseReflectionStepLogOnce);
+    expect(buildPauseScoreImpacts).not.toBe(pauseReflectFavoriteToggle);
+    expect(formatReinforcementQuoteFromSession).not.toBe(pauseReflectNoteUpdate);
+    expect(getSessionQuote).not.toBe(pauseReflectTagUpdate);
+    expect(resolvePauseDecideOutcomeFlow).not.toBe(pauseReflectionStepLogOnce);
+    expect(reflectPauseRepository).not.toBe(shouldShowFavoriteProHint);
+    expect(pauseReflectOutcomeLog).not.toBe(shouldLogPauseReflectionStep);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseReflectFavoriteToggle);
+    // Reciprocal inline pins: `pause-reflect-steps-io.test.ts`.
   });
 });
