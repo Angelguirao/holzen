@@ -199,4 +199,13 @@ describe('pause-reflect-generation-flow', () => {
     expect(reflectGenerationPrerequisite).not.toBe(trackShareTapFromTelemetryFlow);
     expect(shouldCommitReflectGeneration).not.toBe(trackWallpaperFromTelemetryFlow);
   });
+
+  it('sibling cluster: manual-open-flow exports stay distinct from holzen-reflect hook exports', () => {
+    expect(runReflectGeneration).not.toBe(openManualFromManualOpenFlow);
+    expect(runReflectGeneration).not.toBe(dismissFromManualOpenFlow);
+    expect(prerequisiteFromFlow).not.toBe(runSilentModeFromManualOpenFlow);
+    expect(openManualFromFlow).not.toBe(runReflectGenerationFromHookFlow);
+    expect(dismissFromFlow).not.toBe(messageFromResultFromHookFlow);
+    expect(runPersistStubFromFlow).not.toBe(runReflectGenerationFromHookFlow);
+  });
 });

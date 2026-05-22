@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — generation-flow ↔ manual-open-flow sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-manual-open-flow-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no reflect moves. Add dedicated sibling parity so <code>pause-reflect-generation-flow</code>, <code>pause-reflect-generation-hook-flow</code>, and <code>pause-reflect-generation-manual-open-flow</code> CI anchors stay namespace-separated (parity with generation↔hub sibling test; complements inline pins in <code>pause-reflect-generation-flow.test.ts</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow header comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or presentation telemetry-io ↔ pending-offer-telemetry-io sibling parity.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — presentation generation-io↔hub-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
