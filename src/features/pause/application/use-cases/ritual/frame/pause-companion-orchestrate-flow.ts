@@ -1,37 +1,38 @@
 /**
  * CI cluster anchor for companion slot orchestrate presentation I/O (§3 / check:architecture-alignment).
- * Slot orchestrate, intervention bootstrap, retry reset, telemetry, and UI state live in sibling modules.
- * Presentation: `pause-companion-orchestrate-io.ts` imports through this CI anchor.
+ * Composes orchestrate subcluster anchors; presentation imports via `pause-companion-orchestrate-io.ts`.
  */
 export {
   applyCompanionOrchestrateRetryReset,
   type CompanionOrchestrateRetryResetInput,
   type CompanionOrchestrateRetryResetPorts,
-} from './apply-companion-orchestrate-retry-reset';
-export { applyCompanionSlotOrchestrateOutcome } from './apply-companion-slot-orchestrate-outcome';
-export type { CompanionOrchestrateSessionContext } from './build-companion-orchestrate-body';
-export { logCompanionSlotOrchestrateInvoke } from './companion-slot-orchestrate-telemetry';
-export { trackCompanionGenerationInitiated } from './companion-generation-telemetry';
-export type { ApplyCompanionSlotOrchestrateFailureUiPorts } from './companion-slot-orchestrate-failure-ui';
+} from './pause-companion-orchestrate-retry-flow';
+export { applyCompanionSlotOrchestrateOutcome } from './pause-companion-orchestrate-outcome-flow';
+export type { CompanionOrchestrateSessionContext } from './pause-companion-slot-orchestrate-flow';
+export {
+  logCompanionSlotOrchestrateInvoke,
+  trackCompanionGenerationInitiated,
+} from './pause-companion-slot-orchestrate-telemetry-flow';
+export type { ApplyCompanionSlotOrchestrateFailureUiPorts } from './pause-companion-orchestrate-outcome-flow';
 export {
   setCompanionSlotError,
   setCompanionSlotLoading,
   type CompanionSlotErrorSetters,
   type CompanionSlotLoadingSetters,
-} from './companion-slot-ui-state';
-export { resetInterventionIdempotency } from './intervention-idempotency';
+} from './pause-companion-slot-orchestrate-ui-flow';
+export { resetInterventionIdempotency } from './pause-companion-intervention-orchestrate-flow';
 export {
   EMPTY_COMPANION_SLOT_RELAXATIONS,
   type CompanionSlotAutosaveParams,
   type CompanionSlotCacheIds,
   type CompanionSlotCommitters,
   type CompanionSlotRelaxations,
-} from './orchestrate-slot-apply';
+} from './pause-companion-orchestrate-slot-apply-flow';
 export {
   runCompanionSlotOrchestrate,
   type CompanionSlotOrchestrateMode,
-} from './run-companion-slot-orchestrate';
+} from './pause-companion-slot-orchestrate-flow';
 export {
   runCompanionInterventionBootstrap,
   type RunCompanionInterventionBootstrapPorts,
-} from './run-companion-intervention-bootstrap';
+} from './pause-companion-intervention-orchestrate-flow';
