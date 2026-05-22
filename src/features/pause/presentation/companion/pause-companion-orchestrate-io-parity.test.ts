@@ -138,6 +138,7 @@ describe('pause-companion-orchestrate-io parity', () => {
     expect('getCompanionSectionVisibility' in orchestrateIo).toBe(false);
     expect(runCompanionSlotOrchestrate).not.toBe(severityFromFrameUiIo);
     expect(trackCompanionGenerationInitiated).not.toBe(breathingRoomFromFrameUiIo);
+    // Dedicated sibling: `pause-companion-orchestrate-frame-ui-io-sibling-parity.test.ts` (presentation).
   });
 
   it('orchestrate I/O exports stay distinct from orchestration-flow session load and expansion siblings', () => {
@@ -176,6 +177,6 @@ describe('pause-companion-orchestrate-io parity', () => {
     expect(logCompanionSlotOrchestrateInvoke).not.toBe(runFullviewOpenedFromAnalyticsIo);
     expect(runSlotOrchestrateFromOrchestrateIo).not.toBe(runFeedbackVoteFromAnalyticsIo);
     // Reciprocal inline pins: `pause-companion-analytics-io-parity.test.ts` (application + presentation).
-    // Dedicated sibling: `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts`.
+    // Dedicated sibling: `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts` (presentation).
   });
 });
