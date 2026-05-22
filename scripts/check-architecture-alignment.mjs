@@ -82,6 +82,10 @@ mustExist(
   'pause/application/use-cases/ritual/reflect/mood/',
 );
 mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/pending-offer',
+  'pause/application/use-cases/ritual/reflect/pending-offer/',
+);
+mustExist(
   'src/features/pause/application/use-cases/session/scaffold',
   'pause/application/use-cases/session/scaffold/',
 );
@@ -400,6 +404,25 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_TELEMETRY_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/telemetry/pending-pause-offer-telemetry'",
 ];
 
+/** Session presentation — adopt/decline/display via pause-reflect-pending-offer-flow (pending-offer-io only). */
+const LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_USE_CASE_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pending-offer/',
+  '@/features/pause/application/use-cases/session/pause-session-pending-offer-flow',
+  "from './application/use-cases/session/pending-offer/",
+  "from '../application/use-cases/session/pending-offer/",
+  "from './application/use-cases/session/pause-session-pending-offer-flow'",
+  "from '../application/use-cases/session/pause-session-pending-offer-flow'",
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer',
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer',
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display',
+  "from './application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer'",
+  "from './application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer'",
+  "from './application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display'",
+];
+
 /** Flat presentation/session scaffold paths — use presentation/session/scaffold/. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_IMPORTS = [
   '@/features/pause/presentation/session/scaffold-ritual-payloads',
@@ -585,6 +608,17 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_TELEMETRY_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy pending-offer telemetry import (${needle})`);
+      }
+    }
+  }
+  if (
+    rel.startsWith('src/features/pause/presentation/session/') &&
+    !rel.endsWith('pause-session-pending-offer-io.ts') &&
+    !rel.endsWith('pause-session-pending-offer-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_USE_CASE_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy pending-offer use-case import (${needle})`);
       }
     }
   }
