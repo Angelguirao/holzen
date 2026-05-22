@@ -15,6 +15,10 @@ import {
 } from './pause-reflect-steps-flow';
 import * as stepsFlow from './pause-reflect-steps-flow';
 
+/**
+ * Flow-level sibling parity: steps-flow vs ambience-flow CI umbrellas.
+ * I/O mirror: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation).
+ */
 describe('pause-reflect-steps-flow ↔ pause-reflect-ambience-flow sibling parity', () => {
   it('steps-flow and ambience-flow are distinct sibling CI anchors', () => {
     expect(typeof runPauseFavoriteToggle).toBe('function');
