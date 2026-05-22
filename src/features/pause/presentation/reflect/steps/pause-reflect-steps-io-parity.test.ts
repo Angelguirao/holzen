@@ -24,6 +24,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
 
 /**
  * Presentation-layer steps I/O parity (colocated beside `pause-reflect-steps-io.ts`).
+ * Application mirror: `application/use-cases/ritual/reflect/steps/pause-reflect-steps-io-parity.test.ts`.
  * Delegation parity for steps-flow ↔ steps-io (run-* leaves + repository).
  * Wrapper distinctness sibling file: `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts` (application).
  * Favorite ↔ reflection_step log wrapper pins: presentation +
@@ -41,7 +42,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
  * Steps-io ↔ mood-io: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
  * Steps-io ↔ ambience-io: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `presentation/reflect/ambience/pause-reflect-ambience-io-parity.test.ts`.
+ * reciprocal inline pins ↔ `ambience/pause-reflect-ambience-io-parity.test.ts` and `steps/pause-reflect-steps-io-parity.test.ts` (application + presentation).
  * Steps-io ↔ telemetry-io: `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts`.
  * Steps-io ↔ generation-io: `pause-reflect-steps-generation-io-sibling-parity.test.ts` (application + presentation);
