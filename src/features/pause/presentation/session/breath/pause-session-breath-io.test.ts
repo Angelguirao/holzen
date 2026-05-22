@@ -8,19 +8,12 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'breathIoRepository' },
 }));
 
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow',
-  async (importOriginal) => {
-    const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow')
-    >();
-    return {
-      ...actual,
-      runEnsureBreathSegment1Logged: runEnsureBreathSegment1LoggedMock,
-      runEnsureBreathSegment2Logged: runEnsureBreathSegment2LoggedMock,
-    };
-  },
-);
+vi.mock('@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log', () => ({
+  runEnsureBreathSegment1Logged: runEnsureBreathSegment1LoggedMock,
+  runEnsureBreathSegment2Logged: runEnsureBreathSegment2LoggedMock,
+  runLogBreathSegment1Skipped: vi.fn(),
+  runLogBreathSegment2Skipped: vi.fn(),
+}));
 
 import {
   applyBreathSegmentLogOutcome,
