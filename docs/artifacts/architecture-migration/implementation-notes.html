@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — ritual/decide cluster marker + flows umbrella identity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>ritual-decide-cluster</code> + <code>pause-reflect-flows-flow</code> regression pins</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add empty <code>ritual-decide-cluster</code> beside decide flow anchors (parity with <code>ritual-reflect-flows-cluster</code> and session cluster markers). Strengthen <code>pause-reflect-flows-flow.test.ts</code> with <code>.toBe(direct)</code> identity checks for domain reflect/decide helpers and ritual/decide leaf modules. <code>pause-reflect-flows-io</code> unchanged (imports leaves directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI/documentation slice only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Decide leaf flow modules still lack individual flow tests; umbrella test locks compose re-exports after reflect folder migration.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: decide leaf flow tests or ritual/done cluster marker; Phase B subscription Tier 1 shim when pause Tier 5 is quiet.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — ritual/breathe session breath cluster marker (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
