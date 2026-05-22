@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect ambience umbrella identity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-ambience-flow</code> domain re-export regression pin</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Strengthen <code>pause-reflect-ambience-flow.test.ts</code> with <code>.toBe(direct)</code> identity for <code>startPauseReflectFrameFocusAmbience</code> / <code>stopPauseReflectFrameFocusAmbience</code> from <code>domain/ritual/breathe/reflect-frame-focus-ambience</code> (parity with mood/steps/share umbrella pins). <code>pause-reflect-ambience-io</code> unchanged (imports domain bed directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI slice only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Ambience cluster marker test stays empty-module smoke; umbrella flow test owns identity assertions.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: flows umbrella full <code>.toBe(direct)</code> on decide leaves, or session ritual-restore cluster parity; Phase B subscription Tier 1 shim when pause Tier 5 is quiet.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — ritual/done cluster marker + done umbrella identity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
