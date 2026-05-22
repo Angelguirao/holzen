@@ -164,6 +164,6 @@ describe('pause-reflect-pending-offer-io parity', () => {
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(getPendingPauseOfferDisplay).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(reflectPauseRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
-    // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/ambience/pause-reflect-ambience-io-parity.test.ts`.
   });
 });

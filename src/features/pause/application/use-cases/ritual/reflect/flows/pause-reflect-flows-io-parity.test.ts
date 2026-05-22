@@ -260,7 +260,7 @@ describe('pause-reflect-flows-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (reflect+decide vs frame-focus bed).
+   * Reciprocal inline pins ↔ `presentation/reflect/ambience/pause-reflect-ambience-io-parity.test.ts` (reflect+decide vs frame-focus bed).
    * Dedicated sibling file: `pause-reflect-flows-ambience-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: ambience-io exports stay distinct from flows-io', () => {
@@ -270,7 +270,7 @@ describe('pause-reflect-flows-io parity', () => {
     expect(resolvePauseDecideOutcomeFlow).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(buildPauseScoreImpacts).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
-    // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/ambience/pause-reflect-ambience-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-ambience-io-sibling-parity.test.ts`.
   });
 

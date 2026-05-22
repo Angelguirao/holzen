@@ -30586,7 +30586,24 @@
       <dt>Deviation</dt>
       <dd>None — file move + alignment allowlist + comment anchors only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: colocate remaining application-layer reflect I/O parity tests (<code>flows-io</code>, <code>generation-io</code>, <code>ambience-io</code>, <code>telemetry-io</code>) under presentation clusters, or Phase B Tier 1 shim scan.</dd>
+      <dd>Next: colocate remaining application-layer reflect I/O parity tests (<code>flows-io</code>, <code>generation-io</code>, <code>telemetry-io</code>) under presentation clusters, or Phase B Tier 1 shim scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate ambience-io parity beside presentation cluster (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-ambience-io-parity.test.ts</code> → <code>presentation/reflect/ambience/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no use-case folder moves. Colocate presentation I/O parity beside <code>pause-reflect-ambience-io.ts</code> (parity with mood/hub/share colocation). Allowlist parity test in <code>check:architecture-alignment</code> for ambience-flow CI umbrella and legacy ambience domain import guards under <code>presentation/reflect/ambience/</code>. Application flow/cluster comment anchors updated; production ambience I/O unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>Application-layer ambience sibling parity tests remain under <code>application/.../ritual/reflect/ambience/</code> and <code>flows/</code> when they assert flow umbrellas.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>pause-reflect-generation-io-parity</code> or <code>pause-reflect-telemetry-io-parity</code> under presentation clusters, or Phase B Tier 1 lib shim scan.</dd>
     </dl>
   </article>
 

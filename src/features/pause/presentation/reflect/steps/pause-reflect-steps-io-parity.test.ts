@@ -41,7 +41,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
  * Steps-io ↔ mood-io: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
  * Steps-io ↔ ambience-io: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts`.
+ * reciprocal inline pins ↔ `presentation/reflect/ambience/pause-reflect-ambience-io-parity.test.ts`.
  * Steps-io ↔ telemetry-io: `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts`.
  * Steps-io ↔ generation-io: `pause-reflect-steps-generation-io-sibling-parity.test.ts` (application + presentation);
@@ -332,7 +332,7 @@ describe('pause-reflect-steps-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (step RPC wrappers vs frame-focus bed).
+   * Reciprocal inline pins ↔ `presentation/reflect/ambience/pause-reflect-ambience-io-parity.test.ts` (step RPC wrappers vs frame-focus bed).
    * Dedicated sibling file: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: ambience-io exports stay distinct from steps-io wrappers', () => {
@@ -348,7 +348,7 @@ describe('pause-reflect-steps-io parity', () => {
     expect(shouldLogFromStepsIo).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(reflectPauseRepository).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(reflectPauseRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
-    // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/ambience/pause-reflect-ambience-io-parity.test.ts`.
   });
 
   /**
