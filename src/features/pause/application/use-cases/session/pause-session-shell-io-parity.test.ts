@@ -65,12 +65,15 @@ import {
   persistedPauseSessionAllowsTerminalEntry as persistedAllowsFromTerminalEntryIo,
   TERMINAL_PAUSE_DB_STATES as terminalStatesFromTerminalEntryIo,
 } from '@/features/pause/presentation/session/pause-session-terminal-entry-io';
+import { pickPauseHolzenProvidersSlice } from '@/features/pause/presentation/session/pause-session-providers-io';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
 /**
  * Shell CI umbrella ↔ presentation I/O delegation parity.
  * Terminal-entry-io sibling: `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins below ↔ `pause-session-terminal-entry-io-parity.test.ts`.
+ * Providers-io sibling: `pause-session-providers-shell-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-session-providers-io-parity.test.ts`.
  */
 describe('pause-session-shell-io parity', () => {
   it('presentation I/O shell exports match pause-session-shell-flow CI umbrella', () => {
@@ -119,6 +122,24 @@ describe('pause-session-shell-io parity', () => {
     expect(hasPersistedPauseSessionPayload).not.toBe(persistedAllowsFromTerminalEntryIo);
     expect(isPauseSessionWaitingForInstanceFetch).not.toBe(isTerminalFromTerminalEntryIo);
     // Reciprocal inline pins: `pause-session-terminal-entry-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-providers-io-parity.test.ts` (shell chrome vs Holzen slice).
+   * Dedicated sibling file: `pause-session-providers-shell-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: providers-io export stays distinct from shell-io hydration and header-back', () => {
+    expect(computePauseSessionHydration).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(computePauseSessionResolved).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(isPauseSessionHeaderBackVisible).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(computePauseHeaderBackIntent).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(buildPauseSessionMountLogParams).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(coalescePauseSessionShellViewModel).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(hasPersistedPauseSessionPayload).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(isPauseSessionWaitingForInstanceFetch).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(computeHydrationFromShellIo).not.toBe(pickPauseHolzenProvidersSlice);
+    // Reciprocal inline pins: `pause-session-providers-io-parity.test.ts`.
+    // Full pins: `pause-session-providers-shell-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: shell presentation exports stay distinct from scaffold, terminal-entry, and persisted-tab-session I/O', () => {

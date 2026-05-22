@@ -31,6 +31,7 @@ import {
   computePauseStorageRitualSyncPatch as computeSyncFromScaffoldIo,
   hasPersistablePauseSessionAnchor as hasAnchorFromScaffoldIo,
 } from '@/features/pause/presentation/session/scaffold/pause-session-scaffold-io';
+import { pickPauseHolzenProvidersSlice } from '@/features/pause/presentation/session/pause-session-providers-io';
 import {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
@@ -85,6 +86,20 @@ describe('pause-session-scaffold-io parity', () => {
       hasAnchorFromDomain('pi-parity', ''),
     );
     expect(hasAnchorFromScaffoldIo(null, 'copy')).toBe(hasAnchorFromDomain(null, 'copy'));
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-providers-io-parity.test.ts` (scaffold persist vs Holzen slice).
+   * Dedicated sibling file: `pause-session-providers-scaffold-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: providers-io export stays distinct from scaffold-io helpers', () => {
+    expect(buildPauseSessionPersistSnapshot).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(computePauseStorageRitualSyncPatch).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(buildPauseSessionScaffoldRitualDerived).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(hasPersistablePauseSessionAnchor).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(buildPersistFromScaffoldIo).not.toBe(pickPauseHolzenProvidersSlice);
+    // Reciprocal inline pins: `pause-session-providers-io-parity.test.ts`.
+    // Full pins: `pause-session-providers-scaffold-io-sibling-parity.test.ts`.
   });
 
   /**
