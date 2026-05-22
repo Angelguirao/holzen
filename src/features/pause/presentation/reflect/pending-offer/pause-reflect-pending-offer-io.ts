@@ -1,15 +1,17 @@
 /**
  * Presentation I/O for pending pause offer RPC + display copy.
- * Imports adopt/decline use cases and display helpers via `pause-reflect-pending-offer-flow`
- * CI anchor (`presentation/reflect/pending-offer/` cluster).
+ * Imports adopt/decline via `pause-reflect-pending-offer-rpc-flow` and display via
+ * `pause-pending-offer-display-flow` (parity with hub/steps I/O subcluster peels).
  */
 import {
   getPendingPauseOfferDisplay,
-  runAdoptPendingPauseOffer,
-  runDeclinePendingPauseOffer,
   type PendingPauseOfferDisplay,
   type PendingPauseOfferDisplayInput,
-} from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow';
+import {
+  runAdoptPendingPauseOffer,
+  runDeclinePendingPauseOffer,
+} from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
