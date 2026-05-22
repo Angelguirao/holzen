@@ -19964,7 +19964,7 @@
       <dt>Deviation</dt>
       <dd>None — CI-only; no runtime behavior change.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Home <code>use-manual-pause-trigger</code> remains under <code>presentation/home/manual-open/</code> by design (route conductor).</dd>
+      <dd>Superseded same day: <code>use-manual-pause-trigger</code> moved under <code>presentation/reflect/generation/manual-open/</code>; telemetry under <code>presentation/reflect/telemetry/home/</code>.</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B cross-context slice, or archive decide I/O peel when pause Tier 5 is clean.</dd>
     </dl>
@@ -19986,6 +19986,26 @@
       <dd>Three presentation surfaces (telemetry/home, generation/manual-open barrel, home/manual-open shim) until Home conductors import telemetry/home directly.</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B cross-context Tier 1 shim, or peel archive decide I/O when pause Tier 5 is clean.</dd>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — manual-open conductor colocated (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-manual-pause-trigger</code> under <code>presentation/reflect/generation/manual-open/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Completes presentation colocation on branch tip. Move <code>use-manual-pause-trigger</code> + test beside <code>pause-home-reflect-io</code>, telemetry I/O, and <code>use-open-pause-home-preview</code> under <code>reflect/generation/manual-open/</code>. Update <code>public-home</code> and <code>use-holzen-home-context-state</code> import paths; telemetry imports use <code>reflect/telemetry/home/</code> or generation/manual-open barrel per branch tip.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; path only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Removes <code>presentation/home/manual-open/</code> shim for the conductor (remote had deprecated re-export until this slice).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim, or archive decide I/O peel.</dd>
+    </dl>
+  </article>
+
     </dl>
   </article>
 

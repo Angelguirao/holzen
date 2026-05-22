@@ -11,7 +11,7 @@ import { useProfile } from '@/features/user/public-hooks';
 import { millisecondsUntilNextQuarterHour } from '@/features/pause/public-scheduling';
 import { useOpenPauseHomePreview } from '@/features/pause/presentation/reflect/generation/manual-open/use-open-pause-home-preview';
 import { useHolzenManualTriggerOrchestration } from './use-holzen-manual-trigger-orchestration';
-import { useManualPauseTrigger } from './manual-open/use-manual-pause-trigger';
+import { useManualPauseTrigger } from '@/features/pause/presentation/reflect/generation/manual-open/use-manual-pause-trigger';
 
 /**
  * Shared Home + `/pause` context: profile, market display, open-pause preview, manual trigger.

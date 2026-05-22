@@ -75,7 +75,7 @@ export { useOpenPauseHomePreview } from './presentation/reflect/generation/manua
 export {
   useManualPauseTrigger,
   type UseManualPauseTriggerParams,
-} from './presentation/home/manual-open/use-manual-pause-trigger';
+} from './presentation/reflect/generation/manual-open/use-manual-pause-trigger';
 export {
   useHolzenManualTriggerOrchestration,
   type UseHolzenManualTriggerOrchestrationParams,
