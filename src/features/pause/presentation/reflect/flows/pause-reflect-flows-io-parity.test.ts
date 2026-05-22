@@ -353,7 +353,7 @@ describe('pause-reflect-flows-io parity', () => {
     expect(resolvePauseDecideOutcomeFlow).not.toBe(getPendingPauseOfferDisplay);
     expect(showPauseOutcomeNotCompletedToast).not.toBe(getPendingPauseOfferDisplay);
     expect(showPauseOutcomeSaveFailedToast).not.toBe(pauseAdoptPendingOffer);
-    // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`.
+    // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`, `pause-reflect-pending-offer-io.test.ts`.
     // Full pins: `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts`.
   });
 
