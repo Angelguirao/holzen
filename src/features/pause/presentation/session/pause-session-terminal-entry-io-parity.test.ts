@@ -1,6 +1,7 @@
 /**
  * Presentation I/O parity for session terminal-entry cluster (colocated beside
  * `pause-session-terminal-entry-io.ts`; application `pause-session-terminal-entry-flow` stays CI umbrella).
+ * Application mirror: `application/use-cases/session/pause-session-terminal-entry-io-parity.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
 

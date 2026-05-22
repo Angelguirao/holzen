@@ -2,7 +2,7 @@
  * Presentation I/O for `/pause` terminal-entry redirect guards.
  * Imports `terminal-entry-guard` directly (parity with step-transition and ritual-done I/O peels;
  * not `pause-session-terminal-entry-flow` CI anchor).
- * Parity pins: `pause-session-terminal-entry-io-parity.test.ts` (extended leaf + tab-session sibling), `pause-session-terminal-entry-io.re-exports.test.ts`,
+ * Parity pins: `pause-session-terminal-entry-io-parity.test.ts` (extended leaf + tab-session sibling; application mirror beside `pause-session-terminal-entry-flow`), `pause-session-terminal-entry-io.re-exports.test.ts`,
  * `pause-session-terminal-entry-io.test.ts` (presentation smoke + leaf identity + reciprocal inline pins vs shell/scaffold I/O),
  * `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` ↔ `pause-session-scaffold-io` (application
  * `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` under `application/.../session/`; reciprocal inline pins in
