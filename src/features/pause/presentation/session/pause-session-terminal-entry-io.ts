@@ -8,7 +8,7 @@
  * `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` under `application/.../session/`; reciprocal inline pins in
  * `pause-session-terminal-entry-io-parity.test.ts` ↔ `pause-session-scaffold-io-parity.test.ts`),
  * `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` ↔ `pause-session-shell-io` (application + presentation);
- * application reciprocal inline pins: `pause-session-terminal-entry-io-parity.test.ts` ↔ `pause-session-shell-io-parity.test.ts`;
+ * reciprocal inline pins: `pause-session-terminal-entry-io-parity.test.ts` ↔ `pause-session-shell-io-parity.test.ts` (both colocated under `presentation/session/`).
  * sibling cluster vs `pause-session-persisted-tab-session-flow` in application flow tests.
  */
 export {
