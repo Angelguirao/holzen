@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — presentation steps-io ↔ telemetry-io sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-telemetry-io-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mirror application <code>pause-reflect-steps-telemetry-flow-sibling-parity</code> at presentation: <code>pause-reflect-steps-io</code> (step RPC + reflection_step storage) vs <code>pause-reflect-telemetry-io</code> (session reflect UI PostHog taps) stay namespace-separated; complements generation↔telemetry-io and share↔telemetry-io presentation pins.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + I/O header comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: application-layer reciprocal inline pins on steps-flow ↔ generation-flow unit tests, or Phase B subscription/auth slice.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — presentation steps-io ↔ generation-io reciprocal inline pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -29004,23 +29021,6 @@
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open questions</dt>
       <dd>Next: presentation steps-io ↔ share-io reciprocal inline pins, or Phase B subscription Tier 1 shim scan.</dd>
-    </dl>
-  </article>
-
-  <article class="note">
-    <header>
-      <span>2026-05-22</span>
-      <span>Phase A — presentation steps-io ↔ telemetry-io sibling parity (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-reflect-steps-telemetry-io-sibling-parity.test.ts</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mirror application <code>pause-reflect-steps-telemetry-flow-sibling-parity</code> at presentation: <code>pause-reflect-steps-io</code> (post-it RPC + step gates) vs <code>pause-reflect-telemetry-io</code> (session reflect PostHog) stay namespace-separated. Production modules unchanged.</dd>
-      <dt>Deviation</dt>
-      <dd>None — tests + comment anchors only.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: Phase B subscription/auth Tier 1 shim scan; pause query-client registration via <code>public-queries</code> (in progress on branch).</dd>
     </dl>
   </article>
 
