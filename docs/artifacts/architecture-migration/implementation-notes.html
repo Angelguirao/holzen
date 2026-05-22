@@ -26323,6 +26323,8 @@
       <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add presentation <code>pause-session-shell-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> identity for hydration, header back, mount log, shell VM, and persisted/waiting guards (parity with scaffold-io / brief-io re-exports pins; application <code>pause-session-shell-io-parity.test.ts</code> already landed). Allowlist re-exports test for shell-flow import in <code>check:architecture-alignment</code>. Production shell I/O keeps leaf imports.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + alignment allowlist only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation re-exports test allowlisted to import shell-flow CI umbrella for identity pins only.</dd>
       <dt>Open questions</dt>
       <dd>Next: Tier 1 <code>holzen-query-client-ref</code> lib shim (<code>App.tsx</code> → <code>@/lib/holzen-query-client-ref</code>), or Phase B subscription Tier 1 shims.</dd>
     </dl>
@@ -26344,6 +26346,25 @@
       <dd>Regression guard without merging generation and ambience CI umbrellas or changing presentation I/O leaf imports.</dd>
       <dt>Open questions</dt>
       <dd>Next: Tier 1 <code>holzen-query-client-ref</code> ↔ <code>public-queries</code> re-export parity test, session terminal-entry/step-handlers extended pins, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — holzen-query-client-ref public-queries parity (backlog #1 verified, Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>holzen-query-client-ref-parity.test.ts</code> pins <code>public-queries</code> registry re-exports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add infrastructure parity test so <code>getHolzenQueryClient</code> / <code>setHolzenQueryClient</code> on <code>public-queries</code> stay identity-bound to <code>holzen-query-client-ref.ts</code> (App boot already registers via barrel; RPC invalidation imports infrastructure path directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — test + comment only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Does not relocate <code>holzen-console</code> logging shims — separate Tier 1 slice if needed.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shims, or session terminal-entry-io extended parity pins.</dd>
     </dl>
   </article>
 
