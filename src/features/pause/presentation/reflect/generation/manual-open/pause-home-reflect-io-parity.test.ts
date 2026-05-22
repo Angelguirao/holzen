@@ -243,8 +243,11 @@ describe('pause-home-reflect-io parity', () => {
     expect(buildMarketFromHomeIo).not.toBe(trackPauseReflectShareTap);
     expect(persistStubFromHomeIo).not.toBe(trackPauseReflectWallpaperTap);
     expect(openManualPauseFromHome).not.toBe(trackPauseReflectPostItOpen);
+    expect('trackPauseReflectPostItOpen' in homeReflectIo).toBe(false);
+    expect('trackPauseReflectShareTap' in homeReflectIo).toBe(false);
+    expect('trackPauseReflectWallpaperTap' in homeReflectIo).toBe(false);
     // Reciprocal inline pins: `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`,
-    // `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts`.
+    // `application/.../manual-open/pause-home-reflect-io-parity.test.ts`.
   });
 
   /**
