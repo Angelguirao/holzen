@@ -1,12 +1,15 @@
 /**
  * Ritual done presentation I/O (brief post-pause emotion log when feel changed).
- * Imports done use cases via `pause-ritual-done-flow` CI anchor (parity with reflect hub/steps I/O).
+ * Imports `post-pause-emotion-log` directly (parity with archive decide and reflect I/O leaf peels).
  */
-import { runPostPauseEmotionLogIfDirty } from '@/features/pause/application/use-cases/ritual/done/pause-ritual-done-flow';
+import {
+  runPostPauseEmotionLogIfDirty,
+  type PostPauseFeelSnapshot,
+} from '@/features/pause/application/use-cases/ritual/done/post-pause-emotion-log';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
-export type { PostPauseFeelSnapshot } from '@/features/pause/application/use-cases/ritual/done/pause-ritual-done-flow';
+export type { PostPauseFeelSnapshot };
 
 /** Default `PauseRepository` for ritual done presentation hooks. */
 export const reflectPauseRepository = supabasePauseRepository;

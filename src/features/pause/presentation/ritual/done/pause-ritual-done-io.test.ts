@@ -8,7 +8,7 @@ import {
 const runPostPauseEmotionLogIfDirtyMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/done/pause-ritual-done-flow',
+  '@/features/pause/application/use-cases/ritual/done/post-pause-emotion-log',
   () => ({
     runPostPauseEmotionLogIfDirty: runPostPauseEmotionLogIfDirtyMock,
   }),
@@ -38,7 +38,7 @@ describe('pause-ritual-done-io', () => {
     expect(reflectPauseRepository).toEqual({ port: 'reflectPauseRepository' });
   });
 
-  it('routes post-pause emotion log through pause-ritual-done-flow with injected repository', () => {
+  it('routes post-pause emotion log through post-pause-emotion-log with injected repository', () => {
     const repository = { kind: 'test' };
     pausePostPauseEmotionLogIfDirtyWithRepository(repository as never, {
       pauseInstanceId: 'inst-2',

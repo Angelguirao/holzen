@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel pause-ritual-done-io to post-pause-emotion-log leaf (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-ritual-done-io</code> imports <code>post-pause-emotion-log</code> directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route <code>pause-ritual-done-io</code> through <code>post-pause-emotion-log</code> instead of <code>pause-ritual-done-flow</code> or <code>pause-post-pause-emotion-log-flow</code> CI anchors (parity with <code>pause-archive-io</code> leaf peel on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-ritual-done-flow</code> and <code>pause-post-pause-emotion-log-flow</code> remain for cluster detection and umbrella composition.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session breath I/O peels (<code>pause-session-breath-io</code>, step-navigation-io) or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — split reflect generation hook-flow domain cluster (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>reflect-generation-hook-flow.ts</code> remains a domain re-export barrel for tests and application cluster anchor.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B cross-context Tier 1 shim (auth/subscription/market) or session breath/ritual-done I/O peels.</dd>
+      <dd>Superseded by ritual-done-io peel on branch tip.</dd>
     </dl>
   </article>
 

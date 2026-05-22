@@ -1445,12 +1445,28 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_SUBCLUSTER_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow'",
 ];
 
-/** Ritual done presentation I/O — import via pause-ritual-done-flow only (not done subcluster flows). */
+/** Ritual done presentation (non-I/O) — import post-pause emotion log via pause-ritual-done-io only. */
 const LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_IO_USE_CASE_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/done/post-pause-emotion-log',
   '@/features/pause/application/use-cases/ritual/done/pause-post-pause-emotion-log-flow',
+  '@/features/pause/application/use-cases/ritual/done/pause-ritual-done-flow',
   "from './application/use-cases/ritual/done/post-pause-emotion-log'",
   "from '../application/use-cases/ritual/done/post-pause-emotion-log'",
+  "from './application/use-cases/ritual/done/pause-post-pause-emotion-log-flow'",
+  "from '../application/use-cases/ritual/done/pause-post-pause-emotion-log-flow'",
+  "from './application/use-cases/ritual/done/pause-ritual-done-flow'",
+  "from '../application/use-cases/ritual/done/pause-ritual-done-flow'",
+];
+
+const LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_IO_UMBRELLA_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/done/pause-ritual-done-flow',
+  "from './application/use-cases/ritual/done/pause-ritual-done-flow'",
+  "from '../application/use-cases/ritual/done/pause-ritual-done-flow'",
+];
+
+/** Ritual done I/O — import post-pause emotion log leaf directly (not done subcluster flow anchors). */
+const LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_IO_SUBCLUSTER_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/done/pause-post-pause-emotion-log-flow',
   "from './application/use-cases/ritual/done/pause-post-pause-emotion-log-flow'",
   "from '../application/use-cases/ritual/done/pause-post-pause-emotion-log-flow'",
 ];
@@ -1961,10 +1977,17 @@ for (const file of walkTs(join(root, 'src'))) {
     }
   }
   if (rel.endsWith('pause-ritual-done-io.ts') || rel.endsWith('pause-ritual-done-io.test.ts')) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_USE_CASE_IMPORTS) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_IO_UMBRELLA_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: ritual done I/O must import via pause-ritual-done-flow (${needle})`,
+          `${rel}: ritual done I/O must not import ritual done umbrella (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_IO_SUBCLUSTER_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: ritual done I/O must import post-pause-emotion-log leaf directly (${needle})`,
         );
       }
     }
@@ -2275,10 +2298,17 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-ritual-done-io.ts') ||
     rel.endsWith('pause-ritual-done-io.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_IO_USE_CASE_IMPORTS) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_IO_UMBRELLA_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: ritual done I/O must import via pause-ritual-done-flow (${needle})`,
+          `${rel}: ritual done I/O must not import ritual done umbrella (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_IO_SUBCLUSTER_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: ritual done I/O must import post-pause-emotion-log leaf directly (${needle})`,
         );
       }
     }
