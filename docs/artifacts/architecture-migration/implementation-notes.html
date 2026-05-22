@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect pending-offer leaf flow regression tests (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-*-pending-offer-*-flow</code> leaf CI anchors have unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-reflect-pending-offer-rpc-flow.test.ts</code>, <code>pause-pending-offer-display-flow.test.ts</code>, and <code>pause-pending-offer-telemetry-flow.test.ts</code> beside pending-offer subcluster CI anchors (parity with mood/hub/steps/share leaf flow tests and umbrella <code>pause-reflect-pending-offer-flow.test.ts</code>). Presentation <code>pause-reflect-pending-offer-io</code> unchanged (imports leaf modules directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test-only slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No CI guard change; pending-offer leaf flow anchors remain CI-only; umbrella test already covered aggregate re-exports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: remaining frame orchestrate subcluster flow tests, reflect flows/ambience leaf tests, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect hub leaf flow regression tests (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -90,7 +109,7 @@
       <dt>Tradeoffs</dt>
       <dd>No CI guard change; mood leaf flow anchors remain CI-only; umbrella <code>pause-reflect-mood-flow.test.ts</code> already covers aggregate re-exports.</dd>
       <dt>Open questions</dt>
-      <dd>Next: reflect hub leaf flow regression tests, pending-offer flow tests, or Phase B subscription Tier 1 shim.</dd>
+      <dd>Next: reflect pending-offer flow regression tests, remaining frame orchestrate subcluster flow tests, or Phase B subscription Tier 1 shim.</dd>
     </dl>
   </article>
 
