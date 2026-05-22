@@ -21604,4 +21604,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect Home manual-open telemetry I/O leaf peel (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel <code>pause-home-reflect-telemetry-io</code> off <code>pause-home-reflect-telemetry-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-home-reflect-telemetry-io</code> imports PostHog trackers from <code>home-pause-actions-telemetry</code> and <code>manual-pause-trigger-telemetry</code> directly (parity with <code>pause-reflect-telemetry-io</code> → <code>pause-reflect-session-ui-telemetry</code> on the same branch tip). CI blocks telemetry-flow and generation umbrella imports on manual-open telemetry I/O.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-home-reflect-telemetry-flow</code> remains the CI compose anchor for <code>pause-reflect-generation-flow</code>; presentation no longer routes through it.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-scaffold-io</code> subcluster peel, Phase B subscription Tier 1 shim, or ritual breathe presentation I/O alignment.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

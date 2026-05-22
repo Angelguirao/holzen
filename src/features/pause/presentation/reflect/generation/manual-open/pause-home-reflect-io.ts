@@ -2,7 +2,7 @@
  * Home manual-open reflect cluster I/O (use cases, domain builders, dismiss preview, default ports).
  * Colocated under `presentation/reflect/generation/manual-open/` (parity with application `generation/manual-open/` cluster).
  * Imports manual-open use cases and domain builders via `pause-reflect-generation-manual-open-flow`
- * CI anchor (parity with `pause-home-reflect-telemetry-io` → telemetry-flow, not generation umbrella).
+ * CI anchor (parity with `pause-home-reflect-telemetry-io` → leaf telemetry modules, not generation umbrella).
  */
 import {
   buildManualPauseCreateOrReuseParams,
