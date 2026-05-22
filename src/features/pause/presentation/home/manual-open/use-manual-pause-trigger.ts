@@ -16,7 +16,7 @@ import {
   markPauseManualStartedHomeOnce,
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
-} from '@/features/pause/presentation/reflect/telemetry/home/pause-home-reflect-telemetry-io';
+} from './pause-home-reflect-telemetry-io';
 import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import { holzenLog } from '@/lib/holzen-console';
 
