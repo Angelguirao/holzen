@@ -9,6 +9,7 @@
  * `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`,
  * `pause-reflect-mood-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`,
  * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
+ * reciprocal inline pins: `pause-reflect-hub-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`;
  * `pause-reflect-ambience-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`;
  * `pause-reflect-flows-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`;
  * `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`;

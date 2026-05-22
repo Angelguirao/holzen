@@ -7,7 +7,8 @@
  * Sibling surfaces: `pause-reflect-flows-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (reciprocal inline pins in
  * `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-flows-io.test.ts`);
  * `pause-reflect-steps-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`,
- * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`,
+ * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
+ * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-hub-io.test.ts`,
  * `pause-reflect-share-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`;
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-share-io.test.ts`,
  * `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-generation-io.test.ts`,
