@@ -51,6 +51,11 @@ import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from '../ambience/pause-reflect-ambience-flow';
+import {
+  runPauseFavoriteToggle as runFavoriteFromStepsFlow,
+  runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
+  shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
+} from '../steps/pause-reflect-steps-flow';
 
 import {
   buildPauseScoreImpacts as buildImpactsFromFlow,
@@ -128,5 +133,14 @@ describe('pause-reflect-flows-flow', () => {
     expect(resolveAfterGenFromFlow).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(runOutcomeLogFromFlow).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(formatQuoteFromFlow).not.toBe(stopPauseReflectFrameFocusAmbience);
+  });
+
+  it('sibling cluster: steps-flow exports stay distinct from flows umbrella exports', () => {
+    expect(resolvePreflightFromFlow).not.toBe(runFavoriteFromStepsFlow);
+    expect(resolvePreflightFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+    expect(runOutcomeLogFromFlow).not.toBe(runFavoriteFromStepsFlow);
+    expect(runOutcomeLogFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+    expect(formatQuoteFromFlow).not.toBe(shouldLogFromStepsFlow);
+    expect(resolveAfterGenFromFlow).not.toBe(runReflectionStepFromStepsFlow);
   });
 });

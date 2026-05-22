@@ -29,6 +29,10 @@ import { runPauseFavoriteToggle as runFavoriteDirect } from './run-pause-favorit
 import { runPauseReflectNoteUpdate as runNoteDirect } from './run-pause-reflect-note-update';
 import { runPauseReflectTagUpdate as runTagDirect } from './run-pause-reflect-tag-update';
 import { runPauseReflectionStepLogOnce as runReflectionStepDirect } from './run-pause-reflection-step-log';
+import {
+  resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
+  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
+} from '../flows/pause-reflect-flows-flow';
 
 describe('pause-reflect-steps-flow', () => {
   it('re-exports step mutations and domain gates from leaf modules', () => {
@@ -54,5 +58,14 @@ describe('pause-reflect-steps-flow', () => {
     expect(runPauseReflectTagUpdate).toBe(runTagFromTagFlow);
     expect(runPauseReflectionStepLogOnce).toBe(runReflectionStepFromLogFlow);
     expect(shouldLogFromFlow).toBe(shouldLogFromLogFlow);
+  });
+
+  it('sibling cluster: flows-flow exports stay distinct from steps umbrella exports', () => {
+    expect(runPauseFavoriteToggle).not.toBe(resolvePreflightFromFlowsFlow);
+    expect(runPauseFavoriteToggle).not.toBe(runOutcomeLogFromFlowsFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(resolvePreflightFromFlowsFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(runOutcomeLogFromFlowsFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(resolvePreflightFromFlowsFlow);
+    expect(shouldLogFromFlow).not.toBe(runOutcomeLogFromFlowsFlow);
   });
 });
