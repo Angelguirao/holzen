@@ -24,7 +24,8 @@ import * as moodIo from './pause-reflect-mood-io';
 
 /**
  * Presentation sibling parity: mood-io vs hub-io (parity with application
- * `pause-reflect-hub-mood-flow-sibling-parity.test.ts`).
+ * `pause-reflect-hub-mood-flow-sibling-parity.test.ts`; complements
+ * `pause-reflect-steps-mood-io-sibling-parity.test.ts`).
  */
 describe('pause-reflect-mood-io ↔ pause-reflect-hub-io sibling parity', () => {
   it('mood-io and hub-io are distinct presentation I/O surfaces', () => {
