@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  buildPauseSessionStepTransitionConfig as buildConfigFromFlow,
+  PAUSE_SESSION_STEP_SLIDE_OFFSET_PX as slideOffsetFromFlow,
+  PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S as durationReducedFromFlow,
+  PAUSE_SESSION_STEP_TRANSITION_DURATION_S as durationFromFlow,
+  PAUSE_SESSION_STEP_TRANSITION_EASE as easeFromFlow,
+  pauseStepSwipeDirection as swipeFromFlow,
+} from '@/features/pause/application/use-cases/session/pause-session-step-transition-flow';
+import {
   buildPauseSessionStepTransitionConfig as buildDirect,
   PAUSE_SESSION_STEP_SLIDE_OFFSET_PX as slideOffsetDirect,
   PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S as durationReducedDirect,
@@ -26,5 +34,23 @@ describe('pause-session-step-transition-io re-exports', () => {
     expect(PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S).toBe(durationReducedDirect);
     expect(PAUSE_SESSION_STEP_TRANSITION_EASE).toBe(easeDirect);
     expect(pauseStepSwipeDirection).toBe(swipeDirect);
+  });
+
+  it('presentation I/O bindings match pause-session-step-transition-flow CI anchor (leaf parity)', () => {
+    expect(buildPauseSessionStepTransitionConfig).toBe(buildConfigFromFlow);
+    expect(PAUSE_SESSION_STEP_SLIDE_OFFSET_PX).toBe(slideOffsetFromFlow);
+    expect(PAUSE_SESSION_STEP_TRANSITION_DURATION_S).toBe(durationFromFlow);
+    expect(PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S).toBe(durationReducedFromFlow);
+    expect(PAUSE_SESSION_STEP_TRANSITION_EASE).toBe(easeFromFlow);
+    expect(pauseStepSwipeDirection).toBe(swipeFromFlow);
+  });
+
+  it('step transition config export remains callable (smoke)', () => {
+    const config = buildPauseSessionStepTransitionConfig({
+      swipeDirection: 'forward',
+      prefersReducedMotion: false,
+    });
+    expect(config.animate).toEqual({ opacity: 1, x: 0 });
+    expect(pauseStepSwipeDirection('decide', 'reflect')).toBe('back');
   });
 });
