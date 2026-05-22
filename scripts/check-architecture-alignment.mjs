@@ -3148,7 +3148,8 @@ for (const file of walkTs(join(root, 'src'))) {
     }
     const sessionBriefIoAllowlisted =
       rel.endsWith('pause-session-brief-io.ts') ||
-      rel.endsWith('pause-session-brief-io.test.ts');
+      rel.endsWith('pause-session-brief-io.test.ts') ||
+      rel.endsWith('pause-session-brief-io.re-exports.test.ts');
     if (!sessionBriefIoAllowlisted) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BRIEF_USE_CASE_IMPORTS) {
         if (text.includes(needle)) {
@@ -3205,7 +3206,8 @@ for (const file of walkTs(join(root, 'src'))) {
   }
   if (
     rel.endsWith('pause-session-brief-io.ts') ||
-    rel.endsWith('pause-session-brief-io.test.ts')
+    rel.endsWith('pause-session-brief-io.test.ts') ||
+    rel.endsWith('pause-session-brief-io.re-exports.test.ts')
   ) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BRIEF_IO_UMBRELLA_FLOW_IMPORTS) {
       if (text.includes(needle)) {

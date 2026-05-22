@@ -2,6 +2,7 @@
  * Presentation I/O for `/pause` brief ritual depth upgrade RPC and brief hydration from storage.
  * Imports restored brief fields and depth-upgrade RPC via sibling application modules
  * (parity with `pause-session-scaffold-io` → scaffold subcluster modules).
+ * Parity pins: `pause-session-brief-io.re-exports.test.ts` and `pause-session-brief-io-parity.test.ts`.
  */
 import {
   initialBriefIntegrateDoneFromRestored,
