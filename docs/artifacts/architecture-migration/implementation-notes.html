@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect share subcluster flow regression tests (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflection-share-*-flow</code> CI cluster anchors have unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-reflection-share-image-flow.test.ts</code>, <code>pause-reflection-share-text-flow.test.ts</code>, and <code>pause-reflection-share-channel-urls-flow.test.ts</code> beside share subcluster CI anchors (parity with <code>pause-reflect-share-orchestration-flow</code> and <code>pause-reflect-telemetry-flow</code> after orchestration peel). Presentation <code>pause-reflect-share-io</code> unchanged (imports leaf modules directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test-only slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No CI guard change; share subcluster flow anchors remain CI-only; orchestration umbrella already peeled to leaf modules.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect steps/mood/hub subcluster flow regression tests, <code>pause-companion-orchestrate-flow</code> peel, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — pause-companion-analytics-flow regression test (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
