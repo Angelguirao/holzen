@@ -318,7 +318,7 @@ describe('pause-reflect-flows-io parity', () => {
     expect(resolvePauseDecideOutcomeFlow).not.toBe(trackPauseReflectWallpaperTap);
     expect(getSessionQuote).not.toBe(trackPauseReflectPostItOpen);
     expect(buildPauseScoreImpacts).not.toBe(trackPauseReflectShareTap);
-    // Reciprocal inline pins: `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-telemetry-io-sibling-parity.test.ts`.
   });
 
