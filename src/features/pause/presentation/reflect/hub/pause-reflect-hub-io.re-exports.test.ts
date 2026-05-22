@@ -7,8 +7,11 @@ vi.mock('@/features/pause/public-rpc', () => ({
 import { buildShiftEmotionFrameHubLogBundle as buildLogBundleDirect } from '@/features/pause/domain/reflect/hub/shift-emotion-log';
 import { resolveShiftFrameHubDonePresentation as resolvePresentationDirect } from '@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation';
 
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
+
 import {
   buildShiftEmotionFrameHubLogBundle,
+  reflectPauseRepository,
   resolveShiftFrameHubDonePresentation,
 } from './pause-reflect-hub-io';
 
@@ -19,5 +22,9 @@ describe('pause-reflect-hub-io re-exports', () => {
 
     expect(buildShiftEmotionFrameHubLogBundle).toBe(buildLogBundleDirect);
     expect(resolveShiftFrameHubDonePresentation).toBe(resolvePresentationDirect);
+  });
+
+  it('binds default reflectPauseRepository to public-rpc supabasePauseRepository', () => {
+    expect(reflectPauseRepository).toBe(supabasePauseRepository);
   });
 });
