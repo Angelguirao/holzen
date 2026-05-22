@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel pause-session-breath-io ritual-audio to leaf module (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-breath-io</code> imports <code>ritual-audio</code> directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Route Web Audio breath cues through <code>ritual-audio</code> instead of <code>pause-ritual-audio-breathe-flow</code> (segment RPC already on sibling leaf modules).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-ritual-audio-breathe-flow</code> remains for cluster detection; other breath presentation hooks import audio via <code>pause-session-breath-io</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session shell-io / scaffold-io subcluster peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-session-terminal-entry-io to terminal-entry-guard (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

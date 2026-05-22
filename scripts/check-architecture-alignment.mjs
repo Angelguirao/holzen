@@ -732,7 +732,14 @@ const LEGACY_PAUSE_ARCHIVE_DECIDE_FLOW_LEAF_IMPORTS = [
   "from '../pause-outcome-retrospective-telemetry'",
 ];
 
-/** Deep ritual-audio in session breath I/O — use pause-ritual-audio-breathe-flow anchor. */
+/** Session breath I/O — import ritual-audio leaf only (not pause-ritual-audio-breathe-flow). */
+const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_IO_AUDIO_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/breathe/pause-ritual-audio-breathe-flow',
+  "from './application/use-cases/ritual/breathe/pause-ritual-audio-breathe-flow'",
+  "from '../application/use-cases/ritual/breathe/pause-ritual-audio-breathe-flow'",
+];
+
+/** Deep ritual-audio in session breath presentation — use pause-session-breath-io only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_AUDIO_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/breathe/ritual-audio',
   "from './application/use-cases/ritual/breathe/ritual-audio'",
@@ -2656,18 +2663,27 @@ for (const file of walkTs(join(root, 'src'))) {
         );
       }
     }
-  }
-  if (rel.startsWith('src/features/pause/presentation/session/breath/')) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_AUDIO_IMPORTS) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_IO_AUDIO_FLOW_IMPORTS) {
       if (text.includes(needle)) {
-        failures.push(`${rel}: legacy session breath ritual-audio import (${needle})`);
+        failures.push(
+          `${rel}: session breath I/O must import ritual-audio directly (${needle})`,
+        );
       }
     }
+  }
+  if (rel.startsWith('src/features/pause/presentation/session/breath/')) {
     const breathIoAllowlisted =
       rel.endsWith('pause-session-breath-io.ts') ||
       rel.endsWith('pause-session-breath-io.test.ts') ||
       rel.endsWith('pause-session-breath-step-navigation-io.ts') ||
       rel.endsWith('pause-session-breath-step-navigation-io.test.ts');
+    if (!breathIoAllowlisted) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_AUDIO_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy session breath ritual-audio import (${needle})`);
+        }
+      }
+    }
     if (!breathIoAllowlisted) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_SEGMENT_LOG_IMPORTS) {
         if (text.includes(needle)) {
