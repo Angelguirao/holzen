@@ -34,9 +34,10 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperDirect);
   });
 
-  it('presentation I/O session reflect telemetry matches share CI umbrella (cross-cluster parity)', () => {
-    expect(trackPauseReflectPostItOpen).toBe(trackPostItFromShareFlow);
-    expect(trackPauseReflectShareTap).toBe(trackShareTapFromShareFlow);
-    expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperFromShareFlow);
+  it('share-flow and telemetry-flow re-export the same session UI telemetry leaf', () => {
+    expect(trackPostItFromShareFlow).toBe(trackPauseReflectPostItOpen);
+    expect(trackShareTapFromShareFlow).toBe(trackPauseReflectShareTap);
+    expect(trackWallpaperFromShareFlow).toBe(trackPauseReflectWallpaperTap);
+    expect(trackPostItFromShareFlow).toBe(trackPostItDirect);
   });
 });
