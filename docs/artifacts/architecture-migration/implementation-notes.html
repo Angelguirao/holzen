@@ -29502,4 +29502,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — presentation companion analytics-io ↔ orchestration-io sibling parity (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-analytics-orchestration-io-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>ritual/frame/</code>) remains complete — no folder moves. Add dedicated presentation sibling parity so analytics write I/O (feedback vote + fullview opened on <code>PauseAnalyticsRepository</code>) stays namespace-separated from orchestration I/O (session load, favorites, UI completion, expansion). Reciprocal inline pins on analytics-io and orchestration-io unit tests (parity with frame-ui ↔ orchestration-io slice).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + I/O header comments only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: presentation analytics-io ↔ orchestrate-io sibling parity, or Phase B subscription Tier 1 shim scan.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
