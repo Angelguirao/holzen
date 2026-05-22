@@ -2,6 +2,7 @@
  * Holzen-reflect generation presentation I/O (bound ReflectGenerator port).
  * Imports domain hook leaf modules and `run-reflect-generation` directly (parity with
  * `pause-reflect-mood-io` leaf imports; not generation umbrella or hook-flow bundle).
+ * Wrapper delegation pins: pause-reflect-generation-io-parity.test.ts (default generator + injected port).
  */
 import {
   runReflectGeneration,
