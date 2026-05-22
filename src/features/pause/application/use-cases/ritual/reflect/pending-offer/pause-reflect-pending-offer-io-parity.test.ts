@@ -44,21 +44,53 @@ import {
   trackPauseSessionAbandoned as trackAbandonedFromTelemetryIo,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 import {
-  pauseShiftEmotionFrameHubDone,
-  pauseShiftEmotionFrameHubDoneWithRepository,
-} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
-  pauseInitialEmotionSelect,
-  pauseInitialEmotionSkip,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
-import {
-  pauseReflectOutcomeLog,
-  resolvePauseSessionReflectAndDecidePreflight,
-} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+  buildReflectionShareTelegramUrl,
+  buildReflectionShareText,
+  buildReflectionShareTweetUrl,
+  buildReflectionShareWhatsAppUrl,
+  pauseReflectionShareImage,
+} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
   pauseReflectionStepLogOnce,
+  pauseReflectFavoriteToggleWithRepository,
+  pauseReflectNoteUpdateWithRepository,
+  pauseReflectTagUpdateWithRepository,
+  pauseReflectionStepLogOnceWithRepository,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
+  buildPauseScoreImpacts,
+  formatReinforcementQuoteFromSession,
+  getSessionQuote,
+  pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
+  resolvePauseDecideOutcomeFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
+  buildShiftEmotionFrameHubLogBundle,
+  pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
+  resolveShiftFrameHubDonePresentation,
+} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
+  buildFeelTilesMoodLogOptions,
+  pauseInitialEmotionSelect,
+  pauseInitialEmotionSkip,
+  pauseInitialEmotionSelectWithRepository,
+  pauseInitialEmotionSkipWithRepository,
+} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
@@ -145,44 +177,69 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
     expect(pauseAdoptPendingOffer).not.toBe(trackAdoptedFromTelemetryIo);
     expect(pauseDeclinePendingOffer).not.toBe(trackDeclinedFromTelemetryIo);
     expect(pauseAdoptPendingOfferWithRepository).not.toBe(trackAbandonedFromTelemetryIo);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(trackAdoptedFromTelemetryIo);
     expect(getPendingPauseOfferDisplay).not.toBe(trackDeclinedFromTelemetryIo);
     expect(reflectPauseRepository).not.toBe(trackAbandonedFromTelemetryIo);
   });
 
-  /**
-   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (application + presentation).
-   */
+  it('sibling cluster: flows-io exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(pauseDeclinePendingOffer).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
+    expect(getPendingPauseOfferDisplay).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(pauseDeclinePendingOffer).not.toBe(buildPauseScoreImpacts);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(resolvePauseDecideOutcomeFlow);
+    expect(getPendingPauseOfferDisplay).not.toBe(formatReinforcementQuoteFromSession);
+    expect(getPendingPauseOfferDisplay).not.toBe(getSessionQuote);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(showPauseOutcomeSaveFailedToast);
+    expect(pauseDeclinePendingOffer).not.toBe(showPauseOutcomeNotCompletedToast);
+  });
+
+  it('sibling cluster: steps-io exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseReflectNoteUpdate);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseReflectTagUpdateWithRepository);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(pauseReflectFavoriteToggleWithRepository);
+    expect(getPendingPauseOfferDisplay).not.toBe(pauseReflectionStepLogOnce);
+    expect(pauseAdoptPendingOffer).not.toBe(shouldShowFavoriteProHint);
+    expect(pauseDeclinePendingOffer).not.toBe(shouldLogPauseReflectionStep);
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectionStepLogOnceWithRepository);
+  });
+
   it('sibling cluster: hub-io shift-frame exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(pauseShiftEmotionFrameHubDone);
     expect(pauseDeclinePendingOffer).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
-    expect(getPendingPauseOfferDisplay).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(getPendingPauseOfferDisplay).not.toBe(resolveShiftFrameHubDonePresentation);
+    expect(pauseAdoptPendingOffer).not.toBe(buildShiftEmotionFrameHubLogBundle);
   });
 
-  /**
-   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (application + presentation).
-   */
-  it('sibling cluster: flows-io exports stay distinct from pending-offer-io', () => {
-    expect(pauseAdoptPendingOffer).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
-    expect(pauseDeclinePendingOffer).not.toBe(pauseReflectOutcomeLog);
-    expect(getPendingPauseOfferDisplay).not.toBe(pauseReflectOutcomeLog);
-  });
-
-  /**
-   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (application + presentation).
-   */
   it('sibling cluster: mood-io initial-emotion exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(pauseInitialEmotionSelect);
     expect(pauseDeclinePendingOffer).not.toBe(pauseInitialEmotionSkip);
-    expect(getPendingPauseOfferDisplay).not.toBe(pauseInitialEmotionSelect);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseInitialEmotionSelectWithRepository);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(pauseInitialEmotionSkipWithRepository);
+    expect(getPendingPauseOfferDisplay).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(pauseAdoptPendingOffer).not.toBe(buildFeelTilesMoodLogOptions);
   });
 
-  /**
-   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application + presentation).
-   */
-  it('sibling cluster: steps-io exports stay distinct from pending-offer-io', () => {
-    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectFavoriteToggle);
-    expect(pauseDeclinePendingOffer).not.toBe(pauseReflectionStepLogOnce);
-    expect(getPendingPauseOfferDisplay).not.toBe(pauseReflectFavoriteToggle);
+  it('sibling cluster: share-io exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectionShareImage);
+    expect(pauseDeclinePendingOffer).not.toBe(buildReflectionShareText);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(buildReflectionShareTweetUrl);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(buildReflectionShareWhatsAppUrl);
+    expect(getPendingPauseOfferDisplay).not.toBe(buildReflectionShareTelegramUrl);
+    expect(reflectPauseRepository).not.toBe(pauseReflectionShareImage);
+  });
+
+  it('sibling cluster: ambience-io frame-focus bed exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseDeclinePendingOffer).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(getPendingPauseOfferDisplay).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(reflectPauseRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
   });
 
   /**
