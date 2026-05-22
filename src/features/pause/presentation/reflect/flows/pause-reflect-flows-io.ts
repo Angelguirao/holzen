@@ -35,6 +35,9 @@ import { getSessionQuote } from '@/features/pause/application/use-cases/ritual/d
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
+/** Default `PauseRepository` for reflect+decide presentation hooks. */
+export const reflectPauseRepository = supabasePauseRepository;
+
 export {
   buildPauseScoreImpacts,
   formatReinforcementQuoteFromSession,
@@ -59,7 +62,7 @@ export {
 export function pauseReflectOutcomeLog(
   input: { pauseInstanceId: string | null; decision: string },
 ): ReturnType<typeof runPauseOutcomeLog> {
-  return runPauseOutcomeLog(supabasePauseRepository, input);
+  return runPauseOutcomeLog(reflectPauseRepository, input);
 }
 
 /** Test seam: inject a custom `PauseRepository`. */

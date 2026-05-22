@@ -19,18 +19,25 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
 }));
 
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
+
 import {
   buildPauseScoreImpacts,
   formatReinforcementQuoteFromSession,
   getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
+  reflectPauseRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecidePreflight,
   type PauseImpactData,
 } from './pause-reflect-flows-io';
 
 describe('pause-reflect-flows-io', () => {
+  it('binds default reflectPauseRepository to public-rpc supabasePauseRepository', () => {
+    expect(reflectPauseRepository).toBe(supabasePauseRepository);
+  });
+
   it('types PauseImpactData via pause-session-decide-io (session decide beat)', () => {
     const sample: PauseImpactData = {
       mood: null,
@@ -107,10 +114,10 @@ describe('pause-reflect-flows-io', () => {
     });
 
     expect(result).toEqual({ status: 'completed' });
-    expect(runPauseOutcomeLogMock).toHaveBeenCalledWith(
-      { port: 'reflectPauseRepository' },
-      { pauseInstanceId: 'pi-1', decision: 'hold' },
-    );
+    expect(runPauseOutcomeLogMock).toHaveBeenCalledWith(reflectPauseRepository, {
+      pauseInstanceId: 'pi-1',
+      decision: 'hold',
+    });
   });
 
   it('pauseReflectOutcomeLogWithRepository forwards a custom repository', async () => {
