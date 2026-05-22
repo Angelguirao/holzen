@@ -27,7 +27,8 @@ import {
 
 /**
  * Presentation sibling parity: steps-io vs telemetry-io (parity with application
- * `pause-reflect-steps-telemetry-flow-sibling-parity.test.ts`; complements
+ * `pause-reflect-steps-telemetry-flow-sibling-parity.test.ts` and
+ * `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` under `application/.../steps/`; complements
  * `pause-reflect-share-telemetry-io-sibling-parity.test.ts` and
  * `pause-reflect-flows-telemetry-io-sibling-parity.test.ts`).
  */

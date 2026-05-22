@@ -22,7 +22,8 @@
  * `pause-reflect-steps-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io` (presentation + application);
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-ambience-io.test.ts`;
  * application parity: `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-ambience-io-parity.test.ts`;
- * `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`;
+ * `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io` (presentation + application);
+ * reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-telemetry-io-parity.test.ts`;
  * `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow` (application CI umbrella),
  * `pause-reflect-steps-note-tag-io-sibling-parity.test.ts` (note vs tag wrappers on this module;
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-steps-note-tag-io-sibling-parity.test.ts`;
