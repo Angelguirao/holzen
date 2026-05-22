@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for ritual reflect mood presentation I/O (§3 / check:architecture-alignment).
  * Composes domain mood helpers + `run-initial-emotion-log` leaf use case (not subcluster flow anchors).
- * Parity pins: `pause-reflect-mood-io-parity.test.ts` (presentation I/O ↔ umbrella + domain mood leaves + `reflectPauseRepository` ↔ `supabasePauseRepository`), `pause-reflect-mood-io.re-exports.test.ts`, `pause-reflect-hub-mood-flow-sibling-parity.test.ts`, `pause-reflect-steps-mood-flow-sibling-parity.test.ts`;
+ * Parity pins: `pause-reflect-mood-io-parity.test.ts` (presentation I/O ↔ umbrella + domain mood leaves + `reflectPauseRepository` ↔ `supabasePauseRepository`), `pause-reflect-mood-io.re-exports.test.ts`, `pause-reflect-flows-mood-flow-sibling-parity.test.ts`, `pause-reflect-hub-mood-flow-sibling-parity.test.ts`, `pause-reflect-steps-mood-flow-sibling-parity.test.ts`;
  * `pause-reflect-mood-flow.test.ts` pins sibling-cluster separation from `pause-reflect-hub-flow`.
  */
 export {
