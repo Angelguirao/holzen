@@ -9,6 +9,11 @@ import {
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
+  trackPausePendingAdopted,
+  trackPausePendingDeclined,
+  trackPauseSessionAbandoned,
+} from './pause-reflect-pending-offer-telemetry-io';
+import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
@@ -52,5 +57,11 @@ describe('pause-reflect-telemetry-io', () => {
   it('routes post-it open through the session UI telemetry module', () => {
     trackPauseReflectPostItOpen('pi-1');
     expect(trackPauseReflectPostItOpenMock).toHaveBeenCalledWith('pi-1');
+  });
+
+  it('sibling cluster: pending-offer-telemetry-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(trackPausePendingAdopted);
+    expect(trackPauseReflectShareTap).not.toBe(trackPausePendingDeclined);
+    expect(trackPauseReflectWallpaperTap).not.toBe(trackPauseSessionAbandoned);
   });
 });

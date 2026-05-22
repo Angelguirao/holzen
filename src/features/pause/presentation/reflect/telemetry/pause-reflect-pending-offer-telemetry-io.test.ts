@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from './pause-reflect-telemetry-io';
+import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
@@ -44,5 +49,11 @@ describe('pause-reflect-pending-offer-telemetry-io', () => {
     expect(trackPausePendingAdopted).toBe(trackPausePendingAdoptedMock);
     expect(trackPausePendingDeclined).toBe(trackPausePendingDeclinedMock);
     expect(trackPauseSessionAbandoned).toBe(trackPauseSessionAbandonedMock);
+  });
+
+  it('sibling cluster: session reflect telemetry-io exports stay distinct from pending-offer telemetry-io', () => {
+    expect(trackPausePendingAdopted).not.toBe(trackPauseReflectPostItOpen);
+    expect(trackPausePendingDeclined).not.toBe(trackPauseReflectShareTap);
+    expect(trackPauseSessionAbandoned).not.toBe(trackPauseReflectWallpaperTap);
   });
 });
