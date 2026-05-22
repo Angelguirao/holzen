@@ -8,6 +8,15 @@ import {
 } from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';
 
 import {
+  buildReflectionShareText as buildTextFromTextFlow,
+} from './pause-reflection-share-text-flow';
+import {
+  buildReflectionShareTelegramUrl as buildTelegramFromChannelFlow,
+  buildReflectionShareTweetUrl as buildTweetFromChannelFlow,
+  buildReflectionShareWhatsAppUrl as buildWhatsAppFromChannelFlow,
+} from './pause-reflection-share-channel-urls-flow';
+import { runReflectionShareImage as runShareImageFromImageFlow } from './pause-reflection-share-image-flow';
+import {
   buildReflectionShareText as buildTextFromFlow,
   buildReflectionShareTelegramUrl as buildTelegramFromFlow,
   buildReflectionShareTweetUrl as buildTweetFromFlow,
@@ -51,5 +60,13 @@ describe('pause-reflect-share-flow', () => {
     expect(trackPauseReflectPostItOpen).toBe(trackPostItFromTelemetryFlow);
     expect(trackPauseReflectShareTap).toBe(trackShareTapFromTelemetryFlow);
     expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperFromTelemetryFlow);
+  });
+
+  it('umbrella bindings match share subcluster CI anchors (leaf parity)', () => {
+    expect(buildTextFromFlow).toBe(buildTextFromTextFlow);
+    expect(buildTelegramFromFlow).toBe(buildTelegramFromChannelFlow);
+    expect(buildTweetFromFlow).toBe(buildTweetFromChannelFlow);
+    expect(buildWhatsAppFromFlow).toBe(buildWhatsAppFromChannelFlow);
+    expect(runReflectionShareImage).toBe(runShareImageFromImageFlow);
   });
 });
