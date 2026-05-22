@@ -3,7 +3,8 @@
  * Imports domain builders and `run-reflection-share-image` directly (parity with
  * `pause-reflect-pending-offer-io` → leaf RPC/display modules).
  * Sibling parity: `pause-reflect-hub-share-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
- * `pause-reflect-share-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`.
+ * `pause-reflect-share-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
+ * `pause-reflect-share-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`.
  */
 import {
   runReflectionShareImage,
