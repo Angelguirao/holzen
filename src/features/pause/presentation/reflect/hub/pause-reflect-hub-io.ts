@@ -5,7 +5,8 @@
  * Wrapper delegation pins: pause-reflect-hub-io-parity.test.ts (default + *WithRepository seam).
  * Sibling parity: `pause-reflect-generation-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`,
  * `pause-reflect-hub-share-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`,
- * `pause-reflect-mood-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`.
+ * `pause-reflect-mood-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`,
+ * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`.
  */
 import { runShiftEmotionFrameHubDone } from '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
 import { buildShiftEmotionFrameHubLogBundle } from '@/features/pause/domain/reflect/hub/shift-emotion-log';

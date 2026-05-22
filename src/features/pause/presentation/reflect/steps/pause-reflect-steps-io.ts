@@ -4,7 +4,8 @@
  * `pause-reflect-hub-io` → domain + leaf use case).
  * Wrapper delegation pins: `pause-reflect-steps-io.test.ts` (default + *WithRepository seams incl. reflection_step log);
  * Sibling surfaces: `pause-reflect-flows-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`;
- * `pause-reflect-steps-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`, and
+ * `pause-reflect-steps-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`;
+ * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
  * `pause-reflect-steps-flow-steps-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow`.
  */
 import { runPauseFavoriteToggle } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
