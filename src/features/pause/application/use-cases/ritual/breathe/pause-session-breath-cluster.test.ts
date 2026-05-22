@@ -25,7 +25,7 @@ import { computeBreathingPhaseAdvance as computeAdvanceDirect } from './phase-ad
 import {
   runEnsureBreathSegment1Logged as runSegment1Direct,
   runEnsureBreathSegment2Logged as runSegment2Direct,
-} from './run-breath-segment-log';
+} from './pause-run-breath-segment-log-flow';
 
 import * as cluster from './pause-session-breath-cluster';
 
