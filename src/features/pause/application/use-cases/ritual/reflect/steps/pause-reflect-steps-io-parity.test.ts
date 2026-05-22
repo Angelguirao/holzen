@@ -40,6 +40,8 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
  * reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts`.
  * Steps-io ↔ ambience-io: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts`.
+ * Steps-io ↔ telemetry-io: `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts`.
  */
 import {
   runPauseFavoriteToggle,
@@ -97,6 +99,11 @@ import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   reflectionStepSessionStorage,
   supabasePauseRepository,
@@ -319,6 +326,22 @@ describe('pause-reflect-steps-io parity', () => {
     expect(reflectPauseRepository).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(reflectPauseRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
     // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (step RPC wrappers vs session UI telemetry).
+   * Dedicated sibling file: `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: telemetry-io exports stay distinct from steps-io wrappers', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(trackPauseReflectPostItOpen);
+    expect(pauseReflectNoteUpdate).not.toBe(trackPauseReflectShareTap);
+    expect(pauseReflectTagUpdate).not.toBe(trackPauseReflectWallpaperTap);
+    expect(pauseReflectionStepLogOnce).not.toBe(trackPauseReflectPostItOpen);
+    expect(shouldShowFromStepsIo).not.toBe(trackPauseReflectShareTap);
+    expect(shouldLogFromStepsIo).not.toBe(trackPauseReflectWallpaperTap);
+    expect(pauseReflectFavoriteToggleWithRepository).not.toBe(trackPauseReflectShareTap);
+    expect(pauseReflectionStepLogOnceWithRepository).not.toBe(trackPauseReflectWallpaperTap);
+    // Reciprocal inline pins: `pause-reflect-telemetry-io-parity.test.ts`.
   });
 
   /**

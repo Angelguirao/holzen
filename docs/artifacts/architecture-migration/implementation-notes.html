@@ -76,6 +76,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — application steps-io ↔ telemetry-io sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-telemetry-io-sibling-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete — no moves. Mirror presentation <code>pause-reflect-steps-telemetry-io-sibling-parity</code> at application layer so post-it step RPC wrappers stay namespace-separated from session reflect PostHog <code>pause-reflect-telemetry-io</code> (parity with <code>pause-reflect-steps-telemetry-flow-sibling-parity</code>). Extend reciprocal inline pins on <code>pause-reflect-steps-io-parity</code> and <code>pause-reflect-telemetry-io-parity</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + I/O header comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: application steps-io ↔ generation-io or pending-offer-io sibling parity (presentation mirrors exist), or Phase B subscription/auth Tier 1 shim scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — application terminal-entry-io ↔ scaffold-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

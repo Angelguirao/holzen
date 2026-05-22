@@ -39,6 +39,12 @@ import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 
 describe('pause-reflect-telemetry-io parity', () => {
   it('presentation I/O session reflect telemetry matches telemetry CI umbrella', () => {
@@ -80,6 +86,19 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackPauseReflectShareTap).not.toBe(buildPauseScoreImpacts);
     // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-telemetry-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (session UI telemetry vs step RPC wrappers).
+   * Dedicated sibling file: `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: steps-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseReflectFavoriteToggle);
+    expect(trackPauseReflectShareTap).not.toBe(pauseReflectNoteUpdate);
+    expect(trackPauseReflectWallpaperTap).not.toBe(pauseReflectTagUpdate);
+    expect(trackPostItFromTelemetryIo).not.toBe(pauseReflectionStepLogOnce);
+    // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
+    // Full pins: `pause-reflect-steps-telemetry-io-sibling-parity.test.ts`.
   });
 
   /**
