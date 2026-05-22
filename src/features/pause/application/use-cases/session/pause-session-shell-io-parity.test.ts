@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  persistedTabSessionStorage: { port: 'persistedTabSessionStorage' },
+}));
 
 import {
   computePauseSessionHydration as computeHydrationDirect,
@@ -12,6 +16,12 @@ import { buildPauseSessionMountLogParams as buildMountLogDirect } from '@/featur
 import { coalescePauseSessionShellViewModel as coalesceShellVmDirect } from '@/features/pause/application/use-cases/session/shell-view-model';
 import { hasPersistedPauseSessionPayload as hasPersistedDirect } from '@/features/pause/domain/session/persisted-session-guards';
 import { isPauseSessionWaitingForInstanceFetch as isWaitingDirect } from '@/features/pause/domain/session/waiting-for-instance-fetch';
+import { isTerminalPauseDbState } from '@/features/pause/application/use-cases/session/pause-session-terminal-entry-flow';
+import {
+  clearPersistedTabSession,
+  loadPersistedTabSession,
+  savePersistedTabSession,
+} from '@/features/pause/application/use-cases/session/pause-session-persisted-tab-session-flow';
 import {
   buildPauseSessionMountLogParams,
   coalescePauseSessionShellViewModel,
@@ -33,6 +43,11 @@ import {
   isPauseSessionWaitingForInstanceFetch as isWaitingFromShellIo,
 } from '@/features/pause/presentation/session/pause-session-shell-io';
 import {
+  clearPausePersistedTabSession,
+  loadPausePersistedTabSession,
+  savePausePersistedTabSession,
+} from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
+import {
   isTerminalPauseDbState as isTerminalFromTerminalEntryIo,
   persistedPauseSessionAllowsTerminalEntry as persistedAllowsFromTerminalEntryIo,
   TERMINAL_PAUSE_DB_STATES as terminalStatesFromTerminalEntryIo,
@@ -44,6 +59,8 @@ import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persist
  * Presentation mirror: `presentation/session/pause-session-shell-io-parity.test.ts`.
  * Imports shell-flow CI umbrella for `.toBe` identity pins only — production shell I/O keeps
  * sibling session subcluster leaf imports.
+ * Terminal-entry-io sibling: reciprocal inline pins ↔ `pause-session-terminal-entry-io-parity.test.ts`
+ * (application + presentation); dedicated `pause-session-terminal-entry-shell-io-sibling-parity.test.ts`.
  */
 describe('pause-session-shell-io parity (application)', () => {
   it('presentation shell I/O matches session shell-flow CI umbrella', () => {
@@ -76,6 +93,17 @@ describe('pause-session-shell-io parity (application)', () => {
     expect(hasPersistedFromShellIo(null)).toBe(hasPersistedDirect(null));
   });
 
+  it('presentation shell I/O re-exports leaf shell helpers (not port-bound tab-session wrappers)', () => {
+    expect(computePauseSessionHydration).toBe(computeHydrationDirect);
+    expect(computePauseSessionHydration).not.toBe(loadPausePersistedTabSession);
+    expect(computePauseSessionResolved).not.toBe(savePausePersistedTabSession);
+    expect(hasPersistedPauseSessionPayload).not.toBe(clearPausePersistedTabSession);
+    expect(isPauseSessionHeaderBackVisible).not.toBe(loadPersistedTabSession);
+    expect(buildPauseSessionMountLogParams).not.toBe(savePersistedTabSession);
+    expect(coalescePauseSessionShellViewModel).not.toBe(clearPersistedTabSession);
+    expect(isPauseSessionWaitingForInstanceFetch).not.toBe(isTerminalPauseDbState);
+  });
+
   /**
    * Reciprocal inline pins ↔ `pause-session-terminal-entry-io-parity.test.ts` (shell chrome vs terminal guards).
    * Dedicated sibling file: `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` (application + presentation).
@@ -90,5 +118,6 @@ describe('pause-session-shell-io parity (application)', () => {
     expect(isWaitingFromShellIo).not.toBe(isTerminalFromTerminalEntryIo);
     // Reciprocal inline pins: `application/.../pause-session-terminal-entry-io-parity.test.ts`,
     // `presentation/session/pause-session-terminal-entry-io-parity.test.ts`.
+    // Full pins: `pause-session-terminal-entry-shell-io-sibling-parity.test.ts`.
   });
 });
