@@ -28,7 +28,7 @@ vi.mock('@/features/pause/presentation/session/pause-persisted-tab-session-io', 
   savePausePersistedTabSession: vi.fn(),
 }));
 
-vi.mock('@/features/pause/presentation/reflect/telemetry/home/pause-home-reflect-telemetry-io', () => ({
+vi.mock('./pause-home-reflect-telemetry-io', () => ({
   markPauseManualStartedHomeOnce: markPauseManualStartedHomeOnceMock,
   trackManualPauseInstanceCreated: trackManualPauseInstanceCreatedMock,
   trackPauseManualCompleted: trackPauseManualCompletedMock,

@@ -65,11 +65,30 @@
     <h3><code>pause-*-reflect-telemetry-flow</code> beside tracker modules</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. Move <code>pause-home-reflect-telemetry-flow</code> to <code>generation/manual-open/</code> and <code>pause-reflect-telemetry-flow</code> to <code>share/</code> beside their tracker modules; keep <code>application/.../reflect/telemetry/ritual-reflect-telemetry-cluster.ts</code> as CI cluster marker. Presentation session reflect PostHog I/O stays under <code>presentation/reflect/share/pause-reflect-telemetry-io.ts</code> (remote tip).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. Move <code>pause-home-reflect-telemetry-flow</code> to <code>generation/manual-open/</code> and <code>pause-reflect-telemetry-flow</code> to <code>share/</code> beside their tracker modules; keep <code>application/.../reflect/telemetry/ritual-reflect-telemetry-cluster.ts</code> as CI cluster marker. Presentation session reflect PostHog I/O stays under <code>presentation/reflect/share/pause-reflect-telemetry-io.ts</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import paths only.</dd>
       <dt>Tradeoffs</dt>
       <dd>CI forbids resurrecting <code>application/.../reflect/telemetry/pause-*-telemetry-flow</code>; manual-open presentation still imports Home PostHog via <code>pause-home-reflect-telemetry-io</code> only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>pause-home-reflect-telemetry-io</code> presentation module under <code>generation/manual-open/</code> (follow-up slice).</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate Home manual-open telemetry I/O under generation/manual-open (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-telemetry-io</code> beside manual-open conductors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. After session reflect UI telemetry moved to <code>presentation/reflect/share/</code>, colocate <code>pause-home-reflect-telemetry-io</code> (+ test) under <code>presentation/reflect/generation/manual-open/</code> beside <code>pause-home-reflect-io</code> and <code>apply-manual-pause-open-result</code>; manual-open conductors use sibling imports. <code>use-home-pause-actions</code> imports the generation path. CI forbids resurrecting <code>presentation/reflect/telemetry/home/</code>; empty <code>presentation/reflect/telemetry/</code> removed.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Home route still imports across <code>presentation/home/</code> → <code>presentation/reflect/generation/manual-open/</code> for banner/dismiss PostHog (acceptable single consumer).</dd>
       <dt>Open questions</dt>
       <dd>Next: remaining session presentation deep imports or Phase B subscription Tier 1 shim.</dd>
     </dl>
