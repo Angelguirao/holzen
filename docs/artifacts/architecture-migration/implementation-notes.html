@@ -19761,4 +19761,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — companion frame-ui I/O via flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-frame-ui-io</code> imports through <code>pause-companion-frame-ui-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no reflect relocations. Route full-view + section-visibility presentation helpers through the existing frame UI CI anchor instead of deep <code>ritual/frame/full-view-page-helpers</code> and <code>section-visibility</code> paths (parity with orchestration I/O on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion analytics I/O still imports some frame modules directly until a follow-up peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-analytics-io</code> through a frame analytics-flow anchor, archive decide I/O peel, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
