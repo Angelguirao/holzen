@@ -11,6 +11,7 @@ import {
   type PickPauseHolzenProvidersSliceSource as SourceDirect,
 } from './pause-holzen-providers-slice';
 import { computePauseSessionHydration } from './pause-session-shell-flow';
+import { buildPauseSessionPersistSnapshot } from './pause-session-scaffold-flow';
 
 describe('pause-session-providers-flow', () => {
   it('re-exports Holzen provider slice picker from pause-holzen-providers-slice', () => {
@@ -49,5 +50,10 @@ describe('pause-session-providers-flow', () => {
   it('sibling cluster: shell-flow exports stay distinct from providers umbrella export', () => {
     expect(pickPauseHolzenProvidersSlice).not.toBe(computePauseSessionHydration);
     // Full cross-umbrella pins: `pause-session-providers-shell-flow-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: scaffold-flow exports stay distinct from providers umbrella export', () => {
+    expect(pickPauseHolzenProvidersSlice).not.toBe(buildPauseSessionPersistSnapshot);
+    // Full cross-umbrella pins: `pause-session-providers-scaffold-flow-sibling-parity.test.ts`.
   });
 });

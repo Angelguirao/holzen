@@ -16,6 +16,7 @@ import {
   computePauseStorageRitualSyncPatch as computeStorageSyncDirect,
 } from './storage-ritual-sync';
 import { computePauseSessionHydration } from './pause-session-shell-flow';
+import { pickPauseHolzenProvidersSlice } from './pause-session-providers-flow';
 
 const companions = { haiku: null, groundingTitle: null, groundingBody: null } as const;
 const companionPrefs = {
@@ -78,5 +79,13 @@ describe('pause-session-scaffold-flow', () => {
     expect(computePauseStorageRitualSyncPatch).not.toBe(computePauseSessionHydration);
     expect(buildPauseSessionScaffoldRitualDerived).not.toBe(computePauseSessionHydration);
     expect(hasPersistablePauseSessionAnchor).not.toBe(computePauseSessionHydration);
+  });
+
+  it('sibling cluster: providers-flow export stays distinct from scaffold umbrella exports', () => {
+    expect(buildPauseSessionPersistSnapshot).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(computePauseStorageRitualSyncPatch).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(buildPauseSessionScaffoldRitualDerived).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(hasPersistablePauseSessionAnchor).not.toBe(pickPauseHolzenProvidersSlice);
+    // Full cross-umbrella pins: `pause-session-providers-scaffold-flow-sibling-parity.test.ts`.
   });
 });
