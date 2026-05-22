@@ -23,8 +23,9 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
 }));
 
 /**
- * Application-layer delegation parity for steps-flow ↔ steps-io (run-* leaves + repository).
- * Wrapper distinctness sibling file: `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts`.
+ * Presentation-layer steps I/O parity (colocated beside `pause-reflect-steps-io.ts`).
+ * Delegation parity for steps-flow ↔ steps-io (run-* leaves + repository).
+ * Wrapper distinctness sibling file: `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts` (application).
  * Favorite ↔ reflection_step log wrapper pins: presentation +
  * application `pause-reflect-steps-favorite-reflection-step-log-io-sibling-parity.test.ts`
  * (reciprocal inline: `pause-reflect-steps-io.test.ts`); flow umbrellas:
@@ -70,7 +71,7 @@ import {
   reflectPauseRepository,
   shouldLogPauseReflectionStep as shouldLogFromStepsIo,
   shouldShowFavoriteProHint as shouldShowFromStepsIo,
-} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+} from './pause-reflect-steps-io';
 import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
@@ -125,6 +126,7 @@ import {
   shouldCommitReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 
+/** Presentation-layer steps I/O parity (colocated beside `pause-reflect-steps-io.ts`). */
 describe('pause-reflect-steps-io parity', () => {
   it('presentation I/O step gate re-exports match steps CI umbrella', () => {
     expect(shouldShowFavoriteProHint).toBe(shouldShowFromStepsIo);

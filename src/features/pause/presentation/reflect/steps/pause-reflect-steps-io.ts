@@ -3,16 +3,16 @@
  * Imports domain step gates and `run-pause-*` use cases directly (parity with
  * `pause-reflect-hub-io` → domain + leaf use case).
  * Wrapper delegation pins: `pause-reflect-steps-io.test.ts` (default + *WithRepository seams incl. reflection_step log);
- * `pause-reflect-steps-io-parity.test.ts` (flow umbrella + application layer).
+ * `pause-reflect-steps-io-parity.test.ts` (flow umbrella + steps-flow CI anchor; colocated).
  * Sibling surfaces: `pause-reflect-flows-steps-io-sibling-parity.test.ts`,
  * `pause-reflect-steps-flows-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (reciprocal inline pins in
  * `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-flows-io.test.ts`);
  * `pause-reflect-steps-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io` (presentation + application);
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-mood-io.test.ts`;
- * application parity: `pause-reflect-steps-io-parity.test.ts` (application) ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`;
+ * presentation parity: `pause-reflect-steps-io-parity.test.ts` ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`;
  * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-hub-io.test.ts`;
- * presentation parity: `pause-reflect-steps-io-parity.test.ts` ↔ `presentation/reflect/hub/pause-reflect-hub-io-parity.test.ts`;
+ * presentation parity: `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-hub-io-parity.test.ts` (hub cluster);
  * `pause-reflect-share-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`;
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-share-io.test.ts`,
  * `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-generation-io.test.ts`,
@@ -21,7 +21,7 @@
  * `pause-reflect-steps-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`;
  * `pause-reflect-steps-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io` (presentation + application);
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-ambience-io.test.ts`;
- * application parity: `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-ambience-io-parity.test.ts`;
+ * application parity: `pause-reflect-steps-io-parity.test.ts` ↔ `application/.../ambience/pause-reflect-ambience-io-parity.test.ts`;
  * `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io` (presentation + application);
  * reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-telemetry-io-parity.test.ts`;
  * `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow` (application CI umbrella),

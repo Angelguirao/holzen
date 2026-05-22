@@ -2620,9 +2620,13 @@ for (const file of walkTs(join(root, 'src'))) {
   if (
     rel.endsWith('pause-reflect-steps-io.ts') ||
     rel.endsWith('pause-reflect-steps-io.test.ts') ||
-    rel.endsWith('pause-reflect-steps-io.re-exports.test.ts')
+    rel.endsWith('pause-reflect-steps-io.re-exports.test.ts') ||
+    rel.endsWith('pause-reflect-steps-io-parity.test.ts')
   ) {
-    if (!rel.endsWith('pause-reflect-steps-io.re-exports.test.ts')) {
+    if (
+      !rel.endsWith('pause-reflect-steps-io.re-exports.test.ts') &&
+      !rel.endsWith('pause-reflect-steps-io-parity.test.ts')
+    ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_IO_UMBRELLA_FLOW_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(
@@ -2664,7 +2668,8 @@ for (const file of walkTs(join(root, 'src'))) {
     if (
       !rel.endsWith('pause-reflect-steps-io.ts') &&
       !rel.endsWith('pause-reflect-steps-io.test.ts') &&
-      !rel.endsWith('pause-reflect-steps-io.re-exports.test.ts')
+      !rel.endsWith('pause-reflect-steps-io.re-exports.test.ts') &&
+      !rel.endsWith('pause-reflect-steps-io-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {

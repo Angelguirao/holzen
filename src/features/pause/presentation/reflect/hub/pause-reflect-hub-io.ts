@@ -10,7 +10,7 @@
  * `pause-reflect-mood-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`,
  * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
  * reciprocal inline pins: `pause-reflect-hub-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`;
- * presentation parity: `pause-reflect-hub-io-parity.test.ts` ↔ `pause-reflect-steps-io-parity.test.ts`;
+ * presentation parity: `pause-reflect-hub-io-parity.test.ts` ↔ `pause-reflect-steps-io-parity.test.ts` (steps cluster);
  * `pause-reflect-ambience-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`;
  * `pause-reflect-flows-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (application
  * `pause-reflect-flows-hub-io-sibling-parity.test.ts` under `application/.../flows/`);
