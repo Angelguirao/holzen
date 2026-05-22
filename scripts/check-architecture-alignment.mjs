@@ -722,6 +722,9 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/flows/',
   '@/features/pause/domain/decide/pause-impact-data',
   '@/features/pause/domain/decide/pause-decide-outcome-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-score-impacts-flow',
+  '@/features/pause/application/use-cases/ritual/decide/score-impacts',
+  '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation',
   '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log',
   '@/features/pause/application/use-cases/ritual/decide/outcome-toast',
   '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes',
@@ -738,6 +741,24 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS = [
   "from '../domain/decide/pause-decide-outcome-flow",
   "from './application/use-cases/ritual/decide/run-pause-outcome-log'",
   "from '../application/use-cases/ritual/decide/run-pause-outcome-log'",
+  "from './application/use-cases/ritual/decide/pause-decide-score-impacts-flow'",
+  "from '../application/use-cases/ritual/decide/pause-decide-score-impacts-flow'",
+  "from './application/use-cases/ritual/decide/score-impacts'",
+  "from '../application/use-cases/ritual/decide/score-impacts'",
+  "from './application/use-cases/ritual/decide/score-impact-presentation'",
+  "from '../application/use-cases/ritual/decide/score-impact-presentation'",
+];
+
+/** Reflect flows umbrella — compose decide score builders via pause-decide-score-impacts-flow only. */
+const LEGACY_PAUSE_REFLECT_FLOWS_FLOW_DIRECT_SCORE_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/decide/score-impacts',
+  '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation',
+  "from './application/use-cases/ritual/decide/score-impacts'",
+  "from '../application/use-cases/ritual/decide/score-impacts'",
+  "from './application/use-cases/ritual/decide/score-impact-presentation'",
+  "from '../application/use-cases/ritual/decide/score-impact-presentation'",
+  "from '../../decide/score-impacts'",
+  "from '../../decide/score-impact-presentation'",
 ];
 
 /** Reflect share presentation — import session UI telemetry via pause-reflect-share-flow only. */
@@ -1258,6 +1279,11 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_REFLECT_FLOWS_FLOW_DECIDE_APP_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: reflect flows umbrella flow must compose decide subcluster anchors (${needle})`);
+      }
+    }
+    for (const needle of LEGACY_PAUSE_REFLECT_FLOWS_FLOW_DIRECT_SCORE_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect flows umbrella flow must compose score impacts via pause-decide-score-impacts-flow (${needle})`);
       }
     }
   }
