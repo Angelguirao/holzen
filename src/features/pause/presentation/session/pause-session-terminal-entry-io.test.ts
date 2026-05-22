@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  isTerminalPauseDbState as isTerminalFromLeaf,
+  persistedPauseSessionAllowsTerminalEntry as persistedAllowsFromLeaf,
+  TERMINAL_PAUSE_DB_STATES as terminalStatesFromLeaf,
+} from '@/features/pause/application/use-cases/session/terminal-entry-guard';
+import {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
   TERMINAL_PAUSE_DB_STATES,
@@ -17,5 +22,11 @@ describe('pause-session-terminal-entry-io', () => {
     const restored = makeTestPersistedPauseSession({ pauseInstanceId: 'inst-1' });
     expect(persistedPauseSessionAllowsTerminalEntry(restored, 'inst-1')).toBe(true);
     expect(persistedPauseSessionAllowsTerminalEntry(restored, 'other')).toBe(false);
+  });
+
+  it('presentation I/O re-exports match application leaf module (direct re-export parity)', () => {
+    expect(isTerminalPauseDbState).toBe(isTerminalFromLeaf);
+    expect(persistedPauseSessionAllowsTerminalEntry).toBe(persistedAllowsFromLeaf);
+    expect(TERMINAL_PAUSE_DB_STATES).toBe(terminalStatesFromLeaf);
   });
 });
