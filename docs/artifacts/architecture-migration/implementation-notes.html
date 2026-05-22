@@ -93,6 +93,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect mood-io full domain leaf parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-io-parity</code> depth-picker + presentation + chrome leaves</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-mood-io-parity.test.ts</code> so the mood CI umbrella and presentation I/O bind the same domain leaves for depth picker, initial-emotion presentation, feel tiles, and session chrome (parity with <code>pause-reflect-ambience-io-parity</code> and <code>pause-reflect-mood-io.re-exports.test.ts</code>). RPC delegation tests unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow comment only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: session <code>pause-session-shell-io.re-exports.test.ts</code>, or colocate <code>home/bulk-hold/group-by-local-day</code> under decide/home presentation.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect mood-io domain leaf parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
