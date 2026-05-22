@@ -45,6 +45,11 @@ import {
   resolveReflectGenerationPrefetch as resolvePrefetchFromGenerationFlow,
   runReflectGeneration as runReflectGenerationFromGenerationFlow,
 } from '../generation/pause-reflect-generation-flow';
+import {
+  buildShiftEmotionFrameHubLogBundle as buildLogBundleFromHubFlow,
+  resolveShiftFrameHubDonePresentation as resolvePresentationFromHubFlow,
+  runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
+} from '../hub/pause-reflect-hub-flow';
 
 describe('pause-reflect-pending-offer-flow', () => {
   it('re-exports pending-offer RPC use cases, display projection, and telemetry trackers from leaf modules', () => {
@@ -107,5 +112,15 @@ describe('pause-reflect-pending-offer-flow', () => {
     expect(trackAdoptedFromFlow).not.toBe(runAdoptFromRpcSubcluster);
     expect(trackDeclinedFromFlow).not.toBe(runDeclineFromRpcSubcluster);
     expect(trackAbandonedFromFlow).not.toBe(runDeclineFromRpcSubcluster);
+  });
+
+  it('sibling cluster: hub-flow exports stay distinct from pending-offer umbrella exports', () => {
+    expect(runAdoptPendingPauseOffer).not.toBe(runShiftHubDoneFromHubFlow);
+    expect(runDeclinePendingPauseOffer).not.toBe(runShiftHubDoneFromHubFlow);
+    expect(getDisplayFromFlow).not.toBe(buildLogBundleFromHubFlow);
+    expect(getDisplayFromFlow).not.toBe(resolvePresentationFromHubFlow);
+    expect(trackAdoptedFromFlow).not.toBe(runShiftHubDoneFromHubFlow);
+    expect(trackDeclinedFromFlow).not.toBe(buildLogBundleFromHubFlow);
+    expect(trackAbandonedFromFlow).not.toBe(resolvePresentationFromHubFlow);
   });
 });
