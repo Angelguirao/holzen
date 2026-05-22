@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — pending-offer presentation under reflect/pending-offer (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate pending-offer hooks + I/O in <code>presentation/reflect/pending-offer/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. After adopt/decline use cases moved to <code>application/.../ritual/reflect/pending-offer/</code>, colocate query/mutations, leave sheet, and I/O modules under <code>presentation/reflect/pending-offer/</code>; rename <code>pause-session-pending-offer-*-io</code> → <code>pause-reflect-pending-offer-*-io</code> (parity with <code>pause-reflect-pending-offer-flow</code>). <code>public-session</code>, <code>public-home</code>, <code>public-hooks</code>, and session shell bootstrap import paths only; session navigation hook stays in <code>presentation/session/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; path colocation only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session shell still orchestrates pending-offer UX via cross-cluster imports (reflect presentation + session navigation).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim, or companion orchestration-io peel if drift appears.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session breath CI guards + step-navigation I/O test (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -74,10 +93,6 @@
       <dd>Next: Phase B subscription Tier 1 shim (<code>src/lib/subscription-*</code> → <code>features/subscription/public*</code>).</dd>
     </dl>
   </article>
-
-  <article class="note">
-    <header>
-      <span>2026-05-22</span>
 
   <article class="note">
     <header>

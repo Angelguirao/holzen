@@ -5,8 +5,8 @@ import {
   getPendingPauseOfferQueryOptions,
   pendingPauseOfferQueryKey,
   type PendingPauseOfferRow,
-} from '../../public-queries';
-import { usePauseInstancesRealtime } from '../realtime/use-pause-instances-realtime';
+} from '@/features/pause/public-queries';
+import { usePauseInstancesRealtime } from '@/features/pause/presentation/realtime/use-pause-instances-realtime';
 
 export type { PendingPauseOfferRow };
 export { pendingPauseOfferQueryKey };

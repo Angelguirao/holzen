@@ -4,11 +4,11 @@ import { toast } from 'sonner';
 import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
-} from './pause-session-pending-offer-telemetry-io';
+} from './pause-reflect-pending-offer-telemetry-io';
 import {
   pauseAdoptPendingOffer,
   pauseDeclinePendingOffer,
-} from './pause-session-pending-offer-io';
+} from './pause-reflect-pending-offer-io';
 import type { PendingPauseOfferRow } from './use-pending-pause-offer';
 
 export function usePendingPauseOfferMutations(options: {

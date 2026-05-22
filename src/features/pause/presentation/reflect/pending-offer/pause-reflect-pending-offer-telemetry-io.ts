@@ -1,5 +1,5 @@
 /**
- * Session pending-offer PostHog helpers.
+ * Pending-offer PostHog helpers (reflect presentation cluster).
  * All trackers via `pause-pending-offer-telemetry-flow` (reflect telemetry cluster).
  */
 export {

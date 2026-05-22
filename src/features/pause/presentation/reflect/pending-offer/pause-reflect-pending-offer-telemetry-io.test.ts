@@ -3,7 +3,7 @@ import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
-} from './pause-session-pending-offer-telemetry-io';
+} from './pause-reflect-pending-offer-telemetry-io';
 
 const trackPausePendingAdoptedMock = vi.hoisted(() => vi.fn());
 const trackPausePendingDeclinedMock = vi.hoisted(() => vi.fn());
@@ -24,7 +24,7 @@ vi.mock(
   },
 );
 
-describe('pause-session-pending-offer-telemetry-io', () => {
+describe('pause-reflect-pending-offer-telemetry-io', () => {
   it('re-exports adopt, decline, and abandoned from pause-pending-offer-telemetry-flow', () => {
     expect(typeof trackPausePendingAdopted).toBe('function');
     expect(typeof trackPausePendingDeclined).toBe('function');
