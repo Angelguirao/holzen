@@ -39,6 +39,12 @@ import {
   isPauseSessionHeaderBackVisible,
   isPauseSessionWaitingForInstanceFetch,
 } from '@/features/pause/presentation/session/pause-session-shell-io';
+import {
+  buildPauseSessionPersistSnapshot,
+  buildPauseSessionScaffoldRitualDerived,
+  computePauseStorageRitualSyncPatch,
+  hasPersistablePauseSessionAnchor,
+} from '@/features/pause/presentation/session/scaffold/pause-session-scaffold-io';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
 /**
@@ -97,5 +103,21 @@ describe('pause-session-terminal-entry-io parity', () => {
     expect(persistedAllowsFromTerminalEntryIo).not.toBe(hasPersistedPauseSessionPayload);
     expect(isTerminalFromTerminalEntryIo).not.toBe(isPauseSessionWaitingForInstanceFetch);
     // Reciprocal inline pins: `pause-session-shell-io-parity.test.ts`.
+    // Full pins: `pause-session-terminal-entry-shell-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-scaffold-io-parity.test.ts` (terminal guards vs scaffold persist).
+   * Dedicated sibling file: `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: scaffold-io exports stay distinct from terminal-entry-io guards', () => {
+    expect(isTerminalFromTerminalEntryIo).not.toBe(buildPauseSessionPersistSnapshot);
+    expect(isTerminalFromTerminalEntryIo).not.toBe(computePauseStorageRitualSyncPatch);
+    expect(persistedAllowsFromTerminalEntryIo).not.toBe(buildPauseSessionScaffoldRitualDerived);
+    expect(terminalStatesFromTerminalEntryIo).not.toBe(hasPersistablePauseSessionAnchor);
+    expect(isTerminalFromTerminalEntryIo).not.toBe(buildPauseSessionScaffoldRitualDerived);
+    expect(persistedAllowsFromTerminalEntryIo).not.toBe(computePauseStorageRitualSyncPatch);
+    // Reciprocal inline pins: `pause-session-scaffold-io-parity.test.ts`.
+    // Full pins: `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts`.
   });
 });

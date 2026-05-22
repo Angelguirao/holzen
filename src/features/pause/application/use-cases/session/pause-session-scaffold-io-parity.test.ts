@@ -31,7 +31,17 @@ import {
   computePauseStorageRitualSyncPatch as computeSyncFromScaffoldIo,
   hasPersistablePauseSessionAnchor as hasAnchorFromScaffoldIo,
 } from '@/features/pause/presentation/session/scaffold/pause-session-scaffold-io';
+import {
+  isTerminalPauseDbState,
+  persistedPauseSessionAllowsTerminalEntry,
+  TERMINAL_PAUSE_DB_STATES,
+} from '@/features/pause/presentation/session/pause-session-terminal-entry-io';
 
+/**
+ * Scaffold CI umbrella ↔ presentation I/O delegation parity.
+ * Terminal-entry sibling: `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins below ↔ `pause-session-terminal-entry-io-parity.test.ts`.
+ */
 describe('pause-session-scaffold-io parity', () => {
   it('presentation I/O scaffold exports match pause-session-scaffold-flow CI umbrella', () => {
     expect(buildPauseSessionPersistSnapshot).toBe(buildPersistFromScaffoldIo);
@@ -75,5 +85,20 @@ describe('pause-session-scaffold-io parity', () => {
       hasAnchorFromDomain('pi-parity', ''),
     );
     expect(hasAnchorFromScaffoldIo(null, 'copy')).toBe(hasAnchorFromDomain(null, 'copy'));
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-terminal-entry-io-parity.test.ts` (scaffold persist vs terminal guards).
+   * Dedicated sibling file: `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: terminal-entry-io exports stay distinct from scaffold-io helpers', () => {
+    expect(buildPauseSessionPersistSnapshot).not.toBe(isTerminalPauseDbState);
+    expect(computePauseStorageRitualSyncPatch).not.toBe(persistedPauseSessionAllowsTerminalEntry);
+    expect(buildPauseSessionScaffoldRitualDerived).not.toBe(isTerminalPauseDbState);
+    expect(hasPersistablePauseSessionAnchor).not.toBe(persistedPauseSessionAllowsTerminalEntry);
+    expect(buildPauseSessionPersistSnapshot).not.toBe(TERMINAL_PAUSE_DB_STATES);
+    expect(hasPersistablePauseSessionAnchor).not.toBe(TERMINAL_PAUSE_DB_STATES);
+    // Reciprocal inline pins: `pause-session-terminal-entry-io-parity.test.ts`.
+    // Full pins: `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts`.
   });
 });
