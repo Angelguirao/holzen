@@ -13,6 +13,7 @@ import {
 import * as hubFlow from './pause-reflect-hub-flow';
 import * as moodFlow from '../mood/pause-reflect-mood-flow';
 
+/** Flow-level sibling parity; I/O mirrors: `pause-reflect-hub-mood-io-sibling-parity.test.ts` and `mood/pause-reflect-mood-hub-io-sibling-parity.test.ts`. */
 describe('pause-reflect-hub-flow ↔ pause-reflect-mood-flow sibling parity', () => {
   it('hub-flow and mood-flow are distinct sibling CI anchors', () => {
     expect(typeof runShiftEmotionFrameHubDone).toBe('function');
