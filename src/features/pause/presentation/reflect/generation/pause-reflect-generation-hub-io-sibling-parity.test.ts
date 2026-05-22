@@ -25,7 +25,10 @@ import * as generationIo from './pause-reflect-generation-io';
 
 /**
  * Presentation sibling parity: generation-io vs hub-io (parity with application
+ * `pause-reflect-generation-hub-io-sibling-parity.test.ts` and flow-level
  * `pause-reflect-generation-hub-flow-sibling-parity.test.ts`).
+ * Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts` ↔
+ * `pause-reflect-hub-io-parity.test.ts`.
  */
 describe('pause-reflect-generation-io ↔ pause-reflect-hub-io sibling parity', () => {
   it('generation-io and hub-io are distinct presentation I/O surfaces', () => {

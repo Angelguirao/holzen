@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'supabasePauseRepository' },
+  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done', () => ({
@@ -45,6 +46,14 @@ import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
+  messageFromReflectGenerationResult,
+  pauseReflectGeneration,
+  reflectGenerationPrerequisite,
+  reflectGenerator,
+  runReflectGeneration,
+  shouldCommitReflectGeneration,
+} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 /** Presentation-layer hub I/O parity (colocated beside `pause-reflect-hub-io.ts`). */
@@ -83,6 +92,22 @@ describe('pause-reflect-hub-io parity', () => {
     );
 
     expect(runShiftHubDoneDirect).toHaveBeenCalledWith(customRepository, input);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (shift-frame hub vs holzen-reflect).
+   * Dedicated sibling file: `pause-reflect-generation-hub-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: generation-io holzen-reflect exports stay distinct from hub-io wrappers', () => {
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(runReflectGeneration);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseReflectGeneration);
+    expect(buildLogBundleFromHubIo).not.toBe(reflectGenerationPrerequisite);
+    expect(resolvePresentationFromHubIo).not.toBe(shouldCommitReflectGeneration);
+    expect(reflectPauseRepository).not.toBe(reflectGenerator);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(messageFromReflectGenerationResult);
+    expect(buildLogBundleFromHubIo).not.toBe(runReflectGeneration);
+    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
+    // Full pins: `pause-reflect-generation-hub-io-sibling-parity.test.ts`.
   });
 
   /**
