@@ -113,7 +113,8 @@ describe('pause-companion-orchestrate-io parity', () => {
     expect(trackCompanionGenerationInitiated).not.toBe(pauseCompanionUiStepCompletion);
     expect(setCompanionSlotLoading).not.toBe(invalidateCompanionUiCompletionQuery);
     expect(resetInterventionIdempotency).not.toBe(pauseLoadCompanionOrchestrateSession);
-    // Reciprocal inline pins: `application/.../ritual/frame/pause-companion-orchestrate-io-parity.test.ts`.
+    // Reciprocal inline pins: `application/.../ritual/frame/pause-companion-orchestrate-io-parity.test.ts`,
+    // `pause-companion-orchestration-io-parity.test.ts`.
     // Dedicated siblings: `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts` (application + presentation).
   });
 

@@ -3,6 +3,8 @@
  * Application mirror: `application/.../ritual/frame/pause-companion-orchestration-io-parity.test.ts`.
  * Imports `pause-companion-orchestration-flow` CI umbrella for `.toBe` identity pins only —
  * production orchestration I/O keeps ritual/frame leaf imports.
+ * Orchestrate-io sibling: reciprocal inline pins ↔ `pause-companion-orchestrate-io-parity.test.ts`;
+ * dedicated `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
 
@@ -37,6 +39,15 @@ import {
   persistCompanionUiStepCompletion,
   runToggleCompanionLibraryFavorite,
 } from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow';
+import {
+  applyCompanionSlotOrchestrateOutcome,
+  logCompanionSlotOrchestrateInvoke,
+  resetInterventionIdempotency,
+  runCompanionInterventionBootstrap,
+  runCompanionSlotOrchestrate,
+  setCompanionSlotLoading,
+  trackCompanionGenerationInitiated,
+} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow';
 import {
   companionOrchestrator,
   companionPauseRepository,
@@ -110,5 +121,19 @@ describe('pause-companion-orchestration-io parity', () => {
     // Reciprocal inline pins: `pause-companion-orchestration-io.test.ts`;
     // dedicated siblings: `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts`,
     // `pause-companion-analytics-orchestration-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-companion-orchestrate-io-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: orchestrate-io slot/intervention exports stay distinct from orchestration-io', () => {
+    expect(pauseLoadCompanionOrchestrateSession).not.toBe(runCompanionSlotOrchestrate);
+    expect(pauseToggleCompanionLibraryFavorite).not.toBe(runCompanionInterventionBootstrap);
+    expect(pauseCompanionUiStepCompletion).not.toBe(applyCompanionSlotOrchestrateOutcome);
+    expect(loadCompanionOrchestrateSession).not.toBe(logCompanionSlotOrchestrateInvoke);
+    expect(nextExpandedWithLazyFetch).not.toBe(trackCompanionGenerationInitiated);
+    expect(pauseLoadCompanionOrchestrateSession).not.toBe(setCompanionSlotLoading);
+    expect(pauseToggleCompanionLibraryFavorite).not.toBe(resetInterventionIdempotency);
+    expect(companionOrchestrator).not.toBe(runCompanionSlotOrchestrate);
   });
 });

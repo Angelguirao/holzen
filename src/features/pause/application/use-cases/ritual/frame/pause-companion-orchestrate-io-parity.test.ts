@@ -154,7 +154,8 @@ describe('pause-companion-orchestrate-io parity (application)', () => {
     expect(resetInterventionIdempotency).not.toBe(pauseLoadCompanionOrchestrateSession);
     expect(runSlotOrchestrateFromOrchestrateIo).not.toBe(loadSessionFromOrchestrationFlow);
     expect(runInterventionFromOrchestrateIo).not.toBe(nextExpandedFromOrchestrationFlow);
-    // Reciprocal inline pins: `presentation/companion/pause-companion-orchestrate-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/companion/pause-companion-orchestrate-io-parity.test.ts`,
+    // `pause-companion-orchestration-io-parity.test.ts`.
     // Dedicated siblings: `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts` (application + presentation);
     // `pause-companion-orchestrate-frame-ui-io-sibling-parity.test.ts` (presentation).
   });
