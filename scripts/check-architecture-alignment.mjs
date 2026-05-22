@@ -1021,6 +1021,31 @@ const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATE_IO_UMBRELLA_FLOW_IMPORTS =
   "from '../application/use-cases/ritual/frame/pause-companion-orchestrate-flow'",
 ];
 
+/** Companion orchestrate I/O — import ritual/frame leaf modules directly (not orchestrate subcluster flow anchors). */
+const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATE_IO_SUBCLUSTER_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-retry-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-outcome-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-slot-apply-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-intervention-orchestrate-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-telemetry-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-ui-flow',
+  "from './application/use-cases/ritual/frame/pause-companion-orchestrate-retry-flow'",
+  "from '../application/use-cases/ritual/frame/pause-companion-orchestrate-retry-flow'",
+  "from './application/use-cases/ritual/frame/pause-companion-orchestrate-outcome-flow'",
+  "from '../application/use-cases/ritual/frame/pause-companion-orchestrate-outcome-flow'",
+  "from './application/use-cases/ritual/frame/pause-companion-orchestrate-slot-apply-flow'",
+  "from '../application/use-cases/ritual/frame/pause-companion-orchestrate-slot-apply-flow'",
+  "from './application/use-cases/ritual/frame/pause-companion-intervention-orchestrate-flow'",
+  "from '../application/use-cases/ritual/frame/pause-companion-intervention-orchestrate-flow'",
+  "from './application/use-cases/ritual/frame/pause-companion-slot-orchestrate-telemetry-flow'",
+  "from '../application/use-cases/ritual/frame/pause-companion-slot-orchestrate-telemetry-flow'",
+  "from './application/use-cases/ritual/frame/pause-companion-slot-orchestrate-flow'",
+  "from '../application/use-cases/ritual/frame/pause-companion-slot-orchestrate-flow'",
+  "from './application/use-cases/ritual/frame/pause-companion-slot-orchestrate-ui-flow'",
+  "from '../application/use-cases/ritual/frame/pause-companion-slot-orchestrate-ui-flow'",
+];
+
 /** Companion frame UI I/O — import via subcluster flows only (not pause-companion-frame-ui-flow umbrella). */
 const LEGACY_PAUSE_PRESENTATION_COMPANION_FRAME_UI_IO_UMBRELLA_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-frame-ui-flow',
@@ -2286,7 +2311,14 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATE_IO_UMBRELLA_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: companion orchestrate I/O must import via orchestrate subcluster flows (${needle})`,
+          `${rel}: companion orchestrate I/O must not import orchestrate umbrella (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATE_IO_SUBCLUSTER_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: companion orchestrate I/O must import ritual/frame leaf modules directly (${needle})`,
         );
       }
     }
