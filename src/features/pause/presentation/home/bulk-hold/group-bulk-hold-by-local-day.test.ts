@@ -20,4 +20,15 @@ describe('groupBulkHoldByLocalDay', () => {
     expect(sections[0].items).toHaveLength(2);
     expect(sections[1].items).toHaveLength(1);
   });
+
+  it('uses Today label for items created on the current local day', () => {
+    const todayIso = new Date().toISOString();
+    const sections = groupBulkHoldByLocalDay(
+      [{ id: 'today', created_at: todayIso, context_snapshot: null }],
+      'en-US',
+      t,
+    );
+    expect(sections[0].label).toBe('Today');
+    expect(t).toHaveBeenCalledWith('bulkHold.sectionToday', { defaultValue: 'Today' });
+  });
 });
