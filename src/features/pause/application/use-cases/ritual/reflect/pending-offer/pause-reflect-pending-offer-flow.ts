@@ -8,6 +8,7 @@
  * run-* with default repository — parity with hub-io), `pause-reflect-pending-offer-telemetry-io-parity.test.ts` (PostHog trackers).
  * Sibling cluster: `pause-reflect-steps-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow`;
  * `pause-reflect-flows-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow`;
+ * `pause-reflect-share-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-share-flow`;
  * `pause-reflect-pending-offer-flow.test.ts` ↔ `pause-reflect-steps-flow` + `pause-reflect-share-flow` (inline sibling pins; share-flow also pins pending-offer RPC/telemetry-flow).
  */
 export { runAdoptPendingPauseOffer } from './run-adopt-pending-pause-offer';

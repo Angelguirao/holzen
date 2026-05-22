@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — share-flow ↔ pending-offer-flow sibling pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-share-pending-offer-flow-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated sibling-parity test so <code>pause-reflect-share-flow</code> and <code>pause-reflect-pending-offer-flow</code> CI anchors stay namespace-separated (parity with flows↔pending-offer and share↔telemetry pins; complements inline pins in <code>pause-reflect-share-flow.test.ts</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow comments only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shims, or shell-io presentation wrapper delegation tests.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — scaffold-flow ↔ shell-flow sibling pins + scaffold-io presentation parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + flow comments only.</dd>
       <dt>Open question</dt>
-      <dd>Next: Phase B app-shell boot import scan, or shell-io presentation wrapper delegation tests.</dd>
+      <dd>Superseded by share↔pending-offer slice for “next” ordering; see latest note.</dd>
     </dl>
   </article>
 
@@ -86,7 +103,7 @@
       <dt>Deviation</dt>
       <dd>None — presentation I/O test seam only; default <code>pauseReflectionStepLogOnce</code> behavior unchanged.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B app-shell boot import scan, or shell-io presentation wrapper delegation tests.</dd>
+      <dd>Superseded by share↔pending-offer slice for “next” ordering; see latest note.</dd>
     </dl>
   </article>
 
