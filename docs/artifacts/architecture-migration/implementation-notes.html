@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — ritual/frame analytics and frame UI leaf identity (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Analytics, frame-ui, and full-view-ui flow pins</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>application/use-cases/companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Strengthen <code>pause-companion-analytics-flow</code>, <code>pause-companion-frame-ui-flow</code>, and <code>pause-companion-full-view-ui-flow</code> with <code>.toBe(direct)</code> identity (parity with orchestration/orchestrate subcluster pins). Presentation I/O modules unchanged (import leaf modules directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI slice only.</dd>
+      <dt>Tradeoff</dt>
+      <dd>Three leaf tests in one commit (analytics + composed frame-ui + full-view-ui anchors).</dd>
+      <dt>Open question</dt>
+      <dd>Next: pin remaining <code>ritual/frame</code> typeof-only anchors (e.g. slot-apply constants, library-favorite if still open), or Phase B subscription Tier 1 when pause Tier 5 is quiet.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — ritual/frame orchestration leaf flow identity (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
