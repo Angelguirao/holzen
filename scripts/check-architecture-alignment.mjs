@@ -62,6 +62,10 @@ mustExist(
   'pause/application/use-cases/ritual/reflect/generation/',
 );
 mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow.ts',
+  'pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow.ts',
+);
+mustExist(
   'src/features/pause/application/use-cases/ritual/reflect/generation/manual-open',
   'pause/application/use-cases/ritual/reflect/generation/manual-open/',
 );
@@ -900,6 +904,20 @@ for (const file of walkTs(join(root, 'src'))) {
     ]) {
       if (text.includes(needle)) {
         failures.push(`${rel}: reflect hub umbrella flow must not deep-import run-shift-emotion-frame-hub-done (${needle})`);
+      }
+    }
+  }
+  if (rel === 'src/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow.ts') {
+    for (const needle of [
+      '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation',
+      '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/open-manual-pause-from-home',
+      "from './holzen-reflect/run-reflect-generation'",
+      "from './manual-open/open-manual-pause-from-home'",
+    ]) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect generation umbrella flow must compose subcluster anchors (${needle})`,
+        );
       }
     }
   }
