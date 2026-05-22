@@ -1,9 +1,9 @@
 /**
  * Session pending-offer PostHog helpers.
- * Adopt/decline via `pause-pending-offer-telemetry-flow`; abandoned stays session beat.
+ * All trackers via `pause-pending-offer-telemetry-flow` (reflect telemetry cluster).
  */
 export {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
+  trackPauseSessionAbandoned,
 } from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow';
-export { trackPauseSessionAbandoned } from '@/features/pause/application/use-cases/session/pause-session-telemetry';
