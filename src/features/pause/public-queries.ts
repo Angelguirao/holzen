@@ -211,7 +211,7 @@ export {
   COMPANION_UI_COMPLETION_NONE_QUERY_KEY,
   companionUiCompletionQueryKey,
   getCompanionUiCompletionQueryOptions,
-} from './infrastructure/queries/companion-ui-completion-query';
+} from './infrastructure/queries/companion/companion-ui-completion-query';
 export {
   EMPTY_COMPANION_UI_COMPLETION,
   loadCompanionUiCompletionState,

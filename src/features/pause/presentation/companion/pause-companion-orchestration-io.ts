@@ -19,6 +19,7 @@ import type { CompanionUiCompletionStep } from '@/features/pause/application/use
 import { nextExpandedWithLazyFetch } from '@/features/pause/application/use-cases/ritual/frame/next-expanded-with-lazy-fetch';
 import { persistCompanionUiStepCompletion } from '@/features/pause/application/use-cases/ritual/frame/persist-ui-step-completion';
 import { runToggleCompanionLibraryFavorite } from '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { loadMoodHistoryForOrchestrate } from '@/features/pause/public-queries';
 import {
   supabaseCompanionOrchestrator,
@@ -50,6 +51,23 @@ export function pauseToggleCompanionLibraryFavorite(
   input: Parameters<typeof runToggleCompanionLibraryFavorite>[1],
 ): ReturnType<typeof runToggleCompanionLibraryFavorite> {
   return runToggleCompanionLibraryFavorite(companionPauseRepository, input);
+}
+
+/** Test seam: inject a custom `PauseRepository` for UI step completion persist. */
+export function pauseCompanionUiStepCompletionWithRepository(
+  repository: PauseRepository,
+  pauseInstanceId: string,
+  step: CompanionUiCompletionStep,
+): ReturnType<typeof persistCompanionUiStepCompletion> {
+  return persistCompanionUiStepCompletion(repository, pauseInstanceId, step);
+}
+
+/** Test seam: inject a custom `PauseRepository` for companion library favorites. */
+export function pauseToggleCompanionLibraryFavoriteWithRepository(
+  repository: PauseRepository,
+  input: Parameters<typeof runToggleCompanionLibraryFavorite>[1],
+): ReturnType<typeof runToggleCompanionLibraryFavorite> {
+  return runToggleCompanionLibraryFavorite(repository, input);
 }
 
 /** Default mood-history query + session builder for slot orchestrate invokes. */
