@@ -242,6 +242,7 @@ describe('pause-reflect-hub-io parity (application)', () => {
 
   /**
    * Reciprocal inline pins ↔ `share/pause-reflect-share-io-parity.test.ts` (application + presentation).
+   * Presentation mirror: `presentation/reflect/hub/pause-reflect-hub-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-hub-share-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: share-io builders stay distinct from hub-io wrappers', () => {
@@ -249,6 +250,10 @@ describe('pause-reflect-hub-io parity (application)', () => {
     expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(buildReflectionShareText);
     expect(buildLogBundleFromHubIo).not.toBe(pauseReflectionShareImage);
     expect(resolvePresentationFromHubIo).not.toBe(buildReflectionShareText);
-    // Reciprocal inline pins: `share/pause-reflect-share-io-parity.test.ts`.
+    expect(reflectPauseRepository).not.toBe(pauseReflectionShareImage);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(buildReflectionShareText);
+    // Reciprocal inline pins: `share/pause-reflect-share-io-parity.test.ts`,
+    // `presentation/reflect/hub/pause-reflect-hub-io-parity.test.ts`.
+    // Full pins: `pause-reflect-hub-share-io-sibling-parity.test.ts`.
   });
 });

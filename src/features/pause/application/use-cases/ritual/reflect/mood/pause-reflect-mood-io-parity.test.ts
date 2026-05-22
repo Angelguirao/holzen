@@ -313,13 +313,21 @@ describe('pause-reflect-mood-io parity (application)', () => {
 
   /**
    * Reciprocal inline pins ↔ `share/pause-reflect-share-io-parity.test.ts` (application + presentation).
+   * Presentation mirror: `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-share-mood-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: share-io builders stay distinct from mood-io wrappers', () => {
     expect(pauseInitialEmotionSelect).not.toBe(pauseReflectionShareImage);
     expect(pauseInitialEmotionSkip).not.toBe(buildReflectionShareText);
     expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseReflectionShareImage);
+    expect(pauseInitialEmotionSkipWithRepository).not.toBe(pauseReflectionShareImage);
+    expect(pauseInitialEmotionSkipWithRepository).not.toBe(buildReflectionShareText);
     expect(buildFeelTilesMoodLogOptions).not.toBe(buildReflectionShareText);
-    // Reciprocal inline pins: `share/pause-reflect-share-io-parity.test.ts`.
+    expect(buildFeelTilesFromMoodIo).not.toBe(pauseReflectionShareImage);
+    expect(buildFeelTilesFromMoodIo).not.toBe(buildReflectionShareText);
+    expect(reflectPauseRepository).not.toBe(pauseReflectionShareImage);
+    // Reciprocal inline pins: `share/pause-reflect-share-io-parity.test.ts`,
+    // `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
+    // Full pins: `pause-reflect-share-mood-io-sibling-parity.test.ts`.
   });
 });
