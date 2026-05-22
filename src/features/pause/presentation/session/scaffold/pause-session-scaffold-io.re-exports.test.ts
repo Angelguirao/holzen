@@ -18,6 +18,7 @@ import {
 } from '@/features/pause/application/use-cases/session/storage-ritual-sync';
 import { hasPersistablePauseSessionAnchor as hasAnchorDirect } from '@/features/pause/domain/session/persisted-session-guards';
 
+import { pickPauseHolzenProvidersSlice as pickSliceFromProvidersIo } from '../pause-session-providers-io';
 import {
   buildPauseSessionPersistSnapshot,
   buildPauseSessionScaffoldRitualDerived,
@@ -38,6 +39,13 @@ describe('pause-session-scaffold-io re-exports', () => {
     expect(computePauseStorageRitualSyncPatch).toBe(computeSyncFromFlow);
     expect(buildPauseSessionScaffoldRitualDerived).toBe(buildDerivedFromFlow);
     expect(hasPersistablePauseSessionAnchor).toBe(hasAnchorFromFlow);
+  });
+
+  it('sibling cluster: providers-io export stays distinct from scaffold-io exports', () => {
+    expect(buildPauseSessionPersistSnapshot).not.toBe(pickSliceFromProvidersIo);
+    expect(computePauseStorageRitualSyncPatch).not.toBe(pickSliceFromProvidersIo);
+    expect(buildPauseSessionScaffoldRitualDerived).not.toBe(pickSliceFromProvidersIo);
+    expect(hasPersistablePauseSessionAnchor).not.toBe(pickSliceFromProvidersIo);
   });
 
   it('persist snapshot export remains callable (smoke)', () => {
