@@ -615,6 +615,13 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BRIEF_IO_UMBRELLA_FLOW_IMPORTS = [
   "from '../application/use-cases/session/pause-session-brief-flow'",
 ];
 
+/** Session frame I/O — import restored frame hydration only (not pause-session-frame-flow umbrella). */
+const LEGACY_PAUSE_PRESENTATION_SESSION_FRAME_IO_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pause-session-frame-flow',
+  "from './application/use-cases/session/pause-session-frame-flow'",
+  "from '../application/use-cases/session/pause-session-frame-flow'",
+];
+
 /** Session ritual-restore I/O — import via session + ritual subcluster modules only (not pause-session-ritual-restore-flow umbrella). */
 const LEGACY_PAUSE_PRESENTATION_SESSION_RITUAL_RESTORE_IO_UMBRELLA_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/session/pause-session-ritual-restore-flow',
@@ -2914,7 +2921,9 @@ for (const file of walkTs(join(root, 'src'))) {
       rel.endsWith('pause-session-ritual-restore-io.ts') ||
       rel.endsWith('pause-session-ritual-restore-io.test.ts') ||
       rel.endsWith('pause-session-breath-io.ts') ||
-      rel.endsWith('pause-session-breath-io.test.ts');
+      rel.endsWith('pause-session-breath-io.test.ts') ||
+      rel.endsWith('pause-session-frame-io.ts') ||
+      rel.endsWith('pause-session-frame-io.test.ts');
     if (!sessionRitualRestoreIoAllowlisted) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_RITUAL_RESTORE_USE_CASE_IMPORTS) {
         if (text.includes(needle)) {
@@ -2960,6 +2969,18 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: session brief I/O must import via session + ritual/brief modules (${needle})`,
+        );
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-session-frame-io.ts') ||
+    rel.endsWith('pause-session-frame-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_FRAME_IO_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: session frame I/O must import restored-frame-ritual-state directly (${needle})`,
         );
       }
     }
