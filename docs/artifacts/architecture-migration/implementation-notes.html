@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — application pending-offer-telemetry-io parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-telemetry-io-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation <code>pause-reflect-pending-offer-telemetry-io-parity</code> at application layer beside <code>pause-pending-offer-telemetry-flow.ts</code> so PostHog trackers stay namespace-separated from pending-offer RPC I/O (parity with session <code>pause-reflect-telemetry-io-parity</code> application mirror).</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only; presentation parity stays colocated beside pending-offer-io per existing convention.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: application <code>pause-home-reflect-telemetry-io-parity</code> beside manual-open flow, or Phase B Tier 1 shim scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — application telemetry-io parity beside telemetry-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

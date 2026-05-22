@@ -1,6 +1,7 @@
 /**
  * Presentation I/O parity for pending-offer PostHog trackers (colocated beside
  * `pause-reflect-pending-offer-io.ts`; production module stays under `reflect/telemetry/`).
+ * Application mirror: `application/.../pending-offer/pause-reflect-pending-offer-telemetry-io-parity.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
 
