@@ -89,6 +89,16 @@ import {
   shouldLogPauseReflectionStep,
   shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseDeclinePendingOffer,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import {
+  dismissOpenPauseHome,
+  openManualPauseFromHome,
+  pauseHomeManualOpenPorts,
+} from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 
 /**
  * Presentation I/O parity (colocated beside `pause-reflect-generation-io.ts`).
@@ -99,7 +109,9 @@ import {
  * flows-io sibling: `pause-reflect-flows-generation-io-sibling-parity.test.ts`;
  * telemetry-io sibling: `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`;
  * share-io sibling: `pause-reflect-generation-share-io-sibling-parity.test.ts`;
- * steps-io sibling: `pause-reflect-steps-generation-io-sibling-parity.test.ts` (reciprocal inline pins below).
+ * steps-io sibling: `pause-reflect-steps-generation-io-sibling-parity.test.ts` (reciprocal inline pins below);
+ * pending-offer-io sibling: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts` (application + presentation);
+ * home-reflect-io sibling: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` (application + presentation).
  */
 describe('pause-reflect-generation-io parity', () => {
   it('presentation I/O holzen-reflect exports match generation CI umbrella', () => {
@@ -259,5 +271,25 @@ describe('pause-reflect-generation-io parity', () => {
     expect(pauseReflectGeneration).not.toBe(pauseReflectTagUpdate);
     // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
     // Full pins: `pause-reflect-steps-generation-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: pending-offer-io exports stay distinct from generation-io', () => {
+    expect(pauseReflectGeneration).not.toBe(pauseAdoptPendingOffer);
+    expect(runReflectGeneration).not.toBe(pauseDeclinePendingOffer);
+    expect(reflectGenerator).not.toBe(getPendingPauseOfferDisplay);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-home-reflect-io.test.ts`.
+   * Dedicated sibling file: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: home-reflect-io exports stay distinct from generation-io', () => {
+    expect(pauseReflectGeneration).not.toBe(openManualPauseFromHome);
+    expect(runReflectGeneration).not.toBe(dismissOpenPauseHome);
+    expect(reflectGenerator).not.toBe(pauseHomeManualOpenPorts);
   });
 });
