@@ -4,6 +4,7 @@ import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+import { pauseReflectionShareImage } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import { pauseReflectGeneration, reflectGenerator } from './pause-reflect-generation-io';
 
 const runReflectGenerationMock = vi.hoisted(() => vi.fn());
@@ -68,5 +69,11 @@ describe('pause-reflect-generation-io', () => {
     expect(reflectGenerator).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(reflectGenerator).not.toBe(stopPauseReflectFrameFocusAmbience);
     // Full cross-I/O pins: `pause-reflect-ambience-generation-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: share-io exports stay distinct from generation-io holzen-reflect surface', () => {
+    expect(pauseReflectGeneration).not.toBe(pauseReflectionShareImage);
+    expect(reflectGenerator).not.toBe(pauseReflectionShareImage);
+    // Full cross-I/O pins: `pause-reflect-generation-share-io-sibling-parity.test.ts`.
   });
 });
