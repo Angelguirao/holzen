@@ -19856,4 +19856,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — manual-open generation flow anchor colocation (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-manual-open-flow</code> under <code>generation/manual-open/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no legacy folder moves. Colocate the manual-open CI cluster anchor beside the four manual-open use cases (parity with <code>pause-reflect-generation-hook-flow</code> beside <code>run-reflect-generation</code>). <code>pause-home-reflect-io</code> import path updated only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; path colocation only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Anchor remains required for <code>check:architecture-alignment</code>; presentation still imports through the anchor, not scattered sibling modules.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>presentation/home/manual-open/pause-home-reflect-io</code> under <code>presentation/reflect/generation/manual-open/</code>, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

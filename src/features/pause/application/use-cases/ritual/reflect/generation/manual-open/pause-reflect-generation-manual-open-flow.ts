@@ -35,7 +35,7 @@ export type {
   TrackManualPauseInstanceCreatedPayload,
   TrackPauseManualCompletedPayload,
 } from '@/features/pause/domain/reflect/generation/manual-pause-home-telemetry-types';
-export { dismissOpenPauseHome } from './manual-open/dismiss-open-pause-home';
-export { openManualPauseFromHome } from './manual-open/open-manual-pause-from-home';
-export { runOpenManualPauseSilentModeAfterCreate } from './manual-open/run-open-manual-pause-silent-mode-after-create';
-export { runPersistSilentReflectionStub } from './manual-open/run-persist-silent-reflection-stub';
+export { dismissOpenPauseHome } from './dismiss-open-pause-home';
+export { openManualPauseFromHome } from './open-manual-pause-from-home';
+export { runOpenManualPauseSilentModeAfterCreate } from './run-open-manual-pause-silent-mode-after-create';
+export { runPersistSilentReflectionStub } from './run-persist-silent-reflection-stub';
