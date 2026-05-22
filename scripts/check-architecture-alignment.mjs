@@ -197,6 +197,9 @@ const LEGACY_PAUSE_USE_CASE_IMPORTS = [
   '@/features/pause/application/use-cases/session/pending-pause-offer-telemetry',
   "from './application/use-cases/session/pending-pause-offer-telemetry",
   "from '../application/use-cases/session/pending-pause-offer-telemetry",
+  '@/features/pause/application/use-cases/session/pause-session-telemetry',
+  "from './application/use-cases/session/pause-session-telemetry'",
+  "from '../application/use-cases/session/pause-session-telemetry'",
 ];
 
 /** Flat presentation/reflect paths — use subclusters (generation/, steps/, mood/, …). */
