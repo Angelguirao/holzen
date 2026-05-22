@@ -22,6 +22,7 @@
  * `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts` (generation-io ↔ pending-offer-io; application + presentation);
  * `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` (generation-io ↔ home-reflect-io; application + presentation).
  * may import this umbrella for parity; production generation I/O keeps leaf imports.
+ * `pause-reflect-generation-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-generation-io` (application + presentation wrappers off flow umbrella).
  */
 export {
   messageFromReflectGenerationResult,
