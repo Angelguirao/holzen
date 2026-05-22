@@ -1,0 +1,15 @@
+import { describe, expect, it } from 'vitest';
+
+import { initialFrameDoneFromRestored as initialFrameDoneDirect } from '@/features/pause/application/use-cases/ritual/frame/restored-frame-ritual-state';
+import { initialFrameDoneFromRestored } from '@/features/pause/application/use-cases/session/pause-session-frame-flow';
+import { initialFrameDoneFromRestored as initialFrameDoneFromFrameIo } from '@/features/pause/presentation/session/pause-session-frame-io';
+
+describe('pause-session-frame-io parity', () => {
+  it('presentation I/O frame exports match pause-session-frame-flow CI umbrella', () => {
+    expect(initialFrameDoneFromRestored).toBe(initialFrameDoneFromFrameIo);
+  });
+
+  it('session-frame-flow CI umbrella composes the same leaf module as presentation I/O', () => {
+    expect(initialFrameDoneFromRestored).toBe(initialFrameDoneDirect);
+  });
+});
