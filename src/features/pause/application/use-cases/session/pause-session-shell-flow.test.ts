@@ -93,9 +93,12 @@ describe('pause-session-shell-flow', () => {
   it('sibling cluster: scaffold-flow exports stay distinct from shell umbrella exports', () => {
     expect(computePauseSessionHydration).not.toBe(buildPersistFromScaffoldFlow);
     expect(computePauseSessionResolved).not.toBe(computeSyncFromScaffoldFlow);
+    expect(isPauseSessionHeaderBackVisible).not.toBe(buildDerivedFromScaffoldFlow);
+    expect(computePauseHeaderBackIntent).not.toBe(hasAnchorFromScaffoldFlow);
     expect(coalescePauseSessionShellViewModel).not.toBe(buildDerivedFromScaffoldFlow);
     expect(hasPersistedPauseSessionPayload).not.toBe(hasAnchorFromScaffoldFlow);
     expect(buildPauseSessionMountLogParams).not.toBe(buildPersistFromScaffoldFlow);
+    expect(isPauseSessionWaitingForInstanceFetch).not.toBe(computeSyncFromScaffoldFlow);
   });
 
   it('sibling cluster: terminal-entry-flow exports stay distinct from shell umbrella exports', () => {
