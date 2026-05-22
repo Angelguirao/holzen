@@ -60,6 +60,11 @@ import {
   runReflectionShareImage as runShareImageFromShareFlow,
   trackPauseReflectShareTap as trackShareTapFromShareFlow,
 } from '../share/pause-reflect-share-flow';
+import {
+  trackPauseReflectPostItOpen as trackPostItFromTelemetryFlow,
+  trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
+  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
+} from '../telemetry/pause-reflect-telemetry-flow';
 
 describe('pause-reflect-steps-flow', () => {
   it('re-exports step mutations and domain gates from leaf modules', () => {
@@ -134,5 +139,16 @@ describe('pause-reflect-steps-flow', () => {
     expect(runPauseReflectionStepLogOnce).not.toBe(trackShareTapFromShareFlow);
     expect(shouldShowFavoriteFromFlow).not.toBe(buildShareTextFromShareFlow);
     expect(shouldLogFromFlow).not.toBe(trackShareTapFromShareFlow);
+  });
+
+  it('sibling cluster: telemetry-flow exports stay distinct from steps umbrella exports', () => {
+    expect(runPauseFavoriteToggle).not.toBe(trackPostItFromTelemetryFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(trackShareTapFromTelemetryFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(trackWallpaperFromTelemetryFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(trackPostItFromTelemetryFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(trackShareTapFromTelemetryFlow);
+    expect(shouldLogFromFlow).not.toBe(trackWallpaperFromTelemetryFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(trackShareTapFromTelemetryFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(trackPostItFromTelemetryFlow);
   });
 });
