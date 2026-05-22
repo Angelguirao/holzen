@@ -26882,4 +26882,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — home pwa-install use-case cluster (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>run-log-pwa-install-analytics-event</code> under <code>home/pwa-install/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no reflect moves. Colocate the lone Home analytics command with its <code>pwa-install-analytics-query</code> consumer under <code>application/use-cases/home/pwa-install/</code>. <code>public-hooks</code> export path unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mechanical relocation; behavior parity.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-flows-io</code> outcome wrapper export distinctness pin, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
