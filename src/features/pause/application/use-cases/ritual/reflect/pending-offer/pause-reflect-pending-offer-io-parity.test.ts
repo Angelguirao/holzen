@@ -101,6 +101,13 @@ import {
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import {
+  dismissOpenPauseHome,
+  openManualPauseFromHome,
+  pauseDismissOpenPauseHomePreview,
+  pauseDismissOpenPauseHomePreviewWithRepository,
+  pauseHomeManualOpenPorts,
+} from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 /**
@@ -304,6 +311,19 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
    * Dedicated sibling file: `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts`
    * (application + presentation).
    */
+  /**
+   * Reciprocal inline pins ↔ `application/.../manual-open/pause-home-reflect-io-parity.test.ts`.
+   * Dedicated sibling: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: home-reflect-io manual-open exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(openManualPauseFromHome);
+    expect(pauseDeclinePendingOffer).not.toBe(dismissOpenPauseHome);
+    expect(getPendingPauseOfferDisplay).not.toBe(pauseHomeManualOpenPorts);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseDismissOpenPauseHomePreview);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(pauseDismissOpenPauseHomePreviewWithRepository);
+    // Reciprocal inline pins: `pause-home-reflect-io-parity.test.ts` (application).
+  });
+
   it('sibling cluster: session reflect telemetry-io exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(trackPauseReflectPostItOpen);
     expect(pauseDeclinePendingOffer).not.toBe(trackPauseReflectShareTap);
