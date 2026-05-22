@@ -52,8 +52,11 @@ import {
 } from '../flows/pause-reflect-flows-flow';
 import {
   runPauseFavoriteToggle as runFavoriteFromStepsFlow,
+  runPauseReflectNoteUpdate as runNoteFromStepsFlow,
+  runPauseReflectTagUpdate as runTagFromStepsFlow,
   runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
   shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
+  shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
 } from '../steps/pause-reflect-steps-flow';
 
 import {
@@ -148,8 +151,11 @@ describe('pause-reflect-generation-flow', () => {
 
   it('sibling cluster: steps-flow exports stay distinct from generation umbrella exports', () => {
     expect(runReflectGeneration).not.toBe(runFavoriteFromStepsFlow);
-    expect(runReflectGeneration).not.toBe(runReflectionStepFromStepsFlow);
-    expect(openManualFromFlow).not.toBe(runFavoriteFromStepsFlow);
-    expect(dismissFromFlow).not.toBe(shouldLogFromStepsFlow);
+    expect(runReflectGeneration).not.toBe(runNoteFromStepsFlow);
+    expect(reflectGenerationPrerequisite).not.toBe(runTagFromStepsFlow);
+    expect(openManualFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+    expect(runReflectGeneration).not.toBe(shouldShowFavoriteFromStepsFlow);
+    expect(openManualFromFlow).not.toBe(shouldLogFromStepsFlow);
+    expect(dismissFromFlow).not.toBe(runReflectionStepFromStepsFlow);
   });
 });

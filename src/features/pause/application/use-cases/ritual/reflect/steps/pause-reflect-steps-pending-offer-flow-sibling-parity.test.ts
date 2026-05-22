@@ -6,6 +6,7 @@ import {
   runDeclinePendingPauseOffer,
   trackPausePendingAdopted,
   trackPausePendingDeclined,
+  trackPauseSessionAbandoned,
 } from '../pending-offer/pause-reflect-pending-offer-flow';
 import {
   runPauseFavoriteToggle,
@@ -49,9 +50,11 @@ describe('pause-reflect-steps-flow ↔ pause-reflect-pending-offer-flow sibling 
   it('steps umbrella exports stay off pending-offer adopt/decline and display', () => {
     expect(runPauseFavoriteToggle).not.toBe(runAdoptPendingPauseOffer);
     expect(runPauseReflectNoteUpdate).not.toBe(runDeclinePendingPauseOffer);
-    expect(runPauseReflectTagUpdate).not.toBe(getPendingPauseOfferDisplay);
-    expect(runPauseReflectionStepLogOnce).not.toBe(trackPausePendingAdopted);
-    expect(shouldShowFavoriteProHint).not.toBe(trackPausePendingDeclined);
+    expect(runPauseReflectTagUpdate).not.toBe(runAdoptPendingPauseOffer);
+    expect(runPauseReflectionStepLogOnce).not.toBe(runDeclinePendingPauseOffer);
+    expect(shouldShowFavoriteProHint).not.toBe(getPendingPauseOfferDisplay);
+    expect(shouldLogPauseReflectionStep).not.toBe(trackPausePendingAdopted);
+    expect(shouldLogPauseReflectionStep).not.toBe(trackPauseSessionAbandoned);
   });
 
   it('pending-offer umbrella exports stay off reflect step mutations and step gates', () => {
@@ -59,6 +62,7 @@ describe('pause-reflect-steps-flow ↔ pause-reflect-pending-offer-flow sibling 
     expect(runDeclinePendingPauseOffer).not.toBe(runPauseReflectNoteUpdate);
     expect(getPendingPauseOfferDisplay).not.toBe(runPauseReflectTagUpdate);
     expect(trackPausePendingAdopted).not.toBe(runPauseReflectionStepLogOnce);
-    expect(trackPausePendingDeclined).not.toBe(shouldLogPauseReflectionStep);
+    expect(trackPausePendingDeclined).not.toBe(shouldShowFavoriteProHint);
+    expect(trackPauseSessionAbandoned).not.toBe(shouldLogPauseReflectionStep);
   });
 });
