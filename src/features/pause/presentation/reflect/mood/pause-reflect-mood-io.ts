@@ -3,6 +3,7 @@
  * Imports domain mood leaf modules and `run-initial-emotion-log` directly (parity with
  * `pause-reflect-hub-io` → domain + leaf use case).
  * Wrapper delegation pins: pause-reflect-mood-io-parity.test.ts (default + *WithRepository seams).
+ * Sibling surface pins: pause-reflect-steps-mood-io-sibling-parity.test.ts (vs pause-reflect-steps-io).
  */
 import {
   runInitialEmotionSelect,
