@@ -9,6 +9,8 @@
  * Ambience-io sibling: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (application + presentation); reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts`.
  * Share-io sibling: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation); reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts`.
  * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts`, `pause-reflect-steps-io-parity.test.ts`, `pause-reflect-generation-io-parity.test.ts`.
+ * Pending-offer-io sibling: reciprocal inline pins ↔ `pending-offer/pause-reflect-pending-offer-io-parity.test.ts`;
+ * dedicated file: `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts` (application + presentation).
  */
 import { describe, expect, it, vi } from 'vitest';
 
@@ -111,6 +113,11 @@ import {
   resolveShiftFrameHubDonePresentation as resolvePresentationFromHubFlow,
   runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
 } from '@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow';
+import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseDeclinePendingOffer,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 
 describe('pause-reflect-telemetry-io parity', () => {
   it('presentation I/O session reflect telemetry matches telemetry CI umbrella', () => {
@@ -307,5 +314,22 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackWallpaperFromTelemetryIo).not.toBe(stopPauseReflectFrameFocusAmbience);
     // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
     // Full pins: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts`.
+   * Reciprocal inline pins ↔ `pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts`
+   * (application + presentation).
+   */
+  it('sibling cluster: pending-offer-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseAdoptPendingOffer);
+    expect(trackPauseReflectShareTap).not.toBe(pauseDeclinePendingOffer);
+    expect(trackPauseReflectWallpaperTap).not.toBe(getPendingPauseOfferDisplay);
+    expect(trackPostItFromTelemetryIo).not.toBe(pauseAdoptPendingOffer);
+    expect(trackShareTapFromTelemetryIo).not.toBe(pauseDeclinePendingOffer);
+    expect(trackWallpaperFromTelemetryIo).not.toBe(getPendingPauseOfferDisplay);
+    // Reciprocal inline pins: `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts`.
+    // Reciprocal inline pins: `pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
   });
 });
