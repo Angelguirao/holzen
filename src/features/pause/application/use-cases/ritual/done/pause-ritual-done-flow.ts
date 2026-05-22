@@ -1,6 +1,6 @@
 /**
  * CI cluster anchor for ritual done presentation I/O (§3 / check:architecture-alignment).
- * Composes done subcluster anchors; presentation imports via `pause-ritual-done-io.ts` (leaf use case re-exported for parity tests).
+ * Composes done subcluster anchors; presentation imports via `pause-ritual-done-io.ts` (leaf use case; parity: `presentation/ritual/done/pause-ritual-done-io-parity.test.ts`).
  */
 export {
   runPostPauseEmotionLogIfDirty,

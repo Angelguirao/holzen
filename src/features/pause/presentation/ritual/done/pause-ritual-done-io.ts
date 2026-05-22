@@ -1,6 +1,7 @@
 /**
  * Ritual done presentation I/O (brief post-pause emotion log when feel changed).
  * Imports `post-pause-emotion-log` directly (parity with archive decide and reflect I/O leaf peels).
+ * Parity pins: `pause-ritual-done-io-parity.test.ts` (colocated), `pause-ritual-done-io.re-exports.test.ts`.
  */
 import {
   runPostPauseEmotionLogIfDirty,

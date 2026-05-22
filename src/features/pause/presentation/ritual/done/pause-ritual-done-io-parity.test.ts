@@ -6,12 +6,17 @@ vi.mock('@/features/pause/public-rpc', () => ({
 
 import { runPostPauseEmotionLogIfDirty as runEmotionLogDirect } from '@/features/pause/application/use-cases/ritual/done/post-pause-emotion-log';
 import { runPostPauseEmotionLogIfDirty } from '@/features/pause/application/use-cases/ritual/done/pause-ritual-done-flow';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import {
   reflectPauseRepository,
   runPostPauseEmotionLogIfDirty as runEmotionLogFromDoneIo,
-} from '@/features/pause/presentation/ritual/done/pause-ritual-done-io';
-import { supabasePauseRepository } from '@/features/pause/public-rpc';
+} from './pause-ritual-done-io';
 
+/**
+ * Presentation I/O parity (colocated beside `pause-ritual-done-io.ts`).
+ * Imports `pause-ritual-done-flow` CI umbrella for `.toBe` identity pins only —
+ * production ritual done I/O keeps `post-pause-emotion-log` leaf import.
+ */
 describe('pause-ritual-done-io parity', () => {
   it('presentation I/O re-exported emotion log matches pause-ritual-done-flow CI umbrella', () => {
     expect(runPostPauseEmotionLogIfDirty).toBe(runEmotionLogFromDoneIo);
