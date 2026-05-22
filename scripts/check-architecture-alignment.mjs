@@ -856,12 +856,23 @@ const LEGACY_PAUSE_SESSION_RITUAL_RESTORE_BRIEF_IMPORTS = [
   "from '../application/use-cases/session/pause-session-brief-flow'",
 ];
 
-/** Reflect mood umbrella flow — compose subcluster anchors only (no deep domain/reflect/mood). */
-const LEGACY_PAUSE_REFLECT_MOOD_FLOW_DOMAIN_IMPORTS = [
-  '@/features/pause/domain/reflect/mood/',
-  "from '@/features/pause/domain/reflect/mood/",
-  "from './domain/reflect/mood/",
-  "from '../domain/reflect/mood/",
+/** Reflect mood umbrella flow — compose domain + leaf use case only (not mood subcluster flow anchors). */
+const LEGACY_PAUSE_REFLECT_MOOD_FLOW_SUBCLUSTER_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow',
+  "from './pause-depth-picker-mood-flow'",
+  "from '../pause-depth-picker-mood-flow'",
+  "from './pause-feel-tiles-mood-flow'",
+  "from '../pause-feel-tiles-mood-flow'",
+  "from './pause-initial-emotion-presentation-flow'",
+  "from '../pause-initial-emotion-presentation-flow'",
+  "from './pause-initial-emotion-log-flow'",
+  "from '../pause-initial-emotion-log-flow'",
+  "from './pause-session-mood-chrome-flow'",
+  "from '../pause-session-mood-chrome-flow'",
 ];
 
 /** Reflect hub umbrella flow — compose subcluster anchors only (no deep domain/reflect/hub). */
@@ -2080,17 +2091,11 @@ for (const file of walkTs(join(root, 'src'))) {
     }
   }
   if (rel === 'src/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow.ts') {
-    for (const needle of LEGACY_PAUSE_REFLECT_MOOD_FLOW_DOMAIN_IMPORTS) {
+    for (const needle of LEGACY_PAUSE_REFLECT_MOOD_FLOW_SUBCLUSTER_IMPORTS) {
       if (text.includes(needle)) {
-        failures.push(`${rel}: reflect mood umbrella flow must compose subcluster anchors (${needle})`);
-      }
-    }
-    for (const needle of [
-      '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log',
-      "from './run-initial-emotion-log'",
-    ]) {
-      if (text.includes(needle)) {
-        failures.push(`${rel}: reflect mood umbrella flow must not deep-import run-initial-emotion-log (${needle})`);
+        failures.push(
+          `${rel}: reflect mood umbrella flow must import domain + run-initial-emotion-log directly (${needle})`,
+        );
       }
     }
   }

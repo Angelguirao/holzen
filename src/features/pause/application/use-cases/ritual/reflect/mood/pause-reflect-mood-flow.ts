@@ -1,31 +1,31 @@
 /**
  * CI cluster anchor for ritual reflect mood presentation I/O (§3 / check:architecture-alignment).
- * Composes mood subcluster anchors; presentation imports via `pause-reflect-mood-io.ts`.
+ * Composes domain mood helpers + `run-initial-emotion-log` leaf use case (not subcluster flow anchors).
  */
 export {
   runInitialEmotionSelect,
   runInitialEmotionSkip,
-} from './pause-initial-emotion-log-flow';
+} from './run-initial-emotion-log';
 export type {
   RunInitialEmotionSelectResult,
   RunInitialEmotionSkipResult,
-} from './pause-initial-emotion-log-flow';
-export { buildFeelTilesMoodLogOptions } from './pause-feel-tiles-mood-flow';
+} from './run-initial-emotion-log';
+export { buildFeelTilesMoodLogOptions } from '@/features/pause/domain/reflect/mood/build-feel-tiles-mood-log-options';
 export {
   applyBriefDepthPickerRitualEntry,
   applyDeepDepthPickerRitualEntry,
-  isPauseSessionDepthPickerActive,
-  resolvePauseDepthContextLineParams,
-} from './pause-depth-picker-mood-flow';
+} from '@/features/pause/domain/reflect/mood/apply-depth-picker-ritual-entry';
+export { isPauseSessionDepthPickerActive } from '@/features/pause/domain/reflect/mood/pause-depth-picker-active';
+export { resolvePauseDepthContextLineParams } from '@/features/pause/domain/reflect/mood/resolve-pause-depth-context-line-params';
 export {
   initialEmotionResetUi,
   initialEmotionSelectRollbackUi,
   type InitialEmotionUiState,
-} from './pause-initial-emotion-presentation-flow';
+} from '@/features/pause/domain/reflect/mood/initial-emotion-presentation';
 export {
   resolvePauseSessionChromeCloseAction,
-  runDeepPausePickerEntryIfPro,
   runPauseSessionChromeCloseAction,
   type PauseSessionChromeCloseAction,
   type PauseSessionPhase,
-} from './pause-session-mood-chrome-flow';
+} from '@/features/pause/domain/reflect/mood/pause-session-chrome-close';
+export { runDeepPausePickerEntryIfPro } from '@/features/pause/domain/reflect/mood/run-deep-pause-picker-entry-if-pro';
