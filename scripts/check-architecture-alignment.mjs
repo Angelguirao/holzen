@@ -2924,7 +2924,8 @@ for (const file of walkTs(join(root, 'src'))) {
     }
     if (
       !rel.endsWith('pause-reflect-flows-io.re-exports.test.ts') &&
-      !rel.endsWith('pause-reflect-flows-io-parity.test.ts')
+      !rel.endsWith('pause-reflect-flows-io-parity.test.ts') &&
+      !rel.endsWith('pause-reflect-flows-flow-io-wrapper-sibling-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_UMBRELLA_FLOW_IMPORTS) {
         if (text.includes(needle)) {
