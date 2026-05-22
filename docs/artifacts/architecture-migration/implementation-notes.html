@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel run-shift-emotion-frame-hub-done off hub log flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>run-shift-emotion-frame-hub-done</code> imports shift log bundle from domain</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Application use case + test import <code>buildShiftEmotionFrameHubLogBundle</code> from <code>domain/reflect/hub/shift-emotion-log</code> instead of <code>pause-shift-emotion-log-flow</code> (parity with <code>pause-reflect-hub-io</code> and mood I/O leaf imports on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-shift-emotion-log-flow.ts</code> remains application cluster re-export for CI; <code>pause-reflect-hub-flow</code> still composes subcluster anchors.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-persisted-tab-session-io</code> to <code>persisted-tab-session</code>, or session shell/scaffold subcluster peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel ritual-restore brief hydration off session brief-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

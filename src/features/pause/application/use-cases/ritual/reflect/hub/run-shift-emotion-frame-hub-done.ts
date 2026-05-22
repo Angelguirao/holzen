@@ -1,5 +1,5 @@
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
-import { buildShiftEmotionFrameHubLogBundle } from './pause-shift-emotion-log-flow';
+import { buildShiftEmotionFrameHubLogBundle } from '@/features/pause/domain/reflect/hub/shift-emotion-log';
 import type { ShiftEmotionFrameHubDoneOutcome } from '@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
