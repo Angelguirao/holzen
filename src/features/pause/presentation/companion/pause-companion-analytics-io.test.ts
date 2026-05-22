@@ -4,9 +4,15 @@ const runLogCompanionFeedbackVoteMock = vi.hoisted(() => vi.fn());
 const runLogCompanionFullviewOpenedMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/pause-companion-analytics-flow',
+  '@/features/pause/application/use-cases/ritual/frame/run-log-companion-feedback-vote',
   () => ({
     runLogCompanionFeedbackVote: runLogCompanionFeedbackVoteMock,
+  }),
+);
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/frame/run-log-companion-fullview-opened',
+  () => ({
     runLogCompanionFullviewOpened: runLogCompanionFullviewOpenedMock,
   }),
 );
