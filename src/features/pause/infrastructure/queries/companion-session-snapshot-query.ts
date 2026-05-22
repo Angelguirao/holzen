@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import { reflectionTextMessageFromArtifactRows } from '@/features/pause/domain/reflect/generation/reflection-text-from-artifact-rows';
 import { companionDataFromArtifacts } from '@/features/pause/application/use-cases/ritual/frame/companion-data-from-artifacts';
-import { PAUSE_QUERY_PREFIX } from '@/features/pause/application/queries/pause-query-namespace';
+import { PAUSE_QUERY_PREFIX } from '@/features/pause/infrastructure/queries/pause-query-namespace';
 
 export interface PauseSessionSnapshot {
   id: string;

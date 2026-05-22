@@ -1,4 +1,4 @@
-import { PAUSE_QUERY_PREFIX } from '@/features/pause/application/queries/pause-query-namespace';
+import { PAUSE_QUERY_PREFIX } from '@/features/pause/infrastructure/queries/pause-query-namespace';
 
 export const CURRENT_PAUSE_QUERY_LEAF = 'current-open' as const;
 
