@@ -1,18 +1,18 @@
 /**
  * Reflect share presentation I/O — plain-text/channel builders (domain) + PNG orchestration (application).
- * Imports share subcluster flow anchors directly (parity with
- * `pause-reflect-steps-io` → steps subcluster flows).
+ * Imports domain builders and `run-reflection-share-image` directly (parity with
+ * `pause-reflect-pending-offer-io` → leaf RPC/display modules).
  */
+import {
+  runReflectionShareImage,
+  type DeliverReflectionShareImageDeps,
+} from '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image';
 import {
   buildReflectionShareTelegramUrl,
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
-} from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-channel-urls-flow';
-import {
-  runReflectionShareImage,
-  type DeliverReflectionShareImageDeps,
-} from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-image-flow';
-import { buildReflectionShareText } from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-text-flow';
+} from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';
+import { buildReflectionShareText } from '@/features/pause/domain/reflect/share/reflection-share-text';
 
 export {
   buildReflectionShareTelegramUrl,

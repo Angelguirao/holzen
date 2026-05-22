@@ -767,6 +767,27 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_IO_ORCHESTRATION_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/share/pause-reflect-share-flow'",
 ];
 
+/** Reflect share I/O — import PNG orchestration via leaf module only (not pause-reflection-share-image-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_IO_IMAGE_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-image-flow',
+  "from './application/use-cases/ritual/reflect/share/pause-reflection-share-image-flow'",
+  "from '../application/use-cases/ritual/reflect/share/pause-reflection-share-image-flow'",
+];
+
+/** Reflect share I/O — import plain-text via domain only (not pause-reflection-share-text-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_IO_TEXT_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-text-flow',
+  "from './application/use-cases/ritual/reflect/share/pause-reflection-share-text-flow'",
+  "from '../application/use-cases/ritual/reflect/share/pause-reflection-share-text-flow'",
+];
+
+/** Reflect share I/O — import channel URLs via domain only (not pause-reflection-share-channel-urls-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_IO_CHANNEL_URLS_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-channel-urls-flow',
+  "from './application/use-cases/ritual/reflect/share/pause-reflection-share-channel-urls-flow'",
+  "from '../application/use-cases/ritual/reflect/share/pause-reflection-share-channel-urls-flow'",
+];
+
 /** Reflect share presentation — import share builders via pause-reflect-share-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/share/',
@@ -1615,7 +1636,28 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_IO_ORCHESTRATION_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: reflect share I/O must import via share subcluster flows (${needle})`,
+          `${rel}: reflect share I/O must not import share umbrella (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_IO_IMAGE_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect share I/O must import run-reflection-share-image directly (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_IO_TEXT_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect share I/O must import domain reflection-share-text directly (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_IO_CHANNEL_URLS_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect share I/O must import domain reflection-share-channel-urls directly (${needle})`,
         );
       }
     }
