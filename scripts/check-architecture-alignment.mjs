@@ -540,6 +540,7 @@ const LEGACY_PAUSE_REFLECT_FLOWS_FLOW_DECIDE_APP_IMPORTS = [
 /** Reflect flows presentation — import reflect/decide helpers via pause-reflect-flows-flow only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/flows/',
+  '@/features/pause/domain/decide/pause-impact-data',
   '@/features/pause/domain/decide/pause-decide-outcome-flow',
   '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log',
   '@/features/pause/application/use-cases/ritual/decide/outcome-toast',
@@ -551,6 +552,8 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow',
   "from './domain/reflect/flows/",
   "from '../domain/reflect/flows/",
+  "from './domain/decide/pause-impact-data",
+  "from '../domain/decide/pause-impact-data",
   "from './domain/decide/pause-decide-outcome-flow",
   "from '../domain/decide/pause-decide-outcome-flow",
   "from './application/use-cases/ritual/decide/run-pause-outcome-log'",
@@ -901,8 +904,7 @@ for (const file of walkTs(join(root, 'src'))) {
   if (rel.startsWith('src/features/pause/presentation/reflect/flows/')) {
     if (
       !rel.endsWith('pause-reflect-flows-io.ts') &&
-      !rel.endsWith('pause-reflect-flows-io.test.ts') &&
-      !rel.endsWith('-types.ts')
+      !rel.endsWith('pause-reflect-flows-io.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {

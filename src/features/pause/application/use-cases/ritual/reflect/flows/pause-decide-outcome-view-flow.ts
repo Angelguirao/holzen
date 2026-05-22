@@ -6,3 +6,4 @@ export {
   formatReinforcementQuoteFromSession,
   resolvePauseDecideOutcomeFlow,
 } from '@/features/pause/domain/decide/pause-decide-outcome-flow';
+export type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';

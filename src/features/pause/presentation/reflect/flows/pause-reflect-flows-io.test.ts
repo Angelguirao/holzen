@@ -26,9 +26,24 @@ import {
   pauseReflectOutcomeLogWithRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecidePreflight,
+  type PauseImpactData,
 } from './pause-reflect-flows-io';
 
 describe('pause-reflect-flows-io', () => {
+  it('re-exports PauseImpactData from the decide outcome view flow anchor', () => {
+    const sample: PauseImpactData = {
+      mood: null,
+      moodAfter: null,
+      breathingCompleted: true,
+      decision: 'hold',
+      context: null,
+      engagedTools: 0,
+      wroteNote: false,
+      usedTags: false,
+    };
+    expect(sample.decision).toBe('hold');
+  });
+
   it('re-exports reflect-and-decide preflight helpers from pause-reflect-flows-flow', () => {
     const view = resolvePauseSessionReflectAndDecidePreflight({
       seedMessage: 'seed',
