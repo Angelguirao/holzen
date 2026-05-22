@@ -130,6 +130,13 @@ import {
   buildReflectionShareWhatsAppUrl,
   pauseReflectionShareImage,
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
+import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
+  pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
@@ -329,11 +336,17 @@ describe('pause-reflect-flows-io parity', () => {
   it('sibling cluster: pending-offer-io exports stay distinct from flows-io', () => {
     expect(pauseReflectOutcomeLog).not.toBe(pauseAdoptPendingOffer);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseDeclinePendingOffer);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(getPendingPauseOfferDisplay);
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseAdoptPendingOfferWithRepository);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseAdoptPendingOfferWithRepository);
     expect(buildPauseScoreImpacts).not.toBe(getPendingPauseOfferDisplay);
+    expect(buildPauseScoreImpacts).not.toBe(pauseDeclinePendingOffer);
     expect(formatReinforcementQuoteFromSession).not.toBe(pauseAdoptPendingOffer);
+    expect(formatReinforcementQuoteFromSession).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(getSessionQuote).not.toBe(pauseAdoptPendingOffer);
     expect(getSessionQuote).not.toBe(pauseDeclinePendingOffer);
+    expect(resolvePauseDecideOutcomeFlow).not.toBe(getPendingPauseOfferDisplay);
     expect(showPauseOutcomeNotCompletedToast).not.toBe(getPendingPauseOfferDisplay);
     expect(showPauseOutcomeSaveFailedToast).not.toBe(pauseAdoptPendingOffer);
     // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`.

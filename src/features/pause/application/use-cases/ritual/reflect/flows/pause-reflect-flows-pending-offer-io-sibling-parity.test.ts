@@ -31,9 +31,11 @@ import {
 /**
  * Application sibling parity: flows-io vs pending-offer-io (parity with presentation
  * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` and flow-level
- * `pause-reflect-flows-pending-offer-flow-sibling-parity.test.ts`).
+ * `pause-reflect-flows-pending-offer-flow-sibling-parity.test.ts`; complements
+ * `pause-reflect-flows-share-io-sibling-parity.test.ts`).
  * Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts` ↔
- * `presentation/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+ * `pause-reflect-pending-offer-io-parity.test.ts` and `pause-reflect-flows-io.test.ts` ↔
+ * `pause-reflect-pending-offer-io.test.ts`.
  */
 describe('pause-reflect-flows-io ↔ pause-reflect-pending-offer-io sibling parity (application)', () => {
   it('flows-io and pending-offer-io are distinct presentation I/O surfaces', () => {
@@ -74,6 +76,8 @@ describe('pause-reflect-flows-io ↔ pause-reflect-pending-offer-io sibling pari
     expect(buildPauseScoreImpacts).not.toBe(pauseDeclinePendingOffer);
     expect(formatReinforcementQuoteFromSession).not.toBe(pauseAdoptPendingOffer);
     expect(showPauseOutcomeSaveFailedToast).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(getSessionQuote).not.toBe(getPendingPauseOfferDisplay);
+    expect(resolvePauseDecideOutcomeFlow).not.toBe(pauseAdoptPendingOfferWithRepository);
     // Shared default repository binding is intentional; wrapper exports above must stay distinct.
     expect(flowsReflectPauseRepository).toBe(pendingOfferReflectPauseRepository);
   });
