@@ -11,6 +11,10 @@ import {
   pauseInitialEmotionSkipWithRepository,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import {
+  buildReflectionShareText,
+  pauseReflectionShareImage,
+} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
+import {
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
   reflectPauseRepository,
@@ -92,5 +96,13 @@ describe('pause-reflect-hub-io', () => {
     expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseInitialEmotionSkip);
     expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseInitialEmotionSkipWithRepository);
     // Full cross-I/O pins: `pause-reflect-mood-hub-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: share-io exports stay distinct from hub-io', () => {
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseReflectionShareImage);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(buildReflectionShareText);
+    expect(resolveShiftFrameHubDonePresentation).not.toBe(pauseReflectionShareImage);
+    expect(reflectPauseRepository).not.toBe(pauseReflectionShareImage);
+    // Full cross-umbrella pins: `pause-reflect-hub-share-io-sibling-parity.test.ts`.
   });
 });

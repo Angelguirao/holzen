@@ -105,6 +105,7 @@ describe('pause-reflect-hub-flow', () => {
     expect(buildLogBundleFromFlow).not.toBe(trackShareTapFromShareFlow);
     expect(resolvePresentationFromFlow).not.toBe(trackWallpaperFromShareFlow);
     expect(runShiftEmotionFrameHubDone).not.toBe(buildShareTextFromShareFlow);
+    // Full cross-umbrella pins: `pause-reflect-hub-share-flow-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: pending-offer-flow exports stay distinct from hub umbrella exports', () => {

@@ -30,6 +30,11 @@ import {
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
+  pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
+  resolveShiftFrameHubDonePresentation,
+} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
   pauseReflectTagUpdate,
@@ -40,7 +45,7 @@ import {
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
-import { pauseReflectionShareImage } from './pause-reflect-share-io';
+import { buildReflectionShareText, pauseReflectionShareImage } from './pause-reflect-share-io';
 
 describe('pause-reflect-share-io', () => {
   it('delegates to runReflectionShareImage', async () => {
@@ -84,5 +89,13 @@ describe('pause-reflect-share-io', () => {
     expect(pauseReflectionShareImage).not.toBe(stopPauseReflectFrameFocusAmbience);
     // Full cross-I/O pins: `pause-reflect-share-ambience-io-sibling-parity.test.ts` and
     // `pause-reflect-ambience-share-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: hub-io exports stay distinct from share-io', () => {
+    expect(pauseReflectionShareImage).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseReflectionShareImage).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(buildReflectionShareText).not.toBe(resolveShiftFrameHubDonePresentation);
+    expect(buildReflectionShareText).not.toBe(pauseShiftEmotionFrameHubDone);
+    // Full cross-umbrella pins: `pause-reflect-hub-share-io-sibling-parity.test.ts`.
   });
 });
