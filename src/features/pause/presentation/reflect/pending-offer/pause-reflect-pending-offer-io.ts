@@ -14,7 +14,7 @@
  * application reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`;
  * `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`;
  * `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io` (presentation + application);
- * application reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`;
+ * presentation reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`;
  * reciprocal inline pins on `pause-reflect-pending-offer-io.test.ts` ↔ `pause-reflect-flows-io.test.ts` (pending-offer RPC vs reflect+decide),
  * ↔ `pause-reflect-ambience-io.test.ts` (RPC vs frame-focus Web Audio bed),
  * ↔ `pause-reflect-pending-offer-telemetry-io.test.ts` (RPC vs pending-offer telemetry),

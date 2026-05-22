@@ -45,11 +45,12 @@ import {
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 
 /**
- * Application-layer ambience I/O parity (domain frame-focus leaves ↔ ambience-flow ↔ presentation I/O).
+ * Presentation I/O parity (colocated beside `pause-reflect-ambience-io.ts`).
+ * Imports `pause-reflect-ambience-flow` CI umbrella for `.toBe` identity pins only — production ambience I/O keeps domain leaf imports.
  * Steps-io cross-surface: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts`.
+ * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application).
  * Pending-offer cross-surface: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins below.
+ * reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts` (presentation).
  */
 describe('pause-reflect-ambience-io parity', () => {
   it('presentation I/O frame-focus exports match ambience CI umbrella', () => {
