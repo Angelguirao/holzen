@@ -20901,4 +20901,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — pending-offer telemetry I/O via pending-offer umbrella (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>pause-reflect-pending-offer-telemetry-io</code> through <code>pause-reflect-pending-offer-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-pending-offer-telemetry-io</code> imports adopt/decline/abandoned trackers through the pending-offer umbrella (parity with share <code>pause-reflect-share-flow</code> + telemetry-io). CI blocks direct <code>pause-pending-offer-telemetry-flow</code> imports under <code>presentation/reflect/pending-offer/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session shell still imports telemetry-io sibling, not application paths.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim, archive decide I/O peel, or hub I/O direct subcluster imports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

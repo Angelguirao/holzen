@@ -785,6 +785,13 @@ const LEGACY_PAUSE_REFLECT_PENDING_OFFER_TELEMETRY_PATH_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/telemetry/pause-session-abandoned-telemetry'",
 ];
 
+/** Reflect pending-offer presentation — import PostHog via pause-reflect-pending-offer-flow only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_SUBCLUSTER_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow',
+  "from './application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow'",
+];
+
 /** Session presentation — import pending-offer PostHog via pause-pending-offer-telemetry-flow (telemetry-io only). */
 const LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_TELEMETRY_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-telemetry',
@@ -1242,27 +1249,40 @@ for (const file of walkTs(join(root, 'src'))) {
     }
   }
   if (rel.startsWith('src/features/pause/presentation/reflect/pending-offer/')) {
+    const pendingOfferIoAllowlisted =
+      rel.endsWith('pause-reflect-pending-offer-io.ts') ||
+      rel.endsWith('pause-reflect-pending-offer-io.test.ts') ||
+      rel.endsWith('pause-reflect-pending-offer-telemetry-io.ts') ||
+      rel.endsWith('pause-reflect-pending-offer-telemetry-io.test.ts');
     for (const needle of LEGACY_PAUSE_REFLECT_PENDING_OFFER_TELEMETRY_PATH_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy reflect/telemetry pending-offer import (${needle})`);
       }
     }
-    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_TELEMETRY_IMPORTS) {
-      if (
-        !rel.endsWith('pause-reflect-pending-offer-telemetry-io.ts') &&
-        !rel.endsWith('pause-reflect-pending-offer-telemetry-io.test.ts') &&
-        text.includes(needle)
-      ) {
-        failures.push(`${rel}: legacy pending-offer telemetry import (${needle})`);
+    if (!pendingOfferIoAllowlisted) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_TELEMETRY_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy pending-offer telemetry import (${needle})`);
+        }
       }
-    }
-    if (
-      !rel.endsWith('pause-reflect-pending-offer-io.ts') &&
-      !rel.endsWith('pause-reflect-pending-offer-io.test.ts')
-    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_SUBCLUSTER_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy pending-offer telemetry subcluster import (${needle})`);
+        }
+      }
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_USE_CASE_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy pending-offer use-case import (${needle})`);
+        }
+      }
+    }
+    if (
+      rel.endsWith('pause-reflect-pending-offer-telemetry-io.ts') ||
+      rel.endsWith('pause-reflect-pending-offer-telemetry-io.test.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_SUBCLUSTER_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: pending-offer telemetry I/O must import via pause-reflect-pending-offer-flow (${needle})`);
         }
       }
     }
