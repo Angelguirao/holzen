@@ -185,6 +185,7 @@ const LEGACY_PAUSE_USE_CASE_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/scaffold/storage-ritual-sync',
   '@/features/pause/application/use-cases/ritual/reflect/scaffold/persist-snapshot',
   '@/features/pause/application/use-cases/ritual/reflect/scaffold/migrate-persisted-session',
+  '@/features/pause/application/use-cases/ritual/reflect/telemetry/manual-open/',
   "from './application/use-cases/reflect/",
   "from './application/use-cases/companion/",
   "from './application/use-cases/ritual/reflect/scaffold/scaffold-ritual-derived'",
@@ -197,6 +198,8 @@ const LEGACY_PAUSE_USE_CASE_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/scaffold/storage-ritual-sync'",
   "from '../application/use-cases/ritual/reflect/scaffold/persist-snapshot'",
   "from '../application/use-cases/ritual/reflect/scaffold/migrate-persisted-session'",
+  "from './application/use-cases/ritual/reflect/telemetry/manual-open/",
+  "from '../application/use-cases/ritual/reflect/telemetry/manual-open/",
 ];
 
 /** Flat presentation/reflect paths — use subclusters (generation/, steps/, mood/, …). */

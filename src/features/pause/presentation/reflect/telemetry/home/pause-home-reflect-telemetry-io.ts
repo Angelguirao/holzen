@@ -1,7 +1,7 @@
 /**
  * Home manual-open PostHog helpers (manual open + dismiss/banner).
  * Colocated under `presentation/reflect/telemetry/home/` beside application
- * `ritual/reflect/telemetry/home/` + `telemetry/manual-open/`.
+ * `ritual/reflect/telemetry/home/` + manual-open trackers in `generation/manual-open/`.
  * Imports trackers via `pause-home-reflect-telemetry-flow` CI anchor
  * (parity with `pause-reflect-telemetry-io` → session telemetry flow).
  */

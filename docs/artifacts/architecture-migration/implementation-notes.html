@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — colocate manual-open PostHog trackers under generation/manual-open (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>manual-pause-trigger-telemetry</code> beside manual-open use cases</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. Move <code>manual-pause-trigger-telemetry</code> (+ test) from <code>telemetry/manual-open/</code> to <code>generation/manual-open/</code>; <code>pause-home-reflect-telemetry-flow</code> re-exports from the generation cluster. Presentation still imports via <code>presentation/reflect/telemetry/home/pause-home-reflect-telemetry-io</code> (CI anchor). Resolved leftover merge conflict in <code>check-architecture-alignment.mjs</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Home banner/dismiss telemetry stays in <code>telemetry/home/</code> (Home surface, not manual-open generation).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session scaffold / ritual-restore I/O flow-anchor peels, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session terminal-entry I/O via pause-session-terminal-entry-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
