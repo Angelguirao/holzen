@@ -57,6 +57,11 @@ import {
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
   runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
 } from '../flows/pause-reflect-flows-flow';
+import {
+  buildShiftEmotionFrameHubLogBundle as buildLogBundleFromHubFlow,
+  resolveShiftFrameHubDonePresentation as resolvePresentationFromHubFlow,
+  runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
+} from '../hub/pause-reflect-hub-flow';
 
 describe('pause-reflect-share-flow', () => {
   it('re-exports share orchestration + domain builders + session UI telemetry from leaf modules', () => {
@@ -122,5 +127,14 @@ describe('pause-reflect-share-flow', () => {
     expect(buildTelegramFromFlow).not.toBe(runOutcomeLogFromFlowsFlow);
     expect(trackPauseReflectShareTap).not.toBe(runOutcomeLogFromFlowsFlow);
     expect(trackPauseReflectWallpaperTap).not.toBe(resolvePreflightFromFlowsFlow);
+  });
+
+  it('sibling cluster: share-flow exports stay distinct from hub-flow exports', () => {
+    expect(runReflectionShareImage).not.toBe(runShiftHubDoneFromHubFlow);
+    expect(runReflectionShareImage).not.toBe(buildLogBundleFromHubFlow);
+    expect(buildTextFromFlow).not.toBe(resolvePresentationFromHubFlow);
+    expect(trackPauseReflectPostItOpen).not.toBe(runShiftHubDoneFromHubFlow);
+    expect(trackPauseReflectShareTap).not.toBe(buildLogBundleFromHubFlow);
+    expect(trackPauseReflectWallpaperTap).not.toBe(resolvePresentationFromHubFlow);
   });
 });

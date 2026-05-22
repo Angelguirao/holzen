@@ -31,6 +31,13 @@ import {
   reflectGenerationPrerequisite as prerequisiteFromGenerationFlow,
   runReflectGeneration as runReflectGenerationFromGenerationFlow,
 } from '../generation/pause-reflect-generation-flow';
+import {
+  buildReflectionShareText as buildShareTextFromShareFlow,
+  runReflectionShareImage as runShareImageFromShareFlow,
+  trackPauseReflectPostItOpen as trackPostItFromShareFlow,
+  trackPauseReflectShareTap as trackShareTapFromShareFlow,
+  trackPauseReflectWallpaperTap as trackWallpaperFromShareFlow,
+} from '../share/pause-reflect-share-flow';
 
 describe('pause-reflect-hub-flow', () => {
   it('re-exports hub helpers from domain + leaf RPC use case', () => {
@@ -81,5 +88,14 @@ describe('pause-reflect-hub-flow', () => {
     expect(buildLogBundleFromFlow).not.toBe(prerequisiteFromGenerationFlow);
     expect(resolvePresentationFromFlow).not.toBe(runReflectGenerationFromGenerationFlow);
     expect(runShiftEmotionFrameHubDone).not.toBe(prerequisiteFromGenerationFlow);
+  });
+
+  it('sibling cluster: share-flow exports stay distinct from hub umbrella exports', () => {
+    expect(runShiftEmotionFrameHubDone).not.toBe(runShareImageFromShareFlow);
+    expect(runShiftEmotionFrameHubDone).not.toBe(trackPostItFromShareFlow);
+    expect(buildLogBundleFromFlow).not.toBe(buildShareTextFromShareFlow);
+    expect(buildLogBundleFromFlow).not.toBe(trackShareTapFromShareFlow);
+    expect(resolvePresentationFromFlow).not.toBe(trackWallpaperFromShareFlow);
+    expect(runShiftEmotionFrameHubDone).not.toBe(buildShareTextFromShareFlow);
   });
 });
