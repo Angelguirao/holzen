@@ -28545,4 +28545,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — display-flow reciprocal telemetry pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-pending-offer-display-flow.test.ts</code> + <code>pause-reflect-pending-offer-flow.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Extend reciprocal inline sibling pins so <code>pause-pending-offer-display-flow</code> stays distinct from PostHog trackers and <code>pause-reflect-pending-offer-flow</code> documents telemetry-flow subcluster binding (complements dedicated <code>pause-reflect-pending-offer-flow-telemetry-flow-sibling-parity.test.ts</code> on branch).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comment anchors only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription presentation slices, or remaining presentation I/O cross-pins (mood-io ↔ hub-io).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
