@@ -20638,6 +20638,7 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+<<<<<<< HEAD
       <span>Phase A — pending-offer navigation into reflect/pending-offer (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -20651,6 +20652,21 @@
       <dd>Session shell imports pending-offer navigation from reflect presentation (cross-subfolder within session bootstrap).</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B subscription Tier 1 shim, or archive decide I/O peel when pause Tier 5 is clean.</dd>
+=======
+      <span>Phase A — compose reflect flows-flow from subcluster anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-flow</code> composes reflect+decide view, outcome, RPC, toast, and quotes anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Split umbrella <code>pause-reflect-flows-flow</code> into <code>pause-reflect-and-decide-view-flow</code>, <code>pause-decide-outcome-view-flow</code>, <code>pause-reflect-decide-outcome-log-flow</code>, <code>pause-reflect-decide-outcome-toast-flow</code>, and <code>pause-reflect-decide-wisdom-quotes-flow</code> (parity with hub/mood umbrella flows). <code>pause-reflect-flows-io</code> unchanged import path.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; application import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation type modules may still import <code>domain/decide/pause-impact-data</code> types directly; functional helpers route through flows I/O.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim, or session step-transition I/O peel.</dd>
+>>>>>>> c49e9f0bb (refactor(pause): compose reflect flows-flow from subcluster anchors)
     </dl>
   </article>
 
