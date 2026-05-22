@@ -54,6 +54,13 @@ import {
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
+  pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
   pauseReflectTagUpdate,
@@ -222,6 +229,22 @@ describe('pause-reflect-flows-io', () => {
     expect(buildPauseScoreImpacts).not.toBe(pauseInitialEmotionSkip);
     expect(buildPauseScoreImpacts).not.toBe(buildFeelTilesMoodLogOptions);
     // Reciprocal inline pins: `pause-reflect-mood-io.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-pending-offer-io.test.ts` (reflect+decide vs pending-offer RPC).
+   * Dedicated sibling file: `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: pending-offer-io exports stay distinct from flows-io', () => {
+    expect(pauseReflectOutcomeLog).not.toBe(pauseAdoptPendingOffer);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseDeclinePendingOffer);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(getPendingPauseOfferDisplay);
+    expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseAdoptPendingOfferWithRepository);
+    expect(buildPauseScoreImpacts).not.toBe(pauseDeclinePendingOffer);
+    expect(formatReinforcementQuoteFromSession).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(getSessionQuote).not.toBe(pauseAdoptPendingOffer);
+    expect(resolvePauseDecideOutcomeFlow).not.toBe(getPendingPauseOfferDisplay);
+    // Reciprocal inline pins: `pause-reflect-pending-offer-io.test.ts`.
   });
 
   /**

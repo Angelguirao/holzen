@@ -75,6 +75,13 @@ import {
   runReflectionShareImage as runShareImageFromShareFlow,
   trackPauseReflectShareTap as trackShareTapFromShareFlow,
 } from '../share/pause-reflect-share-flow';
+import {
+  getPendingPauseOfferDisplay as getDisplayFromPendingOfferFlow,
+  runAdoptPendingPauseOffer as runAdoptFromPendingOfferFlow,
+  runDeclinePendingPauseOffer as runDeclineFromPendingOfferFlow,
+  trackPausePendingAdopted as trackAdoptedFromPendingOfferFlow,
+  trackPausePendingDeclined as trackDeclinedFromPendingOfferFlow,
+} from '../pending-offer/pause-reflect-pending-offer-flow';
 
 import {
   pauseReflectOutcomeLog,
@@ -193,6 +200,23 @@ describe('pause-reflect-flows-flow', () => {
     expect(runOutcomeLogFromFlow).not.toBe(buildShareTextFromShareFlow);
     expect(formatQuoteFromFlow).not.toBe(trackShareTapFromShareFlow);
     expect(buildImpactsFromFlow).not.toBe(runShareImageFromShareFlow);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-pending-offer-flow.test.ts` (reflect+decide vs pending-offer).
+   * Dedicated sibling file: `pause-reflect-flows-pending-offer-flow-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: pending-offer-flow exports stay distinct from flows umbrella exports', () => {
+    expect(resolvePreflightFromFlow).not.toBe(runAdoptFromPendingOfferFlow);
+    expect(resolveAfterGenFromFlow).not.toBe(runDeclineFromPendingOfferFlow);
+    expect(runOutcomeLogFromFlow).not.toBe(getDisplayFromPendingOfferFlow);
+    expect(formatQuoteFromFlow).not.toBe(runAdoptFromPendingOfferFlow);
+    expect(resolveOutcomeFlowFromFlow).not.toBe(runDeclineFromPendingOfferFlow);
+    expect(buildImpactsFromFlow).not.toBe(trackAdoptedFromPendingOfferFlow);
+    expect(getQuoteFromFlow).not.toBe(trackDeclinedFromPendingOfferFlow);
+    expect(showNotCompletedFromFlow).not.toBe(getDisplayFromPendingOfferFlow);
+    expect(showSaveFailedFromFlow).not.toBe(runAdoptFromPendingOfferFlow);
+    // Reciprocal inline pins: `pause-reflect-pending-offer-flow.test.ts`.
   });
 
   it('flows CI umbrella re-exports runPauseOutcomeLog as ritual/decide leaf (not presentation port wrappers)', () => {

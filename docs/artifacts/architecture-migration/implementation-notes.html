@@ -29536,4 +29536,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — flows ↔ pending-offer reciprocal inline pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-*</code> ↔ <code>pause-reflect-pending-offer-*</code> unit tests</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add reciprocal inline pins on application flow umbrellas and presentation I/O unit tests so reflect+decide exports stay namespace-separated from pending-offer adopt/decline/display (complements existing dedicated sibling-parity files).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comment anchors only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or session step-handlers-io ↔ reflect steps-io cross-surface parity.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
