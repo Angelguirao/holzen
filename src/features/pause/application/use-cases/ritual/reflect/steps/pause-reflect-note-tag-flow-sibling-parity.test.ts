@@ -5,6 +5,11 @@ import { runPauseReflectTagUpdate } from './pause-reflect-tag-flow';
 import * as noteFlow from './pause-reflect-note-flow';
 import * as tagFlow from './pause-reflect-tag-flow';
 
+/**
+ * Note ↔ tag subcluster anchors only. Steps umbrella parity:
+ * `pause-reflect-steps-note-tag-flow-sibling-parity.test.ts` (reciprocal inline pins on
+ * `pause-reflect-steps-flow.test.ts`, `pause-reflect-note-flow.test.ts`, `pause-reflect-tag-flow.test.ts`).
+ */
 describe('pause-reflect-note-flow ↔ pause-reflect-tag-flow sibling parity', () => {
   it('note-flow and tag-flow are distinct sibling CI anchors', () => {
     expect(typeof runPauseReflectNoteUpdate).toBe('function');

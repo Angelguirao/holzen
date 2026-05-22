@@ -11,7 +11,8 @@
  * pause-reflect-steps-pending-offer-flow-sibling-parity.test.ts, pause-reflect-steps-share-flow-sibling-parity.test.ts,
  * pause-reflect-steps-telemetry-flow-sibling-parity.test.ts,
  * pause-reflect-steps-generation-flow-sibling-parity.test.ts (dedicated + reciprocal inline pins in `pause-reflect-steps-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts`),
- * pause-reflect-note-tag-flow-sibling-parity.test.ts (note/tag subcluster anchors), and
+ * pause-reflect-note-tag-flow-sibling-parity.test.ts (note/tag subcluster anchors),
+ * pause-reflect-steps-note-tag-flow-sibling-parity.test.ts (steps-flow ↔ note/tag; reciprocal inline pins in `pause-reflect-steps-flow.test.ts` ↔ `pause-reflect-note-flow.test.ts` / `pause-reflect-tag-flow.test.ts`), and
  * pause-reflect-steps-flows-flow-sibling-parity.test.ts pin separation from hub/mood/pending-offer/share/telemetry/generation/flows CI anchors;
  * `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (presentation wrappers off flow umbrella).
  */
