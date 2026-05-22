@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — colocate Home dismiss/banner PostHog under generation/manual-open (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>home-pause-actions-telemetry</code> beside manual-open use cases</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. After <code>manual-pause-trigger-telemetry</code>, move <code>home-pause-actions-telemetry</code> (+ test) from <code>telemetry/home/</code> to <code>generation/manual-open/</code>; <code>pause-home-reflect-telemetry-flow</code> imports both tracker modules from the generation cluster. Presentation still uses <code>presentation/reflect/telemetry/home/pause-home-reflect-telemetry-io</code> (CI anchor). CI forbids resurrecting <code>application/.../telemetry/home/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>All Home reflect PostHog trackers now live under <code>generation/manual-open/</code>; application <code>telemetry/home/</code> removed. Presentation <code>telemetry/home/</code> I/O shim remains for Home route imports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session scaffold / ritual-restore I/O flow-anchor peels, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session breath segment-log flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
