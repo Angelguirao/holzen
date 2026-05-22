@@ -19799,4 +19799,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate Home reflect telemetry presentation (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>presentation/reflect/telemetry/home/</code> mirrors application telemetry subcluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no application folder moves. Colocate Home manual-open PostHog I/O under <code>presentation/reflect/telemetry/home/</code> beside application <code>telemetry/home/</code> and <code>telemetry/manual-open/</code> (parity with session telemetry colocation). Home hooks and <code>apply-manual-pause-open-result</code> import via <code>@/features/pause/presentation/reflect/telemetry/home/pause-home-reflect-telemetry-io</code>; manual-open generation I/O and <code>use-manual-pause-trigger</code> stay under <code>presentation/home/manual-open/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; path colocation only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Cross-route import from <code>presentation/home/*</code> into <code>presentation/reflect/telemetry/home/</code> — acceptable because Home is the only consumer of manual-open telemetry I/O.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>presentation/home/manual-open/pause-home-reflect-io</code> under <code>presentation/reflect/generation/manual-open/</code>, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
