@@ -48,6 +48,10 @@ import {
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
+  buildPauseSessionStepRitualBundle,
+  buildPauseSessionStepShellBundle,
+} from '@/features/pause/presentation/session/pause-session-step-handlers-io';
+import {
   pauseReflectFavoriteToggle,
   pauseReflectFavoriteToggleWithRepository,
   pauseReflectNoteUpdate,
@@ -306,6 +310,26 @@ describe('pause-reflect-steps-io', () => {
     expect(reflectPauseRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
     // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-ambience-io.test.ts`;
     // `pause-reflect-steps-ambience-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-step-handlers-io.test.ts` (reflect RPC vs session bundles).
+   * Dedicated sibling file: `pause-session-step-handlers-steps-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: session step-handlers-io exports stay distinct from steps-io', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(buildPauseSessionStepShellBundle);
+    expect(pauseReflectNoteUpdate).not.toBe(buildPauseSessionStepRitualBundle);
+    expect(pauseReflectTagUpdate).not.toBe(buildPauseSessionStepShellBundle);
+    expect(pauseReflectionStepLogOnce).not.toBe(buildPauseSessionStepRitualBundle);
+    expect(pauseReflectFavoriteToggleWithRepository).not.toBe(buildPauseSessionStepShellBundle);
+    expect(pauseReflectNoteUpdateWithRepository).not.toBe(buildPauseSessionStepRitualBundle);
+    expect(pauseReflectTagUpdateWithRepository).not.toBe(buildPauseSessionStepShellBundle);
+    expect(pauseReflectionStepLogOnceWithRepository).not.toBe(buildPauseSessionStepRitualBundle);
+    expect(shouldShowFavoriteProHint).not.toBe(buildPauseSessionStepShellBundle);
+    expect(shouldLogPauseReflectionStep).not.toBe(buildPauseSessionStepRitualBundle);
+    expect(reflectPauseRepository).not.toBe(buildPauseSessionStepShellBundle);
+    expect(reflectPauseRepository).not.toBe(buildPauseSessionStepRitualBundle);
+    // Reciprocal inline pins: `pause-session-step-handlers-io.test.ts`.
   });
 
   /**
