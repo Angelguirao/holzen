@@ -352,7 +352,7 @@ describe('pause-reflect-telemetry-io parity (application)', () => {
 
   /**
    * Reciprocal inline pins ↔ `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
-   * Reciprocal inline pins ↔ `application/.../manual-open/pause-home-reflect-telemetry-io-parity.test.ts`.
+   * Reciprocal inline pins ↔ `application/.../telemetry/pause-home-reflect-telemetry-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`
    * (application + presentation).
    */

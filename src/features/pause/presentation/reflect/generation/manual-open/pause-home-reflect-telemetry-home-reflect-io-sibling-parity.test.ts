@@ -32,7 +32,7 @@ import * as homeReflectTelemetryIo from '@/features/pause/presentation/reflect/t
  * cluster; colocated beside pause-home-reflect-io; parity with
  * `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` separating holzen-reflect
  * generation from manual-open I/O).
- * Application mirror: `application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts`.
+ * Application mirror: `application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts`.
  */
 describe('pause-home-reflect-telemetry-io ↔ pause-home-reflect-io sibling parity', () => {
   it('home-reflect-telemetry-io and home-reflect-io are distinct presentation I/O surfaces', () => {
