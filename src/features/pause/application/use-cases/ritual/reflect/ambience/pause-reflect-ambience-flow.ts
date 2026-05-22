@@ -9,7 +9,8 @@
  * `pause-reflect-ambience-generation-flow-sibling-parity.test.ts` (ambience-flow ↔ generation-flow);
  * `pause-reflect-flows-ambience-flow-sibling-parity.test.ts` (ambience-flow ↔ flows-flow);
  * `pause-reflect-ambience-mood-flow-sibling-parity.test.ts` (ambience-flow ↔ mood-flow);
- * `pause-reflect-ambience-share-flow-sibling-parity.test.ts` + `share/pause-reflect-share-ambience-flow-sibling-parity.test.ts` (ambience-flow ↔ share-flow).
+ * `pause-reflect-ambience-share-flow-sibling-parity.test.ts` + `share/pause-reflect-share-ambience-flow-sibling-parity.test.ts` (ambience-flow ↔ share-flow);
+ * `pause-reflect-steps-ambience-flow-sibling-parity.test.ts` (steps-flow ↔ ambience-flow; reciprocal inline pins in unit tests).
  */
 export {
   startPauseReflectFrameFocusAmbience,

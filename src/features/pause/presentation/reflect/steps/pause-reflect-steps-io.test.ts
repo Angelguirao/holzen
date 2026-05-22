@@ -11,6 +11,10 @@ import {
   pauseDeclinePendingOfferWithRepository,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+import {
   messageFromReflectGenerationResult,
   pauseReflectGeneration,
   reflectGenerationPrerequisite,
@@ -233,5 +237,18 @@ describe('pause-reflect-steps-io', () => {
     expect(shouldShowFavoriteProHint).not.toBe(getPendingPauseOfferDisplay);
     // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-pending-offer-io.test.ts`;
     // `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: ambience-io exports stay distinct from steps-io', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseReflectNoteUpdate).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(pauseReflectTagUpdate).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseReflectionStepLogOnce).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(shouldShowFavoriteProHint).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(shouldLogPauseReflectionStep).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(reflectPauseRepository).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(reflectPauseRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
+    // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-ambience-io.test.ts`;
+    // `pause-reflect-steps-ambience-io-sibling-parity.test.ts`.
   });
 });

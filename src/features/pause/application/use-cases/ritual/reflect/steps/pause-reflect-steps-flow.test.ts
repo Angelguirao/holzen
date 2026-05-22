@@ -64,6 +64,10 @@ import {
   trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
   trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
 } from '../telemetry/pause-reflect-telemetry-flow';
+import {
+  startPauseReflectFrameFocusAmbience as startAmbienceFromAmbienceFlow,
+  stopPauseReflectFrameFocusAmbience as stopAmbienceFromAmbienceFlow,
+} from '../ambience/pause-reflect-ambience-flow';
 
 describe('pause-reflect-steps-flow', () => {
   it('re-exports step mutations and domain gates from leaf modules', () => {
@@ -193,5 +197,21 @@ describe('pause-reflect-steps-flow', () => {
     expect(shouldLogFromFlow).not.toBe(trackWallpaperFromTelemetryFlow);
     expect(runPauseReflectTagUpdate).not.toBe(trackShareTapFromTelemetryFlow);
     expect(shouldShowFavoriteFromFlow).not.toBe(trackPostItFromTelemetryFlow);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-ambience-flow.test.ts` (steps-flow cluster).
+   * Dedicated sibling file: `pause-reflect-steps-ambience-flow-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: ambience-flow exports stay distinct from steps umbrella exports', () => {
+    expect(runPauseFavoriteToggle).not.toBe(startAmbienceFromAmbienceFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(stopAmbienceFromAmbienceFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(startAmbienceFromAmbienceFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(stopAmbienceFromAmbienceFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(startAmbienceFromAmbienceFlow);
+    expect(shouldLogFromFlow).not.toBe(stopAmbienceFromAmbienceFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(stopAmbienceFromAmbienceFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(stopAmbienceFromAmbienceFlow);
+    // Full cross-flow pins: `pause-reflect-steps-ambience-flow-sibling-parity.test.ts`.
   });
 });
