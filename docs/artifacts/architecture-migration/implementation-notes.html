@@ -24545,4 +24545,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase B — subscription Tier 1 shim removal (Tier 1)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>App.tsx</code> imports checkout guard cleanup from <code>features/subscription/public</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Phase A pause interior backlog is complete on this branch. Remove <code>src/lib/subscription-checkout-guard-ref.ts</code> and import <code>scheduleCheckoutGuardCleanup</code> from <code>@/features/subscription/public</code> in <code>App.tsx</code> (Tier 1: delete shim when the sole call site is updated).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior unchanged; implementation remains in subscription application.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other <code>src/lib/*-ref</code> seams (e.g. <code>holzen-query-client-ref</code>) stay until their call sites migrate.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: pause Tier 2–4 scan, or expand subscription public surface for remaining cross-context imports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
