@@ -3,7 +3,7 @@ import type { PauseState } from '@/features/pause/domain/pause-state';
 import {
   CURRENT_PAUSE_NONE_QUERY_KEY,
   currentPauseQueryKey,
-} from '@/features/pause/application/queries/current-pause-keys';
+} from './current-pause-query-key';
 
 export {
   CURRENT_PAUSE_DISABLED_USER_ID,
@@ -11,7 +11,7 @@ export {
   CURRENT_PAUSE_QUERY_LEAF,
   CURRENT_PAUSE_QUERY_PREFIX,
   currentPauseQueryKey,
-} from '@/features/pause/application/queries/current-pause-keys';
+} from './current-pause-query-key';
 
 export interface CurrentPauseRow {
   id: string;
