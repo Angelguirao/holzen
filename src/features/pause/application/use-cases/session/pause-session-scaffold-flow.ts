@@ -15,3 +15,4 @@ export {
   buildPauseSessionScaffoldRitualDerived,
   type PauseSessionScaffoldRitualDerived,
 } from './scaffold/scaffold-ritual-derived';
+export { hasPersistablePauseSessionAnchor } from '@/features/pause/domain/session/persisted-session-guards';

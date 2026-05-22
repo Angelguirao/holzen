@@ -6,8 +6,8 @@ import {
   computePauseSessionResolved,
   type PauseSessionHydrationReady,
   type PauseSessionHydrationState,
+  hasPersistedPauseSessionPayload,
 } from './pause-session-shell-io';
-import { hasPersistedPauseSessionPayload } from '@/features/pause/domain/session/persisted-session-guards';
 import type { PauseSessionNavParsed } from '@/features/pause/public-navigation';
 import { usePauseSessionFetch } from './use-pause-session-fetch';
 import { loadPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';

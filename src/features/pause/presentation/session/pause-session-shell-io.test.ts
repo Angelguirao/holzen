@@ -3,13 +3,17 @@ import {
   computePauseHeaderBackIntent,
   computePauseSessionHydration,
   computePauseSessionResolved,
+  hasPersistedPauseSessionPayload,
   isPauseSessionHeaderBackVisible,
+  isPauseSessionWaitingForInstanceFetch,
 } from './pause-session-shell-io';
 
 describe('pause-session-shell-io', () => {
   it('re-exports hydration helpers from pause-session-shell-flow', () => {
     expect(typeof computePauseSessionHydration).toBe('function');
     expect(typeof computePauseSessionResolved).toBe('function');
+    expect(typeof hasPersistedPauseSessionPayload).toBe('function');
+    expect(typeof isPauseSessionWaitingForInstanceFetch).toBe('function');
   });
 
   it('re-exports header back visibility and intent helpers for session conductors', () => {

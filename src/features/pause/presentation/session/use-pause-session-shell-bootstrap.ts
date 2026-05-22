@@ -3,8 +3,8 @@ import type { TFunction } from 'i18next';
 import {
   buildPauseSessionMountLogParams,
   coalescePauseSessionShellViewModel,
+  isPauseSessionWaitingForInstanceFetch,
 } from './pause-session-shell-io';
-import { isPauseSessionWaitingForInstanceFetch } from '@/features/pause/domain/session/waiting-for-instance-fetch';
 import { parsePauseSessionLocationState } from '@/features/pause/public-navigation';
 import type { PauseSessionShellHolzen } from '@/features/pause/domain/pause-session-shell-holzen';
 import { usePauseSessionMountLog } from './use-pause-session-mount-log';

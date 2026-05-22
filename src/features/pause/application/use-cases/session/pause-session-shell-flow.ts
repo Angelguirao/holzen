@@ -27,3 +27,5 @@ export {
   type PauseSessionSwipeDirection,
 } from './step-transition';
 export { pauseStepSwipeDirection } from './step-swipe-direction';
+export { hasPersistedPauseSessionPayload } from '@/features/pause/domain/session/persisted-session-guards';
+export { isPauseSessionWaitingForInstanceFetch } from '@/features/pause/domain/session/waiting-for-instance-fetch';
