@@ -23,16 +23,22 @@ import {
   logPauseRitualDepthUpgraded,
 } from '@/features/pause/application/use-cases/session/pause-session-brief-flow';
 import {
+  briefPauseRepository,
   initialBriefIntegrateDoneFromRestored as integrateDoneFromBriefIo,
   initialBriefPauseStepFromRestored as briefStepFromBriefIo,
   initialRitualEntry as ritualEntryFromBriefIo,
   initialSelectedBriefFaceFromRestored as briefFaceFromBriefIo,
   pauseBriefRitualDepthUpgraded,
+  pauseBriefRitualDepthUpgradedWithRepository,
 } from '@/features/pause/presentation/session/pause-session-brief-io';
 import { logPauseRitualDepthUpgraded as logDepthUpgradedMock } from '@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 describe('pause-session-brief-io parity', () => {
+  it('presentation I/O binds briefPauseRepository to public-rpc supabasePauseRepository', () => {
+    expect(briefPauseRepository).toBe(supabasePauseRepository);
+  });
+
   it('presentation I/O brief exports match pause-session-brief-flow CI umbrella', () => {
     expect(initialBriefPauseStepFromRestored).toBe(briefStepFromBriefIo);
     expect(initialBriefIntegrateDoneFromRestored).toBe(integrateDoneFromBriefIo);
@@ -52,8 +58,16 @@ describe('pause-session-brief-io parity', () => {
     await pauseBriefRitualDepthUpgraded('pi-brief-parity');
 
     expect(logDepthUpgradedMock).toHaveBeenCalledWith(
-      supabasePauseRepository,
+      briefPauseRepository,
       'pi-brief-parity',
     );
+  });
+
+  it('pauseBriefRitualDepthUpgradedWithRepository forwards injected PauseRepository', async () => {
+    const customRepo = { port: 'injected' } as unknown as typeof supabasePauseRepository;
+
+    await pauseBriefRitualDepthUpgradedWithRepository(customRepo, 'pi-brief-custom');
+
+    expect(logDepthUpgradedMock).toHaveBeenCalledWith(customRepo, 'pi-brief-custom');
   });
 });

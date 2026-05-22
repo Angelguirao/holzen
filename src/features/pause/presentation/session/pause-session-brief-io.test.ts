@@ -11,6 +11,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 import {
+  briefPauseRepository,
   initialBriefIntegrateDoneFromRestored,
   initialBriefPauseStepFromRestored,
   initialRitualEntry,
@@ -41,9 +42,6 @@ describe('pause-session-brief-io', () => {
 
     await pauseBriefRitualDepthUpgraded('pi-brief');
 
-    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith(
-      { port: 'briefRepository' },
-      'pi-brief',
-    );
+    expect(logPauseRitualDepthUpgradedMock).toHaveBeenCalledWith(briefPauseRepository, 'pi-brief');
   });
 });
