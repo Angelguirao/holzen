@@ -4,8 +4,9 @@
  * `pause-reflect-generation-io` → domain + run-reflect-generation; not ambience-flow umbrella).
  * Sibling parity: `pause-reflect-ambience-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io` (presentation + application);
  * `pause-reflect-ambience-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io` (presentation + application);
- * `pause-reflect-flows-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (application
- * `pause-reflect-flows-ambience-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
+ * `pause-reflect-ambience-flows-io-sibling-parity.test.ts` + `flows/pause-reflect-flows-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (application mirrors:
+ * `application/.../ambience/pause-reflect-ambience-flows-io-sibling-parity.test.ts` and
+ * `application/.../flows/pause-reflect-flows-ambience-io-sibling-parity.test.ts`; reciprocal inline pins in
  * `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-ambience-io-parity.test.ts`);
  * `pause-reflect-ambience-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io` (application mirror:
  * `application/.../ambience/pause-reflect-ambience-mood-io-sibling-parity.test.ts`; reciprocal inline:
