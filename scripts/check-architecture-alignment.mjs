@@ -2031,7 +2031,11 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
-  if (rel.endsWith('pause-home-reflect-io.ts') || rel.endsWith('pause-home-reflect-io.test.ts')) {
+  if (
+    rel.endsWith('pause-home-reflect-io.ts') ||
+    rel.endsWith('pause-home-reflect-io.test.ts') ||
+    rel.endsWith('pause-home-reflect-io.re-exports.test.ts')
+  ) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_IO_GENERATION_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(

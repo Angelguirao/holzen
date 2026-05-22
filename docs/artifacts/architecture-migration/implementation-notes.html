@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — presentation Home manual-open reflect I/O identity (backlog #1 complete, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-io</code> unmocked manual-open re-export regression</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-home-reflect-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> identity for manual-open use cases, domain builders, and <code>pauseHomeManualOpenPorts</code> ↔ <code>public-rpc</code> adapters; mocked <code>pause-home-reflect-io.test.ts</code> keeps dismiss delegation. Allowlist re-exports test beside home I/O in <code>check:architecture-alignment</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — dismiss/preview facades unchanged.</dd>
+      <dt>Open question</dt>
+      <dd>Next: session ritual-restore umbrella pins against leaf modules (not session *-flow), or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — presentation reflect share I/O identity split (backlog #1 complete, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
       <dt>Open question</dt>
-      <dd>Next: session ritual-restore umbrella pins against leaf modules (not session *-flow), or Phase B subscription Tier 1 shims.</dd>
+      <dd>None — share I/O identity file landed on branch tip.</dd>
     </dl>
   </article>
 
