@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — colocate session reflect UI PostHog under share/ (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-session-ui-telemetry</code> beside share orchestration</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. After Home manual-open telemetry colocation, move <code>pause-reflect-session-ui-telemetry</code> (+ test) from <code>telemetry/session/</code> to <code>share/</code> (post-it / share / wallpaper taps); <code>pause-reflect-telemetry-flow</code> imports from the share cluster. Presentation still uses <code>presentation/reflect/telemetry/session/pause-reflect-telemetry-io</code> (CI anchor). CI forbids resurrecting <code>application/.../telemetry/session/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session reflect UI PostHog lives beside share PNG/delivery use cases; application <code>telemetry/session/</code> removed. Presentation <code>telemetry/session/</code> I/O shim remains for <code>usePauseReflectUiTelemetry</code> and <code>public-ritual-reflect</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session providers-conductor I/O peel, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — scaffold step-transition via pause-session-shell-io (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
