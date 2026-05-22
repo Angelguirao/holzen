@@ -1,7 +1,7 @@
 import {
   runLogPwaInstallAnalyticsEvent,
   type LogPwaInstallAnalyticsEventInput,
-} from '@/features/pause/application/use-cases/home/run-log-pwa-install-analytics-event';
+} from '@/features/pause/application/use-cases/home/pwa-install/run-log-pwa-install-analytics-event';
 import { supabasePauseAnalyticsRepository } from '@/features/pause/public-rpc';
 
 export type { LogPwaInstallAnalyticsEventInput };

@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — home pwa-install analytics subcluster (backlog #1 verified, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>run-log-pwa-install-analytics-event</code> under <code>home/pwa-install/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no reflect moves. Group PWA install analytics command under <code>application/use-cases/home/pwa-install/</code> (port-backed write stays in application; <code>pwa-install-analytics-query</code> import path updated). Not moved to <code>presentation/home/</code> — infrastructure must not import presentation.</dd>
+      <dt>Deviation</dt>
+      <dd>Subcluster under <code>home/</code> rather than <code>presentation/home/</code> (layering).</dd>
+      <dt>Open question</dt>
+      <dd>Next: steps-flow ↔ pending-offer-flow sibling pins, or Phase B app-shell boot import scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — steps-flow ↔ flows-flow sibling cluster pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + flow comment only.</dd>
       <dt>Open question</dt>
-      <dd>Next: steps-flow ↔ pending-offer-flow sibling pins, or <code>run-log-pwa-install-analytics-event</code> colocation.</dd>
+      <dd>Next: steps-flow ↔ pending-offer-flow sibling pins, or Phase B app-shell boot import scan.</dd>
     </dl>
   </article>
 
