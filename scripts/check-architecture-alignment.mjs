@@ -416,6 +416,16 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IO_GENERATION_FLOW
   "from '../application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow'",
 ];
 
+/** Manual-open telemetry I/O — import leaf trackers only (not pause-home-reflect-telemetry-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IO_HOME_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow',
+  "from './application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow'",
+  "from '../application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow'",
+  "from './manual-open/pause-home-reflect-telemetry-flow'",
+  "from '../manual-open/pause-home-reflect-telemetry-flow'",
+];
+
 /** Manual-open reflect I/O — import via pause-reflect-generation-manual-open-flow only (not generation umbrella). */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_IO_GENERATION_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow',
@@ -1458,10 +1468,17 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-home-reflect-telemetry-io.ts') ||
     rel.endsWith('pause-home-reflect-telemetry-io.test.ts')
   ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IO_HOME_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: manual-open telemetry I/O must import home/manual-open telemetry leaf modules directly (${needle})`,
+        );
+      }
+    }
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IO_GENERATION_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: manual-open telemetry I/O must import via pause-home-reflect-telemetry-flow (${needle})`,
+          `${rel}: manual-open telemetry I/O must not import generation umbrella (${needle})`,
         );
       }
     }
