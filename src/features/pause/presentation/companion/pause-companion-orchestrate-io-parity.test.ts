@@ -15,6 +15,7 @@ vi.mock('@/integrations/supabase/client', () => ({
 vi.mock('@/features/pause/public-rpc', () => ({
   supabaseCompanionOrchestrator: { port: 'companionOrchestrator' },
   supabasePauseRepository: { port: 'companionPauseRepository' },
+  supabasePauseAnalyticsRepository: { port: 'companionAnalyticsRepository' },
 }));
 
 import {
@@ -46,6 +47,18 @@ import {
   trackCompanionGenerationInitiated,
 } from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow';
 import * as orchestrateFlow from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow';
+import {
+  runLogCompanionFeedbackVote as runFeedbackVoteFromAnalyticsFlow,
+  runLogCompanionFullviewOpened as runFullviewOpenedFromAnalyticsFlow,
+} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-analytics-flow';
+import {
+  runLogCompanionFeedbackVote as runFeedbackVoteFromAnalyticsIo,
+  runLogCompanionFullviewOpened as runFullviewOpenedFromAnalyticsIo,
+} from '@/features/pause/presentation/companion/pause-companion-analytics-io';
+import {
+  COMPANION_FULL_VIEW_BREATHING_ROOM_MS as breathingRoomFromFrameUiIo,
+  pauseSeverityToOrchestrateNumber as severityFromFrameUiIo,
+} from '@/features/pause/presentation/companion/pause-companion-frame-ui-io';
 import {
   applyCompanionOrchestrateRetryReset as applyRetryResetFromOrchestrateIo,
   applyCompanionSlotOrchestrateOutcome as applyOutcomeFromOrchestrateIo,
@@ -102,6 +115,31 @@ describe('pause-companion-orchestrate-io parity', () => {
     expect('trackCompanionGenerationInitiated' in orchestrateFlow).toBe(true);
   });
 
+  it('orchestrate-flow CI umbrella composes the same leaf modules as presentation I/O', () => {
+    expect(applyRetryResetFromOrchestrateIo).toBe(applyRetryResetDirect);
+    expect(applyOutcomeFromOrchestrateIo).toBe(applyOutcomeDirect);
+    expect(logInvokeFromOrchestrateIo).toBe(logInvokeDirect);
+    expect(trackGenerationFromOrchestrateIo).toBe(trackGenerationDirect);
+    expect(runSlotOrchestrateFromOrchestrateIo).toBe(runSlotOrchestrateDirect);
+    expect(runInterventionFromOrchestrateIo).toBe(runInterventionDirect);
+  });
+
+  it('orchestrate leaf exports stay namespace-separated from each other', () => {
+    expect(applyRetryResetDirect).not.toBe(applyOutcomeDirect);
+    expect(logInvokeDirect).not.toBe(trackGenerationDirect);
+    expect(setErrorDirect).not.toBe(setLoadingDirect);
+    expect(runSlotOrchestrateDirect).not.toBe(runInterventionDirect);
+    expect(resetInterventionDirect).not.toBe(emptyRelaxationsDirect);
+  });
+
+  it('presentation orchestrate-io stays off frame-ui-io exports', () => {
+    expect('pauseSeverityToOrchestrateNumber' in orchestrateIo).toBe(false);
+    expect('COMPANION_FULL_VIEW_BREATHING_ROOM_MS' in orchestrateIo).toBe(false);
+    expect('getCompanionSectionVisibility' in orchestrateIo).toBe(false);
+    expect(runCompanionSlotOrchestrate).not.toBe(severityFromFrameUiIo);
+    expect(trackCompanionGenerationInitiated).not.toBe(breathingRoomFromFrameUiIo);
+  });
+
   it('orchestrate I/O exports stay distinct from orchestration-flow session load and expansion siblings', () => {
     expect(runCompanionSlotOrchestrate).not.toBe(loadSessionFromOrchestrationFlow);
     expect(runCompanionInterventionBootstrap).not.toBe(nextExpandedFromOrchestrationFlow);
@@ -115,9 +153,12 @@ describe('pause-companion-orchestrate-io parity', () => {
     expect(trackCompanionGenerationInitiated).not.toBe(pauseCompanionUiStepCompletion);
     expect(setCompanionSlotLoading).not.toBe(invalidateCompanionUiCompletionQuery);
     expect(resetInterventionIdempotency).not.toBe(pauseLoadCompanionOrchestrateSession);
+    expect(runSlotOrchestrateFromOrchestrateIo).not.toBe(loadSessionFromOrchestrationFlow);
+    expect(runInterventionFromOrchestrateIo).not.toBe(nextExpandedFromOrchestrationFlow);
     // Reciprocal inline pins: `application/.../ritual/frame/pause-companion-orchestrate-io-parity.test.ts`,
     // `pause-companion-orchestration-io-parity.test.ts`.
-    // Dedicated siblings: `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts` (application + presentation).
+    // Dedicated siblings: `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts` (application + presentation);
+    // `pause-companion-orchestrate-frame-ui-io-sibling-parity.test.ts` (presentation).
   });
 
   it('presentation orchestrate-io stays off orchestration-io session/favorite wrappers', () => {
@@ -126,5 +167,15 @@ describe('pause-companion-orchestrate-io parity', () => {
     expect('nextExpandedWithLazyFetch' in orchestrateIo).toBe(false);
     expect('invalidateCompanionUiCompletionQuery' in orchestrateIo).toBe(false);
     expect('companionOrchestrator' in orchestrateIo).toBe(true);
+  });
+
+  it('orchestrate-flow CI umbrella exports stay distinct from analytics-flow and analytics-io', () => {
+    expect(runCompanionSlotOrchestrate).not.toBe(runFeedbackVoteFromAnalyticsFlow);
+    expect(runCompanionInterventionBootstrap).not.toBe(runFullviewOpenedFromAnalyticsFlow);
+    expect(trackCompanionGenerationInitiated).not.toBe(runFeedbackVoteFromAnalyticsIo);
+    expect(logCompanionSlotOrchestrateInvoke).not.toBe(runFullviewOpenedFromAnalyticsIo);
+    expect(runSlotOrchestrateFromOrchestrateIo).not.toBe(runFeedbackVoteFromAnalyticsIo);
+    // Reciprocal inline pins: `pause-companion-analytics-io-parity.test.ts` (presentation).
+    // Dedicated sibling: `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts` (presentation).
   });
 });
