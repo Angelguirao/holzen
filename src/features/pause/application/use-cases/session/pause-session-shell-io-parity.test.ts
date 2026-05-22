@@ -32,6 +32,11 @@ import {
   isPauseSessionHeaderBackVisible as isHeaderBackVisibleFromShellIo,
   isPauseSessionWaitingForInstanceFetch as isWaitingFromShellIo,
 } from '@/features/pause/presentation/session/pause-session-shell-io';
+import {
+  isTerminalPauseDbState as isTerminalFromTerminalEntryIo,
+  persistedPauseSessionAllowsTerminalEntry as persistedAllowsFromTerminalEntryIo,
+  TERMINAL_PAUSE_DB_STATES as terminalStatesFromTerminalEntryIo,
+} from '@/features/pause/presentation/session/pause-session-terminal-entry-io';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
 /**
@@ -69,5 +74,21 @@ describe('pause-session-shell-io parity (application)', () => {
     expect(hasPersistedPauseSessionPayload(null)).toBe(false);
     expect(hasPersistedFromShellIo(restored)).toBe(hasPersistedDirect(restored));
     expect(hasPersistedFromShellIo(null)).toBe(hasPersistedDirect(null));
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-terminal-entry-io-parity.test.ts` (shell chrome vs terminal guards).
+   * Dedicated sibling file: `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: terminal-entry-io exports stay distinct from shell-io hydration and header-back', () => {
+    expect(computeHydrationFromShellIo).not.toBe(isTerminalFromTerminalEntryIo);
+    expect(computeResolvedFromShellIo).not.toBe(persistedAllowsFromTerminalEntryIo);
+    expect(isHeaderBackVisibleFromShellIo).not.toBe(isTerminalFromTerminalEntryIo);
+    expect(computeHeaderBackFromShellIo).not.toBe(terminalStatesFromTerminalEntryIo);
+    expect(buildMountLogFromShellIo).not.toBe(isTerminalFromTerminalEntryIo);
+    expect(hasPersistedFromShellIo).not.toBe(persistedAllowsFromTerminalEntryIo);
+    expect(isWaitingFromShellIo).not.toBe(isTerminalFromTerminalEntryIo);
+    // Reciprocal inline pins: `application/.../pause-session-terminal-entry-io-parity.test.ts`,
+    // `presentation/session/pause-session-terminal-entry-io-parity.test.ts`.
   });
 });
