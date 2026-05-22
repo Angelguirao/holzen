@@ -29,11 +29,13 @@ import {
   initialEmotionResetUi as resetUiFromMoodIo,
   initialEmotionSelectRollbackUi as rollbackUiFromMoodIo,
   isPauseSessionDepthPickerActive as isDepthPickerActiveFromMoodIo,
+  reflectPauseRepository,
   resolvePauseDepthContextLineParams as resolveDepthLineFromMoodIo,
   resolvePauseSessionChromeCloseAction as resolveChromeCloseFromMoodIo,
   runDeepPausePickerEntryIfPro as runDeepPickerFromMoodIo,
   runPauseSessionChromeCloseAction as runChromeCloseFromMoodIo,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 describe('pause-reflect-mood-io parity', () => {
   it('presentation I/O mood exports match pause-reflect-mood-flow CI umbrella', () => {
@@ -49,5 +51,9 @@ describe('pause-reflect-mood-io parity', () => {
     expect(runPauseSessionChromeCloseAction).toBe(runChromeCloseFromMoodIo);
     expect(runInitialEmotionSelect).toBe(runInitialEmotionSelectDirect);
     expect(runInitialEmotionSkip).toBe(runInitialEmotionSkipDirect);
+  });
+
+  it('presentation I/O binds reflectPauseRepository to public-rpc supabasePauseRepository', () => {
+    expect(reflectPauseRepository).toBe(supabasePauseRepository);
   });
 });
