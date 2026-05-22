@@ -33,6 +33,11 @@ import {
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
   runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
 } from '../flows/pause-reflect-flows-flow';
+import {
+  buildShiftEmotionFrameHubLogBundle as buildHubLogBundleFromHubFlow,
+  resolveShiftFrameHubDonePresentation as resolveHubPresentationFromHubFlow,
+  runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
+} from '../hub/pause-reflect-hub-flow';
 
 describe('pause-reflect-steps-flow', () => {
   it('re-exports step mutations and domain gates from leaf modules', () => {
@@ -67,5 +72,14 @@ describe('pause-reflect-steps-flow', () => {
     expect(runPauseReflectTagUpdate).not.toBe(runOutcomeLogFromFlowsFlow);
     expect(runPauseReflectionStepLogOnce).not.toBe(resolvePreflightFromFlowsFlow);
     expect(shouldLogFromFlow).not.toBe(runOutcomeLogFromFlowsFlow);
+  });
+
+  it('sibling cluster: hub-flow exports stay distinct from steps umbrella exports', () => {
+    expect(runPauseFavoriteToggle).not.toBe(runShiftHubDoneFromHubFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(runShiftHubDoneFromHubFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(buildHubLogBundleFromHubFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(buildHubLogBundleFromHubFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(resolveHubPresentationFromHubFlow);
+    expect(shouldLogFromFlow).not.toBe(resolveHubPresentationFromHubFlow);
   });
 });

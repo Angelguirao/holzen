@@ -17,6 +17,14 @@ import {
   runInitialEmotionSelect as runInitialEmotionSelectFromMoodFlow,
   runInitialEmotionSkip as runInitialEmotionSkipFromMoodFlow,
 } from '../mood/pause-reflect-mood-flow';
+import {
+  runPauseFavoriteToggle as runFavoriteFromStepsFlow,
+  runPauseReflectNoteUpdate as runNoteFromStepsFlow,
+  runPauseReflectTagUpdate as runTagFromStepsFlow,
+  runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
+  shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
+  shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
+} from '../steps/pause-reflect-steps-flow';
 
 describe('pause-reflect-hub-flow', () => {
   it('re-exports hub helpers from domain + leaf RPC use case', () => {
@@ -49,5 +57,14 @@ describe('pause-reflect-hub-flow', () => {
     expect(runShiftEmotionFrameHubDone).not.toBe(runInitialEmotionSelectFromMoodFlow);
     expect(runShiftEmotionFrameHubDone).not.toBe(runInitialEmotionSkipFromMoodFlow);
     expect(resolvePresentationFromFlow).not.toBe(buildFeelTilesFromMoodFlow);
+  });
+
+  it('sibling cluster: steps-flow exports stay distinct from hub umbrella exports', () => {
+    expect(runShiftEmotionFrameHubDone).not.toBe(runFavoriteFromStepsFlow);
+    expect(runShiftEmotionFrameHubDone).not.toBe(runNoteFromStepsFlow);
+    expect(runShiftEmotionFrameHubDone).not.toBe(runTagFromStepsFlow);
+    expect(buildLogBundleFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+    expect(buildLogBundleFromFlow).not.toBe(shouldShowFavoriteFromStepsFlow);
+    expect(resolvePresentationFromFlow).not.toBe(shouldLogFromStepsFlow);
   });
 });
