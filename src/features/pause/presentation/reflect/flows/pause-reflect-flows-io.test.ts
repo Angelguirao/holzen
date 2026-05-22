@@ -20,6 +20,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 import {
+  buildPauseScoreImpacts,
   formatReinforcementQuoteFromSession,
   getSessionQuote,
   pauseReflectOutcomeLog,
@@ -53,6 +54,24 @@ describe('pause-reflect-flows-io', () => {
     });
     expect(view.reflectGenEnabled).toBe(true);
     expect(view.effectiveReflectionMessage).toBe('seed');
+  });
+
+  it('re-exports score-impact builders from pause-reflect-flows-flow', () => {
+    const impacts = buildPauseScoreImpacts(
+      {
+        mood: 'calm',
+        moodAfter: 'calm',
+        breathingCompleted: true,
+        decision: 'hold',
+        context: null,
+        engagedTools: 0,
+        wroteNote: false,
+        usedTags: false,
+      },
+      (key) => key,
+      'brief',
+    );
+    expect(impacts.length).toBeGreaterThan(0);
   });
 
   it('re-exports decide flow helpers from pause-reflect-flows-flow', () => {

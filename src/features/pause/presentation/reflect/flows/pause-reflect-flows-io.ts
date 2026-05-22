@@ -6,29 +6,45 @@
  */
 import type { PauseImpactData } from '@/features/pause/application/use-cases/session/pause-session-decide-flow';
 import {
+  buildPauseScoreImpacts,
   formatReinforcementQuoteFromSession,
   getSessionQuote,
+  parseScoreImpactVolatilityPct,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
+  resolveScoreImpactDisplayImpacts,
+  resolveScoreImpactViewMode,
   runPauseOutcomeLog,
+  scoreImpactMotionDelaySec,
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
+  type PauseScoreImpactRow,
   type PauseSessionReflectAndDecideViewInput,
+  type ScoreImpactVariant,
+  type ScoreImpactViewMode,
 } from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 export {
+  buildPauseScoreImpacts,
   formatReinforcementQuoteFromSession,
   getSessionQuote,
+  parseScoreImpactVolatilityPct,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
+  resolveScoreImpactDisplayImpacts,
+  resolveScoreImpactViewMode,
+  scoreImpactMotionDelaySec,
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
   type PauseImpactData,
+  type PauseScoreImpactRow,
   type PauseSessionReflectAndDecideViewInput,
+  type ScoreImpactVariant,
+  type ScoreImpactViewMode,
 };
 
 /** Default port + use case: decide step `outcome_logged` RPC. */
