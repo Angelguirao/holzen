@@ -1,6 +1,7 @@
 /**
  * CI cluster anchor for companion slot orchestrate presentation I/O (§3 / check:architecture-alignment).
- * Composes orchestrate subcluster anchors; presentation imports via `pause-companion-orchestrate-io.ts`.
+ * Composes orchestrate subcluster anchors (CI cluster detection only).
+ * Presentation: `pause-companion-orchestrate-io.ts` imports ritual/frame leaf modules directly.
  */
 export {
   applyCompanionOrchestrateRetryReset,

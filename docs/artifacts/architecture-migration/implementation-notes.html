@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel pause-companion-orchestrate-io to ritual/frame leaf modules (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestrate-io</code> imports companion orchestrate helpers from leaf modules</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>application/use-cases/companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Route <code>pause-companion-orchestrate-io</code> through <code>run-companion-slot-orchestrate</code>, <code>run-companion-intervention-bootstrap</code>, and sibling apply/retry/outcome/telemetry/ui modules instead of orchestrate subcluster <code>*-flow</code> CI anchors (parity with <code>pause-reflect-flows-io</code> leaf imports on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-companion-orchestrate-flow.ts</code> and orchestrate <code>*-flow</code> anchors remain for cluster detection; <code>companionOrchestrator</code> still re-exported from <code>pause-companion-orchestration-io</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-companion-orchestration-io</code> or <code>pause-companion-frame-ui-io</code> off subcluster flow anchors, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session decide I/O direct domain impact type (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

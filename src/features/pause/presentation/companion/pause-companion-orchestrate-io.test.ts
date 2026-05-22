@@ -4,10 +4,10 @@ const runCompanionSlotOrchestrateMock = vi.hoisted(() => vi.fn());
 const runCompanionInterventionBootstrapMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-flow',
+  '@/features/pause/application/use-cases/ritual/frame/run-companion-slot-orchestrate',
   async (importOriginal) => {
     const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-flow')
+      typeof import('@/features/pause/application/use-cases/ritual/frame/run-companion-slot-orchestrate')
     >();
     return {
       ...actual,
@@ -17,10 +17,10 @@ vi.mock(
 );
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/pause-companion-intervention-orchestrate-flow',
+  '@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap',
   async (importOriginal) => {
     const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/frame/pause-companion-intervention-orchestrate-flow')
+      typeof import('@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap')
     >();
     return {
       ...actual,
@@ -49,7 +49,7 @@ describe('pause-companion-orchestrate-io', () => {
     });
   });
 
-  it('imports slot orchestrate and intervention bootstrap via orchestrate subcluster flow anchors', () => {
+  it('imports slot orchestrate and intervention bootstrap from ritual/frame leaf modules', () => {
     expect(runCompanionSlotOrchestrate).toBe(runCompanionSlotOrchestrateMock);
     expect(runCompanionInterventionBootstrap).toBe(runCompanionInterventionBootstrapMock);
   });
