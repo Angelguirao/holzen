@@ -3,6 +3,7 @@
  * Colocated under `presentation/reflect/generation/manual-open/` (parity with application `generation/manual-open/` cluster).
  * Imports manual-open use cases and domain builders from sibling modules directly
  * (parity with `pause-home-reflect-telemetry-io` → leaf telemetry modules, not manual-open-flow umbrella).
+ * Sibling parity: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`.
  */
 import { dismissOpenPauseHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/dismiss-open-pause-home';
 import { openManualPauseFromHome } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/open-manual-pause-from-home';

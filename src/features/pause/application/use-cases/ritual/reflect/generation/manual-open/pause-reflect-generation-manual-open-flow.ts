@@ -4,7 +4,8 @@
  * Presentation: `pause-home-reflect-io.ts` imports sibling modules directly (CI cluster anchor only; not `pause-reflect-generation-flow` umbrella).
  * Parity: `pause-home-reflect-io-parity.test.ts` and `pause-home-reflect-io.re-exports.test.ts` pin presentation ↔ this anchor.
  * Sibling parity: `pause-reflect-generation-manual-open-flow-sibling-parity.test.ts` ↔ `pause-reflect-generation-flow` /
- * `pause-reflect-generation-hook-flow` (holzen-reflect vs manual-open CI anchors).
+ * `pause-reflect-generation-hook-flow` (holzen-reflect vs manual-open CI anchors);
+ * presentation: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`.
  */
 export {
   buildManualPauseCreateOrReuseParams,
