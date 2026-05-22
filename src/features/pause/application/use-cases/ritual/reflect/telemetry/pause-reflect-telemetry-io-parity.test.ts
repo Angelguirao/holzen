@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
   supabaseReflectGenerator: { port: 'reflectGenerator' },
 }));
 
@@ -28,6 +29,16 @@ import {
   pauseReflectGeneration,
   reflectGenerator,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import {
+  buildPauseScoreImpacts,
+  formatReinforcementQuoteFromSession,
+  getSessionQuote,
+  pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
+  resolvePauseDecideOutcomeFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 
 describe('pause-reflect-telemetry-io parity', () => {
   it('presentation I/O session reflect telemetry matches telemetry CI umbrella', () => {
@@ -52,6 +63,23 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackPostItFromShareFlow).toBe(trackPostItDirect);
     expect(trackShareTapFromShareFlow).toBe(trackShareTapDirect);
     expect(trackWallpaperFromShareFlow).toBe(trackWallpaperDirect);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (session UI telemetry vs reflect+decide).
+   * Dedicated sibling file: `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: flows-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseReflectOutcomeLog);
+    expect(trackPauseReflectShareTap).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(trackPauseReflectWallpaperTap).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(trackPauseReflectPostItOpen).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
+    expect(trackPauseReflectShareTap).not.toBe(formatReinforcementQuoteFromSession);
+    expect(trackPauseReflectWallpaperTap).not.toBe(resolvePauseDecideOutcomeFlow);
+    expect(trackPauseReflectPostItOpen).not.toBe(getSessionQuote);
+    expect(trackPauseReflectShareTap).not.toBe(buildPauseScoreImpacts);
+    // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts`.
+    // Full pins: `pause-reflect-flows-telemetry-io-sibling-parity.test.ts`.
   });
 
   /**

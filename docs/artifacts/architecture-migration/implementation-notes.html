@@ -29944,4 +29944,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — application flows-io ↔ telemetry-io sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-telemetry-io-sibling-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add application-layer sibling parity so reflect+decide <code>pause-reflect-flows-io</code> stays namespace-separated from session reflect UI telemetry <code>pause-reflect-telemetry-io</code> (parity with presentation sibling test and flow-level <code>pause-reflect-flows-telemetry-flow-sibling-parity</code>). Extend reciprocal inline pins on <code>pause-reflect-flows-io-parity.test.ts</code> and <code>pause-reflect-telemetry-io-parity.test.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comment anchors only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or remaining session presentation I/O re-exports parity gaps.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
