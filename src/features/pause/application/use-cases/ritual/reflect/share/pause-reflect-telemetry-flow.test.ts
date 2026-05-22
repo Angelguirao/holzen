@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  trackPauseReflectPostItOpen as trackPostItDirect,
+  trackPauseReflectShareTap as trackShareTapDirect,
+  trackPauseReflectWallpaperTap as trackWallpaperDirect,
+} from './pause-reflect-session-ui-telemetry';
+
+import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
@@ -11,5 +17,9 @@ describe('pause-reflect-telemetry-flow', () => {
     expect(typeof trackPauseReflectPostItOpen).toBe('function');
     expect(typeof trackPauseReflectShareTap).toBe('function');
     expect(typeof trackPauseReflectWallpaperTap).toBe('function');
+
+    expect(trackPauseReflectPostItOpen).toBe(trackPostItDirect);
+    expect(trackPauseReflectShareTap).toBe(trackShareTapDirect);
+    expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperDirect);
   });
 });
