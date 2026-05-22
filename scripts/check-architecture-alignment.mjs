@@ -356,6 +356,13 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_SEGMENT_LOG_IMPORTS = [
   "from '../application/use-cases/ritual/breathe/run-breath-segment-log'",
 ];
 
+/** Session breath presentation — import segment RPC dedupe flags via breath-flow anchor only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_RPC_FLAGS_IMPORTS = [
+  '@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags',
+  "from './domain/ritual/breathe/initial-breath-segment-rpc-flags'",
+  "from '../domain/ritual/breathe/initial-breath-segment-rpc-flags'",
+];
+
 /** Deep session telemetry in presentation/session — use pending-offer flow anchor via telemetry-io. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_TELEMETRY_IMPORTS = [
   '@/features/pause/application/use-cases/session/pause-session-telemetry',
@@ -516,6 +523,16 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_SEGMENT_LOG_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session breath segment-log import (${needle})`);
+      }
+    }
+    if (
+      !rel.endsWith('pause-session-breath-io.ts') &&
+      !rel.endsWith('pause-session-breath-io.test.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_RPC_FLAGS_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy session breath rpc-flags import (${needle})`);
+        }
       }
     }
   }

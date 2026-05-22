@@ -2,6 +2,7 @@
  * CI cluster anchor for session breath segment RPC (§3 / check:architecture-alignment).
  * Use cases live in sibling modules; re-export for presentation breath I/O imports.
  */
+export { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags';
 export {
   runEnsureBreathSegment1Logged,
   runEnsureBreathSegment2Logged,
