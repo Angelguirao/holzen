@@ -32837,4 +32837,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — home-reflect-io session telemetry namespace pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>presentation/reflect/generation/manual-open/pause-home-reflect-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete. Parallel slices already added session reflect telemetry-io sibling <code>.not.toBe</code> pins; extend colocated presentation <code>pause-home-reflect-io-parity</code> with <code>in homeReflectIo</code> namespace checks for PostHog trackers (parity with application mirror and pending-offer-io hygiene slice).</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B Tier 1 lib shim scan, or session scaffold-io application parity.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
