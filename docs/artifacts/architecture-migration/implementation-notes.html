@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — steps-flow ↔ hub-flow sibling cluster pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-flow.test.ts</code> + <code>pause-reflect-hub-flow.test.ts</code> + <code>pause-reflect-steps-hub-flow-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Reciprocal <code>.not.toBe</code> pins on steps/hub flow tests plus dedicated sibling-parity test asserting namespace separation (parity with <code>pause-reflect-hub-mood-flow-sibling-parity.test.ts</code>). Document cross-test references on flow modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: steps-flow ↔ pending-offer-flow sibling pins, <code>*WithRepository</code> delegation on steps-io parity, or Phase B app-shell boot import scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — home pwa-install analytics subcluster (backlog #1 verified, Tier 4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>Subcluster under <code>home/</code> rather than <code>presentation/home/</code> (layering).</dd>
       <dt>Open question</dt>
-      <dd>Next: steps-flow ↔ pending-offer-flow sibling pins, or Phase B app-shell boot import scan.</dd>
+      <dd>Superseded by steps↔hub slice for reflect “next”; see latest note.</dd>
     </dl>
   </article>
 
@@ -86,7 +103,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + flow comment only.</dd>
       <dt>Open question</dt>
-      <dd>Next: steps-flow ↔ pending-offer-flow sibling pins, or Phase B app-shell boot import scan.</dd>
+      <dd>Superseded by steps↔hub slice for “next” ordering; see latest note.</dd>
     </dl>
   </article>
 
