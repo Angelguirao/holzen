@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session ritual-restore flow leaf identity pins (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-ritual-restore-flow</code> pins leaf modules, not session *-flow umbrellas</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-session-ritual-restore-flow.test.ts</code> so <code>.toBe(direct)</code> identity targets <code>restored-*-ritual-state</code> + <code>initial-ritual-entry</code> + domain <code>mapPersistedStep</code> (parity with presentation <code>pause-session-ritual-restore-io</code> importing siblings off the restore-flow umbrella).</dd>
+      <dt>Deviation</dt>
+      <dd>None — restore-flow exports unchanged; test no longer asserts through <code>pause-session-breath-flow</code> / decide / frame / brief umbrellas.</dd>
+      <dt>Open question</dt>
+      <dd>Next: remaining session breath umbrella sibling pins, <code>ritual/frame</code> typeof-only leaf flows, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — presentation Home manual-open reflect I/O identity (backlog #1 complete, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — dismiss/preview facades unchanged.</dd>
       <dt>Open question</dt>
-      <dd>Next: session ritual-restore umbrella pins against leaf modules (not session *-flow), or Phase B subscription Tier 1 shims.</dd>
+      <dd>None — home manual-open I/O identity file landed on branch tip.</dd>
     </dl>
   </article>
 

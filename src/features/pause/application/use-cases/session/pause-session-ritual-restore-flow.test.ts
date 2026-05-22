@@ -3,20 +3,20 @@ import { describe, expect, it } from 'vitest';
 import { mapPersistedStep } from '@/features/pause/domain/session/map-persisted-step';
 
 import {
-  initialBreathingFirstCompletedFromRestored as initialBreathFirstFromBreathFlow,
-  initialBreathingSecondCompletedFromRestored as initialBreathSecondFromBreathFlow,
-} from '../ritual/breathe/pause-session-breath-flow';
+  initialBreathingFirstCompletedFromRestored as initialBreathFirstFromBreathLeaf,
+  initialBreathingSecondCompletedFromRestored as initialBreathSecondFromBreathLeaf,
+} from '../ritual/breathe/restored-breath-ritual-state';
 import {
-  initialDecisionFromRestored as initialDecisionFromDecideFlow,
-  initialPhaseFromRestored as initialPhaseFromDecideFlow,
-} from './pause-session-decide-flow';
-import { initialFrameDoneFromRestored as initialFrameDoneFromFrameFlow } from './pause-session-frame-flow';
+  initialDecisionFromRestored as initialDecisionFromDecideLeaf,
+  initialPhaseFromRestored as initialPhaseFromDecideLeaf,
+} from '../ritual/decide/restored-decide-ritual-state';
+import { initialFrameDoneFromRestored as initialFrameDoneFromFrameLeaf } from '../ritual/frame/restored-frame-ritual-state';
+import { initialRitualEntry as initialRitualEntryFromLeaf } from './initial-ritual-entry';
 import {
-  initialBriefIntegrateDoneFromRestored as initialBriefIntegrateDoneFromBriefFlow,
-  initialBriefPauseStepFromRestored as initialBriefPauseStepFromBriefFlow,
-  initialRitualEntry as initialRitualEntryFromBriefFlow,
-  initialSelectedBriefFaceFromRestored as initialSelectedBriefFaceFromBriefFlow,
-} from './pause-session-brief-flow';
+  initialBriefIntegrateDoneFromRestored as initialBriefIntegrateDoneFromBriefLeaf,
+  initialBriefPauseStepFromRestored as initialBriefPauseStepFromBriefLeaf,
+  initialSelectedBriefFaceFromRestored as initialSelectedBriefFaceFromBriefLeaf,
+} from './restored-brief-ritual-state';
 import {
   initialBreathingFirstCompletedFromRestored as initialBreathFirstFromFlow,
   initialBreathingSecondCompletedFromRestored as initialBreathSecondFromFlow,
@@ -32,7 +32,7 @@ import {
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
 describe('pause-session-ritual-restore-flow', () => {
-  it('re-exports ritual restore helpers from domain + session subcluster CI anchors', () => {
+  it('re-exports ritual restore helpers from domain + ritual/session leaf modules (not session *-flow umbrellas)', () => {
     expect(typeof mapPersistedStepFromFlow).toBe('function');
     expect(typeof initialBreathFirstFromFlow).toBe('function');
     expect(typeof initialBreathSecondFromFlow).toBe('function');
@@ -45,18 +45,18 @@ describe('pause-session-ritual-restore-flow', () => {
     expect(typeof initialRitualEntryFromFlow).toBe('function');
 
     expect(mapPersistedStepFromFlow).toBe(mapPersistedStep);
-    expect(initialBreathFirstFromFlow).toBe(initialBreathFirstFromBreathFlow);
-    expect(initialBreathSecondFromFlow).toBe(initialBreathSecondFromBreathFlow);
-    expect(initialDecisionFromFlow).toBe(initialDecisionFromDecideFlow);
-    expect(initialPhaseFromFlow).toBe(initialPhaseFromDecideFlow);
-    expect(initialFrameDoneFromFlow).toBe(initialFrameDoneFromFrameFlow);
-    expect(initialBriefPauseStepFromFlow).toBe(initialBriefPauseStepFromBriefFlow);
-    expect(initialBriefIntegrateDoneFromFlow).toBe(initialBriefIntegrateDoneFromBriefFlow);
-    expect(initialSelectedBriefFaceFromFlow).toBe(initialSelectedBriefFaceFromBriefFlow);
-    expect(initialRitualEntryFromFlow).toBe(initialRitualEntryFromBriefFlow);
+    expect(initialBreathFirstFromFlow).toBe(initialBreathFirstFromBreathLeaf);
+    expect(initialBreathSecondFromFlow).toBe(initialBreathSecondFromBreathLeaf);
+    expect(initialDecisionFromFlow).toBe(initialDecisionFromDecideLeaf);
+    expect(initialPhaseFromFlow).toBe(initialPhaseFromDecideLeaf);
+    expect(initialFrameDoneFromFlow).toBe(initialFrameDoneFromFrameLeaf);
+    expect(initialBriefPauseStepFromFlow).toBe(initialBriefPauseStepFromBriefLeaf);
+    expect(initialBriefIntegrateDoneFromFlow).toBe(initialBriefIntegrateDoneFromBriefLeaf);
+    expect(initialSelectedBriefFaceFromFlow).toBe(initialSelectedBriefFaceFromBriefLeaf);
+    expect(initialRitualEntryFromFlow).toBe(initialRitualEntryFromLeaf);
   });
 
-  it('re-exports restored breath hydration via pause-session-breath-flow', () => {
+  it('re-exports restored breath hydration via restored-breath-ritual-state', () => {
     const restored = makeTestPersistedPauseSession({
       breathingFirstCompleted: true,
       breathingSecondCompleted: false,
@@ -67,7 +67,7 @@ describe('pause-session-ritual-restore-flow', () => {
     expect(initialBreathFirstFromFlow(null)).toBe(false);
   });
 
-  it('re-exports restored decide hydration via pause-session-decide-flow', () => {
+  it('re-exports restored decide hydration via restored-decide-ritual-state', () => {
     const restored = makeTestPersistedPauseSession({
       decision: 'hold',
       phase: 'decide',
@@ -78,12 +78,12 @@ describe('pause-session-ritual-restore-flow', () => {
     expect(initialDecisionFromFlow(null)).toBeNull();
   });
 
-  it('re-exports restored frame hydration via pause-session-frame-flow', () => {
+  it('re-exports restored frame hydration via restored-frame-ritual-state', () => {
     expect(initialFrameDoneFromFlow(makeTestPersistedPauseSession({ frameDone: true }))).toBe(true);
     expect(initialFrameDoneFromFlow(null)).toBe(false);
   });
 
-  it('re-exports restored brief hydration via pause-session-brief-flow', () => {
+  it('re-exports restored brief hydration via restored-brief-ritual-state + initial-ritual-entry', () => {
     const restored = makeTestPersistedPauseSession({
       ritualDepth: 'brief',
       briefStep: 'integrate',
