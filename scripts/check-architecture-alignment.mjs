@@ -953,6 +953,19 @@ const LEGACY_PAUSE_REFLECT_SHARE_FLOW_SUBCLUSTER_IMPORTS = [
   "from '../pause-reflect-telemetry-flow'",
 ];
 
+/** Reflect share orchestration umbrella — compose leaf modules only (not share subcluster flow anchors). */
+const LEGACY_PAUSE_REFLECT_SHARE_ORCHESTRATION_FLOW_SUBCLUSTER_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-image-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-text-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-channel-urls-flow',
+  "from './pause-reflection-share-image-flow'",
+  "from '../pause-reflection-share-image-flow'",
+  "from './pause-reflection-share-text-flow'",
+  "from '../pause-reflection-share-text-flow'",
+  "from './pause-reflection-share-channel-urls-flow'",
+  "from '../pause-reflection-share-channel-urls-flow'",
+];
+
 /** Reflect share I/O — import via share subcluster flows only (not pause-reflect-share-orchestration-flow). */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_IO_ORCHESTRATION_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow',
@@ -2169,6 +2182,18 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: reflect share umbrella flow must import domain + leaf modules directly (${needle})`,
+        );
+      }
+    }
+  }
+  if (
+    rel ===
+    'src/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow.ts'
+  ) {
+    for (const needle of LEGACY_PAUSE_REFLECT_SHARE_ORCHESTRATION_FLOW_SUBCLUSTER_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect share orchestration umbrella flow must import leaf modules directly (${needle})`,
         );
       }
     }
