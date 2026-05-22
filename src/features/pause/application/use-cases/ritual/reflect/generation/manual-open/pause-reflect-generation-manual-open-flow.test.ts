@@ -25,6 +25,16 @@ import {
 } from './pause-reflect-generation-manual-open-flow';
 import { runOpenManualPauseSilentModeAfterCreate as runSilentModeDirect } from './run-open-manual-pause-silent-mode-after-create';
 import { runPersistSilentReflectionStub as runPersistStubDirect } from './run-persist-silent-reflection-stub';
+import {
+  buildManualPauseCreateOrReuseParams as buildCreateOrReuseFromGenerationFlow,
+  buildManualPauseMarketContext as buildMarketFromGenerationFlow,
+  buildManualPauseOpenParams as buildOpenFromGenerationFlow,
+  dismissOpenPauseHome as dismissFromGenerationFlow,
+  MANUAL_PAUSE_VOLATILITY_TEMPLATE as volatilityTemplateFromGenerationFlow,
+  openManualPauseFromHome as openManualFromGenerationFlow,
+  runOpenManualPauseSilentModeAfterCreate as runSilentModeFromGenerationFlow,
+  runPersistSilentReflectionStub as runPersistStubFromGenerationFlow,
+} from '../pause-reflect-generation-flow';
 
 describe('pause-reflect-generation-manual-open-flow', () => {
   it('re-exports manual-open domain builders and Home use cases from siblings', () => {
@@ -45,5 +55,16 @@ describe('pause-reflect-generation-manual-open-flow', () => {
     expect(openManualPauseFromHome).toBe(openManualDirect);
     expect(runOpenManualPauseSilentModeAfterCreate).toBe(runSilentModeDirect);
     expect(runPersistSilentReflectionStub).toBe(runPersistStubDirect);
+  });
+
+  it('manual-open subcluster bindings match generation presentation umbrella (leaf parity)', () => {
+    expect(buildCreateOrReuseFromFlow).toBe(buildCreateOrReuseFromGenerationFlow);
+    expect(buildOpenFromFlow).toBe(buildOpenFromGenerationFlow);
+    expect(buildMarketFromFlow).toBe(buildMarketFromGenerationFlow);
+    expect(volatilityTemplateFromFlow).toBe(volatilityTemplateFromGenerationFlow);
+    expect(dismissOpenPauseHome).toBe(dismissFromGenerationFlow);
+    expect(openManualPauseFromHome).toBe(openManualFromGenerationFlow);
+    expect(runOpenManualPauseSilentModeAfterCreate).toBe(runSilentModeFromGenerationFlow);
+    expect(runPersistSilentReflectionStub).toBe(runPersistStubFromGenerationFlow);
   });
 });
