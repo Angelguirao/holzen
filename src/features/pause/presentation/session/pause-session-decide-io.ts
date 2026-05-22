@@ -1,5 +1,5 @@
 /**
  * Session presentation I/O for decide outcome impact types (ritual state, step bundles).
- * Re-exports `PauseImpactData` via reflect+decide flows I/O (parity with reflect flows cluster).
+ * Re-exports `PauseImpactData` via `pause-session-decide-flow` (session decide beat).
  */
-export type { PauseImpactData } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+export type { PauseImpactData } from '@/features/pause/application/use-cases/session/pause-session-decide-flow';
