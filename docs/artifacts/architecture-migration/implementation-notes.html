@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect hub-flow cluster re-export test (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-flow</code> CI compose anchor has unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder moves this slice. Add <code>pause-reflect-hub-flow.test.ts</code> beside the umbrella anchor (parity with <code>pause-session-persisted-tab-session-flow.test.ts</code>) so hub compose re-exports stay regression-tested after hub I/O leaf peels.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test-only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-hub-io</code> still imports domain + <code>run-shift-emotion-frame-hub-done</code> directly; umbrella flow remains CI-only for cluster detection.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate remaining decide flow anchors under <code>ritual/decide/</code>, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — colocate decide outcome-log flow anchor under ritual/decide (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -90,7 +109,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-shift-emotion-*-flow</code> and <code>pause-shift-frame-hub-presentation-flow</code> remain on disk as CI subcluster anchors; nothing imports them except optional future consumers.</dd>
       <dt>Open questions</dt>
-      <dd>Next: companion orchestrate-io telemetry leaf peel, reflect flows/mood umbrella flow peels, or Phase B subscription Tier 1 shim.</dd>
+      <dd>Superseded by hub-flow unit test slice on branch tip.</dd>
     </dl>
   </article>
 
@@ -109,7 +128,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-session-persisted-tab-session-flow</code> remains application cluster re-export for CI; session/reflect/home conductors still import <code>pause-persisted-tab-session-io</code> only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: session shell or scaffold subcluster I/O peels (header-back, mount log, persist-snapshot siblings).</dd>
+      <dd>Superseded — shell/scaffold I/O already import session leaf modules via <code>pause-session-shell-io</code> / <code>pause-session-scaffold-io</code> on branch tip.</dd>
     </dl>
   </article>
 
