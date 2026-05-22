@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — presentation reflect share I/O identity pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-share-io.test.ts</code> pins domain builder re-exports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend allowlisted <code>pause-reflect-share-io.test.ts</code> with <code>.toBe(direct)</code> identity for domain share builders (parity with telemetry I/O <code>*.re-exports.test.ts</code>). Separate <code>*.re-exports.test.ts</code> not used — <code>check:architecture-alignment</code> only allowlists <code>pause-reflect-share-io.ts</code> + <code>.test.ts</code> for deep share imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; share hook still imports share-io only.</dd>
+      <dt>Tradeoff</dt>
+      <dd>Identity pins live in the allowlisted I/O test file (not a sibling <code>*.re-exports.test.ts</code>) so CI import guards stay satisfied.</dd>
+      <dt>Open question</dt>
+      <dd>Next: reflect generation/mood/steps/flows/pending-offer I/O re-export pins, companion orchestrate umbrella pins, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session ritual-restore umbrella subcluster identity pins (backlog #1 complete, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoff</dt>
       <dd>Restore umbrella documents composed session subcluster surface without changing presentation import paths.</dd>
       <dt>Open question</dt>
-      <dd>Next: companion orchestrate umbrella subcluster pins or Phase B subscription Tier 1 shims.</dd>
+      <dd>Superseded by share-io slice on branch tip.</dd>
     </dl>
   </article>
 
@@ -90,7 +109,7 @@
       <dt>Tradeoff</dt>
       <dd>Hub umbrella test documents subcluster CI surface without changing presentation import paths.</dd>
       <dt>Open question</dt>
-      <dd>Next: remaining session umbrella pins or Phase B subscription Tier 1 shims.</dd>
+      <dd>Superseded by share-io slice on branch tip.</dd>
     </dl>
   </article>
 
@@ -109,7 +128,7 @@
       <dt>Tradeoff</dt>
       <dd>Umbrella test now documents full CI cluster surface on one anchor without changing presentation import paths.</dd>
       <dt>Open question</dt>
-      <dd>Next: Phase B subscription Tier 1 shim when pause Tier 5 identity pins are quiet.</dd>
+      <dd>Superseded by share-io slice on branch tip.</dd>
     </dl>
   </article>
 
@@ -128,7 +147,7 @@
       <dt>Tradeoff</dt>
       <dd>Home I/O spans two manual-open leaf modules — identity test asserts each export against its source leaf.</dd>
       <dt>Open question</dt>
-      <dd>Next: Phase B subscription Tier 1 shim when pause Tier 5 identity pins are quiet.</dd>
+      <dd>Superseded by share-io slice on branch tip.</dd>
     </dl>
   </article>
 
