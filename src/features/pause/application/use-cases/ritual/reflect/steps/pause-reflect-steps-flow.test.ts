@@ -4,6 +4,20 @@ import { shouldLogPauseReflectionStep } from '@/features/pause/domain/reflect/st
 import { shouldShowFavoriteProHint } from '@/features/pause/domain/reflect/steps/favorite-toggle';
 
 import {
+  runPauseFavoriteToggle as runFavoriteFromFavoriteFlow,
+  shouldShowFavoriteProHint as shouldShowFavoriteFromFavoriteFlow,
+} from './pause-favorite-toggle-flow';
+import {
+  runPauseReflectNoteUpdate as runNoteFromNoteFlow,
+} from './pause-reflect-note-flow';
+import {
+  runPauseReflectTagUpdate as runTagFromTagFlow,
+} from './pause-reflect-tag-flow';
+import {
+  runPauseReflectionStepLogOnce as runReflectionStepFromLogFlow,
+  shouldLogPauseReflectionStep as shouldLogFromLogFlow,
+} from './pause-reflection-step-log-flow';
+import {
   runPauseFavoriteToggle,
   runPauseReflectNoteUpdate,
   runPauseReflectTagUpdate,
@@ -31,5 +45,14 @@ describe('pause-reflect-steps-flow', () => {
     expect(runPauseReflectionStepLogOnce).toBe(runReflectionStepDirect);
     expect(shouldShowFavoriteFromFlow).toBe(shouldShowFavoriteProHint);
     expect(shouldLogFromFlow).toBe(shouldLogPauseReflectionStep);
+  });
+
+  it('umbrella bindings match steps subcluster CI anchors (leaf parity)', () => {
+    expect(runPauseFavoriteToggle).toBe(runFavoriteFromFavoriteFlow);
+    expect(shouldShowFavoriteFromFlow).toBe(shouldShowFavoriteFromFavoriteFlow);
+    expect(runPauseReflectNoteUpdate).toBe(runNoteFromNoteFlow);
+    expect(runPauseReflectTagUpdate).toBe(runTagFromTagFlow);
+    expect(runPauseReflectionStepLogOnce).toBe(runReflectionStepFromLogFlow);
+    expect(shouldLogFromFlow).toBe(shouldLogFromLogFlow);
   });
 });
