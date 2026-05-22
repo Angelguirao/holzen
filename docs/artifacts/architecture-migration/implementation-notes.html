@@ -22953,4 +22953,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect steps application cluster marker (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Backlog #1 complete; steps CI cluster marker</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete on <code>cursor/arch-migrate-src-ca70</code> — no folder moves. Add empty <code>ritual-reflect-steps-cluster</code> module + regression test beside <code>pause-reflect-steps-flow</code> (parity with ambience, pending-offer, telemetry cluster markers).</dd>
+      <dt>Deviation</dt>
+      <dd>None — marker documents existing I/O boundaries; <code>pause-reflect-steps-io</code> still imports <code>run-*</code> leaves directly.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Hub, mood, share, flows, generation subclusters still lack application cluster markers until follow-up slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: cluster marker for another <code>ritual/reflect/</code> subfolder, colocate remaining query key modules, or session shell/scaffold I/O peels.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
