@@ -7,15 +7,15 @@ import {
 } from './pause-reflect-session-ui-telemetry';
 
 import {
-  trackPauseReflectPostItOpen as trackPostItFromShareFlow,
-  trackPauseReflectShareTap as trackShareTapFromShareFlow,
-  trackPauseReflectWallpaperTap as trackWallpaperFromShareFlow,
-} from '../share/pause-reflect-share-flow';
-import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
 } from './pause-pending-offer-telemetry-flow';
+import {
+  trackPauseReflectPostItOpen as trackPostItFromShareFlow,
+  trackPauseReflectShareTap as trackShareTapFromShareFlow,
+  trackPauseReflectWallpaperTap as trackWallpaperFromShareFlow,
+} from '../share/pause-reflect-share-flow';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
