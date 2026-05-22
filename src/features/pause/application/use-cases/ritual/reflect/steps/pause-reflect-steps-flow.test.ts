@@ -90,6 +90,20 @@ describe('pause-reflect-steps-flow', () => {
     expect(shouldLogFromFlow).toBe(shouldLogFromLogFlow);
   });
 
+  it('sibling cluster: note-flow and tag-flow exports stay distinct from steps umbrella-only bindings', () => {
+    expect(runPauseFavoriteToggle).not.toBe(runNoteFromNoteFlow);
+    expect(runPauseFavoriteToggle).not.toBe(runTagFromTagFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(runFavoriteFromFavoriteFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(runFavoriteFromFavoriteFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(runTagFromTagFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(runNoteFromNoteFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(runNoteFromNoteFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(runTagFromTagFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(runNoteFromNoteFlow);
+    expect(shouldLogFromFlow).not.toBe(runTagFromTagFlow);
+    // Full cross-flow pins: `pause-reflect-steps-note-tag-flow-sibling-parity.test.ts`.
+  });
+
   it('sibling cluster: flows-flow exports stay distinct from steps umbrella exports', () => {
     expect(runPauseFavoriteToggle).not.toBe(resolvePreflightFromFlowsFlow);
     expect(runPauseFavoriteToggle).not.toBe(runOutcomeLogFromFlowsFlow);
