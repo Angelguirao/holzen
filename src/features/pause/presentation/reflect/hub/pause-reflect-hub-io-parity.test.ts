@@ -56,7 +56,15 @@ import {
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
-/** Presentation-layer hub I/O parity (colocated beside `pause-reflect-hub-io.ts`). */
+/**
+ * Presentation hub I/O parity (colocated beside `pause-reflect-hub-io.ts`).
+ * Steps-io sibling pins: `pause-reflect-steps-hub-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (steps cluster).
+ * Flows-io sibling pins: `pause-reflect-flows-hub-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (flows cluster).
+ * Generation-io sibling pins: `pause-reflect-generation-hub-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (generation cluster).
+ */
 describe('pause-reflect-hub-io parity', () => {
   it('presentation I/O hub exports match pause-reflect-hub-flow CI umbrella', () => {
     expect(buildShiftEmotionFrameHubLogBundle).toBe(buildLogBundleFromHubIo);
