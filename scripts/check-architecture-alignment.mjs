@@ -2207,7 +2207,11 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
-  if (rel.endsWith('pause-ritual-done-io.ts') || rel.endsWith('pause-ritual-done-io.test.ts')) {
+  if (
+    rel.endsWith('pause-ritual-done-io.ts') ||
+    rel.endsWith('pause-ritual-done-io.test.ts') ||
+    rel.endsWith('pause-ritual-done-io.re-exports.test.ts')
+  ) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_IO_UMBRELLA_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
@@ -2482,7 +2486,8 @@ for (const file of walkTs(join(root, 'src'))) {
   }
   if (
     rel.endsWith('pause-ritual-done-io.ts') ||
-    rel.endsWith('pause-ritual-done-io.test.ts')
+    rel.endsWith('pause-ritual-done-io.test.ts') ||
+    rel.endsWith('pause-ritual-done-io.re-exports.test.ts')
   ) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_IO_UMBRELLA_FLOW_IMPORTS) {
       if (text.includes(needle)) {
@@ -2502,7 +2507,8 @@ for (const file of walkTs(join(root, 'src'))) {
   if (rel.startsWith('src/features/pause/presentation/ritual/done/')) {
     if (
       !rel.endsWith('pause-ritual-done-io.ts') &&
-      !rel.endsWith('pause-ritual-done-io.test.ts')
+      !rel.endsWith('pause-ritual-done-io.test.ts') &&
+      !rel.endsWith('pause-ritual-done-io.re-exports.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {

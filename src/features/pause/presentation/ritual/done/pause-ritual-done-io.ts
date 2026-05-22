@@ -18,7 +18,7 @@ export const reflectPauseRepository = supabasePauseRepository;
 export function pausePostPauseEmotionLogIfDirty(
   input: Parameters<typeof runPostPauseEmotionLogIfDirty>[1],
 ): ReturnType<typeof runPostPauseEmotionLogIfDirty> {
-  return runPostPauseEmotionLogIfDirty(supabasePauseRepository, input);
+  return runPostPauseEmotionLogIfDirty(reflectPauseRepository, input);
 }
 
 /** Test seam: inject a custom `PauseRepository`. */

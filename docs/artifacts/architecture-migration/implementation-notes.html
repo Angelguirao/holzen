@@ -93,6 +93,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — ritual done presentation I/O repository pin (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-ritual-done-io</code> <code>reflectPauseRepository</code> routing + re-exports pin</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route <code>pausePostPauseEmotionLogIfDirty</code> through exported <code>reflectPauseRepository</code> (was calling <code>supabasePauseRepository</code> directly while tests mocked both to the same object). Add <code>pause-ritual-done-io.re-exports.test.ts</code> with <code>.toBe(supabasePauseRepository)</code> binding (parity with reflect flows/mood I/O).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; <code>pausePostPauseEmotionLogIfDirtyWithRepository</code> seam unchanged.</dd>
+      <dt>Open question</dt>
+      <dd>Next: <code>pause-companion-orchestration-io.re-exports.test.ts</code>, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — companion orchestrate presentation I/O identity (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
