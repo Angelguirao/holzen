@@ -1330,9 +1330,13 @@ for (const file of walkTs(join(root, 'src'))) {
         failures.push(`${rel}: reflect generation umbrella flow must compose manual-open subcluster (${needle})`);
       }
     }
-    for (const needle of LEGACY_PAUSE_REFLECT_GENERATION_FLOW_TELEMETRY_IMPORTS) {
+    for (const needle of [
+      '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow',
+      "from './manual-open/pause-home-reflect-telemetry-flow'",
+      ...LEGACY_PAUSE_REFLECT_GENERATION_FLOW_TELEMETRY_IMPORTS,
+    ]) {
       if (text.includes(needle)) {
-        failures.push(`${rel}: reflect generation umbrella flow must compose manual-open telemetry subcluster (${needle})`);
+        failures.push(`${rel}: reflect generation umbrella flow must not compose PostHog (${needle})`);
       }
     }
   }

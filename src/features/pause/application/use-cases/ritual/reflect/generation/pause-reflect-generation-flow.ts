@@ -1,8 +1,9 @@
 /**
  * CI cluster anchor for ritual reflect generation presentation I/O (§3 / check:architecture-alignment).
- * Composes holzen-reflect hook + Home manual-open subclusters (+ manual-open PostHog).
- * Presentation: `pause-reflect-generation-io.ts` and `pause-home-reflect-io.ts` import
- * through this anchor; `pause-home-reflect-telemetry-io.ts` imports `pause-home-reflect-telemetry-flow`.
+ * Composes holzen-reflect hook + Home manual-open subcluster (PostHog stays on `pause-home-reflect-telemetry-flow`).
+ * Presentation: `pause-reflect-generation-io.ts` imports through this anchor;
+ * `pause-home-reflect-io.ts` imports `pause-reflect-generation-manual-open-flow`;
+ * `pause-home-reflect-telemetry-io.ts` imports `pause-home-reflect-telemetry-flow`.
  */
 export {
   messageFromReflectGenerationResult,
@@ -40,12 +41,3 @@ export {
   type TrackManualPauseInstanceCreatedPayload,
   type TrackPauseManualCompletedPayload,
 } from './manual-open/pause-reflect-generation-manual-open-flow';
-export {
-  markPauseManualStartedHomeOnce,
-  trackHomePendingPauseBannerPauseOpened,
-  trackManualPauseInstanceCreated,
-  trackPauseManualCompleted,
-  trackPauseOpenDismissed,
-  type OpenPauseStateForAnalytics,
-  type PauseDismissAnalyticsSurface,
-} from './manual-open/pause-home-reflect-telemetry-flow';
