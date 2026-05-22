@@ -116,25 +116,6 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A — Home manual-open I/O via generation manual-open flow anchor (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-home-reflect-io</code> imports manual-open cluster via <code>pause-reflect-generation-manual-open-flow</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route Home manual-open presentation I/O through <code>pause-reflect-generation-manual-open-flow</code> instead of scattered <code>generation/manual-open/</code> and <code>domain/reflect/generation/</code> imports (parity with reflect share/mood/flows/hub I/O peels). <code>applyManualPauseOpenResult</code>, default ports, and dismiss preview facades stay on presentation I/O.</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior parity; import boundary only.</dd>
-      <dt>Tradeoffs</dt>
-      <dd>Flow anchor remains a re-export barrel for <code>check:architecture-alignment</code> manual-open cluster detection; I/O test mocks the anchor path for <code>dismissOpenPauseHome</code> only.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: peel remaining session I/O off zero-import flow anchors when safe, or Phase B cross-context Tier 1 shim.</dd>
-    </dl>
-  </article>
-
-  <article class="note">
-    <header>
-      <span>2026-05-21</span>
       <span>Phase A — reflect generation + ambience I/O via application anchors (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -147,11 +128,7 @@
       <dt>Tradeoffs</dt>
       <dd>Generation I/O test mocks the hook-flow anchor path (same seam as mood-flow). Ambience anchor remains a thin re-export for alignment cluster detection.</dd>
       <dt>Open questions</dt>
-<<<<<<< HEAD
-      <dd>Next: companion orchestrate-io peel to <code>ritual/frame/</code> flow anchor, or Phase B subscription Tier 1 shim.</dd>
-=======
-      <dd>Next: companion orchestration-io peel, or Phase B subscription Tier 1 shim.</dd>
->>>>>>> 85d7f731c (refactor(pause): route companion orchestration I/O via flow anchor)
+      <dd>Next: companion frame-ui / analytics I/O through frame flow anchors, or Phase B subscription Tier 1 shim.</dd>
     </dl>
   </article>
 
