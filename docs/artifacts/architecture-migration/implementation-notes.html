@@ -59,6 +59,7 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+<<<<<<< HEAD
       <span>Phase A — reflect share I/O ↔ share-flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -87,6 +88,19 @@
       <dd>None — tests only.</dd>
       <dt>Open question</dt>
       <dd>Superseded by share-io ↔ share-flow parity slice (same day).</dd>
+=======
+      <span>Phase A — companion orchestration I/O ↔ orchestration-flow (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestration-io.re-exports.test.ts</code> orchestration-flow parity</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Extend companion orchestration presentation I/O re-export test with <code>.toBe(direct)</code> identity against <code>pause-companion-orchestration-flow</code> for <code>loadCompanionOrchestrateSession</code> and <code>nextExpandedWithLazyFetch</code> (parity with <code>pause-reflect-mood-io</code> ↔ <code>pause-reflect-mood-flow</code>; <code>invalidateCompanionUiCompletionQuery</code> stays infrastructure-only on I/O). Add application-layer <code>pause-companion-orchestration-io-parity.test.ts</code>. Exempt re-exports test from orchestration-flow import guard in <code>check:architecture-alignment</code>; production I/O still imports ritual/frame leaf modules directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + CI allowlist only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: optional <code>pause-run-breath-segment-log-flow</code> CI anchor, <code>pause-companion-orchestrate-io</code> ↔ orchestrate-flow presentation parity, or Phase B subscription Tier 1 shims.</dd>
+>>>>>>> 500ca4aa2 (test(pause): pin orchestration-io exports to orchestration-flow)
     </dl>
   </article>
 
