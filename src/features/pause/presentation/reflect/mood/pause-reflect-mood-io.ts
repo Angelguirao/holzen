@@ -2,7 +2,8 @@
  * Reflect mood beat presentation I/O (feel tiles, depth picker, chrome close, initial emotion RPC).
  * Imports domain mood leaf modules and `run-initial-emotion-log` directly (parity with
  * `pause-reflect-hub-io` → domain + leaf use case).
- * Wrapper delegation pins: pause-reflect-mood-io-parity.test.ts (default + *WithRepository seams).
+ * Wrapper delegation pins: pause-reflect-mood-io-parity.test.ts (default + *WithRepository seams;
+ * flows-io + hub-io reciprocal inline pins).
  * Sibling surface pins: `pause-reflect-steps-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`,
  * `pause-reflect-generation-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`,
  * `pause-reflect-mood-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
