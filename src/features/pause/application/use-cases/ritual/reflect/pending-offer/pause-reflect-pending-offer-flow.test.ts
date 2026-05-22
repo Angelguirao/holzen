@@ -46,6 +46,15 @@ import {
   runReflectGeneration as runReflectGenerationFromGenerationFlow,
 } from '../generation/pause-reflect-generation-flow';
 import {
+  buildPauseScoreImpacts as buildImpactsFromFlowsFlow,
+  formatReinforcementQuoteFromSession as formatQuoteFromFlowsFlow,
+  getSessionQuote as getQuoteFromFlowsFlow,
+  resolvePauseDecideOutcomeFlow as resolveOutcomeFromFlowsFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromFlowsFlow,
+  resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
+  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
+} from '../flows/pause-reflect-flows-flow';
+import {
   buildShiftEmotionFrameHubLogBundle as buildLogBundleFromHubFlow,
   resolveShiftFrameHubDonePresentation as resolvePresentationFromHubFlow,
   runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
@@ -140,5 +149,21 @@ describe('pause-reflect-pending-offer-flow', () => {
     expect(trackAdoptedFromFlow).not.toBe(runShiftHubDoneFromHubFlow);
     expect(trackDeclinedFromFlow).not.toBe(buildLogBundleFromHubFlow);
     expect(trackAbandonedFromFlow).not.toBe(resolvePresentationFromHubFlow);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-flow.test.ts` (pending-offer vs reflect+decide).
+   * Dedicated sibling file: `pause-reflect-flows-pending-offer-flow-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: flows-flow exports stay distinct from pending-offer umbrella exports', () => {
+    expect(runAdoptPendingPauseOffer).not.toBe(resolvePreflightFromFlowsFlow);
+    expect(runDeclinePendingPauseOffer).not.toBe(resolveAfterGenFromFlowsFlow);
+    expect(getDisplayFromFlow).not.toBe(runOutcomeLogFromFlowsFlow);
+    expect(trackAdoptedFromFlow).not.toBe(buildImpactsFromFlowsFlow);
+    expect(trackDeclinedFromFlow).not.toBe(formatQuoteFromFlowsFlow);
+    expect(trackAbandonedFromFlow).not.toBe(getQuoteFromFlowsFlow);
+    expect(runAdoptPendingPauseOffer).not.toBe(resolveOutcomeFromFlowsFlow);
+    expect(runDeclinePendingPauseOffer).not.toBe(runOutcomeLogFromFlowsFlow);
+    // Reciprocal inline pins: `pause-reflect-flows-flow.test.ts`.
   });
 });

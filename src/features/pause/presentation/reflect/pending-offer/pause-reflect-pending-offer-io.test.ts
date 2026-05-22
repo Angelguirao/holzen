@@ -14,6 +14,16 @@ import {
   shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
+  buildPauseScoreImpacts,
+  formatReinforcementQuoteFromSession,
+  getSessionQuote,
+  pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
+  resolvePauseDecideOutcomeFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
@@ -170,5 +180,22 @@ describe('pause-reflect-pending-offer-io', () => {
     expect(reflectPauseRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
     // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-ambience-io.test.ts`;
     // frame-focus bed vs pending-offer RPC: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io.test.ts` (pending-offer RPC vs reflect+decide).
+   * Dedicated sibling file: `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: flows-io exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(getPendingPauseOfferDisplay).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
+    expect(pauseDeclinePendingOffer).not.toBe(buildPauseScoreImpacts);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(formatReinforcementQuoteFromSession);
+    expect(getPendingPauseOfferDisplay).not.toBe(getSessionQuote);
+    expect(pauseAdoptPendingOffer).not.toBe(resolvePauseDecideOutcomeFlow);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseReflectOutcomeLog);
+    // Reciprocal inline pins: `pause-reflect-flows-io.test.ts`.
   });
 });

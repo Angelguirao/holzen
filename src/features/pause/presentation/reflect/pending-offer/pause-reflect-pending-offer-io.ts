@@ -13,7 +13,8 @@
  * `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
  * `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`;
  * `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`;
- * reciprocal inline pins on `pause-reflect-pending-offer-io.test.ts` ↔ `pause-reflect-ambience-io.test.ts` (RPC vs frame-focus Web Audio bed),
+ * reciprocal inline pins on `pause-reflect-pending-offer-io.test.ts` ↔ `pause-reflect-flows-io.test.ts` (pending-offer RPC vs reflect+decide),
+ * ↔ `pause-reflect-ambience-io.test.ts` (RPC vs frame-focus Web Audio bed),
  * ↔ `pause-reflect-pending-offer-telemetry-io.test.ts` (RPC vs pending-offer telemetry),
  * ↔ `pause-reflect-telemetry-io.test.ts` (session reflect UI telemetry),
  * ↔ `pause-reflect-steps-io.test.ts` (RPC vs post-it step mutations).
