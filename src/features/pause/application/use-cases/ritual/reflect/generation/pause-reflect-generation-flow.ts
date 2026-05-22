@@ -4,7 +4,7 @@
  * (not holzen-reflect / manual-open subcluster flow anchors; PostHog stays on telemetry-flow modules).
  * Sibling cluster anchor: `pause-reflect-ambience-flow` (frame-focus bed; presentation via `pause-reflect-ambience-io`).
  * Presentation: `pause-reflect-generation-io.ts` and `pause-home-reflect-io.ts` import leaf modules directly.
- * `pause-reflect-generation-io.re-exports.test.ts` and `pause-reflect-generation-io-parity.test.ts` (incl. `pauseReflectGeneration` wrapper delegation);
+ * `pause-reflect-generation-io.re-exports.test.ts` and `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts` (incl. `pauseReflectGeneration` wrapper delegation);
  * Sibling parity: `pause-reflect-ambience-generation-flow-sibling-parity.test.ts` ↔ `pause-reflect-ambience-flow`;
  * inline pins: `pause-reflect-ambience-flow.test.ts`, `pause-reflect-generation-flow.test.ts` ↔ `pause-reflect-flows-flow.test.ts`;
  * `pause-reflect-steps-generation-flow-sibling-parity.test.ts` (steps-flow ↔ generation-flow; reciprocal inline pins in `pause-reflect-steps-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts`);
@@ -14,8 +14,8 @@
  * `pause-reflect-generation-hook-flow-sibling-parity.test.ts` (generation-flow ↔ holzen-reflect hook-flow);
  * `pause-reflect-generation-manual-open-flow-sibling-parity.test.ts` (generation-flow ↔ manual-open-flow);
  * `pause-reflect-generation-share-flow-sibling-parity.test.ts` (generation-flow ↔ share-flow);
- * `pause-reflect-generation-share-io-sibling-parity.test.ts` (generation-io ↔ share-io; application + presentation; reciprocal inline pins in `pause-reflect-generation-io-parity.test.ts` ↔ `pause-reflect-share-io-parity.test.ts`);
- * `pause-reflect-steps-generation-io-sibling-parity.test.ts` (steps-io ↔ generation-io; application + presentation; reciprocal inline pins in `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-generation-io-parity.test.ts`);
+ * `pause-reflect-generation-share-io-sibling-parity.test.ts` (generation-io ↔ share-io; application + presentation; reciprocal inline pins in `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts` ↔ `pause-reflect-share-io-parity.test.ts`);
+ * `pause-reflect-steps-generation-io-sibling-parity.test.ts` (steps-io ↔ generation-io; application + presentation; reciprocal inline pins in `pause-reflect-steps-io-parity.test.ts` ↔ `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`);
  * `pause-reflect-generation-telemetry-flow-sibling-parity.test.ts` (generation-flow ↔ telemetry-flow);
  * `pause-reflect-generation-mood-flow-sibling-parity.test.ts` (generation-flow ↔ mood-flow);
  * `pause-reflect-generation-pending-offer-flow-sibling-parity.test.ts` (generation-flow ↔ pending-offer-flow).

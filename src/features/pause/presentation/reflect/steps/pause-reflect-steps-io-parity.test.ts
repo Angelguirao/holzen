@@ -45,7 +45,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
  * Steps-io ↔ telemetry-io: `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts`.
  * Steps-io ↔ generation-io: `pause-reflect-steps-generation-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts`.
+ * reciprocal inline pins ↔ `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
  * Steps-io ↔ pending-offer-io: `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
  */
@@ -387,7 +387,7 @@ describe('pause-reflect-steps-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (step RPC wrappers vs holzen-reflect).
+   * Reciprocal inline pins ↔ `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts` (step RPC wrappers vs holzen-reflect).
    * Dedicated sibling file: `pause-reflect-steps-generation-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: generation-io exports stay distinct from steps-io wrappers', () => {
@@ -402,7 +402,7 @@ describe('pause-reflect-steps-io parity', () => {
     expect(shouldShowFromStepsIo).not.toBe(reflectGenerationPrerequisite);
     expect(shouldLogFromStepsIo).not.toBe(shouldCommitReflectGeneration);
     expect(reflectPauseRepository).not.toBe(reflectGenerator);
-    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
     // Full pins: `pause-reflect-steps-generation-io-sibling-parity.test.ts`.
   });
 
