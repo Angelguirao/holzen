@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for ritual reflect share — PNG orchestration (§3).
  * Branded canvas render + native share/download for presentation I/O.
- * Presentation: `pause-reflect-share-io.ts` imports `run-reflection-share-image` directly (not this anchor).
+ * Presentation: `pause-reflect-share-io.ts` imports leaf modules directly (not this anchor).
  */
 export type {
   DeliverReflectionShareImageDeps,
