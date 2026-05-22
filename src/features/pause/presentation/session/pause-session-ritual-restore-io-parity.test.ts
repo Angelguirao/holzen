@@ -41,6 +41,9 @@ import {
   mapPersistedStep as mapPersistedStepFromRestoreIo,
 } from '@/features/pause/presentation/session/pause-session-ritual-restore-io';
 
+/**
+ * Ritual-restore CI umbrella ↔ presentation I/O delegation parity (colocated beside `pause-session-ritual-restore-io.ts`).
+ */
 describe('pause-session-ritual-restore-io parity', () => {
   it('presentation I/O ritual restore exports match session-ritual-restore-flow CI umbrella', () => {
     expect(mapPersistedStep).toBe(mapPersistedStepFromRestoreIo);
