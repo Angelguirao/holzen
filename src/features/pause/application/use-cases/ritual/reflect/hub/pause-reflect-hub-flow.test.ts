@@ -8,6 +8,9 @@ import {
   resolveShiftFrameHubDonePresentation as resolvePresentationFromFlow,
   runShiftEmotionFrameHubDone,
 } from './pause-reflect-hub-flow';
+import { buildShiftEmotionFrameHubLogBundle as buildLogBundleFromLogFlow } from './pause-shift-emotion-log-flow';
+import { runShiftEmotionFrameHubDone as runShiftHubDoneFromDoneFlow } from './pause-shift-emotion-frame-hub-done-flow';
+import { resolveShiftFrameHubDonePresentation as resolvePresentationFromPresentationFlow } from './pause-shift-frame-hub-presentation-flow';
 import { runShiftEmotionFrameHubDone as runShiftHubDoneDirect } from './run-shift-emotion-frame-hub-done';
 
 describe('pause-reflect-hub-flow', () => {
@@ -19,6 +22,12 @@ describe('pause-reflect-hub-flow', () => {
     expect(buildLogBundleFromFlow).toBe(buildShiftEmotionFrameHubLogBundle);
     expect(resolvePresentationFromFlow).toBe(resolveShiftFrameHubDonePresentation);
     expect(runShiftEmotionFrameHubDone).toBe(runShiftHubDoneDirect);
+  });
+
+  it('umbrella bindings match hub subcluster CI anchors (domain leaf parity)', () => {
+    expect(buildLogBundleFromFlow).toBe(buildLogBundleFromLogFlow);
+    expect(resolvePresentationFromFlow).toBe(resolvePresentationFromPresentationFlow);
+    expect(runShiftEmotionFrameHubDone).toBe(runShiftHubDoneFromDoneFlow);
   });
 
   it('builds a stable shift_emotion log bundle', () => {
