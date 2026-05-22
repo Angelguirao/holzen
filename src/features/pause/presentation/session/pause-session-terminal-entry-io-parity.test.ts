@@ -1,3 +1,7 @@
+/**
+ * Presentation I/O parity for session terminal-entry cluster (colocated beside
+ * `pause-session-terminal-entry-io.ts`; application `pause-session-terminal-entry-flow` stays CI umbrella).
+ */
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
