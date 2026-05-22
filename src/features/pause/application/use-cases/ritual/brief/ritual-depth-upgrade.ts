@@ -1,3 +1,8 @@
+/**
+ * Brief → deep `ritual_depth_upgraded` step log.
+ * Presentation RPC: `pause-session-brief-io` → `pauseBriefRitualDepthUpgraded`
+ * (parity: `pause-session-brief-io-parity.test.ts`).
+ */
 import { logPauseStep } from '@/features/pause/application/use-cases/ritual/log/log-pause-step';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { ritualDepthUpgradedPayload } from './ritual-depth-upgrade-payload';

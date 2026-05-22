@@ -26218,26 +26218,26 @@
       <dt>Tradeoffs</dt>
       <dd>Regression guard without merging generation and ambience CI umbrellas or changing presentation I/O leaf imports.</dd>
       <dt>Open questions</dt>
-      <dd>Next: remaining session presentation I/O parity (terminal-entry, step-handlers, scaffold, brief) or Phase B subscription Tier 1 shims.</dd>
+      <dd>Next: remaining session presentation I/O parity (terminal-entry, step-handlers, scaffold) or Phase B subscription Tier 1 shims.</dd>
     </dl>
   </article>
 
   <article class="note">
     <header>
       <span>2026-05-22</span>
-      <span>Phase A — session brief-io ↔ brief-flow application parity (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — session brief-io repository parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-session-brief-io-parity.test.ts</code> + re-exports identity pins</h3>
+    <h3><code>briefPauseRepository</code> on <code>pause-session-brief-io</code> + extended application parity</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add application-layer <code>pause-session-brief-io-parity.test.ts</code> and presentation <code>pause-session-brief-io.re-exports.test.ts</code> so <code>pause-session-brief-io</code> exports match <code>pause-session-brief-flow</code> CI umbrella and session brief leaf modules (<code>restored-brief-ritual-state</code>, <code>initial-ritual-entry</code>; parity with frame-io / ritual-restore-io session pins). Production brief I/O keeps direct leaf imports.</dd>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Export <code>briefPauseRepository</code> on <code>presentation/session/pause-session-brief-io.ts</code> (parity with <code>homeBulkHoldPauseRepository</code>) and extend <code>application/use-cases/session/pause-session-brief-io-parity.test.ts</code> with repository binding + <code>pauseBriefRitualDepthUpgradedWithRepository</code> delegation (complements existing re-exports + flow-umbrella pins).</dd>
       <dt>Deviation</dt>
-      <dd>None — tests + flow comment only.</dd>
+      <dd>None — presentation export + tests only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Parity pins one hydration export on the CI umbrella; re-exports test covers additional leaf identity without importing <code>pause-session-brief-flow</code> from presentation except allowlisted re-exports test.</dd>
+      <dd>Named repository export keeps session brief RPC parity consistent with Home bulk-hold and reflect mood/hub I/O without importing <code>pause-session-brief-flow</code> from production hooks.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Tier 1 <code>holzen-query-client-ref</code> lib ↔ <code>public-queries</code> re-export parity test, session ritual-restore-io extended pins, or Phase B cross-context Tier 1 shims.</dd>
+      <dd>Next: move <code>home/bulk-hold/group-by-local-day</code> under <code>presentation/home/</code>, Tier 1 <code>holzen-query-client-ref</code> shim peel, or Phase B cross-context Tier 1 scan.</dd>
     </dl>
   </article>
 

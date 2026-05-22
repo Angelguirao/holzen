@@ -21,11 +21,14 @@ export {
   initialSelectedBriefFaceFromRestored,
 };
 
+/** Default `PauseRepository` for session brief presentation hooks. */
+export const briefPauseRepository = supabasePauseRepository;
+
 /** Default port + use case: brief → deep `ritual_depth_upgraded` step log. */
 export function pauseBriefRitualDepthUpgraded(
   pauseInstanceId: string,
 ): ReturnType<typeof logPauseRitualDepthUpgraded> {
-  return logPauseRitualDepthUpgraded(supabasePauseRepository, pauseInstanceId);
+  return logPauseRitualDepthUpgraded(briefPauseRepository, pauseInstanceId);
 }
 
 /** Test seam: inject a custom `PauseRepository`. */
