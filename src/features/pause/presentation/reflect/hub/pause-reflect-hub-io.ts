@@ -21,7 +21,8 @@
  * `pause-reflect-flows-hub-io-sibling-parity.test.ts` under `application/.../flows/`);
  * `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io` (application mirror:
  * `application/.../hub/pause-reflect-hub-telemetry-io-sibling-parity.test.ts`; reciprocal inline:
- * `pause-reflect-hub-io-parity.test.ts` ↔ `pause-reflect-telemetry-io-parity.test.ts`).
+ * `pause-reflect-hub-io-parity.test.ts` ↔ `pause-reflect-telemetry-io-parity.test.ts`),
+ * `pause-reflect-hub-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-hub-flow` (presentation + application).
  */
 import { runShiftEmotionFrameHubDone } from '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
 import { buildShiftEmotionFrameHubLogBundle } from '@/features/pause/domain/reflect/hub/shift-emotion-log';

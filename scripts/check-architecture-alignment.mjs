@@ -2613,7 +2613,8 @@ for (const file of walkTs(join(root, 'src'))) {
   ) {
     if (
       !rel.endsWith('pause-reflect-hub-io.re-exports.test.ts') &&
-      !rel.endsWith('pause-reflect-hub-io-parity.test.ts')
+      !rel.endsWith('pause-reflect-hub-io-parity.test.ts') &&
+      !rel.endsWith('pause-reflect-hub-flow-io-wrapper-sibling-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_UMBRELLA_FLOW_IMPORTS) {
         if (text.includes(needle)) {
@@ -2650,7 +2651,8 @@ for (const file of walkTs(join(root, 'src'))) {
       !rel.endsWith('pause-reflect-hub-io.ts') &&
       !rel.endsWith('pause-reflect-hub-io.test.ts') &&
       !rel.endsWith('pause-reflect-hub-io.re-exports.test.ts') &&
-      !rel.endsWith('pause-reflect-hub-io-parity.test.ts')
+      !rel.endsWith('pause-reflect-hub-io-parity.test.ts') &&
+      !rel.endsWith('pause-reflect-hub-flow-io-wrapper-sibling-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {
