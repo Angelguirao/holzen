@@ -2,6 +2,7 @@
  * Reflect share presentation I/O — plain-text/channel builders (domain) + PNG orchestration (application).
  * Imports domain builders and `run-reflection-share-image` directly (parity with
  * `pause-reflect-pending-offer-io` → leaf RPC/display modules).
+ * Parity: `pause-reflect-hub-share-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`.
  */
 import {
   runReflectionShareImage,
