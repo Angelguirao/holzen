@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect steps/share/tag/note/mood tests via presentation I/O (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Extend <code>importActual</code> mocks to remaining reflect hook and I/O tests</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. After favorite-toggle / reflection-step-log / port-lock peels, align <code>pause-reflect-steps-io.test</code>, share + telemetry I/O tests, tag/note hooks, and mood-chrome handlers with <code>importActual</code> on <code>*-io</code> modules (stub <code>public-rpc</code> where steps-io loads repository ports).</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only boundary tightening; production import graph unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Share I/O test now exercises real channel URL builders from the flow anchor instead of inline stubs.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session pending-offer telemetry presentation peel or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — breath step navigation via pause-session-breath-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

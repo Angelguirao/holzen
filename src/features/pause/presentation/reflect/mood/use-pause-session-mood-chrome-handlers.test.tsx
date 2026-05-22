@@ -25,10 +25,18 @@ const {
   };
 });
 
-vi.mock('./pause-reflect-mood-io', () => ({
-  resolvePauseSessionChromeCloseAction: resolvePauseSessionChromeCloseActionMock,
-  runPauseSessionChromeCloseAction: runPauseSessionChromeCloseActionMock,
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
 }));
+
+vi.mock('./pause-reflect-mood-io', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./pause-reflect-mood-io')>();
+  return {
+    ...actual,
+    resolvePauseSessionChromeCloseAction: resolvePauseSessionChromeCloseActionMock,
+    runPauseSessionChromeCloseAction: runPauseSessionChromeCloseActionMock,
+  };
+});
 
 vi.mock('../steps/use-pause-favorite-toggle', () => ({
   usePauseFavoriteToggle: usePauseFavoriteToggleMock,

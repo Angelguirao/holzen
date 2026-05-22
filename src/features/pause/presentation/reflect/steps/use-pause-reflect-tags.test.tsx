@@ -7,9 +7,18 @@ const { pauseReflectTagUpdateMock, emptyTags } = vi.hoisted(() => ({
   emptyTags: [] as string[],
 }));
 
-vi.mock('./pause-reflect-steps-io', () => ({
-  pauseReflectTagUpdate: pauseReflectTagUpdateMock,
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectStepsRepository' },
+  reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' },
 }));
+
+vi.mock('./pause-reflect-steps-io', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./pause-reflect-steps-io')>();
+  return {
+    ...actual,
+    pauseReflectTagUpdate: pauseReflectTagUpdateMock,
+  };
+});
 
 vi.mock('@/features/auth/public', () => ({
   useAuth: () => ({ user: null, loading: false }),
