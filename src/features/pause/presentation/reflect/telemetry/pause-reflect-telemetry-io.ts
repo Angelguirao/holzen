@@ -12,7 +12,7 @@
  * `pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ pending-offer telemetry-io,
  * `pause-reflect-share-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io` (application mirror:
  * `application/.../share/pause-reflect-share-telemetry-io-sibling-parity.test.ts`; reciprocal inline:
- * `pause-reflect-telemetry-io-parity.test.ts` ↔ `pause-reflect-share-io-parity.test.ts`), and
+ * application `pause-reflect-telemetry-io-parity.test.ts` ↔ presentation `pause-reflect-share-io-parity.test.ts`), and
  * `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`, and
  * `pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts` ↔ `pause-home-reflect-telemetry-io`,
  * `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (presentation + application;

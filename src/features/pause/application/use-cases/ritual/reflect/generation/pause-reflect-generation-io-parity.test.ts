@@ -189,7 +189,7 @@ describe('pause-reflect-generation-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` (holzen-reflect vs share builders).
+   * Reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts` (holzen-reflect vs share builders).
    * Dedicated sibling file: `pause-reflect-generation-share-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: share-io exports stay distinct from generation-io', () => {
@@ -200,7 +200,7 @@ describe('pause-reflect-generation-io parity', () => {
     expect(messageFromReflectGenerationResult).not.toBe(buildReflectionShareWhatsAppUrl);
     expect(reflectGenerator).not.toBe(pauseReflectionShareImage);
     expect(shouldCommitReflectGeneration).not.toBe(buildReflectionShareText);
-    // Reciprocal inline pins: `pause-reflect-share-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
     // Full pins: `pause-reflect-generation-share-io-sibling-parity.test.ts`.
   });
 

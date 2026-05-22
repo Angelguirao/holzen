@@ -56,7 +56,7 @@ import {
 /**
  * Application-layer telemetry I/O parity. Share-io sibling:
  * `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts`.
+ * reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
  */
 describe('pause-reflect-telemetry-io parity', () => {
   it('presentation I/O session reflect telemetry matches telemetry CI umbrella', () => {
@@ -126,7 +126,7 @@ describe('pause-reflect-telemetry-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` (session UI telemetry vs share builders).
+   * Reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts` (session UI telemetry vs share builders).
    * Dedicated sibling file: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: share-io exports stay distinct from session reflect telemetry-io', () => {
@@ -136,6 +136,6 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackPostItFromTelemetryIo).not.toBe(buildReflectionShareTweetUrl);
     expect(trackShareTapFromTelemetryIo).not.toBe(buildReflectionShareWhatsAppUrl);
     expect(trackWallpaperFromTelemetryIo).not.toBe(pauseReflectionShareImage);
-    // Reciprocal inline pins: `pause-reflect-share-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
   });
 });
