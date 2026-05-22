@@ -1238,6 +1238,31 @@ const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_IO_SUBCLUSTER_FLOW_IMPOR
   "from '../application/use-cases/ritual/frame/pause-companion-ui-completion-flow'",
 ];
 
+/** Companion orchestrate umbrella — compose leaf modules only (not orchestrate subcluster flow anchors). */
+const LEGACY_PAUSE_COMPANION_ORCHESTRATE_FLOW_SUBCLUSTER_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-retry-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-outcome-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-slot-apply-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-intervention-orchestrate-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-telemetry-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-ui-flow',
+  "from './pause-companion-orchestrate-retry-flow'",
+  "from '../pause-companion-orchestrate-retry-flow'",
+  "from './pause-companion-orchestrate-outcome-flow'",
+  "from '../pause-companion-orchestrate-outcome-flow'",
+  "from './pause-companion-orchestrate-slot-apply-flow'",
+  "from '../pause-companion-orchestrate-slot-apply-flow'",
+  "from './pause-companion-intervention-orchestrate-flow'",
+  "from '../pause-companion-intervention-orchestrate-flow'",
+  "from './pause-companion-slot-orchestrate-telemetry-flow'",
+  "from '../pause-companion-slot-orchestrate-telemetry-flow'",
+  "from './pause-companion-slot-orchestrate-flow'",
+  "from '../pause-companion-slot-orchestrate-flow'",
+  "from './pause-companion-slot-orchestrate-ui-flow'",
+  "from '../pause-companion-slot-orchestrate-ui-flow'",
+];
+
 /** Companion orchestrate I/O — import via orchestrate subcluster flows only (not pause-companion-orchestrate-flow umbrella). */
 const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATE_IO_UMBRELLA_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow',
@@ -2194,6 +2219,17 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: reflect share orchestration umbrella flow must import leaf modules directly (${needle})`,
+        );
+      }
+    }
+  }
+  if (
+    rel === 'src/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow.ts'
+  ) {
+    for (const needle of LEGACY_PAUSE_COMPANION_ORCHESTRATE_FLOW_SUBCLUSTER_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: companion orchestrate umbrella flow must import leaf modules directly (${needle})`,
         );
       }
     }
