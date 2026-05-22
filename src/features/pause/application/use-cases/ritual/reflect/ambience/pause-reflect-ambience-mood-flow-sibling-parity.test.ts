@@ -18,6 +18,7 @@ import * as ambienceFlow from './pause-reflect-ambience-flow';
  * Sibling parity: ambience-flow vs mood-flow CI anchors (parity with
  * `pause-reflect-ambience-generation-flow-sibling-parity.test.ts` and
  * `pause-reflect-mood-pending-offer-flow-sibling-parity.test.ts`).
+ * Presentation mirror: `presentation/reflect/ambience/pause-reflect-ambience-mood-flow-sibling-parity.test.ts`.
  */
 describe('pause-reflect-ambience-flow ↔ pause-reflect-mood-flow sibling parity', () => {
   it('ambience-flow and mood-flow are distinct sibling CI anchors', () => {

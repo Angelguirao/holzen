@@ -32,6 +32,13 @@ import {
   trackPauseReflectShareTap as trackShareTapFromShareFlow,
   trackPauseReflectWallpaperTap as trackWallpaperFromShareFlow,
 } from '../share/pause-reflect-share-flow';
+import {
+  applyBriefDepthPickerRitualEntry as applyBriefFromMoodFlow,
+  buildFeelTilesMoodLogOptions as buildFeelTilesFromMoodFlow,
+  resolvePauseSessionChromeCloseAction as resolveChromeCloseFromMoodFlow,
+  runInitialEmotionSelect as runSelectFromMoodFlow,
+  runInitialEmotionSkip as runSkipFromMoodFlow,
+} from '../mood/pause-reflect-mood-flow';
 
 import {
   startPauseReflectFrameFocusAmbience,
@@ -94,5 +101,19 @@ describe('pause-reflect-ambience-flow', () => {
     expect(stopPauseReflectFrameFocusAmbience).not.toBe(trackShareTapFromShareFlow);
     expect(startPauseReflectFrameFocusAmbience).not.toBe(trackWallpaperFromShareFlow);
     // Full cross-flow pins: `pause-reflect-ambience-share-flow-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-mood-flow.test.ts` (ambience-flow cluster).
+   * Dedicated sibling file: `pause-reflect-ambience-mood-flow-sibling-parity.test.ts`
+   * (+ presentation mirror under `presentation/reflect/ambience/`).
+   */
+  it('sibling cluster: mood-flow exports stay distinct from ambience-flow exports', () => {
+    expect(startPauseReflectFrameFocusAmbience).not.toBe(runSelectFromMoodFlow);
+    expect(stopPauseReflectFrameFocusAmbience).not.toBe(runSkipFromMoodFlow);
+    expect(startPauseReflectFrameFocusAmbience).not.toBe(buildFeelTilesFromMoodFlow);
+    expect(stopPauseReflectFrameFocusAmbience).not.toBe(applyBriefFromMoodFlow);
+    expect(startPauseReflectFrameFocusAmbience).not.toBe(resolveChromeCloseFromMoodFlow);
+    // Full cross-flow pins: `pause-reflect-ambience-mood-flow-sibling-parity.test.ts`.
   });
 });

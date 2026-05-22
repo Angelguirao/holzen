@@ -22,6 +22,7 @@ import * as shareFlow from '@/features/pause/application/use-cases/ritual/reflec
  * uses `pause-reflect-ambience-io` / `pause-reflect-share-io` leaf bindings).
  * Application source: `application/.../ambience/pause-reflect-ambience-share-flow-sibling-parity.test.ts`.
  * Share-anchored mirror: `application/.../share/pause-reflect-share-ambience-flow-sibling-parity.test.ts`.
+ * Mood sibling: `pause-reflect-ambience-mood-flow-sibling-parity.test.ts` (application + presentation).
  * I/O sibling: `pause-reflect-ambience-share-io-sibling-parity.test.ts` (application + presentation).
  */
 describe('pause-reflect-ambience-flow ↔ pause-reflect-share-flow sibling parity (presentation)', () => {
