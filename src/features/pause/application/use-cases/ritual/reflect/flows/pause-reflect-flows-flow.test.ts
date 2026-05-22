@@ -61,6 +61,11 @@ import {
   shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
 } from '../steps/pause-reflect-steps-flow';
 import {
+  trackPauseReflectPostItOpen as trackPostItFromTelemetryFlow,
+  trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
+  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
+} from '../telemetry/pause-reflect-telemetry-flow';
+import {
   buildFeelTilesMoodLogOptions as buildFeelTilesFromMoodFlow,
   runInitialEmotionSelect as runEmotionSelectFromMoodFlow,
   runInitialEmotionSkip as runEmotionSkipFromMoodFlow,
@@ -184,6 +189,7 @@ describe('pause-reflect-flows-flow', () => {
     expect(resolveOutcomeFlowFromFlow).not.toBe(trackShareTapFromTelemetryFlow);
     expect(buildImpactsFromFlow).not.toBe(trackWallpaperFromTelemetryFlow);
     expect(showNotCompletedFromFlow).not.toBe(trackPostItFromTelemetryFlow);
+    // Full cross-umbrella pins: `pause-reflect-flows-telemetry-flow-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: share-flow exports stay distinct from flows umbrella exports', () => {

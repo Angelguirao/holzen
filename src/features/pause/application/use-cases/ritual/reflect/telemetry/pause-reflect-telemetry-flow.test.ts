@@ -81,6 +81,7 @@ describe('pause-reflect-telemetry-flow', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(formatQuoteFromFlowsFlow);
     expect(trackPauseReflectShareTap).not.toBe(runOutcomeLogFromFlowsFlow);
     expect(trackPauseReflectWallpaperTap).not.toBe(formatQuoteFromFlowsFlow);
+    // Full cross-umbrella pins: `pause-reflect-flows-telemetry-flow-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: session reflect UI telemetry-flow exports stay distinct from steps-flow exports', () => {

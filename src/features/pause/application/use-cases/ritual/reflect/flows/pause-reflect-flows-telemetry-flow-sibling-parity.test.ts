@@ -46,19 +46,19 @@ describe('pause-reflect-flows-flow ↔ pause-reflect-telemetry-flow sibling pari
     expect('buildPauseScoreImpacts' in telemetryFlow).toBe(false);
   });
 
-  it('flows umbrella exports stay off session reflect UI PostHog tap trackers', () => {
+  it('flows umbrella exports stay off session reflect UI telemetry trackers', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(trackPauseReflectPostItOpen);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(trackPauseReflectShareTap);
-    expect(runPauseOutcomeLog).not.toBe(trackPauseReflectWallpaperTap);
-    expect(formatReinforcementQuoteFromSession).not.toBe(trackPauseReflectPostItOpen);
-    expect(resolvePauseDecideOutcomeFlow).not.toBe(trackPauseReflectShareTap);
+    expect(formatReinforcementQuoteFromSession).not.toBe(trackPauseReflectWallpaperTap);
+    expect(resolvePauseDecideOutcomeFlow).not.toBe(trackPauseReflectPostItOpen);
+    expect(runPauseOutcomeLog).not.toBe(trackPauseReflectShareTap);
     expect(getSessionQuote).not.toBe(trackPauseReflectWallpaperTap);
     expect(buildPauseScoreImpacts).not.toBe(trackPauseReflectPostItOpen);
     expect(showPauseOutcomeNotCompletedToast).not.toBe(trackPauseReflectShareTap);
     expect(showPauseOutcomeSaveFailedToast).not.toBe(trackPauseReflectWallpaperTap);
   });
 
-  it('telemetry umbrella exports stay off reflect+decide preflight and decide outcome helpers', () => {
+  it('telemetry umbrella exports stay off reflect+decide preflight and outcome helpers', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(trackPauseReflectShareTap).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
     expect(trackPauseReflectWallpaperTap).not.toBe(formatReinforcementQuoteFromSession);
