@@ -59,21 +59,6 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
-      <span>Phase A — colocate decide outcome-toast + wisdom-quotes flow anchors under ritual/decide (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-decide-outcome-toast-flow</code> and <code>pause-decide-wisdom-quotes-flow</code> live in <code>ritual/decide/</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Move decide Sonner-toast and session-quote CI anchors from <code>ritual/reflect/flows/pause-reflect-decide-*</code> to <code>ritual/decide/pause-decide-outcome-toast-flow</code> and <code>pause-decide-wisdom-quotes-flow</code>. <code>pause-reflect-flows-flow</code> and <code>pause-reflect-flows-io</code> still import <code>outcome-toast</code> and <code>wisdom-quotes</code> leaf modules directly (umbrella peel unchanged).</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior parity; path taxonomy only.</dd>
-      <dt>Tradeoffs</dt>
-      <dd>Decide flow anchors are CI markers; reflect+decide umbrella does not re-compose them after the flows-flow peel.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: <code>pause-reflect-mood-flow.test.ts</code>, peel <code>pause-reflect-steps-flow</code> / <code>pause-reflect-share-flow</code>, or Phase B subscription Tier 1 shim.</dd>
-=======
       <span>Phase A — peel pause-reflect-steps-flow off steps subcluster anchors (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -86,8 +71,26 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-favorite-toggle-flow</code>, note/tag, and <code>pause-reflection-step-log-flow</code> remain on disk; presentation imports <code>pause-reflect-steps-io</code> only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-reflect-mood-flow.test.ts</code>, peel <code>pause-reflect-share-flow</code>, colocate remaining decide toast/quotes anchors under <code>ritual/decide/</code>, or Phase B subscription Tier 1 shim.</dd>
->>>>>>> 2543c637e (refactor(pause): peel pause-reflect-steps-flow off steps subcluster anchors)
+      <dd>Next: <code>pause-reflect-mood-flow.test.ts</code>, peel <code>pause-reflect-share-flow</code>, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate decide outcome-toast + wisdom-quotes flow anchors under ritual/decide (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-decide-outcome-toast-flow</code> and <code>pause-decide-wisdom-quotes-flow</code> live in <code>ritual/decide/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Move decide Sonner-toast and session-quote CI anchors from <code>ritual/reflect/flows/pause-reflect-decide-*</code> to <code>ritual/decide/pause-decide-outcome-toast-flow</code> and <code>pause-decide-wisdom-quotes-flow</code>. <code>pause-reflect-flows-flow</code> and <code>pause-reflect-flows-io</code> still import <code>outcome-toast</code> and <code>wisdom-quotes</code> leaf modules directly (umbrella peel unchanged).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; path taxonomy only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Decide flow anchors are CI markers; reflect+decide umbrella does not re-compose them after the flows-flow peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Superseded on branch tip by steps-flow peel; next: mood-flow test or share-flow peel.</dd>
     </dl>
   </article>
 
