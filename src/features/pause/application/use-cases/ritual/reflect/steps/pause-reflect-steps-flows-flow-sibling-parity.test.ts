@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  buildPauseScoreImpacts,
   formatReinforcementQuoteFromSession,
+  getSessionQuote,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   runPauseOutcomeLog,
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
 } from '../flows/pause-reflect-flows-flow';
 import * as flowsFlow from '../flows/pause-reflect-flows-flow';
 import {
@@ -31,12 +35,20 @@ describe('pause-reflect-steps-flow ↔ pause-reflect-flows-flow sibling parity',
     expect(typeof formatReinforcementQuoteFromSession).toBe('function');
     expect(typeof resolvePauseDecideOutcomeFlow).toBe('function');
     expect(typeof runPauseOutcomeLog).toBe('function');
+    expect(typeof getSessionQuote).toBe('function');
+    expect(typeof showPauseOutcomeNotCompletedToast).toBe('function');
+    expect(typeof showPauseOutcomeSaveFailedToast).toBe('function');
+    expect(typeof buildPauseScoreImpacts).toBe('function');
 
     expect('resolvePauseSessionReflectAndDecidePreflight' in stepsFlow).toBe(false);
     expect('resolvePauseSessionReflectAndDecideAfterGeneration' in stepsFlow).toBe(false);
     expect('formatReinforcementQuoteFromSession' in stepsFlow).toBe(false);
     expect('resolvePauseDecideOutcomeFlow' in stepsFlow).toBe(false);
     expect('runPauseOutcomeLog' in stepsFlow).toBe(false);
+    expect('getSessionQuote' in stepsFlow).toBe(false);
+    expect('showPauseOutcomeNotCompletedToast' in stepsFlow).toBe(false);
+    expect('showPauseOutcomeSaveFailedToast' in stepsFlow).toBe(false);
+    expect('buildPauseScoreImpacts' in stepsFlow).toBe(false);
     expect('runPauseFavoriteToggle' in flowsFlow).toBe(false);
     expect('runPauseReflectNoteUpdate' in flowsFlow).toBe(false);
     expect('runPauseReflectTagUpdate' in flowsFlow).toBe(false);
@@ -52,6 +64,9 @@ describe('pause-reflect-steps-flow ↔ pause-reflect-flows-flow sibling parity',
     expect(runPauseReflectionStepLogOnce).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(shouldShowFavoriteProHint).not.toBe(runPauseOutcomeLog);
     expect(shouldLogPauseReflectionStep).not.toBe(runPauseOutcomeLog);
+    expect(runPauseFavoriteToggle).not.toBe(getSessionQuote);
+    expect(shouldShowFavoriteProHint).not.toBe(showPauseOutcomeNotCompletedToast);
+    expect(shouldLogPauseReflectionStep).not.toBe(buildPauseScoreImpacts);
   });
 
   it('flows umbrella exports stay off step mutations and domain step gates', () => {
@@ -61,5 +76,8 @@ describe('pause-reflect-steps-flow ↔ pause-reflect-flows-flow sibling parity',
     expect(resolvePauseDecideOutcomeFlow).not.toBe(shouldShowFavoriteProHint);
     expect(runPauseOutcomeLog).not.toBe(runPauseReflectionStepLogOnce);
     expect(runPauseOutcomeLog).not.toBe(shouldLogPauseReflectionStep);
+    expect(getSessionQuote).not.toBe(runPauseFavoriteToggle);
+    expect(showPauseOutcomeSaveFailedToast).not.toBe(runPauseReflectTagUpdate);
+    expect(buildPauseScoreImpacts).not.toBe(shouldShowFavoriteProHint);
   });
 });
