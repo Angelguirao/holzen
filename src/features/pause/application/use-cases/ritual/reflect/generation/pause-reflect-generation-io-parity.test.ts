@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'supabasePauseRepository' },
   supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
@@ -59,11 +60,20 @@ import {
   buildReflectionShareWhatsAppUrl,
   pauseReflectionShareImage,
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
+import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 
 /**
  * Application-layer generation I/O parity. Telemetry-io sibling:
  * `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`; share-io sibling:
  * `pause-reflect-generation-share-io-sibling-parity.test.ts` (reciprocal inline pins below).
+ * Steps-io sibling: `pause-reflect-steps-generation-io-sibling-parity.test.ts` (reciprocal inline pins below).
  */
 describe('pause-reflect-generation-io parity', () => {
   it('presentation I/O holzen-reflect exports match generation CI umbrella', () => {
@@ -159,5 +169,22 @@ describe('pause-reflect-generation-io parity', () => {
     expect(runReflectGeneration).not.toBe(trackPauseReflectShareTap);
     expect(reflectGenerationPrerequisite).not.toBe(trackPauseReflectWallpaperTap);
     // Reciprocal inline pins: `pause-reflect-telemetry-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (holzen-reflect vs step RPC wrappers).
+   * Dedicated sibling file: `pause-reflect-steps-generation-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: steps-io exports stay distinct from generation-io', () => {
+    expect(pauseReflectGeneration).not.toBe(pauseReflectFavoriteToggle);
+    expect(runReflectGeneration).not.toBe(pauseReflectNoteUpdate);
+    expect(reflectGenerationPrerequisite).not.toBe(pauseReflectTagUpdate);
+    expect(resolveReflectGenerationPrefetch).not.toBe(pauseReflectionStepLogOnce);
+    expect(shouldCommitReflectGeneration).not.toBe(shouldShowFavoriteProHint);
+    expect(messageFromReflectGenerationResult).not.toBe(shouldLogPauseReflectionStep);
+    expect(reflectGenerator).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseReflectGeneration).not.toBe(pauseReflectTagUpdate);
+    // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
+    // Full pins: `pause-reflect-steps-generation-io-sibling-parity.test.ts`.
   });
 });
