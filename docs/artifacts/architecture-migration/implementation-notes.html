@@ -20255,4 +20255,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate session reflect UI telemetry under presentation/share (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>presentation/reflect/share/</code> owns session PostHog I/O + <code>usePauseReflectUiTelemetry</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete. After application <code>pause-reflect-session-ui-telemetry</code> moved to <code>ritual/reflect/share/</code>, colocate <code>pause-reflect-telemetry-io</code>, <code>use-pause-reflect-ui-telemetry</code> (+ tests) under <code>presentation/reflect/share/</code> beside <code>pause-reflect-share-io</code>. <code>public-ritual-reflect</code> export path only; screens still import the hook from the barrel. CI forbids <code>presentation/reflect/telemetry/session/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; path colocation only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Share presentation cluster mixes PNG/share orchestration hooks with session UI PostHog — matches application share cluster boundary.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: other session presentation deep imports (e.g. <code>step-map</code>) or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
