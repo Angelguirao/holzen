@@ -785,8 +785,16 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IMPACT_IMPORTS = [
   "from '../domain/decide/pause-impact-data",
 ];
 
-/** Reflect flows presentation — import reflect/decide helpers via pause-reflect-flows-flow only. */
+/** Reflect flows I/O — import via flows subcluster anchors only (not pause-reflect-flows-flow umbrella). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_UMBRELLA_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow',
+  "from './application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow'",
+  "from '../application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow'",
+];
+
+/** Reflect flows presentation — import reflect/decide helpers via pause-reflect-flows-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow',
   '@/features/pause/domain/reflect/flows/',
   '@/features/pause/domain/decide/pause-impact-data',
   '@/features/pause/domain/decide/pause-decide-outcome-flow',
@@ -815,6 +823,8 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS = [
   "from '../application/use-cases/ritual/decide/score-impacts'",
   "from './application/use-cases/ritual/decide/score-impact-presentation'",
   "from '../application/use-cases/ritual/decide/score-impact-presentation'",
+  "from './application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow'",
+  "from '../application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow'",
 ];
 
 /** Reflect flows umbrella — compose decide score builders via pause-decide-score-impacts-flow only. */
@@ -1761,11 +1771,21 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
-  if (rel === 'src/features/pause/presentation/reflect/flows/pause-reflect-flows-io.ts') {
+  if (
+    rel.endsWith('pause-reflect-flows-io.ts') ||
+    rel.endsWith('pause-reflect-flows-io.test.ts')
+  ) {
     for (const needle of LEGACY_PAUSE_REFLECT_FLOWS_IO_DECIDE_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: reflect flows I/O must import PauseImpactData via pause-session-decide-io (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_UMBRELLA_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect flows I/O must import via flows subcluster anchors (${needle})`,
         );
       }
     }

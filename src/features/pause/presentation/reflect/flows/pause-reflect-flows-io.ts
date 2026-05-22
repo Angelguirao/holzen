@@ -1,29 +1,34 @@
 /**
  * Reflect+decide flows presentation I/O (preflight, decide outcome RPC, outcome toasts).
- * Imports reflect/decide helpers and `runPauseOutcomeLog` via `pause-reflect-flows-flow` CI anchor
- * (parity with hub/steps/share I/O flow anchors). `PauseImpactData` via `pause-session-decide-io`
- * (session decide beat — parity with reflect handler param types and `public-hooks`).
+ * Imports reflect/decide helpers via flows subcluster anchors (parity with mood/steps I/O peels).
+ * `PauseImpactData` via `pause-session-decide-io` (session decide beat).
  */
 import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   parseScoreImpactVolatilityPct,
-  resolvePauseDecideOutcomeFlow,
-  resolvePauseSessionReflectAndDecideAfterGeneration,
-  resolvePauseSessionReflectAndDecidePreflight,
   resolveScoreImpactDisplayImpacts,
   resolveScoreImpactViewMode,
-  runPauseOutcomeLog,
   scoreImpactMotionDelaySec,
-  showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
   type PauseScoreImpactRow,
-  type PauseSessionReflectAndDecideViewInput,
   type ScoreImpactVariant,
   type ScoreImpactViewMode,
-} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
+} from '@/features/pause/application/use-cases/ritual/decide/pause-decide-score-impacts-flow';
+import {
+  formatReinforcementQuoteFromSession,
+  resolvePauseDecideOutcomeFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow';
+import {
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+  type PauseSessionReflectAndDecideViewInput,
+} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow';
+import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow';
+import {
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
+} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow';
+import { getSessionQuote } from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
