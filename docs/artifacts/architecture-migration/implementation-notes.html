@@ -23181,4 +23181,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session ritual-restore application cluster marker (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-ritual-restore-flow</code> CI cluster marker has unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no reflect folder moves. Add empty <code>pause-session-ritual-restore-cluster</code> + regression test beside <code>pause-session-ritual-restore-flow</code> (parity with shell/scaffold/brief session cluster markers). <code>pause-session-ritual-restore-io</code> unchanged (imports restored ritual subcluster modules directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — marker-only slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session frame/decide/providers/persisted-tab/step-handlers/terminal-entry/step-transition flow umbrellas still lack cluster markers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>application/queries/current-pause-keys</code> (and siblings) under <code>infrastructure/queries/</code>, or <code>pause-session-frame-flow</code> cluster marker.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
