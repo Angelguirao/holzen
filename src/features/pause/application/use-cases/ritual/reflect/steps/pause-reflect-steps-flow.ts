@@ -10,7 +10,7 @@
  * pause-reflect-steps-hub-flow-sibling-parity.test.ts, pause-reflect-steps-mood-flow-sibling-parity.test.ts,
  * pause-reflect-steps-pending-offer-flow-sibling-parity.test.ts, pause-reflect-steps-share-flow-sibling-parity.test.ts,
  * pause-reflect-steps-telemetry-flow-sibling-parity.test.ts,
- * pause-reflect-steps-generation-flow-sibling-parity.test.ts, and
+ * pause-reflect-steps-generation-flow-sibling-parity.test.ts, pause-reflect-note-tag-flow-sibling-parity.test.ts (note/tag subcluster anchors), and
  * pause-reflect-steps-flows-flow-sibling-parity.test.ts pin separation from hub/mood/pending-offer/share/telemetry/generation/flows CI anchors.
  */
 export { runPauseFavoriteToggle } from './run-pause-favorite-toggle';
