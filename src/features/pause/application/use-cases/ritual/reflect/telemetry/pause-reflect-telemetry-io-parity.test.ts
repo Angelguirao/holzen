@@ -32,6 +32,9 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackPauseReflectPostItOpen).toBe(trackPostItDirect);
     expect(trackPauseReflectShareTap).toBe(trackShareTapDirect);
     expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperDirect);
+    expect(trackPostItFromTelemetryIo).toBe(trackPostItDirect);
+    expect(trackShareTapFromTelemetryIo).toBe(trackShareTapDirect);
+    expect(trackWallpaperFromTelemetryIo).toBe(trackWallpaperDirect);
   });
 
   it('share-flow and telemetry-flow re-export the same session UI telemetry leaf', () => {
@@ -39,5 +42,7 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackShareTapFromShareFlow).toBe(trackPauseReflectShareTap);
     expect(trackWallpaperFromShareFlow).toBe(trackPauseReflectWallpaperTap);
     expect(trackPostItFromShareFlow).toBe(trackPostItDirect);
+    expect(trackShareTapFromShareFlow).toBe(trackShareTapDirect);
+    expect(trackWallpaperFromShareFlow).toBe(trackWallpaperDirect);
   });
 });
