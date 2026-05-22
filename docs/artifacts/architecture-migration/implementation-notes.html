@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session ritual-restore + brief flow identity pins (backlog #1 complete, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-ritual-restore-flow</code> + <code>pause-session-brief-flow</code> sibling re-export pins</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>.toBe(direct)</code> identity on session CI umbrellas for <code>mapPersistedStep</code>, breath/decide/frame/brief restore siblings, <code>initialRitualEntry</code>, <code>logPauseRitualDepthUpgraded</code>, and domain <code>hasPersistablePauseSessionAnchor</code> on scaffold-flow (parity with persist-snapshot pins).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; presentation I/O modules still import leaf modules directly (off umbrellas).</dd>
+      <dt>Tradeoff</dt>
+      <dd>Extra import surface in flow tests — documents CI cluster anchors without changing runtime wiring.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription Tier 1 shims when remaining session flow umbrellas lack identity pins.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — presentation reflect telemetry under presentation/reflect/telemetry/ (backlog #1, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
