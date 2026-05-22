@@ -1,7 +1,7 @@
 /**
  * Presentation I/O for pending pause offer adopt/decline RPC.
  * Imports use cases via `pause-reflect-pending-offer-flow` CI anchor
- * (parity with reflect/companion presentation I/O peels).
+ * (`presentation/reflect/pending-offer/` cluster).
  */
 import {
   runAdoptPendingPauseOffer,

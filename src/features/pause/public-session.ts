@@ -30,4 +30,4 @@ export {
 } from './application/use-cases/session/persist-snapshot';
 
 /** Pending-offer adopt/decline (session shell + blocking modal). */
-export { usePendingPauseOfferMutations } from './presentation/session/use-pending-pause-offer-mutations';
+export { usePendingPauseOfferMutations } from './presentation/reflect/pending-offer/use-pending-pause-offer-mutations';

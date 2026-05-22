@@ -18,8 +18,8 @@ const {
   mockPauseRepository: { port: 'supabasePauseRepository' },
 }));
 
-vi.mock('./pause-session-pending-offer-telemetry-io', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('./pause-session-pending-offer-telemetry-io')>();
+vi.mock('./pause-reflect-pending-offer-telemetry-io', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./pause-reflect-pending-offer-telemetry-io')>();
   return {
     ...actual,
     trackPausePendingAdopted: trackPausePendingAdoptedMock,
@@ -27,7 +27,7 @@ vi.mock('./pause-session-pending-offer-telemetry-io', async (importOriginal) => 
   };
 });
 
-vi.mock('./pause-session-pending-offer-io', () => ({
+vi.mock('./pause-reflect-pending-offer-io', () => ({
   pauseAdoptPendingOffer: () => runAdoptPendingPauseOfferMock(mockPauseRepository),
   pauseDeclinePendingOffer: () => runDeclinePendingPauseOfferMock(mockPauseRepository),
 }));

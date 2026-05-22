@@ -61,7 +61,7 @@ export {
   usePendingPauseOffer,
   pendingPauseOfferQueryKey,
   type PendingPauseOfferRow,
-} from './presentation/session/use-pending-pause-offer';
+} from './presentation/reflect/pending-offer/use-pending-pause-offer';
 export {
   getPendingPauseOfferDisplay,
   type PendingPauseOfferDisplay,

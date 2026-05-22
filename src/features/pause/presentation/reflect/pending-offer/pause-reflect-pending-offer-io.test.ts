@@ -4,7 +4,7 @@ import {
   pauseAdoptPendingOfferWithRepository,
   pauseDeclinePendingOffer,
   pauseDeclinePendingOfferWithRepository,
-} from './pause-session-pending-offer-io';
+} from './pause-reflect-pending-offer-io';
 
 const runAdoptPendingPauseOfferMock = vi.hoisted(() => vi.fn());
 const runDeclinePendingPauseOfferMock = vi.hoisted(() => vi.fn());
@@ -21,7 +21,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { kind: 'supabase' },
 }));
 
-describe('pause-session-pending-offer-io', () => {
+describe('pause-reflect-pending-offer-io', () => {
   it('re-exports adopt/decline use cases from pause-reflect-pending-offer-flow', () => {
     expect(typeof pauseAdoptPendingOffer).toBe('function');
     expect(typeof pauseDeclinePendingOffer).toBe('function');

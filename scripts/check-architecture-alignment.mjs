@@ -143,6 +143,10 @@ mustExist(
   'pause/presentation/reflect/mood/',
 );
 mustExist(
+  'src/features/pause/presentation/reflect/pending-offer',
+  'pause/presentation/reflect/pending-offer/',
+);
+mustExist(
   'src/features/pause/presentation/session/breath',
   'pause/presentation/session/breath/',
 );
@@ -479,6 +483,25 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_DOMAIN_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/mood/run-initial-emotion-log'",
 ];
 
+/** Flat session pending-offer presentation — use presentation/reflect/pending-offer/. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_CLUSTER_IMPORTS = [
+  '@/features/pause/presentation/session/pause-session-pending-offer-io',
+  '@/features/pause/presentation/session/pause-session-pending-offer-telemetry-io',
+  '@/features/pause/presentation/session/use-pending-pause-offer',
+  '@/features/pause/presentation/session/use-pending-pause-offer-mutations',
+  '@/features/pause/presentation/session/use-pause-session-pending-leave-sheet',
+  "from './presentation/session/pause-session-pending-offer-io'",
+  "from './presentation/session/pause-session-pending-offer-telemetry-io'",
+  "from './presentation/session/use-pending-pause-offer'",
+  "from './presentation/session/use-pending-pause-offer-mutations'",
+  "from './presentation/session/use-pause-session-pending-leave-sheet'",
+  "from '../presentation/session/pause-session-pending-offer-io'",
+  "from '../presentation/session/pause-session-pending-offer-telemetry-io'",
+  "from '../presentation/session/use-pending-pause-offer'",
+  "from '../presentation/session/use-pending-pause-offer-mutations'",
+  "from '../presentation/session/use-pause-session-pending-leave-sheet'",
+];
+
 /** Deep session telemetry in presentation/session — use telemetry-io only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_TELEMETRY_IMPORTS = [
   '@/features/pause/application/use-cases/session/pause-session-telemetry',
@@ -734,30 +757,36 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
-  if (
-    rel.startsWith('src/features/pause/presentation/session/') &&
-    !rel.endsWith('pause-session-pending-offer-telemetry-io.ts') &&
-    !rel.endsWith('pause-session-pending-offer-telemetry-io.test.ts')
-  ) {
+  if (rel.startsWith('src/features/pause/presentation/session/')) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_CLUSTER_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy session pending-offer cluster import (${needle})`);
+      }
+    }
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_TELEMETRY_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session telemetry import (${needle})`);
       }
     }
+  }
+  if (rel.startsWith('src/features/pause/presentation/reflect/pending-offer/')) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_TELEMETRY_IMPORTS) {
-      if (text.includes(needle)) {
+      if (
+        !rel.endsWith('pause-reflect-pending-offer-telemetry-io.ts') &&
+        !rel.endsWith('pause-reflect-pending-offer-telemetry-io.test.ts') &&
+        text.includes(needle)
+      ) {
         failures.push(`${rel}: legacy pending-offer telemetry import (${needle})`);
       }
     }
-  }
-  if (
-    rel.startsWith('src/features/pause/presentation/session/') &&
-    !rel.endsWith('pause-session-pending-offer-io.ts') &&
-    !rel.endsWith('pause-session-pending-offer-io.test.ts')
-  ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_USE_CASE_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(`${rel}: legacy pending-offer use-case import (${needle})`);
+    if (
+      !rel.endsWith('pause-reflect-pending-offer-io.ts') &&
+      !rel.endsWith('pause-reflect-pending-offer-io.test.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_USE_CASE_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy pending-offer use-case import (${needle})`);
+        }
       }
     }
   }
