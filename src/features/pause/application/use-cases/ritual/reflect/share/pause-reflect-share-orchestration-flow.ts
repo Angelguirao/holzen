@@ -3,7 +3,9 @@
  * Composes domain share builders + `run-reflection-share-image` + `deliver-reflection-share-image` leaf modules
  * (not share subcluster flow anchors).
  * Presentation: `pause-reflect-share-io.ts` imports `run-reflection-share-image` directly (not this anchor).
- * Parity pins: `pause-reflect-share-io-parity.test.ts` + `pause-reflect-share-io.re-exports.test.ts`.
+ * Parity pins: `pause-reflect-share-io-parity.test.ts` + `pause-reflect-share-io.re-exports.test.ts`;
+ * `pause-reflect-share-orchestration-flow-sibling-parity.test.ts` ↔ `pause-reflect-share-flow`;
+ * `pause-reflect-share-flow.test.ts` + `pause-reflect-share-orchestration-flow.test.ts` (inline sibling pins).
  */
 export type {
   DeliverReflectionShareImageDeps,

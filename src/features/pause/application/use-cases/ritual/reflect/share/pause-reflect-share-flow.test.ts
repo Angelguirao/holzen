@@ -21,8 +21,10 @@ import {
   buildReflectionShareText as buildTextFromOrchestrationFlow,
   buildReflectionShareTweetUrl as buildTweetFromOrchestrationFlow,
   buildReflectionShareWhatsAppUrl as buildWhatsAppFromOrchestrationFlow,
+  deliverReflectionShareImage,
   runReflectionShareImage as runShareImageFromOrchestrationFlow,
 } from './pause-reflect-share-orchestration-flow';
+import * as shareFlowModule from './pause-reflect-share-flow';
 import {
   buildReflectionShareText as buildTextFromFlow,
   buildReflectionShareTelegramUrl as buildTelegramFromFlow,
@@ -118,6 +120,14 @@ describe('pause-reflect-share-flow', () => {
     expect(buildWhatsAppFromFlow).not.toBe(trackPauseSessionAbandoned);
     expect(trackPauseReflectPostItOpen).not.toBe(runAdoptPendingPauseOffer);
     expect(trackPauseReflectShareTap).not.toBe(trackPausePendingAdopted);
+  });
+
+  it('sibling cluster: share-flow exports stay distinct from share-orchestration-flow deliver leaf', () => {
+    expect('deliverReflectionShareImage' in shareFlowModule).toBe(false);
+    expect(runReflectionShareImage).toBe(runShareImageFromOrchestrationFlow);
+    expect(runReflectionShareImage).not.toBe(deliverReflectionShareImage);
+    expect(trackPauseReflectPostItOpen).not.toBe(deliverReflectionShareImage);
+    expect(trackPauseReflectShareTap).not.toBe(deliverReflectionShareImage);
   });
 
   it('sibling cluster: flows-flow exports stay distinct from share umbrella exports', () => {
