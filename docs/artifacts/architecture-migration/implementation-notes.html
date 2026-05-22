@@ -59,8 +59,6 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
-=======
       <span>Phase A — application telemetry-io parity beside telemetry-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -78,24 +76,6 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-      <span>Phase A — application persisted-tab-session-io parity beside persisted-tab-session-flow (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-session-persisted-tab-session-io-parity.test.ts</code> (application)</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation <code>pause-session-persisted-tab-session-io-parity</code> at application layer so tab-session CI umbrella, <code>persisted-tab-session</code> leaf use cases, and port-bound presentation wrappers stay aligned (parity with <code>pause-session-ritual-restore-io-parity</code> session pins).</dd>
-      <dt>Deviation</dt>
-      <dd>None — test-only; production tab-session I/O keeps <code>persisted-tab-session</code> leaf import.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: application <code>pause-reflect-hub-io-parity</code> or <code>pause-reflect-pending-offer-io-parity</code>, or Phase B Tier 1 shim scan.</dd>
-    </dl>
-  </article>
-
-  <article class="note">
-    <header>
-      <span>2026-05-22</span>
->>>>>>> 55f605f98 (refactor(pause): application reflect telemetry-io parity test)
       <span>Phase A — colocate companion orchestration-io parity beside presentation cluster (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
