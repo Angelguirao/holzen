@@ -59,6 +59,7 @@ describe('pause-reflect-pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(pauseDeclinePendingOffer);
     expect(pauseAdoptPendingOfferWithRepository).not.toBe(runAdoptDirect);
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(runDeclineDirect);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseDeclinePendingOfferWithRepository);
   });
 
   it('routes adopt through the leaf use case with the default repository', () => {

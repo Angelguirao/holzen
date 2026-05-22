@@ -49,6 +49,9 @@ describe('pause-reflect-pending-offer-io parity', () => {
     expect(pauseAdoptPendingOffer).not.toBe(runAdoptDirect);
     expect(pauseDeclinePendingOffer).not.toBe(runDeclineDirect);
     expect(pauseAdoptPendingOffer).not.toBe(pauseDeclinePendingOffer);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(runAdoptDirect);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(runDeclineDirect);
   });
 
   it('pauseAdoptPendingOffer delegates to run-adopt-pending-pause-offer with default repository', async () => {
