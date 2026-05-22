@@ -10,9 +10,9 @@
  * `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (application
  * `application/.../hub/pause-reflect-hub-pending-offer-io-sibling-parity.test.ts`; reciprocal inline:
  * `pause-reflect-hub-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`),
- * `pause-reflect-mood-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io` (application
- * `application/.../hub/pause-reflect-hub-mood-io-sibling-parity.test.ts` and
- * `application/.../mood/pause-reflect-mood-hub-io-sibling-parity.test.ts`),
+ * `pause-reflect-hub-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io` (application
+ * `application/.../hub/pause-reflect-hub-mood-io-sibling-parity.test.ts`; mood-anchored
+ * `mood/pause-reflect-mood-hub-io-sibling-parity.test.ts`),
  * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
  * reciprocal inline pins: `pause-reflect-hub-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`;
  * presentation parity: `pause-reflect-hub-io-parity.test.ts` ↔ `pause-reflect-steps-io-parity.test.ts` (steps cluster);

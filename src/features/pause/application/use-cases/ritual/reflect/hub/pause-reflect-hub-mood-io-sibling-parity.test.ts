@@ -24,7 +24,8 @@ import {
 
 /**
  * Application sibling parity: hub-io vs mood-io (hub-anchored; parity with presentation
- * `pause-reflect-mood-hub-io-sibling-parity.test.ts` and flow-level
+ * `presentation/reflect/hub/pause-reflect-hub-mood-io-sibling-parity.test.ts`,
+ * `pause-reflect-mood-hub-io-sibling-parity.test.ts`, and flow-level
  * `pause-reflect-hub-mood-flow-sibling-parity.test.ts`; complements mood-anchored
  * `mood/pause-reflect-mood-hub-io-sibling-parity.test.ts`).
  * Reciprocal inline pins: `pause-reflect-hub-io.test.ts` ↔ `pause-reflect-mood-io.test.ts`.
