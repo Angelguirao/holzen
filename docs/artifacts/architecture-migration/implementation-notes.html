@@ -21699,4 +21699,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect pending-offer RPC I/O leaf peel (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel <code>pause-reflect-pending-offer-io</code> off pending-offer RPC/display flow anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-pending-offer-io</code> imports adopt/decline from <code>run-adopt-pending-pause-offer</code> / <code>run-decline-pending-pause-offer</code> and display from <code>pending-pause-offer-display</code> directly (parity with <code>pause-reflect-pending-offer-telemetry-io</code> leaf imports on the same branch tip). CI blocks rpc-flow, display-flow, and umbrella imports on pending-offer RPC I/O.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-pending-offer-rpc-flow</code> and <code>pause-pending-offer-display-flow</code> remain CI compose anchors for <code>pause-reflect-pending-offer-flow</code>; presentation no longer routes through them.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion orchestrate-io telemetry leaf peel, archive decide-io leaf peel, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

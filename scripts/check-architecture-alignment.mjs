@@ -1262,6 +1262,20 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_UMBRELLA_FLOW_IMPORTS =
   "from '../application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow'",
 ];
 
+/** Pending-offer RPC I/O — import leaf use cases only (not pause-reflect-pending-offer-rpc-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_RPC_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow',
+  "from './application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow'",
+];
+
+/** Pending-offer display I/O — import leaf module only (not pause-pending-offer-display-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_DISPLAY_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow',
+  "from './application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow'",
+];
+
 /** Reflect pending-offer presentation — import PostHog via pause-reflect-pending-offer-telemetry-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_SUBCLUSTER_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow',
@@ -2262,10 +2276,24 @@ for (const file of walkTs(join(root, 'src'))) {
       rel.endsWith('pause-reflect-pending-offer-io.ts') ||
       rel.endsWith('pause-reflect-pending-offer-io.test.ts')
     ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_RPC_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: pending-offer RPC I/O must import adopt/decline leaf use cases directly (${needle})`,
+          );
+        }
+      }
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_DISPLAY_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: pending-offer RPC I/O must import display leaf module directly (${needle})`,
+          );
+        }
+      }
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_UMBRELLA_FLOW_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(
-            `${rel}: pending-offer RPC I/O must import via pending-offer RPC + display subclusters (${needle})`,
+            `${rel}: pending-offer RPC I/O must not import pending-offer umbrella (${needle})`,
           );
         }
       }
