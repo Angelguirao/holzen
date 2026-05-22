@@ -1,5 +1,6 @@
 /**
  * Session presentation I/O for decide outcome impact types (ritual state, step bundles).
- * Re-exports `PauseImpactData` via session decide-flow → reflect decide outcome view anchor.
+ * Imports `PauseImpactData` from domain directly (parity with manual-open and generation I/O peels;
+ * not session decide-flow CI anchor).
  */
-export type { PauseImpactData } from '@/features/pause/application/use-cases/session/pause-session-decide-flow';
+export type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
