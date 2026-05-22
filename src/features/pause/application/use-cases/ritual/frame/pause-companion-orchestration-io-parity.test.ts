@@ -53,8 +53,10 @@ import {
   loadCompanionOrchestrateSession as loadSessionFromOrchestrationIo,
   nextExpandedWithLazyFetch as nextExpandedFromOrchestrationIo,
   pauseCompanionUiStepCompletion,
+  pauseCompanionUiStepCompletionWithRepository,
   pauseLoadCompanionOrchestrateSession,
   pauseToggleCompanionLibraryFavorite,
+  pauseToggleCompanionLibraryFavoriteWithRepository,
 } from '@/features/pause/presentation/companion/pause-companion-orchestration-io';
 import {
   supabaseCompanionOrchestrator,
@@ -90,6 +92,10 @@ describe('pause-companion-orchestration-io parity (application)', () => {
     expect(pauseToggleCompanionLibraryFavorite).not.toBe(toggleFavoriteDirect);
     expect(pauseLoadCompanionOrchestrateSession).not.toBe(loadSessionFromOrchestrationIo);
     expect(pauseCompanionUiStepCompletion).not.toBe(pauseToggleCompanionLibraryFavorite);
+    expect(pauseCompanionUiStepCompletionWithRepository).not.toBe(persistDirect);
+    expect(pauseToggleCompanionLibraryFavoriteWithRepository).not.toBe(toggleFavoriteDirect);
+    expect(pauseCompanionUiStepCompletionWithRepository).not.toBe(pauseCompanionUiStepCompletion);
+    expect(pauseToggleCompanionLibraryFavoriteWithRepository).not.toBe(pauseToggleCompanionLibraryFavorite);
     // Reciprocal inline pins: `pause-companion-orchestrate-io-parity.test.ts`.
   });
 
@@ -112,6 +118,28 @@ describe('pause-companion-orchestration-io parity (application)', () => {
     expect(toggleFavoriteDirect).toHaveBeenCalledWith(companionPauseRepository, {
       pauseInstanceId: 'pi-app-parity',
       sourceType: 'podcast',
+    });
+  });
+
+  it('pauseCompanionUiStepCompletionWithRepository forwards injected PauseRepository', async () => {
+    const customRepo = { port: 'injected-persist-app' } as unknown as typeof companionPauseRepository;
+
+    await pauseCompanionUiStepCompletionWithRepository(customRepo, 'pi-app-injected', 'signal');
+
+    expect(persistDirect).toHaveBeenCalledWith(customRepo, 'pi-app-injected', 'signal');
+  });
+
+  it('pauseToggleCompanionLibraryFavoriteWithRepository forwards injected PauseRepository', async () => {
+    const customRepo = { port: 'injected-favorite-app' } as unknown as typeof companionPauseRepository;
+
+    await pauseToggleCompanionLibraryFavoriteWithRepository(customRepo, {
+      pauseInstanceId: 'pi-app-injected',
+      sourceType: 'article',
+    });
+
+    expect(toggleFavoriteDirect).toHaveBeenCalledWith(customRepo, {
+      pauseInstanceId: 'pi-app-injected',
+      sourceType: 'article',
     });
   });
 

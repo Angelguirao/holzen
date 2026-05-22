@@ -32973,4 +32973,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — companion orchestration-io WithRepository + query colocation (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestration-io</code> + <code>infrastructure/queries/companion/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no reflect moves. Colocate <code>companion-ui-completion-query.ts</code> under <code>infrastructure/queries/companion/</code> (parity with keys + archive/reflect query subclusters). Add <code>pauseCompanionUiStepCompletionWithRepository</code> and <code>pauseToggleCompanionLibraryFavoriteWithRepository</code> on orchestration I/O (parity with <code>pause-reflect-steps-io</code> <code>*WithRepository</code> test seams); extend application + presentation <code>pause-companion-orchestration-io-parity</code> delegation pins.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mechanical query path + presentation I/O wrappers; <code>public-queries</code> re-export path updated only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B Tier 1 lib shim scan, or extend orchestrate-io persist/favorite reciprocal pins on <code>pause-companion-orchestrate-io-parity</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
