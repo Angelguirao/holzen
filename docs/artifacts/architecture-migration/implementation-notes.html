@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — application ritual-restore-io parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-ritual-restore-io-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation colocated ritual-restore I/O parity at <code>application/use-cases/session/</code> (parity with <code>pause-session-breath-io-parity.test.ts</code>). Allowlist presentation <code>pause-session-ritual-restore-io-parity.test.ts</code> for restore-flow CI umbrella import on parity tests only; production restore I/O keeps sibling subcluster leaf imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + CI allowlist + cross-links on flow/I/O headers only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: ritual-restore ↔ frame-io sibling parity, Phase B Tier 1 shim scan, or remaining session I/O colocation gaps.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — application session frame-io parity beside frame-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — test-only; doc anchors on frame-flow and presentation frame-io-parity.</dd>
       <dt>Open questions</dt>
-      <dd>Next: application <code>pause-session-ritual-restore-io-parity</code> beside <code>pause-session-ritual-restore-flow</code>, or Phase B Tier 1 shim scan.</dd>
+      <dd>Next: ritual-restore ↔ frame-io sibling parity, or Phase B Tier 1 shim scan.</dd>
     </dl>
   </article>
 
