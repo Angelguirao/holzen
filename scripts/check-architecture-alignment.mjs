@@ -118,6 +118,26 @@ mustExist(
   'pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow.ts',
 );
 mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow.ts',
+  'pause/application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow.ts',
+);
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow.ts',
+  'pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow.ts',
+);
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow.ts',
+  'pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow.ts',
+);
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow.ts',
+  'pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow.ts',
+);
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow.ts',
+  'pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow.ts',
+);
+mustExist(
   'src/features/pause/application/use-cases/session/scaffold',
   'pause/application/use-cases/session/scaffold/',
 );
@@ -488,6 +508,51 @@ const LEGACY_PAUSE_REFLECT_HUB_FLOW_DOMAIN_IMPORTS = [
   "from '../domain/reflect/hub/",
 ];
 
+/** Reflect flows umbrella flow — compose subcluster anchors only (no deep domain/reflect/flows or decide). */
+const LEGACY_PAUSE_REFLECT_FLOWS_FLOW_DOMAIN_IMPORTS = [
+  '@/features/pause/domain/reflect/flows/',
+  '@/features/pause/domain/decide/pause-decide-outcome-flow',
+  "from '@/features/pause/domain/reflect/flows/",
+  "from './domain/reflect/flows/",
+  "from '../domain/reflect/flows/",
+  "from '@/features/pause/domain/decide/pause-decide-outcome-flow",
+  "from './domain/decide/pause-decide-outcome-flow",
+  "from '../domain/decide/pause-decide-outcome-flow",
+];
+
+/** Reflect flows umbrella flow — import decide application helpers via subcluster anchors only. */
+const LEGACY_PAUSE_REFLECT_FLOWS_FLOW_DECIDE_APP_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log',
+  '@/features/pause/application/use-cases/ritual/decide/outcome-toast',
+  '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes',
+  "from './application/use-cases/ritual/decide/run-pause-outcome-log'",
+  "from '../application/use-cases/ritual/decide/run-pause-outcome-log'",
+  "from './application/use-cases/ritual/decide/outcome-toast'",
+  "from '../application/use-cases/ritual/decide/outcome-toast'",
+  "from './application/use-cases/ritual/decide/wisdom-quotes'",
+  "from '../application/use-cases/ritual/decide/wisdom-quotes'",
+];
+
+/** Reflect flows presentation — import reflect/decide helpers via pause-reflect-flows-flow only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS = [
+  '@/features/pause/domain/reflect/flows/',
+  '@/features/pause/domain/decide/pause-decide-outcome-flow',
+  '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log',
+  '@/features/pause/application/use-cases/ritual/decide/outcome-toast',
+  '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow',
+  "from './domain/reflect/flows/",
+  "from '../domain/reflect/flows/",
+  "from './domain/decide/pause-decide-outcome-flow",
+  "from '../domain/decide/pause-decide-outcome-flow",
+  "from './application/use-cases/ritual/decide/run-pause-outcome-log'",
+  "from '../application/use-cases/ritual/decide/run-pause-outcome-log'",
+];
+
 /** Reflect hub presentation — import domain hub helpers via pause-reflect-hub-flow only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/hub/',
@@ -752,6 +817,18 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
+  if (rel === 'src/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow.ts') {
+    for (const needle of LEGACY_PAUSE_REFLECT_FLOWS_FLOW_DOMAIN_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect flows umbrella flow must compose subcluster anchors (${needle})`);
+      }
+    }
+    for (const needle of LEGACY_PAUSE_REFLECT_FLOWS_FLOW_DECIDE_APP_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect flows umbrella flow must compose decide subcluster anchors (${needle})`);
+      }
+    }
+  }
   if (rel === 'src/features/pause/application/use-cases/session/pause-session-ritual-restore-flow.ts') {
     for (const needle of LEGACY_PAUSE_SESSION_RITUAL_RESTORE_BREATH_IMPORTS) {
       if (text.includes(needle)) {
@@ -779,6 +856,19 @@ for (const file of walkTs(join(root, 'src'))) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy reflect hub import (${needle})`);
+        }
+      }
+    }
+  }
+  if (rel.startsWith('src/features/pause/presentation/reflect/flows/')) {
+    if (
+      !rel.endsWith('pause-reflect-flows-io.ts') &&
+      !rel.endsWith('pause-reflect-flows-io.test.ts') &&
+      !rel.endsWith('-types.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy reflect flows import (${needle})`);
         }
       }
     }
