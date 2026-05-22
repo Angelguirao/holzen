@@ -3,7 +3,8 @@
  * Imports adopt/decline and display from leaf modules directly (parity with
  * `presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io` → pending-offer telemetry leaf trackers).
  * Parity pins: `pause-reflect-pending-offer-io.test.ts` (wrapper distinctness + repository delegation),
- * `pause-reflect-pending-offer-io-parity.test.ts` (flow umbrella + application layer).
+ * `pause-reflect-pending-offer-io-parity.test.ts` (flow umbrella + application layer),
+ * `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-telemetry-io`.
  */
 import {
   getPendingPauseOfferDisplay,
