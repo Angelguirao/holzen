@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import { runShiftEmotionFrameHubDone as runShiftHubDoneDirect } from '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
 import {
+  pauseInitialEmotionSelect,
+  pauseInitialEmotionSkip,
+} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import {
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
   reflectPauseRepository,
@@ -52,6 +56,8 @@ describe('pause-reflect-hub-io', () => {
     expect(typeof pauseShiftEmotionFrameHubDone).toBe('function');
     expect(typeof pauseShiftEmotionFrameHubDoneWithRepository).toBe('function');
     expect(pauseShiftEmotionFrameHubDone).not.toBe(runShiftHubDoneDirect);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseInitialEmotionSelect);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseInitialEmotionSkip);
   });
 
   it('pauseShiftEmotionFrameHubDoneWithRepository forwards injected repository', async () => {
