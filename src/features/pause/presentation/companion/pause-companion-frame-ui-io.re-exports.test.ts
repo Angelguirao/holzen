@@ -10,6 +10,10 @@ import {
   getCompanionSectionVisibility as getVisibilityDirect,
   isCompanionSectionVisible as isVisibleDirect,
 } from '@/features/pause/application/use-cases/ritual/frame/section-visibility';
+import {
+  getCompanionSectionVisibility as getVisibilityFromSectionFlow,
+  isCompanionSectionVisible as isVisibleFromSectionFlow,
+} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-section-visibility-flow';
 
 import {
   COMPANION_FULL_VIEW_BREATHING_ROOM_MS,
@@ -34,5 +38,10 @@ describe('pause-companion-frame-ui-io re-exports', () => {
     expect(pauseSeverityToOrchestrateNumber).toBe(severityToOrchestrateDirect);
     expect(getCompanionSectionVisibility).toBe(getVisibilityDirect);
     expect(isCompanionSectionVisible).toBe(isVisibleDirect);
+  });
+
+  it('presentation I/O section visibility bindings match pause-companion-section-visibility-flow CI anchor (leaf parity)', () => {
+    expect(getCompanionSectionVisibility).toBe(getVisibilityFromSectionFlow);
+    expect(isCompanionSectionVisible).toBe(isVisibleFromSectionFlow);
   });
 });
