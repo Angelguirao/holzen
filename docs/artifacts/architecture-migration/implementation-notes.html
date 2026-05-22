@@ -27987,4 +27987,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect favorite-toggle-flow ↔ reflection-step-log-flow sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated sibling parity between <code>pause-favorite-toggle-flow</code> and <code>pause-reflection-step-log-flow</code> steps subcluster CI anchors (favorite toggle vs <code>reflection_step</code> log). Reciprocal inline pins on both flow unit tests. Production umbrellas unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comment anchors only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: share-flow ↔ share-orchestration-flow dedicated sibling file, pending-offer-flow ↔ pending-offer-rpc-flow pins, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
