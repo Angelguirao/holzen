@@ -7,17 +7,30 @@ import {
 import { pauseReflectionShareImage } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   pauseReflectFavoriteToggle,
+  pauseReflectFavoriteToggleWithRepository,
   pauseReflectNoteUpdate,
+  pauseReflectNoteUpdateWithRepository,
   pauseReflectionStepLogOnce,
+  pauseReflectionStepLogOnceWithRepository,
   pauseReflectTagUpdate,
+  pauseReflectTagUpdateWithRepository,
   reflectPauseRepository,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
-import { pauseReflectGeneration, reflectGenerator } from './pause-reflect-generation-io';
+import {
+  messageFromReflectGenerationResult,
+  pauseReflectGeneration,
+  reflectGenerationPrerequisite,
+  reflectGenerator,
+  resolveReflectGenerationPrefetch,
+  shouldCommitReflectGeneration,
+} from './pause-reflect-generation-io';
 
 const runReflectGenerationMock = vi.hoisted(() => vi.fn());
 
@@ -97,7 +110,18 @@ describe('pause-reflect-generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(pauseReflectTagUpdate);
     expect(pauseReflectGeneration).not.toBe(pauseReflectionStepLogOnce);
     expect(reflectGenerator).not.toBe(reflectPauseRepository);
-    // Full cross-I/O pins: `pause-reflect-steps-generation-io-sibling-parity.test.ts`.
+    expect(runReflectGenerationDirect).not.toBe(pauseReflectFavoriteToggle);
+    expect(reflectGenerationPrerequisite).not.toBe(pauseReflectNoteUpdate);
+    expect(shouldCommitReflectGeneration).not.toBe(pauseReflectTagUpdate);
+    expect(resolveReflectGenerationPrefetch).not.toBe(pauseReflectionStepLogOnce);
+    expect(messageFromReflectGenerationResult).not.toBe(pauseReflectFavoriteToggleWithRepository);
+    expect(pauseReflectGeneration).not.toBe(pauseReflectNoteUpdateWithRepository);
+    expect(reflectGenerator).not.toBe(pauseReflectTagUpdateWithRepository);
+    expect(reflectGenerationPrerequisite).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    expect(shouldCommitReflectGeneration).not.toBe(shouldShowFavoriteProHint);
+    expect(messageFromReflectGenerationResult).not.toBe(shouldLogPauseReflectionStep);
+    // Full cross-I/O pins: `pause-reflect-steps-generation-io-sibling-parity.test.ts`;
+    // reciprocal inline pins: `pause-reflect-steps-io.test.ts`.
   });
 
   it('sibling cluster: session reflect telemetry-io exports stay distinct from generation-io', () => {
