@@ -959,6 +959,21 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_UMBRELLA_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow'",
 ];
 
+/** Ritual done presentation I/O — import via pause-ritual-done-flow only (not post-pause-emotion-log). */
+const LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_IO_USE_CASE_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/done/post-pause-emotion-log',
+  "from './application/use-cases/ritual/done/post-pause-emotion-log'",
+  "from '../application/use-cases/ritual/done/post-pause-emotion-log'",
+];
+
+/** Ritual done presentation — import domain done helpers via pause-ritual-done-io only. */
+const LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_DOMAIN_IMPORTS = [
+  '@/features/pause/domain/ritual/done/',
+  "from '@/features/pause/domain/ritual/done/",
+  "from './domain/ritual/done/",
+  "from '../domain/ritual/done/",
+];
+
 /** Reflect mood presentation — import domain mood helpers via pause-reflect-mood-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/mood/',
@@ -1588,6 +1603,35 @@ for (const file of walkTs(join(root, 'src'))) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy reflect mood import (${needle})`);
+        }
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-ritual-done-io.ts') ||
+    rel.endsWith('pause-ritual-done-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_IO_USE_CASE_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: ritual done I/O must import via pause-ritual-done-flow (${needle})`,
+        );
+      }
+    }
+  }
+  if (rel.startsWith('src/features/pause/presentation/ritual/done/')) {
+    if (
+      !rel.endsWith('pause-ritual-done-io.ts') &&
+      !rel.endsWith('pause-ritual-done-io.test.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_DOMAIN_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy ritual done import (${needle})`);
+        }
+      }
+      for (const needle of LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_IO_USE_CASE_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy ritual done import (${needle})`);
         }
       }
     }

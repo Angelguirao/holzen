@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — ritual done I/O via pause-ritual-done-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>pause-ritual-done-io</code> through <code>pause-ritual-done-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-ritual-done-flow</code> as the application CI anchor for brief done post-pause emotion logging; <code>pause-ritual-done-io</code> imports <code>runPostPauseEmotionLogIfDirty</code> and <code>PostPauseFeelSnapshot</code> through the flow (parity with reflect mood/hub I/O peels). <code>use-pause-brief-done-check-in</code> imports the feel snapshot type via done I/O. CI blocks deep <code>post-pause-emotion-log</code> and <code>domain/ritual/done/</code> under <code>presentation/ritual/done/</code> except <code>*-io.ts</code> modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Wallpaper mood helper stays on <code>public-ritual-done</code> direct use-case import until a later done subcluster peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-steps-io</code> subcluster peel, Phase B subscription Tier 1 shim, or session scaffold I/O peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect hub I/O via pause-reflect-hub-flow umbrella (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
