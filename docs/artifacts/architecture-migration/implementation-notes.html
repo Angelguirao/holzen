@@ -25796,4 +25796,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect generation-io leaf pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-io-parity</code> pins holzen-reflect exports to generation-flow</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-generation-io-parity.test.ts</code> with domain + <code>run-reflect-generation</code> leaf identity and <code>reflectGenerator</code> ↔ <code>supabaseReflectGenerator</code> (parity with extended <code>pause-reflect-flows-io-parity</code>). Document generation-flow comment for re-exports parity. Production generation I/O keeps leaf imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without presentation I/O importing the generation umbrella in production code.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: extend <code>pause-reflect-mood-io-parity</code> with domain leaf + repository binding tests, <code>pause-reflect-hub-io-parity</code> hub leaf pins, or Tier 1 <code>holzen-query-client-ref</code> shim peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
