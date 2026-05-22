@@ -102,6 +102,16 @@ import {
   buildReflectionShareText,
   pauseReflectionShareImage,
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
+import {
+  applyBriefDepthPickerRitualEntry,
+  applyDeepDepthPickerRitualEntry,
+  buildFeelTilesMoodLogOptions,
+  pauseInitialEmotionSelect,
+  pauseInitialEmotionSkip,
+  pauseInitialEmotionSelectWithRepository,
+  pauseInitialEmotionSkipWithRepository,
+  resolvePauseSessionChromeCloseAction,
+} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 describe('pause-reflect-hub-io parity (application)', () => {
@@ -238,6 +248,25 @@ describe('pause-reflect-hub-io parity (application)', () => {
     expect(reflectPauseRepository).not.toBe(trackPauseReflectShareTap);
     expect(pauseShiftEmotionFrameHubDone).not.toBe(trackPauseReflectWallpaperTap);
     // Reciprocal inline pins: `pause-reflect-telemetry-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `mood/pause-reflect-mood-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-hub-mood-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: mood-io initial-emotion exports stay distinct from hub-io wrappers', () => {
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseInitialEmotionSelect);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseInitialEmotionSkip);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseInitialEmotionSelectWithRepository);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseInitialEmotionSkipWithRepository);
+    expect(buildLogBundleFromHubIo).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(resolvePresentationFromHubIo).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(applyBriefDepthPickerRitualEntry);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(applyDeepDepthPickerRitualEntry);
+    expect(buildShiftEmotionFrameHubLogBundle).not.toBe(resolvePauseSessionChromeCloseAction);
+    expect(reflectPauseRepository).not.toBe(pauseInitialEmotionSelect);
+    // Reciprocal inline pins: `mood/pause-reflect-mood-io-parity.test.ts`.
+    // Full pins: `pause-reflect-hub-mood-io-sibling-parity.test.ts`.
   });
 
   /**
