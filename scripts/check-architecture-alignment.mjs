@@ -467,14 +467,24 @@ const LEGACY_PAUSE_APPLICATION_REFLECT_TELEMETRY_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow'",
 ];
 
-/** Session presentation — import step-transition via dedicated I/O anchor only. */
+/** Session presentation (non-I/O) — import step motion via pause-session-step-transition-io only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_STEP_TRANSITION_IMPORTS = [
   '@/features/pause/application/use-cases/session/step-transition',
   '@/features/pause/application/use-cases/session/step-swipe-direction',
+  '@/features/pause/application/use-cases/session/pause-session-step-transition-flow',
   "from './application/use-cases/session/step-transition'",
   "from '../application/use-cases/session/step-transition'",
   "from './application/use-cases/session/step-swipe-direction'",
   "from '../application/use-cases/session/step-swipe-direction'",
+  "from './application/use-cases/session/pause-session-step-transition-flow'",
+  "from '../application/use-cases/session/pause-session-step-transition-flow'",
+];
+
+/** Session step-transition I/O — import leaf modules only (not step-transition-flow umbrella). */
+const LEGACY_PAUSE_PRESENTATION_SESSION_STEP_TRANSITION_IO_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pause-session-step-transition-flow',
+  "from './application/use-cases/session/pause-session-step-transition-flow'",
+  "from '../application/use-cases/session/pause-session-step-transition-flow'",
 ];
 
 /** Session presentation — step motion must not import via shell I/O (use step-transition-io). */
@@ -2785,6 +2795,18 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_STEP_TRANSITION_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session step-transition import (${needle})`);
+      }
+    }
+    if (
+      rel.endsWith('pause-session-step-transition-io.ts') ||
+      rel.endsWith('pause-session-step-transition-io.test.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_STEP_TRANSITION_IO_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: session step-transition I/O must import step-transition + step-swipe-direction directly (${needle})`,
+          );
+        }
       }
     }
     if (text.includes('pause-session-shell-io')) {

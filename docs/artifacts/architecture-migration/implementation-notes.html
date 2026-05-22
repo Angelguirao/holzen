@@ -22041,4 +22041,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session step-transition I/O leaf peel (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel <code>pause-session-step-transition-io</code> off step-transition-flow anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-session-step-transition-io</code> imports <code>step-transition</code> + <code>step-swipe-direction</code> directly (parity with ritual done and archive I/O leaf peels). CI blocks <code>pause-session-step-transition-flow</code> on step-transition I/O.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-step-transition-flow</code> remains a CI cluster anchor; presentation no longer routes through it on step-transition I/O.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session shell/scaffold I/O leaf peels, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

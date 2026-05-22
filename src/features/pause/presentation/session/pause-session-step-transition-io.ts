@@ -1,6 +1,6 @@
 /**
  * Presentation I/O for `/pause` Framer step-panel motion.
- * Session conductors import here instead of `pause-session-shell-io` or deep `application/use-cases/*`.
+ * Imports session step-transition leaf modules directly (parity with ritual done I/O peels).
  */
 export {
   buildPauseSessionStepTransitionConfig,
@@ -8,7 +8,7 @@ export {
   PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S,
   PAUSE_SESSION_STEP_TRANSITION_DURATION_S,
   PAUSE_SESSION_STEP_TRANSITION_EASE,
-  pauseStepSwipeDirection,
   type PauseSessionStepTransitionConfig,
   type PauseSessionSwipeDirection,
-} from '@/features/pause/application/use-cases/session/pause-session-step-transition-flow';
+} from '@/features/pause/application/use-cases/session/step-transition';
+export { pauseStepSwipeDirection } from '@/features/pause/application/use-cases/session/step-swipe-direction';
