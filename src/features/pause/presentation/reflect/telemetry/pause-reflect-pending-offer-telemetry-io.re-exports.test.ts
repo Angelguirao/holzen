@@ -10,6 +10,11 @@ import {
   trackPauseSessionAbandoned as trackAbandonedFromTelemetryFlow,
 } from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow';
 import { trackPauseSessionAbandoned as trackAbandonedDirect } from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-session-abandoned-telemetry';
+import {
+  trackPausePendingAdopted as trackAdoptedFromTelemetryFlow,
+  trackPausePendingDeclined as trackDeclinedFromTelemetryFlow,
+  trackPauseSessionAbandoned as trackAbandonedFromTelemetryFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow';
 
 import {
   trackPausePendingAdopted,
