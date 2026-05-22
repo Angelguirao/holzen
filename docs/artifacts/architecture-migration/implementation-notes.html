@@ -25853,4 +25853,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect steps-io repository binding (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-io-parity</code> pins <code>reflectPauseRepository</code> port adapter</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-steps-io-parity.test.ts</code> with <code>reflectPauseRepository</code> ↔ <code>supabasePauseRepository</code> (parity with flows/mood/hub/pending-offer I/O parity tests). Production steps I/O keeps leaf <code>run-pause-*</code> imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without presentation I/O importing the steps-flow umbrella in production code.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-orchestration-flow</code> ↔ <code>pause-companion-section-visibility-flow</code> application sibling pin, or Tier 1 <code>holzen-query-client-ref</code> shim peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
