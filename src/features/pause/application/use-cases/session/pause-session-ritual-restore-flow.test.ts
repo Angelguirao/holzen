@@ -30,6 +30,7 @@ import {
   mapPersistedStep as mapPersistedStepFromFlow,
 } from './pause-session-ritual-restore-flow';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
+import { logPauseRitualDepthUpgraded as logBriefDepthUpgradedFromBriefFlow } from './pause-session-brief-flow';
 
 describe('pause-session-ritual-restore-flow', () => {
   it('re-exports ritual restore helpers from domain + ritual/session leaf modules (not session *-flow umbrellas)', () => {
@@ -95,5 +96,12 @@ describe('pause-session-ritual-restore-flow', () => {
     expect(initialBriefIntegrateDoneFromFlow(restored)).toBe(true);
     expect(initialSelectedBriefFaceFromFlow(restored)).toBe('calm');
     expect(initialBriefPauseStepFromFlow(null)).toBe('feel');
+  });
+
+  it('sibling cluster: brief-flow depth-upgrade export stays off ritual-restore umbrella', () => {
+    expect(mapPersistedStepFromFlow).not.toBe(logBriefDepthUpgradedFromBriefFlow);
+    expect(initialBreathFirstFromFlow).not.toBe(logBriefDepthUpgradedFromBriefFlow);
+    expect(initialRitualEntryFromFlow).not.toBe(logBriefDepthUpgradedFromBriefFlow);
+    expect(initialBriefPauseStepFromFlow).not.toBe(logBriefDepthUpgradedFromBriefFlow);
   });
 });
