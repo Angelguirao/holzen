@@ -1,3 +1,7 @@
+/**
+ * Presentation I/O parity for session ritual-restore cluster (colocated beside
+ * `pause-session-ritual-restore-io.ts`; application `pause-session-ritual-restore-flow` stays CI umbrella).
+ */
 import { describe, expect, it } from 'vitest';
 
 import { mapPersistedStep as mapPersistedStepDirect } from '@/features/pause/domain/session/map-persisted-step';

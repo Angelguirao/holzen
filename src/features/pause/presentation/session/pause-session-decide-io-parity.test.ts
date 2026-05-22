@@ -1,3 +1,7 @@
+/**
+ * Presentation I/O parity for session decide cluster (colocated beside
+ * `pause-session-decide-io.ts`; application `pause-session-decide-flow` stays CI umbrella for hydration).
+ */
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/integrations/supabase/client', () => ({
