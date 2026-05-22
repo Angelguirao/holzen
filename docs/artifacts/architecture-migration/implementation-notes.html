@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session reflect telemetry cluster under ritual/reflect/telemetry/ (backlog #1, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-session-ui-telemetry</code> + <code>pause-reflect-telemetry-flow</code> leave share/</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Incremental reflect interior slice: colocate session reflect PostHog trackers and CI anchor under <code>application/use-cases/ritual/reflect/telemetry/</code> (§3). <code>pause-reflect-share-flow</code> and <code>pause-reflect-telemetry-io</code> import <code>pause-reflect-session-ui-telemetry</code> from <code>../telemetry/</code>; presentation I/O still bypasses <code>pause-reflect-telemetry-flow</code> anchor. CI forbids resurrecting <code>share/pause-reflect-*-telemetry</code> paths.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; tracker call sites unchanged.</dd>
+      <dt>Tradeoff</dt>
+      <dd>Share umbrella still composes telemetry leaf directly (not via telemetry-flow anchor) — matches pending-offer and generation manual-open patterns.</dd>
+      <dt>Open question</dt>
+      <dd>Next: remaining <code>ritual/frame</code> typeof-only anchors, or Phase B subscription Tier 1 when pause Tier 5 is quiet.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — archive decide umbrella flow identity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

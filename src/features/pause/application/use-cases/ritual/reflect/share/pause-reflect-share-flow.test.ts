@@ -22,7 +22,7 @@ import {
   trackPauseReflectPostItOpen as trackPostItDirect,
   trackPauseReflectShareTap as trackShareTapDirect,
   trackPauseReflectWallpaperTap as trackWallpaperDirect,
-} from './pause-reflect-session-ui-telemetry';
+} from '../telemetry/pause-reflect-session-ui-telemetry';
 
 describe('pause-reflect-share-flow', () => {
   it('re-exports share orchestration + domain builders + session UI telemetry from leaf modules', () => {

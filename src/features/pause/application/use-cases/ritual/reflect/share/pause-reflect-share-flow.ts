@@ -16,4 +16,4 @@ export {
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
   type PauseReflectTelemetrySurface,
-} from './pause-reflect-session-ui-telemetry';
+} from '../telemetry/pause-reflect-session-ui-telemetry';
