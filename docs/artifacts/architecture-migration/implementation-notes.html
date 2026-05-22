@@ -76,19 +76,6 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
-      <span>Phase A — terminal-entry-io tab-session import fix (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-session-terminal-entry-io-parity.test.ts</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no reflect moves. Fix parity test to import tab-session presentation bindings from <code>pause-persisted-tab-session-io</code> (with <code>public-rpc</code> mock), not <code>pause-session-terminal-entry-io</code> (terminal guards only), so sibling-cluster <code>.not.toBe</code> pins are meaningful.</dd>
-      <dt>Deviation</dt>
-      <dd>None — test import correction only.</dd>
-      <dt>Open question</dt>
-      <dd>Next: Phase B subscription/auth Tier 1 shims, or shell-io presentation wrapper delegation tests.</dd>
-=======
       <span>Phase A — shell-io presentation wrapper delegation pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -100,7 +87,23 @@
       <dd>None — tests + shell-io comment only.</dd>
       <dt>Open question</dt>
       <dd>Next: presentation shell-io ↔ scaffold-io sibling parity test, terminal-entry ↔ scaffold sibling pins, or Phase B app-shell boot import scan.</dd>
->>>>>>> c8c56c28b (test(pause): shell-io presentation wrapper delegation pins)
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — terminal-entry-io tab-session import fix (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-terminal-entry-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no reflect moves. Fix parity test to import tab-session presentation bindings from <code>pause-persisted-tab-session-io</code> (with <code>public-rpc</code> mock), not <code>pause-session-terminal-entry-io</code> (terminal guards only), so sibling-cluster <code>.not.toBe</code> pins are meaningful.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test import correction only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shims, or presentation shell-io ↔ scaffold-io sibling parity.</dd>
     </dl>
   </article>
 
