@@ -7,6 +7,7 @@ import { buildPauseSessionPersistSnapshot as buildPersistFromLeaf } from '@/feat
 import { buildPauseSessionScaffoldRitualDerived as buildDerivedFromLeaf } from '@/features/pause/application/use-cases/session/scaffold/scaffold-ritual-derived';
 import { computePauseStorageRitualSyncPatch as computeSyncFromLeaf } from '@/features/pause/application/use-cases/session/storage-ritual-sync';
 import { hasPersistablePauseSessionAnchor as hasAnchorFromDomain } from '@/features/pause/domain/session/persisted-session-guards';
+import { pickPauseHolzenProvidersSlice } from '@/features/pause/presentation/session/pause-session-providers-io';
 import {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
@@ -120,5 +121,16 @@ describe('pause-session-scaffold-io', () => {
     expect(buildPauseSessionPersistSnapshot).not.toBe(buildPauseSessionStepShellBundle);
     expect(computePauseStorageRitualSyncPatch).not.toBe(buildPauseSessionStepRitualBundle);
     // Full cross-I/O pins: `pause-session-scaffold-step-handlers-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-providers-io.test.ts`.
+   * Dedicated sibling file: `pause-session-providers-scaffold-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: providers-io exports stay distinct from scaffold-io', () => {
+    expect(buildPauseSessionPersistSnapshot).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(computePauseStorageRitualSyncPatch).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(buildPauseSessionScaffoldRitualDerived).not.toBe(pickPauseHolzenProvidersSlice);
+    expect(hasPersistablePauseSessionAnchor).not.toBe(pickPauseHolzenProvidersSlice);
   });
 });

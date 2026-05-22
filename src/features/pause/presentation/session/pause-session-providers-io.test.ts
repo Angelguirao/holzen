@@ -10,6 +10,10 @@ import {
   isPauseSessionWaitingForInstanceFetch,
 } from './pause-session-shell-io';
 import {
+  buildPauseSessionPersistSnapshot,
+  computePauseStorageRitualSyncPatch,
+} from './scaffold/pause-session-scaffold-io';
+import {
   pickPauseHolzenProvidersSlice,
   type PauseHolzenProvidersSlice,
 } from './pause-session-providers-io';
@@ -43,8 +47,9 @@ describe('pause-session-providers-io', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-session-shell-io.test.ts`.
-   * Dedicated sibling file: `pause-session-providers-shell-io-sibling-parity.test.ts`.
+   * Reciprocal inline pins ↔ `pause-session-shell-io.test.ts` and `scaffold/pause-session-scaffold-io.test.ts`.
+   * Dedicated sibling files: `pause-session-providers-shell-io-sibling-parity.test.ts`,
+   * `pause-session-providers-scaffold-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: shell-io exports stay distinct from providers-io Holzen slice picker', () => {
     expect(pickPauseHolzenProvidersSlice).not.toBe(computePauseSessionHydration);
@@ -55,5 +60,10 @@ describe('pause-session-providers-io', () => {
     expect(pickPauseHolzenProvidersSlice).not.toBe(coalescePauseSessionShellViewModel);
     expect(pickPauseHolzenProvidersSlice).not.toBe(hasPersistedPauseSessionPayload);
     expect(pickPauseHolzenProvidersSlice).not.toBe(isPauseSessionWaitingForInstanceFetch);
+  });
+
+  it('sibling cluster: scaffold-io exports stay distinct from providers-io', () => {
+    expect(pickPauseHolzenProvidersSlice).not.toBe(buildPauseSessionPersistSnapshot);
+    expect(pickPauseHolzenProvidersSlice).not.toBe(computePauseStorageRitualSyncPatch);
   });
 });

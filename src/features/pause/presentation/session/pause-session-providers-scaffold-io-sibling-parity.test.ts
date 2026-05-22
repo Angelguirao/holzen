@@ -12,8 +12,10 @@ import * as scaffoldIo from './scaffold/pause-session-scaffold-io';
 
 /**
  * Presentation I/O sibling parity (parity with
- * `pause-session-providers-scaffold-flow-sibling-parity.test.ts` and
+ * `pause-session-providers-scaffold-flow-sibling-parity.test.ts`,
+ * `pause-session-providers-shell-io-sibling-parity.test.ts`, and
  * `pause-session-scaffold-shell-io-sibling-parity.test.ts`).
+ * Reciprocal inline pins: `pause-session-providers-io.test.ts`, `scaffold/pause-session-scaffold-io.test.ts`.
  */
 describe('pause-session-providers-io ↔ pause-session-scaffold-io sibling parity', () => {
   it('providers-io and scaffold-io are distinct sibling presentation I/O anchors', () => {
