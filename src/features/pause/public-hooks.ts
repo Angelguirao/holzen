@@ -123,7 +123,7 @@ export {
   computeBreathingPhaseAdvance,
   resumePauseAudioContext,
 } from './public-ritual-breathe';
-export type { PauseImpactData } from './domain/decide/pause-impact-data';
+export type { PauseImpactData } from './application/use-cases/session/pause-session-decide-flow';
 export {
   buildPauseScoreImpacts,
   type PauseScoreImpactRow,
