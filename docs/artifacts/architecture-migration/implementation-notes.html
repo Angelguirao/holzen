@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel ritual-restore breath hydration off breath-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-ritual-restore-flow</code> imports <code>restored-breath-ritual-state</code> directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route restored breath hydration on <code>pause-session-ritual-restore-flow</code> through <code>restored-breath-ritual-state</code> instead of <code>pause-session-breath-flow</code> (parity with <code>pause-session-ritual-restore-io</code> and <code>pause-session-breath-step-navigation-io</code> leaf peels on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-breath-flow</code> still re-exports restored breath + phase advance for breath cluster detection; breath-only conductors unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B cross-context Tier 1 shim, or peel decide/frame restored helpers off session decide/frame flow umbrellas.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-session-breath-step-navigation-io to domain leaf (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
