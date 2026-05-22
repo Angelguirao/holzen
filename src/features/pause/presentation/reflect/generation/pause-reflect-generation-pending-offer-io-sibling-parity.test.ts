@@ -26,7 +26,10 @@ import * as generationIo from './pause-reflect-generation-io';
 
 /**
  * Presentation sibling parity: generation-io vs pending-offer-io (parity with application
+ * `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts` and flow-level
  * `pause-reflect-generation-pending-offer-flow-sibling-parity.test.ts`).
+ * Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts` ↔
+ * `pause-reflect-pending-offer-io-parity.test.ts`.
  */
 describe('pause-reflect-generation-io ↔ pause-reflect-pending-offer-io sibling parity', () => {
   it('generation-io and pending-offer-io are distinct presentation I/O surfaces', () => {
