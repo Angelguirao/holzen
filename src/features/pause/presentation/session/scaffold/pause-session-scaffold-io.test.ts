@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest';
+import { buildPauseSessionPersistSnapshot as buildPersistFromLeaf } from '@/features/pause/application/use-cases/session/persist-snapshot';
+import { buildPauseSessionScaffoldRitualDerived as buildDerivedFromLeaf } from '@/features/pause/application/use-cases/session/scaffold/scaffold-ritual-derived';
+import { computePauseStorageRitualSyncPatch as computeSyncFromLeaf } from '@/features/pause/application/use-cases/session/storage-ritual-sync';
+import { hasPersistablePauseSessionAnchor as hasAnchorFromDomain } from '@/features/pause/domain/session/persisted-session-guards';
 import {
   buildPauseSessionPersistSnapshot,
   buildPauseSessionScaffoldRitualDerived,
   computePauseStorageRitualSyncPatch,
+  hasPersistablePauseSessionAnchor,
 } from './pause-session-scaffold-io';
 
 describe('pause-session-scaffold-io', () => {
@@ -58,5 +63,19 @@ describe('pause-session-scaffold-io', () => {
     });
 
     expect(derived.macroProgressLine).toBeDefined();
+  });
+
+  it('re-exports persistable session anchor guard from domain persisted-session-guards', () => {
+    expect(typeof hasPersistablePauseSessionAnchor).toBe('function');
+    expect(hasPersistablePauseSessionAnchor('pi-1', '')).toBe(true);
+    expect(hasPersistablePauseSessionAnchor(null, 'copy')).toBe(true);
+    expect(hasPersistablePauseSessionAnchor(null, '   ')).toBe(false);
+    expect(hasPersistablePauseSessionAnchor).toBe(hasAnchorFromDomain);
+  });
+
+  it('presentation I/O re-exports match application leaf modules (direct re-export parity)', () => {
+    expect(buildPauseSessionPersistSnapshot).toBe(buildPersistFromLeaf);
+    expect(computePauseStorageRitualSyncPatch).toBe(computeSyncFromLeaf);
+    expect(buildPauseSessionScaffoldRitualDerived).toBe(buildDerivedFromLeaf);
   });
 });
