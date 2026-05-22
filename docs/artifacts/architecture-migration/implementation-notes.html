@@ -22117,4 +22117,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session frame I/O leaf peel (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel <code>pause-session-frame-io</code> off frame-flow anchor</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-session-frame-io</code> imports <code>ritual/frame/restored-frame-ritual-state</code> directly (closes gap vs May 21 note — code had regressed to <code>pause-session-frame-flow</code>). CI blocks frame-flow on frame I/O.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-frame-flow</code> remains for restore-flow cluster composition; presentation frame I/O no longer routes through it.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: ritual-restore-flow breath hydration peel off <code>pause-session-breath-flow</code>, session shell/scaffold I/O peels, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
