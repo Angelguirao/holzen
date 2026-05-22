@@ -31,7 +31,7 @@ import {
 } from './pause-reflect-flows-io';
 
 describe('pause-reflect-flows-io', () => {
-  it('re-exports PauseImpactData from the session decide flow anchor', () => {
+  it('types PauseImpactData via pause-session-decide-io (session decide beat)', () => {
     const sample: PauseImpactData = {
       mood: null,
       moodAfter: null,
