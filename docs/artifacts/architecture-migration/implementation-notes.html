@@ -28021,4 +28021,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect generation-flow ↔ pending-offer-flow sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-pending-offer-flow-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated sibling parity between <code>pause-reflect-generation-flow</code> and <code>pause-reflect-pending-offer-flow</code> CI anchors (holzen-reflect/manual-open vs adopt/decline/display/telemetry). Reciprocal inline pins on both flow module unit tests. Production umbrellas unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comment anchors only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: hub↔share sibling parity gap, pending-offer-flow ↔ pending-offer-rpc-flow pins, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

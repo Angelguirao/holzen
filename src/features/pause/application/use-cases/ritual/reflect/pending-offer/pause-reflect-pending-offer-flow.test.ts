@@ -39,6 +39,12 @@ import {
   runReflectionShareImage as runShareImageFromShareFlow,
   trackPauseReflectPostItOpen as trackPostItFromShareFlow,
 } from '../share/pause-reflect-share-flow';
+import {
+  dismissOpenPauseHome as dismissFromGenerationFlow,
+  openManualPauseFromHome as openManualFromGenerationFlow,
+  resolveReflectGenerationPrefetch as resolvePrefetchFromGenerationFlow,
+  runReflectGeneration as runReflectGenerationFromGenerationFlow,
+} from '../generation/pause-reflect-generation-flow';
 
 describe('pause-reflect-pending-offer-flow', () => {
   it('re-exports pending-offer RPC use cases, display projection, and telemetry trackers from leaf modules', () => {
@@ -83,5 +89,14 @@ describe('pause-reflect-pending-offer-flow', () => {
     expect(trackAdoptedFromFlow).not.toBe(runShareImageFromShareFlow);
     expect(trackDeclinedFromFlow).not.toBe(buildShareTextFromShareFlow);
     expect(trackAbandonedFromFlow).not.toBe(trackPostItFromShareFlow);
+  });
+
+  it('sibling cluster: generation-flow exports stay distinct from pending-offer umbrella exports', () => {
+    expect(runAdoptPendingPauseOffer).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(runDeclinePendingPauseOffer).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(getDisplayFromFlow).not.toBe(resolvePrefetchFromGenerationFlow);
+    expect(trackAdoptedFromFlow).not.toBe(openManualFromGenerationFlow);
+    expect(trackDeclinedFromFlow).not.toBe(dismissFromGenerationFlow);
+    expect(trackAbandonedFromFlow).not.toBe(runReflectGenerationFromGenerationFlow);
   });
 });
