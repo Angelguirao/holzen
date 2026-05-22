@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session brief application cluster marker (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>application/use-cases/session/</code> brief CI cluster marker has unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add empty <code>pause-session-brief-cluster</code> + <code>pause-session-brief-flow.test.ts</code> beside <code>pause-session-brief-flow</code> (parity with <code>pause-session-scaffold-cluster</code> and <code>ritual/reflect/generation/holzen-reflect/ritual-reflect-generation-holzen-reflect-cluster</code>). <code>pause-session-brief-io</code> unchanged (imports <code>restored-brief-ritual-state</code>, <code>initial-ritual-entry</code>, and <code>ritual/brief/ritual-depth-upgrade</code> directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — marker + regression test slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session ritual-restore umbrella still lacks an application cluster marker until a follow-up slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-ritual-restore-cluster</code> or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect holzen-reflect generation subcluster marker (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
