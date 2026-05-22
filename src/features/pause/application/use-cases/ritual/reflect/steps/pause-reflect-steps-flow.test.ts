@@ -30,6 +30,11 @@ import { runPauseReflectNoteUpdate as runNoteDirect } from './run-pause-reflect-
 import { runPauseReflectTagUpdate as runTagDirect } from './run-pause-reflect-tag-update';
 import { runPauseReflectionStepLogOnce as runReflectionStepDirect } from './run-pause-reflection-step-log';
 import {
+  openManualPauseFromHome as openManualFromGenerationFlow,
+  reflectGenerationPrerequisite as prerequisiteFromGenerationFlow,
+  runReflectGeneration as runReflectGenerationFromGenerationFlow,
+} from '../generation/pause-reflect-generation-flow';
+import {
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
   runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
 } from '../flows/pause-reflect-flows-flow';
@@ -107,9 +112,9 @@ describe('pause-reflect-steps-flow', () => {
   it('sibling cluster: generation-flow exports stay distinct from steps umbrella exports', () => {
     expect(runPauseFavoriteToggle).not.toBe(runReflectGenerationFromGenerationFlow);
     expect(runPauseReflectNoteUpdate).not.toBe(runReflectGenerationFromGenerationFlow);
-    expect(runPauseReflectTagUpdate).not.toBe(shouldCommitFromGenerationFlow);
-    expect(runPauseReflectionStepLogOnce).not.toBe(runReflectGenerationFromGenerationFlow);
-    expect(shouldShowFavoriteFromFlow).not.toBe(shouldCommitFromGenerationFlow);
-    expect(shouldLogFromFlow).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(prerequisiteFromGenerationFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(openManualFromGenerationFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(shouldLogFromFlow).not.toBe(openManualFromGenerationFlow);
   });
 });
