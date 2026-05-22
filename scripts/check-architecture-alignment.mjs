@@ -2172,13 +2172,16 @@ for (const file of walkTs(join(root, 'src'))) {
   }
   if (
     rel.endsWith('pause-session-decide-io.ts') ||
-    rel.endsWith('pause-session-decide-io.test.ts')
+    rel.endsWith('pause-session-decide-io.test.ts') ||
+    rel.endsWith('pause-session-decide-io.re-exports.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_SESSION_DECIDE_IO_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: session decide I/O must import PauseImpactData from domain/pause-impact-data (${needle})`,
-        );
+    if (!rel.endsWith('pause-session-decide-io.re-exports.test.ts')) {
+      for (const needle of LEGACY_PAUSE_SESSION_DECIDE_IO_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: session decide I/O must import PauseImpactData from domain/pause-impact-data (${needle})`,
+          );
+        }
       }
     }
   }
@@ -3120,7 +3123,9 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
     const sessionDecideIoAllowlisted =
-      rel.endsWith('pause-session-decide-io.ts') || rel.endsWith('pause-session-decide-io.test.ts');
+      rel.endsWith('pause-session-decide-io.ts') ||
+      rel.endsWith('pause-session-decide-io.test.ts') ||
+      rel.endsWith('pause-session-decide-io.re-exports.test.ts');
     if (!sessionDecideIoAllowlisted) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_DECIDE_IMPACT_IMPORTS) {
         if (text.includes(needle)) {

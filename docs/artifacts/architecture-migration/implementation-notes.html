@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session decide-io + step-transition-io re-exports (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-decide-io.re-exports.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add presentation <code>pause-session-decide-io.re-exports.test.ts</code> for <code>PauseImpactData</code> type peel (parity with application <code>pause-session-decide-io-parity.test.ts</code>; no runtime hydration on decide-io). Extend <code>pause-session-step-transition-io.re-exports.test.ts</code> with <code>pause-session-step-transition-flow</code> anchor identity + callable smoke. Allowlist decide-io re-exports test for flow type import in <code>check:architecture-alignment</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + decide-io comment + alignment allowlist only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription Tier 1 shims or Tier 1 <code>holzen-query-client-ref</code> lib shim for <code>App.tsx</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect pending-offer-io adopt/decline parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
