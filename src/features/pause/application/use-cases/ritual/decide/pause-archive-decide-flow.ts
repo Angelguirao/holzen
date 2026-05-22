@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for archive retrospective decide presentation I/O (§3 / check:architecture-alignment).
  * Composes RPC + PostHog subcluster anchors.
- * Presentation: `pause-archive-io.ts` imports through this anchor (off deep ritual/decide paths).
+ * Presentation: `pause-archive-io.ts` imports RPC + telemetry leaf modules directly (off this anchor).
  */
 export { logRetrospectiveOutcome } from './pause-archive-decide-rpc-flow';
 export {

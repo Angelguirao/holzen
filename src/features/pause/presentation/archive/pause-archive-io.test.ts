@@ -12,10 +12,13 @@ const {
   trackPauseOutcomeRetrospectiveMock: vi.fn(),
 }));
 
+vi.mock('@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome', () => ({
+  logRetrospectiveOutcome: logRetrospectiveOutcomeMock,
+}));
+
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/decide/pause-archive-decide-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry',
   () => ({
-    logRetrospectiveOutcome: logRetrospectiveOutcomeMock,
     trackPauseOutcomeRetrospective: trackPauseOutcomeRetrospectiveMock,
   }),
 );
