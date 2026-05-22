@@ -289,6 +289,13 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_STEP_BUNDLES_IMPORTS = [
   "from '../application/use-cases/session/step-bundles'",
 ];
 
+/** Reflect generation/manual-open — import Home PostHog via telemetry-io only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow',
+  "from './application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow'",
+  "from '../application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow'",
+];
+
 /** Archive presentation I/O — import retrospective decide helpers via flow anchor only. */
 const LEGACY_PAUSE_PRESENTATION_ARCHIVE_DECIDE_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome',
@@ -438,6 +445,18 @@ for (const file of walkTs(join(root, 'src'))) {
   for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS) {
     if (text.includes(needle)) {
       failures.push(`${rel}: legacy flat presentation/reflect import (${needle})`);
+    }
+  }
+  if (
+    rel.startsWith('src/features/pause/presentation/reflect/generation/manual-open/') &&
+    !rel.endsWith('-io.ts') &&
+    !rel.endsWith('.test.ts') &&
+    !rel.endsWith('.test.tsx')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy reflect manual-open telemetry import (${needle})`);
+      }
     }
   }
   if (rel.startsWith('src/features/pause/presentation/archive/')) {
