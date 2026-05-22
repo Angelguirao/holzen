@@ -51,7 +51,9 @@ import {
   initialEmotionSelectRollbackUi as rollbackUiFromMoodIo,
   isPauseSessionDepthPickerActive as isDepthPickerActiveFromMoodIo,
   pauseInitialEmotionSelect,
+  pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkip,
+  pauseInitialEmotionSkipWithRepository,
   reflectPauseRepository,
   resolvePauseDepthContextLineParams as resolveDepthLineFromMoodIo,
   resolvePauseSessionChromeCloseAction as resolveChromeCloseFromMoodIo,
@@ -121,5 +123,42 @@ describe('pause-reflect-mood-io parity', () => {
     await pauseInitialEmotionSkip(input);
 
     expect(runInitialEmotionSkip).toHaveBeenCalledWith(supabasePauseRepository, input);
+  });
+
+  it('presentation I/O exports mood RPC wrappers distinct from leaf use cases', () => {
+    expect(typeof pauseInitialEmotionSelect).toBe('function');
+    expect(typeof pauseInitialEmotionSelectWithRepository).toBe('function');
+    expect(typeof pauseInitialEmotionSkip).toBe('function');
+    expect(typeof pauseInitialEmotionSkipWithRepository).toBe('function');
+    expect(pauseInitialEmotionSelect).not.toBe(runInitialEmotionSelect);
+    expect(pauseInitialEmotionSkip).not.toBe(runInitialEmotionSkip);
+  });
+
+  it('pauseInitialEmotionSelectWithRepository delegates with injected repository', async () => {
+    const customRepository = { port: 'customPauseRepository' };
+    const input = {
+      pauseInstanceId: 'inst-mood-custom',
+      mood: 'energized' as const,
+      lastFeelLogKey: 'key-1',
+    };
+
+    await pauseInitialEmotionSelectWithRepository(
+      customRepository as unknown as typeof supabasePauseRepository,
+      input,
+    );
+
+    expect(runInitialEmotionSelect).toHaveBeenCalledWith(customRepository, input);
+  });
+
+  it('pauseInitialEmotionSkipWithRepository delegates with injected repository', async () => {
+    const customRepository = { port: 'customPauseRepositorySkip' };
+    const input = { pauseInstanceId: 'inst-mood-skip-custom' };
+
+    await pauseInitialEmotionSkipWithRepository(
+      customRepository as unknown as typeof supabasePauseRepository,
+      input,
+    );
+
+    expect(runInitialEmotionSkip).toHaveBeenCalledWith(customRepository, input);
   });
 });

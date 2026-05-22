@@ -2,6 +2,7 @@
  * Reflect mood beat presentation I/O (feel tiles, depth picker, chrome close, initial emotion RPC).
  * Imports domain mood leaf modules and `run-initial-emotion-log` directly (parity with
  * `pause-reflect-hub-io` → domain + leaf use case).
+ * Wrapper delegation pins: pause-reflect-mood-io-parity.test.ts (default + *WithRepository seams).
  */
 import {
   runInitialEmotionSelect,
@@ -26,6 +27,7 @@ import {
 } from '@/features/pause/domain/reflect/mood/pause-session-chrome-close';
 import { runDeepPausePickerEntryIfPro } from '@/features/pause/domain/reflect/mood/run-deep-pause-picker-entry-if-pro';
 import { resolvePauseDepthContextLineParams } from '@/features/pause/domain/reflect/mood/resolve-pause-depth-context-line-params';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 export {
@@ -59,4 +61,20 @@ export function pauseInitialEmotionSkip(
   input: Parameters<typeof runInitialEmotionSkip>[1],
 ): ReturnType<typeof runInitialEmotionSkip> {
   return runInitialEmotionSkip(reflectPauseRepository, input);
+}
+
+/** Test seam: inject a custom `PauseRepository` for mood select. */
+export function pauseInitialEmotionSelectWithRepository(
+  repository: PauseRepository,
+  input: Parameters<typeof runInitialEmotionSelect>[1],
+): ReturnType<typeof runInitialEmotionSelect> {
+  return runInitialEmotionSelect(repository, input);
+}
+
+/** Test seam: inject a custom `PauseRepository` for mood skip. */
+export function pauseInitialEmotionSkipWithRepository(
+  repository: PauseRepository,
+  input: Parameters<typeof runInitialEmotionSkip>[1],
+): ReturnType<typeof runInitialEmotionSkip> {
+  return runInitialEmotionSkip(repository, input);
 }

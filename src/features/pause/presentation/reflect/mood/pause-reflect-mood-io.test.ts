@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import {
+  runInitialEmotionSelect as runInitialEmotionSelectDirect,
+  runInitialEmotionSkip as runInitialEmotionSkipDirect,
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log';
+import {
   applyBriefDepthPickerRitualEntry as applyBriefDirect,
   applyDeepDepthPickerRitualEntry as applyDeepDirect,
 } from '@/features/pause/domain/reflect/mood/apply-depth-picker-ritual-entry';
@@ -26,7 +30,9 @@ import {
   initialEmotionSelectRollbackUi,
   isPauseSessionDepthPickerActive,
   pauseInitialEmotionSelect,
+  pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkip,
+  pauseInitialEmotionSkipWithRepository,
   reflectPauseRepository,
   resolvePauseDepthContextLineParams,
   resolvePauseSessionChromeCloseAction,
@@ -111,6 +117,47 @@ describe('pause-reflect-mood-io', () => {
 
     expect(runInitialEmotionSkipMock).toHaveBeenCalledWith(reflectPauseRepository, {
       pauseInstanceId: 'pi-1',
+    });
+  });
+
+  it('exports mood RPC wrappers distinct from leaf use cases', () => {
+    expect(typeof pauseInitialEmotionSelect).toBe('function');
+    expect(typeof pauseInitialEmotionSelectWithRepository).toBe('function');
+    expect(typeof pauseInitialEmotionSkip).toBe('function');
+    expect(typeof pauseInitialEmotionSkipWithRepository).toBe('function');
+    expect(pauseInitialEmotionSelect).not.toBe(runInitialEmotionSelectDirect);
+    expect(pauseInitialEmotionSkip).not.toBe(runInitialEmotionSkipDirect);
+  });
+
+  it('pauseInitialEmotionSelectWithRepository forwards injected repository', async () => {
+    const customRepo = { port: 'injected-mood-select' };
+    runInitialEmotionSelectMock.mockResolvedValue({ status: 'deduped', ui: {} });
+
+    await pauseInitialEmotionSelectWithRepository(customRepo as never, {
+      pauseInstanceId: 'pi-custom',
+      mood: 'calm',
+      intensity: 2,
+      lastFeelLogKey: null,
+    });
+
+    expect(runInitialEmotionSelectMock).toHaveBeenCalledWith(customRepo, {
+      pauseInstanceId: 'pi-custom',
+      mood: 'calm',
+      intensity: 2,
+      lastFeelLogKey: null,
+    });
+  });
+
+  it('pauseInitialEmotionSkipWithRepository forwards injected repository', async () => {
+    const customRepo = { port: 'injected-mood-skip' };
+    runInitialEmotionSkipMock.mockResolvedValue({ status: 'synced', logKey: 'k', ui: {} });
+
+    await pauseInitialEmotionSkipWithRepository(customRepo as never, {
+      pauseInstanceId: 'pi-skip-custom',
+    });
+
+    expect(runInitialEmotionSkipMock).toHaveBeenCalledWith(customRepo, {
+      pauseInstanceId: 'pi-skip-custom',
     });
   });
 });
