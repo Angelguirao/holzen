@@ -3338,9 +3338,13 @@ for (const file of walkTs(join(root, 'src'))) {
   if (
     rel.endsWith('pause-session-ritual-restore-io.ts') ||
     rel.endsWith('pause-session-ritual-restore-io.test.ts') ||
-    rel.endsWith('pause-session-ritual-restore-io.re-exports.test.ts')
+    rel.endsWith('pause-session-ritual-restore-io.re-exports.test.ts') ||
+    rel.endsWith('pause-session-ritual-restore-io-parity.test.ts')
   ) {
-    if (!rel.endsWith('pause-session-ritual-restore-io.re-exports.test.ts')) {
+    if (
+      !rel.endsWith('pause-session-ritual-restore-io.re-exports.test.ts') &&
+      !rel.endsWith('pause-session-ritual-restore-io-parity.test.ts')
+    ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_RITUAL_RESTORE_IO_UMBRELLA_FLOW_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(
