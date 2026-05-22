@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session breath-step-navigation-io ↔ breath-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-breath-step-navigation-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete — no folder moves. Add application-layer <code>pause-session-breath-step-navigation-io-parity.test.ts</code> so presentation <code>pause-session-breath-step-navigation-io</code> exports match <code>pause-session-breath-flow</code> navigation re-exports and <code>domain/ritual/breathe/pause-breath-step-navigation</code> leaf bindings (parity with breath-io pins; step handlers import step-navigation I/O sibling only).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + I/O/flow comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: extend <code>pause-reflect-pending-offer-io-parity</code> adopt/decline pins, or hub-flow ↔ mood-flow sibling cluster pins.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — home bulk-hold day grouping → presentation (Tier 4)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -26434,7 +26451,11 @@
       <dt>Tradeoffs</dt>
       <dd>Re-exports test may import step-handlers-flow CI anchor; production I/O keeps <code>step-bundles</code> direct import.</dd>
       <dt>Open questions</dt>
+<<<<<<< HEAD
       <dd>Next: session terminal-entry-io extended parity pins, or Phase B subscription Tier 1 shims.</dd>
+=======
+      <dd>Next: Phase B subscription Tier 1 shims.</dd>
+>>>>>>> dac2953b8 (test(pause): add breath-step-navigation-io parity pins)
     </dl>
   </article>
 
