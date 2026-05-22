@@ -24878,4 +24878,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect pending-offer umbrella pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-flow</code> ↔ rpc / display / telemetry subclusters</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-pending-offer-flow.test.ts</code> so the pending-offer CI umbrella re-exports are identical to <code>pause-reflect-pending-offer-rpc-flow</code>, <code>pause-pending-offer-display-flow</code>, and <code>pause-pending-offer-telemetry-flow</code> (parity with <code>pause-reflect-share-flow</code> telemetry pins).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without rewiring presentation I/O (still imports leaf modules directly per §6 peel).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-analytics-io</code> identity pins, <code>pause-reflect-share-orchestration-flow</code> ↔ share umbrella pins, or Phase B / Tier 1 <code>holzen-query-client-ref</code> shim peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
