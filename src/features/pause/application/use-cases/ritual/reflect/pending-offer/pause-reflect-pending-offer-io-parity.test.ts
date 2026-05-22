@@ -47,8 +47,10 @@ import {
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   pauseReflectGeneration,
+  reflectGenerator,
   runReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import * as generationIo from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
@@ -192,6 +194,21 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(trackAdoptedFromTelemetryIo);
     expect(getPendingPauseOfferDisplay).not.toBe(trackDeclinedFromTelemetryIo);
     expect(reflectPauseRepository).not.toBe(trackAbandonedFromTelemetryIo);
+  });
+
+  it('application mirror: pending-offer-io stays off generation-io holzen-reflect exports', () => {
+    expect('runReflectGeneration' in pendingOfferIo).toBe(false);
+    expect('pauseReflectGeneration' in pendingOfferIo).toBe(false);
+    expect('reflectGenerator' in pendingOfferIo).toBe(false);
+    expect('pauseAdoptPendingOffer' in generationIo).toBe(false);
+    expect('pauseDeclinePendingOffer' in generationIo).toBe(false);
+    expect('getPendingPauseOfferDisplay' in generationIo).toBe(false);
+    expect('reflectPauseRepository' in generationIo).toBe(false);
+    expect(pauseAdoptPendingOffer).not.toBe(runReflectGeneration);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseReflectGeneration);
+    expect(reflectPauseRepository).not.toBe(reflectGenerator);
+    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts` (application + presentation).
+    // Dedicated sibling: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`.
   });
 
   /**
