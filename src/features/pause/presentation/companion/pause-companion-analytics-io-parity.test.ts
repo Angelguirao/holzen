@@ -1,5 +1,6 @@
 /**
  * Presentation I/O parity (colocated beside `pause-companion-analytics-io.ts`).
+ * Application mirror: `application/use-cases/ritual/frame/pause-companion-analytics-io-parity.test.ts` (colocated beside analytics-flow).
  * Imports `pause-companion-analytics-flow` CI umbrella for `.toBe` identity pins only —
  * production analytics I/O keeps ritual/frame leaf imports.
  * Orchestrate distinctness sibling: `application/.../frame/pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts`

@@ -2,7 +2,8 @@
  * CI cluster anchor for companion frame analytics presentation I/O (§3 / check:architecture-alignment).
  * Feedback vote + fullview opened use cases live in sibling `ritual/frame/*` modules.
  * Presentation: `pause-companion-analytics-io.ts` imports leaf modules directly (not this anchor);
- * `pause-companion-analytics-io.re-exports.test.ts` + colocated `presentation/companion/pause-companion-analytics-io-parity.test.ts` pin parity.
+ * `pause-companion-analytics-io.re-exports.test.ts`, `presentation/companion/pause-companion-analytics-io-parity.test.ts`,
+ * and `application/.../frame/pause-companion-analytics-io-parity.test.ts` (application mirror) pin parity.
  * Sibling cluster: `pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts` ↔ `pause-companion-orchestrate-flow`.
  */
 export type {
