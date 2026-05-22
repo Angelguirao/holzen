@@ -3,7 +3,7 @@
  * Colocated under `presentation/reflect/telemetry/home/` beside application
  * `ritual/reflect/generation/manual-open/` Home PostHog trackers (dismiss/banner + manual trigger).
  * Imports trackers via `pause-home-reflect-telemetry-flow` CI anchor
- * (parity with `pause-reflect-telemetry-io` → session telemetry flow).
+ * (parity with `pause-reflect-telemetry-io` → share cluster + session telemetry flow).
  */
 export {
   markPauseManualStartedHomeOnce,

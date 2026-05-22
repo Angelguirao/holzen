@@ -1,6 +1,6 @@
 /**
- * Session reflect beat PostHog helpers (post-it, share, wallpaper taps).
- * Colocated under `presentation/reflect/telemetry/session/` (parity with application `share/pause-reflect-session-ui-telemetry`).
+ * Session reflect beat PostHog helpers (post-it, share menu, wallpaper taps).
+ * Colocated under `presentation/reflect/share/` beside share orchestration I/O (parity with application `share/pause-reflect-session-ui-telemetry`).
  * Imports trackers via `pause-reflect-telemetry-flow` CI anchor.
  */
 export {

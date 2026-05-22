@@ -115,10 +115,6 @@ mustExist(
   'pause/presentation/reflect/telemetry/',
 );
 mustExist(
-  'src/features/pause/presentation/reflect/telemetry/session',
-  'pause/presentation/reflect/telemetry/session/',
-);
-mustExist(
   'src/features/pause/presentation/reflect/telemetry/home',
   'pause/presentation/reflect/telemetry/home/',
 );
@@ -215,6 +211,9 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS = [
   '@/features/pause/presentation/reflect/use-pause-artifact-reflection-text',
   '@/features/pause/presentation/reflect/use-pause-reflection-step-log',
   '@/features/pause/presentation/reflect/use-pause-reflect-ui-telemetry',
+  '@/features/pause/presentation/reflect/telemetry/session/',
+  "from './presentation/reflect/telemetry/session/",
+  "from '../presentation/reflect/telemetry/session/",
   '@/features/pause/presentation/reflect/use-pause-reflect-tags',
   '@/features/pause/presentation/reflect/use-pause-reflect-note',
   '@/features/pause/presentation/reflect/use-pause-reflect-frame-focus-ambience',
