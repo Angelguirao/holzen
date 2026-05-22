@@ -12,6 +12,10 @@ import { buildShiftEmotionFrameHubLogBundle as buildLogBundleFromLogFlow } from 
 import { runShiftEmotionFrameHubDone as runShiftHubDoneFromDoneFlow } from './pause-shift-emotion-frame-hub-done-flow';
 import { resolveShiftFrameHubDonePresentation as resolvePresentationFromPresentationFlow } from './pause-shift-frame-hub-presentation-flow';
 import { runShiftEmotionFrameHubDone as runShiftHubDoneDirect } from './run-shift-emotion-frame-hub-done';
+import {
+  buildFeelTilesMoodLogOptions as buildFeelTilesFromMoodFlow,
+  runInitialEmotionSelect as runInitialEmotionSelectFromMoodFlow,
+} from '../mood/pause-reflect-mood-flow';
 
 describe('pause-reflect-hub-flow', () => {
   it('re-exports hub helpers from domain + leaf RPC use case', () => {
@@ -35,5 +39,12 @@ describe('pause-reflect-hub-flow', () => {
     const second = buildShiftEmotionFrameHubLogBundle();
     expect(first.logKey).toBe(second.logKey);
     expect(first.payload).toEqual(second.payload);
+  });
+
+  it('sibling cluster: mood-flow exports stay distinct from hub umbrella exports', () => {
+    expect(buildLogBundleFromFlow).not.toBe(runInitialEmotionSelectFromMoodFlow);
+    expect(buildLogBundleFromFlow).not.toBe(buildFeelTilesFromMoodFlow);
+    expect(runShiftEmotionFrameHubDone).not.toBe(runInitialEmotionSelectFromMoodFlow);
+    expect(resolvePresentationFromFlow).not.toBe(buildFeelTilesFromMoodFlow);
   });
 });

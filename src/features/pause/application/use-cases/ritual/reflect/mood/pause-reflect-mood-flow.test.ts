@@ -55,6 +55,11 @@ import {
   runDeepPausePickerEntryIfPro as runDeepPickerFromChromeFlow,
   runPauseSessionChromeCloseAction as runChromeCloseFromChromeFlow,
 } from './pause-session-mood-chrome-flow';
+import {
+  buildShiftEmotionFrameHubLogBundle as buildHubLogBundleFromHubFlow,
+  resolveShiftFrameHubDonePresentation as resolveHubPresentationFromHubFlow,
+  runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
+} from '../hub/pause-reflect-hub-flow';
 
 describe('pause-reflect-mood-flow', () => {
   it('re-exports mood helpers from domain + run-initial-emotion-log leaf module', () => {
@@ -98,5 +103,12 @@ describe('pause-reflect-mood-flow', () => {
     expect(resolveChromeCloseFromFlow).toBe(resolveChromeCloseFromChromeFlow);
     expect(runChromeCloseFromFlow).toBe(runChromeCloseFromChromeFlow);
     expect(runDeepPickerFromFlow).toBe(runDeepPickerFromChromeFlow);
+  });
+
+  it('sibling cluster: hub-flow exports stay distinct from mood umbrella exports', () => {
+    expect(runInitialEmotionSelect).not.toBe(buildHubLogBundleFromHubFlow);
+    expect(runInitialEmotionSelect).not.toBe(runShiftHubDoneFromHubFlow);
+    expect(buildFeelTilesFromFlow).not.toBe(buildHubLogBundleFromHubFlow);
+    expect(buildFeelTilesFromFlow).not.toBe(resolveHubPresentationFromHubFlow);
   });
 });
