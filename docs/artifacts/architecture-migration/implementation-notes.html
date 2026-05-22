@@ -22649,4 +22649,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — peel pause-companion-orchestrate-flow off orchestrate subclusters (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel <code>pause-companion-orchestrate-flow</code> off orchestrate subcluster flow anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>application/use-cases/companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. <code>pause-companion-orchestrate-flow</code> composes ritual/frame leaf modules directly (parity with <code>pause-companion-orchestration-flow</code> and <code>pause-reflect-share-orchestration-flow</code> umbrella peels on branch tip). <code>pause-companion-orchestrate-io</code> already imported leaf modules; CI now blocks orchestrate subcluster flow imports on the orchestrate umbrella.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Orchestrate <code>*-flow</code> subcluster anchors remain CI-only; no presentation consumer routes through <code>pause-companion-orchestrate-flow</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session shell/scaffold I/O peels, or Phase B subscription Tier 1 shim (<code>App.tsx</code> checkout guard).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

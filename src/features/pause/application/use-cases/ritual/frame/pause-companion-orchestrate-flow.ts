@@ -1,39 +1,37 @@
 /**
  * CI cluster anchor for companion slot orchestrate presentation I/O (§3 / check:architecture-alignment).
- * Composes orchestrate subcluster anchors (CI cluster detection only).
- * Presentation: `pause-companion-orchestrate-io.ts` imports ritual/frame leaf modules directly.
+ * Composes ritual/frame leaf modules directly (not orchestrate subcluster flow anchors).
+ * Presentation: `pause-companion-orchestrate-io.ts` imports leaf modules directly.
  */
 export {
   applyCompanionOrchestrateRetryReset,
   type CompanionOrchestrateRetryResetInput,
   type CompanionOrchestrateRetryResetPorts,
-} from './pause-companion-orchestrate-retry-flow';
-export { applyCompanionSlotOrchestrateOutcome } from './pause-companion-orchestrate-outcome-flow';
-export type { CompanionOrchestrateSessionContext } from './pause-companion-slot-orchestrate-flow';
-export {
-  logCompanionSlotOrchestrateInvoke,
-  trackCompanionGenerationInitiated,
-} from './pause-companion-slot-orchestrate-telemetry-flow';
-export type { ApplyCompanionSlotOrchestrateFailureUiPorts } from './pause-companion-orchestrate-outcome-flow';
+} from './apply-companion-orchestrate-retry-reset';
+export { applyCompanionSlotOrchestrateOutcome } from './apply-companion-slot-orchestrate-outcome';
+export type { ApplyCompanionSlotOrchestrateFailureUiPorts } from './companion-slot-orchestrate-failure-ui';
+export type { CompanionOrchestrateSessionContext } from './build-companion-orchestrate-body';
+export { logCompanionSlotOrchestrateInvoke } from './companion-slot-orchestrate-telemetry';
+export { trackCompanionGenerationInitiated } from './companion-generation-telemetry';
 export {
   setCompanionSlotError,
   setCompanionSlotLoading,
   type CompanionSlotErrorSetters,
   type CompanionSlotLoadingSetters,
-} from './pause-companion-slot-orchestrate-ui-flow';
-export { resetInterventionIdempotency } from './pause-companion-intervention-orchestrate-flow';
+} from './companion-slot-ui-state';
+export { resetInterventionIdempotency } from './intervention-idempotency';
 export {
   EMPTY_COMPANION_SLOT_RELAXATIONS,
   type CompanionSlotAutosaveParams,
   type CompanionSlotCacheIds,
   type CompanionSlotCommitters,
   type CompanionSlotRelaxations,
-} from './pause-companion-orchestrate-slot-apply-flow';
+} from './orchestrate-slot-apply';
 export {
   runCompanionSlotOrchestrate,
   type CompanionSlotOrchestrateMode,
-} from './pause-companion-slot-orchestrate-flow';
+} from './run-companion-slot-orchestrate';
 export {
   runCompanionInterventionBootstrap,
   type RunCompanionInterventionBootstrapPorts,
-} from './pause-companion-intervention-orchestrate-flow';
+} from './run-companion-intervention-bootstrap';
