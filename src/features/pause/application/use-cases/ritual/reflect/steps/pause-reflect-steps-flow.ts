@@ -14,6 +14,7 @@
  * pause-reflect-steps-telemetry-flow-sibling-parity.test.ts,
  * pause-reflect-steps-generation-flow-sibling-parity.test.ts (dedicated + reciprocal inline pins in `pause-reflect-steps-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts`),
  * pause-reflect-steps-ambience-flow-sibling-parity.test.ts (dedicated + reciprocal inline pins in `pause-reflect-steps-flow.test.ts` ↔ `pause-reflect-ambience-flow.test.ts`),
+ * pause-reflect-steps-ambience-io-sibling-parity.test.ts (steps-io ↔ ambience-io; application + presentation; reciprocal inline pins in `pause-reflect-steps-io-parity.test.ts` / `pause-reflect-ambience-io-parity.test.ts`),
  * pause-reflect-note-tag-flow-sibling-parity.test.ts (note/tag subcluster anchors),
  * pause-reflect-steps-note-tag-flow-sibling-parity.test.ts (steps-flow ↔ note/tag; reciprocal inline pins in `pause-reflect-steps-flow.test.ts` ↔ `pause-reflect-note-flow.test.ts` / `pause-reflect-tag-flow.test.ts`),
  * pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts (favorite ↔ reflection_step log subcluster anchors),

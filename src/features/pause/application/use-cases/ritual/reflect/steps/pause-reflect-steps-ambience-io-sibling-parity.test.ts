@@ -27,11 +27,10 @@ import {
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 
 /**
- * Application sibling parity: steps-io vs ambience-io (parity with presentation
- * `pause-reflect-steps-ambience-io-sibling-parity.test.ts` and flow-level
- * `pause-reflect-steps-ambience-flow-sibling-parity.test.ts`).
- * Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts` ↔
- * `pause-reflect-ambience-io-parity.test.ts`.
+ * Application-layer sibling parity: presentation steps-io vs ambience-io (parity with
+ * `pause-reflect-steps-ambience-flow-sibling-parity.test.ts` and presentation
+ * `pause-reflect-steps-ambience-io-sibling-parity.test.ts`; complements reciprocal inline pins on
+ * `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-ambience-io-parity.test.ts`.
  */
 describe('pause-reflect-steps-io ↔ pause-reflect-ambience-io sibling parity (application)', () => {
   it('steps-io and ambience-io are distinct presentation I/O surfaces', () => {
