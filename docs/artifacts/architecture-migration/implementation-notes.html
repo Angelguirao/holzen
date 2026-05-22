@@ -30301,4 +30301,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — steps-colocated steps-io ↔ flows-io sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-flows-io-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves remain complete — no reflect moves. Add steps-colocated application + presentation IO sibling parity so <code>pause-reflect-steps-io</code> stays namespace-separated from <code>pause-reflect-flows-io</code> (parity with flow-level <code>pause-reflect-steps-flows-flow-sibling-parity.test.ts</code> and flows-colocated <code>pause-reflect-flows-steps-io-sibling-parity.test.ts</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comment anchors only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B Tier 1 shim scan (<code>subscription-checkout-guard-ref</code>), or mood-io parity colocation under <code>presentation/reflect/mood/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

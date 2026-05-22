@@ -19,7 +19,9 @@
  * pause-reflect-steps-note-tag-flow-sibling-parity.test.ts (steps-flow ↔ note/tag; reciprocal inline pins in `pause-reflect-steps-flow.test.ts` ↔ `pause-reflect-note-flow.test.ts` / `pause-reflect-tag-flow.test.ts`),
  * pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts (favorite ↔ reflection_step log subcluster anchors),
  * pause-reflect-steps-favorite-reflection-step-log-flow-sibling-parity.test.ts (steps-flow ↔ favorite/reflection_step log; reciprocal inline pins in `pause-reflect-steps-flow.test.ts` ↔ `pause-favorite-toggle-flow.test.ts` / `pause-reflection-step-log-flow.test.ts`), and
- * pause-reflect-steps-flows-flow-sibling-parity.test.ts pin separation from hub/mood/pending-offer/share/telemetry/generation/flows CI anchors;
+ * pause-reflect-steps-flows-flow-sibling-parity.test.ts,
+ * pause-reflect-steps-flows-io-sibling-parity.test.ts (application + presentation; steps-io ↔ flows-io),
+ * pause-reflect-flows-steps-io-sibling-parity.test.ts (flows-colocated mirror) pin separation from hub/mood/pending-offer/share/telemetry/generation/flows CI anchors;
  * reciprocal inline pins: `pause-reflect-steps-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts` (holzen-reflect + manual-open off steps umbrella).
  * `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (presentation wrappers off flow umbrella).
  * Cross-surface: `pause-session-step-handlers-steps-flow-sibling-parity.test.ts` ↔ `session/pause-session-step-handlers-flow`
