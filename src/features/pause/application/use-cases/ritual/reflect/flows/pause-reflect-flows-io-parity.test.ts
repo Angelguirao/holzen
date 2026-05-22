@@ -298,7 +298,7 @@ describe('pause-reflect-flows-io parity (application)', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `presentation/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+   * Reciprocal inline pins ↔ `pending-offer/pause-reflect-pending-offer-io-parity.test.ts` (application + presentation).
    * Dedicated sibling file: `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: pending-offer-io exports stay distinct from flows-io', () => {
@@ -309,7 +309,7 @@ describe('pause-reflect-flows-io parity (application)', () => {
     expect(buildPauseScoreImpacts).not.toBe(pauseDeclinePendingOfferWithRepository);
     expect(formatReinforcementQuoteFromSession).not.toBe(pauseAdoptPendingOffer);
     expect(getSessionQuote).not.toBe(pauseDeclinePendingOffer);
-    // Reciprocal inline pins: `presentation/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+    // Reciprocal inline pins: `pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
   });
 
   /**

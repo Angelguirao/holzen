@@ -3,7 +3,7 @@
  * `pause-reflect-hub-io-parity.test.ts`; presentation pins stay colocated beside
  * `pause-reflect-pending-offer-io.ts`).
  * Imports `pause-reflect-pending-offer-flow` CI umbrella for `.toBe` identity pins only —
- * production pending-offer I/O keeps run-* + display leaf imports.
+ * production pending-offer I/O keeps adopt/decline/display leaf imports.
  */
 import { describe, expect, it, vi } from 'vitest';
 
@@ -19,6 +19,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/pending-offer/run
   runDeclinePendingPauseOffer: vi.fn(() => Promise.resolve({ status: 'ok' as const })),
 }));
 
+import { getPendingPauseOfferDisplay as getDisplayDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display';
 import { runAdoptPendingPauseOffer as runAdoptDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer';
 import { runDeclinePendingPauseOffer as runDeclineDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer';
 import { getPendingPauseOfferDisplay as getDisplayFromDisplayFlow } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-display-flow';
@@ -43,15 +44,21 @@ import {
   trackPauseSessionAbandoned as trackAbandonedFromTelemetryIo,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 import {
-  buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
-  resolveShiftFrameHubDonePresentation,
+  pauseShiftEmotionFrameHubDoneWithRepository,
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
-  buildFeelTilesMoodLogOptions,
   pauseInitialEmotionSelect,
   pauseInitialEmotionSkip,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import {
+  pauseReflectOutcomeLog,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
+  pauseReflectFavoriteToggle,
+  pauseReflectionStepLogOnce,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 /**
@@ -70,6 +77,8 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
   it('pending-offer CI umbrella composes the same run-* leaf use cases as presentation I/O', () => {
     expect(runAdoptPendingPauseOffer).toBe(runAdoptDirect);
     expect(runDeclinePendingPauseOffer).toBe(runDeclineDirect);
+    expect(getPendingPauseOfferDisplay).toBe(getDisplayDirect);
+    expect(getDisplayFromPendingOfferIo).toBe(getDisplayDirect);
   });
 
   it('presentation I/O binds reflectPauseRepository to public-rpc supabasePauseRepository', () => {
@@ -83,6 +92,8 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
     expect(pauseDeclinePendingOffer).not.toBe(runDeclineDirect);
     expect(pauseAdoptPendingOffer).not.toBe(pauseDeclinePendingOffer);
     expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(runAdoptDirect);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(runDeclineDirect);
   });
 
   it('pauseAdoptPendingOffer delegates to run-adopt-pending-pause-offer with default repository', async () => {
@@ -136,9 +147,17 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
    */
   it('sibling cluster: hub-io shift-frame exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(pauseShiftEmotionFrameHubDone);
-    expect(pauseDeclinePendingOffer).not.toBe(buildShiftEmotionFrameHubLogBundle);
-    expect(getPendingPauseOfferDisplay).not.toBe(resolveShiftFrameHubDonePresentation);
-    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(getPendingPauseOfferDisplay).not.toBe(pauseShiftEmotionFrameHubDone);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: flows-io exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseReflectOutcomeLog);
+    expect(getPendingPauseOfferDisplay).not.toBe(pauseReflectOutcomeLog);
   });
 
   /**
@@ -147,7 +166,15 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
   it('sibling cluster: mood-io initial-emotion exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(pauseInitialEmotionSelect);
     expect(pauseDeclinePendingOffer).not.toBe(pauseInitialEmotionSkip);
-    expect(getPendingPauseOfferDisplay).not.toBe(buildFeelTilesMoodLogOptions);
-    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseInitialEmotionSelect);
+    expect(getPendingPauseOfferDisplay).not.toBe(pauseInitialEmotionSelect);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: steps-io exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseReflectionStepLogOnce);
+    expect(getPendingPauseOfferDisplay).not.toBe(pauseReflectFavoriteToggle);
   });
 });
