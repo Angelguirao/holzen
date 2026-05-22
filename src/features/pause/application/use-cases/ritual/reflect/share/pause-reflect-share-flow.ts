@@ -1,20 +1,19 @@
 /**
  * CI cluster anchor for ritual reflect share presentation I/O (§3 / check:architecture-alignment).
- * Composes orchestration + session reflect UI PostHog subclusters.
- * Presentation: `pause-reflect-share-io.ts` → domain share builders + `run-reflection-share-image` directly;
- * `pause-reflect-telemetry-io.ts` imports `pause-reflect-session-ui-telemetry` directly (not this umbrella).
+ * Composes domain share builders + `run-reflection-share-image` + session UI telemetry (not subcluster flow anchors).
+ * Presentation: `pause-reflect-share-io.ts` and `pause-reflect-telemetry-io.ts` import leaf modules directly.
  */
-export type { DeliverReflectionShareImageDeps } from './pause-reflect-share-orchestration-flow';
-export { runReflectionShareImage } from './pause-reflect-share-orchestration-flow';
-export { buildReflectionShareText } from './pause-reflect-share-orchestration-flow';
+export type { DeliverReflectionShareImageDeps } from './deliver-reflection-share-image';
+export { runReflectionShareImage } from './run-reflection-share-image';
+export { buildReflectionShareText } from '@/features/pause/domain/reflect/share/reflection-share-text';
 export {
   buildReflectionShareTelegramUrl,
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
-} from './pause-reflect-share-orchestration-flow';
+} from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';
 export {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
   type PauseReflectTelemetrySurface,
-} from './pause-reflect-telemetry-flow';
+} from './pause-reflect-session-ui-telemetry';
