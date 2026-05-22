@@ -11,6 +11,18 @@ import {
   pauseInitialEmotionSkipWithRepository,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
+  pauseReflectFavoriteToggleWithRepository,
+  pauseReflectNoteUpdateWithRepository,
+  pauseReflectTagUpdateWithRepository,
+  pauseReflectionStepLogOnceWithRepository,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
   buildReflectionShareText,
   pauseReflectionShareImage,
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
@@ -102,6 +114,21 @@ describe('pause-reflect-hub-io', () => {
     expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseInitialEmotionSkip);
     expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseInitialEmotionSkipWithRepository);
     // Full cross-I/O pins: `pause-reflect-mood-hub-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: steps-io exports stay distinct from hub-io', () => {
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseReflectNoteUpdate);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseReflectTagUpdate);
+    expect(buildShiftEmotionFrameHubLogBundle).not.toBe(pauseReflectionStepLogOnce);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseReflectFavoriteToggleWithRepository);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseReflectNoteUpdateWithRepository);
+    expect(resolveShiftFrameHubDonePresentation).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    expect(buildShiftEmotionFrameHubLogBundle).not.toBe(shouldShowFavoriteProHint);
+    expect(resolveShiftFrameHubDonePresentation).not.toBe(shouldLogPauseReflectionStep);
+    expect(reflectPauseRepository).not.toBe(pauseReflectFavoriteToggle);
+    // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-steps-io.test.ts`;
+    // `pause-reflect-steps-hub-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: share-io exports stay distinct from hub-io', () => {

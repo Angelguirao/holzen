@@ -24,6 +24,13 @@ import {
   shouldCommitReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
+  buildShiftEmotionFrameHubLogBundle,
+  pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
+  reflectPauseRepository as hubReflectPauseRepository,
+  resolveShiftFrameHubDonePresentation,
+} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
   buildReflectionShareTelegramUrl,
   buildReflectionShareText,
   buildReflectionShareTweetUrl,
@@ -259,6 +266,21 @@ describe('pause-reflect-steps-io', () => {
     expect(shouldShowFavoriteProHint).not.toBe(getPendingPauseOfferDisplay);
     // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-pending-offer-io.test.ts`;
     // `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: hub-io exports stay distinct from steps-io', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(pauseReflectTagUpdate).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseReflectionStepLogOnce).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(pauseReflectFavoriteToggleWithRepository).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(pauseReflectNoteUpdateWithRepository).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseReflectionStepLogOnceWithRepository).not.toBe(resolveShiftFrameHubDonePresentation);
+    expect(shouldShowFavoriteProHint).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(shouldLogPauseReflectionStep).not.toBe(resolveShiftFrameHubDonePresentation);
+    expect(reflectPauseRepository).toBe(hubReflectPauseRepository);
+    // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-hub-io.test.ts`;
+    // `pause-reflect-steps-hub-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: ambience-io exports stay distinct from steps-io', () => {
