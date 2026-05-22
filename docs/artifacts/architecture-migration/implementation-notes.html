@@ -76,6 +76,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — application shell-io ↔ scaffold-io sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-shell-scaffold-io-sibling-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation <code>pause-session-shell-scaffold-io-sibling-parity</code> at application layer so session shell hydration/header-back I/O stays namespace-separated from scaffold persist/sync/derived I/O (parity with flow-level <code>pause-session-scaffold-shell-flow-sibling-parity.test.ts</code>). Extend reciprocal inline pins on <code>pause-session-shell-io-parity</code> and <code>pause-session-scaffold-io-parity</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + I/O header comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: colocate <code>pause-reflect-generation-io-parity</code> under <code>presentation/reflect/generation/</code>, or Phase B subscription/auth Tier 1 shim scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — application flows-io ↔ pending-offer-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
