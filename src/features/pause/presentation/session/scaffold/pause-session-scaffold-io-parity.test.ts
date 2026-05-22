@@ -44,6 +44,7 @@ import {
 
 /**
  * Scaffold CI umbrella ↔ presentation I/O delegation parity (colocated beside `pause-session-scaffold-io.ts`).
+ * Application mirror: `application/use-cases/session/pause-session-scaffold-io-parity.test.ts`.
  * Terminal-entry sibling: `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins below ↔ `pause-session-terminal-entry-io-parity.test.ts`.
  */
