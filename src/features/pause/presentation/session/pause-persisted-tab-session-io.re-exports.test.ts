@@ -32,12 +32,21 @@ describe('pause-persisted-tab-session-io re-exports', () => {
     expect(clearFromFlow).toBe(clearDirect);
   });
 
-  it('presentation I/O exports port-bound helpers (delegation in pause-persisted-tab-session-io.test.ts)', () => {
+  it('presentation I/O bindings match pause-session-persisted-tab-session-flow CI anchor (leaf parity)', () => {
+    expect(loadFromFlow).toBe(loadDirect);
+    expect(saveFromFlow).toBe(saveDirect);
+    expect(clearFromFlow).toBe(clearDirect);
+  });
+
+  it('presentation I/O exports port-bound helpers distinct from flow leaf re-exports', () => {
     expect(typeof loadPausePersistedTabSession).toBe('function');
     expect(typeof savePausePersistedTabSession).toBe('function');
     expect(typeof clearPausePersistedTabSession).toBe('function');
     expect(loadPausePersistedTabSession).not.toBe(loadDirect);
+    expect(loadPausePersistedTabSession).not.toBe(loadFromFlow);
     expect(savePausePersistedTabSession).not.toBe(saveDirect);
+    expect(savePausePersistedTabSession).not.toBe(saveFromFlow);
     expect(clearPausePersistedTabSession).not.toBe(clearDirect);
+    expect(clearPausePersistedTabSession).not.toBe(clearFromFlow);
   });
 });

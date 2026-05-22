@@ -26848,4 +26848,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — persisted-tab-session-io re-exports flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-persisted-tab-session-io.re-exports.test.ts</code> flow CI anchor parity</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend presentation re-exports test with explicit flow-anchor leaf parity (parity with <code>pause-session-terminal-entry-io.re-exports.test.ts</code>) and distinctness guards for port-bound presentation wrappers vs <code>pause-session-persisted-tab-session-flow</code> leaf re-exports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comments only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shims, or <code>holzen-console</code> logging re-export parity across features.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
