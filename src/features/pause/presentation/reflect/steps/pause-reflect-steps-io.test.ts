@@ -258,11 +258,17 @@ describe('pause-reflect-steps-io', () => {
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectTagUpdate);
     expect(pauseReflectNoteUpdateWithRepository).not.toBe(pauseReflectTagUpdateWithRepository);
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseReflectionStepLogOnce);
     expect(pauseReflectTagUpdate).not.toBe(pauseReflectionStepLogOnce);
+    expect(pauseReflectTagUpdate).not.toBe(pauseReflectFavoriteToggle);
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectionStepLogOnceWithRepository);
     expect(pauseReflectTagUpdate).not.toBe(pauseReflectFavoriteToggleWithRepository);
     expect(pauseReflectNoteUpdateWithRepository).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseReflectNoteUpdateWithRepository).not.toBe(pauseReflectFavoriteToggleWithRepository);
     expect(pauseReflectTagUpdateWithRepository).not.toBe(pauseReflectionStepLogOnce);
+    expect(pauseReflectTagUpdateWithRepository).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    expect(pauseReflectNoteUpdate).not.toBe(shouldLogPauseReflectionStep);
+    expect(pauseReflectTagUpdate).not.toBe(shouldShowFavoriteProHint);
     expect(shouldShowFavoriteProHint).not.toBe(pauseReflectNoteUpdate);
     expect(shouldLogPauseReflectionStep).not.toBe(pauseReflectTagUpdate);
     // Reciprocal inline pins: `pause-reflect-note-flow.test.ts`, `pause-reflect-tag-flow.test.ts`.

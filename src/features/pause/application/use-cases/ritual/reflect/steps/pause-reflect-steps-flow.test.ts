@@ -122,6 +122,11 @@ describe('pause-reflect-steps-flow', () => {
     expect(runPauseReflectTagUpdate).not.toBe(shouldLogFromLogFlow);
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-note-flow.test.ts` and
+   * `pause-reflect-tag-flow.test.ts` (note vs tag subclusters via steps umbrella).
+   * Dedicated sibling file: `pause-reflect-steps-note-tag-flow-sibling-parity.test.ts`.
+   */
   it('sibling cluster: note-flow and tag-flow exports stay distinct from steps umbrella-only bindings', () => {
     expect(runPauseFavoriteToggle).not.toBe(runNoteFromNoteFlow);
     expect(runPauseFavoriteToggle).not.toBe(runTagFromTagFlow);
@@ -133,7 +138,9 @@ describe('pause-reflect-steps-flow', () => {
     expect(runPauseReflectionStepLogOnce).not.toBe(runTagFromTagFlow);
     expect(shouldShowFavoriteFromFlow).not.toBe(runNoteFromNoteFlow);
     expect(shouldLogFromFlow).not.toBe(runTagFromTagFlow);
-    // Full cross-flow pins: `pause-reflect-steps-note-tag-flow-sibling-parity.test.ts`.
+    expect(runPauseReflectNoteUpdate).not.toBe(runReflectionStepFromLogFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(shouldLogFromLogFlow);
+    // Reciprocal inline pins: `pause-reflect-note-flow.test.ts`, `pause-reflect-tag-flow.test.ts`.
   });
 
   /**

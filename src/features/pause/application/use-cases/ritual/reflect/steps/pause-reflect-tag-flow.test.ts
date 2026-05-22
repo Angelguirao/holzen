@@ -4,6 +4,14 @@ import { runPauseReflectTagUpdate as runTagDirect } from './run-pause-reflect-ta
 import { runPauseReflectTagUpdate } from './pause-reflect-tag-flow';
 import { runPauseReflectNoteUpdate as runNoteFromNoteFlow } from './pause-reflect-note-flow';
 import {
+  runPauseReflectionStepLogOnce as runReflectionStepFromLogFlow,
+  shouldLogPauseReflectionStep as shouldLogFromLogFlow,
+} from './pause-reflection-step-log-flow';
+import {
+  runPauseFavoriteToggle as runFavoriteFromToggleFlow,
+  shouldShowFavoriteProHint as shouldShowFromToggleFlow,
+} from './pause-favorite-toggle-flow';
+import {
   runPauseFavoriteToggle as runFavoriteFromStepsFlow,
   runPauseReflectNoteUpdate as runNoteFromStepsFlow,
   runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
@@ -18,11 +26,15 @@ describe('pause-reflect-tag-flow', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-note-flow.test.ts`.
+   * Reciprocal inline pins ↔ `pause-reflect-note-flow.test.ts` (tag vs note subclusters).
    * Dedicated sibling file: `pause-reflect-note-tag-flow-sibling-parity.test.ts`.
    */
   it('sibling cluster: note-flow export stays distinct from tag-flow export', () => {
     expect(runPauseReflectTagUpdate).not.toBe(runNoteFromNoteFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(runReflectionStepFromLogFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(shouldLogFromLogFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(runFavoriteFromToggleFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(shouldShowFromToggleFlow);
     expect(runPauseReflectTagUpdate).not.toBe(runFavoriteFromStepsFlow);
     expect(runPauseReflectTagUpdate).not.toBe(runReflectionStepFromStepsFlow);
     // Reciprocal inline pins: `pause-reflect-note-flow.test.ts`.
