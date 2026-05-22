@@ -98,7 +98,7 @@
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves remain complete — no use-case moves. Colocate Home manual-open presentation I/O parity beside <code>pause-home-reflect-io.ts</code> (<code>presentation/reflect/generation/manual-open/</code>) and Home telemetry I/O parity beside <code>pause-home-reflect-telemetry-io.ts</code> (<code>presentation/reflect/telemetry/</code>). Application flow/cluster sibling parity tests stay under <code>application/.../generation/manual-open/</code>.</dd>
       <dt>Deviation</dt>
-      <dd>Parity tests still import application CI umbrellas (<code>pause-reflect-generation-manual-open-flow</code>, <code>pause-home-reflect-telemetry-flow</code>) — intentional presentation ↔ application binding guards.</dd>
+      <dd>Parity/re-exports tests still import application CI umbrellas (<code>pause-reflect-generation-manual-open-flow</code>, <code>pause-home-reflect-telemetry-flow</code>) — intentional binding guards; exempted in <code>check:architecture-alignment</code>.</dd>
       <dt>Open questions</dt>
       <dd>Next: remaining presentation-only reflect I/O sibling mirrors, colocate remaining session <code>*-io-parity.test.ts</code> files, or Phase B Tier 1 shim scan.</dd>
     </dl>

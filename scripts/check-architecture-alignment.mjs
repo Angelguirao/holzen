@@ -2024,12 +2024,16 @@ for (const file of walkTs(join(root, 'src'))) {
   if (
     rel.endsWith('pause-home-reflect-telemetry-io.ts') ||
     rel.endsWith('pause-home-reflect-telemetry-io.test.ts') ||
+    rel.endsWith('pause-home-reflect-telemetry-io.re-exports.test.ts') ||
     rel.endsWith('pause-home-reflect-telemetry-io-parity.test.ts')
   ) {
     const homeReflectTelemetryIoParityTest = rel.endsWith(
       'pause-home-reflect-telemetry-io-parity.test.ts',
     );
-    if (!homeReflectTelemetryIoParityTest) {
+    const homeReflectTelemetryIoReexportsTest = rel.endsWith(
+      'pause-home-reflect-telemetry-io.re-exports.test.ts',
+    );
+    if (!homeReflectTelemetryIoParityTest && !homeReflectTelemetryIoReexportsTest) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IO_HOME_FLOW_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(
@@ -2038,11 +2042,13 @@ for (const file of walkTs(join(root, 'src'))) {
         }
       }
     }
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IO_GENERATION_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: manual-open telemetry I/O must not import generation umbrella (${needle})`,
-        );
+    if (!homeReflectTelemetryIoParityTest) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IO_GENERATION_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: manual-open telemetry I/O must not import generation umbrella (${needle})`,
+          );
+        }
       }
     }
   }
@@ -2053,7 +2059,8 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-home-reflect-io-parity.test.ts')
   ) {
     const homeReflectIoParityTest = rel.endsWith('pause-home-reflect-io-parity.test.ts');
-    if (!homeReflectIoParityTest) {
+    const homeReflectIoReexportsTest = rel.endsWith('pause-home-reflect-io.re-exports.test.ts');
+    if (!homeReflectIoParityTest && !homeReflectIoReexportsTest) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_IO_GENERATION_FLOW_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(
@@ -2061,6 +2068,8 @@ for (const file of walkTs(join(root, 'src'))) {
           );
         }
       }
+    }
+    if (!homeReflectIoParityTest && !homeReflectIoReexportsTest) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_IO_FLOW_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(
