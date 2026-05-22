@@ -6,7 +6,8 @@
  * `pause-session-shell-io` / persisted-tab-session flow), `pause-session-scaffold-io.re-exports.test.ts`,
  * `pause-session-scaffold-io.test.ts` (presentation smoke + leaf identity),
  * `pause-session-scaffold-shell-io-sibling-parity.test.ts` (sibling vs shell-io),
- * `pause-session-providers-scaffold-io-sibling-parity.test.ts` (sibling vs providers-io).
+ * `pause-session-providers-scaffold-io-sibling-parity.test.ts` (sibling vs providers-io),
+ * `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` (sibling vs terminal-entry-io).
  */
 export {
   buildPauseSessionPersistSnapshot,
