@@ -1,9 +1,8 @@
 /**
  * Home manual-open PostHog helpers (manual open + dismiss/banner).
- * Colocated under `presentation/reflect/generation/manual-open/` beside
- * `pause-home-reflect-io` and application `ritual/reflect/generation/manual-open/` trackers.
- * Imports trackers from leaf modules directly (parity with
- * `pause-reflect-telemetry-io` → `pause-reflect-session-ui-telemetry`; not generation umbrella or telemetry-flow anchor).
+ * Colocated under `presentation/reflect/telemetry/` beside session reflect UI telemetry
+ * (`pause-reflect-telemetry-io`); application trackers stay in `ritual/reflect/generation/manual-open/`.
+ * Imports trackers from leaf modules directly (not generation umbrella or telemetry-flow anchor).
  */
 export {
   trackHomePendingPauseBannerPauseOpened,
