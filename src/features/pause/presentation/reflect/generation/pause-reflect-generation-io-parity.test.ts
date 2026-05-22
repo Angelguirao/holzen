@@ -1,9 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: { port: 'reflectPauseRepository' },
-  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
   supabasePauseRepository: { port: 'supabasePauseRepository' },
+  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
 vi.mock(
@@ -46,7 +45,7 @@ import {
   runReflectGeneration as runReflectGenerationFromGenerationIo,
   shouldClearReflectGenerationLoading as shouldClearLoadingFromGenerationIo,
   shouldCommitReflectGeneration as shouldCommitFromGenerationIo,
-} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+} from './pause-reflect-generation-io';
 
 import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
 import {
@@ -94,8 +93,8 @@ import {
 /**
  * Presentation I/O parity (colocated beside `pause-reflect-generation-io.ts`).
  * Imports `pause-reflect-generation-flow` CI umbrella and domain hook bundle for `.toBe` identity pins only — production generation I/O keeps leaf imports.
- * Hub-io sibling:
- * `pause-reflect-generation-hub-io-sibling-parity.test.ts` (application + presentation);
+ * Application-layer sibling parity tests remain under `application/.../ritual/reflect/generation/` when they assert flow umbrellas.
+ * Hub-io sibling: `pause-reflect-generation-hub-io-sibling-parity.test.ts` (application + presentation);
  * mood-io sibling: `pause-reflect-generation-mood-io-sibling-parity.test.ts` (application + presentation);
  * flows-io sibling: `pause-reflect-flows-generation-io-sibling-parity.test.ts`;
  * telemetry-io sibling: `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`;

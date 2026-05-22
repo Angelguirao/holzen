@@ -2169,6 +2169,8 @@ for (const file of walkTs(join(root, 'src'))) {
           );
         }
       }
+    }
+    if (!generationIoParityTest) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IO_HOOK_FLOW_BUNDLE_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(
