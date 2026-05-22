@@ -72,6 +72,11 @@ import {
   reflectGenerationPrerequisite as prerequisiteFromGenerationFlow,
   runReflectGeneration as runReflectGenerationFromGenerationFlow,
 } from '../generation/pause-reflect-generation-flow';
+import {
+  getPendingPauseOfferDisplay as getDisplayFromPendingOfferFlow,
+  runAdoptPendingPauseOffer as runAdoptFromPendingOfferFlow,
+  runDeclinePendingPauseOffer as runDeclineFromPendingOfferFlow,
+} from '../pending-offer/pause-reflect-pending-offer-flow';
 
 describe('pause-reflect-mood-flow', () => {
   it('re-exports mood helpers from domain + run-initial-emotion-log leaf module', () => {
@@ -143,5 +148,14 @@ describe('pause-reflect-mood-flow', () => {
     expect(runChromeCloseFromFlow).not.toBe(runReflectGenerationFromGenerationFlow);
     expect(applyBriefFromFlow).not.toBe(prerequisiteFromGenerationFlow);
     expect(runInitialEmotionSelect).not.toBe(openManualFromGenerationFlow);
+  });
+
+  it('sibling cluster: pending-offer-flow exports stay distinct from mood umbrella exports', () => {
+    expect(runInitialEmotionSelect).not.toBe(runAdoptFromPendingOfferFlow);
+    expect(runInitialEmotionSkip).not.toBe(runDeclineFromPendingOfferFlow);
+    expect(buildFeelTilesFromFlow).not.toBe(getDisplayFromPendingOfferFlow);
+    expect(runChromeCloseFromFlow).not.toBe(runAdoptFromPendingOfferFlow);
+    expect(applyBriefFromFlow).not.toBe(runDeclineFromPendingOfferFlow);
+    // Full cross-umbrella pins: `pause-reflect-mood-pending-offer-flow-sibling-parity.test.ts`.
   });
 });
