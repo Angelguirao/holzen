@@ -38,8 +38,14 @@ import {
   shouldCommitReflectGeneration as shouldCommitFromGenerationFlow,
 } from '../generation/pause-reflect-generation-flow';
 import {
+  buildPauseScoreImpacts as buildImpactsFromFlowsFlow,
+  formatReinforcementQuoteFromSession as formatQuoteFromFlowsFlow,
+  getSessionQuote as getQuoteFromFlowsFlow,
+  resolvePauseDecideOutcomeFlow as resolveOutcomeFromFlowsFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromFlowsFlow,
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
   runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
+  showPauseOutcomeNotCompletedToast as showNotCompletedFromFlowsFlow,
 } from '../flows/pause-reflect-flows-flow';
 import {
   buildShiftEmotionFrameHubLogBundle as buildHubLogBundleFromHubFlow,
@@ -162,13 +168,28 @@ describe('pause-reflect-steps-flow', () => {
     expect(shouldLogFromFlow).toBe(shouldLogFromLogFlow);
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-flow.test.ts` (step RPC umbrella vs reflect+decide).
+   * Dedicated sibling file: `pause-reflect-steps-flows-flow-sibling-parity.test.ts`.
+   */
   it('sibling cluster: flows-flow exports stay distinct from steps umbrella exports', () => {
     expect(runPauseFavoriteToggle).not.toBe(resolvePreflightFromFlowsFlow);
+    expect(runPauseFavoriteToggle).not.toBe(resolveAfterGenFromFlowsFlow);
+    expect(runPauseFavoriteToggle).not.toBe(formatQuoteFromFlowsFlow);
     expect(runPauseFavoriteToggle).not.toBe(runOutcomeLogFromFlowsFlow);
     expect(runPauseReflectNoteUpdate).not.toBe(resolvePreflightFromFlowsFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(resolveOutcomeFromFlowsFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(getQuoteFromFlowsFlow);
     expect(runPauseReflectTagUpdate).not.toBe(runOutcomeLogFromFlowsFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(buildImpactsFromFlowsFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(showNotCompletedFromFlowsFlow);
     expect(runPauseReflectionStepLogOnce).not.toBe(resolvePreflightFromFlowsFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(resolveAfterGenFromFlowsFlow);
     expect(shouldLogFromFlow).not.toBe(runOutcomeLogFromFlowsFlow);
+    expect(shouldLogFromFlow).not.toBe(formatQuoteFromFlowsFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(resolveOutcomeFromFlowsFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(buildImpactsFromFlowsFlow);
+    // Reciprocal inline pins: `pause-reflect-flows-flow.test.ts`.
   });
 
   it('sibling cluster: hub-flow exports stay distinct from steps umbrella exports', () => {

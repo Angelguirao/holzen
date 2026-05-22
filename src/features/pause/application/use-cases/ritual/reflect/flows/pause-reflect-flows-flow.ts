@@ -6,7 +6,7 @@
  * may import this umbrella for parity; production flows I/O keeps leaf imports.
  * Sibling pins: `pause-reflect-flows-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts` (inline),
  * ↔ `pause-reflect-pending-offer-flow.test.ts` (inline; dedicated `pause-reflect-flows-pending-offer-flow-sibling-parity.test.ts`),
- * `pause-reflect-ambience-flow.test.ts`, and `pause-reflect-steps-flow.test.ts` (inline);
+ * `pause-reflect-ambience-flow.test.ts`, and `pause-reflect-steps-flow.test.ts` (reciprocal inline pins);
  * dedicated: `pause-reflect-flows-ambience-flow-sibling-parity.test.ts` ↔ `pause-reflect-ambience-flow`;
  * `pause-reflect-steps-flows-flow-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow`;
  * `pause-reflect-flows-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-flow`;

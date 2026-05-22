@@ -57,8 +57,11 @@ import {
 } from '../ambience/pause-reflect-ambience-flow';
 import {
   runPauseFavoriteToggle as runFavoriteFromStepsFlow,
+  runPauseReflectNoteUpdate as runNoteFromStepsFlow,
+  runPauseReflectTagUpdate as runTagFromStepsFlow,
   runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
   shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
+  shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
 } from '../steps/pause-reflect-steps-flow';
 import {
   trackPauseReflectPostItOpen as trackPostItFromTelemetryFlow,
@@ -165,13 +168,32 @@ describe('pause-reflect-flows-flow', () => {
     expect(formatQuoteFromFlow).not.toBe(stopPauseReflectFrameFocusAmbience);
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-flow.test.ts` (reflect+decide vs step RPC umbrella).
+   * Dedicated sibling file: `pause-reflect-steps-flows-flow-sibling-parity.test.ts`.
+   */
   it('sibling cluster: steps-flow exports stay distinct from flows umbrella exports', () => {
     expect(resolvePreflightFromFlow).not.toBe(runFavoriteFromStepsFlow);
+    expect(resolvePreflightFromFlow).not.toBe(runNoteFromStepsFlow);
+    expect(resolvePreflightFromFlow).not.toBe(runTagFromStepsFlow);
     expect(resolvePreflightFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+    expect(resolveAfterGenFromFlow).not.toBe(runFavoriteFromStepsFlow);
+    expect(resolveAfterGenFromFlow).not.toBe(runNoteFromStepsFlow);
+    expect(resolveAfterGenFromFlow).not.toBe(runTagFromStepsFlow);
+    expect(resolveAfterGenFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+    expect(formatQuoteFromFlow).not.toBe(runFavoriteFromStepsFlow);
+    expect(formatQuoteFromFlow).not.toBe(shouldLogFromStepsFlow);
+    expect(formatQuoteFromFlow).not.toBe(shouldShowFavoriteFromStepsFlow);
+    expect(resolveOutcomeFlowFromFlow).not.toBe(runNoteFromStepsFlow);
+    expect(resolveOutcomeFlowFromFlow).not.toBe(runTagFromStepsFlow);
     expect(runOutcomeLogFromFlow).not.toBe(runFavoriteFromStepsFlow);
     expect(runOutcomeLogFromFlow).not.toBe(runReflectionStepFromStepsFlow);
-    expect(formatQuoteFromFlow).not.toBe(shouldLogFromStepsFlow);
-    expect(resolveAfterGenFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+    expect(runOutcomeLogFromFlow).not.toBe(runNoteFromStepsFlow);
+    expect(getQuoteFromFlow).not.toBe(runTagFromStepsFlow);
+    expect(buildImpactsFromFlow).not.toBe(shouldLogFromStepsFlow);
+    expect(showNotCompletedFromFlow).not.toBe(shouldShowFavoriteFromStepsFlow);
+    expect(showSaveFailedFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+    // Reciprocal inline pins: `pause-reflect-steps-flow.test.ts`.
   });
 
   it('sibling cluster: mood-flow exports stay distinct from flows umbrella exports', () => {
