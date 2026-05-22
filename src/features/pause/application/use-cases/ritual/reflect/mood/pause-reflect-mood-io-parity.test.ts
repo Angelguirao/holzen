@@ -3,7 +3,8 @@
  * `pause-reflect-hub-io-parity.test.ts`; presentation pins stay colocated beside
  * `pause-reflect-mood-io.ts`).
  * Imports `pause-reflect-mood-flow` CI umbrella for `.toBe` identity pins only —
- * production mood I/O keeps domain + `run-initial-emotion-log` leaf imports.
+ * production mood I/O keeps domain mood helpers + `run-initial-emotion-log` leaf imports.
+ * Presentation mirror: `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
 
@@ -68,6 +69,35 @@ import {
   runDeepPausePickerEntryIfPro as runDeepPickerFromMoodIo,
   runPauseSessionChromeCloseAction as runChromeCloseFromMoodIo,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import {
+  messageFromReflectGenerationResult,
+  pauseReflectGeneration,
+  reflectGenerationPrerequisite,
+  reflectGenerator,
+  runReflectGeneration,
+} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectionStepLogOnce,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
+  formatReinforcementQuoteFromSession,
+  pauseReflectOutcomeLog,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import {
+  buildShiftEmotionFrameHubLogBundle,
+  pauseShiftEmotionFrameHubDone,
+} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 /**
@@ -171,5 +201,61 @@ describe('pause-reflect-mood-io parity (application)', () => {
     );
 
     expect(runInitialEmotionSkip).toHaveBeenCalledWith(customRepository, input);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (application).
+   */
+  it('sibling cluster: hub-io shift-frame exports stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseInitialEmotionSkip).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(buildFeelTilesFromMoodIo).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(reflectPauseRepository).not.toBe(pauseShiftEmotionFrameHubDone);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (application).
+   */
+  it('sibling cluster: generation-io holzen-reflect exports stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(runReflectGeneration);
+    expect(pauseInitialEmotionSkip).not.toBe(pauseReflectGeneration);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(reflectGenerationPrerequisite);
+    expect(reflectPauseRepository).not.toBe(reflectGenerator);
+    expect(pauseInitialEmotionSelect).not.toBe(messageFromReflectGenerationResult);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application).
+   */
+  it('sibling cluster: steps-io exports stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseInitialEmotionSkip).not.toBe(pauseReflectNoteUpdate);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(pauseReflectionStepLogOnce);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (application).
+   */
+  it('sibling cluster: flows-io reflect+decide exports stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(pauseInitialEmotionSkip).not.toBe(pauseReflectOutcomeLog);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(formatReinforcementQuoteFromSession);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `presentation/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+   */
+  it('sibling cluster: pending-offer-io exports stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(pauseAdoptPendingOffer);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(getPendingPauseOfferDisplay);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (application).
+   */
+  it('sibling cluster: ambience-io frame-focus bed exports stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseInitialEmotionSkip).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(buildFeelTilesFromMoodIo).not.toBe(startPauseReflectFrameFocusAmbience);
   });
 });

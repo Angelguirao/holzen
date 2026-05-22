@@ -27,7 +27,7 @@ import {
  * `pause-reflect-mood-hub-io-sibling-parity.test.ts` and flow-level
  * `pause-reflect-hub-mood-flow-sibling-parity.test.ts`; complements hub-anchored
  * `hub/pause-reflect-hub-mood-io-sibling-parity.test.ts`).
- * Reciprocal inline pins: `pause-reflect-mood-io.test.ts` ↔ `pause-reflect-hub-io.test.ts`.
+ * Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts` ↔ `pause-reflect-hub-io-parity.test.ts` (application).
  */
 describe('pause-reflect-mood-io ↔ pause-reflect-hub-io sibling parity (application)', () => {
   it('mood-io and hub-io are distinct presentation I/O surfaces', () => {

@@ -15,6 +15,7 @@
  * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts`.
  * Telemetry-io sibling: `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts`.
+ * Mood-io sibling: `mood/pause-reflect-mood-io-parity.test.ts` (application); reciprocal inline pins ↔ hub-io.
  */
 import { describe, expect, it, vi } from 'vitest';
 
