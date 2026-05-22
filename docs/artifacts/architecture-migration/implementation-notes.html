@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — companion orchestrate umbrella flow identity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestrate-flow</code> pins slot UI loading + empty relaxations re-exports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no reflect folder moves. Extend umbrella flow test with <code>.toBe(direct)</code> identity for <code>setCompanionSlotLoading</code> and <code>EMPTY_COMPANION_SLOT_RELAXATIONS</code> (parity with other orchestrate leaf pins on branch tip). <code>pause-companion-orchestrate-io</code> unchanged (imports leaf modules directly, not orchestrate umbrella).</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI slice only.</dd>
+      <dt>Tradeoff</dt>
+      <dd>Other <code>ritual/frame</code> umbrellas already had full identity; orchestrate umbrella was the last partial pin set.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription Tier 1 shims when pause Tier 5 identity pins are quiet.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session reflect telemetry cluster under ritual/reflect/telemetry/ (backlog #1, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
