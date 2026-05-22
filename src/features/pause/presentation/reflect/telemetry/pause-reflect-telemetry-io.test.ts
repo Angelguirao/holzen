@@ -86,6 +86,7 @@ describe('pause-reflect-telemetry-io', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(pauseAdoptPendingOfferWithRepository);
     expect(trackPauseReflectShareTap).not.toBe(pauseDeclinePendingOfferWithRepository);
     // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-pending-offer-io.test.ts`;
+    // dedicated session telemetry sibling: `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts`;
     // pending-offer RPC vs pending-offer telemetry: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
   });
 });

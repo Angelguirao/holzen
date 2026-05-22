@@ -119,7 +119,7 @@ describe('pause-reflect-pending-offer-io', () => {
     expect(pauseAdoptPendingOfferWithRepository).not.toBe(trackPauseReflectWallpaperTap);
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(trackPauseReflectPostItOpen);
     expect(getPendingPauseOfferDisplay).not.toBe(trackPauseReflectShareTap);
-    // Session reflect UI: `pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts`.
+    // Session reflect UI: `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: pending-offer-telemetry-io exports stay distinct from pending-offer-io', () => {
