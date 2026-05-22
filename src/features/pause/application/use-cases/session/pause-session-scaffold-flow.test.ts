@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { hasPersistablePauseSessionAnchor as hasPersistableAnchorDirect } from '@/features/pause/domain/session/persisted-session-guards';
+
 import {
   buildPauseSessionPersistSnapshot,
   buildPauseSessionScaffoldRitualDerived,
@@ -63,6 +65,8 @@ describe('pause-session-scaffold-flow', () => {
   });
 
   it('re-exports persistable session anchor guard from domain', () => {
+    expect(typeof hasPersistablePauseSessionAnchor).toBe('function');
+    expect(hasPersistablePauseSessionAnchor).toBe(hasPersistableAnchorDirect);
     expect(hasPersistablePauseSessionAnchor('pi-1', '')).toBe(true);
     expect(hasPersistablePauseSessionAnchor(null, 'copy')).toBe(true);
     expect(hasPersistablePauseSessionAnchor(null, '   ')).toBe(false);
