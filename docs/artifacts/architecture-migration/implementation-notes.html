@@ -31647,4 +31647,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — application steps-io *WithRepository delegation parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>application/.../steps/pause-reflect-steps-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Mirror presentation <code>pause-reflect-steps-io-parity</code> default + <code>*WithRepository</code> delegation pins at application layer (mocked run-* leaves; injected <code>PauseRepository</code> + optional reflection-step storage port on <code>pauseReflectionStepLogOnceWithRepository</code>). Keeps application/presentation parity tests symmetric beside steps CI umbrella.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: colocate <code>pause-archive-io-parity</code> / <code>pause-home-bulk-hold-io-parity</code> beside presentation I/O, or companion application parity under <code>presentation/companion/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
