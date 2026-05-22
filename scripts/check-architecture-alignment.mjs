@@ -2688,11 +2688,13 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-companion-orchestration-io.test.ts') ||
     rel.endsWith('pause-companion-orchestration-io.re-exports.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_IO_UMBRELLA_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: companion orchestration I/O must not import orchestration umbrella (${needle})`,
-        );
+    if (!rel.endsWith('pause-companion-orchestration-io.re-exports.test.ts')) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_IO_UMBRELLA_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: companion orchestration I/O must not import orchestration umbrella (${needle})`,
+          );
+        }
       }
     }
     for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_IO_SUBCLUSTER_FLOW_IMPORTS) {

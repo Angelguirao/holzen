@@ -13,6 +13,10 @@ import { invalidateCompanionUiCompletionQuery as invalidateQueryDirect } from '@
 import { loadCompanionOrchestrateSession as loadSessionDirect } from '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session';
 import { nextExpandedWithLazyFetch as nextExpandedDirect } from '@/features/pause/application/use-cases/ritual/frame/next-expanded-with-lazy-fetch';
 import {
+  loadCompanionOrchestrateSession as loadSessionFromOrchestrationFlow,
+  nextExpandedWithLazyFetch as nextExpandedFromOrchestrationFlow,
+} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow';
+import {
   supabaseCompanionOrchestrator,
   supabasePauseRepository,
 } from '@/features/pause/public-rpc';
@@ -26,7 +30,7 @@ import {
 } from './pause-companion-orchestration-io';
 
 describe('pause-companion-orchestration-io re-exports', () => {
-  it('re-exports ritual/frame leaf modules with identity bindings (not orchestration-flow umbrella)', () => {
+  it('re-exports ritual/frame leaf modules with identity bindings', () => {
     expect(typeof loadCompanionOrchestrateSession).toBe('function');
     expect(typeof nextExpandedWithLazyFetch).toBe('function');
     expect(typeof invalidateCompanionUiCompletionQuery).toBe('function');
@@ -39,5 +43,10 @@ describe('pause-companion-orchestration-io re-exports', () => {
   it('re-exports default ports from public-rpc', () => {
     expect(companionOrchestrator).toBe(supabaseCompanionOrchestrator);
     expect(companionPauseRepository).toBe(supabasePauseRepository);
+  });
+
+  it('presentation I/O bindings match pause-companion-orchestration-flow CI anchor (leaf parity)', () => {
+    expect(loadCompanionOrchestrateSession).toBe(loadSessionFromOrchestrationFlow);
+    expect(nextExpandedWithLazyFetch).toBe(nextExpandedFromOrchestrationFlow);
   });
 });
