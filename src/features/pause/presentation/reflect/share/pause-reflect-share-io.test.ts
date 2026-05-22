@@ -21,6 +21,13 @@ vi.mock(
 );
 
 import {
+  pauseInitialEmotionSelect,
+  pauseInitialEmotionSkip,
+  pauseInitialEmotionSelectWithRepository,
+  pauseInitialEmotionSkipWithRepository,
+  buildFeelTilesMoodLogOptions,
+} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
@@ -120,5 +127,15 @@ describe('pause-reflect-share-io', () => {
     expect(buildReflectionShareText).not.toBe(resolveShiftFrameHubDonePresentation);
     expect(buildReflectionShareText).not.toBe(pauseShiftEmotionFrameHubDone);
     // Full cross-umbrella pins: `pause-reflect-hub-share-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: mood-io exports stay distinct from share-io', () => {
+    expect(pauseReflectionShareImage).not.toBe(pauseInitialEmotionSelect);
+    expect(pauseReflectionShareImage).not.toBe(pauseInitialEmotionSkip);
+    expect(buildReflectionShareText).not.toBe(pauseInitialEmotionSelectWithRepository);
+    expect(buildReflectionShareTelegramUrl).not.toBe(pauseInitialEmotionSkipWithRepository);
+    expect(buildReflectionShareTweetUrl).not.toBe(buildFeelTilesMoodLogOptions);
+    // Full cross-I/O pins: `pause-reflect-share-mood-io-sibling-parity.test.ts`;
+    // reciprocal inline pins: `pause-reflect-mood-io.test.ts`.
   });
 });

@@ -23,6 +23,10 @@ import { runDeepPausePickerEntryIfPro as runDeepPickerDirect } from '@/features/
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
+  buildReflectionShareText,
+  pauseReflectionShareImage,
+} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
+import {
   buildPauseScoreImpacts,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
@@ -219,5 +223,14 @@ describe('pause-reflect-mood-io', () => {
     expect(reflectPauseRepository).not.toBe(trackPauseReflectShareTap);
     // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-telemetry-io.test.ts`;
     // mood RPC vs session UI telemetry: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: share-io exports stay distinct from mood-io', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(pauseReflectionShareImage);
+    expect(pauseInitialEmotionSkip).not.toBe(buildReflectionShareText);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseReflectionShareImage);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(buildReflectionShareText);
+    // Full cross-I/O pins: `pause-reflect-share-mood-io-sibling-parity.test.ts`;
+    // reciprocal inline pins: `pause-reflect-share-io.test.ts`.
   });
 });
