@@ -3,10 +3,7 @@
  * Imports steps subcluster flow anchors directly (parity with
  * `pause-reflect-mood-io` → mood subcluster flows).
  */
-import {
-  runPauseFavoriteToggle,
-  shouldShowFavoriteProHint,
-} from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-favorite-toggle-flow';
+import { runPauseFavoriteToggle, shouldShowFavoriteProHint } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-favorite-toggle-flow';
 import { runPauseReflectNoteUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-note-flow';
 import { runPauseReflectTagUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-tag-flow';
 import {
