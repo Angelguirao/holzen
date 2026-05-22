@@ -326,7 +326,7 @@ describe('pause-reflect-steps-io parity (application)', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (presentation).
+   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (application + presentation).
    * Dedicated sibling file: `pause-reflect-steps-hub-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: hub-io exports stay distinct from steps-io wrappers', () => {

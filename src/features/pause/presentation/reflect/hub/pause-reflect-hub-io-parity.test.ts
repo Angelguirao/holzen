@@ -74,6 +74,7 @@ import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 /**
  * Presentation hub I/O parity (colocated beside `pause-reflect-hub-io.ts`).
+ * Application mirror: `application/use-cases/ritual/reflect/hub/pause-reflect-hub-io-parity.test.ts`.
  * Steps-io sibling pins: `pause-reflect-steps-hub-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (steps cluster).
  * Flows-io sibling pins: `pause-reflect-flows-hub-io-sibling-parity.test.ts` (application + presentation);
