@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — apply-manual-pause-open-result via telemetry-io (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>applyManualPauseOpenResult</code> imports PostHog through presentation telemetry-io</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. <code>apply-manual-pause-open-result.ts</code> imports <code>trackManualPauseInstanceCreated</code> and <code>trackPauseManualCompleted</code> from <code>presentation/reflect/telemetry/home/pause-home-reflect-telemetry-io</code> instead of deep <code>pause-home-reflect-telemetry-flow</code> (parity with manual-open I/O cluster). CI forbids flow-anchor imports under <code>presentation/reflect/generation/manual-open/</code> except <code>*-io</code> modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Telemetry-io still reaches application trackers through the flow anchor — presentation modules do not import PostHog helpers directly yet.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: providers-conductor I/O peel or session scaffold I/O peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — colocate Home dismiss/banner PostHog under generation/manual-open (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
