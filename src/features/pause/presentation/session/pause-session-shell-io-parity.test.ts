@@ -74,7 +74,7 @@ import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persist
  * Terminal-entry-io sibling: `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins below ↔ `application/.../session/pause-session-terminal-entry-io-parity.test.ts`.
  * Providers-io sibling: `pause-session-providers-shell-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `application/.../session/pause-session-providers-io-parity.test.ts`.
+ * reciprocal inline pins ↔ `pause-session-providers-io-parity.test.ts`.
  */
 describe('pause-session-shell-io parity', () => {
   it('presentation I/O shell exports match pause-session-shell-flow CI umbrella', () => {
@@ -139,7 +139,7 @@ describe('pause-session-shell-io parity', () => {
     expect(hasPersistedPauseSessionPayload).not.toBe(pickPauseHolzenProvidersSlice);
     expect(isPauseSessionWaitingForInstanceFetch).not.toBe(pickPauseHolzenProvidersSlice);
     expect(computeHydrationFromShellIo).not.toBe(pickPauseHolzenProvidersSlice);
-    // Reciprocal inline pins: `application/.../session/pause-session-providers-io-parity.test.ts`.
+    // Reciprocal inline pins: `pause-session-providers-io-parity.test.ts`.
     // Full pins: `pause-session-providers-shell-io-sibling-parity.test.ts`.
   });
 

@@ -3,9 +3,6 @@ import { describe, expect, it } from 'vitest';
 import { pickPauseHolzenProvidersSlice as pickSliceDirect } from '@/features/pause/application/use-cases/session/pause-holzen-providers-slice';
 import { pickPauseHolzenProvidersSlice } from '@/features/pause/application/use-cases/session/pause-session-providers-flow';
 import {
-  pickPauseHolzenProvidersSlice as pickSliceFromProvidersIo,
-} from '@/features/pause/presentation/session/pause-session-providers-io';
-import {
   buildPauseSessionPersistSnapshot,
   buildPauseSessionScaffoldRitualDerived,
   computePauseStorageRitualSyncPatch,
@@ -21,8 +18,11 @@ import {
   isPauseSessionHeaderBackVisible,
   isPauseSessionWaitingForInstanceFetch,
 } from '@/features/pause/presentation/session/pause-session-shell-io';
+import { pickPauseHolzenProvidersSlice as pickSliceFromProvidersIo } from './pause-session-providers-io';
 
 /**
+ * Presentation I/O parity (colocated beside `pause-session-providers-io.ts`).
+ * Imports `pause-session-providers-flow` CI umbrella for `.toBe` identity pins only — production providers I/O keeps `pause-holzen-providers-slice` leaf import.
  * Shell-io / scaffold-io sibling pins: `pause-session-providers-shell-io-sibling-parity.test.ts`
  * and `pause-session-providers-scaffold-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-session-shell-io-parity.test.ts` / `pause-session-scaffold-io-parity.test.ts`.
