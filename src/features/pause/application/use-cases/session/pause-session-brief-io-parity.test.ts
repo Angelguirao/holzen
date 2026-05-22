@@ -5,19 +5,55 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade', () => ({
-  logPauseRitualDepthUpgraded: vi.fn(),
+  logPauseRitualDepthUpgraded: vi.fn(() => Promise.resolve({ status: 'success' as const })),
 }));
 
-import { initialBriefPauseStepFromRestored as initialBriefPauseStepDirect } from '@/features/pause/application/use-cases/session/restored-brief-ritual-state';
-import { initialBriefPauseStepFromRestored } from '@/features/pause/application/use-cases/session/pause-session-brief-flow';
-import { initialBriefPauseStepFromRestored as initialBriefPauseStepFromBriefIo } from '@/features/pause/presentation/session/pause-session-brief-io';
+import { logPauseRitualDepthUpgraded as logDepthUpgradedDirect } from '@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade';
+import {
+  initialBriefIntegrateDoneFromRestored as integrateDoneDirect,
+  initialBriefPauseStepFromRestored as briefStepDirect,
+  initialSelectedBriefFaceFromRestored as briefFaceDirect,
+} from '@/features/pause/application/use-cases/session/restored-brief-ritual-state';
+import { initialRitualEntry as ritualEntryDirect } from '@/features/pause/application/use-cases/session/initial-ritual-entry';
+import {
+  initialBriefIntegrateDoneFromRestored,
+  initialBriefPauseStepFromRestored,
+  initialRitualEntry,
+  initialSelectedBriefFaceFromRestored,
+  logPauseRitualDepthUpgraded,
+} from '@/features/pause/application/use-cases/session/pause-session-brief-flow';
+import {
+  initialBriefIntegrateDoneFromRestored as integrateDoneFromBriefIo,
+  initialBriefPauseStepFromRestored as briefStepFromBriefIo,
+  initialRitualEntry as ritualEntryFromBriefIo,
+  initialSelectedBriefFaceFromRestored as briefFaceFromBriefIo,
+  pauseBriefRitualDepthUpgraded,
+} from '@/features/pause/presentation/session/pause-session-brief-io';
+import { logPauseRitualDepthUpgraded as logDepthUpgradedMock } from '@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 describe('pause-session-brief-io parity', () => {
   it('presentation I/O brief exports match pause-session-brief-flow CI umbrella', () => {
-    expect(initialBriefPauseStepFromRestored).toBe(initialBriefPauseStepFromBriefIo);
+    expect(initialBriefPauseStepFromRestored).toBe(briefStepFromBriefIo);
+    expect(initialBriefIntegrateDoneFromRestored).toBe(integrateDoneFromBriefIo);
+    expect(initialSelectedBriefFaceFromRestored).toBe(briefFaceFromBriefIo);
+    expect(initialRitualEntry).toBe(ritualEntryFromBriefIo);
   });
 
-  it('session-brief-flow CI umbrella composes the same leaf module as presentation I/O', () => {
-    expect(initialBriefPauseStepFromRestored).toBe(initialBriefPauseStepDirect);
+  it('session-brief-flow CI umbrella composes the same leaf modules as presentation I/O', () => {
+    expect(initialBriefPauseStepFromRestored).toBe(briefStepDirect);
+    expect(initialBriefIntegrateDoneFromRestored).toBe(integrateDoneDirect);
+    expect(initialSelectedBriefFaceFromRestored).toBe(briefFaceDirect);
+    expect(initialRitualEntry).toBe(ritualEntryDirect);
+    expect(logPauseRitualDepthUpgraded).toBe(logDepthUpgradedDirect);
+  });
+
+  it('pauseBriefRitualDepthUpgraded delegates to ritual-depth-upgrade leaf with default repository', async () => {
+    await pauseBriefRitualDepthUpgraded('pi-brief-parity');
+
+    expect(logDepthUpgradedMock).toHaveBeenCalledWith(
+      supabasePauseRepository,
+      'pi-brief-parity',
+    );
   });
 });

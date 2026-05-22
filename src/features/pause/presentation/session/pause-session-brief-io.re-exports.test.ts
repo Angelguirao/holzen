@@ -4,24 +4,31 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'supabasePauseRepository' },
 }));
 
-vi.mock('@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade', () => ({
-  logPauseRitualDepthUpgraded: vi.fn(),
-}));
-
-import { initialBriefPauseStepFromRestored as initialBriefPauseStepDirect } from '@/features/pause/application/use-cases/session/restored-brief-ritual-state';
-import { initialRitualEntry as initialRitualEntryDirect } from '@/features/pause/application/use-cases/session/initial-ritual-entry';
+import { logPauseRitualDepthUpgraded as logDepthUpgradedDirect } from '@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade';
+import {
+  initialBriefIntegrateDoneFromRestored as integrateDoneDirect,
+  initialBriefPauseStepFromRestored as briefStepDirect,
+  initialSelectedBriefFaceFromRestored as briefFaceDirect,
+} from '@/features/pause/application/use-cases/session/restored-brief-ritual-state';
+import { initialRitualEntry as ritualEntryDirect } from '@/features/pause/application/use-cases/session/initial-ritual-entry';
 
 import {
+  initialBriefIntegrateDoneFromRestored,
   initialBriefPauseStepFromRestored,
   initialRitualEntry,
+  initialSelectedBriefFaceFromRestored,
 } from './pause-session-brief-io';
 
 describe('pause-session-brief-io re-exports', () => {
-  it('re-exports brief hydration with identity binding to restored-brief-ritual-state leaf module', () => {
-    expect(initialBriefPauseStepFromRestored).toBe(initialBriefPauseStepDirect);
+  it('re-exports brief hydration with identity binding to session + ritual/brief leaf modules', () => {
+    expect(initialBriefPauseStepFromRestored).toBe(briefStepDirect);
+    expect(initialBriefIntegrateDoneFromRestored).toBe(integrateDoneDirect);
+    expect(initialSelectedBriefFaceFromRestored).toBe(briefFaceDirect);
+    expect(initialRitualEntry).toBe(ritualEntryDirect);
   });
 
-  it('re-exports initialRitualEntry with identity binding to initial-ritual-entry leaf module', () => {
-    expect(initialRitualEntry).toBe(initialRitualEntryDirect);
+  it('does not re-export logPauseRitualDepthUpgraded on presentation I/O (RPC via pauseBriefRitualDepthUpgraded)', () => {
+    expect(logDepthUpgradedDirect).toBeTypeOf('function');
+    expect(initialBriefPauseStepFromRestored).not.toBe(logDepthUpgradedDirect);
   });
 });
