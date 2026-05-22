@@ -14,6 +14,16 @@ import { reflectGenerationPrerequisite as prerequisiteDirect } from '@/features/
 import { resolveEffectiveReflectionCopy as resolveCopyDirect } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
 import { resolveReflectGenerationPrefetch as resolvePrefetchDirect } from '@/features/pause/domain/reflect/generation/resolve-reflect-generation-prefetch';
 import { runReflectGeneration as runReflectGenerationDirect } from '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation';
+import {
+  messageFromReflectGenerationResult as messageFromGenerationFlow,
+  reflectGenerationPrerequisite as prerequisiteFromGenerationFlow,
+  reflectGenerationUserErrorMessage as userErrorFromGenerationFlow,
+  resolveEffectiveReflectionCopy as resolveCopyFromGenerationFlow,
+  resolveReflectGenerationPrefetch as resolvePrefetchFromGenerationFlow,
+  runReflectGeneration as runReflectGenerationFromGenerationFlow,
+  shouldClearReflectGenerationLoading as shouldClearLoadingFromGenerationFlow,
+  shouldCommitReflectGeneration as shouldCommitFromGenerationFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow';
 import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
 
 import {
@@ -54,5 +64,16 @@ describe('pause-reflect-generation-io re-exports', () => {
   it('re-exports runReflectGeneration from holzen-reflect leaf (not generation umbrella)', () => {
     expect(typeof runReflectGeneration).toBe('function');
     expect(runReflectGeneration).toBe(runReflectGenerationDirect);
+  });
+
+  it('presentation I/O bindings match pause-reflect-generation-flow CI anchor (leaf parity)', () => {
+    expect(resolveReflectGenerationPrefetch).toBe(resolvePrefetchFromGenerationFlow);
+    expect(shouldClearReflectGenerationLoading).toBe(shouldClearLoadingFromGenerationFlow);
+    expect(shouldCommitReflectGeneration).toBe(shouldCommitFromGenerationFlow);
+    expect(messageFromReflectGenerationResult).toBe(messageFromGenerationFlow);
+    expect(reflectGenerationPrerequisite).toBe(prerequisiteFromGenerationFlow);
+    expect(reflectGenerationUserErrorMessage).toBe(userErrorFromGenerationFlow);
+    expect(resolveEffectiveReflectionCopy).toBe(resolveCopyFromGenerationFlow);
+    expect(runReflectGeneration).toBe(runReflectGenerationFromGenerationFlow);
   });
 });

@@ -2135,11 +2135,15 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-reflect-generation-io.test.ts') ||
     rel.endsWith('pause-reflect-generation-io.re-exports.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IO_GENERATION_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: holzen-reflect generation I/O must not import generation umbrella (${needle})`,
-        );
+    if (
+      !rel.endsWith('pause-reflect-generation-io.re-exports.test.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IO_GENERATION_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: holzen-reflect generation I/O must not import generation umbrella (${needle})`,
+          );
+        }
       }
     }
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IO_HOOK_FLOW_IMPORTS) {
