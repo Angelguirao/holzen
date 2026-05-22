@@ -16,6 +16,18 @@ import {
   initialSelectedBriefFaceFromRestored as initialSelectedBriefFaceDirect,
 } from '@/features/pause/application/use-cases/session/restored-brief-ritual-state';
 import { initialRitualEntry as initialRitualEntryDirect } from '@/features/pause/application/use-cases/session/initial-ritual-entry';
+import {
+  initialBreathingFirstCompletedFromRestored as initialBreathFirstFromFlow,
+  initialBreathingSecondCompletedFromRestored as initialBreathSecondFromFlow,
+  initialBriefIntegrateDoneFromRestored as initialBriefIntegrateDoneFromFlow,
+  initialBriefPauseStepFromRestored as initialBriefPauseStepFromFlow,
+  initialDecisionFromRestored as initialDecisionFromFlow,
+  initialFrameDoneFromRestored as initialFrameDoneFromFlow,
+  initialPhaseFromRestored as initialPhaseFromFlow,
+  initialRitualEntry as initialRitualEntryFromFlow,
+  initialSelectedBriefFaceFromRestored as initialSelectedBriefFaceFromFlow,
+  mapPersistedStep as mapPersistedStepFromFlow,
+} from '@/features/pause/application/use-cases/session/pause-session-ritual-restore-flow';
 
 import {
   initialBreathingFirstCompletedFromRestored,
@@ -42,5 +54,18 @@ describe('pause-session-ritual-restore-io re-exports', () => {
     expect(initialBriefIntegrateDoneFromRestored).toBe(initialBriefIntegrateDoneDirect);
     expect(initialSelectedBriefFaceFromRestored).toBe(initialSelectedBriefFaceDirect);
     expect(initialRitualEntry).toBe(initialRitualEntryDirect);
+  });
+
+  it('presentation I/O bindings match pause-session-ritual-restore-flow CI anchor (leaf parity)', () => {
+    expect(mapPersistedStep).toBe(mapPersistedStepFromFlow);
+    expect(initialBreathingFirstCompletedFromRestored).toBe(initialBreathFirstFromFlow);
+    expect(initialBreathingSecondCompletedFromRestored).toBe(initialBreathSecondFromFlow);
+    expect(initialDecisionFromRestored).toBe(initialDecisionFromFlow);
+    expect(initialPhaseFromRestored).toBe(initialPhaseFromFlow);
+    expect(initialFrameDoneFromRestored).toBe(initialFrameDoneFromFlow);
+    expect(initialBriefPauseStepFromRestored).toBe(initialBriefPauseStepFromFlow);
+    expect(initialBriefIntegrateDoneFromRestored).toBe(initialBriefIntegrateDoneFromFlow);
+    expect(initialSelectedBriefFaceFromRestored).toBe(initialSelectedBriefFaceFromFlow);
+    expect(initialRitualEntry).toBe(initialRitualEntryFromFlow);
   });
 });
