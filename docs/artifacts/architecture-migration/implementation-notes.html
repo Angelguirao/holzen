@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect application cluster marker regression tests (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>ritual/reflect/telemetry/</code> and <code>pending-offer/</code> CI cluster markers have unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>ritual-reflect-telemetry-cluster.test.ts</code> and <code>ritual-reflect-pending-offer-cluster.test.ts</code> beside empty cluster markers required by <code>check:architecture-alignment</code> (parity with leaf flow re-export tests after folder migration). Owner doc §10.1/§8 rows: <code>pause-home-reflect-telemetry-io</code> imports leaf trackers directly, not <code>pause-home-reflect-telemetry-flow</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test-only slice plus doc path clarification.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Cluster tests only assert empty export modules; flow anchors in subclusters retain existing leaf tests.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate remaining query key modules under <code>infrastructure/queries/</code>, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — companion UI completion query keys under infrastructure/queries/companion (Tier 3)</span>
       <span class="status resolved">resolved</span>
     </header>
