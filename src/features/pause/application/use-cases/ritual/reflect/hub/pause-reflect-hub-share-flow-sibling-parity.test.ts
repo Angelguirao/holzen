@@ -27,7 +27,6 @@ describe('pause-reflect-hub-flow ↔ pause-reflect-share-flow sibling parity', (
     expect(typeof runShiftEmotionFrameHubDone).toBe('function');
     expect(typeof buildShiftEmotionFrameHubLogBundle).toBe('function');
     expect(typeof resolveShiftFrameHubDonePresentation).toBe('function');
-
     expect(typeof runReflectionShareImage).toBe('function');
     expect(typeof buildReflectionShareText).toBe('function');
     expect(typeof buildReflectionShareTelegramUrl).toBe('function');

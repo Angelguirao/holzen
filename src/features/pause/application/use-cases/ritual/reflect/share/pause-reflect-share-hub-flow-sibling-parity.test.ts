@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
+/**
+ * Application sibling parity (share colocation): share-flow ↔ hub-flow CI anchors.
+ * Complements `../hub/pause-reflect-hub-share-flow-sibling-parity.test.ts`.
+ */
+
 import {
   buildReflectionShareText,
   buildReflectionShareTelegramUrl,

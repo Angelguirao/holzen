@@ -8,6 +8,11 @@ import {
   pauseDeclinePendingOffer,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
+  buildReflectionShareText,
+  buildReflectionShareTelegramUrl,
+  pauseReflectionShareImage,
+} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
+import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
   pauseReflectTagUpdate,
@@ -149,5 +154,14 @@ describe('pause-reflect-steps-io', () => {
     expect(pauseReflectionStepLogOnce).not.toBe(runReflectionStepLogDirect);
     expect(pauseReflectFavoriteToggle).not.toBe(pauseAdoptPendingOffer);
     expect(pauseReflectNoteUpdate).not.toBe(pauseDeclinePendingOffer);
+  });
+
+  it('sibling cluster: share-io exports stay distinct from steps-io', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseReflectionShareImage);
+    expect(pauseReflectNoteUpdate).not.toBe(buildReflectionShareText);
+    expect(pauseReflectTagUpdate).not.toBe(buildReflectionShareTelegramUrl);
+    expect(pauseReflectionStepLogOnce).not.toBe(pauseReflectionShareImage);
+    expect(shouldShowFavoriteProHint).not.toBe(buildReflectionShareText);
+    expect(shouldLogPauseReflectionStep).not.toBe(pauseReflectionShareImage);
   });
 });

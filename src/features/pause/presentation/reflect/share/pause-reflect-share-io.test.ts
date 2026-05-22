@@ -26,6 +26,12 @@ import {
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
@@ -60,5 +66,12 @@ describe('pause-reflect-share-io', () => {
   it('sibling cluster: generation-io exports stay distinct from share-io PNG orchestration', () => {
     expect(pauseReflectionShareImage).not.toBe(pauseReflectGeneration);
     // Full cross-I/O pins: `pause-reflect-generation-share-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: steps-io exports stay distinct from share-io', () => {
+    expect(pauseReflectionShareImage).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseReflectionShareImage).not.toBe(pauseReflectNoteUpdate);
+    expect(pauseReflectionShareImage).not.toBe(pauseReflectionStepLogOnce);
+    expect(pauseReflectionShareImage).not.toBe(pauseReflectTagUpdate);
   });
 });
