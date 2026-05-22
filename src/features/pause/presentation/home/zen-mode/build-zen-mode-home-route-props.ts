@@ -1,7 +1,7 @@
 import type { BtcPriceData, BtcMoveSeverity } from '@/features/market/public';
 import type { Entitlement } from '@/features/subscription/public';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
-import type { PauseContextHomePreview } from '@/features/pause/application/use-cases/home/home-pause-card-body-props';
+import type { PauseContextHomePreview } from '@/features/pause/presentation/home/home-pause-card-body-props';
 import { zenModeHomePauseSnapshot } from './zen-mode-home-pause-snapshot';
 
 export type BuildZenModeHomeRoutePropsInput = {

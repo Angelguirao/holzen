@@ -12,7 +12,7 @@ export {
   type BuildHomePauseCardBodyPropsInput,
   type HomePauseCardBodyPropsProjection,
   type PauseContextHomePreview,
-} from './application/use-cases/home/home-pause-card-body-props';
+} from './presentation/home/home-pause-card-body-props';
 export {
   pauseHomeErrorKind,
   pauseHomeErrorStrings,
