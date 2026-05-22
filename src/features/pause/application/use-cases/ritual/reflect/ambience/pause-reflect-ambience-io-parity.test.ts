@@ -19,8 +19,10 @@ describe('pause-reflect-ambience-io parity', () => {
     expect(stopPauseReflectFrameFocusAmbience).toBe(stopFromAmbienceIo);
   });
 
-  it('ambience CI umbrella composes domain reflect-frame-focus-ambience leaf as presentation I/O', () => {
+  it('ambience CI umbrella composes the same domain frame-focus leaf as presentation I/O', () => {
     expect(startPauseReflectFrameFocusAmbience).toBe(startDirect);
     expect(stopPauseReflectFrameFocusAmbience).toBe(stopDirect);
+    expect(startFromAmbienceIo).toBe(startDirect);
+    expect(stopFromAmbienceIo).toBe(stopDirect);
   });
 });
