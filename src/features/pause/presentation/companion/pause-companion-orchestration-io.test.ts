@@ -40,6 +40,11 @@ vi.mock('@/features/pause/public-queries', () => ({
   loadMoodHistoryForOrchestrate: loadMoodHistoryForOrchestrateMock,
 }));
 
+vi.mock('./pause-companion-analytics-io', () => ({
+  logCompanionFeedbackVote: vi.fn(),
+  logCompanionFullviewOpened: vi.fn(),
+}));
+
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'companionPauseRepository' },
   supabaseCompanionOrchestrator: { port: 'companionOrchestrator' },
@@ -54,11 +59,16 @@ import {
 } from './pause-companion-frame-ui-io';
 import {
   companionPauseRepository,
+  invalidateCompanionUiCompletionQuery,
   loadCompanionOrchestrateSession,
   nextExpandedWithLazyFetch,
   pauseLoadCompanionOrchestrateSession,
   pauseToggleCompanionLibraryFavorite,
 } from './pause-companion-orchestration-io';
+import {
+  logCompanionFeedbackVote,
+  logCompanionFullviewOpened,
+} from './pause-companion-analytics-io';
 
 describe('pause-companion-orchestration-io', () => {
   it('routes orchestrate session load through default mood-history query', async () => {
@@ -124,5 +134,14 @@ describe('pause-companion-orchestration-io', () => {
     expect(nextExpandedWithLazyFetch).not.toBe(COMPANION_FULL_VIEW_BREATHING_ROOM_MS);
     // Reciprocal inline pins: `pause-companion-frame-ui-io.test.ts`;
     // dedicated sibling: `pause-companion-frame-ui-orchestration-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: analytics-io exports stay distinct from orchestration-io', () => {
+    expect(pauseLoadCompanionOrchestrateSession).not.toBe(logCompanionFeedbackVote);
+    expect(pauseToggleCompanionLibraryFavorite).not.toBe(logCompanionFullviewOpened);
+    expect(nextExpandedWithLazyFetch).not.toBe(logCompanionFeedbackVote);
+    expect(invalidateCompanionUiCompletionQuery).not.toBe(logCompanionFullviewOpened);
+    // Reciprocal inline pins: `pause-companion-analytics-io.test.ts`;
+    // dedicated sibling: `pause-companion-analytics-orchestration-io-sibling-parity.test.ts`.
   });
 });

@@ -17,6 +17,15 @@ vi.mock(
   }),
 );
 
+const orchestrationIoStubs = vi.hoisted(() => ({
+  pauseLoadCompanionOrchestrateSession: vi.fn(),
+  pauseToggleCompanionLibraryFavorite: vi.fn(),
+  nextExpandedWithLazyFetch: vi.fn(),
+  invalidateCompanionUiCompletionQuery: vi.fn(),
+}));
+
+vi.mock('./pause-companion-orchestration-io', () => orchestrationIoStubs);
+
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseAnalyticsRepository: { port: 'companionAnalyticsRepository' },
 }));
@@ -25,6 +34,13 @@ import {
   logCompanionFeedbackVote,
   logCompanionFullviewOpened,
 } from './pause-companion-analytics-io';
+
+const {
+  pauseLoadCompanionOrchestrateSession,
+  pauseToggleCompanionLibraryFavorite,
+  nextExpandedWithLazyFetch,
+  invalidateCompanionUiCompletionQuery,
+} = orchestrationIoStubs;
 
 describe('pause-companion-analytics-io', () => {
   it('routes feedback vote through the default PauseAnalyticsRepository port adapter', async () => {
@@ -63,5 +79,13 @@ describe('pause-companion-analytics-io', () => {
         pauseInstanceId: 'pi-1',
       },
     );
+  });
+
+  it('sibling cluster: orchestration-io exports stay distinct from analytics-io', () => {
+    expect(logCompanionFeedbackVote).not.toBe(pauseLoadCompanionOrchestrateSession);
+    expect(logCompanionFullviewOpened).not.toBe(pauseToggleCompanionLibraryFavorite);
+    expect(logCompanionFeedbackVote).not.toBe(nextExpandedWithLazyFetch);
+    expect(logCompanionFullviewOpened).not.toBe(invalidateCompanionUiCompletionQuery);
+    // Full cross-I/O pins: `pause-companion-analytics-orchestration-io-sibling-parity.test.ts`.
   });
 });
