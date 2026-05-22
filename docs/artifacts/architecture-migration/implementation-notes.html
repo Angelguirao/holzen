@@ -97,19 +97,19 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-      <span>Phase A — compose pause-reflect-pending-offer-flow from RPC + telemetry subclusters (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — split pending-offer display from RPC subcluster (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Pending-offer umbrella composes <code>pause-reflect-pending-offer-rpc-flow</code> + <code>pause-pending-offer-telemetry-flow</code></h3>
+    <h3>Pending-offer umbrella composes RPC, display, and telemetry anchors</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-reflect-pending-offer-rpc-flow</code> for adopt/decline use cases + display; <code>pause-reflect-pending-offer-flow</code> re-exports only through RPC and telemetry anchors (parity with share/steps/hub/generation umbrellas). CI blocks deep <code>run-adopt-*</code> / <code>pending-pause-offer-display</code> on the umbrella.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Split the prior combined <code>pause-reflect-pending-offer-rpc-flow</code> (RPC + display) into adopt/decline-only RPC anchor + <code>pause-pending-offer-display-flow</code>; <code>pause-reflect-pending-offer-flow</code> composes all three subclusters (parity with share/generation umbrellas). CI blocks deep leaf imports under <code>presentation/reflect/pending-offer/</code> except <code>*-io.ts</code> modules.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>One more application flow module; <code>public-home</code> / <code>public-hooks</code> still import display via the umbrella.</dd>
+      <dd>Three thin application anchors; <code>public-home</code> / <code>public-hooks</code> still import display via the umbrella.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B subscription Tier 1 shim or archive decide I/O peel.</dd>
+      <dd>Next: Phase B subscription Tier 1 shim, or further session scaffold I/O peels.</dd>
     </dl>
   </article>
 
