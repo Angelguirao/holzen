@@ -34,6 +34,15 @@ import {
   shouldCommitReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
+  buildPauseScoreImpacts,
+  formatReinforcementQuoteFromSession,
+  pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
+  resolvePauseDecideOutcomeFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
   trackPauseReflectPostItOpen as trackPostItFromTelemetryIo,
   trackPauseReflectShareTap as trackShareTapFromTelemetryIo,
   trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryIo,
@@ -50,6 +59,8 @@ import {
 /**
  * Presentation-layer share I/O parity (colocated beside `pause-reflect-share-io.ts`).
  * Generation-io sibling: `pause-reflect-generation-share-io-sibling-parity.test.ts`.
+ * Flows-io sibling: `pause-reflect-flows-share-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (application).
  * Telemetry-io sibling: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ application `pause-reflect-telemetry-io-parity.test.ts`.
  */
@@ -103,6 +114,21 @@ describe('pause-reflect-share-io parity', () => {
     expect(runReflectionShareImage).not.toBe(deliverReflectionShareImage);
     expect(trackPauseReflectPostItOpen).not.toBe(deliverReflectionShareImage);
     expect(trackPauseReflectWallpaperTap).not.toBe(runReflectionShareImageFromOrchestration);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ application `pause-reflect-flows-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-flows-share-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: flows-io exports stay distinct from share-io wrappers', () => {
+    expect(pauseReflectionShareImage).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(buildTextFromShareIo).not.toBe(pauseReflectOutcomeLog);
+    expect(buildTelegramFromShareIo).not.toBe(formatReinforcementQuoteFromSession);
+    expect(buildTweetFromShareIo).not.toBe(resolvePauseDecideOutcomeFlow);
+    expect(buildWhatsAppFromShareIo).not.toBe(buildPauseScoreImpacts);
+    expect(pauseReflectionShareImage).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
+    expect(buildTextFromShareIo).not.toBe(pauseReflectOutcomeLogWithRepository);
+    // Full pins: `pause-reflect-flows-share-io-sibling-parity.test.ts`.
   });
 
   /**

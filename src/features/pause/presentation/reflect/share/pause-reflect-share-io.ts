@@ -9,7 +9,9 @@
  * `pause-reflect-share-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io` (application mirror:
  * `application/.../share/pause-reflect-share-telemetry-io-sibling-parity.test.ts`; reciprocal inline:
  * `pause-reflect-share-io-parity.test.ts` ↔ `pause-reflect-telemetry-io-parity.test.ts`);
- * `pause-reflect-flows-share-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`, and
+ * `pause-reflect-flows-share-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (application mirror under
+ * `application/.../flows/`; reciprocal inline pins in `pause-reflect-flows-io-parity.test.ts` ↔
+ * `pause-reflect-share-io-parity.test.ts`), and
  * `pause-reflect-generation-share-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`;
  * `pause-reflect-share-ambience-io-sibling-parity.test.ts` + `ambience/pause-reflect-ambience-share-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`;
  * `pause-reflect-share-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`;

@@ -231,11 +231,16 @@ describe('pause-reflect-flows-io', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseShiftEmotionFrameHubDone);
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-share-io.test.ts` (reflect+decide vs reflection share).
+   * Dedicated sibling file: `pause-reflect-flows-share-io-sibling-parity.test.ts` (application + presentation).
+   */
   it('sibling cluster: share-io exports stay distinct from flows-io', () => {
     expect(pauseReflectOutcomeLog).not.toBe(pauseReflectionShareImage);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseReflectionShareImage);
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseReflectionShareImage);
     expect(buildPauseScoreImpacts).not.toBe(pauseReflectionShareImage);
+    // Full pins: `pause-reflect-flows-share-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: mood-io exports stay distinct from flows-io', () => {
