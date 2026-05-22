@@ -323,9 +323,6 @@ describe('pause-reflect-flows-io parity', () => {
   });
 
   /**
-<<<<<<< HEAD
-   * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` and `pause-reflect-share-io.test.ts`.
-=======
    * Reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts` (reflect+decide vs pending-offer RPC).
    * Dedicated sibling file: `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` (application + presentation).
    */
@@ -344,8 +341,7 @@ describe('pause-reflect-flows-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` (reflect+decide vs reflection share).
->>>>>>> 641409678 (test(pause): application flows-io ↔ pending-offer-io sibling parity)
+   * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` and `pause-reflect-share-io.test.ts`.
    * Dedicated sibling file: `pause-reflect-flows-share-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: share-io exports stay distinct from flows-io', () => {
