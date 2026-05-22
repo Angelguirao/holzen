@@ -6,7 +6,9 @@
  * Parity pins: `pause-session-step-handlers-io-parity.test.ts`, `pause-session-step-handlers-io.re-exports.test.ts`,
  * `pause-session-step-handlers-step-transition-flow-sibling-parity.test.ts` ↔ `pause-session-step-transition-flow`,
  * `pause-session-step-handlers-steps-flow-sibling-parity.test.ts` ↔ `ritual/reflect/steps/pause-reflect-steps-flow`
- * (presentation mirror: `pause-session-step-handlers-steps-io-sibling-parity.test.ts`).
+ * (presentation mirror: `pause-session-step-handlers-steps-io-sibling-parity.test.ts`);
+ * `pause-session-step-handlers-flows-flow-sibling-parity.test.ts` ↔ `ritual/reflect/flows/pause-reflect-flows-flow`
+ * (presentation mirror: `pause-session-step-handlers-flows-io-sibling-parity.test.ts`).
  * Sibling pin: `pause-session-step-handlers-flow.test.ts` ↔ `pause-session-step-transition-flow.test.ts`.
  */
 export {

@@ -18,7 +18,8 @@
  * `pause-reflect-flows-hub-io-sibling-parity.test.ts` under `application/.../flows/`),
  * `pause-reflect-flows-share-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`,
  * `pause-reflect-flows-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`, and
- * `pause-reflect-flows-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`.
+ * `pause-reflect-flows-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`,
+ * `pause-session-step-handlers-flows-io-sibling-parity.test.ts` ↔ `pause-session-step-handlers-io` (cross-surface).
  */
 import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
 import {
