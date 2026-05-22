@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect pending-offer umbrella identity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-flow</code> leaf re-export regression pin</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Strengthen <code>pause-reflect-pending-offer-flow.test.ts</code> with <code>.toBe(direct)</code> identity for adopt/decline RPC, display projection, and telemetry trackers (parity with hub/mood/steps/share umbrella pins). Also assert <code>trackPausePendingDeclined</code> re-export. <code>pause-reflect-pending-offer-io</code> unchanged (imports leaf modules directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI slice only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Pending-offer subcluster leaf flow tests unchanged; umbrella owns compose identity.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-generation-flow</code> umbrella <code>.toBe(direct)</code> on holzen-reflect + manual-open leaves; Phase B subscription Tier 1 shim when pause Tier 5 is quiet.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect ambience umbrella identity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
