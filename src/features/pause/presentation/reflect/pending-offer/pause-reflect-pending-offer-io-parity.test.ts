@@ -1,6 +1,7 @@
 /**
  * Presentation pending-offer I/O parity (colocated beside `pause-reflect-pending-offer-io.ts`).
  * Application mirror: `application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+ * Wrapper distinctness sibling: `pause-reflect-pending-offer-flow-io-wrapper-sibling-parity.test.ts` (application + presentation).
  * Generation-io sibling: reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts`;
  * dedicated file: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`.
  * Session telemetry-io sibling: `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts`
