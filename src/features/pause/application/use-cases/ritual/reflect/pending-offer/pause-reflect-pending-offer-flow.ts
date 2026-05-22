@@ -3,7 +3,7 @@
  * Composes adopt/decline RPC use cases, display projection, and PostHog leaf trackers
  * (not RPC/display/telemetry subcluster flow anchors).
  * Presentation: `pause-reflect-pending-offer-io.ts` and `presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io.ts`
- * import leaf modules directly. Parity pins: `presentation/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts` (display + run-* leaves +
+ * import leaf modules directly. Parity pins: `pause-reflect-pending-offer-io-parity.test.ts` (application + presentation; display + run-* leaves +
  * `reflectPauseRepository` ↔ `supabasePauseRepository`; `pauseAdoptPendingOffer` / `pauseDeclinePendingOffer` delegation to
  * run-* with default repository — parity with hub-io), `presentation/reflect/pending-offer/pause-reflect-pending-offer-telemetry-io-parity.test.ts` (PostHog trackers).
  * Sibling cluster: `pause-reflect-steps-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow`;

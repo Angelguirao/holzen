@@ -31868,4 +31868,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — application reflect pending-offer-io parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-io-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no reflect moves. Mirror presentation colocated <code>pause-reflect-pending-offer-io-parity</code> at <code>application/use-cases/ritual/reflect/pending-offer/</code> (parity with hub-io and mood-io application mirrors). Display + adopt/decline RPC delegation + telemetry namespace separation pins; full sibling-cluster guards stay on presentation colocated parity.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test + comment cross-links only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>pause-archive-io-parity</code> / <code>pause-home-bulk-hold-io-parity</code> beside presentation I/O, or extend <code>pause-companion-orchestration-io-parity</code> under <code>presentation/companion/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
