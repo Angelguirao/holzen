@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect pending-offer-io adopt/decline parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-io-parity</code> RPC wrapper delegation</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-pending-offer-io-parity.test.ts</code> so <code>pauseAdoptPendingOffer</code> and <code>pauseDeclinePendingOffer</code> delegate to <code>run-adopt-pending-pause-offer</code> / <code>run-decline-pending-pause-offer</code> with <code>supabasePauseRepository</code> (parity with <code>pause-reflect-hub-io-parity</code> shift-frame RPC pin). Display + run-* leaf identity and repository binding tests unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow comment only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Tier 1 <code>holzen-query-client-ref</code> lib shim for <code>App.tsx</code>, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect flows-flow ↔ generation-flow sibling pin (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + flow comments only.</dd>
       <dt>Open question</dt>
-      <dd>Next: session step-transition ↔ step-handlers sibling pin, or extend <code>pause-reflect-pending-offer-io-parity</code> adopt/decline pins.</dd>
+      <dd>Next: session step-transition ↔ step-handlers sibling pin, or hub-flow ↔ mood-flow sibling cluster pins.</dd>
     </dl>
   </article>
 
@@ -86,7 +103,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + I/O/flow comments only.</dd>
       <dt>Open question</dt>
-      <dd>Next: extend <code>pause-reflect-pending-offer-io-parity</code> adopt/decline pins, or hub-flow ↔ mood-flow sibling cluster pins.</dd>
+      <dd>Next: hub-flow ↔ mood-flow sibling cluster pins, or Tier 1 <code>holzen-query-client-ref</code> lib shim.</dd>
     </dl>
   </article>
 
