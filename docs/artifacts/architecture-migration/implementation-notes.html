@@ -25058,4 +25058,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect hub-io ↔ hub-flow umbrella (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-io</code> domain re-exports pinned to <code>pause-reflect-hub-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-hub-io.re-exports.test.ts</code> with <code>.toBe</code> identity against <code>pause-reflect-hub-flow</code> for domain hub helpers (parity with <code>pause-reflect-share-flow</code> ↔ orchestration subcluster pins). <code>pauseShiftEmotionFrameHubDone</code> stays a bound wrapper; mocked routing remains in <code>pause-reflect-hub-io.test.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without exporting <code>runShiftEmotionFrameHubDone</code> on presentation I/O (hooks import bound <code>pauseShiftEmotionFrameHubDone</code> only).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-telemetry-flow</code> ↔ <code>pause-reflect-share-flow</code> telemetry pins, <code>pause-companion-orchestration-flow</code> ↔ <code>pause-companion-section-visibility-flow</code>, or Phase B / Tier 1 <code>holzen-query-client-ref</code> shim peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
