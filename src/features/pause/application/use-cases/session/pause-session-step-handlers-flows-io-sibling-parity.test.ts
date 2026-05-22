@@ -28,7 +28,7 @@ import {
  * Application cross-surface sibling parity: session step-handlers-io vs reflect flows-io.
  * Mirrors presentation `pause-session-step-handlers-flows-io-sibling-parity.test.ts` and
  * `pause-session-step-handlers-flows-flow-sibling-parity.test.ts` (flow-level).
- * Reciprocal inline pins: `pause-session-step-handlers-io-parity.test.ts` ↔
+ * Reciprocal inline pins: `presentation/session/pause-session-step-handlers-io-parity.test.ts` ↔
  * `pause-reflect-flows-io-parity.test.ts`.
  */
 describe('pause-session-step-handlers-io ↔ pause-reflect-flows-io sibling parity (application)', () => {

@@ -29,7 +29,7 @@ import {
  * Application-layer cross-surface parity: session step-handlers-io vs reflect steps-io.
  * Mirrors presentation `pause-session-step-handlers-steps-io-sibling-parity.test.ts` and
  * `pause-reflect-steps-hub-io-sibling-parity.test.ts` (application); complements reciprocal
- * inline pins on `pause-session-step-handlers-io-parity.test.ts` /
+ * inline pins on `presentation/session/pause-session-step-handlers-io-parity.test.ts` /
  * `pause-reflect-steps-io-parity.test.ts`.
  */
 describe('pause-session-step-handlers-io ↔ pause-reflect-steps-io sibling parity (application)', () => {

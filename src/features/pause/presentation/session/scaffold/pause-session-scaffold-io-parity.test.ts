@@ -134,7 +134,7 @@ describe('pause-session-scaffold-io parity', () => {
     expect(buildPauseSessionScaffoldRitualDerived).not.toBe(buildPauseSessionStepShellBundle);
     expect(hasPersistablePauseSessionAnchor).not.toBe(buildPauseSessionStepRitualBundle);
     expect(buildPersistFromScaffoldIo).not.toBe(buildPauseSessionStepShellBundle);
-    // Reciprocal inline pins: `pause-session-step-handlers-io-parity.test.ts`.
+    // Reciprocal inline pins: `../pause-session-step-handlers-io-parity.test.ts`.
     // Full pins: `pause-session-scaffold-step-handlers-io-sibling-parity.test.ts`.
   });
 });

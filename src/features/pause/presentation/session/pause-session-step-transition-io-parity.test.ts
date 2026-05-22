@@ -55,7 +55,7 @@ describe('pause-session-step-transition-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-session-step-handlers-io-parity.test.ts` (Framer motion vs step bundles).
+   * Reciprocal inline pins ↔ `pause-session-step-handlers-io-parity.test.ts` under `presentation/session/` (Framer motion vs step bundles).
    * Dedicated sibling file: `pause-session-step-handlers-step-transition-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: step-handlers-io exports stay distinct from step-transition-io', () => {
@@ -65,7 +65,7 @@ describe('pause-session-step-transition-io parity', () => {
     expect(pauseStepSwipeDirection).not.toBe(buildPauseSessionStepRitualBundle);
     expect(PAUSE_SESSION_STEP_SLIDE_OFFSET_PX).not.toBe(buildPauseSessionStepRitualBundle);
     expect(PAUSE_SESSION_STEP_TRANSITION_DURATION_S).not.toBe(buildPauseSessionStepShellBundle);
-    // Reciprocal inline pins: `pause-session-step-handlers-io-parity.test.ts` (presentation/session).
+    // Reciprocal inline pins: `pause-session-step-handlers-io-parity.test.ts` (colocated under `presentation/session/`).
     // Full pins: `pause-session-step-handlers-step-transition-io-sibling-parity.test.ts`.
   });
 });

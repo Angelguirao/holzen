@@ -17,7 +17,7 @@ import {
  * Application sibling parity: scaffold-io vs step-handlers-io (parity with
  * presentation `pause-session-scaffold-step-handlers-io-sibling-parity.test.ts`).
  * Reciprocal inline pins: `pause-session-scaffold-io-parity.test.ts` ↔
- * `pause-session-step-handlers-io-parity.test.ts`.
+ * `presentation/session/pause-session-step-handlers-io-parity.test.ts`.
  */
 describe('pause-session-scaffold-io ↔ pause-session-step-handlers-io sibling parity (application)', () => {
   it('scaffold-io and step-handlers-io are distinct presentation I/O surfaces', () => {
