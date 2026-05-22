@@ -5,6 +5,13 @@ import {
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import { pauseReflectionShareImage } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
+import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectionStepLogOnce,
+  pauseReflectTagUpdate,
+  reflectPauseRepository,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import { pauseReflectGeneration, reflectGenerator } from './pause-reflect-generation-io';
 
 const runReflectGenerationMock = vi.hoisted(() => vi.fn());
@@ -18,6 +25,8 @@ vi.mock(
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
+  reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' },
 }));
 
 describe('pause-reflect-generation-io', () => {
@@ -75,5 +84,14 @@ describe('pause-reflect-generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(pauseReflectionShareImage);
     expect(reflectGenerator).not.toBe(pauseReflectionShareImage);
     // Full cross-I/O pins: `pause-reflect-generation-share-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: steps-io exports stay distinct from generation-io', () => {
+    expect(pauseReflectGeneration).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseReflectGeneration).not.toBe(pauseReflectNoteUpdate);
+    expect(pauseReflectGeneration).not.toBe(pauseReflectTagUpdate);
+    expect(pauseReflectGeneration).not.toBe(pauseReflectionStepLogOnce);
+    expect(reflectGenerator).not.toBe(reflectPauseRepository);
+    // Full cross-I/O pins: `pause-reflect-steps-generation-io-sibling-parity.test.ts`.
   });
 });

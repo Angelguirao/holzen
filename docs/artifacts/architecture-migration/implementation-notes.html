@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — presentation steps-io ↔ generation-io reciprocal inline pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-io.test.ts</code> ↔ <code>pause-reflect-generation-io.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no reflect folder moves. Add reciprocal inline <code>.not.toBe</code> pins on steps-io and generation-io unit tests so post-it RPC wrappers stay distinct from holzen-reflect generation I/O (parity with steps-io ↔ share-io reciprocal pins; complements <code>pause-reflect-steps-generation-io-sibling-parity.test.ts</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + header comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: application-layer reciprocal inline pins on steps-flow ↔ generation-flow unit tests, or Phase B subscription/auth slice.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — presentation steps-io note ↔ tag wrapper sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
