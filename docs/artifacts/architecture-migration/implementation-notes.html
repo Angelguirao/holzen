@@ -59,6 +59,7 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+<<<<<<< HEAD
       <span>Phase A — hub/mood/share-io reciprocal namespace guards (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -70,6 +71,19 @@
       <dd>None — test-only.</dd>
       <dt>Open questions</dt>
       <dd>Next: ambience flow↔io wrapper mirrors, or Phase B Tier 1 lib shim scan.</dd>
+=======
+      <span>Phase A — reflect telemetry flow↔io wrapper sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-telemetry-flow-io-wrapper-sibling-parity.test.ts</code> (application + presentation)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no relocations. Add application + presentation wrapper parity beside <code>pause-reflect-telemetry-io.ts</code> so <code>pause-reflect-telemetry-flow</code> CI umbrella stays namespace-separated from presentation I/O while session UI tracker re-exports stay shared by reference (presentation imports <code>pause-reflect-session-ui-telemetry</code> directly, not the flow anchor). Allowlist wrapper test on telemetry-io path checks in <code>check:architecture-alignment</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B Tier 1 lib shim scan (<code>@/lib/posthog</code> in ritual reflect telemetry), or companion frame I/O colocation.</dd>
+>>>>>>> c63ba3543 (test(pause): reflect telemetry flow↔io wrapper sibling parity)
     </dl>
   </article>
 

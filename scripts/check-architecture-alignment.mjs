@@ -2078,9 +2078,13 @@ for (const file of walkTs(join(root, 'src'))) {
   if (
     rel.endsWith('pause-reflect-telemetry-io.ts') ||
     rel.endsWith('pause-reflect-telemetry-io.test.ts') ||
-    rel.endsWith('pause-reflect-telemetry-io-parity.test.ts')
+    rel.endsWith('pause-reflect-telemetry-io-parity.test.ts') ||
+    rel.endsWith('pause-reflect-telemetry-flow-io-wrapper-sibling-parity.test.ts')
   ) {
-    if (!rel.endsWith('pause-reflect-telemetry-io-parity.test.ts')) {
+    if (
+      !rel.endsWith('pause-reflect-telemetry-io-parity.test.ts') &&
+      !rel.endsWith('pause-reflect-telemetry-flow-io-wrapper-sibling-parity.test.ts')
+    ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IO_TELEMETRY_FLOW_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(
