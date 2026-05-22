@@ -1,7 +1,8 @@
 /**
  * Companion orchestration presentation I/O (session load, UI completion, favorites, expansion).
  * Imports ritual/frame leaf modules directly (parity with `pause-companion-orchestrate-io` peel).
- * Parity pins: `pause-companion-orchestration-io.test.ts`, colocated `pause-companion-orchestration-io-parity.test.ts`,
+ * Parity pins: `pause-companion-orchestration-io.test.ts`, colocated `pause-companion-orchestration-io-parity.test.ts`
+ * (application mirror: `application/.../ritual/frame/pause-companion-orchestration-io-parity.test.ts`),
  * `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts` ↔ `pause-companion-orchestrate-io`,
  * `pause-companion-frame-ui-orchestration-io-sibling-parity.test.ts` ↔ `pause-companion-frame-ui-io`,
  * `pause-companion-analytics-orchestration-io-sibling-parity.test.ts` ↔ `pause-companion-analytics-io`;
