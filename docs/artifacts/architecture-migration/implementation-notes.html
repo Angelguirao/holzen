@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect hub application cluster marker (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>ritual/reflect/hub/</code> CI cluster marker has unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder move remains complete. Add empty <code>ritual-reflect-hub-cluster.ts</code> + regression test beside <code>pause-reflect-hub-flow</code> (parity with ambience, pending-offer, telemetry, steps, mood cluster markers). <code>pause-reflect-hub-io</code> unchanged (imports domain + <code>run-shift-emotion-frame-hub-done</code> directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — marker-only slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Share and flows subclusters still lack application cluster markers until follow-up slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: cluster marker for <code>ritual/reflect/share/</code> or <code>flows/</code>, or session shell/scaffold I/O peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect generation application cluster marker (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,9 +88,9 @@
       <dt>Deviation</dt>
       <dd>None — marker documents existing I/O boundaries only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Hub, mood, share, flows subclusters still lack application cluster markers until follow-up slices.</dd>
+      <dd>Share and flows subclusters still lack application cluster markers until follow-up slices.</dd>
       <dt>Open questions</dt>
-      <dd>Next: cluster marker for another <code>ritual/reflect/</code> subfolder (hub, mood, share, flows), or Phase B subscription Tier 1 shim.</dd>
+      <dd>Next: cluster marker for <code>ritual/reflect/share/</code> or <code>flows/</code>, or Phase B subscription Tier 1 shim.</dd>
     </dl>
   </article>
 
