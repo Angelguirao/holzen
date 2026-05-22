@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for session decide ritual hydration (§3 / check:architecture-alignment).
- * Use cases live in `ritual/decide/`; re-export for application imports.
- * Presentation: `pause-session-decide-io.ts` imports `PauseImpactData` from domain directly (CI anchor only).
+ * Cluster marker: `pause-session-decide-cluster.ts` (empty export; unit-tested).
+ * Use cases live in `ritual/decide/`; presentation decide I/O imports leaf modules (CI anchor only).
  */
 export {
   initialDecisionFromRestored,
