@@ -1,7 +1,7 @@
 /**
  * Application-layer I/O parity for ritual reflect pending-offer PostHog telemetry
- * (parity with `pause-reflect-telemetry-io-parity.test.ts`; presentation pins stay
- * colocated beside `pause-reflect-pending-offer-telemetry-io.ts` under `presentation/reflect/telemetry/`).
+ * (colocated beside `pause-reflect-telemetry-io-parity.test.ts` under `application/.../telemetry/`).
+ * Presentation mirror: `presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io-parity.test.ts`.
  * Imports `pause-pending-offer-telemetry-flow` CI umbrella for `.toBe` identity pins only —
  * production pending-offer telemetry I/O keeps leaf tracker modules under `pending-offer/`.
  */
@@ -37,9 +37,6 @@ import {
   trackPauseSessionAbandoned as trackAbandonedFromPendingOfferTelemetryIo,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 
-/**
- * Application mirror: `presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io-parity.test.ts`.
- */
 describe('pause-reflect-pending-offer-telemetry-io parity (application)', () => {
   it('presentation I/O pending-offer telemetry matches pending-offer-telemetry-flow CI umbrella', () => {
     expect(trackPausePendingAdopted).toBe(trackAdoptedFromPendingOfferTelemetryIo);
