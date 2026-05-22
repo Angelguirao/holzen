@@ -165,7 +165,7 @@ describe('pause-reflect-ambience-io parity (application)', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts`.
+   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (application + presentation).
    * Dedicated sibling file: `pause-reflect-ambience-generation-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: generation-io exports stay distinct from ambience-io frame-focus bed', () => {
@@ -176,7 +176,7 @@ describe('pause-reflect-ambience-io parity (application)', () => {
     expect(startFromAmbienceIo).not.toBe(resolveReflectGenerationPrefetch);
     expect(stopFromAmbienceIo).not.toBe(shouldCommitReflectGeneration);
     expect(startFromAmbienceIo).not.toBe(reflectGenerator);
-    // Reciprocal inline pins: `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
+    // Reciprocal inline pins: `application/.../generation/pause-reflect-generation-io-parity.test.ts` + presentation mirror.
     // Full pins: `pause-reflect-ambience-generation-io-sibling-parity.test.ts`.
   });
 
