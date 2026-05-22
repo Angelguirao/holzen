@@ -294,8 +294,21 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_STEP_BUNDLES_IMPORTS = [
 /** Reflect generation/manual-open — import Home PostHog via telemetry-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow',
   "from './application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow'",
   "from '../application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow'",
+  "from './application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow'",
+  "from '../application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow'",
+];
+
+/** Application reflect telemetry/ — flow anchors live in generation/manual-open/ and share/. */
+const LEGACY_PAUSE_APPLICATION_REFLECT_TELEMETRY_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow',
+  "from './application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow'",
+  "from '../application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow'",
+  "from './application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow'",
+  "from '../application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow'",
 ];
 
 /** Session presentation — import step-transition via shell I/O anchor only. */
@@ -470,6 +483,11 @@ for (const file of walkTs(join(root, 'src'))) {
   for (const needle of LEGACY_PAUSE_USE_CASE_IMPORTS) {
     if (text.includes(needle)) {
       failures.push(`${rel}: legacy pause use-case import (${needle})`);
+    }
+  }
+  for (const needle of LEGACY_PAUSE_APPLICATION_REFLECT_TELEMETRY_FLOW_IMPORTS) {
+    if (text.includes(needle)) {
+      failures.push(`${rel}: legacy application reflect telemetry flow import (${needle})`);
     }
   }
   for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS) {

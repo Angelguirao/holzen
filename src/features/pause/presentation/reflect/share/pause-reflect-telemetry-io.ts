@@ -8,4 +8,4 @@ export {
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
   type PauseReflectTelemetrySurface,
-} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow';

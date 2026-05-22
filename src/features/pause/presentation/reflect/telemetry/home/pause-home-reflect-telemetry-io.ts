@@ -13,4 +13,4 @@ export {
   trackPauseOpenDismissed,
   type OpenPauseStateForAnalytics,
   type PauseDismissAnalyticsSurface,
-} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow';

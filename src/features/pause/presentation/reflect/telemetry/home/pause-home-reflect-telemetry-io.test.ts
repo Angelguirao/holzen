@@ -14,7 +14,7 @@ const trackPauseManualCompletedMock = vi.hoisted(() => vi.fn());
 const trackPauseOpenDismissedMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow',
   () => ({
     markPauseManualStartedHomeOnce: markPauseManualStartedHomeOnceMock,
     trackHomePendingPauseBannerPauseOpened: trackHomePendingPauseBannerPauseOpenedMock,
