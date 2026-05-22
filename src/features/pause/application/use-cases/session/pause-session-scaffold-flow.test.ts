@@ -15,6 +15,7 @@ import {
 import {
   computePauseStorageRitualSyncPatch as computeStorageSyncDirect,
 } from './storage-ritual-sync';
+import { computePauseSessionHydration } from './pause-session-shell-flow';
 
 const companions = { haiku: null, groundingTitle: null, groundingBody: null } as const;
 const companionPrefs = {
@@ -70,5 +71,12 @@ describe('pause-session-scaffold-flow', () => {
     expect(hasPersistablePauseSessionAnchor('pi-1', '')).toBe(true);
     expect(hasPersistablePauseSessionAnchor(null, 'copy')).toBe(true);
     expect(hasPersistablePauseSessionAnchor(null, '   ')).toBe(false);
+  });
+
+  it('sibling cluster: shell-flow exports stay distinct from scaffold umbrella exports', () => {
+    expect(buildPauseSessionPersistSnapshot).not.toBe(computePauseSessionHydration);
+    expect(computePauseStorageRitualSyncPatch).not.toBe(computePauseSessionHydration);
+    expect(buildPauseSessionScaffoldRitualDerived).not.toBe(computePauseSessionHydration);
+    expect(hasPersistablePauseSessionAnchor).not.toBe(computePauseSessionHydration);
   });
 });

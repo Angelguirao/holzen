@@ -2,7 +2,8 @@
  * CI cluster anchor for session scaffold presentation I/O (§3 / check:architecture-alignment).
  * Re-exports persist snapshot, storage ritual sync, and scaffold derived VM helpers.
  * Presentation: `pause-session-scaffold-io.ts` imports subcluster modules directly (off this umbrella).
- * Parity pins: `pause-session-scaffold-io-parity.test.ts`.
+ * Sibling CI anchor: `pause-session-shell-flow.ts` (hydration/header-back/shell VM — distinct exports).
+ * Parity pins: `pause-session-scaffold-io-parity.test.ts`, `pause-session-scaffold-io.re-exports.test.ts`.
  */
 export {
   buildPauseSessionPersistSnapshot,

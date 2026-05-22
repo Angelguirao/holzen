@@ -26258,4 +26258,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session scaffold-io ↔ scaffold-flow parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-scaffold-io-parity</code> + shell sibling pin</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add application-layer <code>pause-session-scaffold-io-parity.test.ts</code> and presentation <code>pause-session-scaffold-io.re-exports.test.ts</code> so <code>pause-session-scaffold-io</code> exports match <code>pause-session-scaffold-flow</code> CI umbrella and leaf modules (<code>persist-snapshot</code>, <code>storage-ritual-sync</code>, <code>scaffold/scaffold-ritual-derived</code>, <code>persisted-session-guards</code>). Extend <code>pause-session-scaffold-flow.test.ts</code> with sibling-cluster tests vs <code>pause-session-shell-flow</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comments only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without presentation importing scaffold-flow CI umbrella in production hooks.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Tier 1 <code>holzen-query-client-ref</code> shim peel (<code>App.tsx</code> → <code>public-queries</code>), session step-transition-io parity, or Phase B cross-context Tier 1 shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
