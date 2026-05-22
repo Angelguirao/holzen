@@ -4,6 +4,7 @@
  * `presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io` → pending-offer telemetry leaf trackers).
  * Parity pins: `pause-reflect-pending-offer-io.test.ts` (wrapper distinctness + repository delegation + reciprocal pending-offer-telemetry-io sibling pins),
  * `pause-reflect-pending-offer-io-parity.test.ts` beside this module (flow umbrella + display-flow CI anchor + pending-offer-telemetry-io sibling pins),
+ * `pause-reflect-pending-offer-flow-io-wrapper-sibling-parity.test.ts` beside this module (flow umbrella vs port-bound wrappers; application mirror under `application/.../pending-offer/`),
  * `pause-reflect-pending-offer-telemetry-io-parity.test.ts` colocated under `reflect/telemetry/` (telemetry-flow CI umbrella ↔ presentation telemetry-io),
  * `pause-reflect-pending-offer-io.re-exports.test.ts` (leaf + umbrella + display-flow parity pins; reciprocal inline pins ↔ `pause-reflect-ambience-io.re-exports.test.ts`).
  * Sibling parity: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`;

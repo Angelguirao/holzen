@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — presentation reflect pending-offer flow↔io wrapper sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-flow-io-wrapper-sibling-parity.test.ts</code> → <code>presentation/reflect/pending-offer/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves remain complete — no relocations. Mirror application <code>pause-reflect-pending-offer-flow-io-wrapper-sibling-parity</code> beside <code>pause-reflect-pending-offer-io.ts</code> so pending-offer-flow CI umbrella exports stay namespace-separated from presentation port-bound wrappers (parity with steps flow↔io wrapper mirrors). Allowlist wrapper parity test in <code>check:architecture-alignment</code> for pending-offer-flow CI umbrella import.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only; application wrapper sibling file unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: presentation flows or share flow↔io wrapper mirrors, or Phase B Tier 1 lib shim scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — colocate home-telemetry application parity under ritual/reflect/telemetry (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -76,6 +93,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — application companion-analytics leaf composition pins (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-analytics-io-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no reflect moves. Extend application analytics-io parity with presentation-matching leaf <code>.toBe</code> pins on analytics I/O exports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: presentation <code>pause-reflect-pending-offer-flow-io-wrapper-sibling-parity</code> mirror, or Phase B Tier 1 lib shim scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — presentation reflect steps flow↔io wrapper sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -86,7 +120,7 @@
       <dt>Deviation</dt>
       <dd>None — test-only; application wrapper sibling file unchanged.</dd>
       <dt>Open questions</dt>
-      <dd>Next: presentation <code>pause-reflect-pending-offer-flow-io-wrapper-sibling-parity</code> mirror, or Phase B Tier 1 lib shim scan.</dd>
+      <dd>Next: presentation flows or share flow↔io wrapper mirrors, or Phase B Tier 1 lib shim scan.</dd>
     </dl>
   </article>
 
@@ -32996,14 +33030,31 @@
       <span>Phase A — application home-reflect-io session telemetry namespace pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>application/.../manual-open/pause-home-reflect-io-parity.test.ts</code></h3>
+    <h3><code>pause-home-reflect-io-parity.test.ts</code> (application)</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation <code>in homeReflectIo</code> namespace checks on application colocated <code>pause-home-reflect-io-parity</code> so session reflect telemetry-flow exports cannot merge into home-reflect-io (reciprocal to presentation slice on same branch).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation <code>in homeReflectIo</code> namespace checks on application colocated <code>pause-home-reflect-io-parity</code> so session reflect telemetry-io exports cannot merge into home-reflect-io (reciprocal to presentation slice on same branch).</dd>
       <dt>Deviation</dt>
-      <dd>None — test-only; align <code>persistStubFromHomeIo</code> alias in session-telemetry sibling test with presentation mirror.</dd>
+      <dd>None — test-only; align reciprocal cross-links on session-telemetry sibling cluster.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B Tier 1 lib shim scan (<code>@/lib/holzen-console</code> in pause application telemetry), or session scaffold-io application parity.</dd>
+      <dd>Next: Phase B Tier 1 lib shim scan (<code>@/lib/posthog</code> in <code>ritual/reflect/</code> telemetry), or companion orchestration-io persist/favorite leaf pins.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — generation-io + steps-io parity import hygiene (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-io-parity.test.ts</code> + <code>pause-reflect-steps-io-parity.test.ts</code> (presentation)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete. Dedupe double-imported <code>pause-reflect-ambience-io</code> modules; merge duplicate ambience-io sibling inline tests in generation-io parity into one block with combined pins — no behavior changes.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test hygiene only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B Tier 1 lib shim scan, or application-layer parity import dedupe where triple imports remain.</dd>
     </dl>
   </article>
 

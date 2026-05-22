@@ -4,6 +4,10 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'supabasePauseRepository' },
 }));
 
+/**
+ * Application sibling parity: pending-offer-flow CI umbrella vs presentation pending-offer-io wrappers.
+ * Presentation mirror: `presentation/reflect/pending-offer/pause-reflect-pending-offer-flow-io-wrapper-sibling-parity.test.ts`.
+ */
 import {
   pauseAdoptPendingOffer,
   pauseAdoptPendingOfferWithRepository,
