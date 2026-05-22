@@ -25,7 +25,8 @@ import * as flowsIo from '@/features/pause/presentation/reflect/flows/pause-refl
 
 /**
  * Application sibling parity: flows-io vs ambience-io (parity with presentation
- * `pause-reflect-flows-ambience-io-sibling-parity.test.ts` and flow-level
+ * `pause-reflect-flows-ambience-io-sibling-parity.test.ts`,
+ * `pause-reflect-ambience-flows-io-sibling-parity.test.ts` under `ambience/`, and flow-level
  * `pause-reflect-flows-ambience-flow-sibling-parity.test.ts`).
  * Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts` ↔
  * `pause-reflect-ambience-io-parity.test.ts`.
