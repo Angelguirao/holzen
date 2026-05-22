@@ -4,7 +4,8 @@
  * Presentation: `pause-session-shell-io.ts` imports sibling modules directly (not this umbrella).
  * Parity pins: `pause-session-shell-io.re-exports.test.ts` and `pause-session-shell-io-parity.test.ts`.
  * Sibling cluster: `pause-session-terminal-entry-shell-flow-sibling-parity.test.ts` ↔ `pause-session-terminal-entry-flow`;
- * `pause-session-scaffold-shell-flow-sibling-parity.test.ts` ↔ `pause-session-scaffold-flow`.
+ * `pause-session-scaffold-shell-flow-sibling-parity.test.ts` ↔ `pause-session-scaffold-flow`;
+ * `pause-session-providers-shell-flow-sibling-parity.test.ts` ↔ `pause-session-providers-flow`.
  * Reciprocal pins: `pause-session-shell-flow.test.ts` ↔ `pause-session-scaffold-flow.test.ts`.
  */
 export {
