@@ -26077,4 +26077,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — companion orchestration ↔ section-visibility sibling pin (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestration-flow</code> and <code>pause-companion-section-visibility-flow</code> documented as distinct siblings</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) and #2 (<code>companion/</code> → <code>ritual/frame/</code>) remain complete — no folder moves. Add <code>pause-companion-orchestration-section-visibility-sibling-parity.test.ts</code> to assert orchestration-flow does not export section-visibility helpers, section-visibility-flow does not export orchestration exports, orchestration lazy expansion matches <code>pause-companion-section-expansion-flow</code>, and <code>pause-companion-frame-ui-flow</code> composes visibility from the section-visibility sibling (parity with reflect telemetry cross-cluster pins).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + cluster anchor comments only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Documents sibling boundaries without production code importing the peer CI umbrella.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Tier 1 <code>holzen-query-client-ref</code> lib ↔ <code>public-queries</code> re-export parity test, session breath umbrella consolidated subcluster pin, or Phase B cross-context Tier 2–4 scan.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
