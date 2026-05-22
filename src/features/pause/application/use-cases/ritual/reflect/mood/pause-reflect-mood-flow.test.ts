@@ -66,6 +66,12 @@ import {
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
   runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
 } from '../flows/pause-reflect-flows-flow';
+import {
+  dismissOpenPauseHome as dismissFromGenerationFlow,
+  openManualPauseFromHome as openManualFromGenerationFlow,
+  reflectGenerationPrerequisite as prerequisiteFromGenerationFlow,
+  runReflectGeneration as runReflectGenerationFromGenerationFlow,
+} from '../generation/pause-reflect-generation-flow';
 
 describe('pause-reflect-mood-flow', () => {
   it('re-exports mood helpers from domain + run-initial-emotion-log leaf module', () => {
@@ -127,5 +133,15 @@ describe('pause-reflect-mood-flow', () => {
     expect(buildFeelTilesFromFlow).not.toBe(formatQuoteFromFlowsFlow);
     expect(runChromeCloseFromFlow).not.toBe(runOutcomeLogFromFlowsFlow);
     expect(applyBriefFromFlow).not.toBe(resolvePreflightFromFlowsFlow);
+  });
+
+  it('sibling cluster: generation-flow exports stay distinct from mood umbrella exports', () => {
+    expect(runInitialEmotionSelect).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(runInitialEmotionSkip).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(buildFeelTilesFromFlow).not.toBe(openManualFromGenerationFlow);
+    expect(buildFeelTilesFromFlow).not.toBe(dismissFromGenerationFlow);
+    expect(runChromeCloseFromFlow).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(applyBriefFromFlow).not.toBe(prerequisiteFromGenerationFlow);
+    expect(runInitialEmotionSelect).not.toBe(openManualFromGenerationFlow);
   });
 });

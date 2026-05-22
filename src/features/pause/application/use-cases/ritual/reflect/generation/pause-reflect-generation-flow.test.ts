@@ -64,6 +64,11 @@ import {
   shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
 } from '../steps/pause-reflect-steps-flow';
 import {
+  buildFeelTilesMoodLogOptions as buildFeelTilesFromMoodFlow,
+  runInitialEmotionSelect as runEmotionSelectFromMoodFlow,
+  runInitialEmotionSkip as runEmotionSkipFromMoodFlow,
+} from '../mood/pause-reflect-mood-flow';
+import {
   trackPauseReflectPostItOpen as trackPostItFromTelemetryFlow,
   trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
   trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
@@ -175,6 +180,15 @@ describe('pause-reflect-generation-flow', () => {
     expect(runReflectGeneration).not.toBe(shouldShowFavoriteFromStepsFlow);
     expect(openManualFromFlow).not.toBe(shouldLogFromStepsFlow);
     expect(dismissFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+  });
+
+  it('sibling cluster: mood-flow exports stay distinct from generation umbrella exports', () => {
+    expect(runReflectGeneration).not.toBe(runEmotionSelectFromMoodFlow);
+    expect(runReflectGeneration).not.toBe(runEmotionSkipFromMoodFlow);
+    expect(openManualFromFlow).not.toBe(buildFeelTilesFromMoodFlow);
+    expect(dismissFromFlow).not.toBe(runEmotionSelectFromMoodFlow);
+    expect(reflectGenerationPrerequisite).not.toBe(buildFeelTilesFromMoodFlow);
+    expect(openManualFromFlow).not.toBe(runEmotionSkipFromMoodFlow);
   });
 
   it('sibling cluster: telemetry-flow exports stay distinct from generation umbrella exports', () => {
