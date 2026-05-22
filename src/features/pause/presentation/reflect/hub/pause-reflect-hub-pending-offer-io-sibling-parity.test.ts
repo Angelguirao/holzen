@@ -24,9 +24,11 @@ import {
 
 /**
  * Presentation sibling parity: hub-io vs pending-offer-io (parity with application
- * `pause-reflect-hub-pending-offer-flow-sibling-parity.test.ts`; complements
- * `pause-reflect-mood-hub-io-sibling-parity.test.ts` and
+ * `application/.../hub/pause-reflect-hub-pending-offer-io-sibling-parity.test.ts`;
+ * complements `pause-reflect-mood-hub-io-sibling-parity.test.ts` and
  * `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`).
+ * Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts` ↔
+ * `pause-reflect-pending-offer-io-parity.test.ts`.
  */
 describe('pause-reflect-hub-io ↔ pause-reflect-pending-offer-io sibling parity', () => {
   it('hub-io and pending-offer-io are distinct presentation I/O surfaces', () => {
@@ -63,7 +65,7 @@ describe('pause-reflect-hub-io ↔ pause-reflect-pending-offer-io sibling parity
     expect(buildShiftEmotionFrameHubLogBundle).not.toBe(getPendingPauseOfferDisplay);
     expect(resolveShiftFrameHubDonePresentation).not.toBe(getPendingPauseOfferDisplay);
     expect(resolveShiftFrameHubDonePresentation).not.toBe(pauseAdoptPendingOffer);
-    expect(hubReflectPauseRepository).not.toBe(pauseAdoptPendingOffer);
+    expect(hubReflectPauseRepository).toBe(pendingOfferReflectPauseRepository);
   });
 
   it('pending-offer-io exports stay off shift-frame hub RPC and presentation mapping', () => {
@@ -73,7 +75,7 @@ describe('pause-reflect-hub-io ↔ pause-reflect-pending-offer-io sibling parity
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
     expect(getPendingPauseOfferDisplay).not.toBe(buildShiftEmotionFrameHubLogBundle);
     expect(getPendingPauseOfferDisplay).not.toBe(resolveShiftFrameHubDonePresentation);
-    expect(pendingOfferReflectPauseRepository).not.toBe(pauseShiftEmotionFrameHubDone);
-    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(pauseAdoptPendingOffer).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(resolveShiftFrameHubDonePresentation);
   });
 });

@@ -7,7 +7,9 @@
  * `pause-reflect-pending-offer-telemetry-io-parity.test.ts` beside this module (telemetry-flow CI umbrella ↔ presentation telemetry-io),
  * `pause-reflect-pending-offer-io.re-exports.test.ts` (leaf + umbrella + display-flow parity pins; reciprocal inline pins ↔ `pause-reflect-ambience-io.re-exports.test.ts`).
  * Sibling parity: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`;
- * `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
+ * `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io` (application mirror:
+ * `application/.../hub/pause-reflect-hub-pending-offer-io-sibling-parity.test.ts`; reciprocal inline:
+ * `pause-reflect-hub-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`);
  * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (application
  * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
  * `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`);

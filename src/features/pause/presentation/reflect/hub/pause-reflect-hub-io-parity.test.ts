@@ -47,6 +47,13 @@ import {
   showPauseOutcomeSaveFailedToast,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
+  pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import {
   messageFromReflectGenerationResult,
   pauseReflectGeneration,
   reflectGenerationPrerequisite,
@@ -151,5 +158,22 @@ describe('pause-reflect-hub-io parity', () => {
     expect(pauseShiftEmotionFrameHubDone).not.toBe(buildPauseScoreImpacts);
     expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(showPauseOutcomeSaveFailedToast);
     // Full pins: `pause-reflect-flows-hub-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts` (shift-frame hub vs pending-offer RPC).
+   * Dedicated sibling file: `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: pending-offer-io exports stay distinct from hub-io wrappers', () => {
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseAdoptPendingOffer);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseDeclinePendingOffer);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseAdoptPendingOfferWithRepository);
+    expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(buildLogBundleFromHubIo).not.toBe(getPendingPauseOfferDisplay);
+    expect(resolvePresentationFromHubIo).not.toBe(getPendingPauseOfferDisplay);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseAdoptPendingOfferWithRepository);
+    expect(resolvePresentationFromHubIo).not.toBe(pauseDeclinePendingOffer);
+    // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`.
+    // Full pins: `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts`.
   });
 });
