@@ -19,6 +19,11 @@ import {
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
+  trackPausePendingAdopted,
+  trackPausePendingDeclined,
+  trackPauseSessionAbandoned,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
+import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
   pauseAdoptPendingOfferWithRepository,
