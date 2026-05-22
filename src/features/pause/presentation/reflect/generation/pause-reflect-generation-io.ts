@@ -12,7 +12,8 @@
  * `pause-reflect-flows-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`;
  * `pause-reflect-steps-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
  * `pause-reflect-generation-share-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`;
- * application `pause-reflect-generation-hook-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-hook-flow`;
+ * `pause-reflect-generation-hook-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-hook-flow`;
+ * application `pause-reflect-generation-hook-io-sibling-parity.test.ts` (cross-layer duplicate pins);
  * reciprocal inline pins: `pause-reflect-generation-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`,
  * `pause-reflect-telemetry-io.test.ts`;
  * application flow umbrellas: `pause-reflect-generation-flow.test.ts` ↔ `pause-reflect-steps-flow.test.ts` (reciprocal inline).

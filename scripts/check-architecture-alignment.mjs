@@ -1988,7 +1988,8 @@ for (const file of walkTs(join(root, 'src'))) {
     if (
       !rel.endsWith('pause-reflect-generation-io.ts') &&
       !rel.endsWith('pause-reflect-generation-io.test.ts') &&
-      !rel.endsWith('pause-reflect-generation-io.re-exports.test.ts')
+      !rel.endsWith('pause-reflect-generation-io.re-exports.test.ts') &&
+      !rel.endsWith('pause-reflect-generation-hook-io-sibling-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_HOOK_IMPORTS) {
         if (text.includes(needle)) {
@@ -2142,7 +2143,8 @@ for (const file of walkTs(join(root, 'src'))) {
   if (
     rel.endsWith('pause-reflect-generation-io.ts') ||
     rel.endsWith('pause-reflect-generation-io.test.ts') ||
-    rel.endsWith('pause-reflect-generation-io.re-exports.test.ts')
+    rel.endsWith('pause-reflect-generation-io.re-exports.test.ts') ||
+    rel.endsWith('pause-reflect-generation-hook-io-sibling-parity.test.ts')
   ) {
     if (
       !rel.endsWith('pause-reflect-generation-io.re-exports.test.ts')
