@@ -29,6 +29,12 @@ const row = (id: string): BulkHoldPendingPause => ({
 });
 
 describe('pause-home-bulk-hold-io parity', () => {
+  it('presentation I/O exports bulk-hold apply wrapper distinct from ritual/decide leaf', () => {
+    expect(typeof pauseApplyBulkHoldOutcomes).toBe('function');
+    expect(typeof pauseApplyBulkHoldOutcomesWithRepository).toBe('function');
+    expect(pauseApplyBulkHoldOutcomes).not.toBe(applyBulkHoldOutcomes);
+  });
+
   it('presentation I/O binds homeBulkHoldPauseRepository to public-rpc supabasePauseRepository', () => {
     expect(homeBulkHoldPauseRepository).toBe(supabasePauseRepository);
   });
