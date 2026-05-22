@@ -5,11 +5,11 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer', () => ({
-  runAdoptPendingPauseOffer: vi.fn(() => Promise.resolve({ status: 'adopted' as const })),
+  runAdoptPendingPauseOffer: vi.fn(() => Promise.resolve({ status: 'ok' as const, instanceId: 'inst-adopted' })),
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer', () => ({
-  runDeclinePendingPauseOffer: vi.fn(() => Promise.resolve({ status: 'declined' as const })),
+  runDeclinePendingPauseOffer: vi.fn(() => Promise.resolve({ status: 'ok' as const })),
 }));
 
 import { runAdoptPendingPauseOffer as runAdoptDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer';
