@@ -29,6 +29,10 @@ import {
   pauseReflectNoteUpdate,
   pauseReflectTagUpdate,
   pauseReflectionStepLogOnce,
+  pauseReflectFavoriteToggleWithRepository,
+  pauseReflectNoteUpdateWithRepository,
+  pauseReflectTagUpdateWithRepository,
+  pauseReflectionStepLogOnceWithRepository,
   shouldLogPauseReflectionStep,
   shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
@@ -52,6 +56,24 @@ describe('pause-reflect-ambience-io parity', () => {
   });
 
   /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (frame-focus bed vs step RPC wrappers).
+   * Dedicated sibling file: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: steps-io exports stay distinct from ambience-io frame-focus bed', () => {
+    expect(startFromAmbienceIo).not.toBe(pauseReflectFavoriteToggle);
+    expect(stopFromAmbienceIo).not.toBe(pauseReflectNoteUpdate);
+    expect(startFromAmbienceIo).not.toBe(pauseReflectTagUpdate);
+    expect(stopFromAmbienceIo).not.toBe(pauseReflectionStepLogOnce);
+    expect(startFromAmbienceIo).not.toBe(pauseReflectFavoriteToggleWithRepository);
+    expect(stopFromAmbienceIo).not.toBe(pauseReflectNoteUpdateWithRepository);
+    expect(startFromAmbienceIo).not.toBe(pauseReflectTagUpdateWithRepository);
+    expect(stopFromAmbienceIo).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    expect(startFromAmbienceIo).not.toBe(shouldShowFavoriteProHint);
+    expect(stopFromAmbienceIo).not.toBe(shouldLogPauseReflectionStep);
+    // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
+  });
+
+  /**
    * Reciprocal inline pins ↔ `pause-reflect-pending-offer-io-parity.test.ts` (frame-focus bed vs pending-offer RPC).
    * Dedicated sibling file: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` (application + presentation).
    */
@@ -63,21 +85,5 @@ describe('pause-reflect-ambience-io parity', () => {
     expect(startFromAmbienceIo).not.toBe(getPendingPauseOfferDisplay);
     expect(stopFromAmbienceIo).not.toBe(reflectPauseRepository);
     // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`.
-  });
-
-  /**
-   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (frame-focus bed vs step RPC wrappers).
-   * Dedicated sibling file: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation).
-   */
-  it('sibling cluster: steps-io exports stay distinct from ambience-io frame-focus bed', () => {
-    expect(startFromAmbienceIo).not.toBe(pauseReflectFavoriteToggle);
-    expect(stopFromAmbienceIo).not.toBe(pauseReflectNoteUpdate);
-    expect(startFromAmbienceIo).not.toBe(pauseReflectTagUpdate);
-    expect(stopFromAmbienceIo).not.toBe(pauseReflectionStepLogOnce);
-    expect(startFromAmbienceIo).not.toBe(shouldShowFavoriteProHint);
-    expect(stopFromAmbienceIo).not.toBe(shouldLogPauseReflectionStep);
-    expect(startFromAmbienceIo).not.toBe(pauseReflectNoteUpdate);
-    expect(stopFromAmbienceIo).not.toBe(pauseReflectTagUpdate);
-    // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
   });
 });

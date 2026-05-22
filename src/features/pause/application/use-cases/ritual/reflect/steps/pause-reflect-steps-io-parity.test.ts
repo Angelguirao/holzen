@@ -77,6 +77,10 @@ import {
   pauseInitialEmotionSkipWithRepository,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
@@ -307,6 +311,7 @@ describe('pause-reflect-steps-io parity', () => {
     expect(pauseReflectionStepLogOnce).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(pauseReflectFavoriteToggleWithRepository).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(pauseReflectNoteUpdateWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(pauseReflectTagUpdateWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(pauseReflectionStepLogOnceWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(shouldShowFromStepsIo).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(shouldLogFromStepsIo).not.toBe(stopPauseReflectFrameFocusAmbience);
