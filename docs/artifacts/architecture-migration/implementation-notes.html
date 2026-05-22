@@ -30174,11 +30174,11 @@
     <h3><code>pause-session-providers-shell-io-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Move presentation I/O sibling parity for providers-io ↔ shell-io from <code>application/use-cases/session/</code> to <code>presentation/session/</code> (parity with terminal-entry↔shell/scaffold colocation). Add reciprocal inline pins on <code>pause-session-providers-io.test.ts</code> and <code>pause-session-shell-io.test.ts</code>.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Move presentation I/O sibling parity for providers-io ↔ shell-io from <code>application/use-cases/session/</code> to <code>presentation/session/</code> (parity with terminal-entry↔shell/scaffold colocation). Remove duplicate application-layer providers↔scaffold-io sibling parity (presentation copy is canonical). Add reciprocal inline pins on <code>pause-session-providers-io.test.ts</code>, <code>pause-session-shell-io.test.ts</code>, and <code>scaffold/pause-session-scaffold-io.test.ts</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — test colocation + comment anchors only; application flow-level sibling tests unchanged.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B <code>subscription-checkout-guard-ref</code> lib shim for <code>App.tsx</code> boot seam.</dd>
+      <dd>Next: move <code>pause-session-scaffold-shell-io-sibling-parity</code> to presentation if still under application, or Phase B Tier 1 shim scan.</dd>
     </dl>
   </article>
 
