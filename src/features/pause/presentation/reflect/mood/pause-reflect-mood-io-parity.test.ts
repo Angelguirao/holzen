@@ -89,7 +89,10 @@ import {
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
+  buildReflectionShareTelegramUrl,
   buildReflectionShareText,
+  buildReflectionShareTweetUrl,
+  buildReflectionShareWhatsAppUrl,
   pauseReflectionShareImage,
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
@@ -341,6 +344,9 @@ describe('pause-reflect-mood-io parity', () => {
   it('sibling cluster: share-io builders stay distinct from mood-io wrappers', () => {
     expect(pauseInitialEmotionSelect).not.toBe(pauseReflectionShareImage);
     expect(pauseInitialEmotionSkip).not.toBe(buildReflectionShareText);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(buildReflectionShareTweetUrl);
+    expect(pauseInitialEmotionSkipWithRepository).not.toBe(buildReflectionShareTelegramUrl);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(buildReflectionShareWhatsAppUrl);
     expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseReflectionShareImage);
     expect(pauseInitialEmotionSkipWithRepository).not.toBe(buildReflectionShareText);
     expect(buildFeelTilesMoodLogOptions).not.toBe(pauseReflectionShareImage);
