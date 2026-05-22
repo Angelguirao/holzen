@@ -23504,4 +23504,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — ritual/reflect flows umbrella identity tests (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-flow</code> pins domain + ritual/decide leaf re-exports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-flows-flow.test.ts</code> with <code>.toBe(direct)</code> identity checks on reflect+decide preflight/after-generation helpers, outcome log/toast/quote/score-impact modules (parity with steps/share umbrella pinning). <code>pause-reflect-flows-io</code> unchanged (imports leaf modules directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only; presentation I/O still imports leaf modules directly per §6 peel.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mood, hub, ambience, generation, and pending-offer umbrellas still use typeof-only tests until a slice needs stricter pinning.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: pin remaining reflect umbrella flow tests, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
