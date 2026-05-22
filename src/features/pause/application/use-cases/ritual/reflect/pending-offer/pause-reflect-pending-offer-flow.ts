@@ -6,6 +6,7 @@
  * import leaf modules directly. Parity pins: `pause-reflect-pending-offer-io-parity.test.ts` (display + run-* leaves +
  * `reflectPauseRepository` ↔ `supabasePauseRepository`; `pauseAdoptPendingOffer` / `pauseDeclinePendingOffer` delegation to
  * run-* with default repository — parity with hub-io), `pause-reflect-pending-offer-telemetry-io-parity.test.ts` (PostHog trackers).
+ * Sibling cluster: `pause-reflect-steps-pending-offer-flow-sibling-parity.test.ts` pins separation from `pause-reflect-steps-flow`.
  */
 export { runAdoptPendingPauseOffer } from './run-adopt-pending-pause-offer';
 export { runDeclinePendingPauseOffer } from './run-decline-pending-pause-offer';

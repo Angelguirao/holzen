@@ -5,7 +5,8 @@
  * Wrapper delegation: pause-reflect-steps-io-parity.test.ts (presentation I/O → run-* leaves).
  * Sibling pins: pause-reflect-steps-flow.test.ts (umbrella vs steps subcluster flow anchors);
  * pause-reflect-steps-flow.test.ts ↔ pause-reflect-flows-flow.test.ts;
- * pause-reflect-steps-hub-flow-sibling-parity.test.ts pins separation from pause-reflect-hub-flow.
+ * pause-reflect-steps-hub-flow-sibling-parity.test.ts pins separation from pause-reflect-hub-flow;
+ * pause-reflect-steps-pending-offer-flow-sibling-parity.test.ts pins separation from pause-reflect-pending-offer-flow.
  */
 export { runPauseFavoriteToggle } from './run-pause-favorite-toggle';
 export { shouldShowFavoriteProHint } from '@/features/pause/domain/reflect/steps/favorite-toggle';
