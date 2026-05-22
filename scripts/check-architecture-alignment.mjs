@@ -2907,7 +2907,8 @@ for (const file of walkTs(join(root, 'src'))) {
       rel.endsWith('pause-session-breath-io.test.ts') ||
       rel.endsWith('pause-session-breath-io.re-exports.test.ts') ||
       rel.endsWith('pause-session-breath-step-navigation-io.ts') ||
-      rel.endsWith('pause-session-breath-step-navigation-io.test.ts');
+      rel.endsWith('pause-session-breath-step-navigation-io.test.ts') ||
+      rel.endsWith('pause-session-breath-step-navigation-io.re-exports.test.ts');
     if (!breathIoAllowlisted) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_AUDIO_IMPORTS) {
         if (text.includes(needle)) {
