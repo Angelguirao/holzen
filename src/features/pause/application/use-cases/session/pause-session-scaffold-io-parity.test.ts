@@ -70,6 +70,9 @@ describe('pause-session-scaffold-io parity', () => {
     expect(hasPersistablePauseSessionAnchor).not.toBe(loadPersistedTabSession);
   });
 
+  /**
+   * Dedicated sibling file: `pause-session-shell-scaffold-io-sibling-parity.test.ts` (application + presentation).
+   */
   it('sibling cluster: scaffold presentation exports stay distinct from shell I/O and persisted-tab-session flow', () => {
     expect(buildPauseSessionPersistSnapshot).not.toBe(computePauseSessionHydration);
     expect(computePauseStorageRitualSyncPatch).not.toBe(computePauseSessionHydration);

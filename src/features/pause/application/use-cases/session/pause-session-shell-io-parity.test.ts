@@ -142,6 +142,9 @@ describe('pause-session-shell-io parity', () => {
     // Full pins: `pause-session-providers-shell-io-sibling-parity.test.ts`.
   });
 
+  /**
+   * Dedicated sibling file: `pause-session-shell-scaffold-io-sibling-parity.test.ts` (application + presentation).
+   */
   it('sibling cluster: shell presentation exports stay distinct from scaffold, terminal-entry, and persisted-tab-session I/O', () => {
     expect(computePauseSessionHydration).not.toBe(buildPauseSessionPersistSnapshot);
     expect(computePauseSessionHydration).not.toBe(computePauseStorageRitualSyncPatch);
