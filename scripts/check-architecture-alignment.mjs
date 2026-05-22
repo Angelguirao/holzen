@@ -3164,7 +3164,8 @@ for (const file of walkTs(join(root, 'src'))) {
       rel.endsWith('pause-session-breath-io.test.ts') ||
       rel.endsWith('pause-session-breath-io.re-exports.test.ts') ||
       rel.endsWith('pause-session-frame-io.ts') ||
-      rel.endsWith('pause-session-frame-io.test.ts');
+      rel.endsWith('pause-session-frame-io.test.ts') ||
+      rel.endsWith('pause-session-frame-io.re-exports.test.ts');
     if (!sessionRitualRestoreIoAllowlisted) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_RITUAL_RESTORE_USE_CASE_IMPORTS) {
         if (text.includes(needle)) {
@@ -3216,7 +3217,8 @@ for (const file of walkTs(join(root, 'src'))) {
   }
   if (
     rel.endsWith('pause-session-frame-io.ts') ||
-    rel.endsWith('pause-session-frame-io.test.ts')
+    rel.endsWith('pause-session-frame-io.test.ts') ||
+    rel.endsWith('pause-session-frame-io.re-exports.test.ts')
   ) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_FRAME_IO_FLOW_IMPORTS) {
       if (text.includes(needle)) {

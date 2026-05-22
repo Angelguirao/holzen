@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session frame-io ↔ frame-flow application parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-frame-io-parity.test.ts</code> + re-exports identity pin</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add application-layer <code>pause-session-frame-io-parity.test.ts</code> and presentation <code>pause-session-frame-io.re-exports.test.ts</code> so <code>pause-session-frame-io</code> exports match <code>pause-session-frame-flow</code> CI umbrella and <code>ritual/frame/restored-frame-ritual-state</code> leaf (parity with ritual-restore-io / breath-io session pins). Production frame I/O keeps direct leaf import.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow comment only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: session brief-io parity or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — home bulk-hold-io ↔ apply-bulk-hold-outcomes (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -86,7 +103,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + flow comment only.</dd>
       <dt>Open question</dt>
-      <dd>Next: remaining session I/O parity (terminal-entry, step-handlers, scaffold, brief, frame, decide) or Phase B subscription Tier 1 shims.</dd>
+      <dd>Next: remaining session I/O parity (terminal-entry, step-handlers, scaffold, brief, decide) or Phase B subscription Tier 1 shims.</dd>
     </dl>
   </article>
 
