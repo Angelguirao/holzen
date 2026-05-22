@@ -21029,4 +21029,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — manual-open telemetry I/O via telemetry-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>pause-home-reflect-telemetry-io</code> through <code>pause-home-reflect-telemetry-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. After the generation presentation CI guard, peel <code>pause-home-reflect-telemetry-io</code> off <code>pause-reflect-generation-flow</code> to import <code>pause-home-reflect-telemetry-flow</code> directly (parity with <code>pause-reflect-pending-offer-telemetry-io</code> → pending-offer umbrella). Generation umbrella still composes the telemetry subcluster for holzen-reflect + manual-open I/O paths.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Telemetry-io no longer depends on the generation umbrella barrel; manual-open conductors still import telemetry-io sibling only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim (<code>subscription-checkout-guard-ref</code> in <code>App.tsx</code>) or archive decide I/O peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
