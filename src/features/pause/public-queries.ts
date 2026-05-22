@@ -24,7 +24,7 @@ export {
   getPendingPauseOfferQueryOptions,
   pendingPauseOfferQueryKey,
   type PendingPauseOfferRow,
-} from './infrastructure/queries/pending-pause-offer-query';
+} from './infrastructure/queries/reflect/pending-offer/pending-pause-offer-query';
 export {
   type PauseArchiveListSort,
   type PauseArchiveRow,
