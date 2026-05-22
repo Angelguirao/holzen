@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — home manual-open I/O parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-io-parity.test.ts</code> ports + colocated apply</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend application-layer <code>pause-home-reflect-io-parity.test.ts</code> with <code>pauseHomeManualOpenPorts</code> ↔ <code>public-rpc</code>, <code>MANUAL_PAUSE_VOLATILITY_TEMPLATE</code>, and <code>applyManualPauseOpenResult</code> pins (parity with generation-io / breath-io cluster tests; <code>pause-home-reflect-io.re-exports.test.ts</code> already covered leaf identity). Document manual-open-flow comment for parity tests. Production Home I/O keeps leaf imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription Tier 1 shims, or remaining session presentation I/O parity tests.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session ritual-restore-io ↔ ritual-restore-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -25898,7 +25915,7 @@
       <dt>Tradeoffs</dt>
       <dd>Regression guard without presentation I/O importing the steps-flow umbrella in production code.</dd>
       <dt>Open questions</dt>
-      <dd>Next: mood/hub io-parity repository pins, <code>pause-companion-orchestration-flow</code> ↔ section-visibility sibling pin, or Tier 1 <code>holzen-query-client-ref</code> shim peel.</dd>
+      <dd>Next: <code>pause-companion-orchestration-flow</code> ↔ section-visibility sibling pin, or Tier 1 <code>holzen-query-client-ref</code> shim peel (mood/hub io-parity repository pins done).</dd>
     </dl>
   </article>
 
