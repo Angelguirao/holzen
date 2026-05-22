@@ -16,6 +16,10 @@ import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
   getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
+  pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
   reflectPauseRepository,
 } from './pause-reflect-pending-offer-io';
 
@@ -33,5 +37,15 @@ describe('pause-reflect-pending-offer-io re-exports', () => {
     expect(getPendingPauseOfferDisplay).toBe(getDisplayFromPendingOfferFlow);
     expect(runAdoptFromPendingOfferFlow).toBe(runAdoptDirect);
     expect(runDeclineFromPendingOfferFlow).toBe(runDeclineDirect);
+  });
+
+  it('presentation port-bound wrappers stay off pending-offer-flow CI umbrella exports', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(runAdoptFromPendingOfferFlow);
+    expect(pauseDeclinePendingOffer).not.toBe(runDeclineFromPendingOfferFlow);
+    expect(pauseAdoptPendingOffer).not.toBe(runDeclineFromPendingOfferFlow);
+    expect(pauseDeclinePendingOffer).not.toBe(runAdoptFromPendingOfferFlow);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(runAdoptFromPendingOfferFlow);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(runDeclineFromPendingOfferFlow);
+    expect(reflectPauseRepository).not.toBe(getDisplayFromPendingOfferFlow);
   });
 });

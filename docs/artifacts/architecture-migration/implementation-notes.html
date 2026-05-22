@@ -27881,7 +27881,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or reflect pending-offer-io adopt/decline wrapper distinctness if not already pinned on remote.</dd>
+      <dd>Next: pending-offer-flow ↔ pending-offer-io wrapper sibling parity, or Phase B subscription Tier 1 shims.</dd>
     </dl>
   </article>
 
@@ -27898,7 +27898,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: share-flow ↔ share-orchestration-flow sibling parity, pending-offer-flow ↔ pending-offer-rpc-flow pins, or Phase B subscription Tier 1 shims.</dd>
+      <dd>Next: share-flow ↔ share-orchestration-flow sibling parity, pending-offer-flow ↔ pending-offer-io wrapper pins, or Phase B subscription Tier 1 shims.</dd>
     </dl>
   </article>
 
@@ -27912,6 +27912,23 @@
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Extend presentation <code>pause-reflect-pending-offer-io.test.ts</code> with adopt/decline RPC wrapper <code>.not.toBe</code> pins against leaf <code>run-*</code> use cases (parity with hub-io and generation-io presentation wrapper distinctness; application <code>pause-reflect-pending-offer-io-parity.test.ts</code> already covered delegation).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comment anchors only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: pending-offer-flow ↔ pending-offer-io wrapper sibling parity file, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — pending-offer-flow ↔ pending-offer-io wrapper sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-flow-io-wrapper-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated sibling parity between <code>pause-reflect-pending-offer-flow</code> CI umbrella (leaf run-* + display + telemetry re-exports) and <code>pause-reflect-pending-offer-io</code> port-bound wrappers (<code>pauseAdoptPendingOffer</code>, <code>pauseDeclinePendingOffer</code>, <code>reflectPauseRepository</code>). Reciprocal pin on <code>pause-reflect-pending-offer-io.re-exports.test.ts</code>. Production modules unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open questions</dt>
