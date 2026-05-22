@@ -5,7 +5,8 @@
  * Wrapper delegation pins: pause-reflect-mood-io-parity.test.ts (default + *WithRepository seams).
  * Sibling surface pins: `pause-reflect-steps-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`,
  * `pause-reflect-generation-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`,
- * `pause-reflect-mood-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`.
+ * `pause-reflect-mood-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
+ * `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`.
  */
 import {
   runInitialEmotionSelect,
