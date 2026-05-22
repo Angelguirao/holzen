@@ -32,7 +32,9 @@ import {
 /**
  * Presentation sibling parity: flows-io vs mood-io (parity with application
  * `pause-reflect-flows-mood-flow-sibling-parity.test.ts` and
- * `pause-reflect-generation-mood-io-sibling-parity.test.ts`).
+ * `pause-reflect-generation-mood-io-sibling-parity.test.ts`; complements
+ * reciprocal inline pins on `pause-reflect-flows-io.test.ts` and
+ * `pause-reflect-mood-io.test.ts`).
  */
 describe('pause-reflect-flows-io ↔ pause-reflect-mood-io sibling parity', () => {
   it('flows-io and mood-io are distinct presentation I/O surfaces', () => {
