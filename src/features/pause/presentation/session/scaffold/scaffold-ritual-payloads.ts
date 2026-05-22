@@ -9,7 +9,7 @@ import type {
 } from '@/features/pause/presentation/session/ritual-body-props';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { BriefPauseStep } from '@/features/pause/domain/ritual-types';
-import type { PauseSessionStepTransitionConfig } from '../pause-session-shell-io';
+import type { PauseSessionStepTransitionConfig } from '../pause-session-step-transition-io';
 
 /**
  * Assembles `briefRitual` / `deepRitual` props for `PauseSessionScaffoldShell` from the `PauseSession` route.
