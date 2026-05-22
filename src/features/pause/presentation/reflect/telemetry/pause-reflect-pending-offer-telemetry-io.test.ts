@@ -1,4 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
+}));
+
+import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
+  pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
@@ -55,5 +67,14 @@ describe('pause-reflect-pending-offer-telemetry-io', () => {
     expect(trackPausePendingAdopted).not.toBe(trackPauseReflectPostItOpen);
     expect(trackPausePendingDeclined).not.toBe(trackPauseReflectShareTap);
     expect(trackPauseSessionAbandoned).not.toBe(trackPauseReflectWallpaperTap);
+  });
+
+  it('sibling cluster: pending-offer-io exports stay distinct from pending-offer-telemetry-io', () => {
+    expect(trackPausePendingAdopted).not.toBe(pauseAdoptPendingOffer);
+    expect(trackPausePendingDeclined).not.toBe(pauseDeclinePendingOffer);
+    expect(trackPauseSessionAbandoned).not.toBe(pauseAdoptPendingOfferWithRepository);
+    expect(trackPausePendingAdopted).not.toBe(getPendingPauseOfferDisplay);
+    expect(trackPausePendingDeclined).not.toBe(pauseDeclinePendingOfferWithRepository);
+    // Full cross-I/O pins: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
   });
 });
