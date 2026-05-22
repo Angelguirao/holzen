@@ -27,8 +27,10 @@ import {
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
+  buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
+  resolveShiftFrameHubDonePresentation,
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
   applyBriefDepthPickerRitualEntry,
@@ -176,5 +178,15 @@ describe('pause-reflect-mood-io', () => {
     expect(pauseInitialEmotionSelect).not.toBe(pauseReflectOutcomeLog);
     expect(pauseInitialEmotionSkip).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(pauseInitialEmotionSelect).not.toBe(pauseShiftEmotionFrameHubDone);
+  });
+
+  it('sibling cluster: hub-io exports stay distinct from mood-io', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(pauseInitialEmotionSkip).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseInitialEmotionSkipWithRepository).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(resolveShiftFrameHubDonePresentation);
+    // Full cross-I/O pins: `pause-reflect-mood-hub-io-sibling-parity.test.ts`.
   });
 });
