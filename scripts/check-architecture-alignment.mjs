@@ -2730,7 +2730,8 @@ for (const file of walkTs(join(root, 'src'))) {
       rel.endsWith('pause-reflect-ambience-io.ts') ||
       rel.endsWith('pause-reflect-ambience-io.test.ts') ||
       rel.endsWith('pause-reflect-ambience-io.re-exports.test.ts') ||
-      rel.endsWith('pause-reflect-ambience-io-parity.test.ts');
+      rel.endsWith('pause-reflect-ambience-io-parity.test.ts') ||
+      rel.endsWith('pause-reflect-ambience-pending-offer-flow-sibling-parity.test.ts');
     if (!ambienceIoAllowlisted) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_AMBIENCE_IMPORTS) {
         if (text.includes(needle)) {
@@ -2743,11 +2744,13 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-reflect-ambience-io.ts') ||
     rel.endsWith('pause-reflect-ambience-io.test.ts') ||
     rel.endsWith('pause-reflect-ambience-io.re-exports.test.ts') ||
-    rel.endsWith('pause-reflect-ambience-io-parity.test.ts')
+    rel.endsWith('pause-reflect-ambience-io-parity.test.ts') ||
+    rel.endsWith('pause-reflect-ambience-pending-offer-flow-sibling-parity.test.ts')
   ) {
     if (
       !rel.endsWith('pause-reflect-ambience-io.re-exports.test.ts') &&
-      !rel.endsWith('pause-reflect-ambience-io-parity.test.ts')
+      !rel.endsWith('pause-reflect-ambience-io-parity.test.ts') &&
+      !rel.endsWith('pause-reflect-ambience-pending-offer-flow-sibling-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_AMBIENCE_IO_FLOW_IMPORTS) {
         if (text.includes(needle)) {
