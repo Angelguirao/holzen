@@ -1034,6 +1034,24 @@ const LEGACY_PAUSE_REFLECT_GENERATION_FLOW_TELEMETRY_IMPORTS = [
   "from '../manual-open/manual-pause-trigger-telemetry'",
 ];
 
+/** Reflect ambience presentation — import via pause-reflect-ambience-io only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_AMBIENCE_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/ambience/pause-reflect-ambience-flow',
+  '@/features/pause/domain/ritual/breathe/reflect-frame-focus-ambience',
+  "from './application/use-cases/ritual/reflect/ambience/pause-reflect-ambience-flow'",
+  "from '../application/use-cases/ritual/reflect/ambience/pause-reflect-ambience-flow'",
+  "from '@/features/pause/domain/ritual/breathe/reflect-frame-focus-ambience'",
+  "from './domain/ritual/breathe/reflect-frame-focus-ambience'",
+  "from '../domain/ritual/breathe/reflect-frame-focus-ambience'",
+];
+
+/** Reflect ambience I/O — import domain directly (not pause-reflect-ambience-flow umbrella). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_AMBIENCE_IO_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/ambience/pause-reflect-ambience-flow',
+  "from './application/use-cases/ritual/reflect/ambience/pause-reflect-ambience-flow'",
+  "from '../application/use-cases/ritual/reflect/ambience/pause-reflect-ambience-flow'",
+];
+
 /** Reflect hub I/O — import via hub subcluster flows only (not pause-reflect-hub-flow umbrella). */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_UMBRELLA_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow',
@@ -1852,6 +1870,30 @@ for (const file of walkTs(join(root, 'src'))) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy reflect steps import (${needle})`);
         }
+      }
+    }
+  }
+  if (rel.startsWith('src/features/pause/presentation/reflect/ambience/')) {
+    const ambienceIoAllowlisted =
+      rel.endsWith('pause-reflect-ambience-io.ts') ||
+      rel.endsWith('pause-reflect-ambience-io.test.ts');
+    if (!ambienceIoAllowlisted) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_AMBIENCE_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy reflect ambience import (${needle})`);
+        }
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-reflect-ambience-io.ts') ||
+    rel.endsWith('pause-reflect-ambience-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_AMBIENCE_IO_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect ambience I/O must import domain reflect-frame-focus-ambience directly (${needle})`,
+        );
       }
     }
   }

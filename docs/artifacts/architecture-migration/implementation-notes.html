@@ -21547,4 +21547,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect ambience I/O via domain (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>pause-reflect-ambience-io</code> through <code>domain/ritual/breathe/reflect-frame-focus-ambience</code> directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Peel reflect/frame focus-bed presentation I/O off <code>pause-reflect-ambience-flow</code> to import Web Audio helpers from domain directly (parity with generation I/O domain imports). CI blocks ambience-flow umbrella on ambience I/O; focus-ambience hooks still import ambience-io only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-ambience-flow</code> remains the compose anchor for application-layer re-exports; presentation no longer depends on the umbrella barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session scaffold/shell I/O subcluster peels, Phase B subscription Tier 1 shim, or ritual breathe presentation I/O alignment.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
