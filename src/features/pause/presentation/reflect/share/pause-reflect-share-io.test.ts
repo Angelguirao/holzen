@@ -74,6 +74,10 @@ import {
 } from './pause-reflect-share-io';
 
 describe('pause-reflect-share-io', () => {
+  /**
+   * Flow↔I/O wrapper distinctness: `pause-reflect-share-flow-io-wrapper-sibling-parity.test.ts`
+   * (application mirror beside `pause-reflect-share-flow.ts`).
+   */
   it('delegates to runReflectionShareImage', async () => {
     runReflectionShareImageMock.mockResolvedValue('downloaded');
 
