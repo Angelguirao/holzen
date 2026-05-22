@@ -2,7 +2,7 @@
  * Reflect step mutation presentation I/O (bound PauseRepository + step storage).
  * Imports domain step gates and `run-pause-*` use cases directly (parity with
  * `pause-reflect-hub-io` → domain + leaf use case).
- * Wrapper delegation pins: pause-reflect-steps-io-parity.test.ts (default + *WithRepository seams).
+ * Wrapper delegation pins: pause-reflect-steps-io-parity.test.ts (default + *WithRepository seams incl. reflection_step log).
  */
 import { runPauseFavoriteToggle } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import { runPauseReflectNoteUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
@@ -11,6 +11,7 @@ import { runPauseReflectionStepLogOnce } from '@/features/pause/application/use-
 import { shouldShowFavoriteProHint } from '@/features/pause/domain/reflect/steps/favorite-toggle';
 import { shouldLogPauseReflectionStep } from '@/features/pause/domain/reflect/steps/reflection-step-log';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+import type { ReflectionStepLogStoragePort } from '@/features/pause/ports/reflection-step-log-storage';
 import {
   reflectionStepSessionStorage,
   supabasePauseRepository,
@@ -72,4 +73,15 @@ export function pauseReflectFavoriteToggleWithRepository(
   input: { pauseInstanceId: string | null; isFavorite: boolean },
 ): ReturnType<typeof runPauseFavoriteToggle> {
   return runPauseFavoriteToggle(repository, input);
+}
+
+/** Test seam: inject custom `PauseRepository` and optional step-log storage port. */
+export function pauseReflectionStepLogOnceWithRepository(
+  repository: PauseRepository,
+  input: { pauseInstanceId: string },
+  ports: { storage: ReflectionStepLogStoragePort } = {
+    storage: reflectionStepSessionStorage,
+  },
+): ReturnType<typeof runPauseReflectionStepLogOnce> {
+  return runPauseReflectionStepLogOnce(repository, input, ports);
 }
