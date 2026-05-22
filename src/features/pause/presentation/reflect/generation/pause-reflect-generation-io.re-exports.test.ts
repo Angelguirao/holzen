@@ -28,6 +28,7 @@ import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
 
 import {
   messageFromReflectGenerationResult,
+  pauseReflectGeneration,
   reflectGenerationPrerequisite,
   reflectGenerationUserErrorMessage,
   reflectGenerator,
@@ -64,6 +65,8 @@ describe('pause-reflect-generation-io re-exports', () => {
   it('re-exports runReflectGeneration from holzen-reflect leaf (not generation umbrella)', () => {
     expect(typeof runReflectGeneration).toBe('function');
     expect(runReflectGeneration).toBe(runReflectGenerationDirect);
+    expect(typeof pauseReflectGeneration).toBe('function');
+    expect(pauseReflectGeneration).not.toBe(runReflectGenerationDirect);
   });
 
   it('presentation I/O bindings match pause-reflect-generation-flow CI anchor (leaf parity)', () => {

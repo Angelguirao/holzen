@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { runReflectGeneration as runReflectGenerationDirect } from '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation';
 import { pauseReflectGeneration, reflectGenerator } from './pause-reflect-generation-io';
 
 const runReflectGenerationMock = vi.hoisted(() => vi.fn());
@@ -15,6 +16,11 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 describe('pause-reflect-generation-io', () => {
+  it('exports holzen-reflect RPC wrapper distinct from leaf use case', () => {
+    expect(typeof pauseReflectGeneration).toBe('function');
+    expect(pauseReflectGeneration).not.toBe(runReflectGenerationDirect);
+  });
+
   it('delegates to runReflectGeneration with default reflectGenerator port', async () => {
     runReflectGenerationMock.mockResolvedValue({ status: 'generated', message: 'ok' });
 

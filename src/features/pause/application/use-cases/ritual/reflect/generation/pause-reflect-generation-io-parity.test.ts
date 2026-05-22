@@ -4,6 +4,15 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation',
+  () => ({
+    runReflectGeneration: vi.fn(() =>
+      Promise.resolve({ status: 'generated' as const, message: 'ok' }),
+    ),
+  }),
+);
+
 import { messageFromReflectGenerationResult as messageDirect } from '@/features/pause/domain/reflect/generation/message-from-reflect-generation-result';
 import { reflectGenerationPrerequisite as prerequisiteDirect } from '@/features/pause/domain/reflect/generation/reflect-generation-prerequisites';
 import { reflectGenerationUserErrorMessage as userErrorDirect } from '@/features/pause/domain/reflect/generation/reflect-generation-errors';
@@ -26,6 +35,7 @@ import {
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow';
 import {
   messageFromReflectGenerationResult as messageFromGenerationIo,
+  pauseReflectGeneration,
   reflectGenerationPrerequisite as prerequisiteFromGenerationIo,
   reflectGenerationUserErrorMessage as userErrorFromGenerationIo,
   reflectGenerator,
@@ -63,5 +73,44 @@ describe('pause-reflect-generation-io parity', () => {
 
   it('presentation I/O binds reflectGenerator to public-rpc supabaseReflectGenerator', () => {
     expect(reflectGenerator).toBe(supabaseReflectGenerator);
+  });
+
+  it('presentation I/O exports holzen-reflect RPC wrapper distinct from leaf use case', () => {
+    expect(typeof pauseReflectGeneration).toBe('function');
+    expect(pauseReflectGeneration).not.toBe(runReflectGenerationDirect);
+    expect(runReflectGeneration).not.toBe(pauseReflectGeneration);
+  });
+
+  it('pauseReflectGeneration delegates to run-reflect-generation with default generator', async () => {
+    const input = {
+      pauseInstanceId: 'inst-gen',
+      userId: 'user-gen',
+      context: 'btc',
+      initialReflectionMessage: '',
+      severityAbsPct: 50,
+      profile: { display_name: 'Test' },
+      signal: new AbortController().signal,
+    };
+
+    await pauseReflectGeneration(input);
+
+    expect(runReflectGenerationDirect).toHaveBeenCalledWith(input, supabaseReflectGenerator);
+  });
+
+  it('pauseReflectGeneration accepts injected ReflectGenerator port', async () => {
+    const customGenerator = { port: 'customReflectGenerator' };
+    const input = {
+      pauseInstanceId: 'inst-gen-custom',
+      userId: 'user-gen-custom',
+      context: 'eth',
+      initialReflectionMessage: 'seed',
+      severityAbsPct: 10,
+      profile: {},
+      signal: new AbortController().signal,
+    };
+
+    await pauseReflectGeneration(input, customGenerator as typeof supabaseReflectGenerator);
+
+    expect(runReflectGenerationDirect).toHaveBeenCalledWith(input, customGenerator);
   });
 });
