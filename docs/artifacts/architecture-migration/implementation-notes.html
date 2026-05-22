@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel pause-reflect-pending-offer-flow off pending-offer subcluster anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-flow</code> composes RPC use cases + display + telemetry leaf modules</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Pending-offer CI umbrella re-exports the same paths as <code>pause-reflect-pending-offer-io</code> + <code>pause-reflect-pending-offer-telemetry-io</code> (adopt/decline use cases, <code>pending-pause-offer-display</code>, leaf PostHog trackers); RPC/display/telemetry subcluster flow anchors remain CI-only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Presentation unchanged; subcluster anchors stay on disk for CI detection.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-ambience-flow</code> regression test, companion frame peels, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-companion-frame-ui-flow off frame UI subcluster anchors (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

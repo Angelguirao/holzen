@@ -1,20 +1,19 @@
 /**
  * CI cluster anchor for ritual reflect pending-offer presentation I/O (§3 / check:architecture-alignment).
- * Composes RPC, display, and PostHog subcluster anchors.
- * Presentation: `pause-reflect-pending-offer-io.ts` imports RPC/display leaf modules directly;
- * `pause-reflect-pending-offer-telemetry-io.ts` imports telemetry leaf modules directly.
+ * Composes adopt/decline RPC use cases, display projection, and PostHog leaf trackers
+ * (not RPC/display/telemetry subcluster flow anchors).
+ * Presentation: `pause-reflect-pending-offer-io.ts` and `pause-reflect-pending-offer-telemetry-io.ts`
+ * import leaf modules directly.
  */
-export {
-  runAdoptPendingPauseOffer,
-  runDeclinePendingPauseOffer,
-} from './pause-reflect-pending-offer-rpc-flow';
+export { runAdoptPendingPauseOffer } from './run-adopt-pending-pause-offer';
+export { runDeclinePendingPauseOffer } from './run-decline-pending-pause-offer';
 export {
   getPendingPauseOfferDisplay,
   type PendingPauseOfferDisplay,
   type PendingPauseOfferDisplayInput,
-} from './pause-pending-offer-display-flow';
+} from './pending-pause-offer-display';
 export {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
-  trackPauseSessionAbandoned,
-} from './pause-pending-offer-telemetry-flow';
+} from './pending-pause-offer-telemetry';
+export { trackPauseSessionAbandoned } from './pause-session-abandoned-telemetry';
