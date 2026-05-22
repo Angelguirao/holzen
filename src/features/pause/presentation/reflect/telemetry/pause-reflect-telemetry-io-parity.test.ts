@@ -56,10 +56,21 @@ import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+import {
+  buildFeelTilesMoodLogOptions,
+  pauseInitialEmotionSelect as pauseInitialEmotionSelectFromMoodIo,
+  pauseInitialEmotionSelectWithRepository,
+  pauseInitialEmotionSkip as pauseInitialEmotionSkipFromMoodIo,
+  pauseInitialEmotionSkipWithRepository,
+  reflectPauseRepository,
+  resolvePauseSessionChromeCloseAction,
+} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 
 /**
  * Presentation-layer telemetry I/O parity (colocated beside `pause-reflect-telemetry-io.ts`).
  * Application mirror: `application/.../ritual/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
+ * Mood-io sibling: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (mood cluster).
  * Ambience-io sibling: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (ambience cluster).
  * Share-io sibling: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation);
@@ -144,6 +155,22 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackShareTapFromTelemetryIo).not.toBe(buildReflectionShareWhatsAppUrl);
     expect(trackWallpaperFromTelemetryIo).not.toBe(pauseReflectionShareImage);
     // Reciprocal inline pins: `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (session reflect telemetry vs feel-step mood RPC).
+   * Dedicated sibling file: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: mood-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseInitialEmotionSelectFromMoodIo);
+    expect(trackPauseReflectShareTap).not.toBe(pauseInitialEmotionSelectWithRepository);
+    expect(trackPauseReflectWallpaperTap).not.toBe(pauseInitialEmotionSkipFromMoodIo);
+    expect(trackPostItFromTelemetryIo).not.toBe(pauseInitialEmotionSkipWithRepository);
+    expect(trackShareTapFromTelemetryIo).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(trackWallpaperFromTelemetryIo).not.toBe(resolvePauseSessionChromeCloseAction);
+    expect(trackPauseReflectPostItOpen).not.toBe(reflectPauseRepository);
+    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
+    // Full pins: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts`.
   });
 
   /**
