@@ -114,6 +114,10 @@ import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+import {
+  buildReflectionShareText,
+  pauseReflectionShareImage,
+} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 /**
@@ -305,5 +309,17 @@ describe('pause-reflect-mood-io parity (application)', () => {
     expect(pauseInitialEmotionSelect).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(pauseInitialEmotionSkip).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(buildFeelTilesFromMoodIo).not.toBe(startPauseReflectFrameFocusAmbience);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `share/pause-reflect-share-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-share-mood-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: share-io builders stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(pauseReflectionShareImage);
+    expect(pauseInitialEmotionSkip).not.toBe(buildReflectionShareText);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseReflectionShareImage);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(buildReflectionShareText);
+    // Reciprocal inline pins: `share/pause-reflect-share-io-parity.test.ts`.
   });
 });
