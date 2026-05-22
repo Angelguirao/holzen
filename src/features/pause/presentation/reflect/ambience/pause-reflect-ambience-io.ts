@@ -11,7 +11,8 @@
  * `pause-reflect-ambience-share-io-sibling-parity.test.ts` + `share/pause-reflect-share-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`;
  * `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (presentation + application);
  * presentation parity (colocated): `pause-reflect-ambience-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`,
- * `pause-reflect-hub-io-parity.test.ts`, and `pause-reflect-generation-io-parity.test.ts`;
+ * `pause-reflect-hub-io-parity.test.ts`, `pause-reflect-generation-io-parity.test.ts`,
+ * `pause-reflect-mood-io-parity.test.ts`, and `pause-reflect-telemetry-io-parity.test.ts`;
  * reciprocal inline pins ↔ colocated `pause-reflect-flows-io-parity.test.ts`;
  * `pause-reflect-steps-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (presentation + application);
  * application parity: `pause-reflect-steps-io-parity.test.ts` (application) ↔ `pause-reflect-ambience-io-parity.test.ts` (presentation);

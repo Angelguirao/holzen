@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — ambience-io ↔ mood-io + telemetry-io reciprocal parity pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-ambience-io-parity.test.ts</code> ↔ mood-io + telemetry-io colocated parity</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Extend colocated ambience I/O parity with reciprocal inline sibling-cluster pins vs <code>pause-reflect-mood-io-parity.test.ts</code> and <code>pause-reflect-telemetry-io-parity.test.ts</code> (parity with hub-io + generation-io expansion slice). Dedicated sibling files unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only docblock and <code>.not.toBe</code> pins.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate remaining session application <code>*-io-parity.test.ts</code> files (step-handlers, ritual-restore, decide), or application-layer mirrors for ambience↔mood/telemetry sibling parity.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — colocate session terminal-entry I/O parity beside presentation cluster (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -120,7 +137,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comments only.</dd>
       <dt>Open question</dt>
-      <dd>Next: remaining presentation-only reflect I/O sibling mirrors (telemetry cross-links), colocate session application <code>*-io-parity.test.ts</code> under <code>presentation/session/</code>, or Phase B subscription/auth Tier 1 shim scan.</dd>
+      <dd>Next: colocate remaining session application <code>*-io-parity.test.ts</code> under <code>presentation/session/</code>, or Phase B subscription/auth Tier 1 shim scan.</dd>
     </dl>
   </article>
 
