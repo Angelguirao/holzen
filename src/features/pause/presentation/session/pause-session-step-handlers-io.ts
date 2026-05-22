@@ -1,8 +1,8 @@
 /**
  * Presentation I/O for session step-handler bundle builders.
- * `use-pause-session-step-handlers` imports here instead of deep `application/use-cases/*`.
+ * Imports `application/use-cases/session/step-bundles` directly (parity with frame/breath I/O peels).
  */
 export {
   buildPauseSessionStepRitualBundle,
   buildPauseSessionStepShellBundle,
-} from '@/features/pause/application/use-cases/session/pause-session-step-handlers-flow';
+} from '@/features/pause/application/use-cases/session/step-bundles';
