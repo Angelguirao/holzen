@@ -5,12 +5,20 @@ vi.mock('@/features/pause/public-rpc', () => ({
   reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' },
 }));
 
+import { runPauseFavoriteToggle as runFavoriteToggleDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
+import { runPauseReflectNoteUpdate as runNoteUpdateDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
+import { runPauseReflectTagUpdate as runTagUpdateDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
+import { runPauseReflectionStepLogOnce as runReflectionStepLogDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
+import {
+  runPauseFavoriteToggle as runFavoriteToggleFromStepsFlow,
+  runPauseReflectNoteUpdate as runNoteUpdateFromStepsFlow,
+  runPauseReflectTagUpdate as runTagUpdateFromStepsFlow,
+  runPauseReflectionStepLogOnce as runReflectionStepLogFromStepsFlow,
+  shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
+  shouldShowFavoriteProHint as shouldShowFromStepsFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow';
 import { shouldShowFavoriteProHint as shouldShowFavoriteProHintDirect } from '@/features/pause/domain/reflect/steps/favorite-toggle';
 import { shouldLogPauseReflectionStep as shouldLogPauseReflectionStepDirect } from '@/features/pause/domain/reflect/steps/reflection-step-log';
-import {
-  shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
-  shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
-} from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
@@ -33,7 +41,14 @@ describe('pause-reflect-steps-io re-exports', () => {
   });
 
   it('presentation I/O bindings match pause-reflect-steps-flow CI anchor (leaf parity)', () => {
-    expect(shouldShowFavoriteProHint).toBe(shouldShowFavoriteFromStepsFlow);
+    expect(shouldShowFavoriteProHint).toBe(shouldShowFromStepsFlow);
+    expect(shouldShowFavoriteProHint).toBe(shouldShowFavoriteProHintDirect);
     expect(shouldLogPauseReflectionStep).toBe(shouldLogFromStepsFlow);
+    expect(shouldLogPauseReflectionStep).toBe(shouldLogPauseReflectionStepDirect);
+
+    expect(runFavoriteToggleFromStepsFlow).toBe(runFavoriteToggleDirect);
+    expect(runNoteUpdateFromStepsFlow).toBe(runNoteUpdateDirect);
+    expect(runTagUpdateFromStepsFlow).toBe(runTagUpdateDirect);
+    expect(runReflectionStepLogFromStepsFlow).toBe(runReflectionStepLogDirect);
   });
 });
