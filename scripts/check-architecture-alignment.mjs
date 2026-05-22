@@ -509,6 +509,19 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_DECIDE_IMPACT_IMPORTS = [
   "from '../presentation/reflect/flows/pause-reflect-flows-io'",
 ];
 
+/** Session decide I/O — import PauseImpactData from domain only (not session decide-flow). */
+const LEGACY_PAUSE_SESSION_DECIDE_IO_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pause-session-decide-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow',
+  '@/features/pause/application/use-cases/ritual/decide/impact-data',
+  "from './application/use-cases/session/pause-session-decide-flow'",
+  "from '../application/use-cases/session/pause-session-decide-flow'",
+  "from './application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
+  "from '../application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
+  "from './application/use-cases/ritual/decide/impact-data'",
+  "from '../application/use-cases/ritual/decide/impact-data'",
+];
+
 /** Session presentation — import mapPersistedStep via ritual-restore I/O anchor only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_MAP_PERSISTED_STEP_IMPORTS = [
   '@/features/pause/domain/session/map-persisted-step',
@@ -1761,6 +1774,18 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: holzen-reflect generation I/O must import domain + run-reflect-generation directly (${needle})`,
+        );
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-session-decide-io.ts') ||
+    rel.endsWith('pause-session-decide-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_SESSION_DECIDE_IO_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: session decide I/O must import PauseImpactData from domain/pause-impact-data (${needle})`,
         );
       }
     }
