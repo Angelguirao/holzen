@@ -8,7 +8,8 @@
  * `pause-session-scaffold-shell-io-sibling-parity.test.ts` (application sibling vs shell-io),
  * `pause-session-shell-scaffold-io-sibling-parity.test.ts` (presentation sibling vs shell-io),
  * `pause-session-providers-scaffold-io-sibling-parity.test.ts` (sibling vs providers-io),
- * `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` (sibling vs terminal-entry-io).
+ * `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` (sibling vs terminal-entry-io),
+ * `pause-session-scaffold-step-handlers-io-sibling-parity.test.ts` (sibling vs step-handlers-io).
  */
 export {
   buildPauseSessionPersistSnapshot,
