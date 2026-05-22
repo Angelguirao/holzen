@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session scaffold application cluster marker (Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>application/use-cases/session/</code> scaffold CI cluster marker has unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add empty <code>pause-session-scaffold-cluster</code> + regression test beside <code>pause-session-scaffold-flow</code> (parity with <code>pause-session-shell-cluster</code> and <code>ritual/reflect/*</code> cluster markers). <code>pause-session-scaffold-io</code> unchanged (imports persist-snapshot, storage-ritual-sync, scaffold-ritual-derived siblings directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — marker-only slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session brief, ritual-restore, and other session flow umbrellas still lack application cluster markers until follow-up slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-brief-cluster</code> or <code>pause-session-ritual-restore-cluster</code>, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session shell application cluster marker (Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
