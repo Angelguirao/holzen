@@ -21176,13 +21176,13 @@
     <h3>Route <code>pause-reflect-telemetry-io</code> through <code>pause-reflect-telemetry-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Peel <code>pause-reflect-telemetry-io</code> off <code>pause-reflect-share-flow</code> to import <code>pause-reflect-telemetry-flow</code> directly (parity with <code>pause-home-reflect-telemetry-io</code> → <code>pause-home-reflect-telemetry-flow</code> and pending-offer telemetry I/O). Share umbrella still composes telemetry for <code>pause-reflect-share-io</code>.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Peel <code>pause-reflect-telemetry-io</code> off <code>pause-reflect-share-flow</code> to import <code>pause-reflect-telemetry-flow</code> directly (parity with <code>pause-home-reflect-telemetry-io</code> → <code>pause-home-reflect-telemetry-flow</code> and pending-offer telemetry I/O).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
       <dd>Session UI telemetry conductors still import presentation telemetry-io sibling only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: hub I/O direct subcluster imports or Phase B subscription Tier 1 shim follow-ups.</dd>
+      <dd>Next: share orchestration I/O peel (follow-up slice on same branch).</dd>
     </dl>
   </article>
 
@@ -21201,7 +21201,26 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-reflect-hub-flow</code> remains the compose anchor for other consumers; hub presentation I/O no longer depends on the umbrella barrel.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B subscription Tier 1 shim (<code>subscription-checkout-guard-ref</code> in <code>App.tsx</code>) or reflect mood/steps I/O subcluster peels.</dd>
+      <dd>Next: share orchestration I/O peel or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — share orchestration I/O via orchestration-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>pause-reflect-share-io</code> through <code>pause-reflect-share-orchestration-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. After telemetry-io peeled to <code>pause-reflect-telemetry-flow</code>, peel <code>pause-reflect-share-io</code> off <code>pause-reflect-share-flow</code> to import <code>pause-reflect-share-orchestration-flow</code> directly (parity with hub and home telemetry I/O peels). CI blocks share-flow imports on share-io modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Share-io no longer depends on the share umbrella barrel; telemetry-io uses telemetry-flow subcluster only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim (<code>subscription-checkout-guard-ref</code> in <code>App.tsx</code>) or archive decide I/O peel.</dd>
     </dl>
   </article>
 
