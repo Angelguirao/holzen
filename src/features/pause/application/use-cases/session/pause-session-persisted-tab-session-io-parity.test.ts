@@ -11,8 +11,11 @@ vi.mock('@/features/pause/application/use-cases/session/persisted-tab-session', 
 }));
 
 import {
+  clearPersistedTabSession as clearDirect,
   clearPersistedTabSession,
+  loadPersistedTabSession as loadDirect,
   loadPersistedTabSession,
+  savePersistedTabSession as saveDirect,
   savePersistedTabSession,
 } from '@/features/pause/application/use-cases/session/persisted-tab-session';
 import {
@@ -43,9 +46,22 @@ describe('pause-session-persisted-tab-session-io parity', () => {
     expect(clearPersistedTabSession).toHaveBeenCalledWith(persistedTabSessionStorage);
   });
 
-  it('persisted-tab-session-flow CI umbrella re-exports the same leaf use cases as presentation I/O path', () => {
-    expect(loadFromFlow).toBe(loadPersistedTabSession);
-    expect(saveFromFlow).toBe(savePersistedTabSession);
-    expect(clearFromFlow).toBe(clearPersistedTabSession);
+  it('persisted-tab-session-flow CI umbrella composes the same leaf use cases', () => {
+    expect(loadPersistedTabSession).toBe(loadDirect);
+    expect(savePersistedTabSession).toBe(saveDirect);
+    expect(clearPersistedTabSession).toBe(clearDirect);
+    expect(loadFromFlow).toBe(loadDirect);
+    expect(saveFromFlow).toBe(saveDirect);
+    expect(clearFromFlow).toBe(clearDirect);
+  });
+
+  it('presentation I/O exports port-bound tab-session helpers (not raw use-case re-exports)', () => {
+    expect(typeof loadPausePersistedTabSession).toBe('function');
+    expect(typeof savePausePersistedTabSession).toBe('function');
+    expect(typeof clearPausePersistedTabSession).toBe('function');
+    expect(loadPausePersistedTabSession).not.toBe(loadDirect);
+    expect(savePausePersistedTabSession).not.toBe(saveDirect);
+    expect(clearPausePersistedTabSession).not.toBe(clearDirect);
+    expect(loadPausePersistedTabSession).not.toBe(loadPersistedTabSession);
   });
 });
