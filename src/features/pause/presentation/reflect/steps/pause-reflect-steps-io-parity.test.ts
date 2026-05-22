@@ -26,7 +26,7 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
  * Presentation-layer steps I/O parity (colocated beside `pause-reflect-steps-io.ts`).
  * Application mirror: `application/use-cases/ritual/reflect/steps/pause-reflect-steps-io-parity.test.ts`.
  * Delegation parity for steps-flow ↔ steps-io (run-* leaves + repository).
- * Wrapper distinctness sibling file: `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts` (application).
+ * Wrapper distinctness sibling files: `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts` (application + presentation).
  * Favorite ↔ reflection_step log wrapper pins: presentation +
  * application `pause-reflect-steps-favorite-reflection-step-log-io-sibling-parity.test.ts`
  * (reciprocal inline: `pause-reflect-steps-io.test.ts`); flow umbrellas:

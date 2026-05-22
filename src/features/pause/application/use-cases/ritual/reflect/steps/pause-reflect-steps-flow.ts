@@ -25,7 +25,7 @@
  * pause-reflect-steps-flows-io-sibling-parity.test.ts (application + presentation; steps-io ↔ flows-io),
  * pause-reflect-flows-steps-io-sibling-parity.test.ts (flows-colocated mirror) pin separation from hub/mood/pending-offer/share/telemetry/generation/flows CI anchors;
  * reciprocal inline pins: `pause-reflect-steps-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts` (holzen-reflect + manual-open off steps umbrella).
- * `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (presentation wrappers off flow umbrella).
+ * `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts` (application + presentation) ↔ `pause-reflect-steps-io` (presentation wrappers off flow umbrella).
  * Cross-surface: `pause-session-step-handlers-steps-flow-sibling-parity.test.ts` ↔ `session/pause-session-step-handlers-flow`
  * (presentation mirror: `pause-session-step-handlers-steps-io-sibling-parity.test.ts`).
  */
