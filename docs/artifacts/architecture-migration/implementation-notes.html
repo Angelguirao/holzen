@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel pause-session-breath-step-navigation-io to domain leaf (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-breath-step-navigation-io</code> imports <code>pause-breath-step-navigation</code> directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route <code>pause-session-breath-step-navigation-io</code> through <code>domain/ritual/breathe/pause-breath-step-navigation</code> instead of <code>pause-session-breath-flow</code> CI anchor (parity with <code>pause-ritual-done-io</code> → <code>post-pause-emotion-log</code> on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-breath-flow</code> still re-exports step navigation for ritual-restore and cluster detection; <code>pause-session-breath-io</code> unchanged (imports step targets via step-navigation-io sibling).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel ritual-restore breath hydration off breath-flow, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-ritual-done-io to post-pause-emotion-log leaf (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

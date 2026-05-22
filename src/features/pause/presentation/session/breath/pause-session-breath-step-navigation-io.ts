@@ -1,6 +1,6 @@
 /**
  * Presentation I/O for breath segment step targets + brief integrate advance guard.
- * Imports via `pause-session-breath-flow` CI anchor (no RPC bindings).
+ * Imports `domain/ritual/breathe/pause-breath-step-navigation` directly (parity with ritual-done and segment RPC I/O peels).
  */
 export {
   BRIEF_FIRST_BREATH_SEGMENT_LOG,
@@ -10,4 +10,4 @@ export {
   DEEP_PAUSE_STEP_AFTER_FIRST_BREATH,
   DEEP_PAUSE_STEP_AFTER_SECOND_BREATH,
   shouldResetBriefIntegrateAdvanceGuard,
-} from '@/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow';
+} from '@/features/pause/domain/ritual/breathe/pause-breath-step-navigation';
