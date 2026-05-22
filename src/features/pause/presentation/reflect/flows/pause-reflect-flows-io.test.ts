@@ -69,6 +69,10 @@ import {
   shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
+  buildPauseSessionStepRitualBundle,
+  buildPauseSessionStepShellBundle,
+} from '@/features/pause/presentation/session/pause-session-step-handlers-io';
+import {
   buildPauseScoreImpacts,
   formatReinforcementQuoteFromSession,
   getSessionQuote,
@@ -276,5 +280,20 @@ describe('pause-reflect-flows-io', () => {
     expect(pauseReflectOutcomeLog).not.toBe(shouldLogPauseReflectionStep);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseReflectFavoriteToggle);
     // Reciprocal inline pins: `pause-reflect-steps-io.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-step-handlers-io.test.ts` (reflect+decide vs session bundles).
+   * Dedicated sibling file: `pause-session-step-handlers-flows-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: step-handlers-io exports stay distinct from flows-io', () => {
+    expect(pauseReflectOutcomeLog).not.toBe(buildPauseSessionStepShellBundle);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(buildPauseSessionStepRitualBundle);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(buildPauseSessionStepShellBundle);
+    expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(buildPauseSessionStepRitualBundle);
+    expect(buildPauseScoreImpacts).not.toBe(buildPauseSessionStepShellBundle);
+    expect(formatReinforcementQuoteFromSession).not.toBe(buildPauseSessionStepRitualBundle);
+    expect(reflectPauseRepository).not.toBe(buildPauseSessionStepShellBundle);
+    // Full cross-I/O pins: `pause-session-step-handlers-flows-io-sibling-parity.test.ts`.
   });
 });

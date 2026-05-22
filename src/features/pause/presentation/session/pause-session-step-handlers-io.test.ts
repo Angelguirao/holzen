@@ -37,6 +37,15 @@ import {
   shouldLogPauseReflectionStep,
   shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
+  buildPauseScoreImpacts,
+  formatReinforcementQuoteFromSession,
+  pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
+  reflectPauseRepository,
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 
 describe('pause-session-step-handlers-io', () => {
   it('re-exports bundle builders from step-bundles', () => {
@@ -86,5 +95,20 @@ describe('pause-session-step-handlers-io', () => {
     expect(buildPauseSessionStepShellBundle).not.toBe(pauseReflectNoteUpdateWithRepository);
     expect(buildPauseSessionStepRitualBundle).not.toBe(pauseReflectFavoriteToggleWithRepository);
     // Full cross-I/O pins: `pause-session-step-handlers-steps-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io.test.ts` (session bundles vs reflect+decide flows I/O).
+   * Dedicated sibling file: `pause-session-step-handlers-flows-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: reflect flows-io exports stay distinct from step-handlers-io', () => {
+    expect(buildPauseSessionStepShellBundle).not.toBe(pauseReflectOutcomeLog);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(buildPauseSessionStepShellBundle).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
+    expect(buildPauseSessionStepShellBundle).not.toBe(buildPauseScoreImpacts);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(formatReinforcementQuoteFromSession);
+    expect(buildPauseSessionStepShellBundle).not.toBe(reflectPauseRepository);
+    // Full cross-I/O pins: `pause-session-step-handlers-flows-io-sibling-parity.test.ts`.
   });
 });

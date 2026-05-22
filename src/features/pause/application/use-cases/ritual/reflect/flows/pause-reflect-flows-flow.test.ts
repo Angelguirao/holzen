@@ -47,6 +47,10 @@ import {
 import { getSessionQuote } from '../../decide/wisdom-quotes';
 
 import {
+  buildPauseSessionStepRitualBundle,
+  buildPauseSessionStepShellBundle,
+} from '@/features/pause/application/use-cases/session/pause-session-step-handlers-flow';
+import {
   resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromAndDecideViewFlow,
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromAndDecideViewFlow,
 } from './pause-reflect-and-decide-view-flow';
@@ -239,6 +243,18 @@ describe('pause-reflect-flows-flow', () => {
     expect(showNotCompletedFromFlow).not.toBe(getDisplayFromPendingOfferFlow);
     expect(showSaveFailedFromFlow).not.toBe(runAdoptFromPendingOfferFlow);
     // Reciprocal inline pins: `pause-reflect-pending-offer-flow.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-step-handlers-flow.test.ts` (reflect+decide vs session bundles).
+   * Dedicated sibling file: `pause-session-step-handlers-flows-flow-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: step-handlers-flow exports stay distinct from flows umbrella exports', () => {
+    expect(resolvePreflightFromFlow).not.toBe(buildPauseSessionStepShellBundle);
+    expect(resolveAfterGenFromFlow).not.toBe(buildPauseSessionStepRitualBundle);
+    expect(runOutcomeLogFromFlow).not.toBe(buildPauseSessionStepShellBundle);
+    expect(buildImpactsFromFlow).not.toBe(buildPauseSessionStepRitualBundle);
+    // Full cross-flow pins: `pause-session-step-handlers-flows-flow-sibling-parity.test.ts`.
   });
 
   /**

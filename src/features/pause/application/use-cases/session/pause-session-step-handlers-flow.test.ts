@@ -13,6 +13,11 @@ import {
   pauseStepSwipeDirection,
 } from './pause-session-step-transition-flow';
 import {
+  buildPauseScoreImpacts,
+  resolvePauseSessionReflectAndDecidePreflight,
+  runPauseOutcomeLog,
+} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
+import {
   runPauseFavoriteToggle,
   runPauseReflectNoteUpdate,
   runPauseReflectTagUpdate,
@@ -49,5 +54,16 @@ describe('pause-session-step-handlers-flow', () => {
     expect(buildPauseSessionStepShellBundle).not.toBe(shouldShowFavoriteProHint);
     expect(buildPauseSessionStepRitualBundle).not.toBe(shouldLogPauseReflectionStep);
     // Reciprocal inline pins: `pause-reflect-steps-flow.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-flow.test.ts`. Full cross-flow pins:
+   * `pause-session-step-handlers-flows-flow-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: reflect flows-flow exports stay distinct from step-handlers-flow', () => {
+    expect(buildPauseSessionStepShellBundle).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(runPauseOutcomeLog);
+    expect(buildPauseSessionStepShellBundle).not.toBe(buildPauseScoreImpacts);
+    // Full cross-flow pins: `pause-session-step-handlers-flows-flow-sibling-parity.test.ts`.
   });
 });
