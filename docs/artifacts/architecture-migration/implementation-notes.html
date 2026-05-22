@@ -59,6 +59,7 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+<<<<<<< HEAD
       <span>Phase A — CI guard public-hooks score-impact imports (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -72,6 +73,21 @@
       <dd>Guard runs on <code>public-hooks.ts</code> only; presentation modules may still import decide domain types directly for hook params.</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B subscription Tier 1 shim (<code>App.tsx</code> checkout guard), or session scaffold I/O peels.</dd>
+=======
+      <span>Phase A — compose pause-reflect-share-flow from orchestration + telemetry subclusters (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Share umbrella composes <code>pause-reflect-share-orchestration-flow</code> + <code>pause-reflect-telemetry-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-reflect-share-orchestration-flow</code> for PNG share + channel URL builders; <code>pause-reflect-share-flow</code> re-exports only through orchestration and telemetry anchors (parity with pending-offer and generation umbrellas). CI blocks deep <code>pause-reflection-share-*-flow</code> on the umbrella; share telemetry I/O must not import <code>pause-reflect-telemetry-flow</code> directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>One more application flow module; presentation share I/O unchanged (still imports umbrella).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: compose <code>pause-reflect-steps-flow</code> from mutation subclusters or Phase B subscription Tier 1 shim.</dd>
+>>>>>>> 403ed0bce (refactor(pause): compose pause-reflect-share-flow from orchestration subcluster)
     </dl>
   </article>
 
