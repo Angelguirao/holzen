@@ -2,7 +2,7 @@
  * CI cluster anchor for ritual reflect share presentation I/O (§3 / check:architecture-alignment).
  * Composes domain share builders + `run-reflection-share-image` + session UI telemetry (not subcluster flow anchors).
  * Presentation: `pause-reflect-share-io.ts` imports share leaves directly; `presentation/reflect/telemetry/pause-reflect-telemetry-io.ts` imports session UI telemetry directly.
- * Sibling cluster: `pause-reflect-share-flow.test.ts` ↔ `pause-reflect-telemetry-flow.test.ts`;
+ * Sibling cluster: `pause-reflect-share-flow.test.ts` ↔ `pause-reflect-telemetry-flow.test.ts` (inline telemetry + pending-offer pins);
  * `pause-reflect-share-telemetry-flow-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-flow`;
  * `pause-reflect-share-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-flow`.
  */
