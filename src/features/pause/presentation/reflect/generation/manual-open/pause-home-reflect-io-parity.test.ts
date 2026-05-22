@@ -1,3 +1,7 @@
+/**
+ * Presentation I/O parity for Home manual-open reflect cluster (colocated beside
+ * `pause-home-reflect-io.ts`; application `pause-reflect-generation-manual-open-flow` stays CI umbrella).
+ */
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/integrations/supabase/client', () => ({
@@ -19,7 +23,7 @@ import {
   runOpenManualPauseSilentModeAfterCreate,
   runPersistSilentReflectionStub,
 } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-reflect-generation-manual-open-flow';
-import { applyManualPauseOpenResult as applyOpenResultDirect } from '@/features/pause/presentation/reflect/generation/manual-open/apply-manual-pause-open-result';
+import { applyManualPauseOpenResult as applyOpenResultDirect } from './apply-manual-pause-open-result';
 import {
   applyManualPauseOpenResult,
   applyManualPauseOpenResult as applyOpenResultFromHomeIo,
@@ -33,7 +37,7 @@ import {
   pauseHomeManualOpenPorts,
   runOpenManualPauseSilentModeAfterCreate as silentAfterCreateFromHomeIo,
   runPersistSilentReflectionStub as persistStubFromHomeIo,
-} from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
+} from './pause-home-reflect-io';
 
 import { supabasePauseRepository, supabaseReflectGenerator } from '@/features/pause/public-rpc';
 

@@ -1,3 +1,7 @@
+/**
+ * Presentation I/O parity for Home manual-open PostHog trackers (colocated beside
+ * `pause-home-reflect-telemetry-io.ts`; application `pause-home-reflect-telemetry-flow` stays CI umbrella).
+ */
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -13,7 +17,7 @@ import {
   trackManualPauseInstanceCreated as trackInstanceCreatedFromHomeTelemetryIo,
   trackPauseManualCompleted as trackManualCompletedFromHomeTelemetryIo,
   trackPauseOpenDismissed as trackOpenDismissedFromHomeTelemetryIo,
-} from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
+} from './pause-home-reflect-telemetry-io';
 
 describe('pause-home-reflect-telemetry-io parity', () => {
   it('presentation I/O Home reflect telemetry matches home-reflect-telemetry-flow CI umbrella', () => {
