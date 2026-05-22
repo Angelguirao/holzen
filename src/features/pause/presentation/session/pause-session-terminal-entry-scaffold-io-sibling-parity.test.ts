@@ -4,20 +4,21 @@ import {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
   TERMINAL_PAUSE_DB_STATES,
-} from '@/features/pause/presentation/session/pause-session-terminal-entry-io';
+} from './pause-session-terminal-entry-io';
 import {
   buildPauseSessionPersistSnapshot,
   buildPauseSessionScaffoldRitualDerived,
   computePauseStorageRitualSyncPatch,
   hasPersistablePauseSessionAnchor,
-} from '@/features/pause/presentation/session/scaffold/pause-session-scaffold-io';
-import * as scaffoldIo from '@/features/pause/presentation/session/scaffold/pause-session-scaffold-io';
-import * as terminalEntryIo from '@/features/pause/presentation/session/pause-session-terminal-entry-io';
+} from './scaffold/pause-session-scaffold-io';
+import * as scaffoldIo from './scaffold/pause-session-scaffold-io';
+import * as terminalEntryIo from './pause-session-terminal-entry-io';
 
 /**
- * Sibling parity: terminal-entry-io vs scaffold-io presentation I/O (parity with
+ * Dedicated presentation sibling guard (parity with
  * `pause-session-terminal-entry-shell-flow-sibling-parity.test.ts` and
- * `pause-session-providers-scaffold-io-sibling-parity.test.ts`).
+ * `pause-session-shell-scaffold-io-sibling-parity.test.ts`).
+ * Reciprocal inline pins: `pause-session-terminal-entry-io.test.ts`, `scaffold/pause-session-scaffold-io.test.ts`.
  */
 describe('pause-session-terminal-entry-io ↔ pause-session-scaffold-io sibling parity', () => {
   it('terminal-entry-io and scaffold-io are distinct sibling presentation I/O anchors', () => {

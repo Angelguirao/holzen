@@ -29927,4 +29927,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate terminal-entry presentation sibling parity under presentation/session (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-terminal-entry-*-io-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Move presentation I/O sibling parity tests for terminal-entry ↔ shell/scaffold from <code>application/use-cases/session/</code> to <code>presentation/session/</code> (parity with <code>pause-session-shell-scaffold-io-sibling-parity.test.ts</code>). Add reciprocal inline pins on <code>pause-session-terminal-entry-io.test.ts</code>, <code>pause-session-shell-io.test.ts</code>, and <code>scaffold/pause-session-scaffold-io.test.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test colocation + comment anchors only; application flow-level sibling tests unchanged.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or remaining session presentation I/O sibling gaps (e.g. providers-io).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -9,19 +9,20 @@ import {
   hasPersistedPauseSessionPayload,
   isPauseSessionHeaderBackVisible,
   isPauseSessionWaitingForInstanceFetch,
-} from '@/features/pause/presentation/session/pause-session-shell-io';
+} from './pause-session-shell-io';
 import {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
   TERMINAL_PAUSE_DB_STATES,
-} from '@/features/pause/presentation/session/pause-session-terminal-entry-io';
-import * as shellIo from '@/features/pause/presentation/session/pause-session-shell-io';
-import * as terminalEntryIo from '@/features/pause/presentation/session/pause-session-terminal-entry-io';
+} from './pause-session-terminal-entry-io';
+import * as shellIo from './pause-session-shell-io';
+import * as terminalEntryIo from './pause-session-terminal-entry-io';
 
 /**
- * Sibling parity: terminal-entry-io vs shell-io presentation I/O (parity with
+ * Dedicated presentation sibling guard (parity with
  * `pause-session-terminal-entry-shell-flow-sibling-parity.test.ts` and
  * `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts`).
+ * Reciprocal inline pins: `pause-session-terminal-entry-io.test.ts`, `pause-session-shell-io.test.ts`.
  */
 describe('pause-session-terminal-entry-io ↔ pause-session-shell-io sibling parity', () => {
   it('terminal-entry-io and shell-io are distinct sibling presentation I/O anchors', () => {
