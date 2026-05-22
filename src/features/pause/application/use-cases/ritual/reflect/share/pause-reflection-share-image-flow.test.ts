@@ -6,6 +6,11 @@ import {
 import { runReflectionShareImage as runShareImageDirect } from './run-reflection-share-image';
 
 import {
+  deliverReflectionShareImage as deliverFromOrchestration,
+  runReflectionShareImage as runFromOrchestration,
+} from './pause-reflect-share-orchestration-flow';
+import { runReflectionShareImage as runFromShareFlow } from './pause-reflect-share-flow';
+import {
   deliverReflectionShareImage,
   runReflectionShareImage,
 } from './pause-reflection-share-image-flow';
@@ -17,5 +22,14 @@ describe('pause-reflection-share-image-flow', () => {
 
     expect(runReflectionShareImage).toBe(runShareImageDirect);
     expect(deliverReflectionShareImage).toBe(deliverShareImageDirect);
+  });
+
+  it('image subcluster anchor matches share orchestration umbrella (run + deliver)', () => {
+    expect(runReflectionShareImage).toBe(runFromOrchestration);
+    expect(deliverReflectionShareImage).toBe(deliverFromOrchestration);
+  });
+
+  it('image subcluster run binding matches share presentation umbrella (deliver omitted by design)', () => {
+    expect(runReflectionShareImage).toBe(runFromShareFlow);
   });
 });
