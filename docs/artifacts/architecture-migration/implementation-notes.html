@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — home-pause-card-body-props → presentation/home (backlog #1 verified, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>home-pause-card-body-props</code> UI projection</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no reflect moves. Colocate <code>buildHomePauseCardBodyProps</code> + types under <code>presentation/home/</code> (screen prop projection, not a command use case). <code>public-home</code> re-exports unchanged for consumers.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mechanical relocation; behavior parity.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>run-log-pwa-install-analytics-event</code> colocation, or scan app shell for remaining deep <code>public</code> boot imports.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase B — holzen-query-client-ref lib identity pin (Tier 1)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
       <dt>Open question</dt>
-      <dd>Next: colocate <code>home-pause-card-body-props</code> under <code>presentation/home/</code>.</dd>
+      <dd>Resolved by home-pause-card-body-props colocation slice; see latest note.</dd>
     </dl>
   </article>
 
@@ -86,7 +103,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + comment only.</dd>
       <dt>Open question</dt>
-      <dd>Next: colocate <code>home-pause-card-body-props</code> under <code>presentation/home/</code>, or scan app shell for remaining deep <code>public</code> boot imports.</dd>
+      <dd>Resolved by home-pause-card-body-props colocation slice; see latest note.</dd>
     </dl>
   </article>
 
