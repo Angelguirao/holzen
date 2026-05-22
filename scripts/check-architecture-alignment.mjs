@@ -828,6 +828,13 @@ const LEGACY_PAUSE_SESSION_RITUAL_RESTORE_BREATH_IMPORTS = [
   "from '../application/use-cases/ritual/breathe/pause-session-breath-flow'",
 ];
 
+/** Session ritual restore flow — import restored brief hydration via restored-brief-ritual-state only (not brief-flow). */
+const LEGACY_PAUSE_SESSION_RITUAL_RESTORE_BRIEF_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pause-session-brief-flow',
+  "from './application/use-cases/session/pause-session-brief-flow'",
+  "from '../application/use-cases/session/pause-session-brief-flow'",
+];
+
 /** Reflect mood umbrella flow — compose subcluster anchors only (no deep domain/reflect/mood). */
 const LEGACY_PAUSE_REFLECT_MOOD_FLOW_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/mood/',
@@ -2302,6 +2309,11 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_SESSION_RITUAL_RESTORE_BREATH_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: session ritual restore must import breath hydration via restored-breath-ritual-state (${needle})`);
+      }
+    }
+    for (const needle of LEGACY_PAUSE_SESSION_RITUAL_RESTORE_BRIEF_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: session ritual restore must import brief hydration via restored-brief-ritual-state (${needle})`);
       }
     }
   }

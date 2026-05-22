@@ -3,9 +3,12 @@ import { describe, expect, it } from 'vitest';
 import {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
+  initialBriefIntegrateDoneFromRestored,
+  initialBriefPauseStepFromRestored,
   initialDecisionFromRestored,
   initialFrameDoneFromRestored,
   initialPhaseFromRestored,
+  initialSelectedBriefFaceFromRestored,
 } from './pause-session-ritual-restore-flow';
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
@@ -37,5 +40,19 @@ describe('pause-session-ritual-restore-flow', () => {
       true,
     );
     expect(initialFrameDoneFromRestored(null)).toBe(false);
+  });
+
+  it('re-exports restored brief hydration from restored-brief-ritual-state', () => {
+    const restored = makeTestPersistedPauseSession({
+      ritualDepth: 'brief',
+      briefStep: 'integrate',
+      briefIntegrateDone: true,
+      briefFace: 'calm',
+    });
+
+    expect(initialBriefPauseStepFromRestored(restored)).toBe('integrate');
+    expect(initialBriefIntegrateDoneFromRestored(restored)).toBe(true);
+    expect(initialSelectedBriefFaceFromRestored(restored)).toBe('calm');
+    expect(initialBriefPauseStepFromRestored(null)).toBe('feel');
   });
 });

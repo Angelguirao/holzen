@@ -16,6 +16,6 @@ export { initialFrameDoneFromRestored } from '@/features/pause/application/use-c
 export {
   initialBriefIntegrateDoneFromRestored,
   initialBriefPauseStepFromRestored,
-  initialRitualEntry,
   initialSelectedBriefFaceFromRestored,
-} from './pause-session-brief-flow';
+} from './restored-brief-ritual-state';
+export { initialRitualEntry } from './initial-ritual-entry';
