@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect flows I/O impact type via session decide I/O (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-io</code> imports <code>PauseImpactData</code> via <code>pause-session-decide-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align <code>pause-reflect-flows-io</code> with reflect handler param types: import <code>PauseImpactData</code> from <code>presentation/session/pause-session-decide-io</code> instead of <code>application/.../pause-session-decide-flow</code>. CI blocks deep session decide-flow imports on the flows I/O module.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Flows I/O now depends on session presentation I/O for a type re-export (acceptable: same bounded context, session decide beat).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim (<code>App.tsx</code> checkout guard), or session scaffold I/O peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — compose pause-reflect-share-flow from orchestration + telemetry subclusters (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

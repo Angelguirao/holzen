@@ -707,6 +707,14 @@ const LEGACY_PAUSE_PUBLIC_HOOKS_SCORE_IMPACT_IMPORTS = [
   "from '../application/use-cases/ritual/decide/pause-decide-score-impacts-flow'",
 ];
 
+/** Reflect flows I/O — import PauseImpactData via pause-session-decide-io only (not session decide-flow). */
+const LEGACY_PAUSE_REFLECT_FLOWS_IO_DECIDE_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pause-session-decide-flow',
+  "from '@/features/pause/application/use-cases/session/pause-session-decide-flow'",
+  "from './application/use-cases/session/pause-session-decide-flow'",
+  "from '../application/use-cases/session/pause-session-decide-flow'",
+];
+
 /** Reflect flows handler params — import PauseImpactData via pause-session-decide-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IMPACT_IMPORTS = [
   '@/features/pause/domain/decide/pause-impact-data',
@@ -1517,6 +1525,15 @@ for (const file of walkTs(join(root, 'src'))) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy reflect share telemetry import (${needle})`);
         }
+      }
+    }
+  }
+  if (rel === 'src/features/pause/presentation/reflect/flows/pause-reflect-flows-io.ts') {
+    for (const needle of LEGACY_PAUSE_REFLECT_FLOWS_IO_DECIDE_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect flows I/O must import PauseImpactData via pause-session-decide-io (${needle})`,
+        );
       }
     }
   }

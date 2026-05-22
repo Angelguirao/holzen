@@ -1,10 +1,10 @@
 /**
  * Reflect+decide flows presentation I/O (preflight, decide outcome RPC, outcome toasts).
  * Imports reflect/decide helpers and `runPauseOutcomeLog` via `pause-reflect-flows-flow` CI anchor
- * (parity with hub/steps/share I/O flow anchors). `PauseImpactData` via `pause-session-decide-flow`
- * (session decide beat — parity with `pause-session-decide-io` and `public-hooks`).
+ * (parity with hub/steps/share I/O flow anchors). `PauseImpactData` via `pause-session-decide-io`
+ * (session decide beat — parity with reflect handler param types and `public-hooks`).
  */
-import type { PauseImpactData } from '@/features/pause/application/use-cases/session/pause-session-decide-flow';
+import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
 import {
   buildPauseScoreImpacts,
   formatReinforcementQuoteFromSession,
