@@ -69,7 +69,24 @@
       <dt>Deviation</dt>
       <dd>None — test-only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: hub or mood flow↔io wrapper mirror, or Phase B Tier 1 lib shim scan.</dd>
+      <dd>Superseded by hub flow↔io wrapper slice on same branch.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect hub flow↔io wrapper sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-flow-io-wrapper-sibling-parity.test.ts</code> (application + presentation)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no relocations. Mirror share/flows/pending-offer wrapper sibling parity: hub-flow CI umbrella exports stay namespace-separated from presentation <code>pause-reflect-hub-io</code> (<code>pauseShiftEmotionFrameHubDone*</code> vs <code>runShiftEmotionFrameHubDone</code>; shared domain hub re-exports by reference). Allowlist wrapper parity tests in <code>check:architecture-alignment</code> for hub-flow umbrella import under <code>presentation/reflect/hub/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-mood-flow-io-wrapper-sibling-parity</code> (mood-flow ↔ mood-io), or Phase B Tier 1 lib shim scan (<code>@/lib/posthog</code> in ritual reflect telemetry).</dd>
     </dl>
   </article>
 

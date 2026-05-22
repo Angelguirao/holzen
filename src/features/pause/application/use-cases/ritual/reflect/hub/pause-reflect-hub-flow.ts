@@ -13,6 +13,7 @@
  * `pause-reflect-steps-hub-flow-sibling-parity.test.ts`,
  * `pause-reflect-steps-hub-io-sibling-parity.test.ts` (application + presentation steps-io ↔ hub-io), and
  * `pause-reflect-flows-hub-flow-sibling-parity.test.ts` may import this umbrella for parity;
+ * flow↔io wrapper sibling parity (`pause-reflect-hub-flow-io-wrapper-sibling-parity.test.ts` application + presentation) may import this umbrella for parity;
  * `pause-reflect-generation-hub-flow-sibling-parity.test.ts` (generation-flow ↔ hub-flow);
  * `pause-reflect-hub-flow.test.ts` pins sibling-cluster separation from `pause-reflect-mood-flow`,
  * `pause-reflect-pending-offer-flow`, `pause-reflect-steps-flow`, `pause-reflect-share-flow`,
