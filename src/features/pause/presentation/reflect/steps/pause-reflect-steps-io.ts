@@ -2,6 +2,7 @@
  * Reflect step mutation presentation I/O (bound PauseRepository + step storage).
  * Imports domain step gates and `run-pause-*` use cases directly (parity with
  * `pause-reflect-hub-io` → domain + leaf use case).
+ * Wrapper delegation pins: pause-reflect-steps-io-parity.test.ts.
  */
 import { runPauseFavoriteToggle } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import { runPauseReflectNoteUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
