@@ -1,6 +1,6 @@
 /**
  * Presentation I/O for `/pause` breath segment RPC, timed breathing UI, and breath hydration.
- * Segment RPC + phase advance import sibling ritual/breathe modules; audio via `pause-ritual-audio-breathe-flow`.
+ * Segment RPC + phase advance import sibling ritual/breathe modules; audio via `ritual-audio` leaf module.
  */
 export { applyBreathSegmentLogOutcome } from '@/features/pause/domain/ritual/breathe/apply-breath-segment-log-outcome';
 export {
@@ -27,7 +27,7 @@ export {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
-} from '@/features/pause/application/use-cases/ritual/breathe/pause-ritual-audio-breathe-flow';
+} from '@/features/pause/application/use-cases/ritual/breathe/ritual-audio';
 export {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,
