@@ -23,6 +23,11 @@ import { runPauseOutcomeLog as runPauseOutcomeLogDirect } from '@/features/pause
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import {
   buildPauseScoreImpacts,
   formatReinforcementQuoteFromSession,
   getSessionQuote,
@@ -142,5 +147,13 @@ describe('pause-reflect-flows-io', () => {
       pauseInstanceId: null,
       decision: 'hold',
     });
+  });
+
+  it('sibling cluster: telemetry-io exports stay distinct from flows-io re-exports', () => {
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(trackPauseReflectPostItOpen);
+    expect(pauseReflectOutcomeLog).not.toBe(trackPauseReflectShareTap);
+    expect(buildPauseScoreImpacts).not.toBe(trackPauseReflectWallpaperTap);
+    expect(getSessionQuote).not.toBe(trackPauseReflectPostItOpen);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(trackPauseReflectShareTap);
   });
 });

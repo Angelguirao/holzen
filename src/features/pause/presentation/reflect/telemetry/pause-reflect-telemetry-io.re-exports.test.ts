@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
+}));
 
 import {
   trackPauseReflectPostItOpen as trackPostItDirect,
@@ -11,6 +15,12 @@ import {
   trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
 } from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow';
 
+import {
+  buildPauseScoreImpacts,
+  getSessionQuote,
+  pauseReflectOutcomeLog,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
@@ -32,5 +42,12 @@ describe('pause-reflect-telemetry-io re-exports', () => {
     expect(trackPauseReflectPostItOpen).toBe(trackPostItFromTelemetryFlow);
     expect(trackPauseReflectShareTap).toBe(trackShareTapFromTelemetryFlow);
     expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperFromTelemetryFlow);
+  });
+
+  it('sibling cluster: flows-io exports stay distinct from telemetry-io re-exports', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(trackPauseReflectShareTap).not.toBe(pauseReflectOutcomeLog);
+    expect(trackPauseReflectWallpaperTap).not.toBe(buildPauseScoreImpacts);
+    expect(trackPauseReflectPostItOpen).not.toBe(getSessionQuote);
   });
 });
