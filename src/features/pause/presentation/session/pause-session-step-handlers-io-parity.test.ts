@@ -1,7 +1,8 @@
 /**
  * Presentation I/O parity (colocated beside `pause-session-step-handlers-io.ts`).
  * Imports `pause-session-step-handlers-flow` CI umbrella for `.toBe` identity pins only — production step-handlers I/O keeps `step-bundles` leaf import.
- * Application flow/sibling parity tests stay under `application/.../session/`.
+ * Application mirror: `application/.../session/pause-session-step-handlers-io-parity.test.ts`.
+ * Other flow/sibling parity tests stay under `application/.../session/`.
  */
 import { describe, expect, it, vi } from 'vitest';
 
