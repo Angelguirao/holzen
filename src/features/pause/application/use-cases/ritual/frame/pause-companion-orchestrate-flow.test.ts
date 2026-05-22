@@ -12,6 +12,28 @@ import { EMPTY_COMPANION_SLOT_RELAXATIONS as emptyRelaxationsDirect } from './or
 import { resetInterventionIdempotency as resetIdempotencyDirect } from './intervention-idempotency';
 import { runCompanionInterventionBootstrap as runBootstrapDirect } from './run-companion-intervention-bootstrap';
 import { runCompanionSlotOrchestrate as runSlotOrchestrateDirect } from './run-companion-slot-orchestrate';
+import {
+  applyCompanionOrchestrateRetryReset as applyRetryResetFromRetryFlow,
+} from './pause-companion-orchestrate-retry-flow';
+import {
+  applyCompanionSlotOrchestrateOutcome as applyOutcomeFromOutcomeFlow,
+} from './pause-companion-orchestrate-outcome-flow';
+import {
+  EMPTY_COMPANION_SLOT_RELAXATIONS as emptyRelaxationsFromSlotApplyFlow,
+} from './pause-companion-orchestrate-slot-apply-flow';
+import {
+  resetInterventionIdempotency as resetIdempotencyFromInterventionFlow,
+  runCompanionInterventionBootstrap as runBootstrapFromInterventionFlow,
+} from './pause-companion-intervention-orchestrate-flow';
+import {
+  logCompanionSlotOrchestrateInvoke as logInvokeFromTelemetryFlow,
+  trackCompanionGenerationInitiated as trackGenerationFromTelemetryFlow,
+} from './pause-companion-slot-orchestrate-telemetry-flow';
+import {
+  setCompanionSlotError as setErrorFromUiFlow,
+  setCompanionSlotLoading as setLoadingFromUiFlow,
+} from './pause-companion-slot-orchestrate-ui-flow';
+import { runCompanionSlotOrchestrate as runSlotOrchestrateFromSlotFlow } from './pause-companion-slot-orchestrate-flow';
 
 import {
   applyCompanionOrchestrateRetryReset,
@@ -27,6 +49,19 @@ import {
 } from './pause-companion-orchestrate-flow';
 
 describe('pause-companion-orchestrate-flow', () => {
+  it('re-exports orchestrate helpers via ritual/frame orchestrate subcluster CI anchors', () => {
+    expect(applyCompanionOrchestrateRetryReset).toBe(applyRetryResetFromRetryFlow);
+    expect(applyCompanionSlotOrchestrateOutcome).toBe(applyOutcomeFromOutcomeFlow);
+    expect(EMPTY_COMPANION_SLOT_RELAXATIONS).toBe(emptyRelaxationsFromSlotApplyFlow);
+    expect(resetInterventionIdempotency).toBe(resetIdempotencyFromInterventionFlow);
+    expect(runCompanionInterventionBootstrap).toBe(runBootstrapFromInterventionFlow);
+    expect(logCompanionSlotOrchestrateInvoke).toBe(logInvokeFromTelemetryFlow);
+    expect(trackCompanionGenerationInitiated).toBe(trackGenerationFromTelemetryFlow);
+    expect(setCompanionSlotError).toBe(setErrorFromUiFlow);
+    expect(setCompanionSlotLoading).toBe(setLoadingFromUiFlow);
+    expect(runCompanionSlotOrchestrate).toBe(runSlotOrchestrateFromSlotFlow);
+  });
+
   it('re-exports orchestrate leaf modules for slot run, intervention, retry, outcome, telemetry, and UI state', () => {
     expect(typeof applyCompanionOrchestrateRetryReset).toBe('function');
     expect(typeof applyCompanionSlotOrchestrateOutcome).toBe('function');
