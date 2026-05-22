@@ -38,10 +38,15 @@ import {
 import {
   dismissOpenPauseHome,
   openManualPauseFromHome,
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-reflect-generation-manual-open-flow';
+import {
+  dismissOpenPauseHome as dismissFromHomeReflectIo,
+  openManualPauseFromHome as openFromHomeReflectIo,
   pauseDismissOpenPauseHomePreview,
   pauseHomeManualOpenPorts,
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 import * as homeReflectIo from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
+import * as sessionReflectTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   markPauseManualStartedHomeOnce as markManualStartedFromHomeTelemetryIo,
   trackHomePendingPauseBannerPauseOpened as trackBannerOpenedFromHomeTelemetryIo,
@@ -94,27 +99,61 @@ describe('pause-home-reflect-telemetry-io parity', () => {
   });
 
   it('home-reflect-telemetry-io trackers stay distinct from home-reflect-io manual-open RPC wrappers', () => {
-    expect(trackPauseOpenDismissed).not.toBe(openManualPauseFromHome);
+    expect(trackPauseOpenDismissed).not.toBe(openFromHomeReflectIo);
     expect(trackHomePendingPauseBannerPauseOpened).not.toBe(pauseDismissOpenPauseHomePreview);
     expect(markPauseManualStartedHomeOnce).not.toBe(pauseHomeManualOpenPorts);
-    expect(trackManualPauseInstanceCreated).not.toBe(openManualPauseFromHome);
+    expect(trackManualPauseInstanceCreated).not.toBe(openFromHomeReflectIo);
     expect(trackPauseManualCompleted).not.toBe(pauseDismissOpenPauseHomePreview);
     expect(trackOpenDismissedFromHomeTelemetryIo).not.toBe(pauseHomeManualOpenPorts);
-    expect(trackBannerOpenedFromHomeTelemetryIo).not.toBe(dismissOpenPauseHome);
+    expect(trackBannerOpenedFromHomeTelemetryIo).not.toBe(dismissFromHomeReflectIo);
     // Reciprocal inline pins: `application/.../manual-open/pause-home-reflect-telemetry-io-parity.test.ts`.
     // Dedicated siblings: `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`;
     // `pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts` (application + presentation).
     // Presentation sibling: `presentation/reflect/telemetry/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`.
   });
 
-  it('home-reflect-telemetry-io trackers stay distinct from session reflect UI telemetry-flow', () => {
+  it('home-reflect-telemetry-io trackers stay distinct from manual-open-flow and session reflect UI telemetry-flow', () => {
+    expect(trackPauseOpenDismissed).not.toBe(openManualPauseFromHome);
+    expect(trackHomePendingPauseBannerPauseOpened).not.toBe(dismissOpenPauseHome);
+    expect(markPauseManualStartedHomeOnce).not.toBe(openManualPauseFromHome);
+    expect(trackManualPauseInstanceCreated).not.toBe(dismissOpenPauseHome);
+    expect(trackPauseManualCompleted).not.toBe(openManualPauseFromHome);
+    expect(trackOpenDismissedFromHomeTelemetryIo).not.toBe(dismissOpenPauseHome);
     expect(trackPauseOpenDismissed).not.toBe(trackPauseReflectPostItOpen);
     expect(trackHomePendingPauseBannerPauseOpened).not.toBe(trackPauseReflectShareTap);
     expect(markPauseManualStartedHomeOnce).not.toBe(trackPauseReflectWallpaperTap);
     expect(trackManualPauseInstanceCreated).not.toBe(trackPauseReflectPostItOpen);
     expect(trackPauseManualCompleted).not.toBe(trackPauseReflectShareTap);
     expect(trackOpenDismissedFromHomeTelemetryIo).not.toBe(trackPauseReflectWallpaperTap);
-    expect(trackPauseOpenDismissed).not.toBe(dismissOpenPauseHome);
-    // Reciprocal inline pins: `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts` (application).
+    // Reciprocal inline pins: `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`
+   * (application + presentation).
+   */
+  it('sibling cluster: session reflect telemetry-io exports stay distinct from Home manual-open telemetry-io', () => {
+    expect(trackPauseOpenDismissed).not.toBe(trackPauseReflectPostItOpen);
+    expect(trackHomePendingPauseBannerPauseOpened).not.toBe(trackPauseReflectShareTap);
+    expect(markPauseManualStartedHomeOnce).not.toBe(trackPauseReflectWallpaperTap);
+    expect(trackManualPauseInstanceCreated).not.toBe(trackPauseReflectPostItOpen);
+    expect(trackPauseManualCompleted).not.toBe(trackPauseReflectShareTap);
+    expect(trackOpenDismissedFromHomeTelemetryIo).not.toBe(trackPauseReflectPostItOpen);
+    expect(trackBannerOpenedFromHomeTelemetryIo).not.toBe(trackPauseReflectShareTap);
+    expect(markManualStartedFromHomeTelemetryIo).not.toBe(trackPauseReflectWallpaperTap);
+
+    expect('trackPauseOpenDismissed' in sessionReflectTelemetryIo).toBe(false);
+    expect('trackHomePendingPauseBannerPauseOpened' in sessionReflectTelemetryIo).toBe(false);
+    expect('markPauseManualStartedHomeOnce' in sessionReflectTelemetryIo).toBe(false);
+    expect('trackManualPauseInstanceCreated' in sessionReflectTelemetryIo).toBe(false);
+    expect('trackPauseManualCompleted' in sessionReflectTelemetryIo).toBe(false);
+
+    expect('trackPauseReflectPostItOpen' in homeReflectTelemetryIo).toBe(false);
+    expect('trackPauseReflectShareTap' in homeReflectTelemetryIo).toBe(false);
+    expect('trackPauseReflectWallpaperTap' in homeReflectTelemetryIo).toBe(false);
+    // Reciprocal inline pins: `application/.../manual-open/pause-home-reflect-io-parity.test.ts`,
+    // `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
+    // Dedicated sibling: `pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`.
   });
 });
