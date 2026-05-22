@@ -410,9 +410,18 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_STEP_NAV_IMPORTS = [
   "from '../domain/ritual/breathe/pause-breath-step-navigation'",
 ];
 
-/** Session breath presentation — import phase-advance via pause-session-breath-flow anchor only. */
-const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_PHASE_ADVANCE_IMPORTS = [
+/** Session breath presentation — import hydration + phase advance via breath-io anchor only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_HYDRATION_IMPORTS = [
+  '@/features/pause/domain/ritual/breathe/restored-breath-ritual-state',
+  '@/features/pause/domain/ritual/breathe/phase-advance',
+  '@/features/pause/application/use-cases/ritual/breathe/restored-breath-ritual-state',
   '@/features/pause/application/use-cases/ritual/breathe/phase-advance',
+  "from './domain/ritual/breathe/restored-breath-ritual-state'",
+  "from '../domain/ritual/breathe/restored-breath-ritual-state'",
+  "from './domain/ritual/breathe/phase-advance'",
+  "from '../domain/ritual/breathe/phase-advance'",
+  "from './application/use-cases/ritual/breathe/restored-breath-ritual-state'",
+  "from '../application/use-cases/ritual/breathe/restored-breath-ritual-state'",
   "from './application/use-cases/ritual/breathe/phase-advance'",
   "from '../application/use-cases/ritual/breathe/phase-advance'",
 ];
@@ -688,9 +697,9 @@ for (const file of walkTs(join(root, 'src'))) {
           failures.push(`${rel}: legacy session breath step-navigation import (${needle})`);
         }
       }
-      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_PHASE_ADVANCE_IMPORTS) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_HYDRATION_IMPORTS) {
         if (text.includes(needle)) {
-          failures.push(`${rel}: legacy session breath phase-advance import (${needle})`);
+          failures.push(`${rel}: legacy session breath hydration import (${needle})`);
         }
       }
     }
