@@ -2180,11 +2180,13 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-archive-io.test.ts') ||
     rel.endsWith('pause-archive-io.re-exports.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_ARCHIVE_IO_UMBRELLA_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: archive decide I/O must not import archive decide umbrella (${needle})`,
-        );
+    if (!rel.endsWith('pause-archive-io.re-exports.test.ts')) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_ARCHIVE_IO_UMBRELLA_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: archive decide I/O must not import archive decide umbrella (${needle})`,
+          );
+        }
       }
     }
     for (const needle of LEGACY_PAUSE_PRESENTATION_ARCHIVE_IO_SUBCLUSTER_FLOW_IMPORTS) {

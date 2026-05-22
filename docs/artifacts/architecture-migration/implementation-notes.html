@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — archive decide I/O ↔ archive-decide-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-archive-io.re-exports.test.ts</code> archive-decide-flow parity</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend archive presentation I/O re-export test with <code>.toBe(direct)</code> identity against <code>pause-archive-decide-flow</code> for retrospective telemetry and <code>logRetrospectiveOutcome</code> (parity with share/mood I/O ↔ flow anchors). Exempt re-exports test from archive-decide-umbrella import guard in <code>check:architecture-alignment</code>; production <code>pause-archive-io.ts</code> still imports ritual/decide leaf modules directly.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + CI allowlist only.</dd>
+      <dt>Open question</dt>
+      <dd>Superseded by telemetry-io parity slice (same day).</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect telemetry-io ↔ telemetry-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -68,8 +85,8 @@
       <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add application-layer <code>pause-reflect-telemetry-io-parity.test.ts</code> (parity with hub/share/mood cluster tests; presentation <code>pause-reflect-telemetry-io.re-exports.test.ts</code> already pins <code>pause-reflect-telemetry-flow</code>). Production telemetry I/O still imports <code>pause-reflect-session-ui-telemetry</code> directly.</dd>
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: Home/pending-offer telemetry I/O application parity tests, companion orchestration-flow sibling pins, or Phase B subscription Tier 1 shims.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Home/pending-offer telemetry I/O application parity tests, companion orchestrate-io ↔ orchestrate-flow pins, or Phase B subscription Tier 1 shims.</dd>
     </dl>
   </article>
 

@@ -8,9 +8,14 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'archivePauseRepository' },
 }));
 
+import { logRetrospectiveOutcome as logRetrospectiveDirect } from '@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome';
 import {
   trackPauseOutcomeRetrospective as trackRetrospectiveDirect,
 } from '@/features/pause/application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry';
+import {
+  logRetrospectiveOutcome as logRetrospectiveFromArchiveDecideFlow,
+  trackPauseOutcomeRetrospective as trackRetrospectiveFromArchiveDecideFlow,
+} from '@/features/pause/application/use-cases/ritual/decide/pause-archive-decide-flow';
 
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
@@ -27,5 +32,10 @@ describe('pause-archive-io re-exports', () => {
 
   it('binds default archivePauseRepository to public-rpc supabasePauseRepository', () => {
     expect(archivePauseRepository).toBe(supabasePauseRepository);
+  });
+
+  it('presentation I/O bindings match pause-archive-decide-flow CI anchor (leaf parity)', () => {
+    expect(trackPauseOutcomeRetrospective).toBe(trackRetrospectiveFromArchiveDecideFlow);
+    expect(logRetrospectiveFromArchiveDecideFlow).toBe(logRetrospectiveDirect);
   });
 });
