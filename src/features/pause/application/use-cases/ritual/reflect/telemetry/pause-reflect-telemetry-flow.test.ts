@@ -30,6 +30,14 @@ import {
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
   runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
 } from '../flows/pause-reflect-flows-flow';
+import {
+  runPauseFavoriteToggle as runFavoriteFromStepsFlow,
+  runPauseReflectNoteUpdate as runNoteFromStepsFlow,
+  runPauseReflectTagUpdate as runTagFromStepsFlow,
+  runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
+  shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
+  shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
+} from '../steps/pause-reflect-steps-flow';
 
 describe('pause-reflect-telemetry-flow', () => {
   it('re-exports session reflect UI telemetry trackers from pause-reflect-session-ui-telemetry', () => {
@@ -69,5 +77,16 @@ describe('pause-reflect-telemetry-flow', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(formatQuoteFromFlowsFlow);
     expect(trackPauseReflectShareTap).not.toBe(runOutcomeLogFromFlowsFlow);
     expect(trackPauseReflectWallpaperTap).not.toBe(formatQuoteFromFlowsFlow);
+  });
+
+  it('sibling cluster: session reflect UI telemetry-flow exports stay distinct from steps-flow exports', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(runFavoriteFromStepsFlow);
+    expect(trackPauseReflectShareTap).not.toBe(runNoteFromStepsFlow);
+    expect(trackPauseReflectWallpaperTap).not.toBe(runTagFromStepsFlow);
+    expect(trackPauseReflectPostItOpen).not.toBe(runReflectionStepFromStepsFlow);
+    expect(trackPauseReflectShareTap).not.toBe(shouldShowFavoriteFromStepsFlow);
+    expect(trackPauseReflectWallpaperTap).not.toBe(shouldLogFromStepsFlow);
+    expect(trackPauseReflectPostItOpen).not.toBe(shouldLogFromStepsFlow);
+    expect(trackPauseReflectShareTap).not.toBe(runReflectionStepFromStepsFlow);
   });
 });
