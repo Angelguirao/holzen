@@ -8,6 +8,7 @@ import {
   setCompanionSlotError as setErrorDirect,
   setCompanionSlotLoading as setLoadingDirect,
 } from './companion-slot-ui-state';
+import { EMPTY_COMPANION_SLOT_RELAXATIONS as emptyRelaxationsDirect } from './orchestrate-slot-apply';
 import { resetInterventionIdempotency as resetIdempotencyDirect } from './intervention-idempotency';
 import { runCompanionInterventionBootstrap as runBootstrapDirect } from './run-companion-intervention-bootstrap';
 import { runCompanionSlotOrchestrate as runSlotOrchestrateDirect } from './run-companion-slot-orchestrate';
@@ -15,11 +16,13 @@ import { runCompanionSlotOrchestrate as runSlotOrchestrateDirect } from './run-c
 import {
   applyCompanionOrchestrateRetryReset,
   applyCompanionSlotOrchestrateOutcome,
+  EMPTY_COMPANION_SLOT_RELAXATIONS,
   logCompanionSlotOrchestrateInvoke,
   resetInterventionIdempotency,
   runCompanionInterventionBootstrap,
   runCompanionSlotOrchestrate,
   setCompanionSlotError,
+  setCompanionSlotLoading,
   trackCompanionGenerationInitiated,
 } from './pause-companion-orchestrate-flow';
 
@@ -32,7 +35,10 @@ describe('pause-companion-orchestrate-flow', () => {
     expect(typeof runCompanionInterventionBootstrap).toBe('function');
     expect(typeof runCompanionSlotOrchestrate).toBe('function');
     expect(typeof setCompanionSlotError).toBe('function');
+    expect(typeof setCompanionSlotLoading).toBe('function');
     expect(typeof trackCompanionGenerationInitiated).toBe('function');
+
+    expect(EMPTY_COMPANION_SLOT_RELAXATIONS).toBe(emptyRelaxationsDirect);
 
     expect(applyCompanionOrchestrateRetryReset).toBe(applyRetryResetDirect);
     expect(applyCompanionSlotOrchestrateOutcome).toBe(applyOutcomeDirect);
@@ -41,6 +47,7 @@ describe('pause-companion-orchestrate-flow', () => {
     expect(runCompanionInterventionBootstrap).toBe(runBootstrapDirect);
     expect(runCompanionSlotOrchestrate).toBe(runSlotOrchestrateDirect);
     expect(setCompanionSlotError).toBe(setErrorDirect);
+    expect(setCompanionSlotLoading).toBe(setLoadingDirect);
     expect(trackCompanionGenerationInitiated).toBe(trackGenerationDirect);
   });
 });
