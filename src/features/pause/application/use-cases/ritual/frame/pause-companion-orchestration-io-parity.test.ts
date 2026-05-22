@@ -9,9 +9,13 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'companionPauseRepository' },
 }));
 
+import { persistCompanionUiStepCompletion as persistDirect } from '@/features/pause/application/use-cases/ritual/frame/persist-ui-step-completion';
+import { runToggleCompanionLibraryFavorite as toggleFavoriteDirect } from '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite';
 import {
   loadCompanionOrchestrateSession,
   nextExpandedWithLazyFetch,
+  persistCompanionUiStepCompletion,
+  runToggleCompanionLibraryFavorite,
 } from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow';
 import {
   companionOrchestrator,
@@ -28,6 +32,11 @@ describe('pause-companion-orchestration-io parity', () => {
   it('presentation I/O orchestration exports match pause-companion-orchestration-flow CI umbrella', () => {
     expect(loadCompanionOrchestrateSession).toBe(loadSessionFromOrchestrationIo);
     expect(nextExpandedWithLazyFetch).toBe(nextExpandedFromOrchestrationIo);
+  });
+
+  it('orchestration-flow composes persist + favorite leaf modules (presentation I/O uses wrappers)', () => {
+    expect(persistCompanionUiStepCompletion).toBe(persistDirect);
+    expect(runToggleCompanionLibraryFavorite).toBe(toggleFavoriteDirect);
   });
 
   it('presentation I/O binds companion ports to public-rpc adapters', () => {
