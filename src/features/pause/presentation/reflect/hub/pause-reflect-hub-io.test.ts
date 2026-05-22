@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import { runShiftEmotionFrameHubDone as runShiftHubDoneDirect } from '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
 import {
+  pauseReflectOutcomeLog,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
   pauseInitialEmotionSelect,
   pauseInitialEmotionSkip,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
@@ -73,5 +77,10 @@ describe('pause-reflect-hub-io', () => {
       pauseInstanceId: 'pi-custom',
       lastShiftLogKey: 'prev',
     });
+  });
+
+  it('sibling cluster: flows-io exports stay distinct from hub-io', () => {
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
   });
 });
