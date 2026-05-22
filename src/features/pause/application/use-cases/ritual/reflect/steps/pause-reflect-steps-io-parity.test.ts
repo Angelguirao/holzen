@@ -35,8 +35,11 @@ import { runPauseReflectTagUpdate as runTagUpdateDirect } from '@/features/pause
 import { runPauseReflectionStepLogOnce as runReflectionStepLogDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
 import {
   pauseReflectFavoriteToggle,
+  pauseReflectFavoriteToggleWithRepository,
   pauseReflectNoteUpdate,
+  pauseReflectNoteUpdateWithRepository,
   pauseReflectTagUpdate,
+  pauseReflectTagUpdateWithRepository,
   pauseReflectionStepLogOnce,
   reflectPauseRepository,
   shouldLogPauseReflectionStep as shouldLogFromStepsIo,
@@ -69,6 +72,9 @@ describe('pause-reflect-steps-io parity', () => {
     expect(typeof pauseReflectNoteUpdate).toBe('function');
     expect(typeof pauseReflectFavoriteToggle).toBe('function');
     expect(typeof pauseReflectionStepLogOnce).toBe('function');
+    expect(typeof pauseReflectTagUpdateWithRepository).toBe('function');
+    expect(typeof pauseReflectNoteUpdateWithRepository).toBe('function');
+    expect(typeof pauseReflectFavoriteToggleWithRepository).toBe('function');
     expect(pauseReflectFavoriteToggle).not.toBe(runFavoriteToggleDirect);
     expect(pauseReflectNoteUpdate).not.toBe(runNoteUpdateDirect);
     expect(pauseReflectTagUpdate).not.toBe(runTagUpdateDirect);
