@@ -85,6 +85,7 @@ import {
   reflectPauseRepository,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
+  buildManualPauseCreateOrReuseParams,
   buildManualPauseMarketContext,
   buildManualPauseOpenParams,
   dismissOpenPauseHome,
@@ -264,6 +265,7 @@ describe('pause-reflect-generation-io parity (application)', () => {
     expect(messageFromReflectGenerationResult).not.toBe(pauseDismissOpenPauseHomePreviewWithRepository);
     expect(messageFromReflectGenerationResult).not.toBe(openManualPauseFromHome);
     expect(pauseReflectGeneration).not.toBe(dismissOpenPauseHome);
+    expect(shouldCommitReflectGeneration).not.toBe(buildManualPauseCreateOrReuseParams);
     expect(pauseHomeManualOpenPorts.reflect).toBe(reflectGenerator);
     // Reciprocal inline pins: `generation/manual-open/pause-home-reflect-io-parity.test.ts`.
     // Full pins: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`.
@@ -280,5 +282,6 @@ describe('pause-reflect-generation-io parity (application)', () => {
     expect('pauseReflectGeneration' in homeReflectIo).toBe(false);
     expect('pauseHomeManualOpenPorts' in homeReflectIo).toBe(true);
     expect('reflectGenerator' in generationIo).toBe(true);
+    // Reciprocal inline pins: `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
   });
 });
