@@ -1,25 +1,45 @@
 import { describe, expect, it } from 'vitest';
 
+import { reflectGenerationUserErrorMessage } from '@/features/pause/domain/reflect/generation/reflect-generation-errors';
 import {
   messageFromReflectGenerationResult,
-  reflectGenerationPrerequisite,
-  reflectGenerationUserErrorMessage,
-  resolveEffectiveReflectionCopy,
   resolveReflectGenerationPrefetch,
-  runReflectGeneration,
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
+} from '@/features/pause/domain/reflect/generation/reflect-generation-hook-flow';
+import { reflectGenerationPrerequisite } from '@/features/pause/domain/reflect/generation/reflect-generation-prerequisites';
+import { resolveEffectiveReflectionCopy } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
+
+import {
+  messageFromReflectGenerationResult as messageFromResultFromFlow,
+  reflectGenerationPrerequisite as prerequisiteFromFlow,
+  reflectGenerationUserErrorMessage as userErrorFromFlow,
+  resolveEffectiveReflectionCopy as resolveCopyFromFlow,
+  resolveReflectGenerationPrefetch as resolvePrefetchFromFlow,
+  runReflectGeneration,
+  shouldClearReflectGenerationLoading as shouldClearLoadingFromFlow,
+  shouldCommitReflectGeneration as shouldCommitFromFlow,
 } from './pause-reflect-generation-hook-flow';
+import { runReflectGeneration as runReflectGenerationDirect } from './run-reflect-generation';
 
 describe('pause-reflect-generation-hook-flow', () => {
   it('re-exports holzen-reflect domain helpers and run-reflect-generation', () => {
-    expect(typeof messageFromReflectGenerationResult).toBe('function');
-    expect(typeof resolveReflectGenerationPrefetch).toBe('function');
-    expect(typeof shouldClearReflectGenerationLoading).toBe('function');
-    expect(typeof shouldCommitReflectGeneration).toBe('function');
-    expect(typeof reflectGenerationPrerequisite).toBe('function');
-    expect(typeof reflectGenerationUserErrorMessage).toBe('function');
-    expect(typeof resolveEffectiveReflectionCopy).toBe('function');
+    expect(typeof resolvePrefetchFromFlow).toBe('function');
+    expect(typeof shouldClearLoadingFromFlow).toBe('function');
+    expect(typeof shouldCommitFromFlow).toBe('function');
+    expect(typeof messageFromResultFromFlow).toBe('function');
+    expect(typeof prerequisiteFromFlow).toBe('function');
+    expect(typeof userErrorFromFlow).toBe('function');
+    expect(typeof resolveCopyFromFlow).toBe('function');
     expect(typeof runReflectGeneration).toBe('function');
+
+    expect(resolvePrefetchFromFlow).toBe(resolveReflectGenerationPrefetch);
+    expect(shouldClearLoadingFromFlow).toBe(shouldClearReflectGenerationLoading);
+    expect(shouldCommitFromFlow).toBe(shouldCommitReflectGeneration);
+    expect(messageFromResultFromFlow).toBe(messageFromReflectGenerationResult);
+    expect(prerequisiteFromFlow).toBe(reflectGenerationPrerequisite);
+    expect(userErrorFromFlow).toBe(reflectGenerationUserErrorMessage);
+    expect(resolveCopyFromFlow).toBe(resolveEffectiveReflectionCopy);
+    expect(runReflectGeneration).toBe(runReflectGenerationDirect);
   });
 });
