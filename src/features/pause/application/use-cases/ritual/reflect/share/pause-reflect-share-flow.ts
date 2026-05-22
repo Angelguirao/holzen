@@ -5,7 +5,7 @@
  * Sibling cluster: `pause-reflect-share-flow.test.ts` ↔ `pause-reflect-telemetry-flow.test.ts` (inline telemetry + pending-offer pins);
  * `pause-reflect-share-telemetry-flow-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-flow`;
  * `pause-reflect-share-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-flow`;
- * `pause-reflect-share-hub-flow-sibling-parity.test.ts` ↔ `pause-reflect-hub-flow`;
+ * `pause-reflect-share-hub-flow-sibling-parity.test.ts` + `pause-reflect-hub-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-hub-flow`;
  * `pause-reflect-flows-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow`;
  * Presentation sibling: `pause-reflect-flows-share-io-sibling-parity.test.ts` ↔ flows-io / share-io;
  * `pause-reflect-steps-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow`;

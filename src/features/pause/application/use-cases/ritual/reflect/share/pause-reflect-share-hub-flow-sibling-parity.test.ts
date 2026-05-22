@@ -18,6 +18,7 @@ import {
 import * as shareFlow from './pause-reflect-share-flow';
 import * as hubFlow from '../hub/pause-reflect-hub-flow';
 
+/** Share-anchored sibling parity; hub-anchored mirror: `hub/pause-reflect-hub-share-flow-sibling-parity.test.ts`. */
 describe('pause-reflect-share-flow ↔ pause-reflect-hub-flow sibling parity', () => {
   it('share-flow and hub-flow are distinct sibling CI anchors', () => {
     expect(typeof runReflectionShareImage).toBe('function');
