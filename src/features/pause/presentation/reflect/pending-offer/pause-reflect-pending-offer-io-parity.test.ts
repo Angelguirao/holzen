@@ -1,3 +1,7 @@
+/**
+ * Presentation pending-offer I/O parity (colocated beside `pause-reflect-pending-offer-io.ts`).
+ * Application mirror: `application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+ */
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({

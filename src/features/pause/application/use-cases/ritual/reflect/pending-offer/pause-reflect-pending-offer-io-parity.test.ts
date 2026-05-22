@@ -43,10 +43,15 @@ import {
   trackPauseSessionAbandoned as trackAbandonedFromTelemetryIo,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 import {
-  pauseShiftEmotionFrameHubDone,
   buildShiftEmotionFrameHubLogBundle,
+  pauseShiftEmotionFrameHubDone,
+  resolveShiftFrameHubDonePresentation,
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
-import { pauseInitialEmotionSelect } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import {
+  buildFeelTilesMoodLogOptions,
+  pauseInitialEmotionSelect,
+  pauseInitialEmotionSkip,
+} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 /**
@@ -77,6 +82,7 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
     expect(pauseAdoptPendingOffer).not.toBe(runAdoptDirect);
     expect(pauseDeclinePendingOffer).not.toBe(runDeclineDirect);
     expect(pauseAdoptPendingOffer).not.toBe(pauseDeclinePendingOffer);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseDeclinePendingOfferWithRepository);
   });
 
   it('pauseAdoptPendingOffer delegates to run-adopt-pending-pause-offer with default repository', async () => {
@@ -97,6 +103,14 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
     await pauseAdoptPendingOfferWithRepository(customRepo);
 
     expect(runAdoptDirect).toHaveBeenCalledWith(customRepo);
+  });
+
+  it('pauseDeclinePendingOfferWithRepository forwards injected PauseRepository', async () => {
+    const customRepo = { port: 'injected-decline' } as unknown as typeof supabasePauseRepository;
+
+    await pauseDeclinePendingOfferWithRepository(customRepo);
+
+    expect(runDeclineDirect).toHaveBeenCalledWith(customRepo);
   });
 
   it('presentation pending-offer-io stays off pending-offer-telemetry-io exports', () => {
@@ -120,18 +134,20 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
   /**
    * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (application + presentation).
    */
-  it('sibling cluster: hub-io exports stay distinct from pending-offer-io', () => {
+  it('sibling cluster: hub-io shift-frame exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(pauseShiftEmotionFrameHubDone);
     expect(pauseDeclinePendingOffer).not.toBe(buildShiftEmotionFrameHubLogBundle);
-    expect(getPendingPauseOfferDisplay).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(getPendingPauseOfferDisplay).not.toBe(resolveShiftFrameHubDonePresentation);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseShiftEmotionFrameHubDone);
   });
 
   /**
    * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (application + presentation).
    */
-  it('sibling cluster: mood-io exports stay distinct from pending-offer-io', () => {
+  it('sibling cluster: mood-io initial-emotion exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(pauseInitialEmotionSelect);
-    expect(pauseDeclinePendingOffer).not.toBe(pauseInitialEmotionSelect);
-    expect(getPendingPauseOfferDisplay).not.toBe(pauseInitialEmotionSelect);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseInitialEmotionSkip);
+    expect(getPendingPauseOfferDisplay).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseInitialEmotionSelect);
   });
 });
