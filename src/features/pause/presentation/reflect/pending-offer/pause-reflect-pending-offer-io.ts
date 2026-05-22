@@ -1,7 +1,7 @@
 /**
  * Presentation I/O for pending pause offer RPC + display copy.
  * Imports adopt/decline and display from leaf modules directly (parity with
- * `pause-reflect-pending-offer-telemetry-io` → pending-offer telemetry leaf trackers).
+ * `presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io` → pending-offer telemetry leaf trackers).
  */
 import {
   getPendingPauseOfferDisplay,

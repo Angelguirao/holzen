@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — pending-offer reflect telemetry under presentation/reflect/telemetry/ (backlog #1, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-telemetry-io</code> leaves pending-offer/</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Follow session reflect telemetry slice: colocate pending-offer PostHog presentation I/O under <code>presentation/reflect/telemetry/</code> (§3). Pending-offer hooks import sibling <code>../telemetry/pause-reflect-pending-offer-telemetry-io</code>; leaf application imports unchanged. CI forbids resurrecting <code>presentation/reflect/pending-offer/pause-reflect-pending-offer-telemetry-io</code> paths.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoff</dt>
+      <dd><code>pending-offer/</code> subcluster keeps RPC/display I/O only; all reflect PostHog presentation I/O lives under <code>telemetry/</code>.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription Tier 1 expansion when pause Tier 5 identity pins are quiet.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session ritual-restore + brief flow identity pins (backlog #1 complete, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
