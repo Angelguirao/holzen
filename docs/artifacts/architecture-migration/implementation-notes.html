@@ -30199,4 +30199,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate pending-offer-io parity beside presentation cluster (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-io-parity.test.ts</code> → <code>presentation/reflect/pending-offer/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no use-case folder moves. Colocate presentation I/O parity test beside <code>pause-reflect-pending-offer-io.ts</code> (parity with <code>pause-reflect-pending-offer-io.re-exports.test.ts</code> and sibling I/O tests under <code>presentation/reflect/pending-offer/</code>). Application flow/cluster comment anchors updated; production I/O unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>Some reflect I/O parity tests remain under <code>application/.../ritual/reflect/</code> when they assert flow umbrellas — pending-offer is presentation-first because wrappers live on presentation I/O only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or mood-io parity colocation under <code>presentation/reflect/mood/</code>.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
