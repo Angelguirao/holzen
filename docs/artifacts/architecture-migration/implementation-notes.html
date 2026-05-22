@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — archive TanStack keys under infrastructure/queries/archive (Tier 3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>archive-query-keys</code> + <code>archive-pauses-tab-keys</code> colocated with archive query modules (§5.2)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 reflect folder moves remain complete. Move key-only modules from <code>application/queries/</code> into <code>infrastructure/queries/archive/</code> (parity with reflect <code>steps/</code> and pending-offer key splits). <code>archive-list-query</code> / <code>archive-pauses-tab-query</code> re-export keys for <code>public-queries</code>; presentation hooks unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; mechanical key module move only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>application/queries/</code> may be empty until other key modules move; journey/current-pause keys unchanged this slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: reflect <code>steps/</code> cluster marker (Tier 5), or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect steps query keys under infrastructure/queries/reflect/steps (Tier 3)</span>
       <span class="status resolved">resolved</span>
     </header>
