@@ -12,7 +12,7 @@ export {
   resolvePauseDecideOutcomeFlow,
 } from './pause-decide-outcome-view-flow';
 export type { PauseImpactData } from './pause-decide-outcome-view-flow';
-export { runPauseOutcomeLog } from './pause-reflect-decide-outcome-log-flow';
+export { runPauseOutcomeLog } from '../../decide/pause-decide-outcome-log-flow';
 export {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
