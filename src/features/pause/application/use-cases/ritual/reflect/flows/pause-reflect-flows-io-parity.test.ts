@@ -98,6 +98,14 @@ import {
   initialDecisionFromRestored,
   initialPhaseFromRestored,
 } from '@/features/pause/application/use-cases/session/pause-session-decide-flow';
+import {
+  buildFeelTilesMoodLogOptions,
+  pauseInitialEmotionSelect,
+  pauseInitialEmotionSelectWithRepository,
+  pauseInitialEmotionSkip,
+  pauseInitialEmotionSkipWithRepository,
+  resolvePauseSessionChromeCloseAction,
+} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
@@ -218,6 +226,25 @@ describe('pause-reflect-flows-io parity', () => {
   });
 
   /**
+   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (reflect+decide vs initial-emotion mood).
+   * Dedicated sibling file: `pause-reflect-flows-mood-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: mood-io exports stay distinct from flows-io', () => {
+    expect(pauseReflectOutcomeLog).not.toBe(pauseInitialEmotionSelect);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseInitialEmotionSkip);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseInitialEmotionSelectWithRepository);
+    expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseInitialEmotionSkipWithRepository);
+    expect(formatReinforcementQuoteFromSession).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(resolvePauseDecideOutcomeFlow).not.toBe(resolvePauseSessionChromeCloseAction);
+    expect(buildPauseScoreImpacts).not.toBe(pauseInitialEmotionSelect);
+    expect(getSessionQuote).not.toBe(pauseInitialEmotionSkip);
+    expect(showPauseOutcomeNotCompletedToast).not.toBe(buildFeelTilesMoodLogOptions);
+    expect(showPauseOutcomeSaveFailedToast).not.toBe(resolvePauseSessionChromeCloseAction);
+    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
+    // Full pins: `pause-reflect-flows-mood-io-sibling-parity.test.ts`.
+  });
+
+  /**
    * Reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (reflect+decide vs session UI telemetry).
    * Dedicated sibling file: `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` (application + presentation).
    */
@@ -232,24 +259,5 @@ describe('pause-reflect-flows-io parity', () => {
     expect(buildPauseScoreImpacts).not.toBe(trackPauseReflectShareTap);
     // Reciprocal inline pins: `pause-reflect-telemetry-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-telemetry-io-sibling-parity.test.ts`.
-  });
-
-  /**
-   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (reflect+decide vs initial-emotion mood).
-   * Dedicated sibling file: `pause-reflect-flows-mood-io-sibling-parity.test.ts` (application + presentation).
-   */
-  it('sibling cluster: mood-io exports stay distinct from flows-io wrappers', () => {
-    expect(pauseReflectOutcomeLog).not.toBe(pauseInitialEmotionSelect);
-    expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseInitialEmotionSkip);
-    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseInitialEmotionSelectWithRepository);
-    expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseInitialEmotionSkipWithRepository);
-    expect(formatReinforcementQuoteFromSession).not.toBe(buildFeelTilesMoodLogOptions);
-    expect(resolvePauseDecideOutcomeFlow).not.toBe(resolvePauseSessionChromeCloseAction);
-    expect(getSessionQuote).not.toBe(pauseInitialEmotionSelect);
-    expect(buildPauseScoreImpacts).not.toBe(pauseInitialEmotionSkip);
-    expect(showPauseOutcomeNotCompletedToast).not.toBe(buildFeelTilesMoodLogOptions);
-    expect(showPauseOutcomeSaveFailedToast).not.toBe(resolvePauseSessionChromeCloseAction);
-    expect(pauseReflectOutcomeLog).not.toBe(pauseReflectFavoriteToggle);
-    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
   });
 });

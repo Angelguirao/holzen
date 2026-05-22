@@ -85,6 +85,18 @@ import {
   shouldLogPauseReflectionStep,
   shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
+  buildPauseScoreImpacts,
+  formatReinforcementQuoteFromSession,
+  getSessionQuote,
+  pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
+  resolvePauseDecideOutcomeFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 
 /**
  * Application-layer mood I/O parity. Steps-io sibling pins:
@@ -191,6 +203,25 @@ describe('pause-reflect-mood-io parity', () => {
     );
 
     expect(runInitialEmotionSkip).toHaveBeenCalledWith(customRepository, input);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (mood RPC vs reflect+decide flows).
+   * Dedicated sibling file: `pause-reflect-flows-mood-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: flows-io exports stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(pauseReflectOutcomeLog);
+    expect(pauseInitialEmotionSkip).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
+    expect(pauseInitialEmotionSkip).not.toBe(formatReinforcementQuoteFromSession);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(resolvePauseDecideOutcomeFlow);
+    expect(pauseInitialEmotionSelect).not.toBe(getSessionQuote);
+    expect(pauseInitialEmotionSkip).not.toBe(buildPauseScoreImpacts);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(showPauseOutcomeNotCompletedToast);
+    expect(resolvePauseSessionChromeCloseAction).not.toBe(showPauseOutcomeSaveFailedToast);
+    // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts`.
+    // Full pins: `pause-reflect-flows-mood-io-sibling-parity.test.ts`.
   });
 
   /**
