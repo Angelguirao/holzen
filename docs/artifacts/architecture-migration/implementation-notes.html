@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel pause-session-providers-io to pause-holzen-providers-slice (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-providers-io</code> imports Holzen provider slice from leaf module</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Route <code>pickPauseHolzenProvidersSlice</code> through <code>pause-holzen-providers-slice</code> instead of <code>pause-session-providers-flow</code> CI anchor (parity with <code>pause-session-step-handlers-io</code> → <code>step-bundles</code> on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-providers-flow</code> remains application cluster anchor for CI; providers conductor imports I/O only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-persisted-tab-session-io</code> to <code>persisted-tab-session</code>, or session shell/scaffold subcluster peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-reflect-mood-io mood chrome to domain leaf modules (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-session-mood-chrome-flow.ts</code> remains application/domain cluster re-export for CI; mood conductors still import <code>pause-reflect-mood-io</code> only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>pause-session-providers-io</code> and <code>pause-persisted-tab-session-io</code> to leaf modules, or session shell/scaffold subcluster peels.</dd>
+      <dd>Next: peel <code>pause-persisted-tab-session-io</code> to leaf modules, or session shell/scaffold subcluster peels.</dd>
     </dl>
   </article>
 

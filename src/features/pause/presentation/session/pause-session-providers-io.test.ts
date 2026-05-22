@@ -5,7 +5,7 @@ import {
 } from './pause-session-providers-io';
 
 describe('pause-session-providers-io', () => {
-  it('re-exports pickPauseHolzenProvidersSlice from pause-session-providers-flow', () => {
+  it('re-exports pickPauseHolzenProvidersSlice from pause-holzen-providers-slice', () => {
     const slice: PauseHolzenProvidersSlice = pickPauseHolzenProvidersSlice({
       mantra: null,
       dismissMessage: async () => {},
