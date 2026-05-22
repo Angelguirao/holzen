@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — frame orchestrate leaf flow regression tests (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-*-orchestrate-*-flow</code> leaf CI anchors have unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>application/use-cases/companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Add leaf flow tests beside orchestrate subcluster CI anchors: <code>pause-companion-slot-orchestrate-flow</code>, <code>pause-companion-intervention-orchestrate-flow</code>, <code>pause-companion-orchestrate-retry-flow</code>, <code>pause-companion-orchestrate-outcome-flow</code>, <code>pause-companion-slot-orchestrate-telemetry-flow</code>, and <code>pause-companion-slot-orchestrate-ui-flow</code> (parity with reflect hub/mood/pending-offer leaf tests). <code>pause-companion-orchestrate-io</code> unchanged (imports leaf modules directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test-only slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No CI guard change; orchestrate leaf flow anchors remain CI-only; umbrella <code>pause-companion-orchestrate-flow.test.ts</code> already covers aggregate re-exports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: frame orchestration/session/library-favorite leaf flow tests, generation holzen-reflect / manual-open leaf flow tests, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect flows and-decide-view leaf flow regression test (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
