@@ -89,6 +89,7 @@ import {
   runReflectGeneration,
   shouldCommitReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import * as generationIo from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
@@ -268,5 +269,15 @@ describe('pause-home-reflect-io parity', () => {
     // Reciprocal inline pins: `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`,
     // `application/.../generation/pause-reflect-generation-io-parity.test.ts`,
     // `application/.../manual-open/pause-home-reflect-io-parity.test.ts`.
+  });
+
+  it('presentation home-reflect-io stays off generation-io holzen-reflect wrappers', () => {
+    expect('openManualPauseFromHome' in generationIo).toBe(false);
+    expect('pauseDismissOpenPauseHomePreview' in generationIo).toBe(false);
+    expect('pauseHomeManualOpenPorts' in generationIo).toBe(false);
+    expect('runReflectGeneration' in homeReflectIo).toBe(false);
+    expect('pauseReflectGeneration' in homeReflectIo).toBe(false);
+    expect('pauseHomeManualOpenPorts' in homeReflectIo).toBe(true);
+    expect('reflectGenerator' in generationIo).toBe(true);
   });
 });
