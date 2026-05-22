@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session breath audio + pending-leave telemetry I/O anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-breath-io</code> and pending-leave sheet import through flow anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no reflect folder moves. Route breath phase/pattern audio cues through <code>pause-ritual-audio-breathe-flow</code>; re-export <code>trackPauseSessionAbandoned</code> on <code>pause-session-pending-offer-flow</code> and import via <code>pause-session-pending-offer-telemetry-io</code> from <code>use-pause-session-pending-leave-sheet</code> (parity with archive decide and pending-offer adopt/decline peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>run-breath-segment-log</code> still binds directly on <code>pause-session-breath-io</code> — optional follow-up <code>pause-session-breath-flow</code> cluster anchor.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: breath segment log flow anchor, session scaffold/step-handler I/O peels, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — archive decide I/O via pause-archive-decide-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

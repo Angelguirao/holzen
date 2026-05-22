@@ -8,3 +8,4 @@ export {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
 } from './pending-pause-offer-telemetry';
+export { trackPauseSessionAbandoned } from './pause-session-telemetry';
