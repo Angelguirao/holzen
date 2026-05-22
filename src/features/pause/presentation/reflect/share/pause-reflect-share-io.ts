@@ -14,7 +14,7 @@
  * `pause-reflect-share-ambience-io-sibling-parity.test.ts` + `ambience/pause-reflect-ambience-share-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`;
  * `pause-reflect-share-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`;
  * reciprocal inline pins: `pause-reflect-share-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`;
- * application `pause-reflect-share-io-parity.test.ts` pins share-io ↔ share-orchestration-flow (no `deliverReflectionShareImage` on presentation I/O).
+ * presentation `pause-reflect-share-io-parity.test.ts` (colocated) pins share-io ↔ share-orchestration-flow (no `deliverReflectionShareImage` on presentation I/O).
  */
 import {
   runReflectionShareImage,

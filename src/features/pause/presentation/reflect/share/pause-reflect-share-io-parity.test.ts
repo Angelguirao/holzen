@@ -25,19 +25,6 @@ import {
 import * as shareFlow from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow';
 import * as orchestrationFlow from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow';
 import {
-  trackPauseReflectPostItOpen as trackPostItFromTelemetryIo,
-  trackPauseReflectShareTap as trackShareTapFromTelemetryIo,
-  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryIo,
-} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
-import * as shareIo from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
-import {
-  buildReflectionShareTelegramUrl as buildTelegramFromShareIo,
-  buildReflectionShareText as buildTextFromShareIo,
-  buildReflectionShareTweetUrl as buildTweetFromShareIo,
-  buildReflectionShareWhatsAppUrl as buildWhatsAppFromShareIo,
-  pauseReflectionShareImage,
-} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
-import {
   messageFromReflectGenerationResult,
   pauseReflectGeneration,
   reflectGenerationPrerequisite,
@@ -46,12 +33,25 @@ import {
   runReflectGeneration,
   shouldCommitReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import {
+  trackPauseReflectPostItOpen as trackPostItFromTelemetryIo,
+  trackPauseReflectShareTap as trackShareTapFromTelemetryIo,
+  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryIo,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import * as shareIo from './pause-reflect-share-io';
+import {
+  buildReflectionShareTelegramUrl as buildTelegramFromShareIo,
+  buildReflectionShareText as buildTextFromShareIo,
+  buildReflectionShareTweetUrl as buildTweetFromShareIo,
+  buildReflectionShareWhatsAppUrl as buildWhatsAppFromShareIo,
+  pauseReflectionShareImage,
+} from './pause-reflect-share-io';
 
 /**
- * Application-layer share I/O parity. Generation-io sibling:
- * `pause-reflect-generation-share-io-sibling-parity.test.ts` (reciprocal inline pins below).
+ * Presentation-layer share I/O parity (colocated beside `pause-reflect-share-io.ts`).
+ * Generation-io sibling: `pause-reflect-generation-share-io-sibling-parity.test.ts`.
  * Telemetry-io sibling: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts`.
+ * reciprocal inline pins ↔ application `pause-reflect-telemetry-io-parity.test.ts`.
  */
 describe('pause-reflect-share-io parity', () => {
   it('presentation I/O share builder exports match share CI umbrella', () => {
@@ -106,8 +106,8 @@ describe('pause-reflect-share-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (share builders vs holzen-reflect).
-   * Dedicated sibling file: `pause-reflect-generation-share-io-sibling-parity.test.ts` (application + presentation).
+   * Reciprocal inline pins ↔ application `pause-reflect-generation-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-generation-share-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: generation-io exports stay distinct from share-io wrappers', () => {
     expect(pauseReflectionShareImage).not.toBe(runReflectGeneration);
@@ -117,13 +117,12 @@ describe('pause-reflect-share-io parity', () => {
     expect(buildWhatsAppFromShareIo).not.toBe(messageFromReflectGenerationResult);
     expect(pauseReflectionShareImage).not.toBe(reflectGenerator);
     expect(buildTextFromShareIo).not.toBe(shouldCommitReflectGeneration);
-    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
     // Full pins: `pause-reflect-generation-share-io-sibling-parity.test.ts`.
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (share builders vs session UI telemetry).
-   * Dedicated sibling file: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation).
+   * Reciprocal inline pins ↔ application `pause-reflect-telemetry-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-share-telemetry-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: telemetry-io exports stay distinct from share-io builders', () => {
     expect(pauseReflectionShareImage).not.toBe(trackPostItFromTelemetryIo);
@@ -132,6 +131,5 @@ describe('pause-reflect-share-io parity', () => {
     expect(buildTweetFromShareIo).not.toBe(trackPostItFromTelemetryIo);
     expect(buildWhatsAppFromShareIo).not.toBe(trackShareTapFromTelemetryIo);
     expect(pauseReflectionShareImage).not.toBe(trackWallpaperFromTelemetryIo);
-    // Reciprocal inline pins: `pause-reflect-telemetry-io-parity.test.ts`.
   });
 });
