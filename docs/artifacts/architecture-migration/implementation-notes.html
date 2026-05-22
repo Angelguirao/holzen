@@ -82,11 +82,11 @@
     <h3><code>pause-reflect-hub-pending-offer-io-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no reflect moves. Mirror application <code>pause-reflect-hub-pending-offer-flow-sibling-parity</code> at presentation: <code>pause-reflect-hub-io</code> (shift-frame hub done RPC) vs <code>pause-reflect-pending-offer-io</code> (adopt/decline + display) stay distinct surfaces; shared <code>reflectPauseRepository</code> binding must not collapse wrappers.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no reflect moves. Mirror application <code>pause-reflect-hub-pending-offer-flow-sibling-parity</code> at presentation: <code>pause-reflect-hub-io</code> (shift-frame hub done RPC) vs <code>pause-reflect-pending-offer-io</code> (adopt/decline + display) stay distinct surfaces; shared <code>reflectPauseRepository</code> binding and <code>*WithRepository</code> seams must not collapse wrappers.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comments only.</dd>
       <dt>Open question</dt>
-      <dd>Next: presentation share-io ↔ telemetry-io sibling parity, or Phase B subscription/auth Tier 1 shim scan.</dd>
+      <dd>Next: presentation share-io ↔ telemetry-io cross-umbrella sibling parity, or Phase B subscription/auth Tier 1 shim scan.</dd>
     </dl>
   </article>
 
@@ -99,11 +99,11 @@
     <h3><code>pause-reflect-share-pending-offer-io-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mirror application <code>pause-reflect-share-pending-offer-flow-sibling-parity</code> at presentation: <code>pause-reflect-share-io</code> (channel builders + PNG orchestration) vs <code>pause-reflect-pending-offer-io</code> (adopt/decline RPC + display) stay distinct surfaces (complements generation↔pending-offer presentation pins).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mirror application <code>pause-reflect-share-pending-offer-flow-sibling-parity</code> at presentation: <code>pause-reflect-share-io</code> (channel builders + PNG orchestration) vs <code>pause-reflect-pending-offer-io</code> (adopt/decline RPC + display) stay distinct surfaces (complements generation↔pending-offer and hub↔pending-offer presentation pins).</dd>
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comments only.</dd>
       <dt>Open question</dt>
-      <dd>None — superseded by hub-io ↔ pending-offer-io slice on same branch.</dd>
+      <dd>None — complements hub-io ↔ pending-offer-io slice on same branch.</dd>
     </dl>
   </article>
 
