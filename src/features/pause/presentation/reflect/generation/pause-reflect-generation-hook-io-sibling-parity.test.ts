@@ -35,8 +35,9 @@ import * as generationIo from './pause-reflect-generation-io';
 /**
  * Presentation sibling parity: generation-io holzen-reflect hook leaf bindings (parity with
  * application `pause-reflect-generation-hook-io-sibling-parity.test.ts` ↔ hook-flow CI anchor;
- * complements `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`). Presentation
- * tests import domain leaves + `run-reflect-generation` only — not flow umbrellas.
+ * complements `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` and reciprocal
+ * inline pins on `pause-reflect-generation-io.test.ts`). Presentation tests import domain leaves
+ * + `run-reflect-generation` only — not flow umbrellas.
  */
 describe('pause-reflect-generation-io ↔ holzen-reflect hook leaf sibling parity', () => {
   it('generation-io re-exports holzen-reflect domain hook leaves and runReflectGeneration sibling', () => {

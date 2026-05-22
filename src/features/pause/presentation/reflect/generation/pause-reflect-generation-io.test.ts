@@ -24,11 +24,17 @@ import {
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
+  dismissOpenPauseHome,
+  openManualPauseFromHome,
+} from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
+import {
   messageFromReflectGenerationResult,
   pauseReflectGeneration,
   reflectGenerationPrerequisite,
   reflectGenerator,
   resolveReflectGenerationPrefetch,
+  runReflectGeneration,
+  shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
 } from './pause-reflect-generation-io';
 
@@ -102,6 +108,23 @@ describe('pause-reflect-generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(pauseReflectionShareImage);
     expect(reflectGenerator).not.toBe(pauseReflectionShareImage);
     // Full cross-I/O pins: `pause-reflect-generation-share-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-generation-hook-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: holzen-reflect hook exports stay distinct from Home manual-open', () => {
+    expect(pauseReflectGeneration).not.toBe(openManualPauseFromHome);
+    expect(pauseReflectGeneration).not.toBe(dismissOpenPauseHome);
+    expect(runReflectGeneration).not.toBe(openManualPauseFromHome);
+    expect(runReflectGenerationDirect).not.toBe(dismissOpenPauseHome);
+    expect(reflectGenerationPrerequisite).not.toBe(openManualPauseFromHome);
+    expect(resolveReflectGenerationPrefetch).not.toBe(dismissOpenPauseHome);
+    expect(shouldCommitReflectGeneration).not.toBe(openManualPauseFromHome);
+    expect(shouldClearReflectGenerationLoading).not.toBe(dismissOpenPauseHome);
+    expect(messageFromReflectGenerationResult).not.toBe(openManualPauseFromHome);
+    expect(reflectGenerator).not.toBe(dismissOpenPauseHome);
+    // Full pins: `pause-reflect-generation-hook-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: steps-io exports stay distinct from generation-io', () => {
