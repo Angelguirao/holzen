@@ -1,9 +1,10 @@
 /**
  * Presentation I/O for `/pause` terminal-entry redirect guards.
- * `use-pause-session-terminal-entry-redirect` imports here instead of deep `application/use-cases/*`.
+ * Imports `terminal-entry-guard` directly (parity with step-transition and ritual-done I/O peels;
+ * not `pause-session-terminal-entry-flow` CI anchor).
  */
 export {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
   TERMINAL_PAUSE_DB_STATES,
-} from '@/features/pause/application/use-cases/session/pause-session-terminal-entry-flow';
+} from '@/features/pause/application/use-cases/session/terminal-entry-guard';

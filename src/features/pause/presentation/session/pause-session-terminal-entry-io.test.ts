@@ -7,7 +7,7 @@ import {
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
 describe('pause-session-terminal-entry-io', () => {
-  it('re-exports terminal DB states from pause-session-terminal-entry-flow', () => {
+  it('re-exports terminal DB states from terminal-entry-guard', () => {
     expect(TERMINAL_PAUSE_DB_STATES.has('completed')).toBe(true);
     expect(isTerminalPauseDbState('active')).toBe(false);
     expect(isTerminalPauseDbState('expired')).toBe(true);
