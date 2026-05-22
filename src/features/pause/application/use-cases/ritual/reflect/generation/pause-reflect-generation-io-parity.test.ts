@@ -167,7 +167,7 @@ describe('pause-reflect-generation-io parity (application)', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (presentation).
+   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: hub-io exports stay distinct from generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(pauseShiftEmotionFrameHubDone);
