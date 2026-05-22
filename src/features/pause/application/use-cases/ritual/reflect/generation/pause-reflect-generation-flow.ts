@@ -7,7 +7,7 @@
  * `pause-reflect-generation-io.re-exports.test.ts` and `pause-reflect-generation-io-parity.test.ts` (incl. `pauseReflectGeneration` wrapper delegation);
  * Sibling parity: `pause-reflect-ambience-generation-flow-sibling-parity.test.ts` ↔ `pause-reflect-ambience-flow`;
  * inline pins: `pause-reflect-ambience-flow.test.ts`, `pause-reflect-generation-flow.test.ts` ↔ `pause-reflect-flows-flow.test.ts`;
- * `pause-reflect-steps-generation-flow-sibling-parity.test.ts` (steps-flow ↔ generation-flow; reciprocal inline in both flow unit tests);
+ * `pause-reflect-steps-generation-flow-sibling-parity.test.ts` (steps-flow ↔ generation-flow; reciprocal inline pins in `pause-reflect-steps-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts`);
  * `pause-reflect-flows-generation-flow-sibling-parity.test.ts` (flows-flow ↔ generation-flow);
  * `pause-reflect-ambience-generation-flow-sibling-parity.test.ts` (ambience-flow ↔ generation-flow);
  * `pause-reflect-generation-hub-flow-sibling-parity.test.ts` (generation-flow ↔ hub-flow);

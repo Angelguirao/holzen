@@ -30,6 +30,13 @@ import { runPauseReflectNoteUpdate as runNoteDirect } from './run-pause-reflect-
 import { runPauseReflectTagUpdate as runTagDirect } from './run-pause-reflect-tag-update';
 import { runPauseReflectionStepLogOnce as runReflectionStepDirect } from './run-pause-reflection-step-log';
 import {
+  messageFromReflectGenerationResult as messageFromResultFromGenerationFlow,
+  openManualPauseFromHome as openManualFromGenerationFlow,
+  reflectGenerationPrerequisite as prerequisiteFromGenerationFlow,
+  runReflectGeneration as runReflectGenerationFromGenerationFlow,
+  shouldCommitReflectGeneration as shouldCommitFromGenerationFlow,
+} from '../generation/pause-reflect-generation-flow';
+import {
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
   runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
 } from '../flows/pause-reflect-flows-flow';
@@ -46,12 +53,6 @@ import {
   trackPausePendingDeclined as trackDeclinedFromPendingOfferFlow,
   trackPauseSessionAbandoned as trackAbandonedFromPendingOfferFlow,
 } from '../pending-offer/pause-reflect-pending-offer-flow';
-import {
-  openManualPauseFromHome as openManualFromGenerationFlow,
-  reflectGenerationPrerequisite as prerequisiteFromGenerationFlow,
-  runReflectGeneration as runReflectGenerationFromGenerationFlow,
-  shouldCommitReflectGeneration as shouldCommitFromGenerationFlow,
-} from '../generation/pause-reflect-generation-flow';
 import {
   buildReflectionShareText as buildShareTextFromShareFlow,
   runReflectionShareImage as runShareImageFromShareFlow,
@@ -129,7 +130,11 @@ describe('pause-reflect-steps-flow', () => {
     expect(shouldLogFromFlow).not.toBe(openManualFromGenerationFlow);
     expect(runPauseReflectTagUpdate).not.toBe(shouldCommitFromGenerationFlow);
     expect(shouldShowFavoriteFromFlow).not.toBe(openManualFromGenerationFlow);
-    // Full cross-umbrella pins: `pause-reflect-steps-generation-flow-sibling-parity.test.ts`.
+    expect(runPauseFavoriteToggle).not.toBe(messageFromResultFromGenerationFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(shouldCommitFromGenerationFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(messageFromResultFromGenerationFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(shouldCommitFromGenerationFlow);
+    // Full cross-flow pins: `pause-reflect-steps-generation-flow-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: share-flow exports stay distinct from steps umbrella exports', () => {
