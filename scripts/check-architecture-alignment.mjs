@@ -379,11 +379,21 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_IMPORTS = [
   "from '../presentation/session/use-pause-session-breath-second-label-variant'",
 ];
 
-/** Session presentation — import terminal-entry guards via flow anchor only. */
+/** Session presentation (non-I/O) — import terminal-entry guards via terminal-entry-io only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_TERMINAL_ENTRY_IMPORTS = [
   '@/features/pause/application/use-cases/session/terminal-entry-guard',
+  '@/features/pause/application/use-cases/session/pause-session-terminal-entry-flow',
   "from './application/use-cases/session/terminal-entry-guard'",
   "from '../application/use-cases/session/terminal-entry-guard'",
+  "from './application/use-cases/session/pause-session-terminal-entry-flow'",
+  "from '../application/use-cases/session/pause-session-terminal-entry-flow'",
+];
+
+/** Session terminal-entry I/O — import terminal-entry-guard directly (not terminal-entry-flow). */
+const LEGACY_PAUSE_PRESENTATION_SESSION_TERMINAL_ENTRY_IO_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pause-session-terminal-entry-flow',
+  "from './application/use-cases/session/pause-session-terminal-entry-flow'",
+  "from '../application/use-cases/session/pause-session-terminal-entry-flow'",
 ];
 
 /** Session presentation — import step bundle builders via flow anchor only. */
@@ -2801,6 +2811,18 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_TERMINAL_ENTRY_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session terminal-entry import (${needle})`);
+      }
+    }
+    if (
+      rel.endsWith('pause-session-terminal-entry-io.ts') ||
+      rel.endsWith('pause-session-terminal-entry-io.test.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_TERMINAL_ENTRY_IO_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: session terminal-entry I/O must import terminal-entry-guard directly (${needle})`,
+          );
+        }
       }
     }
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_STEP_BUNDLES_IMPORTS) {
