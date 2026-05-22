@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for session breath segment RPC + timed breathing (§3 / check:architecture-alignment).
  * Cluster marker: `pause-session-breath-cluster.ts` (empty export; unit-tested).
- * Re-exports restored breath state, phase advance, segment log, and navigation constants from sibling modules.
+ * Re-exports restored breath state, phase advance, segment log (`pause-run-breath-segment-log-flow`), and navigation constants from sibling modules.
  * Presentation: `pause-session-breath-io` imports leaf modules directly (not this umbrella).
  */
 export { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags';
@@ -32,4 +32,4 @@ export {
   runLogBreathSegment1Skipped,
   runLogBreathSegment2Skipped,
   type BreathSegmentLogDeps,
-} from './run-breath-segment-log';
+} from './pause-run-breath-segment-log-flow';

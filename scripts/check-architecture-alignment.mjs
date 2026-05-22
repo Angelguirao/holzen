@@ -815,6 +815,13 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_IO_AUDIO_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/breathe/pause-ritual-audio-breathe-flow'",
 ];
 
+/** Session breath I/O — import segment log leaf only (not pause-run-breath-segment-log-flow). */
+const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_IO_SEGMENT_LOG_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/breathe/pause-run-breath-segment-log-flow',
+  "from './application/use-cases/ritual/breathe/pause-run-breath-segment-log-flow'",
+  "from '../application/use-cases/ritual/breathe/pause-run-breath-segment-log-flow'",
+];
+
 /** Deep ritual-audio in session breath presentation — use pause-session-breath-io only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_AUDIO_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/breathe/ritual-audio',
@@ -822,7 +829,7 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_AUDIO_IMPORTS = [
   "from '../application/use-cases/ritual/breathe/ritual-audio'",
 ];
 
-/** Deep breath segment log in session breath I/O — use pause-session-breath-flow anchor. */
+/** Deep breath segment log in non-allowlisted session breath presentation — use breath-io leaf import. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_SEGMENT_LOG_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/breathe/run-breath-segment-log',
   "from './application/use-cases/ritual/breathe/run-breath-segment-log'",
@@ -2267,6 +2274,15 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
+  if (rel === 'src/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow.ts') {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_SEGMENT_LOG_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: session breath umbrella flow must compose pause-run-breath-segment-log-flow subcluster (${needle})`,
+        );
+      }
+    }
+  }
   if (rel === 'src/features/pause/application/use-cases/ritual/done/pause-ritual-done-flow.ts') {
     for (const needle of [
       '@/features/pause/application/use-cases/ritual/done/post-pause-emotion-log',
@@ -2871,6 +2887,13 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: session breath I/O must import ritual-audio directly (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_IO_SEGMENT_LOG_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: session breath I/O must import run-breath-segment-log directly (${needle})`,
         );
       }
     }

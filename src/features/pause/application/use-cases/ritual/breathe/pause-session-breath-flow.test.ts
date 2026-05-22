@@ -49,6 +49,12 @@ import {
   initialBreathingSecondCompletedFromRestored as secondCompletedFromRestoredModule,
 } from './restored-breath-ritual-state';
 import {
+  runEnsureBreathSegment1Logged as runSegment1FromSegmentLogFlow,
+  runEnsureBreathSegment2Logged as runSegment2FromSegmentLogFlow,
+  runLogBreathSegment1Skipped as runSegment1SkippedFromSegmentLogFlow,
+  runLogBreathSegment2Skipped as runSegment2SkippedFromSegmentLogFlow,
+} from './pause-run-breath-segment-log-flow';
+import {
   runEnsureBreathSegment1Logged as runSegment1Direct,
   runEnsureBreathSegment2Logged as runSegment2Direct,
   runLogBreathSegment1Skipped as runSegment1SkippedDirect,
@@ -98,12 +104,16 @@ describe('pause-session-breath-flow', () => {
     expect(claimBriefIntegrateAdvance).toBe(claimIntegrateAdvanceDirect);
   });
 
-  it('re-exports segment log helpers from run-breath-segment-log sibling', () => {
+  it('re-exports segment log helpers from pause-run-breath-segment-log-flow subcluster anchor', () => {
     expect(typeof runEnsureBreathSegment1Logged).toBe('function');
     expect(typeof runEnsureBreathSegment2Logged).toBe('function');
     expect(typeof runLogBreathSegment1Skipped).toBe('function');
     expect(typeof runLogBreathSegment2Skipped).toBe('function');
 
+    expect(runEnsureBreathSegment1Logged).toBe(runSegment1FromSegmentLogFlow);
+    expect(runEnsureBreathSegment2Logged).toBe(runSegment2FromSegmentLogFlow);
+    expect(runLogBreathSegment1Skipped).toBe(runSegment1SkippedFromSegmentLogFlow);
+    expect(runLogBreathSegment2Skipped).toBe(runSegment2SkippedFromSegmentLogFlow);
     expect(runEnsureBreathSegment1Logged).toBe(runSegment1Direct);
     expect(runEnsureBreathSegment2Logged).toBe(runSegment2Direct);
     expect(runLogBreathSegment1Skipped).toBe(runSegment1SkippedDirect);
@@ -124,6 +134,10 @@ describe('pause-session-breath-flow', () => {
     expect(BRIEF_FIRST_BREATH_SEGMENT_LOG).toBe(briefFirstSegmentDirect);
     expect(shouldResetBriefIntegrateAdvanceGuard).toBe(shouldResetIntegrateGuardDirect);
     expect(claimBriefIntegrateAdvance).toBe(claimIntegrateAdvanceDirect);
+    expect(runEnsureBreathSegment1Logged).toBe(runSegment1FromSegmentLogFlow);
+    expect(runEnsureBreathSegment2Logged).toBe(runSegment2FromSegmentLogFlow);
+    expect(runLogBreathSegment1Skipped).toBe(runSegment1SkippedFromSegmentLogFlow);
+    expect(runLogBreathSegment2Skipped).toBe(runSegment2SkippedFromSegmentLogFlow);
     expect(runEnsureBreathSegment1Logged).toBe(runSegment1Direct);
     expect(runEnsureBreathSegment2Logged).toBe(runSegment2Direct);
     expect(runLogBreathSegment1Skipped).toBe(runSegment1SkippedDirect);
