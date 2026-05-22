@@ -19742,4 +19742,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — manual-open conductor colocation (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-manual-pause-trigger</code> under <code>presentation/home/manual-open/</code>; open-result types via <code>pause-home-reflect-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no application relocations. Colocate the Home manual-open conductor beside <code>pause-home-reflect-io</code> / <code>apply-manual-pause-open-result</code>. Route open-result payload types through the manual-open I/O barrel instead of deep <code>pause-reflect-generation-manual-open-flow</code> (presentation imports presentation I/O only).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; path + import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>public-home</code> re-export path updated; <code>use-holzen-home-context-state</code> imports sibling <code>manual-open/</code> conductor directly (not an aggregate Home barrel).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion analytics/frame-ui I/O through flow anchors, session ritual-restore flow anchor, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

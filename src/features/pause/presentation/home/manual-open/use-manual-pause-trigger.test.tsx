@@ -28,13 +28,13 @@ vi.mock('@/features/pause/presentation/session/pause-persisted-tab-session-io', 
   savePausePersistedTabSession: vi.fn(),
 }));
 
-vi.mock('./manual-open/pause-home-reflect-telemetry-io', () => ({
+vi.mock('./pause-home-reflect-telemetry-io', () => ({
   markPauseManualStartedHomeOnce: markPauseManualStartedHomeOnceMock,
   trackManualPauseInstanceCreated: trackManualPauseInstanceCreatedMock,
   trackPauseManualCompleted: trackPauseManualCompletedMock,
 }));
 
-vi.mock('./manual-open/pause-home-reflect-io', () => ({
+vi.mock('./pause-home-reflect-io', () => ({
   pauseHomeManualOpenPorts: mockPauseHomeManualOpenPorts,
   applyManualPauseOpenResult: async (
     _input: { result: { outcome: string; userMessage?: string } },
