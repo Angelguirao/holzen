@@ -3,7 +3,7 @@ import { trackPausePendingAdopted, trackPausePendingDeclined } from './pending-p
 
 const trackEvent = vi.fn();
 
-vi.mock('@/lib/posthog', () => ({
+vi.mock('../telemetry/pause-reflect-product-telemetry', () => ({
   trackEvent: (...args: unknown[]) => trackEvent(...args),
 }));
 

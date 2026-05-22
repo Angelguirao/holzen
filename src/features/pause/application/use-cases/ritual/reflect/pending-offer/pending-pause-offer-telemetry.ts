@@ -1,4 +1,4 @@
-import { trackEvent } from '@/lib/posthog';
+import { trackEvent } from '../telemetry/pause-reflect-product-telemetry';
 
 /** User confirms switching to the queued pending pause (taxonomy: pause_pending_adopted). */
 export function trackPausePendingAdopted(pauseInstanceId: string): void {
