@@ -31,11 +31,14 @@ import {
 } from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
 import { getSessionQuote as getQuoteDirect } from '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes';
 
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
+
 import {
   buildPauseScoreImpacts,
   formatReinforcementQuoteFromSession,
   getSessionQuote,
   parseScoreImpactVolatilityPct,
+  reflectPauseRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
@@ -73,5 +76,9 @@ describe('pause-reflect-flows-io re-exports', () => {
     expect(scoreImpactMotionDelaySec).toBe(motionDelayDirect);
     expect(showPauseOutcomeNotCompletedToast).toBe(showNotCompletedDirect);
     expect(showPauseOutcomeSaveFailedToast).toBe(showSaveFailedDirect);
+  });
+
+  it('binds default reflectPauseRepository to public-rpc supabasePauseRepository', () => {
+    expect(reflectPauseRepository).toBe(supabasePauseRepository);
   });
 });
