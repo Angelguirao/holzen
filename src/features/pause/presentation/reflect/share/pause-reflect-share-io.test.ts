@@ -33,8 +33,14 @@ import {
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import { pauseReflectGeneration } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
+  buildPauseScoreImpacts,
+  formatReinforcementQuoteFromSession,
   pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
+  resolvePauseDecideOutcomeFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
+  showPauseOutcomeNotCompletedToast,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   pauseShiftEmotionFrameHubDone,
@@ -87,9 +93,21 @@ describe('pause-reflect-share-io', () => {
     expect(pauseReflectionShareImage).not.toBe(trackPauseReflectWallpaperTap);
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io.test.ts` (reflection share vs reflect+decide).
+   * Dedicated sibling file: `pause-reflect-flows-share-io-sibling-parity.test.ts` (application + presentation).
+   */
   it('sibling cluster: flows-io exports stay distinct from share-io', () => {
     expect(pauseReflectionShareImage).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(pauseReflectionShareImage).not.toBe(pauseReflectOutcomeLog);
+    expect(buildReflectionShareText).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(buildReflectionShareTelegramUrl).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
+    expect(buildReflectionShareTweetUrl).not.toBe(formatReinforcementQuoteFromSession);
+    expect(buildReflectionShareWhatsAppUrl).not.toBe(resolvePauseDecideOutcomeFlow);
+    expect(pauseReflectionShareImage).not.toBe(buildPauseScoreImpacts);
+    expect(buildReflectionShareText).not.toBe(showPauseOutcomeNotCompletedToast);
+    // Reciprocal inline pins: `pause-reflect-flows-io.test.ts`, `pause-reflect-flows-io-parity.test.ts`.
+    // Full pins: `pause-reflect-flows-share-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: generation-io exports stay distinct from share-io PNG orchestration', () => {

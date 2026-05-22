@@ -18,9 +18,10 @@
  * `pause-reflect-flows-telemetry-flow-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-flow`;
  * `pause-reflect-flows-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-share-flow`;
  * `pause-session-step-handlers-flows-flow-sibling-parity.test.ts` ↔ `session/pause-session-step-handlers-flow`.
- * Presentation sibling: `pause-reflect-flows-share-io-sibling-parity.test.ts` ↔ flows-io / share-io (application
- * mirror: `pause-reflect-flows-share-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline
- * pins in `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-share-io-parity.test.ts`).
+ * Presentation + application sibling: `pause-reflect-flows-share-io-sibling-parity.test.ts` (presentation)
+ * and `application/.../flows/pause-reflect-flows-share-io-sibling-parity.test.ts` ↔ flows-io / share-io;
+ * reciprocal inline pins in `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-share-io-parity.test.ts`
+ * and `pause-reflect-share-io.test.ts`.
  * Outcome leaf vs presentation wrappers: flows umbrella re-exports `runPauseOutcomeLog` identity;
  * `pauseReflectOutcomeLog*` live on `pause-reflect-flows-io` only (pinned in flows-flow + flows-io-parity tests).
  */

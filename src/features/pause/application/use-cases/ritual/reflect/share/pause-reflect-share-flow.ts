@@ -7,7 +7,8 @@
  * `pause-reflect-share-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-flow`;
  * `pause-reflect-share-hub-flow-sibling-parity.test.ts` + `pause-reflect-hub-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-hub-flow`;
  * `pause-reflect-flows-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow`;
- * Presentation sibling: `pause-reflect-flows-share-io-sibling-parity.test.ts` ↔ flows-io / share-io;
+ * Presentation + application sibling: `pause-reflect-flows-share-io-sibling-parity.test.ts` (presentation)
+ * and `application/.../flows/pause-reflect-flows-share-io-sibling-parity.test.ts` ↔ flows-io / share-io;
  * `pause-reflect-generation-share-io-sibling-parity.test.ts` (generation-io ↔ share-io; application + presentation);
  * `pause-reflect-steps-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow`;
  * `pause-reflect-generation-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-generation-flow`;
