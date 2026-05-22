@@ -151,8 +151,12 @@ mustExist(
   'pause/application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow.ts',
 );
 mustExist(
+  'src/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-view-flow.ts',
+  'pause/application/use-cases/ritual/decide/pause-decide-outcome-view-flow.ts',
+);
+mustNotExist(
   'src/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow.ts',
-  'pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow.ts',
+  'pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow.ts (use ritual/decide/pause-decide-outcome-view-flow.ts)',
 );
 mustExist(
   'src/features/pause/application/use-cases/ritual/decide/impact-data.ts',
@@ -552,11 +556,14 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_PERSISTED_TAB_IO_FLOW_IMPORTS = [
 const LEGACY_PAUSE_PRESENTATION_SESSION_DECIDE_IMPACT_IMPORTS = [
   '@/features/pause/domain/decide/pause-impact-data',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-view-flow',
   '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io',
   "from './domain/decide/pause-impact-data",
   "from '../domain/decide/pause-impact-data",
   "from './application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
   "from '../application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
+  "from './application/use-cases/ritual/decide/pause-decide-outcome-view-flow'",
+  "from '../application/use-cases/ritual/decide/pause-decide-outcome-view-flow'",
   "from './presentation/reflect/flows/pause-reflect-flows-io'",
   "from '../presentation/reflect/flows/pause-reflect-flows-io'",
 ];
@@ -565,12 +572,15 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_DECIDE_IMPACT_IMPORTS = [
 const LEGACY_PAUSE_SESSION_APPLICATION_DECIDE_FLOW_IMPACT_IMPORTS = [
   '@/features/pause/application/use-cases/session/pause-session-decide-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-view-flow',
   '@/features/pause/application/use-cases/ritual/decide/impact-data',
   "from '@/features/pause/application/use-cases/session/pause-session-decide-flow'",
   "from '../application/use-cases/session/pause-session-decide-flow'",
   "from './application/use-cases/session/pause-session-decide-flow'",
   "from './application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
   "from '../application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
+  "from './application/use-cases/ritual/decide/pause-decide-outcome-view-flow'",
+  "from '../application/use-cases/ritual/decide/pause-decide-outcome-view-flow'",
   "from './application/use-cases/ritual/decide/impact-data'",
   "from '../application/use-cases/ritual/decide/impact-data'",
 ];
@@ -579,6 +589,7 @@ const LEGACY_PAUSE_SESSION_APPLICATION_DECIDE_FLOW_IMPACT_IMPORTS = [
 const LEGACY_PAUSE_PUBLIC_HOOKS_IMPACT_TYPE_IMPORTS = [
   '@/features/pause/application/use-cases/session/pause-session-decide-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-view-flow',
   "from './application/use-cases/session/pause-session-decide-flow'",
   "from '../application/use-cases/session/pause-session-decide-flow'",
 ];
@@ -587,11 +598,14 @@ const LEGACY_PAUSE_PUBLIC_HOOKS_IMPACT_TYPE_IMPORTS = [
 const LEGACY_PAUSE_SESSION_DECIDE_IO_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/session/pause-session-decide-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-view-flow',
   '@/features/pause/application/use-cases/ritual/decide/impact-data',
   "from './application/use-cases/session/pause-session-decide-flow'",
   "from '../application/use-cases/session/pause-session-decide-flow'",
   "from './application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
   "from '../application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
+  "from './application/use-cases/ritual/decide/pause-decide-outcome-view-flow'",
+  "from '../application/use-cases/ritual/decide/pause-decide-outcome-view-flow'",
   "from './application/use-cases/ritual/decide/impact-data'",
   "from '../application/use-cases/ritual/decide/impact-data'",
 ];
@@ -1118,6 +1132,7 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IMPACT_IMPORTS = [
   '@/features/pause/domain/decide/pause-impact-data',
   '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-view-flow',
   "from './pause-reflect-flows-io'",
   "from '../pause-reflect-flows-io'",
   "from './domain/decide/pause-impact-data",
@@ -1142,6 +1157,7 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_SCORE_IMPACTS_FLOW_IMPORTS = [
 const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_SUBCLUSTER_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-view-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-log-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow',
@@ -1150,6 +1166,8 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_SUBCLUSTER_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow'",
   "from './application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
   "from '../application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
+  "from './application/use-cases/ritual/decide/pause-decide-outcome-view-flow'",
+  "from '../application/use-cases/ritual/decide/pause-decide-outcome-view-flow'",
   "from './application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow'",
   "from '../application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow'",
   "from './application/use-cases/ritual/decide/pause-decide-outcome-log-flow'",
@@ -1303,6 +1321,7 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-view-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-log-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow',
@@ -2237,10 +2256,10 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
-  if (rel === 'src/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow.ts') {
+  if (rel === 'src/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-view-flow.ts') {
     for (const needle of LEGACY_PAUSE_DECIDE_APPLICATION_IMPACT_TYPE_IMPORTS) {
       if (text.includes(needle)) {
-        failures.push(`${rel}: reflect decide outcome view must import PauseImpactData via decide/impact-data (${needle})`);
+        failures.push(`${rel}: decide outcome view flow must import PauseImpactData via decide/impact-data (${needle})`);
       }
     }
   }
