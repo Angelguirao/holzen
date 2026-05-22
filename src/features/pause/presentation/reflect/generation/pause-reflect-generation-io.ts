@@ -28,6 +28,7 @@ export {
   reflectGenerationUserErrorMessage,
   resolveEffectiveReflectionCopy,
   resolveReflectGenerationPrefetch,
+  runReflectGeneration,
   shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
   type ReflectGenerationPrefetch,
