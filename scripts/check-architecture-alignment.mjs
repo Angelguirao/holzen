@@ -376,6 +376,13 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_RPC_FLAGS_IMPORTS = [
   "from '../domain/ritual/breathe/initial-breath-segment-rpc-flags'",
 ];
 
+/** Session breath presentation — import step navigation via breath-flow anchor only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_STEP_NAV_IMPORTS = [
+  '@/features/pause/domain/ritual/breathe/pause-breath-step-navigation',
+  "from './domain/ritual/breathe/pause-breath-step-navigation'",
+  "from '../domain/ritual/breathe/pause-breath-step-navigation'",
+];
+
 /** Deep session telemetry in presentation/session — use pending-offer flow anchor via telemetry-io. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_TELEMETRY_IMPORTS = [
   '@/features/pause/application/use-cases/session/pause-session-telemetry',
@@ -540,11 +547,17 @@ for (const file of walkTs(join(root, 'src'))) {
     }
     if (
       !rel.endsWith('pause-session-breath-io.ts') &&
-      !rel.endsWith('pause-session-breath-io.test.ts')
+      !rel.endsWith('pause-session-breath-io.test.ts') &&
+      !rel.endsWith('pause-session-breath-step-navigation-io.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_RPC_FLAGS_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy session breath rpc-flags import (${needle})`);
+        }
+      }
+      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_STEP_NAV_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy session breath step-navigation import (${needle})`);
         }
       }
     }
