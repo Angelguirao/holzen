@@ -39,6 +39,12 @@ import {
   PAUSE_SESSION_STEP_TRANSITION_DURATION_S,
   pauseStepSwipeDirection,
 } from '@/features/pause/presentation/session/pause-session-step-transition-io';
+import {
+  buildPauseSessionPersistSnapshot,
+  buildPauseSessionScaffoldRitualDerived,
+  computePauseStorageRitualSyncPatch,
+  hasPersistablePauseSessionAnchor,
+} from '@/features/pause/presentation/session/scaffold/pause-session-scaffold-io';
 
 describe('pause-session-step-handlers-io parity', () => {
   it('presentation I/O bundle builders match step-handlers CI umbrella', () => {
@@ -96,5 +102,20 @@ describe('pause-session-step-handlers-io parity', () => {
     expect(buildPauseSessionStepRitualBundle).not.toBe(PAUSE_SESSION_STEP_TRANSITION_DURATION_S);
     // Reciprocal inline pins: `pause-session-step-transition-io-parity.test.ts`.
     // Full pins: `pause-session-step-handlers-step-transition-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-scaffold-io-parity.test.ts` (step bundles vs persist/sync/derived).
+   * Dedicated sibling file: `pause-session-scaffold-step-handlers-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: scaffold-io exports stay distinct from step-handlers-io', () => {
+    expect(buildPauseSessionStepShellBundle).not.toBe(buildPauseSessionPersistSnapshot);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(computePauseStorageRitualSyncPatch);
+    expect(buildPauseSessionStepShellBundle).not.toBe(buildPauseSessionScaffoldRitualDerived);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(hasPersistablePauseSessionAnchor);
+    expect(buildPauseSessionStepShellBundle).not.toBe(hasPersistablePauseSessionAnchor);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(buildPauseSessionPersistSnapshot);
+    // Reciprocal inline pins: `pause-session-scaffold-io-parity.test.ts`.
+    // Full pins: `pause-session-scaffold-step-handlers-io-sibling-parity.test.ts`.
   });
 });

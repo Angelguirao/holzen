@@ -33,6 +33,10 @@ import {
 } from '@/features/pause/presentation/session/scaffold/pause-session-scaffold-io';
 import { pickPauseHolzenProvidersSlice } from '@/features/pause/presentation/session/pause-session-providers-io';
 import {
+  buildPauseSessionStepRitualBundle,
+  buildPauseSessionStepShellBundle,
+} from '@/features/pause/presentation/session/pause-session-step-handlers-io';
+import {
   isTerminalPauseDbState,
   persistedPauseSessionAllowsTerminalEntry,
   TERMINAL_PAUSE_DB_STATES,
@@ -115,5 +119,19 @@ describe('pause-session-scaffold-io parity', () => {
     expect(hasPersistablePauseSessionAnchor).not.toBe(TERMINAL_PAUSE_DB_STATES);
     // Reciprocal inline pins: `pause-session-terminal-entry-io-parity.test.ts`.
     // Full pins: `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-step-handlers-io-parity.test.ts` (scaffold persist vs step bundles).
+   * Dedicated sibling file: `pause-session-scaffold-step-handlers-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: step-handlers-io exports stay distinct from scaffold-io helpers', () => {
+    expect(buildPauseSessionPersistSnapshot).not.toBe(buildPauseSessionStepShellBundle);
+    expect(computePauseStorageRitualSyncPatch).not.toBe(buildPauseSessionStepRitualBundle);
+    expect(buildPauseSessionScaffoldRitualDerived).not.toBe(buildPauseSessionStepShellBundle);
+    expect(hasPersistablePauseSessionAnchor).not.toBe(buildPauseSessionStepRitualBundle);
+    expect(buildPersistFromScaffoldIo).not.toBe(buildPauseSessionStepShellBundle);
+    // Reciprocal inline pins: `pause-session-step-handlers-io-parity.test.ts`.
+    // Full pins: `pause-session-scaffold-step-handlers-io-sibling-parity.test.ts`.
   });
 });
