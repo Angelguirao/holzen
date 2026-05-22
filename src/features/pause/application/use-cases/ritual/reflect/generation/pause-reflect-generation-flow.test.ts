@@ -45,6 +45,11 @@ import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from '../ambience/pause-reflect-ambience-flow';
+import {
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+  runPauseOutcomeLog,
+} from '../flows/pause-reflect-flows-flow';
 
 import {
   buildManualPauseCreateOrReuseParams as buildCreateOrReuseFromFlow,
@@ -126,5 +131,13 @@ describe('pause-reflect-generation-flow', () => {
     expect(runReflectGeneration).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(openManualFromFlow).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(dismissFromFlow).not.toBe(stopPauseReflectFrameFocusAmbience);
+  });
+
+  it('sibling cluster: flows-flow exports stay distinct from generation umbrella exports', () => {
+    expect(runReflectGeneration).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(runReflectGeneration).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
+    expect(runReflectGeneration).not.toBe(runPauseOutcomeLog);
+    expect(openManualFromFlow).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(dismissFromFlow).not.toBe(runPauseOutcomeLog);
   });
 });

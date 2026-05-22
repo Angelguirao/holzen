@@ -46,6 +46,7 @@ import {
   resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromAndDecideViewFlow,
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromAndDecideViewFlow,
 } from './pause-reflect-and-decide-view-flow';
+import { runReflectGeneration } from '../generation/pause-reflect-generation-flow';
 
 import {
   buildPauseScoreImpacts as buildImpactsFromFlow,
@@ -108,5 +109,13 @@ describe('pause-reflect-flows-flow', () => {
     expect(resolveDisplayImpactsFromFlow).toBe(resolveDisplayImpactsFromScoreImpactsFlow);
     expect(resolveViewModeFromFlow).toBe(resolveViewModeFromScoreImpactsFlow);
     expect(motionDelayFromFlow).toBe(motionDelayFromScoreImpactsFlow);
+  });
+
+  it('sibling cluster: generation-flow exports stay distinct from flows umbrella exports', () => {
+    expect(resolvePreflightFromFlow).not.toBe(runReflectGeneration);
+    expect(resolveAfterGenFromFlow).not.toBe(runReflectGeneration);
+    expect(formatQuoteFromFlow).not.toBe(runReflectGeneration);
+    expect(resolveOutcomeFlowFromFlow).not.toBe(runReflectGeneration);
+    expect(runOutcomeLogFromFlow).not.toBe(runReflectGeneration);
   });
 });
