@@ -2565,13 +2565,20 @@ for (const file of walkTs(join(root, 'src'))) {
   }
   if (
     rel.endsWith('pause-reflect-hub-io.ts') ||
-    rel.endsWith('pause-reflect-hub-io.test.ts')
+    rel.endsWith('pause-reflect-hub-io.test.ts') ||
+    rel.endsWith('pause-reflect-hub-io.re-exports.test.ts') ||
+    rel.endsWith('pause-reflect-hub-io-parity.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_UMBRELLA_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: reflect hub I/O must not import hub umbrella (${needle})`,
-        );
+    if (
+      !rel.endsWith('pause-reflect-hub-io.re-exports.test.ts') &&
+      !rel.endsWith('pause-reflect-hub-io-parity.test.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_UMBRELLA_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: reflect hub I/O must not import hub umbrella (${needle})`,
+          );
+        }
       }
     }
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_IO_DONE_FLOW_IMPORTS) {
@@ -2600,7 +2607,8 @@ for (const file of walkTs(join(root, 'src'))) {
     if (
       !rel.endsWith('pause-reflect-hub-io.ts') &&
       !rel.endsWith('pause-reflect-hub-io.test.ts') &&
-      !rel.endsWith('pause-reflect-hub-io.re-exports.test.ts')
+      !rel.endsWith('pause-reflect-hub-io.re-exports.test.ts') &&
+      !rel.endsWith('pause-reflect-hub-io-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {
