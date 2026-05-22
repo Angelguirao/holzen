@@ -11,7 +11,8 @@
  * `pause-reflect-steps-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow`;
  * `pause-reflect-generation-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-generation-flow`;
  * `pause-reflect-share-orchestration-flow-sibling-parity.test.ts` ↔ `pause-reflect-share-orchestration-flow`;
- * `pause-reflect-share-ambience-flow-sibling-parity.test.ts` + `ambience/pause-reflect-ambience-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-ambience-flow`.
+ * `pause-reflect-share-ambience-flow-sibling-parity.test.ts` + `ambience/pause-reflect-ambience-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-ambience-flow`;
+ * `pause-reflect-share-mood-flow-sibling-parity.test.ts` ↔ `pause-reflect-mood-flow`.
  */
 export type { DeliverReflectionShareImageDeps } from './deliver-reflection-share-image';
 export { runReflectionShareImage } from './run-reflection-share-image';
