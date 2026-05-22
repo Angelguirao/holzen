@@ -88,6 +88,7 @@ import {
   resolvePauseSessionChromeCloseAction,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import * as hubIo from './pause-reflect-hub-io';
+import * as generationIo from '../generation/pause-reflect-generation-io';
 import * as moodIo from '../mood/pause-reflect-mood-io';
 import * as shareIo from '../share/pause-reflect-share-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
@@ -161,6 +162,23 @@ describe('pause-reflect-hub-io parity', () => {
     expect(buildLogBundleFromHubIo).not.toBe(runReflectGeneration);
     // Reciprocal inline pins: `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
     // Full pins: `pause-reflect-generation-hub-io-sibling-parity.test.ts`.
+  });
+
+  it('presentation hub-io and generation-io I/O namespaces stay separated (reciprocal inline)', () => {
+    expect('runReflectGeneration' in hubIo).toBe(false);
+    expect('pauseReflectGeneration' in hubIo).toBe(false);
+    expect('reflectGenerationPrerequisite' in hubIo).toBe(false);
+    expect('shouldCommitReflectGeneration' in hubIo).toBe(false);
+    expect('reflectGenerator' in hubIo).toBe(false);
+    expect('messageFromReflectGenerationResult' in hubIo).toBe(false);
+    expect('resolveReflectGenerationPrefetch' in hubIo).toBe(false);
+
+    expect('pauseShiftEmotionFrameHubDone' in generationIo).toBe(false);
+    expect('pauseShiftEmotionFrameHubDoneWithRepository' in generationIo).toBe(false);
+    expect('buildShiftEmotionFrameHubLogBundle' in generationIo).toBe(false);
+    expect('resolveShiftFrameHubDonePresentation' in generationIo).toBe(false);
+    expect('reflectPauseRepository' in generationIo).toBe(false);
+    // Reciprocal inline pins: `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
   });
 
   /**

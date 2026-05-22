@@ -47,6 +47,7 @@ import {
   shouldCommitReflectGeneration as shouldCommitFromGenerationIo,
 } from './pause-reflect-generation-io';
 import * as generationIo from './pause-reflect-generation-io';
+import * as hubIo from '../hub/pause-reflect-hub-io';
 
 import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
 import {
@@ -228,6 +229,21 @@ describe('pause-reflect-generation-io parity', () => {
     expect(pauseReflectGeneration).not.toBe(buildShiftEmotionFrameHubLogBundle);
     // Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts`.
     // Full pins: `pause-reflect-generation-hub-io-sibling-parity.test.ts`.
+  });
+
+  it('presentation generation-io and hub-io I/O namespaces stay separated (reciprocal inline)', () => {
+    expect('pauseShiftEmotionFrameHubDone' in generationIo).toBe(false);
+    expect('pauseShiftEmotionFrameHubDoneWithRepository' in generationIo).toBe(false);
+    expect('buildShiftEmotionFrameHubLogBundle' in generationIo).toBe(false);
+    expect('resolveShiftFrameHubDonePresentation' in generationIo).toBe(false);
+    expect('reflectPauseRepository' in generationIo).toBe(false);
+
+    expect('runReflectGeneration' in hubIo).toBe(false);
+    expect('pauseReflectGeneration' in hubIo).toBe(false);
+    expect('reflectGenerationPrerequisite' in hubIo).toBe(false);
+    expect('shouldCommitReflectGeneration' in hubIo).toBe(false);
+    expect('reflectGenerator' in hubIo).toBe(false);
+    // Reciprocal inline pins: `presentation/reflect/hub/pause-reflect-hub-io-parity.test.ts`.
   });
 
   /**
