@@ -33279,4 +33279,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — hub↔mood I/O namespace guards on colocated parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-io-parity</code> + <code>pause-reflect-mood-io-parity</code> (application + presentation)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no production moves. After hub↔mood reciprocal <code>.not.toBe</code> inline pins, add namespace <code>in hubIo</code> / <code>in moodIo</code> guards on all four colocated parity tests (parity with share-io <code>in shareIo</code> slice). Presentation <code>mood-io-parity</code> gains the hub reciprocal inline block that application already had.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comment cross-links only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-orchestrate-io-parity</code> persist/favorite reciprocal pins on orchestration-io, or Phase B Tier 1 lib shim scan (<code>@/lib/posthog</code> in pause application telemetry).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

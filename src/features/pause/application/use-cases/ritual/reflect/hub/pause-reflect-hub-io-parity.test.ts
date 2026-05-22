@@ -112,6 +112,8 @@ import {
   pauseInitialEmotionSkipWithRepository,
   resolvePauseSessionChromeCloseAction,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import * as hubIo from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import * as moodIo from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 describe('pause-reflect-hub-io parity (application)', () => {
@@ -267,6 +269,21 @@ describe('pause-reflect-hub-io parity (application)', () => {
     expect(reflectPauseRepository).not.toBe(pauseInitialEmotionSelect);
     // Reciprocal inline pins: `mood/pause-reflect-mood-io-parity.test.ts`.
     // Full pins: `pause-reflect-hub-mood-io-sibling-parity.test.ts`.
+  });
+
+  it('presentation hub-io and mood-io I/O namespaces stay separated (reciprocal inline)', () => {
+    expect('pauseInitialEmotionSelect' in hubIo).toBe(false);
+    expect('pauseInitialEmotionSkip' in hubIo).toBe(false);
+    expect('pauseInitialEmotionSelectWithRepository' in hubIo).toBe(false);
+    expect('pauseInitialEmotionSkipWithRepository' in hubIo).toBe(false);
+    expect('buildFeelTilesMoodLogOptions' in hubIo).toBe(false);
+    expect('resolvePauseSessionChromeCloseAction' in hubIo).toBe(false);
+
+    expect('pauseShiftEmotionFrameHubDone' in moodIo).toBe(false);
+    expect('pauseShiftEmotionFrameHubDoneWithRepository' in moodIo).toBe(false);
+    expect('buildShiftEmotionFrameHubLogBundle' in moodIo).toBe(false);
+    expect('resolveShiftFrameHubDonePresentation' in moodIo).toBe(false);
+    // Reciprocal inline pins: `mood/pause-reflect-mood-io-parity.test.ts` (application + presentation).
   });
 
   /**

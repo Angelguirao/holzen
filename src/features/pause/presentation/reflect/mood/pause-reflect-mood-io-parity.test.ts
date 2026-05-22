@@ -95,6 +95,14 @@ import {
   buildReflectionShareWhatsAppUrl,
   pauseReflectionShareImage,
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
+import {
+  buildShiftEmotionFrameHubLogBundle,
+  pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
+  resolveShiftFrameHubDonePresentation,
+} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import * as hubIo from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import * as moodIo from './pause-reflect-mood-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
@@ -134,6 +142,8 @@ import {
  * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts`.
  * Share-io sibling pins: `pause-reflect-share-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
+ * Hub-io sibling pins: `pause-reflect-hub-mood-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `presentation/reflect/hub/pause-reflect-hub-io-parity.test.ts` (hub cluster).
  */
 describe('pause-reflect-mood-io parity', () => {
   it('mood CI umbrella composes the same domain mood leaves as presentation I/O', () => {
@@ -233,6 +243,37 @@ describe('pause-reflect-mood-io parity', () => {
     );
 
     expect(runInitialEmotionSkip).toHaveBeenCalledWith(customRepository, input);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `presentation/reflect/hub/pause-reflect-hub-io-parity.test.ts` (initial-emotion vs shift-frame hub).
+   * Dedicated sibling file: `pause-reflect-hub-mood-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: hub-io shift-frame exports stay distinct from mood-io wrappers', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseInitialEmotionSkip).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(pauseInitialEmotionSkipWithRepository).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(buildFeelTilesFromMoodIo).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(resolveChromeCloseFromMoodIo).not.toBe(resolveShiftFrameHubDonePresentation);
+    expect(reflectPauseRepository).not.toBe(pauseShiftEmotionFrameHubDone);
+    // Reciprocal inline pins: `presentation/reflect/hub/pause-reflect-hub-io-parity.test.ts`.
+    // Full pins: `pause-reflect-hub-mood-io-sibling-parity.test.ts`.
+  });
+
+  it('presentation mood-io and hub-io I/O namespaces stay separated (reciprocal inline)', () => {
+    expect('pauseShiftEmotionFrameHubDone' in moodIo).toBe(false);
+    expect('pauseShiftEmotionFrameHubDoneWithRepository' in moodIo).toBe(false);
+    expect('buildShiftEmotionFrameHubLogBundle' in moodIo).toBe(false);
+    expect('resolveShiftFrameHubDonePresentation' in moodIo).toBe(false);
+
+    expect('pauseInitialEmotionSelect' in hubIo).toBe(false);
+    expect('pauseInitialEmotionSkip' in hubIo).toBe(false);
+    expect('pauseInitialEmotionSelectWithRepository' in hubIo).toBe(false);
+    expect('pauseInitialEmotionSkipWithRepository' in hubIo).toBe(false);
+    expect('buildFeelTilesMoodLogOptions' in hubIo).toBe(false);
+    expect('resolvePauseSessionChromeCloseAction' in hubIo).toBe(false);
+    // Reciprocal inline pins: `presentation/reflect/hub/pause-reflect-hub-io-parity.test.ts`.
   });
 
   /**
