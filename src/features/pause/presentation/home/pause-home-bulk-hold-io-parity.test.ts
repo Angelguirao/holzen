@@ -1,5 +1,6 @@
 /**
  * Presentation I/O parity (colocated beside `pause-home-bulk-hold-io.ts`).
+ * Application mirror: `application/use-cases/ritual/decide/pause-home-bulk-hold-io-parity.test.ts`.
  * Mocks `apply-bulk-hold-outcomes` leaf — production Home I/O keeps direct ritual/decide import.
  */
 import { describe, expect, it, vi } from 'vitest';
