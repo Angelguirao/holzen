@@ -2081,20 +2081,23 @@ for (const file of walkTs(join(root, 'src'))) {
   }
   if (
     rel.endsWith('pause-reflect-telemetry-io.ts') ||
-    rel.endsWith('pause-reflect-telemetry-io.test.ts')
+    rel.endsWith('pause-reflect-telemetry-io.test.ts') ||
+    rel.endsWith('pause-reflect-telemetry-io-parity.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IO_TELEMETRY_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: reflect telemetry I/O must import pause-reflect-session-ui-telemetry directly (${needle})`,
-        );
+    if (!rel.endsWith('pause-reflect-telemetry-io-parity.test.ts')) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IO_TELEMETRY_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: reflect telemetry I/O must import pause-reflect-session-ui-telemetry directly (${needle})`,
+          );
+        }
       }
-    }
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IO_SHARE_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: reflect telemetry I/O must not import share umbrella (${needle})`,
-        );
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IO_SHARE_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: reflect telemetry I/O must not import share umbrella (${needle})`,
+          );
+        }
       }
     }
   }

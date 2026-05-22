@@ -84,7 +84,7 @@ import {
  * Mood-io sibling pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (mood cluster).
  * Telemetry-io sibling pins: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `telemetry/pause-reflect-telemetry-io-parity.test.ts` (application + presentation).
+ * reciprocal inline pins ↔ `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
  * Steps-io cross-surface: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `steps/pause-reflect-steps-io-parity.test.ts` (application + presentation).
  * Pending-offer cross-surface: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` (application + presentation);
@@ -197,7 +197,7 @@ describe('pause-reflect-ambience-io parity (application)', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `telemetry/pause-reflect-telemetry-io-parity.test.ts` (application + presentation).
+   * Reciprocal inline pins ↔ `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: telemetry-io exports stay distinct from ambience-io frame-focus bed', () => {
@@ -205,7 +205,7 @@ describe('pause-reflect-ambience-io parity (application)', () => {
     expect(stopFromAmbienceIo).not.toBe(trackPauseReflectShareTap);
     expect(startFromAmbienceIo).not.toBe(trackPauseReflectWallpaperTap);
     expect(stopFromAmbienceIo).not.toBe(trackPauseReflectPostItOpen);
-    // Reciprocal inline pins: `telemetry/pause-reflect-telemetry-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
     // Full pins: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts`.
   });
 });

@@ -31514,6 +31514,7 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+<<<<<<< HEAD
       <span>Phase A — application generation-io parity colocated (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -31525,6 +31526,19 @@
       <dd>None — test-only; imports presentation generation I/O for sibling distinctness pins.</dd>
       <dt>Open questions</dt>
       <dd>Next: application <code>pause-reflect-flows-io-parity</code> beside flows-flow, or Phase B Tier 1 lib shim scan.</dd>
+=======
+      <span>Phase A — colocate reflect telemetry I/O parity beside presentation cluster (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-telemetry-io-parity.test.ts</code> → <code>presentation/reflect/telemetry/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete — no reflect moves. Merge application-layer telemetry I/O parity into the colocated presentation file (parity with session breath I/O parity colocation). Consolidated presentation I/O pins plus application <code>flows-flow</code>, <code>steps-flow</code>, <code>generation-flow</code>, <code>mood-flow</code>, and <code>share-flow</code> sibling-cluster guards in one test module beside <code>pause-reflect-telemetry-io.ts</code>. Allowlist parity test for telemetry-flow imports in <code>check:architecture-alignment</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test consolidation + CI allowlist only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate remaining companion application I/O parity under <code>presentation/companion/</code>, or Phase B Tier 1 lib shim scan.</dd>
+>>>>>>> d16d04732 (refactor(pause): colocate reflect telemetry I/O parity beside presentation cluster)
     </dl>
   </article>
 

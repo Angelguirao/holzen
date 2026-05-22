@@ -317,7 +317,7 @@ describe('pause-reflect-flows-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts` (reflect+decide vs session UI telemetry).
+   * Reciprocal inline pins ↔ `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts` (reflect+decide vs session UI telemetry).
    * Dedicated sibling file: `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: telemetry-io exports stay distinct from flows-io', () => {

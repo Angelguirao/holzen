@@ -1,3 +1,12 @@
+/**
+ * Presentation I/O parity (colocated beside `pause-reflect-telemetry-io.ts`).
+ * Imports `pause-reflect-telemetry-flow` CI umbrella for `.toBe` identity pins only — production telemetry I/O keeps `pause-reflect-session-ui-telemetry` leaf imports.
+ * Application flow-cluster sibling pins: `pause-reflect-flows-flow`, `pause-reflect-steps-flow`, `pause-reflect-generation-flow`, `pause-reflect-share-flow`.
+ * Mood-io sibling: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts` (application + presentation); reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts`.
+ * Ambience-io sibling: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (application + presentation); reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts`.
+ * Share-io sibling: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation); reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts`.
+ * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts`, `pause-reflect-steps-io-parity.test.ts`, `pause-reflect-generation-io-parity.test.ts`.
+ */
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
@@ -14,6 +23,8 @@ import {
   trackPauseReflectPostItOpen as trackPostItFromShareFlow,
   trackPauseReflectShareTap as trackShareTapFromShareFlow,
   trackPauseReflectWallpaperTap as trackWallpaperFromShareFlow,
+  buildReflectionShareText as buildShareTextFromShareFlow,
+  runReflectionShareImage as runShareImageFromShareFlow,
 } from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow';
 import {
   trackPauseReflectPostItOpen,
@@ -24,7 +35,22 @@ import {
   trackPauseReflectPostItOpen as trackPostItFromTelemetryIo,
   trackPauseReflectShareTap as trackShareTapFromTelemetryIo,
   trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryIo,
-} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+} from './pause-reflect-telemetry-io';
+import {
+  formatReinforcementQuoteFromSession as formatQuoteFromFlowsFlow,
+  resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
+  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
+import {
+  runPauseFavoriteToggle as runFavoriteFromStepsFlow,
+  runPauseReflectNoteUpdate as runNoteFromStepsFlow,
+  runPauseReflectTagUpdate as runTagFromStepsFlow,
+  runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow';
+import {
+  openManualPauseFromHome as openManualFromGenerationFlow,
+  runReflectGeneration as runReflectGenerationFromGenerationFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow';
 import {
   pauseReflectGeneration,
   reflectGenerator,
@@ -65,17 +91,13 @@ import {
   reflectPauseRepository,
   resolvePauseSessionChromeCloseAction,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import {
+  buildFeelTilesMoodLogOptions as buildFeelTilesFromMoodFlow,
+  resolvePauseSessionChromeCloseAction as resolveChromeCloseFromMoodFlow,
+  runInitialEmotionSelect as runInitialEmotionSelectFromMoodFlow,
+  runInitialEmotionSkip as runInitialEmotionSkipFromMoodFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow';
 
-/**
- * Presentation-layer telemetry I/O parity (colocated beside `pause-reflect-telemetry-io.ts`).
- * Application mirror: `application/.../ritual/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
- * Mood-io sibling: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (mood cluster).
- * Ambience-io sibling: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (ambience cluster).
- * Share-io sibling: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
- */
 describe('pause-reflect-telemetry-io parity', () => {
   it('presentation I/O session reflect telemetry matches telemetry CI umbrella', () => {
     expect(trackPauseReflectPostItOpen).toBe(trackPostItFromTelemetryIo);
@@ -102,7 +124,7 @@ describe('pause-reflect-telemetry-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (session UI telemetry vs reflect+decide).
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (session UI telemetry vs reflect+decide I/O).
    * Dedicated sibling file: `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: flows-io exports stay distinct from session reflect telemetry-io', () => {
@@ -119,6 +141,17 @@ describe('pause-reflect-telemetry-io parity', () => {
   });
 
   /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (application flows-flow CI anchor).
+   */
+  it('sibling cluster: flows-flow exports stay distinct from session reflect telemetry umbrella', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(runOutcomeLogFromFlowsFlow);
+    expect(trackPauseReflectShareTap).not.toBe(resolvePreflightFromFlowsFlow);
+    expect(trackPauseReflectWallpaperTap).not.toBe(formatQuoteFromFlowsFlow);
+    expect(trackPostItDirect).not.toBe(runOutcomeLogFromFlowsFlow);
+    // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts`.
+  });
+
+  /**
    * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (session UI telemetry vs step RPC wrappers).
    * Dedicated sibling file: `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` (application + presentation).
    */
@@ -132,7 +165,18 @@ describe('pause-reflect-telemetry-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (session UI telemetry vs holzen-reflect).
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (application steps-flow CI anchor).
+   */
+  it('sibling cluster: steps-flow exports stay distinct from session reflect telemetry umbrella', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(runFavoriteFromStepsFlow);
+    expect(trackPauseReflectShareTap).not.toBe(runNoteFromStepsFlow);
+    expect(trackPauseReflectWallpaperTap).not.toBe(runTagFromStepsFlow);
+    expect(trackPostItDirect).not.toBe(runReflectionStepFromStepsFlow);
+    // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (session UI telemetry vs holzen-reflect I/O).
    * Dedicated sibling file: `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: generation-io exports stay distinct from session reflect telemetry-io', () => {
@@ -144,7 +188,17 @@ describe('pause-reflect-telemetry-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts` (session UI telemetry vs share builders).
+   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (application generation-flow CI anchor).
+   */
+  it('sibling cluster: generation-flow exports stay distinct from session reflect telemetry umbrella', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(trackPauseReflectShareTap).not.toBe(openManualFromGenerationFlow);
+    expect(trackPauseReflectWallpaperTap).not.toBe(runReflectGenerationFromGenerationFlow);
+    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` (session UI telemetry vs share I/O).
    * Dedicated sibling file: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: share-io exports stay distinct from session reflect telemetry-io', () => {
@@ -154,7 +208,19 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackPostItFromTelemetryIo).not.toBe(buildReflectionShareTweetUrl);
     expect(trackShareTapFromTelemetryIo).not.toBe(buildReflectionShareWhatsAppUrl);
     expect(trackWallpaperFromTelemetryIo).not.toBe(pauseReflectionShareImage);
-    // Reciprocal inline pins: `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
+    // Reciprocal inline pins: `pause-reflect-share-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` (application share-flow CI anchor).
+   */
+  it('sibling cluster: share-flow exports stay distinct from session reflect telemetry umbrella', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(buildShareTextFromShareFlow);
+    expect(trackPauseReflectShareTap).not.toBe(runShareImageFromShareFlow);
+    expect(trackPauseReflectWallpaperTap).not.toBe(buildShareTextFromShareFlow);
+    expect(trackPostItDirect).not.toBe(runShareImageFromShareFlow);
+    // Reciprocal inline pins: `pause-reflect-share-io-parity.test.ts`.
+    // Full pins: `share/pause-reflect-share-telemetry-io-sibling-parity.test.ts`.
   });
 
   /**
@@ -174,8 +240,21 @@ describe('pause-reflect-telemetry-io parity', () => {
   });
 
   /**
+   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (application mood-flow CI anchor).
+   */
+  it('sibling cluster: mood-flow leaf exports stay distinct from session reflect telemetry umbrella', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(runInitialEmotionSelectFromMoodFlow);
+    expect(trackPauseReflectShareTap).not.toBe(runInitialEmotionSkipFromMoodFlow);
+    expect(trackPauseReflectWallpaperTap).not.toBe(buildFeelTilesFromMoodFlow);
+    expect(trackPostItDirect).not.toBe(resolveChromeCloseFromMoodFlow);
+    expect(trackShareTapDirect).not.toBe(runInitialEmotionSelectFromMoodFlow);
+    expect(trackWallpaperDirect).not.toBe(runInitialEmotionSkipFromMoodFlow);
+    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
+  });
+
+  /**
    * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (session reflect telemetry vs frame-focus bed).
-   * Dedicated sibling file: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (presentation).
+   * Dedicated sibling file: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: ambience-io exports stay distinct from session reflect telemetry-io', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(startPauseReflectFrameFocusAmbience);

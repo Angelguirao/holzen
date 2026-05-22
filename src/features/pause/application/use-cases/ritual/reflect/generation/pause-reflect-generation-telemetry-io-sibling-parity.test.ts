@@ -25,8 +25,7 @@ import * as generationIo from '@/features/pause/presentation/reflect/generation/
  * `pause-reflect-generation-telemetry-flow-sibling-parity.test.ts` and presentation
  * `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`).
  * Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts` ↔
- * `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts` ↔
- * `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts`.
+ * `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
  */
 describe('pause-reflect-generation-io ↔ pause-reflect-telemetry-io sibling parity (application)', () => {
   it('generation-io and session reflect telemetry-io are distinct presentation I/O surfaces', () => {
