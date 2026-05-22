@@ -33364,4 +33364,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate application pending-offer-telemetry-io parity under ritual/reflect/telemetry (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-telemetry-io-parity.test.ts</code> → <code>application/.../telemetry/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves remain complete — no use-case moves. Colocate application I/O parity beside <code>pause-reflect-telemetry-io-parity.test.ts</code> (parity with presentation colocation under <code>presentation/reflect/telemetry/</code>). Leaf trackers + <code>pause-pending-offer-telemetry-flow</code> CI anchor stay under <code>pending-offer/</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test file + comment cross-links only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: application shell-io reciprocal <code>computePauseHeaderBackIntent</code> pin on presentation shell-io parity, or companion orchestrate-io persist/favorite leaf pins.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
