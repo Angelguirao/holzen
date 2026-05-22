@@ -1,7 +1,9 @@
 /**
  * CI cluster anchor for ritual reflect share orchestration (§3 / check:architecture-alignment).
- * Composes domain share builders + `run-reflection-share-image` leaf module (not share subcluster flow anchors).
- * Presentation: `pause-reflect-share-io.ts` imports leaf modules directly.
+ * Composes domain share builders + `run-reflection-share-image` + `deliver-reflection-share-image` leaf modules
+ * (not share subcluster flow anchors).
+ * Presentation: `pause-reflect-share-io.ts` imports `run-reflection-share-image` directly (not this anchor).
+ * Parity pins: `pause-reflect-share-io-parity.test.ts` + `pause-reflect-share-io.re-exports.test.ts`.
  */
 export type {
   DeliverReflectionShareImageDeps,
