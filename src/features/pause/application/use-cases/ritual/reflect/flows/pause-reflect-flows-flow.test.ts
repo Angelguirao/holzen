@@ -68,6 +68,7 @@ import {
 import {
   trackPauseReflectPostItOpen as trackPostItFromTelemetryFlow,
   trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
+  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
 } from '../telemetry/pause-reflect-telemetry-flow';
 
 import {
@@ -173,8 +174,11 @@ describe('pause-reflect-flows-flow', () => {
   it('sibling cluster: telemetry-flow exports stay distinct from flows umbrella exports', () => {
     expect(resolvePreflightFromFlow).not.toBe(trackPostItFromTelemetryFlow);
     expect(resolveAfterGenFromFlow).not.toBe(trackShareTapFromTelemetryFlow);
-    expect(runOutcomeLogFromFlow).not.toBe(trackPostItFromTelemetryFlow);
-    expect(formatQuoteFromFlow).not.toBe(trackShareTapFromTelemetryFlow);
+    expect(runOutcomeLogFromFlow).not.toBe(trackWallpaperFromTelemetryFlow);
+    expect(formatQuoteFromFlow).not.toBe(trackPostItFromTelemetryFlow);
+    expect(resolveOutcomeFlowFromFlow).not.toBe(trackShareTapFromTelemetryFlow);
+    expect(buildImpactsFromFlow).not.toBe(trackWallpaperFromTelemetryFlow);
+    expect(showNotCompletedFromFlow).not.toBe(trackPostItFromTelemetryFlow);
   });
 
   it('flows CI umbrella re-exports runPauseOutcomeLog as ritual/decide leaf (not presentation port wrappers)', () => {
