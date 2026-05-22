@@ -1,4 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: {},
+}));
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
+}));
 
 import {
   initialDecisionFromRestored,
@@ -12,6 +20,10 @@ import type { PauseImpactData as PauseImpactDataFromDecideFlow } from '@/feature
 import type { PauseImpactData as PauseImpactDataFromDomain } from '@/features/pause/domain/decide/pause-impact-data';
 import type { PauseImpactData as PauseImpactDataFromDecideIo } from '@/features/pause/presentation/session/pause-session-decide-io';
 import * as pauseSessionDecideIo from '@/features/pause/presentation/session/pause-session-decide-io';
+import {
+  pauseReflectOutcomeLog,
+  resolvePauseSessionReflectAndDecidePreflight,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 
 /** Compile-time: presentation decide-io type peel matches flow + domain. */
 type AssertIoMatchesFlow = PauseImpactDataFromIo extends PauseImpactDataFromDecideFlow
@@ -42,5 +54,16 @@ describe('pause-session-decide-io parity', () => {
   it('decide-flow CI umbrella composes restored-decide ritual leaf modules', () => {
     expect(initialDecisionFromRestored).toBe(initialDecisionFromDecideFlow);
     expect(initialPhaseFromRestored).toBe(initialPhaseFromDecideFlow);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts` (restored decide vs reflect+decide I/O).
+   * Dedicated sibling file: `pause-reflect-flows-decide-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: flows-io reflect+decide exports stay distinct from decide-io type peel', () => {
+    expect(initialDecisionFromRestored).not.toBe(pauseReflectOutcomeLog);
+    expect(initialPhaseFromRestored).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(initialDecisionFromRestored).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    // Full pins: `pause-reflect-flows-decide-io-sibling-parity.test.ts`.
   });
 });

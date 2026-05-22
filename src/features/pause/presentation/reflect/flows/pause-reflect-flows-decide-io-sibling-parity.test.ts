@@ -26,8 +26,11 @@ import {
 
 /**
  * Presentation sibling parity: flows-io vs session decide-io (parity with application
- * `pause-reflect-flows-decide-flow-sibling-parity.test.ts` and
+ * `pause-reflect-flows-decide-flow-sibling-parity.test.ts`,
+ * `pause-reflect-flows-decide-io-sibling-parity.test.ts`, and
  * `pause-reflect-flows-mood-io-sibling-parity.test.ts`).
+ * Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts` ↔
+ * `pause-session-decide-io-parity.test.ts`.
  */
 describe('pause-reflect-flows-io ↔ pause-session-decide-io sibling parity', () => {
   it('flows-io and session decide-io are distinct presentation I/O surfaces', () => {

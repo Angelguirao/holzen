@@ -86,6 +86,10 @@ import {
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import {
+  initialDecisionFromRestored,
+  initialPhaseFromRestored,
+} from '@/features/pause/application/use-cases/session/pause-session-decide-flow';
 
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
@@ -186,6 +190,23 @@ describe('pause-reflect-flows-io parity', () => {
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectTagUpdate);
     // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-steps-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-decide-io-parity.test.ts` (reflect+decide vs restored decide hydration).
+   * Dedicated sibling file: `pause-reflect-flows-decide-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: session decide-io hydration stays distinct from flows-io', () => {
+    expect(pauseReflectOutcomeLog).not.toBe(initialDecisionFromRestored);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(initialPhaseFromRestored);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(initialDecisionFromRestored);
+    expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(initialPhaseFromRestored);
+    expect(formatReinforcementQuoteFromSession).not.toBe(initialDecisionFromRestored);
+    expect(resolvePauseDecideOutcomeFlow).not.toBe(initialPhaseFromRestored);
+    expect(buildPauseScoreImpacts).not.toBe(initialDecisionFromRestored);
+    expect(getSessionQuote).not.toBe(initialPhaseFromRestored);
+    // Reciprocal inline pins: `pause-session-decide-io-parity.test.ts`.
+    // Full pins: `pause-reflect-flows-decide-io-sibling-parity.test.ts`.
   });
 
   /**
