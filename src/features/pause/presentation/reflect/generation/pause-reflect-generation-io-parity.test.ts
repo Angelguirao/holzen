@@ -231,7 +231,7 @@ describe('pause-reflect-generation-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (holzen-reflect vs session UI telemetry).
+   * Reciprocal inline pins ↔ `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts` (holzen-reflect vs session UI telemetry).
    * Dedicated sibling file: `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: session reflect telemetry-io exports stay distinct from generation-io', () => {
@@ -241,7 +241,7 @@ describe('pause-reflect-generation-io parity', () => {
     expect(reflectGenerator).not.toBe(trackPauseReflectPostItOpen);
     expect(runReflectGeneration).not.toBe(trackPauseReflectShareTap);
     expect(reflectGenerationPrerequisite).not.toBe(trackPauseReflectWallpaperTap);
-    // Reciprocal inline pins: `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
   });
 
   /**
