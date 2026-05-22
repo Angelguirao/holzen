@@ -12,16 +12,14 @@ export {
   DEEP_PAUSE_STEP_AFTER_SECOND_BREATH,
   shouldResetBriefIntegrateAdvanceGuard,
 } from './pause-session-breath-step-navigation-io';
-export { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow';
-export {
-  initialBreathingFirstCompletedFromRestored,
-  initialBreathingSecondCompletedFromRestored,
-} from '@/features/pause/domain/ritual/breathe/restored-breath-ritual-state';
 export {
   computeBreathingPhaseAdvance,
+  initialBreathSegmentRpcLoggedFlagsFromRestored,
+  initialBreathingFirstCompletedFromRestored,
+  initialBreathingSecondCompletedFromRestored,
   resolveBreathingCompleted,
   resolveBreathingPhaseAdvanceOutcome,
-} from '@/features/pause/domain/ritual/breathe/phase-advance';
+} from '@/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow';
 export type { PauseBreathingPhase } from '@/features/pause/domain/ritual/breathe/pause-breathing-phase';
 export {
   playPauseBreathPatternCompleteCue,

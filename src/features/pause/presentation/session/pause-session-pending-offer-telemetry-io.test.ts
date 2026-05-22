@@ -11,15 +11,27 @@ const trackPauseSessionAbandonedMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
   '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow',
-  () => ({
-    trackPausePendingAdopted: trackPausePendingAdoptedMock,
-    trackPausePendingDeclined: trackPausePendingDeclinedMock,
-  }),
+  async (importOriginal) => {
+    const actual = await importOriginal<
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow')
+    >();
+    return {
+      ...actual,
+      trackPausePendingAdopted: trackPausePendingAdoptedMock,
+      trackPausePendingDeclined: trackPausePendingDeclinedMock,
+    };
+  },
 );
 
-vi.mock('@/features/pause/application/use-cases/session/pause-session-telemetry', () => ({
-  trackPauseSessionAbandoned: trackPauseSessionAbandonedMock,
-}));
+vi.mock('@/features/pause/application/use-cases/session/pause-session-telemetry', async (importOriginal) => {
+  const actual = await importOriginal<
+    typeof import('@/features/pause/application/use-cases/session/pause-session-telemetry')
+  >();
+  return {
+    ...actual,
+    trackPauseSessionAbandoned: trackPauseSessionAbandonedMock,
+  };
+});
 
 describe('pause-session-pending-offer-telemetry-io', () => {
   it('re-exports adopt/decline from pause-pending-offer-telemetry-flow and abandoned from session telemetry', () => {
