@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — pending-offer telemetry I/O ↔ telemetry-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-telemetry-io.re-exports.test.ts</code> pending-offer telemetry-flow parity</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-pending-offer-telemetry-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> identity against <code>pause-pending-offer-telemetry-flow</code> (parity with <code>pause-reflect-telemetry-io</code> ↔ <code>pause-reflect-telemetry-flow</code>). Presentation I/O still imports leaf tracker modules directly per CI rule.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: <code>pause-home-reflect-io</code> ↔ <code>pause-reflect-generation-manual-open-flow</code> presentation parity, <code>pause-reflect-generation-io</code> ↔ generation-flow umbrella parity, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — Home reflect telemetry I/O ↔ manual-open telemetry-flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
