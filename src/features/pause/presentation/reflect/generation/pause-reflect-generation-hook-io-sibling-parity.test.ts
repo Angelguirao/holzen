@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
   supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
