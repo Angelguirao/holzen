@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel pause-companion-orchestration-io to ritual/frame leaf modules (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestration-io</code> imports session load, favorites, expansion, UI completion directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Route <code>pause-companion-orchestration-io</code> through <code>load-companion-orchestrate-session</code>, <code>run-toggle-companion-library-favorite</code>, <code>next-expanded-with-lazy-fetch</code>, and UI-completion siblings instead of orchestration subcluster flow anchors (follows <code>pause-companion-orchestrate-io</code> peel on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Orchestration <code>*-flow</code> anchors remain for cluster detection; <code>companionOrchestrator</code> still exported from orchestration-io for orchestrate-io re-export.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-companion-frame-ui-io</code> or <code>pause-companion-analytics-io</code> off subcluster flow anchors.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-reflect-flows-io score impacts off decide flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-decide-score-impacts-flow.ts</code> remains for <code>check:architecture-alignment</code> decide cluster detection and flows umbrella composition.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>pause-companion-orchestration-io</code> off ritual/frame subcluster flow anchors, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Superseded by orchestration-io peel — next: frame-ui-io or Phase B Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -90,7 +109,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-companion-orchestrate-flow.ts</code> and orchestrate <code>*-flow</code> anchors remain for cluster detection; <code>companionOrchestrator</code> still re-exported from <code>pause-companion-orchestration-io</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>pause-companion-orchestration-io</code> or <code>pause-companion-frame-ui-io</code> off subcluster flow anchors, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Superseded by orchestration-io peel — next: frame-ui-io or analytics-io, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 

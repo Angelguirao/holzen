@@ -1043,6 +1043,22 @@ const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_IO_UMBRELLA_FLOW_IMPORTS
   "from '../application/use-cases/ritual/frame/pause-companion-orchestration-flow'",
 ];
 
+/** Companion orchestration I/O — import ritual/frame leaf modules directly (not orchestration subcluster flow anchors). */
+const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_IO_SUBCLUSTER_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-session-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-library-favorite-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-section-expansion-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-ui-completion-flow',
+  "from './application/use-cases/ritual/frame/pause-companion-orchestrate-session-flow'",
+  "from '../application/use-cases/ritual/frame/pause-companion-orchestrate-session-flow'",
+  "from './application/use-cases/ritual/frame/pause-companion-library-favorite-flow'",
+  "from '../application/use-cases/ritual/frame/pause-companion-library-favorite-flow'",
+  "from './application/use-cases/ritual/frame/pause-companion-section-expansion-flow'",
+  "from '../application/use-cases/ritual/frame/pause-companion-section-expansion-flow'",
+  "from './application/use-cases/ritual/frame/pause-companion-ui-completion-flow'",
+  "from '../application/use-cases/ritual/frame/pause-companion-ui-completion-flow'",
+];
+
 /** Companion orchestrate I/O — import via orchestrate subcluster flows only (not pause-companion-orchestrate-flow umbrella). */
 const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATE_IO_UMBRELLA_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow',
@@ -2368,7 +2384,14 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_IO_UMBRELLA_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: companion orchestration I/O must import via orchestration subcluster flows (${needle})`,
+          `${rel}: companion orchestration I/O must not import orchestration umbrella (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_IO_SUBCLUSTER_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: companion orchestration I/O must import ritual/frame leaf modules directly (${needle})`,
         );
       }
     }

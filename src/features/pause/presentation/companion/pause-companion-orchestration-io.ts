@@ -1,20 +1,17 @@
 /**
  * Companion orchestration presentation I/O (session load, UI completion, favorites, expansion).
- * Imports ritual/frame use cases via orchestration subcluster flow anchors
- * (parity with `pause-reflect-steps-io` / `pause-reflect-flows-io` peels).
+ * Imports ritual/frame leaf modules directly (parity with `pause-companion-orchestrate-io` peel).
  */
+import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 import {
   loadCompanionOrchestrateSession,
   type LoadCompanionOrchestrateSessionInput,
   type LoadCompanionOrchestrateSessionPorts,
-} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-session-flow';
-import { runToggleCompanionLibraryFavorite } from '@/features/pause/application/use-cases/ritual/frame/pause-companion-library-favorite-flow';
-import { nextExpandedWithLazyFetch } from '@/features/pause/application/use-cases/ritual/frame/pause-companion-section-expansion-flow';
-import {
-  invalidateCompanionUiCompletionQuery,
-  persistCompanionUiStepCompletion,
-  type CompanionUiCompletionStep,
-} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-ui-completion-flow';
+} from '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session';
+import type { CompanionUiCompletionStep } from '@/features/pause/application/use-cases/ritual/frame/companion-ui-completion-types';
+import { nextExpandedWithLazyFetch } from '@/features/pause/application/use-cases/ritual/frame/next-expanded-with-lazy-fetch';
+import { persistCompanionUiStepCompletion } from '@/features/pause/application/use-cases/ritual/frame/persist-ui-step-completion';
+import { runToggleCompanionLibraryFavorite } from '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite';
 import { loadMoodHistoryForOrchestrate } from '@/features/pause/public-queries';
 import {
   supabaseCompanionOrchestrator,

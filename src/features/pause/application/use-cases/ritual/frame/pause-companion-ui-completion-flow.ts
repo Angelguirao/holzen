@@ -1,6 +1,6 @@
 /**
  * CI cluster anchor for companion reflect-strip UI step completion (§3).
- * Presentation: `pause-companion-orchestration-io.ts` imports through this anchor.
+ * Presentation: `pause-companion-orchestration-io.ts` imports persist + query-key modules directly.
  */
 export { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 export type { CompanionUiCompletionStep } from './companion-ui-completion-types';

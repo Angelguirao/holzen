@@ -1,6 +1,6 @@
 /**
  * CI cluster anchor for companion orchestrate session load (§3).
- * Presentation: `pause-companion-orchestration-io.ts` imports through this anchor.
+ * Presentation: `pause-companion-orchestration-io.ts` imports `load-companion-orchestrate-session` directly.
  */
 export {
   loadCompanionOrchestrateSession,

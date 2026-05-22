@@ -11,10 +11,10 @@ const {
 }));
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-session-flow',
+  '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session',
   async (importOriginal) => {
     const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-session-flow')
+      typeof import('@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session')
     >();
     return {
       ...actual,
@@ -24,10 +24,10 @@ vi.mock(
 );
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/pause-companion-library-favorite-flow',
+  '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite',
   async (importOriginal) => {
     const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/frame/pause-companion-library-favorite-flow')
+      typeof import('@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite')
     >();
     return {
       ...actual,
@@ -67,7 +67,7 @@ describe('pause-companion-orchestration-io', () => {
     );
   });
 
-  it('re-exports nextExpandedWithLazyFetch from section-expansion flow anchor', () => {
+  it('re-exports nextExpandedWithLazyFetch from leaf expansion helper', () => {
     const fetch = vi.fn();
     expect(
       nextExpandedWithLazyFetch(false, {
