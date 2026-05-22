@@ -16,11 +16,6 @@ import { reflectGenerationPrerequisite } from '@/features/pause/domain/reflect/g
 import { reflectGenerationUserErrorMessage } from '@/features/pause/domain/reflect/generation/reflect-generation-errors';
 import { resolveEffectiveReflectionCopy } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
 
-import { dismissOpenPauseHome } from './manual-open/dismiss-open-pause-home';
-import { openManualPauseFromHome } from './manual-open/open-manual-pause-from-home';
-import { runOpenManualPauseSilentModeAfterCreate } from './manual-open/run-open-manual-pause-silent-mode-after-create';
-import { runPersistSilentReflectionStub } from './manual-open/run-persist-silent-reflection-stub';
-import { runReflectGeneration as runReflectGenerationDirect } from './holzen-reflect/run-reflect-generation';
 import {
   messageFromReflectGenerationResult as messageFromResultFromHookFlow,
   reflectGenerationPrerequisite as prerequisiteFromHookFlow,
@@ -31,6 +26,21 @@ import {
   shouldClearReflectGenerationLoading as shouldClearLoadingFromHookFlow,
   shouldCommitReflectGeneration as shouldCommitFromHookFlow,
 } from './holzen-reflect/pause-reflect-generation-hook-flow';
+import {
+  buildManualPauseCreateOrReuseParams as buildCreateOrReuseFromManualOpenFlow,
+  buildManualPauseMarketContext as buildMarketContextFromManualOpenFlow,
+  buildManualPauseOpenParams as buildOpenParamsFromManualOpenFlow,
+  dismissOpenPauseHome as dismissFromManualOpenFlow,
+  MANUAL_PAUSE_VOLATILITY_TEMPLATE as volatilityTemplateFromManualOpenFlow,
+  openManualPauseFromHome as openManualFromManualOpenFlow,
+  runOpenManualPauseSilentModeAfterCreate as runSilentModeFromManualOpenFlow,
+  runPersistSilentReflectionStub as runPersistStubFromManualOpenFlow,
+} from './manual-open/pause-reflect-generation-manual-open-flow';
+import { dismissOpenPauseHome } from './manual-open/dismiss-open-pause-home';
+import { openManualPauseFromHome } from './manual-open/open-manual-pause-from-home';
+import { runOpenManualPauseSilentModeAfterCreate } from './manual-open/run-open-manual-pause-silent-mode-after-create';
+import { runPersistSilentReflectionStub } from './manual-open/run-persist-silent-reflection-stub';
+import { runReflectGeneration as runReflectGenerationDirect } from './holzen-reflect/run-reflect-generation';
 
 import {
   buildManualPauseCreateOrReuseParams as buildCreateOrReuseFromFlow,
@@ -87,7 +97,7 @@ describe('pause-reflect-generation-flow', () => {
     expect(runPersistStubFromFlow).toBe(runPersistSilentReflectionStub);
   });
 
-  it('umbrella bindings match holzen-reflect hook-flow subcluster CI anchor (leaf parity)', () => {
+  it('umbrella bindings match generation subcluster CI anchors (leaf parity)', () => {
     expect(resolvePrefetchFromFlow).toBe(resolvePrefetchFromHookFlow);
     expect(shouldClearLoadingFromFlow).toBe(shouldClearLoadingFromHookFlow);
     expect(shouldCommitFromFlow).toBe(shouldCommitFromHookFlow);
@@ -96,5 +106,14 @@ describe('pause-reflect-generation-flow', () => {
     expect(userErrorFromFlow).toBe(userErrorFromHookFlow);
     expect(resolveCopyFromFlow).toBe(resolveCopyFromHookFlow);
     expect(runReflectGeneration).toBe(runReflectGenerationFromHookFlow);
+
+    expect(buildCreateOrReuseFromFlow).toBe(buildCreateOrReuseFromManualOpenFlow);
+    expect(buildOpenParamsFromFlow).toBe(buildOpenParamsFromManualOpenFlow);
+    expect(buildMarketContextFromFlow).toBe(buildMarketContextFromManualOpenFlow);
+    expect(volatilityTemplateFromFlow).toBe(volatilityTemplateFromManualOpenFlow);
+    expect(openManualFromFlow).toBe(openManualFromManualOpenFlow);
+    expect(dismissFromFlow).toBe(dismissFromManualOpenFlow);
+    expect(runSilentModeFromFlow).toBe(runSilentModeFromManualOpenFlow);
+    expect(runPersistStubFromFlow).toBe(runPersistStubFromManualOpenFlow);
   });
 });
