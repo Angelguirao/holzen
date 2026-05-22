@@ -1,7 +1,7 @@
 /**
  * Holzen-reflect generation presentation I/O (bound ReflectGenerator port).
  * Imports domain hook helpers and `run-reflect-generation` via
- * `pause-reflect-generation-hook-flow` CI anchor (parity with mood/hub/share I/O).
+ * `pause-reflect-generation-flow` CI anchor (parity with mood/hub/steps I/O).
  */
 import {
   messageFromReflectGenerationResult,
@@ -14,7 +14,7 @@ import {
   shouldCommitReflectGeneration,
   type ReflectGenerationPrefetch,
   type RunReflectGenerationInput,
-} from '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/pause-reflect-generation-hook-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
 

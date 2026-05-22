@@ -8,10 +8,10 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-reflect-generation-manual-open-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow',
   async (importOriginal) => {
     const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/pause-reflect-generation-manual-open-flow')
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow')
     >();
     return {
       ...actual,
