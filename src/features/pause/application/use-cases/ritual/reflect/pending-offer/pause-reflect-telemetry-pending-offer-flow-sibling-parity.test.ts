@@ -4,15 +4,20 @@ import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
-} from './pause-reflect-telemetry-flow';
+} from '../telemetry/pause-reflect-telemetry-flow';
 import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
-} from '../pending-offer/pause-pending-offer-telemetry-flow';
-import * as sessionReflectTelemetryFlow from './pause-reflect-telemetry-flow';
-import * as pendingOfferTelemetryFlow from '../pending-offer/pause-pending-offer-telemetry-flow';
+} from './pause-pending-offer-telemetry-flow';
+import * as sessionReflectTelemetryFlow from '../telemetry/pause-reflect-telemetry-flow';
+import * as pendingOfferTelemetryFlow from './pause-pending-offer-telemetry-flow';
 
+/**
+ * Application sibling parity: session reflect telemetry-flow vs pending-offer telemetry-flow
+ * (colocated under pending-offer/; parity with presentation
+ * `pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts`).
+ */
 describe('pause-reflect-telemetry-flow ↔ pause-pending-offer-telemetry-flow sibling parity', () => {
   it('session reflect telemetry-flow and pending-offer telemetry-flow are distinct sibling CI anchors', () => {
     expect(typeof trackPauseReflectPostItOpen).toBe('function');
