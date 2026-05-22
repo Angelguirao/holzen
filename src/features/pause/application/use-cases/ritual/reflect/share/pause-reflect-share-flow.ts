@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for ritual reflect share presentation I/O (§3 / check:architecture-alignment).
- * Re-exports domain share builders and PNG orchestration for application-layer imports.
- * Presentation: `pause-reflect-share-io.ts` imports through this anchor (off deep domain and run-* paths).
+ * Composes share orchestration + session reflect UI PostHog subclusters.
+ * Presentation: `pause-reflect-share-io.ts` and `pause-reflect-telemetry-io.ts` import through this anchor.
  */
 export type { DeliverReflectionShareImageDeps } from './deliver-reflection-share-image';
 export { runReflectionShareImage } from './run-reflection-share-image';
@@ -11,3 +11,9 @@ export {
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
 } from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';
+export {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+  type PauseReflectTelemetrySurface,
+} from './pause-reflect-telemetry-flow';

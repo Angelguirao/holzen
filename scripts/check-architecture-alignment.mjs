@@ -613,6 +613,23 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS = [
   "from '../application/use-cases/ritual/decide/run-pause-outcome-log'",
 ];
 
+/** Reflect share presentation — import session UI telemetry via pause-reflect-share-flow only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-session-ui-telemetry',
+  "from './application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow'",
+  "from '../application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow'",
+  "from './application/use-cases/ritual/reflect/share/pause-reflect-session-ui-telemetry'",
+  "from '../application/use-cases/ritual/reflect/share/pause-reflect-session-ui-telemetry'",
+];
+
+/** Reflect share umbrella flow — compose telemetry subcluster only (no deep session-ui tracker). */
+const LEGACY_PAUSE_REFLECT_SHARE_FLOW_TELEMETRY_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-session-ui-telemetry',
+  "from './pause-reflect-session-ui-telemetry'",
+  "from '../pause-reflect-session-ui-telemetry'",
+];
+
 /** Reflect hub presentation — import domain hub helpers via pause-reflect-hub-flow only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/hub/',
@@ -907,6 +924,13 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
+  if (rel === 'src/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow.ts') {
+    for (const needle of LEGACY_PAUSE_REFLECT_SHARE_FLOW_TELEMETRY_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect share umbrella flow must compose telemetry subcluster (${needle})`);
+      }
+    }
+  }
   if (rel === 'src/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow.ts') {
     for (const needle of LEGACY_PAUSE_REFLECT_HUB_FLOW_DOMAIN_IMPORTS) {
       if (text.includes(needle)) {
@@ -984,6 +1008,13 @@ for (const file of walkTs(join(root, 'src'))) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy reflect steps import (${needle})`);
         }
+      }
+    }
+  }
+  if (rel.startsWith('src/features/pause/presentation/reflect/share/')) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy reflect share telemetry import (${needle})`);
       }
     }
   }
