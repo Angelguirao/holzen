@@ -1242,6 +1242,13 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_SUBCLUSTER_IMPOR
   "from '../application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow'",
 ];
 
+/** Pending-offer telemetry I/O — import leaf trackers only (not pause-pending-offer-telemetry-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_IO_TELEMETRY_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow',
+  "from './application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow'",
+  "from '../application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow'",
+];
+
 /** Reflect pending-offer presentation — import adopt/decline via pause-reflect-pending-offer-flow only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_RPC_SUBCLUSTER_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-rpc-flow',
@@ -2197,10 +2204,17 @@ for (const file of walkTs(join(root, 'src'))) {
       rel.endsWith('pause-reflect-pending-offer-telemetry-io.ts') ||
       rel.endsWith('pause-reflect-pending-offer-telemetry-io.test.ts')
     ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_IO_TELEMETRY_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: pending-offer telemetry I/O must import pending-offer telemetry leaf modules directly (${needle})`,
+          );
+        }
+      }
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_UMBRELLA_FLOW_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(
-            `${rel}: pending-offer telemetry I/O must import via pending-offer telemetry subcluster (${needle})`,
+            `${rel}: pending-offer telemetry I/O must not import pending-offer umbrella (${needle})`,
           );
         }
       }
