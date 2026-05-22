@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { buildShiftEmotionFrameHubLogBundle } from './pause-reflect-hub-flow';
+import { buildShiftEmotionFrameHubLogBundle } from './pause-shift-emotion-log-flow';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { runShiftEmotionFrameHubDone } from './run-shift-emotion-frame-hub-done';
 
