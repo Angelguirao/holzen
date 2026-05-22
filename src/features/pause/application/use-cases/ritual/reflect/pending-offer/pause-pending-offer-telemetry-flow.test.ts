@@ -4,7 +4,7 @@ import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
-} from './pause-reflect-telemetry-flow';
+} from '../telemetry/pause-reflect-telemetry-flow';
 import {
   trackPausePendingAdopted as trackAdoptedDirect,
   trackPausePendingDeclined as trackDeclinedDirect,

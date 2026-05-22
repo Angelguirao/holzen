@@ -13,8 +13,8 @@ import {
   trackPausePendingAdopted as trackAdoptedFromTelemetryFlow,
   trackPausePendingDeclined as trackDeclinedFromTelemetryFlow,
   trackPauseSessionAbandoned as trackAbandonedFromTelemetryFlow,
-} from '../telemetry/pause-pending-offer-telemetry-flow';
-import * as pendingOfferTelemetryFlow from '../telemetry/pause-pending-offer-telemetry-flow';
+} from './pause-pending-offer-telemetry-flow';
+import * as pendingOfferTelemetryFlow from './pause-pending-offer-telemetry-flow';
 
 /**
  * Application sibling parity: presentation umbrella vs PostHog-only subcluster anchor.

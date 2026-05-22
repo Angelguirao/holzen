@@ -4,8 +4,8 @@ import { getPendingPauseOfferDisplay } from './pending-pause-offer-display';
 import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
-} from '../telemetry/pending-pause-offer-telemetry';
-import { trackPauseSessionAbandoned } from '../telemetry/pause-session-abandoned-telemetry';
+} from './pending-pause-offer-telemetry';
+import { trackPauseSessionAbandoned } from './pause-session-abandoned-telemetry';
 import { getPendingPauseOfferDisplay as getDisplayFromDisplayFlow } from './pause-pending-offer-display-flow';
 import {
   runAdoptPendingPauseOffer as runAdoptFromRpcSubcluster,
@@ -15,7 +15,7 @@ import {
   trackPausePendingAdopted as trackAdoptedFromTelemetryFlow,
   trackPausePendingDeclined as trackDeclinedFromTelemetryFlow,
   trackPauseSessionAbandoned as trackAbandonedFromTelemetryFlow,
-} from '../telemetry/pause-pending-offer-telemetry-flow';
+} from './pause-pending-offer-telemetry-flow';
 import {
   getPendingPauseOfferDisplay as getDisplayFromFlow,
   runAdoptPendingPauseOffer,

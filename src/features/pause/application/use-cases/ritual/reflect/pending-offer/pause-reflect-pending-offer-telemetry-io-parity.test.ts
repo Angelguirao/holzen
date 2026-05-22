@@ -7,13 +7,13 @@ vi.mock('@/features/pause/public-rpc', () => ({
 import {
   trackPausePendingAdopted as trackAdoptedDirect,
   trackPausePendingDeclined as trackDeclinedDirect,
-} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pending-pause-offer-telemetry';
-import { trackPauseSessionAbandoned as trackAbandonedDirect } from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-session-abandoned-telemetry';
+} from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-telemetry';
+import { trackPauseSessionAbandoned as trackAbandonedDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-session-abandoned-telemetry';
 import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
-} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-pending-offer-telemetry-flow';
 import {
   pauseAdoptPendingOffer,
   pauseDeclinePendingOffer,
@@ -62,6 +62,6 @@ describe('pause-reflect-pending-offer-telemetry-io parity', () => {
     expect(trackDeclinedFromPendingOfferTelemetryIo).not.toBe(getPendingPauseOfferDisplay);
     expect(trackAbandonedFromPendingOfferTelemetryIo).not.toBe(reflectPauseRepository);
     // Reciprocal inline pins: `pause-reflect-pending-offer-telemetry-io.test.ts`;
-    // dedicated sibling: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
+    // dedicated sibling: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` (application + presentation).
   });
 });

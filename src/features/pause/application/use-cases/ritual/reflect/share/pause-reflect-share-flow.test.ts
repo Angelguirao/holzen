@@ -50,7 +50,7 @@ import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
-} from '../telemetry/pause-pending-offer-telemetry-flow';
+} from '../pending-offer/pause-pending-offer-telemetry-flow';
 import {
   runAdoptPendingPauseOffer,
   runDeclinePendingPauseOffer,

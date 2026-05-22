@@ -9,9 +9,9 @@ import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
-} from './pause-pending-offer-telemetry-flow';
+} from '../pending-offer/pause-pending-offer-telemetry-flow';
 import * as sessionReflectTelemetryFlow from './pause-reflect-telemetry-flow';
-import * as pendingOfferTelemetryFlow from './pause-pending-offer-telemetry-flow';
+import * as pendingOfferTelemetryFlow from '../pending-offer/pause-pending-offer-telemetry-flow';
 
 describe('pause-reflect-telemetry-flow ↔ pause-pending-offer-telemetry-flow sibling parity', () => {
   it('session reflect telemetry-flow and pending-offer telemetry-flow are distinct sibling CI anchors', () => {

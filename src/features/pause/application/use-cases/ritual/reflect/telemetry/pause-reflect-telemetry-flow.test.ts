@@ -10,7 +10,7 @@ import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
-} from './pause-pending-offer-telemetry-flow';
+} from '../pending-offer/pause-pending-offer-telemetry-flow';
 import {
   trackPauseReflectPostItOpen as trackPostItFromShareFlow,
   trackPauseReflectShareTap as trackShareTapFromShareFlow,
