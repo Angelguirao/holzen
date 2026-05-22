@@ -25,7 +25,10 @@ import {
 
 /**
  * Presentation sibling parity: mood-io vs pending-offer-io (parity with application
- * `pause-reflect-mood-pending-offer-flow-sibling-parity.test.ts`).
+ * `pause-reflect-mood-pending-offer-flow-sibling-parity.test.ts` and
+ * `application/.../mood/pause-reflect-mood-pending-offer-io-sibling-parity.test.ts`;
+ * reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts` ↔
+ * `pause-reflect-pending-offer-io-parity.test.ts`).
  */
 describe('pause-reflect-mood-io ↔ pause-reflect-pending-offer-io sibling parity', () => {
   it('mood-io and pending-offer-io are distinct presentation I/O surfaces', () => {
