@@ -4,7 +4,6 @@ import {
   buildPauseSessionStepRitualBundle,
   buildPauseSessionStepShellBundle,
 } from './pause-session-step-handlers-flow';
-import * as handlersFlow from './pause-session-step-handlers-flow';
 import {
   runPauseFavoriteToggle,
   runPauseReflectNoteUpdate,
@@ -13,16 +12,19 @@ import {
   shouldLogPauseReflectionStep,
   shouldShowFavoriteProHint,
 } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow';
+import * as handlersFlow from './pause-session-step-handlers-flow';
 import * as stepsFlow from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow';
 
 /**
  * Cross-surface application sibling parity: session step-handlers-flow vs reflect steps-flow.
- * Complements presentation `pause-session-step-handlers-steps-io-sibling-parity.test.ts`.
+ * Presentation mirror: `pause-session-step-handlers-steps-io-sibling-parity.test.ts`.
+ * Reciprocal inline pins: `pause-session-step-handlers-flow.test.ts` ↔ `pause-reflect-steps-flow.test.ts`.
  */
 describe('pause-session-step-handlers-flow ↔ pause-reflect-steps-flow sibling parity', () => {
-  it('step-handlers-flow and reflect steps-flow are distinct CI anchors', () => {
+  it('step-handlers-flow and reflect steps-flow are distinct sibling CI anchors', () => {
     expect(typeof buildPauseSessionStepShellBundle).toBe('function');
     expect(typeof buildPauseSessionStepRitualBundle).toBe('function');
+
     expect(typeof runPauseFavoriteToggle).toBe('function');
     expect(typeof runPauseReflectNoteUpdate).toBe('function');
     expect(typeof runPauseReflectTagUpdate).toBe('function');
@@ -42,8 +44,12 @@ describe('pause-session-step-handlers-flow ↔ pause-reflect-steps-flow sibling 
 
   it('step-handlers umbrella exports stay off reflect step use cases and domain gates', () => {
     expect(buildPauseSessionStepShellBundle).not.toBe(runPauseFavoriteToggle);
-    expect(buildPauseSessionStepRitualBundle).not.toBe(runPauseReflectNoteUpdate);
+    expect(buildPauseSessionStepShellBundle).not.toBe(runPauseReflectNoteUpdate);
     expect(buildPauseSessionStepShellBundle).not.toBe(runPauseReflectTagUpdate);
+    expect(buildPauseSessionStepShellBundle).not.toBe(runPauseReflectionStepLogOnce);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(runPauseFavoriteToggle);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(runPauseReflectNoteUpdate);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(runPauseReflectTagUpdate);
     expect(buildPauseSessionStepRitualBundle).not.toBe(runPauseReflectionStepLogOnce);
     expect(buildPauseSessionStepShellBundle).not.toBe(shouldShowFavoriteProHint);
     expect(buildPauseSessionStepRitualBundle).not.toBe(shouldLogPauseReflectionStep);
