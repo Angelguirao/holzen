@@ -153,6 +153,18 @@ describe('pause-reflect-flows-io', () => {
     ).toBe('abort_sync_failed');
   });
 
+  /**
+   * Reciprocal pins ↔ `pause-reflect-flows-flow.test.ts`. Full cross-layer pins:
+   * `pause-reflect-flows-io-flow-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: flows-flow leaf outcome log stays distinct from presentation port wrappers', () => {
+    expect(pauseReflectOutcomeLog).not.toBe(runPauseOutcomeLogDirect);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(runPauseOutcomeLogDirect);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseReflectOutcomeLog);
+    expect(formatReinforcementQuoteFromSession).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(reflectPauseRepository).not.toBe(runPauseOutcomeLogDirect);
+  });
+
   it('exports pauseReflectOutcomeLog wrappers distinct from run-pause-outcome-log leaf', () => {
     expect(typeof pauseReflectOutcomeLog).toBe('function');
     expect(typeof pauseReflectOutcomeLogWithRepository).toBe('function');
