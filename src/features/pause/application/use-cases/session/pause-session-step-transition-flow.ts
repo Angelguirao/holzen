@@ -1,6 +1,7 @@
 /**
  * CI cluster anchor for Framer step-panel motion on `/pause` (§3 / check:architecture-alignment).
- * Re-exports pure helpers; presentation imports leaf modules via `pause-session-step-transition-io.ts` (CI anchor only).
+ * Cluster marker: `pause-session-step-transition-cluster.ts` (empty export; unit-tested).
+ * Re-exports pure helpers; presentation imports leaf modules via `pause-session-step-transition-io.ts` (not this umbrella).
  */
 export {
   buildPauseSessionStepTransitionConfig,
