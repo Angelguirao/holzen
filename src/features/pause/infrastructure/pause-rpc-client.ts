@@ -22,7 +22,7 @@ import { pauseSessionFetchedInstanceQueryKey } from '@/features/pause/infrastruc
 import { pauseInstanceQueryPrefix } from '@/features/pause/application/queries/pause-instance-query-prefix';
 import { pauseTerminalEntryStateQueryKey } from '@/features/pause/infrastructure/queries/terminal-entry-state-query';
 import { pauseSessionCompanionSnapshotQueryKey } from '@/features/pause/infrastructure/queries/companion-session-snapshot-query';
-import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
+import { invalidateCompanionUiCompletionQuery } from '@/features/pause/infrastructure/queries/companion/companion-ui-completion-query-key';
 import {
   trackPauseCompanionCounted,
   trackPauseCompanionNotCounted,

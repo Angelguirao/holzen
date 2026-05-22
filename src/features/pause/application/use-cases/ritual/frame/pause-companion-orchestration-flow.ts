@@ -3,7 +3,6 @@
  * Composes ritual/frame leaf modules (not orchestration subcluster flow anchors).
  * Presentation: `pause-companion-orchestration-io.ts` imports leaf modules directly.
  */
-import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 import {
   loadCompanionOrchestrateSession,
   type LoadCompanionOrchestrateSessionInput,
@@ -18,7 +17,7 @@ export type { LoadCompanionOrchestrateSessionInput, LoadCompanionOrchestrateSess
 
 export { loadCompanionOrchestrateSession };
 
-export { invalidateCompanionUiCompletionQuery, nextExpandedWithLazyFetch };
+export { nextExpandedWithLazyFetch };
 
 export type { CompanionUiCompletionStep };
 

@@ -1,5 +1,5 @@
-import { getHolzenQueryClient } from '../../infrastructure/holzen-query-client-ref';
-import { PAUSE_QUERY_PREFIX } from './pause-query-namespace';
+import { getHolzenQueryClient } from '../../holzen-query-client-ref';
+import { PAUSE_QUERY_PREFIX } from '@/features/pause/application/queries/pause-query-namespace';
 
 /**
  * TanStack query key for companion ritual “step completed” flags
