@@ -1,4 +1,4 @@
-import { PAUSE_QUERY_PREFIX } from './pause-query-namespace';
+import { PAUSE_QUERY_PREFIX } from '@/features/pause/application/queries/pause-query-namespace';
 
 export const PENDING_PAUSE_OFFER_QUERY_LEAF = 'pending-offer' as const;
 
