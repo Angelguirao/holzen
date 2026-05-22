@@ -71,7 +71,10 @@ import {
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
+  buildReflectionShareTelegramUrl,
   buildReflectionShareText,
+  buildReflectionShareTweetUrl,
+  buildReflectionShareWhatsAppUrl,
   pauseReflectionShareImage,
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
@@ -266,6 +269,9 @@ describe('pause-reflect-hub-io parity', () => {
   it('sibling cluster: share-io builders stay distinct from hub-io wrappers', () => {
     expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseReflectionShareImage);
     expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(buildReflectionShareText);
+    expect(buildLogBundleFromHubIo).not.toBe(buildReflectionShareTweetUrl);
+    expect(resolvePresentationFromHubIo).not.toBe(buildReflectionShareTelegramUrl);
+    expect(pauseShiftEmotionFrameHubDone).not.toBe(buildReflectionShareWhatsAppUrl);
     expect(buildLogBundleFromHubIo).not.toBe(pauseReflectionShareImage);
     expect(resolvePresentationFromHubIo).not.toBe(buildReflectionShareText);
     expect(reflectPauseRepository).not.toBe(pauseReflectionShareImage);
