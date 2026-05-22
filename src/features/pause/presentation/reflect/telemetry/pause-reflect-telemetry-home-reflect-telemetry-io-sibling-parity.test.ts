@@ -17,8 +17,8 @@ import * as sessionReflectTelemetryIo from '@/features/pause/presentation/reflec
 
 /**
  * Presentation sibling parity: session reflect telemetry-io vs Home manual-open telemetry-io
- * (colocated beside pause-home-reflect-io; parity with application
- * `application/.../manual-open/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`
+ * (colocated beside `pause-home-reflect-telemetry-io.ts`; parity with application
+ * `application/.../telemetry/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`
  * and `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`).
  */
 describe('pause-reflect-telemetry-io ↔ pause-home-reflect-telemetry-io sibling parity', () => {

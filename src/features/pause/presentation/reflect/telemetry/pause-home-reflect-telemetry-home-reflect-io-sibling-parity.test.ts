@@ -28,8 +28,8 @@ import {
 import * as homeReflectTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
 
 /**
- * Presentation sibling parity: home-reflect-telemetry-io vs home-reflect-io (manual-open
- * cluster; colocated beside pause-home-reflect-io; parity with
+ * Presentation sibling parity: home-reflect-telemetry-io vs home-reflect-io (colocated beside
+ * `pause-home-reflect-telemetry-io.ts`; parity with
  * `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` separating holzen-reflect
  * generation from manual-open I/O).
  * Application mirror: `application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts`.
