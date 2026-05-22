@@ -41,6 +41,7 @@ import {
   pauseReflectTagUpdate,
   pauseReflectTagUpdateWithRepository,
   pauseReflectionStepLogOnce,
+  pauseReflectionStepLogOnceWithRepository,
   reflectPauseRepository,
   shouldLogPauseReflectionStep as shouldLogFromStepsIo,
   shouldShowFavoriteProHint as shouldShowFromStepsIo,
@@ -75,10 +76,12 @@ describe('pause-reflect-steps-io parity', () => {
     expect(typeof pauseReflectTagUpdateWithRepository).toBe('function');
     expect(typeof pauseReflectNoteUpdateWithRepository).toBe('function');
     expect(typeof pauseReflectFavoriteToggleWithRepository).toBe('function');
+    expect(typeof pauseReflectionStepLogOnceWithRepository).toBe('function');
     expect(pauseReflectFavoriteToggle).not.toBe(runFavoriteToggleDirect);
     expect(pauseReflectNoteUpdate).not.toBe(runNoteUpdateDirect);
     expect(pauseReflectTagUpdate).not.toBe(runTagUpdateDirect);
     expect(pauseReflectionStepLogOnce).not.toBe(runReflectionStepLogDirect);
+    expect(pauseReflectionStepLogOnceWithRepository).not.toBe(runReflectionStepLogDirect);
   });
 
   it('pauseReflectTagUpdate delegates to run-pause-reflect-tag-update with default repository', async () => {
@@ -151,5 +154,25 @@ describe('pause-reflect-steps-io parity', () => {
     );
 
     expect(runFavoriteToggleDirect).toHaveBeenCalledWith(customRepository, input);
+  });
+
+  it('pauseReflectionStepLogOnceWithRepository forwards injected PauseRepository and storage port', async () => {
+    const customRepository = { port: 'customPauseRepository' };
+    const customStorage = {
+      canRead: () => true,
+      isLogged: () => false,
+      markLogged: vi.fn(),
+    };
+    const input = { pauseInstanceId: 'inst-reflection-step-custom' };
+
+    await pauseReflectionStepLogOnceWithRepository(
+      customRepository as unknown as typeof supabasePauseRepository,
+      input,
+      { storage: customStorage },
+    );
+
+    expect(runReflectionStepLogDirect).toHaveBeenCalledWith(customRepository, input, {
+      storage: customStorage,
+    });
   });
 });
