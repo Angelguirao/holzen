@@ -66,6 +66,11 @@ import {
   runInitialEmotionSkip as runEmotionSkipFromMoodFlow,
 } from '../mood/pause-reflect-mood-flow';
 import {
+  buildReflectionShareText as buildShareTextFromShareFlow,
+  runReflectionShareImage as runShareImageFromShareFlow,
+  trackPauseReflectShareTap as trackShareTapFromShareFlow,
+} from '../share/pause-reflect-share-flow';
+import {
   trackPauseReflectPostItOpen as trackPostItFromTelemetryFlow,
   trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
   trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
@@ -179,6 +184,14 @@ describe('pause-reflect-flows-flow', () => {
     expect(resolveOutcomeFlowFromFlow).not.toBe(trackShareTapFromTelemetryFlow);
     expect(buildImpactsFromFlow).not.toBe(trackWallpaperFromTelemetryFlow);
     expect(showNotCompletedFromFlow).not.toBe(trackPostItFromTelemetryFlow);
+  });
+
+  it('sibling cluster: share-flow exports stay distinct from flows umbrella exports', () => {
+    expect(resolvePreflightFromFlow).not.toBe(runShareImageFromShareFlow);
+    expect(resolveAfterGenFromFlow).not.toBe(runShareImageFromShareFlow);
+    expect(runOutcomeLogFromFlow).not.toBe(buildShareTextFromShareFlow);
+    expect(formatQuoteFromFlow).not.toBe(trackShareTapFromShareFlow);
+    expect(buildImpactsFromFlow).not.toBe(runShareImageFromShareFlow);
   });
 
   it('flows CI umbrella re-exports runPauseOutcomeLog as ritual/decide leaf (not presentation port wrappers)', () => {

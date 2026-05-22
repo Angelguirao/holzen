@@ -53,6 +53,10 @@ import {
   runAdoptPendingPauseOffer,
   runDeclinePendingPauseOffer,
 } from '../pending-offer/pause-reflect-pending-offer-flow';
+import {
+  resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
+  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
+} from '../flows/pause-reflect-flows-flow';
 
 describe('pause-reflect-share-flow', () => {
   it('re-exports share orchestration + domain builders + session UI telemetry from leaf modules', () => {
@@ -109,5 +113,14 @@ describe('pause-reflect-share-flow', () => {
     expect(buildWhatsAppFromFlow).not.toBe(trackPauseSessionAbandoned);
     expect(trackPauseReflectPostItOpen).not.toBe(runAdoptPendingPauseOffer);
     expect(trackPauseReflectShareTap).not.toBe(trackPausePendingAdopted);
+  });
+
+  it('sibling cluster: flows-flow exports stay distinct from share umbrella exports', () => {
+    expect(runReflectionShareImage).not.toBe(resolvePreflightFromFlowsFlow);
+    expect(runReflectionShareImage).not.toBe(runOutcomeLogFromFlowsFlow);
+    expect(buildTextFromFlow).not.toBe(resolvePreflightFromFlowsFlow);
+    expect(buildTelegramFromFlow).not.toBe(runOutcomeLogFromFlowsFlow);
+    expect(trackPauseReflectShareTap).not.toBe(runOutcomeLogFromFlowsFlow);
+    expect(trackPauseReflectWallpaperTap).not.toBe(resolvePreflightFromFlowsFlow);
   });
 });

@@ -31,6 +31,7 @@ describe('pause-reflect-flows-flow ↔ pause-reflect-share-flow sibling parity',
     expect(typeof runPauseOutcomeLog).toBe('function');
     expect(typeof showPauseOutcomeNotCompletedToast).toBe('function');
     expect(typeof buildPauseScoreImpacts).toBe('function');
+
     expect(typeof runReflectionShareImage).toBe('function');
     expect(typeof buildReflectionShareText).toBe('function');
     expect(typeof buildReflectionShareTelegramUrl).toBe('function');
