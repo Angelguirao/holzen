@@ -29,8 +29,10 @@ import { runDeclinePendingPauseOffer as runDeclineDirect } from './run-decline-p
 import {
   runPauseFavoriteToggle as runFavoriteFromStepsFlow,
   runPauseReflectNoteUpdate as runNoteFromStepsFlow,
+  runPauseReflectTagUpdate as runTagFromStepsFlow,
   runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
   shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
+  shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
 } from '../steps/pause-reflect-steps-flow';
 
 describe('pause-reflect-pending-offer-flow', () => {
@@ -62,9 +64,10 @@ describe('pause-reflect-pending-offer-flow', () => {
   it('sibling cluster: steps-flow exports stay distinct from pending-offer umbrella exports', () => {
     expect(runAdoptPendingPauseOffer).not.toBe(runFavoriteFromStepsFlow);
     expect(runDeclinePendingPauseOffer).not.toBe(runNoteFromStepsFlow);
+    expect(getDisplayFromFlow).not.toBe(runTagFromStepsFlow);
     expect(getDisplayFromFlow).not.toBe(runReflectionStepFromStepsFlow);
-    expect(trackAdoptedFromFlow).not.toBe(runFavoriteFromStepsFlow);
-    expect(trackDeclinedFromFlow).not.toBe(runNoteFromStepsFlow);
+    expect(trackAdoptedFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+    expect(trackDeclinedFromFlow).not.toBe(shouldShowFavoriteFromStepsFlow);
     expect(trackAbandonedFromFlow).not.toBe(shouldLogFromStepsFlow);
   });
 });

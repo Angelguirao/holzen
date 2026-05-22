@@ -92,10 +92,11 @@ describe('pause-reflect-steps-flow', () => {
 
   it('sibling cluster: pending-offer-flow exports stay distinct from steps umbrella exports', () => {
     expect(runPauseFavoriteToggle).not.toBe(runAdoptFromPendingOfferFlow);
-    expect(runPauseFavoriteToggle).not.toBe(runDeclineFromPendingOfferFlow);
-    expect(runPauseReflectNoteUpdate).not.toBe(getDisplayFromPendingOfferFlow);
-    expect(runPauseReflectTagUpdate).not.toBe(trackAdoptedFromPendingOfferFlow);
-    expect(runPauseReflectionStepLogOnce).not.toBe(trackAbandonedFromPendingOfferFlow);
-    expect(shouldLogFromFlow).not.toBe(getDisplayFromPendingOfferFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(runDeclineFromPendingOfferFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(runAdoptFromPendingOfferFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(runDeclineFromPendingOfferFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(getDisplayFromPendingOfferFlow);
+    expect(shouldLogFromFlow).not.toBe(trackAdoptedFromPendingOfferFlow);
+    expect(shouldLogFromFlow).not.toBe(trackAbandonedFromPendingOfferFlow);
   });
 });
