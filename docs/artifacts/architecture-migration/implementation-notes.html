@@ -19757,7 +19757,26 @@
       <dt>Tradeoffs</dt>
       <dd><code>public-home</code> re-export path updated; <code>use-holzen-home-context-state</code> imports sibling <code>manual-open/</code> conductor directly (not an aggregate Home barrel).</dd>
       <dt>Open questions</dt>
-      <dd>Next: companion analytics/frame-ui I/O through flow anchors, session ritual-restore flow anchor, or Phase B subscription Tier 1 shim.</dd>
+      <dd>Next: companion analytics/frame-ui I/O through flow anchors, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect hub shift log bundle via hub-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>buildShiftEmotionFrameHubLogBundle</code> on <code>pause-reflect-hub-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Re-export shift-frame hub log payload helpers on the hub CI anchor; <code>run-shift-emotion-frame-hub-done</code> and hub presentation tests import through <code>pause-reflect-hub-flow</code> instead of deep <code>domain/reflect/hub/shift-emotion-log</code> (parity with other reflect presentation I/O flow peels).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; domain module unchanged.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Domain unit test for <code>shift-emotion-log</code> still imports the domain module directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: companion frame-ui/analytics I/O peels, or Phase B subscription Tier 1 shim.</dd>
     </dl>
   </article>
 

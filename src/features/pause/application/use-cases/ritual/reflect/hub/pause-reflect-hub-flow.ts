@@ -7,4 +7,5 @@ export {
   resolveShiftFrameHubDonePresentation,
   type ShiftFrameHubDonePresentation,
 } from '@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation';
+export { buildShiftEmotionFrameHubLogBundle } from '@/features/pause/domain/reflect/hub/shift-emotion-log';
 export { runShiftEmotionFrameHubDone } from './run-shift-emotion-frame-hub-done';
