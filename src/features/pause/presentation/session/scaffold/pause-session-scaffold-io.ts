@@ -10,4 +10,5 @@ export {
   type PauseSessionPersistSnapshotInput,
   type PauseSessionScaffoldRitualDerived,
   type PauseStorageRitualSyncPatch,
+  hasPersistablePauseSessionAnchor,
 } from '@/features/pause/application/use-cases/session/pause-session-scaffold-flow';

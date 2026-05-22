@@ -332,6 +332,16 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_MAP_PERSISTED_STEP_IMPORTS = [
   "from '../domain/session/map-persisted-step'",
 ];
 
+/** Session presentation — import persisted-session guards via shell/scaffold I/O only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_DOMAIN_GUARDS_IMPORTS = [
+  '@/features/pause/domain/session/persisted-session-guards',
+  '@/features/pause/domain/session/waiting-for-instance-fetch',
+  "from './domain/session/persisted-session-guards'",
+  "from '../domain/session/persisted-session-guards'",
+  "from './domain/session/waiting-for-instance-fetch'",
+  "from '../domain/session/waiting-for-instance-fetch'",
+];
+
 /** Archive presentation I/O — import retrospective decide helpers via flow anchor only. */
 const LEGACY_PAUSE_PRESENTATION_ARCHIVE_DECIDE_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome',
@@ -581,6 +591,11 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_MAP_PERSISTED_STEP_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session map-persisted-step import (${needle})`);
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_DOMAIN_GUARDS_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy session domain guard import (${needle})`);
       }
     }
   }

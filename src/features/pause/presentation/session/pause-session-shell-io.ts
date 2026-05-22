@@ -20,4 +20,6 @@ export {
   type PauseSessionMountLogParams,
   type PauseSessionStepTransitionConfig,
   type PauseSessionSwipeDirection,
+  hasPersistedPauseSessionPayload,
+  isPauseSessionWaitingForInstanceFetch,
 } from '@/features/pause/application/use-cases/session/pause-session-shell-flow';
