@@ -107,7 +107,8 @@ describe('pause-session-terminal-entry-io parity', () => {
     expect(isTerminalFromTerminalEntryIo).not.toBe(buildPauseSessionMountLogParams);
     expect(persistedAllowsFromTerminalEntryIo).not.toBe(hasPersistedPauseSessionPayload);
     expect(isTerminalFromTerminalEntryIo).not.toBe(isPauseSessionWaitingForInstanceFetch);
-    // Reciprocal inline pins: `pause-session-shell-io-parity.test.ts`.
+    expect(isTerminalFromTerminalEntryIo).not.toBe(computePauseHeaderBackIntent);
+    // Reciprocal inline pins: `pause-session-shell-io-parity.test.ts` (application + presentation).
     // Full pins: `pause-session-terminal-entry-shell-io-sibling-parity.test.ts`.
   });
 
