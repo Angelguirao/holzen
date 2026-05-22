@@ -37,7 +37,7 @@ import {
 /**
  * Presentation sibling parity: orchestrate-io vs orchestration-io (parity with application
  * `pause-companion-orchestrate-orchestration-flow-sibling-parity.test.ts`; complements
- * `pause-companion-orchestrate-io-parity.test.ts`).
+ * colocated `pause-companion-orchestrate-io-parity.test.ts`).
  */
 describe('pause-companion-orchestrate-io ↔ pause-companion-orchestration-io sibling parity', () => {
   it('orchestrate-io and orchestration-io are distinct presentation I/O surfaces', () => {
