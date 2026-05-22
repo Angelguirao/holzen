@@ -29044,31 +29044,17 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
       <span>Phase A — presentation pending-offer-io ↔ pending-offer-telemetry-io reciprocal inline pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
     <h3><code>pause-reflect-pending-offer-io.test.ts</code> + <code>pause-reflect-pending-offer-telemetry-io.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts</code> already on branch; add reciprocal inline sibling-cluster pins on pending-offer-io and pending-offer-telemetry-io unit tests (parity with flows-io ↔ mood-io and hub-io ↔ mood-io inline pins).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts</code> already on branch; reciprocal inline sibling-cluster pins on both pending-offer-io and pending-offer-telemetry-io unit tests (session reflect telemetry pins on pending-offer-io unchanged; parity with flows-io ↔ mood-io).</dd>
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comments only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: application <code>pause-reflect-pending-offer-rpc-flow</code> ↔ <code>pause-pending-offer-display-flow</code> dedicated sibling file if not already on branch, or Phase B subscription Tier 1 shims.</dd>
-=======
-      <span>Phase A — pending-offer-io reciprocal pins for pending-offer-telemetry-io (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-reflect-pending-offer-io.test.ts</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Remote already had reciprocal pins on <code>pause-reflect-pending-offer-telemetry-io.test.ts</code>; complete the pair on <code>pause-reflect-pending-offer-io.test.ts</code> with a dedicated sibling-cluster test against pending-offer telemetry exports (session reflect telemetry pins unchanged).</dd>
-      <dt>Deviation</dt>
-      <dd>None — tests + I/O header comment only.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: application <code>pause-reflect-hub-share-flow-sibling-parity</code> colocated reciprocal file, or Phase B subscription/auth Tier 1 shim scan.</dd>
->>>>>>> df95ef3ef (test(pause): complete pending-offer-io reciprocal telemetry-io pins)
+      <dd>Next: application <code>pause-reflect-pending-offer-rpc-flow</code> ↔ <code>pause-pending-offer-display-flow</code> dedicated sibling file, <code>pause-reflect-hub-share-flow-sibling-parity</code> colocated reciprocal file, or Phase B subscription/auth Tier 1 shim scan.</dd>
     </dl>
   </article>
 
