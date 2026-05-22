@@ -384,6 +384,13 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-flow'",
 ];
 
+/** Manual-open telemetry I/O — import via pause-home-reflect-telemetry-flow only (not generation umbrella). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IO_GENERATION_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow',
+  "from './application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow'",
+  "from '../application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow'",
+];
+
 /** Application reflect telemetry/ — flow anchors live in generation/manual-open/ and share/. */
 const LEGACY_PAUSE_APPLICATION_REFLECT_TELEMETRY_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow',
@@ -1065,6 +1072,18 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_MANUAL_OPEN_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy reflect manual-open generation import (${needle})`);
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-home-reflect-telemetry-io.ts') ||
+    rel.endsWith('pause-home-reflect-telemetry-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IO_GENERATION_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: manual-open telemetry I/O must import via pause-home-reflect-telemetry-flow (${needle})`,
+        );
       }
     }
   }
