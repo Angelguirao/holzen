@@ -2,8 +2,9 @@
  * Presentation I/O parity (colocated beside `pause-companion-analytics-io.ts`).
  * Imports `pause-companion-analytics-flow` CI umbrella for `.toBe` identity pins only —
  * production analytics I/O keeps ritual/frame leaf imports.
- * Orchestrate distinctness sibling file: `application/.../frame/pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts`;
- * presentation sibling: `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts`.
+ * Orchestrate distinctness sibling: `application/.../frame/pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts`
+ * + `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts` (presentation).
+ * Leaf + flow re-export pins also live in `pause-companion-analytics-io.re-exports.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
 
