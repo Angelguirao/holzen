@@ -2745,7 +2745,8 @@ for (const file of walkTs(join(root, 'src'))) {
   }
   if (
     rel.endsWith('pause-reflect-flows-io.ts') ||
-    rel.endsWith('pause-reflect-flows-io.test.ts')
+    rel.endsWith('pause-reflect-flows-io.test.ts') ||
+    rel.endsWith('pause-reflect-flows-io.re-exports.test.ts')
   ) {
     for (const needle of LEGACY_PAUSE_REFLECT_FLOWS_IO_DECIDE_FLOW_IMPORTS) {
       if (text.includes(needle)) {
@@ -2789,7 +2790,8 @@ for (const file of walkTs(join(root, 'src'))) {
     }
     if (
       !rel.endsWith('pause-reflect-flows-io.ts') &&
-      !rel.endsWith('pause-reflect-flows-io.test.ts')
+      !rel.endsWith('pause-reflect-flows-io.test.ts') &&
+      !rel.endsWith('pause-reflect-flows-io.re-exports.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {
