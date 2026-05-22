@@ -22,6 +22,12 @@ import { buildPauseSessionMountLogParams as buildMountLogDirect } from './mount-
 import { coalescePauseSessionShellViewModel as coalesceShellVmDirect } from './shell-view-model';
 import { hasPersistedPauseSessionPayload as hasPersistedDirect } from '@/features/pause/domain/session/persisted-session-guards';
 import { isPauseSessionWaitingForInstanceFetch as isWaitingDirect } from '@/features/pause/domain/session/waiting-for-instance-fetch';
+import {
+  buildPauseSessionPersistSnapshot as buildPersistFromScaffoldFlow,
+  buildPauseSessionScaffoldRitualDerived as buildDerivedFromScaffoldFlow,
+  computePauseStorageRitualSyncPatch as computeSyncFromScaffoldFlow,
+  hasPersistablePauseSessionAnchor as hasAnchorFromScaffoldFlow,
+} from './pause-session-scaffold-flow';
 
 describe('pause-session-shell-flow', () => {
   it('re-exports hydration helpers from hydration', () => {
@@ -77,5 +83,13 @@ describe('pause-session-shell-flow', () => {
     ).toBe(true);
     expect(hasPersistedPauseSessionPayload).toBe(hasPersistedDirect);
     expect(isPauseSessionWaitingForInstanceFetch).toBe(isWaitingDirect);
+  });
+
+  it('sibling cluster: scaffold-flow exports stay distinct from shell umbrella exports', () => {
+    expect(computePauseSessionHydration).not.toBe(buildPersistFromScaffoldFlow);
+    expect(computePauseSessionResolved).not.toBe(computeSyncFromScaffoldFlow);
+    expect(coalescePauseSessionShellViewModel).not.toBe(buildDerivedFromScaffoldFlow);
+    expect(hasPersistedPauseSessionPayload).not.toBe(hasAnchorFromScaffoldFlow);
+    expect(buildPauseSessionMountLogParams).not.toBe(buildPersistFromScaffoldFlow);
   });
 });
