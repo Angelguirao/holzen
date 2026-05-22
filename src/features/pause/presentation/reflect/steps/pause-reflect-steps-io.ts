@@ -28,6 +28,7 @@
  * application: `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`,
  * `pause-reflect-steps-favorite-reflection-step-log-flow-sibling-parity.test.ts`).
  * `pause-session-step-handlers-steps-io-sibling-parity.test.ts` ↔ `pause-session-step-handlers-io` (session bundle builders;
+ * application mirror: `application/.../session/pause-session-step-handlers-steps-io-sibling-parity.test.ts`;
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-session-step-handlers-io.test.ts`).
  * Application flow umbrellas: `pause-reflect-steps-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts` (reciprocal inline).
  * Cross-surface application: `pause-session-step-handlers-steps-flow-sibling-parity.test.ts` ↔ `pause-session-step-handlers-flow`.
