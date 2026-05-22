@@ -1,4 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
+  reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' },
+}));
+
 import {
   buildPauseSessionStepRitualBundle,
   buildPauseSessionStepShellBundle,
@@ -11,6 +17,18 @@ import {
   buildPauseSessionPersistSnapshot,
   computePauseStorageRitualSyncPatch,
 } from './scaffold/pause-session-scaffold-io';
+import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
+  pauseReflectFavoriteToggleWithRepository,
+  pauseReflectNoteUpdateWithRepository,
+  pauseReflectTagUpdateWithRepository,
+  pauseReflectionStepLogOnceWithRepository,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   buildPauseSessionStepRitualBundle as buildRitualFromLeaf,
   buildPauseSessionStepShellBundle as buildShellFromLeaf,
@@ -38,5 +56,23 @@ describe('pause-session-step-handlers-io', () => {
     expect(buildPauseSessionStepShellBundle).not.toBe(buildPauseSessionPersistSnapshot);
     expect(buildPauseSessionStepRitualBundle).not.toBe(computePauseStorageRitualSyncPatch);
     // Full cross-I/O pins: `pause-session-scaffold-step-handlers-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io.test.ts` (session bundles vs reflect RPC).
+   * Dedicated sibling file: `pause-session-step-handlers-steps-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: reflect steps-io exports stay distinct from step-handlers-io', () => {
+    expect(buildPauseSessionStepShellBundle).not.toBe(pauseReflectTagUpdate);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(pauseReflectNoteUpdate);
+    expect(buildPauseSessionStepShellBundle).not.toBe(pauseReflectFavoriteToggle);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(pauseReflectionStepLogOnce);
+    expect(buildPauseSessionStepShellBundle).not.toBe(pauseReflectTagUpdateWithRepository);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    expect(buildPauseSessionStepShellBundle).not.toBe(shouldShowFavoriteProHint);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(shouldLogPauseReflectionStep);
+    expect(buildPauseSessionStepShellBundle).not.toBe(pauseReflectNoteUpdateWithRepository);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(pauseReflectFavoriteToggleWithRepository);
+    // Reciprocal inline pins: `pause-reflect-steps-io.test.ts`.
   });
 });

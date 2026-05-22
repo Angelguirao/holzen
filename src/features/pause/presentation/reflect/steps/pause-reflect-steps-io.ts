@@ -25,6 +25,8 @@
  * `pause-reflect-steps-favorite-reflection-step-log-io-sibling-parity.test.ts` (favorite vs reflection_step log wrappers;
  * application: `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`,
  * `pause-reflect-steps-favorite-reflection-step-log-flow-sibling-parity.test.ts`).
+ * `pause-session-step-handlers-steps-io-sibling-parity.test.ts` ↔ `pause-session-step-handlers-io` (session bundle builders;
+ * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-session-step-handlers-io.test.ts`).
  * Application flow umbrellas: `pause-reflect-steps-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts` (reciprocal inline).
  */
 import { runPauseFavoriteToggle } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
