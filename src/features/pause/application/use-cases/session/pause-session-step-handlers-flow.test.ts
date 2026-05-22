@@ -8,7 +8,10 @@ import {
   buildPauseSessionStepRitualBundle as buildRitualDirect,
   buildPauseSessionStepShellBundle as buildShellDirect,
 } from './step-bundles';
-import { buildPauseSessionStepTransitionConfig } from './pause-session-step-transition-flow';
+import {
+  buildPauseSessionStepTransitionConfig,
+  pauseStepSwipeDirection,
+} from './pause-session-step-transition-flow';
 
 describe('pause-session-step-handlers-flow', () => {
   it('re-exports step bundle builders from step-bundles', () => {
@@ -18,8 +21,10 @@ describe('pause-session-step-handlers-flow', () => {
     expect(buildPauseSessionStepRitualBundle).toBe(buildRitualDirect);
   });
 
-  it('sibling cluster: step-handlers umbrella exports stay distinct from step-transition umbrella exports', () => {
+  it('sibling cluster: step-transition-flow exports stay distinct from step-handlers umbrella exports', () => {
     expect(buildPauseSessionStepShellBundle).not.toBe(buildPauseSessionStepTransitionConfig);
     expect(buildPauseSessionStepRitualBundle).not.toBe(buildPauseSessionStepTransitionConfig);
+    expect(buildPauseSessionStepShellBundle).not.toBe(pauseStepSwipeDirection);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(pauseStepSwipeDirection);
   });
 });

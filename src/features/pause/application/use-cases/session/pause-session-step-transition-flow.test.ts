@@ -16,7 +16,10 @@ import {
   PAUSE_SESSION_STEP_TRANSITION_EASE as easeDirect,
 } from './step-transition';
 import { pauseStepSwipeDirection as swipeDirect } from './step-swipe-direction';
-import { buildPauseSessionStepShellBundle } from './pause-session-step-handlers-flow';
+import {
+  buildPauseSessionStepRitualBundle,
+  buildPauseSessionStepShellBundle,
+} from './pause-session-step-handlers-flow';
 
 describe('pause-session-step-transition-flow', () => {
   it('re-exports step motion helpers from step-transition', () => {
@@ -44,7 +47,10 @@ describe('pause-session-step-transition-flow', () => {
     expect(pauseStepSwipeDirection).toBe(swipeDirect);
   });
 
-  it('sibling cluster: step-transition umbrella exports stay distinct from step-handlers umbrella exports', () => {
+  it('sibling cluster: step-handlers-flow exports stay distinct from step-transition umbrella exports', () => {
     expect(buildPauseSessionStepTransitionConfig).not.toBe(buildPauseSessionStepShellBundle);
+    expect(buildPauseSessionStepTransitionConfig).not.toBe(buildPauseSessionStepRitualBundle);
+    expect(pauseStepSwipeDirection).not.toBe(buildPauseSessionStepShellBundle);
+    expect(PAUSE_SESSION_STEP_SLIDE_OFFSET_PX).not.toBe(buildPauseSessionStepRitualBundle);
   });
 });
