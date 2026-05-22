@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — scaffold step-transition via pause-session-shell-io (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Scaffold ritual payloads import Framer step-transition through shell I/O</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>scaffold-ritual-payloads</code>, its test, and <code>ritual-body-props</code> import <code>PauseSessionStepTransitionConfig</code> / <code>buildPauseSessionStepTransitionConfig</code> via <code>pause-session-shell-io</code> (already re-exports through <code>pause-session-shell-flow</code>). CI forbids deep <code>step-transition</code> imports under <code>presentation/session/</code> except <code>*-io.ts</code> modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-providers-conductor</code> still imports <code>pause-holzen-providers-slice</code> directly — peel in a follow-up slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: providers-conductor I/O peel or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — apply-manual-pause-open-result via telemetry-io (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

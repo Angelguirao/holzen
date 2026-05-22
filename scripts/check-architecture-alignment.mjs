@@ -296,6 +296,13 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_TELEMETRY_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow'",
 ];
 
+/** Session presentation — import step-transition via shell I/O anchor only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_STEP_TRANSITION_IMPORTS = [
+  '@/features/pause/application/use-cases/session/step-transition',
+  "from './application/use-cases/session/step-transition'",
+  "from '../application/use-cases/session/step-transition'",
+];
+
 /** Archive presentation I/O — import retrospective decide helpers via flow anchor only. */
 const LEGACY_PAUSE_PRESENTATION_ARCHIVE_DECIDE_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome',
@@ -503,6 +510,11 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_STEP_BUNDLES_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session step-bundles import (${needle})`);
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_STEP_TRANSITION_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy session step-transition import (${needle})`);
       }
     }
   }
