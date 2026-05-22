@@ -1,6 +1,10 @@
 /**
  * Presentation pending-offer I/O parity (colocated beside `pause-reflect-pending-offer-io.ts`).
  * Application mirror: `application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
+ * Generation-io sibling: reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts`;
+ * dedicated file: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`.
+ * Session telemetry-io sibling: `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts`
+ * (application + presentation); reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
 
@@ -40,11 +44,6 @@ import {
   reflectPauseRepository,
 } from './pause-reflect-pending-offer-io';
 import * as pendingOfferTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
-import {
-  trackPauseReflectPostItOpen,
-  trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
-} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import {
   pauseReflectGeneration,
@@ -61,15 +60,6 @@ import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
-import {
-  pauseReflectGeneration,
-  runReflectGeneration,
-} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
-import {
-  trackPauseReflectPostItOpen,
-  trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
-} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   buildReflectionShareTelegramUrl,
   buildReflectionShareText,
@@ -115,28 +105,11 @@ import {
   pauseInitialEmotionSkipWithRepository,
 } from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import {
-  pauseReflectGeneration,
-  runReflectGeneration,
-} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
-import {
-  dismissOpenPauseHome,
-  openManualPauseFromHome,
-  pauseDismissOpenPauseHomePreview,
-  pauseDismissOpenPauseHomePreviewWithRepository,
-  pauseHomeManualOpenPorts,
-} from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
-import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 
-/**
- * Presentation pending-offer I/O parity (colocated beside `pause-reflect-pending-offer-io.ts`).
- * Application mirror: `application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-io-parity.test.ts`.
- * Session telemetry-io sibling: `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
- */
 describe('pause-reflect-pending-offer-io parity', () => {
   it('presentation I/O pending-offer display matches pending-offer CI umbrella', () => {
     expect(getPendingPauseOfferDisplay).toBe(getDisplayFromPendingOfferIo);
