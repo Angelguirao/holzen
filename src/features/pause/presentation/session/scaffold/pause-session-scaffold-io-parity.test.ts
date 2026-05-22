@@ -43,7 +43,7 @@ import {
 } from '@/features/pause/presentation/session/pause-session-terminal-entry-io';
 
 /**
- * Scaffold CI umbrella ↔ presentation I/O delegation parity.
+ * Scaffold CI umbrella ↔ presentation I/O delegation parity (colocated beside `pause-session-scaffold-io.ts`).
  * Terminal-entry sibling: `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins below ↔ `pause-session-terminal-entry-io-parity.test.ts`.
  */
