@@ -10,6 +10,12 @@ import {
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
+  pauseInitialEmotionSelect,
+  pauseInitialEmotionSelectWithRepository,
+  pauseInitialEmotionSkip,
+  pauseInitialEmotionSkipWithRepository,
+} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import {
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
   resolveShiftFrameHubDonePresentation,
@@ -117,5 +123,16 @@ describe('pause-reflect-telemetry-io', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(reflectGenerator);
     // Full cross-I/O pins: `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`;
     // reciprocal inline pins on `pause-reflect-generation-io.test.ts`.
+  });
+
+  it('sibling cluster: mood-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseInitialEmotionSelect);
+    expect(trackPauseReflectShareTap).not.toBe(pauseInitialEmotionSelectWithRepository);
+    expect(trackPauseReflectWallpaperTap).not.toBe(pauseInitialEmotionSkip);
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseInitialEmotionSkipWithRepository);
+    expect(trackPauseReflectShareTap).not.toBe(pauseInitialEmotionSelect);
+    expect(trackPauseReflectWallpaperTap).not.toBe(pauseInitialEmotionSkip);
+    // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-mood-io.test.ts`;
+    // mood RPC vs session UI telemetry: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts`.
   });
 });

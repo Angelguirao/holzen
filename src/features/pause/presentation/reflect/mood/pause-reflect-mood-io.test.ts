@@ -23,6 +23,11 @@ import { runDeepPausePickerEntryIfPro as runDeepPickerDirect } from '@/features/
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import {
   pauseReflectOutcomeLog,
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
@@ -190,5 +195,17 @@ describe('pause-reflect-mood-io', () => {
     expect(buildFeelTilesMoodLogOptions).not.toBe(buildShiftEmotionFrameHubLogBundle);
     expect(buildFeelTilesMoodLogOptions).not.toBe(resolveShiftFrameHubDonePresentation);
     // Full cross-I/O pins: `pause-reflect-mood-hub-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: session reflect telemetry-io exports stay distinct from mood-io', () => {
+    expect(pauseInitialEmotionSelect).not.toBe(trackPauseReflectPostItOpen);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(trackPauseReflectShareTap);
+    expect(pauseInitialEmotionSkip).not.toBe(trackPauseReflectWallpaperTap);
+    expect(pauseInitialEmotionSkipWithRepository).not.toBe(trackPauseReflectPostItOpen);
+    expect(buildFeelTilesMoodLogOptions).not.toBe(trackPauseReflectShareTap);
+    expect(resolvePauseSessionChromeCloseAction).not.toBe(trackPauseReflectWallpaperTap);
+    expect(reflectPauseRepository).not.toBe(trackPauseReflectShareTap);
+    // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-telemetry-io.test.ts`;
+    // mood RPC vs session UI telemetry: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts`.
   });
 });
