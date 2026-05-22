@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — manual-open + home-telemetry leaf identity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-manual-open-flow</code> + <code>pause-home-reflect-telemetry-flow</code> regression pins</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Strengthen manual-open subcluster leaf flow tests with <code>.toBe(direct)</code> identity for domain builders (<code>build-manual-pause-*</code>, <code>MANUAL_PAUSE_VOLATILITY_TEMPLATE</code>), manual-open use cases, and Home PostHog trackers (parity with holzen-reflect hook-flow and steps umbrella pins). <code>pause-home-reflect-io</code>, <code>pause-home-reflect-telemetry-io</code>, and <code>pause-reflect-generation-io</code> unchanged (import leaf modules directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — CI slice only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Manual-open cluster marker test remains typeof-only; subcluster leaf flows now own identity pins.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: pin remaining reflect mood/hub leaf flow tests, <code>ritual/frame</code> orchestrate subcluster leaf flows, or Phase B subscription Tier 1 when pause Tier 5 is quiet.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — ritual/reflect steps leaf flow identity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
