@@ -4,7 +4,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
 }));
 
-import * as pendingOfferIo from './pause-reflect-pending-offer-io';
+import * as pendingOfferIo from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
@@ -12,18 +12,18 @@ import {
   pauseDeclinePendingOffer,
   pauseDeclinePendingOfferWithRepository,
   reflectPauseRepository,
-} from './pause-reflect-pending-offer-io';
-import * as telemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import * as telemetryIo from './pause-reflect-telemetry-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
   type PauseReflectTelemetrySurface,
-} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+} from './pause-reflect-telemetry-io';
 
 /**
  * Presentation sibling parity: pending-offer-io vs session reflect telemetry-io
- * (parity with `pause-reflect-share-telemetry-io-sibling-parity.test.ts`; distinct from
+ * (colocated beside `pause-reflect-telemetry-io.ts`; distinct from
  * `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ pending-offer telemetry-io).
  * Application mirror: `application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts`.
  */

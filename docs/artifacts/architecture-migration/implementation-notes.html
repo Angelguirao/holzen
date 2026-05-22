@@ -59,7 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
+      <span>Phase A — colocate session↔pending-offer telemetry-io sibling under reflect/telemetry (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts</code> → <code>presentation/reflect/telemetry/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete. Colocate presentation pending-offer-io ↔ session telemetry-io sibling parity beside <code>pause-reflect-telemetry-io.ts</code>; application mirror stays under <code>pending-offer/</code>. Allowlist pending-offer-io import on the telemetry sibling test in <code>check:architecture-alignment</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test relocation + import path updates only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B Tier 1 lib shim scan (<code>@/lib/posthog</code> in ritual reflect telemetry), or peel <code>public.ts</code> follow-ups.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect telemetry flow↔io wrapper sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -70,8 +86,13 @@
       <dt>Deviation</dt>
       <dd>None — test-only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B Tier 1 lib shim scan (<code>@/lib/posthog</code> in ritual reflect telemetry), or companion frame I/O colocation.</dd>
-=======
+      <dd>Superseded by session telemetry-io colocation slice on same branch.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reciprocal generation-io ↔ hub-io namespace pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -82,8 +103,7 @@
       <dt>Deviation</dt>
       <dd>None — test-only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: ambience flow↔io wrapper mirrors, or Phase B Tier 1 lib shim scan (<code>@/lib/posthog</code> in ritual reflect telemetry).</dd>
->>>>>>> 4903c54c6 (test(pause): reciprocal generation-io ↔ hub-io namespace pins)
+      <dd>Superseded by session telemetry-io colocation slice on same branch.</dd>
     </dl>
   </article>
 
@@ -33527,11 +33547,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + allowlist + comment cross-links only.</dd>
       <dt>Open questions</dt>
-<<<<<<< HEAD
-      <dd>Next: extend presentation <code>pause-home-reflect-telemetry-io-parity</code> session-telemetry namespace pins to match application, or Phase B Tier 1 lib shim scan.</dd>
-=======
       <dd>Superseded by flows↔ambience flow sibling slice on same branch.</dd>
->>>>>>> 4903c54c6 (test(pause): reciprocal generation-io ↔ hub-io namespace pins)
     </dl>
   </article>
 
