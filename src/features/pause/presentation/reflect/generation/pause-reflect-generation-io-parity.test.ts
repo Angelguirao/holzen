@@ -307,7 +307,9 @@ describe('pause-reflect-generation-io parity', () => {
   it('sibling cluster: pending-offer-io exports stay distinct from generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(pauseAdoptPendingOffer);
     expect(runReflectGeneration).not.toBe(pauseDeclinePendingOffer);
-    expect(reflectGenerator).not.toBe(getPendingPauseOfferDisplay);
+    expect(runReflectGeneration).not.toBe(getPendingPauseOfferDisplay);
+    expect(reflectGenerator).not.toBe(pauseAdoptPendingOffer);
+    // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts` (application + presentation).
   });
 
   /**

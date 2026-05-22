@@ -40,11 +40,16 @@ import {
   reflectPauseRepository,
 } from './pause-reflect-pending-offer-io';
 import * as pendingOfferTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
+import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import {
-  startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
-} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+  pauseReflectGeneration,
+  runReflectGeneration,
+} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   dismissOpenPauseHome,
   openManualPauseFromHome,
@@ -52,6 +57,10 @@ import {
   pauseDismissOpenPauseHomePreviewWithRepository,
   pauseHomeManualOpenPorts,
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
+import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
   pauseReflectGeneration,
   runReflectGeneration,
@@ -275,7 +284,7 @@ describe('pause-reflect-pending-offer-io parity', () => {
 
   /**
    * Reciprocal inline pins ↔ `pause-home-reflect-io-parity.test.ts` (application + presentation).
-   * Dedicated sibling file: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: home-reflect-io manual-open exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(openManualPauseFromHome);
