@@ -19723,4 +19723,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session pending-offer I/O via flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-pending-offer-io</code> + telemetry I/O import <code>pause-session-pending-offer-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no reflect folder moves. Route adopt/decline use cases and pending-offer PostHog helpers through the session CI anchor instead of deep <code>pending-offer/*</code> and <code>pending-pause-offer-telemetry</code> modules (restores May 2026 peel that had regressed on the branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Companion orchestration I/O already uses <code>pause-companion-orchestration-flow</code>; session shell/scaffold flow peels remain optional follow-ups.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: consolidate <code>use-companion-orchestrate-session</code> imports via companion orchestration I/O only, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
