@@ -103,7 +103,7 @@ describe('pause-session-scaffold-io', () => {
 
   /**
    * Reciprocal inline pins ↔ `pause-session-terminal-entry-io.test.ts` (scaffold persist vs terminal guards).
-   * Dedicated sibling file: `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts`.
+   * Dedicated sibling file: `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` (presentation + application).
    */
   it('sibling cluster: terminal-entry-io exports stay distinct from scaffold-io', () => {
     expect(buildPauseSessionPersistSnapshot).not.toBe(isTerminalPauseDbState);

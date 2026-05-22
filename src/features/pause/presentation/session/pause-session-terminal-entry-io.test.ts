@@ -41,7 +41,7 @@ describe('pause-session-terminal-entry-io', () => {
   /**
    * Reciprocal inline pins ↔ `pause-session-shell-io.test.ts` and `scaffold/pause-session-scaffold-io.test.ts`.
    * Dedicated sibling files: `pause-session-terminal-entry-shell-io-sibling-parity.test.ts`,
-   * `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts`.
+   * `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` (presentation + application).
    */
   it('sibling cluster: shell-io exports stay distinct from terminal-entry-io', () => {
     expect(isTerminalPauseDbState).not.toBe(computePauseSessionHydration);

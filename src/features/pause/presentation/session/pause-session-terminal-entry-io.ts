@@ -4,8 +4,10 @@
  * not `pause-session-terminal-entry-flow` CI anchor).
  * Parity pins: `pause-session-terminal-entry-io-parity.test.ts` (extended leaf + tab-session sibling), `pause-session-terminal-entry-io.re-exports.test.ts`,
  * `pause-session-terminal-entry-io.test.ts` (presentation smoke + leaf identity + reciprocal inline pins vs shell/scaffold I/O),
- * `presentation/session/pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` ↔ `pause-session-scaffold-io`;
- * `presentation/session/pause-session-terminal-entry-shell-io-sibling-parity.test.ts` ↔ `pause-session-shell-io` (application + presentation);
+ * `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` ↔ `pause-session-scaffold-io` (application
+ * `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` under `application/.../session/`; reciprocal inline pins in
+ * `pause-session-terminal-entry-io-parity.test.ts` ↔ `pause-session-scaffold-io-parity.test.ts`),
+ * `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` ↔ `pause-session-shell-io` (application + presentation);
  * application reciprocal inline pins: `pause-session-terminal-entry-io-parity.test.ts` ↔ `pause-session-shell-io-parity.test.ts`;
  * sibling cluster vs `pause-session-persisted-tab-session-flow` in application flow tests.
  */

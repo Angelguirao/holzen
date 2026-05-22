@@ -7,7 +7,7 @@
  * Sibling cluster: `pause-session-terminal-entry-flow.test.ts` ↔ `pause-session-persisted-tab-session-flow` (distinct session CI umbrellas);
  * `pause-session-terminal-entry-shell-flow-sibling-parity.test.ts` ↔ `pause-session-shell-flow`;
  * `presentation/session/pause-session-terminal-entry-shell-io-sibling-parity.test.ts` ↔ `pause-session-shell-io` (application + presentation);
- * `presentation/session/pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` ↔ `pause-session-scaffold-io` (presentation).
+ * `pause-session-terminal-entry-scaffold-io-sibling-parity.test.ts` ↔ `pause-session-scaffold-io` (application + presentation).
  */
 export {
   isTerminalPauseDbState,
