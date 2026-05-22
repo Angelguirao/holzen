@@ -9,6 +9,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'supabasePauseRepository' },
+  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer', () => ({
@@ -44,6 +45,10 @@ import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
+  pauseReflectGeneration,
+  runReflectGeneration,
+} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
@@ -252,6 +257,18 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(pauseInitialEmotionSkipWithRepository);
     // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
     // Full pins: `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: generation-io holzen-reflect exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(runReflectGeneration);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseReflectGeneration);
+    expect(getPendingPauseOfferDisplay).not.toBe(runReflectGeneration);
+    expect(reflectPauseRepository).not.toBe(pauseReflectGeneration);
+    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
   });
 
   /**
