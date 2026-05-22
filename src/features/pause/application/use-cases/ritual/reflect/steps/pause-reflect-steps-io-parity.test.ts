@@ -18,14 +18,20 @@ import { runPauseReflectNoteUpdate as runNoteUpdateDirect } from '@/features/pau
 import { runPauseReflectTagUpdate as runTagUpdateDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
 import { runPauseReflectionStepLogOnce as runReflectionStepLogDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
 import {
+  reflectPauseRepository,
   shouldLogPauseReflectionStep as shouldLogFromStepsIo,
   shouldShowFavoriteProHint as shouldShowFromStepsIo,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 describe('pause-reflect-steps-io parity', () => {
   it('presentation I/O step gate re-exports match steps CI umbrella', () => {
     expect(shouldShowFavoriteProHint).toBe(shouldShowFromStepsIo);
     expect(shouldLogPauseReflectionStep).toBe(shouldLogFromStepsIo);
+  });
+
+  it('presentation I/O binds reflectPauseRepository to public-rpc supabasePauseRepository', () => {
+    expect(reflectPauseRepository).toBe(supabasePauseRepository);
   });
 
   it('steps CI umbrella composes the same run-* leaf use cases as presentation I/O', () => {
