@@ -24897,4 +24897,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — companion analytics I/O identity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-analytics-io</code> unmocked re-export regression</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Export <code>runLogCompanionFeedbackVote</code>, <code>runLogCompanionFullviewOpened</code>, and <code>companionAnalyticsRepository</code> on presentation I/O; add <code>pause-companion-analytics-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> leaf + <code>pause-companion-analytics-flow</code> umbrella parity (existing mocked <code>pause-companion-analytics-io.test.ts</code> keeps port routing).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + named repository export only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Split identity vs mocked behavior tests so Vitest mocks do not mask re-export parity.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-orchestration-flow</code> umbrella pins, reflect share/hub flow umbrellas, or Phase B subscription cross-context imports.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

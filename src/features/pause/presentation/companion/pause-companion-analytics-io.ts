@@ -18,18 +18,23 @@ export type {
   LogCompanionFullviewOpenedInput,
 };
 
+export { runLogCompanionFeedbackVote, runLogCompanionFullviewOpened };
+
+/** Default `PauseAnalyticsRepository` for companion frame presentation hooks. */
+export const companionAnalyticsRepository = supabasePauseAnalyticsRepository;
+
 /** Default port + use case: persist companion thumbs feedback. */
 export function logCompanionFeedbackVote(
   input: LogCompanionFeedbackVoteInput,
 ): ReturnType<typeof runLogCompanionFeedbackVote> {
-  return runLogCompanionFeedbackVote(supabasePauseAnalyticsRepository, input);
+  return runLogCompanionFeedbackVote(companionAnalyticsRepository, input);
 }
 
 /** Default port + use case: persist companion fullview open. */
 export function logCompanionFullviewOpened(
   input: LogCompanionFullviewOpenedInput,
 ): ReturnType<typeof runLogCompanionFullviewOpened> {
-  return runLogCompanionFullviewOpened(supabasePauseAnalyticsRepository, input);
+  return runLogCompanionFullviewOpened(companionAnalyticsRepository, input);
 }
 
 /** Test seam: inject a custom `PauseAnalyticsRepository`. */
