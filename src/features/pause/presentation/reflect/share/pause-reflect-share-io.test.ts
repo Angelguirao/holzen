@@ -20,6 +20,10 @@ vi.mock(
   },
 );
 
+import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import { pauseReflectGeneration } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   pauseReflectOutcomeLog,
@@ -73,5 +77,12 @@ describe('pause-reflect-share-io', () => {
     expect(pauseReflectionShareImage).not.toBe(pauseReflectNoteUpdate);
     expect(pauseReflectionShareImage).not.toBe(pauseReflectionStepLogOnce);
     expect(pauseReflectionShareImage).not.toBe(pauseReflectTagUpdate);
+  });
+
+  it('sibling cluster: ambience-io exports stay distinct from share-io', () => {
+    expect(pauseReflectionShareImage).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseReflectionShareImage).not.toBe(stopPauseReflectFrameFocusAmbience);
+    // Full cross-I/O pins: `pause-reflect-share-ambience-io-sibling-parity.test.ts` and
+    // `pause-reflect-ambience-share-io-sibling-parity.test.ts`.
   });
 });
