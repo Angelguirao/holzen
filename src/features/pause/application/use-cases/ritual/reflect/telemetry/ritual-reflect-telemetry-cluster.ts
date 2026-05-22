@@ -3,6 +3,6 @@
  * PostHog flow anchors colocate with tracker modules:
  * - Home manual-open: `generation/manual-open/pause-home-reflect-telemetry-flow`
  * - Session reflect UI: `share/pause-reflect-telemetry-flow`
- * - Pending pause offer: `pending-pause-offer-telemetry` (adopt/decline; session flow re-exports)
+ * - Pending pause offer: `pause-pending-offer-telemetry-flow` (adopt/decline; session telemetry I/O)
  */
 export {};

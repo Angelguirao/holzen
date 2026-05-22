@@ -1,9 +1,9 @@
 /**
  * Session pending-offer PostHog helpers.
- * Imports trackers via `pause-session-pending-offer-flow` CI anchor.
+ * Adopt/decline via `pause-pending-offer-telemetry-flow`; abandoned stays session beat.
  */
 export {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
-  trackPauseSessionAbandoned,
-} from '@/features/pause/application/use-cases/session/pause-session-pending-offer-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow';
+export { trackPauseSessionAbandoned } from '@/features/pause/application/use-cases/session/pause-session-telemetry';
