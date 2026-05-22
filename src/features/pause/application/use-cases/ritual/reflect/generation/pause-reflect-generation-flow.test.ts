@@ -46,6 +46,11 @@ import {
   stopPauseReflectFrameFocusAmbience,
 } from '../ambience/pause-reflect-ambience-flow';
 import {
+  buildShiftEmotionFrameHubLogBundle as buildHubLogBundleFromHubFlow,
+  resolveShiftFrameHubDonePresentation as resolveHubPresentationFromHubFlow,
+  runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
+} from '../hub/pause-reflect-hub-flow';
+import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   runPauseOutcomeLog,
@@ -139,6 +144,14 @@ describe('pause-reflect-generation-flow', () => {
     expect(runReflectGeneration).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(openManualFromFlow).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(dismissFromFlow).not.toBe(stopPauseReflectFrameFocusAmbience);
+  });
+
+  it('sibling cluster: hub-flow exports stay distinct from generation umbrella exports', () => {
+    expect(runReflectGeneration).not.toBe(runShiftHubDoneFromHubFlow);
+    expect(openManualFromFlow).not.toBe(buildHubLogBundleFromHubFlow);
+    expect(dismissFromFlow).not.toBe(resolveHubPresentationFromHubFlow);
+    expect(reflectGenerationPrerequisite).not.toBe(runShiftHubDoneFromHubFlow);
+    expect(runReflectGeneration).not.toBe(buildHubLogBundleFromHubFlow);
   });
 
   it('sibling cluster: flows-flow exports stay distinct from generation umbrella exports', () => {
