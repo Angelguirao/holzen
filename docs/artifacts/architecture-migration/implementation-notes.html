@@ -26045,6 +26045,7 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+<<<<<<< HEAD
       <span>Phase A — companion orchestration ↔ section-visibility sibling pin (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -26058,6 +26059,21 @@
       <dd>Regression guard without merging orchestration and visibility CI umbrellas or changing presentation I/O leaf imports.</dd>
       <dt>Open questions</dt>
       <dd>Next: extend <code>pause-reflect-telemetry-io-parity</code>, Tier 1 <code>holzen-query-client-ref</code> shim peel (<code>App.tsx</code> → <code>public-queries</code>), or Phase B cross-context Tier 1 scan.</dd>
+=======
+      <span>Phase A — home bulk-hold-io repository parity (decide path, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-bulk-hold-io-parity</code> pins <code>homeBulkHoldPauseRepository</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Export <code>homeBulkHoldPauseRepository</code> on <code>presentation/home/pause-home-bulk-hold-io.ts</code> (mirrors <code>archivePauseRepository</code>) and add application-layer <code>pause-home-bulk-hold-io-parity.test.ts</code> binding + delegation to <code>ritual/decide/apply-bulk-hold-outcomes</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — presentation export + tests only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Named repository export keeps Home bulk-hold parity consistent with reflect/archive presentation I/O without a decide-flow CI umbrella for bulk-hold.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Tier 1 <code>holzen-query-client-ref</code> shim peel, <code>pause-companion-orchestration-flow</code> ↔ section-visibility sibling pin, or Phase B subscription Tier 1 shims.</dd>
+>>>>>>> 0c35020ab (test(pause): pin homeBulkHoldPauseRepository on bulk-hold I/O parity)
     </dl>
   </article>
 
