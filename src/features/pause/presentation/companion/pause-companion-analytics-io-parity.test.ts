@@ -1,3 +1,10 @@
+/**
+ * Presentation I/O parity (colocated beside `pause-companion-analytics-io.ts`).
+ * Imports `pause-companion-analytics-flow` CI umbrella for `.toBe` identity pins only —
+ * production analytics I/O keeps ritual/frame leaf imports.
+ * Orchestrate distinctness sibling file: `application/.../frame/pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts`;
+ * presentation sibling: `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts`.
+ */
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/integrations/supabase/client', () => ({
@@ -18,19 +25,13 @@ import {
   companionAnalyticsRepository,
   runLogCompanionFeedbackVote as runFeedbackVoteFromAnalyticsIo,
   runLogCompanionFullviewOpened as runFullviewOpenedFromAnalyticsIo,
-} from '@/features/pause/presentation/companion/pause-companion-analytics-io';
+} from './pause-companion-analytics-io';
 import {
   runCompanionInterventionBootstrap as runInterventionFromOrchestrateIo,
   runCompanionSlotOrchestrate as runSlotOrchestrateFromOrchestrateIo,
-} from '@/features/pause/presentation/companion/pause-companion-orchestrate-io';
+} from './pause-companion-orchestrate-io';
 import { supabasePauseAnalyticsRepository } from '@/features/pause/public-rpc';
 
-/**
- * Presentation I/O parity (colocated beside `pause-companion-analytics-io.ts`).
- * Imports `pause-companion-analytics-flow` CI umbrella for `.toBe` identity pins only — production analytics I/O keeps ritual/frame leaf imports.
- * Orchestrate distinctness sibling file: `application/.../frame/pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts`;
- * presentation sibling: `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts`.
- */
 describe('pause-companion-analytics-io parity', () => {
   it('presentation I/O analytics exports match pause-companion-analytics-flow CI umbrella', () => {
     expect(runLogCompanionFeedbackVote).toBe(runFeedbackVoteFromAnalyticsIo);
