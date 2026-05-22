@@ -79,13 +79,18 @@ import {
 import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
+  pauseDeclinePendingOffer,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   buildManualPauseMarketContext,
   buildManualPauseOpenParams,
   dismissOpenPauseHome,
   openManualPauseFromHome,
+  pauseDismissOpenPauseHomePreview,
+  pauseDismissOpenPauseHomePreviewWithRepository,
   pauseHomeManualOpenPorts,
+  runOpenManualPauseSilentModeAfterCreate,
+  runPersistSilentReflectionStub,
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 
 import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
@@ -95,7 +100,8 @@ import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
  * Presentation mirror: `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`.
  * Imports generation-flow CI umbrella and domain hook bundle for `.toBe` identity pins only — production generation I/O keeps leaf imports.
  * Sibling parity files remain under `application/.../ritual/reflect/generation/` and sibling clusters when they assert flow umbrellas.
- * Home-reflect-io sibling: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`; reciprocal inline pins ↔ `manual-open/pause-home-reflect-io-parity.test.ts`.
+ * Home-reflect-io sibling: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `generation/manual-open/pause-home-reflect-io-parity.test.ts`.
  */
 describe('pause-reflect-generation-io parity (application)', () => {
   it('presentation I/O holzen-reflect exports match generation CI umbrella', () => {
@@ -224,22 +230,29 @@ describe('pause-reflect-generation-io parity (application)', () => {
    */
   it('sibling cluster: pending-offer-io exports stay distinct from generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(pauseAdoptPendingOffer);
-    expect(runReflectGeneration).not.toBe(getPendingPauseOfferDisplay);
-    expect(reflectGenerator).not.toBe(pauseAdoptPendingOffer);
+    expect(runReflectGeneration).not.toBe(pauseDeclinePendingOffer);
+    expect(reflectGenerator).not.toBe(getPendingPauseOfferDisplay);
+    expect(reflectGenerationPrerequisite).not.toBe(pauseAdoptPendingOffer);
+    expect(resolveReflectGenerationPrefetch).not.toBe(getPendingPauseOfferDisplay);
   });
 
   /**
-   * Reciprocal inline pins ↔ `manual-open/pause-home-reflect-io-parity.test.ts` (application + presentation).
+   * Reciprocal inline pins ↔ `generation/manual-open/pause-home-reflect-io-parity.test.ts` (application + presentation).
    * Dedicated sibling file: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: home-reflect-io exports stay distinct from generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(openManualPauseFromHome);
     expect(runReflectGeneration).not.toBe(dismissOpenPauseHome);
     expect(reflectGenerator).not.toBe(pauseHomeManualOpenPorts);
+    expect(reflectGenerationPrerequisite).not.toBe(runOpenManualPauseSilentModeAfterCreate);
     expect(reflectGenerationPrerequisite).not.toBe(buildManualPauseMarketContext);
+    expect(resolveReflectGenerationPrefetch).not.toBe(runPersistSilentReflectionStub);
     expect(resolveReflectGenerationPrefetch).not.toBe(buildManualPauseOpenParams);
+    expect(shouldCommitReflectGeneration).not.toBe(pauseDismissOpenPauseHomePreview);
+    expect(messageFromReflectGenerationResult).not.toBe(pauseDismissOpenPauseHomePreviewWithRepository);
     expect(messageFromReflectGenerationResult).not.toBe(openManualPauseFromHome);
-    // Reciprocal inline pins: `manual-open/pause-home-reflect-io-parity.test.ts`.
+    expect(pauseReflectGeneration).not.toBe(dismissOpenPauseHome);
+    // Reciprocal inline pins: `generation/manual-open/pause-home-reflect-io-parity.test.ts`.
     // Full pins: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`.
   });
 });
