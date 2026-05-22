@@ -91,10 +91,7 @@ describe('pause-home-reflect-telemetry-io parity (application)', () => {
     // Reciprocal inline pins: `presentation/reflect/telemetry/pause-home-reflect-telemetry-io-parity.test.ts`.
     // Dedicated siblings: `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`;
     // `pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts` (application + presentation).
-<<<<<<< HEAD
     // Presentation + application IO sibling: `pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`.
-=======
->>>>>>> aa722d801 (test(pause): extend home-reflect-telemetry-io parity leaf and I/O pins)
   });
 
   it('home-reflect-telemetry-io trackers stay distinct from manual-open-flow and session reflect UI telemetry-flow', () => {
