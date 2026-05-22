@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  isPauseSessionDepthPickerActive,
   pauseInitialEmotionSelect,
   pauseInitialEmotionSkip,
   reflectPauseRepository,
@@ -27,6 +28,23 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 describe('pause-reflect-mood-io', () => {
+  it('re-exports depth-picker active gate from pause-reflect-mood-flow subclusters', () => {
+    expect(
+      isPauseSessionDepthPickerActive({
+        phase: 'session',
+        ritualEntry: 'picker',
+        hasShellMessage: true,
+      }),
+    ).toBe(true);
+    expect(
+      isPauseSessionDepthPickerActive({
+        phase: 'session',
+        ritualEntry: 'deep',
+        hasShellMessage: true,
+      }),
+    ).toBe(false);
+  });
+
   it('routes initial emotion select through the default PauseRepository port adapter', async () => {
     runInitialEmotionSelectMock.mockResolvedValue({ status: 'deduped', ui: {} });
 

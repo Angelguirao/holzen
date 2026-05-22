@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — compose pause-reflect-mood-flow from mood subclusters + breath restore anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Mood umbrella flow composes subcluster CI anchors; ritual restore uses breath-flow</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-mood-flow</code> re-exports only through <code>pause-initial-emotion-log-flow</code>, <code>pause-feel-tiles-mood-flow</code>, <code>pause-depth-picker-mood-flow</code> (incl. <code>isPauseSessionDepthPickerActive</code>), <code>pause-initial-emotion-presentation-flow</code>, and <code>pause-session-mood-chrome-flow</code>. <code>pause-session-ritual-restore-flow</code> imports restored breath hydration via <code>pause-session-breath-flow</code> (finishes prior breath slice). CI guards block deep mood domain imports on the umbrella flow and legacy breath/mood paths in presentation.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Subcluster anchors remain thin re-export shims; domain still owns pure helpers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>use-pause-shift-frame-done-handler</code> under <code>presentation/reflect/hub/</code>, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — pending-offer adopt/decline under ritual/reflect/pending-offer (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
