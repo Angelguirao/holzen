@@ -20866,6 +20866,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — CI guard reflect generation presentation imports (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Forbid deep generation imports under <code>presentation/reflect/generation/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. After <code>pause-reflect-generation-flow</code> umbrella, extend <code>check:architecture-alignment</code> so holzen-reflect hooks import only via <code>pause-reflect-generation-io</code> and manual-open conductors via <code>pause-home-reflect-io</code> (telemetry still via <code>pause-home-reflect-telemetry-io</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — guard only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Manual-open hooks may still import <code>domain/</code> trigger/result types directly; application use-case paths are gated.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim or companion presentation orchestrate-io peel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session ritual-state PauseImpactData via decide I/O (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
