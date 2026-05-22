@@ -406,6 +406,13 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_MANUAL_OPEN_IO_GENERATION_FLOW_IMPORTS =
   "from '../application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow'",
 ];
 
+/** Holzen-reflect generation I/O — import via pause-reflect-generation-hook-flow only (not generation umbrella). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IO_GENERATION_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow',
+  "from './application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow'",
+  "from '../application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow'",
+];
+
 /** Application reflect telemetry/ — flow anchors live in generation/manual-open/ and share/. */
 const LEGACY_PAUSE_APPLICATION_REFLECT_TELEMETRY_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow',
@@ -1241,6 +1248,18 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: share orchestration I/O must import via pause-reflect-share-orchestration-flow (${needle})`,
+        );
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-reflect-generation-io.ts') ||
+    rel.endsWith('pause-reflect-generation-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IO_GENERATION_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: holzen-reflect generation I/O must import via pause-reflect-generation-hook-flow (${needle})`,
         );
       }
     }
