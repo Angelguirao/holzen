@@ -39,6 +39,12 @@ import {
   buildReflectionShareWhatsAppUrl as buildWhatsAppFromFlow,
   runReflectionShareImage,
 } from './pause-reflect-share-orchestration-flow';
+import * as orchestrationFlowModule from './pause-reflect-share-orchestration-flow';
+import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from './pause-reflect-share-flow';
 
 describe('pause-reflect-share-orchestration-flow', () => {
   it('re-exports share orchestration leaf modules and domain builders', () => {
@@ -72,5 +78,14 @@ describe('pause-reflect-share-orchestration-flow', () => {
     expect(buildTelegramFromFlow).toBe(buildTelegramFromShareFlow);
     expect(buildTweetFromFlow).toBe(buildTweetFromShareFlow);
     expect(buildWhatsAppFromFlow).toBe(buildWhatsAppFromShareFlow);
+  });
+
+  it('sibling cluster: share-orchestration-flow exports stay distinct from share-flow session UI telemetry', () => {
+    expect('trackPauseReflectPostItOpen' in orchestrationFlowModule).toBe(false);
+    expect('trackPauseReflectShareTap' in orchestrationFlowModule).toBe(false);
+    expect('trackPauseReflectWallpaperTap' in orchestrationFlowModule).toBe(false);
+    expect(deliverReflectionShareImage).not.toBe(trackPauseReflectPostItOpen);
+    expect(runReflectionShareImage).not.toBe(trackPauseReflectShareTap);
+    expect(deliverReflectionShareImage).not.toBe(trackPauseReflectWallpaperTap);
   });
 });
