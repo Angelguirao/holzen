@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — compose pause-reflect-pending-offer-flow from RPC + telemetry subclusters (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Pending-offer umbrella composes <code>pause-reflect-pending-offer-rpc-flow</code> + <code>pause-pending-offer-telemetry-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-reflect-pending-offer-rpc-flow</code> for adopt/decline use cases + display; <code>pause-reflect-pending-offer-flow</code> re-exports only through RPC and telemetry anchors (parity with share/steps/hub/generation umbrellas). CI blocks deep <code>run-adopt-*</code> / <code>pending-pause-offer-display</code> on the umbrella.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>One more application flow module; <code>public-home</code> / <code>public-hooks</code> still import display via the umbrella.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim or archive decide I/O peel.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect/decide handler params via session decide I/O (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
