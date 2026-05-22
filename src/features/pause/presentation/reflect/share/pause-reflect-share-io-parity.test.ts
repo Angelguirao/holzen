@@ -4,6 +4,13 @@ vi.mock('@/integrations/supabase/client', () => ({
   supabase: {},
 }));
 
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image',
+  () => ({
+    runReflectionShareImage: vi.fn(() => Promise.resolve('downloaded' as const)),
+  }),
+);
+
 import {
   deliverReflectionShareImage as deliverReflectionShareImageDirect,
 } from '@/features/pause/application/use-cases/ritual/reflect/share/deliver-reflection-share-image';
@@ -121,6 +128,23 @@ describe('pause-reflect-share-io parity', () => {
     expect(runReflectionShareImage).toBe(runReflectionShareImageFromOrchestration);
     expect(runReflectionShareImageFromOrchestration).toBe(runReflectionShareImageDirect);
     expect(typeof pauseReflectionShareImage).toBe('function');
+  });
+
+  it('pauseReflectionShareImage delegates to run-reflection-share-image leaf', async () => {
+    const deps = { share: vi.fn() };
+
+    await pauseReflectionShareImage('parity-msg', 'parity-ctx', 'parity-haiku', deps);
+
+    expect(runReflectionShareImageDirect).toHaveBeenCalledWith(
+      'parity-msg',
+      'parity-ctx',
+      'parity-haiku',
+      deps,
+    );
+  });
+
+  it('presentation share wrapper stays distinct from run-reflection-share-image leaf', () => {
+    expect(pauseReflectionShareImage).not.toBe(runReflectionShareImageDirect);
   });
 
   it('share orchestration CI umbrella composes deliver + run leaf modules', () => {
