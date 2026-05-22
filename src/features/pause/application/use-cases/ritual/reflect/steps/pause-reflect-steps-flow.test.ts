@@ -38,6 +38,13 @@ import {
   resolveShiftFrameHubDonePresentation as resolveHubPresentationFromHubFlow,
   runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
 } from '../hub/pause-reflect-hub-flow';
+import {
+  getPendingPauseOfferDisplay as getDisplayFromPendingOfferFlow,
+  runAdoptPendingPauseOffer as runAdoptFromPendingOfferFlow,
+  runDeclinePendingPauseOffer as runDeclineFromPendingOfferFlow,
+  trackPausePendingAdopted as trackAdoptedFromPendingOfferFlow,
+  trackPauseSessionAbandoned as trackAbandonedFromPendingOfferFlow,
+} from '../pending-offer/pause-reflect-pending-offer-flow';
 
 describe('pause-reflect-steps-flow', () => {
   it('re-exports step mutations and domain gates from leaf modules', () => {
@@ -81,5 +88,14 @@ describe('pause-reflect-steps-flow', () => {
     expect(runPauseReflectionStepLogOnce).not.toBe(buildHubLogBundleFromHubFlow);
     expect(shouldShowFavoriteFromFlow).not.toBe(resolveHubPresentationFromHubFlow);
     expect(shouldLogFromFlow).not.toBe(resolveHubPresentationFromHubFlow);
+  });
+
+  it('sibling cluster: pending-offer-flow exports stay distinct from steps umbrella exports', () => {
+    expect(runPauseFavoriteToggle).not.toBe(runAdoptFromPendingOfferFlow);
+    expect(runPauseFavoriteToggle).not.toBe(runDeclineFromPendingOfferFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(getDisplayFromPendingOfferFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(trackAdoptedFromPendingOfferFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(trackAbandonedFromPendingOfferFlow);
+    expect(shouldLogFromFlow).not.toBe(getDisplayFromPendingOfferFlow);
   });
 });
