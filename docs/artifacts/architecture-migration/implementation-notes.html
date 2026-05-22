@@ -93,6 +93,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — providers-io ↔ shell-io presentation sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-providers-shell-io-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add presentation I/O sibling parity so <code>pause-session-providers-io</code> (Holzen slice picker) cannot merge with <code>pause-session-shell-io</code> hydration/header-back/mount-log exports (parity with providers↔scaffold and scaffold↔shell presentation pins and application <code>pause-session-providers-shell-flow-sibling-parity.test.ts</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + I/O header comment cross-refs only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shims, or terminal-entry-io ↔ shell-io dedicated sibling file if still inline-only.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — shell-io ↔ scaffold-io presentation sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
