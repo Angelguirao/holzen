@@ -13,6 +13,7 @@
  * reciprocal inline pins ↔ `steps/pause-reflect-steps-io-parity.test.ts`.
  * Ambience-io sibling: `pause-reflect-share-ambience-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `ambience/pause-reflect-ambience-io-parity.test.ts`.
+ * Home-reflect-io sibling: reciprocal inline pins ↔ `generation/manual-open/pause-home-reflect-io-parity.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
 
@@ -107,6 +108,13 @@ import {
   shouldLogPauseReflectionStep,
   shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
+  dismissOpenPauseHome,
+  openManualPauseFromHome,
+  pauseDismissOpenPauseHomePreview,
+  pauseDismissOpenPauseHomePreviewWithRepository,
+  pauseHomeManualOpenPorts,
+} from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 import {
   buildReflectionShareTelegramUrl as buildTelegramFromShareIo,
   buildReflectionShareText as buildTextFromShareIo,
@@ -282,6 +290,21 @@ describe('pause-reflect-share-io parity (application)', () => {
     expect(buildTweetFromShareIo).not.toBe(pauseInitialEmotionSkipWithRepository);
     expect(buildWhatsAppFromShareIo).not.toBe(buildFeelTilesMoodLogOptions);
     expect(pauseReflectionShareImage).not.toBe(buildFeelTilesMoodLogOptions);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `generation/manual-open/pause-home-reflect-io-parity.test.ts`
+   * (application + presentation).
+   */
+  it('sibling cluster: home-reflect-io exports stay distinct from share-io builders', () => {
+    expect(pauseReflectionShareImage).not.toBe(openManualPauseFromHome);
+    expect(buildTextFromShareIo).not.toBe(dismissOpenPauseHome);
+    expect(buildTelegramFromShareIo).not.toBe(pauseDismissOpenPauseHomePreview);
+    expect(buildTweetFromShareIo).not.toBe(pauseDismissOpenPauseHomePreviewWithRepository);
+    expect(buildWhatsAppFromShareIo).not.toBe(pauseHomeManualOpenPorts);
+    expect(pauseReflectionShareImage).not.toBe(pauseHomeManualOpenPorts);
+    // Reciprocal inline pins: `generation/manual-open/pause-home-reflect-io-parity.test.ts`,
+    // `presentation/reflect/generation/manual-open/pause-home-reflect-io-parity.test.ts`.
   });
 
   /**

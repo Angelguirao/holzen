@@ -33228,4 +33228,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — home-reflect ↔ share-io reciprocal parity pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-io-parity.test.ts</code> + <code>pause-reflect-share-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no reflect moves. Extend manual-open <code>pause-home-reflect-io</code> parity (application + presentation) with reciprocal share-io sibling inline pins; mirror on colocated share-io parity (parity with generation/telemetry home-reflect siblings already on branch).</dd>
+      <dt>Deviation</dt>
+      <dd>None — test-only + comment cross-links.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B Tier 1 lib shim scan (<code>@/lib/holzen-console</code> in frame telemetry), or dedicated <code>pause-reflect-share-home-reflect-io-sibling-parity</code> if CI wants a third file.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

@@ -5,6 +5,7 @@
  * Sibling parity: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (presentation + application)
  * and `telemetry/pause-reflect-telemetry-io-parity.test.ts` (session reflect UI telemetry-io).
+ * Share-io sibling pins: reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
 
@@ -95,6 +96,10 @@ import {
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import {
+  buildReflectionShareText,
+  pauseReflectionShareImage,
+} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 
 import { supabasePauseRepository, supabaseReflectGenerator } from '@/features/pause/public-rpc';
 
@@ -279,5 +284,21 @@ describe('pause-home-reflect-io parity', () => {
     expect('pauseReflectGeneration' in homeReflectIo).toBe(false);
     expect('pauseHomeManualOpenPorts' in homeReflectIo).toBe(true);
     expect('reflectGenerator' in generationIo).toBe(true);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`
+   * (Home manual-open I/O vs reflection share builders).
+   */
+  it('sibling cluster: share-io builders stay distinct from home-reflect-io', () => {
+    expect(openFromHomeIo).not.toBe(pauseReflectionShareImage);
+    expect(dismissFromHomeIo).not.toBe(buildReflectionShareText);
+    expect(pauseDismissOpenPauseHomePreview).not.toBe(pauseReflectionShareImage);
+    expect(pauseDismissOpenPauseHomePreviewWithRepository).not.toBe(buildReflectionShareText);
+    expect(pauseHomeManualOpenPorts).not.toBe(pauseReflectionShareImage);
+    expect(buildMarketFromHomeIo).not.toBe(buildReflectionShareText);
+    expect(persistStubFromHomeIo).not.toBe(pauseReflectionShareImage);
+    // Reciprocal inline pins: `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`,
+    // `application/.../share/pause-reflect-share-io-parity.test.ts`.
   });
 });
