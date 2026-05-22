@@ -16,15 +16,21 @@ import {
   runReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
-  buildReflectionShareText,
   buildReflectionShareTelegramUrl,
+  buildReflectionShareText,
+  buildReflectionShareTweetUrl,
+  buildReflectionShareWhatsAppUrl,
   pauseReflectionShareImage,
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   pauseReflectFavoriteToggle,
+  pauseReflectFavoriteToggleWithRepository,
   pauseReflectNoteUpdate,
+  pauseReflectNoteUpdateWithRepository,
   pauseReflectTagUpdate,
+  pauseReflectTagUpdateWithRepository,
   pauseReflectionStepLogOnce,
+  pauseReflectionStepLogOnceWithRepository,
   reflectPauseRepository,
   shouldLogPauseReflectionStep,
   shouldShowFavoriteProHint,
@@ -172,6 +178,15 @@ describe('pause-reflect-steps-io', () => {
     expect(pauseReflectionStepLogOnce).not.toBe(pauseReflectionShareImage);
     expect(shouldShowFavoriteProHint).not.toBe(buildReflectionShareText);
     expect(shouldLogPauseReflectionStep).not.toBe(pauseReflectionShareImage);
+    expect(pauseReflectFavoriteToggle).not.toBe(buildReflectionShareTweetUrl);
+    expect(pauseReflectNoteUpdate).not.toBe(buildReflectionShareWhatsAppUrl);
+    expect(pauseReflectTagUpdate).not.toBe(pauseReflectionShareImage);
+    expect(pauseReflectionStepLogOnce).not.toBe(buildReflectionShareTweetUrl);
+    expect(pauseReflectFavoriteToggleWithRepository).not.toBe(buildReflectionShareText);
+    expect(pauseReflectionStepLogOnceWithRepository).not.toBe(pauseReflectionShareImage);
+    expect(reflectPauseRepository).not.toBe(pauseReflectionShareImage);
+    // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-share-io.test.ts`;
+    // `pause-reflect-share-steps-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: generation-io exports stay distinct from steps-io', () => {
