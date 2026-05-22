@@ -6,6 +6,18 @@ import { persistCompanionUiStepCompletion as persistDirect } from './persist-ui-
 import { runToggleCompanionLibraryFavorite as toggleFavoriteDirect } from './run-toggle-companion-library-favorite';
 
 import {
+  loadCompanionOrchestrateSession as loadSessionFromSessionFlow,
+} from './pause-companion-orchestrate-session-flow';
+import {
+  runToggleCompanionLibraryFavorite as toggleFavoriteFromLibraryFlow,
+} from './pause-companion-library-favorite-flow';
+import {
+  nextExpandedWithLazyFetch as nextExpandedFromExpansionFlow,
+} from './pause-companion-section-expansion-flow';
+import {
+  persistCompanionUiStepCompletion as persistFromUiCompletionFlow,
+} from './pause-companion-ui-completion-flow';
+import {
   loadCompanionOrchestrateSession,
   nextExpandedWithLazyFetch,
   persistCompanionUiStepCompletion,
@@ -23,5 +35,12 @@ describe('pause-companion-orchestration-flow', () => {
     expect(nextExpandedWithLazyFetch).toBe(nextExpandedDirect);
     expect(persistCompanionUiStepCompletion).toBe(persistDirect);
     expect(runToggleCompanionLibraryFavorite).toBe(toggleFavoriteDirect);
+  });
+
+  it('umbrella bindings match orchestration subcluster CI anchors (leaf parity)', () => {
+    expect(loadCompanionOrchestrateSession).toBe(loadSessionFromSessionFlow);
+    expect(nextExpandedWithLazyFetch).toBe(nextExpandedFromExpansionFlow);
+    expect(persistCompanionUiStepCompletion).toBe(persistFromUiCompletionFlow);
+    expect(runToggleCompanionLibraryFavorite).toBe(toggleFavoriteFromLibraryFlow);
   });
 });

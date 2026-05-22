@@ -24988,4 +24988,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — companion orchestration-flow ↔ subcluster anchors (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestration-flow</code> pins umbrella exports to orchestration CI anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) and #2 (<code>companion/</code> → <code>ritual/frame/</code>) remain complete — no folder moves. Extend <code>pause-companion-orchestration-flow.test.ts</code> with <code>.toBe</code> identity against <code>pause-companion-orchestrate-session-flow</code>, <code>pause-companion-section-expansion-flow</code>, <code>pause-companion-ui-completion-flow</code>, and <code>pause-companion-library-favorite-flow</code> (parity with <code>pause-reflect-steps-flow</code> umbrella pins). Presentation <code>pause-companion-orchestration-io</code> unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without rewiring umbrella imports (CI forbids umbrella → subcluster flow imports in production code).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-generation-io</code> <code>runReflectGeneration</code> leaf import pin, <code>pause-companion-section-visibility-flow</code> sibling pins, or Phase B cross-context Tier 1 shim peel.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
