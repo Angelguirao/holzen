@@ -17,8 +17,15 @@ describe('pause-reflect-tag-flow', () => {
     expect(runPauseReflectTagUpdate).toBe(runTagDirect);
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-note-flow.test.ts`.
+   * Dedicated sibling file: `pause-reflect-note-tag-flow-sibling-parity.test.ts`.
+   */
   it('sibling cluster: note-flow export stays distinct from tag-flow export', () => {
     expect(runPauseReflectTagUpdate).not.toBe(runNoteFromNoteFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(runFavoriteFromStepsFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(runReflectionStepFromStepsFlow);
+    // Reciprocal inline pins: `pause-reflect-note-flow.test.ts`.
   });
 
   it('sibling cluster: steps-flow exports stay distinct from tag-flow export', () => {
