@@ -23922,4 +23922,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — ritual/frame orchestrate-slot-apply leaf identity (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-orchestrate-slot-apply-flow</code> pins empty relaxations re-export</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder move and reflect leaf flow identity pins are complete on this branch — no reflect files changed. Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Strengthen <code>pause-companion-orchestrate-slot-apply-flow.test.ts</code> with <code>.toBe(direct)</code> identity for <code>EMPTY_COMPANION_SLOT_RELAXATIONS</code> from <code>orchestrate-slot-apply</code> (last <code>ritual/frame</code> typeof-only leaf anchor on this branch). Presentation I/O unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>Session targeted reflect backlog #1 cluster move; that item was already complete — this slice closes the remaining frame Tier 5 leaf pin gap.</dd>
+      <dt>Tradeoff</dt>
+      <dd>Constant-only anchor — shape <code>toMatchObject</code> kept alongside identity.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription Tier 1 shims, or pause Tier 2–4 scan.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
