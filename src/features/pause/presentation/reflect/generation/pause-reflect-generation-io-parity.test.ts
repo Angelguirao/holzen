@@ -75,6 +75,10 @@ import {
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+import {
   applyBriefDepthPickerRitualEntry,
   buildFeelTilesMoodLogOptions,
   pauseInitialEmotionSelect,
@@ -215,6 +219,22 @@ describe('pause-reflect-generation-io parity', () => {
     expect(pauseReflectGeneration).not.toBe(buildShiftEmotionFrameHubLogBundle);
     // Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts`.
     // Full pins: `pause-reflect-generation-hub-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (holzen-reflect vs frame-focus bed).
+   * Dedicated sibling file: `pause-reflect-ambience-generation-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: ambience-io frame-focus bed exports stay distinct from generation-io', () => {
+    expect(pauseReflectGeneration).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(runReflectGeneration).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(reflectGenerationPrerequisite).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(resolveReflectGenerationPrefetch).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(shouldCommitReflectGeneration).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(messageFromReflectGenerationResult).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(reflectGenerator).not.toBe(startPauseReflectFrameFocusAmbience);
+    // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
+    // Full pins: `pause-reflect-ambience-generation-io-sibling-parity.test.ts`.
   });
 
   /**
