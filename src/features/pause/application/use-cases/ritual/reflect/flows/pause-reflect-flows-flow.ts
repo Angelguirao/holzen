@@ -5,7 +5,8 @@
  * `pause-reflect-flows-io.re-exports.test.ts` and `pause-reflect-flows-io-parity.test.ts`
  * may import this umbrella for parity; production flows I/O keeps leaf imports.
  * Sibling pins: `pause-reflect-flows-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts`,
- * `pause-reflect-ambience-flow.test.ts`, and `pause-reflect-steps-flow.test.ts`.
+ * `pause-reflect-ambience-flow.test.ts`, and `pause-reflect-steps-flow.test.ts`;
+ * `pause-reflect-flows-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-flow`.
  */
 export {
   resolvePauseSessionReflectAndDecideAfterGeneration,
