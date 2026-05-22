@@ -2,7 +2,8 @@
  * CI cluster anchor for session ritual hydration from `PersistedSession` (§3).
  * Cluster marker: `pause-session-ritual-restore-cluster.ts` (empty export; unit-tested).
  * Composes breath/decide/frame/brief restore helpers for presentation I/O (leaf modules, not session *-flow umbrellas).
- * Presentation: `pause-session-ritual-restore-io.ts` imports sibling subcluster modules directly (CI cluster anchor only).
+ * Presentation: `pause-session-ritual-restore-io.ts` imports sibling subcluster modules directly (not this umbrella).
+ * Parity pins: `pause-session-ritual-restore-io.re-exports.test.ts` and `pause-session-ritual-restore-io-parity.test.ts`.
  */
 export { mapPersistedStep } from '@/features/pause/domain/session/map-persisted-step';
 export {
