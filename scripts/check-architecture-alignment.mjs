@@ -107,6 +107,10 @@ mustExist(
   'pause/presentation/reflect/telemetry/',
 );
 mustExist(
+  'src/features/pause/presentation/reflect/telemetry/session',
+  'pause/presentation/reflect/telemetry/session/',
+);
+mustExist(
   'src/features/pause/presentation/reflect/hub',
   'pause/presentation/reflect/hub/',
 );

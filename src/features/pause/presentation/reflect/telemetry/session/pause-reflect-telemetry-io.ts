@@ -1,7 +1,7 @@
 /**
  * Session reflect beat PostHog helpers (post-it, share, wallpaper taps).
- * Imports trackers via `pause-reflect-telemetry-flow` CI anchor
- * (parity with `pause-home-reflect-telemetry-io` → home telemetry flow).
+ * Colocated under `presentation/reflect/telemetry/session/` (parity with application `telemetry/session/`).
+ * Imports trackers via `pause-reflect-telemetry-flow` CI anchor.
  */
 export {
   trackPauseReflectPostItOpen,

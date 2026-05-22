@@ -19628,4 +19628,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate session reflect telemetry presentation (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>presentation/reflect/telemetry/session/</code> mirrors application telemetry subcluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no application folder moves. Colocate session PostHog I/O + <code>usePauseReflectUiTelemetry</code> under <code>presentation/reflect/telemetry/session/</code> beside application <code>telemetry/session/pause-reflect-session-ui-telemetry.ts</code>. <code>public-ritual-reflect</code> export path only; screens still import the hook from the barrel.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; path colocation only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Home manual-open telemetry stays under <code>presentation/home/manual-open/</code> (not mirrored under <code>presentation/reflect/telemetry/home/</code>) to avoid cross-route churn.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: route <code>pause-companion-orchestration-io</code> through <code>pause-companion-orchestration-flow</code>, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
