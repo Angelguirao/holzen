@@ -1,7 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
 
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: {},
+}));
+
 vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: { port: 'supabasePauseRepository' },
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
+}));
+
+vi.mock('@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log', () => ({
+  runPauseOutcomeLog: vi.fn(() => Promise.resolve({ status: 'no_instance' as const })),
 }));
 
 /**
@@ -43,7 +51,7 @@ import {
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import * as flowsIo from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 
-describe('pause-reflect-flows-flow ↔ pause-reflect-flows-io wrapper sibling parity', () => {
+describe('pause-reflect-flows-flow ↔ pause-reflect-flows-io wrapper sibling parity (application)', () => {
   it('flows-flow CI umbrella and presentation flows-io are distinct anchors', () => {
     expect(typeof resolvePauseSessionReflectAndDecidePreflight).toBe('function');
     expect(typeof resolvePauseSessionReflectAndDecideAfterGeneration).toBe('function');
@@ -59,6 +67,9 @@ describe('pause-reflect-flows-flow ↔ pause-reflect-flows-io wrapper sibling pa
     expect('pauseReflectOutcomeLog' in flowsFlow).toBe(false);
     expect('pauseReflectOutcomeLogWithRepository' in flowsFlow).toBe(false);
     expect('reflectPauseRepository' in flowsFlow).toBe(false);
+    expect('pauseReflectOutcomeLog' in flowsIo).toBe(true);
+    expect('pauseReflectOutcomeLogWithRepository' in flowsIo).toBe(true);
+    expect('reflectPauseRepository' in flowsIo).toBe(true);
     expect('runPauseOutcomeLog' in flowsIo).toBe(false);
   });
 
