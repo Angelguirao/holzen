@@ -59,7 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
+      <span>Phase A — Home reflect telemetry I/O under presentation/reflect/telemetry/ (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-home-reflect-telemetry-io</code> leaves generation/manual-open/</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no application moves. After session and pending-offer reflect telemetry I/O moved to <code>presentation/reflect/telemetry/</code>, colocate Home manual-open PostHog I/O (+ test) there beside the other telemetry I/O modules (application trackers stay in <code>ritual/reflect/generation/manual-open/</code>). <code>use-home-pause-actions</code> and manual-open conductors import the telemetry path.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; leaf tracker imports unchanged.</dd>
+      <dt>Tradeoff</dt>
+      <dd><code>generation/manual-open/</code> keeps generation I/O only (<code>pause-home-reflect-io</code>); Home PostHog no longer siblings manual-open conductors by folder (imports use <code>@/features/.../telemetry/</code>).</dd>
+      <dt>Open question</dt>
+      <dd>Next: complete remaining session breath umbrella sibling pins on <code>pause-session-breath-flow</code>, or start Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect share ↔ telemetry flow identity pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -73,21 +91,6 @@
       <dd>Share umbrella test now depends on telemetry subcluster anchor — documents CI cluster wiring without changing runtime imports.</dd>
       <dt>Open question</dt>
       <dd>Next: complete remaining session breath umbrella sibling pins on <code>pause-session-breath-flow</code>, or start Phase B subscription Tier 1 shims.</dd>
-=======
-      <span>Phase A — Home reflect telemetry I/O under presentation/reflect/telemetry/ (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>pause-home-reflect-telemetry-io</code> leaves generation/manual-open/</h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no application moves. After session and pending-offer reflect telemetry I/O moved to <code>presentation/reflect/telemetry/</code>, colocate Home manual-open PostHog I/O (+ test) there beside the other telemetry I/O modules (application trackers stay in <code>ritual/reflect/generation/manual-open/</code>). <code>use-home-pause-actions</code> and manual-open conductors import the telemetry path.</dd>
-      <dt>Deviation</dt>
-      <dd>None — behavior parity; leaf tracker imports unchanged.</dd>
-      <dt>Tradeoff</dt>
-      <dd><code>generation/manual-open/</code> keeps generation I/O only (<code>pause-home-reflect-io</code>); Home PostHog no longer siblings manual-open conductors by folder (imports use <code>@/features/.../telemetry/</code>).</dd>
-      <dt>Open question</dt>
-      <dd>Next: Phase B subscription Tier 1 shim when pause Tier 5 identity pins are quiet.</dd>
->>>>>>> 39df52027 (refactor(pause): colocate home reflect telemetry I/O under reflect/telemetry/)
     </dl>
   </article>
 
