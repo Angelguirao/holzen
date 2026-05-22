@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
+import type { PauseImpactData } from './impact-data';
 
 const COMPOSURE: Record<string, number> = {
   fomo: 10,
