@@ -66,7 +66,7 @@
     <h3><code>pause-session-decide-io-parity.test.ts</code> → <code>presentation/session/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete — no use-case moves. Colocate decide I/O parity beside type-only <code>pause-session-decide-io.ts</code> (parity with frame-io and brief-io colocation). Imports decide-flow CI umbrella and reflect flows-io for sibling distinctness pins only.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves remain complete — no use-case moves. Colocate decide I/O parity beside type-only <code>pause-session-decide-io.ts</code> (parity with brief-io, providers-io, and shell-io colocation). Imports <code>pause-session-decide-flow</code> CI umbrella and ritual restore leaf modules for <code>.toBe</code> identity pins only; production decide I/O stays type-only (<code>PauseImpactData</code> peel).</dd>
       <dt>Deviation</dt>
       <dd>None — file move + comment anchor updates only.</dd>
       <dt>Open questions</dt>
@@ -113,11 +113,14 @@
     <h3><code>pause-session-terminal-entry-io-parity.test.ts</code> → <code>presentation/session/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete — no use-case moves. Colocate terminal-entry presentation I/O parity beside <code>pause-session-terminal-entry-io.ts</code> (parity with providers-io, brief-io, and shell-io colocation). Application flow/sibling parity tests stay under <code>application/.../session/</code>.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves remain complete — no use-case moves. Colocate terminal-entry presentation I/O parity beside <code>pause-session-terminal-entry-io.ts</code> (parity with providers-io, brief-io, and shell-io colocation). Application flow/sibling parity tests stay under <code>application/.../session/</code>.</dd>
       <dt>Deviation</dt>
       <dd>Parity test still imports <code>pause-session-terminal-entry-flow</code> and <code>pause-session-persisted-tab-session-flow</code> CI umbrellas — intentional presentation ↔ application binding guards.</dd>
       <dt>Open questions</dt>
-      <dd>Next: colocate remaining session application <code>*-io-parity.test.ts</code> files (step-handlers, ritual-restore, decide, …), or Phase B Tier 1 shim scan.</dd>
+      <dd>Next: colocate remaining session application <code>*-io-parity.test.ts</code> files (step-handlers, ritual-restore, …), or Phase B Tier 1 shim scan.</dd>
+    </dl>
+  </article>
+
     </dl>
   </article>
 

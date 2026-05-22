@@ -39,7 +39,10 @@ type AssertFlowMatchesDomain = PauseImpactDataFromDecideFlow extends PauseImpact
 
 /**
  * Presentation I/O parity (colocated beside `pause-session-decide-io.ts`).
- * Imports `pause-session-decide-flow` CI umbrella and reflect flows-io for sibling distinctness pins only — production decide-io stays type-only from domain.
+ * Imports `pause-session-decide-flow` CI umbrella and ritual restore leaf modules for identity pins only —
+ * production decide I/O stays type-only (`PauseImpactData` peel).
+ * Reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts`.
+ * Dedicated sibling file: `pause-reflect-flows-decide-io-sibling-parity.test.ts` (application + presentation).
  */
 describe('pause-session-decide-io parity', () => {
   it('PauseImpactData type peel matches pause-session-decide-flow and domain', () => {
