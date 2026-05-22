@@ -7,8 +7,9 @@
  * `pause-session-providers-flow.test.ts` (inline);
  * `pause-session-scaffold-shell-flow-sibling-parity.test.ts` ↔ `pause-session-shell-flow`;
  * `pause-session-providers-scaffold-flow-sibling-parity.test.ts` ↔ `pause-session-providers-flow`.
- * Parity pins: `pause-session-scaffold-io-parity.test.ts` (application + presentation; sibling distinctness vs shell-io +
- * persisted-tab-session flow + persistable-anchor behavioral pin), `pause-session-scaffold-io.re-exports.test.ts`.
+ * Parity pins: `pause-session-scaffold-io-parity.test.ts` (application + presentation; umbrella/leaf identity +
+ * sibling distinctness vs shell-io, persisted-tab-session flow, providers/terminal/step-handlers-io inline pins,
+ * persistable-anchor behavioral pin), `pause-session-scaffold-io.re-exports.test.ts`.
  */
 export {
   buildPauseSessionPersistSnapshot,
