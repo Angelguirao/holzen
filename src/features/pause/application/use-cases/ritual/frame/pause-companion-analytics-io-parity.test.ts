@@ -13,13 +13,19 @@ import {
   runLogCompanionFullviewOpened,
 } from '@/features/pause/application/use-cases/ritual/frame/pause-companion-analytics-flow';
 import {
+  companionAnalyticsRepository,
   runLogCompanionFeedbackVote as runFeedbackVoteFromAnalyticsIo,
   runLogCompanionFullviewOpened as runFullviewOpenedFromAnalyticsIo,
 } from '@/features/pause/presentation/companion/pause-companion-analytics-io';
+import { supabasePauseAnalyticsRepository } from '@/features/pause/public-rpc';
 
 describe('pause-companion-analytics-io parity', () => {
   it('presentation I/O analytics exports match pause-companion-analytics-flow CI umbrella', () => {
     expect(runLogCompanionFeedbackVote).toBe(runFeedbackVoteFromAnalyticsIo);
     expect(runLogCompanionFullviewOpened).toBe(runFullviewOpenedFromAnalyticsIo);
+  });
+
+  it('binds default companionAnalyticsRepository to public-rpc supabasePauseAnalyticsRepository', () => {
+    expect(companionAnalyticsRepository).toBe(supabasePauseAnalyticsRepository);
   });
 });

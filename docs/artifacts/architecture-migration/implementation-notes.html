@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — companion frame-ui-io ↔ frame-ui-flow (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-frame-ui-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Add application-layer <code>pause-companion-frame-ui-io-parity.test.ts</code> so presentation <code>pause-companion-frame-ui-io</code> matches <code>pause-companion-frame-ui-flow</code> (parity with orchestrate/orchestration-io parity tests; presentation re-exports test already pins leaves + section-visibility subcluster). Production frame UI I/O keeps direct ritual/frame leaf imports.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow comment only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — breath segment-log-flow CI anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -69,7 +86,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + CI guard only.</dd>
       <dt>Open question</dt>
-      <dd>Superseded by companion analytics-io parity slice (same day).</dd>
+      <dd>Superseded by frame-ui-io parity slice (same day).</dd>
     </dl>
   </article>
 
@@ -82,11 +99,11 @@
     <h3><code>pause-companion-analytics-io-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Add application-layer <code>pause-companion-analytics-io-parity.test.ts</code> so presentation <code>pause-companion-analytics-io</code> run-log exports match <code>pause-companion-analytics-flow</code> (parity with orchestration-io parity; presentation re-exports test already pins leaf + flow + repository). Production analytics I/O keeps direct leaf imports.</dd>
+      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Add application-layer <code>pause-companion-analytics-io-parity.test.ts</code> so presentation <code>pause-companion-analytics-io</code> run-log exports match <code>pause-companion-analytics-flow</code> (parity with orchestration-io parity; presentation re-exports test already pins leaf + flow + repository). Extend parity test with explicit <code>companionAnalyticsRepository</code> ↔ <code>supabasePauseAnalyticsRepository</code> binding (orchestrate-io-style port pin). Production analytics I/O keeps direct leaf imports.</dd>
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
       <dt>Open question</dt>
-      <dd>Next: Phase B subscription Tier 1 shims.</dd>
+      <dd>Superseded by frame-ui-io parity slice (same day).</dd>
     </dl>
   </article>
 
@@ -120,7 +137,7 @@
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
       <dt>Open question</dt>
-      <dd>Superseded by archive-io application parity slice (same day).</dd>
+      <dd>Superseded by frame-ui-io parity slice (same day).</dd>
     </dl>
   </article>
 
