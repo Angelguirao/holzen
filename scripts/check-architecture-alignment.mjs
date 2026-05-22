@@ -948,6 +948,25 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_UMBRELLA_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow'",
 ];
 
+/** Reflect flows I/O — import leaf domain/decide modules only (not reflect/flows subcluster anchors). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_SUBCLUSTER_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow',
+  "from './application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow'",
+  "from '../application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow'",
+  "from './application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
+  "from '../application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
+  "from './application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow'",
+  "from '../application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow'",
+  "from './application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow'",
+  "from '../application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow'",
+  "from './application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow'",
+  "from '../application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow'",
+];
+
 const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_IO_UMBRELLA_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow',
   "from './application/use-cases/ritual/frame/pause-companion-orchestration-flow'",
@@ -2249,7 +2268,14 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_UMBRELLA_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: reflect flows I/O must import via flows subcluster anchors (${needle})`,
+          `${rel}: reflect flows I/O must not import flows umbrella (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_SUBCLUSTER_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect flows I/O must import domain/decide leaf modules directly (${needle})`,
         );
       }
     }

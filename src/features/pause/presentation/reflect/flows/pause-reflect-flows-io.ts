@@ -1,6 +1,7 @@
 /**
  * Reflect+decide flows presentation I/O (preflight, decide outcome RPC, outcome toasts).
- * Imports reflect/decide helpers via flows subcluster anchors (parity with mood/steps I/O peels).
+ * Imports reflect/decide helpers from domain + ritual/decide leaf modules (parity with
+ * `pause-reflect-pending-offer-io` → adopt/decline/display leaf use cases).
  * `PauseImpactData` via `pause-session-decide-io` (session decide beat).
  */
 import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
@@ -17,18 +18,18 @@ import {
 import {
   formatReinforcementQuoteFromSession,
   resolvePauseDecideOutcomeFlow,
-} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow';
+} from '@/features/pause/domain/decide/pause-decide-outcome-flow';
 import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   type PauseSessionReflectAndDecideViewInput,
-} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow';
-import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow';
+} from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow';
+import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
 import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-} from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow';
-import { getSessionQuote } from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow';
+} from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
+import { getSessionQuote } from '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
