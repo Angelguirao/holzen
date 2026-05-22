@@ -18,7 +18,7 @@ export {
   playPauseBreathPatternCompleteCue,
   playPauseBreathPhaseCue,
   resumePauseAudioContext,
-} from '@/features/pause/application/use-cases/ritual/breathe/ritual-audio';
+} from '@/features/pause/application/use-cases/ritual/breathe/pause-ritual-audio-breathe-flow';
 export {
   resolvePauseBreathSecondLabelVariant,
   viteWantsPauseBreathSecondLabelShift,

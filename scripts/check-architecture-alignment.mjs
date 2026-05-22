@@ -279,6 +279,20 @@ const LEGACY_PAUSE_PRESENTATION_ARCHIVE_DECIDE_IMPORTS = [
   "from '../application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry'",
 ];
 
+/** Deep ritual-audio in session breath I/O — use pause-ritual-audio-breathe-flow anchor. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_AUDIO_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/breathe/ritual-audio',
+  "from './application/use-cases/ritual/breathe/ritual-audio'",
+  "from '../application/use-cases/ritual/breathe/ritual-audio'",
+];
+
+/** Deep session telemetry in presentation/session — use pending-offer flow anchor via telemetry-io. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_TELEMETRY_IMPORTS = [
+  '@/features/pause/application/use-cases/session/pause-session-telemetry',
+  "from './application/use-cases/session/pause-session-telemetry'",
+  "from '../application/use-cases/session/pause-session-telemetry'",
+];
+
 /** Flat presentation/session scaffold paths — use presentation/session/scaffold/. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_SCAFFOLD_IMPORTS = [
   '@/features/pause/presentation/session/scaffold-ritual-payloads',
@@ -403,6 +417,24 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_ARCHIVE_DECIDE_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy archive decide import (${needle})`);
+      }
+    }
+  }
+  if (rel.startsWith('src/features/pause/presentation/session/breath/')) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_AUDIO_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy session breath ritual-audio import (${needle})`);
+      }
+    }
+  }
+  if (
+    rel.startsWith('src/features/pause/presentation/session/') &&
+    !rel.endsWith('pause-session-pending-offer-telemetry-io.ts') &&
+    !rel.endsWith('pause-session-pending-offer-telemetry-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_TELEMETRY_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy session telemetry import (${needle})`);
       }
     }
   }
