@@ -24824,19 +24824,38 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-      <span>Phase A — companion orchestration I/O identity (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — presentation companion orchestration I/O identity (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
     <h3><code>pause-companion-orchestration-io</code> unmocked re-export regression</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-companion-orchestration-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> identity for <code>load-companion-orchestrate-session</code>, <code>next-expanded-with-lazy-fetch</code>, and <code>invalidateCompanionUiCompletionQuery</code>, plus port bindings for <code>companionOrchestrator</code> / <code>companionPauseRepository</code> (existing mocked <code>pause-companion-orchestration-io.test.ts</code> keeps routing behavior).</dd>
+      <dd>Backlog #2 (<code>application/use-cases/companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Add <code>pause-companion-orchestration-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> identity for <code>load-companion-orchestrate-session</code>, <code>next-expanded-with-lazy-fetch</code>, <code>invalidateCompanionUiCompletionQuery</code>, and default <code>public-rpc</code> port bindings (<code>companionOrchestrator</code> / <code>companionPauseRepository</code>; not <code>pause-companion-orchestration-flow</code> umbrella). Existing mocked <code>pause-companion-orchestration-io.test.ts</code> keeps routing behavior.</dd>
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
       <dt>Tradeoffs</dt>
       <dd>Split identity vs mocked behavior tests so Vitest mocks do not mask re-export parity.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-companion-orchestrate-io</code> identity pins, or Phase B subscription cross-context imports.</dd>
+      <dd>Next: <code>pause-reflect-share-flow</code> umbrella ↔ share subcluster pins, <code>pause-companion-orchestration-flow</code> ↔ orchestration subcluster pins, or Phase B Tier 2–4 scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect share-flow ↔ subcluster anchors (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-share-flow</code> pins umbrella exports to share CI anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-share-flow.test.ts</code> with <code>.toBe</code> identity against <code>pause-reflection-share-text-flow</code>, <code>pause-reflection-share-channel-urls-flow</code>, and <code>pause-reflection-share-image-flow</code> (parity with <code>pause-reflect-steps-flow</code> / <code>pause-reflect-flows-flow</code>). Presentation <code>pause-reflect-share-io</code> unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without rewiring umbrella imports (CI forbids umbrella → subcluster flow imports in production code).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-reflect-generation-flow</code> ↔ manual-open / holzen-reflect subcluster pins, <code>pause-companion-orchestration-flow</code> ↔ orchestration subcluster pins, or Phase B Tier 2–4 scan.</dd>
     </dl>
   </article>
 
