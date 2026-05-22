@@ -12,7 +12,7 @@
  * application parity: `pause-reflect-steps-io-parity.test.ts` (application) ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`;
  * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-hub-io.test.ts`;
- * application parity: `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-hub-io-parity.test.ts`;
+ * presentation parity: `pause-reflect-steps-io-parity.test.ts` ↔ `presentation/reflect/hub/pause-reflect-hub-io-parity.test.ts`;
  * `pause-reflect-share-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`;
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-share-io.test.ts`,
  * `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-generation-io.test.ts`,
