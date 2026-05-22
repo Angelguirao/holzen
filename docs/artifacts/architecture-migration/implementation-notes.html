@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — presentation flows-io ↔ telemetry-io sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-flows-telemetry-io-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Mirror application <code>pause-reflect-flows-telemetry-flow-sibling-parity</code> at presentation: <code>pause-reflect-flows-io</code> (reflect+decide + outcome RPC) vs <code>pause-reflect-telemetry-io</code> (session UI PostHog) stay distinct surfaces (parity with <code>pause-reflect-flows-steps-io-sibling-parity</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + I/O header comments only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or presentation generation-io ↔ hub-io sibling parity.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — generation↔share dedicated sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
