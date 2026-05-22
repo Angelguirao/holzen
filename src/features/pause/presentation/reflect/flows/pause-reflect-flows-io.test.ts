@@ -19,6 +19,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
 }));
 
+import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
 import {
   formatReinforcementQuoteFromSession,
   getSessionQuote,
@@ -26,11 +27,10 @@ import {
   pauseReflectOutcomeLogWithRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecidePreflight,
-  type PauseImpactData,
 } from './pause-reflect-flows-io';
 
 describe('pause-reflect-flows-io', () => {
-  it('re-exports PauseImpactData from the decide outcome view flow anchor', () => {
+  it('session decide I/O re-exports PauseImpactData for reflect/decide handler params', () => {
     const sample: PauseImpactData = {
       mood: null,
       moodAfter: null,

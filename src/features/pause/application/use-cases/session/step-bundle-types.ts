@@ -4,7 +4,7 @@ import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import type { FetchedPauseInstance } from '@/features/pause/domain/session-model';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
-import type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
+import type { PauseImpactData } from '@/features/pause/application/use-cases/session/pause-session-decide-flow';
 import type { PauseSessionHydrationState } from '@/features/pause/application/use-cases/session/hydration';
 
 /** React-free setter shape for ritual bundle inputs. */

@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect/decide handler params via session decide I/O (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Reflect flows handler types import PauseImpactData from pause-session-decide-io</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-session-reflect-and-decide-types</code> and <code>pause-session-decide-handler-types</code> import <code>PauseImpactData</code> via <code>presentation/session/pause-session-decide-io</code> (parity with <code>use-pause-session-ritual-state</code> and breath reflect handlers). <code>pause-reflect-flows-io</code> no longer re-exports the impact type; session <code>step-bundle-types</code> uses <code>pause-session-decide-flow</code>. CI guards block legacy impact imports in reflect flows <code>*-types.ts</code> modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session ritual-state and reflect/decide conductors share one impact-type seam; flows I/O stays focused on preflight/outcome RPC helpers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim (<code>App.tsx</code> checkout guard), or further session scaffold I/O peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — compose pause-reflect-share-flow from share subclusters (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

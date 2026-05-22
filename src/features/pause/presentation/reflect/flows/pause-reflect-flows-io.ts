@@ -12,7 +12,6 @@ import {
   runPauseOutcomeLog,
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-  type PauseImpactData,
   type PauseSessionReflectAndDecideViewInput,
 } from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
@@ -26,7 +25,6 @@ export {
   resolvePauseSessionReflectAndDecidePreflight,
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-  type PauseImpactData,
   type PauseSessionReflectAndDecideViewInput,
 };
 
