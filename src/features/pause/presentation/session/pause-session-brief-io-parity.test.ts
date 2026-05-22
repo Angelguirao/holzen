@@ -22,6 +22,8 @@ import {
   initialSelectedBriefFaceFromRestored,
   logPauseRitualDepthUpgraded,
 } from '@/features/pause/application/use-cases/session/pause-session-brief-flow';
+import { logPauseRitualDepthUpgraded as logDepthUpgradedMock } from '@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
 import {
   briefPauseRepository,
   initialBriefIntegrateDoneFromRestored as integrateDoneFromBriefIo,
@@ -30,10 +32,12 @@ import {
   initialSelectedBriefFaceFromRestored as briefFaceFromBriefIo,
   pauseBriefRitualDepthUpgraded,
   pauseBriefRitualDepthUpgradedWithRepository,
-} from '@/features/pause/presentation/session/pause-session-brief-io';
-import { logPauseRitualDepthUpgraded as logDepthUpgradedMock } from '@/features/pause/application/use-cases/ritual/brief/ritual-depth-upgrade';
-import { supabasePauseRepository } from '@/features/pause/public-rpc';
+} from './pause-session-brief-io';
 
+/**
+ * Presentation I/O parity (colocated beside `pause-session-brief-io.ts`).
+ * Imports `pause-session-brief-flow` CI umbrella for `.toBe` identity pins only — production brief I/O keeps session + ritual/brief leaf imports.
+ */
 describe('pause-session-brief-io parity', () => {
   it('presentation I/O binds briefPauseRepository to public-rpc supabasePauseRepository', () => {
     expect(briefPauseRepository).toBe(supabasePauseRepository);
