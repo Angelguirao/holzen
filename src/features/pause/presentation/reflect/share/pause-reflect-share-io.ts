@@ -1,7 +1,7 @@
 /**
  * Reflect share presentation I/O — plain-text/channel builders (domain) + PNG orchestration (application).
- * Imports builders and orchestration via `pause-reflect-share-flow` CI anchor
- * (parity with `pause-reflect-steps-io` → steps flow).
+ * Imports builders and orchestration via `pause-reflect-share-orchestration-flow` CI anchor
+ * (parity with `pause-reflect-telemetry-io` → `pause-reflect-telemetry-flow`).
  */
 import {
   buildReflectionShareTelegramUrl,
@@ -10,7 +10,7 @@ import {
   buildReflectionShareWhatsAppUrl,
   runReflectionShareImage,
   type DeliverReflectionShareImageDeps,
-} from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow';
+} from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow';
 
 export {
   buildReflectionShareTelegramUrl,

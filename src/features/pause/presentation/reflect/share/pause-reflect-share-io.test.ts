@@ -8,10 +8,10 @@ import {
 const runReflectionShareImageMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow',
   async (importOriginal) => {
     const actual = await importOriginal<
-      typeof import('@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow')
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow')
     >();
     return {
       ...actual,
@@ -21,7 +21,7 @@ vi.mock(
 );
 
 describe('pause-reflect-share-io', () => {
-  it('re-exports share text and channel URL builders from pause-reflect-share-flow', () => {
+  it('re-exports share text and channel URL builders from pause-reflect-share-orchestration-flow', () => {
     const text = buildReflectionShareText('Stay calm.');
     expect(text).toContain('Stay calm.');
     expect(buildReflectionShareTweetUrl(text)).toContain('https://x.com/intent/tweet?text=');

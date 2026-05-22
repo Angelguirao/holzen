@@ -807,6 +807,13 @@ const LEGACY_PAUSE_REFLECT_SHARE_FLOW_TELEMETRY_IMPORTS = [
   "from '../pause-reflect-session-ui-telemetry'",
 ];
 
+/** Reflect share presentation — orchestration I/O via pause-reflect-share-orchestration-flow only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_ORCHESTRATION_UMBRELLA_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow',
+  "from './application/use-cases/ritual/reflect/share/pause-reflect-share-flow'",
+  "from '../application/use-cases/ritual/reflect/share/pause-reflect-share-flow'",
+];
+
 /** Reflect generation presentation (holzen-reflect) — import via pause-reflect-generation-flow only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_HOOK_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/pause-reflect-generation-hook-flow',
@@ -1222,6 +1229,18 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: share telemetry I/O must import via pause-reflect-telemetry-flow (${needle})`,
+        );
+      }
+    }
+  }
+  if (
+    rel.endsWith('pause-reflect-share-io.ts') ||
+    rel.endsWith('pause-reflect-share-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_ORCHESTRATION_UMBRELLA_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: share orchestration I/O must import via pause-reflect-share-orchestration-flow (${needle})`,
         );
       }
     }
