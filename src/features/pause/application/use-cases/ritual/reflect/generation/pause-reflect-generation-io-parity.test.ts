@@ -52,7 +52,19 @@ import {
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import {
+  buildReflectionShareTelegramUrl,
+  buildReflectionShareText,
+  buildReflectionShareTweetUrl,
+  buildReflectionShareWhatsAppUrl,
+  pauseReflectionShareImage,
+} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 
+/**
+ * Application-layer generation I/O parity. Telemetry-io sibling:
+ * `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`; share-io sibling:
+ * `pause-reflect-generation-share-io-sibling-parity.test.ts` (reciprocal inline pins below).
+ */
 describe('pause-reflect-generation-io parity', () => {
   it('presentation I/O holzen-reflect exports match generation CI umbrella', () => {
     expect(resolveReflectGenerationPrefetch).toBe(resolvePrefetchFromGenerationIo);
@@ -117,6 +129,22 @@ describe('pause-reflect-generation-io parity', () => {
     await pauseReflectGeneration(input, customGenerator as typeof supabaseReflectGenerator);
 
     expect(runReflectGenerationDirect).toHaveBeenCalledWith(input, customGenerator);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` (holzen-reflect vs share builders).
+   * Dedicated sibling file: `pause-reflect-generation-share-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: share-io exports stay distinct from generation-io', () => {
+    expect(pauseReflectGeneration).not.toBe(pauseReflectionShareImage);
+    expect(runReflectGeneration).not.toBe(buildReflectionShareText);
+    expect(reflectGenerationPrerequisite).not.toBe(buildReflectionShareTweetUrl);
+    expect(resolveReflectGenerationPrefetch).not.toBe(buildReflectionShareTelegramUrl);
+    expect(messageFromReflectGenerationResult).not.toBe(buildReflectionShareWhatsAppUrl);
+    expect(reflectGenerator).not.toBe(pauseReflectionShareImage);
+    expect(shouldCommitReflectGeneration).not.toBe(buildReflectionShareText);
+    // Reciprocal inline pins: `pause-reflect-share-io-parity.test.ts`.
+    // Full pins: `pause-reflect-generation-share-io-sibling-parity.test.ts`.
   });
 
   /**

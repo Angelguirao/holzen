@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: {},
+}));
 
 import {
   deliverReflectionShareImage as deliverReflectionShareImageDirect,
@@ -33,7 +37,20 @@ import {
   buildReflectionShareWhatsAppUrl as buildWhatsAppFromShareIo,
   pauseReflectionShareImage,
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
+import {
+  messageFromReflectGenerationResult,
+  pauseReflectGeneration,
+  reflectGenerationPrerequisite,
+  reflectGenerator,
+  resolveReflectGenerationPrefetch,
+  runReflectGeneration,
+  shouldCommitReflectGeneration,
+} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 
+/**
+ * Application-layer share I/O parity. Generation-io sibling:
+ * `pause-reflect-generation-share-io-sibling-parity.test.ts` (reciprocal inline pins below).
+ */
 describe('pause-reflect-share-io parity', () => {
   it('presentation I/O share builder exports match share CI umbrella', () => {
     expect(buildReflectionShareText).toBe(buildTextFromShareIo);
@@ -84,5 +101,21 @@ describe('pause-reflect-share-io parity', () => {
     expect(runReflectionShareImage).not.toBe(deliverReflectionShareImage);
     expect(trackPauseReflectPostItOpen).not.toBe(deliverReflectionShareImage);
     expect(trackPauseReflectWallpaperTap).not.toBe(runReflectionShareImageFromOrchestration);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (share builders vs holzen-reflect).
+   * Dedicated sibling file: `pause-reflect-generation-share-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: generation-io exports stay distinct from share-io wrappers', () => {
+    expect(pauseReflectionShareImage).not.toBe(runReflectGeneration);
+    expect(buildTextFromShareIo).not.toBe(pauseReflectGeneration);
+    expect(buildTelegramFromShareIo).not.toBe(resolveReflectGenerationPrefetch);
+    expect(buildTweetFromShareIo).not.toBe(reflectGenerationPrerequisite);
+    expect(buildWhatsAppFromShareIo).not.toBe(messageFromReflectGenerationResult);
+    expect(pauseReflectionShareImage).not.toBe(reflectGenerator);
+    expect(buildTextFromShareIo).not.toBe(shouldCommitReflectGeneration);
+    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
+    // Full pins: `pause-reflect-generation-share-io-sibling-parity.test.ts`.
   });
 });
