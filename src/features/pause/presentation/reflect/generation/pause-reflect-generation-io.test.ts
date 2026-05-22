@@ -154,4 +154,20 @@ describe('pause-reflect-generation-io', () => {
     expect(reflectGenerator).not.toBe(trackPauseReflectPostItOpen);
     // Full cross-I/O pins: `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`.
   });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-home-reflect-io.test.ts` (manual-open vs holzen-reflect).
+   * Dedicated sibling file: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: home-reflect-io manual-open exports stay distinct from generation-io', () => {
+    expect(pauseReflectGeneration).not.toBe(openManualPauseFromHome);
+    expect(pauseReflectGeneration).not.toBe(dismissOpenPauseHome);
+    expect(runReflectGenerationDirect).not.toBe(openManualPauseFromHome);
+    expect(reflectGenerationPrerequisite).not.toBe(dismissOpenPauseHome);
+    expect(reflectGenerator).not.toBe(openManualPauseFromHome);
+    expect(shouldCommitReflectGeneration).not.toBe(dismissOpenPauseHome);
+    expect(resolveReflectGenerationPrefetch).not.toBe(openManualPauseFromHome);
+    expect(messageFromReflectGenerationResult).not.toBe(dismissOpenPauseHome);
+    // Reciprocal inline pins: `pause-home-reflect-io.test.ts`.
+  });
 });
