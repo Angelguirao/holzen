@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — session step-handlers I/O via pause-session-step-handlers-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>use-pause-session-step-handlers</code> imports bundle builders through presentation I/O</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-session-step-handlers-flow</code> beside <code>step-bundles</code>; <code>presentation/session/pause-session-step-handlers-io.ts</code> re-exports for the step-handler conductor (parity with terminal-entry and ritual-restore I/O peels). CI forbids deep <code>step-bundles</code> imports under <code>presentation/session/</code> except <code>*-io.ts</code> modules.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>use-pause-session-providers-conductor</code> and scaffold <code>step-transition</code> imports remain direct — peel in follow-up slices.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: providers-conductor I/O peel, breath segment-log flow anchor, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — colocate manual-open PostHog trackers under generation/manual-open (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

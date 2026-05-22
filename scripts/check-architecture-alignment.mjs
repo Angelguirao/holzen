@@ -279,6 +279,13 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_TERMINAL_ENTRY_IMPORTS = [
   "from '../application/use-cases/session/terminal-entry-guard'",
 ];
 
+/** Session presentation — import step bundle builders via flow anchor only. */
+const LEGACY_PAUSE_PRESENTATION_SESSION_STEP_BUNDLES_IMPORTS = [
+  '@/features/pause/application/use-cases/session/step-bundles',
+  "from './application/use-cases/session/step-bundles'",
+  "from '../application/use-cases/session/step-bundles'",
+];
+
 /** Archive presentation I/O — import retrospective decide helpers via flow anchor only. */
 const LEGACY_PAUSE_PRESENTATION_ARCHIVE_DECIDE_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome',
@@ -457,6 +464,11 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_TERMINAL_ENTRY_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session terminal-entry import (${needle})`);
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_STEP_BUNDLES_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy session step-bundles import (${needle})`);
       }
     }
   }
