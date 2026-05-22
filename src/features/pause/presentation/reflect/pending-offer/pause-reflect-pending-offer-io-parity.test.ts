@@ -72,6 +72,12 @@ import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
+import {
+  buildShiftEmotionFrameHubLogBundle,
+  pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
+  resolveShiftFrameHubDonePresentation,
+} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 
 describe('pause-reflect-pending-offer-io parity', () => {
   it('presentation I/O pending-offer display matches pending-offer CI umbrella', () => {
@@ -186,6 +192,22 @@ describe('pause-reflect-pending-offer-io parity', () => {
     expect(pauseAdoptPendingOffer).not.toBe(pauseReflectionStepLogOnceWithRepository);
     // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
     // Full pins: `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (pending-offer RPC vs shift-frame hub).
+   * Dedicated sibling file: `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: hub-io shift-frame exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(getPendingPauseOfferDisplay).not.toBe(resolveShiftFrameHubDonePresentation);
+    expect(pauseAdoptPendingOffer).not.toBe(buildShiftEmotionFrameHubLogBundle);
+    expect(pauseDeclinePendingOffer).not.toBe(resolveShiftFrameHubDonePresentation);
+    // Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts`.
+    // Full pins: `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts`.
   });
 
   /**

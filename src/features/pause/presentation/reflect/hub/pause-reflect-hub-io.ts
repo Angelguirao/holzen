@@ -6,7 +6,9 @@
  * mood-io, flows-io, and share-io reciprocal inline pins).
  * Sibling parity: `pause-reflect-generation-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`,
  * `pause-reflect-hub-share-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`,
- * `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`,
+ * `pause-reflect-hub-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (application
+ * `application/.../hub/pause-reflect-hub-pending-offer-io-sibling-parity.test.ts`; reciprocal inline:
+ * `pause-reflect-hub-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`),
  * `pause-reflect-mood-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`,
  * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
  * reciprocal inline pins: `pause-reflect-hub-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`;

@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — application hub-io ↔ pending-offer-io sibling parity (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-pending-offer-io-sibling-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete — no moves. Mirror presentation <code>pause-reflect-hub-pending-offer-io-sibling-parity</code> at application layer so shift-frame hub RPC stays namespace-separated from pending-offer adopt/decline/display I/O. Extend reciprocal inline pins on <code>pause-reflect-hub-io-parity</code> and <code>pause-reflect-pending-offer-io-parity</code>; align presentation sibling test shared <code>reflectPauseRepository</code> binding with flows/pending-offer pattern.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + I/O header comments only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: remaining presentation-only reflect I/O sibling mirrors (ambience, generation-home-reflect, telemetry cross-links), or Phase B subscription/auth Tier 1 shim scan.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — colocate scaffold-io parity beside presentation cluster (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
