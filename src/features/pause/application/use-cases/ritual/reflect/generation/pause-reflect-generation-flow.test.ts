@@ -180,6 +180,10 @@ describe('pause-reflect-generation-flow', () => {
     expect(dismissFromFlow).not.toBe(runPauseOutcomeLog);
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-flow.test.ts` (generation-flow cluster).
+   * Dedicated sibling file: `pause-reflect-steps-generation-flow-sibling-parity.test.ts`.
+   */
   it('sibling cluster: steps-flow exports stay distinct from generation umbrella exports', () => {
     expect(runReflectGeneration).not.toBe(runFavoriteFromStepsFlow);
     expect(runReflectGeneration).not.toBe(runNoteFromStepsFlow);
@@ -194,6 +198,9 @@ describe('pause-reflect-generation-flow', () => {
     expect(shouldCommitFromFlow).not.toBe(runTagFromStepsFlow);
     expect(prerequisiteFromFlow).not.toBe(shouldLogFromStepsFlow);
     expect(resolvePrefetchFromFlow).not.toBe(runTagFromStepsFlow);
+    expect(userErrorFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+    expect(runReflectGeneration).not.toBe(shouldLogFromStepsFlow);
+    expect(openManualFromFlow).not.toBe(shouldShowFavoriteFromStepsFlow);
     // Full cross-flow pins: `pause-reflect-steps-generation-flow-sibling-parity.test.ts`.
   });
 

@@ -30,6 +30,7 @@ import { runPauseReflectNoteUpdate as runNoteDirect } from './run-pause-reflect-
 import { runPauseReflectTagUpdate as runTagDirect } from './run-pause-reflect-tag-update';
 import { runPauseReflectionStepLogOnce as runReflectionStepDirect } from './run-pause-reflection-step-log';
 import {
+  dismissOpenPauseHome as dismissFromGenerationFlow,
   messageFromReflectGenerationResult as messageFromResultFromGenerationFlow,
   openManualPauseFromHome as openManualFromGenerationFlow,
   reflectGenerationPrerequisite as prerequisiteFromGenerationFlow,
@@ -135,6 +136,10 @@ describe('pause-reflect-steps-flow', () => {
     expect(shouldShowFavoriteFromFlow).not.toBe(trackDeclinedFromPendingOfferFlow);
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-generation-flow.test.ts` (steps-flow cluster).
+   * Dedicated sibling file: `pause-reflect-steps-generation-flow-sibling-parity.test.ts`.
+   */
   it('sibling cluster: generation-flow exports stay distinct from steps umbrella exports', () => {
     expect(runPauseFavoriteToggle).not.toBe(runReflectGenerationFromGenerationFlow);
     expect(runPauseReflectNoteUpdate).not.toBe(runReflectGenerationFromGenerationFlow);
@@ -147,7 +152,10 @@ describe('pause-reflect-steps-flow', () => {
     expect(runPauseFavoriteToggle).not.toBe(messageFromResultFromGenerationFlow);
     expect(runPauseReflectNoteUpdate).not.toBe(shouldCommitFromGenerationFlow);
     expect(runPauseReflectTagUpdate).not.toBe(messageFromResultFromGenerationFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(dismissFromGenerationFlow);
     expect(runPauseReflectionStepLogOnce).not.toBe(shouldCommitFromGenerationFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(shouldCommitFromGenerationFlow);
+    expect(shouldLogFromFlow).not.toBe(dismissFromGenerationFlow);
     // Full cross-flow pins: `pause-reflect-steps-generation-flow-sibling-parity.test.ts`.
   });
 

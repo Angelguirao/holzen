@@ -17,6 +17,7 @@
  * `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow` (application CI umbrella),
  * `pause-reflect-steps-note-tag-io-sibling-parity.test.ts` (note vs tag wrappers on this module;
  * application: `pause-reflect-steps-note-tag-flow-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow`).
+ * Application flow umbrellas: `pause-reflect-steps-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts` (reciprocal inline).
  */
 import { runPauseFavoriteToggle } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import { runPauseReflectNoteUpdate } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
