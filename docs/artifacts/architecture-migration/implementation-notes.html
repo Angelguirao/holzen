@@ -24093,4 +24093,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session scaffold umbrella identity pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-scaffold-flow</code> pins storage sync + scaffold derived re-exports</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-session-scaffold-flow.test.ts</code> with <code>.toBe(direct)</code> identity on <code>computePauseStorageRitualSyncPatch</code> and <code>buildPauseSessionScaffoldRitualDerived</code> (parity with persist-snapshot pin already in the same file). Presentation scaffold I/O unchanged (imports leaf modules directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-brief-flow</code> ritual-entry / depth-upgrade anchors still typeof-only until a slice needs stricter pinning.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>ritual/frame</code> CI cluster markers (orchestration / orchestrate / frame-ui), <code>pause-session-brief-flow</code> identity pins, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
