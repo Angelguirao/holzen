@@ -1,39 +1,32 @@
 /**
  * Companion slot orchestrate presentation I/O (orchestrate, intervention, retry, telemetry, UI state).
- * Imports ritual/frame use cases and domain helpers directly (off `pause-companion-orchestrate-flow` CI anchor).
+ * Imports ritual/frame use cases via `pause-companion-orchestrate-flow` CI anchor
+ * (parity with `pause-reflect-mood-io` → mood flow).
  */
 import {
   applyCompanionOrchestrateRetryReset,
-  type CompanionOrchestrateRetryResetInput,
-  type CompanionOrchestrateRetryResetPorts,
-} from '@/features/pause/application/use-cases/ritual/frame/apply-companion-orchestrate-retry-reset';
-import { applyCompanionSlotOrchestrateOutcome } from '@/features/pause/application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome';
-import type { CompanionOrchestrateSessionContext } from '@/features/pause/application/use-cases/ritual/frame/build-companion-orchestrate-body';
-import { logCompanionSlotOrchestrateInvoke } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry';
-import { trackCompanionGenerationInitiated } from '@/features/pause/application/use-cases/ritual/frame/companion-generation-telemetry';
-import type { ApplyCompanionSlotOrchestrateFailureUiPorts } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-failure-ui';
-import {
+  applyCompanionSlotOrchestrateOutcome,
+  EMPTY_COMPANION_SLOT_RELAXATIONS,
+  logCompanionSlotOrchestrateInvoke,
+  resetInterventionIdempotency,
+  runCompanionInterventionBootstrap,
+  runCompanionSlotOrchestrate,
   setCompanionSlotError,
   setCompanionSlotLoading,
-  type CompanionSlotErrorSetters,
-  type CompanionSlotLoadingSetters,
-} from '@/features/pause/application/use-cases/ritual/frame/companion-slot-ui-state';
-import { resetInterventionIdempotency } from '@/features/pause/application/use-cases/ritual/frame/intervention-idempotency';
-import {
-  EMPTY_COMPANION_SLOT_RELAXATIONS,
+  trackCompanionGenerationInitiated,
+  type ApplyCompanionSlotOrchestrateFailureUiPorts,
+  type CompanionOrchestrateRetryResetInput,
+  type CompanionOrchestrateRetryResetPorts,
+  type CompanionOrchestrateSessionContext,
   type CompanionSlotAutosaveParams,
   type CompanionSlotCacheIds,
   type CompanionSlotCommitters,
-  type CompanionSlotRelaxations,
-} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
-import {
-  runCompanionSlotOrchestrate,
+  type CompanionSlotErrorSetters,
+  type CompanionSlotLoadingSetters,
   type CompanionSlotOrchestrateMode,
-} from '@/features/pause/application/use-cases/ritual/frame/run-companion-slot-orchestrate';
-import {
-  runCompanionInterventionBootstrap,
+  type CompanionSlotRelaxations,
   type RunCompanionInterventionBootstrapPorts,
-} from '@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
+} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow';
 
 export { companionOrchestrator } from './pause-companion-orchestration-io';
 

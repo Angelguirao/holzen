@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for companion slot orchestrate presentation I/O (§3 / check:architecture-alignment).
  * Slot orchestrate, intervention bootstrap, retry reset, telemetry, and UI state live in sibling modules.
- * Re-export for presentation I/O imports.
+ * Presentation: `pause-companion-orchestrate-io.ts` imports through this CI anchor.
  */
 export {
   applyCompanionOrchestrateRetryReset,

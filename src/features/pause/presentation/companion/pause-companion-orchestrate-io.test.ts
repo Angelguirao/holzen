@@ -4,17 +4,17 @@ const runCompanionSlotOrchestrateMock = vi.hoisted(() => vi.fn());
 const runCompanionInterventionBootstrapMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/run-companion-slot-orchestrate',
-  () => ({
-    runCompanionSlotOrchestrate: runCompanionSlotOrchestrateMock,
-  }),
-);
-
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap',
-  () => ({
-    runCompanionInterventionBootstrap: runCompanionInterventionBootstrapMock,
-  }),
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow',
+  async (importOriginal) => {
+    const actual = await importOriginal<
+      typeof import('@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow')
+    >();
+    return {
+      ...actual,
+      runCompanionSlotOrchestrate: runCompanionSlotOrchestrateMock,
+      runCompanionInterventionBootstrap: runCompanionInterventionBootstrapMock,
+    };
+  },
 );
 
 vi.mock('./pause-companion-orchestration-io', () => ({
@@ -37,7 +37,7 @@ describe('pause-companion-orchestrate-io', () => {
     });
   });
 
-  it('imports slot orchestrate and intervention bootstrap from ritual/frame siblings', () => {
+  it('imports slot orchestrate and intervention bootstrap via orchestrate-flow anchor', () => {
     expect(runCompanionSlotOrchestrate).toBe(runCompanionSlotOrchestrateMock);
     expect(runCompanionInterventionBootstrap).toBe(runCompanionInterventionBootstrapMock);
   });
