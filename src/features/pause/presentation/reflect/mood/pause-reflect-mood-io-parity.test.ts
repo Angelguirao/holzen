@@ -99,8 +99,8 @@ import {
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 
 /**
- * Application-layer mood I/O parity. Steps-io sibling pins:
- * `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
+ * Presentation mood I/O parity (colocated beside `pause-reflect-mood-io.ts`).
+ * Steps-io sibling pins: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts`.
  * Flows-io sibling pins: `pause-reflect-flows-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-flows-io-parity.test.ts`.

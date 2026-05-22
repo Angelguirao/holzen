@@ -2488,9 +2488,13 @@ for (const file of walkTs(join(root, 'src'))) {
   if (
     rel.endsWith('pause-reflect-mood-io.ts') ||
     rel.endsWith('pause-reflect-mood-io.test.ts') ||
-    rel.endsWith('pause-reflect-mood-io.re-exports.test.ts')
+    rel.endsWith('pause-reflect-mood-io.re-exports.test.ts') ||
+    rel.endsWith('pause-reflect-mood-io-parity.test.ts')
   ) {
-    if (!rel.endsWith('pause-reflect-mood-io.re-exports.test.ts')) {
+    if (
+      !rel.endsWith('pause-reflect-mood-io.re-exports.test.ts') &&
+      !rel.endsWith('pause-reflect-mood-io-parity.test.ts')
+    ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_UMBRELLA_FLOW_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(
@@ -2511,7 +2515,8 @@ for (const file of walkTs(join(root, 'src'))) {
     if (
       !rel.endsWith('pause-reflect-mood-io.ts') &&
       !rel.endsWith('pause-reflect-mood-io.test.ts') &&
-      !rel.endsWith('pause-reflect-mood-io.re-exports.test.ts')
+      !rel.endsWith('pause-reflect-mood-io.re-exports.test.ts') &&
+      !rel.endsWith('pause-reflect-mood-io-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {
