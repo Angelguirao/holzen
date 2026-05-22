@@ -30463,4 +30463,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate hub-io parity beside presentation cluster (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-hub-io-parity.test.ts</code> → <code>presentation/reflect/hub/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no use-case folder moves. Colocate presentation I/O parity beside <code>pause-reflect-hub-io.ts</code> (parity with <code>pause-reflect-mood-io-parity.test.ts</code> and <code>pause-reflect-pending-offer-io-parity.test.ts</code>). Allowlist <code>pause-reflect-hub-io-parity.test.ts</code> in <code>check:architecture-alignment</code> for hub-flow umbrella imports and legacy hub domain import guards under <code>presentation/reflect/hub/</code>. Application flow/cluster comment anchors updated; production I/O unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>Application-layer hub sibling parity tests remain under <code>application/.../ritual/reflect/hub/</code> when they assert flow umbrellas; hub presentation wrappers are presentation-first.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>pause-reflect-pending-offer-telemetry-io-parity</code> under <code>presentation/reflect/pending-offer/</code>, or Phase B Tier 1 shim scan (<code>subscription-checkout-guard-ref</code>).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
