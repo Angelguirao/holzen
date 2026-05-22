@@ -26328,4 +26328,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect ambience-flow ↔ generation-flow sibling pin (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-ambience-flow.test.ts</code> reciprocal sibling-cluster guard</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-ambience-flow.test.ts</code> with sibling-cluster tests so ambience-flow exports stay distinct from <code>pause-reflect-generation-flow</code> holzen-reflect + manual-open symbols (reciprocal to existing generation-flow ↔ ambience-flow pin). Document cross-test reference on <code>pause-reflect-ambience-flow.ts</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + comment only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without merging generation and ambience CI umbrellas or changing presentation I/O leaf imports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Tier 1 <code>holzen-query-client-ref</code> ↔ <code>public-queries</code> re-export parity test, session terminal-entry/step-handlers extended pins, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
