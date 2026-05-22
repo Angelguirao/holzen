@@ -11,7 +11,7 @@ const trackPauseReflectShareTapMock = vi.hoisted(() => vi.fn());
 const trackPauseReflectWallpaperTapMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-telemetry-flow',
   () => ({
     trackPauseReflectPostItOpen: trackPauseReflectPostItOpenMock,
     trackPauseReflectShareTap: trackPauseReflectShareTapMock,
