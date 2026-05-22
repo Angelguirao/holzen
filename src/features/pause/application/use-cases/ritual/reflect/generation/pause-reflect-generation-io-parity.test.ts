@@ -79,7 +79,10 @@ import {
 import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
   pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
+  reflectPauseRepository,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   buildManualPauseMarketContext,
@@ -234,6 +237,10 @@ describe('pause-reflect-generation-io parity (application)', () => {
     expect(reflectGenerator).not.toBe(getPendingPauseOfferDisplay);
     expect(reflectGenerationPrerequisite).not.toBe(pauseAdoptPendingOffer);
     expect(resolveReflectGenerationPrefetch).not.toBe(getPendingPauseOfferDisplay);
+    expect(pauseReflectGeneration).not.toBe(pauseAdoptPendingOfferWithRepository);
+    expect(runReflectGeneration).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(reflectGenerator).not.toBe(reflectPauseRepository);
+    // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts` (application + presentation).
   });
 
   /**
