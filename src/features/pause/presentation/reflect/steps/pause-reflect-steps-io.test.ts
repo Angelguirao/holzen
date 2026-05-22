@@ -8,6 +8,11 @@ import {
   pauseDeclinePendingOffer,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
+  pauseReflectGeneration,
+  reflectGenerator,
+  runReflectGeneration,
+} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import {
   buildReflectionShareText,
   buildReflectionShareTelegramUrl,
   pauseReflectionShareImage,
@@ -90,6 +95,7 @@ vi.mock('@/features/pause/domain/reflect/steps/reflection-step-log', () => ({
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectStepsRepository' },
   reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' },
+  supabaseReflectGenerator: { port: 'reflectGenerator' },
 }));
 
 describe('pause-reflect-steps-io', () => {
@@ -163,6 +169,15 @@ describe('pause-reflect-steps-io', () => {
     expect(pauseReflectionStepLogOnce).not.toBe(pauseReflectionShareImage);
     expect(shouldShowFavoriteProHint).not.toBe(buildReflectionShareText);
     expect(shouldLogPauseReflectionStep).not.toBe(pauseReflectionShareImage);
+  });
+
+  it('sibling cluster: generation-io exports stay distinct from steps-io', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseReflectGeneration);
+    expect(pauseReflectNoteUpdate).not.toBe(runReflectGeneration);
+    expect(pauseReflectTagUpdate).not.toBe(pauseReflectGeneration);
+    expect(pauseReflectionStepLogOnce).not.toBe(runReflectGeneration);
+    expect(reflectPauseRepository).not.toBe(reflectGenerator);
+    // Full cross-I/O pins: `pause-reflect-steps-generation-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: note and tag wrappers stay distinct on steps-io', () => {

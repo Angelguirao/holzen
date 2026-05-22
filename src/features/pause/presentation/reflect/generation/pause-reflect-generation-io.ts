@@ -12,6 +12,7 @@
  * `pause-reflect-flows-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`;
  * `pause-reflect-steps-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
  * `pause-reflect-generation-share-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`;
+ * reciprocal inline pins: `pause-reflect-generation-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`;
  * inline pins: `pause-reflect-generation-io.test.ts`, `pause-reflect-ambience-io.test.ts`.
  */
 import {
