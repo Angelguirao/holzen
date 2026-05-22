@@ -24,7 +24,20 @@ import {
   pauseDeclinePendingOfferWithRepository,
   reflectPauseRepository,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
+import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 
+/**
+ * Application-layer ambience I/O parity. Steps-io sibling pins:
+ * `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts`.
+ */
 describe('pause-reflect-ambience-io parity', () => {
   it('presentation I/O frame-focus exports match ambience CI umbrella', () => {
     expect(startPauseReflectFrameFocusAmbience).toBe(startFromAmbienceIo);
@@ -50,5 +63,21 @@ describe('pause-reflect-ambience-io parity', () => {
     expect(startFromAmbienceIo).not.toBe(getPendingPauseOfferDisplay);
     expect(stopFromAmbienceIo).not.toBe(reflectPauseRepository);
     // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts` (frame-focus bed vs step RPC wrappers).
+   * Dedicated sibling file: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: steps-io exports stay distinct from ambience-io frame-focus bed', () => {
+    expect(startFromAmbienceIo).not.toBe(pauseReflectFavoriteToggle);
+    expect(stopFromAmbienceIo).not.toBe(pauseReflectNoteUpdate);
+    expect(startFromAmbienceIo).not.toBe(pauseReflectTagUpdate);
+    expect(stopFromAmbienceIo).not.toBe(pauseReflectionStepLogOnce);
+    expect(startFromAmbienceIo).not.toBe(shouldShowFavoriteProHint);
+    expect(stopFromAmbienceIo).not.toBe(shouldLogPauseReflectionStep);
+    expect(startFromAmbienceIo).not.toBe(pauseReflectNoteUpdate);
+    expect(stopFromAmbienceIo).not.toBe(pauseReflectTagUpdate);
+    // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
   });
 });

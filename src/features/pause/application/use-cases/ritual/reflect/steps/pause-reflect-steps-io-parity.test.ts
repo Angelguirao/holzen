@@ -37,6 +37,8 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
  * `pause-reflect-flows-steps-io-sibling-parity.test.ts` (application + presentation).
  * Steps-io ↔ mood-io: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts`.
+ * Steps-io ↔ ambience-io: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts`.
  */
 import {
   runPauseFavoriteToggle,
@@ -63,6 +65,10 @@ import {
   shouldLogPauseReflectionStep as shouldLogFromStepsIo,
   shouldShowFavoriteProHint as shouldShowFromStepsIo,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
   buildFeelTilesMoodLogOptions,
   pauseInitialEmotionSelect,
@@ -288,6 +294,25 @@ describe('pause-reflect-steps-io parity', () => {
     expect(shouldShowFromStepsIo).not.toBe(buildFeelTilesMoodLogOptions);
     expect(shouldLogFromStepsIo).not.toBe(pauseInitialEmotionSkip);
     // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (step RPC wrappers vs frame-focus bed).
+   * Dedicated sibling file: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: ambience-io exports stay distinct from steps-io wrappers', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseReflectNoteUpdate).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(pauseReflectTagUpdate).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseReflectionStepLogOnce).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(pauseReflectFavoriteToggleWithRepository).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseReflectNoteUpdateWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(pauseReflectionStepLogOnceWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(shouldShowFromStepsIo).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(shouldLogFromStepsIo).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(reflectPauseRepository).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(reflectPauseRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
+    // Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts`.
   });
 
   /**

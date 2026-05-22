@@ -9,7 +9,8 @@
  * `pause-reflect-ambience-share-io-sibling-parity.test.ts` + `share/pause-reflect-share-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`;
  * `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (presentation + application);
  * application reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`;
- * `pause-reflect-steps-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
+ * `pause-reflect-steps-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (presentation + application);
+ * application parity: `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-ambience-io-parity.test.ts`;
  * `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`;
  * reciprocal inline pins: `pause-reflect-ambience-io.test.ts` ↔ `pause-reflect-pending-offer-io.test.ts`,
  * `pause-reflect-ambience-io.re-exports.test.ts` ↔ `pause-reflect-pending-offer-io.re-exports.test.ts`,

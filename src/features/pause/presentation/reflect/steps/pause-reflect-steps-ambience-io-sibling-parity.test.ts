@@ -28,8 +28,10 @@ import {
 
 /**
  * Presentation sibling parity: steps-io vs ambience-io (parity with application
- * `pause-reflect-steps-ambience-flow-sibling-parity.test.ts`). Frame-focus Web Audio
- * bed stays off step-mutation RPC wrappers.
+ * `pause-reflect-steps-ambience-flow-sibling-parity.test.ts` and
+ * `application/.../steps/pause-reflect-steps-ambience-io-sibling-parity.test.ts`).
+ * Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts` ↔
+ * `pause-reflect-ambience-io-parity.test.ts`.
  */
 describe('pause-reflect-steps-io ↔ pause-reflect-ambience-io sibling parity', () => {
   it('steps-io and ambience-io are distinct presentation I/O surfaces', () => {
