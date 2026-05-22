@@ -246,10 +246,22 @@ describe('pause-reflect-steps-io', () => {
     // Full pins: `pause-reflect-steps-favorite-reflection-step-log-io-sibling-parity.test.ts`.
   });
 
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-note-flow.test.ts` / `pause-reflect-tag-flow.test.ts`.
+   * Dedicated sibling file: `pause-reflect-steps-note-tag-io-sibling-parity.test.ts`.
+   */
   it('sibling cluster: note and tag wrappers stay distinct on steps-io', () => {
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectTagUpdate);
+    expect(pauseReflectNoteUpdateWithRepository).not.toBe(pauseReflectTagUpdateWithRepository);
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectFavoriteToggle);
     expect(pauseReflectTagUpdate).not.toBe(pauseReflectionStepLogOnce);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    expect(pauseReflectTagUpdate).not.toBe(pauseReflectFavoriteToggleWithRepository);
+    expect(pauseReflectNoteUpdateWithRepository).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseReflectTagUpdateWithRepository).not.toBe(pauseReflectionStepLogOnce);
+    expect(shouldShowFavoriteProHint).not.toBe(pauseReflectNoteUpdate);
+    expect(shouldLogPauseReflectionStep).not.toBe(pauseReflectTagUpdate);
+    // Reciprocal inline pins: `pause-reflect-note-flow.test.ts`, `pause-reflect-tag-flow.test.ts`.
     // Full pins: `pause-reflect-steps-note-tag-io-sibling-parity.test.ts`.
   });
 
