@@ -1,7 +1,7 @@
 /**
  * Reflect hub presentation I/O (shift-frame done RPC + presentation mapping).
  * Imports hub helpers via `pause-reflect-hub-flow` CI anchor
- * (parity with `pause-reflect-mood-io` → `pause-reflect-mood-flow`).
+ * (parity with `pause-reflect-steps-io` → `pause-reflect-steps-flow`).
  */
 import {
   buildShiftEmotionFrameHubLogBundle,
