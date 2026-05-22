@@ -21163,7 +21163,26 @@
       <dt>Tradeoffs</dt>
       <dd>Session UI telemetry conductors still import presentation telemetry-io sibling only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B subscription Tier 1 shim follow-ups, archive decide I/O peel, or hub I/O direct subcluster imports.</dd>
+      <dd>Next: hub I/O direct subcluster imports or Phase B subscription Tier 1 shim follow-ups.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect hub I/O via subcluster flows (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Route <code>pause-reflect-hub-io</code> through hub subcluster flow anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Peel <code>pause-reflect-hub-io</code> off <code>pause-reflect-hub-flow</code> to import <code>pause-shift-frame-hub-presentation-flow</code>, <code>pause-shift-emotion-log-flow</code>, and <code>pause-shift-emotion-frame-hub-done-flow</code> directly (parity with <code>pause-home-reflect-telemetry-io</code> → telemetry-flow). CI blocks umbrella imports in hub I/O; hub conductors still import hub-io only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-hub-flow</code> remains the compose anchor for other consumers; hub presentation I/O no longer depends on the umbrella barrel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim (<code>subscription-checkout-guard-ref</code> in <code>App.tsx</code>) or reflect mood/steps I/O subcluster peels.</dd>
     </dl>
   </article>
 
