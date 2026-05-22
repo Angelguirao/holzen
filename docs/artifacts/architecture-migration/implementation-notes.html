@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — pause-companion-analytics-flow regression test (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-analytics-flow</code> CI cluster anchor has unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #2 (<code>ritual/frame/</code>) remains complete — no folder moves. Add <code>pause-companion-analytics-flow.test.ts</code> beside the frame analytics CI anchor (parity with <code>pause-reflect-telemetry-flow</code> and <code>pause-companion-orchestration-flow</code> umbrella tests). Presentation <code>pause-companion-analytics-io</code> unchanged (imports leaf modules directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test-only slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No CI guard change; analytics flow anchor remains CI-only under <code>ritual/frame/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-orchestrate-flow</code> peel or regression test, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — pause-reflect-telemetry-flow regression test (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
