@@ -7,7 +7,7 @@ import {
 } from './pause-session-shell-io';
 
 describe('pause-session-shell-io', () => {
-  it('re-exports hydration helpers for usePauseSessionShell', () => {
+  it('re-exports hydration helpers from pause-session-shell-flow', () => {
     expect(typeof computePauseSessionHydration).toBe('function');
     expect(typeof computePauseSessionResolved).toBe('function');
   });

@@ -19624,7 +19624,26 @@
       <dt>Tradeoffs</dt>
       <dd>Domain module keeps descriptive <code>reflect-frame-focus-ambience</code> filename (implementation detail); application layer uses <code>*-flow</code> convention.</dd>
       <dt>Open questions</dt>
-      <dd>Next: companion orchestration-io consolidate <code>load-companion-orchestrate-session</code> imports, or Phase B subscription Tier 1 shim.</dd>
+      <dd>Next: session shell I/O through <code>pause-session-shell-flow</code>, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session shell I/O via shell-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-shell-io</code> imports through <code>pause-session-shell-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no relocations. Extend <code>pause-session-shell-flow</code> with hydration helpers; route shell presentation I/O through the anchor instead of deep <code>application/use-cases/session/*</code> siblings (parity with scaffold/brief/orchestration I/O peels on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-session-ritual-restore-io</code> still imports restored brief fields directly until a restore-flow peel.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-ritual-restore-io</code> through a session restore-flow anchor, companion frame-ui/analytics I/O peels, or Phase B subscription Tier 1 shim.</dd>
     </dl>
   </article>
 
