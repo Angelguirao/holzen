@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
-} from './pause-reflect-pending-offer-telemetry-io';
+} from '../telemetry/pause-reflect-pending-offer-telemetry-io';
 import {
   pauseAdoptPendingOffer,
   pauseDeclinePendingOffer,

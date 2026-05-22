@@ -344,6 +344,9 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS = [
   '@/features/pause/presentation/reflect/use-pause-reflect-ui-telemetry',
   '@/features/pause/presentation/reflect/share/pause-reflect-telemetry-io',
   '@/features/pause/presentation/reflect/share/use-pause-reflect-ui-telemetry',
+  '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-telemetry-io',
+  "from './presentation/reflect/pending-offer/pause-reflect-pending-offer-telemetry-io'",
+  "from '../presentation/reflect/pending-offer/pause-reflect-pending-offer-telemetry-io'",
   '@/features/pause/presentation/reflect/telemetry/session/',
   "from './presentation/reflect/telemetry/session/",
   "from '../presentation/reflect/telemetry/session/",
@@ -2057,6 +2060,25 @@ for (const file of walkTs(join(root, 'src'))) {
     }
   }
   if (
+    rel.endsWith('pause-reflect-pending-offer-telemetry-io.ts') ||
+    rel.endsWith('pause-reflect-pending-offer-telemetry-io.test.ts')
+  ) {
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_IO_TELEMETRY_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: pending-offer telemetry I/O must import pending-offer telemetry leaf modules directly (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_UMBRELLA_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: pending-offer telemetry I/O must not import pending-offer umbrella (${needle})`,
+        );
+      }
+    }
+  }
+  if (
     rel.endsWith('pause-reflect-share-io.ts') ||
     rel.endsWith('pause-reflect-share-io.test.ts')
   ) {
@@ -2855,9 +2877,7 @@ for (const file of walkTs(join(root, 'src'))) {
   if (rel.startsWith('src/features/pause/presentation/reflect/pending-offer/')) {
     const pendingOfferIoAllowlisted =
       rel.endsWith('pause-reflect-pending-offer-io.ts') ||
-      rel.endsWith('pause-reflect-pending-offer-io.test.ts') ||
-      rel.endsWith('pause-reflect-pending-offer-telemetry-io.ts') ||
-      rel.endsWith('pause-reflect-pending-offer-telemetry-io.test.ts');
+      rel.endsWith('pause-reflect-pending-offer-io.test.ts');
     for (const needle of LEGACY_PAUSE_REFLECT_PENDING_OFFER_TELEMETRY_PATH_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy reflect/telemetry pending-offer import (${needle})`);
@@ -2887,25 +2907,6 @@ for (const file of walkTs(join(root, 'src'))) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_USE_CASE_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy pending-offer use-case import (${needle})`);
-        }
-      }
-    }
-    if (
-      rel.endsWith('pause-reflect-pending-offer-telemetry-io.ts') ||
-      rel.endsWith('pause-reflect-pending-offer-telemetry-io.test.ts')
-    ) {
-      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_TELEMETRY_IO_TELEMETRY_FLOW_IMPORTS) {
-        if (text.includes(needle)) {
-          failures.push(
-            `${rel}: pending-offer telemetry I/O must import pending-offer telemetry leaf modules directly (${needle})`,
-          );
-        }
-      }
-      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_PENDING_OFFER_IO_UMBRELLA_FLOW_IMPORTS) {
-        if (text.includes(needle)) {
-          failures.push(
-            `${rel}: pending-offer telemetry I/O must not import pending-offer umbrella (${needle})`,
-          );
         }
       }
     }
