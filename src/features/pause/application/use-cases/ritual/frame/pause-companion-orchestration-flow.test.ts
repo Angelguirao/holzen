@@ -61,4 +61,17 @@ describe('pause-companion-orchestration-flow', () => {
   it('frame-ui-flow composes section-visibility sibling cluster anchor (cross-pin)', () => {
     expect(getVisibilityFromFrameUiFlow).toBe(getCompanionSectionVisibility);
   });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-companion-frame-ui-flow.test.ts` (session orchestration vs frame UI).
+   * Dedicated sibling file: `pause-companion-frame-ui-orchestration-flow-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: frame-ui-flow exports stay distinct from orchestration umbrella exports', () => {
+    expect(loadCompanionOrchestrateSession).not.toBe(getVisibilityFromFrameUiFlow);
+    expect(loadCompanionOrchestrateSession).not.toBe(isCompanionSectionVisible);
+    expect(nextExpandedWithLazyFetch).not.toBe(getVisibilityFromFrameUiFlow);
+    expect(persistCompanionUiStepCompletion).not.toBe(isCompanionSectionVisible);
+    expect(runToggleCompanionLibraryFavorite).not.toBe(getVisibilityFromFrameUiFlow);
+    // Reciprocal inline pins: `pause-companion-frame-ui-flow.test.ts`.
+  });
 });
