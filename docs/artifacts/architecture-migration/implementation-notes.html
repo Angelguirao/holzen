@@ -33075,4 +33075,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — generation↔pending-offer WithRepository distinctness union (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-io-parity.test.ts</code> + <code>pause-reflect-pending-offer-io-parity.test.ts</code> (application)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete. After parallel remote slices (<code>120c98472</code>, <code>0ec6e31fe</code>), union remaining reciprocal pins: <code>pauseAdoptPendingOfferWithRepository</code> ↔ <code>pauseDeclinePendingOfferWithRepository</code> distinctness on both application colocated parity tests.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only (rebase merge).</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B Tier 1 lib shim scan, or companion orchestration-io persist/favorite leaf pins.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
