@@ -1,6 +1,7 @@
 /**
  * Presentation I/O parity for Home manual-open PostHog trackers (colocated beside
  * `pause-home-reflect-telemetry-io.ts`; application `pause-home-reflect-telemetry-flow` stays CI umbrella).
+ * Application mirror: `application/use-cases/ritual/reflect/generation/manual-open/pause-home-reflect-telemetry-io-parity.test.ts`.
  */
 import { describe, expect, it } from 'vitest';
 
