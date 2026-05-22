@@ -21,6 +21,10 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
   runPauseReflectionStepLogOnce: vi.fn(() => Promise.resolve({ status: 'logged' as const })),
 }));
 
+/**
+ * Application-layer delegation parity for steps-flow ↔ steps-io (run-* leaves + repository).
+ * Wrapper distinctness sibling file: `pause-reflect-steps-flow-steps-io-wrapper-sibling-parity.test.ts`.
+ */
 import {
   runPauseFavoriteToggle,
   runPauseReflectNoteUpdate,

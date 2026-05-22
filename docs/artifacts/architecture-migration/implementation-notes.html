@@ -28248,7 +28248,7 @@
     <h3><code>pause-reflect-steps-flow-steps-io-wrapper-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated sibling parity between <code>pause-reflect-steps-flow</code> (application CI umbrella + leaf <code>run-*</code>) and <code>pause-reflect-steps-io</code> (presentation port-bound wrappers). Single dedicated file only — <code>check:architecture-alignment</code> forbids presentation <code>steps-io</code> importing application <code>steps-flow</code> (and flow unit test must not import presentation I/O). Complements <code>pause-reflect-steps-io-parity.test.ts</code> delegation coverage. Production modules unchanged.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated sibling parity between <code>pause-reflect-steps-flow</code> (application CI umbrella + leaf <code>run-*</code>) and <code>pause-reflect-steps-io</code> (presentation port-bound wrappers). Single dedicated file only — <code>check:architecture-alignment</code> forbids presentation <code>steps-io</code> importing application <code>steps-flow</code> (and flow unit test must not import presentation I/O). Complements <code>pause-reflect-steps-io-parity.test.ts</code> delegation coverage. Reciprocal wrapper pins on <code>pause-reflect-steps-io.re-exports.test.ts</code> (follow-up slice). Production modules unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open questions</dt>

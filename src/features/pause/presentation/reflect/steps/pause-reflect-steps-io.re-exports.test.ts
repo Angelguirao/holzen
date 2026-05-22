@@ -22,6 +22,14 @@ import { shouldLogPauseReflectionStep as shouldLogPauseReflectionStepDirect } fr
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
+  pauseReflectFavoriteToggle,
+  pauseReflectFavoriteToggleWithRepository,
+  pauseReflectNoteUpdate,
+  pauseReflectNoteUpdateWithRepository,
+  pauseReflectTagUpdate,
+  pauseReflectTagUpdateWithRepository,
+  pauseReflectionStepLogOnce,
+  pauseReflectionStepLogOnceWithRepository,
   reflectPauseRepository,
   shouldLogPauseReflectionStep,
   shouldShowFavoriteProHint,
@@ -50,5 +58,20 @@ describe('pause-reflect-steps-io re-exports', () => {
     expect(runNoteUpdateFromStepsFlow).toBe(runNoteUpdateDirect);
     expect(runTagUpdateFromStepsFlow).toBe(runTagUpdateDirect);
     expect(runReflectionStepLogFromStepsFlow).toBe(runReflectionStepLogDirect);
+  });
+
+  it('presentation port-bound wrappers stay off steps-flow CI umbrella exports', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(runFavoriteToggleFromStepsFlow);
+    expect(pauseReflectNoteUpdate).not.toBe(runNoteUpdateFromStepsFlow);
+    expect(pauseReflectTagUpdate).not.toBe(runTagUpdateFromStepsFlow);
+    expect(pauseReflectionStepLogOnce).not.toBe(runReflectionStepLogFromStepsFlow);
+    expect(pauseReflectFavoriteToggle).not.toBe(runNoteUpdateFromStepsFlow);
+    expect(pauseReflectNoteUpdate).not.toBe(runTagUpdateFromStepsFlow);
+    expect(pauseReflectTagUpdate).not.toBe(runReflectionStepLogFromStepsFlow);
+    expect(pauseReflectFavoriteToggleWithRepository).not.toBe(runFavoriteToggleFromStepsFlow);
+    expect(pauseReflectNoteUpdateWithRepository).not.toBe(runNoteUpdateFromStepsFlow);
+    expect(pauseReflectTagUpdateWithRepository).not.toBe(runTagUpdateFromStepsFlow);
+    expect(pauseReflectionStepLogOnceWithRepository).not.toBe(runReflectionStepLogFromStepsFlow);
+    expect(reflectPauseRepository).not.toBe(runFavoriteToggleFromStepsFlow);
   });
 });
