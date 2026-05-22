@@ -2700,7 +2700,8 @@ for (const file of walkTs(join(root, 'src'))) {
   }
   if (
     rel.endsWith('pause-companion-frame-ui-io.ts') ||
-    rel.endsWith('pause-companion-frame-ui-io.test.ts')
+    rel.endsWith('pause-companion-frame-ui-io.test.ts') ||
+    rel.endsWith('pause-companion-frame-ui-io.re-exports.test.ts')
   ) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_FRAME_UI_IO_UMBRELLA_FLOW_IMPORTS) {
       if (text.includes(needle)) {
@@ -2744,7 +2745,8 @@ for (const file of walkTs(join(root, 'src'))) {
       !rel.endsWith('pause-companion-analytics-io.ts') &&
       !rel.endsWith('pause-companion-analytics-io.test.ts') &&
       !rel.endsWith('pause-companion-frame-ui-io.ts') &&
-      !rel.endsWith('pause-companion-frame-ui-io.test.ts')
+      !rel.endsWith('pause-companion-frame-ui-io.test.ts') &&
+      !rel.endsWith('pause-companion-frame-ui-io.re-exports.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {
