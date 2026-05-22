@@ -6,6 +6,8 @@ vi.mock('@/integrations/supabase/client', () => ({
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseAnalyticsRepository: { port: 'companionAnalyticsRepository' },
+  supabaseCompanionOrchestrator: { port: 'companionOrchestrator' },
+  supabasePauseRepository: { port: 'companionPauseRepository' },
 }));
 
 import {
