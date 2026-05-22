@@ -20,6 +20,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
+import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
 
 import {
   buildPauseScoreImpacts,
@@ -103,6 +104,13 @@ describe('pause-reflect-flows-io', () => {
         reinforcementQuote: 'quote',
       }).kind,
     ).toBe('abort_sync_failed');
+  });
+
+  it('exports pauseReflectOutcomeLog wrappers distinct from run-pause-outcome-log leaf', () => {
+    expect(typeof pauseReflectOutcomeLog).toBe('function');
+    expect(typeof pauseReflectOutcomeLogWithRepository).toBe('function');
+    expect(pauseReflectOutcomeLog).not.toBe(runPauseOutcomeLog);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(runPauseOutcomeLog);
   });
 
   it('routes decide outcome log through the default PauseRepository port adapter', async () => {
