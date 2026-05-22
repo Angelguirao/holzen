@@ -25,7 +25,11 @@ import {
   buildReflectionShareText as buildShareTextFromShareFlow,
   runReflectionShareImage as runShareImageFromShareFlow,
 } from '../share/pause-reflect-share-flow';
-import { runPauseOutcomeLog as runOutcomeLogFromFlowsFlow } from '../flows/pause-reflect-flows-flow';
+import {
+  formatReinforcementQuoteFromSession as formatQuoteFromFlowsFlow,
+  resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
+  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
+} from '../flows/pause-reflect-flows-flow';
 
 describe('pause-reflect-telemetry-flow', () => {
   it('re-exports session reflect UI telemetry trackers from pause-reflect-session-ui-telemetry', () => {
@@ -58,9 +62,12 @@ describe('pause-reflect-telemetry-flow', () => {
     expect(trackPauseReflectShareTap).not.toBe(buildShareTextFromShareFlow);
   });
 
-  it('sibling cluster: telemetry-flow exports stay distinct from flows umbrella exports', () => {
-    expect(trackPauseReflectPostItOpen).not.toBe(runOutcomeLogFromFlowsFlow);
-    expect(trackPauseReflectShareTap).not.toBe(runOutcomeLogFromFlowsFlow);
+  it('sibling cluster: session reflect UI telemetry-flow exports stay distinct from flows-flow exports', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(resolvePreflightFromFlowsFlow);
+    expect(trackPauseReflectShareTap).not.toBe(resolvePreflightFromFlowsFlow);
     expect(trackPauseReflectWallpaperTap).not.toBe(runOutcomeLogFromFlowsFlow);
+    expect(trackPauseReflectPostItOpen).not.toBe(formatQuoteFromFlowsFlow);
+    expect(trackPauseReflectShareTap).not.toBe(runOutcomeLogFromFlowsFlow);
+    expect(trackPauseReflectWallpaperTap).not.toBe(formatQuoteFromFlowsFlow);
   });
 });
