@@ -8,7 +8,7 @@ const { pauseDismissOpenPauseHomePreviewMock, clearSessionMock } = vi.hoisted(()
   clearSessionMock: vi.fn(),
 }));
 
-vi.mock('./manual-open/pause-home-reflect-io', () => ({
+vi.mock('@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io', () => ({
   pauseDismissOpenPauseHomePreview: pauseDismissOpenPauseHomePreviewMock,
 }));
 
