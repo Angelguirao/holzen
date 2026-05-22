@@ -9,9 +9,7 @@ import {
   trackPauseSessionAbandoned,
 } from './pause-reflect-pending-offer-flow';
 import * as pendingOfferFlow from './pause-reflect-pending-offer-flow';
-import {
-  getPendingPauseOfferDisplay as getDisplayFromDisplayFlow,
-} from './pause-pending-offer-display-flow';
+import { getPendingPauseOfferDisplay as getDisplayFromDisplayFlow } from './pause-pending-offer-display-flow';
 import * as pendingOfferDisplayFlow from './pause-pending-offer-display-flow';
 import {
   runAdoptPendingPauseOffer as runAdoptFromRpcFlow,
