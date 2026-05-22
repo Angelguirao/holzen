@@ -59,7 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
+      <span>Phase A — reflect pending-offer queries under infrastructure/queries/reflect/pending-offer (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Colocate pending pause offer TanStack read under <code>infrastructure/queries/reflect/pending-offer/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no use-case folder moves. Move <code>getPendingPauseOfferQueryOptions</code> + fetch to <code>infrastructure/queries/reflect/pending-offer/pending-pause-offer-query.ts</code> (parity with archive list under <code>infrastructure/queries/archive/</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>Stable TanStack keys stay in <code>application/queries/pending-pause-offer-keys.ts</code> so <code>application/queries/invalidate-pause-stats</code> does not import infrastructure (same as archive keys).</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Keys remain coupled to <code>pause-query-namespace</code>. Adopt/decline RPC use cases stay in <code>ritual/reflect/pending-offer/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-persisted-tab-session-io</code> to <code>persisted-tab-session</code>, or session shell/scaffold subcluster peels.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-session-providers-io to pause-holzen-providers-slice (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -92,21 +110,6 @@
       <dd><code>pause-session-mood-chrome-flow.ts</code> remains application/domain cluster re-export for CI; mood conductors still import <code>pause-reflect-mood-io</code> only.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>pause-persisted-tab-session-io</code> to leaf modules, or session shell/scaffold subcluster peels.</dd>
-=======
-      <span>Phase A — reflect pending-offer queries under infrastructure/queries/reflect/pending-offer (backlog #1 verified, Tier 5)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3>Colocate pending pause offer TanStack read under <code>infrastructure/queries/reflect/pending-offer/</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no use-case folder moves. Move <code>getPendingPauseOfferQueryOptions</code> + fetch to <code>infrastructure/queries/reflect/pending-offer/pending-pause-offer-query.ts</code> (parity with archive list under <code>infrastructure/queries/archive/</code>).</dd>
-      <dt>Deviation</dt>
-      <dd>Stable TanStack keys stay in <code>application/queries/pending-pause-offer-keys.ts</code> so <code>application/queries/invalidate-pause-stats</code> does not import infrastructure (same as archive keys).</dd>
-      <dt>Tradeoffs</dt>
-      <dd>Keys remain coupled to <code>pause-query-namespace</code>. Adopt/decline RPC use cases stay in <code>ritual/reflect/pending-offer/</code>.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: peel <code>pause-session-providers-io</code> and <code>pause-persisted-tab-session-io</code> to leaf modules, or session shell/scaffold subcluster peels.</dd>
->>>>>>> ca880ab56 (refactor(pause): group pending-offer query under reflect queries)
     </dl>
   </article>
 
