@@ -19685,4 +19685,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — applyManualPauseOpenResult telemetry via home reflect telemetry I/O (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>apply-manual-pause-open-result</code> default trackers import <code>pause-home-reflect-telemetry-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route default PostHog trackers through <code>pause-home-reflect-telemetry-io</code> instead of deep <code>pause-home-reflect-telemetry-flow</code> (parity with <code>pause-home-reflect-telemetry-io</code> consumers and prior manual-open type peel via <code>pause-reflect-generation-manual-open-flow</code>).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Open-result payload types stay on manual-open CI anchor; telemetry-io re-exports trackers only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-pending-offer-io</code> flow anchor, companion orchestrate-session import consolidate, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
