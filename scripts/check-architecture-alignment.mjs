@@ -1011,6 +1011,13 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_UMBRELLA_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow'",
 ];
 
+/** Reflect flows I/O — import score-impact builders via leaf modules only (not pause-decide-score-impacts-flow). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_SCORE_IMPACTS_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-score-impacts-flow',
+  "from './application/use-cases/ritual/decide/pause-decide-score-impacts-flow'",
+  "from '../application/use-cases/ritual/decide/pause-decide-score-impacts-flow'",
+];
+
 /** Reflect flows I/O — import leaf domain/decide modules only (not reflect/flows subcluster anchors). */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_SUBCLUSTER_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow',
@@ -2444,6 +2451,13 @@ for (const file of walkTs(join(root, 'src'))) {
       if (text.includes(needle)) {
         failures.push(
           `${rel}: reflect flows I/O must not import flows umbrella (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_SCORE_IMPACTS_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect flows I/O must import score impacts via score-impacts + score-impact-presentation (${needle})`,
         );
       }
     }
