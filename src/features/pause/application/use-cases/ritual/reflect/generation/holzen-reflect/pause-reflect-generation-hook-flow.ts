@@ -3,6 +3,7 @@
  * Pure prefetch/commit/clear helpers live in domain; re-export for application-layer imports.
  * Presentation: `pause-reflect-generation-io.ts` imports domain helpers + `run-reflect-generation` directly (CI cluster anchor only).
  * Sibling parity: `pause-reflect-generation-hook-flow-sibling-parity.test.ts` ↔ `pause-reflect-generation-flow`;
+ * presentation parity: `pause-reflect-generation-hook-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`;
  * inline pins: `pause-reflect-generation-hook-flow.test.ts`, `pause-reflect-generation-flow.test.ts`.
  */
 export {

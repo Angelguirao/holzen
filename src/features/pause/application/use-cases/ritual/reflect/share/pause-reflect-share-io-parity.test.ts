@@ -18,6 +18,8 @@ import {
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow';
+import * as shareFlow from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow';
+import * as orchestrationFlow from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow';
 import {
   trackPauseReflectPostItOpen as trackPostItFromTelemetryIo,
   trackPauseReflectShareTap as trackShareTapFromTelemetryIo,
@@ -64,9 +66,23 @@ describe('pause-reflect-share-io parity', () => {
   it('presentation share-io stays off deliver-reflection-share-image (orchestration-flow sibling parity)', () => {
     expect('deliverReflectionShareImage' in shareIo).toBe(false);
     expect('runReflectionShareImage' in shareIo).toBe(false);
+    expect('trackPauseReflectPostItOpen' in shareIo).toBe(false);
+    expect('trackPauseReflectShareTap' in shareIo).toBe(false);
+    expect('trackPauseReflectWallpaperTap' in shareIo).toBe(false);
     expect(pauseReflectionShareImage).not.toBe(deliverReflectionShareImage);
     expect(pauseReflectionShareImage).not.toBe(deliverReflectionShareImageDirect);
     expect(pauseReflectionShareImage).not.toBe(runReflectionShareImageFromOrchestration);
     expect(typeof pauseReflectionShareImage).toBe('function');
+  });
+
+  it('share-flow vs orchestration-flow CI namespaces stay separated (presentation share-io off both)', () => {
+    expect('deliverReflectionShareImage' in shareFlow).toBe(false);
+    expect('trackPauseReflectPostItOpen' in shareFlow).toBe(true);
+    expect('deliverReflectionShareImage' in orchestrationFlow).toBe(true);
+    expect('trackPauseReflectPostItOpen' in orchestrationFlow).toBe(false);
+    expect(runReflectionShareImage).toBe(runReflectionShareImageFromOrchestration);
+    expect(runReflectionShareImage).not.toBe(deliverReflectionShareImage);
+    expect(trackPauseReflectPostItOpen).not.toBe(deliverReflectionShareImage);
+    expect(trackPauseReflectWallpaperTap).not.toBe(runReflectionShareImageFromOrchestration);
   });
 });
