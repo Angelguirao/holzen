@@ -6,14 +6,6 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 import {
-  getPendingPauseOfferDisplay,
-  pauseAdoptPendingOffer,
-  pauseAdoptPendingOfferWithRepository,
-  pauseDeclinePendingOffer,
-  pauseDeclinePendingOfferWithRepository,
-  reflectPauseRepository,
-} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
-import {
   pauseReflectOutcomeLog,
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
@@ -22,6 +14,14 @@ import {
   pauseReflectGeneration,
   runReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
+  pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
+  reflectPauseRepository,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
@@ -62,6 +62,6 @@ describe('pause-reflect-ambience-io', () => {
     expect(startPauseReflectFrameFocusAmbience).not.toBe(getPendingPauseOfferDisplay);
     expect(stopPauseReflectFrameFocusAmbience).not.toBe(reflectPauseRepository);
     // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-pending-offer-io.test.ts`;
-    // `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts`.
+    // frame-focus bed vs pending-offer RPC: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts`.
   });
 });

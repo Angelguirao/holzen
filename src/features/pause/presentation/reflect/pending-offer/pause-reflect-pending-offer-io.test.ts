@@ -169,6 +169,6 @@ describe('pause-reflect-pending-offer-io', () => {
     expect(getPendingPauseOfferDisplay).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(reflectPauseRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
     // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-ambience-io.test.ts`;
-    // `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts`.
+    // frame-focus bed vs pending-offer RPC: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts`.
   });
 });
