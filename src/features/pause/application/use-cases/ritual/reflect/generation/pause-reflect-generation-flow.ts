@@ -14,7 +14,8 @@
  * `pause-reflect-generation-manual-open-flow-sibling-parity.test.ts` (generation-flow ↔ manual-open-flow);
  * `pause-reflect-generation-share-flow-sibling-parity.test.ts` (generation-flow ↔ share-flow);
  * `pause-reflect-generation-telemetry-flow-sibling-parity.test.ts` (generation-flow ↔ telemetry-flow);
- * `pause-reflect-generation-mood-flow-sibling-parity.test.ts` (generation-flow ↔ mood-flow).
+ * `pause-reflect-generation-mood-flow-sibling-parity.test.ts` (generation-flow ↔ mood-flow);
+ * `pause-reflect-generation-pending-offer-flow-sibling-parity.test.ts` (generation-flow ↔ pending-offer-flow).
  * may import this umbrella for parity; production generation I/O keeps leaf imports.
  */
 export {

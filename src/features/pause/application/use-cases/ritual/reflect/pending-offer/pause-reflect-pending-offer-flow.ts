@@ -9,6 +9,7 @@
  * Sibling cluster: `pause-reflect-steps-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-steps-flow`;
  * `pause-reflect-flows-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow`;
  * `pause-reflect-share-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-share-flow`;
+ * `pause-reflect-generation-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-generation-flow`;
  * `pause-reflect-pending-offer-flow.test.ts` ↔ `pause-reflect-steps-flow` + `pause-reflect-share-flow` (inline sibling pins; presentation-io wrappers in dedicated sibling file below);
  * `pause-reflect-share-flow.test.ts` (inline share ↔ pending-offer pins);
  * `pause-reflect-pending-offer-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (presentation wrappers off flow umbrella).

@@ -73,6 +73,14 @@ import {
   trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
   trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
 } from '../telemetry/pause-reflect-telemetry-flow';
+import {
+  getPendingPauseOfferDisplay as getPendingDisplayFromPendingOfferFlow,
+  runAdoptPendingPauseOffer as runAdoptFromPendingOfferFlow,
+  runDeclinePendingPauseOffer as runDeclineFromPendingOfferFlow,
+  trackPausePendingAdopted as trackAdoptedFromPendingOfferFlow,
+  trackPausePendingDeclined as trackDeclinedFromPendingOfferFlow,
+  trackPauseSessionAbandoned as trackAbandonedFromPendingOfferFlow,
+} from '../pending-offer/pause-reflect-pending-offer-flow';
 
 import {
   buildManualPauseCreateOrReuseParams as buildCreateOrReuseFromFlow,
@@ -207,5 +215,14 @@ describe('pause-reflect-generation-flow', () => {
     expect(openManualFromFlow).not.toBe(runReflectGenerationFromHookFlow);
     expect(dismissFromFlow).not.toBe(messageFromResultFromHookFlow);
     expect(runPersistStubFromFlow).not.toBe(runReflectGenerationFromHookFlow);
+  });
+
+  it('sibling cluster: pending-offer-flow exports stay distinct from generation umbrella exports', () => {
+    expect(runReflectGeneration).not.toBe(runAdoptFromPendingOfferFlow);
+    expect(runReflectGeneration).not.toBe(runDeclineFromPendingOfferFlow);
+    expect(openManualFromFlow).not.toBe(getPendingDisplayFromPendingOfferFlow);
+    expect(dismissFromFlow).not.toBe(trackAdoptedFromPendingOfferFlow);
+    expect(resolveReflectGenerationPrefetch).not.toBe(trackDeclinedFromPendingOfferFlow);
+    expect(runReflectGeneration).not.toBe(trackAbandonedFromPendingOfferFlow);
   });
 });
