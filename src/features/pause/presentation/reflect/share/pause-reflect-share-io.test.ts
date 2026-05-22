@@ -36,16 +36,29 @@ import {
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
   pauseReflectFavoriteToggle,
+  pauseReflectFavoriteToggleWithRepository,
   pauseReflectNoteUpdate,
+  pauseReflectNoteUpdateWithRepository,
   pauseReflectTagUpdate,
+  pauseReflectTagUpdateWithRepository,
   pauseReflectionStepLogOnce,
+  pauseReflectionStepLogOnceWithRepository,
+  reflectPauseRepository,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
-import { buildReflectionShareText, pauseReflectionShareImage } from './pause-reflect-share-io';
+import {
+  buildReflectionShareTelegramUrl,
+  buildReflectionShareText,
+  buildReflectionShareTweetUrl,
+  buildReflectionShareWhatsAppUrl,
+  pauseReflectionShareImage,
+} from './pause-reflect-share-io';
 
 describe('pause-reflect-share-io', () => {
   it('delegates to runReflectionShareImage', async () => {
@@ -82,6 +95,16 @@ describe('pause-reflect-share-io', () => {
     expect(pauseReflectionShareImage).not.toBe(pauseReflectNoteUpdate);
     expect(pauseReflectionShareImage).not.toBe(pauseReflectionStepLogOnce);
     expect(pauseReflectionShareImage).not.toBe(pauseReflectTagUpdate);
+    expect(buildReflectionShareText).not.toBe(pauseReflectNoteUpdate);
+    expect(buildReflectionShareTelegramUrl).not.toBe(pauseReflectTagUpdate);
+    expect(buildReflectionShareTweetUrl).not.toBe(pauseReflectionStepLogOnce);
+    expect(buildReflectionShareWhatsAppUrl).not.toBe(shouldShowFavoriteProHint);
+    expect(pauseReflectionShareImage).not.toBe(shouldLogPauseReflectionStep);
+    expect(buildReflectionShareText).not.toBe(pauseReflectFavoriteToggleWithRepository);
+    expect(pauseReflectionShareImage).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    expect(buildReflectionShareTelegramUrl).not.toBe(reflectPauseRepository);
+    // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-steps-io.test.ts`;
+    // `pause-reflect-share-steps-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: ambience-io exports stay distinct from share-io', () => {
