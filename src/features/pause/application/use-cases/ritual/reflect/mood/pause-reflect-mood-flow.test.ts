@@ -110,5 +110,7 @@ describe('pause-reflect-mood-flow', () => {
     expect(runInitialEmotionSelect).not.toBe(runShiftHubDoneFromHubFlow);
     expect(buildFeelTilesFromFlow).not.toBe(buildHubLogBundleFromHubFlow);
     expect(buildFeelTilesFromFlow).not.toBe(resolveHubPresentationFromHubFlow);
+    expect(runChromeCloseFromFlow).not.toBe(runShiftHubDoneFromHubFlow);
+    expect(applyBriefFromFlow).not.toBe(resolveHubPresentationFromHubFlow);
   });
 });
