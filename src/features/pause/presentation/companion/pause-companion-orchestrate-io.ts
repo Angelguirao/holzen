@@ -1,6 +1,8 @@
 /**
  * Companion slot orchestrate presentation I/O (orchestrate, intervention, retry, telemetry, UI state).
  * Imports ritual/frame leaf modules directly (parity with `pause-reflect-flows-io` → domain/decide peels).
+ * Parity pins: `pause-companion-orchestrate-io.test.ts`, `pause-companion-orchestrate-io-parity.test.ts`,
+ * and `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts` ↔ `pause-companion-orchestration-io`.
  */
 import {
   applyCompanionOrchestrateRetryReset,
