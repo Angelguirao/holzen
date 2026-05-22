@@ -1,12 +1,13 @@
 /**
- * CI cluster anchor for ritual reflect share orchestration (§3).
- * PNG share + plain-text/channel URL builders for presentation I/O.
+ * CI cluster anchor for ritual reflect share orchestration (§3 / check:architecture-alignment).
+ * Composes domain share builders + `run-reflection-share-image` leaf module (not share subcluster flow anchors).
+ * Presentation: `pause-reflect-share-io.ts` imports leaf modules directly.
  */
-export type { DeliverReflectionShareImageDeps } from './pause-reflection-share-image-flow';
-export { runReflectionShareImage } from './pause-reflection-share-image-flow';
-export { buildReflectionShareText } from './pause-reflection-share-text-flow';
+export type { DeliverReflectionShareImageDeps } from './deliver-reflection-share-image';
+export { runReflectionShareImage } from './run-reflection-share-image';
+export { buildReflectionShareText } from '@/features/pause/domain/reflect/share/reflection-share-text';
 export {
   buildReflectionShareTelegramUrl,
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
-} from './pause-reflection-share-channel-urls-flow';
+} from '@/features/pause/domain/reflect/share/reflection-share-channel-urls';

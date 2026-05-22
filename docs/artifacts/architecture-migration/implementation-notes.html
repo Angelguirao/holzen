@@ -22630,4 +22630,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — reflect share orchestration peel (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Peel <code>pause-reflect-share-orchestration-flow</code> off share subcluster flow anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-share-orchestration-flow</code> composes <code>run-reflection-share-image</code> + domain share builders directly (parity with <code>pause-reflect-share-flow</code> and <code>pause-companion-orchestration-flow</code> umbrella peels on branch tip). <code>pause-reflect-share-io</code> already imported leaf modules; CI now blocks subcluster flow imports on the orchestration umbrella.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflection-share-*-flow</code> subcluster anchors remain CI-only; no presentation consumer routes through <code>pause-reflect-share-orchestration-flow</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-orchestrate-flow</code> peel off orchestrate subclusters, session shell/scaffold I/O peels, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
