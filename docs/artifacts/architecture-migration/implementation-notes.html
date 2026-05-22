@@ -33024,4 +33024,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — generation-io + steps-io parity import hygiene (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-io-parity.test.ts</code> + <code>pause-reflect-steps-io-parity.test.ts</code> (presentation)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete. Dedupe double-imported <code>pause-reflect-ambience-io</code> modules; merge duplicate ambience-io sibling inline tests in generation-io parity into one block with combined pins — no behavior changes.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test hygiene only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B Tier 1 lib shim scan, or application-layer parity import dedupe where triple imports remain.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
