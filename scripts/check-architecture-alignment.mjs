@@ -383,11 +383,18 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_STEP_NAV_IMPORTS = [
   "from '../domain/ritual/breathe/pause-breath-step-navigation'",
 ];
 
-/** Deep session telemetry in presentation/session — use pending-offer flow anchor via telemetry-io. */
+/** Deep session telemetry in presentation/session — use telemetry-io only. */
 const LEGACY_PAUSE_PRESENTATION_SESSION_TELEMETRY_IMPORTS = [
   '@/features/pause/application/use-cases/session/pause-session-telemetry',
   "from './application/use-cases/session/pause-session-telemetry'",
   "from '../application/use-cases/session/pause-session-telemetry'",
+];
+
+/** Session presentation — import pending-offer PostHog via pause-pending-offer-telemetry-flow (telemetry-io only). */
+const LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_TELEMETRY_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pending-pause-offer-telemetry',
+  "from './application/use-cases/ritual/reflect/telemetry/pending-pause-offer-telemetry'",
+  "from '../application/use-cases/ritual/reflect/telemetry/pending-pause-offer-telemetry'",
 ];
 
 /** Flat presentation/session scaffold paths — use presentation/session/scaffold/. */
@@ -570,6 +577,11 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_TELEMETRY_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: legacy session telemetry import (${needle})`);
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_PENDING_OFFER_TELEMETRY_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: legacy pending-offer telemetry import (${needle})`);
       }
     }
   }

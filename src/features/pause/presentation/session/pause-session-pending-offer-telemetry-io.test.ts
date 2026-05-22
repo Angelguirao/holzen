@@ -10,16 +10,19 @@ const trackPausePendingDeclinedMock = vi.hoisted(() => vi.fn());
 const trackPauseSessionAbandonedMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
-  '@/features/pause/application/use-cases/session/pause-session-pending-offer-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-pending-offer-telemetry-flow',
   () => ({
     trackPausePendingAdopted: trackPausePendingAdoptedMock,
     trackPausePendingDeclined: trackPausePendingDeclinedMock,
-    trackPauseSessionAbandoned: trackPauseSessionAbandonedMock,
   }),
 );
 
+vi.mock('@/features/pause/application/use-cases/session/pause-session-telemetry', () => ({
+  trackPauseSessionAbandoned: trackPauseSessionAbandonedMock,
+}));
+
 describe('pause-session-pending-offer-telemetry-io', () => {
-  it('re-exports pending-offer PostHog helpers from pause-session-pending-offer-flow', () => {
+  it('re-exports adopt/decline from pause-pending-offer-telemetry-flow and abandoned from session telemetry', () => {
     expect(typeof trackPausePendingAdopted).toBe('function');
     expect(typeof trackPausePendingDeclined).toBe('function');
     expect(typeof trackPauseSessionAbandoned).toBe('function');

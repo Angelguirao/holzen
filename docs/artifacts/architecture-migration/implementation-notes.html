@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — pending-offer PostHog flow anchor (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-pending-offer-telemetry-flow</code> for session pending-offer I/O</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Add CI anchor <code>pause-pending-offer-telemetry-flow</code> beside <code>pending-pause-offer-telemetry</code>; <code>pause-session-pending-offer-telemetry-io</code> imports adopt/decline through the reflect flow anchor and <code>trackPauseSessionAbandoned</code> from <code>pause-session-telemetry</code> (session beat). <code>pause-session-pending-offer-flow</code> keeps adopt/decline use cases only.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session presentation still uses <code>presentation/session/pause-session-pending-offer-telemetry-io</code> (not reflect presentation I/O) so pending-offer mutations stay in the session cluster.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: remaining session presentation deep imports or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect steps/share/tag/note/mood tests via presentation I/O (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

@@ -4,8 +4,3 @@
  */
 export { runAdoptPendingPauseOffer } from './pending-offer/run-adopt-pending-pause-offer';
 export { runDeclinePendingPauseOffer } from './pending-offer/run-decline-pending-pause-offer';
-export {
-  trackPausePendingAdopted,
-  trackPausePendingDeclined,
-} from '../ritual/reflect/telemetry/pending-pause-offer-telemetry';
-export { trackPauseSessionAbandoned } from './pause-session-telemetry';
