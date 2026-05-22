@@ -118,7 +118,7 @@ import {
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
   trackPauseOpenDismissed,
-} from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
+} from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io';
 import {
   dismissOpenPauseHome as dismissFromHomeIo,
   openManualPauseFromHome as openFromHomeIo,

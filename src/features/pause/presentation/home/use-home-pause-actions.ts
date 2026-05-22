@@ -12,7 +12,7 @@ import {
   trackHomePendingPauseBannerPauseOpened,
   trackPauseOpenDismissed,
   type PauseDismissAnalyticsSurface,
-} from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
+} from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io';
 import { holzenLog } from '@/lib/holzen-console';
 
 export type { PauseDismissAnalyticsSurface };

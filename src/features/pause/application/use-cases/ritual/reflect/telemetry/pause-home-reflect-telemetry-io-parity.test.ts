@@ -1,7 +1,7 @@
 /**
  * Application-layer I/O parity for Home manual-open PostHog telemetry (colocated beside
  * `generation/manual-open/pause-home-reflect-telemetry-flow.ts`; presentation pins stay colocated beside
- * `presentation/reflect/telemetry/pause-home-reflect-telemetry-io.ts`; colocated in this folder).
+ * `presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io.ts`; application parity in this folder).
  * Imports `pause-home-reflect-telemetry-flow` CI umbrella for `.toBe` identity pins only —
  * production Home telemetry I/O keeps leaf tracker modules under `manual-open/`.
  */
@@ -47,8 +47,8 @@ import {
   trackManualPauseInstanceCreated as trackInstanceCreatedFromHomeTelemetryIo,
   trackPauseManualCompleted as trackManualCompletedFromHomeTelemetryIo,
   trackPauseOpenDismissed as trackOpenDismissedFromHomeTelemetryIo,
-} from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
-import * as homeReflectTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
+} from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io';
+import * as homeReflectTelemetryIo from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io';
 import * as sessionReflectTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   dismissOpenPauseHome as dismissFromHomeReflectIo,
@@ -59,7 +59,7 @@ import {
 import * as homeReflectIo from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 
 /**
- * Application mirror: `presentation/reflect/telemetry/pause-home-reflect-telemetry-io-parity.test.ts`.
+ * Application mirror: `presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io-parity.test.ts`.
  */
 describe('pause-home-reflect-telemetry-io parity (application)', () => {
   it('presentation I/O Home reflect telemetry matches home-reflect-telemetry-flow CI umbrella', () => {
@@ -109,7 +109,7 @@ describe('pause-home-reflect-telemetry-io parity (application)', () => {
     expect(trackPauseManualCompleted).not.toBe(pauseDismissOpenPauseHomePreview);
     expect(trackOpenDismissedFromHomeTelemetryIo).not.toBe(pauseHomeManualOpenPorts);
     expect(trackBannerOpenedFromHomeTelemetryIo).not.toBe(dismissFromHomeReflectIo);
-    // Reciprocal inline pins: `presentation/reflect/telemetry/pause-home-reflect-telemetry-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io-parity.test.ts`.
     // Dedicated siblings: `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`;
     // `pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts` (application + presentation).
     // Presentation + application IO sibling: `pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`.

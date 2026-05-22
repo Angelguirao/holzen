@@ -73,8 +73,8 @@ import {
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
   trackPauseOpenDismissed,
-} from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
-import * as homeReflectTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
+} from './pause-home-reflect-telemetry-io';
+import * as homeReflectTelemetryIo from './pause-home-reflect-telemetry-io';
 import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,

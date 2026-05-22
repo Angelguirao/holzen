@@ -24,8 +24,8 @@ import {
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
   trackPauseOpenDismissed,
-} from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
-import * as homeReflectTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-home-reflect-telemetry-io';
+} from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io';
+import * as homeReflectTelemetryIo from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io';
 
 /**
  * Presentation mirror: `presentation/reflect/telemetry/pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts`.
