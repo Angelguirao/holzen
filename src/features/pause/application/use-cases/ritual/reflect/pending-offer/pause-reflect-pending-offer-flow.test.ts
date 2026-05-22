@@ -6,6 +6,16 @@ import {
   trackPausePendingDeclined,
 } from '../telemetry/pending-pause-offer-telemetry';
 import { trackPauseSessionAbandoned } from '../telemetry/pause-session-abandoned-telemetry';
+import { getPendingPauseOfferDisplay as getDisplayFromDisplayFlow } from './pause-pending-offer-display-flow';
+import {
+  runAdoptPendingPauseOffer as runAdoptFromRpcSubcluster,
+  runDeclinePendingPauseOffer as runDeclineFromRpcSubcluster,
+} from './pause-reflect-pending-offer-rpc-flow';
+import {
+  trackPausePendingAdopted as trackAdoptedFromTelemetryFlow,
+  trackPausePendingDeclined as trackDeclinedFromTelemetryFlow,
+  trackPauseSessionAbandoned as trackAbandonedFromTelemetryFlow,
+} from '../telemetry/pause-pending-offer-telemetry-flow';
 import {
   getPendingPauseOfferDisplay as getDisplayFromFlow,
   runAdoptPendingPauseOffer,
@@ -32,5 +42,14 @@ describe('pause-reflect-pending-offer-flow', () => {
     expect(trackAdoptedFromFlow).toBe(trackPausePendingAdopted);
     expect(trackDeclinedFromFlow).toBe(trackPausePendingDeclined);
     expect(trackAbandonedFromFlow).toBe(trackPauseSessionAbandoned);
+  });
+
+  it('re-exports pending-offer umbrella bindings identical to rpc, display, and telemetry subcluster anchors', () => {
+    expect(runAdoptPendingPauseOffer).toBe(runAdoptFromRpcSubcluster);
+    expect(runDeclinePendingPauseOffer).toBe(runDeclineFromRpcSubcluster);
+    expect(getDisplayFromFlow).toBe(getDisplayFromDisplayFlow);
+    expect(trackAdoptedFromFlow).toBe(trackAdoptedFromTelemetryFlow);
+    expect(trackDeclinedFromFlow).toBe(trackDeclinedFromTelemetryFlow);
+    expect(trackAbandonedFromFlow).toBe(trackAbandonedFromTelemetryFlow);
   });
 });
