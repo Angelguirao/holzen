@@ -3,6 +3,15 @@ import { runAdoptPendingPauseOffer as runAdoptDirect } from '@/features/pause/ap
 import { runDeclinePendingPauseOffer as runDeclineDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer';
 import {
   pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
+  pauseReflectFavoriteToggleWithRepository,
+  pauseReflectNoteUpdateWithRepository,
+  pauseReflectTagUpdateWithRepository,
+  pauseReflectionStepLogOnceWithRepository,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   trackPauseReflectPostItOpen,
@@ -101,6 +110,21 @@ describe('pause-reflect-pending-offer-io', () => {
     });
     expect(getPendingPauseOfferDisplayMock).toHaveBeenCalled();
     expect(display.contextText).toBe('mock-context');
+  });
+
+  it('sibling cluster: steps-io exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectFavoriteToggle);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseReflectNoteUpdate);
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectTagUpdate);
+    expect(pauseDeclinePendingOffer).not.toBe(pauseReflectionStepLogOnce);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseReflectFavoriteToggleWithRepository);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(pauseReflectNoteUpdateWithRepository);
+    expect(getPendingPauseOfferDisplay).not.toBe(pauseReflectTagUpdateWithRepository);
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    expect(pauseDeclinePendingOffer).not.toBe(shouldShowFavoriteProHint);
+    expect(getPendingPauseOfferDisplay).not.toBe(shouldLogPauseReflectionStep);
+    // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-steps-io.test.ts`;
+    // `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: session reflect telemetry-io exports stay distinct from pending-offer-io', () => {

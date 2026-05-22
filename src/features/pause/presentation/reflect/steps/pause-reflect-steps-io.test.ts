@@ -4,8 +4,11 @@ import { runPauseReflectNoteUpdate as runNoteUpdateDirect } from '@/features/pau
 import { runPauseReflectTagUpdate as runTagUpdateDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
 import { runPauseReflectionStepLogOnce as runReflectionStepLogDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
 import {
+  getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
   pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   pauseReflectGeneration,
@@ -185,5 +188,20 @@ describe('pause-reflect-steps-io', () => {
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectFavoriteToggle);
     expect(pauseReflectTagUpdate).not.toBe(pauseReflectionStepLogOnce);
     // Full pins: `pause-reflect-steps-note-tag-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: pending-offer-io exports stay distinct from steps-io', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseAdoptPendingOffer);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseDeclinePendingOffer);
+    expect(pauseReflectTagUpdate).not.toBe(pauseAdoptPendingOffer);
+    expect(pauseReflectionStepLogOnce).not.toBe(pauseDeclinePendingOffer);
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseAdoptPendingOfferWithRepository);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(pauseReflectionStepLogOnce).not.toBe(getPendingPauseOfferDisplay);
+    expect(shouldShowFavoriteProHint).not.toBe(pauseAdoptPendingOffer);
+    expect(shouldLogPauseReflectionStep).not.toBe(pauseDeclinePendingOffer);
+    expect(shouldShowFavoriteProHint).not.toBe(getPendingPauseOfferDisplay);
+    // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-pending-offer-io.test.ts`;
+    // `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts`.
   });
 });
