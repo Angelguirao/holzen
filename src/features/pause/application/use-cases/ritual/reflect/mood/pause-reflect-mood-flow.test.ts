@@ -77,6 +77,10 @@ import {
   runAdoptPendingPauseOffer as runAdoptFromPendingOfferFlow,
   runDeclinePendingPauseOffer as runDeclineFromPendingOfferFlow,
 } from '../pending-offer/pause-reflect-pending-offer-flow';
+import {
+  startPauseReflectFrameFocusAmbience as startAmbienceFromAmbienceFlow,
+  stopPauseReflectFrameFocusAmbience as stopAmbienceFromAmbienceFlow,
+} from '../ambience/pause-reflect-ambience-flow';
 
 describe('pause-reflect-mood-flow', () => {
   it('re-exports mood helpers from domain + run-initial-emotion-log leaf module', () => {
@@ -157,5 +161,19 @@ describe('pause-reflect-mood-flow', () => {
     expect(runChromeCloseFromFlow).not.toBe(runAdoptFromPendingOfferFlow);
     expect(applyBriefFromFlow).not.toBe(runDeclineFromPendingOfferFlow);
     // Full cross-umbrella pins: `pause-reflect-mood-pending-offer-flow-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-ambience-flow.test.ts` (mood-flow cluster).
+   * Dedicated sibling file: `pause-reflect-ambience-mood-flow-sibling-parity.test.ts`
+   * (+ presentation mirror under `presentation/reflect/ambience/`).
+   */
+  it('sibling cluster: ambience-flow exports stay distinct from mood umbrella exports', () => {
+    expect(runInitialEmotionSelect).not.toBe(startAmbienceFromAmbienceFlow);
+    expect(runInitialEmotionSkip).not.toBe(stopAmbienceFromAmbienceFlow);
+    expect(buildFeelTilesFromFlow).not.toBe(startAmbienceFromAmbienceFlow);
+    expect(runChromeCloseFromFlow).not.toBe(stopAmbienceFromAmbienceFlow);
+    expect(applyBriefFromFlow).not.toBe(startAmbienceFromAmbienceFlow);
+    // Full cross-flow pins: `pause-reflect-ambience-mood-flow-sibling-parity.test.ts`.
   });
 });
