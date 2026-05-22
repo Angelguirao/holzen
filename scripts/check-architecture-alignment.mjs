@@ -194,6 +194,9 @@ const LEGACY_PAUSE_USE_CASE_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/telemetry/home/",
   "from './application/use-cases/ritual/reflect/telemetry/session/",
   "from '../application/use-cases/ritual/reflect/telemetry/session/",
+  '@/features/pause/application/use-cases/session/pending-pause-offer-telemetry',
+  "from './application/use-cases/session/pending-pause-offer-telemetry",
+  "from '../application/use-cases/session/pending-pause-offer-telemetry",
 ];
 
 /** Flat presentation/reflect paths — use subclusters (generation/, steps/, mood/, …). */
