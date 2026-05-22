@@ -115,6 +115,8 @@ import {
 /**
  * Presentation mood I/O parity (colocated beside `pause-reflect-mood-io.ts`).
  * Application mirror: `application/use-cases/ritual/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
+ * Share-io sibling pins: `pause-reflect-share-mood-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts` (share cluster).
  * Ambience-io sibling pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (presentation);
  * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts` (ambience cluster).
  * Steps-io sibling pins: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
@@ -343,6 +345,8 @@ describe('pause-reflect-mood-io parity', () => {
     expect(pauseInitialEmotionSkipWithRepository).not.toBe(buildReflectionShareText);
     expect(buildFeelTilesMoodLogOptions).not.toBe(pauseReflectionShareImage);
     expect(buildFeelTilesFromMoodIo).not.toBe(buildReflectionShareText);
+    expect(applyBriefDepthPickerRitualEntry).not.toBe(pauseReflectionShareImage);
+    expect(runPauseSessionChromeCloseAction).not.toBe(buildReflectionShareText);
     expect(reflectPauseRepository).not.toBe(pauseReflectionShareImage);
     // Reciprocal inline pins: `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
     // Full pins: `pause-reflect-share-mood-io-sibling-parity.test.ts`.

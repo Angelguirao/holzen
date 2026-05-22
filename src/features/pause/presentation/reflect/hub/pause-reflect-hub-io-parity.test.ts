@@ -90,7 +90,7 @@ import { supabasePauseRepository } from '@/features/pause/public-rpc';
  * Telemetry-io sibling pins: `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (telemetry cluster).
  * Share-io sibling pins: `pause-reflect-hub-share-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
+ * reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts` (share cluster).
  */
 describe('pause-reflect-hub-io parity', () => {
   it('presentation I/O hub exports match pause-reflect-hub-flow CI umbrella', () => {
