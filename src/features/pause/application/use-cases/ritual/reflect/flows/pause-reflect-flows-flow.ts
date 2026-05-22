@@ -8,6 +8,8 @@
  * `pause-reflect-ambience-flow.test.ts`, and `pause-reflect-steps-flow.test.ts`;
  * `pause-reflect-flows-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-flow`;
  * `pause-reflect-flows-hub-flow-sibling-parity.test.ts` ↔ `pause-reflect-hub-flow`.
+ * Outcome leaf vs presentation wrappers: flows umbrella re-exports `runPauseOutcomeLog` identity;
+ * `pauseReflectOutcomeLog*` live on `pause-reflect-flows-io` only (pinned in flows-flow + flows-io-parity tests).
  */
 export {
   resolvePauseSessionReflectAndDecideAfterGeneration,

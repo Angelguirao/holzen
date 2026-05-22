@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: {},
+}));
 
 import {
   formatReinforcementQuoteFromSession,
@@ -57,6 +61,10 @@ import {
   shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
 } from '../steps/pause-reflect-steps-flow';
 
+import {
+  pauseReflectOutcomeLog,
+  pauseReflectOutcomeLogWithRepository,
+} from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   buildPauseScoreImpacts as buildImpactsFromFlow,
   formatReinforcementQuoteFromSession as formatQuoteFromFlow,
@@ -142,5 +150,13 @@ describe('pause-reflect-flows-flow', () => {
     expect(runOutcomeLogFromFlow).not.toBe(runReflectionStepFromStepsFlow);
     expect(formatQuoteFromFlow).not.toBe(shouldLogFromStepsFlow);
     expect(resolveAfterGenFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+  });
+
+  it('flows CI umbrella re-exports runPauseOutcomeLog as ritual/decide leaf (not presentation port wrappers)', () => {
+    expect(runOutcomeLogFromFlow).toBe(runPauseOutcomeLog);
+    expect(runOutcomeLogFromFlow).not.toBe(pauseReflectOutcomeLog);
+    expect(runOutcomeLogFromFlow).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(pauseReflectOutcomeLog).not.toBe(runPauseOutcomeLog);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(runPauseOutcomeLog);
   });
 });
