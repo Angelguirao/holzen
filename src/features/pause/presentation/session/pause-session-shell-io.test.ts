@@ -9,7 +9,7 @@ import {
 } from './pause-session-shell-io';
 
 describe('pause-session-shell-io', () => {
-  it('re-exports hydration helpers from pause-session-shell-flow', () => {
+  it('re-exports hydration helpers from session shell subcluster modules', () => {
     expect(typeof computePauseSessionHydration).toBe('function');
     expect(typeof computePauseSessionResolved).toBe('function');
     expect(typeof hasPersistedPauseSessionPayload).toBe('function');
