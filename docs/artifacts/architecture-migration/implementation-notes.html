@@ -59,19 +59,6 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-<<<<<<< HEAD
-      <span>Phase A — zen-mode Home read-model → presentation/home (backlog #1 verified, Tier 4)</span>
-      <span class="status resolved">resolved</span>
-    </header>
-    <h3><code>zen-mode-home-pause-snapshot</code> + <code>build-zen-mode-home-route-props</code></h3>
-    <dl>
-      <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no reflect moves. Colocate Zen reflection Home static snapshot + route props merger under <code>presentation/home/zen-mode/</code> beside <code>use-zen-mode-home-route-props</code>; <code>home-pause-card-body-props</code> stays in <code>application/use-cases/home/</code>. <code>public-home</code> export paths unchanged.</dd>
-      <dt>Deviation</dt>
-      <dd>None — mechanical relocation; no behavior change.</dd>
-      <dt>Open questions</dt>
-      <dd>Next: colocate <code>home-pause-card-body-props</code> or <code>run-log-pwa-install-analytics-event</code>, or Phase B subscription Tier 1 checkout-guard shim.</dd>
-=======
       <span>Phase B — subscription-checkout-guard-ref lib shim (Tier 1)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -83,7 +70,23 @@
       <dd>None — import path only; behavior parity.</dd>
       <dt>Open questions</dt>
       <dd>Next: additional Phase B Tier 1 shims only where app shell still deep-imports feature <code>public</code> at boot.</dd>
->>>>>>> 0bbf9de8a (refactor(subscription): add checkout-guard lib shim for App boot)
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — zen-mode Home read-model → presentation/home (backlog #1 verified, Tier 4)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>zen-mode-home-pause-snapshot</code> + <code>build-zen-mode-home-route-props</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no reflect moves. Colocate Zen reflection Home static snapshot + route props merger under <code>presentation/home/zen-mode/</code> beside <code>use-zen-mode-home-route-props</code>; <code>home-pause-card-body-props</code> stays in <code>application/use-cases/home/</code>. <code>public-home</code> export paths unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mechanical relocation; no behavior change.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>home-pause-card-body-props</code> or <code>run-log-pwa-install-analytics-event</code>.</dd>
     </dl>
   </article>
 
