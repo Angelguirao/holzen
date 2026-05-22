@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — persisted-tab-session-io ↔ persisted-tab-session-flow (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-persisted-tab-session-io-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add application-layer <code>pause-session-persisted-tab-session-io-parity.test.ts</code> so <code>pause-persisted-tab-session-io</code> wrappers delegate load/save/clear to <code>persisted-tab-session</code> leaf use cases with <code>persistedTabSessionStorage</code> from <code>public-rpc</code>, and the flow CI umbrella re-exports the same leaf modules (parity with ritual-done-io / home-bulk-hold-io repository pins). Production tab-session I/O unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + flow comment only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription Tier 1 shims or <code>home/bulk-hold/group-by-local-day</code> colocation.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session step-transition-io ↔ step-transition-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
