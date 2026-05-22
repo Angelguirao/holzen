@@ -549,6 +549,33 @@ const LEGACY_PAUSE_REFLECT_STEPS_FLOW_DOMAIN_IMPORTS = [
   "from '../domain/reflect/steps/",
 ];
 
+/** Reflect share umbrella flow — compose subcluster anchors only (no deep domain/reflect/share or run-*). */
+const LEGACY_PAUSE_REFLECT_SHARE_FLOW_DOMAIN_IMPORTS = [
+  '@/features/pause/domain/reflect/share/',
+  "from '@/features/pause/domain/reflect/share/",
+  "from './domain/reflect/share/",
+  "from '../domain/reflect/share/",
+];
+
+/** Reflect share presentation — import share builders/orchestration via pause-reflect-share-flow only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_DOMAIN_IMPORTS = [
+  '@/features/pause/domain/reflect/share/',
+  '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image',
+  '@/features/pause/application/use-cases/ritual/reflect/share/deliver-reflection-share-image',
+  '@/features/pause/application/use-cases/ritual/reflect/share/reflection-share-canvas',
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-image-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-text-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflection-share-channel-urls-flow',
+  "from './domain/reflect/share/",
+  "from '../domain/reflect/share/",
+  "from './application/use-cases/ritual/reflect/share/run-reflection-share-image'",
+  "from '../application/use-cases/ritual/reflect/share/run-reflection-share-image'",
+  "from './application/use-cases/ritual/reflect/share/deliver-reflection-share-image'",
+  "from '../application/use-cases/ritual/reflect/share/deliver-reflection-share-image'",
+  "from './application/use-cases/ritual/reflect/share/reflection-share-canvas'",
+  "from '../application/use-cases/ritual/reflect/share/reflection-share-canvas'",
+];
+
 /** Reflect steps presentation — import step mutations/gates via pause-reflect-steps-flow only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/steps/',
@@ -946,6 +973,23 @@ for (const file of walkTs(join(root, 'src'))) {
     }
   }
   if (rel === 'src/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow.ts') {
+    for (const needle of LEGACY_PAUSE_REFLECT_SHARE_FLOW_DOMAIN_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect share umbrella flow must compose subcluster anchors (${needle})`);
+      }
+    }
+    for (const needle of [
+      '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image',
+      '@/features/pause/application/use-cases/ritual/reflect/share/deliver-reflection-share-image',
+      '@/features/pause/application/use-cases/ritual/reflect/share/reflection-share-canvas',
+      "from './run-reflection-share-image'",
+      "from './deliver-reflection-share-image'",
+      "from './reflection-share-canvas'",
+    ]) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect share umbrella flow must not deep-import share orchestration (${needle})`);
+      }
+    }
     for (const needle of LEGACY_PAUSE_REFLECT_SHARE_FLOW_TELEMETRY_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(`${rel}: reflect share umbrella flow must compose telemetry subcluster (${needle})`);
@@ -1033,9 +1077,21 @@ for (const file of walkTs(join(root, 'src'))) {
     }
   }
   if (rel.startsWith('src/features/pause/presentation/reflect/share/')) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(`${rel}: legacy reflect share telemetry import (${needle})`);
+    const shareIoAllowlisted =
+      rel.endsWith('pause-reflect-share-io.ts') ||
+      rel.endsWith('pause-reflect-share-io.test.ts') ||
+      rel.endsWith('pause-reflect-telemetry-io.ts') ||
+      rel.endsWith('pause-reflect-telemetry-io.test.ts');
+    if (!shareIoAllowlisted) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_DOMAIN_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy reflect share import (${needle})`);
+        }
+      }
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy reflect share telemetry import (${needle})`);
+        }
       }
     }
   }
