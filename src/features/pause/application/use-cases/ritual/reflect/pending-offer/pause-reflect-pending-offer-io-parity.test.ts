@@ -273,9 +273,14 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
   it('sibling cluster: generation-io holzen-reflect exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(runReflectGeneration);
     expect(pauseDeclinePendingOffer).not.toBe(pauseReflectGeneration);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(runReflectGeneration);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(pauseReflectGeneration);
     expect(getPendingPauseOfferDisplay).not.toBe(runReflectGeneration);
+    expect(getPendingPauseOfferDisplay).not.toBe(pauseReflectGeneration);
     expect(reflectPauseRepository).not.toBe(pauseReflectGeneration);
-    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
+    expect(reflectPauseRepository).not.toBe(runReflectGeneration);
+    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts` (application + presentation).
+    // Dedicated sibling: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`.
   });
 
   /**

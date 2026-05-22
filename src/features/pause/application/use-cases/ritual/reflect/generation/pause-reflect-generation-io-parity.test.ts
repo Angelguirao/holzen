@@ -240,7 +240,10 @@ describe('pause-reflect-generation-io parity (application)', () => {
     expect(pauseReflectGeneration).not.toBe(pauseAdoptPendingOfferWithRepository);
     expect(runReflectGeneration).not.toBe(pauseDeclinePendingOfferWithRepository);
     expect(reflectGenerator).not.toBe(reflectPauseRepository);
+    expect(shouldCommitReflectGeneration).not.toBe(pauseAdoptPendingOfferWithRepository);
+    expect(runReflectGeneration).not.toBe(getPendingPauseOfferDisplay);
     // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts` (application + presentation).
+    // Dedicated sibling: `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`.
   });
 
   /**
