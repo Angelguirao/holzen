@@ -39,6 +39,10 @@ import {
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
+  pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
+} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
@@ -181,5 +185,11 @@ describe('pause-reflect-flows-io', () => {
     expect(pauseReflectOutcomeLog).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(buildPauseScoreImpacts).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(formatReinforcementQuoteFromSession).not.toBe(stopPauseReflectFrameFocusAmbience);
+  });
+
+  it('sibling cluster: hub-io exports stay distinct from flows-io', () => {
+    expect(pauseReflectOutcomeLog).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseShiftEmotionFrameHubDone);
   });
 });
