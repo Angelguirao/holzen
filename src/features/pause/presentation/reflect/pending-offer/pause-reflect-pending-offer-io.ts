@@ -11,7 +11,9 @@
  * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (application
  * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
  * `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`);
- * `pause-reflect-share-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`;
+ * `pause-reflect-share-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io` (application mirror:
+ * `application/.../share/pause-reflect-share-pending-offer-io-sibling-parity.test.ts`; reciprocal inline:
+ * `pause-reflect-share-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`);
  * `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-telemetry-io` (reciprocal inline pins in `*.test.ts`),
  * `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (presentation + application);
  * application reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`;

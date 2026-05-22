@@ -24,8 +24,11 @@ import {
 
 /**
  * Presentation sibling parity: share-io vs pending-offer-io (parity with
- * application `pause-reflect-share-pending-offer-flow-sibling-parity.test.ts` and
+ * application `pause-reflect-share-pending-offer-flow-sibling-parity.test.ts`,
+ * `application/.../share/pause-reflect-share-pending-offer-io-sibling-parity.test.ts`, and
  * `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`).
+ * Reciprocal inline pins: `pause-reflect-share-io-parity.test.ts` ↔
+ * `pause-reflect-pending-offer-io-parity.test.ts`.
  */
 describe('pause-reflect-share-io ↔ pause-reflect-pending-offer-io sibling parity', () => {
   it('share-io and pending-offer-io are distinct presentation I/O surfaces', () => {

@@ -45,6 +45,13 @@ import {
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
+  buildReflectionShareTelegramUrl,
+  buildReflectionShareText,
+  buildReflectionShareTweetUrl,
+  buildReflectionShareWhatsAppUrl,
+  pauseReflectionShareImage,
+} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
+import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
   pauseReflectTagUpdate,
@@ -174,6 +181,20 @@ describe('pause-reflect-pending-offer-io parity', () => {
     expect(pauseAdoptPendingOffer).not.toBe(pauseReflectionStepLogOnceWithRepository);
     // Reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts`.
     // Full pins: `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` (pending-offer RPC vs share builders).
+   * Dedicated sibling file: `pause-reflect-share-pending-offer-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: share-io exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(pauseReflectionShareImage);
+    expect(pauseDeclinePendingOffer).not.toBe(buildReflectionShareText);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(buildReflectionShareTweetUrl);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(buildReflectionShareWhatsAppUrl);
+    expect(getPendingPauseOfferDisplay).not.toBe(buildReflectionShareTelegramUrl);
+    expect(reflectPauseRepository).not.toBe(pauseReflectionShareImage);
+    // Full pins: `pause-reflect-share-pending-offer-io-sibling-parity.test.ts`.
   });
 
   /**

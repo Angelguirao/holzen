@@ -4,7 +4,9 @@
  * `pause-reflect-pending-offer-io` → leaf RPC/display modules).
  * Parity pins: `pause-reflect-share-io.test.ts` (hub-io reciprocal inline pins).
  * Sibling parity: `pause-reflect-hub-share-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
- * `pause-reflect-share-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
+ * `pause-reflect-share-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (application mirror:
+ * `application/.../share/pause-reflect-share-pending-offer-io-sibling-parity.test.ts`; reciprocal inline:
+ * `pause-reflect-share-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`);
  * `pause-reflect-share-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
  * `pause-reflect-share-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io` (application mirror:
  * `application/.../share/pause-reflect-share-telemetry-io-sibling-parity.test.ts`; reciprocal inline:
