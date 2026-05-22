@@ -32783,4 +32783,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — pending-offer-io-parity import hygiene (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-io-parity.test.ts</code> (presentation)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete. Parallel branch already added generation/home-reflect/telemetry sibling pins; this slice dedupes triple-imported modules (generation-io, telemetry-io, home-reflect-io) and merges file-header cross-links — no behavior or pin changes.</dd>
+      <dt>Deviation</dt>
+      <dd>None — test hygiene only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B Tier 1 lib shim scan (<code>@/lib/holzen-console</code> in pause application telemetry), or session scaffold-io application parity.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
