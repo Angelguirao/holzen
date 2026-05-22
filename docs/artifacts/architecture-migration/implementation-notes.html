@@ -23390,4 +23390,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate pause TanStack query prefixes (backlog #1 verified, Tier 3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-query-namespace</code> and <code>pause-instance-query-prefix</code> live under <code>infrastructure/queries/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no use-case folder moves. Move the last <code>application/queries/</code> modules to <code>infrastructure/queries/pause-query-namespace.ts</code> and <code>pause-instance-query-prefix.ts</code> (parity with reflect <code>steps/</code> and <code>pending-offer/</code> key modules). <code>public-queries</code> re-exports unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — mechanical colocation; removes empty <code>features/pause/application/queries/</code>.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Shared prefixes are infrastructure-owned; all pause TanStack key modules import from the colocated namespace.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-session-persisted-tab-session-flow</code> cluster marker, or session step-transition / step-handlers / terminal-entry cluster markers; or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->

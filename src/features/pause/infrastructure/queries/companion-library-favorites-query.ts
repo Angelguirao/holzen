@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { pauseInstanceQueryPrefix } from '@/features/pause/application/queries/pause-instance-query-prefix';
+import { pauseInstanceQueryPrefix } from '@/features/pause/infrastructure/queries/pause-instance-query-prefix';
 import { parseCompanionSlotFavoritesFromMetadata } from '@/features/pause/domain/companion/companion-slot-favorites-metadata';
 
 export { COMPANION_SLOT_FAVORITES_METADATA_KEY } from '@/features/pause/domain/companion/companion-slot-favorites-metadata';

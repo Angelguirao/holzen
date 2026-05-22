@@ -1,5 +1,5 @@
 import type { PauseReflectStepType } from '@/features/pause/domain/reflect/steps/reflect-step-latest';
-import { PAUSE_QUERY_PREFIX } from '@/features/pause/application/queries/pause-query-namespace';
+import { PAUSE_QUERY_PREFIX } from '@/features/pause/infrastructure/queries/pause-query-namespace';
 
 export const PAUSE_REFLECT_STEP_QUERY_PREFIX = [...PAUSE_QUERY_PREFIX, 'reflect-step', 'latest'] as const;
 
