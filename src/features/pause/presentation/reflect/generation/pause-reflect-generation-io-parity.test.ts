@@ -99,8 +99,11 @@ import {
   pauseDeclinePendingOffer,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
+  buildManualPauseMarketContext,
+  buildManualPauseOpenParams,
   dismissOpenPauseHome,
   openManualPauseFromHome,
+  pauseDismissOpenPauseHomePreview,
   pauseHomeManualOpenPorts,
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 import {
@@ -313,13 +316,19 @@ describe('pause-reflect-generation-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-home-reflect-io.test.ts`.
+   * Reciprocal inline pins ↔ `manual-open/pause-home-reflect-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: home-reflect-io exports stay distinct from generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(openManualPauseFromHome);
     expect(runReflectGeneration).not.toBe(dismissOpenPauseHome);
     expect(reflectGenerator).not.toBe(pauseHomeManualOpenPorts);
+    expect(reflectGenerationPrerequisite).not.toBe(buildManualPauseMarketContext);
+    expect(resolveReflectGenerationPrefetch).not.toBe(buildManualPauseOpenParams);
+    expect(messageFromReflectGenerationResult).not.toBe(openManualPauseFromHome);
+    expect(shouldCommitReflectGeneration).not.toBe(pauseDismissOpenPauseHomePreview);
+    // Reciprocal inline pins: `presentation/reflect/generation/manual-open/pause-home-reflect-io-parity.test.ts`,
+    // `application/.../manual-open/pause-home-reflect-io-parity.test.ts`.
   });
 
   /**
