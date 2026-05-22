@@ -47,6 +47,11 @@ import {
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 
 import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
+import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 
 describe('pause-reflect-generation-io parity', () => {
   it('presentation I/O holzen-reflect exports match generation CI umbrella', () => {
@@ -112,5 +117,19 @@ describe('pause-reflect-generation-io parity', () => {
     await pauseReflectGeneration(input, customGenerator as typeof supabaseReflectGenerator);
 
     expect(runReflectGenerationDirect).toHaveBeenCalledWith(input, customGenerator);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (holzen-reflect vs session UI telemetry).
+   * Dedicated sibling file: `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: session reflect telemetry-io exports stay distinct from generation-io', () => {
+    expect(pauseReflectGeneration).not.toBe(trackPauseReflectPostItOpen);
+    expect(pauseReflectGeneration).not.toBe(trackPauseReflectShareTap);
+    expect(pauseReflectGeneration).not.toBe(trackPauseReflectWallpaperTap);
+    expect(reflectGenerator).not.toBe(trackPauseReflectPostItOpen);
+    expect(runReflectGeneration).not.toBe(trackPauseReflectShareTap);
+    expect(reflectGenerationPrerequisite).not.toBe(trackPauseReflectWallpaperTap);
+    // Reciprocal inline pins: `pause-reflect-telemetry-io-parity.test.ts`.
   });
 });

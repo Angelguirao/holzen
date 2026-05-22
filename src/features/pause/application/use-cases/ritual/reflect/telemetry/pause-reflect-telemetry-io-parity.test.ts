@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabaseReflectGenerator: { port: 'reflectGenerator' },
+}));
 
 import {
   trackPauseReflectPostItOpen as trackPostItDirect,
@@ -20,6 +24,10 @@ import {
   trackPauseReflectShareTap as trackShareTapFromTelemetryIo,
   trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryIo,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import {
+  pauseReflectGeneration,
+  reflectGenerator,
+} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 
 describe('pause-reflect-telemetry-io parity', () => {
   it('presentation I/O session reflect telemetry matches telemetry CI umbrella', () => {
@@ -44,5 +52,17 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackPostItFromShareFlow).toBe(trackPostItDirect);
     expect(trackShareTapFromShareFlow).toBe(trackShareTapDirect);
     expect(trackWallpaperFromShareFlow).toBe(trackWallpaperDirect);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (session UI telemetry vs holzen-reflect).
+   * Dedicated sibling file: `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: generation-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseReflectGeneration);
+    expect(trackPauseReflectShareTap).not.toBe(pauseReflectGeneration);
+    expect(trackPauseReflectWallpaperTap).not.toBe(reflectGenerator);
+    expect(trackPostItFromTelemetryIo).not.toBe(reflectGenerator);
+    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
   });
 });
