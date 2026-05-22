@@ -10,9 +10,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 import { invalidateCompanionUiCompletionQuery as invalidateQueryDirect } from '@/features/pause/infrastructure/queries/companion/companion-ui-completion-query-key';
-import {
-  loadCompanionOrchestrateSession as loadSessionDirect,
-} from '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session';
+import { loadCompanionOrchestrateSession as loadSessionDirect } from '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session';
 import { nextExpandedWithLazyFetch as nextExpandedDirect } from '@/features/pause/application/use-cases/ritual/frame/next-expanded-with-lazy-fetch';
 import {
   supabaseCompanionOrchestrator,
@@ -29,6 +27,10 @@ import {
 
 describe('pause-companion-orchestration-io re-exports', () => {
   it('re-exports ritual/frame leaf modules with identity bindings (not orchestration-flow umbrella)', () => {
+    expect(typeof loadCompanionOrchestrateSession).toBe('function');
+    expect(typeof nextExpandedWithLazyFetch).toBe('function');
+    expect(typeof invalidateCompanionUiCompletionQuery).toBe('function');
+
     expect(loadCompanionOrchestrateSession).toBe(loadSessionDirect);
     expect(nextExpandedWithLazyFetch).toBe(nextExpandedDirect);
     expect(invalidateCompanionUiCompletionQuery).toBe(invalidateQueryDirect);
