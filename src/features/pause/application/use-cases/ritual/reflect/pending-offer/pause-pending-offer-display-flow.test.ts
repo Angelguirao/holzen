@@ -7,6 +7,11 @@ import {
   runAdoptPendingPauseOffer,
   runDeclinePendingPauseOffer,
 } from './pause-reflect-pending-offer-rpc-flow';
+import {
+  trackPausePendingAdopted,
+  trackPausePendingDeclined,
+  trackPauseSessionAbandoned,
+} from '../telemetry/pause-pending-offer-telemetry-flow';
 
 describe('pause-pending-offer-display-flow', () => {
   it('re-exports pending pause offer display projection', () => {
@@ -18,5 +23,13 @@ describe('pause-pending-offer-display-flow', () => {
     expect(getPendingPauseOfferDisplay).toBe(getDisplayFromPendingOfferFlow);
     expect(getPendingPauseOfferDisplay).not.toBe(runAdoptPendingPauseOffer);
     expect(getPendingPauseOfferDisplay).not.toBe(runDeclinePendingPauseOffer);
+  });
+
+  it('sibling cluster: display-flow export stays distinct from pending-offer telemetry trackers', () => {
+    expect(getPendingPauseOfferDisplay).not.toBe(trackPausePendingAdopted);
+    expect(getPendingPauseOfferDisplay).not.toBe(trackPausePendingDeclined);
+    expect(getPendingPauseOfferDisplay).not.toBe(trackPauseSessionAbandoned);
+    expect(trackPausePendingAdopted).not.toBe(trackPausePendingDeclined);
+    expect(trackPausePendingDeclined).not.toBe(trackPauseSessionAbandoned);
   });
 });

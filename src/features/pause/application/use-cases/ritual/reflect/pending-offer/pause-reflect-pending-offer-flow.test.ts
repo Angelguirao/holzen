@@ -123,6 +123,15 @@ describe('pause-reflect-pending-offer-flow', () => {
     expect(trackAbandonedFromFlow).not.toBe(getDisplayFromDisplayFlow);
   });
 
+  it('sibling cluster: telemetry-flow subcluster shares PostHog trackers only (not RPC or display)', () => {
+    expect(trackAdoptedFromFlow).toBe(trackAdoptedFromTelemetryFlow);
+    expect(trackDeclinedFromFlow).toBe(trackDeclinedFromTelemetryFlow);
+    expect(trackAbandonedFromFlow).toBe(trackAbandonedFromTelemetryFlow);
+    expect(runAdoptPendingPauseOffer).not.toBe(trackAdoptedFromTelemetryFlow);
+    expect(runDeclinePendingPauseOffer).not.toBe(trackDeclinedFromTelemetryFlow);
+    expect(getDisplayFromFlow).not.toBe(trackAbandonedFromTelemetryFlow);
+  });
+
   it('sibling cluster: hub-flow exports stay distinct from pending-offer umbrella exports', () => {
     expect(runAdoptPendingPauseOffer).not.toBe(runShiftHubDoneFromHubFlow);
     expect(runDeclinePendingPauseOffer).not.toBe(runShiftHubDoneFromHubFlow);
