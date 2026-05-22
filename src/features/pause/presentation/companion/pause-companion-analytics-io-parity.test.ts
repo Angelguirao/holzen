@@ -19,6 +19,8 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'companionPauseRepository' },
 }));
 
+import { runLogCompanionFeedbackVote as runFeedbackVoteDirect } from '@/features/pause/application/use-cases/ritual/frame/run-log-companion-feedback-vote';
+import { runLogCompanionFullviewOpened as runFullviewOpenedDirect } from '@/features/pause/application/use-cases/ritual/frame/run-log-companion-fullview-opened';
 import {
   runLogCompanionFeedbackVote,
   runLogCompanionFullviewOpened,
@@ -28,6 +30,10 @@ import {
   runLogCompanionFeedbackVote as runFeedbackVoteFromAnalyticsIo,
   runLogCompanionFullviewOpened as runFullviewOpenedFromAnalyticsIo,
 } from './pause-companion-analytics-io';
+import {
+  loadCompanionOrchestrateSession as loadSessionFromOrchestrationIo,
+  pauseLoadCompanionOrchestrateSession,
+} from './pause-companion-orchestration-io';
 import {
   runCompanionInterventionBootstrap as runInterventionFromOrchestrateIo,
   runCompanionSlotOrchestrate as runSlotOrchestrateFromOrchestrateIo,
@@ -40,16 +46,37 @@ describe('pause-companion-analytics-io parity', () => {
     expect(runLogCompanionFullviewOpened).toBe(runFullviewOpenedFromAnalyticsIo);
   });
 
+  it('analytics-flow CI umbrella composes the same leaf modules as presentation I/O', () => {
+    expect(runLogCompanionFeedbackVote).toBe(runFeedbackVoteDirect);
+    expect(runLogCompanionFullviewOpened).toBe(runFullviewOpenedDirect);
+    expect(runFeedbackVoteFromAnalyticsIo).toBe(runFeedbackVoteDirect);
+    expect(runFullviewOpenedFromAnalyticsIo).toBe(runFullviewOpenedDirect);
+  });
+
   it('binds default companionAnalyticsRepository to public-rpc supabasePauseAnalyticsRepository', () => {
     expect(companionAnalyticsRepository).toBe(supabasePauseAnalyticsRepository);
   });
 
+  /**
+   * Reciprocal inline pins ↔ `application/.../frame/pause-companion-analytics-io-parity.test.ts`.
+   * Dedicated siblings: `pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts`,
+   * `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts`,
+   * `pause-companion-analytics-orchestration-io-sibling-parity.test.ts`.
+   */
   it('analytics-flow CI umbrella exports stay distinct from orchestrate-io', () => {
     expect(runLogCompanionFeedbackVote).not.toBe(runSlotOrchestrateFromOrchestrateIo);
     expect(runLogCompanionFullviewOpened).not.toBe(runInterventionFromOrchestrateIo);
     expect(runFeedbackVoteFromAnalyticsIo).not.toBe(runSlotOrchestrateFromOrchestrateIo);
     expect(runFullviewOpenedFromAnalyticsIo).not.toBe(runInterventionFromOrchestrateIo);
     expect(companionAnalyticsRepository).not.toBe(runSlotOrchestrateFromOrchestrateIo);
-    // Full pins: `pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts`.
+    // Reciprocal inline pins: `application/.../pause-companion-analytics-io-parity.test.ts`.
+  });
+
+  it('sibling cluster: analytics-io exports stay distinct from orchestration-io', () => {
+    expect(runLogCompanionFeedbackVote).not.toBe(loadSessionFromOrchestrationIo);
+    expect(runLogCompanionFullviewOpened).not.toBe(pauseLoadCompanionOrchestrateSession);
+    expect(runFeedbackVoteFromAnalyticsIo).not.toBe(pauseLoadCompanionOrchestrateSession);
+    expect(companionAnalyticsRepository).not.toBe(loadSessionFromOrchestrationIo);
+    // Reciprocal inline pins: `application/.../pause-companion-analytics-io-parity.test.ts`.
   });
 });
