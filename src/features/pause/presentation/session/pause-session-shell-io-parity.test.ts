@@ -48,7 +48,7 @@ import {
   hasPersistedPauseSessionPayload as hasPersistedFromShellIo,
   isPauseSessionHeaderBackVisible as isHeaderBackVisibleFromShellIo,
   isPauseSessionWaitingForInstanceFetch as isWaitingFromShellIo,
-} from '@/features/pause/presentation/session/pause-session-shell-io';
+} from './pause-session-shell-io';
 import {
   buildPauseSessionPersistSnapshot,
   buildPauseSessionScaffoldRitualDerived,
@@ -69,11 +69,12 @@ import { pickPauseHolzenProvidersSlice } from '@/features/pause/presentation/ses
 import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persisted-pause-session';
 
 /**
- * Shell CI umbrella ↔ presentation I/O delegation parity.
+ * Shell CI umbrella ↔ presentation I/O delegation parity (colocated beside `pause-session-shell-io.ts`).
+ * Application-layer sibling parity files stay under `application/.../session/`.
  * Terminal-entry-io sibling: `pause-session-terminal-entry-shell-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins below ↔ `pause-session-terminal-entry-io-parity.test.ts`.
+ * reciprocal inline pins below ↔ `application/.../session/pause-session-terminal-entry-io-parity.test.ts`.
  * Providers-io sibling: `pause-session-providers-shell-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-session-providers-io-parity.test.ts`.
+ * reciprocal inline pins ↔ `application/.../session/pause-session-providers-io-parity.test.ts`.
  */
 describe('pause-session-shell-io parity', () => {
   it('presentation I/O shell exports match pause-session-shell-flow CI umbrella', () => {
@@ -121,7 +122,7 @@ describe('pause-session-shell-io parity', () => {
     expect(buildPauseSessionMountLogParams).not.toBe(isTerminalFromTerminalEntryIo);
     expect(hasPersistedPauseSessionPayload).not.toBe(persistedAllowsFromTerminalEntryIo);
     expect(isPauseSessionWaitingForInstanceFetch).not.toBe(isTerminalFromTerminalEntryIo);
-    // Reciprocal inline pins: `pause-session-terminal-entry-io-parity.test.ts`.
+    // Reciprocal inline pins: `application/.../session/pause-session-terminal-entry-io-parity.test.ts`.
   });
 
   /**
@@ -138,7 +139,7 @@ describe('pause-session-shell-io parity', () => {
     expect(hasPersistedPauseSessionPayload).not.toBe(pickPauseHolzenProvidersSlice);
     expect(isPauseSessionWaitingForInstanceFetch).not.toBe(pickPauseHolzenProvidersSlice);
     expect(computeHydrationFromShellIo).not.toBe(pickPauseHolzenProvidersSlice);
-    // Reciprocal inline pins: `pause-session-providers-io-parity.test.ts`.
+    // Reciprocal inline pins: `application/.../session/pause-session-providers-io-parity.test.ts`.
     // Full pins: `pause-session-providers-shell-io-sibling-parity.test.ts`.
   });
 
