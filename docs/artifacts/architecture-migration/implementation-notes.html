@@ -28350,7 +28350,7 @@
       <span>Phase A — steps-flow ↔ steps-io wrapper sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-steps-flow-steps-io-wrapper-sibling-parity.test.ts</code></h3>
+    <h3><code>pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated sibling parity between <code>pause-reflect-steps-flow</code> (application CI umbrella + leaf <code>run-*</code>) and <code>pause-reflect-steps-io</code> (presentation port-bound wrappers). Single dedicated file only — <code>check:architecture-alignment</code> forbids presentation <code>steps-io</code> importing application <code>steps-flow</code> (and flow unit test must not import presentation I/O). Complements <code>pause-reflect-steps-io-parity.test.ts</code> delegation coverage. Reciprocal wrapper pins on <code>pause-reflect-steps-io.re-exports.test.ts</code> (follow-up slice). Production modules unchanged.</dd>
@@ -28460,6 +28460,23 @@
       <dd>None — import path + test relocation only.</dd>
       <dt>Open questions</dt>
       <dd>Next: other Tier 1 lib shims (<code>holzen-query-client-ref</code> stays until pause invalidation paths peel), or subscription presentation slices per <code>subscription-client-architecture.md</code>.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — rename steps-flow-io-wrapper parity test (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Align filename with <code>pause-reflect-pending-offer-flow-io-wrapper-sibling-parity</code> (<code>flow-io-wrapper</code>, not <code>flow-steps-io-wrapper</code>). Extend export <code>in</code> guards for <code>*WithRepository</code> presentation seams. No production change.</dd>
+      <dt>Deviation</dt>
+      <dd>None.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shims, or presentation hub-io ↔ pending-offer-io sibling parity.</dd>
     </dl>
   </article>
 

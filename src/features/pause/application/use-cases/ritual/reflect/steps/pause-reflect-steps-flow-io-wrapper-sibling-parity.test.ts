@@ -47,6 +47,10 @@ describe('pause-reflect-steps-flow ↔ pause-reflect-steps-io wrapper sibling pa
     expect('pauseReflectNoteUpdate' in stepsFlow).toBe(false);
     expect('pauseReflectFavoriteToggle' in stepsFlow).toBe(false);
     expect('pauseReflectionStepLogOnce' in stepsFlow).toBe(false);
+    expect('pauseReflectTagUpdateWithRepository' in stepsFlow).toBe(false);
+    expect('pauseReflectNoteUpdateWithRepository' in stepsFlow).toBe(false);
+    expect('pauseReflectFavoriteToggleWithRepository' in stepsFlow).toBe(false);
+    expect('pauseReflectionStepLogOnceWithRepository' in stepsFlow).toBe(false);
     expect('reflectPauseRepository' in stepsFlow).toBe(false);
 
     expect('runPauseFavoriteToggle' in stepsIo).toBe(false);
