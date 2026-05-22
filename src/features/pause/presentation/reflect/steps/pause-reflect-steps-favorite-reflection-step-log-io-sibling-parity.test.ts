@@ -23,6 +23,7 @@ import {
  * steps-io (parity with application `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`
  * and `pause-reflect-steps-favorite-reflection-step-log-flow-sibling-parity.test.ts`;
  * complements `pause-reflect-steps-note-tag-io-sibling-parity.test.ts`).
+ * Application delegation mirror: `pause-reflect-steps-io-parity.test.ts`.
  */
 describe('pause-reflect-steps-io favorite ↔ reflection_step log wrapper sibling parity', () => {
   it('favorite and reflection_step log presentation wrappers are distinct exports on steps-io', () => {
