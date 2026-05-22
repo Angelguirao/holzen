@@ -4,6 +4,10 @@ import {
   startPauseReflectFrameFocusAmbience as startPauseReflectFrameFocusAmbienceDirect,
   stopPauseReflectFrameFocusAmbience as stopPauseReflectFrameFocusAmbienceDirect,
 } from '@/features/pause/domain/ritual/breathe/reflect-frame-focus-ambience';
+import {
+  startPauseReflectFrameFocusAmbience as startFromAmbienceFlow,
+  stopPauseReflectFrameFocusAmbience as stopFromAmbienceFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/ambience/pause-reflect-ambience-flow';
 
 import {
   startPauseReflectFrameFocusAmbience,
@@ -17,5 +21,10 @@ describe('pause-reflect-ambience-io re-exports', () => {
 
     expect(startPauseReflectFrameFocusAmbience).toBe(startPauseReflectFrameFocusAmbienceDirect);
     expect(stopPauseReflectFrameFocusAmbience).toBe(stopPauseReflectFrameFocusAmbienceDirect);
+  });
+
+  it('presentation I/O bindings match pause-reflect-ambience-flow CI anchor (leaf parity)', () => {
+    expect(startPauseReflectFrameFocusAmbience).toBe(startFromAmbienceFlow);
+    expect(stopPauseReflectFrameFocusAmbience).toBe(stopFromAmbienceFlow);
   });
 });

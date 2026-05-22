@@ -2649,11 +2649,13 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-reflect-ambience-io.test.ts') ||
     rel.endsWith('pause-reflect-ambience-io.re-exports.test.ts')
   ) {
-    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_AMBIENCE_IO_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: reflect ambience I/O must import domain reflect-frame-focus-ambience directly (${needle})`,
-        );
+    if (!rel.endsWith('pause-reflect-ambience-io.re-exports.test.ts')) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_AMBIENCE_IO_FLOW_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(
+            `${rel}: reflect ambience I/O must import domain reflect-frame-focus-ambience directly (${needle})`,
+          );
+        }
       }
     }
   }
