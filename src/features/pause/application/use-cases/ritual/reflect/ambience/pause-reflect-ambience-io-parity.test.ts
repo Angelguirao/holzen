@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: { port: 'reflectPauseRepository' },
+}));
 
 import {
   startPauseReflectFrameFocusAmbience as startDirect,
@@ -12,6 +16,14 @@ import {
   startPauseReflectFrameFocusAmbience as startFromAmbienceIo,
   stopPauseReflectFrameFocusAmbience as stopFromAmbienceIo,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+import {
+  getPendingPauseOfferDisplay,
+  pauseAdoptPendingOffer,
+  pauseAdoptPendingOfferWithRepository,
+  pauseDeclinePendingOffer,
+  pauseDeclinePendingOfferWithRepository,
+  reflectPauseRepository,
+} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 
 describe('pause-reflect-ambience-io parity', () => {
   it('presentation I/O frame-focus exports match ambience CI umbrella', () => {
@@ -24,5 +36,16 @@ describe('pause-reflect-ambience-io parity', () => {
     expect(stopPauseReflectFrameFocusAmbience).toBe(stopDirect);
     expect(startFromAmbienceIo).toBe(startDirect);
     expect(stopFromAmbienceIo).toBe(stopDirect);
+  });
+
+  it('sibling cluster: pending-offer-io exports stay distinct from ambience-io frame-focus bed', () => {
+    expect(startFromAmbienceIo).not.toBe(pauseAdoptPendingOffer);
+    expect(stopFromAmbienceIo).not.toBe(pauseDeclinePendingOffer);
+    expect(startFromAmbienceIo).not.toBe(pauseAdoptPendingOfferWithRepository);
+    expect(stopFromAmbienceIo).not.toBe(pauseDeclinePendingOfferWithRepository);
+    expect(startFromAmbienceIo).not.toBe(getPendingPauseOfferDisplay);
+    expect(stopFromAmbienceIo).not.toBe(reflectPauseRepository);
+    // Reciprocal inline pins: `pause-reflect-pending-offer-io-parity.test.ts`;
+    // dedicated sibling: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` (application + presentation).
   });
 });
