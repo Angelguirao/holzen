@@ -50,6 +50,8 @@ import {
 /**
  * Application-layer share I/O parity. Generation-io sibling:
  * `pause-reflect-generation-share-io-sibling-parity.test.ts` (reciprocal inline pins below).
+ * Telemetry-io sibling: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts`.
  */
 describe('pause-reflect-share-io parity', () => {
   it('presentation I/O share builder exports match share CI umbrella', () => {
@@ -117,5 +119,19 @@ describe('pause-reflect-share-io parity', () => {
     expect(buildTextFromShareIo).not.toBe(shouldCommitReflectGeneration);
     // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
     // Full pins: `pause-reflect-generation-share-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (share builders vs session UI telemetry).
+   * Dedicated sibling file: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: telemetry-io exports stay distinct from share-io builders', () => {
+    expect(pauseReflectionShareImage).not.toBe(trackPostItFromTelemetryIo);
+    expect(buildTextFromShareIo).not.toBe(trackShareTapFromTelemetryIo);
+    expect(buildTelegramFromShareIo).not.toBe(trackWallpaperFromTelemetryIo);
+    expect(buildTweetFromShareIo).not.toBe(trackPostItFromTelemetryIo);
+    expect(buildWhatsAppFromShareIo).not.toBe(trackShareTapFromTelemetryIo);
+    expect(pauseReflectionShareImage).not.toBe(trackWallpaperFromTelemetryIo);
+    // Reciprocal inline pins: `pause-reflect-telemetry-io-parity.test.ts`.
   });
 });

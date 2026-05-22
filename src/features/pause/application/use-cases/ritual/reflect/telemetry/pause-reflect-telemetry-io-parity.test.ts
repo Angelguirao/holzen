@@ -45,7 +45,19 @@ import {
   pauseReflectTagUpdate,
   pauseReflectionStepLogOnce,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
+  buildReflectionShareTelegramUrl,
+  buildReflectionShareText,
+  buildReflectionShareTweetUrl,
+  buildReflectionShareWhatsAppUrl,
+  pauseReflectionShareImage,
+} from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 
+/**
+ * Application-layer telemetry I/O parity. Share-io sibling:
+ * `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts`.
+ */
 describe('pause-reflect-telemetry-io parity', () => {
   it('presentation I/O session reflect telemetry matches telemetry CI umbrella', () => {
     expect(trackPauseReflectPostItOpen).toBe(trackPostItFromTelemetryIo);
@@ -111,5 +123,19 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackPauseReflectWallpaperTap).not.toBe(reflectGenerator);
     expect(trackPostItFromTelemetryIo).not.toBe(reflectGenerator);
     // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts` (session UI telemetry vs share builders).
+   * Dedicated sibling file: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: share-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseReflectionShareImage);
+    expect(trackPauseReflectShareTap).not.toBe(buildReflectionShareText);
+    expect(trackPauseReflectWallpaperTap).not.toBe(buildReflectionShareTelegramUrl);
+    expect(trackPostItFromTelemetryIo).not.toBe(buildReflectionShareTweetUrl);
+    expect(trackShareTapFromTelemetryIo).not.toBe(buildReflectionShareWhatsAppUrl);
+    expect(trackWallpaperFromTelemetryIo).not.toBe(pauseReflectionShareImage);
+    // Reciprocal inline pins: `pause-reflect-share-io-parity.test.ts`.
   });
 });
