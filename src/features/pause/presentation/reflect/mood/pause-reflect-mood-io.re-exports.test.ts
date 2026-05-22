@@ -24,6 +24,18 @@ import {
 } from '@/features/pause/domain/reflect/mood/pause-session-chrome-close';
 import { runDeepPausePickerEntryIfPro as runDeepPickerDirect } from '@/features/pause/domain/reflect/mood/run-deep-pause-picker-entry-if-pro';
 import { resolvePauseDepthContextLineParams as resolveDepthLineDirect } from '@/features/pause/domain/reflect/mood/resolve-pause-depth-context-line-params';
+import {
+  applyBriefDepthPickerRitualEntry as applyBriefFromMoodFlow,
+  applyDeepDepthPickerRitualEntry as applyDeepFromMoodFlow,
+  buildFeelTilesMoodLogOptions as buildFeelTilesFromMoodFlow,
+  initialEmotionResetUi as resetUiFromMoodFlow,
+  initialEmotionSelectRollbackUi as rollbackUiFromMoodFlow,
+  isPauseSessionDepthPickerActive as isDepthPickerActiveFromMoodFlow,
+  resolvePauseDepthContextLineParams as resolveDepthLineFromMoodFlow,
+  resolvePauseSessionChromeCloseAction as resolveChromeCloseFromMoodFlow,
+  runDeepPausePickerEntryIfPro as runDeepPickerFromMoodFlow,
+  runPauseSessionChromeCloseAction as runChromeCloseFromMoodFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
@@ -67,5 +79,18 @@ describe('pause-reflect-mood-io re-exports', () => {
 
   it('binds default reflectPauseRepository to public-rpc supabasePauseRepository', () => {
     expect(reflectPauseRepository).toBe(supabasePauseRepository);
+  });
+
+  it('presentation I/O bindings match pause-reflect-mood-flow CI anchor (leaf parity)', () => {
+    expect(applyBriefDepthPickerRitualEntry).toBe(applyBriefFromMoodFlow);
+    expect(applyDeepDepthPickerRitualEntry).toBe(applyDeepFromMoodFlow);
+    expect(buildFeelTilesMoodLogOptions).toBe(buildFeelTilesFromMoodFlow);
+    expect(initialEmotionResetUi).toBe(resetUiFromMoodFlow);
+    expect(initialEmotionSelectRollbackUi).toBe(rollbackUiFromMoodFlow);
+    expect(isPauseSessionDepthPickerActive).toBe(isDepthPickerActiveFromMoodFlow);
+    expect(resolvePauseDepthContextLineParams).toBe(resolveDepthLineFromMoodFlow);
+    expect(resolvePauseSessionChromeCloseAction).toBe(resolveChromeCloseFromMoodFlow);
+    expect(runDeepPausePickerEntryIfPro).toBe(runDeepPickerFromMoodFlow);
+    expect(runPauseSessionChromeCloseAction).toBe(runChromeCloseFromMoodFlow);
   });
 });
