@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect steps query keys under infrastructure/queries/reflect/steps (Tier 3)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>reflect-step-query-key</code> colocated with TanStack query modules (§5.2)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder moves remain complete. Split <code>PAUSE_REFLECT_STEP_QUERY_PREFIX</code> and <code>pauseReflectStepLatestQueryKey</code> into <code>infrastructure/queries/reflect/steps/reflect-step-query-key.ts</code> (parity with <code>pending-pause-offer-query-key</code>). <code>reflect-step-query.ts</code> re-exports keys for <code>public-queries</code>; presentation hooks unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; mechanical key module split only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Archive list keys still in <code>application/queries/</code>; journey/current-pause keys unchanged this slice.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>archive-query-keys</code> + <code>archive-pauses-tab-keys</code> under <code>infrastructure/queries/archive/</code>, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect ambience application cluster marker (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
