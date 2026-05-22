@@ -32,8 +32,9 @@ import {
 
 /**
  * Presentation sibling parity: analytics-io vs orchestration-io (parity with
- * `pause-companion-frame-ui-orchestration-io-sibling-parity.test.ts` and
- * `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts`).
+ * `pause-companion-frame-ui-orchestration-io-sibling-parity.test.ts`,
+ * `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts`, and application
+ * `application/.../pause-companion-analytics-orchestration-io-sibling-parity.test.ts`).
  */
 describe('pause-companion-analytics-io ↔ pause-companion-orchestration-io sibling parity', () => {
   it('analytics-io and orchestration-io are distinct presentation I/O surfaces', () => {

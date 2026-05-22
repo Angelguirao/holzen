@@ -107,5 +107,8 @@ describe('pause-companion-orchestration-io parity (application)', () => {
     expect(pauseToggleCompanionLibraryFavorite).not.toBe(runToggleCompanionLibraryFavorite);
     expect(pauseLoadCompanionOrchestrateSession).not.toBe(loadCompanionOrchestrateSession);
     // Reciprocal inline pins: `presentation/companion/pause-companion-orchestration-io-parity.test.ts`.
+    // Dedicated siblings (application + presentation):
+    // `pause-companion-orchestrate-orchestration-io-sibling-parity.test.ts`,
+    // `pause-companion-analytics-orchestration-io-sibling-parity.test.ts`.
   });
 });
