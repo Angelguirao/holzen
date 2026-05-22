@@ -24,7 +24,7 @@ vi.mock(
   }),
 );
 
-describe('pause-home-reflect-telemetry-io', () => {
+describe('pause-home-reflect-telemetry-io (telemetry/home cluster)', () => {
   it('re-exports Home reflect PostHog helpers from pause-home-reflect-telemetry-flow', () => {
     expect(typeof markPauseManualStartedHomeOnce).toBe('function');
     expect(typeof trackHomePendingPauseBannerPauseOpened).toBe('function');

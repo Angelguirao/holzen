@@ -19970,4 +19970,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — canonical Home reflect telemetry I/O (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>presentation/reflect/telemetry/home/</code> owns <code>pause-home-reflect-telemetry-io</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Flip canonical Home PostHog I/O to <code>presentation/reflect/telemetry/home/</code>; add <code>generation/manual-open/pause-home-reflect-telemetry-io.ts</code> barrel so <code>apply-manual-pause-open-result</code> sibling imports resolve (fixes broken <code>./pause-home-reflect-telemetry-io</code> after manual-open I/O colocation). <code>presentation/home/manual-open/</code> keeps a deprecated re-export for <code>use-manual-pause-trigger</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import paths only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Three presentation surfaces (telemetry/home, generation/manual-open barrel, home/manual-open shim) until Home conductors import telemetry/home directly.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B cross-context Tier 1 shim, or peel archive decide I/O when pause Tier 5 is clean.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
