@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect ambience application cluster marker (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>ritual/reflect/ambience/</code> CI cluster marker has unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 folder move remains complete. Add empty <code>ritual-reflect-ambience-cluster.ts</code> + regression test beside <code>pause-reflect-ambience-flow</code> (parity with telemetry/pending-offer cluster markers). Leaf anchor still re-exports domain bed helpers; <code>pause-reflect-ambience-io</code> unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — marker-only slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Other reflect subclusters (share, flows, generation, hub, mood, steps) still use flow anchors only until follow-up cluster markers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: cluster markers for remaining reflect subclusters, or colocate other <code>application/queries/*-keys.ts</code> modules.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect application cluster marker regression tests (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
