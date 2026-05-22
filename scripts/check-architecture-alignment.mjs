@@ -527,6 +527,37 @@ const LEGACY_PAUSE_REFLECT_HUB_FLOW_DOMAIN_IMPORTS = [
   "from '../domain/reflect/hub/",
 ];
 
+/** Reflect steps umbrella flow — compose subcluster anchors only (no deep domain/reflect/steps or run-*). */
+const LEGACY_PAUSE_REFLECT_STEPS_FLOW_DOMAIN_IMPORTS = [
+  '@/features/pause/domain/reflect/steps/',
+  "from '@/features/pause/domain/reflect/steps/",
+  "from './domain/reflect/steps/",
+  "from '../domain/reflect/steps/",
+];
+
+/** Reflect steps presentation — import step mutations/gates via pause-reflect-steps-flow only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_DOMAIN_IMPORTS = [
+  '@/features/pause/domain/reflect/steps/',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-favorite-toggle-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-note-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-tag-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflection-step-log-flow',
+  "from './domain/reflect/steps/",
+  "from '../domain/reflect/steps/",
+  "from './application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle'",
+  "from '../application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle'",
+  "from './application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update'",
+  "from '../application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update'",
+  "from './application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update'",
+  "from '../application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update'",
+  "from './application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log'",
+  "from '../application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log'",
+];
+
 /** Reflect flows umbrella flow — compose subcluster anchors only (no deep domain/reflect/flows or decide). */
 const LEGACY_PAUSE_REFLECT_FLOWS_FLOW_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/flows/',
@@ -848,6 +879,27 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
+  if (rel === 'src/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow.ts') {
+    for (const needle of LEGACY_PAUSE_REFLECT_STEPS_FLOW_DOMAIN_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect steps umbrella flow must compose subcluster anchors (${needle})`);
+      }
+    }
+    for (const needle of [
+      '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle',
+      '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update',
+      '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update',
+      '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log',
+      "from './run-pause-favorite-toggle'",
+      "from './run-pause-reflect-note-update'",
+      "from './run-pause-reflect-tag-update'",
+      "from './run-pause-reflection-step-log'",
+    ]) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect steps umbrella flow must not deep-import run-* use cases (${needle})`);
+      }
+    }
+  }
   if (rel === 'src/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow.ts') {
     for (const needle of LEGACY_PAUSE_REFLECT_HUB_FLOW_DOMAIN_IMPORTS) {
       if (text.includes(needle)) {
@@ -912,6 +964,18 @@ for (const file of walkTs(join(root, 'src'))) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy reflect hub import (${needle})`);
+        }
+      }
+    }
+  }
+  if (rel.startsWith('src/features/pause/presentation/reflect/steps/')) {
+    if (
+      !rel.endsWith('pause-reflect-steps-io.ts') &&
+      !rel.endsWith('pause-reflect-steps-io.test.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_DOMAIN_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy reflect steps import (${needle})`);
         }
       }
     }
