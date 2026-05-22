@@ -6,7 +6,7 @@ import {
 
 const trackEvent = vi.fn();
 
-vi.mock('@/lib/posthog', () => ({
+vi.mock('@/features/pause/application/pause-product-analytics', () => ({
   trackEvent: (...args: unknown[]) => trackEvent(...args),
 }));
 
