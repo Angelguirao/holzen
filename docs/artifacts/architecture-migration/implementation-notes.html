@@ -30352,4 +30352,21 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — colocate mood-io parity beside presentation cluster (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-io-parity.test.ts</code> → <code>presentation/reflect/mood/</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no use-case folder moves. Colocate presentation I/O parity beside <code>pause-reflect-mood-io.ts</code> (parity with <code>pause-reflect-pending-offer-io-parity.test.ts</code>). Drop duplicate flows-io sibling test block and duplicate import block during move. Allowlist <code>pause-reflect-mood-io-parity.test.ts</code> in <code>check:architecture-alignment</code> (parity pins need domain + mood-flow imports). Application flow/cluster comment anchors unchanged; production I/O unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>Reflect I/O parity tests that assert flow umbrellas may remain under <code>application/.../ritual/reflect/</code>; mood presentation wrappers are presentation-first.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>pause-reflect-hub-io-parity.test.ts</code> under <code>presentation/reflect/hub/</code>, or Phase B Tier 1 shim scan (<code>subscription-checkout-guard-ref</code>).</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
