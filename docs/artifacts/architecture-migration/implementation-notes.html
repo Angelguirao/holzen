@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — presentation reflect telemetry under presentation/reflect/telemetry/ (backlog #1, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-telemetry-io</code> + <code>use-pause-reflect-ui-telemetry</code> leave share/</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Follow application slice: colocate session reflect PostHog presentation I/O + hook under <code>presentation/reflect/telemetry/</code> (§3). <code>public-ritual-reflect</code> export path only; hook still imports <code>pause-reflect-telemetry-io</code> sibling. CI forbids resurrecting <code>presentation/reflect/share/pause-reflect-*-telemetry</code> paths.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; tracker call sites unchanged.</dd>
+      <dt>Tradeoff</dt>
+      <dd>Share subcluster no longer hosts session UI telemetry — keeps share/ for orchestration + share handlers only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: Phase B subscription Tier 1 shims when pause Tier 5 identity pins are quiet.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — ritual/frame cluster marker (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

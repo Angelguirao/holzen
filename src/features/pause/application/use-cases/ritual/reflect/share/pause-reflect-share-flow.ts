@@ -1,7 +1,7 @@
 /**
  * CI cluster anchor for ritual reflect share presentation I/O (§3 / check:architecture-alignment).
  * Composes domain share builders + `run-reflection-share-image` + session UI telemetry (not subcluster flow anchors).
- * Presentation: `pause-reflect-share-io.ts` and `pause-reflect-telemetry-io.ts` import leaf modules directly.
+ * Presentation: `pause-reflect-share-io.ts` imports share leaves directly; `presentation/reflect/telemetry/pause-reflect-telemetry-io.ts` imports session UI telemetry directly.
  */
 export type { DeliverReflectionShareImageDeps } from './deliver-reflection-share-image';
 export { runReflectionShareImage } from './run-reflection-share-image';

@@ -244,6 +244,10 @@ mustExist(
   'pause/presentation/reflect/pending-offer/',
 );
 mustExist(
+  'src/features/pause/presentation/reflect/telemetry',
+  'pause/presentation/reflect/telemetry/',
+);
+mustExist(
   'src/features/pause/presentation/session/breath',
   'pause/presentation/session/breath/',
 );
@@ -338,9 +342,15 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_IMPORTS = [
   '@/features/pause/presentation/reflect/use-pause-artifact-reflection-text',
   '@/features/pause/presentation/reflect/use-pause-reflection-step-log',
   '@/features/pause/presentation/reflect/use-pause-reflect-ui-telemetry',
+  '@/features/pause/presentation/reflect/share/pause-reflect-telemetry-io',
+  '@/features/pause/presentation/reflect/share/use-pause-reflect-ui-telemetry',
   '@/features/pause/presentation/reflect/telemetry/session/',
   "from './presentation/reflect/telemetry/session/",
   "from '../presentation/reflect/telemetry/session/",
+  "from './presentation/reflect/share/pause-reflect-telemetry-io'",
+  "from '../presentation/reflect/share/pause-reflect-telemetry-io'",
+  "from './presentation/reflect/share/use-pause-reflect-ui-telemetry'",
+  "from '../presentation/reflect/share/use-pause-reflect-ui-telemetry'",
   '@/features/pause/presentation/reflect/use-pause-reflect-tags',
   '@/features/pause/presentation/reflect/use-pause-reflect-note',
   '@/features/pause/presentation/reflect/use-pause-reflect-frame-focus-ambience',
@@ -2034,14 +2044,14 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IO_TELEMETRY_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: share telemetry I/O must import pause-reflect-session-ui-telemetry directly (${needle})`,
+          `${rel}: reflect telemetry I/O must import pause-reflect-session-ui-telemetry directly (${needle})`,
         );
       }
     }
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_TELEMETRY_IO_SHARE_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: share telemetry I/O must not import share umbrella (${needle})`,
+          `${rel}: reflect telemetry I/O must not import share umbrella (${needle})`,
         );
       }
     }
@@ -2586,9 +2596,7 @@ for (const file of walkTs(join(root, 'src'))) {
   if (rel.startsWith('src/features/pause/presentation/reflect/share/')) {
     const shareIoAllowlisted =
       rel.endsWith('pause-reflect-share-io.ts') ||
-      rel.endsWith('pause-reflect-share-io.test.ts') ||
-      rel.endsWith('pause-reflect-telemetry-io.ts') ||
-      rel.endsWith('pause-reflect-telemetry-io.test.ts');
+      rel.endsWith('pause-reflect-share-io.test.ts');
     if (!shareIoAllowlisted) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_SHARE_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {
