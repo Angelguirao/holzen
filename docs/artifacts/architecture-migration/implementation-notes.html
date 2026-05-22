@@ -99,7 +99,7 @@
     <h3><code>runPauseOutcomeLog</code> + steps <code>run-pause-*</code> parity pins</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-flows-io.re-exports.test.ts</code> and <code>pause-reflect-flows-io-parity.test.ts</code> with <code>runPauseOutcomeLog</code> identity against <code>ritual/decide/run-pause-outcome-log</code> and <code>pause-reflect-flows-flow</code> (parity with score-impact/toast pins). Extend <code>pause-reflect-steps-io-parity.test.ts</code> so steps-flow <code>run-pause-*</code> leaves match direct ritual/reflect/steps modules (presentation I/O facades unchanged).</dd>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-flows-io.re-exports.test.ts</code> and <code>pause-reflect-flows-io-parity.test.ts</code> with <code>runPauseOutcomeLog</code> identity against <code>ritual/decide/run-pause-outcome-log</code> and <code>pause-reflect-flows-flow</code> (parity with score-impact/toast pins); parity test also pins all domain/decide leaf exports and <code>reflectPauseRepository</code> ↔ <code>supabasePauseRepository</code> (orchestrate-io-style cluster guard). Document <code>pause-reflect-flows-flow</code> re-exports comment. Extend <code>pause-reflect-steps-io-parity.test.ts</code> so steps-flow <code>run-pause-*</code> leaves match direct ritual/reflect/steps modules (presentation I/O facades unchanged).</dd>
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
       <dt>Open question</dt>
