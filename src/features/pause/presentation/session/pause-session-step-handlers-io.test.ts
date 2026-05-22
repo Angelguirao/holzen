@@ -47,10 +47,30 @@ import {
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 
+import {
+  buildPauseSessionStepRitualBundle as buildRitualFromHandlersFlow,
+  buildPauseSessionStepShellBundle as buildShellFromHandlersFlow,
+} from '@/features/pause/application/use-cases/session/pause-session-step-handlers-flow';
+
 describe('pause-session-step-handlers-io', () => {
   it('re-exports bundle builders from step-bundles', () => {
     expect(buildPauseSessionStepShellBundle).toBe(buildShellFromLeaf);
     expect(buildPauseSessionStepRitualBundle).toBe(buildRitualFromLeaf);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-session-step-handlers-flow.test.ts` (presentation I/O vs flow CI umbrella).
+   * Dedicated sibling file: `pause-session-step-handlers-flow-io-wrapper-sibling-parity.test.ts` (application);
+   * presentation mirror: `pause-session-step-handlers-flow-io-wrapper-sibling-parity.test.ts` (this folder).
+   */
+  it('sibling cluster: step-handlers-flow bundle exports align with step-handlers-io (wrapper parity)', () => {
+    expect(buildPauseSessionStepShellBundle).toBe(buildShellFromHandlersFlow);
+    expect(buildPauseSessionStepRitualBundle).toBe(buildRitualFromHandlersFlow);
+    expect(buildPauseSessionStepShellBundle).not.toBe(pauseReflectTagUpdate);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(pauseReflectNoteUpdate);
+    expect(buildPauseSessionStepShellBundle).not.toBe(pauseReflectFavoriteToggle);
+    expect(buildPauseSessionStepRitualBundle).not.toBe(pauseReflectionStepLogOnce);
+    // Reciprocal inline pins: `pause-session-step-handlers-flow.test.ts`.
   });
 
   /**
