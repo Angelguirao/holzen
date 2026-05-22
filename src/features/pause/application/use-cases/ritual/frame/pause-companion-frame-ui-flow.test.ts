@@ -12,6 +12,16 @@ import {
 } from './section-visibility';
 
 import {
+  COMPANION_FULL_VIEW_BREATHING_ROOM_MS as breathingRoomMsFromFullViewFlow,
+  companionPrefsForFullViewSlot as prefsForSlotFromFullViewFlow,
+  isCompanionFullViewSlotSettled as isSlotSettledFromFullViewFlow,
+  pauseSeverityToOrchestrateNumber as severityToNumberFromFullViewFlow,
+} from './pause-companion-full-view-ui-flow';
+import {
+  getCompanionSectionVisibility as getVisibilityFromSectionFlow,
+  isCompanionSectionVisible as isVisibleFromSectionFlow,
+} from './pause-companion-section-visibility-flow';
+import {
   COMPANION_FULL_VIEW_BREATHING_ROOM_MS,
   companionPrefsForFullViewSlot,
   getCompanionSectionVisibility,
@@ -35,5 +45,14 @@ describe('pause-companion-frame-ui-flow', () => {
     expect(companionPrefsForFullViewSlot).toBe(prefsForSlotDirect);
     expect(isCompanionFullViewSlotSettled).toBe(isSlotSettledDirect);
     expect(pauseSeverityToOrchestrateNumber).toBe(severityToNumberDirect);
+  });
+
+  it('umbrella bindings match frame UI subcluster CI anchors (leaf parity)', () => {
+    expect(getCompanionSectionVisibility).toBe(getVisibilityFromSectionFlow);
+    expect(isCompanionSectionVisible).toBe(isVisibleFromSectionFlow);
+    expect(COMPANION_FULL_VIEW_BREATHING_ROOM_MS).toBe(breathingRoomMsFromFullViewFlow);
+    expect(companionPrefsForFullViewSlot).toBe(prefsForSlotFromFullViewFlow);
+    expect(isCompanionFullViewSlotSettled).toBe(isSlotSettledFromFullViewFlow);
+    expect(pauseSeverityToOrchestrateNumber).toBe(severityToNumberFromFullViewFlow);
   });
 });

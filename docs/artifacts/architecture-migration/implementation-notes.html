@@ -25111,4 +25111,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — companion frame-ui-flow ↔ subcluster anchors (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-frame-ui-flow</code> pins umbrella exports to section-visibility + full-view CI anchors</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) and #2 (<code>companion/</code> → <code>ritual/frame/</code>) remain complete — no folder moves. Extend <code>pause-companion-frame-ui-flow.test.ts</code> with <code>.toBe</code> identity against <code>pause-companion-section-visibility-flow</code> and <code>pause-companion-full-view-ui-flow</code> (parity with orchestration-flow subcluster pins). Presentation <code>pause-companion-frame-ui-io</code> unchanged.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Regression guard without frame-ui umbrella importing subcluster flow anchors in production code.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-orchestration-flow</code> ↔ <code>pause-companion-section-visibility-flow</code> sibling pin, Phase B / Tier 1 <code>holzen-query-client-ref</code> shim peel, or cross-context Tier 2–4 scan.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
