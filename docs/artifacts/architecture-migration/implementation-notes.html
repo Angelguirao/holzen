@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect share subcluster umbrella pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Share text/channel/image flow anchors ↔ orchestration + presentation umbrellas</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflection-share-*-flow.test.ts</code> subcluster tests with <code>.toBe(direct)</code> identity against <code>pause-reflect-share-orchestration-flow</code> and <code>pause-reflect-share-flow</code> (reverse parity with orchestration umbrella pins). Image subcluster asserts <code>deliverReflectionShareImage</code> only on orchestration anchor — presentation umbrella still omits deliver by design.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests only.</dd>
+      <dt>Open question</dt>
+      <dd>Next: session breath umbrella consolidated subcluster pin test, <code>pause-reflect-telemetry-flow</code> cross-umbrella pins, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect share umbrella orchestration subcluster pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
