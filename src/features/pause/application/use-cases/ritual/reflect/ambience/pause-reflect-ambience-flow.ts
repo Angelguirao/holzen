@@ -3,7 +3,7 @@
  * Web Audio bed implementation lives in domain; re-export for application-layer imports.
  * Sibling cluster anchor to `pause-reflect-generation-flow` (holzen-reflect + manual-open umbrella).
  * Presentation: `pause-reflect-ambience-io.ts` imports domain directly (not this anchor).
- * Parity: `presentation/reflect/ambience/pause-reflect-ambience-io-parity.test.ts` + `pause-reflect-ambience-io.re-exports.test.ts`;
+ * Parity: `pause-reflect-ambience-io-parity.test.ts` (application, colocated) + `presentation/reflect/ambience/pause-reflect-ambience-io-parity.test.ts` + `pause-reflect-ambience-io.re-exports.test.ts`;
  * Sibling I/O: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (application + presentation);
  * `pause-reflect-ambience-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-flow` (flow CI anchors);
  * sibling pins: `pause-reflect-ambience-flow.test.ts` ↔ `pause-reflect-generation-flow.test.ts`

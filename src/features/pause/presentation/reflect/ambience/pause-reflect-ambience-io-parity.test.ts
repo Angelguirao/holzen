@@ -76,6 +76,7 @@ import {
 
 /**
  * Presentation I/O parity (colocated beside `pause-reflect-ambience-io.ts`).
+ * Application mirror: `application/.../ambience/pause-reflect-ambience-io-parity.test.ts` (colocated beside ambience-flow).
  * Imports `pause-reflect-ambience-flow` CI umbrella for `.toBe` identity pins only — production ambience I/O keeps domain leaf imports.
  * Hub-io sibling pins: `pause-reflect-ambience-hub-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (hub cluster).
