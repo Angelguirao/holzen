@@ -5,6 +5,7 @@
  * Imports `pause-reflect-mood-flow` CI umbrella for `.toBe` identity pins only —
  * production mood I/O keeps domain mood helpers + `run-initial-emotion-log` leaf imports.
  * Presentation mirror: `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
+ * Hub-io sibling: reciprocal inline pins ↔ `hub/pause-reflect-hub-io-parity.test.ts` (application + presentation).
  * Telemetry-io sibling: reciprocal inline pins ↔ `telemetry/pause-reflect-telemetry-io-parity.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
@@ -105,6 +106,8 @@ import {
   pauseShiftEmotionFrameHubDoneWithRepository,
   resolveShiftFrameHubDonePresentation,
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import * as hubIo from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import * as moodIo from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
@@ -236,6 +239,21 @@ describe('pause-reflect-mood-io parity (application)', () => {
     expect(reflectPauseRepository).not.toBe(pauseShiftEmotionFrameHubDone);
     // Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts` (application + presentation).
     // Full pins: `pause-reflect-hub-mood-io-sibling-parity.test.ts`.
+  });
+
+  it('presentation mood-io and hub-io I/O namespaces stay separated (reciprocal inline)', () => {
+    expect('pauseShiftEmotionFrameHubDone' in moodIo).toBe(false);
+    expect('pauseShiftEmotionFrameHubDoneWithRepository' in moodIo).toBe(false);
+    expect('buildShiftEmotionFrameHubLogBundle' in moodIo).toBe(false);
+    expect('resolveShiftFrameHubDonePresentation' in moodIo).toBe(false);
+
+    expect('pauseInitialEmotionSelect' in hubIo).toBe(false);
+    expect('pauseInitialEmotionSkip' in hubIo).toBe(false);
+    expect('pauseInitialEmotionSelectWithRepository' in hubIo).toBe(false);
+    expect('pauseInitialEmotionSkipWithRepository' in hubIo).toBe(false);
+    expect('buildFeelTilesMoodLogOptions' in hubIo).toBe(false);
+    expect('resolvePauseSessionChromeCloseAction' in hubIo).toBe(false);
+    // Reciprocal inline pins: `hub/pause-reflect-hub-io-parity.test.ts` (application + presentation).
   });
 
   /**
