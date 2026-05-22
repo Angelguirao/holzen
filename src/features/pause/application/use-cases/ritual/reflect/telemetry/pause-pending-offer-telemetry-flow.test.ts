@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from './pause-reflect-telemetry-flow';
+import {
   trackPausePendingAdopted as trackAdoptedDirect,
   trackPausePendingDeclined as trackDeclinedDirect,
 } from './pending-pause-offer-telemetry';
@@ -10,11 +15,6 @@ import {
   trackPausePendingDeclined,
   trackPauseSessionAbandoned,
 } from './pause-pending-offer-telemetry-flow';
-import {
-  trackPauseReflectPostItOpen,
-  trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
-} from './pause-reflect-telemetry-flow';
 
 describe('pause-pending-offer-telemetry-flow', () => {
   it('re-exports pending-offer and session-abandoned telemetry trackers', () => {
@@ -32,6 +32,10 @@ describe('pause-pending-offer-telemetry-flow', () => {
     expect(trackPausePendingAdopted).not.toBe(trackPauseReflectShareTap);
     expect(trackPausePendingAdopted).not.toBe(trackPauseReflectWallpaperTap);
     expect(trackPausePendingDeclined).not.toBe(trackPauseReflectPostItOpen);
+    expect(trackPausePendingDeclined).not.toBe(trackPauseReflectShareTap);
+    expect(trackPausePendingDeclined).not.toBe(trackPauseReflectWallpaperTap);
+    expect(trackPauseSessionAbandoned).not.toBe(trackPauseReflectPostItOpen);
+    expect(trackPauseSessionAbandoned).not.toBe(trackPauseReflectShareTap);
     expect(trackPauseSessionAbandoned).not.toBe(trackPauseReflectWallpaperTap);
   });
 });
