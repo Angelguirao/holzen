@@ -1,15 +1,16 @@
 /**
  * CI cluster anchor for companion frame UI presentation I/O (§3 / check:architecture-alignment).
- * Composes frame UI subcluster anchors; presentation imports via `pause-companion-frame-ui-io.ts`.
+ * Composes ritual/frame leaf modules (not full-view / section-visibility subcluster flow anchors).
+ * Presentation: `pause-companion-frame-ui-io.ts` imports leaf modules directly.
  */
 export {
   COMPANION_FULL_VIEW_BREATHING_ROOM_MS,
   companionPrefsForFullViewSlot,
   isCompanionFullViewSlotSettled,
   pauseSeverityToOrchestrateNumber,
-} from './pause-companion-full-view-ui-flow';
+} from './full-view-page-helpers';
 export {
   getCompanionSectionVisibility,
   isCompanionSectionVisible,
   type CompanionSectionVisibility,
-} from './pause-companion-section-visibility-flow';
+} from './section-visibility';

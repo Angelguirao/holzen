@@ -1286,12 +1286,14 @@ const LEGACY_PAUSE_PRESENTATION_COMPANION_FRAME_UI_DOMAIN_IMPORTS = [
   "from '../section-visibility'",
 ];
 
-/** Companion frame UI umbrella — compose subcluster anchors only (not leaf modules). */
-const LEGACY_PAUSE_COMPANION_FRAME_UI_FLOW_DIRECT_IMPORTS = [
-  "from './full-view-page-helpers'",
-  "from './section-visibility'",
-  "from '../full-view-page-helpers'",
-  "from '../section-visibility'",
+/** Companion frame UI umbrella — compose leaf modules only (not frame UI subcluster flow anchors). */
+const LEGACY_PAUSE_COMPANION_FRAME_UI_FLOW_SUBCLUSTER_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-full-view-ui-flow',
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-section-visibility-flow',
+  "from './pause-companion-full-view-ui-flow'",
+  "from '../pause-companion-full-view-ui-flow'",
+  "from './pause-companion-section-visibility-flow'",
+  "from '../pause-companion-section-visibility-flow'",
 ];
 
 /** Companion orchestration presentation — import via pause-companion-orchestration-io only. */
@@ -2568,10 +2570,10 @@ for (const file of walkTs(join(root, 'src'))) {
     }
   }
   if (rel === 'src/features/pause/application/use-cases/ritual/frame/pause-companion-frame-ui-flow.ts') {
-    for (const needle of LEGACY_PAUSE_COMPANION_FRAME_UI_FLOW_DIRECT_IMPORTS) {
+    for (const needle of LEGACY_PAUSE_COMPANION_FRAME_UI_FLOW_SUBCLUSTER_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: companion frame UI umbrella flow must compose subcluster anchors (${needle})`,
+          `${rel}: companion frame UI umbrella flow must import leaf modules directly (${needle})`,
         );
       }
     }
