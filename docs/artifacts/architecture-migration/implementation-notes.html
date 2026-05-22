@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — pause-reflect-telemetry-flow regression test (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-telemetry-flow</code> CI cluster anchor has unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-reflect-telemetry-flow.test.ts</code> beside the share-cluster telemetry anchor (parity with ambience/hub/pending-offer umbrella tests). Presentation <code>pause-reflect-telemetry-io</code> unchanged (imports <code>pause-reflect-session-ui-telemetry</code> directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test-only slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No CI guard change; subcluster flow anchors remain CI-only under <code>share/</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: <code>pause-companion-analytics-flow</code> regression test, <code>pause-companion-orchestrate-flow</code> peel, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-companion-orchestration-flow off orchestration subclusters (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
