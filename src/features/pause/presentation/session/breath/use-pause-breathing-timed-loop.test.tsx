@@ -1,13 +1,16 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseRepository: {},
+}));
+
 import { usePauseBreathingTimedLoop } from './use-pause-breathing-timed-loop';
 
-vi.mock('./pause-session-breath-io', async () => {
-  const phaseAdvance = await vi.importActual<
-    typeof import('@/features/pause/application/use-cases/ritual/breathe/phase-advance')
-  >('@/features/pause/application/use-cases/ritual/breathe/phase-advance');
+vi.mock('./pause-session-breath-io', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./pause-session-breath-io')>();
   return {
-    ...phaseAdvance,
+    ...actual,
     playPauseBreathPhaseCue: vi.fn(),
     playPauseBreathPatternCompleteCue: vi.fn(),
     resumePauseAudioContext: vi.fn(),
