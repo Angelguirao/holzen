@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect generation holzen-reflect hook leaf flow regression test (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-generation-hook-flow</code> leaf CI anchor has unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-reflect-generation-hook-flow.test.ts</code> beside the holzen-reflect subcluster leaf anchor (parity with generation umbrella <code>pause-reflect-generation-flow.test.ts</code> and other reflect subcluster leaf flow tests). <code>pause-reflect-generation-io</code> unchanged (imports domain + <code>run-reflect-generation</code> directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test-only slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>No CI guard change; hook leaf anchor remains CI-only; umbrella test already covered aggregate re-exports.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: manual-open + home-telemetry generation leaf flow tests, remaining frame orchestration/session/library-favorite leaf flow tests, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — frame orchestrate leaf flow regression tests (backlog #2 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd>No CI guard change; orchestrate leaf flow anchors remain CI-only; umbrella <code>pause-companion-orchestrate-flow.test.ts</code> already covers aggregate re-exports.</dd>
       <dt>Open questions</dt>
-      <dd>Next: frame orchestration/session/library-favorite leaf flow tests, generation holzen-reflect / manual-open leaf flow tests, or Phase B subscription Tier 1 shim.</dd>
+      <dd>Next: frame orchestration/session/library-favorite leaf flow tests, generation manual-open / home-telemetry leaf flow tests, or Phase B subscription Tier 1 shim.</dd>
     </dl>
   </article>
 
