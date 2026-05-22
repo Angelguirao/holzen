@@ -5,6 +5,10 @@
  */
 import { describe, expect, it, vi } from 'vitest';
 
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: {},
+}));
+
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'supabasePauseRepository' },
   supabaseReflectGenerator: { port: 'reflectGenerator' },
@@ -66,6 +70,13 @@ describe('pause-home-reflect-telemetry-io parity', () => {
     expect(trackManualCompletedFromHomeTelemetryIo).toBe(trackManualCompletedDirect);
   });
 
+  it('home-pause-actions and manual-pause-trigger leaf trackers stay namespace-separated', () => {
+    expect(trackOpenDismissedDirect).not.toBe(markManualStartedDirect);
+    expect(trackBannerOpenedDirect).not.toBe(trackInstanceCreatedDirect);
+    expect(trackPauseOpenDismissed).not.toBe(trackManualPauseInstanceCreated);
+    expect(trackHomePendingPauseBannerPauseOpened).not.toBe(trackPauseManualCompleted);
+  });
+
   it('home-reflect-telemetry-io trackers stay distinct from home-reflect-io manual-open RPC wrappers', () => {
     expect(trackPauseOpenDismissed).not.toBe(openManualPauseFromHome);
     expect(trackHomePendingPauseBannerPauseOpened).not.toBe(pauseDismissOpenPauseHomePreview);
@@ -74,7 +85,8 @@ describe('pause-home-reflect-telemetry-io parity', () => {
     expect(trackPauseManualCompleted).not.toBe(pauseDismissOpenPauseHomePreview);
     expect(trackOpenDismissedFromHomeTelemetryIo).not.toBe(pauseHomeManualOpenPorts);
     // Reciprocal inline pins: `application/.../manual-open/pause-home-reflect-telemetry-io-parity.test.ts`.
-    // Dedicated sibling: `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts` (application).
+    // Dedicated siblings: `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`;
+    // `pause-home-reflect-telemetry-home-reflect-io-sibling-parity.test.ts` (application + presentation).
     // Presentation sibling: `presentation/reflect/generation/manual-open/pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`.
   });
 
@@ -85,6 +97,6 @@ describe('pause-home-reflect-telemetry-io parity', () => {
     expect(trackManualPauseInstanceCreated).not.toBe(trackPauseReflectPostItOpen);
     expect(trackPauseManualCompleted).not.toBe(trackPauseReflectShareTap);
     expect(trackOpenDismissedFromHomeTelemetryIo).not.toBe(trackPauseReflectWallpaperTap);
-    // Reciprocal inline pins: `application/.../pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`.
+    // Reciprocal inline pins: `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`.
   });
 });
