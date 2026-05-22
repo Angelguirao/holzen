@@ -1,8 +1,6 @@
 /**
- * Home manual-open PostHog helpers (manual open + dismiss/banner).
- * Colocated under `presentation/reflect/telemetry/home/` (mirrors application `telemetry/home/`).
- * Imports trackers via `pause-home-reflect-telemetry-flow` CI anchor
- * (parity with `pause-reflect-telemetry-io` → session telemetry flow).
+ * @deprecated Import from `presentation/home/manual-open/pause-home-reflect-telemetry-io` instead.
+ * Re-export shim keeps `presentation/reflect/telemetry/home/` for architecture-alignment CI.
  */
 export {
   markPauseManualStartedHomeOnce,
@@ -12,4 +10,4 @@ export {
   trackPauseOpenDismissed,
   type OpenPauseStateForAnalytics,
   type PauseDismissAnalyticsSurface,
-} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-home-reflect-telemetry-flow';
+} from '@/features/pause/presentation/home/manual-open/pause-home-reflect-telemetry-io';
