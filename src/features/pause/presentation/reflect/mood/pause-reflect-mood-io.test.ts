@@ -23,6 +23,10 @@ import { runDeepPausePickerEntryIfPro as runDeepPickerDirect } from '@/features/
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
+  pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
+} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
   applyBriefDepthPickerRitualEntry,
   applyDeepDepthPickerRitualEntry,
   buildFeelTilesMoodLogOptions,
@@ -68,6 +72,9 @@ describe('pause-reflect-mood-io', () => {
     expect(runDeepPausePickerEntryIfPro).toBe(runDeepPickerDirect);
     expect(runPauseSessionChromeCloseAction).toBe(runChromeCloseDirect);
     expect(reflectPauseRepository).toBe(supabasePauseRepository);
+    expect(pauseInitialEmotionSelect).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseInitialEmotionSkip).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
   });
 
   it('re-exports depth-picker active gate from domain mood helpers', () => {
