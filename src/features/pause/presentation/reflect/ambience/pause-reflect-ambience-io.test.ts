@@ -11,6 +11,14 @@ import {
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import { pauseReflectionShareImage } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
+  shouldLogPauseReflectionStep,
+  shouldShowFavoriteProHint,
+} from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
+import {
   pauseReflectGeneration,
   runReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
@@ -57,6 +65,17 @@ describe('pause-reflect-ambience-io', () => {
     expect(stopPauseReflectFrameFocusAmbience).not.toBe(pauseReflectionShareImage);
     // Full cross-I/O pins: `pause-reflect-share-ambience-io-sibling-parity.test.ts` and
     // `pause-reflect-ambience-share-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: steps-io exports stay distinct from ambience-io frame-focus bed', () => {
+    expect(startPauseReflectFrameFocusAmbience).not.toBe(pauseReflectFavoriteToggle);
+    expect(stopPauseReflectFrameFocusAmbience).not.toBe(pauseReflectNoteUpdate);
+    expect(startPauseReflectFrameFocusAmbience).not.toBe(pauseReflectTagUpdate);
+    expect(stopPauseReflectFrameFocusAmbience).not.toBe(pauseReflectionStepLogOnce);
+    expect(startPauseReflectFrameFocusAmbience).not.toBe(shouldShowFavoriteProHint);
+    expect(stopPauseReflectFrameFocusAmbience).not.toBe(shouldLogPauseReflectionStep);
+    // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-steps-io.test.ts`;
+    // `pause-reflect-steps-ambience-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: pending-offer-io exports stay distinct from ambience-io frame-focus bed', () => {

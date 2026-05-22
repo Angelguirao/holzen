@@ -8,8 +8,13 @@
  * `pause-reflect-ambience-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`;
  * `pause-reflect-ambience-share-io-sibling-parity.test.ts` + `share/pause-reflect-share-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`;
  * `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io`;
+<<<<<<< HEAD
+=======
+ * `pause-reflect-steps-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
+>>>>>>> 9915b0de0 (test(pause): steps ↔ ambience sibling parity (reflect Tier 5))
  * `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`;
- * reciprocal inline pins: `pause-reflect-ambience-io.test.ts` ↔ `pause-reflect-pending-offer-io.test.ts`;
+ * reciprocal inline pins: `pause-reflect-ambience-io.test.ts` ↔ `pause-reflect-pending-offer-io.test.ts`,
+ * `pause-reflect-ambience-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`;
  * inline pins: `pause-reflect-ambience-io.test.ts`, `pause-reflect-generation-io.test.ts`, `pause-reflect-flows-io.test.ts`, `pause-reflect-telemetry-io.test.ts`.
  */
 export {

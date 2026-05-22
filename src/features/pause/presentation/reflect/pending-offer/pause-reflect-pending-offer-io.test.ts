@@ -18,11 +18,6 @@ import {
   stopPauseReflectFrameFocusAmbience,
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
-  trackPausePendingAdopted,
-  trackPausePendingDeclined,
-  trackPauseSessionAbandoned,
-} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
-import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
