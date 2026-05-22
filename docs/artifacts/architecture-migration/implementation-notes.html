@@ -78,6 +78,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — peel pause-reflect-mood-io to domain + leaf use case (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-io</code> imports domain mood helpers + <code>run-initial-emotion-log</code> directly</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route <code>pause-reflect-mood-io</code> through <code>domain/reflect/mood/*</code> and <code>run-initial-emotion-log</code> instead of mood subcluster flow anchors (parity with <code>pause-reflect-hub-io</code> and <code>pause-reflect-flows-io</code> leaf imports on branch tip).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Mood subcluster <code>*-mood-flow.ts</code> anchors remain for <code>check:architecture-alignment</code> cluster detection; mood presentation hooks still import only <code>pause-reflect-mood-io</code>.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-companion-orchestration-io</code> off subcluster flow anchors, or Phase B cross-context Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — session decide I/O direct domain impact type (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>

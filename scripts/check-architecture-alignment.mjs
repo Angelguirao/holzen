@@ -1345,6 +1345,25 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_UMBRELLA_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow'",
 ];
 
+/** Reflect mood I/O — import domain + leaf use cases directly (not mood subcluster flow anchors). */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_SUBCLUSTER_FLOW_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow',
+  "from './application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow'",
+  "from '../application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow'",
+  "from './application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow'",
+  "from '../application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow'",
+  "from './application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow'",
+  "from '../application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow'",
+  "from './application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow'",
+  "from '../application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow'",
+  "from './application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow'",
+  "from '../application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow'",
+];
+
 /** Ritual done presentation I/O — import via pause-ritual-done-flow only (not done subcluster flows). */
 const LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_IO_USE_CASE_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/done/post-pause-emotion-log',
@@ -2106,7 +2125,14 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_UMBRELLA_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: reflect mood I/O must import via mood subcluster flows (${needle})`,
+          `${rel}: reflect mood I/O must not import mood umbrella (${needle})`,
+        );
+      }
+    }
+    for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_SUBCLUSTER_FLOW_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(
+          `${rel}: reflect mood I/O must import domain mood helpers + run-initial-emotion-log directly (${needle})`,
         );
       }
     }
