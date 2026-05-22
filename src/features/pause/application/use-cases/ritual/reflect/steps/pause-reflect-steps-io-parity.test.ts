@@ -24,6 +24,11 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
 /**
  * Application-layer delegation parity for steps-flow ↔ steps-io (run-* leaves + repository).
  * Wrapper distinctness sibling file: `pause-reflect-steps-flow-io-wrapper-sibling-parity.test.ts`.
+ * Favorite ↔ reflection_step log wrapper pins: presentation
+ * `pause-reflect-steps-favorite-reflection-step-log-io-sibling-parity.test.ts` (reciprocal inline:
+ * `pause-reflect-steps-io.test.ts`); flow umbrellas:
+ * `pause-favorite-toggle-reflection-step-log-flow-sibling-parity.test.ts`,
+ * `pause-reflect-steps-favorite-reflection-step-log-flow-sibling-parity.test.ts`.
  */
 import {
   runPauseFavoriteToggle,
@@ -86,6 +91,13 @@ describe('pause-reflect-steps-io parity', () => {
     expect(pauseReflectTagUpdate).not.toBe(runTagUpdateDirect);
     expect(pauseReflectionStepLogOnce).not.toBe(runReflectionStepLogDirect);
     expect(pauseReflectionStepLogOnceWithRepository).not.toBe(runReflectionStepLogDirect);
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseReflectionStepLogOnce);
+    expect(pauseReflectFavoriteToggleWithRepository).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    expect(pauseReflectFavoriteToggle).not.toBe(pauseReflectionStepLogOnceWithRepository);
+    expect(shouldShowFromStepsIo).not.toBe(shouldLogFromStepsIo);
+    expect(pauseReflectFavoriteToggle).not.toBe(shouldLogFromStepsIo);
+    expect(pauseReflectionStepLogOnce).not.toBe(shouldShowFromStepsIo);
+    // Full pins: `pause-reflect-steps-favorite-reflection-step-log-io-sibling-parity.test.ts`.
   });
 
   it('pauseReflectTagUpdate delegates to run-pause-reflect-tag-update with default repository', async () => {
