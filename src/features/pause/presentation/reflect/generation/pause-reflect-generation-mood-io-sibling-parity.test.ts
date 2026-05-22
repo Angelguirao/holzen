@@ -27,7 +27,10 @@ import * as generationIo from './pause-reflect-generation-io';
 
 /**
  * Presentation sibling parity: generation-io vs mood-io (parity with application
+ * `pause-reflect-generation-mood-io-sibling-parity.test.ts` and flow-level
  * `pause-reflect-generation-mood-flow-sibling-parity.test.ts`).
+ * Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts` ↔
+ * `pause-reflect-mood-io-parity.test.ts`.
  */
 describe('pause-reflect-generation-io ↔ pause-reflect-mood-io sibling parity', () => {
   it('generation-io and mood-io are distinct presentation I/O surfaces', () => {
