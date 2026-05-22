@@ -14,6 +14,10 @@ import {
   shouldShowFavoriteProHint,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
@@ -29,6 +33,7 @@ import {
   pauseAdoptPendingOfferWithRepository,
   pauseDeclinePendingOffer,
   pauseDeclinePendingOfferWithRepository,
+  reflectPauseRepository,
   type PendingPauseOfferDisplay,
 } from './pause-reflect-pending-offer-io';
 
@@ -149,5 +154,16 @@ describe('pause-reflect-pending-offer-io', () => {
     expect(getPendingPauseOfferDisplay).not.toBe(trackPausePendingDeclined);
     // Reciprocal inline pins: `pause-reflect-pending-offer-telemetry-io.test.ts`;
     // dedicated sibling: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: ambience-io exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseDeclinePendingOffer).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(getPendingPauseOfferDisplay).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(reflectPauseRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
+    // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-ambience-io.test.ts`;
+    // `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts`.
   });
 });
