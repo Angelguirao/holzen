@@ -2,7 +2,7 @@
  * Presentation sibling parity (colocated beside `pause-reflect-pending-offer-telemetry-io.ts`):
  * pending-offer RPC I/O vs pending-offer PostHog telemetry I/O stay namespace-separated.
  * Application mirror: `application/.../pending-offer/pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
- * Distinct from `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts` (pending-offer-io ↔ session telemetry-io).
+ * Distinct from colocated `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts` (pending-offer-io ↔ session telemetry-io).
  */
 import { describe, expect, it, vi } from 'vitest';
 
