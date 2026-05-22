@@ -62,4 +62,20 @@ describe('pause-reflect-pending-offer-io parity', () => {
 
     expect(runDeclineDirect).toHaveBeenCalledWith(supabasePauseRepository);
   });
+
+  it('pauseAdoptPendingOfferWithRepository forwards injected PauseRepository', async () => {
+    const customRepo = { port: 'injected-adopt' } as unknown as typeof supabasePauseRepository;
+
+    await pauseAdoptPendingOfferWithRepository(customRepo);
+
+    expect(runAdoptDirect).toHaveBeenCalledWith(customRepo);
+  });
+
+  it('pauseDeclinePendingOfferWithRepository forwards injected PauseRepository', async () => {
+    const customRepo = { port: 'injected-decline' } as unknown as typeof supabasePauseRepository;
+
+    await pauseDeclinePendingOfferWithRepository(customRepo);
+
+    expect(runDeclineDirect).toHaveBeenCalledWith(customRepo);
+  });
 });

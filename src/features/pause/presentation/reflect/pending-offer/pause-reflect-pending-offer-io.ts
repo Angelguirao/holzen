@@ -32,7 +32,7 @@ export function pauseDeclinePendingOffer(): ReturnType<typeof runDeclinePendingP
   return runDeclinePendingPauseOffer(reflectPauseRepository);
 }
 
-/** Test seam: inject a custom `PauseRepository` for adopt. */
+/** Test seam: inject a custom `PauseRepository` for adopt (parity: `pause-reflect-pending-offer-io-parity.test.ts`). */
 export function pauseAdoptPendingOfferWithRepository(
   repository: PauseRepository,
 ): ReturnType<typeof runAdoptPendingPauseOffer> {
