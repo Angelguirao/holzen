@@ -6,6 +6,10 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
+import {
   buildFeelTilesMoodLogOptions,
   pauseInitialEmotionSelect,
   pauseInitialEmotionSelectWithRepository,
@@ -135,5 +139,12 @@ describe('pause-reflect-telemetry-io', () => {
     expect(trackPauseReflectWallpaperTap).not.toBe(pauseInitialEmotionSkip);
     // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-mood-io.test.ts`;
     // mood RPC vs session UI telemetry: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: ambience-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(trackPauseReflectShareTap).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(trackPauseReflectWallpaperTap).not.toBe(startPauseReflectFrameFocusAmbience);
+    // Full cross-I/O pins: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts`.
   });
 });

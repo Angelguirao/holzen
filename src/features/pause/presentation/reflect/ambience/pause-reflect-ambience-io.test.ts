@@ -23,6 +23,11 @@ import {
   reflectPauseRepository,
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
 } from './pause-reflect-ambience-io';
@@ -63,5 +68,12 @@ describe('pause-reflect-ambience-io', () => {
     expect(stopPauseReflectFrameFocusAmbience).not.toBe(reflectPauseRepository);
     // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-pending-offer-io.test.ts`;
     // frame-focus bed vs pending-offer RPC: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: telemetry-io exports stay distinct from ambience-io frame-focus bed', () => {
+    expect(startPauseReflectFrameFocusAmbience).not.toBe(trackPauseReflectPostItOpen);
+    expect(stopPauseReflectFrameFocusAmbience).not.toBe(trackPauseReflectShareTap);
+    expect(startPauseReflectFrameFocusAmbience).not.toBe(trackPauseReflectWallpaperTap);
+    // Full cross-I/O pins: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts`.
   });
 });
