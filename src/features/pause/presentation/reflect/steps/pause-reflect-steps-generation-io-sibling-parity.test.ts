@@ -33,7 +33,8 @@ import {
 
 /**
  * Presentation sibling parity: steps-io vs generation-io (parity with application
- * `pause-reflect-steps-generation-flow-sibling-parity.test.ts`). Manual-open stays on
+ * `pause-reflect-steps-generation-flow-sibling-parity.test.ts` and
+ * `pause-reflect-steps-generation-io-sibling-parity.test.ts`). Manual-open stays on
  * `pause-home-reflect-io`, not generation-io.
  */
 describe('pause-reflect-steps-io ↔ pause-reflect-generation-io sibling parity', () => {

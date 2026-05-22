@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'supabasePauseRepository' },
+  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
   reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' },
 }));
 
@@ -42,6 +43,8 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
  * reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts`.
  * Steps-io ↔ telemetry-io: `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts`.
+ * Steps-io ↔ generation-io: `pause-reflect-steps-generation-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts`.
  */
 import {
   runPauseFavoriteToggle,
@@ -112,6 +115,15 @@ import {
   buildPauseSessionStepRitualBundle,
   buildPauseSessionStepShellBundle,
 } from '@/features/pause/presentation/session/pause-session-step-handlers-io';
+import {
+  messageFromReflectGenerationResult,
+  pauseReflectGeneration,
+  reflectGenerationPrerequisite,
+  reflectGenerator,
+  resolveReflectGenerationPrefetch,
+  runReflectGeneration,
+  shouldCommitReflectGeneration,
+} from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 
 describe('pause-reflect-steps-io parity', () => {
   it('presentation I/O step gate re-exports match steps CI umbrella', () => {
@@ -361,5 +373,25 @@ describe('pause-reflect-steps-io parity', () => {
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectTagUpdate);
     // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts`.
     // Full pins: `pause-reflect-flows-steps-io-sibling-parity.test.ts`.
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (step RPC wrappers vs holzen-reflect).
+   * Dedicated sibling file: `pause-reflect-steps-generation-io-sibling-parity.test.ts` (application + presentation).
+   */
+  it('sibling cluster: generation-io exports stay distinct from steps-io wrappers', () => {
+    expect(pauseReflectFavoriteToggle).not.toBe(runReflectGeneration);
+    expect(pauseReflectNoteUpdate).not.toBe(pauseReflectGeneration);
+    expect(pauseReflectTagUpdate).not.toBe(reflectGenerationPrerequisite);
+    expect(pauseReflectionStepLogOnce).not.toBe(resolveReflectGenerationPrefetch);
+    expect(pauseReflectFavoriteToggleWithRepository).not.toBe(pauseReflectGeneration);
+    expect(pauseReflectNoteUpdateWithRepository).not.toBe(runReflectGeneration);
+    expect(pauseReflectTagUpdateWithRepository).not.toBe(shouldCommitReflectGeneration);
+    expect(pauseReflectionStepLogOnceWithRepository).not.toBe(messageFromReflectGenerationResult);
+    expect(shouldShowFromStepsIo).not.toBe(reflectGenerationPrerequisite);
+    expect(shouldLogFromStepsIo).not.toBe(shouldCommitReflectGeneration);
+    expect(reflectPauseRepository).not.toBe(reflectGenerator);
+    // Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts`.
+    // Full pins: `pause-reflect-steps-generation-io-sibling-parity.test.ts`.
   });
 });
