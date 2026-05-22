@@ -11,7 +11,8 @@
  * `pause-reflect-share-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`;
  * `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-telemetry-io`,
  * `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
- * `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`.
+ * `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`;
+ * reciprocal inline pins on `pause-reflect-pending-offer-io.test.ts` ↔ `pause-reflect-telemetry-io.test.ts` (RPC vs session reflect UI telemetry).
  */
 import {
   getPendingPauseOfferDisplay,

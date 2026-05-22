@@ -5,6 +5,11 @@ import {
   pauseReflectFavoriteToggle,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
   pauseAdoptPendingOfferWithRepository,
@@ -96,5 +101,15 @@ describe('pause-reflect-pending-offer-io', () => {
     });
     expect(getPendingPauseOfferDisplayMock).toHaveBeenCalled();
     expect(display.contextText).toBe('mock-context');
+  });
+
+  it('sibling cluster: telemetry-io exports stay distinct from pending-offer-io', () => {
+    expect(pauseAdoptPendingOffer).not.toBe(trackPauseReflectPostItOpen);
+    expect(pauseDeclinePendingOffer).not.toBe(trackPauseReflectShareTap);
+    expect(pauseAdoptPendingOfferWithRepository).not.toBe(trackPauseReflectWallpaperTap);
+    expect(pauseDeclinePendingOfferWithRepository).not.toBe(trackPauseReflectPostItOpen);
+    expect(getPendingPauseOfferDisplay).not.toBe(trackPauseReflectShareTap);
+    // Full cross-I/O pins: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts` (RPC vs pending-offer telemetry);
+    // session reflect telemetry: `pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts`.
   });
 });
