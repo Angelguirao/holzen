@@ -7,6 +7,8 @@
  */
 import { describe, expect, it, vi } from 'vitest';
 
+const dismissOpenPauseHomeMock = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
+
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {},
 }));
@@ -19,7 +21,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
 vi.mock(
   '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/dismiss-open-pause-home',
   () => ({
-    dismissOpenPauseHome: vi.fn(() => Promise.resolve()),
+    dismissOpenPauseHome: dismissOpenPauseHomeMock,
   }),
 );
 
@@ -104,11 +106,6 @@ describe('pause-home-reflect-io parity', () => {
     expect(applyManualPauseOpenResult).toBe(applyOpenResultDirect);
   });
 
-  it('presentation I/O binds pauseHomeManualOpenPorts to public-rpc adapters', () => {
-    expect(pauseHomeManualOpenPorts.repository).toBe(supabasePauseRepository);
-    expect(pauseHomeManualOpenPorts.reflect).toBe(supabaseReflectGenerator);
-  });
-
   it('manual-open-flow CI umbrella composes the same run-* leaf use cases as presentation I/O', () => {
     expect(openManualPauseFromHome).toBe(openDirect);
     expect(dismissOpenPauseHome).toBe(dismissDirect);
@@ -118,6 +115,11 @@ describe('pause-home-reflect-io parity', () => {
     expect(dismissFromHomeIo).toBe(dismissDirect);
     expect(persistStubFromHomeIo).toBe(persistStubDirect);
     expect(silentAfterCreateFromHomeIo).toBe(silentAfterCreateDirect);
+  });
+
+  it('presentation I/O binds pauseHomeManualOpenPorts to public-rpc adapters', () => {
+    expect(pauseHomeManualOpenPorts.repository).toBe(supabasePauseRepository);
+    expect(pauseHomeManualOpenPorts.reflect).toBe(supabaseReflectGenerator);
   });
 
   it('presentation I/O exports dismiss preview wrappers distinct from manual-open leaf', () => {
@@ -134,9 +136,9 @@ describe('pause-home-reflect-io parity', () => {
 
     await pauseDismissOpenPauseHomePreview({ hasUser: true, clearPreview });
 
-    expect(dismissDirect).toHaveBeenCalledWith(true, {
+    expect(dismissOpenPauseHomeMock).toHaveBeenCalledWith(true, {
       clearPreview,
-      repository: pauseHomeManualOpenPorts.repository,
+      repository: supabasePauseRepository,
     });
   });
 
@@ -149,7 +151,7 @@ describe('pause-home-reflect-io parity', () => {
       clearPreview,
     });
 
-    expect(dismissDirect).toHaveBeenCalledWith(false, {
+    expect(dismissOpenPauseHomeMock).toHaveBeenCalledWith(false, {
       clearPreview,
       repository: customRepo,
     });
@@ -160,6 +162,7 @@ describe('pause-home-reflect-io parity', () => {
     expect(pauseDismissOpenPauseHomePreviewWithRepository).not.toBe(dismissOpenPauseHome);
     // Reciprocal inline pins: `pause-home-reflect-io.test.ts`;
     // sibling: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts`.
+    // Reciprocal inline pins: `application/.../manual-open/pause-home-reflect-io-parity.test.ts`.
   });
 
   it('presentation home-reflect-io stays off home-reflect-telemetry-io exports', () => {
