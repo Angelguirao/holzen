@@ -1,5 +1,6 @@
 /**
  * CI cluster anchor for ritual reflect+decide flows presentation I/O (§3 / check:architecture-alignment).
+ * Cluster markers: `ritual-reflect-flows-cluster.ts`, `ritual/decide/ritual-decide-cluster.ts` (empty exports; unit-tested).
  * Composes domain reflect/decide helpers + ritual/decide leaf modules (not subcluster flow anchors).
  */
 export {

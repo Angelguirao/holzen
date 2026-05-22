@@ -10,58 +10,65 @@ import {
 } from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow';
 
 import {
-  buildPauseScoreImpacts,
-  getSessionQuote,
-  resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlow,
-  resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterFromFlow,
-  formatReinforcementQuoteFromSession as formatQuoteFromFlow,
-  resolvePauseDecideOutcomeFlow as resolveOutcomeFlowFromFlow,
-  runPauseOutcomeLog,
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
+} from '../../decide/outcome-toast';
+import { runPauseOutcomeLog } from '../../decide/run-pause-outcome-log';
+import {
+  buildPauseScoreImpacts,
+  parseScoreImpactVolatilityPct,
+} from '../../decide/score-impacts';
+import {
   resolveScoreImpactDisplayImpacts,
   resolveScoreImpactViewMode,
   scoreImpactMotionDelaySec,
-} from './pause-reflect-flows-flow';
-import { runPauseOutcomeLog as runOutcomeLogDirect } from '../../decide/run-pause-outcome-log';
-import {
-  showPauseOutcomeNotCompletedToast as showNotCompletedDirect,
-  showPauseOutcomeSaveFailedToast as showSaveFailedDirect,
-} from '../../decide/outcome-toast';
-import { getSessionQuote as getSessionQuoteDirect } from '../../decide/wisdom-quotes';
-import { buildPauseScoreImpacts as buildScoreImpactsDirect } from '../../decide/score-impacts';
-import {
-  resolveScoreImpactDisplayImpacts as resolveDisplayImpactsDirect,
-  resolveScoreImpactViewMode as resolveViewModeDirect,
-  scoreImpactMotionDelaySec as motionDelayDirect,
 } from '../../decide/score-impact-presentation';
+import { getSessionQuote } from '../../decide/wisdom-quotes';
+
+import {
+  buildPauseScoreImpacts as buildImpactsFromFlow,
+  formatReinforcementQuoteFromSession as formatQuoteFromFlow,
+  getSessionQuote as getQuoteFromFlow,
+  parseScoreImpactVolatilityPct as parseVolatilityFromFlow,
+  resolvePauseDecideOutcomeFlow as resolveOutcomeFlowFromFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromFlow,
+  resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlow,
+  resolveScoreImpactDisplayImpacts as resolveDisplayImpactsFromFlow,
+  resolveScoreImpactViewMode as resolveViewModeFromFlow,
+  runPauseOutcomeLog as runOutcomeLogFromFlow,
+  scoreImpactMotionDelaySec as motionDelayFromFlow,
+  showPauseOutcomeNotCompletedToast as showNotCompletedFromFlow,
+  showPauseOutcomeSaveFailedToast as showSaveFailedFromFlow,
+} from './pause-reflect-flows-flow';
 
 describe('pause-reflect-flows-flow', () => {
   it('re-exports reflect+decide helpers from domain + ritual/decide leaf modules', () => {
     expect(typeof resolvePreflightFromFlow).toBe('function');
-    expect(typeof resolveAfterFromFlow).toBe('function');
+    expect(typeof resolveAfterGenFromFlow).toBe('function');
     expect(typeof formatQuoteFromFlow).toBe('function');
     expect(typeof resolveOutcomeFlowFromFlow).toBe('function');
-    expect(typeof runPauseOutcomeLog).toBe('function');
-    expect(typeof getSessionQuote).toBe('function');
-    expect(typeof buildPauseScoreImpacts).toBe('function');
-    expect(typeof showPauseOutcomeNotCompletedToast).toBe('function');
-    expect(typeof showPauseOutcomeSaveFailedToast).toBe('function');
-    expect(typeof resolveScoreImpactDisplayImpacts).toBe('function');
-    expect(typeof resolveScoreImpactViewMode).toBe('function');
-    expect(typeof scoreImpactMotionDelaySec).toBe('function');
+    expect(typeof getQuoteFromFlow).toBe('function');
+    expect(typeof runOutcomeLogFromFlow).toBe('function');
+    expect(typeof showNotCompletedFromFlow).toBe('function');
+    expect(typeof showSaveFailedFromFlow).toBe('function');
+    expect(typeof buildImpactsFromFlow).toBe('function');
+    expect(typeof parseVolatilityFromFlow).toBe('function');
+    expect(typeof resolveDisplayImpactsFromFlow).toBe('function');
+    expect(typeof resolveViewModeFromFlow).toBe('function');
+    expect(typeof motionDelayFromFlow).toBe('function');
 
     expect(resolvePreflightFromFlow).toBe(resolvePauseSessionReflectAndDecidePreflight);
-    expect(resolveAfterFromFlow).toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
+    expect(resolveAfterGenFromFlow).toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
     expect(formatQuoteFromFlow).toBe(formatReinforcementQuoteFromSession);
     expect(resolveOutcomeFlowFromFlow).toBe(resolvePauseDecideOutcomeFlow);
-    expect(runPauseOutcomeLog).toBe(runOutcomeLogDirect);
-    expect(showPauseOutcomeNotCompletedToast).toBe(showNotCompletedDirect);
-    expect(showPauseOutcomeSaveFailedToast).toBe(showSaveFailedDirect);
-    expect(getSessionQuote).toBe(getSessionQuoteDirect);
-    expect(buildPauseScoreImpacts).toBe(buildScoreImpactsDirect);
-    expect(resolveScoreImpactDisplayImpacts).toBe(resolveDisplayImpactsDirect);
-    expect(resolveScoreImpactViewMode).toBe(resolveViewModeDirect);
-    expect(scoreImpactMotionDelaySec).toBe(motionDelayDirect);
+    expect(getQuoteFromFlow).toBe(getSessionQuote);
+    expect(runOutcomeLogFromFlow).toBe(runPauseOutcomeLog);
+    expect(showNotCompletedFromFlow).toBe(showPauseOutcomeNotCompletedToast);
+    expect(showSaveFailedFromFlow).toBe(showPauseOutcomeSaveFailedToast);
+    expect(buildImpactsFromFlow).toBe(buildPauseScoreImpacts);
+    expect(parseVolatilityFromFlow).toBe(parseScoreImpactVolatilityPct);
+    expect(resolveDisplayImpactsFromFlow).toBe(resolveScoreImpactDisplayImpacts);
+    expect(resolveViewModeFromFlow).toBe(resolveScoreImpactViewMode);
+    expect(motionDelayFromFlow).toBe(scoreImpactMotionDelaySec);
   });
 });
