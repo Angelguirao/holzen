@@ -59,6 +59,25 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — reflect mood-flow cluster re-export test (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-mood-flow</code> CI compose anchor has unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-reflect-mood-flow.test.ts</code> beside the umbrella anchor (parity with hub/steps flow tests).</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; test-only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd><code>pause-reflect-mood-io</code> still imports domain + <code>run-initial-emotion-log</code> directly; umbrella flow remains CI-only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: peel <code>pause-reflect-share-flow</code> off share subcluster anchors, or Phase B subscription Tier 1 shim.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — peel pause-reflect-steps-flow off steps subcluster anchors (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -71,7 +90,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-favorite-toggle-flow</code>, note/tag, and <code>pause-reflection-step-log-flow</code> remain on disk; presentation imports <code>pause-reflect-steps-io</code> only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-reflect-mood-flow.test.ts</code>, peel <code>pause-reflect-share-flow</code>, or Phase B subscription Tier 1 shim.</dd>
+      <dd>Superseded on branch tip by mood-flow test coverage slice.</dd>
     </dl>
   </article>
 
@@ -90,7 +109,7 @@
       <dt>Tradeoffs</dt>
       <dd>Decide flow anchors are CI markers; reflect+decide umbrella does not re-compose them after the flows-flow peel.</dd>
       <dt>Open questions</dt>
-      <dd>Superseded on branch tip by steps-flow peel; next: mood-flow test or share-flow peel.</dd>
+      <dd>Superseded on branch tip by steps-flow peel and mood-flow test coverage slice.</dd>
     </dl>
   </article>
 
