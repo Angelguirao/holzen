@@ -1,8 +1,9 @@
 /**
  * CI cluster anchor for companion orchestration presentation I/O (§3 / check:architecture-alignment).
  * Session load, UI completion, favorites, and section expansion live in sibling `ritual/frame/*` modules.
- * Re-export for presentation I/O imports.
+ * Presentation: `pause-companion-orchestration-io.ts` imports through this anchor (off deep frame paths).
  */
+export { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
 export type { CompanionUiCompletionStep } from './companion-ui-completion-types';
 export {
   loadCompanionOrchestrateSession,

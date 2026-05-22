@@ -1,10 +1,4 @@
 import { describe, expect, it, vi } from 'vitest';
-import {
-  companionPauseRepository,
-  nextExpandedWithLazyFetch,
-  pauseLoadCompanionOrchestrateSession,
-  pauseToggleCompanionLibraryFavorite,
-} from './pause-companion-orchestration-io';
 
 const {
   loadCompanionOrchestrateSessionMock,
@@ -17,17 +11,17 @@ const {
 }));
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session',
-  () => ({
-    loadCompanionOrchestrateSession: loadCompanionOrchestrateSessionMock,
-  }),
-);
-
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite',
-  () => ({
-    runToggleCompanionLibraryFavorite: runToggleCompanionLibraryFavoriteMock,
-  }),
+  '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow',
+  async (importOriginal) => {
+    const actual = await importOriginal<
+      typeof import('@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow')
+    >();
+    return {
+      ...actual,
+      loadCompanionOrchestrateSession: loadCompanionOrchestrateSessionMock,
+      runToggleCompanionLibraryFavorite: runToggleCompanionLibraryFavoriteMock,
+    };
+  },
 );
 
 vi.mock('@/features/pause/public-queries', () => ({
@@ -38,6 +32,13 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'companionPauseRepository' },
   supabaseCompanionOrchestrator: { port: 'companionOrchestrator' },
 }));
+
+import {
+  companionPauseRepository,
+  nextExpandedWithLazyFetch,
+  pauseLoadCompanionOrchestrateSession,
+  pauseToggleCompanionLibraryFavorite,
+} from './pause-companion-orchestration-io';
 
 describe('pause-companion-orchestration-io', () => {
   it('routes orchestrate session load through default mood-history query', async () => {
@@ -54,7 +55,7 @@ describe('pause-companion-orchestration-io', () => {
     );
   });
 
-  it('re-exports nextExpandedWithLazyFetch from ritual/frame use case', () => {
+  it('re-exports nextExpandedWithLazyFetch from pause-companion-orchestration-flow', () => {
     const fetch = vi.fn();
     expect(
       nextExpandedWithLazyFetch(false, {
