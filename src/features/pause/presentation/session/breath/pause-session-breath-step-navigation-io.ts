@@ -1,8 +1,8 @@
 /**
  * Presentation I/O for breath segment step targets + brief integrate advance guard.
  * Imports `domain/ritual/breathe/pause-breath-step-navigation` directly (not `pause-session-breath-flow` CI anchor).
- * Parity pins: `pause-session-breath-step-navigation-io-parity.test.ts` and
- * `pause-session-breath-step-navigation-io.re-exports.test.ts`.
+ * Parity pins: colocated `pause-session-breath-step-navigation-io-parity.test.ts` (reciprocal ↔ breath-io parity)
+ * and `pause-session-breath-step-navigation-io.re-exports.test.ts`.
  */
 export {
   BRIEF_FIRST_BREATH_SEGMENT_LOG,

@@ -2968,9 +2968,11 @@ for (const file of walkTs(join(root, 'src'))) {
       rel.endsWith('pause-session-breath-io.ts') ||
       rel.endsWith('pause-session-breath-io.test.ts') ||
       rel.endsWith('pause-session-breath-io.re-exports.test.ts') ||
+      rel.endsWith('pause-session-breath-io-parity.test.ts') ||
       rel.endsWith('pause-session-breath-step-navigation-io.ts') ||
       rel.endsWith('pause-session-breath-step-navigation-io.test.ts') ||
-      rel.endsWith('pause-session-breath-step-navigation-io.re-exports.test.ts');
+      rel.endsWith('pause-session-breath-step-navigation-io.re-exports.test.ts') ||
+      rel.endsWith('pause-session-breath-step-navigation-io-parity.test.ts');
     if (!breathIoAllowlisted) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_AUDIO_IMPORTS) {
         if (text.includes(needle)) {
@@ -3012,13 +3014,16 @@ for (const file of walkTs(join(root, 'src'))) {
     }
     if (
       rel.endsWith('pause-session-breath-step-navigation-io.ts') ||
-      rel.endsWith('pause-session-breath-step-navigation-io.test.ts')
+      rel.endsWith('pause-session-breath-step-navigation-io.test.ts') ||
+      rel.endsWith('pause-session-breath-step-navigation-io-parity.test.ts')
     ) {
-      for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_STEP_NAV_IO_FLOW_IMPORTS) {
-        if (text.includes(needle)) {
-          failures.push(
-            `${rel}: session breath step-navigation I/O must import pause-breath-step-navigation domain leaf directly (${needle})`,
-          );
+      if (!rel.endsWith('pause-session-breath-step-navigation-io-parity.test.ts')) {
+        for (const needle of LEGACY_PAUSE_PRESENTATION_SESSION_BREATH_STEP_NAV_IO_FLOW_IMPORTS) {
+          if (text.includes(needle)) {
+            failures.push(
+              `${rel}: session breath step-navigation I/O must import pause-breath-step-navigation domain leaf directly (${needle})`,
+            );
+          }
         }
       }
     }

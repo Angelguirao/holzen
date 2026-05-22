@@ -1,3 +1,8 @@
+/**
+ * Presentation I/O parity (colocated beside `pause-session-breath-io.ts`).
+ * Imports `pause-session-breath-flow` CI umbrella for `.toBe` identity pins only — production breath I/O keeps sibling leaf imports.
+ * Reciprocal inline pins ↔ `pause-session-breath-step-navigation-io-parity.test.ts` (step targets vs segment RPC / phase advance).
+ */
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/integrations/supabase/client', () => ({
@@ -68,7 +73,7 @@ import {
   resolveBreathingCompleted as resolveCompletedFromBreathIo,
   resolveBreathingPhaseAdvanceOutcome as resolveOutcomeFromBreathIo,
   shouldResetBriefIntegrateAdvanceGuard as shouldResetIntegrateFromBreathIo,
-} from '@/features/pause/presentation/session/breath/pause-session-breath-io';
+} from './pause-session-breath-io';
 
 describe('pause-session-breath-io parity', () => {
   it('presentation I/O breath exports match session-breath-flow CI umbrella', () => {
@@ -106,5 +111,13 @@ describe('pause-session-breath-io parity', () => {
     expect(runEnsureBreathSegment2Logged).toBe(runSegment2Direct);
     expect(runLogBreathSegment1Skipped).toBe(runSegment1SkippedDirect);
     expect(runLogBreathSegment2Skipped).toBe(runSegment2SkippedDirect);
+  });
+
+  it('sibling cluster: breath-io presentation exports stay distinct from step-navigation-io step targets', () => {
+    expect(computeBreathingPhaseAdvance).not.toBe(DEEP_PAUSE_STEP_AFTER_FIRST_BREATH);
+    expect(resolveBreathingCompleted).not.toBe(claimBriefIntegrateAdvance);
+    expect(runEnsureBreathSegment1Logged).not.toBe(BRIEF_FIRST_BREATH_SEGMENT_LOG);
+    expect(applyOutcomeFromBreathIo).not.toBe(shouldResetBriefIntegrateAdvanceGuard);
+    // Reciprocal inline pins: `pause-session-breath-step-navigation-io-parity.test.ts`.
   });
 });
