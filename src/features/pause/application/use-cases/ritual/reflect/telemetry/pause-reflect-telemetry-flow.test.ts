@@ -12,6 +12,11 @@ import {
   trackPauseReflectWallpaperTap as trackWallpaperFromShareFlow,
 } from '../share/pause-reflect-share-flow';
 import {
+  trackPausePendingAdopted,
+  trackPausePendingDeclined,
+  trackPauseSessionAbandoned,
+} from './pause-pending-offer-telemetry-flow';
+import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,
@@ -32,5 +37,11 @@ describe('pause-reflect-telemetry-flow', () => {
     expect(trackPauseReflectPostItOpen).toBe(trackPostItFromShareFlow);
     expect(trackPauseReflectShareTap).toBe(trackShareTapFromShareFlow);
     expect(trackPauseReflectWallpaperTap).toBe(trackWallpaperFromShareFlow);
+  });
+
+  it('sibling cluster: session reflect UI telemetry-flow exports stay distinct from pending-offer-telemetry-flow exports', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(trackPausePendingAdopted);
+    expect(trackPauseReflectShareTap).not.toBe(trackPausePendingDeclined);
+    expect(trackPauseReflectWallpaperTap).not.toBe(trackPauseSessionAbandoned);
   });
 });

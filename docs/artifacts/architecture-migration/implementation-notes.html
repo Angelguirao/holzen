@@ -26768,6 +26768,7 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+<<<<<<< HEAD
       <span>Phase A — reflect steps-io wrapper export distinctness (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
@@ -26798,4 +26799,20 @@
   </article>
 
 
+=======
+      <span>Phase A — reflect telemetry ↔ pending-offer cross-umbrella pins (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-pending-offer-telemetry-flow</code> ↔ <code>pause-reflect-telemetry-flow</code> sibling cluster</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-pending-offer-telemetry-io-parity.test.ts</code> with leaf composition (parity with <code>pause-reflect-telemetry-io-parity</code>). Add reciprocal sibling-cluster guards on <code>pause-pending-offer-telemetry-flow.test.ts</code> and <code>pause-reflect-telemetry-flow.test.ts</code> so pending-offer/session-abandoned trackers cannot merge with session reflect UI telemetry umbrellas.</dd>
+      <dt>Deviation</dt>
+      <dd>None — tests + cluster anchor comments only.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: session terminal-entry-io extended parity pins, <code>pause-persisted-tab-session-io</code> flow anchor on re-exports test, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+>>>>>>> 369751df9 (test(pause): pin reflect telemetry ↔ pending-offer sibling cluster)
   <!-- Append new <article class="note"> blocks above this line -->
