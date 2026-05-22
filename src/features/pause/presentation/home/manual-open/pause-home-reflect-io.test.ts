@@ -8,10 +8,16 @@ vi.mock('@/features/pause/public-rpc', () => ({
 }));
 
 vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/dismiss-open-pause-home',
-  () => ({
-    dismissOpenPauseHome: dismissOpenPauseHomeMock,
-  }),
+  '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-manual-open-flow',
+  async (importOriginal) => {
+    const actual = await importOriginal<
+      typeof import('@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-manual-open-flow')
+    >();
+    return {
+      ...actual,
+      dismissOpenPauseHome: dismissOpenPauseHomeMock,
+    };
+  },
 );
 
 import {
