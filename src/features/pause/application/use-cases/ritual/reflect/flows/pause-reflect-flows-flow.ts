@@ -1,30 +1,32 @@
 /**
  * CI cluster anchor for ritual reflect+decide flows presentation I/O (§3 / check:architecture-alignment).
- * Composes reflect/decide subcluster anchors; presentation imports via `pause-reflect-flows-io.ts`.
+ * Composes domain reflect/decide helpers + ritual/decide leaf modules (not subcluster flow anchors).
  */
 export {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   type PauseSessionReflectAndDecideViewInput,
-} from './pause-reflect-and-decide-view-flow';
+} from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow';
 export {
   formatReinforcementQuoteFromSession,
   resolvePauseDecideOutcomeFlow,
-} from '../../decide/pause-decide-outcome-view-flow';
-export type { PauseImpactData } from '../../decide/pause-decide-outcome-view-flow';
-export { runPauseOutcomeLog } from '../../decide/pause-decide-outcome-log-flow';
+} from '@/features/pause/domain/decide/pause-decide-outcome-flow';
+export type { PauseImpactData } from '../../decide/impact-data';
+export { runPauseOutcomeLog } from '../../decide/run-pause-outcome-log';
 export {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
-} from './pause-reflect-decide-outcome-toast-flow';
-export { getSessionQuote } from './pause-reflect-decide-wisdom-quotes-flow';
+} from '../../decide/outcome-toast';
+export { getSessionQuote } from '../../decide/wisdom-quotes';
 export {
   buildPauseScoreImpacts,
   parseScoreImpactVolatilityPct,
+  type PauseScoreImpactRow,
+} from '../../decide/score-impacts';
+export {
   resolveScoreImpactDisplayImpacts,
   resolveScoreImpactViewMode,
   scoreImpactMotionDelaySec,
-  type PauseScoreImpactRow,
   type ScoreImpactVariant,
   type ScoreImpactViewMode,
-} from '../../decide/pause-decide-score-impacts-flow';
+} from '../../decide/score-impact-presentation';

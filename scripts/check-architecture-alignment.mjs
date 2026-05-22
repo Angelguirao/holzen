@@ -1042,37 +1042,25 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_STEPS_DOMAIN_IMPORTS = [
 ];
 
 /** Reflect flows umbrella flow — compose subcluster anchors only (no deep domain/reflect/flows or decide). */
-const LEGACY_PAUSE_REFLECT_FLOWS_FLOW_DOMAIN_IMPORTS = [
-  '@/features/pause/domain/reflect/flows/',
-  '@/features/pause/domain/decide/pause-decide-outcome-flow',
-  "from '@/features/pause/domain/reflect/flows/",
-  "from './domain/reflect/flows/",
-  "from '../domain/reflect/flows/",
-  "from '@/features/pause/domain/decide/pause-decide-outcome-flow",
-  "from './domain/decide/pause-decide-outcome-flow",
-  "from '../domain/decide/pause-decide-outcome-flow",
-];
-
-/** Reflect flows umbrella flow — import decide application helpers via subcluster anchors only. */
-const LEGACY_PAUSE_REFLECT_FLOWS_FLOW_DECIDE_APP_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log',
-  '@/features/pause/application/use-cases/ritual/decide/outcome-toast',
-  '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes',
-  '@/features/pause/application/use-cases/ritual/decide/score-impacts',
-  '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation',
+const LEGACY_PAUSE_REFLECT_FLOWS_FLOW_SUBCLUSTER_IMPORTS = [
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-view-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow',
+  '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-log-flow',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-score-impacts-flow',
-  "from './application/use-cases/ritual/decide/run-pause-outcome-log'",
-  "from '../application/use-cases/ritual/decide/run-pause-outcome-log'",
-  "from './application/use-cases/ritual/decide/outcome-toast'",
-  "from '../application/use-cases/ritual/decide/outcome-toast'",
-  "from './application/use-cases/ritual/decide/wisdom-quotes'",
-  "from '../application/use-cases/ritual/decide/wisdom-quotes'",
-  "from './application/use-cases/ritual/decide/score-impacts'",
-  "from '../application/use-cases/ritual/decide/score-impacts'",
-  "from './application/use-cases/ritual/decide/score-impact-presentation'",
-  "from '../application/use-cases/ritual/decide/score-impact-presentation'",
-  "from '../../decide/score-impacts'",
-  "from '../../decide/score-impact-presentation'",
+  "from './pause-reflect-and-decide-view-flow'",
+  "from '../pause-reflect-and-decide-view-flow'",
+  "from '../../decide/pause-decide-outcome-view-flow'",
+  "from './pause-reflect-decide-outcome-log-flow'",
+  "from '../pause-reflect-decide-outcome-log-flow'",
+  "from './pause-reflect-decide-outcome-toast-flow'",
+  "from '../pause-reflect-decide-outcome-toast-flow'",
+  "from './pause-reflect-decide-wisdom-quotes-flow'",
+  "from '../pause-reflect-decide-wisdom-quotes-flow'",
+  "from '../../decide/pause-decide-outcome-log-flow'",
+  "from '../../decide/pause-decide-score-impacts-flow'",
 ];
 
 /** Decide application — import PauseImpactData via impact-data anchor only. */
@@ -1342,18 +1330,6 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS = [
   "from '../application/use-cases/ritual/decide/score-impact-presentation'",
   "from './application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow'",
   "from '../application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow'",
-];
-
-/** Reflect flows umbrella — compose decide score builders via pause-decide-score-impacts-flow only. */
-const LEGACY_PAUSE_REFLECT_FLOWS_FLOW_DIRECT_SCORE_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/decide/score-impacts',
-  '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation',
-  "from './application/use-cases/ritual/decide/score-impacts'",
-  "from '../application/use-cases/ritual/decide/score-impacts'",
-  "from './application/use-cases/ritual/decide/score-impact-presentation'",
-  "from '../application/use-cases/ritual/decide/score-impact-presentation'",
-  "from '../../decide/score-impacts'",
-  "from '../../decide/score-impact-presentation'",
 ];
 
 /** Reflect share presentation — import session UI telemetry via pause-reflect-share-flow only. */
@@ -2240,19 +2216,11 @@ for (const file of walkTs(join(root, 'src'))) {
     }
   }
   if (rel === 'src/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow.ts') {
-    for (const needle of LEGACY_PAUSE_REFLECT_FLOWS_FLOW_DOMAIN_IMPORTS) {
+    for (const needle of LEGACY_PAUSE_REFLECT_FLOWS_FLOW_SUBCLUSTER_IMPORTS) {
       if (text.includes(needle)) {
-        failures.push(`${rel}: reflect flows umbrella flow must compose subcluster anchors (${needle})`);
-      }
-    }
-    for (const needle of LEGACY_PAUSE_REFLECT_FLOWS_FLOW_DECIDE_APP_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(`${rel}: reflect flows umbrella flow must compose decide subcluster anchors (${needle})`);
-      }
-    }
-    for (const needle of LEGACY_PAUSE_REFLECT_FLOWS_FLOW_DIRECT_SCORE_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(`${rel}: reflect flows umbrella flow must compose score impacts via pause-decide-score-impacts-flow (${needle})`);
+        failures.push(
+          `${rel}: reflect flows umbrella flow must import domain + ritual/decide leaf modules directly (${needle})`,
+        );
       }
     }
   }
