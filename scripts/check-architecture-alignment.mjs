@@ -106,6 +106,18 @@ mustExist(
   'pause/application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow.ts',
 );
 mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-presentation-flow.ts',
+  'pause/application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-presentation-flow.ts',
+);
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-log-flow.ts',
+  'pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-log-flow.ts',
+);
+mustExist(
+  'src/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow.ts',
+  'pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow.ts',
+);
+mustExist(
   'src/features/pause/application/use-cases/session/scaffold',
   'pause/application/use-cases/session/scaffold/',
 );
@@ -468,6 +480,27 @@ const LEGACY_PAUSE_REFLECT_MOOD_FLOW_DOMAIN_IMPORTS = [
   "from '../domain/reflect/mood/",
 ];
 
+/** Reflect hub umbrella flow — compose subcluster anchors only (no deep domain/reflect/hub). */
+const LEGACY_PAUSE_REFLECT_HUB_FLOW_DOMAIN_IMPORTS = [
+  '@/features/pause/domain/reflect/hub/',
+  "from '@/features/pause/domain/reflect/hub/",
+  "from './domain/reflect/hub/",
+  "from '../domain/reflect/hub/",
+];
+
+/** Reflect hub presentation — import domain hub helpers via pause-reflect-hub-flow only. */
+const LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_DOMAIN_IMPORTS = [
+  '@/features/pause/domain/reflect/hub/',
+  '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
+  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-presentation-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-log-flow',
+  '@/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow',
+  "from './domain/reflect/hub/",
+  "from '../domain/reflect/hub/",
+  "from './application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done'",
+  "from '../application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done'",
+];
+
 /** Reflect mood presentation — import domain mood helpers via pause-reflect-mood-flow only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_DOMAIN_IMPORTS = [
   '@/features/pause/domain/reflect/mood/',
@@ -694,6 +727,28 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
+  if (rel === 'src/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow.ts') {
+    for (const needle of LEGACY_PAUSE_REFLECT_HUB_FLOW_DOMAIN_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect hub umbrella flow must compose subcluster anchors (${needle})`);
+      }
+    }
+    for (const needle of [
+      '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done',
+      "from './run-shift-emotion-frame-hub-done'",
+    ]) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect hub umbrella flow must not deep-import run-shift-emotion-frame-hub-done (${needle})`);
+      }
+    }
+  }
+  if (rel === 'src/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-emotion-frame-hub-done-flow.ts') {
+    for (const needle of LEGACY_PAUSE_REFLECT_HUB_FLOW_DOMAIN_IMPORTS) {
+      if (text.includes(needle)) {
+        failures.push(`${rel}: reflect hub done-flow must not import domain/reflect/hub (${needle})`);
+      }
+    }
+  }
   if (rel === 'src/features/pause/application/use-cases/session/pause-session-ritual-restore-flow.ts') {
     for (const needle of LEGACY_PAUSE_SESSION_RITUAL_RESTORE_BREATH_IMPORTS) {
       if (text.includes(needle)) {
@@ -709,6 +764,18 @@ for (const file of walkTs(join(root, 'src'))) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(`${rel}: legacy reflect mood import (${needle})`);
+        }
+      }
+    }
+  }
+  if (rel.startsWith('src/features/pause/presentation/reflect/hub/')) {
+    if (
+      !rel.endsWith('pause-reflect-hub-io.ts') &&
+      !rel.endsWith('pause-reflect-hub-io.test.ts')
+    ) {
+      for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_HUB_DOMAIN_IMPORTS) {
+        if (text.includes(needle)) {
+          failures.push(`${rel}: legacy reflect hub import (${needle})`);
         }
       }
     }
