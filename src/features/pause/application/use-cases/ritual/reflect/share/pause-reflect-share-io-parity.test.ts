@@ -179,6 +179,11 @@ describe('pause-reflect-share-io parity (application)', () => {
     expect(runReflectionShareImageDirect).toHaveBeenCalledWith(message, context, haiku, deps);
   });
 
+  it('presentation share wrapper stays distinct from run-reflection-share-image leaf', () => {
+    expect(pauseReflectionShareImage).not.toBe(runReflectionShareImageDirect);
+    // Reciprocal inline pins: `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
+  });
+
   /**
    * Reciprocal inline pins ↔ `presentation/reflect/flows/pause-reflect-flows-io-parity.test.ts`.
    * Dedicated sibling file: `pause-reflect-flows-share-io-sibling-parity.test.ts` (application + presentation).
