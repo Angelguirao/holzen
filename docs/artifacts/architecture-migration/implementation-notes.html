@@ -19837,4 +19837,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — companion frame UI + analytics I/O via flow anchors (backlog #2 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-companion-frame-ui-io</code> + <code>pause-companion-analytics-io</code> import <code>pause-companion-*-flow</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) and backlog #2 (<code>ritual/frame/</code>) folder moves remain complete — no relocations. Route frame UI helpers and companion analytics use cases through existing <code>pause-companion-frame-ui-flow</code> and <code>pause-companion-analytics-flow</code> CI anchors instead of deep <code>ritual/frame/*</code> siblings (parity with orchestration and pending-offer I/O peels). <code>use-companion-orchestrate-session</code> uses sibling <code>pause-companion-orchestration-io</code> import.</dd>
+      <dt>Deviation</dt>
+      <dd>None — behavior parity; import boundary only.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Did not peel orchestrate-io slot helpers in the same commit — orchestrate flow anchor already covers slot orchestrate paths.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: Phase B subscription Tier 1 shim (<code>subscription-checkout-guard-ref</code>), or cross-context lib shim peel per architecture-migration README.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
