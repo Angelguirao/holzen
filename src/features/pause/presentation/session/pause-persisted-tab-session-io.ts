@@ -1,6 +1,7 @@
 /**
  * Presentation I/O for tab-local pause ritual snapshots.
  * Imports `persisted-tab-session` use cases directly (parity with providers-io → holzen-providers-slice).
+ * Parity pins: `pause-session-persisted-tab-session-io-parity.test.ts` + `pause-persisted-tab-session-io.re-exports.test.ts`.
  */
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 import {
