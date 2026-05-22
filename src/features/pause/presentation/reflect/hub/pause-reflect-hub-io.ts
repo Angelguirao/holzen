@@ -10,7 +10,9 @@
  * `pause-reflect-mood-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`,
  * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`;
  * `pause-reflect-ambience-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io`;
- * `pause-reflect-flows-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`.
+ * `pause-reflect-flows-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io`;
+ * `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io`;
+ * reciprocal inline pins: `pause-reflect-hub-io.test.ts` ↔ `pause-reflect-telemetry-io.test.ts`.
  */
 import { runShiftEmotionFrameHubDone } from '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
 import { buildShiftEmotionFrameHubLogBundle } from '@/features/pause/domain/reflect/hub/shift-emotion-log';

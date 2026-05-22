@@ -9,6 +9,11 @@ import {
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
+  pauseShiftEmotionFrameHubDone,
+  pauseShiftEmotionFrameHubDoneWithRepository,
+  resolveShiftFrameHubDonePresentation,
+} from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
+import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
   pauseAdoptPendingOfferWithRepository,
@@ -88,5 +93,15 @@ describe('pause-reflect-telemetry-io', () => {
     // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-pending-offer-io.test.ts`;
     // dedicated session telemetry sibling: `pause-reflect-pending-offer-session-telemetry-io-sibling-parity.test.ts`;
     // pending-offer RPC vs pending-offer telemetry: `pause-reflect-pending-offer-telemetry-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: hub-io exports stay distinct from session reflect telemetry-io', () => {
+    expect(trackPauseReflectPostItOpen).not.toBe(pauseShiftEmotionFrameHubDone);
+    expect(trackPauseReflectShareTap).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
+    expect(trackPauseReflectWallpaperTap).not.toBe(resolveShiftFrameHubDonePresentation);
+    expect(trackPauseReflectPostItOpen).not.toBe(resolveShiftFrameHubDonePresentation);
+    expect(trackPauseReflectShareTap).not.toBe(pauseShiftEmotionFrameHubDone);
+    // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-hub-io.test.ts`;
+    // hub RPC vs session UI telemetry: `pause-reflect-hub-telemetry-io-sibling-parity.test.ts`.
   });
 });

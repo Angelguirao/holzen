@@ -10,7 +10,8 @@
  * `pause-reflect-telemetry-pending-offer-telemetry-io-sibling-parity.test.ts` ↔ pending-offer telemetry-io,
  * `pause-reflect-share-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io`, and
  * `pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts` ↔ `pause-home-reflect-telemetry-io`,
- * `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`.
+ * `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io`, and
+ * `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`.
  */
 export {
   trackPauseReflectPostItOpen,
