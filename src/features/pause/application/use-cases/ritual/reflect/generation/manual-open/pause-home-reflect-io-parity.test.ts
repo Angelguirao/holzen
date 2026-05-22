@@ -6,7 +6,8 @@
  * production home reflect I/O keeps manual-open leaf imports.
  * Presentation mirror: `presentation/reflect/generation/manual-open/pause-home-reflect-io-parity.test.ts`.
  * Sibling parity: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts`.
+ * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` and
+ * `telemetry/pause-reflect-telemetry-io-parity.test.ts`.
  */
 import { describe, expect, it, vi } from 'vitest';
 
@@ -91,6 +92,11 @@ import {
   runReflectGeneration,
   shouldCommitReflectGeneration,
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow';
 
 import { supabasePauseRepository, supabaseReflectGenerator } from '@/features/pause/public-rpc';
 
@@ -221,6 +227,21 @@ describe('pause-home-reflect-io parity (application)', () => {
     expect('trackPausePendingAdopted' in homeReflectIo).toBe(false);
     expect('openManualPauseFromHome' in pendingOfferTelemetryIo).toBe(false);
     expect('pauseDismissOpenPauseHomePreview' in pendingOfferTelemetryIo).toBe(false);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `telemetry/pause-reflect-telemetry-io-parity.test.ts`.
+   * Dedicated sibling: `pause-reflect-telemetry-home-reflect-telemetry-io-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: session reflect telemetry-io exports stay distinct from home-reflect-io', () => {
+    expect(openFromHomeIo).not.toBe(trackPauseReflectPostItOpen);
+    expect(dismissFromHomeIo).not.toBe(trackPauseReflectShareTap);
+    expect(pauseHomeManualOpenPorts).not.toBe(trackPauseReflectWallpaperTap);
+    expect(pauseDismissOpenPauseHomePreview).not.toBe(trackPauseReflectPostItOpen);
+    expect(buildMarketFromHomeIo).not.toBe(trackPauseReflectShareTap);
+    expect(persistStubDirect).not.toBe(trackPauseReflectWallpaperTap);
+    expect(openManualPauseFromHome).not.toBe(trackPauseReflectPostItOpen);
+    // Reciprocal inline pins: `application/.../telemetry/pause-reflect-telemetry-io-parity.test.ts`.
   });
 
   /**
