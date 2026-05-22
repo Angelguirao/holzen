@@ -23257,4 +23257,23 @@
     </dl>
   </article>
 
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
+      <span>Phase A — session providers application cluster marker (backlog #1 verified, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-session-providers-flow</code> CI cluster marker has unit coverage</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no reflect folder moves. Add empty <code>pause-session-providers-cluster</code> + <code>pause-session-providers-flow.test.ts</code> beside <code>pause-session-providers-flow</code> (parity with decide/frame/scaffold/brief session cluster markers). <code>pause-session-providers-io</code> unchanged (imports <code>pause-holzen-providers-slice</code> directly).</dd>
+      <dt>Deviation</dt>
+      <dd>None — marker + regression test slice.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Session persisted-tab/step-handlers/terminal-entry/step-transition flow umbrellas still lack cluster markers.</dd>
+      <dt>Open questions</dt>
+      <dd>Next: colocate <code>application/queries/current-pause-keys</code> under <code>infrastructure/queries/</code>, or <code>pause-session-persisted-tab-session-flow</code> cluster marker.</dd>
+    </dl>
+  </article>
+
   <!-- Append new <article class="note"> blocks above this line -->
