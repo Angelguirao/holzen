@@ -20,8 +20,8 @@ const {
 
 vi.mock('@/features/pause/presentation/session/breath/pause-session-breath-io', async () => {
   const { initialBreathSegmentRpcLoggedFlagsFromRestored } = await vi.importActual<
-    typeof import('@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags')
-  >('@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags');
+    typeof import('@/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow')
+  >('@/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow');
   const { applyBreathSegmentLogOutcome } = await vi.importActual<
     typeof import('@/features/pause/domain/ritual/breathe/apply-breath-segment-log-outcome')
   >('@/features/pause/domain/ritual/breathe/apply-breath-segment-log-outcome');

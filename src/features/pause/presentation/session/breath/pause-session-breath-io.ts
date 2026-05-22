@@ -3,7 +3,7 @@
  * Segment RPC use cases import via `pause-session-breath-flow`; audio cues via `pause-ritual-audio-breathe-flow`.
  */
 export { applyBreathSegmentLogOutcome } from '@/features/pause/domain/ritual/breathe/apply-breath-segment-log-outcome';
-export { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags';
+export { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/application/use-cases/ritual/breathe/pause-session-breath-flow';
 export {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
