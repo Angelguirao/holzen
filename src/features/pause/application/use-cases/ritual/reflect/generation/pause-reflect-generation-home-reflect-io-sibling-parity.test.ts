@@ -35,7 +35,8 @@ import * as generationIo from '@/features/pause/presentation/reflect/generation/
  * Application sibling parity: generation-io vs home-reflect-io (parity with presentation
  * `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` and flow-level
  * `pause-reflect-generation-manual-open-flow-sibling-parity.test.ts`).
- * Reciprocal inline pins: `pause-reflect-generation-io.test.ts` ↔ `pause-home-reflect-io.test.ts`.
+ * Reciprocal inline pins: `pause-reflect-generation-io-parity.test.ts` ↔
+ * `pause-home-reflect-io-parity.test.ts`.
  */
 describe('pause-reflect-generation-io ↔ pause-home-reflect-io sibling parity (application)', () => {
   it('generation-io and home-reflect-io are distinct presentation I/O surfaces', () => {
@@ -67,7 +68,7 @@ describe('pause-reflect-generation-io ↔ pause-home-reflect-io sibling parity (
     expect('resolveReflectGenerationPrefetch' in homeReflectIo).toBe(false);
   });
 
-  it('generation-io exports stay off Home manual-open use cases and default ports', () => {
+  it('holzen-reflect generation I/O keeps edge generation off Home manual-open use cases', () => {
     expect(runReflectGeneration).not.toBe(openManualPauseFromHome);
     expect(pauseReflectGeneration).not.toBe(dismissOpenPauseHome);
     expect(reflectGenerationPrerequisite).not.toBe(runOpenManualPauseSilentModeAfterCreate);
@@ -81,7 +82,7 @@ describe('pause-reflect-generation-io ↔ pause-home-reflect-io sibling parity (
     expect(reflectGenerationPrerequisite).not.toBe(MANUAL_PAUSE_VOLATILITY_TEMPLATE);
   });
 
-  it('home-reflect-io exports stay off holzen-reflect generation wrappers and domain gates', () => {
+  it('home-reflect-io keeps manual-open use cases off holzen-reflect generation wrappers', () => {
     expect(openManualPauseFromHome).not.toBe(runReflectGeneration);
     expect(dismissOpenPauseHome).not.toBe(pauseReflectGeneration);
     expect(runOpenManualPauseSilentModeAfterCreate).not.toBe(reflectGenerationPrerequisite);

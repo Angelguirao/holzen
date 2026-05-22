@@ -5,7 +5,7 @@
  * Parity: `presentation/reflect/generation/manual-open/pause-home-reflect-io-parity.test.ts` and `pause-home-reflect-io.re-exports.test.ts` pin presentation ↔ this anchor.
  * Sibling parity: `pause-reflect-generation-manual-open-flow-sibling-parity.test.ts` ↔ `pause-reflect-generation-flow` /
  * `pause-reflect-generation-hook-flow` (holzen-reflect vs manual-open CI anchors);
- * presentation: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`;
+ * presentation + application: `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io`;
  * `pause-home-reflect-telemetry-flow-manual-open-flow-sibling-parity.test.ts` ↔ `pause-home-reflect-telemetry-flow`.
  */
 export {
