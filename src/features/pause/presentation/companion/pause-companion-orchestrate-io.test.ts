@@ -33,6 +33,31 @@ vi.mock('./pause-companion-orchestration-io', () => ({
   companionOrchestrator: { port: 'companionOrchestrator' },
 }));
 
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabasePauseAnalyticsRepository: { port: 'companionAnalyticsRepository' },
+}));
+
+const runLogCompanionFeedbackVoteMock = vi.hoisted(() => vi.fn());
+const runLogCompanionFullviewOpenedMock = vi.hoisted(() => vi.fn());
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/frame/run-log-companion-feedback-vote',
+  () => ({
+    runLogCompanionFeedbackVote: runLogCompanionFeedbackVoteMock,
+  }),
+);
+
+vi.mock(
+  '@/features/pause/application/use-cases/ritual/frame/run-log-companion-fullview-opened',
+  () => ({
+    runLogCompanionFullviewOpened: runLogCompanionFullviewOpenedMock,
+  }),
+);
+
+import {
+  logCompanionFeedbackVote,
+  logCompanionFullviewOpened,
+} from './pause-companion-analytics-io';
 import {
   getCompanionSectionVisibility,
   isCompanionSectionVisible,
@@ -63,5 +88,13 @@ describe('pause-companion-orchestrate-io', () => {
     expect(runCompanionInterventionBootstrap).not.toBe(isCompanionSectionVisible);
     expect(EMPTY_COMPANION_SLOT_RELAXATIONS).not.toBe(getCompanionSectionVisibility);
     // Full cross-I/O pins: `pause-companion-orchestrate-frame-ui-io-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: analytics-io exports stay distinct from orchestrate-io', () => {
+    expect(runCompanionSlotOrchestrate).not.toBe(logCompanionFeedbackVote);
+    expect(runCompanionInterventionBootstrap).not.toBe(logCompanionFullviewOpened);
+    expect(EMPTY_COMPANION_SLOT_RELAXATIONS).not.toBe(logCompanionFeedbackVote);
+    // Reciprocal inline pins: `pause-companion-analytics-io.test.ts`;
+    // dedicated sibling: `pause-companion-analytics-orchestrate-io-sibling-parity.test.ts`.
   });
 });
