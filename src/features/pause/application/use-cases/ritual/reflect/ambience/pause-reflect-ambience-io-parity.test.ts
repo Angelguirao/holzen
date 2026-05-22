@@ -38,9 +38,11 @@ import {
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 
 /**
- * Application-layer ambience I/O parity. Steps-io sibling pins:
- * `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
+ * Application-layer ambience I/O parity (domain frame-focus leaves ↔ ambience-flow ↔ presentation I/O).
+ * Steps-io cross-surface: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-steps-io-parity.test.ts`.
+ * Pending-offer cross-surface: `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins below.
  */
 describe('pause-reflect-ambience-io parity', () => {
   it('presentation I/O frame-focus exports match ambience CI umbrella', () => {
