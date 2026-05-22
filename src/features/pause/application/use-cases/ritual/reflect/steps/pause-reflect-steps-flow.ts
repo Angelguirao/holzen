@@ -2,6 +2,8 @@
  * CI cluster anchor for ritual reflect steps presentation I/O (§3 / check:architecture-alignment).
  * Composes domain step gates + run-* leaf use cases (not steps subcluster flow anchors).
  * Re-export parity: pause-reflect-steps-io.re-exports.test.ts may import this anchor (CI exempt).
+ * Wrapper delegation: pause-reflect-steps-io-parity.test.ts (presentation I/O → run-* leaves).
+ * Sibling cluster: pause-reflect-steps-flow.test.ts (umbrella vs steps subcluster flow anchors).
  */
 export { runPauseFavoriteToggle } from './run-pause-favorite-toggle';
 export { shouldShowFavoriteProHint } from '@/features/pause/domain/reflect/steps/favorite-toggle';

@@ -5,6 +5,22 @@ vi.mock('@/features/pause/public-rpc', () => ({
   reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' },
 }));
 
+vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle', () => ({
+  runPauseFavoriteToggle: vi.fn(() => Promise.resolve({ status: 'success' as const, newValue: true })),
+}));
+
+vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update', () => ({
+  runPauseReflectNoteUpdate: vi.fn(() => Promise.resolve({ status: 'success' as const })),
+}));
+
+vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update', () => ({
+  runPauseReflectTagUpdate: vi.fn(() => Promise.resolve({ status: 'success' as const })),
+}));
+
+vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log', () => ({
+  runPauseReflectionStepLogOnce: vi.fn(() => Promise.resolve({ status: 'logged' as const })),
+}));
+
 import {
   runPauseFavoriteToggle,
   runPauseReflectNoteUpdate,
@@ -18,11 +34,18 @@ import { runPauseReflectNoteUpdate as runNoteUpdateDirect } from '@/features/pau
 import { runPauseReflectTagUpdate as runTagUpdateDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update';
 import { runPauseReflectionStepLogOnce as runReflectionStepLogDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log';
 import {
+  pauseReflectFavoriteToggle,
+  pauseReflectNoteUpdate,
+  pauseReflectTagUpdate,
+  pauseReflectionStepLogOnce,
   reflectPauseRepository,
   shouldLogPauseReflectionStep as shouldLogFromStepsIo,
   shouldShowFavoriteProHint as shouldShowFromStepsIo,
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
-import { supabasePauseRepository } from '@/features/pause/public-rpc';
+import {
+  reflectionStepSessionStorage,
+  supabasePauseRepository,
+} from '@/features/pause/public-rpc';
 
 describe('pause-reflect-steps-io parity', () => {
   it('presentation I/O step gate re-exports match steps CI umbrella', () => {
@@ -39,5 +62,41 @@ describe('pause-reflect-steps-io parity', () => {
     expect(runPauseReflectNoteUpdate).toBe(runNoteUpdateDirect);
     expect(runPauseReflectTagUpdate).toBe(runTagUpdateDirect);
     expect(runPauseReflectionStepLogOnce).toBe(runReflectionStepLogDirect);
+  });
+
+  it('pauseReflectTagUpdate delegates to run-pause-reflect-tag-update with default repository', async () => {
+    const input = { pauseInstanceId: 'inst-tags', tags: ['focus'] };
+
+    await pauseReflectTagUpdate(input);
+
+    expect(runTagUpdateDirect).toHaveBeenCalledWith(supabasePauseRepository, input);
+  });
+
+  it('pauseReflectNoteUpdate delegates to run-pause-reflect-note-update with default repository', async () => {
+    const input = { pauseInstanceId: 'inst-note', text: 'breathe' };
+
+    await pauseReflectNoteUpdate(input);
+
+    expect(runNoteUpdateDirect).toHaveBeenCalledWith(supabasePauseRepository, input);
+  });
+
+  it('pauseReflectFavoriteToggle delegates to run-pause-favorite-toggle with default repository', async () => {
+    const input = { pauseInstanceId: 'inst-fav', isFavorite: true };
+
+    await pauseReflectFavoriteToggle(input);
+
+    expect(runFavoriteToggleDirect).toHaveBeenCalledWith(supabasePauseRepository, input);
+  });
+
+  it('pauseReflectionStepLogOnce delegates to run-pause-reflection-step-log with default repository + storage', async () => {
+    const input = { pauseInstanceId: 'inst-reflection-step' };
+
+    await pauseReflectionStepLogOnce(input);
+
+    expect(runReflectionStepLogDirect).toHaveBeenCalledWith(
+      supabasePauseRepository,
+      input,
+      { storage: reflectionStepSessionStorage },
+    );
   });
 });
