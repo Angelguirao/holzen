@@ -55,6 +55,11 @@ import {
   runReflectGeneration as runReflectGenerationFromGenerationFlow,
   shouldCommitReflectGeneration as shouldCommitFromGenerationFlow,
 } from '../generation/pause-reflect-generation-flow';
+import {
+  buildReflectionShareText as buildShareTextFromShareFlow,
+  runReflectionShareImage as runShareImageFromShareFlow,
+  trackPauseReflectShareTap as trackShareTapFromShareFlow,
+} from '../share/pause-reflect-share-flow';
 
 describe('pause-reflect-steps-flow', () => {
   it('re-exports step mutations and domain gates from leaf modules', () => {
@@ -120,5 +125,14 @@ describe('pause-reflect-steps-flow', () => {
     expect(runPauseReflectionStepLogOnce).not.toBe(openManualFromGenerationFlow);
     expect(shouldShowFavoriteFromFlow).not.toBe(runReflectGenerationFromGenerationFlow);
     expect(shouldLogFromFlow).not.toBe(openManualFromGenerationFlow);
+  });
+
+  it('sibling cluster: share-flow exports stay distinct from steps umbrella exports', () => {
+    expect(runPauseFavoriteToggle).not.toBe(runShareImageFromShareFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(buildShareTextFromShareFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(runShareImageFromShareFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(trackShareTapFromShareFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(buildShareTextFromShareFlow);
+    expect(shouldLogFromFlow).not.toBe(trackShareTapFromShareFlow);
   });
 });
