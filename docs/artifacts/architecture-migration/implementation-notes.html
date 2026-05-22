@@ -59,6 +59,23 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
+      <span>Phase A — presentation reflect pending-offer I/O identity (backlog #1 complete, Tier 5)</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3><code>pause-reflect-pending-offer-io</code> unmocked display + repository re-export regression</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Export <code>reflectPauseRepository</code> on pending-offer I/O (parity with mood/steps/hub). Add <code>pause-reflect-pending-offer-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> on <code>getPendingPauseOfferDisplay</code> and <code>reflectPauseRepository</code> ↔ <code>supabasePauseRepository</code>; mocked <code>pause-reflect-pending-offer-io.test.ts</code> keeps adopt/decline delegation. Allowlist re-exports test in <code>check:architecture-alignment</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None — adopt/decline wrappers unchanged; default port binding uses named <code>reflectPauseRepository</code> constant.</dd>
+      <dt>Open question</dt>
+      <dd>Next: hub <code>reflectPauseRepository</code> pin, remaining session umbrella pins, or Phase B subscription Tier 1 shims.</dd>
+    </dl>
+  </article>
+
+  <article class="note">
+    <header>
+      <span>2026-05-22</span>
       <span>Phase A — reflect ambience I/O identity pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
