@@ -3,6 +3,7 @@
  * Cluster marker: `pause-session-breath-cluster.ts` (empty export; unit-tested).
  * Re-exports restored breath state, phase advance, segment log (`pause-run-breath-segment-log-flow`), and navigation constants from sibling modules.
  * Presentation: `pause-session-breath-io` imports leaf modules directly (not this umbrella).
+ * Parity pins: `pause-session-breath-io.re-exports.test.ts` and `pause-session-breath-io-parity.test.ts`.
  */
 export { initialBreathSegmentRpcLoggedFlagsFromRestored } from '@/features/pause/domain/ritual/breathe/initial-breath-segment-rpc-flags';
 export {
