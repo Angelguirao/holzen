@@ -45,6 +45,10 @@ import {
   trackPausePendingAdopted as trackAdoptedFromPendingOfferFlow,
   trackPauseSessionAbandoned as trackAbandonedFromPendingOfferFlow,
 } from '../pending-offer/pause-reflect-pending-offer-flow';
+import {
+  runReflectGeneration as runReflectGenerationFromGenerationFlow,
+  shouldCommitReflectGeneration as shouldCommitFromGenerationFlow,
+} from '../generation/pause-reflect-generation-flow';
 
 describe('pause-reflect-steps-flow', () => {
   it('re-exports step mutations and domain gates from leaf modules', () => {
@@ -98,5 +102,14 @@ describe('pause-reflect-steps-flow', () => {
     expect(shouldShowFavoriteFromFlow).not.toBe(getDisplayFromPendingOfferFlow);
     expect(shouldLogFromFlow).not.toBe(trackAdoptedFromPendingOfferFlow);
     expect(shouldLogFromFlow).not.toBe(trackAbandonedFromPendingOfferFlow);
+  });
+
+  it('sibling cluster: generation-flow exports stay distinct from steps umbrella exports', () => {
+    expect(runPauseFavoriteToggle).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(runPauseReflectNoteUpdate).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(runPauseReflectTagUpdate).not.toBe(shouldCommitFromGenerationFlow);
+    expect(runPauseReflectionStepLogOnce).not.toBe(runReflectGenerationFromGenerationFlow);
+    expect(shouldShowFavoriteFromFlow).not.toBe(shouldCommitFromGenerationFlow);
+    expect(shouldLogFromFlow).not.toBe(runReflectGenerationFromGenerationFlow);
   });
 });

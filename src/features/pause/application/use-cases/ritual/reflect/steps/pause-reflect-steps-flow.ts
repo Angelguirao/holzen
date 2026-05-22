@@ -7,7 +7,8 @@
  * pause-reflect-steps-flow.test.ts ↔ pause-reflect-flows-flow.test.ts;
  * pause-reflect-steps-flow.test.ts ↔ pause-reflect-pending-offer-flow.test.ts (inline sibling pins);
  * pause-reflect-steps-hub-flow-sibling-parity.test.ts, pause-reflect-steps-mood-flow-sibling-parity.test.ts,
- * and pause-reflect-steps-pending-offer-flow-sibling-parity.test.ts pin separation from hub/mood/pending-offer flows.
+ * pause-reflect-steps-pending-offer-flow-sibling-parity.test.ts, and
+ * pause-reflect-steps-generation-flow-sibling-parity.test.ts pin separation from hub/mood/pending-offer/generation flows.
  */
 export { runPauseFavoriteToggle } from './run-pause-favorite-toggle';
 export { shouldShowFavoriteProHint } from '@/features/pause/domain/reflect/steps/favorite-toggle';
