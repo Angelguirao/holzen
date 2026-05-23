@@ -95,6 +95,8 @@ function baseRitual(
     briefIntegrateDone: false,
     selectedBriefFace: null,
     isFavorite: false,
+    isFavoriteCommitted: false,
+    addOptimisticFavorite: vi.fn(),
     setIsFavorite: vi.fn(),
     setRitualEntry: vi.fn(),
     setBriefStep: vi.fn(),
@@ -129,8 +131,9 @@ describe('usePauseSessionMoodChromeHandlers', () => {
     expect(usePauseSessionMoodAndPersistMock).toHaveBeenCalledOnce();
     expect(usePauseFavoriteToggleMock).toHaveBeenCalledWith({
       pauseInstanceId: 'pi-chrome-1',
-      isFavorite: false,
-      setIsFavorite: ritual.setIsFavorite,
+      isFavoriteCommitted: false,
+      addOptimisticFavorite: ritual.addOptimisticFavorite,
+      setIsFavorite: expect.any(Function),
       subscribed: true,
       t,
     });

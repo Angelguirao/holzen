@@ -1,4 +1,4 @@
-import { useCallback, type Dispatch, type SetStateAction } from 'react';
+import { useCallback, useOptimistic } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useAuth } from '@/features/auth/public';
@@ -12,24 +12,32 @@ import { hapticFeedback } from '@/lib/haptics';
 
 export function usePauseFavoriteToggle(input: {
   pauseInstanceId: string | null;
-  isFavorite: boolean;
-  setIsFavorite: Dispatch<SetStateAction<boolean>>;
+  isFavoriteCommitted: boolean;
+  addOptimisticFavorite: (next: boolean) => void;
+  setIsFavorite: (value: boolean) => void;
   subscribed: boolean;
   t: TFunction;
 }): { toggleFavorite: () => Promise<void> } {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const { pauseInstanceId, isFavorite, setIsFavorite, subscribed, t } = input;
+  const {
+    pauseInstanceId,
+    isFavoriteCommitted,
+    addOptimisticFavorite,
+    setIsFavorite,
+    subscribed,
+    t,
+  } = input;
 
   const toggleFavorite = useCallback(async () => {
     if (!pauseInstanceId) return;
-    const optimisticNext = !isFavorite;
-    setIsFavorite(optimisticNext);
+    const attempted = !isFavoriteCommitted;
+    addOptimisticFavorite(attempted);
     hapticFeedback('light');
 
     const outcome = await pauseReflectFavoriteToggle({
       pauseInstanceId,
-      isFavorite,
+      isFavorite: isFavoriteCommitted,
     });
     if (outcome.status === 'no_instance') return;
 
@@ -38,13 +46,23 @@ export function usePauseFavoriteToggle(input: {
       return;
     }
 
+    setIsFavorite(outcome.newValue);
     if (user?.id) {
       void queryClient.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(user.id) });
     }
     if (shouldShowFavoriteProHint(outcome.newValue, subscribed)) {
       showPauseFavoriteProHintToast(t);
     }
-  }, [pauseInstanceId, isFavorite, subscribed, t, setIsFavorite, user?.id, queryClient]);
+  }, [
+    pauseInstanceId,
+    isFavoriteCommitted,
+    addOptimisticFavorite,
+    setIsFavorite,
+    subscribed,
+    t,
+    user?.id,
+    queryClient,
+  ]);
 
   return { toggleFavorite };
 }

@@ -115,6 +115,8 @@ function baseRitual(
     briefIntegrateDone: false,
     selectedBriefFace: null,
     isFavorite: false,
+    isFavoriteCommitted: false,
+    addOptimisticFavorite: vi.fn(),
     setIsFavorite: vi.fn(),
     setRitualEntry: vi.fn(),
     setBriefStep: vi.fn(),
@@ -148,7 +150,7 @@ describe('usePauseSessionMoodChromeHandlers port-lock', () => {
     const { result } = renderHook(() =>
       usePauseSessionMoodChromeHandlers(baseProviders(), {
         shell: baseShell(),
-        ritual: baseRitual({ isFavorite: false, setIsFavorite }),
+        ritual: baseRitual({ isFavorite: false, isFavoriteCommitted: false, setIsFavorite }),
       }),
     );
 

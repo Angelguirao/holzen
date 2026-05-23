@@ -51,6 +51,8 @@ export function usePauseSessionMoodChromeHandlers(
     briefIntegrateDone,
     selectedBriefFace,
     isFavorite,
+    isFavoriteCommitted,
+    addOptimisticFavorite,
     setIsFavorite,
     setRitualEntry,
     setBriefStep,
@@ -63,8 +65,9 @@ export function usePauseSessionMoodChromeHandlers(
 
   const { toggleFavorite } = usePauseFavoriteToggle({
     pauseInstanceId,
-    isFavorite,
-    setIsFavorite,
+    isFavoriteCommitted,
+    addOptimisticFavorite,
+    setIsFavorite: (value) => setIsFavorite(value),
     subscribed,
     t,
   });
