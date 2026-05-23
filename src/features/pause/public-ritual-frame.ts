@@ -22,6 +22,11 @@ export {
   resolveCompanionRegenerateClick,
   type CompanionRegenerateClickResult,
 } from './application/use-cases/ritual/frame/companion-feedback-regenerate';
+export {
+  getCompanionSectionVisibility,
+  isCompanionSectionVisible,
+  type CompanionSectionVisibility,
+} from './application/use-cases/ritual/frame/section-visibility';
 export { estimateReadTime } from './application/use-cases/ritual/frame/estimate-read-time';
 export { formatCompanionHistoryRelativeDay } from './application/use-cases/ritual/frame/format-companion-history-relative-day';
 export { zoomOutTotalCharsForReadTime } from './application/use-cases/ritual/frame/zoom-out-payload';
