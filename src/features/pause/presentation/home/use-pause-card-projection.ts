@@ -18,7 +18,8 @@ export type PauseCardProjection = {
 
 /** Read-model for Home “Your pause” widget (body props + snooze gate; screen wires JSX). */
 export function usePauseCardProjection(params: UsePauseCardProjectionParams): PauseCardProjection {
-  const { subscriptionReady, hasAccess, ...bodyInput } = params;
+  const { subscriptionReady, hasAccess, ...rest } = params;
+  const bodyInput: BuildHomePauseCardBodyPropsInput = { ...rest, hasAccess };
 
   const showSnoozeToolbar = useMemo(
     () => shouldShowHomePauseSectionSnooze(subscriptionReady, hasAccess),
