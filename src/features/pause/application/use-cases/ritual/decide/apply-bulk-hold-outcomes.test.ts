@@ -17,6 +17,7 @@ function mockRepository(logStep: PauseRepository['logStep']): PauseRepository {
     logStep,
     logCompanion: vi.fn(),
     dismissCurrent: vi.fn(),
+    toggleCompanionSlotFavorite: vi.fn(async () => false),
   };
 }
 
