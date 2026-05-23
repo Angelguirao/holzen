@@ -128,7 +128,7 @@ fi
 # ---- 4. Frontend build + tests ----------------------------------------------
 step "4/6  Frontend tests + build"
 
-if npm run check:active-surface --silent && npm run check:no-phase-labels --silent && npm run check:invoke-edge-allowlist --silent; then
+if npm run check:active-surface --silent && npm run check:no-phase-labels --silent && npm run check:invoke-edge-allowlist --silent && npm run check:react19-leverage --silent; then
   ok "active-surface + phase-label + invoke-edge guards"
 else
   fail_check "surface/allowlist guard failed"

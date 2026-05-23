@@ -1,6 +1,7 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, useTransition } from 'react';
 import type { CachedHistoricalInsightShape } from '@/features/pause/domain/historical-insight';
 import type { ZoomOutData } from '@/features/pause/domain/zoom-out-display';
+import type { CompanionSlotTransitionStarters } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-ui-state';
 import {
   EMPTY_COMPANION_SLOT_RELAXATIONS,
   type CompanionSlotAutosaveParams,
@@ -25,6 +26,11 @@ interface SignalData {
 
 /** Per-slot companion card UI state (loading / error / payload) for a single pause instance. */
 export function useCompanionSlotUiState(pauseInstanceId?: string | null) {
+  const [signalPending, startSignalTransition] = useTransition();
+  const [nudgePending, startNudgeTransition] = useTransition();
+  const [zoomOutPending, startZoomOutTransition] = useTransition();
+  const [historyPending, startHistoryTransition] = useTransition();
+
   const [cacheIds, setCacheIds] = useState<CompanionSlotCacheIds>({
     nudge: null,
     signal: null,
@@ -36,19 +42,15 @@ export function useCompanionSlotUiState(pauseInstanceId?: string | null) {
   );
 
   const [nudge, setNudge] = useState<NudgeData | null>(null);
-  const [nudgeLoading, setNudgeLoading] = useState(false);
   const [nudgeError, setNudgeError] = useState(false);
 
   const [signal, setSignal] = useState<SignalData | null>(null);
-  const [signalLoading, setSignalLoading] = useState(false);
   const [signalError, setSignalError] = useState(false);
 
   const [zoomOut, setZoomOut] = useState<ZoomOutData | null>(null);
-  const [zoomOutLoading, setZoomOutLoading] = useState(false);
   const [zoomOutError, setZoomOutError] = useState(false);
 
   const [historyInsight, setHistoryInsight] = useState<CachedHistoricalInsightShape | null>(null);
-  const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState(false);
 
   const fetchedSlotsRef = useRef<Set<string>>(new Set());
@@ -58,14 +60,14 @@ export function useCompanionSlotUiState(pauseInstanceId?: string | null) {
     [],
   );
 
-  const companionSlotLoadingSetters = useMemo(
+  const companionSlotTransitionStarters = useMemo<CompanionSlotTransitionStarters>(
     () => ({
-      setSignalLoading,
-      setNudgeLoading,
-      setHistoryLoading,
-      setZoomOutLoading,
+      signal: startSignalTransition,
+      grounding: startNudgeTransition,
+      history: startHistoryTransition,
+      zoomOut: startZoomOutTransition,
     }),
-    [],
+    [startSignalTransition, startNudgeTransition, startHistoryTransition, startZoomOutTransition],
   );
 
   const companionSlotErrorSetters = useMemo(
@@ -91,16 +93,12 @@ export function useCompanionSlotUiState(pauseInstanceId?: string | null) {
 
   useLayoutEffect(() => {
     setSignal(null);
-    setSignalLoading(false);
     setSignalError(false);
     setNudge(null);
-    setNudgeLoading(false);
     setNudgeError(false);
     setZoomOut(null);
-    setZoomOutLoading(false);
     setZoomOutError(false);
     setHistoryInsight(null);
-    setHistoryLoading(false);
     setHistoryError(false);
     setCacheIds({ nudge: null, signal: null, zoomOut: null, history: null });
     setCacheRelaxations(EMPTY_COMPANION_SLOT_RELAXATIONS);
@@ -113,16 +111,16 @@ export function useCompanionSlotUiState(pauseInstanceId?: string | null) {
     cacheRelaxations,
     setCacheRelaxations,
     nudge,
-    nudgeLoading,
+    nudgeLoading: nudgePending,
     nudgeError,
     signal,
-    signalLoading,
+    signalLoading: signalPending,
     signalError,
     zoomOut,
-    zoomOutLoading,
+    zoomOutLoading: zoomOutPending,
     zoomOutError,
     historyInsight,
-    historyLoading,
+    historyLoading: historyPending,
     historyError,
     setNudge,
     setNudgeError,
@@ -134,7 +132,7 @@ export function useCompanionSlotUiState(pauseInstanceId?: string | null) {
     setHistoryError,
     fetchedSlotsRef,
     autoSaveToLibrary,
-    companionSlotLoadingSetters,
+    companionSlotTransitionStarters,
     companionSlotErrorSetters,
     slotCommitters,
   };

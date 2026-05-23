@@ -14,7 +14,7 @@ export type UseCompanionInterventionFetchParams = {
   retryCount: number;
   interventionFetchKeyRef: React.MutableRefObject<string | null>;
   interventionSkippedRef: React.MutableRefObject<boolean>;
-  setInterventionLoading: (loading: boolean) => void;
+  startInterventionTransition: React.TransitionStartFunction;
   setInterventionError: (error: boolean) => void;
   setIntervention: (value: InterventionState) => void;
   loadOrchestrateSession: () => Promise<CompanionOrchestrateSessionContext | null>;
@@ -29,7 +29,7 @@ export function useCompanionInterventionFetch({
   retryCount,
   interventionFetchKeyRef,
   interventionSkippedRef,
-  setInterventionLoading,
+  startInterventionTransition,
   setInterventionError,
   setIntervention,
   loadOrchestrateSession,
@@ -45,10 +45,10 @@ export function useCompanionInterventionFetch({
     interventionFetchKeyRef.current = key;
 
     let cancelled = false;
-    setInterventionLoading(true);
-    setInterventionError(false);
 
-    (async () => {
+    startInterventionTransition(async () => {
+      setInterventionError(false);
+
       try {
         const result = await runCompanionInterventionBootstrap(
           {
@@ -77,10 +77,8 @@ export function useCompanionInterventionFetch({
       } catch (e) {
         console.error('[useCompanionInterventionFetch] intervention fetch failed', e);
         if (!cancelled) setInterventionError(true);
-      } finally {
-        if (!cancelled) setInterventionLoading(false);
       }
-    })();
+    });
 
     return () => {
       cancelled = true;
@@ -96,6 +94,6 @@ export function useCompanionInterventionFetch({
     interventionSkippedRef,
     setIntervention,
     setInterventionError,
-    setInterventionLoading,
+    startInterventionTransition,
   ]);
 }

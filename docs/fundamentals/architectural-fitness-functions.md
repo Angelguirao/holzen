@@ -146,7 +146,7 @@ Policy: [ADR 2026-05-23](../decisions/2026-05-23-render-boundaries-defer-react-c
 | Boundaries-first policy | Manual | State low; `React.memo` on heavy shells; no mass memo deletion during migration |
 | Three-question memo gate | Manual (§2.9) | New `useMemo`/`useCallback` only for memo child, expensive derive, or effect deps |
 | Compiler pilot | Build-time | `vite.react-compiler.ts` — annotation mode on home/pause `components/**` + `app/components/*.tsx`; `HOLZEN_REACT_COMPILER=0` disables |
-| React 19 leverage closure | CI | `npm run check:react19-leverage` — no manual mutation loading flags in active `src/` outside allowlist |
+| React 19 leverage closure | CI | `npm run check:react19-leverage` — no manual mutation loading flags in active `src/` outside allowlist (auth boot, admin) |
 | Build green with Compiler | Implicit | `npm run build` / `test:ci` |
 
 ### 5.5 Security and migration conventions

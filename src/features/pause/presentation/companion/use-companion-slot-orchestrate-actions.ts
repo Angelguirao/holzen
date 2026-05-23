@@ -5,6 +5,7 @@ import type {
   CompanionSlotRelaxations,
 } from './pause-companion-orchestrate-io';
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
+import type { CompanionSlotTransitionStarters } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-ui-state';
 import { useCompanionSlotOrchestrateFailurePorts } from './use-companion-slot-orchestrate-failure-ports';
 import { useCompanionSlotRunOrchestrate } from './use-companion-slot-run-orchestrate';
 
@@ -29,12 +30,7 @@ export interface UseCompanionSlotOrchestrateActionsParams {
   setCacheIds: React.Dispatch<React.SetStateAction<CompanionSlotCacheIds>>;
   setCacheRelaxations: React.Dispatch<React.SetStateAction<CompanionSlotRelaxations>>;
   slotCommitters: CompanionSlotCommitters;
-  companionSlotLoadingSetters: {
-    setSignalLoading: (v: boolean) => void;
-    setNudgeLoading: (v: boolean) => void;
-    setHistoryLoading: (v: boolean) => void;
-    setZoomOutLoading: (v: boolean) => void;
-  };
+  companionSlotTransitionStarters: CompanionSlotTransitionStarters;
   companionSlotErrorSetters: {
     setSignalError: (v: boolean) => void;
     setNudgeError: (v: boolean) => void;
@@ -64,7 +60,7 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
     setCacheIds,
     setCacheRelaxations,
     slotCommitters,
-    companionSlotLoadingSetters,
+    companionSlotTransitionStarters,
     companionSlotErrorSetters,
   } = params;
 
@@ -88,7 +84,7 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
     setCacheIds,
     setCacheRelaxations,
     slotCommitters,
-    companionSlotLoadingSetters,
+    companionSlotTransitionStarters,
     companionSlotErrorSetters,
   });
 

@@ -75,7 +75,7 @@ export function useCompanionOrchestration({
     setCacheIds: slotUi.setCacheIds,
     setCacheRelaxations: slotUi.setCacheRelaxations,
     slotCommitters: slotUi.slotCommitters,
-    companionSlotLoadingSetters: slotUi.companionSlotLoadingSetters,
+    companionSlotTransitionStarters: slotUi.companionSlotTransitionStarters,
     companionSlotErrorSetters: slotUi.companionSlotErrorSetters,
   });
 

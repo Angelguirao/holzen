@@ -20,8 +20,10 @@ export { trackCompanionGenerationInitiated } from './companion-generation-teleme
 export {
   setCompanionSlotError,
   setCompanionSlotLoading,
+  startCompanionSlotTransition,
   type CompanionSlotErrorSetters,
   type CompanionSlotLoadingSetters,
+  type CompanionSlotTransitionStarters,
 } from './companion-slot-ui-state';
 export { resetInterventionIdempotency } from './intervention-idempotency';
 export {
