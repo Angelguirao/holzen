@@ -1,0 +1,18 @@
+# Holzen
+
+> Bitcoin-aware mindfulness PWA. When Bitcoin moves, Holzen helps you pause before you act — AI-generated reflections, breathing, journaling, and behavioral insights for long-time-horizon holders.
+
+Holzen watches BTC volatility and sends gentle pause prompts. Not financial advice, not urgency — just a moment to notice your impulse, feel it, and choose with intention. Built by a small husband-and-wife team.
+
+## Pages
+
+- [Welcome](/welcome): Landing page — what Holzen is, how it works, pricing, FAQ.
+- [About](/about): Why we built Holzen and the behavioral-finance research behind it.
+- [Blog](/blog): Articles on Bitcoin psychology, behavioral finance, and the art of pausing.
+- [Roadmap](/roadmap): Public roadmap — see what's planned and vote on next features.
+- [Reserve](/reserve): Holzen's BTC reserve strategy and live treasury metrics.
+
+## Optional
+
+- [Terms of Service](/terms): Legal terms for using Holzen.
+- [Privacy Policy](/privacy): How Holzen handles your data.
