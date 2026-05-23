@@ -157,7 +157,16 @@ describe('pause-reflect-generation-io parity (application)', () => {
       context: 'btc',
       initialReflectionMessage: '',
       severityAbsPct: 50,
-      profile: { display_name: 'Test' },
+      profile: {
+        reflectionTone: 'calm',
+        reflectionStyle: 'brief',
+        customPrompt: '',
+        motivations: [],
+        mantra: '',
+        groundingActivities: [],
+        currency: 'USD',
+        language: 'en',
+      },
       signal: new AbortController().signal,
     };
 

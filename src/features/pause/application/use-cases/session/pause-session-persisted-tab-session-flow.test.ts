@@ -20,7 +20,7 @@ import { makeTestPersistedPauseSession } from '@/test/fixtures/make-test-persist
 
 describe('pause-session-persisted-tab-session-flow', () => {
   it('re-exports tab session helpers from persisted-tab-session', () => {
-    const snapshot = makeTestPersistedPauseSession({ step: 'brief' });
+    const snapshot = makeTestPersistedPauseSession({ step: 'frame' });
     const storage: PersistedTabSessionStoragePort = {
       load: () => snapshot,
       save: () => {},

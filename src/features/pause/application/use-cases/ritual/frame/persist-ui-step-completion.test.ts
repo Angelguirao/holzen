@@ -14,6 +14,7 @@ function mockRepository(overrides: Partial<PauseRepository>): PauseRepository {
       resulting_state: null,
     }),
     dismissCurrent: vi.fn(),
+    toggleCompanionSlotFavorite: vi.fn(async () => false),
     ...overrides,
   };
 }
