@@ -428,12 +428,15 @@ serve(
       // (matching fingerprint -> reuse; differing fingerprint while open
       // -> `pending` offer; recent-dismissal match -> skip).
       const directionBucket = userM.direction === "down" ? "down" : "up";
-      const severityBand = absChange >= 10 ? "high" : absChange >= 5 ? "moderate" : "mild";
+      const dailyBucketPct = bucketChangePercent(userM.changePercent);
+      const absDailyBucket = Math.abs(dailyBucketPct);
+      const severityBand =
+        absDailyBucket >= 10 ? "high" : absDailyBucket >= 5 ? "moderate" : "mild";
       const fingerprint = await computeContextFingerprint({
         templateSlug: "volatility_v1",
         directionBucket,
         severityBand,
-        dailyBucketPct: bucketChangePercent(userM.changePercent),
+        dailyBucketPct,
         cumulativeBucketPct: bucketChangePercent(userM.cumulativeChangePercent),
         trackedAssetId: assetId,
         fearGreedBand: fearGreedSnapshot?.label ?? null,

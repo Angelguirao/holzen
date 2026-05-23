@@ -83,28 +83,12 @@ export async function computeContextFingerprint(parts: {
 }
 
 /**
- * Round a change-percent into a stable bucket so fingerprints are insensitive
- * to minute-to-minute noise. Positive and negative are distinct buckets.
- *   |pct| < 1   -> 0
- *   |pct| < 3   -> 2  (signed: -2 or 2)
- *   |pct| < 5   -> 4
- *   |pct| < 7   -> 6
- *   |pct| < 10  -> 8
- *   |pct| >= 10 -> ceil to nearest 2 (so 10-11.9 -> 10, 12-13.9 -> 12, etc.)
- * Rounds directionally: sign(pct) * bucket.
+ * Truncate to whole percentage points so fingerprints ignore sub-point noise
+ * (e.g. 5.1% and 5.9% both bucket to 5). Sign is preserved: -5.9 -> -5.
  */
 export function bucketChangePercent(pct: number): number {
   if (!Number.isFinite(pct)) return 0;
-  const abs = Math.abs(pct);
-  const sign = pct < 0 ? -1 : 1;
-  let bucket: number;
-  if (abs < 1) bucket = 0;
-  else if (abs < 3) bucket = 2;
-  else if (abs < 5) bucket = 4;
-  else if (abs < 7) bucket = 6;
-  else if (abs < 10) bucket = 8;
-  else bucket = Math.floor(abs / 2) * 2;
-  return sign * bucket;
+  return Math.trunc(pct);
 }
 
 /**
