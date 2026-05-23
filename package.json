@@ -7,6 +7,7 @@
     "dev": "vite",
     "dev:hosted": "vite --mode hosted",
     "dev:local": "vite --mode localstack",
+    "dev:staging": "vite --mode staging",
     "prebuild": "npm run check:version-sync",
     "build": "vite build",
     "build:dev": "vite build --mode development",
@@ -41,6 +42,8 @@
     "supabase:status": "supabase status",
     "supabase:reset": "supabase db reset",
     "gen:types": "node scripts/gen-supabase-types.mjs",
+    "staging:db-push": "node scripts/staging-deploy.mjs db-push",
+    "staging:deploy": "node scripts/staging-deploy.mjs deploy",
     "design:lint": "npx --yes @google/design.md lint DESIGN.md"
   },
   "dependencies": {
@@ -50,7 +53,6 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@hookform/resolvers": "^3.10.0",
     "@khmyznikov/pwa-install": "^0.6.3",
-    "@lovable.dev/cloud-auth-js": "^1.0.0",
     "@lovable.dev/email-js": "^0.0.4",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -132,7 +134,6 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.15.0",
     "jsdom": "^20.0.3",
-    "lovable-tagger": "^1.1.13",
     "postcss": "^8.5.6",
     "supabase": "^2.84.4",
     "tailwindcss": "^3.4.17",

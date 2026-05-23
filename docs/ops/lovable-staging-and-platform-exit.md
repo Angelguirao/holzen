@@ -1,8 +1,25 @@
 # Lovable, staging, and moving off the platform
 
-**Status:** Strategic reference (2026-05). No migration scheduled — use when evaluating staging, visible CI, or leaving Lovable.
+**Status:** Strategic reference + **active exit** (2026-05). Execute via [platform-exit-runbook.md](platform-exit-runbook.md).
 
 **Related:** [deployment-sync-guide.md](deployment-sync-guide.md) (day-to-day push checklist), [backup-restore-drill.md](backup-restore-drill.md) (PITR + claiming Supabase), [navigating-the-codebase.md](../fundamentals/navigating-the-codebase.md) §17 (what deploys when).
+
+---
+
+## Full platform exit (in progress)
+
+Holzen is leaving Lovable Cloud entirely. Code changes in-repo:
+
+| Area | Status |
+|------|--------|
+| Supabase Google OAuth (replaces `cloud-auth-js`) | Done in `AuthScreen` |
+| Direct Gemini + OpenRouter failover (`llm-gateway.ts`) | Active edges migrated |
+| Resend email path | `lovable-email.ts` prefers `RESEND_API_KEY` |
+| GitHub Actions CI | `.github/workflows/ci.yml` |
+| Staging deploy scripts | `npm run staging:deploy`, `staging-supabase-setup.md` |
+| `lovable-tagger` | Removed from Vite |
+
+**Your manual steps:** [platform-exit-runbook.md](platform-exit-runbook.md) Phase 0–4 (freeze Lovable sync, create owned projects, DNS, Stripe, Resend SMTP for auth emails).
 
 ---
 

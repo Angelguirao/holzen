@@ -5,7 +5,13 @@
  */
 
 import { containsSlop, containsCryptoLanguage } from "./quality.ts";
-import { fetchInitWithIncomingTrace } from "./forward-trace-headers.ts";
+import {
+  type LlmBudgetTier,
+  type LlmCredentials,
+  llmChatCompletionsWithFallback,
+  llmLogProvider,
+  resolveModelsForTask,
+} from "./llm-gateway.ts";
 
 /** Bump when the system prompt, tone rules, or quality gate changes. */
 export const REFLECTION_PROMPT_VERSION = "v5";
@@ -27,7 +33,7 @@ export interface MoodHistoryEntry {
 
 export interface GenerateUnifiedReflectionParams {
   context: string;
-  apiKey: string;
+  llm: LlmCredentials;
   tone?: string;
   style?: string;
   language?: string;
@@ -42,8 +48,10 @@ export interface GenerateUnifiedReflectionParams {
   groundingActivities?: string[];
   log?: (msg: string) => void;
   logAttempt?: (entry: Record<string, unknown>) => void;
-  /** Edge `Request` for W3C trace propagation to the Lovable AI gateway. */
+  /** Edge `Request` for W3C trace propagation to the LLM provider. */
   incomingRequest?: Request;
+  /** Budget tier — downgrades model cascade when daily spend is elevated. */
+  budgetTier?: LlmBudgetTier;
 }
 
 export interface GenerateUnifiedReflectionOutcome {
@@ -284,7 +292,7 @@ function applyQualityGateAndHaikuTrim(
     log?.(`reflection line count: ${nonEmptyLines.length} lines (expected ≤4) — consider tightening prompt`);
     logAttempt?.({
       companion_type: "reflection",
-      provider: "lovable",
+      provider: "google",
       model: "quality_gate",
       status: "quality_gate_warning",
       latency_ms: 0,
@@ -308,7 +316,7 @@ function applyQualityGateAndHaikuTrim(
     log?.(`reflection quality gate failed: ${qgReason}`);
     logAttempt?.({
       companion_type: "reflection",
-      provider: "lovable",
+      provider: "google",
       model: "quality_gate",
       status: "quality_gate_failed",
       latency_ms: 0,
@@ -419,7 +427,7 @@ export async function generateUnifiedReflection(
 ): Promise<GenerateUnifiedReflectionOutcome> {
   const {
     context,
-    apiKey,
+    llm,
     tone = "stoic",
     style = "standard",
     language = "en",
@@ -434,6 +442,7 @@ export async function generateUnifiedReflection(
     log,
     logAttempt,
     incomingRequest,
+    budgetTier = "normal",
   } = params;
 
   const severity = typeof severityRaw === "number" ? severityRaw : 0;
@@ -473,22 +482,22 @@ export async function generateUnifiedReflection(
   return await generateWithJson({
     fullSystemPrompt,
     context,
-    apiKey,
     log,
     logAttempt,
     incomingRequest,
+    budgetTier,
   });
 }
 
 async function generateWithJson(opts: {
   fullSystemPrompt: string;
   context: string;
-  apiKey: string;
   log?: (msg: string) => void;
   logAttempt?: (e: Record<string, unknown>) => void;
   incomingRequest?: Request;
+  budgetTier?: LlmBudgetTier;
 }): Promise<GenerateUnifiedReflectionOutcome> {
-  const { fullSystemPrompt, context, apiKey, log, logAttempt, incomingRequest } = opts;
+  const { fullSystemPrompt, context, log, logAttempt, incomingRequest, budgetTier = "normal" } = opts;
   const aiBody = {
     messages: [
       { role: "system" as const, content: fullSystemPrompt },
@@ -499,29 +508,25 @@ async function generateWithJson(opts: {
   };
 
   const TIMEOUTS = [12000, 8000];
-  const models = ["google/gemini-3-flash-preview", "google/gemini-2.5-flash"];
+  const models = resolveModelsForTask("reflect", budgetTier);
   let parsed: { message?: string; haiku?: string | null } | null = null;
   let lastStatus = 500;
 
   for (let i = 0; i < models.length; i++) {
     const model = models[i];
-    const timeoutMs = TIMEOUTS[i];
+    const timeoutMs = TIMEOUTS[Math.min(i, TIMEOUTS.length - 1)];
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     const attemptT0 = Date.now();
+    let logProvider = "google";
     try {
-      const response = await fetch(
-        "https://ai.gateway.lovable.dev/v1/chat/completions",
-        fetchInitWithIncomingTrace(incomingRequest, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ ...aiBody, model }),
-          signal: controller.signal,
-        }),
-      );
+      const { response, creds } = await llmChatCompletionsWithFallback({
+        model,
+        body: aiBody,
+        incomingRequest,
+        signal: controller.signal,
+      });
+      logProvider = llmLogProvider(creds);
       clearTimeout(timeout);
 
       if (response.status === 429 || response.status === 402) {
@@ -529,7 +534,7 @@ async function generateWithJson(opts: {
         await response.text();
         logAttempt?.({
           companion_type: "reflection",
-          provider: "lovable",
+          provider: logProvider,
           model,
           status: "error",
           latency_ms: Date.now() - attemptT0,
@@ -543,7 +548,7 @@ async function generateWithJson(opts: {
         lastStatus = response.status;
         logAttempt?.({
           companion_type: "reflection",
-          provider: "lovable",
+          provider: logProvider,
           model,
           status: "error",
           latency_ms: Date.now() - attemptT0,
@@ -565,7 +570,7 @@ async function generateWithJson(opts: {
         else {
           logAttempt?.({
             companion_type: "reflection",
-            provider: "lovable",
+            provider: logProvider,
             model,
             status: "error",
             latency_ms: Date.now() - attemptT0,
@@ -581,7 +586,7 @@ async function generateWithJson(opts: {
       if (parsed?.message) {
         logAttempt?.({
           companion_type: "reflection",
-          provider: "lovable",
+          provider: logProvider,
           model,
           status: "success",
           latency_ms: Date.now() - attemptT0,
@@ -592,7 +597,7 @@ async function generateWithJson(opts: {
       }
       logAttempt?.({
         companion_type: "reflection",
-        provider: "lovable",
+        provider: logProvider,
         model,
         status: "error",
         latency_ms: Date.now() - attemptT0,
@@ -611,7 +616,7 @@ async function generateWithJson(opts: {
         lastStatus = 504;
         logAttempt?.({
           companion_type: "reflection",
-          provider: "lovable",
+          provider: logProvider,
           model,
           status: "timeout",
           latency_ms: Date.now() - attemptT0,

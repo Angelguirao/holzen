@@ -145,9 +145,9 @@ export async function handleRegenerateOnly(params: {
   const slotNeedsPerplexity = slot === "signal" || slot === "grounding" || slot === "history";
   const breakerBlocked =
     (slotNeedsPerplexity && providerHealth.perplexity.state === "degraded") ||
-    providerHealth.lovable.state === "degraded";
+    providerHealth.google.state === "degraded";
   if (breakerBlocked) {
-    const tripped = providerHealth.lovable.state === "degraded" ? "lovable" : "perplexity";
+    const tripped = providerHealth.google.state === "degraded" ? "google" : "perplexity";
     log(`regenerate blocked by breaker_${tripped}`);
     return new Response(
       JSON.stringify({

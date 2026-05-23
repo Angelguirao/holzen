@@ -2,7 +2,10 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { extractDoi, normalizeCitation } from "../_shared/grounding-enrichment-util.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
-import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
+import {
+  llmChatCompletionsWithFallback,
+  resolveLlmCredentialChain,
+} from "../_shared/llm-gateway.ts";
 
 /**
  * `grounding-enrich` — read-optimized enrichment for Grounding Full View.
@@ -84,7 +87,7 @@ serve(
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
     const enrichGuard = await guardAiFeature(svcGuard, "grounding_enrich", {
       userId: user.id,
-      providers: ["lovable"],
+      providers: ["google"],
     });
     if (!enrichGuard.allowed) {
       return new Response(
@@ -352,8 +355,7 @@ async function fetchSemanticScholar(
  * the caller can fall back to name-only display.
  */
 async function generateBios(names: string[], citation: string, incoming?: Request): Promise<string[]> {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!LOVABLE_API_KEY) return [];
+  if (resolveLlmCredentialChain().length === 0) return [];
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
@@ -367,23 +369,19 @@ ${names.map((n, i) => `${i + 1}. ${n}`).join("\n")}
 
 Return a JSON object with key "bios" containing a string array of the same length as the input, in the same order. Each string is the bio.`;
 
-    const res = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      fetchInitWithIncomingTrace(incoming, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-          response_format: { type: "json_object" },
-          temperature: 0.3,
-        }),
-        signal: controller.signal,
-      }),
-    );
+    const { response: res } = await llmChatCompletionsWithFallback({
+      model: "google/gemini-2.5-flash",
+      body: {
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.3,
+      },
+      incomingRequest: incoming,
+      signal: controller.signal,
+    });
     if (!res.ok) return [];
     const json = await res.json();
     const raw = json.choices?.[0]?.message?.content ?? "{}";

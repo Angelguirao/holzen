@@ -25,7 +25,13 @@ import {
 import { type CacheServeRelaxation, parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../perplexity-client.ts";
-import { fetchInitWithIncomingTrace } from "../forward-trace-headers.ts";
+import {
+  type LlmBudgetTier,
+  llmChatCompletionsWithFallback,
+  llmLogProvider,
+  resolveLlmCredentialChain,
+  resolveModelsForTask,
+} from "../llm-gateway.ts";
 import {
   searchCompanionCatalog,
   eventToHistory,
@@ -62,6 +68,7 @@ export interface GenerateHistoryParams {
   forceLive?: boolean;
   /** Skip the live phase only — library/cache still serve. Used by circuit breaker. */
   skipLive?: boolean;
+  budgetTier?: LlmBudgetTier;
   log: (msg: string, extra?: Record<string, unknown>) => void;
   /** Edge `Request` for W3C trace propagation to Perplexity. */
   incomingRequest?: Request;
@@ -160,7 +167,7 @@ async function serveFallback(
 // ── Public entry point ──
 
 export async function generateHistory(params: GenerateHistoryParams): Promise<HistoryResult> {
-  const { svcClient, context, mood, recentTitles, userId, preferredMood, forceLive, skipLive, log, incomingRequest } =
+  const { svcClient, context, mood, recentTitles, userId, preferredMood, forceLive, skipLive, budgetTier = "normal", log, incomingRequest } =
     params;
   const marketDirection = parseMarketDirection(context);
   const phases = getPhaseConfig();
@@ -209,8 +216,8 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
   const logAttempt = createAttemptLogger(svcClient, { userId });
 
   const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
+  const llmChain = resolveLlmCredentialChain();
+  if (!PERPLEXITY_API_KEY || llmChain.length === 0) {
     log("missing API keys, serving fallback");
     return serveFallback(svcClient, userId, marketDirection, undefined, undefined, log);
   }
@@ -326,33 +333,32 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
     ],
   };
 
-  const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
+  const models = resolveModelsForTask("structure", budgetTier);
   type HistoryLiveData = NonNullable<HistoryResult["data"]>;
   let insight: HistoryLiveData | null = null;
   let lastLovableModel: string | undefined;
+  let logProvider = "google";
 
   const AI_TIMEOUTS = [10000, 8000];
   for (let idx = 0; idx < models.length; idx++) {
     const model = models[idx];
     const aiController = new AbortController();
-    const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[idx]);
+    const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[Math.min(idx, AI_TIMEOUTS.length - 1)]);
     const attemptT0 = Date.now();
     try {
-      const res = await fetch(
-        "https://ai.gateway.lovable.dev/v1/chat/completions",
-        fetchInitWithIncomingTrace(incomingRequest, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ ...aiBody, model }),
-          signal: aiController.signal,
-        }),
-      );
+      const { response: res, creds } = await llmChatCompletionsWithFallback({
+        model,
+        body: aiBody,
+        incomingRequest,
+        signal: aiController.signal,
+      });
+      logProvider = llmLogProvider(creds);
       clearTimeout(aiTimeout);
       log(`AI ${model} responded ${res.status}`);
 
       if (!res.ok) {
         await res.text();
-        logAttempt({ companion_type: "historical_insight", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: `HTTP ${res.status}` });
+        logAttempt({ companion_type: "historical_insight", provider: logProvider, model, status: "error", latency_ms: Date.now() - attemptT0, error_message: `HTTP ${res.status}` });
         if (model !== models[models.length - 1]) continue; break;
       }
 
@@ -365,16 +371,16 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
         const m = raw.match(/\{[\s\S]*\}/);
         if (m) insight = JSON.parse(m[0]) as HistoryLiveData;
         else {
-          logAttempt({ companion_type: "historical_insight", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+          logAttempt({ companion_type: "historical_insight", provider: logProvider, model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
           if (model !== models[models.length - 1]) continue; else break;
         }
       }
-      logAttempt({ companion_type: "historical_insight", provider: "lovable", model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+      logAttempt({ companion_type: "historical_insight", provider: logProvider, model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
       lastLovableModel = model;
       break;
     } catch (e) {
       clearTimeout(aiTimeout);
-      logAttempt({ companion_type: "historical_insight", provider: "lovable", model, status: e instanceof DOMException && e.name === "AbortError" ? "timeout" : "error", latency_ms: Date.now() - attemptT0, error_message: String(e) });
+      logAttempt({ companion_type: "historical_insight", provider: logProvider, model, status: e instanceof DOMException && e.name === "AbortError" ? "timeout" : "error", latency_ms: Date.now() - attemptT0, error_message: String(e) });
       if (model !== models[models.length - 1]) { log(`${model} failed, retrying`); continue; }
       break;
     }
@@ -389,7 +395,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
     if (insight && lastLovableModel) {
       logAttempt({
         companion_type: "historical_insight",
-        provider: "lovable",
+        provider: logProvider,
         model: lastLovableModel,
         status: "quality_gate_failed",
         latency_ms: 0,

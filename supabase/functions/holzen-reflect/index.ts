@@ -19,6 +19,7 @@ import {
   REFLECTION_PROMPT_VERSION,
   type MoodHistoryEntry,
 } from "../_shared/reflection-generate.ts";
+import { resolveLlmCredentialChain, resolveLlmBudgetTier } from "../_shared/llm-gateway.ts";
 
 serve(
   withRequestLogging("holzen-reflect", async ({ req, log }) => {
@@ -64,9 +65,9 @@ serve(
     // Circuit breaker: if Lovable is degraded, skip the live call and serve the
     // curated pool. Reflection only uses Lovable, so this is a simple one-gate
     // check. Saves the API call that would probably fail anyway.
-    const degraded = await degradedProviders(svcClient, ["lovable"]);
+    const degraded = await degradedProviders(svcClient, ["google"]);
     if (degraded.length > 0) {
-      log("reflection: lovable degraded, serving curated pool");
+      log("reflection: gemini degraded, serving curated pool");
       if (companionFallbacksDisabled()) {
         return errorResponse("Provider degraded", 503);
       }
@@ -87,8 +88,9 @@ serve(
       return errorResponse("Missing context", 400);
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    const budgetTier = await resolveLlmBudgetTier(svcClient);
+
+    if (resolveLlmCredentialChain().length === 0) {
       if (companionFallbacksDisabled()) {
         return errorResponse(COMPANION_FALLBACKS_DISABLED_MESSAGE, 503);
       }
@@ -100,7 +102,8 @@ serve(
 
     const { result, lastStatus } = await generateUnifiedReflection({
       context,
-      apiKey: LOVABLE_API_KEY,
+      llm: resolveLlmCredentialChain()[0]!,
+      budgetTier,
       tone,
       style,
       language,

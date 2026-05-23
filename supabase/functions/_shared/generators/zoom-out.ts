@@ -38,7 +38,13 @@ import { fetchPastReflectionWithWords, type PastReflectionWithWords } from "../p
 import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
 import { errorMessageFromUnknown, getEdgeRuntime } from "../edge-runtime.ts";
 import { normalizeTrackedAssetId } from "../tracked-assets.ts";
-import { fetchInitWithIncomingTrace } from "../forward-trace-headers.ts";
+import {
+  type LlmBudgetTier,
+  llmChatCompletionsWithFallback,
+  llmLogProvider,
+  resolveLlmCredentialChain,
+  resolveModelsForTask,
+} from "../llm-gateway.ts";
 
 /** Bump when the deep-time prompt, seed pool, or quality rules change. */
 export const PROMPT_VERSION = "v4";
@@ -76,6 +82,7 @@ export interface GenerateZoomOutParams {
   forceLive?: boolean;
   /** Skip the live phase only — cache still serves. Used by circuit breaker. */
   skipLive?: boolean;
+  budgetTier?: LlmBudgetTier;
   /** When not bitcoin, skip BTC anniversary cache pipeline and serve curated deep-time only. */
   trackedAssetId?: string | null;
   log: (msg: string, extra?: Record<string, unknown>) => void;
@@ -243,15 +250,15 @@ async function generateDeepTime(
     currentPrice: number | null;
     onThisDay: { yearsAgo: number; price: number; date: string }[];
     userId?: string;
+    budgetTier?: LlmBudgetTier;
     log: GenerateZoomOutParams["log"];
     incomingRequest?: Request;
   },
 ): Promise<DeepTimeResult> {
-  const { context, mood, recentTitles, zoomOutAngle, currentPrice, onThisDay, userId, log, incomingRequest } = params;
+  const { context, mood, recentTitles, zoomOutAngle, currentPrice, onThisDay, userId, budgetTier = "normal", log, incomingRequest } = params;
   const logAttempt = createAttemptLogger(svcClient, { userId });
 
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!LOVABLE_API_KEY) {
+  if (resolveLlmCredentialChain().length === 0) {
     if (companionFallbacksDisabled()) {
       return { deepTime: null, source: "empty", error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
     }
@@ -368,31 +375,24 @@ FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but
     temperature: 0.7,
   };
 
-  const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
-  // Bumped 2026-04-18 from [8000, 6000]. Gemini Flash structuring occasionally
-  // overran the old budgets for zoom-out (which has a denser system prompt and
-  // temperature 0.7); timeouts caused us to fall through to the lite model or
-  // curated fallback unnecessarily. 10s/8s keeps the user-perceived latency
-  // well under the reflect-step patience budget while giving the model enough
-  // headroom to finish.
+  const models = resolveModelsForTask("structure", budgetTier);
   const AI_TIMEOUTS = [10000, 8000];
   let deepTime: { title: string; body: string } | null = null;
+  let logProvider = "google";
 
   for (let idx = 0; idx < models.length; idx++) {
     const model = models[idx];
     const aiController = new AbortController();
-    const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[idx]);
+    const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[Math.min(idx, AI_TIMEOUTS.length - 1)]);
     const attemptT0 = Date.now();
     try {
-      const aiRes = await fetch(
-        "https://ai.gateway.lovable.dev/v1/chat/completions",
-        fetchInitWithIncomingTrace(incomingRequest, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ ...aiBody, model }),
-          signal: aiController.signal,
-        }),
-      );
+      const { response: aiRes, creds } = await llmChatCompletionsWithFallback({
+        model,
+        body: aiBody,
+        incomingRequest,
+        signal: aiController.signal,
+      });
+      logProvider = llmLogProvider(creds);
       clearTimeout(aiTimeout);
       if (aiRes.ok) {
         const aiData = await aiRes.json();
@@ -404,7 +404,7 @@ FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but
             const qg = qualityGate("zoom_out_deep_time", parsed);
             if (parsed.title && parsed.body && qg.pass) {
               deepTime = { title: parsed.title, body: parsed.body };
-              logAttempt({ companion_type: "zoom_out", provider: "lovable", model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+              logAttempt({ companion_type: "zoom_out", provider: logProvider, model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
               // Cache with rich metadata and title-based dedup
               try {
                 const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", COMPANION_ZOOM_OUT_DEEP_TIME).eq("language", "en").limit(30);
@@ -440,7 +440,7 @@ FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but
               logQualityGateStructuredReject("zoom_out_deep_time", qgReason);
               logAttempt({
                 companion_type: "zoom_out",
-                provider: "lovable",
+                provider: logProvider,
                 model,
                 status: "quality_gate_failed",
                 latency_ms: Date.now() - attemptT0,
@@ -451,21 +451,21 @@ FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but
               if (model !== models[models.length - 1]) continue;
             }
           } catch {
-            logAttempt({ companion_type: "zoom_out", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed" });
+            logAttempt({ companion_type: "zoom_out", provider: logProvider, model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed" });
             if (model !== models[models.length - 1]) continue;
           }
         } else {
-          logAttempt({ companion_type: "zoom_out", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "empty content" });
+          logAttempt({ companion_type: "zoom_out", provider: logProvider, model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "empty content" });
           if (model !== models[models.length - 1]) continue;
         }
       } else {
         await aiRes.text();
-        logAttempt({ companion_type: "zoom_out", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: `HTTP ${aiRes.status}` });
+        logAttempt({ companion_type: "zoom_out", provider: logProvider, model, status: "error", latency_ms: Date.now() - attemptT0, error_message: `HTTP ${aiRes.status}` });
         if (model !== models[models.length - 1]) continue;
       }
     } catch (e) {
       clearTimeout(aiTimeout);
-      logAttempt({ companion_type: "zoom_out", provider: "lovable", model, status: e instanceof DOMException && e.name === "AbortError" ? "timeout" : "error", latency_ms: Date.now() - attemptT0, error_message: String(e) });
+      logAttempt({ companion_type: "zoom_out", provider: logProvider, model, status: e instanceof DOMException && e.name === "AbortError" ? "timeout" : "error", latency_ms: Date.now() - attemptT0, error_message: String(e) });
       if (model !== models[models.length - 1]) continue;
     }
   }
@@ -501,7 +501,7 @@ FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but
 // ── Public entry point ──
 
 export async function generateZoomOut(params: GenerateZoomOutParams): Promise<ZoomOutResult> {
-  const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, forceLive, skipLive, log, incomingRequest } =
+  const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, forceLive, skipLive, budgetTier = "normal", log, incomingRequest } =
     params;
   const tracked = normalizeTrackedAssetId(params.trackedAssetId);
   if (tracked !== "bitcoin") {
@@ -604,6 +604,7 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
     currentPrice: prices.currentPrice,
     onThisDay: prices.onThisDay,
     userId,
+    budgetTier,
     log,
     incomingRequest,
   });

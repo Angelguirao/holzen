@@ -8,7 +8,11 @@
 
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { createAttemptLogger } from "../observe.ts";
-import { fetchInitWithIncomingTrace } from "../forward-trace-headers.ts";
+import {
+  llmChatCompletionsWithFallback,
+  llmLogProvider,
+  resolveModelsForTask,
+} from "../llm-gateway.ts";
 
 /** Bump when the system prompt or style rules change. */
 export const PROMPT_VERSION = "v1";
@@ -20,11 +24,13 @@ export interface GenerateQuestionParams {
   severity: "mild" | "moderate" | "high";
   moodHistory?: Array<{ mood: string; outcome?: string | null }>;
   apiKey: string;
+  /** When set, used instead of inferring gateway from env (or pass with apiKey from resolveLlmCredentials). */
+  llm?: LlmCredentials;
   language?: string;
   svcClient?: SupabaseClient;
   userId?: string;
   log?: (msg: string, extra?: Record<string, unknown>) => void;
-  /** Edge `Request` for W3C trace propagation to the Lovable AI gateway. */
+  /** Edge `Request` for W3C trace propagation to the LLM provider. */
   incomingRequest?: Request;
 }
 
@@ -34,9 +40,10 @@ const LANG_NAMES: Record<string, string> = {
 };
 
 export async function generateQuestion(params: GenerateQuestionParams): Promise<string | null> {
-  const { context, mood, direction, severity, moodHistory, apiKey, language = "en", svcClient, userId, log, incomingRequest } =
+  const { context, mood, direction, severity, moodHistory, language = "en", svcClient, userId, log, incomingRequest } =
     params;
   const logAttempt = svcClient ? createAttemptLogger(svcClient, { userId: userId ?? undefined }) : null;
+  const model = resolveModelsForTask("intervention", "normal")[0];
 
   const langName = LANG_NAMES[language] || "English";
   const langInstruction = language !== "en"
@@ -81,36 +88,31 @@ Return JSON: { "question": "..." }`;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10_000);
   const t0 = Date.now();
+  let logProvider = "google";
 
   try {
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      fetchInitWithIncomingTrace(incomingRequest, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: context },
-          ],
-          response_format: { type: "json_object" },
-          temperature: 0.8,
-        }),
-        signal: controller.signal,
-      }),
-    );
+    const { response, creds } = await llmChatCompletionsWithFallback({
+      model,
+      body: {
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: context },
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.8,
+      },
+      incomingRequest,
+      signal: controller.signal,
+    });
+    logProvider = llmLogProvider(creds);
     clearTimeout(timeout);
 
     if (!response.ok) {
       log?.(`AI error: HTTP ${response.status}`);
       logAttempt?.({
         companion_type: "question",
-        provider: "lovable",
-        model: "google/gemini-3-flash-preview",
+        provider: logProvider,
+        model,
         status: "error",
         latency_ms: Date.now() - t0,
         error_message: `HTTP ${response.status}`,
@@ -127,8 +129,8 @@ Return JSON: { "question": "..." }`;
       log?.("question rejected: length out of range or empty");
       logAttempt?.({
         companion_type: "question",
-        provider: "lovable",
-        model: "google/gemini-3-flash-preview",
+        provider: logProvider,
+        model,
         status: "error",
         latency_ms: Date.now() - t0,
         error_message: "invalid_length",
@@ -156,8 +158,8 @@ Return JSON: { "question": "..." }`;
 
     logAttempt?.({
       companion_type: "question",
-      provider: "lovable",
-      model: "google/gemini-3-flash-preview",
+      provider: logProvider,
+      model,
       status: "success",
       latency_ms: Date.now() - t0,
       input_tokens: data.usage?.prompt_tokens,
@@ -172,8 +174,8 @@ Return JSON: { "question": "..." }`;
     log?.(`${status}: ${errMsg}`);
     logAttempt?.({
       companion_type: "question",
-      provider: "lovable",
-      model: "google/gemini-3-flash-preview",
+      provider: logProvider,
+      model,
       status,
       latency_ms: Date.now() - t0,
       error_message: errMsg,

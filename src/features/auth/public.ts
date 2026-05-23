@@ -22,6 +22,7 @@ export {
   checkSignupGateForApp,
   resetPasswordForEmail,
   signInWithEmailPassword,
+  signInWithOAuthGoogle,
   signUpWithEmailPassword,
   subscribePasswordRecoveryReady,
   updateUserEmail,

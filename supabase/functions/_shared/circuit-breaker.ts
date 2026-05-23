@@ -22,7 +22,7 @@ import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2
  * coherent regardless of which instance renders them.
  */
 
-export type Provider = "perplexity" | "lovable";
+export type Provider = "perplexity" | "google";
 
 export interface ProviderState {
   state: "ok" | "degraded";
@@ -62,7 +62,7 @@ function emptyHealth(windowMinutes: number): ProviderHealth {
     errors: 0,
     windowMinutes,
   };
-  return { perplexity: { ...s }, lovable: { ...s } };
+  return { perplexity: { ...s }, google: { ...s } };
 }
 
 /**
@@ -104,7 +104,7 @@ export async function getProviderHealth(
     const rows = data as Array<{ provider: string | null; status: string | null }>;
     const agg: Record<Provider, { successes: number; errors: number }> = {
       perplexity: { successes: 0, errors: 0 },
-      lovable: { successes: 0, errors: 0 },
+      google: { successes: 0, errors: 0 },
     };
 
     for (const row of rows) {
@@ -116,7 +116,7 @@ export async function getProviderHealth(
 
     const health: ProviderHealth = {
       perplexity: buildState(agg.perplexity, opts),
-      lovable: buildState(agg.lovable, opts),
+      google: buildState(agg.google, opts),
     };
 
     cache = { at: now, health };
@@ -130,8 +130,15 @@ function normalizeProvider(raw: string | null | undefined): Provider | null {
   if (!raw) return null;
   const lower = raw.toLowerCase();
   if (lower === "perplexity") return "perplexity";
-  // "lovable", "lovable-ai", "google" (some older rows) all roll up to lovable.
-  if (lower === "lovable" || lower === "lovable-ai" || lower === "google") return "lovable";
+  // Gemini-family: direct Google, OpenRouter, and legacy Lovable gateway rows.
+  if (
+    lower === "google" ||
+    lower === "openrouter" ||
+    lower === "lovable" ||
+    lower === "lovable-ai"
+  ) {
+    return "google";
+  }
   return null;
 }
 
@@ -158,11 +165,12 @@ function buildState(
  */
 export async function degradedProviders(
   svcClient: SupabaseClient,
-  providers: Provider[],
+  providers: Array<Provider | "lovable">,
   options?: BreakerOptions,
 ): Promise<Provider[]> {
+  const normalized = [...new Set(providers.map((p) => (p === "lovable" ? "google" : p)))];
   const health = await getProviderHealth(svcClient, options);
-  return providers.filter((p) => health[p].state === "degraded");
+  return normalized.filter((p) => health[p].state === "degraded");
 }
 
 /** For tests only. */

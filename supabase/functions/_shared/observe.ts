@@ -28,6 +28,13 @@ const DEFAULT_COST_MAP: Record<string, [number, number]> = {
   // Gemini image model bills output tokens at a premium (~1290 output tokens
   // per image → ~$0.039 / image). Input stays at text-prompt rates.
   "google/gemini-2.5-flash-image": [0.3, 30],
+  // OpenRouter routes — same list rates as direct Google for cost estimation.
+  "openrouter/google/gemini-2.5-flash": [0.3, 2.5],
+  "openrouter/google/gemini-2.5-flash-lite": [0.1, 0.4],
+  // Direct Google OpenAI-compat ids (no google/ prefix in API body).
+  "gemini-2.5-flash": [0.3, 2.5],
+  "gemini-2.5-flash-lite": [0.1, 0.4],
+  "gemini-2.0-flash": [0.5, 3.0],
 };
 
 /** USD per Chat Completions API request (Perplexity bills separately from tokens). */

@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 /** Matches `screens/admin/lib/admin-query-namespace` — keep in sync if the prefix changes. */
 const ADMIN_QUERY_PREFIX = ['admin'] as const;
 
-export type Provider = 'perplexity' | 'lovable';
+export type Provider = 'perplexity' | 'google';
 
 export interface ProviderStat {
   state: 'ok' | 'degraded' | 'insufficient_sample';
@@ -29,14 +29,21 @@ function normalize(raw: string | null): Provider | null {
   if (!raw) return null;
   const lower = raw.toLowerCase();
   if (lower === 'perplexity') return 'perplexity';
-  if (lower === 'lovable' || lower === 'lovable-ai' || lower === 'google') return 'lovable';
+  if (
+    lower === 'google' ||
+    lower === 'openrouter' ||
+    lower === 'lovable' ||
+    lower === 'lovable-ai'
+  ) {
+    return 'google';
+  }
   return null;
 }
 
 function summarize(rows: AttemptRow[]): Record<Provider, ProviderStat> {
   const agg: Record<Provider, { successes: number; errors: number }> = {
     perplexity: { successes: 0, errors: 0 },
-    lovable: { successes: 0, errors: 0 },
+    google: { successes: 0, errors: 0 },
   };
   for (const r of rows) {
     const p = normalize(r.provider);
@@ -47,7 +54,7 @@ function summarize(rows: AttemptRow[]): Record<Provider, ProviderStat> {
   const out = {} as Record<Provider, ProviderStat>;
   const minSample = PROVIDER_HEALTH_MIN_SAMPLE;
   const threshold = PROVIDER_HEALTH_ERROR_RATE_THRESHOLD;
-  for (const p of ['perplexity', 'lovable'] as Provider[]) {
+  for (const p of ['perplexity', 'google'] as Provider[]) {
     const sample = agg[p].successes + agg[p].errors;
     const errorRate = sample === 0 ? 0 : agg[p].errors / sample;
     let state: ProviderStat['state'] = 'ok';

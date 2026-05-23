@@ -30,6 +30,16 @@ export async function signInWithEmailPassword(
   return { error: error ?? null };
 }
 
+export async function signInWithOAuthGoogle(
+  redirectTo: string,
+): Promise<AuthMutationResult> {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo },
+  });
+  return { error: error ?? null };
+}
+
 export async function resetPasswordForEmail(
   email: string,
   redirectTo: string,

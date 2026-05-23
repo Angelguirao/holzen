@@ -20,7 +20,7 @@ import {
 export function ProviderHealthCard() {
   const { data: stats, isPending: loading } = useQuery(getProviderHealthQueryOptions());
 
-  const providers: Provider[] = useMemo(() => ['perplexity', 'lovable'], []);
+  const providers: Provider[] = useMemo(() => ['perplexity', 'google'], []);
 
   return (
     <section className="space-y-2">
@@ -68,7 +68,7 @@ function ProviderTile({ name, stat }: { name: Provider; stat: ProviderStat | und
     >
       <div className="flex items-center justify-between mb-1">
         <span className="text-[10px] font-mono uppercase tracking-wider text-foreground/80">
-          {name}
+          {name === 'google' ? 'gemini' : name}
         </span>
         {isDegraded ? (
           <span className="flex items-center gap-1 text-[9px] font-mono text-destructive">

@@ -3,19 +3,19 @@ import { useSearchParams } from 'react-router-dom';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { X, Info } from 'lucide-react';
-import { lovable } from '@/integrations/lovable/index';
-import { Button } from '@/components/ui/button';
-import { LoadingButton } from '@/components/ui/loading-button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { useTranslation } from 'react-i18next';
 import {
   checkSignupGateForApp,
   resetPasswordForEmail,
   signInWithEmailPassword,
+  signInWithOAuthGoogle,
   signUpWithEmailPassword,
 } from '@/features/auth/public';
+import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import { PageHeading } from '@/components/ui/page-heading';
 
 type AuthView = 'sign-in' | 'sign-up' | 'forgot-password';
@@ -88,8 +88,13 @@ const AuthScreen = () => {
 
   const handleGoogle = async () => {
     setError(null);
-    const { error } = await lovable.auth.signInWithOAuth('google', { redirect_uri: window.location.origin });
-    if (error) setError(error.message);
+    setLoading(true);
+    try {
+      const { error } = await signInWithOAuthGoogle(window.location.origin);
+      if (error) setError(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (confirmSent) {

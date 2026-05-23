@@ -12,6 +12,7 @@ import {
 } from "../_shared/subscription-entitlements.ts";
 import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "../_shared/ai-user-messages.ts";
 import { generateQuestion } from "../_shared/generators/question.ts";
+import { resolveLlmCredentialChain, resolveLlmBudgetTier } from "../_shared/llm-gateway.ts";
 import { determineSessionIntent } from "../_shared/session-intent.ts";
 import { selectIntervention, parseDirection, bucketSeverity, type InterventionSelection } from "../_shared/intervention-selector.ts";
 import { fetchGroundingSourcesForOrchestrate } from "../_shared/pause-cron-parity.ts";
@@ -211,7 +212,7 @@ serve(
     log(`session intent: ${intent.theme}`, { theme: intent.theme, tone: intent.emotionalTone });
 
     // ── Intervention selection (new pause flow) ──
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") ?? "";
+    const llm = resolveLlmCredentialChain()[0] ?? null;
 
     let selection: InterventionSelection | null = null;
     if (useIntervention && pauseInstanceId) {
@@ -408,14 +409,15 @@ serve(
     const rawSeverityForQuestion = typeof body.severity === "number" ? body.severity : 0;
     const severityBucketForQuestion = bucketSeverity(rawSeverityForQuestion);
     const questionPromise =
-      selection?.mode === "question" && LOVABLE_API_KEY
+      selection?.mode === "question" && llm
         ? generateQuestion({
             context: contextValue ?? "",
             mood: moodValue,
             direction: directionForQuestion,
             severity: severityBucketForQuestion,
             moodHistory,
-            apiKey: LOVABLE_API_KEY,
+            apiKey: llm.apiKey,
+            llm,
             language: languageValue,
             svcClient,
             userId,
@@ -428,17 +430,18 @@ serve(
     // signal/grounding/history skip the Perplexity-dependent live phase;
     // Lovable degraded affects all four (structuring + zoom-out).
     // Cache + library + curated fallback still serve in both cases.
+    const budgetTier = await resolveLlmBudgetTier(svcClient);
     const providerHealth = await getProviderHealth(svcClient);
     const skipLivePerplexity = providerHealth.perplexity.state === "degraded";
-    const skipLiveLovable = providerHealth.lovable.state === "degraded";
-    if (skipLivePerplexity || skipLiveLovable) {
+    const skipLiveGemini = providerHealth.google.state === "degraded";
+    if (skipLivePerplexity || skipLiveGemini) {
       log(
         `circuit breaker: perplexity=${providerHealth.perplexity.state} ` +
           `(${(providerHealth.perplexity.errorRate * 100).toFixed(0)}% err over ` +
           `${providerHealth.perplexity.sample} calls), ` +
-          `lovable=${providerHealth.lovable.state} ` +
-          `(${(providerHealth.lovable.errorRate * 100).toFixed(0)}% err over ` +
-          `${providerHealth.lovable.sample} calls)`,
+          `google=${providerHealth.google.state} ` +
+          `(${(providerHealth.google.errorRate * 100).toFixed(0)}% err over ` +
+          `${providerHealth.google.sample} calls), budget=${budgetTier}`,
       );
     }
 
@@ -466,7 +469,8 @@ serve(
       recentHistoryTitlesValue,
       recentZoomOutTitlesValue,
       skipLivePerplexity,
-      skipLiveLovable,
+      skipLiveGemini,
+      budgetTier,
       trackedAssetId,
       incomingRequest: req,
     });

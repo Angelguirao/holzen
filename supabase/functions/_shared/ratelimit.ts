@@ -375,7 +375,7 @@ export async function guardAiFeature(
      * skip AI in email, cached-only, etc.). Companion-orchestrate does its
      * own per-provider skip since it runs multiple generators in parallel.
      */
-    providers?: Array<"perplexity" | "lovable">;
+    providers?: Array<"perplexity" | "google" | "lovable">;
   },
 ): Promise<{
   allowed: boolean;
@@ -386,7 +386,7 @@ export async function guardAiFeature(
     | "feature_flag"
     | "panic_mode"
     | "breaker_perplexity"
-    | "breaker_lovable";
+    | "breaker_google";
 }> {
   try {
     const { loadAppConfig, isFeatureEnabled, PANIC_MODE_FEATURES } = await import(
@@ -408,14 +408,17 @@ export async function guardAiFeature(
 
     if (options?.providers && options.providers.length > 0) {
       const { degradedProviders } = await import("./circuit-breaker.ts");
-      const degraded = await degradedProviders(svcClient, options.providers);
+      const normalized = [...new Set(
+        options.providers.map((p) => (p === "lovable" ? "google" : p)),
+      )] as Array<"perplexity" | "google">;
+      const degraded = await degradedProviders(svcClient, normalized);
       if (degraded.length > 0) {
         const p = degraded[0];
         return {
           allowed: false,
           reason: `Provider '${p}' degraded — skipping live AI for '${feature}'`,
           status: 503,
-          tripped: p === "perplexity" ? "breaker_perplexity" : "breaker_lovable",
+          tripped: p === "perplexity" ? "breaker_perplexity" : "breaker_google",
         };
       }
     }
