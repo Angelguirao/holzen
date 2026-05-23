@@ -2968,6 +2968,10 @@ export type Database = {
         Returns: Json
       }
       pause_sweep_window_elapsed: { Args: never; Returns: number }
+      pause_expire_cron_volatility_context_lost: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
