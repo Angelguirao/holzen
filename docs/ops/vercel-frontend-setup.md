@@ -4,7 +4,49 @@ Holzen is a **Vite + React SPA** with client-side routing (`react-router-dom`). 
 
 Netlify and Cloudflare Pages work too — same build output (`dist/`). We document Vercel first because it matches how most teams deploy Vite/React apps and avoids a separate CI deploy job when the GitHub integration is enabled.
 
-**Related:** [production-supabase-setup.md](production-supabase-setup.md), [platform-exit-runbook.md](platform-exit-runbook.md), [vercel.json](../../vercel.json).
+**Related:** [production-supabase-setup.md](production-supabase-setup.md), [platform-exit-runbook.md](platform-exit-runbook.md), [branch-model.md](branch-model.md), [vercel.json](../../vercel.json).
+
+---
+
+## Architecture: hybrid by design
+
+Holzen does **not** run the full stack on one PaaS. After platform exit the split is intentional:
+
+| Layer | Owner | What it runs |
+|-------|--------|----------------|
+| **Frontend** | Vercel (recommended) or equivalent static host | Vite build → `dist/` SPA, CDN, SPA rewrites, PWA `sw.js` |
+| **Backend** | Owned **Supabase** | Postgres, Auth, RLS, Edge Functions, `pg_cron` |
+| **Backend deploy** | **GitHub Actions** | `db push` + `functions deploy` ([deploy-production.yml](../../.github/workflows/deploy-production.yml)) |
+
+The browser talks to Supabase (Postgres + `invokeEdge`). Auth, AI, email, and cron live on **Edge**, not on the frontend host. Picking a frontend provider is therefore about **static asset delivery and preview DX** — not about replacing Supabase.
+
+---
+
+## Choosing a frontend host: Vercel vs Render vs Cloudflare
+
+All three can serve the same artifact: `npm run build` → `dist/` with SPA fallback to `index.html`. [vercel.json](../../vercel.json) is the reference config; Netlify/Cloudflare equivalents are a rewrite rule + cache headers.
+
+| Criterion | **Vercel** (recommended) | **Render Static Sites** | **Cloudflare Pages** |
+|-----------|--------------------------|-------------------------|----------------------|
+| **Fit for Holzen today** | Strong — Vite SPA, no SSR, no Node server in active `src/` | Adequate — same static output; platform strengths (Docker, workers, Redis) unused | Strong — cheap CDN; slightly more DIY for previews/observability |
+| **PR preview URLs** | Native GitHub integration | Basic; less polished than Vercel | Supported; config differs |
+| **Rollback** | Promote prior deployment in UI | Redeploy prior commit | Rollback to prior deployment |
+| **Release correlation** | `$VERCEL_GIT_COMMIT_SHA` → `VITE_APP_VERSION` | Set via CI env at build time | `$CF_PAGES_COMMIT_SHA` or CI |
+| **PWA / deep links** | Documented in §4 below | Same rewrite pattern | Same; watch Worker vs Pages routing |
+| **When it wins** | Default for team velocity + docs already in-repo | You later add a **Render Web Service** (BFF, workers, Redis) on the same vendor | Cost/bandwidth at scale; future **Workers** at the edge |
+
+### Why not move “backend” to Render?
+
+Render excels at **long-running services** (Node API, containers, background workers). Holzen’s active path uses **Supabase Edge Functions** and **Postgres** — moving API work to Render would add a third runtime without removing Supabase. Only consider a Render **Web Service** if you introduce a dedicated BFF or workloads Edge cannot host (long CPU, large stateful processes, non-HTTP workers).
+
+### When to reconsider Vercel
+
+- **Cost or limits** — build minutes, bandwidth, or seat pricing at your scale
+- **Compliance** — data residency or vendor requirements Vercel cannot meet
+- **New server tier** — SSR, Remix, or a Node BFF that should not run on Edge
+- **Single-vendor preference** — you deliberately want static site + API + Redis on Render (accept operating two backends: Render + Supabase until you migrate more)
+
+Until one of those applies, **Vercel + Supabase + GitHub Actions** is the documented hybrid; changing frontend host is a config swap, not an architecture rewrite.
 
 ---
 
