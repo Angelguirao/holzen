@@ -213,8 +213,8 @@ If none apply, prefer a **boundary** (lower state, memo shell, lazy branch) inst
 | Hook | Surfaces | Status |
 |------|----------|--------|
 | `useOptimistic` | Profile toggles; snooze; push subscribe; pause favorite; companion vote; ritual favorite | **Done** |
-| `useActionState` | Settings: email, password, feedback, export, delete, sign-out; Home testimonial; Auth email/forgot; reset-password; email unsubscribe | **Done** |
-| `useTransition` | Companion vote; push subscribe; credits refresh; subscription checkout/trial/portal; Auth Google OAuth; onboarding trial start | **Done** |
+| `useActionState` | Settings: email, password, feedback, export, delete, sign-out; Home testimonial; Auth email/forgot; reset-password; email unsubscribe; app `FeedbackWidget` (error boundary) | **Done** |
+| `useTransition` | Companion vote; push subscribe; credits refresh; subscription checkout/trial/portal; Auth Google OAuth; onboarding trial start; Home manual pause trigger; bulk-hold apply | **Done** |
 | React Compiler `"use memo"` | All home + pause `components/**` presentation exports (excl. `render*` helpers) | **Done** (annotation mode) |
 
 **Explicitly out of scope (by design):** companion slot orchestration loading (`setCompanionSlotLoading`), pause ritual step mutations, TanStack Query fetch paths, admin bulk tools — keep existing patterns until a deliberate vertical slice.

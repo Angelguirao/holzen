@@ -50,8 +50,8 @@ Expo SDK 54 is **not** a Holzen signal — shipped product is a Vite SPA on Lova
 ## Consequences
 
 - **Positive:** Reviewers have a single policy; migration PRs avoid compiler/React 19 churn; Home remains the reference boundary pattern.
-- **Negative:** Manual memo boilerplate persists until Compiler pilot; no Actions-based form UX until React 19 track.
-- **Follow-ups:** PR checklist in [modern-react-practices-holzen.md](../fundamentals/modern-react-practices-holzen.md) §6; pilot candidates documented in §2.9 of same file.
+- **Negative:** Manual memo boilerplate persists until Compiler `infer` mode; companion orchestration keeps imperative loading by design.
+- **Follow-ups:** Profile home/pause before `compilationMode: 'infer'`; PR checklist in [modern-react-practices-holzen.md](../fundamentals/modern-react-practices-holzen.md) §6.
 
 ## Recovery
 

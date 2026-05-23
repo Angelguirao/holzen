@@ -56,6 +56,25 @@ describe('submitFeedbackAction', () => {
     await expect(submitFeedbackAction({}, formData)).resolves.toEqual({ success: true });
   });
 
+  it('forwards optional error-boundary diagnostic fields', async () => {
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
+    vi.mocked(sendFeedback).mockResolvedValueOnce({ error: null });
+    const formData = new FormData();
+    formData.set('category', 'bug');
+    formData.set('message', 'Crash on Home');
+    formData.set('sentry_event_id', 'evt-1');
+    formData.set('error_stack', 'Error: boom');
+    formData.set('posthog_session_id', 'ph-sess');
+    await expect(submitFeedbackAction({}, formData)).resolves.toEqual({ success: true });
+    expect(sendFeedback).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sentry_event_id: 'evt-1',
+        error_stack: 'Error: boom',
+        posthog_session_id: 'ph-sess',
+      }),
+    );
+  });
+
   it('surfaces send failures', async () => {
     vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
     vi.mocked(sendFeedback).mockResolvedValueOnce({ error: new Error('network') });
