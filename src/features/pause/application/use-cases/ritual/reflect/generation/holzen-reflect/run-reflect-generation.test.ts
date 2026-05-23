@@ -28,6 +28,7 @@ const noopReflectGeneratorExtras = {
   fetchHaikuText: vi.fn(),
   fetchLatestReflectStep: vi.fn(),
   loadRecencyHints: vi.fn().mockResolvedValue(emptyRecencyHints),
+  persistReflectionArtifacts: vi.fn().mockResolvedValue(undefined),
 };
 
 describe('runReflectGeneration', () => {

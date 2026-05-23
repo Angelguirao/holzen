@@ -3,7 +3,7 @@ import {
   runCompanionSlotOrchestrate,
   type RunCompanionSlotOrchestratePorts,
 } from './run-companion-slot-orchestrate';
-import type { CompanionOrchestrateSessionContext } from '../ritual/frame/build-companion-orchestrate-body';
+import type { CompanionOrchestrateSessionContext } from './build-companion-orchestrate-body';
 
 const session: CompanionOrchestrateSessionContext = {
   pauseInstanceId: 'pause-abc',
@@ -23,6 +23,7 @@ function ports(
     invoke,
     loadSignalSources: vi.fn(async () => [{ name: 'Src', type: 'rss', url: 'https://a.test' }]),
     loadGroundingSources: vi.fn(async () => []),
+    invokeIntervention: vi.fn(async () => ({ data: null, error: null })),
     ...overrides,
   };
 }
