@@ -23,7 +23,7 @@ const shellInput = {
   waitingForFetch: false,
   pauseInstanceIdForTerminal: 'inst-1',
   fetchedInstance: null,
-  companions: [],
+  companions: { haiku: null, groundingTitle: null, groundingBody: null },
   companionPrefs: {
     breathing: true,
     haiku: true,

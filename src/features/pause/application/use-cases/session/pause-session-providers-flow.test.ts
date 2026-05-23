@@ -22,7 +22,7 @@ describe('pause-session-providers-flow', () => {
       dismissMessage,
       message: null,
       context: null,
-      companions: {},
+      companions: { haiku: null, groundingTitle: null, groundingBody: null },
       lastPauseInstanceId: null,
       companionPrefs: {
         breathing: true,
@@ -32,7 +32,7 @@ describe('pause-session-providers-flow', () => {
         zoomOut: false,
         history: false,
       },
-      severity: 'low',
+      severity: 'mild',
       profileLoaded: false,
       resyncOpenPauseFromDb,
       btcData: null,
