@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Activity, ChevronRight, ZoomOut } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   resolveEffectiveReflectionCopy,
@@ -9,20 +9,35 @@ import {
   usePauseArtifactHaiku,
   usePauseArtifactReflectionText,
 } from '@/features/pause/public-ritual-reflect';
+import {
+  getCompanionSectionVisibility,
+  type CompanionData,
+  type CompanionPrefs,
+} from '@/features/pause/public-ritual-frame';
 import { pauseStepLayout } from '@/features/pause/public-session';
 import { hapticFeedback } from '@/lib/haptics';
+import { COMPANION_SECTION_ICONS } from '@/screens/pause/components/companion/companion-section-icons';
 import { PauseFrameHaikuCard } from '@/screens/pause/components/pause-frame-haiku-card';
 import { PauseFrameToolRow } from '@/screens/pause/components/pause-frame-tool-row';
 
 export interface PauseFrameProps {
   pauseInstanceId: string | null;
   reflectionMessage: string;
-  /** When false, hide the haiku row (profile companion toggle). */
-  companionHaikuEnabled: boolean;
+  companionPrefs: CompanionPrefs;
+  /** Used for visibility parity with inline `CompanionSection` orchestrated slots. */
+  companions: CompanionData;
   isFavorite: boolean;
   onToggleFavorite: () => void;
   subscribed: boolean;
   onImDone: () => void;
+}
+
+function companionFullViewHref(
+  pauseInstanceId: string | null,
+  segment: 'signal' | 'grounding' | 'zoom-out' | 'history',
+): string {
+  if (!pauseInstanceId) return '/pause';
+  return `/companion/${segment}/${pauseInstanceId}`;
 }
 
 /**
@@ -32,13 +47,15 @@ export interface PauseFrameProps {
 export function PauseFrame({
   pauseInstanceId,
   reflectionMessage,
-  companionHaikuEnabled,
+  companionPrefs,
+  companions,
   isFavorite,
   onToggleFavorite,
   subscribed,
   onImDone,
 }: PauseFrameProps) {
   const { t } = useTranslation();
+  const companionHaikuEnabled = companionPrefs.haiku;
   const sessionSeedEmpty = !reflectionMessage.trim();
   const { artifactReflectionText } = usePauseArtifactReflectionText({
     pauseInstanceId,
@@ -59,8 +76,15 @@ export function PauseFrame({
     fetchEnabled: haikuOpen,
   });
 
-  const zoomHref = pauseInstanceId ? `/companion/zoom-out/${pauseInstanceId}` : '/pause';
-  const signalHref = pauseInstanceId ? `/companion/signal/${pauseInstanceId}` : '/pause';
+  const { hasSignal, hasGrounding, hasZoomOut, hasHistory } = useMemo(
+    () => getCompanionSectionVisibility(companionPrefs, companions, pauseInstanceId),
+    [companionPrefs, companions, pauseInstanceId],
+  );
+
+  const SignalIcon = COMPANION_SECTION_ICONS.signal;
+  const GroundingIcon = COMPANION_SECTION_ICONS.grounding;
+  const ZoomOutIcon = COMPANION_SECTION_ICONS.zoomOut;
+  const HistoryIcon = COMPANION_SECTION_ICONS.history;
 
   /** Haiku is optional and lazy-loaded — do not require nav reflection seed (matches Reflect artifact pattern). */
   const showHaikuCard = companionHaikuEnabled && Boolean(pauseInstanceId);
@@ -98,16 +122,37 @@ export function PauseFrame({
           />
         ) : null}
 
-        <PauseFrameToolRow
-          icon={<ZoomOut className="h-5 w-5 text-primary" aria-hidden />}
-          label={t('pause.frame.zoomOut', { defaultValue: 'Zoom out' })}
-          href={zoomHref}
-        />
-        <PauseFrameToolRow
-          icon={<Activity className="h-5 w-5 text-primary" aria-hidden />}
-          label={t('pause.frame.signal', { defaultValue: 'Signal' })}
-          href={signalHref}
-        />
+        {hasSignal ? (
+          <PauseFrameToolRow
+            icon={<SignalIcon className="h-5 w-5 text-primary" aria-hidden />}
+            label={t('pause.frame.signal', { defaultValue: 'Signal' })}
+            href={companionFullViewHref(pauseInstanceId, 'signal')}
+          />
+        ) : null}
+
+        {hasGrounding ? (
+          <PauseFrameToolRow
+            icon={<GroundingIcon className="h-5 w-5 text-primary" aria-hidden />}
+            label={t('pause.frame.ground', { defaultValue: 'Ground yourself' })}
+            href={companionFullViewHref(pauseInstanceId, 'grounding')}
+          />
+        ) : null}
+
+        {hasZoomOut ? (
+          <PauseFrameToolRow
+            icon={<ZoomOutIcon className="h-5 w-5 text-primary" aria-hidden />}
+            label={t('pause.frame.zoomOut', { defaultValue: 'Zoom out' })}
+            href={companionFullViewHref(pauseInstanceId, 'zoom-out')}
+          />
+        ) : null}
+
+        {hasHistory ? (
+          <PauseFrameToolRow
+            icon={<HistoryIcon className="h-5 w-5 text-primary" aria-hidden />}
+            label={t('pause.frame.lookBack', { defaultValue: 'Look back' })}
+            href={companionFullViewHref(pauseInstanceId, 'history')}
+          />
+        ) : null}
       </div>
 
       <div className="mt-10 flex w-full justify-center">
