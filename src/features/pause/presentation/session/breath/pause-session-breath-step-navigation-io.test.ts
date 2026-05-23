@@ -25,6 +25,6 @@ describe('pause-session-breath-step-navigation-io', () => {
     expect(claimBriefIntegrateAdvance(false)).toEqual({ canAdvance: true, nextLocked: true });
     expect(claimBriefIntegrateAdvance(true)).toEqual({ canAdvance: false, nextLocked: true });
     expect(shouldResetBriefIntegrateAdvanceGuard('brief', 'integrate')).toBe(true);
-    expect(shouldResetBriefIntegrateAdvanceGuard('brief', 'breathe')).toBe(false);
+    expect(shouldResetBriefIntegrateAdvanceGuard('brief', 'breath')).toBe(false);
   });
 });
