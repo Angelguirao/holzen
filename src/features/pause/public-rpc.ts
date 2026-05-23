@@ -39,6 +39,7 @@ import { runPauseDismissCurrent } from './application/use-cases/session/run-paus
 import type { RunReflectGenerationInput } from './application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation';
 import type { ReflectGenerationResult } from './domain/reflect/generation/reflect-generation-result';
 import type { PauseRepository } from './ports/pause-repository';
+import type { PauseState } from './domain/pause-state';
 import { showPauseStepSyncFailedToast } from './presentation/ritual/pause-step-sync-toast';
 
 export type { RunReflectGenerationInput, ReflectGenerationResult };
