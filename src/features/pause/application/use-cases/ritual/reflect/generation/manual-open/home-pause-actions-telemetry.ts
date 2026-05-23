@@ -1,6 +1,6 @@
 import { trackEvent } from '@/features/pause/application/pause-product-analytics';
 
-export type PauseDismissAnalyticsSurface = 'home_zen_reflection' | 'home_your_pause_widget';
+export type PauseDismissAnalyticsSurface = 'home_your_pause_widget';
 
 export type OpenPauseStateForAnalytics = 'active' | 'engaged';
 

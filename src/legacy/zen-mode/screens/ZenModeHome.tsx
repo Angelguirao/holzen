@@ -169,8 +169,8 @@ export function ZenModeHome({
             className="text-center"
           >
             {hasAccess && !showLimitUpsell ? (
+              <div className="mx-auto max-w-sm text-center">
               <HomePauseEmptyFlow
-                variant="zen"
                 showPauseScheduling={showPauseScheduling}
                 autoCooldownRemaining={autoCooldownRemaining}
                 cooldownHours={cooldownHours}
@@ -179,6 +179,7 @@ export function ZenModeHome({
                 manualCooldownRemaining={manualCooldownRemaining}
                 pauseLoading={loading}
               />
+              </div>
             ) : (
               <>
                 <p className="text-sm text-muted-foreground font-mono leading-relaxed max-w-[280px] mx-auto">

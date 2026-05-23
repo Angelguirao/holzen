@@ -112,7 +112,7 @@ function Parent() {
 }
 ```
 
-Holzen **`Home`** keeps many hooks **above** `if (!profileLoaded)` so order never flips; that means **Zen mode still runs some “dashboard” hooks** even when Zen UI is showing — we accept that tradeoff and **memoize** the dashboard so work stays cheap. The [Home screen doc](../screens/home.md) describes that.
+Holzen **`Home`** keeps many hooks **above** `if (!profileLoaded)` so order never flips. **Zen mode** was quarantined to `src/legacy/zen-mode/` (not MVP); the guided tour below may still mention Zen for historical context — see [Home screen doc](../screens/home.md).
 
 ---
 

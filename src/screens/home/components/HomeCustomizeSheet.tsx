@@ -4,7 +4,6 @@ import { GripVertical } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
 import {
@@ -35,8 +34,6 @@ export interface HomeCustomizeSheetProps {
   onSetVisible: (id: string, value: boolean) => void;
   sectionTitle: (id: string) => string;
   sectionDescription: (id: string) => string;
-  zenMode: boolean;
-  onZenModeChange: (zen: boolean) => void;
   onResetAll: () => void;
   /** When true, Night reflection toggle is disabled (e.g. not Pro). */
   nightToggleDisabled?: boolean;
@@ -160,8 +157,6 @@ export function HomeCustomizeSheet({
   onSetVisible,
   sectionTitle,
   sectionDescription,
-  zenMode,
-  onZenModeChange,
   onResetAll,
   nightToggleDisabled,
   dndRemountKey = 0,
@@ -194,8 +189,6 @@ export function HomeCustomizeSheet({
 
   const tailOrder = order.filter((id) => id !== GOAL_WHY_SECTION_ID);
 
-  const modeValue = zenMode ? 'zen' : 'hold';
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="max-h-[88vh] overflow-y-auto rounded-t-2xl pb-8 pt-6">
@@ -209,44 +202,6 @@ export function HomeCustomizeSheet({
         </SheetHeader>
 
         <div className="mt-6 space-y-6">
-          <section className="space-y-3" aria-labelledby="home-customize-mode">
-            <h3 id="home-customize-mode" className={cn(homeInWidget.kickerAccent, 'text-xs')}>
-              {t('home.customizeSheet.modeHeading')}
-            </h3>
-            <RadioGroup
-              value={modeValue}
-              onValueChange={(v) => onZenModeChange(v === 'zen')}
-              className="grid gap-3"
-            >
-              <label
-                htmlFor="home-mode-hold"
-                className={cn(
-                  'flex cursor-pointer gap-3 rounded-xl border border-border/60 bg-card/40 p-4 transition-colors hover:bg-muted/30',
-                  modeValue === 'hold' && 'border-ring bg-muted/50 ring-1 ring-ring/40',
-                )}
-              >
-                <RadioGroupItem id="home-mode-hold" value="hold" className="mt-0.5 shrink-0" />
-                <div className="min-w-0 space-y-1">
-                  <p className="text-sm font-medium text-foreground">{t('home.customizeSheet.holdModeTitle')}</p>
-                  <p className="text-xs leading-snug text-muted-foreground">{t('home.customizeSheet.holdModeDesc')}</p>
-                </div>
-              </label>
-              <label
-                htmlFor="home-mode-zen"
-                className={cn(
-                  'flex cursor-pointer gap-3 rounded-xl border border-border/60 bg-card/40 p-4 transition-colors hover:bg-muted/30',
-                  modeValue === 'zen' && 'border-ring bg-muted/50 ring-1 ring-ring/40',
-                )}
-              >
-                <RadioGroupItem id="home-mode-zen" value="zen" className="mt-0.5 shrink-0" />
-                <div className="min-w-0 space-y-1">
-                  <p className="text-sm font-medium text-foreground">{t('home.customizeSheet.zenModeTitle')}</p>
-                  <p className="text-xs leading-snug text-muted-foreground">{t('home.customizeSheet.zenModeDesc')}</p>
-                </div>
-              </label>
-            </RadioGroup>
-          </section>
-
           <section className="space-y-3" aria-labelledby="home-customize-widgets">
             <div className="flex items-center justify-between gap-3">
               <h3 id="home-customize-widgets" className={cn(homeInWidget.kickerAccent, 'text-xs')}>

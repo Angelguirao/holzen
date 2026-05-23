@@ -38,6 +38,13 @@ Example: `WHERE created_at >= '2026-05-21T20:00:00.000Z'` on truncated tables is
 
 **DB:** `collections` / `collection_items` tables remain (account deletion, RLS); only the **client UI** was quarantined.
 
+## Home — Zen mode (legacy)
+
+| Surface | MVP shipped | Notes |
+| --- | --- | --- |
+| **Hold** dashboard (`HomeDashboardLayout`, widget customize) | Yes | Default Home |
+| **Zen** minimal reflection Home | **No (stripped)** | `src/legacy/zen-mode/`; `npm run check:active-surface` blocks Zen symbols / `holzen_zen_mode` in active `src/`. Re-enable via [zen-mode README](../../src/legacy/zen-mode/README.md) |
+
 ## Subscription
 
 | `profiles.subscription_status` | Client `entitlement` | Pause engage |

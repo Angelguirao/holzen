@@ -8,12 +8,11 @@ Authoritative orchestration: [`src/screens/home/HomeScreen.tsx`](../../src/scree
 
 | Piece | File |
 |-------|------|
-| Dashboard shell (non-Zen) | [`HomeDashboardLayout.tsx`](../../src/screens/home/components/HomeDashboardLayout.tsx) (`React.memo`) |
+| Dashboard shell | [`HomeDashboardLayout.tsx`](../../src/screens/home/components/HomeDashboardLayout.tsx) (`React.memo`) |
 | Section switch + deps type | [`render-home-dashboard-section.tsx`](../../src/screens/home/components/render-home-dashboard-section.tsx) |
 | Pull-to-refresh row | [`HomePullRefreshIndicator.tsx`](../../src/screens/home/components/HomePullRefreshIndicator.tsx) |
 | Customize link button | [`HomeCustomizeLinkButton.tsx`](../../src/screens/home/components/HomeCustomizeLinkButton.tsx) |
-| Zen lazy route (Suspense + `React.lazy`) | [`HomeZenModeRoute.tsx`](../../src/screens/home/components/HomeZenModeRoute.tsx) |
-| Zen layout | [`ZenModeHome.tsx`](../../src/screens/home/components/ZenModeHome.tsx) |
+| Zen mode (not MVP) | [`src/legacy/zen-mode/`](../../src/legacy/zen-mode/README.md) |
 | Pause widget body | [`HomePauseCardBody.tsx`](../../src/screens/home/components/HomePauseCardBody.tsx) |
 | Pause error panel | [`HomePauseBlockingErrorPanel.tsx`](../../src/screens/home/components/HomePauseBlockingErrorPanel.tsx) |
 | Context meta lines | [`HomePauseContextMeta.tsx`](../../src/screens/home/components/HomePauseContextMeta.tsx) |
@@ -22,7 +21,7 @@ Authoritative orchestration: [`src/screens/home/HomeScreen.tsx`](../../src/scree
 | Pause error surfacing | [`home-pause-widget-error.ts`](../../src/lib/home-pause-widget-error.ts) |
 | Subscription / Zen gate flags (pure) | [`home-subscription-gate.ts`](../../src/lib/home-subscription-gate.ts) |
 
-Hooks (`src/screens/home/hooks/use-home-*.ts` / `use-home-*.tsx`): checkout welcome toast, zen mode, completed pause count, outlet `pauseReady`, document title, hero quote analytics, pause arrival chime + prefetch, market display preferences (price hide, BTC mode, chart expand), **visible section ids** (`useHomeVisibleSections`), **customize sheet wiring** (`useHomeCustomizeBridge`), **market + goal/why header chevrons** (`useHomeMarketGoalHeaders`), **pause navigation + checkout** (`useHomePauseActions`), **pause card projection** (`useHomePauseCardProjection`), **Today wiring** (`useHomeDashboardTodayWiring` composes `useHomeDashboardSectionDeps` + `useHomeDashboardSectionRenderers`; section deps default an optional compact `HolzenNumber` market footer when `marketFooter` is omitted), **dashboard layout props** (`useHomeDashboardLayoutProps` — stable object for `HomeDashboardLayout`), **pause context preview parsing** (`useHomePauseContextPreviews`), **pull full reload** (`useHomePullFullReload`), **Zen route props** (`useHomeZenModeRouteProps`). App shell outlet typing: [`home-app-layout-outlet.ts`](../../src/lib/home-app-layout-outlet.ts). Layout prop surface: exported **`HomeDashboardLayoutProps`** on [`HomeDashboardLayout.tsx`](../../src/screens/home/components/HomeDashboardLayout.tsx). Use **`HOME_WIDGET_DEFAULT_ORDER`** from optional-visibility for a stable `useWidgetLayout` default-order reference. Subscription booleans for Home/Zen come from **`getHomeSubscriptionGate`** in `home-subscription-gate.ts` (Vitest-covered).
+Hooks (`src/screens/home/hooks/use-home-*.ts` / `use-home-*.tsx`): checkout welcome toast, completed pause count, outlet `pauseReady`, document title, hero quote analytics, pause arrival chime + prefetch, market display preferences (price hide, BTC mode, chart expand), **visible section ids** (`useHomeVisibleSections`), **customize sheet wiring** (`useHomeCustomizeBridge`), **market + goal/why header chevrons** (`useHomeMarketGoalHeaders`), **pause navigation + checkout** (`useHomePauseActions`), **pause card projection** (`useHomePauseCardProjection`), **Today wiring** (`useHomeDashboardTodayWiring` composes `useHomeDashboardSectionDeps` + `useHomeDashboardSectionRenderers`; section deps default an optional compact `HolzenNumber` market footer when `marketFooter` is omitted), **dashboard layout props** (`useHomeDashboardLayoutProps` — stable object for `HomeDashboardLayout`), **pause context preview parsing** (`useHomePauseContextPreviews`), **pull full reload** (`useHomePullFullReload`). App shell outlet typing: [`home-app-layout-outlet.ts`](../../src/lib/home-app-layout-outlet.ts). Layout prop surface: exported **`HomeDashboardLayoutProps`** on [`HomeDashboardLayout.tsx`](../../src/screens/home/components/HomeDashboardLayout.tsx). Use **`HOME_WIDGET_DEFAULT_ORDER`** from optional-visibility for a stable `useWidgetLayout` default-order reference. Subscription booleans for Home come from **`getHomeSubscriptionGate`** in `home-subscription-gate.ts` (Vitest-covered).
 
 ## Purpose
 
@@ -42,14 +41,15 @@ Home is the signed-in landing surface after onboarding: hero quote, optional ins
 
 ## Rendering and hooks
 
-`Home.tsx` calls **all** hooks (subscription gate, Today wiring, Zen props, dashboard layout props, and so on) **before** the `profileLoaded` / `hasOnboarded` / `zenMode` returns. That matches the **Rules of Hooks** and avoids subtle ordering bugs. Tradeoff: when Zen is on, the non-Zen dashboard hooks still run (cheap compared to reflection/market work); `HomeDashboardLayout` is **`React.memo`**, and `useHomeDashboardLayoutProps` memoizes props so the shell usually **skips re-render** when only Zen toggles.
+`HomeScreen.tsx` calls **all** hooks (subscription gate, Today wiring, dashboard layout props, and so on) **before** the `profileLoaded` / `hasOnboarded` returns. That matches the **Rules of Hooks**. `HomeDashboardLayout` is **`React.memo`**, and `useHomeDashboardLayoutProps` memoizes props for stable child updates.
 
 ## User-visible modes
 
 1. **Loading** — `!profileLoaded` → `AuthLoading`.
 2. **Onboarding** — `!hasOnboarded` → `Onboarding`.
-3. **Zen mode** — `localStorage.holzen_zen_mode`; one-time migration cleared a stale default (`holzen_zen_mode_reset_v1`). When an open pause exists, Zen shows **market context meta** (+ optional context line) and the same **Continue pause** / dismiss CTAs as the dashboard widget (not the AI reflection paragraph — that appears in `/pause` at Reflect). Otherwise: loading, **blocking errors** (persist, AI, connectivity — not price-only when cached market data exists), subscription skeleton, or empty flow. Cross-tab: `storage` listener syncs zen flag.
-4. **Full dashboard** — Hero quote, pull-to-refresh (full reload), “Today” sections driven by `visibleOrderedSectionIds` (pause-first: **goal-why**, **market**, **your-pause** only), customize sheet, testimonial prompt.
+3. **Hold dashboard** — Hero quote, pull-to-refresh (full reload), “Today” sections driven by `visibleOrderedSectionIds` (pause-first: **goal-why**, **market**, **your-pause** only), customize sheet (widget order/visibility only), testimonial prompt.
+
+**Zen mode** (minimal reflection Home, `holzen_zen_mode`) is **not MVP** — see [`src/legacy/zen-mode/`](../../src/legacy/zen-mode/README.md).
 
 ## Layout section ids (pause-first)
 

@@ -10,8 +10,6 @@ import {
 import type { HomeDashboardLayoutCustomizeProps } from '@/screens/home/components/HomeDashboardLayout';
 import { isHomeSectionAlwaysVisibleInLayout } from '@/screens/home/lib/home-section-visibility-constants';
 
-type SetZenModePersist = (zen: boolean) => void;
-
 export function useHomeCustomizeBridge(args: {
   t: TFunction;
   order: string[];
@@ -20,8 +18,6 @@ export function useHomeCustomizeBridge(args: {
   setVisible: (id: string, value: boolean) => void;
   resetLayout: () => void;
   resetSectionVisibility: () => void;
-  setZenModePersist: SetZenModePersist;
-  zenMode: boolean;
   subscribed: boolean;
 }) {
   const {
@@ -32,8 +28,6 @@ export function useHomeCustomizeBridge(args: {
     setVisible,
     resetLayout,
     resetSectionVisibility,
-    setZenModePersist,
-    zenMode,
     subscribed,
   } = args;
 
@@ -59,9 +53,8 @@ export function useHomeCustomizeBridge(args: {
     trackHomeCustomizeResetLayout();
     resetLayout();
     resetSectionVisibility();
-    setZenModePersist(false);
     setDndRemountKey((n) => n + 1);
-  }, [resetLayout, resetSectionVisibility, setZenModePersist]);
+  }, [resetLayout, resetSectionVisibility]);
 
   const onOpenChange = useCallback((next: boolean) => {
     if (next) trackHomeCustomizeOpened();
@@ -78,8 +71,6 @@ export function useHomeCustomizeBridge(args: {
       onSetVisible,
       sectionTitle,
       sectionDescription,
-      zenMode,
-      onZenModeChange: setZenModePersist,
       onResetAll,
       nightToggleDisabled: !subscribed,
       dndRemountKey,
@@ -93,8 +84,6 @@ export function useHomeCustomizeBridge(args: {
       onSetVisible,
       sectionTitle,
       sectionDescription,
-      zenMode,
-      setZenModePersist,
       onResetAll,
       subscribed,
       dndRemountKey,
