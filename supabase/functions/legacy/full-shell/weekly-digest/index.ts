@@ -9,10 +9,10 @@ import {
   type RequestLoggingContext,
 } from "../_shared/with-request-logging.ts";
 import {
-  holzenLovableEmailLogger,
-  sendLovableEmailBatch,
-  type LovableEmail,
-} from "../_shared/lovable-email.ts";
+  holzenTransactionalEmailLogger,
+  sendTransactionalEmailBatch,
+  type TransactionalEmail,
+} from "../../../_shared/transactional-email.ts";
 
 const DIGEST_MODEL = "google/gemini-2.5-flash-lite";
 
@@ -277,7 +277,7 @@ serve(
     // at the end (≤100 per chunk). That's one Lovable Email round trip instead of N
     // — faster, less rate-limit pressure, and the helper retries the batch on
     // 429/5xx.
-    const queued: LovableEmail[] = [];
+    const queued: TransactionalEmail[] = [];
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
     for (const profile of eligible) {
@@ -413,11 +413,11 @@ serve(
 
     // Idempotency key per day → cron re-runs within 24h don't double-send.
     const idempotencyDate = now.toISOString().slice(0, 10);
-    const batch = await sendLovableEmailBatch(queued, {
+    const batch = await sendTransactionalEmailBatch(queued, {
       apiKey: LOVABLE_EMAIL_API_KEY,
       source: "weekly-digest",
       idempotencyKey: `weekly-digest:${idempotencyDate}`,
-      logger: holzenLovableEmailLogger(
+      logger: holzenTransactionalEmailLogger(
         (m, d) =>
           log("lovable_email_dep", {
             holzen_event: "weekly_digest_cron",

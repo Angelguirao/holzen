@@ -6,9 +6,9 @@ import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2
 import webpush from "https://esm.sh/web-push@3.6.7";
 import { sendWebPushWithCid, type PushSubscriptionRecord } from "./cid-clients.ts";
 import {
-  holzenLovableEmailLogger,
-  sendLovableEmailMessage,
-} from "./lovable-email.ts";
+  holzenTransactionalEmailLogger,
+  sendTransactionalEmail,
+} from "./transactional-email.ts";
 import { unknownErrorForLog, webPushStatusCode } from "./log-unknown-error.ts";
 import type { RequestLoggingContext } from "./with-request-logging.ts";
 
@@ -106,7 +106,7 @@ async function sendPauseOfferEmail(
     </html>
   `;
 
-  const result = await sendLovableEmailMessage(
+  const result = await sendTransactionalEmail(
     {
       from: "Holzen <notify@holzen.app>",
       to: [email],
@@ -116,7 +116,7 @@ async function sendPauseOfferEmail(
     {
       source: "volatility-email",
       idempotencyKey: `volatility:${pauseInstanceId}`,
-      logger: holzenLovableEmailLogger(
+      logger: holzenTransactionalEmailLogger(
         (m, d) =>
           log("notifications_deliver_email_dep", {
             holzen_event: holzenEvent,

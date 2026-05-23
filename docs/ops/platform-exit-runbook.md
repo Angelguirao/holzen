@@ -46,7 +46,7 @@ flowchart TB
 |-------------|---------------|-------------|
 | **Google OAuth** | Was `@lovable.dev/cloud-auth-js` | **Supabase Auth** `signInWithOAuth('google')` — configure Google OAuth in Supabase Dashboard |
 | **AI (reflection + companions)** | `LOVABLE_API_KEY` → Lovable gateway | **`GOOGLE_AI_API_KEY`** (primary) + optional **`OPENROUTER_API_KEY`** (failover) via [`_shared/llm-gateway.ts`](../../supabase/functions/_shared/llm-gateway.ts) |
-| **Transactional email** | `@lovable.dev/email-js` | **`RESEND_API_KEY`** via [`_shared/lovable-email.ts`](../../supabase/functions/_shared/lovable-email.ts) (Resend path) |
+| **Transactional email** | `@lovable.dev/email-js` | **`RESEND_API_KEY`** via [`_shared/transactional-email.ts`](../../supabase/functions/_shared/transactional-email.ts) (Resend path) |
 | **Auth emails** | `auth-email-hook` + Lovable webhooks | **Supabase Auth → Custom SMTP (Resend)** — disable Lovable hook |
 | **Bounce/suppression** | `handle-email-suppression` + Lovable HMAC | **Resend webhooks** → update handler or use Resend dashboard suppressions |
 | **Dev tagger** | `lovable-tagger` in Vite | Removed — no prod impact |

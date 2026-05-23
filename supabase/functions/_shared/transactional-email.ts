@@ -1,10 +1,10 @@
 /**
- * Shared transactional email helper — Resend (preferred) or Lovable Email (legacy).
+ * Shared transactional email helper — Resend (preferred) or legacy Lovable Email API.
  */
-import { sendLovableEmail as sendLovableEmailApi } from "npm:@lovable.dev/email-js";
+import { sendLovableEmail as legacyLovableEmailApi } from "npm:@lovable.dev/email-js";
 
 /** Subset of payload fields we use across edge functions. */
-export interface LovableEmail {
+export interface TransactionalEmail {
   from: string;
   to: string | string[];
   subject: string;
@@ -15,13 +15,13 @@ export interface LovableEmail {
   label?: string;
 }
 
-/** Minimal logger surface. */
-export interface LovableEmailLogger {
+/** Minimal logger surface for email delivery. */
+export interface EmailDeliveryLogger {
   log: (msg: string, data?: Record<string, unknown>) => void;
   error: (msg: string, data?: Record<string, unknown>) => void;
 }
 
-const NOOP_LOGGER: LovableEmailLogger = {
+const NOOP_LOGGER: EmailDeliveryLogger = {
   log: () => { /* noop */ },
   error: () => { /* noop */ },
 };
@@ -29,9 +29,9 @@ const NOOP_LOGGER: LovableEmailLogger = {
 const DEFAULT_SENDER_DOMAIN = "notify.holzen.app";
 
 export interface SendOptions {
-  /** Override `Deno.env.get("LOVABLE_API_KEY")`. */
+  /** Override API key (Resend `re_*` or legacy `LOVABLE_API_KEY`). */
   apiKey?: string;
-  /** Optional Lovable endpoint override (dev/testing). */
+  /** Optional legacy Lovable endpoint override (dev/testing). */
   sendUrl?: string;
   /** Optional sender domain override; defaults to notify.holzen.app. */
   senderDomain?: string;
@@ -41,7 +41,7 @@ export interface SendOptions {
   maxRetries?: number;
   /** Base backoff. Sleeps `baseDelayMs * 2^attempt`. Default 500ms. */
   baseDelayMs?: number;
-  logger?: LovableEmailLogger;
+  logger?: EmailDeliveryLogger;
   source?: string;
 }
 
@@ -62,14 +62,14 @@ export interface BatchResult {
   errors: string[];
 }
 
-export class LovableEmailConfigurationError extends Error {
+export class TransactionalEmailConfigurationError extends Error {
   constructor(message = "RESEND_API_KEY or LOVABLE_API_KEY not configured") {
     super(message);
-    this.name = "LovableEmailConfigurationError";
+    this.name = "TransactionalEmailConfigurationError";
   }
 }
 
-type EmailBackend = "resend" | "lovable";
+type EmailBackend = "resend" | "legacy_lovable";
 
 function resolveEmailBackend(opts: SendOptions): { backend: EmailBackend; apiKey: string } {
   const resend = opts.apiKey?.startsWith("re_")
@@ -77,14 +77,14 @@ function resolveEmailBackend(opts: SendOptions): { backend: EmailBackend; apiKey
     : Deno.env.get("RESEND_API_KEY")?.trim();
   if (resend) return { backend: "resend", apiKey: resend };
 
-  const lovable = opts.apiKey ?? Deno.env.get("LOVABLE_API_KEY") ?? "";
-  if (lovable) return { backend: "lovable", apiKey: lovable };
+  const legacy = opts.apiKey ?? Deno.env.get("LOVABLE_API_KEY") ?? "";
+  if (legacy) return { backend: "legacy_lovable", apiKey: legacy };
 
-  throw new LovableEmailConfigurationError();
+  throw new TransactionalEmailConfigurationError();
 }
 
 async function sendViaResend(
-  email: LovableEmail,
+  email: TransactionalEmail,
   apiKey: string,
   to: string,
   text: string,
@@ -111,10 +111,6 @@ async function sendViaResend(
   }
   const data = await res.json() as { id?: string };
   return { message_id: data.id };
-}
-
-function resolveApiKey(override?: string): string {
-  return resolveEmailBackend({ apiKey: override }).apiKey;
 }
 
 function resolveSenderDomain(override?: string): string {
@@ -153,9 +149,9 @@ function isRetryableStatus(status: number): boolean {
 }
 
 /**
- * Derive a plain-text version of an HTML email body. Lovable Email API
- * rejects sends with empty `text` (`missing_parameter: text`), so callers
- * that only provide HTML get a reasonable fallback.
+ * Derive a plain-text version of an HTML email body. Some providers reject
+ * sends with empty `text` (`missing_parameter: text`), so callers that only
+ * provide HTML get a reasonable fallback.
  */
 function htmlToPlainText(html: string): string {
   if (!html) return " ";
@@ -177,13 +173,13 @@ function htmlToPlainText(html: string): string {
   return text.length > 0 ? text : " ";
 }
 
-export async function sendLovableEmailMessage(
-  email: LovableEmail,
+export async function sendTransactionalEmail(
+  email: TransactionalEmail,
   opts: SendOptions = {},
 ): Promise<SendResult> {
   const emailBackend = resolveEmailBackend(opts);
   const logger = opts.logger ?? NOOP_LOGGER;
-  const source = opts.source ?? "lovable-email";
+  const source = opts.source ?? "transactional-email";
   const maxRetries = opts.maxRetries ?? 3;
   const baseDelayMs = opts.baseDelayMs ?? 500;
   const senderDomain = email.sender_domain ?? resolveSenderDomain(opts.senderDomain);
@@ -196,6 +192,7 @@ export async function sendLovableEmailMessage(
   let status = 0;
   let lastError: string | undefined;
   const start = Date.now();
+  const depName = emailBackend.backend === "resend" ? "resend-email" : "legacy-lovable-email";
 
   for (let i = 0; i <= maxRetries; i++) {
     attempts = i + 1;
@@ -203,7 +200,7 @@ export async function sendLovableEmailMessage(
       if (emailBackend.backend === "resend") {
         const res = await sendViaResend(email, emailBackend.apiKey, to, plainText);
         logger.log("dependency_call", {
-          dep: "resend-email",
+          dep: depName,
           status: "ok",
           operation: "emails.send",
           source,
@@ -213,7 +210,7 @@ export async function sendLovableEmailMessage(
         return { ok: true, id: res?.message_id, status: 200, attempts };
       }
 
-      const res = await sendLovableEmailApi(
+      const res = await legacyLovableEmailApi(
         {
           to,
           from: email.from,
@@ -228,7 +225,7 @@ export async function sendLovableEmailMessage(
         { apiKey: emailBackend.apiKey, sendUrl: opts.sendUrl },
       );
       logger.log("dependency_call", {
-        dep: "lovable-email",
+        dep: depName,
         status: "ok",
         operation: "emails.send",
         source,
@@ -241,7 +238,7 @@ export async function sendLovableEmailMessage(
       const errText = truncate(e instanceof Error ? e.message : String(e ?? "unknown"));
       lastError = errText;
       const retryable = status === 0 || isRetryableStatus(status);
-      logger.log("lovable_email_retry", {
+      logger.log("transactional_email_retry", {
         source,
         operation: "emails.send",
         status,
@@ -260,7 +257,7 @@ export async function sendLovableEmailMessage(
   }
 
   logger.error("dependency_call", {
-    dep: "lovable-email",
+    dep: depName,
     status: "error",
     operation: "emails.send",
     source,
@@ -278,8 +275,8 @@ export async function sendLovableEmailMessage(
   };
 }
 
-export async function sendLovableEmailBatch(
-  emails: LovableEmail[],
+export async function sendTransactionalEmailBatch(
+  emails: TransactionalEmail[],
   opts: SendOptions = {},
 ): Promise<BatchResult> {
   if (emails.length === 0) {
@@ -300,7 +297,7 @@ export async function sendLovableEmailBatch(
       const itemKey = opts.idempotencyKey
         ? `${opts.idempotencyKey}:${chunks}:${i + 1}`
         : undefined;
-      const result = await sendLovableEmailMessage(message, {
+      const result = await sendTransactionalEmail(message, {
         ...opts,
         idempotencyKey: itemKey,
       });
@@ -317,10 +314,10 @@ export async function sendLovableEmailBatch(
   return { ok: failed === 0, sent, failed, chunks, ids, errors };
 }
 
-export function holzenLovableEmailLogger(
+export function holzenTransactionalEmailLogger(
   edgeLog: (msg: string, data?: Record<string, unknown>) => void,
   edgeError: (msg: string, err?: unknown) => void,
-): LovableEmailLogger {
+): EmailDeliveryLogger {
   return {
     log: (msg, data) => edgeLog(msg, data),
     error: (msg, data) => edgeError(msg, data),

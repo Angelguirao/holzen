@@ -35,10 +35,10 @@ import {
   type RequestLoggingContext,
 } from "../_shared/with-request-logging.ts";
 import {
-  holzenLovableEmailLogger,
-  sendLovableEmailBatch,
-  type LovableEmail,
-} from "../_shared/lovable-email.ts";
+  holzenTransactionalEmailLogger,
+  sendTransactionalEmailBatch,
+  type TransactionalEmail,
+} from "../_shared/transactional-email.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -311,17 +311,17 @@ async function sendAlert(
   idempotencyKey: string,
   log: RequestLoggingContext["log"],
 ): Promise<{ sent: number; errors: number }> {
-  const emails: LovableEmail[] = recipients.map((to) => ({
+  const emails: TransactionalEmail[] = recipients.map((to) => ({
     from: "Holzen <notify@holzen.app>",
     to: [to],
     subject,
     html,
   }));
-  const batch = await sendLovableEmailBatch(emails, {
+  const batch = await sendTransactionalEmailBatch(emails, {
     apiKey: lovableKey,
     source: "ai-cost-alert",
     idempotencyKey,
-    logger: holzenLovableEmailLogger(
+    logger: holzenTransactionalEmailLogger(
       (m, d) =>
         log("ai_cost_alert_lovable", {
           holzen_event: "ai_cost_alert_cron",

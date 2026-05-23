@@ -41,7 +41,7 @@ Edge function
    - `internal` — unknown/unexpected. Falls back from raw `Error`s.
    - The wrapper serializes via `edgeErrorToJson()` and attaches `x-cid`. The `code` reaches the client verbatim.
 3. **Wrap external calls with `logDependencyCall(log, dependency, fn, options?)`.**
-   - `dependency`: one of `anthropic`, `perplexity`, `lovable-email`, `stripe`, `supabase-db`, `lovable-ai-gateway`, `coingecko`, `crossref`, `firecrawl`, or a new well-known name.
+   - `dependency`: one of `anthropic`, `perplexity`, `resend-email`, `legacy-lovable-email`, `stripe`, `supabase-db`, `lovable-ai-gateway`, `coingecko`, `crossref`, `firecrawl`, or a new well-known name.
    - `options.operation`: human-readable operation (`chat.completions`, `customers.list`, `emails.send`, `from.table.select`, …). Optional but useful for dashboards.
    - On success: `dependency_call` log with `status: "ok"` + `duration_ms`.
    - On error: `dependency_call` log at error level with `status: "error"`, `duration_ms`, and message. The error re-throws so the wrapper's catch can decide the `EdgeError` shape.

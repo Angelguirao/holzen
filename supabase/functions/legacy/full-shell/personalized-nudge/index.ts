@@ -5,10 +5,10 @@ import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
-  holzenLovableEmailLogger,
-  sendLovableEmailBatch,
-  type LovableEmail,
-} from "../_shared/lovable-email.ts";
+  holzenTransactionalEmailLogger,
+  sendTransactionalEmailBatch,
+  type TransactionalEmail,
+} from "../../../_shared/transactional-email.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -110,7 +110,7 @@ serve(
     const runDirection = (data?.bitcoin?.usd_24h_change ?? 0) >= 0 ? "up" : "down";
     // Each user gets bespoke localized copy; we accumulate rendered payloads
     // and ship them in one batched Lovable Email call at the end.
-    const queued: LovableEmail[] = [];
+    const queued: TransactionalEmail[] = [];
 
     for (const profile of eligible) {
       // Check if user has a pause in the last 48 hours
@@ -222,11 +222,11 @@ serve(
     // Idempotency key per day+direction — if Supabase retries the cron within
     // 24h, Lovable dedupes messages and users never get duplicate nudges.
     const dateKey = new Date().toISOString().slice(0, 10);
-    const batch = await sendLovableEmailBatch(queued, {
+    const batch = await sendTransactionalEmailBatch(queued, {
       apiKey: LOVABLE_API_KEY,
       source: "personalized-nudge",
       idempotencyKey: `personalized-nudge:${dateKey}:${runDirection}`,
-      logger: holzenLovableEmailLogger(
+      logger: holzenTransactionalEmailLogger(
         (m, d) =>
           log("lovable_email_dep", {
             holzen_event: "personalized_nudge_cron",
