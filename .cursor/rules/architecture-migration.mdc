@@ -35,13 +35,13 @@ Two ideas — do not conflate them:
 | 4 | [active-surface.md](../../docs/ops/active-surface.md) | Shipped routes, tables, legacy quarantine |
 | 4b | [information-architecture.md](../../docs/design/information-architecture.md) | Product IA narrative — **§1–§3 = full-IA reference**; live routes → active-surface |
 | 5 | **This rule** + [architecture-migration README](../../docs/artifacts/architecture-migration/README.md) | Slice workflow, scheduling, backlog |
-| 6 | [implementation-notes.html](../../docs/artifacts/architecture-migration/implementation-notes.html) | Resolved deviations during migration |
+| 6 | [implementation-notes.html](../../docs/artifacts/client-implementation/implementation-notes.html) | Resolved deviations and cross-initiative decisions |
 | 7 | [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) | CI checks, migration waves, monorepo north star — **not** pause interior naming |
 | 8 | [refactoring-strategy.md](../../docs/fundamentals/refactoring-strategy.md) | Split mechanics only — extract to **features**, not new `@/lib/<context>-*` |
 
 **Mandatory reads (every slice):**
 
-1. [architecture-migration/README.md](../../docs/artifacts/architecture-migration/README.md) backlog + [implementation-notes.html](../../docs/artifacts/architecture-migration/implementation-notes.html)
+1. [architecture-migration/README.md](../../docs/artifacts/architecture-migration/README.md) backlog + [implementation-notes.html](../../docs/artifacts/client-implementation/implementation-notes.html#initiative-architecture-migration)
 2. [client-architecture-overview.md](../../docs/fundamentals/client-architecture-overview.md) + [docs/README.md](../../docs/README.md) canonical table
 3. [client-src-layout.md](../../docs/fundamentals/client-src-layout.md), [client-server-architecture-holzen.md](../../docs/fundamentals/client-server-architecture-holzen.md), [implementation-notes-workflow.md](../../docs/fundamentals/implementation-notes-workflow.md), [active-surface.md](../../docs/ops/active-surface.md)
 4. **Pause slices:** [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) — overrides `frontend-module-layout.md` §3 for pause interior
@@ -121,7 +121,7 @@ npm run check:architecture-alignment
 ## Workflow
 
 1. **Read spec** — [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) (+ change-map row in AGENTS).
-2. **Maintain notes** — append to [docs/artifacts/architecture-migration/implementation-notes.html](../../docs/artifacts/architecture-migration/implementation-notes.html) when you make design decisions, deviate from spec, trade off alternatives, or have open questions ([implementation-notes-workflow.md](../../docs/fundamentals/implementation-notes-workflow.md)).
+2. **Maintain notes** — when warranted, append to [docs/artifacts/client-implementation/implementation-notes.html](../../docs/artifacts/client-implementation/implementation-notes.html) with tag `architecture-migration` ([implementation-notes-workflow.md](../../docs/fundamentals/implementation-notes-workflow.md)).
 3. **Discover** — list violations for chosen slice (see commands above).
 4. **Plan** — ≤5 files moved/created; behavior parity explicit; names per [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
 5. **Implement** — smallest diff; tests beside moved pure modules.

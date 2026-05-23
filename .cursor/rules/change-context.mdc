@@ -21,7 +21,7 @@ Non-trivial work should be **classified** against the **Change map** table in [A
 ## Full index
 
 - [docs/README.md](../../docs/README.md) — start-here order and **canonical sources** (single owner per kind of information).
-- Incremental `src/` migration sessions: [.cursor/rules/architecture-migration.mdc](architecture-migration.mdc), [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md), [implementation-notes-workflow.md](../../docs/fundamentals/implementation-notes-workflow.md), live [implementation-notes.html](../../docs/artifacts/architecture-migration/implementation-notes.html).
+- Incremental `src/` migration sessions: [.cursor/rules/architecture-migration.mdc](architecture-migration.mdc), [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md), [implementation-notes-workflow.md](../../docs/fundamentals/implementation-notes-workflow.md), live [implementation-notes.html](../../docs/artifacts/client-implementation/implementation-notes.html).
 - Task entry (bug / feature / Figma): [.cursor/rules/task-entry-workflow.mdc](task-entry-workflow.mdc).
 - Flow-first review templates: [docs/reviews/react-spa-review-template.md](../../docs/reviews/react-spa-review-template.md), skill `holzen-flow-review`.
 

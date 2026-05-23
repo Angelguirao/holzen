@@ -22,9 +22,9 @@ Use this **before writing code** for bugs, new features, or Figma-driven UI. It 
 | Kind | Read next | Before edit |
 |------|-----------|-------------|
 | **Bug** | Owner system doc + nearest **sibling** hook/screen in same feature | Trace **one flow** end-to-end (below); check authority is server-side (RLS/RPC/edge), not only React |
-| **Feature** | Owner doc + [client-src-layout.md](../../docs/fundamentals/client-src-layout.md) + [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md) | Placement checklist (§3); [modern-react-practices-holzen.md](../../docs/fundamentals/modern-react-practices-holzen.md) §6 if UI |
+| **Feature** | Owner doc + [client-src-layout.md](../../docs/fundamentals/client-src-layout.md) + [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md) | Placement checklist (§3); [modern-react-practices-holzen.md](../../docs/fundamentals/modern-react-practices-holzen.md) §6 if UI; ambiguous choices → [implementation-notes.html](../../docs/artifacts/client-implementation/implementation-notes.html) |
 | **Figma spec** | [DESIGN.md](../../DESIGN.md) + [docs/design/nox/](../../docs/design/nox/) + route owner doc | Reuse `components/ui/`; **`src/index.css`** wins at runtime; log token mismatches in implementation notes |
-| **Architecture migration** | [architecture-migration.mdc](architecture-migration.mdc) + [implementation-notes-workflow.md](../../docs/fundamentals/implementation-notes-workflow.md) | One vertical slice; update [implementation-notes.html](../../docs/artifacts/architecture-migration/implementation-notes.html) when ambiguous |
+| **Architecture migration** | [architecture-migration.mdc](architecture-migration.mdc) + [implementation-notes-workflow.md](../../docs/fundamentals/implementation-notes-workflow.md) | One vertical slice; append [implementation-notes.html](../../docs/artifacts/client-implementation/implementation-notes.html) when ambiguous |
 
 ## 3. Flow trace (mandatory for user-visible changes)
 
@@ -47,7 +47,7 @@ Use [react-spa-review-template.md](../../docs/reviews/react-spa-review-template.
 
 Match **existing patterns** in the nearest sibling file (imports, hook split, Query keys, error handling). For screens: [react-screen-orchestration.md](../../docs/fundamentals/react-screen-orchestration.md). Extract to **features**, not new context shims in `src/lib/`.
 
-Multi-commit or ambiguous spec → append [implementation-notes.html](../../docs/artifacts/architecture-migration/implementation-notes.html) (decisions, deviations, tradeoffs, open questions).
+Multi-commit or ambiguous spec → append [implementation-notes.html](../../docs/artifacts/client-implementation/implementation-notes.html) (tag initiative; decisions, deviations, tradeoffs, open questions).
 
 ## 5. Verify before done
 

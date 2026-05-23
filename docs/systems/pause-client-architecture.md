@@ -327,4 +327,4 @@ Do not big-bang rename folders; one vertical slice per commit ([refactoring-stra
 
 When client structure changes materially, update **this file** in the same PR.
 
-**During migration:** append interpretive deltas to [../artifacts/architecture-migration/implementation-notes.html](../artifacts/architecture-migration/implementation-notes.html) per [implementation-notes-workflow.md](../fundamentals/implementation-notes-workflow.md).
+**During migration:** append interpretive deltas to [../artifacts/client-implementation/implementation-notes.html#initiative-architecture-migration](../artifacts/client-implementation/implementation-notes.html#initiative-architecture-migration) (tag `architecture-migration`) per [implementation-notes-workflow.md](../fundamentals/implementation-notes-workflow.md).
