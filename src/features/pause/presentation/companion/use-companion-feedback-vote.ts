@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useOptimistic, useTransition } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
 import { hapticFeedback } from '@/lib/haptics';
@@ -19,55 +19,63 @@ export function useCompanionFeedbackVote(options: {
   const { user } = useAuth();
   const userId = user?.id;
   const queryClient = useQueryClient();
-  const [optimisticVote, setOptimisticVote] = useState<'up' | 'down' | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    setOptimisticVote(null);
-  }, [pauseInstanceId, companionType, userId]);
+  const [isPending, startTransition] = useTransition();
 
   const { data: persistedVote = null } = useQuery(
     getCompanionFeedbackVoteQueryOptions(userId, pauseInstanceId, companionType),
   );
 
-  const vote = optimisticVote ?? persistedVote;
-
-  const handleVote = useCallback(
-    async (type: 'up' | 'down') => {
-      if (vote || loading || interactionBlocked) return;
-      if (!userId) return;
-      setLoading(true);
-      setOptimisticVote(type);
-      hapticFeedback('light');
-
-      try {
-        const { ok } = await logCompanionFeedbackVote({
-          userId,
-          companionType,
-          vote: type,
-          cacheId,
-          pauseInstanceId,
-        });
-        if (!ok) {
-          setOptimisticVote(null);
-          return;
-        }
-        if (pauseInstanceId) {
-          queryClient.setQueryData<'up' | 'down' | null>(
-            companionFeedbackVoteQueryKey(userId, pauseInstanceId, companionType),
-            type,
-          );
-          setOptimisticVote(null);
-        }
-        // No pause_instance_id: prior UI kept local vote only (no server read key); leave optimistic set.
-      } catch {
-        setOptimisticVote(null);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [vote, loading, interactionBlocked, userId, pauseInstanceId, companionType, cacheId, queryClient],
+  const [vote, addOptimisticVote] = useOptimistic(
+    persistedVote,
+    (_current, next: 'up' | 'down' | null) => next,
   );
 
-  return { vote, loading, handleVote };
+  const handleVote = useCallback(
+    (type: 'up' | 'down') => {
+      if (vote || isPending || interactionBlocked) return;
+      if (!userId) return;
+
+      const committedVote = persistedVote;
+      startTransition(async () => {
+        addOptimisticVote(type);
+        hapticFeedback('light');
+
+        try {
+          const { ok } = await logCompanionFeedbackVote({
+            userId,
+            companionType,
+            vote: type,
+            cacheId,
+            pauseInstanceId,
+          });
+          if (!ok) {
+            addOptimisticVote(committedVote);
+            return;
+          }
+          if (pauseInstanceId) {
+            queryClient.setQueryData<'up' | 'down' | null>(
+              companionFeedbackVoteQueryKey(userId, pauseInstanceId, companionType),
+              type,
+            );
+          }
+        } catch {
+          addOptimisticVote(committedVote);
+        }
+      });
+    },
+    [
+      vote,
+      isPending,
+      interactionBlocked,
+      userId,
+      persistedVote,
+      addOptimisticVote,
+      pauseInstanceId,
+      companionType,
+      cacheId,
+      queryClient,
+    ],
+  );
+
+  return { vote, loading: isPending, handleVote };
 }

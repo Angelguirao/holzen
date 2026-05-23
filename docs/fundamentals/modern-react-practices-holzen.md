@@ -197,7 +197,7 @@ Hooks should **not** grow unbounded RPC + navigation + analytics; extract **use 
 | Render boundaries | **Yes** on Home (`memo(HomeDashboardLayout)`, stable layout props, lazy Zen) | Extend when touching hot screens; see [react-screen-orchestration.md](react-screen-orchestration.md) |
 | Manual `useMemo` / `useCallback` | Widespread in pause/home/companion | **No new** memos without justification; **no mass removal** during migration |
 | React Compiler | Not configured (Vite + SWC) | Pilot **after** migration — separate track |
-| React 19 / Actions | **Shipped:** pause favorite + snooze (`useOptimistic`), change-email (`useActionState`) | Extend on next simple mutation; keep Query + `invokeEdge` for ritual/companion |
+| React 19 / Actions | **Shipped:** favorite, snooze, email toggle, push sub, companion vote (`useOptimistic` + `useTransition`); change-email + feedback (`useActionState`) | Extend on next simple mutation; keep Query + `invokeEdge` for ritual/companion |
 | react-hook-form + Zod | Settings/admin forms | Keep for complex validated forms |
 
 **When adding `useMemo` / `useCallback` (review gate):**
@@ -213,8 +213,8 @@ If none apply, prefer a **boundary** (lower state, memo shell, lazy branch) inst
 | Pilot | Surface | Status |
 |-------|---------|--------|
 | React Compiler | Vite build + Home / pause session | Not started |
-| `useOptimistic` | Pause reflect favorite; Home snooze | **Shipped** (May 2026) |
-| `useActionState` | Settings change-email form | **Shipped** (May 2026) |
+| `useOptimistic` / `useTransition` | Pause favorite; snooze; email toggle; push subscribe; companion vote | **Shipped** (May 2026) |
+| `useActionState` | Settings change-email; feedback form | **Shipped** (May 2026) |
 
 **Do not** replace TanStack Query or pause/companion mutation paths with form Actions wholesale. **Do** use React 19 hooks on the next simple mutation you touch.
 

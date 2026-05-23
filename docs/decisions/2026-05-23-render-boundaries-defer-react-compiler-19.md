@@ -43,7 +43,7 @@ Adopting React Compiler or upgrading to React 19 during migration adds a second 
 | Track | Trigger | Action |
 |-------|---------|--------|
 | **A. React Compiler pilot** | `src/` migration stable; test + build green | Add `babel-plugin-react-compiler` to Vite; lint/annotation mode first; profile Home + pause session; remove redundant memos only with tests |
-| **B. React 19 Actions pilot** | Runtime on 19.x | **In progress** — `useOptimistic` (pause favorite, snooze), `useActionState` (settings change-email); extend on next simple mutation |
+| **B. React 19 Actions pilot** | Runtime on 19.x | **In progress** — optimistic toggles + `useActionState` forms (see modern-react-practices §2.9) |
 
 Expo SDK 54 is **not** a Holzen signal — shipped product is a Vite SPA on Lovable.
 
