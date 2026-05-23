@@ -11,7 +11,7 @@ Move to **owned infrastructure**:
 |-------|--------|
 | Code | GitHub (Cursor/local dev) |
 | Database + Edge | Owned Supabase projects (staging + prod) via CLI/CI |
-| Frontend | External static host (Netlify / Cloudflare Pages / Vercel) |
+| Frontend | **Vercel** (GitHub integration) |
 | AI | Direct Gemini (`GOOGLE_AI_API_KEY`) via `_shared/llm-gateway.ts` |
 | Email | Resend (`RESEND_API_KEY`) with Supabase Auth custom SMTP |
 | Auth OAuth | Supabase Auth native Google provider |
@@ -38,6 +38,7 @@ Lovable may remain as an optional editor until fully dropped; **Lovable must not
 - Runbook: [platform-exit-runbook.md](../ops/platform-exit-runbook.md)
 - Staging setup: [staging-supabase-setup.md](../ops/staging-supabase-setup.md)
 - Production setup: [production-supabase-setup.md](../ops/production-supabase-setup.md)
+- Frontend (Vercel): [vercel-frontend-setup.md](../ops/vercel-frontend-setup.md)
 - Risk model: [lovable-staging-and-platform-exit.md](../ops/lovable-staging-and-platform-exit.md)
 
 ## Alternatives considered

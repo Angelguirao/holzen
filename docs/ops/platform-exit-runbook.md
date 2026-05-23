@@ -17,7 +17,7 @@ flowchart TB
   end
 
   subgraph prod [Production_you_own]
-    FE[Netlify_or_Cloudflare_Pages]
+    FE[Vercel]
     SB[(Supabase_owned_project)]
     EDGE[Edge_functions_via_CLI]
   end
@@ -34,7 +34,7 @@ flowchart TB
 | Layer | After exit | Lovable role |
 |-------|------------|--------------|
 | **Code** | GitHub | Optional editor (sync only) |
-| **Frontend** | Netlify / Cloudflare Pages / Vercel | None for prod |
+| **Frontend** | **Vercel** (recommended) — or Netlify / Cloudflare Pages | None for prod |
 | **Database + Edge** | Owned Supabase project | **Disconnect** auto-sync |
 | **Secrets** | Supabase Dashboard + GitHub Actions | Export once, then remove |
 
@@ -97,7 +97,7 @@ GitHub Actions (see [`.github/workflows/`](../../.github/workflows/)):
 
 **GitHub secrets:** `SUPABASE_ACCESS_TOKEN`, `SUPABASE_STAGING_PROJECT_REF`, `SUPABASE_PROD_PROJECT_REF`, plus build-time `VITE_SUPABASE_*` for CI and frontend hosts.
 
-**Setup guides:** [staging-supabase-setup.md](staging-supabase-setup.md), [production-supabase-setup.md](production-supabase-setup.md).
+**Setup guides:** [staging-supabase-setup.md](staging-supabase-setup.md), [production-supabase-setup.md](production-supabase-setup.md), [vercel-frontend-setup.md](vercel-frontend-setup.md).
 
 ---
 
@@ -113,12 +113,14 @@ GitHub Actions (see [`.github/workflows/`](../../.github/workflows/)):
 
 ### Frontend
 
-1. Connect repo to **Netlify** or **Cloudflare Pages** ([Lovable external hosting guide](https://docs.lovable.dev/tips-tricks/external-deployment-hosting))
-2. Build: `npm run build` with env:
-   - `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`
-   - `VITE_SENTRY_DSN`, `VITE_POSTHOG_*`, `VITE_APP_VERSION` (= Git SHA)
-3. Custom domain DNS → new host
+See **[vercel-frontend-setup.md](vercel-frontend-setup.md)** (recommended).
+
+1. Import GitHub repo in Vercel — [vercel.json](../../vercel.json) sets Vite build + SPA rewrites
+2. Production env: `VITE_SUPABASE_*`, `VITE_APP_VERSION` = `$VERCEL_GIT_COMMIT_SHA`, observability `VITE_*`
+3. Custom domain DNS → Vercel
 4. **Stop** using Lovable **Publish → Update** for prod
+
+Alternatives: Netlify or Cloudflare Pages with the same `npm run build` / `dist` output ([Lovable external hosting guide](https://docs.lovable.dev/tips-tricks/external-deployment-hosting)).
 
 ### Auth & email
 
@@ -156,7 +158,7 @@ Update [observability-setup.md](observability-setup.md) checklist: Lovable secre
 
 ## Rollback
 
-- **Frontend:** redeploy previous Netlify/CF build
+- **Frontend:** Vercel → Deployments → promote previous build (see [vercel-frontend-setup.md](vercel-frontend-setup.md))
 - **Edges:** redeploy prior Git SHA via CI
 - **DB:** Supabase PITR to timestamp before bad migration ([backup-restore-drill.md](backup-restore-drill.md))
 - **Do not** re-enable Lovable auto-migration without a forward-fix migration plan

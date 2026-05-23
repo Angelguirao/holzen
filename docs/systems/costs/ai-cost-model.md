@@ -43,7 +43,7 @@ negotiated rate differs.
 
 Primary path: **`GOOGLE_AI_API_KEY`** → [Google Gemini OpenAI-compat API](https://ai.google.dev/gemini-api/docs/pricing). Optional failover: **`OPENROUTER_API_KEY`** → [OpenRouter](https://openrouter.ai/docs) (same model ids, used only on retryable errors).
 
-Legacy **`LOVABLE_API_KEY`** remains as last-resort during migration; remove once prod secrets are migrated.
+Legacy **`LOVABLE_API_KEY`** remains for Tier B edges that pass `providers: ["lovable"]`; active pause-first paths use Google → OpenRouter only.
 
 List rates below are Google API pricing ([source](https://ai.google.dev/gemini-api/docs/pricing)). OpenRouter may add a small platform fee on some routes — reconcile with their dashboard if you route significant traffic through it.
 
