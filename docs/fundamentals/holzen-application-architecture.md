@@ -13,6 +13,7 @@ This document is the **constitution** for application structure. It does not rep
 | [frontend-module-layout.md](frontend-module-layout.md) | Target repo tree, package graph, naming, migration waves, CI checks |
 | [2026-05-17-modular-monolith-hexagonal-client.md](../decisions/2026-05-17-modular-monolith-hexagonal-client.md) | Accepted ADR for monorepo + hexagonal client |
 | [modern-react-practices-holzen.md](modern-react-practices-holzen.md) | Industry React norms + Holzen fit/gap scorecard |
+| [architectural-fitness-functions.md](architectural-fitness-functions.md) | CI guardrails + manual scorecard mapped to capabilities |
 | [ops/active-surface.md](../ops/active-surface.md) | Shipped routes, edges, tables, events |
 | [systems/pause-system.md](../systems/pause-system.md) | Pause lifecycle invariants and schema |
 
@@ -60,7 +61,7 @@ Five statements every change should respect:
 1. **Server defines reality** — rows, policies, RPC outcomes, and edge side effects are authoritative.
 2. **Client projects reality** — React renders state; TanStack Query caches **reads**; the UI must **reconcile** when the server disagrees.
 3. **Intentions have names** — user-visible actions map to **use cases** (application layer), not anonymous logic in JSX or god hooks.
-4. **Boundaries are enforced** — bounded contexts (features/packages) and **dependency direction** matter as much as naming.
+4. **Boundaries are enforced** — bounded contexts (features/packages) and **dependency direction** matter as much as naming. Automated guards and review scorecards: [architectural-fitness-functions.md](architectural-fitness-functions.md).
 5. **Contracts are explicit** — wire shapes at boundaries (edge bodies, critical RPC args, analytics payloads); **behavior** is not copy-pasted between runtimes.
 
 TypeScript types are a **shared language**, not a second place to hide business rules ([client-server-architecture-holzen.md](client-server-architecture-holzen.md)).
@@ -457,6 +458,7 @@ holzen-application-architecture.md     ← you are here (principles)
         ├── frontend-module-layout.md              (repo map, migration waves)
         ├── decisions/2026-05-17-modular-monolith-hexagonal-client.md
         ├── modern-react-practices-holzen.md       (React industry norms vs Holzen)
+        ├── architectural-fitness-functions.md     (CI guards + scorecard map)
         ├── react-screen-orchestration.md          (React mechanics)
         ├── refactoring-strategy.md                (incremental moves; superseded for greenfield by §10)
         ├── docs/systems/*                         (per-context behavior)
@@ -474,6 +476,7 @@ When **behavior** of pause changes, update **`pause-system.md`**. When **why we 
 | New bounded context (e.g. new tab/product area) | Add `packages/<context>`, row in §7, system doc under `docs/systems/`, active-surface row |
 | New edge or RPC | Contract schema, adapter, use case, manifest, Bruno if HTTP-reviewed |
 | Principle amendment | PR discussion + edit this doc + ADR if structure-wide |
+| New structural invariant (enforceable) | Add or extend a fitness function — [architectural-fitness-functions.md](architectural-fitness-functions.md) §7 |
 | Folder-only refactor | Update [frontend-module-layout.md](frontend-module-layout.md); no principle edit |
 
 **Supersession:** [refactoring-strategy.md](refactoring-strategy.md) remains valid for **small extractions** inside the transitional tree until the monorepo migration completes; greenfield work should follow **§10** (target repository shape) and per-context [pause-client-architecture.md](../systems/pause-client-architecture.md) §9.

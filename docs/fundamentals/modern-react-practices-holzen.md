@@ -237,6 +237,8 @@ If none apply, prefer a **boundary** (lower state, memo shell, lazy branch) inst
 
 Use in PR description or pre-launch audits. **Target** = after [frontend-module-layout.md](frontend-module-layout.md) migration; **Today** = current `src/` on `main` / `feature/mvpPauseCleanup`.
 
+This scorecard is the **manual** half of Holzen’s architectural fitness functions — practices not yet fully automated in CI. Automated guards (`check:*` scripts) and the capability map live in [architectural-fitness-functions.md](architectural-fitness-functions.md).
+
 | Practice | Target alignment | Today (transitional) | Primary doc |
 |----------|------------------|----------------------|-------------|
 | Domain / feature structure | **Strong** | Weak (flat layers) | [frontend-module-layout.md](frontend-module-layout.md) |
