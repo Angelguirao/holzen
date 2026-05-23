@@ -1,6 +1,10 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import webpush from "https://esm.sh/web-push@3.6.7";
-import { createCidSupabaseClient, sendWebPushWithCid } from "../_shared/cid-clients.ts";
+import { createCidSupabaseClient } from "../_shared/cid-clients.ts";
+import {
+  deliverPauseOfferChannels,
+  initWebPushVapidFromEnv,
+} from "../_shared/notifications-deliver-pause-offer.ts";
 import {
   enrichAutomaticPauseContext,
   fetchFearGreedSnapshot,
@@ -8,7 +12,7 @@ import {
   pauseRecencyInputs,
 } from "../_shared/pause-cron-parity.ts";
 import { isCumulativeMoveTriggered } from "../_shared/volatility-thresholds.ts";
-import { unknownErrorForLog, webPushStatusCode } from "../_shared/log-unknown-error.ts";
+import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import {
   withRequestLogging,
   type RequestLoggingContext,
@@ -17,10 +21,6 @@ import {
 type VolatilityFnLog = RequestLoggingContext["log"];
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
-import {
-  holzenLovableEmailLogger,
-  sendLovableEmailMessage,
-} from "../_shared/lovable-email.ts";
 import {
   bucketChangePercent,
   computeContextFingerprint,
@@ -146,78 +146,6 @@ async function fetchAssetVolatilityForCurrency(
     cumulativeChangePercent,
     cumulativeDirection: cumulativeChangePercent >= 0 ? "up" : "down",
   };
-}
-
-async function sendNotificationEmail(
-  email: string,
-  context: string,
-  pauseInstanceId: string | null,
-  log: VolatilityFnLog,
-): Promise<boolean> {
-  if (!Deno.env.get("LOVABLE_API_KEY")) {
-    log.error("check_volatility_email", {
-      holzen_event: "check_volatility_cron",
-      phase: "lovable_api_key_not_configured",
-    });
-    return false;
-  }
-
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head><meta charset="utf-8"></head>
-    <body style="font-family: 'IBM Plex Mono', monospace, sans-serif; max-width: 400px; margin: 0 auto; padding: 40px 20px; color: #2a2a2a; background: #f7f5f0;">
-      <p style="font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #737373; margin-bottom: 24px;">HOLZEN</p>
-      <p style="font-size: 13px; color: #737373; margin-bottom: 16px;">${context}</p>
-      <p style="font-size: 14px; line-height: 1.6; margin-bottom: 24px;">Open Holzen when you're ready — your personalized reflection is waiting in the pause ritual.</p>
-      <hr style="border: none; border-top: 1px solid #e5e2dc; margin: 24px 0;">
-      <p style="font-size: 11px; color: #a3a3a3;">This is an automated notification from Holzen. You can disable email notifications in your settings.</p>
-    </body>
-    </html>
-  `;
-
-  // Each pause instance has a unique UUID — perfect idempotency key. A retry of
-  // the same volatility cron (or a double-fire from pg_cron) never produces
-  // a duplicate email within Lovable Email's idempotency window.
-  const result = await sendLovableEmailMessage(
-    {
-      from: "Holzen <notify@holzen.app>",
-      to: [email],
-      subject: "Holzen — A moment to pause",
-      html,
-    },
-    {
-      source: "volatility-email",
-      idempotencyKey: pauseInstanceId ? `volatility:${pauseInstanceId}` : undefined,
-      logger: holzenLovableEmailLogger(
-        (m, d) =>
-          log("check_volatility_email_dep", {
-            holzen_event: "check_volatility_cron",
-            phase: "volatility_email_dep",
-            message: m,
-            ...(d ?? {}),
-          }),
-        (m, data) =>
-          log.error("check_volatility_email_dep", {
-            holzen_event: "check_volatility_cron",
-            phase: "volatility_email_dep_error",
-            message: m,
-            ...(data ?? {}),
-          }),
-      ),
-    },
-  );
-
-  if (result.ok) {
-    log("check_volatility_email_sent", {
-      holzen_event: "check_volatility_cron",
-      phase: "volatility_email_sent",
-      recipient_host: email.includes("@") ? email.split("@")[1]!.toLowerCase() : "?",
-      attempts: result.attempts,
-    });
-    return true;
-  }
-  return false;
 }
 
 serve(
@@ -443,48 +371,7 @@ serve(
       total_profiles: profileRows.length,
     });
 
-    // Parse and configure VAPID once — all users share the same keys
-    const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
-    const vapidPrivateKeyJwk = Deno.env.get("VAPID_PRIVATE_KEY");
-    let vapidReady = false;
-    if (vapidPublicKey && vapidPrivateKeyJwk) {
-      try {
-        let privateKey = vapidPrivateKeyJwk;
-        try {
-          const parsed = JSON.parse(vapidPrivateKeyJwk);
-          privateKey = parsed.d || vapidPrivateKeyJwk;
-        } catch {
-          if (vapidPrivateKeyJwk.length > 44) {
-            let stdBase64 = vapidPrivateKeyJwk.replace(/-/g, "+").replace(/_/g, "/");
-            while (stdBase64.length % 4) stdBase64 += "=";
-            try {
-              const binaryStr = atob(stdBase64);
-              const pkcs8Bytes = new Uint8Array(binaryStr.length);
-              for (let i = 0; i < binaryStr.length; i++) pkcs8Bytes[i] = binaryStr.charCodeAt(i);
-              const cryptoKey = await crypto.subtle.importKey(
-                "pkcs8", pkcs8Bytes.buffer, { name: "ECDSA", namedCurve: "P-256" }, true, ["sign"]
-              );
-              const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
-              if (jwk.d) privateKey = jwk.d;
-            } catch (decodeErr) {
-              log.error("check_volatility_push", {
-                holzen_event: "check_volatility_cron",
-                phase: "vapid_pkcs8_decode_failed",
-                ...unknownErrorForLog(decodeErr),
-              });
-            }
-          }
-        }
-        webpush.setVapidDetails("mailto:noreply@holzen.app", vapidPublicKey, privateKey);
-        vapidReady = true;
-      } catch (vapidErr) {
-        log.error("check_volatility_push", {
-          holzen_event: "check_volatility_cron",
-          phase: "vapid_setup_error",
-          ...unknownErrorForLog(vapidErr),
-        });
-      }
-    }
+    const vapidReady = await initWebPushVapidFromEnv(log);
 
     // Process all eligible users in parallel
     const results = await Promise.all(eligible.map(async (profile) => {
@@ -657,59 +544,19 @@ serve(
         });
       }
 
-      // Email + push. In-app bell is emitted by the
-      // notifications_from_pause_instances trigger when the instance was
-      // created above — no explicit insert needed here.
-      await Promise.all([
-        // Email
-        (async () => {
-          if (!profile.email_notifications) return;
-          const { data: userData } = await supabase.auth.admin.getUserById(profile.user_id);
-          const email = userData?.user?.email;
-          if (email) {
-            await sendNotificationEmail(email, ctx, pauseInstanceId, log);
-          }
-        })(),
-        // Push
-        (async () => {
-          if (!vapidReady) return;
-          const { data: pushSubs } = await supabase
-            .from("push_subscriptions")
-            .select("endpoint, p256dh, auth")
-            .eq("user_id", profile.user_id);
-          if (!pushSubs || pushSubs.length === 0) return;
-
-          const payload = JSON.stringify({
-            title: "Holzen",
-            body: ctx.slice(0, 120),
-            pauseInstanceId,
-            action: "pause_ready",
-          });
-          await Promise.all(pushSubs.map(async (sub) => {
-            try {
-              await sendWebPushWithCid(
-                log,
-                webpush,
-                { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-                payload,
-                { notificationTag: "volatility" }
-              );
-            } catch (pushErr: unknown) {
-              const sc = webPushStatusCode(pushErr);
-              log.error("check_volatility_push", {
-                holzen_event: "check_volatility_cron",
-                phase: "push_send_failed",
-                status_code: sc,
-                cid,
-                ...unknownErrorForLog(pushErr),
-              });
-              if (sc === 410 || sc === 404) {
-                await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
-              }
-            }
-          }));
-        })(),
-      ]);
+      // Email + push via shared delivery helper. In-app bell: DB trigger on pause_instances.
+      await deliverPauseOfferChannels({
+        supabase,
+        webpush,
+        userId: profile.user_id,
+        emailNotifications: profile.email_notifications ?? false,
+        contextPreview: ctx,
+        pauseInstanceId,
+        log,
+        cid,
+        vapidReady,
+        holzenEvent: "check_volatility_cron",
+      });
 
       return true;
     }));

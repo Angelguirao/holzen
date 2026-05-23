@@ -7,7 +7,7 @@
 
 ## Context
 
-Holzen is pre-launch with no production users. The active SPA still uses a **transitional** layout: flat `src/hooks/`, flat `src/lib/`, mixed root-level `src/components/`, and `src/legacy/` on main. That layout:
+Holzen is pre-launch with no production users. The active SPA still uses a **transitional** layout: bounded contexts in `src/features/`, route UI in `src/screens/`, shell in `src/app/`, design system in `src/components/ui/`, shared utilities in `src/lib/`, and `src/legacy/` on main (not imported). That layout:
 
 - Does not enforce dependency direction (presentation imports infrastructure freely).
 - Makes cross-feature coupling easy (deep imports, types defined in `.tsx` consumed by `lib/`).
@@ -43,7 +43,7 @@ Moving the SPA to `apps/web` **today** would break publish (no root `index.html`
 
 6. **Keep React SPA + Vite** for the web app; do **not** migrate to Next.js/Remix as part of this ADR ([spa-framework-evaluation.md](../backlog/spa-framework-evaluation.md) remains the place to revisit SSR).
 
-7. **Wave 0 (now):** `src/features/<context>/…` with the same layer folders and import rules as packages; screens stay in `src/pages/` and `src/components/` until a deliberate move. Scaffold started at `src/features/pause/`.
+7. **Wave 0–5j (shipped on root Vite):** `src/features/<context>/…` with layer import rules; presentation in `src/screens/`, `src/app/components/`, and `src/components/ui/` (wave 5 — see [frontend-module-layout.md](../fundamentals/frontend-module-layout.md) §11). `App.tsx` lazy-loads `screens/*` directly (removed `src/pages/` shim, May 2026).
 
 8. **Extract `packages/*` only when** at least one is true:
    - A **second client** (e.g. mobile/native) needs shared modules.
@@ -75,7 +75,7 @@ Moving the SPA to `apps/web` **today** would break publish (no root `index.html`
 |------|----------------|
 | Flesh out [frontend-module-layout.md](../fundamentals/frontend-module-layout.md) as structure lands | Same PR series as scaffold |
 | `src/features/pause/` skeleton + `check:feature-imports` | Done on `feature/refactoring6` |
-| Waves 1–4 (`src/features/*`, active app → `public`, lib shims, legacy quarantined) | Done on `feature/refactoring6` — see [frontend-module-layout.md](../fundamentals/frontend-module-layout.md) §11 |
+| Waves 1–4 (`src/features/*`, active app → `public`, lib shims, legacy quarantined) | **Wave 1 interior in progress** on `feature/refactoring6` — see [frontend-module-layout.md](../fundamentals/frontend-module-layout.md) §11; Phase A backlog in [architecture-migration/README.md](../artifacts/architecture-migration/README.md) |
 | Scaffold `pnpm-workspace.yaml`, `apps/web`, empty `packages/*` | **Gated** — only after §8 extraction trigger |
 | `packages/contracts` for top edges + critical RPCs | Early in pause/companion wave |
 | ADR supersession only if we adopt Next.js or split services | Future |

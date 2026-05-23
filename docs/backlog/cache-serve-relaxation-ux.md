@@ -10,8 +10,8 @@
 ## Related code
 
 - `supabase/functions/_shared/cache.ts` — `serveFromCache`
-- `src/lib/companion-orchestrate-slot-apply.ts` — slot state + `EMPTY_COMPANION_SLOT_RELAXATIONS`
-- `src/hooks/use-companion-data.ts` — wires hydration + lazy fetch + regenerate
+- `src/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply.ts` — slot state + `EMPTY_COMPANION_SLOT_RELAXATIONS`
+- `features/pause/presentation/use-companion-data.ts` — wires hydration + lazy fetch + regenerate
 
 ## Optional follow-ups
 

@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
-import { QuietWindowsManager } from '@/app/components/QuietWindowsManager';
+import { QuietWindowsManager } from '@/screens/settings/components/QuietWindowsManager';
 import { SourceManagement } from '@/screens/settings/components/SourceManagement';
-import { ProLock } from '@/app/components/ProLock';
+import { ProLock } from '@/components/ui/pro-lock';
 import { PRICING } from '@/features/subscription/public';
-import { ThresholdSetting } from '@/app/components/ThresholdSetting';
+import { ThresholdSetting } from '@/screens/settings/components/ThresholdSetting';
 import { ReferralSection } from '@/screens/settings/components/ReferralSection';
 import { CreditsDashboard } from '@/screens/settings/components/CreditsDashboard';
-import { InstallHolzenCard } from '@/app/components/InstallHolzenCard';
+import { InstallHolzenCard } from '@/screens/home/components/InstallHolzenCard';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -33,7 +33,7 @@ import {
 import { useSettingsState } from '@/screens/settings/hooks/use-settings-state';
 import { GroundingTagInput } from '@/screens/settings/components/GroundingTagInput';
 import { ChangeEmailSection } from '@/screens/settings/components/ChangeEmailSection';
-import { HoldGoalWidget } from '@/app/components/HoldGoalWidget';
+import { HoldGoalWidget } from '@/screens/home/components/HoldGoalWidget';
 import {
   Select,
   SelectContent,

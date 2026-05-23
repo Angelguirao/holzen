@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Zap } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import {
   adminDevModeSettingQueryKey,
   getAdminDevModeSettingQueryOptions,
+  logDevModeSetting,
   readLocalDevMode,
-} from '@/lib/admin-dev-mode-setting-query';
+} from '@/screens/admin/public-queries';
 
 export function DevModeToggle() {
   const { user } = useAuth();
@@ -41,15 +41,8 @@ export function DevModeToggle() {
       /* ignore */
     }
     try {
-      const {
-        data: { user: u },
-      } = await supabase.auth.getUser();
-      if (u) {
-        await supabase.from('analytics_events').insert({
-          user_id: u.id,
-          event: 'dev_mode_setting',
-          metadata: { enabled: next },
-        });
+      if (userId) {
+        await logDevModeSetting(userId, next);
       }
     } catch {
       /* non-critical */

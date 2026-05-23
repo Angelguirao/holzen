@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, Bitcoin } from 'lucide-react';
 import { PageMeta } from '@/app/components/PageMeta';
-import { PublicFooter } from '@/app/components/PublicFooter';
+import { PublicFooter } from '@/screens/marketing/components/PublicFooter';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { PageHeading } from '@/app/components/PageHeading';
+import { PageHeading } from '@/components/ui/page-heading';
 import { StateCard } from '@/components/ui/state-card';
 import { getCoingeckoBtcUsdQueryOptions } from '@/features/market/public';
 

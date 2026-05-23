@@ -5,12 +5,12 @@
 ## What shipped
 
 - **Rules of thumb** and a summary table live in **[`docs/fundamentals/navigating-the-codebase.md`](../fundamentals/navigating-the-codebase.md) §6.1** — when to prefer **`useQuery` / `useMutation`**, when to keep **`useEffect` + Supabase**, and how **`fetchBtcData`** coalescing fits in.
-- Guidance to **avoid unscoped `defaultOptions`** on the root **`QueryClient`** until conventions are agreed; per-query options (as in **`use-subscription.ts`**) stay the pattern.
+- Guidance to **avoid unscoped `defaultOptions`** on the root **`QueryClient`** until conventions are agreed; per-query options (as in **`useSubscription`** — `src/features/subscription/presentation/use-subscription.ts`, export `@/features/subscription/public-hooks`) stay the pattern.
 
 ## Optional follow-ups
 
 - Set shared **`QueryClient` defaults** (e.g. `staleTime`, `retry`) in **`App.tsx`** once several queries agree on behavior.
-- Lift **`profiles`** to a layout-level **`useQuery`** ([home-fetch-deduplication.md](home-fetch-deduplication.md)).
+- Optional layout-level profile provider (network dedupe already shipped via shared **`['profile', userId]`** query — see [home-fetch-deduplication.md](home-fetch-deduplication.md)).
 - Migrate individual hooks when touching them — no big-bang rewrite.
 
 ## Related

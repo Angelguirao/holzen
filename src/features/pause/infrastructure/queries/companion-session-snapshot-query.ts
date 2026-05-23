@@ -1,7 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { CompanionData } from '@/features/pause/public';
-import { companionDataFromArtifacts } from '@/features/pause/application/companion/companion-data-from-artifacts';
-import { PAUSE_QUERY_PREFIX } from '@/features/pause/application/queries/pause-query-namespace';
+import type { CompanionData } from '@/features/pause/domain/companion-card-types';
+import { reflectionTextMessageFromArtifactRows } from '@/features/pause/domain/reflect/generation/reflection-text-from-artifact-rows';
+import { companionDataFromArtifacts } from '@/features/pause/application/use-cases/ritual/frame/companion-data-from-artifacts';
+import { PAUSE_QUERY_PREFIX } from '@/features/pause/infrastructure/queries/pause-query-namespace';
 
 export interface PauseSessionSnapshot {
   id: string;
@@ -51,10 +52,7 @@ export async function loadPauseSessionSnapshot(
     .eq('pause_instance_id', pauseInstanceId);
   const artifactRows = (artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>;
 
-  const reflectionArt = artifactRows.find((r) => r.kind === 'reflection_text');
-  const reflectionMessage = typeof reflectionArt?.content?.message === 'string'
-    ? (reflectionArt.content.message as string)
-    : '';
+  const reflectionMessage = reflectionTextMessageFromArtifactRows(artifactRows) ?? '';
 
   return {
     id: pauseInstanceId,

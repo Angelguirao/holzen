@@ -1,0 +1,101 @@
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/features/pause/public-rpc', () => ({
+  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
+}));
+
+import { messageFromReflectGenerationResult as messageDirect } from '@/features/pause/domain/reflect/generation/message-from-reflect-generation-result';
+import { reflectGenerationUserErrorMessage as userErrorDirect } from '@/features/pause/domain/reflect/generation/reflect-generation-errors';
+import {
+  shouldClearReflectGenerationLoading as shouldClearLoadingDirect,
+  shouldCommitReflectGeneration as shouldCommitDirect,
+} from '@/features/pause/domain/reflect/generation/reflect-generation-run-guards';
+import { reflectGenerationPrerequisite as prerequisiteDirect } from '@/features/pause/domain/reflect/generation/reflect-generation-prerequisites';
+import { resolveEffectiveReflectionCopy as resolveCopyDirect } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
+import { resolveReflectGenerationPrefetch as resolvePrefetchDirect } from '@/features/pause/domain/reflect/generation/resolve-reflect-generation-prefetch';
+import { runReflectGeneration as runReflectGenerationDirect } from '@/features/pause/application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation';
+import {
+  messageFromReflectGenerationResult as messageFromGenerationFlow,
+  reflectGenerationPrerequisite as prerequisiteFromGenerationFlow,
+  reflectGenerationUserErrorMessage as userErrorFromGenerationFlow,
+  resolveEffectiveReflectionCopy as resolveCopyFromGenerationFlow,
+  resolveReflectGenerationPrefetch as resolvePrefetchFromGenerationFlow,
+  runReflectGeneration as runReflectGenerationFromGenerationFlow,
+  shouldClearReflectGenerationLoading as shouldClearLoadingFromGenerationFlow,
+  shouldCommitReflectGeneration as shouldCommitFromGenerationFlow,
+} from '@/features/pause/application/use-cases/ritual/reflect/generation/pause-reflect-generation-flow';
+import { supabaseReflectGenerator } from '@/features/pause/public-rpc';
+import {
+  trackPauseReflectPostItOpen,
+  trackPauseReflectShareTap,
+  trackPauseReflectWallpaperTap,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+
+import {
+  messageFromReflectGenerationResult,
+  pauseReflectGeneration,
+  reflectGenerationPrerequisite,
+  reflectGenerationUserErrorMessage,
+  reflectGenerator,
+  resolveEffectiveReflectionCopy,
+  resolveReflectGenerationPrefetch,
+  runReflectGeneration,
+  shouldClearReflectGenerationLoading,
+  shouldCommitReflectGeneration,
+} from './pause-reflect-generation-io';
+
+describe('pause-reflect-generation-io re-exports', () => {
+  it('re-exports holzen-reflect domain helpers from generation leaf modules', () => {
+    expect(typeof resolveReflectGenerationPrefetch).toBe('function');
+    expect(typeof shouldClearReflectGenerationLoading).toBe('function');
+    expect(typeof shouldCommitReflectGeneration).toBe('function');
+    expect(typeof messageFromReflectGenerationResult).toBe('function');
+    expect(typeof reflectGenerationPrerequisite).toBe('function');
+    expect(typeof reflectGenerationUserErrorMessage).toBe('function');
+    expect(typeof resolveEffectiveReflectionCopy).toBe('function');
+
+    expect(resolveReflectGenerationPrefetch).toBe(resolvePrefetchDirect);
+    expect(shouldClearReflectGenerationLoading).toBe(shouldClearLoadingDirect);
+    expect(shouldCommitReflectGeneration).toBe(shouldCommitDirect);
+    expect(messageFromReflectGenerationResult).toBe(messageDirect);
+    expect(reflectGenerationPrerequisite).toBe(prerequisiteDirect);
+    expect(reflectGenerationUserErrorMessage).toBe(userErrorDirect);
+    expect(resolveEffectiveReflectionCopy).toBe(resolveCopyDirect);
+  });
+
+  it('binds default reflectGenerator to public-rpc supabaseReflectGenerator', () => {
+    expect(reflectGenerator).toBe(supabaseReflectGenerator);
+  });
+
+  it('re-exports runReflectGeneration from holzen-reflect leaf (not generation umbrella)', () => {
+    expect(typeof runReflectGeneration).toBe('function');
+    expect(runReflectGeneration).toBe(runReflectGenerationDirect);
+    expect(typeof pauseReflectGeneration).toBe('function');
+    expect(pauseReflectGeneration).not.toBe(runReflectGenerationDirect);
+  });
+
+  it('presentation I/O bindings match pause-reflect-generation-flow CI anchor (leaf parity)', () => {
+    expect(resolveReflectGenerationPrefetch).toBe(resolvePrefetchFromGenerationFlow);
+    expect(shouldClearReflectGenerationLoading).toBe(shouldClearLoadingFromGenerationFlow);
+    expect(shouldCommitReflectGeneration).toBe(shouldCommitFromGenerationFlow);
+    expect(messageFromReflectGenerationResult).toBe(messageFromGenerationFlow);
+    expect(reflectGenerationPrerequisite).toBe(prerequisiteFromGenerationFlow);
+    expect(reflectGenerationUserErrorMessage).toBe(userErrorFromGenerationFlow);
+    expect(resolveEffectiveReflectionCopy).toBe(resolveCopyFromGenerationFlow);
+    expect(runReflectGeneration).toBe(runReflectGenerationFromGenerationFlow);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-telemetry-io.re-exports.test.ts` (holzen-reflect generation vs session reflect PostHog).
+   * Dedicated sibling file: `pause-reflect-generation-telemetry-io-sibling-parity.test.ts` (presentation + application).
+   */
+  it('sibling cluster: telemetry-io re-exports stay distinct from generation-io re-exports', () => {
+    expect(resolveReflectGenerationPrefetch).not.toBe(trackPauseReflectPostItOpen);
+    expect(runReflectGeneration).not.toBe(trackPauseReflectShareTap);
+    expect(pauseReflectGeneration).not.toBe(trackPauseReflectWallpaperTap);
+    expect(reflectGenerationPrerequisite).not.toBe(trackPauseReflectPostItOpen);
+    expect(reflectGenerator).not.toBe(trackPauseReflectShareTap);
+    expect(shouldCommitReflectGeneration).not.toBe(trackPauseReflectWallpaperTap);
+    // Reciprocal inline pins: `pause-reflect-telemetry-io.re-exports.test.ts`.
+  });
+});

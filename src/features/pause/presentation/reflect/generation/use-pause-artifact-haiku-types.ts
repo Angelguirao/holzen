@@ -1,0 +1,27 @@
+/** Params for artifact-only haiku hydrate on Reflect / Frame beats. */
+export type PauseArtifactHaikuFetchPhase = 'idle' | 'loading' | 'error' | 'done';
+
+type UsePauseArtifactHaikuBase = {
+  pauseInstanceId: string | null;
+  companionHaikuEnabled: boolean;
+};
+
+export type UsePauseArtifactHaikuImmediateParams = UsePauseArtifactHaikuBase & {
+  /** Fetch as soon as `pauseInstanceId` is set (Reflect step). */
+  trigger: 'immediate';
+};
+
+export type UsePauseArtifactHaikuWhenEnabledParams = UsePauseArtifactHaikuBase & {
+  /** Fetch only when true (Frame step — user expanded haiku). */
+  trigger: 'whenEnabled';
+  fetchEnabled: boolean;
+};
+
+export type UsePauseArtifactHaikuParams =
+  | UsePauseArtifactHaikuImmediateParams
+  | UsePauseArtifactHaikuWhenEnabledParams;
+
+export type UsePauseArtifactHaikuResult = {
+  artifactHaiku: string | null;
+  haikuFetch: PauseArtifactHaikuFetchPhase;
+};

@@ -2,19 +2,19 @@ import { useState, useCallback, useMemo } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeEdge } from '@/lib/invoke-edge';
-import { useAuth } from '@/hooks/use-auth';
-import { useHolzen } from '@/hooks/use-holzen';
+import { useAuth } from '@/features/auth/public';
+import { useHolzen } from '@/app/components/HolzenProvider';
 import { useTranslation } from 'react-i18next';
 import { RefreshCw, TrendingUp, Clock, Brain, Sparkles, Target, Loader2, Lock } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
-import { useSubscription } from '@/hooks/use-subscription';
-import { SubscriptionSkeleton } from '@/app/components/SubscriptionSkeleton';
+import { useSubscription } from '@/features/subscription/public-hooks';
+import { SubscriptionSkeleton } from '@/screens/home/components/SubscriptionSkeleton';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
-import { useProGate } from '@/hooks/use-pro-gate';
-import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
+import { useProGate } from '@/features/subscription/public-hooks';
+import { isPaidLimitReached, showLimitReachedToast } from '@/features/subscription/public-limits';
 
 interface Insight {
   category: 'regulation' | 'tolerance' | 'alignment' | 'reappraisal' | 'awareness' | 'timing' | 'mood' | 'behavior' | 'engagement' | 'growth';

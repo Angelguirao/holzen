@@ -9,7 +9,7 @@ vi.mock('framer-motion', async () => {
 
 const ensureTrial = vi.fn().mockResolvedValue(undefined);
 
-vi.mock('@/hooks/use-subscription', () => ({
+vi.mock('@/features/subscription/public-hooks', () => ({
   useSubscription: () => ({
     ensureTrial,
     trialLoading: false,

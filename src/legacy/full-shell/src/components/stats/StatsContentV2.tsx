@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { usePauseStatsData } from '@/hooks/use-pause-stats-data';
+import { usePauseStatsData } from '@/legacy/full-shell/src/hooks/use-pause-stats-data';
 import { SkillOverviewCard } from '@/legacy/full-shell/src/components/stats/SkillOverviewCard';
 import { MoodShiftChart } from '@/legacy/full-shell/src/components/stats/regulation/MoodShiftChart';
 import { MoodTrendChart } from '@/legacy/full-shell/src/components/stats/regulation/MoodTrendChart';
@@ -16,7 +16,7 @@ import { MilestoneTimeline } from '@/legacy/full-shell/src/components/stats/jour
 import { PeriodComparisonCard } from '@/legacy/full-shell/src/components/stats/journey/PeriodComparisonCard';
 import { MoodPriceChart } from '@/legacy/full-shell/src/components/stats/advanced/MoodPriceChart';
 import { MoodPriceScatter } from '@/legacy/full-shell/src/components/stats/advanced/MoodPriceScatter';
-import type { PauseFullRow } from '@/lib/pause-stats-data-query';
+import type { PauseFullRow } from '@/legacy/full-shell/src/lib/pause-stats-data-query';
 import { cn } from '@/lib/utils';
 
 interface Props {

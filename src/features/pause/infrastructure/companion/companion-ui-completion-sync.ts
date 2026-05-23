@@ -1,38 +1,17 @@
 import { supabase } from '@/integrations/supabase/client';
-import { deriveBreathingUiCompleteFromPayloads } from '@/features/pause/application/companion/breathing-ui-complete';
+import { deriveBreathingUiCompleteFromPayloads } from '@/features/pause/application/use-cases/ritual/frame/breathing-ui-complete';
 import {
   type CompanionUiCompletionStep,
   type CompanionUiCompletionState,
-} from '@/features/pause/application/companion/companion-ui-completion-types';
-import { invalidateCompanionUiCompletionQuery } from '@/features/pause/application/queries/companion-ui-completion-query-key';
-import { pauseLogCompanion, pauseLogStep } from '@/features/pause/public-rpc';
-import type { PauseStepType } from '@/features/pause/domain/pause-state';
+} from '@/features/pause/application/use-cases/ritual/frame/companion-ui-completion-types';
 
 export type { CompanionUiCompletionStep, CompanionUiCompletionState };
-export { EMPTY_COMPANION_UI_COMPLETION } from '@/features/pause/application/companion/companion-ui-completion-types';
+export { EMPTY_COMPANION_UI_COMPLETION } from '@/features/pause/application/use-cases/ritual/frame/companion-ui-completion-types';
 
 export {
   companionUiCompletionQueryKey,
   invalidateCompanionUiCompletionQuery,
-} from '@/features/pause/application/queries/companion-ui-completion-query-key';
-
-const STEP_TO_COMPANION_TYPE: Record<CompanionUiCompletionStep, string | null> = {
-  breathing: null,
-  haiku: 'haiku',
-  grounding: 'ground_nudge',
-  signal: 'signal',
-  zoomOut: 'zoom_out',
-  history: 'historical_insight',
-};
-
-const STEP_TO_STEP_TYPE: Record<CompanionUiCompletionStep, PauseStepType | null> = {
-  breathing: 'breath_completed',
-  haiku: null,
-  grounding: null,
-  signal: null,
-  zoomOut: null,
-  history: null,
-};
+} from '@/features/pause/infrastructure/queries/companion/companion-ui-completion-query-key';
 
 export async function loadCompanionUiCompletionState(
   pauseInstanceId: string,
@@ -71,31 +50,4 @@ export async function loadCompanionUiCompletionState(
       companionCompleted.has('zoom_out') || companionCompleted.has('zoom_out_deep_time'),
     history: companionCompleted.has('historical_insight'),
   };
-}
-
-export async function persistCompanionUiStepCompletion(
-  pauseInstanceId: string,
-  step: CompanionUiCompletionStep,
-  options?: { entryPoint?: string },
-): Promise<void> {
-  const stepType = STEP_TO_STEP_TYPE[step];
-  if (stepType) {
-    await pauseLogStep({
-      instanceId: pauseInstanceId,
-      stepType,
-    }).catch(() => undefined);
-    invalidateCompanionUiCompletionQuery(pauseInstanceId);
-    return;
-  }
-
-  const companionType = STEP_TO_COMPANION_TYPE[step];
-  if (!companionType) return;
-
-  await pauseLogCompanion({
-    instanceId: pauseInstanceId,
-    companionType,
-    action: 'complete',
-    entryPoint: options?.entryPoint ?? 'pause_flow',
-  }).catch(() => undefined);
-  invalidateCompanionUiCompletionQuery(pauseInstanceId);
 }

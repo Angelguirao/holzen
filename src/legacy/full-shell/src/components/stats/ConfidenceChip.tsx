@@ -1,5 +1,5 @@
 import { Info } from 'lucide-react';
-import type { Confidence } from '@/lib/stats/confidence';
+import type { Confidence } from '@/legacy/full-shell/src/lib/stats/confidence';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 

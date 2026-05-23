@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { format, isToday, startOfDay } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import type { PauseArchiveRow } from '@/features/pause/public-queries';
+import type { PauseArchiveRow } from '@/features/pause/public-hooks';
 import { ArchivePauseCard } from './ArchivePauseCard';
 
 type DateGroup = { key: string; label: string; items: PauseArchiveRow[] };

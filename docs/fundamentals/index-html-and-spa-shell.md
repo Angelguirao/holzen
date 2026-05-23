@@ -16,7 +16,7 @@ Related: [navigating-the-codebase.md](navigating-the-codebase.md) §3 (short boo
 | **Routes** | Same file for `/`, `/pause`, `/journey`, etc. (client router picks the screen) | `App.tsx` + `react-router` choose the screen |
 | **When it changes** | SEO/PWA meta, boot recovery, Vite entry | Almost all product work |
 
-You do **not** add new screens by adding new HTML files. You add pages under `src/pages/` and routes in `src/App.tsx`.
+You do **not** add new screens by adding new HTML files. You add a screen under `src/screens/<route>/` and wire the route in `src/App.tsx`.
 
 ---
 
@@ -48,7 +48,7 @@ Sets Tailwind’s `dark:` variant before CSS/JS load so the first paint matches 
 ### `<head>` — document metadata
 
 - **Title and description** — browser tab and search snippets.
-- **Canonical, Open Graph, Twitter** — link previews when someone shares `https://holzen.app/...`. Default tags live here; per-route pages can override via `PageMeta` (`src/components/PageMeta.tsx`), which uses `SITE_ORIGIN` from `src/config/site.ts`.
+- **Canonical, Open Graph, Twitter** — link previews when someone shares `https://holzen.app/...`. Default tags live here; per-route pages can override via `PageMeta` (`src/app/components/PageMeta.tsx`), which uses `SITE_ORIGIN` from `src/config/site.ts`.
 - **`og:image` / `twitter:image`** — hosted preview image URLs (currently on R2/CDN; not required to match the site hostname).
 - **PWA** — `manifest.json`, theme color, Apple touch icon.
 - **JSON-LD** (`SoftwareApplication`) — structured data for crawlers; `url` should match the custom domain. Keep `offers.price` aligned with [`src/lib/pricing.ts`](../../src/lib/pricing.ts) (`4.99`) and trial-first copy in [`src/locales/en.json`](../../src/locales/en.json) (`landing.pricingDesc`).
@@ -108,7 +108,7 @@ When you change the canonical domain, set optional **`VITE_SITE_ORIGIN`** (build
 | Per-route SEO | `PageMeta` on the page + `SITE_ORIGIN` |
 | Private / app routes | `RobotsNoIndex`, `AppLayout`, or `noindex` on `PageMeta` |
 | Boot / cache recovery behavior | `index.html` inline script |
-| New screen or flow | `src/pages/`, `App.tsx` — not `index.html` |
+| New screen or flow | `src/screens/<route>/`, `App.tsx` — not `index.html` |
 | Faster third-party connections | `vite.config.ts` `preconnectHeadSnippet` |
 
 ---
@@ -121,7 +121,7 @@ When you change the canonical domain, set optional **`VITE_SITE_ORIGIN`** (build
 | `src/main.tsx` | JS entry, observability init, React mount |
 | `src/App.tsx` | Providers, router, layouts |
 | `src/config/site.ts` | `SITE_ORIGIN` / `SITE_HOST` for runtime canonical and share URLs |
-| `src/components/PageMeta.tsx` | Per-route title, description, canonical, OG |
+| `src/app/components/PageMeta.tsx` | Per-route title, description, canonical, OG |
 | `vite.config.ts` | `transformIndexHtml` → SEO placeholders + preconnects |
 | `src/config/site-seo-defaults.ts` | Default title/description/OG URL; JSON-LD offer helper |
 | `public/manifest.json` | PWA manifest (`start_url` is path-relative `/`) |

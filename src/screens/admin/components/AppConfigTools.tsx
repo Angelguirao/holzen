@@ -9,30 +9,24 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, Check, DollarSign, Loader2, Mail, Power, RefreshCw, Save, Users, Zap } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { DevModeToggle } from '@/screens/admin/components/DevModeToggle';
 import { StripePriceCheck } from '@/screens/admin/components/StripePriceCheck';
-import {
-  mergePregenerateCacheTopup,
-  type PregenerateCacheTopupKey,
-} from '../../../../supabase/functions/_shared/pregenerate-cache-topup-config.ts';
 import {
   ADMIN_APP_CONFIG_TOOLS_QUERY_KEY,
   DEFAULTS,
   FEATURE_KEYS,
   getAdminAppConfigToolsQueryOptions,
+  upsertAppConfigRow,
   type ConfigState,
   type FeatureKey,
   type SpendSnapshot,
-} from '@/lib/admin-app-config-tools-query';
+  mergePregenerateCacheTopup,
+  PREGENERATE_CACHE_TOPUP_KEYS,
+  type PregenerateCacheTopupKey,
+} from '@/screens/admin/public-queries';
 
-const PREGENERATE_TOPUP_KEYS: PregenerateCacheTopupKey[] = [
-  'ground_nudge',
-  'signal',
-  'historical_insight',
-  'zoom_out_deep_time',
-];
+const PREGENERATE_TOPUP_KEYS: PregenerateCacheTopupKey[] = [...PREGENERATE_CACHE_TOPUP_KEYS];
 
 const PREGENERATE_TOPUP_LABELS: Record<PregenerateCacheTopupKey, string> = {
   ground_nudge: 'Grounding',
@@ -40,13 +34,6 @@ const PREGENERATE_TOPUP_LABELS: Record<PregenerateCacheTopupKey, string> = {
   historical_insight: 'History',
   zoom_out_deep_time: 'Zoom out (deep time)',
 };
-
-async function saveRow(key: string, value: unknown): Promise<void> {
-  const { error } = await supabase
-    .from('app_config' as never)
-    .upsert({ key, value } as never, { onConflict: 'key' } as never);
-  if (error) throw error;
-}
 
 export function AppConfigTools() {
   const { toast } = useToast();
@@ -99,7 +86,7 @@ export function AppConfigTools() {
   const persist = useCallback(async (key: string, value: unknown, optimistic: ConfigState) => {
     mark(key, true);
     try {
-      await saveRow(key, value);
+      await upsertAppConfigRow(key, value);
       setInitial(optimistic);
       syncBundleQueryCache(optimistic);
       toast({ title: 'Saved', description: key });

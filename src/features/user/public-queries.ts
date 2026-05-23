@@ -8,9 +8,137 @@ export {
   type UserPref,
 } from './infrastructure/queries/user-signal-preferences-query';
 export {
+  deleteUserSignalPreference,
+  insertCatalogSignalPreference,
+  insertCustomUserSignalPreference,
+  updateUserSignalPreferenceActive,
+} from './infrastructure/queries/user-signal-preferences-mutations';
+export {
   fetchProfileRowForUser,
   getProfileRowQueryOptions,
   PROFILE_QUERY_KEY,
   type ProfileRow,
 } from './infrastructure/queries/profile-row-query';
 export { getHoldGoalProfileQueryOptions } from './infrastructure/queries/hold-goal-profile-query';
+export {
+  REFERRAL_QUERY_DISABLED_USER_ID,
+  REFERRAL_REWARDS_NONE_QUERY_KEY,
+  REFERRAL_REWARDS_QUERY_PREFIX,
+  REFERRALS_COUNT_NONE_QUERY_KEY,
+  REFERRALS_COUNT_QUERY_PREFIX,
+  fetchReferralRewards,
+  fetchReferralsCount,
+  getReferralRewardsQueryOptions,
+  getReferralsCountQueryOptions,
+  referralRewardsQueryKey,
+  referralsCountQueryKey,
+  type ReferralGrantedRewardRow,
+} from './infrastructure/queries/referral-query';
+export {
+  deleteQuietWindow,
+  insertQuietWindow,
+  updateQuietWindow,
+} from './infrastructure/queries/quiet-windows-mutations';
+export {
+  getQuietWindowsQueryOptions,
+  quietWindowsQueryKey,
+  type QuietWindow,
+} from './infrastructure/queries/quiet-windows-query';
+export {
+  SIGNAL_SOURCES_CATALOG_QUERY_KEY,
+  SIGNAL_SOURCES_CATALOG_QUERY_PREFIX,
+  fetchSignalSourcesCatalog,
+  getSignalSourcesCatalogQueryOptions,
+  type CatalogSource,
+} from './infrastructure/queries/signal-sources-catalog-query';
+export {
+  approveSignalSourceSuggestion,
+  deleteSignalSourceRow,
+  deleteSignalSourceRowsByIds,
+  insertAdminSignalSource,
+  rejectSignalSourceSuggestion,
+  setSignalSourceDemotedForLive,
+  type ApproveSignalSourceSuggestionInput,
+  type ApproveSignalSourceSuggestionResult,
+  type SignalSourceAdminMutationResult,
+} from './infrastructure/queries/signal-sources-admin-mutations';
+export {
+  ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_KEY,
+  fetchPendingSourceSuggestionsRows,
+  getAdminPendingSourceSuggestionsQueryOptions,
+  type SourceSuggestionRow,
+} from './infrastructure/queries/signal-source-suggestions-admin-query';
+export {
+  getThresholdVolatilityEstimatorQueryOptions,
+  thresholdVolatilityEstimatorQueryKey,
+} from './infrastructure/queries/threshold-volatility-estimator-query';
+export {
+  HOLZEN_NUMBER_QUERY_KEY,
+  fetchHolzenNumber,
+  getHolzenNumberQueryOptions,
+  type HolzenNumberData,
+} from './infrastructure/queries/holzen-number-query';
+export {
+  clearProfileHoldGoal,
+  fetchProfileLastTriggerAt,
+  updateProfileFields,
+  updateProfileHoldGoal,
+  updateProfileSnoozedUntil,
+  type ProfileUpdate,
+  type ProfilesHoldGoalUpdate,
+} from './infrastructure/queries/profile-mutations';
+export { submitUserTestimonial } from './infrastructure/queries/testimonial-mutations';
+export {
+  fetchLandingTestimonials,
+  getLandingTestimonialsQueryOptions,
+  LANDING_TESTIMONIALS_QUERY_KEY,
+  LANDING_TESTIMONIALS_QUERY_PARAMS,
+  LANDING_TESTIMONIALS_QUERY_PREFIX,
+  type LandingTestimonialRow,
+} from './infrastructure/queries/landing-testimonials-query';
+export {
+  deleteRoadmapVote,
+  fetchRoadmapItemsPage,
+  fetchRoadmapVotes,
+  getRoadmapItemsInfiniteQueryOptions,
+  getRoadmapVotesQueryOptions,
+  insertRoadmapVote,
+  roadmapVotesQueryKey,
+  ROADMAP_ITEMS_PAGE_SIZE,
+  ROADMAP_ITEMS_QUERY_KEY,
+  ROADMAP_VOTES_NONE_QUERY_KEY,
+  type RoadmapListItem,
+} from './infrastructure/queries/roadmap-query';
+export {
+  CHANGELOG_ENTRIES_PAGE_SIZE,
+  CHANGELOG_ENTRIES_QUERY_KEY,
+  CHANGELOG_ENTRIES_QUERY_LEAF,
+  CHANGELOG_ENTRIES_QUERY_PREFIX,
+  CHANGELOG_LATEST_VERSION_QUERY_KEY,
+  CHANGELOG_LATEST_VERSION_QUERY_LEAF,
+  CHANGELOG_LATEST_VERSION_QUERY_PREFIX,
+  fetchChangelogEntriesPage,
+  fetchLatestChangelogVersion,
+  getChangelogEntriesInfiniteQueryOptions,
+  getLatestChangelogVersionQueryOptions,
+  prefetchChangelogEntriesFirstPage,
+  type ChangelogEntryRow,
+} from './infrastructure/queries/changelog-query';
+export {
+  BLOG_POST_BY_SLUG_DISABLED_SLUG,
+  BLOG_POST_BY_SLUG_NONE_QUERY_KEY,
+  BLOG_POST_BY_SLUG_QUERY_PREFIX,
+  BLOG_PUBLISHED_LIST_PAGE_SIZE,
+  BLOG_PUBLISHED_POSTS_QUERY_PREFIX,
+  blogPostBySlugQueryKey,
+  blogPublishedPostsInfiniteQueryKey,
+  blogPublishedPostsNextPageParam,
+  fetchBlogPostBySlug,
+  fetchBlogPublishedPostsPage,
+  getBlogPostBySlugQueryOptions,
+  getBlogPublishedPostsInfiniteQueryOptions,
+  prefetchBlogPostBySlug,
+  prefetchBlogPublishedFirstPage,
+  type BlogPostRow,
+  type BlogPublishedListRow,
+} from './infrastructure/queries/blog-post-query';

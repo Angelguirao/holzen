@@ -13,20 +13,22 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | If you change… | Read first (canonical) | Also update / verify in the same PR when relevant |
 |----------------|------------------------|-----------------------------------------------------|
 | App boot, routing, auth wiring, Lovable vs local | [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) | [docs/systems/routing/route-gating-system.md](docs/systems/routing/route-gating-system.md) if gates change |
-| Nav, IA, primary routes, bottom nav | [docs/design/information-architecture.md](docs/design/information-architecture.md) + `src/App.tsx` / `src/lib/app-routes.ts` | [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md) if `navigation.*` or product surface names in analytics change |
-| Pause lifecycle, instances, events, artifacts, stats hooks | [docs/systems/pause-system.md](docs/systems/pause-system.md) | RPCs/migrations listed under **Where to change what → Pause**; keep `invokeEdge` / `x-cid` intact |
+| Nav, IA, primary routes, bottom nav | [docs/ops/active-surface.md](docs/ops/active-surface.md) + `src/App.tsx` / `src/lib/app-routes.ts` | [docs/design/information-architecture.md](docs/design/information-architecture.md) (§1–§3 full-IA reference; §4.5–§4.6 pause-first); [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md) if `navigation.*` or product surface names in analytics change |
+| Pause lifecycle, instances, events, artifacts, stats hooks | [docs/systems/pause-system.md](docs/systems/pause-system.md) | RPCs/migrations listed under **Where to change what → Pause**; client layout [pause-client-architecture.md](docs/systems/pause-client-architecture.md); keep `invokeEdge` / `x-cid` intact |
 | Pause AI, companions, edge orchestration, cron | [docs/systems/pause/ai-powered-pause-system.md](docs/systems/pause/ai-powered-pause-system.md) | [docs/systems/costs/ai-cost-model.md](docs/systems/costs/ai-cost-model.md) when limits/flags/cost paths change |
-| Profile stats UI and skills-first model | [docs/systems/stats-system.md](docs/systems/stats-system.md) | `src/components/stats/`, `src/lib/stats/`, `use-pause-stats-data` |
-| Badges (families, definitions, sync) | [docs/systems/badges-system.md](docs/systems/badges-system.md) | `src/lib/badges/`, `use-badge-sync`, `BadgesPanelV2` |
+| Profile stats UI and skills-first model | [docs/systems/stats-system.md](docs/systems/stats-system.md) | **Not shipped** in pause-first UI — reference `src/legacy/full-shell/`; active journey uses overview in `screens/journey/` |
+| Badges (families, definitions, sync) | [docs/systems/badges-system.md](docs/systems/badges-system.md) | **Not shipped** — `BadgesPanelV2` in `src/legacy/full-shell/` only |
 | Postgres functions, RLS, triggers, views | [docs/ops/migration-security-conventions.md](docs/ops/migration-security-conventions.md) | [docs/ops/migration-view-safety.md](docs/ops/migration-view-safety.md) for views; `npm run gen:types` when possible |
 | New or renamed edge HTTP handler | `supabase/functions/_shared/with-request-logging.ts`, [docs/ops/edge-logging-conventions.md](docs/ops/edge-logging-conventions.md) | `[functions.*]` in `supabase/config.toml`, `EdgeCoverage.tsx`, `npm run check:edge-logging` + `check:edge-coverage-manifest` |
 | PostHog product events or properties | [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md) | Call sites + privacy/sanitization patterns in `src/lib/posthog.ts` |
 | Feature flags (new flag or rollout change) | [docs/ops/feature-flags.md](docs/ops/feature-flags.md) | `use-feature-flag` usage; default and sunset note |
-| React screens (orchestration, hooks split, memoization) | [docs/fundamentals/react-screen-orchestration.md](docs/fundamentals/react-screen-orchestration.md), [src/screens/README.md](src/screens/README.md) | [modern-react-practices-holzen.md](docs/fundamentals/modern-react-practices-holzen.md) scorecard; `npm run check:thin-pages` |
-| Application structure (bounded contexts, use cases, ports, monorepo target, pre-launch restructure) | [docs/fundamentals/holzen-application-architecture.md](docs/fundamentals/holzen-application-architecture.md) | [frontend-module-layout.md](docs/fundamentals/frontend-module-layout.md); ADR [2026-05-17-modular-monolith-hexagonal-client.md](docs/decisions/2026-05-17-modular-monolith-hexagonal-client.md) |
+| React screens (orchestration, hooks split, memoization) | [docs/fundamentals/react-screen-orchestration.md](docs/fundamentals/react-screen-orchestration.md), [src/screens/README.md](src/screens/README.md) | [modern-react-practices-holzen.md](docs/fundamentals/modern-react-practices-holzen.md) scorecard; [refactoring-strategy.md](docs/fundamentals/refactoring-strategy.md); [naming-conventions-holzen.md](docs/fundamentals/naming-conventions-holzen.md) for new screen files |
+| Client `src/` folder placement (app / screens / components / features) | [docs/fundamentals/client-src-layout.md](docs/fundamentals/client-src-layout.md) | [client-architecture-overview.md](docs/fundamentals/client-architecture-overview.md); folder READMEs under `src/app`, `src/screens`, `src/components`; [naming-conventions-holzen.md](docs/fundamentals/naming-conventions-holzen.md) |
+| Application structure (bounded contexts, use cases, ports, monorepo target, pre-launch restructure) | [docs/fundamentals/holzen-application-architecture.md](docs/fundamentals/holzen-application-architecture.md) | [client-architecture-overview.md](docs/fundamentals/client-architecture-overview.md); [pause-client-architecture.md](docs/systems/pause-client-architecture.md); per-context `*-client-architecture.md`; [frontend-module-layout.md](docs/fundamentals/frontend-module-layout.md); ADR [2026-05-17-modular-monolith-hexagonal-client.md](docs/decisions/2026-05-17-modular-monolith-hexagonal-client.md) |
 | Cross-surface ownership (truth vs UI projection; TanStack Query vs UI-only state; avoid duplicate “backends”) | [docs/fundamentals/client-server-architecture-holzen.md](docs/fundamentals/client-server-architecture-holzen.md) | [holzen-application-architecture.md](docs/fundamentals/holzen-application-architecture.md); [navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) §6.1 when fetch/cache patterns change |
 | Visual tokens, Nox, component styling | [DESIGN.md](DESIGN.md), [docs/design/nox/](docs/design/nox/) | `src/index.css`, `tailwind.config.ts` — Figma owns pixel values; markdown owns migration rules |
 | Auth + referral side effects | [docs/systems/auth/auth-and-referral-system.md](docs/systems/auth/auth-and-referral-system.md) | RLS-sensitive paths per [docs/reviews/](docs/reviews/) phases when security-relevant |
+| In-app inbox, web push, delivery channels | [docs/systems/notifications-delivery.md](docs/systems/notifications-delivery.md) | `src/features/notifications/`; bell via `public-hooks`; email toggle stays on **user** profile |
 | Content library ingest / RSS / admin | [docs/systems/content-library-fetch-source-feeds.md](docs/systems/content-library-fetch-source-feeds.md) | Edge + admin docs referenced there |
 | PR / release discipline, flow-first review | [docs/reviews/react-spa-review-template.md](docs/reviews/react-spa-review-template.md), [docs/reviews/end-to-end-review-master-checklist.md](docs/reviews/end-to-end-review-master-checklist.md) | Cursor skill `.cursor/skills/holzen-flow-review/SKILL.md` |
 | Ship to GitHub / Lovable / Supabase | [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md) | `.cursor/rules/deployment-sync.mdc` mirrors the minimum gate |
@@ -55,9 +57,8 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run check:edge` | Optional: `deno check` on all `supabase/functions/*/index.ts`; **skips** if Deno is missing. Resolves `deno` from PATH, then `DENO_INSTALL/bin`, then `~/.deno/bin` (official installer default). |
 | `npm run check:edge-logging` | Regex guardrail: HTTP-serving edge `index.ts` files must wrap handlers in `withRequestLogging` (BetterStack + Sentry). Runs in **`test:ci`** and **`check:prepush`**. |
 | `npm run check:edge-coverage-manifest` | Ensures `src/screens/ops/EdgeCoverageScreen.tsx` `COVERAGE` lists every `supabase/config.toml` `[functions.*]` name (and no extras). Run when adding/removing edge functions. |
-| `npm run check:thin-pages` | Every `src/pages/**/*.tsx` is a one-line re-export from `@/screens/*` (in **`check:architecture-alignment`** / **`test:ci`**) |
 | `npm run check:no-root-components` | No new `src/components/*.tsx` outside `ui/` + allowlist (in **`test:ci`**) |
-| `npm run check:architecture-alignment` | Features layout, no screens-in-features, thin pages (in **`test:ci`**) |
+| `npm run check:architecture-alignment` | Features layout, no screens-in-features (in **`test:ci`**) |
 | `npm run check:prepush` | Full scripted preflight (`scripts/pre-push-check.sh`). **Requires `bash`** (Git Bash / WSL on Windows). |
 | `npm run smoke:edge-logging` | Optional: HTTP smoke against deployed edges — verifies `x-cid` round-trip through `withRequestLogging` (see `supabase/functions/README.md`). |
 | `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **linked** Supabase project (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Run after DB migrations. |
@@ -74,20 +75,19 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 
 | Area | Location |
 |------|----------|
-| Routes | `src/App.tsx` — `ProtectedRoute` / `PublicOnlyRoute`, shell vs full-screen; helpers in `src/lib/app-routes.ts` (`/journey/*`, `/tools/*`, `TOOLS_PREFIX`); no `/profile` routes |
-| Screen UI + orchestration | `src/screens/<route>/` (`*Screen.tsx`, `components/`, `hooks/`); thin re-exports in `src/pages/` — see [src/screens/README.md](src/screens/README.md) |
-| App shell (layout, nav, chrome) | `src/app/components/`, `src/app/hooks/` — see [src/app/README.md](src/app/README.md) |
-| Pause lifecycle | `src/lib/pause-state.ts` (state machine helpers), `src/lib/pause-api.ts` (typed RPC wrappers), `src/lib/pause-quality.ts` (quality score), `src/lib/pause-fingerprint.ts`, `src/lib/pause-artifact-cache.ts`. Canonical model: [docs/systems/pause-system.md](docs/systems/pause-system.md). Schema + RPCs (ordered in `supabase/migrations/`): `202604232007*_pause_*.sql`, `20260423201000_pause_rpc_functions.sql`, `20260423201100_pause_log_companion_race_fix.sql`, `20260423201200_pause_create_or_reuse_service.sql`, `20260423201300_companion_serves_pause_instance_id.sql`, `20260423201400_pause_v2_notifications_trigger.sql`, `20260423201500_pause_ai_artifacts_owner_write.sql`, `20260423202000_pause_v2_destructive_cutover.sql`. |
-| Stats | `src/components/stats/` (skills-first IA post-Pause-V2). Hero: `SkillOverviewCard.tsx`. Deep dives under `src/components/stats/{regulation,tolerance,alignment,reappraisal,awareness}/`. Journey under `src/components/stats/journey/`. Advanced under `src/components/stats/advanced/`. Score: `src/lib/stats/pause-score.ts`. Confidence: `src/lib/stats/confidence.ts`. Loader: `src/hooks/use-pause-stats-data.ts`. |
-| Badges | `src/components/BadgesPanelV2.tsx` (4-family / 14-active). Definitions: `src/lib/badges/definitions.ts`. Computation: `src/lib/badges/compute.ts`. Sync + celebration + silent-seed: `src/hooks/use-badge-sync.ts`. |
-| Shared UI primitives | `src/components/ui/` (shadcn / Radix) — no new `src/components/*.tsx` at root (`check:no-root-components`) |
+| Routes | `src/App.tsx` — `ProtectedRoute` / `PublicOnlyRoute`, shell vs full-screen; helpers in `src/lib/app-routes.ts` (four-tab shell; dead `/tools/*` → `NotFound`) |
+| Screens (presentation) | `src/screens/<route>/` — [src/screens/README.md](src/screens/README.md); `App.tsx` lazy-loads `*Screen.tsx` |
+| App shell (layout, nav, chrome) | `src/app/components/`, `src/app/hooks/` — [src/app/README.md](src/app/README.md) |
+| Pause lifecycle | `src/features/pause/` + ritual UI in `src/screens/pause/`; import via `public*` barrels (active `@/lib/pause-*` shims removed May 2026). Canonical model: [docs/systems/pause-system.md](docs/systems/pause-system.md). Client layout: [pause-client-architecture.md](docs/systems/pause-client-architecture.md). Schema + RPCs: `202604232007*_pause_*.sql` … `20260423202000_pause_v2_destructive_cutover.sql`. |
+| Stats / badges UI | **Not in active bundle** — `src/legacy/full-shell/` + [active-surface.md](docs/ops/active-surface.md); `src/lib/stats/` may remain for tests |
+| Shared UI | `src/components/ui/` + `icons/` — [src/components/README.md](src/components/README.md); no new root `src/components/*.tsx` (`check:no-root-components`) |
 | Visual system (Nox + tokens) | **[DESIGN.md](DESIGN.md)** (agent-oriented); `src/index.css` + `tailwind.config.ts`; deep contract `docs/design/nox/` |
-| Auth state | `src/hooks/use-auth.tsx` + `AuthProvider` in `App.tsx` |
+| Auth state | `src/features/auth/public.ts` (`AuthProvider` / `useAuth`) |
 | Supabase browser client | `src/integrations/supabase/client.ts` |
 | i18n | `src/i18n/`; `useTranslation()` where strings are already externalized |
 | PWA / service worker | `src/sw.ts`; registered via `vite-plugin-pwa` in `vite.config.ts` |
-| Frontend error reporting | `src/lib/sentry.ts` (init + `beforeSend` scrubber); `src/app/components/ErrorBoundary.tsx` (React boundary); `src/main.tsx` (boot + unhandledrejection) |
-| Frontend analytics + flags | `src/lib/posthog.ts` (privacy-first init); `src/hooks/use-feature-flag.ts`; events listed in [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md); flags in [docs/ops/feature-flags.md](docs/ops/feature-flags.md) |
+| Frontend error reporting | `src/lib/sentry.ts` (init + `beforeSend` scrubber); `src/app/components/ErrorBoundary.tsx`; `src/main.tsx` (boot + unhandledrejection) |
+| Frontend analytics + flags | `src/lib/posthog.ts` (privacy-first init); `src/app/hooks/use-feature-flag.ts`; events listed in [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md); flags in [docs/ops/feature-flags.md](docs/ops/feature-flags.md) |
 | Cross-surface correlation | `src/lib/cid.ts` → per-tab `cid`, attached as `x-cid` header via `invokeEdge` wrapper; set as Sentry tag + PostHog super-property |
 | Web Vitals | `src/lib/web-vitals.ts` forwards CLS/INP/LCP/FCP/TTFB to Sentry + PostHog |
 | Edge request logging | `supabase/functions/_shared/with-request-logging.ts` wraps new functions; `_shared/deps.ts` for external call logging; `_shared/edge-error.ts` for standardized errors |
@@ -126,7 +126,7 @@ Never commit `.env` or service role keys.
 ## Git
 
 - **Pause-first MVP launch** (shipped 4-tab shell, legacy strip, cutover): integrate on **`feature/mvpPauseCleanup`** → PR to `main`; manifest [docs/ops/active-surface.md](docs/ops/active-surface.md). Older Pause V2 line was **`cursor/pause-v2-final`** — superseded for this strip.
-- **Commit as you go** when a logical chunk of work is done (e.g. one fix, one migration, one doc update)—do not leave the tree dirty at the end of a task unless the user asked for WIP only.
+- **Commits (agents):** [`.cursor/rules/git-commits.mdc`](.cursor/rules/git-commits.mdc) — commit after each **logical slice** and at task end; default is commit without being asked. Overrides global "only commit when requested" user rules in this repo.
 - Use clear commit messages (what changed and why). Prefer `git` from the system install if it is not on `PATH` (e.g. `C:\Program Files\Git\bin\git.exe` on Windows).
 
 ### Before every push to GitHub (Lovable sync)

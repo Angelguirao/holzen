@@ -9,7 +9,7 @@ Active Holzen frontend. **Pause ritual** is the product; Archive, Journey overvi
 | Home | `/` | `screens/home/HomeScreen.tsx` |
 | Archive | `/archive` | `screens/archive/ArchiveScreen.tsx` |
 | Journey | `/journey` | `screens/journey/JourneyOverviewScreen.tsx` |
-| Settings | `/settings/*` | `screens/settings/*` (+ thin `pages/settings/`) |
+| Settings | `/settings/*` | `screens/settings/*` |
 | Pause | `/pause`, `/companion/*` | `screens/pause/` |
 | Public | `/welcome`, `/auth`, legal, blog | `screens/marketing/*Screen` |
 
@@ -20,13 +20,15 @@ Dead IA (`/tools/*`, `/library`, `/journey/stats`, …) → `NotFound` (no legac
 | Concern | Location |
 | ------- | -------- |
 | Router | `App.tsx`, `lib/app-routes.ts` |
+| Presentation layer | [screens/README.md](screens/README.md), [app/README.md](app/README.md), [components/README.md](components/README.md) |
 | Pause lifecycle | `features/pause/`, `screens/pause/` |
-| Subscription | `hooks/use-subscription.ts`, §5.4 in launch plan |
+| Subscription | `features/subscription/public-hooks` (`useSubscription`), §5.4 in launch plan |
 | Legacy full IA | [`legacy/README.md`](legacy/README.md) — **not imported** |
 | i18n | Shipped: `locales/en.json` only; archived langs in `legacy/locales/` |
 
 ## Architecture
 
+- [`docs/fundamentals/client-src-layout.md`](../docs/fundamentals/client-src-layout.md) — **folder map** (`app` / `screens` / `components` / `features`), layer diagram, PR alignment checklist.
 - [`docs/fundamentals/holzen-application-architecture.md`](../docs/fundamentals/holzen-application-architecture.md) — principles (bounded contexts, use cases, ports).
 - [`docs/fundamentals/frontend-module-layout.md`](../docs/fundamentals/frontend-module-layout.md) — `src/features/` layout (now) and `packages/*` north star (gated).
 - [`features/README.md`](features/README.md) — bounded-context folders under root Vite.

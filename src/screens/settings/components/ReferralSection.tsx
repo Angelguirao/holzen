@@ -1,11 +1,11 @@
 import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { getProfileRowQueryOptions } from '@/features/user/public-queries';
 import {
   getReferralRewardsQueryOptions,
   getReferralsCountQueryOptions,
-} from '@/lib/referral-query';
+} from '@/features/user/public-queries';
 import { useTranslation } from 'react-i18next';
 import { Copy, Check, Gift, Star, Crown } from 'lucide-react';
 import { toast } from 'sonner';

@@ -1,0 +1,29 @@
+import { useEffect } from 'react';
+import { holzenLog } from '@/lib/holzen-console';
+import type { PauseSessionMountLogParams } from './pause-session-shell-io';
+
+/**
+ * One-shot dev diagnostic when `/pause` mounts. Arguments are read from the **first** render only
+ * (empty dependency array); matches prior inline `PauseSession` behavior.
+ *
+ * **Call site:** pass `buildPauseSessionMountLogParams(...)` from `pause-session-shell-io` (shell bootstrap).
+ * so restore + nav + hydration wiring stays in one place.
+ *
+ * **Observability:** `docs/ops/logging-strategy.md` (browser Holzen console / `[holzen:pause]`). Payload
+ * fields are non-PII — see that lib module’s header and `docs/systems/pause-system.md` section 10.
+ */
+export function usePauseSessionMountLog(params: PauseSessionMountLogParams): void {
+  useEffect(() => {
+    holzenLog.pause('mount', {
+      pauseInstanceIdPrefix: params.pauseInstanceIdPrefix,
+      hasNavMessage: params.hasNavMessage,
+      restoredFromStorage: params.restoredFromStorage,
+      hydrationStatus: params.hydrationStatus,
+      ritualEntryInitial: params.ritualEntryInitial,
+      briefStepInitial: params.briefStepInitial,
+      phaseInitial: params.phaseInitial,
+    });
+    // Intentional mount-only snapshot; listing deps would re-log on every navigation/hydration change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-once diagnostic
+  }, []);
+}

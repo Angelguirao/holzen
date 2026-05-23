@@ -46,7 +46,7 @@ That means the app can keep `session` across reloads and refresh tokens automati
 
 ### 2) AuthProvider lifecycle
 
-`AuthProvider` / `useAuth` are exported from `@/features/auth/public` (implementation in `presentation/AuthProvider.tsx`; `src/hooks/use-auth.tsx` re-exports for app boot):
+`AuthProvider` / `useAuth` are exported from `@/features/auth/public` (implementation in `presentation/AuthProvider.tsx`):
 
 1. On mount, it subscribes to Supabase auth events via `supabase.auth.onAuthStateChange(...)`.
 2. For every auth change it updates:

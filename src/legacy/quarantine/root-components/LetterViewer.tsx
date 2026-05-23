@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { formatBtcPrice } from '@/features/market/public';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
+import { useHolzen } from '@/app/components/HolzenProvider';
 
 interface Letter {
   id: string;

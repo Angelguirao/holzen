@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { PageMeta } from '@/app/components/PageMeta';
-import { PublicFooter } from '@/app/components/PublicFooter';
-import { PageHeading } from '@/app/components/PageHeading';
+import { PublicFooter } from '@/screens/marketing/components/PublicFooter';
+import { PageHeading } from '@/components/ui/page-heading';
 import { prefetchCoingeckoBtcUsd } from '@/features/market/public';
 
 const fade = (delay = 0) => ({

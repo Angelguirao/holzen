@@ -22,12 +22,12 @@
 import type {
   PauseStepEventRow,
   PauseCompanionEventRow,
-} from '@/lib/pause-state';
-import type { PauseFullRow } from '@/lib/pause-stats-data-query';
+} from '@/features/pause/public';
+import type { PauseFullRow } from '@/legacy/full-shell/src/lib/pause-stats-data-query';
 import {
   effectivePauseShiftMood,
   hasPauseShiftOrPostEmotion,
-} from '@/lib/pause-effective-emotion';
+} from '@/features/pause/public';
 
 interface HoldGoal {
   type: string | null;

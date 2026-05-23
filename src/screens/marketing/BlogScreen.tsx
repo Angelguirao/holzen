@@ -4,13 +4,16 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { getBlogPublishedPostsInfiniteQueryOptions, prefetchBlogPostBySlug } from '@/lib/blog-post-query';
+import {
+  getBlogPublishedPostsInfiniteQueryOptions,
+  prefetchBlogPostBySlug,
+} from '@/features/user/public-queries';
 import { format } from 'date-fns';
 import { PageMeta } from '@/app/components/PageMeta';
-import { PublicFooter } from '@/app/components/PublicFooter';
-import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+import { PublicFooter } from '@/screens/marketing/components/PublicFooter';
+import { useInfiniteScroll } from '@/app/hooks/use-infinite-scroll';
 import { useTranslation } from 'react-i18next';
-import { PageHeading } from '@/app/components/PageHeading';
+import { PageHeading } from '@/components/ui/page-heading';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },

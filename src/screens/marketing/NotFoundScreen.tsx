@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { trackEvent } from '@/lib/posthog';
+import { trackAppRouteNotFound } from '@/screens/marketing/lib/marketing-screen-telemetry';
 import { RobotsNoIndex } from '@/app/components/PageMeta';
 
 const NotFoundScreen = () => {
@@ -14,7 +14,7 @@ const NotFoundScreen = () => {
     const attempted = location.pathname;
     if (trackedPathRef.current === attempted) return;
     trackedPathRef.current = attempted;
-    trackEvent('app.route_not_found', { attempted_path: attempted });
+    trackAppRouteNotFound(attempted);
     console.error('404 Error: User attempted to access non-existent route:', attempted);
   }, [location.pathname]);
 

@@ -3,29 +3,31 @@ import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { usePauseArchiveList } from '@/screens/archive/hooks/use-pause-archive-list';
-import type { PauseArchiveRow, PauseArchiveSegment } from '@/features/pause/public-queries';
-import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+import {
+  getArchivePausesTabHasRowsQueryOptions,
+  usePauseArchiveList,
+  type PauseArchiveRow,
+  type PauseArchiveSegment,
+} from '@/features/pause/public-hooks';
+import { useInfiniteScroll } from '@/app/hooks/use-infinite-scroll';
 import { PageMeta } from '@/app/components/PageMeta';
 import { Search, X, ArrowUpDown, RefreshCw, Loader2 } from 'lucide-react';
 import { ArchivePauseItems } from '@/screens/archive/components/ArchivePauseItems';
-import { ArchiveCollectionsSection } from '@/screens/archive/components/ArchiveCollectionsSection';
 import { CurrentPauseCard } from '@/screens/archive/components/library/CurrentPauseCard';
-import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
+import { usePullToRefresh } from '@/app/hooks/use-pull-to-refresh';
 
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/use-auth';
-import { getArchivePausesTabHasRowsQueryOptions } from '@/features/pause/public-queries';
-import type { ArchiveMainSegment } from '@/lib/archive-segment';
+import { useAuth } from '@/features/auth/public';
+import type { ArchiveMainSegment } from '@/features/pause/public-hooks';
 
 type SortMode = 'newest' | 'oldest' | 'alphabetical';
 
 function readSegment(params: URLSearchParams): ArchiveMainSegment {
   const s = params.get('seg');
-  if (s === 'echoes' || s === 'collections') return s;
+  if (s === 'echoes') return s;
   return 'pauses';
 }
 
@@ -121,6 +123,19 @@ export default function Archive() {
   );
 
   useEffect(() => {
+    if (searchParams.get('seg') === 'collections') {
+      setSearchParams(
+        (prev) => {
+          const n = new URLSearchParams(prev);
+          n.delete('seg');
+          return n;
+        },
+        { replace: true },
+      );
+    }
+  }, [searchParams, setSearchParams]);
+
+  useEffect(() => {
     if (mainSegment !== 'pauses' && pausesScope === 'favorites') {
       setSearchParams(
         (prev) => {
@@ -173,7 +188,6 @@ export default function Archive() {
   }, [segmentBase]);
 
   const filtered = useMemo(() => {
-    if (mainSegment === 'collections') return [];
     let result = segmentBase;
     if (tagFilter) {
       result = result.filter((r) => (r.tags ?? []).includes(tagFilter));
@@ -280,7 +294,7 @@ export default function Archive() {
         noindex
       />
 
-      {mainSegment !== 'collections' && <CurrentPauseCard />}
+      <CurrentPauseCard />
 
       {pauseArchive.listLoadFailed && (
         <Alert variant="destructive">
@@ -315,7 +329,7 @@ export default function Archive() {
       </AnimatePresence>
 
       <div className="sticky top-0 z-30 flex gap-4 border-b border-border/30 bg-background/95 py-2 backdrop-blur-sm">
-        {(['pauses', 'echoes', 'collections'] as const).map((seg) => (
+        {(['pauses', 'echoes'] as const).map((seg) => (
           <button
             key={seg}
             type="button"
@@ -327,24 +341,12 @@ export default function Archive() {
                 : 'border-transparent text-muted-foreground hover:text-muted-foreground/90',
             )}
           >
-            {seg === 'pauses'
-              ? t('archive.segmentPauses')
-              : seg === 'echoes'
-                ? t('archive.segmentEchoes')
-                : t('library.tabCollections')}
+            {seg === 'pauses' ? t('archive.segmentPauses') : t('archive.segmentEchoes')}
           </button>
         ))}
       </div>
 
-      {mainSegment === 'collections' && (
-        <div className="space-y-4">
-          <p className="text-sm leading-relaxed text-muted-foreground">{t('archive.collectionsBlurb')}</p>
-          <ArchiveCollectionsSection listSort={sortMode} />
-        </div>
-      )}
-
-      {mainSegment !== 'collections' && (
-        <div className="space-y-4">
+      <div className="space-y-4">
           <p className="text-sm leading-relaxed text-muted-foreground">
             {mainSegment === 'pauses' ? t('archive.introPauses') : t('archive.introEchoes')}
           </p>
@@ -462,8 +464,7 @@ export default function Archive() {
               {pauseArchive.loadingMore && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/40" aria-hidden />}
             </div>
           )}
-        </div>
-      )}
+      </div>
     </div>
   );
 }

@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { Sparkles, Flame, Shield, Target, Feather } from 'lucide-react';
-import type { PauseFullRow } from '@/lib/pause-stats-data-query';
-import { effectivePauseShiftMood } from '@/lib/pause-effective-emotion';
+import type { PauseFullRow } from '@/legacy/full-shell/src/lib/pause-stats-data-query';
+import { effectivePauseShiftMood } from '@/features/pause/public';
 
 interface Props {
   rows: readonly PauseFullRow[];

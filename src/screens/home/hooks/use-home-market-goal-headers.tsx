@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 import { useCallback, useMemo, useState } from 'react';
 import { HomeExpandChevronButton } from '@/screens/home/components/HomeExpandChevronButton';
-import { trackEvent } from '@/lib/posthog';
+import { trackHomeGoalWhyExpandToggled } from '@/screens/home/lib/home-screen-telemetry';
 
 export function useHomeMarketGoalHeaders(args: {
   t: TFunction;
@@ -16,7 +16,7 @@ export function useHomeMarketGoalHeaders(args: {
   const toggleGoalWhyExpanded = useCallback(() => {
     setGoalWhyExpanded((prev) => {
       const next = !prev;
-      trackEvent('home.goal_why_expand_toggled', { expanded: next });
+      trackHomeGoalWhyExpandToggled(next);
       return next;
     });
   }, []);

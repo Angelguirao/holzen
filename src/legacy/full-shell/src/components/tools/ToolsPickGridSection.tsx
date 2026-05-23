@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { moreToolEntries, spotlightToolEntries } from '@/lib/tools-catalog';
+import { moreToolEntries, spotlightToolEntries } from '@/legacy/full-shell/src/lib/tools-catalog';
 import { ToolsHubToolCard } from '@/legacy/full-shell/src/components/tools/ToolsHubToolCard';
 
 export function ToolsPickGridSection() {

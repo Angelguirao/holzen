@@ -1,10 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { MoodIcon } from '@/components/icons/MoodIcon';
-import { PAUSE_MOOD_GROUPS, type MoodValue } from '@/features/pause/public';
+import {
+  PAUSE_MOOD_GROUPS,
+  PAUSE_MOOD_VALUES,
+  type MoodValue,
+} from '@/features/pause/public-ritual-feel';
 
-export type { MoodValue } from '@/features/pause/public';
-export { PAUSE_MOOD_VALUES } from '@/features/pause/public';
+export type { MoodValue } from '@/features/pause/public-ritual-feel';
+export { PAUSE_MOOD_VALUES } from '@/features/pause/public-ritual-feel';
 
 interface Props {
   onSelect: (mood: MoodValue) => void;

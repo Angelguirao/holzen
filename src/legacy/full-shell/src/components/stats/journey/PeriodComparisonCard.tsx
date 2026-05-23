@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { PauseFullRow } from '@/lib/pause-stats-data-query';
-import { effectivePauseShiftMood } from '@/lib/pause-effective-emotion';
+import type { PauseFullRow } from '@/legacy/full-shell/src/lib/pause-stats-data-query';
+import { effectivePauseShiftMood } from '@/features/pause/public';
 import {
   startOfWeek, endOfWeek, subWeeks,
   startOfMonth, endOfMonth, subMonths,

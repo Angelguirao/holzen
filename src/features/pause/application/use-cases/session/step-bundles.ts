@@ -1,0 +1,111 @@
+import type {
+  PauseSessionStepRitualBundleInput,
+  PauseSessionStepShellBundleInput,
+  PauseSessionStepShellChromeInput,
+} from '@/features/pause/application/use-cases/session/step-bundle-types';
+
+/** Subset of shell fields passed to scaffold VM and ritual handlers. */
+export function buildPauseSessionStepShellBundle(
+  shell: PauseSessionStepShellBundleInput,
+  sessionChrome: PauseSessionStepShellChromeInput,
+) {
+  const {
+    leaveWithPendingOpen,
+    setLeaveWithPendingOpen,
+    pending,
+    leaveSheetBusy,
+    confirmLeavePauseSession,
+    requestExitPauseBeforeDone,
+    handleDeclinePendingFromLeaveSheet,
+    handlePendingAdoptFromLeaveSheet,
+    hasCoalescedShellSession,
+    hydration,
+    fetchFailed,
+    waitingForFetch,
+    pauseInstanceIdForTerminal,
+    fetchedInstance,
+    companions,
+    companionPrefs,
+    severity,
+    context,
+    pauseInstanceId,
+  } = shell;
+
+  return {
+    handleReturn: sessionChrome.handleReturn,
+    leaveWithPendingOpen,
+    setLeaveWithPendingOpen,
+    pending,
+    leaveSheetBusy,
+    confirmLeavePauseSession,
+    requestExitPauseBeforeDone,
+    handleDeclinePendingFromLeaveSheet,
+    handlePendingAdoptFromLeaveSheet,
+    hasCoalescedShellSession,
+    hydration,
+    fetchFailed,
+    waitingForFetch,
+    pauseInstanceIdForTerminal,
+    fetchedInstance,
+    companions,
+    companionPrefs,
+    severity,
+    context,
+    pauseInstanceId,
+  };
+}
+
+/** Subset of ritual fields passed to scaffold presentation. */
+export function buildPauseSessionStepRitualBundle(ritual: PauseSessionStepRitualBundleInput) {
+  const {
+    step,
+    setStep,
+    setRitualEntry,
+    setBriefStep,
+    phase,
+    curtainLifted,
+    soundMuted,
+    setSoundMuted,
+    ritualEntry,
+    decision,
+    pauseImpactData,
+    isFavorite,
+    moodDone,
+    selectedMood,
+    selectedBriefFace,
+    feelIntensity,
+    briefStep,
+    briefIntegrateDone,
+    breathingFirstCompleted,
+    setBreathingFirstCompleted,
+    breathingSecondCompleted,
+    setBreathingSecondCompleted,
+    swipeDirection,
+  } = ritual;
+
+  return {
+    step,
+    setStep,
+    setRitualEntry,
+    setBriefStep,
+    phase,
+    curtainLifted,
+    soundMuted,
+    setSoundMuted,
+    ritualEntry,
+    decision,
+    pauseImpactData,
+    isFavorite,
+    moodDone,
+    selectedMood,
+    selectedBriefFace,
+    feelIntensity,
+    briefStep,
+    briefIntegrateDone,
+    breathingFirstCompleted,
+    setBreathingFirstCompleted,
+    breathingSecondCompleted,
+    setBreathingSecondCompleted,
+    swipeDirection,
+  };
+}

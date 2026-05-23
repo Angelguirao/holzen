@@ -1,4 +1,4 @@
-import { PRICING } from "@/lib/pricing";
+import { PRICING } from "@/features/subscription/public";
 import { SITE_ORIGIN } from "@/config/site";
 
 /** Default document title (index.html + PageMeta reset). */

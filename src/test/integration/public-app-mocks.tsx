@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { vi } from 'vitest';
 import '@/i18n';
 
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('@/features/auth/public', () => ({
   AuthProvider: ({ children }: { children: ReactNode }) => children,
   useAuth: () => ({
     user: null,
@@ -11,7 +11,7 @@ vi.mock('@/hooks/use-auth', () => ({
   }),
 }));
 
-vi.mock('@/hooks/use-subscription', () => ({
+vi.mock('@/features/subscription/public-hooks', () => ({
   useSubscription: () => ({
     loading: false,
     subscribed: false,

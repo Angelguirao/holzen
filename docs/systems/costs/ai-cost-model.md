@@ -458,12 +458,12 @@ docs when changing ritual depth **and** spend assumptions.
 - `supabase/functions/_shared/ratelimit.ts` — `checkCostCeilings` + `guardAiFeature`.
 - `supabase/functions/_shared/subscription-entitlements.ts` — package limits + flex credit helpers.
 - `supabase/functions/stripe-webhook/index.ts` — Stripe checkout pack grants to flex wallet.
-- `src/components/admin/AppConfigTools.tsx` — Admin Tools UI.
-- `src/components/admin/CostAnalytics.tsx` — Admin Cost tab.
+- `src/screens/admin/components/AppConfigTools.tsx` — Admin Tools UI.
+- `src/screens/admin/components/CostAnalytics.tsx` — Admin Cost tab.
 - `supabase/functions/ai-cost-alert/index.ts` — daily alert email (§7.5).
 - `supabase/migrations/20260419150000_ai_cost_alert_config.sql` — alert config seed.
 - `supabase/functions/_shared/circuit-breaker.ts` — per-provider breakers (§5.2).
-- `src/components/admin/ProviderHealthCard.tsx` — live breaker state in Admin Cost tab.
+- `src/screens/admin/components/ProviderHealthCard.tsx` — live breaker state in Admin Cost tab.
 
 ---
 

@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConfidenceChip } from '@/legacy/full-shell/src/components/stats/ConfidenceChip';
-import { sampleConfidence } from '@/lib/stats/confidence';
-import type { PauseFullRow } from '@/lib/pause-stats-data-query';
-import { effectivePauseShiftMood } from '@/lib/pause-effective-emotion';
+import { sampleConfidence } from '@/legacy/full-shell/src/lib/stats/confidence';
+import type { PauseFullRow } from '@/legacy/full-shell/src/lib/pause-stats-data-query';
+import { effectivePauseShiftMood } from '@/features/pause/public';
 
 const REACTIVE = new Set(['fomo', 'greedy', 'fearful', 'anxious', 'excited']);
 const COMPOSED = new Set(['calm', 'detached']);

@@ -23,6 +23,15 @@ export function isAppShellPath(pathname: string): boolean {
 /** Registered authenticated shell paths (404 for anything else). */
 export const APP_SHELL_ROUTES = ['/', '/archive', JOURNEY_PREFIX, '/settings'] as const;
 
+/** Shipped full-view companion routes (`App.tsx`). */
+export function companionHistoryPath(pauseInstanceId: string): string {
+  return `/companion/history/${encodeURIComponent(pauseInstanceId)}`;
+}
+
+export function companionZoomOutPath(pauseInstanceId: string): string {
+  return `/companion/zoom-out/${encodeURIComponent(pauseInstanceId)}`;
+}
+
 /**
  * Bookmarkable settings section URL (`/settings/<id>`).
  * Valid ids: you, companions, notifications, subscription, account.
