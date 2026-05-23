@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { BRIEF_PAUSE_ORDER, type BriefPauseStep } from '@/features/pause/public-hooks';
+import { BRIEF_PAUSE_ORDER, type BriefPauseStep } from '@/features/pause/public-ritual-progress';
 import { cn } from '@/lib/utils';
 
 interface Props {

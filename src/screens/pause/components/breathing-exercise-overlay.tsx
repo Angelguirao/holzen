@@ -5,7 +5,7 @@ import type {
   BreathingExerciseSeverity,
   StandaloneBreathingPattern,
   StandaloneBreathSeverityRingColors,
-} from '@/features/pause/public-hooks';
+} from '@/features/pause/public-ritual-breathe';
 
 export type BreathingExerciseOverlayProps = {
   severity: BreathingExerciseSeverity;

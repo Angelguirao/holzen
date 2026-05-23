@@ -4,7 +4,7 @@ import {
   BREATH_ORB_PX,
   BREATH_RING_C,
   BREATH_RING_R,
-} from '@/features/pause/public-hooks';
+} from '@/features/pause/public-ritual-breathe';
 
 /** Phase progress ring (wireframe-style) around the breathing orb. */
 export function BreathPhaseProgressRing({ progress }: { progress: number }) {

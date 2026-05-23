@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   formatPauseOpenMaxRemaining,
   pauseOpenMaxDeadlineMs,
-} from '@/features/pause/public-hooks';
+} from '@/features/pause/public-session';
 
 type Props = {
   engagedAtIso: string;

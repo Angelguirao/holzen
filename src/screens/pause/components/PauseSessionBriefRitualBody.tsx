@@ -1,16 +1,16 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import type { MoodValue } from '@/screens/pause/components/MoodCheck';
 import { PauseBreathing } from '@/screens/pause/components/PauseBreathing';
-import type { PauseBreathingHandle } from '@/features/pause/public-hooks';
+import type { PauseBreathingHandle } from '@/features/pause/public-session-ritual';
 import { PauseRitualFeelStep } from '@/screens/pause/components/PauseRitualFeelStep';
 import type { FeelStepTile } from '@/features/pause/public-ritual-feel';
 import { PauseBriefIntegrate } from '@/screens/pause/components/PauseBriefIntegrate';
 import { PauseDecide } from '@/screens/pause/components/PauseDecide';
-import type { PauseSessionStepTransitionConfig } from '@/features/pause/public-hooks';
-import { type BriefPauseStep } from '@/features/pause/public-hooks';
+import type { PauseSessionStepTransitionConfig } from '@/features/pause/public-session-ritual';
+import { type BriefPauseStep } from '@/features/pause/public-ritual-progress';
 
-export type { PauseSessionBriefRitualBodyProps } from '@/features/pause/public-hooks';
-import type { PauseSessionBriefRitualBodyProps } from '@/features/pause/public-hooks';
+export type { PauseSessionBriefRitualBodyProps } from '@/features/pause/public-session-ritual';
+import type { PauseSessionBriefRitualBodyProps } from '@/features/pause/public-session-ritual';
 
 /** Brief ritual step panels inside `PauseSessionScaffold` (Framer step transitions preserved). */
 export function PauseSessionBriefRitualBody({
