@@ -34,7 +34,12 @@ describe('hydrateCompanionSlotsFromArtifactCache', () => {
     expect(result.hasCachedIntervention).toBe(true);
     expect(setSignal).toHaveBeenCalled();
     expect(fetched.has('signal')).toBe(true);
-    expect(setIntervention).toHaveBeenCalledWith({ primary: 'trap', secondary: null });
+    expect(setIntervention).toHaveBeenCalledWith({
+      mode: 'insight',
+      primary: 'trap',
+      secondary: null,
+      question: null,
+    });
   });
 
   it('returns false when intervention is missing', () => {

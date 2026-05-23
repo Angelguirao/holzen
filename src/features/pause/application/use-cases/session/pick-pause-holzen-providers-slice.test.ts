@@ -33,7 +33,7 @@ describe('pickPauseHolzenProvidersSlice', () => {
       dismissMessage,
       message: 'Take a breath.',
       context: 'btc_move',
-      companions: { haiku: 'line' },
+      companions: { haiku: 'line', groundingTitle: null, groundingBody: null },
       lastPauseInstanceId: 'inst-1',
       companionPrefs: {
         breathing: true,
