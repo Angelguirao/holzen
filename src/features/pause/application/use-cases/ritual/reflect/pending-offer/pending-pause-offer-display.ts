@@ -14,10 +14,9 @@ export function getPendingPauseOfferDisplay(
   pending: PendingPauseOfferDisplayInput | null | undefined,
 ): PendingPauseOfferDisplay {
   const previewMessage = pending?.preview_message?.trim() || null;
+  const snapshot = pending?.context_snapshot as { context_text?: unknown } | null | undefined;
   const contextText =
-    pending?.context_snapshot && typeof pending.context_snapshot.context_text === 'string'
-      ? (pending.context_snapshot.context_text as string)
-      : null;
+    snapshot && typeof snapshot.context_text === 'string' ? snapshot.context_text : null;
   const showPreviewLine = Boolean(previewMessage && previewMessage !== contextText?.trim());
   return { contextText, previewMessage, showPreviewLine };
 }
