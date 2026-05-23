@@ -10,6 +10,7 @@ export type PauseSessionScaffoldShellProps = Omit<ComponentProps<typeof PauseSes
 
 /** `PauseSessionScaffold` + ritual / done body — used when depth has been chosen (not on picker). */
 export function PauseSessionScaffoldShell(props: PauseSessionScaffoldShellProps) {
+  "use memo";
   const {
     ritualEntry,
     briefRitual,

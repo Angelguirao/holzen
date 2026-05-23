@@ -196,7 +196,7 @@ Hooks should **not** grow unbounded RPC + navigation + analytics; extract **use 
 |-------|--------------|--------|
 | Render boundaries | **Yes** on Home (`memo(HomeDashboardLayout)`, stable layout props, lazy Zen) | Extend when touching hot screens; see [react-screen-orchestration.md](react-screen-orchestration.md) |
 | Manual `useMemo` / `useCallback` | Widespread in pause/home/companion | **No new** memos without justification; **no mass removal** during migration |
-| React Compiler | Not configured (Vite + SWC) | Pilot **after** migration — separate track |
+| React Compiler | **Pilot:** annotation mode on Home dashboard + pause scaffold shell (`vite.react-compiler.ts`; `HOLZEN_REACT_COMPILER=0` disables) | Expand after profiling; remove redundant manual memos only with tests |
 | React 19 / Actions | **Shipped:** favorite, snooze, email/silent/companion toggles, push sub, companion vote (`useOptimistic` + `useTransition`); change-email, change-password, feedback (`useActionState`) | Extend on next simple mutation; keep Query + `invokeEdge` for ritual/companion |
 | react-hook-form + Zod | Settings/admin forms | Keep for complex validated forms |
 
@@ -212,7 +212,7 @@ If none apply, prefer a **boundary** (lower state, memo shell, lazy branch) inst
 
 | Pilot | Surface | Status |
 |-------|---------|--------|
-| React Compiler | Vite build + Home / pause session | Not started |
+| React Compiler | Vite build + Home / pause session | **Pilot** (May 2026) — annotation mode, two surfaces |
 | `useOptimistic` / `useTransition` | Pause favorite; snooze; email/silent/companion toggles; push subscribe; companion vote | **Shipped** (May 2026) |
 | `useActionState` | Settings change-email; change-password; feedback form | **Shipped** (May 2026) |
 

@@ -56,6 +56,7 @@ export const HomeDashboardLayout = memo(function HomeDashboardLayout({
   customize,
   completedPauseCount,
 }: HomeDashboardLayoutProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (
