@@ -1,7 +1,11 @@
-import { sendLovableEmail } from 'npm:@lovable.dev/email-js'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2'
 import { recipientHostFromEmail } from "../_shared/email-log-helpers.ts";
+import {
+  holzenTransactionalEmailLogger,
+  isTransactionalEmailConfigured,
+  sendTransactionalEmail,
+} from "../_shared/transactional-email.ts";
 import { withRequestLogging, type RequestLoggingContext } from "../_shared/with-request-logging.ts";
 
 const MAX_RETRIES = 5
@@ -9,33 +13,6 @@ const DEFAULT_BATCH_SIZE = 10
 const DEFAULT_SEND_DELAY_MS = 200
 const DEFAULT_AUTH_TTL_MINUTES = 15
 const DEFAULT_TRANSACTIONAL_TTL_MINUTES = 60
-
-// Check if an error is a rate-limit (429) response.
-// Uses EmailAPIError.status when available (email-js >=0.x with structured errors),
-// falls back to parsing the error message for older versions.
-function isRateLimited(error: unknown): boolean {
-  if (error && typeof error === 'object' && 'status' in error) {
-    return (error as { status: number }).status === 429
-  }
-  return error instanceof Error && error.message.includes('429')
-}
-
-// Check if an error is a forbidden (403) response, which means emails are
-// disabled for this project. Retrying won't help — move straight to DLQ.
-function isForbidden(error: unknown): boolean {
-  if (error && typeof error === 'object' && 'status' in error) {
-    return (error as { status: number }).status === 403
-  }
-  return error instanceof Error && error.message.includes('403')
-}
-
-// Extract Retry-After seconds from a structured EmailAPIError, or default to 60s.
-function getRetryAfterSeconds(error: unknown): number {
-  if (error && typeof error === 'object' && 'retryAfterSeconds' in error) {
-    return (error as { retryAfterSeconds: number | null }).retryAfterSeconds ?? 60
-  }
-  return 60
-}
 
 function parseJwtClaims(token: string): Record<string, unknown> | null {
   const parts = token.split('.')
@@ -94,11 +71,10 @@ async function moveToDlq(
 }
 
 Deno.serve(withRequestLogging("process-email-queue", async ({ req, log }) => {
-  const apiKey = Deno.env.get('LOVABLE_API_KEY')
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
-  if (!apiKey || !supabaseUrl || !supabaseServiceKey) {
+  if (!isTransactionalEmailConfigured() || !supabaseUrl || !supabaseServiceKey) {
     try {
       log.error("process_email_queue_missing_env", {
         holzen_event: "process_email_queue_missing_env",
@@ -133,6 +109,10 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req, log }) => {
   }
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  const emailLogger = holzenTransactionalEmailLogger(
+    (m, d) => log("process_email_queue_dep", { message: m, ...(d ?? {}) }),
+    (m, d) => log.error("process_email_queue_dep", { message: m, ...(d ?? {}) }),
+  )
 
   // 1. Check rate-limit cooldown and read queue config
   const { data: state } = await supabase
@@ -306,29 +286,27 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req, log }) => {
         }
       }
 
-      try {
-        await sendLovableEmail(
-          {
-            run_id: payload.run_id,
-            to: payload.to,
-            from: payload.from,
-            sender_domain: payload.sender_domain,
-            subject: payload.subject,
-            html: payload.html,
-            text: payload.text,
-            purpose: payload.purpose,
-            label: payload.label,
-            idempotency_key: payload.idempotency_key,
-            unsubscribe_token: payload.unsubscribe_token,
-            message_id: payload.message_id,
-          },
-          // sendUrl is optional — when LOVABLE_SEND_URL is not set, the library
-          // falls back to the default Lovable API endpoint (https://api.lovable.dev).
-          // Set LOVABLE_SEND_URL as a Supabase secret to override (e.g. for local dev).
-          { apiKey, sendUrl: Deno.env.get('LOVABLE_SEND_URL') }
-        )
+      const result = await sendTransactionalEmail(
+        {
+          from: payload.from,
+          to: payload.to,
+          subject: payload.subject,
+          html: payload.html,
+          text: payload.text,
+          sender_domain: payload.sender_domain,
+          purpose: payload.purpose,
+          label: payload.label,
+        },
+        {
+          source: queue,
+          idempotencyKey: payload.idempotency_key,
+          sendUrl: Deno.env.get('LOVABLE_SEND_URL'),
+          maxRetries: 0,
+          logger: emailLogger,
+        },
+      )
 
-        // Log success
+      if (result.ok) {
         await supabase.from('email_send_log').insert({
           message_id: payload.message_id,
           template_name: payload.label || queue,
@@ -336,7 +314,6 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req, log }) => {
           status: 'sent',
         })
 
-        // Delete from queue
         const { error: delError } = await supabase.rpc('delete_email', {
           queue_name: queue,
           message_id: msg.msg_id,
@@ -354,8 +331,8 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req, log }) => {
           }
         }
         totalProcessed++
-      } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : String(error)
+      } else {
+        const errorMsg = result.error ?? `HTTP ${result.status || "unknown"}`
         try {
           log.error("process_email_queue_send_failed", {
             holzen_event: "process_email_queue_send_failed",
@@ -363,6 +340,7 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req, log }) => {
             msg_id: msg.msg_id,
             read_ct: msg.read_ct,
             failed_attempts: failedAttempts,
+            http_status: result.status,
             recipient_host: typeof payload.to === "string" ? recipientHostFromEmail(payload.to) : null,
             detail: errorMsg.slice(0, 500),
           });
@@ -370,7 +348,7 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req, log }) => {
           /* non-fatal */
         }
 
-        if (isRateLimited(error)) {
+        if (result.status === 429) {
           await supabase.from('email_send_log').insert({
             message_id: payload.message_id,
             template_name: payload.label || queue,
@@ -379,27 +357,21 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req, log }) => {
             error_message: errorMsg.slice(0, 1000),
           })
 
-          const retryAfterSecs = getRetryAfterSeconds(error)
           await supabase
             .from('email_send_state')
             .update({
-              retry_after_until: new Date(
-                Date.now() + retryAfterSecs * 1000
-              ).toISOString(),
+              retry_after_until: new Date(Date.now() + 60 * 1000).toISOString(),
               updated_at: new Date().toISOString(),
             })
             .eq('id', 1)
 
-          // Stop processing — remaining messages stay in queue (VT expires, retried next cycle)
           return new Response(
             JSON.stringify({ processed: totalProcessed, stopped: 'rate_limited' }),
             { headers: { 'Content-Type': 'application/json' } }
           )
         }
 
-        // 403 means emails are disabled for this project — retrying won't help.
-        // Move straight to DLQ and stop processing the rest of the batch.
-        if (isForbidden(error)) {
+        if (result.status === 403) {
           await moveToDlq(supabase, queue, msg, "Emails disabled for this project", log)
           return new Response(
             JSON.stringify({ processed: totalProcessed, stopped: 'emails_disabled' }),
@@ -407,7 +379,6 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req, log }) => {
           )
         }
 
-        // Log non-429 failures to track real retry attempts.
         await supabase.from('email_send_log').insert({
           message_id: payload.message_id,
           template_name: payload.label || queue,
@@ -418,8 +389,6 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req, log }) => {
         if (payload?.message_id && typeof payload.message_id === 'string') {
           failedAttemptsByMessageId.set(payload.message_id, failedAttempts + 1)
         }
-
-        // Non-429 errors: message stays invisible until VT expires, then retried
       }
 
       // Small delay between sends to smooth bursts

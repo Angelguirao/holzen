@@ -111,7 +111,7 @@ serve(
       ).catch(() => { /* swallowed — already logged by logDependencyCall */ });
     }
 
-    if (Deno.env.get("LOVABLE_API_KEY")) {
+    if (Deno.env.get("RESEND_API_KEY") || Deno.env.get("LOVABLE_API_KEY")) {
       const html = `
         <div style="font-family: monospace; max-width: 600px; margin: 0 auto;">
           <h2 style="font-size: 14px; color: #666;">New Feedback</h2>

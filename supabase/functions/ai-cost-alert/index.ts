@@ -20,8 +20,7 @@
  * Auth: service role or CRON_SECRET in `Authorization: Bearer …`, per the
  * shared `verifyServiceAuth` pattern.
  *
- * Email: Lovable Email API (matches `personalized-nudge`, `weekly-digest`,
- * etc.); plain HTML, no template registry.
+ * Email: Resend (preferred) or legacy Lovable via `transactional-email.ts`.
  *
  * Runbook: see `docs/systems/costs/ai-cost-model.md` §7.5.
  */
@@ -36,6 +35,7 @@ import {
 } from "../_shared/with-request-logging.ts";
 import {
   holzenTransactionalEmailLogger,
+  isTransactionalEmailConfigured,
   sendTransactionalEmailBatch,
   type TransactionalEmail,
 } from "../_shared/transactional-email.ts";
@@ -307,7 +307,6 @@ async function sendAlert(
   recipients: string[],
   html: string,
   subject: string,
-  lovableKey: string,
   idempotencyKey: string,
   log: RequestLoggingContext["log"],
 ): Promise<{ sent: number; errors: number }> {
@@ -318,21 +317,20 @@ async function sendAlert(
     html,
   }));
   const batch = await sendTransactionalEmailBatch(emails, {
-    apiKey: lovableKey,
     source: "ai-cost-alert",
     idempotencyKey,
     logger: holzenTransactionalEmailLogger(
       (m, d) =>
-        log("ai_cost_alert_lovable", {
+        log("ai_cost_alert_email", {
           holzen_event: "ai_cost_alert_cron",
-          phase: "lovable_email",
+          phase: "transactional_email",
           message: m,
           ...(d ?? {}),
         }),
       (m, data) =>
-        log.error("ai_cost_alert_lovable", {
+        log.error("ai_cost_alert_email", {
           holzen_event: "ai_cost_alert_cron",
-          phase: "lovable_email_error",
+          phase: "transactional_email_error",
           message: m,
           ...(data ?? {}),
         }),
@@ -408,13 +406,12 @@ serve(
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    if (!isTransactionalEmailConfigured()) {
       log.error("ai_cost_alert_config", {
         holzen_event: "ai_cost_alert_cron",
-        phase: "lovable_api_key_missing",
+        phase: "email_api_key_missing",
       });
-      return new Response(JSON.stringify({ error: "LOVABLE_API_KEY not configured" }), {
+      return new Response(JSON.stringify({ error: "RESEND_API_KEY or LOVABLE_API_KEY not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -430,7 +427,6 @@ serve(
       cfg.recipients,
       html,
       subject,
-      LOVABLE_API_KEY,
       `ai-cost-alert:${dateKey}:${triggerKinds}`,
       log,
     );
