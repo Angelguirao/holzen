@@ -60,8 +60,8 @@ export async function computeContextFingerprint(parts: {
   templateSlug: string;
   directionBucket: string;     // 'up' | 'down' | 'flat'
   severityBand: string;         // 'mild' | 'moderate' | 'high'
-  dailyBucketPct: number;       // rounded to the nearest whole %
-  cumulativeBucketPct: number;  // rounded to the nearest whole %
+  dailyBucketPct: number;       // truncated to whole percentage points
+  cumulativeBucketPct: number;  // truncated to whole percentage points
   /** CoinGecko coin id — keeps fingerprints distinct across assets. */
   trackedAssetId?: string;
   fearGreedBand?: string | null;

@@ -176,6 +176,18 @@ Companion `**counts_for_pause**` is **not** read for completion on `**volatility
 
 **Client mirror:** `**src/features/pause/domain/pause-state.ts**` `**computePauseState**` follows the same `**volatility_v1**` rules (brief/deep for **engaged** only; **completed** = `**outcome_logged**`; `**open_max_age**` as above) so the UI can optimistically match Postgres before the RPC returns.
 
+### 5.2 Context fingerprint (market regime)
+
+`**context_fingerprint**` is a stable hash of regime-relevant market context so `**pause_create_or_reuse**` can reuse an open pause or queue a `**pending**` offer only when the regime actually changed.
+
+| Input | Rule |
+| ----- | ---- |
+| 24h / 7d move | `**bucketChangePercent**` truncates signed `%` to **whole percentage points** (`5.1%` and `5.9%` → `5`; `-5.9%` → `-5`). Sub-point cron noise must **not** flip the fingerprint. |
+| Severity band | `**mild**` / `**moderate**` / `**high**` from the **truncated** absolute move (`≥5%`, `≥10%`), same as client `**severityFromBtcChangePercent**`. |
+| Other keys | Template slug, up/down direction, tracked asset id, Fear & Greed label, optional on-chain band (BTC). |
+
+**Code (keep in sync):** `**src/features/pause/domain/pause-fingerprint.ts**` (browser + Vitest) and `**supabase/functions/_shared/pause.ts**` (cron + service RPC). `**check-volatility**` and Home manual open both call the same helpers before `**pause_create_or_reuse**`.
+
 ---
 
 ## 6. Pause step payloads
