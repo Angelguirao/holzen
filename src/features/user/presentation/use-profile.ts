@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useOptimistic } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -40,7 +40,11 @@ export function useProfile() {
   const [threshold, setThresholdState] = useState(5);
   const [thresholdDown, setThresholdDownState] = useState(5);
   const [cumulativeThreshold, setCumulativeThresholdState] = useState(15);
-  const [emailNotifications, setEmailNotificationsState] = useState(true);
+  const [emailNotificationsCommitted, setEmailNotificationsCommitted] = useState(true);
+  const [emailNotifications, addOptimisticEmailNotifications] = useOptimistic(
+    emailNotificationsCommitted,
+    (_current, next: boolean) => next,
+  );
   const [reflectionTone, setReflectionToneState] = useState('stoic');
   const [silentMode, setSilentModeState] = useState(false);
   const [cooldownHours, setCooldownHoursState] = useState(6);
@@ -86,7 +90,7 @@ export function useProfile() {
       setThresholdState(row.threshold);
       setThresholdDownState(row.threshold_down ?? row.threshold);
       setCumulativeThresholdState(row.cumulative_threshold ?? 15);
-      setEmailNotificationsState(row.email_notifications ?? true);
+      setEmailNotificationsCommitted(row.email_notifications ?? true);
       setReflectionToneState(row.reflection_tone ?? 'stoic');
       setCooldownHoursState(row.cooldown_hours ?? 6);
       setSilentModeState(row.silent_mode ?? false);
@@ -142,11 +146,18 @@ export function useProfile() {
   }, [user, invalidateProfileQuery]);
 
   const setEmailNotifications = useCallback(async (val: boolean) => {
-    setEmailNotificationsState(val);
+    const previous = emailNotificationsCommitted;
+    addOptimisticEmailNotifications(val);
     if (!user) return;
     const { error } = await updateProfileFields(user.id, { email_notifications: val });
-    if (!error) invalidateProfileQuery();
-  }, [user, invalidateProfileQuery]);
+    if (!error) {
+      setEmailNotificationsCommitted(val);
+      invalidateProfileQuery();
+    } else {
+      setEmailNotificationsCommitted(previous);
+      addOptimisticEmailNotifications(previous);
+    }
+  }, [user, invalidateProfileQuery, emailNotificationsCommitted, addOptimisticEmailNotifications]);
 
   const setReflectionTone = useCallback(async (val: string) => {
     setReflectionToneState(val);

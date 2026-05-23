@@ -1,14 +1,10 @@
-import { useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { Send, Bug, Lightbulb, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { sendFeedback } from '@/features/user/public-rpc';
 import { toast } from 'sonner';
-import { enqueueAction } from '@/lib/offline-queue';
 import { useTranslation } from 'react-i18next';
-import { getCid } from '@/lib/cid';
-
-declare const __APP_VERSION__: string;
+import { submitFeedbackAction } from '@/screens/settings/feedback-action';
 
 const CATEGORIES = [
   { value: 'bug', labelKey: 'feedback.bug', icon: Bug, descKey: 'feedback.bugDesc' },
@@ -20,46 +16,30 @@ export function FeedbackForm() {
   const { t } = useTranslation();
   const [category, setCategory] = useState<string>('question');
   const [message, setMessage] = useState('');
-  const [submitting, setSubmitting] = useState(false);
+  const [state, formAction, isPending] = useActionState(submitFeedbackAction, {});
 
-  const submit = async () => {
-    if (!message.trim()) return;
-
-    const payload = {
-      category,
-      message: message.trim(),
-      page: `${window.location.pathname}${window.location.search}`,
-      user_agent: navigator.userAgent,
-      cid: getCid(),
-      app_version: __APP_VERSION__,
-    };
-
-    if (!navigator.onLine) {
-      enqueueAction('feedback', payload);
+  useEffect(() => {
+    if (state.offlineQueued) {
       toast(t('feedback.savedOffline'), { description: t('feedback.savedOfflineDesc') });
       setMessage('');
-      return;
-    }
-
-    setSubmitting(true);
-    const { error } = await sendFeedback(payload);
-    setSubmitting(false);
-    if (error) {
-      toast.error(t('feedback.failedToSend'), { description: t('feedback.tryAgainLater') });
-    } else {
+    } else if (state.success) {
       toast.success(t('feedback.sent'), { description: t('feedback.sentDesc') });
       setMessage('');
+    } else if (state.error === 'send_failed') {
+      toast.error(t('feedback.failedToSend'), { description: t('feedback.tryAgainLater') });
     }
-  };
+  }, [state.success, state.offlineQueued, state.error, t]);
 
   return (
-    <div className="space-y-3">
+    <form action={formAction} className="space-y-3">
       <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">
         {t('feedback.getInTouch')}
       </p>
       <p className="text-muted-foreground leading-relaxed text-sm font-sans">
         {t('feedback.description')}
       </p>
+
+      <input type="hidden" name="category" value={category} />
 
       <div className="grid grid-cols-3 gap-2">
         {CATEGORIES.map((c) => {
@@ -68,6 +48,7 @@ export function FeedbackForm() {
           return (
             <button
               key={c.value}
+              type="button"
               onClick={() => setCategory(c.value)}
               className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
                 selected
@@ -84,6 +65,7 @@ export function FeedbackForm() {
       </div>
 
       <Textarea
+        name="message"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         placeholder={t('feedback.placeholder')}
@@ -94,15 +76,15 @@ export function FeedbackForm() {
       <div className="flex items-center justify-between">
         <span className="text-[10px] text-muted-foreground">{message.length}/1000</span>
         <Button
+          type="submit"
           size="sm"
-          onClick={submit}
-          disabled={submitting || !message.trim()}
+          disabled={isPending || !message.trim()}
           className="text-xs font-mono gap-1.5"
         >
           <Send className="h-3 w-3" />
-          {submitting ? t('feedback.sending') : t('feedback.send')}
+          {isPending ? t('feedback.sending') : t('feedback.send')}
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

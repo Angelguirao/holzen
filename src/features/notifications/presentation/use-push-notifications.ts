@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useCallback, useMemo, useOptimistic, useTransition } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -19,7 +19,7 @@ export function usePushNotifications() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const isSupported = useMemo(
     () => typeof navigator !== "undefined" && "serviceWorker" in navigator && "PushManager" in window,
@@ -32,64 +32,70 @@ export function usePushNotifications() {
     getPushSubscriptionQueryOptions({ userId: user?.id, enabled: subQueryEnabled }),
   );
 
-  const isSubscribed = pushSubQuery.data ?? false;
+  const isSubscribedCommitted = pushSubQuery.data ?? false;
+  const [isSubscribed, addOptimisticSubscribed] = useOptimistic(
+    isSubscribedCommitted,
+    (_current, next: boolean) => next,
+  );
   const pushRegistrationChecked = subQueryEnabled && pushSubQuery.isSuccess;
 
   const subscribe = useCallback(async () => {
     if (!user || !isSupported) return;
-    setLoading(true);
-    try {
-      const { data: keyData, error: keyError } = await getRegisterPushVapidKey();
-      if (keyError || !keyData?.publicKey) throw new Error("Failed to get VAPID key");
+    startTransition(async () => {
+      addOptimisticSubscribed(true);
+      try {
+        const { data: keyData, error: keyError } = await getRegisterPushVapidKey();
+        if (keyError || !keyData?.publicKey) throw new Error("Failed to get VAPID key");
 
-      const reg = await navigator.serviceWorker.ready;
+        const reg = await navigator.serviceWorker.ready;
 
-      const subscription = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(keyData.publicKey) as BufferSource,
-      });
+        const subscription = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(keyData.publicKey) as BufferSource,
+        });
 
-      const subJson = subscription.toJSON();
+        const subJson = subscription.toJSON();
 
-      const { error } = await registerPushSubscribe({
-        endpoint: subJson.endpoint,
-        keys: subJson.keys,
-      });
-      if (error) throw error;
+        const { error } = await registerPushSubscribe({
+          endpoint: subJson.endpoint,
+          keys: subJson.keys,
+        });
+        if (error) throw error;
 
-      queryClient.setQueryData(pushSubscriptionQueryKey(user.id), true);
-    } catch (e) {
-      console.error("Push subscribe error:", e);
-      toast.error(t("settings.pushSubscribeFailed"));
-    } finally {
-      setLoading(false);
-    }
-  }, [user, isSupported, t, queryClient]);
+        queryClient.setQueryData(pushSubscriptionQueryKey(user.id), true);
+      } catch (e) {
+        addOptimisticSubscribed(isSubscribedCommitted);
+        console.error("Push subscribe error:", e);
+        toast.error(t("settings.pushSubscribeFailed"));
+      }
+    });
+  }, [user, isSupported, t, queryClient, addOptimisticSubscribed, isSubscribedCommitted, startTransition]);
 
   const unsubscribe = useCallback(async () => {
     if (!user || !isSupported) return;
-    setLoading(true);
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      const subscription = await reg.pushManager.getSubscription();
-      if (subscription) {
-        const subJson = subscription.toJSON();
+    startTransition(async () => {
+      addOptimisticSubscribed(false);
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        const subscription = await reg.pushManager.getSubscription();
+        if (subscription) {
+          const subJson = subscription.toJSON();
 
-        const { error: unsubErr } = await registerPushUnsubscribe({
-          endpoint: subJson.endpoint,
-        });
-        if (unsubErr) throw unsubErr;
+          const { error: unsubErr } = await registerPushUnsubscribe({
+            endpoint: subJson.endpoint,
+          });
+          if (unsubErr) throw unsubErr;
 
-        await subscription.unsubscribe();
+          await subscription.unsubscribe();
+        }
+        queryClient.setQueryData(pushSubscriptionQueryKey(user.id), false);
+      } catch (e) {
+        addOptimisticSubscribed(isSubscribedCommitted);
+        console.error("Push unsubscribe error:", e);
+        toast.error(t("settings.pushUnsubscribeFailed"));
       }
-      queryClient.setQueryData(pushSubscriptionQueryKey(user.id), false);
-    } catch (e) {
-      console.error("Push unsubscribe error:", e);
-      toast.error(t("settings.pushUnsubscribeFailed"));
-    } finally {
-      setLoading(false);
-    }
-  }, [user, isSupported, t, queryClient]);
+    });
+  }, [user, isSupported, t, queryClient, addOptimisticSubscribed, isSubscribedCommitted, startTransition]);
 
   const permissionGrantedNotSubscribed = useMemo(() => {
     if (typeof window === "undefined" || typeof Notification === "undefined") return false;
@@ -104,7 +110,7 @@ export function usePushNotifications() {
   return {
     isSupported,
     isSubscribed,
-    loading,
+    loading: isPending,
     subscribe,
     unsubscribe,
     permissionGrantedNotSubscribed,
