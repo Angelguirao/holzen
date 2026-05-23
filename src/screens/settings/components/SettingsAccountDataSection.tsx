@@ -16,11 +16,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import { exportDataAction } from '@/screens/settings/export-data-action';
 import { deleteAccountAction } from '@/screens/settings/delete-account-action';
+import { signOutAction } from '@/screens/settings/sign-out-action';
 
 export function SettingsAccountDataSection() {
   const { t } = useTranslation();
   const [exportState, exportFormAction, exportPending] = useActionState(exportDataAction, {});
   const [deleteState, deleteFormAction, deletePending] = useActionState(deleteAccountAction, {});
+  const [signOutState, signOutFormAction, signOutPending] = useActionState(signOutAction, {});
 
   useEffect(() => {
     if (!exportState.success) return;
@@ -53,6 +55,12 @@ export function SettingsAccountDataSection() {
     }
   }, [deleteState.success, deleteState.error]);
 
+  useEffect(() => {
+    if (signOutState.error === 'sign_out_failed') {
+      toast.error(t('settings.signOutFailed', { defaultValue: 'Sign out failed' }));
+    }
+  }, [signOutState.error, t]);
+
   return (
     <>
       <div className="space-y-3">
@@ -84,6 +92,31 @@ export function SettingsAccountDataSection() {
           </form>
         </div>
       </div>
+
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <button type="button" className="block text-xs font-mono text-muted-foreground underline">
+            {t('common.signOut')}
+          </button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-mono text-sm">{t('common.signOut')}</AlertDialogTitle>
+            <AlertDialogDescription className="text-xs">
+              {t('settings.signOutConfirm')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="font-mono text-xs">{t('common.cancel')}</AlertDialogCancel>
+            <form action={signOutFormAction} className="inline">
+              <AlertDialogAction type="submit" disabled={signOutPending} className="font-mono text-xs">
+                {signOutPending && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
+                {t('common.signOut')}
+              </AlertDialogAction>
+            </form>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog>
         <AlertDialogTrigger asChild>

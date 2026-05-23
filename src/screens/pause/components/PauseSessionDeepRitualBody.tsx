@@ -51,6 +51,7 @@ export function PauseSessionDeepRitualBody({
   onRepeatDeepFirstBreathPattern,
   onRepeatDeepSecondBreathPattern,
 }: PauseSessionDeepRitualBodyProps) {
+  "use memo";
   usePauseReflectFrameFocusAmbience({
     active: step === 'reflect' || step === 'frame',
     muted: ritualSoundMuted,

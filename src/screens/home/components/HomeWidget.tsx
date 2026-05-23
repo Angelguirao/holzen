@@ -30,6 +30,7 @@ export function HomeWidget({
   bare = false,
   className = '',
 }: HomeWidgetProps) {
+  "use memo";
   const prefersReduced = useReducedMotion();
   const {
     attributes,

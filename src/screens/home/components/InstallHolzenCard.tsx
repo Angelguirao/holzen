@@ -18,6 +18,7 @@ interface Props {
 }
 
 export function InstallHolzenCard({ alwaysShow = false, compact = false, className }: Props) {
+  "use memo";
   const { user } = useAuth();
   const { canInstall, isInstalled, install } = useInstallPrompt();
   const elRef = useRef<PWAInstallElement | null>(null);

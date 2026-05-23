@@ -8,6 +8,7 @@ interface HomeHeroQuoteProps {
 }
 
 export function HomeHeroQuote({ userId, firstName }: HomeHeroQuoteProps) {
+  "use memo";
   const { t } = useTranslation();
 
   const lines = useMemo(() => {

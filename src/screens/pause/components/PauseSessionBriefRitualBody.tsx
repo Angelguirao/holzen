@@ -39,6 +39,7 @@ export function PauseSessionBriefRitualBody({
   onDecide,
   onBriefDecideBack,
 }: PauseSessionBriefRitualBodyProps) {
+  "use memo";
   return (
     <AnimatePresence mode="wait" initial={false}>
       {briefStep === 'feel' && (

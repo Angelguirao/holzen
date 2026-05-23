@@ -31,6 +31,7 @@ export function HomeSectionCard({
   collapsed = false,
   onToggleCollapse,
 }: HomeSectionCardProps) {
+  "use memo";
   const prefersReduced = useReducedMotion();
   const showBody = !collapsible || !collapsed;
 

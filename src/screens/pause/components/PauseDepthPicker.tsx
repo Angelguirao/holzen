@@ -25,6 +25,7 @@ export function PauseDepthPicker({
   onClose,
   deepPauseLocked = false,
 }: Props) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

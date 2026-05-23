@@ -6,6 +6,7 @@ interface HomePullRefreshIndicatorProps {
 }
 
 export function HomePullRefreshIndicator({ pullDistance, pullRefreshing }: HomePullRefreshIndicatorProps) {
+  "use memo";
   if (pullDistance <= 0 && !pullRefreshing) return null;
   return (
     <div

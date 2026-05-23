@@ -16,7 +16,7 @@ import { isHapticEnabled, setHapticEnabled as persistHapticEnabled } from '@/lib
 
 export function useSettingsModel() {
   const { t } = useTranslation();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const {
     threshold,
     setThreshold,
@@ -154,7 +154,6 @@ export function useSettingsModel() {
   return {
     t,
     user,
-    signOut,
     threshold,
     setThreshold,
     thresholdDown,

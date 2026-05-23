@@ -68,9 +68,21 @@ export function useProfile() {
   const [motivations, setMotivationsState] = useState<string[]>([]);
   const [mantra, setMantraState] = useState<string | null>(null);
   const [groundingActivities, setGroundingActivitiesState] = useState<string[]>([]);
-  const [currency, setCurrencyState] = useState<string>('USD');
-  const [trackedAssetId, setTrackedAssetIdState] = useState<string>('bitcoin');
-  const [language, setLanguageState] = useState<string>('en');
+  const [currencyCommitted, setCurrencyCommitted] = useState<string>('USD');
+  const [currency, addOptimisticCurrency] = useOptimistic(
+    currencyCommitted,
+    (_current, next: string) => next,
+  );
+  const [trackedAssetIdCommitted, setTrackedAssetIdCommitted] = useState<string>('bitcoin');
+  const [trackedAssetId, addOptimisticTrackedAssetId] = useOptimistic(
+    trackedAssetIdCommitted,
+    (_current, next: string) => next,
+  );
+  const [languageCommitted, setLanguageCommitted] = useState<string>('en');
+  const [language, addOptimisticLanguage] = useOptimistic(
+    languageCommitted,
+    (_current, next: string) => next,
+  );
   const [companionPrefsCommitted, setCompanionPrefsCommitted] = useState<CompanionPrefs>({
     breathing: true,
     haiku: true,
@@ -124,9 +136,9 @@ export function useProfile() {
       setFirstNameState(row.first_name ?? null);
       setMotivationsState(row.motivations ?? []);
       setMantraState(row.mantra ?? null);
-      setCurrencyState(row.hold_goal_currency ?? 'USD');
-      setTrackedAssetIdState(normalizeTrackedAssetId(row.tracked_asset_id));
-      setLanguageState(row.language ?? 'en');
+      setCurrencyCommitted(row.hold_goal_currency ?? 'USD');
+      setTrackedAssetIdCommitted(normalizeTrackedAssetId(row.tracked_asset_id));
+      setLanguageCommitted(row.language ?? 'en');
       setGroundingActivitiesState(row.grounding_activities ?? []);
       setHasOnboarded(row.has_onboarded ?? false);
       setCompanionPrefsCommitted({
@@ -366,33 +378,50 @@ export function useProfile() {
     },
     currency,
     setCurrency: async (val: string) => {
-      setCurrencyState(val);
+      const previous = currencyCommitted;
+      addOptimisticCurrency(val);
       if (!user) return;
       const { error } = await updateProfileFields(user.id, { hold_goal_currency: val });
-      if (!error) invalidateProfileQuery();
+      if (!error) {
+        setCurrencyCommitted(val);
+        invalidateProfileQuery();
+      } else {
+        setCurrencyCommitted(previous);
+        addOptimisticCurrency(previous);
+      }
     },
     trackedAssetId,
     setTrackedAssetId: async (val: string) => {
       const next = normalizeTrackedAssetId(val);
-      setTrackedAssetIdState(next);
+      const previous = trackedAssetIdCommitted;
+      addOptimisticTrackedAssetId(next);
       if (!user) return;
       const { error } = await updateProfileFields(user.id, { tracked_asset_id: next });
-      if (!error) invalidateProfileQuery();
+      if (!error) {
+        setTrackedAssetIdCommitted(next);
+        invalidateProfileQuery();
+      } else {
+        setTrackedAssetIdCommitted(previous);
+        addOptimisticTrackedAssetId(previous);
+      }
     },
     language,
     setLanguage: async (val: string) => {
       if (!user) {
-        setLanguageState(val);
+        setLanguageCommitted(val);
+        addOptimisticLanguage(val);
         return;
       }
-      const prev = language;
-      setLanguageState(val);
+      const previous = languageCommitted;
+      addOptimisticLanguage(val);
       const { error } = await updateProfileFields(user.id, { language: val });
       if (error) {
         holzenLog.profile('language update failed', { error: error.message });
-        setLanguageState(prev);
+        setLanguageCommitted(previous);
+        addOptimisticLanguage(previous);
         toast.error(t('common.profileWriteFailed'));
       } else {
+        setLanguageCommitted(val);
         invalidateProfileQuery();
       }
     },
