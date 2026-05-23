@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { RefreshCw } from 'lucide-react';
-import { useState, useCallback } from 'react';
+import { useCallback, useTransition } from 'react';
 import { LoadingButton } from '@/components/ui/loading-button';
 
 /**
@@ -31,16 +31,12 @@ export function CreditsDashboard() {
     manualRetry,
   } = useSubscription();
 
-  const [refreshing, setRefreshing] = useState(false);
-  const handleRefresh = useCallback(async () => {
-    if (refreshing) return;
-    setRefreshing(true);
-    try {
+  const [isPending, startTransition] = useTransition();
+  const handleRefresh = useCallback(() => {
+    startTransition(async () => {
       await manualRetry();
-    } finally {
-      setRefreshing(false);
-    }
-  }, [manualRetry, refreshing]);
+    });
+  }, [manualRetry, startTransition]);
 
   if (loading) {
     return (
@@ -108,12 +104,12 @@ export function CreditsDashboard() {
             variant="ghost"
             size="sm"
             onClick={handleRefresh}
-            loading={refreshing}
+            loading={isPending}
             aria-label={t('common.refresh', { defaultValue: 'Refresh' })}
             title={t('common.refresh', { defaultValue: 'Refresh' })}
             className="h-7 w-7 p-0 text-muted-foreground"
           >
-            {!refreshing && <RefreshCw className="h-3.5 w-3.5" />}
+            {!isPending && <RefreshCw className="h-3.5 w-3.5" />}
           </LoadingButton>
         </div>
       </div>

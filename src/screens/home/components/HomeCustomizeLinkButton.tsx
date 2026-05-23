@@ -11,6 +11,7 @@ interface HomeCustomizeLinkButtonProps {
 }
 
 export function HomeCustomizeLinkButton({ label, onClick, variant = 'default' }: HomeCustomizeLinkButtonProps) {
+  "use memo";
   return (
     <button
       type="button"

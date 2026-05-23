@@ -804,7 +804,6 @@ export function SettingsAccountPanel() {
   const {
     t,
     user,
-    signOut,
     canInstall,
     install,
   } = useSettingsState();
@@ -829,28 +828,6 @@ export function SettingsAccountPanel() {
               </button>
             )}
 
-            {/* Sign out */}
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <button className="block text-xs font-mono text-muted-foreground underline">
-                  {t('common.signOut')}
-                </button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="font-mono text-sm">{t('common.signOut')}</AlertDialogTitle>
-                  <AlertDialogDescription className="text-xs">
-                    {t('settings.signOutConfirm')}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="font-mono text-xs">{t('common.cancel')}</AlertDialogCancel>
-                  <AlertDialogAction onClick={signOut} className="font-mono text-xs">
-                    {t('common.signOut')}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
     </>
   );
 }

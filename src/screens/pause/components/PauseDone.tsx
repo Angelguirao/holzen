@@ -24,6 +24,7 @@ export function PauseDone({
   onSaveToJourney,
   pauseInstanceId,
 }: Props) {
+  "use memo";
   if (doneVariant === 'brief') {
     return (
       <PauseDoneBrief

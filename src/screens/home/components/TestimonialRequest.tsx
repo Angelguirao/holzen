@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send } from 'lucide-react';
@@ -32,13 +32,14 @@ interface Props {
 }
 
 export function TestimonialRequest({ completedPauseCount }: Props) {
+  "use memo";
   const { user } = useAuth();
   const { firstName } = useHolzen();
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [quote, setQuote] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [submitting, setSubmitting] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setVisible(shouldShow(completedPauseCount));
@@ -53,22 +54,22 @@ export function TestimonialRequest({ completedPauseCount }: Props) {
     setVisible(false);
   };
 
-  const submit = async () => {
+  const submit = () => {
     if (!user || !quote.trim() || !displayName.trim()) return;
-    setSubmitting(true);
-    const { error } = await submitUserTestimonial({
-      userId: user.id,
-      displayName,
-      quote,
+    startTransition(async () => {
+      const { error } = await submitUserTestimonial({
+        userId: user.id,
+        displayName,
+        quote,
+      });
+      if (error) {
+        toast.error(t('testimonial.failed'));
+      } else {
+        localStorage.setItem(SUBMITTED_KEY, 'true');
+        toast.success(t('testimonial.thanks'));
+        setVisible(false);
+      }
     });
-    setSubmitting(false);
-    if (error) {
-      toast.error(t('testimonial.failed'));
-    } else {
-      localStorage.setItem(SUBMITTED_KEY, 'true');
-      toast.success(t('testimonial.thanks'));
-      setVisible(false);
-    }
   };
 
   return (
@@ -110,7 +111,7 @@ export function TestimonialRequest({ completedPauseCount }: Props) {
             <LoadingButton
               size="sm"
               onClick={submit}
-              loading={submitting}
+              loading={isPending}
               disabled={!quote.trim() || !displayName.trim()}
               className="text-xs font-mono gap-1.5"
             >

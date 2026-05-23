@@ -70,6 +70,7 @@ export function HomePauseCardBody({
   manualCooldownRemaining,
   onNeedPause,
 }: HomePauseCardBodyProps) {
+  "use memo";
   const { t } = useTranslation();
   const { pending } = usePendingPauseOffer();
   const onPendingBannerPause = onPauseWithThisFromPendingBanner ?? onPauseWithThis;
