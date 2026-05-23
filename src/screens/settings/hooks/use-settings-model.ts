@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { updateUserPassword, useAuth } from '@/features/auth/public';
+import { useAuth } from '@/features/auth/public';
 import { deleteAccount as invokeDeleteAccount } from '@/features/auth/public-rpc';
 import { fetchSettingsDataExportBundle } from '@/features/pause/public-hooks';
 import { getProfileRowQueryOptions } from '@/features/user/public-queries';
@@ -16,7 +16,6 @@ import {
   getCheckoutSuppressionWindowMinutes,
   setCheckoutSuppressionWindowMinutes,
 } from '@/features/subscription/public';
-import { readThrownMessage } from '@/screens/settings/read-thrown-message';
 import { isHapticEnabled, setHapticEnabled as persistHapticEnabled } from '@/lib/haptics';
 
 export function useSettingsModel() {
@@ -94,9 +93,6 @@ export function useSettingsModel() {
   } = usePushNotifications();
   const [deleting, setDeleting] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [changingPassword, setChangingPassword] = useState(false);
   const [zenMode, setZenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled);
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('holzen_sound_enabled') !== 'false');
@@ -157,29 +153,6 @@ export function useSettingsModel() {
     profileLoaded,
     t,
   ]);
-
-  const changePassword = useCallback(async () => {
-    if (newPassword.length < 6) {
-      toast.error(t('auth.passwordTooShort'));
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      toast.error(t('auth.passwordsDoNotMatch'));
-      return;
-    }
-    setChangingPassword(true);
-    try {
-      const { error } = await updateUserPassword(newPassword);
-      if (error) throw error;
-      toast.success(t('auth.passwordUpdated'));
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch (e: unknown) {
-      toast.error(readThrownMessage(e, 'Something went wrong'));
-    } finally {
-      setChangingPassword(false);
-    }
-  }, [newPassword, confirmPassword, t]);
 
   const exportData = async (format: 'json' | 'csv' = 'json') => {
     if (!user) return;
@@ -348,11 +321,6 @@ export function useSettingsModel() {
     pushUnsubscribe,
     deleting,
     exporting,
-    newPassword,
-    setNewPassword,
-    confirmPassword,
-    setConfirmPassword,
-    changingPassword,
     zenMode,
     setZenMode,
     hapticEnabled,
@@ -366,7 +334,6 @@ export function useSettingsModel() {
     btcMode,
     setBtcMode,
     hasUnseenChangelog,
-    changePassword,
     exportData,
     deleteAccount,
   };

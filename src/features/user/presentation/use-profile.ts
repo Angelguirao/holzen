@@ -46,7 +46,11 @@ export function useProfile() {
     (_current, next: boolean) => next,
   );
   const [reflectionTone, setReflectionToneState] = useState('stoic');
-  const [silentMode, setSilentModeState] = useState(false);
+  const [silentModeCommitted, setSilentModeCommitted] = useState(false);
+  const [silentMode, addOptimisticSilentMode] = useOptimistic(
+    silentModeCommitted,
+    (_current, next: boolean) => next,
+  );
   const [cooldownHours, setCooldownHoursState] = useState(6);
   const [customPrompt, setCustomPromptState] = useState<string | null>(null);
   const [reflectionStyle, setReflectionStyleState] = useState('standard');
@@ -59,7 +63,18 @@ export function useProfile() {
   const [currency, setCurrencyState] = useState<string>('USD');
   const [trackedAssetId, setTrackedAssetIdState] = useState<string>('bitcoin');
   const [language, setLanguageState] = useState<string>('en');
-  const [companionPrefs, setCompanionPrefsState] = useState<CompanionPrefs>({ breathing: true, haiku: true, grounding: true, signal: true, zoomOut: true, history: true });
+  const [companionPrefsCommitted, setCompanionPrefsCommitted] = useState<CompanionPrefs>({
+    breathing: true,
+    haiku: true,
+    grounding: true,
+    signal: true,
+    zoomOut: true,
+    history: true,
+  });
+  const [companionPrefs, addOptimisticCompanionPrefs] = useOptimistic(
+    companionPrefsCommitted,
+    (_current, next: CompanionPrefs) => next,
+  );
   const [hasOnboarded, setHasOnboarded] = useState(true);
 
   const retryProfileLoad = useCallback(() => {
@@ -93,7 +108,7 @@ export function useProfile() {
       setEmailNotificationsCommitted(row.email_notifications ?? true);
       setReflectionToneState(row.reflection_tone ?? 'stoic');
       setCooldownHoursState(row.cooldown_hours ?? 6);
-      setSilentModeState(row.silent_mode ?? false);
+      setSilentModeCommitted(row.silent_mode ?? false);
       setCustomPromptState(row.custom_prompt ?? null);
       setReflectionStyleState(row.reflection_style ?? 'standard');
       setQuietHoursStartState(row.quiet_hours_start ?? null);
@@ -106,7 +121,7 @@ export function useProfile() {
       setLanguageState(row.language ?? 'en');
       setGroundingActivitiesState(row.grounding_activities ?? []);
       setHasOnboarded(row.has_onboarded ?? false);
-      setCompanionPrefsState({
+      setCompanionPrefsCommitted({
         breathing: true,
         haiku: row.companion_haiku ?? true,
         grounding: row.companion_grounding ?? true,
@@ -167,20 +182,38 @@ export function useProfile() {
   }, [user, invalidateProfileQuery]);
 
   const setSilentMode = useCallback(async (val: boolean) => {
-    setSilentModeState(val);
+    const previous = silentModeCommitted;
+    addOptimisticSilentMode(val);
     if (!user) return;
     const { error } = await updateProfileFields(user.id, { silent_mode: val });
-    if (!error) invalidateProfileQuery();
-  }, [user, invalidateProfileQuery]);
+    if (!error) {
+      setSilentModeCommitted(val);
+      invalidateProfileQuery();
+    } else {
+      setSilentModeCommitted(previous);
+      addOptimisticSilentMode(previous);
+    }
+  }, [user, invalidateProfileQuery, silentModeCommitted, addOptimisticSilentMode]);
 
   const setCompanionPref = useCallback(async (key: keyof CompanionPrefs, val: boolean) => {
-    setCompanionPrefsState((prev) => ({ ...prev, [key]: val }));
-    if (!user || key === 'breathing') return;
+    const previous = companionPrefsCommitted;
+    const next = { ...previous, [key]: val };
+    addOptimisticCompanionPrefs(next);
+    if (!user || key === 'breathing') {
+      setCompanionPrefsCommitted(next);
+      return;
+    }
     const snakeKey = key === 'zoomOut' ? 'zoom_out' : key;
     const dbKey = `companion_${snakeKey}` as string;
     const { error } = await updateProfileFields(user.id, { [dbKey]: val } as ProfileUpdate);
-    if (!error) invalidateProfileQuery();
-  }, [user, invalidateProfileQuery]);
+    if (!error) {
+      setCompanionPrefsCommitted(next);
+      invalidateProfileQuery();
+    } else {
+      setCompanionPrefsCommitted(previous);
+      addOptimisticCompanionPrefs(previous);
+    }
+  }, [user, invalidateProfileQuery, companionPrefsCommitted, addOptimisticCompanionPrefs]);
 
   const completeOnboarding = useCallback(async (
     result: {
