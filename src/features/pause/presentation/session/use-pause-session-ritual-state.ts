@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useOptimistic, useState } from 'react';
 import {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
@@ -29,7 +29,11 @@ export function usePauseSessionRitualState(restored: PersistedSession | null) {
   const [phase, setPhase] = useState<'session' | 'done'>(() => initialPhaseFromRestored(restored));
   const [decision, setDecision] = useState<string | null>(() => initialDecisionFromRestored(restored));
 
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavoriteCommitted, setIsFavorite] = useState(false);
+  const [isFavorite, addOptimisticFavorite] = useOptimistic(
+    isFavoriteCommitted,
+    (_current, next: boolean) => next,
+  );
   const [moodDone, setMoodDone] = useState(restored?.moodDone ?? false);
   const [moodAfterDone, setMoodAfterDone] = useState(restored?.moodAfterDone ?? false);
   const [selectedMood, setSelectedMood] = useState<MoodValue | null>(restored?.selectedMood ?? null);
@@ -68,6 +72,8 @@ export function usePauseSessionRitualState(restored: PersistedSession | null) {
     decision,
     setDecision,
     isFavorite,
+    isFavoriteCommitted,
+    addOptimisticFavorite,
     setIsFavorite,
     moodDone,
     setMoodDone,

@@ -58,11 +58,13 @@ beforeEach(() => {
 
 describe('usePauseFavoriteToggle', () => {
   it('no-ops when there is no pause instance id', async () => {
+    const addOptimisticFavorite = vi.fn();
     const setIsFavorite = vi.fn();
     const { result } = renderHook(() =>
       usePauseFavoriteToggle({
         pauseInstanceId: null,
-        isFavorite: false,
+        isFavoriteCommitted: false,
+        addOptimisticFavorite,
         setIsFavorite,
         subscribed: false,
         t,
@@ -71,16 +73,19 @@ describe('usePauseFavoriteToggle', () => {
     await act(async () => {
       await result.current.toggleFavorite();
     });
+    expect(addOptimisticFavorite).not.toHaveBeenCalled();
     expect(setIsFavorite).not.toHaveBeenCalled();
     expect(pauseReflectFavoriteToggleMock).not.toHaveBeenCalled();
   });
 
   it('optimistic toggle, RPC payload, and Pro hint when favoriting while not subscribed', async () => {
+    const addOptimisticFavorite = vi.fn();
     const setIsFavorite = vi.fn();
     const { result } = renderHook(() =>
       usePauseFavoriteToggle({
         pauseInstanceId: 'pi-1',
-        isFavorite: false,
+        isFavoriteCommitted: false,
+        addOptimisticFavorite,
         setIsFavorite,
         subscribed: false,
         t,
@@ -89,11 +94,12 @@ describe('usePauseFavoriteToggle', () => {
     await act(async () => {
       await result.current.toggleFavorite();
     });
-    expect(setIsFavorite).toHaveBeenCalledWith(true);
+    expect(addOptimisticFavorite).toHaveBeenCalledWith(true);
     expect(pauseReflectFavoriteToggleMock).toHaveBeenCalledWith({
       pauseInstanceId: 'pi-1',
       isFavorite: false,
     });
+    expect(setIsFavorite).toHaveBeenCalledWith(true);
     expect(showPauseFavoriteProHintToastMock).toHaveBeenCalledWith(t);
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: archiveListPrefix('archive-user-1'),
@@ -101,11 +107,13 @@ describe('usePauseFavoriteToggle', () => {
   });
 
   it('does not show Pro hint when already subscribed', async () => {
+    const addOptimisticFavorite = vi.fn();
     const setIsFavorite = vi.fn();
     const { result } = renderHook(() =>
       usePauseFavoriteToggle({
         pauseInstanceId: 'pi-1',
-        isFavorite: false,
+        isFavoriteCommitted: false,
+        addOptimisticFavorite,
         setIsFavorite,
         subscribed: true,
         t,
@@ -120,16 +128,18 @@ describe('usePauseFavoriteToggle', () => {
     });
   });
 
-  it('rolls back optimistic favorite when RPC fails', async () => {
+  it('rolls back committed favorite when RPC fails', async () => {
     pauseReflectFavoriteToggleMock.mockResolvedValueOnce({
       status: 'sync_failed',
       attemptedValue: true,
     });
+    const addOptimisticFavorite = vi.fn();
     const setIsFavorite = vi.fn();
     const { result } = renderHook(() =>
       usePauseFavoriteToggle({
         pauseInstanceId: 'pi-1',
-        isFavorite: false,
+        isFavoriteCommitted: false,
+        addOptimisticFavorite,
         setIsFavorite,
         subscribed: true,
         t,
@@ -138,8 +148,8 @@ describe('usePauseFavoriteToggle', () => {
     await act(async () => {
       await result.current.toggleFavorite();
     });
-    expect(setIsFavorite).toHaveBeenNthCalledWith(1, true);
-    expect(setIsFavorite).toHaveBeenNthCalledWith(2, false);
+    expect(addOptimisticFavorite).toHaveBeenCalledWith(true);
+    expect(setIsFavorite).toHaveBeenCalledWith(false);
     expect(invalidateQueriesMock).not.toHaveBeenCalled();
   });
 });

@@ -44,6 +44,8 @@ export type PauseSessionMoodChromeRitualSlice = {
   briefIntegrateDone: boolean;
   selectedBriefFace: FeelStepTile | null;
   isFavorite: boolean;
+  isFavoriteCommitted: boolean;
+  addOptimisticFavorite: (next: boolean) => void;
   setIsFavorite: Dispatch<SetStateAction<boolean>>;
   setRitualEntry: Dispatch<SetStateAction<RitualDepth | 'picker'>>;
   setBriefStep: Dispatch<SetStateAction<BriefPauseStep>>;
