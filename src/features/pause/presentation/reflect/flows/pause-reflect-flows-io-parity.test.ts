@@ -134,13 +134,6 @@ import {
   buildReflectionShareWhatsAppUrl,
   pauseReflectionShareImage,
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
-import {
-  getPendingPauseOfferDisplay,
-  pauseAdoptPendingOffer,
-  pauseAdoptPendingOfferWithRepository,
-  pauseDeclinePendingOffer,
-  pauseDeclinePendingOfferWithRepository,
-} from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
