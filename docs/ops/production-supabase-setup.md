@@ -98,11 +98,17 @@ See [platform-exit-runbook.md](platform-exit-runbook.md) § Auth & email:
 
 ---
 
-## 6. Frontend host
+## 6. Frontend host (Vercel)
 
-Connect GitHub `main` to Netlify or Cloudflare Pages. Build command: `npm run build`. Env vars = same `VITE_*` as CI.
+Follow **[vercel-frontend-setup.md](vercel-frontend-setup.md)**:
 
-**Stop** Lovable **Publish → Update** for production once external host serves traffic.
+1. Import repo → production branch `main`
+2. Set `VITE_*` env vars (prod Supabase URL/key, `$VERCEL_GIT_COMMIT_SHA` for version)
+3. Add custom domain; update Supabase Auth redirect URLs
+
+**Stop** Lovable **Publish → Update** once Vercel serves production traffic.
+
+_Netlify / Cloudflare Pages are equivalent alternatives — same build command and `dist/` output._
 
 ---
 

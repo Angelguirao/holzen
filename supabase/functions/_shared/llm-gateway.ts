@@ -1,6 +1,6 @@
 /**
  * LLM gateway — task-aware model selection with provider cascade:
- *   Google Gemini direct → OpenRouter → Lovable gateway (legacy migration only).
+ *   Google Gemini direct → OpenRouter (active). Lovable gateway is legacy opt-in only.
  */
 import { fetchInitWithIncomingTrace } from "./forward-trace-headers.ts";
 import type { LlmBudgetTier } from "./llm-budget.ts";
@@ -9,6 +9,9 @@ export type { LlmBudgetTier } from "./llm-budget.ts";
 export { budgetTierFromSpendRatio, resolveLlmBudgetTier } from "./llm-budget.ts";
 
 export type LlmGatewayProvider = "google" | "openrouter" | "lovable";
+
+/** Active pause-first deploys use Google → OpenRouter only. Lovable is legacy opt-in. */
+const ACTIVE_LLM_PROVIDERS: readonly LlmGatewayProvider[] = ["google", "openrouter"];
 
 export type LlmTask =
   | "reflect"
@@ -81,19 +84,26 @@ export function resolveModelsForTask(
 }
 
 /** Ordered provider credentials — first is primary. */
-export function resolveLlmCredentialChain(): LlmCredentials[] {
+export function resolveLlmCredentialChain(
+  allowedProviders?: ReadonlySet<LlmGatewayProvider>,
+): LlmCredentials[] {
+  const allow = (provider: LlmGatewayProvider) =>
+    !allowedProviders || allowedProviders.has(provider);
+
   const chain: LlmCredentials[] = [];
 
   const googleKey =
     Deno.env.get("GOOGLE_AI_API_KEY")?.trim() ||
     Deno.env.get("GEMINI_API_KEY")?.trim();
-  if (googleKey) chain.push({ apiKey: googleKey, provider: "google" });
+  if (allow("google") && googleKey) chain.push({ apiKey: googleKey, provider: "google" });
 
   const openRouterKey = Deno.env.get("OPENROUTER_API_KEY")?.trim();
-  if (openRouterKey) chain.push({ apiKey: openRouterKey, provider: "openrouter" });
+  if (allow("openrouter") && openRouterKey) {
+    chain.push({ apiKey: openRouterKey, provider: "openrouter" });
+  }
 
   const lovableKey = Deno.env.get("LOVABLE_API_KEY")?.trim();
-  if (lovableKey) chain.push({ apiKey: lovableKey, provider: "lovable" });
+  if (allow("lovable") && lovableKey) chain.push({ apiKey: lovableKey, provider: "lovable" });
 
   return chain;
 }
@@ -196,13 +206,15 @@ export async function llmChatCompletionsWithFallback(
     providers?: LlmGatewayProvider[];
   },
 ): Promise<LlmChatResult> {
-  let chain = resolveLlmCredentialChain();
-  if (opts.providers?.length) {
-    const allowed = new Set(opts.providers);
-    chain = chain.filter((c) => allowed.has(c.provider));
-  }
+  let chain = resolveLlmCredentialChain(
+    opts.providers?.length
+      ? new Set(opts.providers)
+      : new Set(ACTIVE_LLM_PROVIDERS),
+  );
   if (chain.length === 0) {
-    throw new Error("No LLM credentials configured (GOOGLE_AI_API_KEY, OPENROUTER_API_KEY, or LOVABLE_API_KEY)");
+    throw new Error(
+      "No LLM credentials configured (GOOGLE_AI_API_KEY and/or OPENROUTER_API_KEY)",
+    );
   }
 
   let lastResponse: Response | null = null;
