@@ -2980,6 +2980,7 @@ export type Database = {
         Args: { _updates: Json; _user_id: string }
         Returns: undefined
       }
+      user_can_engage_pause: { Args: { p_user_id: string }; Returns: boolean }
     }
     Enums: {
       pause_companion_action: "open" | "complete"
