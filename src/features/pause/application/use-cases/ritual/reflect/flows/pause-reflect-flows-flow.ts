@@ -15,7 +15,7 @@
  * `pause-reflect-flows-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-flow`;
  * `pause-reflect-flows-hub-flow-sibling-parity.test.ts` ↔ `pause-reflect-hub-flow`;
  * `pause-reflect-flows-generation-flow-sibling-parity.test.ts` ↔ `pause-reflect-generation-flow`;
- * `pause-reflect-flows-mood-flow-sibling-parity.test.ts` ↔ `pause-reflect-mood-flow` (application + presentation);
+ * `pause-reflect-flows-feel-flow-sibling-parity.test.ts` ↔ `pause-feel-flow` (application + presentation);
  * `pause-reflect-flows-decide-flow-sibling-parity.test.ts` ↔ `pause-session-decide-flow`;
  * `pause-reflect-flows-telemetry-flow-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-flow`;
  * `pause-reflect-flows-share-flow-sibling-parity.test.ts` ↔ `pause-reflect-share-flow`;

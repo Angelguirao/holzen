@@ -15,7 +15,7 @@ import {
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkip,
   pauseInitialEmotionSkipWithRepository,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   pauseReflectOutcomeLog,
   resolvePauseSessionReflectAndDecidePreflight,
@@ -137,8 +137,8 @@ describe('pause-reflect-telemetry-io', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(pauseInitialEmotionSkipWithRepository);
     expect(trackPauseReflectShareTap).not.toBe(pauseInitialEmotionSelect);
     expect(trackPauseReflectWallpaperTap).not.toBe(pauseInitialEmotionSkip);
-    // Full cross-I/O pins: reciprocal inline pins on `pause-reflect-mood-io.test.ts`;
-    // mood RPC vs session UI telemetry: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts`.
+    // Full cross-I/O pins: reciprocal inline pins on `pause-feel-io.test.ts`;
+    // mood RPC vs session UI telemetry: `pause-feel-telemetry-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: ambience-io exports stay distinct from session reflect telemetry-io', () => {

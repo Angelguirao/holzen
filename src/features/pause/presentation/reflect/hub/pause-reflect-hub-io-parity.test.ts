@@ -86,10 +86,10 @@ import {
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
   resolvePauseSessionChromeCloseAction,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import * as hubIo from './pause-reflect-hub-io';
 import * as generationIo from '../generation/pause-reflect-generation-io';
-import * as moodIo from '../mood/pause-reflect-mood-io';
+import * as moodIo from '../../feel/pause-feel-io';
 import * as shareIo from '../share/pause-reflect-share-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
@@ -108,8 +108,8 @@ import { supabasePauseRepository } from '@/features/pause/public-rpc';
  * reciprocal inline pins ↔ `pause-reflect-telemetry-io-parity.test.ts` (telemetry cluster).
  * Share-io sibling pins: `pause-reflect-hub-share-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/share/pause-reflect-share-io-parity.test.ts` (share cluster).
- * Mood-io sibling pins: `pause-reflect-hub-mood-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts` (mood cluster).
+ * Mood-io sibling pins: `pause-reflect-hub-feel-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `presentation/feel/pause-feel-io-parity.test.ts` (mood cluster).
  */
 describe('pause-reflect-hub-io parity', () => {
   it('presentation I/O hub exports match pause-reflect-hub-flow CI umbrella', () => {
@@ -265,8 +265,8 @@ describe('pause-reflect-hub-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts` (shift-frame hub vs initial-emotion).
-   * Dedicated sibling file: `pause-reflect-hub-mood-io-sibling-parity.test.ts` (application + presentation).
+   * Reciprocal inline pins ↔ `presentation/feel/pause-feel-io-parity.test.ts` (shift-frame hub vs initial-emotion).
+   * Dedicated sibling file: `pause-reflect-hub-feel-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: mood-io initial-emotion exports stay distinct from hub-io wrappers', () => {
     expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseInitialEmotionSelect);
@@ -279,8 +279,8 @@ describe('pause-reflect-hub-io parity', () => {
     expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(applyDeepDepthPickerRitualEntry);
     expect(buildShiftEmotionFrameHubLogBundle).not.toBe(resolvePauseSessionChromeCloseAction);
     expect(reflectPauseRepository).not.toBe(pauseInitialEmotionSelect);
-    // Reciprocal inline pins: `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
-    // Full pins: `pause-reflect-hub-mood-io-sibling-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/feel/pause-feel-io-parity.test.ts`.
+    // Full pins: `pause-reflect-hub-feel-io-sibling-parity.test.ts`.
   });
 
   it('presentation hub-io and mood-io I/O namespaces stay separated (reciprocal inline)', () => {
@@ -295,7 +295,7 @@ describe('pause-reflect-hub-io parity', () => {
     expect('pauseShiftEmotionFrameHubDoneWithRepository' in moodIo).toBe(false);
     expect('buildShiftEmotionFrameHubLogBundle' in moodIo).toBe(false);
     expect('resolveShiftFrameHubDonePresentation' in moodIo).toBe(false);
-    // Reciprocal inline pins: `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/feel/pause-feel-io-parity.test.ts`.
   });
 
   it('presentation hub-io and share-io I/O namespaces stay separated (reciprocal inline)', () => {

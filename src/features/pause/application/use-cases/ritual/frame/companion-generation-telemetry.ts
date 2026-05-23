@@ -1,4 +1,4 @@
-import { trackEvent } from '@/lib/posthog';
+import { trackEvent } from '@/features/pause/application/pause-product-analytics';
 import type { CompanionSlotSource, RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
 import { companionSlotToGenerationTaxonomy } from '@/features/pause/application/use-cases/ritual/frame/generation-taxonomy';
 import type { CompanionSlotOrchestrateMode } from './run-companion-slot-orchestrate';

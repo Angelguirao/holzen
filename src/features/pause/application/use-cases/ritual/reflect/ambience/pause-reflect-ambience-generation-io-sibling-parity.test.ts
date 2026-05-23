@@ -24,10 +24,10 @@ import * as generationIo from '@/features/pause/presentation/reflect/generation/
  * Application sibling parity: ambience-io vs generation-io (parity with presentation
  * `pause-reflect-ambience-generation-io-sibling-parity.test.ts` and flow-level
  * `pause-reflect-ambience-generation-flow-sibling-parity.test.ts`).
- * Mood-io sibling: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (application + presentation).
+ * Mood-io sibling: `pause-reflect-ambience-feel-io-sibling-parity.test.ts` (application + presentation).
  * Telemetry-io sibling: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (application + presentation).
  * Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts` ↔
- * `pause-reflect-generation-io-parity.test.ts`, `pause-reflect-mood-io-parity.test.ts`,
+ * `pause-reflect-generation-io-parity.test.ts`, `pause-feel-io-parity.test.ts`,
  * `pause-reflect-telemetry-io-parity.test.ts`.
  */
 describe('pause-reflect-ambience-io ↔ pause-reflect-generation-io sibling parity (application)', () => {

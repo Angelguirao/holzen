@@ -62,7 +62,7 @@
       <span>Phase A — presentation flows↔mood flow sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-flows-mood-flow-sibling-parity.test.ts</code> (presentation)</h3>
+    <h3><code>pause-reflect-flows-feel-flow-sibling-parity.test.ts</code> (presentation)</h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no relocations. Mirror application <code>pause-reflect-flows-mood-flow-sibling-parity</code> under <code>presentation/reflect/flows/</code> (CI flow anchors only; production I/O unchanged). Allowlist in <code>check:architecture-alignment</code>.</dd>
@@ -201,7 +201,7 @@
     <h3>Colocated parity <code>in</code> namespace pins (hub ↔ mood ↔ share)</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no relocations. Extend application + presentation <code>pause-reflect-hub-io-parity</code>, <code>pause-reflect-mood-io-parity</code>, and <code>pause-reflect-share-io-parity</code> with reciprocal <code>in hubIo/moodIo/shareIo</code> namespace guards so shift-frame hub, initial-emotion mood, and share PNG builders cannot merge across presentation I/O modules (complements dedicated sibling-parity files).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no relocations. Extend application + presentation <code>pause-reflect-hub-io-parity</code>, <code>pause-feel-io-parity</code>, and <code>pause-reflect-share-io-parity</code> with reciprocal <code>in hubIo/moodIo/shareIo</code> namespace guards so shift-frame hub, initial-emotion mood, and share PNG builders cannot merge across presentation I/O modules (complements dedicated sibling-parity files).</dd>
       <dt>Deviation</dt>
       <dd>None — test-only.</dd>
       <dt>Open questions</dt>
@@ -249,10 +249,10 @@
       <span>Phase A — reflect mood flow↔io wrapper sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-flow-io-wrapper-sibling-parity.test.ts</code> (application + presentation)</h3>
+    <h3><code>pause-feel-flow-io-wrapper-sibling-parity.test.ts</code> (application + presentation)</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no relocations. Mirror application + presentation <code>pause-reflect-mood-flow-io-wrapper-sibling-parity</code> beside <code>pause-reflect-mood-io.ts</code> so mood-flow CI umbrella exports stay namespace-separated from <code>pauseInitialEmotionSelect*</code> / <code>reflectPauseRepository</code>. Allowlist mood-flow umbrella import on wrapper parity test under <code>presentation/reflect/mood/</code>.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no relocations. Mirror application + presentation <code>pause-feel-flow-io-wrapper-sibling-parity</code> beside <code>pause-feel-io.ts</code> so mood-flow CI umbrella exports stay namespace-separated from <code>pauseInitialEmotionSelect*</code> / <code>reflectPauseRepository</code>. Allowlist mood-flow umbrella import on wrapper parity test under <code>presentation/feel/</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — test-only.</dd>
       <dt>Open questions</dt>
@@ -307,7 +307,7 @@
       <dt>Deviation</dt>
       <dd>None — test-only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-reflect-mood-flow-io-wrapper-sibling-parity</code> (mood-flow ↔ mood-io), or Phase B Tier 1 lib shim scan (<code>@/lib/posthog</code> in ritual reflect telemetry).</dd>
+      <dd>Next: <code>pause-feel-flow-io-wrapper-sibling-parity</code> (mood-flow ↔ mood-io), or Phase B Tier 1 lib shim scan (<code>@/lib/posthog</code> in ritual reflect telemetry).</dd>
     </dl>
   </article>
 
@@ -912,7 +912,7 @@
       <span>Phase A — application share↔mood I/O sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-share-mood-io-sibling-parity.test.ts</code> (application)</h3>
+    <h3><code>pause-reflect-share-feel-io-sibling-parity.test.ts</code> (application)</h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete. Add share-anchored application mirror for presentation <code>pause-reflect-share-mood-io-sibling-parity</code> (hub↔share application mirror landed in prior slice) so reflection share builders stay namespace-separated from initial-emotion RPC at application CI layer.</dd>
@@ -929,10 +929,10 @@
       <span>Phase A — application mood↔hub-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-hub-io-sibling-parity.test.ts</code> + <code>pause-reflect-hub-mood-io-sibling-parity.test.ts</code> (application)</h3>
+    <h3><code>pause-feel-hub-io-sibling-parity.test.ts</code> + <code>pause-reflect-hub-feel-io-sibling-parity.test.ts</code> (application)</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Add mood-anchored and hub-anchored application mirrors beside existing presentation <code>pause-reflect-mood-hub-io-sibling-parity.test.ts</code> and flow-level <code>pause-reflect-hub-mood-flow-sibling-parity.test.ts</code> so initial-emotion mood I/O stays namespace-separated from shift-frame hub I/O at the application CI layer.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Add mood-anchored and hub-anchored application mirrors beside existing presentation <code>pause-feel-hub-io-sibling-parity.test.ts</code> and flow-level <code>pause-reflect-hub-feel-flow-sibling-parity.test.ts</code> so initial-emotion mood I/O stays namespace-separated from shift-frame hub I/O at the application CI layer.</dd>
       <dt>Deviation</dt>
       <dd>None — test-only; reciprocal docblocks on mood-flow, hub-flow, mood-io, hub-io, and presentation sibling test.</dd>
       <dt>Open questions</dt>
@@ -1150,7 +1150,7 @@
       <span>Phase A — application mood-io ↔ telemetry-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-telemetry-io-sibling-parity.test.ts</code> (application)</h3>
+    <h3><code>pause-feel-telemetry-io-sibling-parity.test.ts</code> (application)</h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation <code>pause-reflect-mood-telemetry-io-sibling-parity</code> at application layer so feel-step mood RPC stays namespace-separated from session reflect PostHog telemetry I/O. Extend reciprocal inline pins on presentation <code>pause-reflect-telemetry-io-parity</code>.</dd>
@@ -1184,10 +1184,10 @@
       <span>Phase A — application ambience-io ↔ mood-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-ambience-mood-io-sibling-parity.test.ts</code> (application)</h3>
+    <h3><code>pause-reflect-ambience-feel-io-sibling-parity.test.ts</code> (application)</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation <code>pause-reflect-ambience-mood-io-sibling-parity</code> at application layer so frame-focus ambience I/O stays namespace-separated from initial-emotion mood RPC (parity with flow-level <code>pause-reflect-ambience-mood-flow-sibling-parity.test.ts</code>). Extend reciprocal inline pins on colocated <code>pause-reflect-ambience-io-parity</code> and <code>pause-reflect-mood-io-parity</code>.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Mirror presentation <code>pause-reflect-ambience-mood-io-sibling-parity</code> at application layer so frame-focus ambience I/O stays namespace-separated from initial-emotion mood RPC (parity with flow-level <code>pause-reflect-ambience-feel-flow-sibling-parity.test.ts</code>). Extend reciprocal inline pins on colocated <code>pause-reflect-ambience-io-parity</code> and <code>pause-feel-io-parity</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comment cross-links only.</dd>
       <dt>Open questions</dt>
@@ -1289,7 +1289,7 @@
     <h3><code>pause-reflect-ambience-io-parity.test.ts</code> ↔ mood-io + telemetry-io colocated parity</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Extend colocated ambience I/O parity with reciprocal inline sibling-cluster pins vs <code>pause-reflect-mood-io-parity.test.ts</code> and <code>pause-reflect-telemetry-io-parity.test.ts</code> (parity with hub-io + generation-io expansion slice). Dedicated sibling files unchanged.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no moves. Extend colocated ambience I/O parity with reciprocal inline sibling-cluster pins vs <code>pause-feel-io-parity.test.ts</code> and <code>pause-reflect-telemetry-io-parity.test.ts</code> (parity with hub-io + generation-io expansion slice). Dedicated sibling files unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — test-only docblock and <code>.not.toBe</code> pins.</dd>
       <dt>Open questions</dt>
@@ -1357,10 +1357,10 @@
       <span>Phase A — application mood-io ↔ pending-offer-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-pending-offer-io-sibling-parity.test.ts</code> (application)</h3>
+    <h3><code>pause-feel-pending-offer-io-sibling-parity.test.ts</code> (application)</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete — no moves. Mirror presentation <code>pause-reflect-mood-pending-offer-io-sibling-parity</code> at application layer so initial-emotion mood RPC stays namespace-separated from pending-offer adopt/decline/display I/O (parity with flow-level <code>pause-reflect-mood-pending-offer-flow-sibling-parity.test.ts</code>). Extend reciprocal inline pins on <code>pause-reflect-mood-io-parity</code> and <code>pause-reflect-pending-offer-io-parity</code>.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete — no moves. Mirror presentation <code>pause-reflect-mood-pending-offer-io-sibling-parity</code> at application layer so initial-emotion mood RPC stays namespace-separated from pending-offer adopt/decline/display I/O (parity with flow-level <code>pause-feel-pending-offer-flow-sibling-parity.test.ts</code>). Extend reciprocal inline pins on <code>pause-feel-io-parity</code> and <code>pause-reflect-pending-offer-io-parity</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comments only.</dd>
       <dt>Open question</dt>
@@ -1901,10 +1901,10 @@
       <span>Phase A — application flows-io ↔ mood-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-flows-mood-io-sibling-parity.test.ts</code> (application)</h3>
+    <h3><code>pause-reflect-flows-feel-io-sibling-parity.test.ts</code> (application)</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete — no moves. Mirror presentation <code>pause-reflect-flows-mood-io-sibling-parity</code> at application layer; extend reciprocal inline pins on <code>pause-reflect-flows-io-parity</code> and <code>pause-reflect-mood-io-parity</code> so reflect+decide outcome I/O stays namespace-separated from initial-emotion mood I/O (flow-level pins in <code>pause-reflect-flows-mood-flow-sibling-parity.test.ts</code>).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete — no moves. Mirror presentation <code>pause-reflect-flows-mood-io-sibling-parity</code> at application layer; extend reciprocal inline pins on <code>pause-reflect-flows-io-parity</code> and <code>pause-feel-io-parity</code> so reflect+decide outcome I/O stays namespace-separated from initial-emotion mood I/O (flow-level pins in <code>pause-reflect-flows-feel-flow-sibling-parity.test.ts</code>).</dd>
       <dt>Deviation</dt>
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open questions</dt>
@@ -1986,10 +1986,10 @@
       <span>Phase A — application steps-io ↔ mood-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-steps-mood-io-sibling-parity.test.ts</code> (application)</h3>
+    <h3><code>pause-reflect-steps-feel-io-sibling-parity.test.ts</code> (application)</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete — no moves. Mirror presentation <code>pause-reflect-steps-mood-io-sibling-parity</code> at application layer so post-it step RPC wrappers stay namespace-separated from initial-emotion mood I/O (parity with <code>pause-reflect-steps-mood-flow-sibling-parity</code> and steps-hub-io application mirror). Extend reciprocal inline pins on application <code>pause-reflect-steps-io-parity</code> and <code>pause-reflect-mood-io-parity</code>.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete — no moves. Mirror presentation <code>pause-reflect-steps-mood-io-sibling-parity</code> at application layer so post-it step RPC wrappers stay namespace-separated from initial-emotion mood I/O (parity with <code>pause-reflect-steps-mood-flow-sibling-parity</code> and steps-hub-io application mirror). Extend reciprocal inline pins on application <code>pause-reflect-steps-io-parity</code> and <code>pause-feel-io-parity</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comments only.</dd>
       <dt>Open questions</dt>
@@ -2411,10 +2411,10 @@
       <span>Phase A — ambience ↔ mood flow and I/O sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-ambience-mood-flow-sibling-parity.test.ts</code> + <code>pause-reflect-ambience-mood-io-sibling-parity.test.ts</code></h3>
+    <h3><code>pause-reflect-ambience-feel-flow-sibling-parity.test.ts</code> + <code>pause-reflect-ambience-feel-io-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Pin Web Audio frame-focus bed (<code>pause-reflect-ambience-flow</code> / <code>pause-reflect-ambience-io</code>) off mood initial-emotion RPC and feel-tile helpers (<code>pause-reflect-mood-flow</code> / <code>pause-reflect-mood-io</code>) at application and presentation layers (parity with ambience↔hub and mood↔hub pins; complements flows↔mood presentation pin on same branch tip).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Pin Web Audio frame-focus bed (<code>pause-reflect-ambience-flow</code> / <code>pause-reflect-ambience-io</code>) off mood initial-emotion RPC and feel-tile helpers (<code>pause-feel-flow</code> / <code>pause-feel-io</code>) at application and presentation layers (parity with ambience↔hub and mood↔hub pins; complements flows↔mood presentation pin on same branch tip).</dd>
       <dt>Deviation</dt>
       <dd>None — tests + I/O/flow header comments only.</dd>
       <dt>Open question</dt>
@@ -2598,10 +2598,10 @@
       <span>Phase A — presentation mood-io ↔ hub-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-hub-io-sibling-parity.test.ts</code></h3>
+    <h3><code>pause-feel-hub-io-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mirror application <code>pause-reflect-hub-mood-flow-sibling-parity</code> at presentation: <code>pause-reflect-mood-io</code> (initial-emotion + feel tiles) vs <code>pause-reflect-hub-io</code> (shift-frame hub done RPC) stay namespace-separated (parity with steps↔mood presentation pins).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mirror application <code>pause-reflect-hub-mood-flow-sibling-parity</code> at presentation: <code>pause-feel-io</code> (initial-emotion + feel tiles) vs <code>pause-reflect-hub-io</code> (shift-frame hub done RPC) stay namespace-separated (parity with steps↔mood presentation pins).</dd>
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comments only.</dd>
       <dt>Open question</dt>
@@ -2666,10 +2666,10 @@
       <span>Phase A — presentation generation-io ↔ mood-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-generation-mood-io-sibling-parity.test.ts</code></h3>
+    <h3><code>pause-reflect-generation-feel-io-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mirror application <code>pause-reflect-generation-mood-flow-sibling-parity</code> at presentation: <code>pause-reflect-generation-io</code> (holzen-reflect + ReflectGenerator port) vs <code>pause-reflect-mood-io</code> (initial-emotion RPC + mood domain helpers + PauseRepository port) stay distinct surfaces (parity with generation-io ↔ hub-io presentation pins).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mirror application <code>pause-reflect-generation-mood-flow-sibling-parity</code> at presentation: <code>pause-reflect-generation-io</code> (holzen-reflect + ReflectGenerator port) vs <code>pause-feel-io</code> (initial-emotion RPC + mood domain helpers + PauseRepository port) stay distinct surfaces (parity with generation-io ↔ hub-io presentation pins).</dd>
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comments only.</dd>
       <dt>Open question</dt>
@@ -2768,10 +2768,10 @@
       <span>Phase A — presentation steps-io ↔ mood-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-steps-mood-io-sibling-parity.test.ts</code></h3>
+    <h3><code>pause-reflect-steps-feel-io-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mirror application <code>pause-reflect-steps-mood-flow-sibling-parity</code> at presentation: <code>pause-reflect-steps-io</code> (post-it step RPC) vs <code>pause-reflect-mood-io</code> (initial-emotion + feel tiles) stay distinct surfaces (parity with <code>pause-reflect-flows-steps-io-sibling-parity</code>).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mirror application <code>pause-reflect-steps-mood-flow-sibling-parity</code> at presentation: <code>pause-reflect-steps-io</code> (post-it step RPC) vs <code>pause-feel-io</code> (initial-emotion + feel tiles) stay distinct surfaces (parity with <code>pause-reflect-flows-steps-io-sibling-parity</code>).</dd>
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comments only.</dd>
       <dt>Open question</dt>
@@ -2870,10 +2870,10 @@
       <span>Phase A — generation-flow ↔ mood-flow reflect sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-generation-mood-flow-sibling-parity.test.ts</code></h3>
+    <h3><code>pause-reflect-generation-feel-flow-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated sibling-parity test so <code>pause-reflect-generation-flow</code> and <code>pause-reflect-mood-flow</code> CI anchors stay namespace-separated (parity with <code>pause-reflect-generation-hub-flow-sibling-parity.test.ts</code> and <code>pause-reflect-steps-mood-flow-sibling-parity.test.ts</code>; reciprocal inline pins on both flow <code>*.test.ts</code> files).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated sibling-parity test so <code>pause-reflect-generation-flow</code> and <code>pause-feel-flow</code> CI anchors stay namespace-separated (parity with <code>pause-reflect-generation-hub-flow-sibling-parity.test.ts</code> and <code>pause-reflect-steps-feel-flow-sibling-parity.test.ts</code>; reciprocal inline pins on both flow <code>*.test.ts</code> files).</dd>
       <dt>Deviation</dt>
       <dd>None — tests + flow header comment cross-refs only.</dd>
       <dt>Tradeoff</dt>
@@ -3414,7 +3414,7 @@
       <span>Phase A — mood-io WithRepository seams (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> repository injection parity</h3>
+    <h3><code>pause-feel-io</code> repository injection parity</h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pauseInitialEmotionSelectWithRepository</code> and <code>pauseInitialEmotionSkipWithRepository</code> on presentation mood I/O plus application + presentation parity pins (parity with hub-io and steps-io <code>*WithRepository</code> delegation).</dd>
@@ -3482,7 +3482,7 @@
       <span>Phase A — steps-flow ↔ mood-flow sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-steps-mood-flow-sibling-parity.test.ts</code></h3>
+    <h3><code>pause-reflect-steps-feel-flow-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated cross-umbrella sibling parity test (parity with <code>pause-reflect-steps-hub-flow-sibling-parity</code> and <code>pause-reflect-hub-mood-flow-sibling-parity</code>) so steps CI exports cannot merge with mood initial-emotion / feel-tile umbrellas.</dd>
@@ -3519,7 +3519,7 @@
     <h3><code>pause-reflect-steps-flow.test.ts</code> + <code>pause-reflect-hub-flow.test.ts</code> + <code>pause-reflect-steps-hub-flow-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Reciprocal <code>.not.toBe</code> pins on steps/hub flow tests plus dedicated sibling-parity test asserting namespace separation (parity with <code>pause-reflect-hub-mood-flow-sibling-parity.test.ts</code>). Document cross-test references on flow modules.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Reciprocal <code>.not.toBe</code> pins on steps/hub flow tests plus dedicated sibling-parity test asserting namespace separation (parity with <code>pause-reflect-hub-feel-flow-sibling-parity.test.ts</code>). Document cross-test references on flow modules.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + comments only.</dd>
       <dt>Open question</dt>
@@ -3669,7 +3669,7 @@
       <span>Phase A — hub-flow ↔ mood-flow sibling cluster pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-hub-flow.test.ts</code> + <code>pause-reflect-mood-flow.test.ts</code> + <code>pause-reflect-hub-mood-flow-sibling-parity.test.ts</code></h3>
+    <h3><code>pause-reflect-hub-flow.test.ts</code> + <code>pause-feel-flow.test.ts</code> + <code>pause-reflect-hub-feel-flow-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Reciprocal <code>.not.toBe</code> pins on hub/mood flow tests plus dedicated sibling-parity test asserting namespace separation (parity with companion orchestration ↔ section-visibility). Document cross-test references on flow modules.</dd>
@@ -3856,10 +3856,10 @@
       <span>Phase A — reflect mood-io full domain leaf parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io-parity</code> depth-picker + presentation + chrome leaves</h3>
+    <h3><code>pause-feel-io-parity</code> depth-picker + presentation + chrome leaves</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-mood-io-parity.test.ts</code> so the mood CI umbrella and presentation I/O bind the same domain leaves for depth picker, initial-emotion presentation, feel tiles, and session chrome (parity with <code>pause-reflect-ambience-io-parity</code> and <code>pause-reflect-mood-io.re-exports.test.ts</code>). RPC delegation tests unchanged.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-feel-io-parity.test.ts</code> so the mood CI umbrella and presentation I/O bind the same domain leaves for depth picker, initial-emotion presentation, feel tiles, and session chrome (parity with <code>pause-reflect-ambience-io-parity</code> and <code>pause-feel-io.re-exports.test.ts</code>). RPC delegation tests unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + flow comment only.</dd>
       <dt>Open question</dt>
@@ -3873,10 +3873,10 @@
       <span>Phase A — reflect mood-io domain leaf parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io-parity</code> domain feel-tiles leaf</h3>
+    <h3><code>pause-feel-io-parity</code> domain feel-tiles leaf</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-mood-io-parity.test.ts</code> with domain <code>build-feel-tiles-mood-log-options</code> leaf identity (parity with <code>pause-reflect-ambience-io-parity</code> domain frame-focus pins). RPC delegation and repository binding tests unchanged.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-feel-io-parity.test.ts</code> with domain <code>build-feel-tiles-mood-log-options</code> leaf identity (parity with <code>pause-reflect-ambience-io-parity</code> domain frame-focus pins). RPC delegation and repository binding tests unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + flow comment only.</dd>
       <dt>Open questions</dt>
@@ -4403,7 +4403,7 @@
     <h3><code>pause-companion-orchestration-io.re-exports.test.ts</code> orchestration-flow parity</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Extend companion orchestration presentation I/O re-export test with <code>.toBe(direct)</code> identity against <code>pause-companion-orchestration-flow</code> for <code>loadCompanionOrchestrateSession</code> and <code>nextExpandedWithLazyFetch</code> (parity with <code>pause-reflect-mood-io</code> ↔ <code>pause-reflect-mood-flow</code>; <code>invalidateCompanionUiCompletionQuery</code> stays infrastructure-only on I/O). Add application-layer <code>pause-companion-orchestration-io-parity.test.ts</code>. Exempt re-exports test from orchestration-flow import guard in <code>check:architecture-alignment</code>; production I/O still imports ritual/frame leaf modules directly.</dd>
+      <dd>Backlog #2 (<code>companion/</code> → <code>ritual/frame/</code>) remains complete — no folder moves. Extend companion orchestration presentation I/O re-export test with <code>.toBe(direct)</code> identity against <code>pause-companion-orchestration-flow</code> for <code>loadCompanionOrchestrateSession</code> and <code>nextExpandedWithLazyFetch</code> (parity with <code>pause-feel-io</code> ↔ <code>pause-feel-flow</code>; <code>invalidateCompanionUiCompletionQuery</code> stays infrastructure-only on I/O). Add application-layer <code>pause-companion-orchestration-io-parity.test.ts</code>. Exempt re-exports test from orchestration-flow import guard in <code>check:architecture-alignment</code>; production I/O still imports ritual/frame leaf modules directly.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + CI allowlist only.</dd>
       <dt>Open question</dt>
@@ -4465,13 +4465,13 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-      <span>Phase A — reflect mood I/O ↔ mood-flow anchor (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — feel I/O ↔ mood-flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io.re-exports.test.ts</code> mood-flow parity</h3>
+    <h3><code>pause-feel-io.re-exports.test.ts</code> mood-flow parity</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend mood presentation I/O re-export test with <code>.toBe(direct)</code> identity against <code>pause-reflect-mood-flow</code> for domain mood helpers (parity with <code>pause-reflect-steps-io</code> ↔ <code>pause-reflect-steps-flow</code>). Leaf imports on <code>pause-reflect-mood-io.ts</code> unchanged; initial-emotion RPC stays on presentation facades. Exempt re-exports test from mood-flow import guard in <code>check:architecture-alignment</code> (steps-io pattern).</dd>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend mood presentation I/O re-export test with <code>.toBe(direct)</code> identity against <code>pause-feel-flow</code> for domain mood helpers (parity with <code>pause-reflect-steps-io</code> ↔ <code>pause-reflect-steps-flow</code>). Leaf imports on <code>pause-feel-io.ts</code> unchanged; initial-emotion RPC stays on presentation facades. Exempt re-exports test from mood-flow import guard in <code>check:architecture-alignment</code> (steps-io pattern).</dd>
       <dt>Deviation</dt>
       <dd>None — tests + CI allowlist only.</dd>
       <dt>Open question</dt>
@@ -4776,10 +4776,10 @@
       <span>Phase A — reflect mood umbrella flow subcluster pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-flow.test.ts</code> mood subcluster CI anchors</h3>
+    <h3><code>pause-feel-flow.test.ts</code> mood subcluster CI anchors</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-mood-flow.test.ts</code> with <code>.toBe(direct)</code> identity against mood subcluster flow anchors (<code>pause-initial-emotion-log-flow</code>, <code>pause-initial-emotion-presentation-flow</code>, <code>pause-feel-tiles-mood-flow</code>, <code>pause-depth-picker-mood-flow</code>, <code>pause-session-mood-chrome-flow</code>) — parity with <code>pause-reflect-hub-flow</code> / <code>pause-reflect-steps-flow</code> umbrella pins. Umbrella module still imports domain + <code>run-initial-emotion-log</code> directly per CI rule.</dd>
+      <dd>Backlog #1 (<code>reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-feel-flow.test.ts</code> with <code>.toBe(direct)</code> identity against mood subcluster flow anchors (<code>pause-initial-emotion-log-flow</code>, <code>pause-initial-emotion-presentation-flow</code>, <code>pause-feel-tiles-flow</code>, <code>pause-depth-picker-feel-flow</code>, <code>pause-session-mood-chrome-flow</code>) — parity with <code>pause-reflect-hub-flow</code> / <code>pause-reflect-steps-flow</code> umbrella pins. Umbrella module still imports domain + <code>run-initial-emotion-log</code> directly per CI rule.</dd>
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
       <dt>Open question</dt>
@@ -4926,13 +4926,13 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-      <span>Phase A — presentation reflect mood I/O repository pin (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — presentation feel I/O repository pin (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> <code>reflectPauseRepository</code> identity regression</h3>
+    <h3><code>pause-feel-io</code> <code>reflectPauseRepository</code> identity regression</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-mood-io.re-exports.test.ts</code> with <code>reflectPauseRepository</code> ↔ <code>supabasePauseRepository</code> (parity with hub/steps/pending-offer I/O pins; domain helper identity pins already present).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-feel-io.re-exports.test.ts</code> with <code>reflectPauseRepository</code> ↔ <code>supabasePauseRepository</code> (parity with hub/steps/pending-offer I/O pins; domain helper identity pins already present).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; named port constant already exported on mood I/O module.</dd>
       <dt>Open question</dt>
@@ -5083,15 +5083,15 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-      <span>Phase A — presentation reflect mood I/O identity pins (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — presentation feel I/O identity pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io.test.ts</code> pins mood domain helper re-exports</h3>
+    <h3><code>pause-feel-io.test.ts</code> pins mood domain helper re-exports</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend allowlisted <code>pause-reflect-mood-io.test.ts</code> with <code>.toBe(direct)</code> identity for domain mood helpers and <code>reflectPauseRepository</code> ↔ <code>supabasePauseRepository</code> (parity with generation-io and share-io presentation I/O pins). Mood hooks still import <code>pause-reflect-mood-io</code> only.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend allowlisted <code>pause-feel-io.test.ts</code> with <code>.toBe(direct)</code> identity for domain mood helpers and <code>reflectPauseRepository</code> ↔ <code>supabasePauseRepository</code> (parity with generation-io and share-io presentation I/O pins). Mood hooks still import <code>pause-feel-io</code> only.</dd>
       <dt>Deviation</dt>
-      <dd>None — behavior parity; no separate <code>*.re-exports.test.ts</code> (mood presentation folder allowlists only <code>pause-reflect-mood-io.ts</code> + <code>.test.ts</code>).</dd>
+      <dd>None — behavior parity; no separate <code>*.re-exports.test.ts</code> (mood presentation folder allowlists only <code>pause-feel-io.ts</code> + <code>.test.ts</code>).</dd>
       <dt>Tradeoff</dt>
       <dd>Identity pins live in the existing I/O test file beside RPC delegation mocks so CI import guards stay satisfied.</dd>
       <dt>Open question</dt>
@@ -5678,7 +5678,7 @@
     <h3>Mood and hub subcluster leaf CI anchors pin direct re-exports</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend mood leaf flows (initial-emotion-log, feel-tiles, presentation, depth-picker, session-mood-chrome) and hub leaf flows (shift-emotion-log, shift-frame-hub-presentation, shift-emotion-frame-hub-done) with <code>.toBe(direct)</code> identity (parity with steps umbrella and <code>pause-reflect-mood-flow</code> / <code>pause-reflect-hub-flow</code>). Presentation I/O modules unchanged.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend mood leaf flows (initial-emotion-log, feel-tiles, presentation, depth-picker, session-mood-chrome) and hub leaf flows (shift-emotion-log, shift-frame-hub-presentation, shift-emotion-frame-hub-done) with <code>.toBe(direct)</code> identity (parity with steps umbrella and <code>pause-feel-flow</code> / <code>pause-reflect-hub-flow</code>). Presentation I/O modules unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — CI slice only.</dd>
       <dt>Tradeoffs</dt>
@@ -6400,11 +6400,11 @@
     <h3><code>pause-*-mood-flow</code> leaf CI anchors have unit coverage</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-initial-emotion-log-flow.test.ts</code>, <code>pause-feel-tiles-mood-flow.test.ts</code>, <code>pause-depth-picker-mood-flow.test.ts</code>, <code>pause-initial-emotion-presentation-flow.test.ts</code>, and <code>pause-session-mood-chrome-flow.test.ts</code> beside mood subcluster CI anchors (parity with steps/share leaf flow tests). <code>pause-reflect-mood-io</code> unchanged (imports leaf modules directly).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-initial-emotion-log-flow.test.ts</code>, <code>pause-feel-tiles-flow.test.ts</code>, <code>pause-depth-picker-feel-flow.test.ts</code>, <code>pause-initial-emotion-presentation-flow.test.ts</code>, and <code>pause-session-mood-chrome-flow.test.ts</code> beside mood subcluster CI anchors (parity with steps/share leaf flow tests). <code>pause-feel-io</code> unchanged (imports leaf modules directly).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; test-only slice.</dd>
       <dt>Tradeoffs</dt>
-      <dd>No CI guard change; mood leaf flow anchors remain CI-only; umbrella <code>pause-reflect-mood-flow.test.ts</code> already covers aggregate re-exports.</dd>
+      <dd>No CI guard change; mood leaf flow anchors remain CI-only; umbrella <code>pause-feel-flow.test.ts</code> already covers aggregate re-exports.</dd>
       <dt>Open questions</dt>
       <dd>Next: reflect pending-offer flow regression tests, remaining frame orchestrate subcluster flow tests, or Phase B subscription Tier 1 shim.</dd>
     </dl>
@@ -6606,14 +6606,14 @@
       <span>Phase A — reflect mood-flow cluster re-export test (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-flow</code> CI compose anchor has unit coverage</h3>
+    <h3><code>pause-feel-flow</code> CI compose anchor has unit coverage</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-reflect-mood-flow.test.ts</code> beside the umbrella anchor (parity with hub/steps flow tests).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-feel-flow.test.ts</code> beside the umbrella anchor (parity with hub/steps flow tests).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; test-only.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>pause-reflect-mood-io</code> still imports domain + <code>run-initial-emotion-log</code> directly; umbrella flow remains CI-only.</dd>
+      <dd><code>pause-feel-io</code> still imports domain + <code>run-initial-emotion-log</code> directly; umbrella flow remains CI-only.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>pause-reflect-share-flow</code> off share subcluster anchors, or Phase B subscription Tier 1 shim.</dd>
     </dl>
@@ -6698,13 +6698,13 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-      <span>Phase A — peel pause-reflect-mood-flow off mood subcluster anchors (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — peel pause-feel-flow off mood subcluster anchors (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-flow</code> composes domain mood helpers + leaf RPC use case</h3>
+    <h3><code>pause-feel-flow</code> composes domain mood helpers + leaf RPC use case</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mood CI umbrella re-exports <code>domain/reflect/mood/</code> helpers and <code>run-initial-emotion-log</code> directly (parity with <code>pause-reflect-mood-io</code> leaf imports; subcluster flow anchors remain for CI only).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mood CI umbrella re-exports <code>domain/feel/</code> helpers and <code>run-initial-emotion-log</code> directly (parity with <code>pause-feel-io</code> leaf imports; subcluster flow anchors remain for CI only).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
@@ -6869,17 +6869,17 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-      <span>Phase A — peel pause-reflect-mood-io mood chrome to domain leaf modules (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — peel pause-feel-io mood chrome to domain leaf modules (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> imports mood chrome leaves directly</h3>
+    <h3><code>pause-feel-io</code> imports mood chrome leaves directly</h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Split <code>pause-session-mood-chrome-flow</code> into <code>pause-session-chrome-close</code> + <code>run-deep-pause-picker-entry-if-pro</code>; presentation I/O imports leaf modules (parity with <code>pause-session-breath-io</code> → <code>ritual-audio</code> on branch tip).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>pause-session-mood-chrome-flow.ts</code> remains application/domain cluster re-export for CI; mood conductors still import <code>pause-reflect-mood-io</code> only.</dd>
+      <dd><code>pause-session-mood-chrome-flow.ts</code> remains application/domain cluster re-export for CI; mood conductors still import <code>pause-feel-io</code> only.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>pause-persisted-tab-session-io</code> to leaf modules, or session shell/scaffold subcluster peels.</dd>
     </dl>
@@ -7103,7 +7103,7 @@
     <h3><code>pause-reflect-flows-io</code> imports score-impact builders from <code>score-impacts</code> + <code>score-impact-presentation</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route decide score-impact presentation helpers through <code>ritual/decide/score-impacts</code> and <code>score-impact-presentation</code> instead of <code>pause-decide-score-impacts-flow</code> (parity with <code>pause-reflect-mood-io</code> leaf imports on branch tip).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route decide score-impact presentation helpers through <code>ritual/decide/score-impacts</code> and <code>score-impact-presentation</code> instead of <code>pause-decide-score-impacts-flow</code> (parity with <code>pause-feel-io</code> leaf imports on branch tip).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
@@ -7154,17 +7154,17 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-      <span>Phase A — peel pause-reflect-mood-io to domain + leaf use case (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — peel pause-feel-io to domain + leaf use case (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> imports domain mood helpers + <code>run-initial-emotion-log</code> directly</h3>
+    <h3><code>pause-feel-io</code> imports domain mood helpers + <code>run-initial-emotion-log</code> directly</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route <code>pause-reflect-mood-io</code> through <code>domain/reflect/mood/*</code> and <code>run-initial-emotion-log</code> instead of mood subcluster flow anchors (parity with <code>pause-reflect-hub-io</code> and <code>pause-reflect-flows-io</code> leaf imports on branch tip).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route <code>pause-feel-io</code> through <code>domain/feel/*</code> and <code>run-initial-emotion-log</code> instead of mood subcluster flow anchors (parity with <code>pause-reflect-hub-io</code> and <code>pause-reflect-flows-io</code> leaf imports on branch tip).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Mood subcluster <code>*-mood-flow.ts</code> anchors remain for <code>check:architecture-alignment</code> cluster detection; mood presentation hooks still import only <code>pause-reflect-mood-io</code>.</dd>
+      <dd>Mood subcluster <code>*-mood-flow.ts</code> anchors remain for <code>check:architecture-alignment</code> cluster detection; mood presentation hooks still import only <code>pause-feel-io</code>.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel <code>pause-companion-orchestration-io</code> off subcluster flow anchors, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
@@ -7293,7 +7293,7 @@
     <h3><code>pause-reflect-hub-io</code> imports hub helpers through <code>pause-reflect-hub-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Route <code>pause-reflect-hub-io</code> through the hub umbrella CI anchor instead of three hub subcluster flows (parity with <code>pause-reflect-mood-io</code> → <code>pause-reflect-mood-flow</code> and <code>pause-reflect-steps-io</code>). CI blocks deep hub subcluster imports on hub I/O modules.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Route <code>pause-reflect-hub-io</code> through the hub umbrella CI anchor instead of three hub subcluster flows (parity with <code>pause-feel-io</code> → <code>pause-feel-flow</code> and <code>pause-reflect-steps-io</code>). CI blocks deep hub subcluster imports on hub I/O modules.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
@@ -7553,13 +7553,13 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-      <span>Phase A — compose pause-reflect-mood-flow from mood subclusters + breath restore anchor (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — compose pause-feel-flow from mood subclusters + breath restore anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
     <h3>Mood umbrella flow composes subcluster CI anchors; ritual restore uses breath-flow</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-mood-flow</code> re-exports only through <code>pause-initial-emotion-log-flow</code>, <code>pause-feel-tiles-mood-flow</code>, <code>pause-depth-picker-mood-flow</code> (incl. <code>isPauseSessionDepthPickerActive</code>), <code>pause-initial-emotion-presentation-flow</code>, and <code>pause-session-mood-chrome-flow</code>. <code>pause-session-ritual-restore-flow</code> imports restored breath hydration via <code>pause-session-breath-flow</code> (finishes prior breath slice). CI guards block deep mood domain imports on the umbrella flow and legacy breath/mood paths in presentation.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-feel-flow</code> re-exports only through <code>pause-initial-emotion-log-flow</code>, <code>pause-feel-tiles-flow</code>, <code>pause-depth-picker-feel-flow</code> (incl. <code>isPauseSessionDepthPickerActive</code>), <code>pause-initial-emotion-presentation-flow</code>, and <code>pause-session-mood-chrome-flow</code>. <code>pause-session-ritual-restore-flow</code> imports restored breath hydration via <code>pause-session-breath-flow</code> (finishes prior breath slice). CI guards block deep mood domain imports on the umbrella flow and legacy breath/mood paths in presentation.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
@@ -8161,13 +8161,13 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A — reflect mood I/O via mood flow anchor (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — feel I/O via mood flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> imports mood helpers + initial-emotion RPC via <code>pause-reflect-mood-flow</code></h3>
+    <h3><code>pause-feel-io</code> imports mood helpers + initial-emotion RPC via <code>pause-feel-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route mood presentation I/O through <code>pause-reflect-mood-flow</code> instead of deep <code>run-initial-emotion-log</code> and scattered <code>domain/reflect/mood/</code> imports (parity with hub and steps I/O peels).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route mood presentation I/O through <code>pause-feel-flow</code> instead of deep <code>run-initial-emotion-log</code> and scattered <code>domain/feel/</code> imports (parity with hub and steps I/O peels).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
@@ -8211,7 +8211,7 @@
       <dt>Tradeoffs</dt>
       <dd>Generation I/O still imports domain hook helpers directly; mood I/O still imports <code>run-initial-emotion-log</code> directly until a mood-flow peel.</dd>
       <dt>Open questions</dt>
-      <dd>Next: mood I/O through <code>pause-reflect-mood-flow</code>, generation I/O through application hook-flow anchor, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: mood I/O through <code>pause-feel-flow</code>, generation I/O through application hook-flow anchor, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -8655,13 +8655,13 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect mood I/O via mood flow anchor (backlog #1 verified, Tier 5)</span>
+      <span>Phase A slice — feel I/O via mood flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> imports mood helpers through <code>pause-reflect-mood-flow</code></h3>
+    <h3><code>pause-feel-io</code> imports mood helpers through <code>pause-feel-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route <code>pause-reflect-mood-io</code> through <code>pause-reflect-mood-flow</code> instead of deep <code>domain/reflect/mood/*</code> and <code>run-initial-emotion-log</code> paths (parity with share/hub/steps/flows presentation I/O anchors; generation I/O uses direct domain + holzen-reflect sibling imports).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. Route <code>pause-feel-io</code> through <code>pause-feel-flow</code> instead of deep <code>domain/feel/*</code> and <code>run-initial-emotion-log</code> paths (parity with share/hub/steps/flows presentation I/O anchors; generation I/O uses direct domain + holzen-reflect sibling imports).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
@@ -8826,17 +8826,17 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect mood I/O direct domain + run-initial-emotion-log (backlog #1 follow-up, Tier 5)</span>
+      <span>Phase A slice — feel I/O direct domain + run-initial-emotion-log (backlog #1 follow-up, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> imports mood helpers off <code>pause-reflect-mood-flow</code> CI anchor</h3>
+    <h3><code>pause-feel-io</code> imports mood helpers off <code>pause-feel-flow</code> CI anchor</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. <code>pause-reflect-mood-io</code> imports depth-picker, feel-tiles, presentation rollback, and session chrome from <code>domain/reflect/mood/*</code> and <code>runInitialEmotion*</code> from <code>run-initial-emotion-log</code> (parity with hub I/O peel; steps now route through <code>pause-reflect-steps-flow</code>).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete. <code>pause-feel-io</code> imports depth-picker, feel-tiles, presentation rollback, and session chrome from <code>domain/feel/*</code> and <code>runInitialEmotion*</code> from <code>run-initial-emotion-log</code> (parity with hub I/O peel; steps now route through <code>pause-reflect-steps-flow</code>).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>pause-reflect-mood-flow.ts</code> and mood subcluster flow anchors remain for <code>check:architecture-alignment</code>; presentation I/O no longer routes through the umbrella anchor.</dd>
+      <dd><code>pause-feel-flow.ts</code> and mood subcluster flow anchors remain for <code>check:architecture-alignment</code>; presentation I/O no longer routes through the umbrella anchor.</dd>
       <dt>Open questions</dt>
       <dd>Next: reconcile presentation I/O direct-import vs flow-anchor routing per subcluster, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
@@ -8978,17 +8978,17 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect mood I/O via mood flow anchor (backlog #1 verified, Tier 5)</span>
+      <span>Phase A slice — feel I/O via mood flow anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> → <code>pause-reflect-mood-flow</code></h3>
+    <h3><code>pause-feel-io</code> → <code>pause-feel-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route mood presentation I/O through <code>pause-reflect-mood-flow</code> instead of deep <code>domain/reflect/mood/*</code> and <code>run-initial-emotion-log</code> imports (parity with hub/share/generation I/O peels on this branch).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route mood presentation I/O through <code>pause-feel-flow</code> instead of deep <code>domain/feel/*</code> and <code>run-initial-emotion-log</code> imports (parity with hub/share/generation I/O peels on this branch).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Unit test mocks <code>pause-reflect-mood-flow</code>; subcluster mood flow anchors remain for CI.</dd>
+      <dd>Unit test mocks <code>pause-feel-flow</code>; subcluster mood flow anchors remain for CI.</dd>
       <dt>Open questions</dt>
       <dd>Next: reflect flows I/O decide/toast anchor peel, peel <code>pause-reflect-generation-io</code> off hook-flow to domain + <code>run-reflect-generation</code>, or companion orchestration-io peel.</dd>
     </dl>
@@ -9161,7 +9161,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-reflect-generation-manual-open-flow.ts</code> remains for <code>check:architecture-alignment</code> only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>pause-reflect-mood-io</code> from flow anchors, or session shell/scaffold I/O anchor peels.</dd>
+      <dd>Next: peel <code>pause-feel-io</code> from flow anchors, or session shell/scaffold I/O anchor peels.</dd>
     </dl>
   </article>
 
@@ -9180,7 +9180,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-reflect-generation-hook-flow.ts</code> remains for <code>check:architecture-alignment</code>; presentation no longer depends on it.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel <code>pause-reflect-mood-io</code> from flow anchors, or session conductor flow-anchor peels.</dd>
+      <dd>Next: peel <code>pause-feel-io</code> from flow anchors, or session conductor flow-anchor peels.</dd>
     </dl>
   </article>
 
@@ -9294,7 +9294,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-companion-orchestration-flow.ts</code> remains for <code>check:architecture-alignment</code>; mirrors reflect steps/flows I/O peels.</dd>
       <dt>Open questions</dt>
-      <dd>Next: home reflect manual-open I/O peel or reflect mood I/O peel from <code>pause-reflect-mood-flow</code>.</dd>
+      <dd>Next: home reflect manual-open I/O peel or feel I/O peel from <code>pause-feel-flow</code>.</dd>
     </dl>
   </article>
 
@@ -9313,7 +9313,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-reflect-generation-manual-open-flow</code> remains for <code>check:architecture-alignment</code>; <code>pause-home-reflect-telemetry-io</code> may still use telemetry flow anchor until a follow-up peel.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-home-reflect-telemetry-io</code> direct telemetry modules, or reflect mood I/O peel from <code>pause-reflect-mood-flow</code>.</dd>
+      <dd>Next: <code>pause-home-reflect-telemetry-io</code> direct telemetry modules, or feel I/O peel from <code>pause-feel-flow</code>.</dd>
     </dl>
   </article>
 
@@ -9339,13 +9339,13 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — unify reflect mood I/O on pause-reflect-mood-flow (backlog #1 verified, Tier 5)</span>
+      <span>Phase A slice — unify feel I/O on pause-feel-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-flow</code> single import on <code>pause-reflect-mood-io</code></h3>
+    <h3><code>pause-feel-flow</code> single import on <code>pause-feel-io</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no relocations. Add <code>pause-reflect-mood-flow.ts</code> as one application cluster re-export (depth-picker, feel-tiles, initial-emotion RPC, presentation rollback, session chrome) so <code>pause-reflect-mood-io</code> has a single import surface (parity with <code>pause-session-brief-flow</code> and other session reflect I/O anchors).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no relocations. Add <code>pause-feel-flow.ts</code> as one application cluster re-export (depth-picker, feel-tiles, initial-emotion RPC, presentation rollback, session chrome) so <code>pause-feel-io</code> has a single import surface (parity with <code>pause-session-brief-flow</code> and other session reflect I/O anchors).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; consolidates existing mood subcluster anchors only.</dd>
       <dt>Tradeoffs</dt>
@@ -9624,15 +9624,15 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect mood I/O pure helpers from domain (backlog #1 follow-up)</span>
+      <span>Phase A slice — feel I/O pure helpers from domain (backlog #1 follow-up)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> imports mood chrome, depth-picker, feel-tile, and Feel-step UI helpers from <code>domain/reflect/mood/</code></h3>
+    <h3><code>pause-feel-io</code> imports mood chrome, depth-picker, feel-tile, and Feel-step UI helpers from <code>domain/feel/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder move remains complete. Presentation mood I/O imports pure helpers directly from <code>domain/reflect/mood/</code> instead of application CI anchor re-exports (<code>pause-*-mood-flow.ts</code>). <code>runInitialEmotionSelect</code> / <code>runInitialEmotionSkip</code> RPC use cases stay on application paths inside the same I/O module.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder move remains complete. Presentation mood I/O imports pure helpers directly from <code>domain/feel/</code> instead of application CI anchor re-exports (<code>pause-*-mood-flow.ts</code>). <code>runInitialEmotionSelect</code> / <code>runInitialEmotionSkip</code> RPC use cases stay on application paths inside the same I/O module.</dd>
       <dt>Deviation</dt>
-      <dd>None — behavior parity; thin application anchors under <code>application/use-cases/ritual/reflect/mood/</code> remain for <code>check:architecture-alignment</code> and non-presentation imports.</dd>
+      <dd>None — behavior parity; thin application anchors under <code>application/use-cases/ritual/feel/</code> remain for <code>check:architecture-alignment</code> and non-presentation imports.</dd>
       <dt>Tradeoffs</dt>
       <dd>Smallest follow-up to the flows decide peel — no file moves, import-path alignment only.</dd>
       <dt>Open questions</dt>
@@ -9779,10 +9779,10 @@
       <span>Phase A slice — reflect mood initial-emotion I/O binding (backlog #1 follow-up)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>pauseInitialEmotionSelect / pauseInitialEmotionSkip on pause-reflect-mood-io</h3>
+    <h3>pauseInitialEmotionSelect / pauseInitialEmotionSkip on pause-feel-io</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Mirror hub I/O: <code>pause-reflect-mood-io.ts</code> wraps <code>runInitialEmotionSelect</code> and <code>runInitialEmotionSkip</code> with default <code>PauseRepository</code>; <code>use-pause-session-initial-mood-handlers</code> imports I/O only (+ unit tests on io module and hook).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Mirror hub I/O: <code>pause-feel-io.ts</code> wraps <code>runInitialEmotionSelect</code> and <code>runInitialEmotionSkip</code> with default <code>PauseRepository</code>; <code>use-pause-session-initial-mood-handlers</code> imports I/O only (+ unit tests on io module and hook).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
@@ -13616,7 +13616,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — colocate feel-shift dedupe refs under presentation/reflect/mood/</span>
+      <span>Phase A slice — colocate feel-shift dedupe refs under presentation/feel/</span>
       <span class="status resolved">resolved</span>
     </header>
     <h3>Backlog #1 presentation peel — complete mood conductor cluster</h3>
@@ -13692,7 +13692,7 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — colocate depth-picker copy hook under presentation/reflect/mood/</span>
+      <span>Phase A slice — colocate depth-picker copy hook under presentation/feel/</span>
       <span class="status resolved">resolved</span>
     </header>
     <h3>Backlog #1 presentation peel — depth context line with mood cluster</h3>
@@ -15180,7 +15180,7 @@
     <h3>Backlog #1 complete; reflect mood UI token colocated</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS</code> from <code>screens/pause/lib/</code> beside depth-picker conductors under <code>presentation/reflect/mood/</code>; <code>PauseDepthPickerDepthCards</code> imports via <code>public-hooks</code>.</dd>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Move <code>PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS</code> from <code>screens/pause/lib/</code> beside depth-picker conductors under <code>presentation/feel/</code>; <code>PauseDepthPickerDepthCards</code> imports via <code>public-hooks</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior-preserving move; Tailwind <code>cn()</code> stays in presentation (not domain).</dd>
       <dt>Tradeoffs</dt>
@@ -15864,7 +15864,7 @@
     <h3>Peel initial-mood and shift-frame-done conductors from public-ports</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move. <code>presentation/reflect/mood/use-pause-session-initial-mood-handlers</code> and <code>presentation/reflect/hub/use-pause-shift-frame-done-handler</code> call wired <code>public-rpc</code> facades (<code>runInitialEmotionSelect</code>, <code>runInitialEmotionSkip</code>, <code>runShiftEmotionFrameHubDone</code>) instead of use cases + <code>supabasePauseRepository</code> from <code>public-ports</code>. Reset UI helper stays on the feel use-case module.</dd>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> is complete on <code>cursor/arch-migrate-src-ca70</code> — no folder move. <code>presentation/feel/use-pause-session-initial-mood-handlers</code> and <code>presentation/reflect/hub/use-pause-shift-frame-done-handler</code> call wired <code>public-rpc</code> facades (<code>runInitialEmotionSelect</code>, <code>runInitialEmotionSkip</code>, <code>runShiftEmotionFrameHubDone</code>) instead of use cases + <code>supabasePauseRepository</code> from <code>public-ports</code>. Reset UI helper stays on the feel use-case module.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; co-located tests mock <code>public-rpc</code> while delegating to use cases with a stub <code>PauseRepository</code>.</dd>
       <dt>Tradeoffs</dt>
@@ -16320,7 +16320,7 @@
     <h3>Peel Feel-step mood payload and UI from ritual/feel use case</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Mirror shift-frame hub peel: pure <code>initial-emotion-log</code> (payload + dedupe keys) and <code>initial-emotion-presentation</code> (optimistic/rollback/skip UI) live under <code>domain/reflect/mood/</code>; <code>run-initial-emotion-log</code> keeps RPC orchestration in <code>ritual/feel/</code>; <code>public-rpc</code> facades unchanged.</dd>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete. Mirror shift-frame hub peel: pure <code>initial-emotion-log</code> (payload + dedupe keys) and <code>initial-emotion-presentation</code> (optimistic/rollback/skip UI) live under <code>domain/feel/</code>; <code>run-initial-emotion-log</code> keeps RPC orchestration in <code>ritual/feel/</code>; <code>public-rpc</code> facades unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; domain tests colocated; use-case tests unchanged expectations.</dd>
       <dt>Tradeoffs</dt>
@@ -16358,7 +16358,7 @@
     <h3>Colocate pause-session-mood-chrome-flow under domain/reflect/mood; presentation uses public-rpc</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>ritual/reflect/</code> folder move is complete. Move <code>pause-session-mood-chrome-flow</code> (+ test) from <code>ritual/feel/</code> application to <code>domain/reflect/mood/</code>; re-export pure helpers on <code>public-rpc</code>; all four <code>presentation/reflect/mood/</code> conductors import the barrel only.</dd>
+      <dd><code>ritual/reflect/</code> folder move is complete. Move <code>pause-session-mood-chrome-flow</code> (+ test) from <code>ritual/feel/</code> application to <code>domain/feel/</code>; re-export pure helpers on <code>public-rpc</code>; all four <code>presentation/feel/</code> conductors import the barrel only.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
@@ -16434,7 +16434,7 @@
     <h3>Colocate run-initial-emotion-log with reflect mood domain peel</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>After domain peels (<code>initial-emotion-log</code>, <code>initial-emotion-presentation</code>, mood chrome flow), move RPC orchestration <code>run-initial-emotion-log</code> (+ test) from <code>ritual/feel/</code> to <code>application/use-cases/ritual/reflect/mood/</code>. <code>public-rpc</code> facade paths updated; frame-hub shift RPC stays in <code>ritual/feel/</code> until a follow-up slice.</dd>
+      <dd>After domain peels (<code>initial-emotion-log</code>, <code>initial-emotion-presentation</code>, mood chrome flow), move RPC orchestration <code>run-initial-emotion-log</code> (+ test) from <code>ritual/feel/</code> to <code>application/use-cases/ritual/feel/</code>. <code>public-rpc</code> facade paths updated; frame-hub shift RPC stays in <code>ritual/feel/</code> until a follow-up slice.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; mechanical path move only.</dd>
       <dt>Tradeoffs</dt>
@@ -16453,7 +16453,7 @@
     <h3>Peel use-pause-session-feel-tiles-select from public-rpc</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Smallest reflect presentation peel: <code>buildFeelTilesMoodLogOptions</code> is pure domain (<code>domain/reflect/mood/pause-session-mood-chrome-flow</code>); hook imports domain directly; test drops <code>public-rpc</code> mock.</dd>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Smallest reflect presentation peel: <code>buildFeelTilesMoodLogOptions</code> is pure domain (<code>domain/feel/pause-session-mood-chrome-flow</code>); hook imports domain directly; test drops <code>public-rpc</code> mock.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
@@ -16643,7 +16643,7 @@
     <h3>Peel depth-picker, mood-chrome close, and deep-picker pro gate off public-rpc</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete. Smallest reflect presentation peel: pure helpers in <code>domain/reflect/mood/pause-session-mood-chrome-flow</code> (<code>BRIEF_DEPTH_PICKER_RITUAL_ENTRY</code>, <code>DEEP_DEPTH_PICKER_RITUAL_ENTRY</code>, chrome close resolve/run, <code>runDeepPausePickerEntryIfPro</code>) imported directly in <code>use-pause-session-depth-picker-handlers</code>, <code>use-pause-session-mood-chrome-handlers</code>, and <code>use-pause-session-mood-and-persist</code>; depth-picker test drops <code>public-rpc</code> mock.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete. Smallest reflect presentation peel: pure helpers in <code>domain/feel/pause-session-mood-chrome-flow</code> (<code>BRIEF_DEPTH_PICKER_RITUAL_ENTRY</code>, <code>DEEP_DEPTH_PICKER_RITUAL_ENTRY</code>, chrome close resolve/run, <code>runDeepPausePickerEntryIfPro</code>) imported directly in <code>use-pause-session-depth-picker-handlers</code>, <code>use-pause-session-mood-chrome-handlers</code>, and <code>use-pause-session-mood-and-persist</code>; depth-picker test drops <code>public-rpc</code> mock.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
@@ -16833,7 +16833,7 @@
     <h3>Presentation conductors already port-backed; slim public-rpc re-exports</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Remote already peeled <code>use-pause-shift-frame-done-handler</code> and reflect step hooks off <code>public-rpc</code>. This slice removes leftover wired facades (<code>runInitialEmotionSelect</code>, <code>runInitialEmotionSkip</code>, <code>runShiftEmotionFrameHubDone</code>) and mood-chrome pure-helper re-exports now imported from <code>domain/reflect/mood/</code> in presentation. <code>PauseStep</code> type on the hub conductor imports <code>domain/pause-ritual-steps</code> instead of <code>public-hooks</code>.</dd>
+      <dd>Remote already peeled <code>use-pause-shift-frame-done-handler</code> and reflect step hooks off <code>public-rpc</code>. This slice removes leftover wired facades (<code>runInitialEmotionSelect</code>, <code>runInitialEmotionSkip</code>, <code>runShiftEmotionFrameHubDone</code>) and mood-chrome pure-helper re-exports now imported from <code>domain/feel/</code> in presentation. <code>PauseStep</code> type on the hub conductor imports <code>domain/pause-ritual-steps</code> instead of <code>public-hooks</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
@@ -17286,14 +17286,14 @@
       <span>Phase A slice — reflect mood depth context params (backlog #1 incremental)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>resolvePauseDepthContextLineParams</code> under <code>ritual/reflect/mood/</code></h3>
+    <h3><code>resolvePauseDepthContextLineParams</code> under <code>ritual/feel/</code></h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 folder migration (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. Peel depth-picker market context interpolation (symbol + abs % change) from <code>use-pause-session-depth-and-brief-copy</code> into a pure helper beside <code>run-initial-emotion-log</code>; hook keeps <code>t()</code> only.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Depth-picker card chrome styles remain in <code>presentation/reflect/mood/pause-depth-picker-styles.ts</code> per §10.1.</dd>
+      <dd>Depth-picker card chrome styles remain in <code>presentation/feel/pause-depth-picker-styles.ts</code> per §10.1.</dd>
       <dt>Open questions</dt>
       <dd>Next: backlog #4 stray <code>PauseRepository</code> call sites or peel companion orchestrate session off <code>public-rpc</code>.</dd>
     </dl>
@@ -17343,10 +17343,10 @@
       <span>Phase A slice — reflect mood chrome handler types (backlog #1 presentation)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Mood chrome slice types → <code>presentation/reflect/mood/</code></h3>
+    <h3>Mood chrome slice types → <code>presentation/feel/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate <code>PauseSessionMoodChrome*</code> slice types with <code>use-pause-session-mood-chrome-handlers</code> under <code>presentation/reflect/mood/</code>; <code>pause-session-step-handler-types.ts</code> re-exports for <code>PauseSessionStepHandlersProvidersSlice</code>. Resolved leftover rebase conflict markers in this notes file (depth-context + flows + fullview articles).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate <code>PauseSessionMoodChrome*</code> slice types with <code>use-pause-session-mood-chrome-handlers</code> under <code>presentation/feel/</code>; <code>pause-session-step-handler-types.ts</code> re-exports for <code>PauseSessionStepHandlersProvidersSlice</code>. Resolved leftover rebase conflict markers in this notes file (depth-context + flows + fullview articles).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; types-only move.</dd>
       <dt>Tradeoffs</dt>
@@ -17400,12 +17400,12 @@
       <span>Phase A slice — depth context params in domain/reflect/mood (backlog #1 incremental)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>resolvePauseDepthContextLineParams</code> → <code>domain/reflect/mood/</code></h3>
+    <h3><code>resolvePauseDepthContextLineParams</code> → <code>domain/feel/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. Prior slice placed the depth-picker market context helper under <code>ritual/reflect/mood/</code> application; it has no I/O — colocate with <code>initial-emotion-presentation</code> and mood chrome flow in <code>domain/reflect/mood/</code>. <code>use-pause-session-depth-and-brief-copy</code> imports domain path; <code>t()</code> stays in presentation.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. Prior slice placed the depth-picker market context helper under <code>ritual/feel/</code> application; it has no I/O — colocate with <code>initial-emotion-presentation</code> and mood chrome flow in <code>domain/feel/</code>. <code>use-pause-session-depth-and-brief-copy</code> imports domain path; <code>t()</code> stays in presentation.</dd>
       <dt>Deviation</dt>
-      <dd>None — aligns §10.1 feel/initial-emotion row (pure helpers in <code>domain/reflect/mood/</code>).</dd>
+      <dd>None — aligns §10.1 feel/initial-emotion row (pure helpers in <code>domain/feel/</code>).</dd>
       <dt>Tradeoffs</dt>
       <dd>Domain module imports <code>@/features/market/public</code> for <code>trackedAssetSymbol</code> (same as presentation hook did via the helper).</dd>
       <dt>Open questions</dt>
@@ -17438,7 +17438,7 @@
       <span>Phase A slice — reflect mood chrome handler types (backlog #1 presentation)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Mood chrome slice types → <code>presentation/reflect/mood/</code></h3>
+    <h3>Mood chrome slice types → <code>presentation/feel/</code></h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete on <code>cursor/arch-migrate-src-ca70</code>. Colocate <code>PauseSessionMoodChrome*</code> slice types with <code>use-pause-session-mood-chrome-handlers</code>; <code>pause-session-step-handler-types.ts</code> re-exports for <code>PauseSessionStepHandlersProvidersSlice</code>.</dd>
@@ -17498,13 +17498,13 @@
     <h3><code>depth-picker-ritual-entries.ts</code> feeds <code>apply-depth-picker-ritual-entry</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Follow-up to <code>apply-depth-picker-ritual-entry</code>: move <code>BRIEF_*</code> / <code>DEEP_*</code> payloads out of <code>domain/reflect/mood/pause-session-mood-chrome-flow.ts</code> into <code>ritual/reflect/mood/</code> beside the apply helpers. Chrome-close and feel-tile helpers remain domain until a later peel.</dd>
+      <dd>Follow-up to <code>apply-depth-picker-ritual-entry</code>: move <code>BRIEF_*</code> / <code>DEEP_*</code> payloads out of <code>domain/feel/pause-session-mood-chrome-flow.ts</code> into <code>ritual/feel/</code> beside the apply helpers. Chrome-close and feel-tile helpers remain domain until a later peel.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
       <dd>Domain mood chrome module still owns feel-tile log option builders; application owns depth-picker entry payloads + apply ports.</dd>
       <dt>Open questions</dt>
-      <dd>Next: move <code>buildFeelTilesMoodLogOptions</code> into <code>ritual/reflect/mood/</code>, or peel remaining companion orchestrate <code>public-rpc</code> re-exports (backlog #4).</dd>
+      <dd>Next: move <code>buildFeelTilesMoodLogOptions</code> into <code>ritual/feel/</code>, or peel remaining companion orchestrate <code>public-rpc</code> re-exports (backlog #4).</dd>
     </dl>
   </article>
 
@@ -17552,7 +17552,7 @@
       <span>Phase A slice — depth picker gate in domain/reflect/mood (backlog #1 incremental)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>isPauseSessionDepthPickerActive</code> → <code>domain/reflect/mood/pause-depth-picker-active.ts</code></h3>
+    <h3><code>isPauseSessionDepthPickerActive</code> → <code>domain/feel/pause-depth-picker-active.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) is complete. Depth-picker visibility is a reflect/mood ritual beat predicate, not session hydration — colocate with mood chrome flow helpers; <code>gate-flags.ts</code> keeps instance-fetch wait and re-exports the depth-picker helper for existing doc links.</dd>
@@ -17628,10 +17628,10 @@
       <span>Phase A slice — depth-picker ritual entry in domain/reflect/mood (backlog #1 follow-up)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>apply-depth-picker-ritual-entry</code> → <code>domain/reflect/mood/</code></h3>
+    <h3><code>apply-depth-picker-ritual-entry</code> → <code>domain/feel/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder migration is complete. <code>depth-picker-ritual-entries</code> constants and <code>applyBriefDepthPickerRitualEntry</code> / <code>applyDeepDepthPickerRitualEntry</code> have no I/O — colocate in <code>domain/reflect/mood/</code> beside <code>pause-session-mood-chrome-flow.ts</code>, matching prior move of <code>resolvePauseDepthContextLineParams</code> to domain.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder migration is complete. <code>depth-picker-ritual-entries</code> constants and <code>applyBriefDepthPickerRitualEntry</code> / <code>applyDeepDepthPickerRitualEntry</code> have no I/O — colocate in <code>domain/feel/</code> beside <code>pause-session-mood-chrome-flow.ts</code>, matching prior move of <code>resolvePauseDepthContextLineParams</code> to domain.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
@@ -17783,11 +17783,11 @@
     <h3><code>pause-session-mood-chrome-flow</code> → application mood cluster</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Follow-up to <code>build-feel-tiles-mood-log-options</code>: move chrome-close, deep-picker pro gate, and <code>isBriefRitualEntry</code> from <code>domain/reflect/mood/</code> into <code>application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow.ts</code>; mood chrome presentation hooks import the ritual module directly.</dd>
+      <dd>Follow-up to <code>build-feel-tiles-mood-log-options</code>: move chrome-close, deep-picker pro gate, and <code>isBriefRitualEntry</code> from <code>domain/feel/</code> into <code>application/use-cases/ritual/feel/pause-session-mood-chrome-flow.ts</code>; mood chrome presentation hooks import the ritual module directly.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Depth-picker entry constants remain in <code>domain/reflect/mood/</code> (no I/O).</dd>
+      <dd>Depth-picker entry constants remain in <code>domain/feel/</code> (no I/O).</dd>
       <dt>Open questions</dt>
       <dd>Next: port-backed companion feedback vote fetch query path, or backlog #4 remaining ritual log <code>PauseRepository</code> call sites.</dd>
     </dl>
@@ -17818,10 +17818,10 @@
       <span>Phase A slice — feel-tiles mood log options in domain/reflect/mood (backlog #1 follow-up)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>buildFeelTilesMoodLogOptions</code> → <code>domain/reflect/mood/</code></h3>
+    <h3><code>buildFeelTilesMoodLogOptions</code> → <code>domain/feel/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder migration is complete. <code>buildFeelTilesMoodLogOptions</code> shapes <code>InitialEmotionLogOpts</code> with no I/O — colocate beside <code>initial-emotion-log.ts</code> (prior slice had placed it under <code>application/ritual/reflect/mood/</code> next to <code>run-initial-emotion-log</code>).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) folder migration is complete. <code>buildFeelTilesMoodLogOptions</code> shapes <code>InitialEmotionLogOpts</code> with no I/O — colocate beside <code>initial-emotion-log.ts</code> (prior slice had placed it under <code>application/ritual/feel/</code> next to <code>run-initial-emotion-log</code>).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
@@ -17989,12 +17989,12 @@
       <span>Phase A slice — mood chrome flow in domain/reflect/mood (backlog #1 follow-up)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-session-mood-chrome-flow</code> → <code>domain/reflect/mood/</code></h3>
+    <h3><code>pause-session-mood-chrome-flow</code> → <code>domain/feel/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Chrome-close resolve/run and deep-picker pro gate are pure (no <code>PauseRepository</code>) — colocate in <code>domain/reflect/mood/</code> beside <code>build-feel-tiles-mood-log-options</code>; presentation mood hooks import domain directly.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) is complete. Chrome-close resolve/run and deep-picker pro gate are pure (no <code>PauseRepository</code>) — colocate in <code>domain/feel/</code> beside <code>build-feel-tiles-mood-log-options</code>; presentation mood hooks import domain directly.</dd>
       <dt>Deviation</dt>
-      <dd>Reverses interim placement under <code>application/use-cases/ritual/reflect/mood/</code> (May 2026).</dd>
+      <dd>Reverses interim placement under <code>application/use-cases/ritual/feel/</code> (May 2026).</dd>
       <dt>Tradeoffs</dt>
       <dd>No <code>public-rpc</code> re-export — helpers are not cross-context; mood RPC stays on wired facades.</dd>
       <dt>Open questions</dt>
@@ -18315,7 +18315,7 @@
     <h3>Reflect <code>ritual/reflect/</code> complete; mood/hub tests mock <code>public-rpc</code> only</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code> — no legacy reflect use-case paths under <code>src/</code>. This slice aligns <code>presentation/reflect/mood/</code> and <code>presentation/reflect/hub/</code> hook tests with step-hook pattern: mock <code>logPauseInitialEmotion*</code> / <code>logPauseShiftEmotionFrameHubDone</code> on <code>public-rpc</code> instead of delegating through use cases + <code>PauseRepository</code>. Also peels <code>use-manual-pause-trigger</code> to wired <code>openManualPauseFromHome</code> on <code>public-rpc</code> (home entry uses ReflectGenerator stub).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code> — no legacy reflect use-case paths under <code>src/</code>. This slice aligns <code>presentation/feel/</code> and <code>presentation/reflect/hub/</code> hook tests with step-hook pattern: mock <code>logPauseInitialEmotion*</code> / <code>logPauseShiftEmotionFrameHubDone</code> on <code>public-rpc</code> instead of delegating through use cases + <code>PauseRepository</code>. Also peels <code>use-manual-pause-trigger</code> to wired <code>openManualPauseFromHome</code> on <code>public-rpc</code> (home entry uses ReflectGenerator stub).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import and test surfaces only.</dd>
       <dt>Tradeoffs</dt>
@@ -18353,7 +18353,7 @@
     <h3>Mood/hub hook tests: public-rpc mocks + domain fixtures only</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Remote already mocked <code>public-rpc</code> for mood/hub conductors; this slice removes the last <code>run-initial-emotion-log</code> use-case import from the mood test (uses <code>domain/reflect/mood/initial-emotion-presentation</code> for <code>initialEmotionResetUi</code>) and aligns hub shift dedupe key with <code>buildShiftEmotionFrameHubLogBundle()</code>.</dd>
+      <dd>Remote already mocked <code>public-rpc</code> for mood/hub conductors; this slice removes the last <code>run-initial-emotion-log</code> use-case import from the mood test (uses <code>domain/feel/initial-emotion-presentation</code> for <code>initialEmotionResetUi</code>) and aligns hub shift dedupe key with <code>buildShiftEmotionFrameHubLogBundle()</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
@@ -18448,7 +18448,7 @@
     <h3>Backlog #1 verified; mood conductor imports domain presentation helpers directly</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Peel pure <code>initialEmotionResetUi</code> off <code>public-rpc</code>; <code>use-pause-session-initial-mood-handlers</code> imports from <code>domain/reflect/mood/initial-emotion-presentation</code>. RPC facades (<code>logPauseInitialEmotion*</code>, <code>showPauseStepSyncFailedToast</code>) stay on <code>public-rpc</code>.</dd>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Peel pure <code>initialEmotionResetUi</code> off <code>public-rpc</code>; <code>use-pause-session-initial-mood-handlers</code> imports from <code>domain/feel/initial-emotion-presentation</code>. RPC facades (<code>logPauseInitialEmotion*</code>, <code>showPauseStepSyncFailedToast</code>) stay on <code>public-rpc</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
@@ -18581,7 +18581,7 @@
     <h3>§6 peel: mood UI type no longer re-exported through run-initial-emotion-log</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) complete — no reflect folder moves. <code>public-rpc</code> re-exports <code>InitialEmotionUiState</code> from <code>domain/reflect/mood/initial-emotion-presentation</code> instead of the use-case module; duplicate <code>initialEmotionResetUi</code> test removed from <code>run-initial-emotion-log.test</code> (covered in domain).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) complete — no reflect folder moves. <code>public-rpc</code> re-exports <code>InitialEmotionUiState</code> from <code>domain/feel/initial-emotion-presentation</code> instead of the use-case module; duplicate <code>initialEmotionResetUi</code> test removed from <code>run-initial-emotion-log.test</code> (covered in domain).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
@@ -18752,7 +18752,7 @@
     <h3>§6 peel: mood UI type is domain-only</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) complete. Remove unused <code>InitialEmotionUiState</code> re-export from <code>public-rpc</code> — presentation mood handlers import the type from <code>domain/reflect/mood/initial-emotion-presentation</code>; RPC result types stay exported.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) complete. Remove unused <code>InitialEmotionUiState</code> re-export from <code>public-rpc</code> — presentation mood handlers import the type from <code>domain/feel/initial-emotion-presentation</code>; RPC result types stay exported.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
@@ -20443,7 +20443,7 @@
     <h3>ritual/reflect/ complete; mood chrome conductor on ritual reflect barrel</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths; 14 modules under <code>ritual/reflect/</code>. Export <code>usePauseSessionMoodChromeHandlers</code> on <code>public-ritual-reflect.ts</code> beside favorite toggle and step hooks; <code>public-hooks</code> re-exports for backward compatibility. Session <code>use-pause-session-step-handlers</code> keeps direct <code>presentation/reflect/mood/</code> import (feature-internal).</dd>
+      <dd>Backlog #1 verified — zero <code>application/use-cases/reflect/</code> paths; 14 modules under <code>ritual/reflect/</code>. Export <code>usePauseSessionMoodChromeHandlers</code> on <code>public-ritual-reflect.ts</code> beside favorite toggle and step hooks; <code>public-hooks</code> re-exports for backward compatibility. Session <code>use-pause-session-step-handlers</code> keeps direct <code>presentation/feel/</code> import (feature-internal).</dd>
       <dt>Deviation</dt>
       <dd>None — mood persist + chrome close behavior unchanged.</dd>
       <dt>Tradeoffs</dt>
@@ -20481,7 +20481,7 @@
     <h3>depth-picker + feel-tiles + initial-mood on ritual reflect barrel</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 verified. Export <code>usePauseSessionDepthPickerHandlers</code>, <code>usePauseSessionFeelTilesSelect</code>, and <code>usePauseSessionInitialMoodHandlers</code> on <code>public-ritual-reflect.ts</code>; <code>public-hooks</code> re-exports from the barrel. Mood-and-persist still composes these via sibling <code>presentation/reflect/mood/</code> imports.</dd>
+      <dd>Backlog #1 verified. Export <code>usePauseSessionDepthPickerHandlers</code>, <code>usePauseSessionFeelTilesSelect</code>, and <code>usePauseSessionInitialMoodHandlers</code> on <code>public-ritual-reflect.ts</code>; <code>public-hooks</code> re-exports from the barrel. Mood-and-persist still composes these via sibling <code>presentation/feel/</code> imports.</dd>
       <dt>Deviation</dt>
       <dd>None — RPC paths unchanged (<code>public-rpc</code> facades).</dd>
       <dt>Tradeoffs</dt>
@@ -20709,7 +20709,7 @@
     <h3>ritual/reflect/ complete; presentation avoids public-ritual-reflect cycle</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 verified — use cases under <code>ritual/reflect/</code>. After home/session domain type imports, align <code>presentation/reflect/mood/</code> and <code>use-pause-session-step-handlers</code> to import <code>usePauseFavoriteToggle</code>, <code>usePauseFeelShiftLogDedupeRefs</code>, and <code>usePauseSessionBreathReflectHandlers</code> from sibling presentation modules instead of <code>public-ritual-reflect</code> (barrel re-export cycle). <code>pause-session-scaffold-vm-types</code> uses <code>BriefPauseStep</code> from <code>domain/ritual-types</code>.</dd>
+      <dd>Backlog #1 verified — use cases under <code>ritual/reflect/</code>. After home/session domain type imports, align <code>presentation/feel/</code> and <code>use-pause-session-step-handlers</code> to import <code>usePauseFavoriteToggle</code>, <code>usePauseFeelShiftLogDedupeRefs</code>, and <code>usePauseSessionBreathReflectHandlers</code> from sibling presentation modules instead of <code>public-ritual-reflect</code> (barrel re-export cycle). <code>pause-session-scaffold-vm-types</code> uses <code>BriefPauseStep</code> from <code>domain/ritual-types</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior unchanged; <code>public-hooks</code> still re-exports hooks for screens.</dd>
       <dt>Tradeoffs</dt>
@@ -23065,7 +23065,7 @@
     <h3>Backlog #1 follow-up; session gate predicates</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>After persisted-session guards moved to <code>domain/session/</code>, delete <code>application/use-cases/session/gate-flags.ts</code>. <code>isPauseSessionWaitingForInstanceFetch</code> lives in <code>domain/session/waiting-for-instance-fetch.ts</code>; depth-picker gate exports from <code>domain/reflect/mood/pause-depth-picker-active.ts</code> via <code>public-session.ts</code> only (no application re-export hop).</dd>
+      <dd>After persisted-session guards moved to <code>domain/session/</code>, delete <code>application/use-cases/session/gate-flags.ts</code>. <code>isPauseSessionWaitingForInstanceFetch</code> lives in <code>domain/session/waiting-for-instance-fetch.ts</code>; depth-picker gate exports from <code>domain/feel/pause-depth-picker-active.ts</code> via <code>public-session.ts</code> only (no application re-export hop).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior-preserving; presentation already imported depth-picker from domain in scaffold conductor.</dd>
       <dt>Tradeoffs</dt>
@@ -23451,7 +23451,7 @@
       <dt>Tradeoffs</dt>
       <dd>Reflect mood, hub, flows, and decide hooks still import <code>public-rpc</code> directly; home manual trigger still binds <code>supabaseReflectGenerator</code> from <code>public-rpc</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>presentation/reflect/mood/*</code> or <code>flows/*</code> bound <code>PauseRepository</code> I/O module, <code>public-ritual-frame</code> barrel peel, or Phase B <code>src/lib/holzen-query-client-ref</code> shim.</dd>
+      <dd>Next: <code>presentation/feel/*</code> or <code>flows/*</code> bound <code>PauseRepository</code> I/O module, <code>public-ritual-frame</code> barrel peel, or Phase B <code>src/lib/holzen-query-client-ref</code> shim.</dd>
     </dl>
   </article>
 
@@ -23464,7 +23464,7 @@
     <h3>Reflect presentation — initial emotion + shift-frame hub off public-rpc</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>presentation/reflect/mood/pause-reflect-mood-io.ts</code> and <code>presentation/reflect/hub/pause-reflect-hub-io.ts</code> as bound <code>PauseRepository</code> imports for <code>use-pause-session-initial-mood-handlers</code> and <code>use-pause-shift-frame-done-handler</code> (mirrors <code>pause-reflect-generation-io.ts</code>).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) was already complete on <code>cursor/arch-migrate-src-ca70</code>. Add <code>presentation/feel/pause-feel-io.ts</code> and <code>presentation/reflect/hub/pause-reflect-hub-io.ts</code> as bound <code>PauseRepository</code> imports for <code>use-pause-session-initial-mood-handlers</code> and <code>use-pause-shift-frame-done-handler</code> (mirrors <code>pause-reflect-generation-io.ts</code>).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior-preserving wiring only.</dd>
       <dt>Tradeoffs</dt>
@@ -23540,7 +23540,7 @@
     <h3>Backlog #1 verified — port-lock mocks match pause-reflect-*-io boundaries</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Align <code>use-pause-session-mood-chrome-handlers.port-lock</code> and <code>use-pause-session-mood-and-persist</code> tests with bound I/O modules: mock <code>pause-reflect-mood-io</code> / <code>pause-reflect-steps-io</code> instead of <code>public-rpc</code> and direct use-case ports for favorite toggle.</dd>
+      <dd><code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code> was already complete on <code>cursor/arch-migrate-src-ca70</code>. Align <code>use-pause-session-mood-chrome-handlers.port-lock</code> and <code>use-pause-session-mood-and-persist</code> tests with bound I/O modules: mock <code>pause-feel-io</code> / <code>pause-reflect-steps-io</code> instead of <code>public-rpc</code> and direct use-case ports for favorite toggle.</dd>
       <dt>Deviation</dt>
       <dd>None — test-only; production hooks unchanged.</dd>
       <dt>Tradeoffs</dt>
@@ -23886,7 +23886,7 @@
       <dt>Deviation</dt>
       <dd>None — behavior-preserving move; <code>check:architecture-alignment</code> legacy import strings inverted (session canonical, reflect/scaffold forbidden for persist modules).</dd>
       <dt>Tradeoffs</dt>
-      <dd>Mood bundle still wires persist via <code>use-pause-session-mood-and-persist</code> under <code>presentation/reflect/mood/</code> — acceptable until session conductor owns full shell wiring.</dd>
+      <dd>Mood bundle still wires persist via <code>use-pause-session-mood-and-persist</code> under <code>presentation/feel/</code> — acceptable until session conductor owns full shell wiring.</dd>
       <dt>Open questions</dt>
       <dd>Next: export persist snapshot types on <code>public-session</code>, or <code>public-home</code> cluster 2 (bulk-hold + pending-offer).</dd>
     </dl>
@@ -25408,7 +25408,7 @@
       <dt>Tradeoffs</dt>
       <dd>Initial-emotion presentation types still import domain directly — peel incrementally.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel depth-picker handlers through reflect mood I/O, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: peel depth-picker handlers through feel I/O, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -25418,16 +25418,16 @@
       <span>Phase A slice — mood chrome close via mood flow anchor (backlog #1, Tier 4)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-session-mood-chrome-flow</code> in <code>ritual/reflect/mood/</code></h3>
+    <h3><code>pause-session-mood-chrome-flow</code> in <code>ritual/feel/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 folder move remains complete — no relocations. Add application anchor beside <code>run-initial-emotion-log</code>; <code>pause-reflect-mood-io</code> re-exports chrome close + deep-picker gate helpers; <code>use-pause-session-mood-chrome-handlers</code> and <code>use-pause-session-mood-and-persist</code> import mood I/O only.</dd>
+      <dd>Backlog #1 folder move remains complete — no relocations. Add application anchor beside <code>run-initial-emotion-log</code>; <code>pause-feel-io</code> re-exports chrome close + deep-picker gate helpers; <code>use-pause-session-mood-chrome-handlers</code> and <code>use-pause-session-mood-and-persist</code> import mood I/O only.</dd>
       <dt>Deviation</dt>
       <dd>None — domain still owns pure helpers; behavior parity.</dd>
       <dt>Tradeoffs</dt>
       <dd>Initial-emotion presentation types and depth-picker handlers still import domain directly — peel incrementally.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel initial-emotion presentation through reflect mood I/O, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: peel initial-emotion presentation through feel I/O, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -25491,13 +25491,13 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — feel-tiles mood log opts via pause-reflect-mood-io (backlog #1 verified, Tier 4)</span>
+      <span>Phase A slice — feel-tiles mood log opts via pause-feel-io (backlog #1 verified, Tier 4)</span>
       <span class="status resolved">resolved</span>
     </header>
     <h3><code>buildFeelTilesMoodLogOptions</code> on mood presentation I/O</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Re-export <code>buildFeelTilesMoodLogOptions</code> on <code>pause-reflect-mood-io</code>; <code>use-pause-session-feel-tiles-select</code> imports mood domain helpers only through the mood I/O barrel (follow-up to chrome close + initial-emotion peels).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Re-export <code>buildFeelTilesMoodLogOptions</code> on <code>pause-feel-io</code>; <code>use-pause-session-feel-tiles-select</code> imports mood domain helpers only through the mood I/O barrel (follow-up to chrome close + initial-emotion peels).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; domain still owns the pure builder.</dd>
       <dt>Tradeoffs</dt>
@@ -25529,19 +25529,19 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — depth-picker ritual entry via reflect mood I/O (backlog #1 verified, Tier 4)</span>
+      <span>Phase A slice — depth-picker ritual entry via feel I/O (backlog #1 verified, Tier 4)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Re-export <code>apply-*-depth-picker-ritual-entry</code> on <code>pause-reflect-mood-io</code></h3>
+    <h3>Re-export <code>apply-*-depth-picker-ritual-entry</code> on <code>pause-feel-io</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Re-export brief/deep depth-picker apply helpers on <code>pause-reflect-mood-io</code>; <code>use-pause-session-depth-picker-handlers</code> imports mood I/O only (alongside chrome close + deep pro gate and feel-tiles log options).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Re-export brief/deep depth-picker apply helpers on <code>pause-feel-io</code>; <code>use-pause-session-depth-picker-handlers</code> imports mood I/O only (alongside chrome close + deep pro gate and feel-tiles log options).</dd>
       <dt>Deviation</dt>
       <dd>None — domain still owns pure helpers; behavior parity.</dd>
       <dt>Tradeoffs</dt>
       <dd>Initial-emotion presentation types still import domain directly — peel incrementally.</dd>
       <dt>Open questions</dt>
-      <dd>Next: peel initial-emotion presentation through reflect mood I/O, or <code>applyBreathSegmentLogOutcome</code> through session breath I/O.</dd>
+      <dd>Next: peel initial-emotion presentation through feel I/O, or <code>applyBreathSegmentLogOutcome</code> through session breath I/O.</dd>
     </dl>
   </article>
 
@@ -25570,10 +25570,10 @@
       <span>Phase A slice — reflect mood chrome domain via mood I/O (backlog #1 verified, Tier 4)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Peel mood presentation domain helpers through <code>pause-reflect-mood-io</code></h3>
+    <h3>Peel mood presentation domain helpers through <code>pause-feel-io</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete on <code>cursor/arch-migrate-src-ca70</code> — no folder moves. Re-export chrome close, depth-picker apply, feel-tile log options, depth context line, and initial-emotion presentation helpers from <code>pause-reflect-mood-io</code>; mood conductors import domain only via the I/O barrel (RPC facades unchanged).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete on <code>cursor/arch-migrate-src-ca70</code> — no folder moves. Re-export chrome close, depth-picker apply, feel-tile log options, depth context line, and initial-emotion presentation helpers from <code>pause-feel-io</code>; mood conductors import domain only via the I/O barrel (RPC facades unchanged).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
@@ -25646,14 +25646,14 @@
       <span>Phase A slice — mood flow anchors for feel-tiles + depth-picker (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-feel-tiles-mood-flow</code> and <code>pause-depth-picker-mood-flow</code></h3>
+    <h3><code>pause-feel-tiles-flow</code> and <code>pause-depth-picker-feel-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 remains complete — no folder moves. Add application cluster anchors beside <code>pause-session-mood-chrome-flow</code>; <code>pause-reflect-mood-io</code> re-exports feel-tile and depth-picker helpers through anchors instead of deep <code>domain/</code> imports (presentation hooks unchanged).</dd>
+      <dd>Backlog #1 remains complete — no folder moves. Add application cluster anchors beside <code>pause-session-mood-chrome-flow</code>; <code>pause-feel-io</code> re-exports feel-tile and depth-picker helpers through anchors instead of deep <code>domain/</code> imports (presentation hooks unchanged).</dd>
       <dt>Deviation</dt>
       <dd>None — domain still owns pure helpers; behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Initial-emotion presentation and depth-context helpers still re-export from domain on <code>pause-reflect-mood-io</code> until a follow-up anchor.</dd>
+      <dd>Initial-emotion presentation and depth-context helpers still re-export from domain on <code>pause-feel-io</code> until a follow-up anchor.</dd>
       <dt>Open questions</dt>
       <dd>Next: peel initial-emotion presentation through a reflect mood flow anchor, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
@@ -25722,14 +25722,14 @@
       <span>Phase A slice — initial-emotion presentation + depth-context mood anchors (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-initial-emotion-presentation-flow</code> + depth-context on <code>pause-depth-picker-mood-flow</code></h3>
+    <h3><code>pause-initial-emotion-presentation-flow</code> + depth-context on <code>pause-depth-picker-feel-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 remains complete — no folder moves. Add application cluster anchors for Feel-step rollback/reset UI and depth-picker market-context copy; <code>pause-reflect-mood-io</code> imports presentation helpers through anchors only (no direct <code>domain/reflect/mood/</code> on the I/O module). Co-located tests import UI helpers from <code>pause-reflect-mood-io</code> or mock the I/O barrel.</dd>
+      <dd>Backlog #1 remains complete — no folder moves. Add application cluster anchors for Feel-step rollback/reset UI and depth-picker market-context copy; <code>pause-feel-io</code> imports presentation helpers through anchors only (no direct <code>domain/feel/</code> on the I/O module). Co-located tests import UI helpers from <code>pause-feel-io</code> or mock the I/O barrel.</dd>
       <dt>Deviation</dt>
       <dd>None — domain still owns pure helpers; behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>run-initial-emotion-log</code> still imported from application on <code>pause-reflect-mood-io</code> (RPC use case, not a domain re-export anchor).</dd>
+      <dd><code>run-initial-emotion-log</code> still imported from application on <code>pause-feel-io</code> (RPC use case, not a domain re-export anchor).</dd>
       <dt>Open questions</dt>
       <dd>Next: Phase B cross-context Tier 1 shim, or peel remaining session presentation clusters that deep-import application modules.</dd>
     </dl>
@@ -25744,7 +25744,7 @@
     <h3><code>pause-initial-emotion-log-flow</code> for Feel-step RPC use cases</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add application cluster anchor beside other mood flow modules; <code>pause-reflect-mood-io</code> imports <code>runInitialEmotionSelect</code> / <code>runInitialEmotionSkip</code> through the anchor instead of deep <code>run-initial-emotion-log</code>. RPC orchestration module unchanged; bound <code>pauseInitialEmotion*</code> facades unchanged.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add application cluster anchor beside other mood flow modules; <code>pause-feel-io</code> imports <code>runInitialEmotionSelect</code> / <code>runInitialEmotionSkip</code> through the anchor instead of deep <code>run-initial-emotion-log</code>. RPC orchestration module unchanged; bound <code>pauseInitialEmotion*</code> facades unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
@@ -25763,7 +25763,7 @@
     <h3><code>pause-reflect-steps-io</code> → <code>pause-favorite-toggle-flow</code> + <code>pause-reflection-step-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route favorite pro-hint and <code>reflection_step</code> gates through existing application cluster anchors; <code>pause-reflect-steps-io</code> no longer deep-imports <code>domain/reflect/steps/</code> (parity with <code>pause-reflect-mood-io</code> mood anchors).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Route favorite pro-hint and <code>reflection_step</code> gates through existing application cluster anchors; <code>pause-reflect-steps-io</code> no longer deep-imports <code>domain/reflect/steps/</code> (parity with <code>pause-feel-io</code> mood anchors).</dd>
       <dt>Deviation</dt>
       <dd>None — domain still owns pure gates; RPC use cases unchanged.</dd>
       <dt>Tradeoffs</dt>
@@ -26118,13 +26118,13 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect mood I/O via mood flow anchors (backlog #1 verified, Tier 5)</span>
+      <span>Phase A slice — feel I/O via mood flow anchors (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> binds domain mood helpers through mood cluster anchors</h3>
+    <h3><code>pause-feel-io</code> binds domain mood helpers through mood cluster anchors</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Route depth-picker, feel-tile, initial-emotion presentation, and session chrome helpers through <code>pause-depth-picker-mood-flow</code>, <code>pause-feel-tiles-mood-flow</code>, <code>pause-initial-emotion-presentation-flow</code>, and <code>pause-session-mood-chrome-flow</code> instead of deep <code>domain/reflect/mood/*</code> on the presentation I/O module (RPC use cases already on <code>pause-initial-emotion-log-flow</code>).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Route depth-picker, feel-tile, initial-emotion presentation, and session chrome helpers through <code>pause-depth-picker-feel-flow</code>, <code>pause-feel-tiles-flow</code>, <code>pause-initial-emotion-presentation-flow</code>, and <code>pause-session-mood-chrome-flow</code> instead of deep <code>domain/feel/*</code> on the presentation I/O module (RPC use cases already on <code>pause-initial-emotion-log-flow</code>).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
@@ -26415,7 +26415,7 @@
       <dt>Tradeoffs</dt>
       <dd>Presentation hooks still import <code>pause-companion-orchestrate-io</code> as the conductor surface; no per-hook path changes.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-session-decide-flow</code> on decide I/O, <code>pause-reflect-mood-flow</code> convergence, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: <code>pause-session-decide-flow</code> on decide I/O, <code>pause-feel-flow</code> convergence, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -26491,7 +26491,7 @@
       <dt>Tradeoffs</dt>
       <dd>None.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-session-decide-flow</code> on decide I/O, <code>pause-reflect-mood-flow</code> convergence, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: <code>pause-session-decide-flow</code> on decide I/O, <code>pause-feel-flow</code> convergence, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -26548,7 +26548,7 @@
       <dt>Tradeoffs</dt>
       <dd>No application cluster anchor under <code>ritual/reflect/steps/</code>; presentation I/O is the conductor import surface (matches companion orchestration-io peel).</dd>
       <dt>Open questions</dt>
-      <dd>Next: reflect mood I/O peel from <code>pause-reflect-mood-flow</code> to sibling mood modules, or reflect flows I/O anchor peel (preflight/post-generation).</dd>
+      <dd>Next: feel I/O peel from <code>pause-feel-flow</code> to sibling mood modules, or reflect flows I/O anchor peel (preflight/post-generation).</dd>
     </dl>
   </article>
 
@@ -26669,17 +26669,17 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect mood I/O via mood-flow cluster anchor (backlog #1 verified, Tier 5)</span>
+      <span>Phase A slice — feel I/O via mood-flow cluster anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> → <code>pause-reflect-mood-flow</code></h3>
+    <h3><code>pause-feel-io</code> → <code>pause-feel-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Presentation mood I/O imports depth-picker, feel-tiles, initial-emotion presentation, chrome-close helpers, and <code>runInitialEmotionSelect</code>/<code>runInitialEmotionSkip</code> through the mood cluster anchor (parity with generation/steps/flows I/O modules).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; repository binding unchanged on the I/O module.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Unit test mocks <code>pause-reflect-mood-flow</code> with partial <code>importOriginal</code> so pure helpers stay real while RPC use cases are stubbed.</dd>
+      <dd>Unit test mocks <code>pause-feel-flow</code> with partial <code>importOriginal</code> so pure helpers stay real while RPC use cases are stubbed.</dd>
       <dt>Open questions</dt>
       <dd>Next: home reflect I/O via <code>pause-reflect-generation-manual-open-flow</code>, hub I/O cluster anchor, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
@@ -26688,17 +26688,17 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect mood I/O cluster anchor (backlog #1 verified, Tier 5)</span>
+      <span>Phase A slice — feel I/O cluster anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> imports <code>pause-reflect-mood-flow</code></h3>
+    <h3><code>pause-feel-io</code> imports <code>pause-feel-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Route mood presentation I/O through the mood umbrella anchor (depth-picker, feel-tiles, initial-emotion, chrome-close sub-flows) instead of deep domain/application paths — matches generation/flows cluster pattern. Attempted deletion of <code>pause-reflect-mood-flow</code> in the same push window was reverted (broke mood I/O resolution).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete. Route mood presentation I/O through the mood umbrella anchor (depth-picker, feel-tiles, initial-emotion, chrome-close sub-flows) instead of deep domain/application paths — matches generation/flows cluster pattern. Attempted deletion of <code>pause-feel-flow</code> in the same push window was reverted (broke mood I/O resolution).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Umbrella anchor is thin re-exports; presentation hooks keep importing <code>pause-reflect-mood-io</code> only.</dd>
+      <dd>Umbrella anchor is thin re-exports; presentation hooks keep importing <code>pause-feel-io</code> only.</dd>
       <dt>Open questions</dt>
       <dd>Next: companion orchestrate-io direct <code>ritual/frame/*</code> imports, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
@@ -26732,7 +26732,7 @@
     <h3><code>pause-reflect-hub-io</code> + <code>pause-reflect-ambience-io</code> off domain paths</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mood I/O peel (<code>pause-reflect-mood-flow</code>) already on branch. Add <code>pause-reflect-hub-flow</code> for shift-frame presentation + RPC use case; ambience I/O imports <code>application/use-cases/ritual/reflect/ambience/reflect-frame-focus-ambience</code>.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Mood I/O peel (<code>pause-feel-flow</code>) already on branch. Add <code>pause-reflect-hub-flow</code> for shift-frame presentation + RPC use case; ambience I/O imports <code>application/use-cases/ritual/reflect/ambience/reflect-frame-focus-ambience</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; conductors still import only presentation I/O modules.</dd>
       <dt>Tradeoffs</dt>
@@ -26764,15 +26764,15 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect mood I/O imports mood subcluster anchors (backlog #1 verified, Tier 5)</span>
+      <span>Phase A slice — feel I/O imports mood subcluster anchors (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> off deleted <code>pause-reflect-mood-flow</code> umbrella</h3>
+    <h3><code>pause-feel-io</code> off deleted <code>pause-feel-flow</code> umbrella</h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align mood presentation I/O with steps/telemetry peels: import depth-picker, feel-tiles, initial-emotion RPC, presentation rollback, and session chrome helpers from sibling <code>*-mood-flow</code> anchors (CI cluster files only; no umbrella re-export).</dd>
       <dt>Deviation</dt>
-      <dd>Fixes broken import after <code>pause-reflect-mood-flow.ts</code> removal — presentation had still referenced the deleted barrel.</dd>
+      <dd>Fixes broken import after <code>pause-feel-flow.ts</code> removal — presentation had still referenced the deleted barrel.</dd>
       <dt>Tradeoffs</dt>
       <dd>Unit tests mock <code>run-initial-emotion-log</code> directly (parity with <code>pause-reflect-steps-io</code>).</dd>
       <dt>Open questions</dt>
@@ -26802,15 +26802,15 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect mood I/O off deleted umbrella anchor (backlog #1 verified, Tier 5)</span>
+      <span>Phase A slice — feel I/O off deleted umbrella anchor (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> imports domain + <code>run-initial-emotion-log</code></h3>
+    <h3><code>pause-feel-io</code> imports domain + <code>run-initial-emotion-log</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align mood presentation I/O with steps/share peel: pure helpers from <code>domain/reflect/mood/</code>; <code>initial_emotion_logged</code> RPC from <code>run-initial-emotion-log</code>. Subcluster CI anchors (<code>pause-depth-picker-mood-flow</code>, <code>pause-feel-tiles-mood-flow</code>, etc.) stay application-only.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align mood presentation I/O with steps/share peel: pure helpers from <code>domain/feel/</code>; <code>initial_emotion_logged</code> RPC from <code>run-initial-emotion-log</code>. Subcluster CI anchors (<code>pause-depth-picker-feel-flow</code>, <code>pause-feel-tiles-flow</code>, etc.) stay application-only.</dd>
       <dt>Deviation</dt>
-      <dd>Repair after <code>pause-reflect-mood-flow</code> deletion left <code>pause-reflect-mood-io</code> importing a missing module — behavior parity unchanged.</dd>
+      <dd>Repair after <code>pause-feel-flow</code> deletion left <code>pause-feel-io</code> importing a missing module — behavior parity unchanged.</dd>
       <dt>Tradeoffs</dt>
       <dd>Unit tests mock <code>run-initial-emotion-log</code> directly (same seam as steps I/O).</dd>
       <dt>Open questions</dt>
@@ -26985,7 +26985,7 @@
       <dt>Tradeoffs</dt>
       <dd>Conductors still import only <code>pause-reflect-hub-io</code>.</dd>
       <dt>Open questions</dt>
-      <dd>Next: <code>pause-reflect-mood-io</code> peel from mood-flow anchor, companion orchestrate-io peel, or Phase B cross-context Tier 1 shim.</dd>
+      <dd>Next: <code>pause-feel-io</code> peel from mood-flow anchor, companion orchestrate-io peel, or Phase B cross-context Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -26998,7 +26998,7 @@
     <h3><code>pause-reflect-flows-io</code> off deep decide and domain reflect imports</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align <code>pause-reflect-flows-io</code> with <code>pause-reflect-mood-io</code>: preflight/post-generation via <code>pause-session-reflect-and-decide-flow</code>; decide mapping via <code>pause-decide-outcome-flow</code>; quotes via <code>wisdom-quotes</code>; Sonner toasts via <code>pause-decide-outcome-toast-flow</code>; <code>outcome_logged</code> RPC via <code>pause-decide-outcome-log-flow</code>. Presentation conductors keep importing only <code>pause-reflect-flows-io</code>.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align <code>pause-reflect-flows-io</code> with <code>pause-feel-io</code>: preflight/post-generation via <code>pause-session-reflect-and-decide-flow</code>; decide mapping via <code>pause-decide-outcome-flow</code>; quotes via <code>wisdom-quotes</code>; Sonner toasts via <code>pause-decide-outcome-toast-flow</code>; <code>outcome_logged</code> RPC via <code>pause-decide-outcome-log-flow</code>. Presentation conductors keep importing only <code>pause-reflect-flows-io</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; bound <code>pauseReflectOutcomeLog</code> facades unchanged.</dd>
       <dt>Tradeoffs</dt>
@@ -27125,13 +27125,13 @@
   <article class="note">
     <header>
       <span>2026-05-21</span>
-      <span>Phase A slice — reflect mood I/O direct domain + run-* (backlog #1 verified, Tier 5)</span>
+      <span>Phase A slice — feel I/O direct domain + run-* (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> off <code>pause-reflect-mood-flow</code> anchor</h3>
+    <h3><code>pause-feel-io</code> off <code>pause-feel-flow</code> anchor</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align mood presentation I/O with steps/hub/share/flows/generation peels: depth-picker, feel-tile, chrome-close, and presentation rollback helpers from <code>domain/reflect/mood/</code>; <code>initial_emotion_logged</code> RPC from <code>run-initial-emotion-log</code>. Keep <code>pause-reflect-mood-flow.ts</code> as CI cluster anchor only.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Align mood presentation I/O with steps/hub/share/flows/generation peels: depth-picker, feel-tile, chrome-close, and presentation rollback helpers from <code>domain/feel/</code>; <code>initial_emotion_logged</code> RPC from <code>run-initial-emotion-log</code>. Keep <code>pause-feel-flow.ts</code> as CI cluster anchor only.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
@@ -27318,12 +27318,12 @@
       <span>Phase A slice — reflect mood CI anchor matches presentation I/O paths (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-flow</code> re-exports align with <code>pause-reflect-mood-io</code></h3>
+    <h3><code>pause-feel-flow</code> re-exports align with <code>pause-feel-io</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-mood-io</code> already imports domain mood helpers and <code>run-initial-emotion-log</code> directly; update <code>pause-reflect-mood-flow.ts</code> CI anchor to the same paths so cluster detection matches on-disk presentation imports (parity with flows-flow alignment on <code>658b44e53</code>).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-feel-io</code> already imports domain mood helpers and <code>run-initial-emotion-log</code> directly; update <code>pause-feel-flow.ts</code> CI anchor to the same paths so cluster detection matches on-disk presentation imports (parity with flows-flow alignment on <code>658b44e53</code>).</dd>
       <dt>Deviation</dt>
-      <dd>None — behavior parity; re-export paths only. Mood subcluster flow anchors (<code>pause-depth-picker-mood-flow</code>, etc.) stay on disk for granular CI detection.</dd>
+      <dd>None — behavior parity; re-export paths only. Mood subcluster flow anchors (<code>pause-depth-picker-feel-flow</code>, etc.) stay on disk for granular CI detection.</dd>
       <dt>Tradeoffs</dt>
       <dd>Top-level mood flow anchor no longer chains through sub-flow re-exports; sub-flow modules remain for mood subcluster checks.</dd>
       <dt>Open questions</dt>
@@ -27517,7 +27517,7 @@
       <dt>Tradeoffs</dt>
       <dd>Hub and mood presentation I/O still import run-* / domain builders directly; align in follow-up slices if drift reappears.</dd>
       <dt>Open questions</dt>
-      <dd>Next: route <code>pause-reflect-hub-io</code> and <code>pause-reflect-mood-io</code> through cluster flow anchors, or Phase B subscription Tier 1 shim.</dd>
+      <dd>Next: route <code>pause-reflect-hub-io</code> and <code>pause-feel-io</code> through cluster flow anchors, or Phase B subscription Tier 1 shim.</dd>
     </dl>
   </article>
 
@@ -27717,14 +27717,14 @@
       <span>Phase A — session scaffold depth-picker via mood flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>use-pause-session-scaffold-presentation</code> imports <code>isPauseSessionDepthPickerActive</code> through <code>pause-reflect-mood-flow</code> / <code>pause-reflect-mood-io</code></h3>
+    <h3><code>use-pause-session-scaffold-presentation</code> imports <code>isPauseSessionDepthPickerActive</code> through <code>pause-feel-flow</code> / <code>pause-feel-io</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no relocations. Re-export depth-picker session gate on <code>pause-reflect-mood-flow</code>; session scaffold conductor imports via <code>pause-reflect-mood-io</code> instead of deep <code>domain/reflect/mood/pause-depth-picker-active</code> (parity with mood presentation I/O peels on branch tip).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder move) remains complete — no relocations. Re-export depth-picker session gate on <code>pause-feel-flow</code>; session scaffold conductor imports via <code>pause-feel-io</code> instead of deep <code>domain/feel/pause-depth-picker-active</code> (parity with mood presentation I/O peels on branch tip).</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd>Session presentation imports reflect mood I/O for one pure gate helper; did not add a session-scaffold-specific re-export layer.</dd>
+      <dd>Session presentation imports feel I/O for one pure gate helper; did not add a session-scaffold-specific re-export layer.</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>pause-session-ritual-restore-io</code> through restore-flow anchor, or Phase B subscription Tier 1 shim.</dd>
     </dl>
@@ -28040,10 +28040,10 @@
       <span>Phase A — reflect steps/mood tests via presentation I/O (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Route reflect hook tests through <code>pause-reflect-steps-io</code> / <code>pause-reflect-mood-io</code></h3>
+    <h3>Route reflect hook tests through <code>pause-reflect-steps-io</code> / <code>pause-feel-io</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>use-pause-reflection-step-log</code>, <code>use-pause-favorite-toggle</code>, and mood chrome port-lock tests mock <code>pause-reflect-steps-io</code> with <code>importActual</code> (real <code>shouldLog*</code> gates off the flow anchor) instead of deep <code>domain/reflect/steps/*</code> imports. <code>use-pause-session-feel-tiles-select</code> test drops redundant mood-io mock — production already imports <code>buildFeelTilesMoodLogOptions</code> from <code>pause-reflect-mood-io</code>.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>use-pause-reflection-step-log</code>, <code>use-pause-favorite-toggle</code>, and mood chrome port-lock tests mock <code>pause-reflect-steps-io</code> with <code>importActual</code> (real <code>shouldLog*</code> gates off the flow anchor) instead of deep <code>domain/reflect/steps/*</code> imports. <code>use-pause-session-feel-tiles-select</code> test drops redundant mood-io mock — production already imports <code>buildFeelTilesMoodLogOptions</code> from <code>pause-feel-io</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; test import boundary only.</dd>
       <dt>Tradeoffs</dt>
@@ -28512,17 +28512,17 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-      <span>Phase A — reflect mood I/O via subcluster flows (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — feel I/O via subcluster flows (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Route <code>pause-reflect-mood-io</code> through mood subcluster flow anchors</h3>
+    <h3>Route <code>pause-feel-io</code> through mood subcluster flow anchors</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Peel <code>pause-reflect-mood-io</code> off <code>pause-reflect-mood-flow</code> to import <code>pause-initial-emotion-log-flow</code>, <code>pause-feel-tiles-mood-flow</code>, <code>pause-depth-picker-mood-flow</code>, <code>pause-initial-emotion-presentation-flow</code>, and <code>pause-session-mood-chrome-flow</code> directly (parity with <code>pause-reflect-hub-io</code> → hub subclusters). CI blocks umbrella imports in mood I/O; mood conductors still import mood-io only.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Peel <code>pause-feel-io</code> off <code>pause-feel-flow</code> to import <code>pause-initial-emotion-log-flow</code>, <code>pause-feel-tiles-flow</code>, <code>pause-depth-picker-feel-flow</code>, <code>pause-initial-emotion-presentation-flow</code>, and <code>pause-session-mood-chrome-flow</code> directly (parity with <code>pause-reflect-hub-io</code> → hub subclusters). CI blocks umbrella imports in mood I/O; mood conductors still import mood-io only.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
-      <dd><code>pause-reflect-mood-flow</code> remains the compose anchor for other consumers; mood presentation I/O no longer depends on the umbrella barrel.</dd>
+      <dd><code>pause-feel-flow</code> remains the compose anchor for other consumers; mood presentation I/O no longer depends on the umbrella barrel.</dd>
       <dt>Open questions</dt>
       <dd>Next: <code>pause-reflect-steps-io</code> subcluster peel or Phase B subscription Tier 1 shim.</dd>
     </dl>
@@ -28575,7 +28575,7 @@
     <h3>Route <code>pause-reflect-steps-io</code> through steps subcluster flow anchors</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Peel <code>pause-reflect-steps-io</code> off <code>pause-reflect-steps-flow</code> to import <code>pause-favorite-toggle-flow</code>, <code>pause-reflect-note-flow</code>, <code>pause-reflect-tag-flow</code>, and <code>pause-reflection-step-log-flow</code> directly (parity with <code>pause-reflect-mood-io</code> → mood subclusters). CI blocks umbrella imports on steps I/O; step conductors still import steps-io only.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Peel <code>pause-reflect-steps-io</code> off <code>pause-reflect-steps-flow</code> to import <code>pause-favorite-toggle-flow</code>, <code>pause-reflect-note-flow</code>, <code>pause-reflect-tag-flow</code>, and <code>pause-reflection-step-log-flow</code> directly (parity with <code>pause-feel-io</code> → mood subclusters). CI blocks umbrella imports on steps I/O; step conductors still import steps-io only.</dd>
       <dt>Deviation</dt>
       <dd>None — behavior parity; import boundary only.</dd>
       <dt>Tradeoffs</dt>
@@ -28961,7 +28961,7 @@
       <dt>Tradeoffs</dt>
       <dd><code>pause-favorite-toggle-flow</code>, <code>pause-reflect-note-flow</code>, <code>pause-reflect-tag-flow</code>, <code>pause-reflection-step-log-flow</code>, and <code>pause-reflect-steps-flow</code> remain CI compose anchors; presentation no longer routes through them on steps I/O.</dd>
       <dt>Open questions</dt>
-      <dd>Next: reflect mood I/O leaf peel, companion orchestrate-io telemetry peel, or session step-transition-io peel.</dd>
+      <dd>Next: feel I/O leaf peel, companion orchestrate-io telemetry peel, or session step-transition-io peel.</dd>
     </dl>
   </article>
 
@@ -29104,10 +29104,10 @@
       <span>Phase A — reflect mood application cluster marker (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>ritual/reflect/mood/</code> CI cluster marker has unit coverage</h3>
+    <h3><code>ritual/feel/</code> CI cluster marker has unit coverage</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 folder move remains complete. Add empty <code>ritual-reflect-mood-cluster.ts</code> + regression test beside <code>pause-reflect-mood-flow</code> (parity with ambience, pending-offer, telemetry, steps cluster markers). <code>pause-reflect-mood-io</code> unchanged (imports domain + <code>run-initial-emotion-log</code> directly).</dd>
+      <dd>Backlog #1 folder move remains complete. Add empty <code>ritual-feel-cluster.ts</code> + regression test beside <code>pause-feel-flow</code> (parity with ambience, pending-offer, telemetry, steps cluster markers). <code>pause-feel-io</code> unchanged (imports domain + <code>run-initial-emotion-log</code> directly).</dd>
       <dt>Deviation</dt>
       <dd>None — marker-only slice.</dd>
       <dt>Tradeoffs</dt>
@@ -29332,10 +29332,10 @@
       <span>Phase A — ritual/reflect mood umbrella identity tests (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-flow</code> pins domain + <code>run-initial-emotion-log</code> leaf re-exports</h3>
+    <h3><code>pause-feel-flow</code> pins domain + <code>run-initial-emotion-log</code> leaf re-exports</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-mood-flow.test.ts</code> with <code>.toBe(direct)</code> identity checks on depth-picker, feel-tiles, initial-emotion presentation, session chrome close, and deep-picker pro gate helpers (parity with steps/share/flows umbrella pinning). <code>pause-reflect-mood-io</code> unchanged (imports leaf modules directly).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-feel-flow.test.ts</code> with <code>.toBe(direct)</code> identity checks on depth-picker, feel-tiles, initial-emotion presentation, session chrome close, and deep-picker pro gate helpers (parity with steps/share/flows umbrella pinning). <code>pause-feel-io</code> unchanged (imports leaf modules directly).</dd>
       <dt>Deviation</dt>
       <dd>None — tests only; presentation I/O still imports leaf modules directly per §6 peel.</dd>
       <dt>Tradeoffs</dt>
@@ -29481,13 +29481,13 @@
   <article class="note">
     <header>
       <span>2026-05-22</span>
-      <span>Phase A — presentation reflect mood I/O identity (backlog #1 verified, Tier 5)</span>
+      <span>Phase A — presentation feel I/O identity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> unmocked re-export regression</h3>
+    <h3><code>pause-feel-io</code> unmocked re-export regression</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-reflect-mood-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> identity against domain mood leaf modules (existing mocked <code>pause-reflect-mood-io.test.ts</code> keeps port-routing behavior). Allowlist re-exports test beside mood I/O in <code>check:architecture-alignment</code>.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-feel-io.re-exports.test.ts</code> with <code>.toBe(direct)</code> identity against domain mood leaf modules (existing mocked <code>pause-feel-io.test.ts</code> keeps port-routing behavior). Allowlist re-exports test beside mood I/O in <code>check:architecture-alignment</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
       <dt>Tradeoffs</dt>
@@ -29826,10 +29826,10 @@
       <span>Phase A — reflect mood-io ↔ mood-flow (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> presentation exports pinned to <code>pause-reflect-mood-flow</code></h3>
+    <h3><code>pause-feel-io</code> presentation exports pinned to <code>pause-feel-flow</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-reflect-mood-io-parity.test.ts</code> beside the mood cluster (imports <code>pause-reflect-mood-flow</code> + presentation I/O; CI blocks umbrella imports on <code>pause-reflect-mood-io.re-exports.test.ts</code> unlike hub/ambience). <code>.toBe</code> identity for domain mood helpers and <code>run-initial-emotion-log</code> leaf exports. Production I/O still imports leaf modules directly.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add <code>pause-feel-io-parity.test.ts</code> beside the mood cluster (imports <code>pause-feel-flow</code> + presentation I/O; CI blocks umbrella imports on <code>pause-feel-io.re-exports.test.ts</code> unlike hub/ambience). <code>.toBe</code> identity for domain mood helpers and <code>run-initial-emotion-log</code> leaf exports. Production I/O still imports leaf modules directly.</dd>
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
       <dt>Tradeoffs</dt>
@@ -29911,7 +29911,7 @@
       <dt>Tradeoffs</dt>
       <dd>Regression guard without presentation I/O importing the generation umbrella in production code.</dd>
       <dt>Open questions</dt>
-      <dd>Next: extend <code>pause-reflect-mood-io-parity</code> with domain leaf + repository binding tests, <code>pause-reflect-hub-io-parity</code> hub leaf pins, or Tier 1 <code>holzen-query-client-ref</code> shim peel.</dd>
+      <dd>Next: extend <code>pause-feel-io-parity</code> with domain leaf + repository binding tests, <code>pause-reflect-hub-io-parity</code> hub leaf pins, or Tier 1 <code>holzen-query-client-ref</code> shim peel.</dd>
     </dl>
   </article>
 
@@ -29940,7 +29940,7 @@
       <span>Phase A — reflect mood-io + hub-io repository parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io-parity</code> and <code>pause-reflect-hub-io-parity</code> pin <code>reflectPauseRepository</code></h3>
+    <h3><code>pause-feel-io-parity</code> and <code>pause-reflect-hub-io-parity</code> pin <code>reflectPauseRepository</code></h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend application-layer mood and hub io-parity tests with <code>reflectPauseRepository</code> ↔ <code>supabasePauseRepository</code> binding (parity with pending-offer-io, flows-io, and generation-io). Document parity imports on mood-flow and cluster anchors.</dd>
@@ -30035,7 +30035,7 @@
       <span>Phase A — reflect mood/hub RPC delegation parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io</code> and <code>pause-reflect-hub-io</code> pin port-bound RPC wrappers</h3>
+    <h3><code>pause-feel-io</code> and <code>pause-reflect-hub-io</code> pin port-bound RPC wrappers</h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend application-layer io-parity tests so <code>pauseInitialEmotionSelect</code> / <code>pauseInitialEmotionSkip</code> and <code>pauseShiftEmotionFrameHubDone</code> delegate to <code>run-initial-emotion-log</code> / <code>run-shift-emotion-frame-hub-done</code> with <code>reflectPauseRepository</code> ↔ <code>supabasePauseRepository</code> (parity with <code>pause-home-bulk-hold-io-parity</code>).</dd>
@@ -30209,7 +30209,7 @@
     <h3><code>pause-reflect-pending-offer-io-parity</code> adopt/decline RPC wrappers</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-pending-offer-io-parity.test.ts</code> with mocked leaf delegation for <code>pauseAdoptPendingOffer</code> and <code>pauseDeclinePendingOffer</code> (parity with <code>pause-reflect-mood-io-parity</code> / <code>pause-reflect-hub-io-parity</code>). Production pending-offer I/O unchanged.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-pending-offer-io-parity.test.ts</code> with mocked leaf delegation for <code>pauseAdoptPendingOffer</code> and <code>pauseDeclinePendingOffer</code> (parity with <code>pause-feel-io-parity</code> / <code>pause-reflect-hub-io-parity</code>). Production pending-offer I/O unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + cluster anchor comments only.</dd>
       <dt>Open questions</dt>
@@ -30245,7 +30245,7 @@
     <h3><code>pause-reflect-steps-io-parity</code> tag/note/favorite/reflection_step wrappers</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-steps-io-parity.test.ts</code> with mocked leaf delegation for all four presentation RPC wrappers plus <code>WithRepository</code> export distinctness (parity with <code>pause-reflect-mood-io-parity</code> / <code>pause-reflect-pending-offer-io-parity</code>). Production <code>pause-reflect-steps-io</code> unchanged.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Extend <code>pause-reflect-steps-io-parity.test.ts</code> with mocked leaf delegation for all four presentation RPC wrappers plus <code>WithRepository</code> export distinctness (parity with <code>pause-feel-io-parity</code> / <code>pause-reflect-pending-offer-io-parity</code>). Production <code>pause-reflect-steps-io</code> unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + cluster comments only.</dd>
       <dt>Open questions</dt>
@@ -30512,10 +30512,10 @@
       <span>Phase A — reflect flows-flow ↔ mood-flow sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-flows-mood-flow-sibling-parity.test.ts</code></h3>
+    <h3><code>pause-reflect-flows-feel-flow-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated sibling parity between <code>pause-reflect-flows-flow</code> and <code>pause-reflect-mood-flow</code> CI anchors (parity with flows↔hub and steps↔mood pins). Reciprocal inline <code>.not.toBe</code> pins on flows-flow and mood-flow unit tests. Production umbrellas unchanged.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated sibling parity between <code>pause-reflect-flows-flow</code> and <code>pause-feel-flow</code> CI anchors (parity with flows↔hub and steps↔mood pins). Reciprocal inline <code>.not.toBe</code> pins on flows-flow and mood-flow unit tests. Production umbrellas unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open questions</dt>
@@ -30872,7 +30872,7 @@
     <h3><code>pause-reflect-ambience-generation-io-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add presentation sibling parity so <code>pause-reflect-ambience-io</code> (domain frame-focus bed) and <code>pause-reflect-generation-io</code> (holzen-reflect + ReflectGenerator port) stay namespace-separated (parity with application <code>pause-reflect-ambience-generation-flow-sibling-parity.test.ts</code> and presentation <code>pause-reflect-generation-mood-io-sibling-parity.test.ts</code>). Reciprocal inline pins on <code>pause-reflect-ambience-io.test.ts</code> and <code>pause-reflect-generation-io.test.ts</code>. Production modules unchanged.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no folder moves. Add presentation sibling parity so <code>pause-reflect-ambience-io</code> (domain frame-focus bed) and <code>pause-reflect-generation-io</code> (holzen-reflect + ReflectGenerator port) stay namespace-separated (parity with application <code>pause-reflect-ambience-generation-flow-sibling-parity.test.ts</code> and presentation <code>pause-reflect-generation-feel-io-sibling-parity.test.ts</code>). Reciprocal inline pins on <code>pause-reflect-ambience-io.test.ts</code> and <code>pause-reflect-generation-io.test.ts</code>. Production modules unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open questions</dt>
@@ -31005,10 +31005,10 @@
       <span>Phase A — mood-flow/io ↔ pending-offer-flow/io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-pending-offer-flow-sibling-parity.test.ts</code> + <code>pause-reflect-mood-pending-offer-io-sibling-parity.test.ts</code></h3>
+    <h3><code>pause-feel-pending-offer-flow-sibling-parity.test.ts</code> + <code>pause-feel-pending-offer-io-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add application and presentation sibling parity between mood (feel/initial-emotion) and pending-offer (adopt/decline/display) I/O surfaces, mirroring hub↔pending-offer and steps↔pending-offer pins. Reciprocal inline pin on <code>pause-reflect-mood-flow.test.ts</code>. Production modules unchanged.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add application and presentation sibling parity between mood (feel/initial-emotion) and pending-offer (adopt/decline/display) I/O surfaces, mirroring hub↔pending-offer and steps↔pending-offer pins. Reciprocal inline pin on <code>pause-feel-flow.test.ts</code>. Production modules unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open questions</dt>
@@ -31022,10 +31022,10 @@
       <span>Phase A — presentation flows-io ↔ mood-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-flows-mood-io-sibling-parity.test.ts</code></h3>
+    <h3><code>pause-reflect-flows-feel-io-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add presentation sibling parity so <code>pause-reflect-flows-io</code> (reflect+decide preflight + decide outcome RPC) and <code>pause-reflect-mood-io</code> (initial-emotion RPC + feel-step domain helpers) stay namespace-separated (parity with application <code>pause-reflect-flows-mood-flow-sibling-parity.test.ts</code> and presentation flows↔hub / flows↔share / flows↔generation pins). Both modules share <code>reflectPauseRepository</code> binding but must not collapse export surfaces. Production modules unchanged.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add presentation sibling parity so <code>pause-reflect-flows-io</code> (reflect+decide preflight + decide outcome RPC) and <code>pause-feel-io</code> (initial-emotion RPC + feel-step domain helpers) stay namespace-separated (parity with application <code>pause-reflect-flows-feel-flow-sibling-parity.test.ts</code> and presentation flows↔hub / flows↔share / flows↔generation pins). Both modules share <code>reflectPauseRepository</code> binding but must not collapse export surfaces. Production modules unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comments only.</dd>
       <dt>Open questions</dt>
@@ -31073,10 +31073,10 @@
       <span>Phase A — flows-io ↔ mood-io reciprocal inline pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-flows-io.test.ts</code> + <code>pause-reflect-mood-io.test.ts</code></h3>
+    <h3><code>pause-reflect-flows-io.test.ts</code> + <code>pause-feel-io.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-flows-mood-io-sibling-parity.test.ts</code> already on branch; add reciprocal inline sibling-cluster pins on flows-io and mood-io unit tests (parity with hub-io inline pins).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-flows-feel-io-sibling-parity.test.ts</code> already on branch; add reciprocal inline sibling-cluster pins on flows-io and mood-io unit tests (parity with hub-io inline pins).</dd>
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
       <dt>Open questions</dt>
@@ -31090,10 +31090,10 @@
       <span>Phase A — presentation hub-io ↔ mood-io reciprocal inline pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-hub-io.test.ts</code> + <code>pause-reflect-mood-io.test.ts</code></h3>
+    <h3><code>pause-reflect-hub-io.test.ts</code> + <code>pause-feel-io.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-reflect-mood-hub-io-sibling-parity.test.ts</code> already on branch; add reciprocal inline sibling-cluster pins on hub-io and mood-io unit tests (parity with flows-io ↔ mood-io inline pins). Production modules unchanged.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. <code>pause-feel-hub-io-sibling-parity.test.ts</code> already on branch; add reciprocal inline sibling-cluster pins on hub-io and mood-io unit tests (parity with flows-io ↔ mood-io inline pins). Production modules unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comments only.</dd>
       <dt>Open questions</dt>
@@ -31141,10 +31141,10 @@
       <span>Phase A — flows-io ↔ mood-io reciprocal inline pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-flows-io.test.ts</code> + <code>pause-reflect-mood-io.test.ts</code></h3>
+    <h3><code>pause-reflect-flows-io.test.ts</code> + <code>pause-feel-io.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — dedicated <code>pause-reflect-flows-mood-io-sibling-parity.test.ts</code> already on branch. Add reciprocal inline pins so flows and mood presentation I/O umbrellas stay distinct alongside hub/share/ambience/telemetry patterns (complements hub-io ↔ mood-io pins on branch).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — dedicated <code>pause-reflect-flows-feel-io-sibling-parity.test.ts</code> already on branch. Add reciprocal inline pins so flows and mood presentation I/O umbrellas stay distinct alongside hub/share/ambience/telemetry patterns (complements hub-io ↔ mood-io pins on branch).</dd>
       <dt>Deviation</dt>
       <dd>None — tests only.</dd>
       <dt>Open questions</dt>
@@ -31364,10 +31364,10 @@
       <span>Phase A — presentation mood-io ↔ telemetry-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-telemetry-io-sibling-parity.test.ts</code></h3>
+    <h3><code>pause-feel-telemetry-io-sibling-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated presentation sibling parity so <code>pause-reflect-mood-io</code> (feel-step mood RPC + depth-picker presentation) and <code>pause-reflect-telemetry-io</code> (session reflect PostHog) stay namespace-separated; reciprocal inline pins on both unit tests (parity with hub↔telemetry slice). Production modules unchanged.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated presentation sibling parity so <code>pause-feel-io</code> (feel-step mood RPC + depth-picker presentation) and <code>pause-reflect-telemetry-io</code> (session reflect PostHog) stay namespace-separated; reciprocal inline pins on both unit tests (parity with hub↔telemetry slice). Production modules unchanged.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open questions</dt>
@@ -31381,10 +31381,10 @@
       <span>Phase A — presentation mood-io ↔ telemetry-io + flows-io reciprocal pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-telemetry-io-sibling-parity.test.ts</code> + mood/flows/telemetry unit tests</h3>
+    <h3><code>pause-feel-telemetry-io-sibling-parity.test.ts</code> + mood/flows/telemetry unit tests</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated mood-io ↔ session telemetry-io sibling parity; complete reciprocal inline pins on <code>pause-reflect-mood-io.test.ts</code> for flows-io (branch note claimed done but mood unit test lacked full cluster) and telemetry-io.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Add dedicated mood-io ↔ session telemetry-io sibling parity; complete reciprocal inline pins on <code>pause-feel-io.test.ts</code> for flows-io (branch note claimed done but mood unit test lacked full cluster) and telemetry-io.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + I/O header comments only.</dd>
       <dt>Open questions</dt>
@@ -31673,7 +31673,7 @@
     <h3><code>pause-reflect-share-mood-io-sibling-parity</code> + <code>pause-reflect-share-mood-flow-sibling-parity</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Close reflect presentation I/O audit gap: reflection share builders + PNG orchestration (<code>pause-reflect-share-io</code>) stay namespace-separated from feel-tile / initial-emotion mood I/O (<code>pause-reflect-mood-io</code>) at presentation and application flow layers (parity with share↔telemetry and ambience↔mood pins). Reciprocal inline pins on both unit tests.</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Close reflect presentation I/O audit gap: reflection share builders + PNG orchestration (<code>pause-reflect-share-io</code>) stay namespace-separated from feel-tile / initial-emotion mood I/O (<code>pause-feel-io</code>) at presentation and application flow layers (parity with share↔telemetry and ambience↔mood pins). Reciprocal inline pins on both unit tests.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open questions</dt>
@@ -32051,7 +32051,7 @@
       <dt>Deviation</dt>
       <dd>Some reflect I/O parity tests remain under <code>application/.../ritual/reflect/</code> when they assert flow umbrellas — pending-offer is presentation-first because wrappers live on presentation I/O only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or mood-io parity colocation under <code>presentation/reflect/mood/</code>.</dd>
+      <dd>Next: Phase B subscription/auth Tier 1 shim scan, or mood-io parity colocation under <code>presentation/feel/</code>.</dd>
     </dl>
   </article>
 
@@ -32085,7 +32085,7 @@
       <dt>Deviation</dt>
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open questions</dt>
-      <dd>Next: mood-io parity colocation under <code>presentation/reflect/mood/</code>, or Phase B Tier 1 shim scan.</dd>
+      <dd>Next: mood-io parity colocation under <code>presentation/feel/</code>, or Phase B Tier 1 shim scan.</dd>
     </dl>
   </article>
 
@@ -32095,12 +32095,12 @@
       <span>Phase A — colocate mood-io parity beside presentation cluster (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io-parity.test.ts</code> → <code>presentation/reflect/mood/</code></h3>
+    <h3><code>pause-feel-io-parity.test.ts</code> → <code>presentation/feel/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no use-case folder moves. Colocate presentation I/O parity beside <code>pause-reflect-mood-io.ts</code> (parity with <code>pause-reflect-mood-io.re-exports.test.ts</code> and <code>pause-reflect-pending-offer-io-parity.test.ts</code>). <code>check:architecture-alignment</code> allowlists parity test for mood-flow CI umbrella imports and legacy mood domain import guards under <code>presentation/reflect/mood/</code>. Removed duplicate flows-io sibling <code>it</code> block and duplicate import during move.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no use-case folder moves. Colocate presentation I/O parity beside <code>pause-feel-io.ts</code> (parity with <code>pause-feel-io.re-exports.test.ts</code> and <code>pause-reflect-pending-offer-io-parity.test.ts</code>). <code>check:architecture-alignment</code> allowlists parity test for mood-flow CI umbrella imports and legacy mood domain import guards under <code>presentation/feel/</code>. Removed duplicate flows-io sibling <code>it</code> block and duplicate import during move.</dd>
       <dt>Deviation</dt>
-      <dd>Application-layer mood sibling parity tests remain under <code>application/.../ritual/reflect/mood/</code> and <code>application/.../flows/</code> when they assert flow umbrellas — presentation mood-io is presentation-first.</dd>
+      <dd>Application-layer mood sibling parity tests remain under <code>application/.../ritual/feel/</code> and <code>application/.../flows/</code> when they assert flow umbrellas — presentation mood-io is presentation-first.</dd>
       <dt>Open questions</dt>
       <dd>Next: colocate <code>pause-reflect-hub-io-parity.test.ts</code> under <code>presentation/reflect/hub/</code>, or Phase B Tier 1 shim scan (<code>subscription-checkout-guard-ref</code>).</dd>
     </dl>
@@ -32115,7 +32115,7 @@
     <h3><code>pause-reflect-pending-offer-telemetry-io-parity.test.ts</code> → <code>presentation/reflect/telemetry/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves remain complete — no use-case moves. Colocate presentation I/O parity beside <code>pause-reflect-pending-offer-telemetry-io.ts</code> (parity with <code>pause-reflect-pending-offer-io-parity</code> under <code>presentation/reflect/pending-offer/</code> and <code>pause-reflect-mood-io-parity</code> under <code>presentation/reflect/mood/</code>). Pending-offer PostHog presentation I/O stays under <code>telemetry/</code> per §10.1 — not <code>pending-offer/</code> (CI blocks resurrecting that path).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves remain complete — no use-case moves. Colocate presentation I/O parity beside <code>pause-reflect-pending-offer-telemetry-io.ts</code> (parity with <code>pause-reflect-pending-offer-io-parity</code> under <code>presentation/reflect/pending-offer/</code> and <code>pause-feel-io-parity</code> under <code>presentation/feel/</code>). Pending-offer PostHog presentation I/O stays under <code>telemetry/</code> per §10.1 — not <code>pending-offer/</code> (CI blocks resurrecting that path).</dd>
       <dt>Deviation</dt>
       <dd>Application-layer pending-offer sibling parity tests remain under <code>application/.../pending-offer/</code> when they assert flow umbrellas.</dd>
       <dt>Open questions</dt>
@@ -32149,7 +32149,7 @@
     <h3><code>pause-reflect-hub-io-parity.test.ts</code> → <code>presentation/reflect/hub/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no use-case folder moves. Colocate presentation I/O parity beside <code>pause-reflect-hub-io.ts</code> (parity with <code>pause-reflect-mood-io-parity.test.ts</code> and <code>pause-reflect-pending-offer-io-parity.test.ts</code>). Allowlist <code>pause-reflect-hub-io-parity.test.ts</code> in <code>check:architecture-alignment</code> for hub-flow umbrella imports and legacy hub domain import guards under <code>presentation/reflect/hub/</code>. Application flow/cluster comment anchors updated; production I/O unchanged.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no use-case folder moves. Colocate presentation I/O parity beside <code>pause-reflect-hub-io.ts</code> (parity with <code>pause-feel-io-parity.test.ts</code> and <code>pause-reflect-pending-offer-io-parity.test.ts</code>). Allowlist <code>pause-reflect-hub-io-parity.test.ts</code> in <code>check:architecture-alignment</code> for hub-flow umbrella imports and legacy hub domain import guards under <code>presentation/reflect/hub/</code>. Application flow/cluster comment anchors updated; production I/O unchanged.</dd>
       <dt>Deviation</dt>
       <dd>Application-layer hub sibling parity tests remain under <code>application/.../ritual/reflect/hub/</code> when they assert flow umbrellas; hub presentation wrappers are presentation-first.</dd>
       <dt>Open questions</dt>
@@ -32200,7 +32200,7 @@
     <h3><code>pause-reflect-steps-io-parity.test.ts</code> → <code>presentation/reflect/steps/</code></h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no use-case folder moves. Colocate presentation I/O parity beside <code>pause-reflect-steps-io.ts</code> (parity with <code>pause-reflect-mood-io-parity</code>, <code>pause-reflect-hub-io-parity</code>, and <code>pause-reflect-pending-offer-io-parity</code>). Allowlist <code>pause-reflect-steps-io-parity.test.ts</code> in <code>check:architecture-alignment</code> for steps-flow CI umbrella imports and legacy steps domain import guards under <code>presentation/reflect/steps/</code>. Application-layer sibling parity tests remain under <code>application/.../ritual/reflect/steps/</code> when they assert flow umbrellas.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) remains complete — no use-case folder moves. Colocate presentation I/O parity beside <code>pause-reflect-steps-io.ts</code> (parity with <code>pause-feel-io-parity</code>, <code>pause-reflect-hub-io-parity</code>, and <code>pause-reflect-pending-offer-io-parity</code>). Allowlist <code>pause-reflect-steps-io-parity.test.ts</code> in <code>check:architecture-alignment</code> for steps-flow CI umbrella imports and legacy steps domain import guards under <code>presentation/reflect/steps/</code>. Application-layer sibling parity tests remain under <code>application/.../ritual/reflect/steps/</code> when they assert flow umbrellas.</dd>
       <dt>Deviation</dt>
       <dd>None — file move + alignment allowlist + comment anchors only.</dd>
       <dt>Open questions</dt>
@@ -32231,10 +32231,10 @@
       <span>Phase A — application generation-io ↔ mood-io sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-generation-mood-io-sibling-parity.test.ts</code> (application)</h3>
+    <h3><code>pause-reflect-generation-feel-io-sibling-parity.test.ts</code> (application)</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves remain complete — no reflect moves. Mirror presentation <code>pause-reflect-generation-mood-io-sibling-parity</code> at application layer with reciprocal inline pins on <code>pause-reflect-generation-io-parity.test.ts</code> ↔ <code>pause-reflect-mood-io-parity.test.ts</code> (parity with hub-io and flows-io application slices).</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves remain complete — no reflect moves. Mirror presentation <code>pause-reflect-generation-mood-io-sibling-parity</code> at application layer with reciprocal inline pins on <code>pause-reflect-generation-io-parity.test.ts</code> ↔ <code>pause-feel-io-parity.test.ts</code> (parity with hub-io and flows-io application slices).</dd>
       <dt>Deviation</dt>
       <dd>None — tests + comment anchors only.</dd>
       <dt>Open questions</dt>
@@ -32527,7 +32527,7 @@
       <dt>Deviation</dt>
       <dd>None — test-only; imports presentation generation I/O for sibling distinctness pins.</dd>
       <dt>Open questions</dt>
-      <dd>Next: application <code>pause-reflect-hub-io-parity</code> / <code>pause-reflect-mood-io-parity</code> beside hub/mood clusters, or Phase B Tier 1 lib shim scan.</dd>
+      <dd>Next: application <code>pause-reflect-hub-io-parity</code> / <code>pause-feel-io-parity</code> beside hub/mood clusters, or Phase B Tier 1 lib shim scan.</dd>
     </dl>
   </article>
 
@@ -32639,10 +32639,10 @@
       <span>Phase A — application reflect mood-io parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io-parity.test.ts</code> (application)</h3>
+    <h3><code>pause-feel-io-parity.test.ts</code> (application)</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no reflect moves. Mirror presentation <code>pause-reflect-mood-io-parity</code> beside <code>pause-reflect-mood-flow.ts</code> so mood CI umbrella + domain leaves + initial-emotion RPC delegation pins live at the application anchor (parity with <code>pause-reflect-hub-io-parity</code> beside hub-flow). Extend application module with sibling-cluster distinctness vs hub/generation/steps/flows/pending-offer/ambience (presentation colocated parity keeps full reciprocal inline pins).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no reflect moves. Mirror presentation <code>pause-feel-io-parity</code> beside <code>pause-feel-flow.ts</code> so mood CI umbrella + domain leaves + initial-emotion RPC delegation pins live at the application anchor (parity with <code>pause-reflect-hub-io-parity</code> beside hub-flow). Extend application module with sibling-cluster distinctness vs hub/generation/steps/flows/pending-offer/ambience (presentation colocated parity keeps full reciprocal inline pins).</dd>
       <dt>Deviation</dt>
       <dd>None — test-only; production mood I/O unchanged.</dd>
       <dt>Open questions</dt>
@@ -32843,7 +32843,7 @@
       <span>Phase A — extend application mood-io parity sibling pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>application/.../mood/pause-reflect-mood-io-parity.test.ts</code></h3>
+    <h3><code>application/.../mood/pause-feel-io-parity.test.ts</code></h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>ritual/reflect/</code>) folder moves remain complete — no reflect moves. Extend application mood-io parity with reciprocal telemetry-io sibling pins and deeper <code>*WithRepository</code> / hub / steps / flows / pending-offer distinctness (parity with hub-io application extension slice). Presentation colocated parity unchanged.</dd>
@@ -33458,7 +33458,7 @@
     <h3><code>pause-reflect-hub-io-parity.test.ts</code> (application + presentation)</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no relocations. Mood-io parity already had hub-io reciprocal inline pins; extend hub-io mirrors (application + presentation colocated parity) so shift-frame hub wrappers and initial-emotion mood wrappers stay namespace-separated at the hub anchor (parity with share-io reciprocal slice; complements <code>pause-reflect-hub-mood-io-sibling-parity.test.ts</code>).</dd>
+      <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no relocations. Mood-io parity already had hub-io reciprocal inline pins; extend hub-io mirrors (application + presentation colocated parity) so shift-frame hub wrappers and initial-emotion mood wrappers stay namespace-separated at the hub anchor (parity with share-io reciprocal slice; complements <code>pause-reflect-hub-feel-io-sibling-parity.test.ts</code>).</dd>
       <dt>Deviation</dt>
       <dd>None — tests + comment cross-links only.</dd>
       <dt>Open questions</dt>
@@ -33489,7 +33489,7 @@
       <span>Phase A — presentation hub-mood-io sibling parity colocation (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-hub-mood-io-sibling-parity.test.ts</code> (presentation)</h3>
+    <h3><code>pause-reflect-hub-feel-io-sibling-parity.test.ts</code> (presentation)</h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no reflect moves. Colocate hub-anchored presentation sibling parity beside <code>pause-reflect-hub-io.ts</code> (application mirror already under <code>application/.../hub/</code>; mood-anchored sibling stays under <code>mood/</code>).</dd>
@@ -33506,7 +33506,7 @@
       <span>Phase A — extend mood/hub-io share URL-builder reciprocal pins (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-mood-io-parity.test.ts</code> + <code>pause-reflect-hub-io-parity.test.ts</code> (presentation)</h3>
+    <h3><code>pause-feel-io-parity.test.ts</code> + <code>pause-reflect-hub-io-parity.test.ts</code> (presentation)</h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>ritual/reflect/</code>) remains complete — no folder moves. Presentation mood/hub-io parity already had share-io reciprocal clusters; extend inline pins to cover tweet/telegram/whatsapp URL builders (parity with <code>presentation/reflect/share/pause-reflect-share-io-parity.test.ts</code> mood/hub clusters).</dd>
@@ -33557,7 +33557,7 @@
       <span>Phase A — hub↔mood I/O namespace guards on colocated parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-hub-io-parity</code> + <code>pause-reflect-mood-io-parity</code> (application + presentation)</h3>
+    <h3><code>pause-reflect-hub-io-parity</code> + <code>pause-feel-io-parity</code> (application + presentation)</h3>
     <dl>
       <dt>Design decision</dt>
       <dd>Backlog #1 (<code>ritual/reflect/</code> folder moves) remains complete — no production moves. After hub↔mood reciprocal <code>.not.toBe</code> inline pins, add namespace <code>in hubIo</code> / <code>in moodIo</code> guards on all four colocated parity tests (parity with share-io <code>in shareIo</code> slice). Presentation <code>mood-io-parity</code> gains the hub reciprocal inline block that application already had.</dd>
@@ -33591,10 +33591,10 @@
       <span>Phase A — presentation ambience↔mood flow sibling parity (backlog #1 verified, Tier 5)</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3><code>pause-reflect-ambience-mood-flow-sibling-parity.test.ts</code> (presentation)</h3>
+    <h3><code>pause-reflect-ambience-feel-flow-sibling-parity.test.ts</code> (presentation)</h3>
     <dl>
       <dt>Design decision</dt>
-      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves remain complete — no use-case relocations. Mirror application <code>pause-reflect-ambience-mood-flow-sibling-parity</code> under <code>presentation/reflect/ambience/</code> (CI flow anchors only; production I/O unchanged). Extend reciprocal inline pins on <code>pause-reflect-ambience-flow.test.ts</code> and <code>pause-reflect-mood-flow.test.ts</code>. Allowlist new parity file in <code>check:architecture-alignment</code>.</dd>
+      <dd>Backlog #1 (<code>application/use-cases/reflect/</code> → <code>ritual/reflect/</code>) folder moves remain complete — no use-case relocations. Mirror application <code>pause-reflect-ambience-mood-flow-sibling-parity</code> under <code>presentation/reflect/ambience/</code> (CI flow anchors only; production I/O unchanged). Extend reciprocal inline pins on <code>pause-reflect-ambience-flow.test.ts</code> and <code>pause-feel-flow.test.ts</code>. Allowlist new parity file in <code>check:architecture-alignment</code>.</dd>
       <dt>Deviation</dt>
       <dd>None — tests + comment cross-links only.</dd>
       <dt>Open questions</dt>

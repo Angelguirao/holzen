@@ -1,15 +1,15 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import type { MoodValue } from '@/screens/pause/components/MoodCheck';
 import { PauseRitualFeelStep } from '@/screens/pause/components/PauseRitualFeelStep';
-import type { FeelStepTile } from '@/features/pause/public-ritual-reflect';
+import type { FeelStepTile } from '@/features/pause/public-ritual-feel';
 import { PauseBreathing } from '@/screens/pause/components/PauseBreathing';
 import { PauseDecide } from '@/screens/pause/components/PauseDecide';
 import { PauseFrame } from '@/screens/pause/components/PauseFrame';
 import { PauseReflect } from '@/screens/pause/components/PauseReflect';
 import { usePauseReflectFrameFocusAmbience } from '@/features/pause/public-ritual-reflect';
 
-export type { PauseSessionDeepRitualBodyProps } from '@/features/pause/public-hooks';
-import type { PauseSessionDeepRitualBodyProps } from '@/features/pause/public-hooks';
+export type { PauseSessionDeepRitualBodyProps } from '@/features/pause/public-session-ritual';
+import type { PauseSessionDeepRitualBodyProps } from '@/features/pause/public-session-ritual';
 
 /** Deep ritual step panels inside `PauseSessionScaffold` (Framer step transitions preserved). */
 export function PauseSessionDeepRitualBody({

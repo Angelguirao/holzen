@@ -1,7 +1,7 @@
 import { useImperativeHandle, forwardRef, useMemo } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import type { FeelStepTile } from '@/features/pause/public-ritual-reflect';
+import type { FeelStepTile } from '@/features/pause/public-ritual-feel';
 import {
   parseTriangleRotatingKickersI18n,
   resolveBreathCycleTotal,
@@ -15,8 +15,8 @@ import { PauseBreathingBody } from '@/screens/pause/components/pause-breathing-b
 /** i18n: `breathing.triangleRotatingKickers` — advances every 2s in `PauseBreathing`, not per phase. */
 const TRIANGLE_ROTATING_KICKERS_I18N_KEY = 'breathing.triangleRotatingKickers';
 
-export type { PauseBreathingHandle } from '@/features/pause/public-hooks';
-import type { PauseBreathingHandle } from '@/features/pause/public-hooks';
+export type { PauseBreathingHandle } from '@/features/pause/public-session-ritual';
+import type { PauseBreathingHandle } from '@/features/pause/public-session-ritual';
 
 export type { PauseBreathSegment };
 

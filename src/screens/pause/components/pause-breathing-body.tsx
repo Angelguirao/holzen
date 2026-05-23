@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { resumePauseAudioContext } from '@/features/pause/public-hooks';
+import { resumePauseAudioContext } from '@/features/pause/public-ritual-breathe';
 import { pauseStepLayout } from '@/features/pause/public-session';
 import { PauseBreathIntro } from '@/screens/pause/components/pause-breath-intro';
 import type { PauseBreathSegment } from '@/screens/pause/components/pause-breath-intro';
@@ -8,7 +8,7 @@ import { PauseBreathingCompletion } from '@/screens/pause/components/pause-breat
 import type {
   PauseBreathingPhase,
   PauseBreathingTimedDisplay,
-} from '@/features/pause/public-hooks';
+} from '@/features/pause/public-ritual-breathe';
 
 export type PauseBreathingBodyProps = {
   started: boolean;

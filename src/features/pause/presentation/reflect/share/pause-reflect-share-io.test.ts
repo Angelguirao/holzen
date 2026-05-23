@@ -26,7 +26,7 @@ import {
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
   buildFeelTilesMoodLogOptions,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   startPauseReflectFrameFocusAmbience,
   stopPauseReflectFrameFocusAmbience,
@@ -157,7 +157,7 @@ describe('pause-reflect-share-io', () => {
     expect(buildReflectionShareText).not.toBe(pauseInitialEmotionSelectWithRepository);
     expect(buildReflectionShareTelegramUrl).not.toBe(pauseInitialEmotionSkipWithRepository);
     expect(buildReflectionShareTweetUrl).not.toBe(buildFeelTilesMoodLogOptions);
-    // Full cross-I/O pins: `pause-reflect-share-mood-io-sibling-parity.test.ts`;
-    // reciprocal inline pins: `pause-reflect-mood-io.test.ts`.
+    // Full cross-I/O pins: `pause-reflect-share-feel-io-sibling-parity.test.ts`;
+    // reciprocal inline pins: `pause-feel-io.test.ts`.
   });
 });

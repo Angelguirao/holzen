@@ -66,3 +66,15 @@ export {
   type UsePauseSessionBreathHandlersParams,
 } from './presentation/session/breath/use-pause-session-breath-handlers';
 export { usePauseSessionBreathReflectHandlers } from './presentation/session/breath/use-pause-session-breath-reflect-handlers';
+export {
+  BREATH_ORB_CX,
+  BREATH_ORB_CY,
+  BREATH_ORB_HEX_PATH_LEN,
+  BREATH_ORB_INNER_LEN,
+  BREATH_ORB_INNER_RING_R,
+  BREATH_ORB_PX,
+  BREATH_RING_C,
+  BREATH_RING_R,
+  resolveHoldMandalaLayerWeights,
+  type HoldMandalaLayerWeights,
+} from './application/use-cases/ritual/breathe/breath-orb-geometry';

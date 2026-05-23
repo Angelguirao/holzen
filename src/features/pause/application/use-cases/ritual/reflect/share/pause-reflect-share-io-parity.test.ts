@@ -5,8 +5,8 @@
  * Imports share-flow + orchestration-flow CI umbrellas for `.toBe` identity pins only —
  * production share I/O keeps domain builders + `run-reflection-share-image` leaf imports.
  * Presentation mirror: `presentation/reflect/share/pause-reflect-share-io-parity.test.ts`.
- * Mood-io sibling: `pause-reflect-share-mood-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `mood/pause-reflect-mood-io-parity.test.ts`.
+ * Mood-io sibling: `pause-reflect-share-feel-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `mood/pause-feel-io-parity.test.ts`.
  * Hub-io sibling: `pause-reflect-hub-share-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `hub/pause-reflect-hub-io-parity.test.ts`.
  * Steps-io sibling: `pause-reflect-share-steps-io-sibling-parity.test.ts` (application + presentation);
@@ -95,7 +95,7 @@ import {
   pauseInitialEmotionSkip,
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
@@ -124,7 +124,7 @@ import {
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import * as shareIo from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import * as hubIo from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
-import * as moodIo from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+import * as moodIo from '@/features/pause/presentation/feel/pause-feel-io';
 
 describe('pause-reflect-share-io parity (application)', () => {
   it('presentation I/O share builder exports match share CI umbrella', () => {
@@ -282,8 +282,8 @@ describe('pause-reflect-share-io parity (application)', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
-   * Dedicated sibling file: `pause-reflect-share-mood-io-sibling-parity.test.ts` (application + presentation).
+   * Reciprocal inline pins ↔ `presentation/feel/pause-feel-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-share-feel-io-sibling-parity.test.ts` (application + presentation).
    */
   it('presentation share-io, hub-io, and mood-io I/O namespaces stay separated (reciprocal inline)', () => {
     expect('pauseShiftEmotionFrameHubDone' in shareIo).toBe(false);
@@ -309,7 +309,7 @@ describe('pause-reflect-share-io parity (application)', () => {
     expect('buildReflectionShareTweetUrl' in moodIo).toBe(false);
     expect('buildReflectionShareTelegramUrl' in moodIo).toBe(false);
     expect('buildReflectionShareWhatsAppUrl' in moodIo).toBe(false);
-    // Reciprocal inline pins: `hub/pause-reflect-hub-io-parity.test.ts`, `mood/pause-reflect-mood-io-parity.test.ts`.
+    // Reciprocal inline pins: `hub/pause-reflect-hub-io-parity.test.ts`, `mood/pause-feel-io-parity.test.ts`.
   });
 
   it('sibling cluster: mood-io exports stay distinct from share-io builders', () => {

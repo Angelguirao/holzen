@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { BreathOrbHoldMandala } from '@/screens/pause/components/breath-orb-hold-mandala';
 import { BreathPhaseProgressRing } from '@/screens/pause/components/breath-phase-progress-ring';
-import { BREATH_ORB_PX } from '@/features/pause/public-hooks';
+import { BREATH_ORB_PX } from '@/features/pause/public-ritual-breathe';
 
 type Props = {
   /** Framer scale for the filled orb (inhale / exhale / 1 on hold). */

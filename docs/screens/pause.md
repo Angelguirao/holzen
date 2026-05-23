@@ -2,7 +2,7 @@
 
 **Pause-first shipped scope (2026-05):** full ritual on `/pause`; reflect artifact kind **`reflection_text`**; post-pause exits go Home/Archive (no Journey stats). Lapsed users see engagement block via entitlement. Manifest: [active-surface.md](../ops/active-surface.md).
 
-Authoritative orchestration: [`PauseSessionScreen.tsx`](../../src/screens/pause/PauseSessionScreen.tsx) → [`usePauseSessionScreen`](../../src/features/pause/public-hooks.ts) (presentation conductor + [`pause-scaffold-chrome-registry.tsx`](../../src/screens/pause/components/pause-scaffold-chrome-registry.tsx) for route-only header slots).
+Authoritative orchestration: [`PauseSessionScreen.tsx`](../../src/screens/pause/PauseSessionScreen.tsx) → [`usePauseSessionScreen`](../../src/features/pause/public-session-ritual.ts) (presentation conductor + [`pause-scaffold-chrome-registry.tsx`](../../src/screens/pause/components/pause-scaffold-chrome-registry.tsx) for route-only header slots).
 
 **Cross-screen patterns:** the same **thin page + named hooks + feature/screen pure helpers** playbook as [Home](home.md) is spelled out in **[React screen orchestration](../fundamentals/react-screen-orchestration.md)**. Home **produces** navigation into this route; this doc is the **consumer** map for the full-screen volatility ritual.
 
