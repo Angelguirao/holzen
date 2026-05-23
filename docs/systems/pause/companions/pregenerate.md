@@ -11,8 +11,8 @@ Yes, as an implemented and deployed path:
 - **Edge function:** `supabase/functions/pregenerate-companions/index.ts` — HTTP handler wrapped in `withRequestLogging`, logged as `fn: pregenerate-companions`.
 - **Schedule:** `pg_cron` posts to the function URL (project-specific URL in migrations; typical schedule is every **6 hours** — see [cron-setup.md](../../../ops/cron-setup.md) § “Cache Warmer” and [observability-setup.md](../../../ops/observability-setup.md) for heartbeat).
 - **Auth:** `verifyServiceAuth` — `Authorization: Bearer` must be **service role** or **`CRON_SECRET`** (same pattern as other cron workers; see [cron-worker-auth-consistency.md](../../../backlog/cron-worker-auth-consistency.md)).
-- **Secrets:** Requires **`PERPLEXITY_API_KEY`** and **`LOVABLE_API_KEY`** on the edge runtime. Missing keys → **500** with `{ error: "Missing API keys" }`.
-- **Kill switches:** `guardAiFeature(svcClient, "pregenerate", { providers: ["perplexity", "lovable"] })` in `_shared/ratelimit.ts` — if the **`pregenerate`** app-config flag is off, daily budget / panic mode blocks, etc., the function returns **200** with `{ skipped: true, reason: "..." }` and does not burn APIs.
+- **Secrets:** Requires **`PERPLEXITY_API_KEY`** and **`GOOGLE_AI_API_KEY`** (or **`GEMINI_API_KEY`**) on the edge runtime. Missing keys → **500** with `{ error: "Missing API keys" }`.
+- **Kill switches:** `guardAiFeature(svcClient, "pregenerate", { providers: ["perplexity", "google"] })` in `_shared/ratelimit.ts` — if the **`pregenerate`** app-config flag is off, daily budget / panic mode blocks, etc., the function returns **200** with `{ skipped: true, reason: "..." }` and does not burn APIs.
 - **Top-up targets (tunable):** `app_config.pregenerate_cache_topup` — per `companion_type`, **min** count of *healthy* rows (`quality_score` ≥ 2, not expired) and **max** new rows to attempt per cron. Loaded via `loadAppConfig` (~30s cache on edge). Editable in **Admin → Tools** (“Pregenerate cache top-up”) without redeploy. Defaults are seeded in `20260425120000_app_config_pregenerate_cache_topup.sql`.
 
 ## What one run does (high level)
@@ -23,7 +23,7 @@ Yes, as an implemented and deployed path:
    - **Prune** low quality (**&lt; 2**) older than **3 days**.  
    - **Expire** non-permanent medium rows older than **30 days** (still below permanent threshold).
 
-2. **Warm the pool (English `en` rows) — need-based:** for each type, the cron counts healthy rows; if count is below the configured **min**, it generates up to **max** new rows (per type) this run, with short delays between API-heavy steps. **0** max disables generation for that type. In practice: **Grounding** — Perplexity `sonar-pro` (academic) → Lovable `return_grounding_nudge` tool; **Signal** — Perplexity → Lovable `return_signal`; **History** — Perplexity → Lovable JSON; **Zoom out deep time** — Lovable only. Exact per-run counts appear in the JSON `results` as a `Top-up plan:` line.
+2. **Warm the pool (English `en` rows) — need-based:** for each type, the cron counts healthy rows; if count is below the configured **min**, it generates up to **max** new rows (per type) this run, with short delays between API-heavy steps. **0** max disables generation for that type. In practice: **Grounding** — Perplexity `sonar-pro` (academic) → Gemini structuring via `llm-gateway`; **Signal** — Perplexity → Gemini `return_signal`; **History** — Perplexity → Gemini JSON; **Zoom out deep time** — Gemini only. Exact per-run counts appear in the JSON `results` as a `Top-up plan:` line.
 
 3. **Dedup:** Inserts are skipped when `isCompanionCacheDuplicate` / fingerprints match existing cache (logs may show `SKIPPED duplicate` in results). See [cache-dedup-near-duplicates.md](../../../backlog/cache-dedup-near-duplicates.md).
 

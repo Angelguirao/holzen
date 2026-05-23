@@ -194,7 +194,7 @@ citation + url (+ optional DOI)
 | --- | --- | --- | --- |
 | **Crossref** `/works` or `/works?query.bibliographic=…` | Canonical DOI + URL, abstract (when publisher provided one), author names | None (User-Agent with contact email) | 8s |
 | **Semantic Scholar** `/graph/v1/paper/DOI:…` | `citationCount` integer | None (free tier) | 8s |
-| **Gemini via Lovable AI gateway** | 1–2 sentence researcher bios, bounded to ≤160 chars each | `LOVABLE_API_KEY` | 10s |
+| **Gemini via `llm-gateway`** | 1–2 sentence researcher bios, bounded to ≤160 chars each | `GOOGLE_AI_API_KEY` | 10s |
 
 ### Client wiring
 

@@ -1,6 +1,6 @@
 /**
  * LLM gateway — task-aware model selection with provider cascade:
- *   Google Gemini direct → OpenRouter (active). Lovable gateway is legacy opt-in only.
+ *   Google Gemini direct → OpenRouter (failover).
  */
 import { fetchInitWithIncomingTrace } from "./forward-trace-headers.ts";
 import type { LlmBudgetTier } from "./llm-budget.ts";
@@ -8,9 +8,9 @@ import type { LlmBudgetTier } from "./llm-budget.ts";
 export type { LlmBudgetTier } from "./llm-budget.ts";
 export { budgetTierFromSpendRatio, resolveLlmBudgetTier } from "./llm-budget.ts";
 
-export type LlmGatewayProvider = "google" | "openrouter" | "lovable";
+export type LlmGatewayProvider = "google" | "openrouter";
 
-/** Active pause-first deploys use Google → OpenRouter only. Lovable is legacy opt-in. */
+/** Active deploys use Google → OpenRouter only. */
 const ACTIVE_LLM_PROVIDERS: readonly LlmGatewayProvider[] = ["google", "openrouter"];
 
 export type LlmTask =
@@ -29,12 +29,11 @@ export interface LlmCredentials {
 /** Circuit-breaker bucket for Gemini-family providers. */
 export type LlmCircuitProvider = "google" | "perplexity";
 
-const LOVABLE_CHAT_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const GOOGLE_OPENAI_CHAT_URL =
   "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
 const OPENROUTER_CHAT_URL = "https://openrouter.ai/api/v1/chat/completions";
 
-/** Lovable / OpenRouter model id → Google OpenAI-compat model id. */
+/** OpenRouter model id → Google OpenAI-compat model id. */
 const GOOGLE_MODEL_MAP: Record<string, string> = {
   "google/gemini-3-flash-preview": "gemini-2.0-flash",
   "google/gemini-2.5-flash": "gemini-2.5-flash",
@@ -102,9 +101,6 @@ export function resolveLlmCredentialChain(
     chain.push({ apiKey: openRouterKey, provider: "openrouter" });
   }
 
-  const lovableKey = Deno.env.get("LOVABLE_API_KEY")?.trim();
-  if (allow("lovable") && lovableKey) chain.push({ apiKey: lovableKey, provider: "lovable" });
-
   return chain;
 }
 
@@ -125,14 +121,7 @@ export function resolveLlmModel(model: string, provider: LlmGatewayProvider): st
 }
 
 export function llmChatCompletionsUrl(provider: LlmGatewayProvider): string {
-  switch (provider) {
-    case "google":
-      return GOOGLE_OPENAI_CHAT_URL;
-    case "openrouter":
-      return OPENROUTER_CHAT_URL;
-    default:
-      return LOVABLE_CHAT_URL;
-  }
+  return provider === "openrouter" ? OPENROUTER_CHAT_URL : GOOGLE_OPENAI_CHAT_URL;
 }
 
 /** Provider label for `generation_attempts` / logs. */
@@ -206,7 +195,7 @@ export async function llmChatCompletionsWithFallback(
     providers?: LlmGatewayProvider[];
   },
 ): Promise<LlmChatResult> {
-  let chain = resolveLlmCredentialChain(
+  const chain = resolveLlmCredentialChain(
     opts.providers?.length
       ? new Set(opts.providers)
       : new Set(ACTIVE_LLM_PROVIDERS),

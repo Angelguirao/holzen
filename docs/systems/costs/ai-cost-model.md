@@ -223,8 +223,10 @@ The defense-in-depth layers, outermost first:
 ### 5.2 Circuit breakers
 
 Implemented in `supabase/functions/_shared/circuit-breaker.ts`. Two
-independent breakers (`perplexity`, `lovable`) computed on the fly from
-`generation_attempts` with a 30-second per-Edge-instance cache.
+independent breakers (`perplexity`, `google`) computed on the fly from
+`generation_attempts` with a 30-second per-Edge-instance cache. Legacy
+`lovable` / `openrouter` provider labels in historical rows normalize to
+`google`.
 
 **Trip rule:** a provider is marked `degraded` when, in the last 10 minutes,
 its error rate is ≥ 30% **and** it has ≥ 10 completed calls. The sample-size
@@ -239,8 +241,8 @@ health issue — a prompt regression shouldn't trip the breaker).
 
 | Breaker tripped | Affected generators | Behavior |
 |---|---|---|
-| `perplexity` | Signal, Grounding, History | Skip the live Perplexity + Lovable structuring step. Library + cache + curated fallback still serve. |
-| `lovable` | Signal, Grounding, History, Zoom-Out, Intervention, Reflection, + all non-companion AI features | Same: skip live phase; cache/library/fallback still serve. Reflection falls back to the curated pool. |
+| `perplexity` | Signal, Grounding, History | Skip the live Perplexity + Gemini structuring step. Library + cache + curated fallback still serve. |
+| `google` | Signal, Grounding, History, Zoom-Out, Intervention, Reflection, + all non-companion AI features | Same: skip live phase; cache/library/fallback still serve. Reflection falls back to the curated pool. |
 
 **Cached serves are completely unaffected.** Rows already written to
 `pause_ai_artifacts`, `companion_cache` hits, and `content_library` hits

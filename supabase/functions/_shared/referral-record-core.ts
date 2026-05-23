@@ -66,16 +66,16 @@ function referralStep(
 function emailLoggerBridge(log: ReferralRecordLogger): EmailDeliveryLogger {
   return {
     log: (msg, data) => {
-      log("lovable_email", {
-        holzen_event: "lovable_email",
+      log("transactional_email", {
+        holzen_event: "transactional_email",
         phase: "log",
         message: msg,
         ...redactReferralExtra(data),
       });
     },
     error: (msg, data) => {
-      log.error("lovable_email", {
-        holzen_event: "lovable_email",
+      log.error("transactional_email", {
+        holzen_event: "transactional_email",
         phase: "error",
         message: msg,
         ...redactReferralExtra(data),

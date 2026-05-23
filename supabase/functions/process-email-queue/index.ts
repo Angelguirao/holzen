@@ -300,7 +300,6 @@ Deno.serve(withRequestLogging("process-email-queue", async ({ req, log }) => {
         {
           source: queue,
           idempotencyKey: payload.idempotency_key,
-          sendUrl: Deno.env.get('LOVABLE_SEND_URL'),
           maxRetries: 0,
           logger: emailLogger,
         },
