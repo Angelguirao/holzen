@@ -55,7 +55,7 @@ Supabase Dashboard → Project Settings → Edge Functions → Secrets.
 | `GOOGLE_AI_API_KEY` | Google AI Studio key (Gemini) |
 | `OPENROUTER_API_KEY` | Optional Gemini failover |
 | `PERPLEXITY_API_KEY` | Perplexity API key |
-| `RESEND_API_KEY` | Resend (preferred over `LOVABLE_API_KEY`) |
+| `RESEND_API_KEY` | Resend transactional email |
 | `RESEND_WEBHOOK_SECRET` | Resend dashboard webhook signing secret (bounces/complaints → `handle-email-suppression`) |
 | `SEND_EMAIL_HOOK_SECRET` | Supabase Auth Send Email Hook secret (→ `auth-email-hook`) |
 | `STRIPE_SECRET_KEY` | Stripe **test** secret |

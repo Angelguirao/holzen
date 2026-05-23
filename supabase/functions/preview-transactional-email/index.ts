@@ -10,7 +10,7 @@ const corsHeaders = {
 }
 
 // Renders all registered templates with their previewData.
-// Gated by ops bearer secrets (LOVABLE_API_KEY, CRON_SECRET, EMAIL_PREVIEW_SECRET, …).
+// Gated by ops bearer secrets (CRON_SECRET, EMAIL_PREVIEW_SECRET, SEND_EMAIL_HOOK_SECRET, …).
 
 Deno.serve(withRequestLogging("preview-transactional-email", async ({ req, log }) => {
   if (!authorizeOpsBearer(req.headers.get("Authorization"))) {

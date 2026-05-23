@@ -47,8 +47,8 @@ flowchart TB
 | **Google OAuth** | Was `@lovable.dev/cloud-auth-js` | **Supabase Auth** `signInWithOAuth('google')` — configure Google OAuth in Supabase Dashboard |
 | **AI (reflection + companions)** | `LOVABLE_API_KEY` → Lovable gateway | **`GOOGLE_AI_API_KEY`** (primary) + optional **`OPENROUTER_API_KEY`** (failover) via [`_shared/llm-gateway.ts`](../../supabase/functions/_shared/llm-gateway.ts) |
 | **Transactional email** | `@lovable.dev/email-js` | **`RESEND_API_KEY`** via [`_shared/transactional-email.ts`](../../supabase/functions/_shared/transactional-email.ts) (Resend path) |
-| **Auth emails** | `auth-email-hook` + Lovable webhooks | **Supabase Auth Send Email Hook** → same `auth-email-hook` edge (`SEND_EMAIL_HOOK_SECRET` + `RESEND_API_KEY`); disable Lovable hook when live |
-| **Bounce/suppression** | `handle-email-suppression` + Lovable HMAC | **Resend webhooks** → same `handle-email-suppression` edge (`RESEND_WEBHOOK_SECRET`); Lovable HMAC path kept until cutover |
+| **Auth emails** | Lovable auth email webhook | **Supabase Auth Send Email Hook** → `auth-email-hook` (`SEND_EMAIL_HOOK_SECRET` + `RESEND_API_KEY`) |
+| **Bounce/suppression** | Lovable / Mailgun HMAC webhook | **Resend webhooks** → `handle-email-suppression` (`RESEND_WEBHOOK_SECRET`) |
 | **Dev tagger** | `lovable-tagger` in Vite | Removed — no prod impact |
 
 Legacy edges under `supabase/functions/legacy/` may still reference Lovable; they are **not** in the pause-first bundle.
@@ -79,7 +79,7 @@ See [staging-supabase-setup.md](staging-supabase-setup.md).
 
 - `GOOGLE_AI_API_KEY` (Gemini)
 - `PERPLEXITY_API_KEY`
-- `RESEND_API_KEY` (or keep `LOVABLE_API_KEY` briefly)
+- `RESEND_API_KEY`
 - `STRIPE_*` (**test mode**)
 - `CRON_SECRET`, observability (`SENTRY_*`, `LOG_DRAIN_*`, …)
 
@@ -137,22 +137,31 @@ Update [observability-setup.md](observability-setup.md) checklist: Lovable secre
 
 ## Phase 4 — Decommission Lovable Cloud
 
-- [ ] Prod traffic on new host + owned Supabase
+- [ ] Prod traffic on Vercel + owned Supabase
 - [ ] No Lovable GitHub sync to prod DB
-- [ ] `LOVABLE_API_KEY` removed from Edge secrets (Gemini + Resend only)
+- [ ] Supabase Auth Send Email Hook live (not Lovable auth email)
+- [ ] Resend webhooks live for suppression
+- [ ] **`LOVABLE_API_KEY` deleted** from Edge secrets (staging + prod) — Gemini + Resend only
 - [ ] Cancel or downgrade Lovable subscription when editor no longer needed
 
----
+Dashboard checklist (both projects):
+
+```text
+Supabase → Edge Functions → Secrets → delete LOVABLE_API_KEY
+Verify: RESEND_API_KEY, SEND_EMAIL_HOOK_SECRET, RESEND_WEBHOOK_SECRET, GOOGLE_AI_API_KEY present
+```
 
 ## Branch model (recommended)
 
+See **[branch-model.md](branch-model.md)** for `staging` / `main` protection and GitHub Environment setup.
+
 | Branch | Environment | Database |
 |--------|-------------|----------|
-| `dev` | Local / Lovable editor | Local Docker or Lovable dev project |
+| `dev` / feature branches | Local / PR CI | Local Docker or staging |
 | `staging` | Staging host preview | `holzen-staging` Supabase |
 | `main` | Production | `holzen-prod` Supabase |
 
-**Features move up; hotfixes move down** (merge hotfix from `main` → `staging` → `dev`).
+**Features move up; hotfixes move down** (merge hotfix from `main` → `staging`).
 
 ---
 

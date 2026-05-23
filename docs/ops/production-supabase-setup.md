@@ -77,13 +77,15 @@ Copy staging values where appropriate; swap to **live** vendor keys where noted.
 | `LOG_DRAIN_URL`, `LOG_DRAIN_TOKEN` | BetterStack |
 | `SLACK_WEBHOOK_URL` | `#holzen-alerts` |
 
-### Migration-only (remove after cutover)
+### Removed after platform exit (Phase 4)
 
-| Secret | Sunset |
+Do **not** set these on owned Supabase projects:
+
+| Secret | Notes |
 |--------|--------|
-| `LOVABLE_API_KEY` | When Resend + Supabase auth hook live and legacy Lovable webhooks disabled |
+| `LOVABLE_API_KEY` | Removed once Resend + Supabase auth hook + Resend webhooks are live |
 
-Full inventory cross-check: [platform-exit-runbook.md](platform-exit-runbook.md) Phase 3.
+Full inventory: [platform-exit-runbook.md](platform-exit-runbook.md) Phase 3–4.
 
 ---
 

@@ -4,7 +4,6 @@ export function authorizeOpsBearer(authHeader: string | null): boolean {
   if (!token) return false;
 
   const allowed = [
-    Deno.env.get("LOVABLE_API_KEY"),
     Deno.env.get("CRON_SECRET"),
     Deno.env.get("EMAIL_PREVIEW_SECRET"),
     Deno.env.get("SEND_EMAIL_HOOK_SECRET"),
