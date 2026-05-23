@@ -55,7 +55,7 @@ function baseParams() {
     retryCount: 0,
     interventionFetchKeyRef,
     interventionSkippedRef,
-    setInterventionLoading: noop,
+    startInterventionTransition: (cb) => { void cb(); },
     setInterventionError: noop,
     setIntervention: noop,
     loadOrchestrateSession: loadOrchestrateSessionMock,

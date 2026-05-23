@@ -1,10 +1,19 @@
+import type { TransitionStartFunction } from 'react';
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
 
+/** @deprecated Prefer `startCompanionSlotTransition` + `useTransition` pending flags. */
 export interface CompanionSlotLoadingSetters {
   setSignalLoading: (value: boolean) => void;
   setNudgeLoading: (value: boolean) => void;
   setHistoryLoading: (value: boolean) => void;
   setZoomOutLoading: (value: boolean) => void;
+}
+
+export interface CompanionSlotTransitionStarters {
+  signal: TransitionStartFunction;
+  grounding: TransitionStartFunction;
+  history: TransitionStartFunction;
+  zoomOut: TransitionStartFunction;
 }
 
 export interface CompanionSlotErrorSetters {
@@ -14,6 +23,7 @@ export interface CompanionSlotErrorSetters {
   setZoomOutError: (value: boolean) => void;
 }
 
+/** @deprecated Prefer `startCompanionSlotTransition` + `useTransition` pending flags. */
 export function setCompanionSlotLoading(
   slot: RegenerateCompanionSlot,
   setters: CompanionSlotLoadingSetters,
@@ -31,6 +41,27 @@ export function setCompanionSlotLoading(
       break;
     case 'zoomOut':
       setters.setZoomOutLoading(value);
+      break;
+  }
+}
+
+export function startCompanionSlotTransition(
+  slot: RegenerateCompanionSlot,
+  starters: CompanionSlotTransitionStarters,
+  callback: Parameters<TransitionStartFunction>[0],
+): void {
+  switch (slot) {
+    case 'signal':
+      starters.signal(callback);
+      break;
+    case 'grounding':
+      starters.grounding(callback);
+      break;
+    case 'history':
+      starters.history(callback);
+      break;
+    case 'zoomOut':
+      starters.zoomOut(callback);
       break;
   }
 }

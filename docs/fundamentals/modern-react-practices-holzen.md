@@ -214,14 +214,14 @@ If none apply, prefer a **boundary** (lower state, memo shell, lazy branch) inst
 |------|----------|--------|
 | `useOptimistic` | Profile toggles; snooze; push subscribe; pause favorite; companion vote; ritual favorite | **Done** |
 | `useActionState` | Settings: email, password, feedback, export, delete, sign-out; Home testimonial; Auth email/forgot; reset-password; email unsubscribe; app `FeedbackWidget` (error boundary) | **Done** |
-| `useTransition` | Companion vote; push subscribe; credits refresh; subscription checkout/trial/portal; Auth Google OAuth; onboarding trial start; Home manual pause + bulk-hold; archive retrospective outcome; pending pause adopt/decline; reflect note save; holzen-reflect generation | **Done** |
+| `useTransition` | Companion vote; push subscribe; credits refresh; subscription checkout/trial/portal; Auth Google OAuth; onboarding trial start; Home manual pause + bulk-hold; archive retrospective outcome; pending pause adopt/decline; reflect note save; holzen-reflect generation; **companion slot orchestrate + intervention bootstrap** | **Done** |
 | React Compiler `"use memo"` | All home + pause `components/**` presentation exports (excl. `render*` helpers) | **Done** (annotation mode) |
 
-**Explicitly out of scope (by design):** companion slot orchestration loading (`setCompanionSlotLoading`), TanStack Query fetch paths, admin bulk tools, auth session boot (`AuthProvider` initial `loading`) — not form/mutation leverage targets.
+**Explicitly out of scope (by design):** TanStack Query fetch paths, admin bulk tools, auth session boot (`AuthProvider` initial `loading`) — not form/mutation leverage targets.
 
 **Do not** replace TanStack Query or pause/companion mutation paths with form Actions wholesale.
 
-**CI closure:** `npm run check:react19-leverage` — fails if active `src/` reintroduces manual `loading`/`submitting`/`busy`/`saving` mutation flags outside the allowlist in `scripts/check-react19-leverage.mjs` (companion orchestration, admin, auth boot).
+**CI closure:** `npm run check:react19-leverage` — fails if active `src/` reintroduces manual `loading`/`submitting`/`busy`/`saving` mutation flags outside the allowlist in `scripts/check-react19-leverage.mjs` (admin, auth boot).
 
 ---
 

@@ -6,15 +6,15 @@ import {
   logCompanionSlotOrchestrateInvoke,
   runCompanionSlotOrchestrate,
   setCompanionSlotError,
-  setCompanionSlotLoading,
+  startCompanionSlotTransition,
   trackCompanionGenerationInitiated,
   type ApplyCompanionSlotOrchestrateFailureUiPorts,
   type CompanionSlotCacheIds,
   type CompanionSlotCommitters,
   type CompanionSlotErrorSetters,
-  type CompanionSlotLoadingSetters,
   type CompanionSlotOrchestrateMode,
   type CompanionSlotRelaxations,
+  type CompanionSlotTransitionStarters,
 } from './pause-companion-orchestrate-io';
 import { useCompanionOrchestrateSession } from './use-companion-orchestrate-session';
 
@@ -35,7 +35,7 @@ export type UseCompanionSlotRunOrchestrateParams = {
   setCacheIds: React.Dispatch<React.SetStateAction<CompanionSlotCacheIds>>;
   setCacheRelaxations: React.Dispatch<React.SetStateAction<CompanionSlotRelaxations>>;
   slotCommitters: CompanionSlotCommitters;
-  companionSlotLoadingSetters: CompanionSlotLoadingSetters;
+  companionSlotTransitionStarters: CompanionSlotTransitionStarters;
   companionSlotErrorSetters: CompanionSlotErrorSetters;
 };
 
@@ -53,7 +53,7 @@ export function useCompanionSlotRunOrchestrate({
   setCacheIds,
   setCacheRelaxations,
   slotCommitters,
-  companionSlotLoadingSetters,
+  companionSlotTransitionStarters,
   companionSlotErrorSetters,
 }: UseCompanionSlotRunOrchestrateParams) {
   const buildOrchestrateSession = useCompanionOrchestrateSession({
@@ -69,51 +69,54 @@ export function useCompanionSlotRunOrchestrate({
     async (slot: RegenerateCompanionSlot, mode: CompanionSlotOrchestrateMode) => {
       if (!pauseInstanceId) return;
 
-      setCompanionSlotLoading(slot, companionSlotLoadingSetters, true);
-      setCompanionSlotError(slot, companionSlotErrorSetters, false);
+      await new Promise<void>((resolve) => {
+        startCompanionSlotTransition(slot, companionSlotTransitionStarters, async () => {
+          setCompanionSlotError(slot, companionSlotErrorSetters, false);
 
-      try {
-        const orchestrateSession = await buildOrchestrateSession();
-        if (!orchestrateSession) return;
+          try {
+            const orchestrateSession = await buildOrchestrateSession();
+            if (!orchestrateSession) return;
 
-        logCompanionSlotOrchestrateInvoke(mode, slot, pauseInstanceId);
-        trackCompanionGenerationInitiated(slot, mode);
+            logCompanionSlotOrchestrateInvoke(mode, slot, pauseInstanceId);
+            trackCompanionGenerationInitiated(slot, mode);
 
-        const result = await runCompanionSlotOrchestrate(
-          mode,
-          slot,
-          orchestrateSession,
-          companionOrchestrator,
-        );
+            const result = await runCompanionSlotOrchestrate(
+              mode,
+              slot,
+              orchestrateSession,
+              companionOrchestrator,
+            );
 
-        applyCompanionSlotOrchestrateOutcome({
-          mode,
-          slot,
-          pauseInstanceId,
-          result,
-          setCacheIds,
-          slotCommitters,
-          setCacheRelaxations,
-          failureUiPorts,
-          setSlotError: (error) => setCompanionSlotError(slot, companionSlotErrorSetters, error),
+            applyCompanionSlotOrchestrateOutcome({
+              mode,
+              slot,
+              pauseInstanceId,
+              result,
+              setCacheIds,
+              slotCommitters,
+              setCacheRelaxations,
+              failureUiPorts,
+              setSlotError: (error) => setCompanionSlotError(slot, companionSlotErrorSetters, error),
+            });
+          } catch (e) {
+            console.error(`[useCompanionSlotRunOrchestrate] ${mode}`, slot, e);
+            if (mode === 'regenerate') {
+              toast({ title: 'Regenerate failed', description: 'Network error', variant: 'destructive' });
+            }
+            setCompanionSlotError(slot, companionSlotErrorSetters, true);
+          } finally {
+            if (mode === 'lazy_fetch') {
+              void refreshSubscription();
+            }
+            resolve();
+          }
         });
-      } catch (e) {
-        console.error(`[useCompanionSlotRunOrchestrate] ${mode}`, slot, e);
-        if (mode === 'regenerate') {
-          toast({ title: 'Regenerate failed', description: 'Network error', variant: 'destructive' });
-        }
-        setCompanionSlotError(slot, companionSlotErrorSetters, true);
-      } finally {
-        setCompanionSlotLoading(slot, companionSlotLoadingSetters, false);
-        if (mode === 'lazy_fetch') {
-          void refreshSubscription();
-        }
-      }
+      });
     },
     [
       pauseInstanceId,
       buildOrchestrateSession,
-      companionSlotLoadingSetters,
+      companionSlotTransitionStarters,
       companionSlotErrorSetters,
       slotCommitters,
       setCacheIds,
@@ -125,4 +128,4 @@ export function useCompanionSlotRunOrchestrate({
   );
 
   return { runSlotOrchestrate };
-}
+};

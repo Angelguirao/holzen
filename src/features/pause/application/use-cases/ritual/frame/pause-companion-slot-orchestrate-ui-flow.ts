@@ -4,6 +4,8 @@
 export {
   setCompanionSlotError,
   setCompanionSlotLoading,
+  startCompanionSlotTransition,
   type CompanionSlotErrorSetters,
   type CompanionSlotLoadingSetters,
+  type CompanionSlotTransitionStarters,
 } from './companion-slot-ui-state';

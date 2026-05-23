@@ -15,8 +15,6 @@ const srcRoot = join(root, 'src');
 /** Paths (posix, relative to repo root) exempt from manual loading bans. */
 const ALLOWLIST = new Set([
   'src/features/auth/presentation/AuthProvider.tsx',
-  'src/features/pause/presentation/companion/use-companion-slot-ui-state.ts',
-  'src/features/pause/presentation/companion/use-companion-intervention-bootstrap.ts',
   'src/screens/admin/components/AppConfigTools.tsx',
   'src/screens/admin/components/SourceCatalogViewer.tsx',
   'src/screens/admin/components/StripePriceCheck.tsx',

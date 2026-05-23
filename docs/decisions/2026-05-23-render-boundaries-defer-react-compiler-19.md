@@ -43,14 +43,14 @@ Adopting React Compiler or upgrading to React 19 during migration adds a second 
 | Track | Trigger | Action |
 |-------|---------|--------|
 | **A. React Compiler pilot** | `src/` migration stable; test + build green | **Annotation complete** on home/pause `components/**`; profile before `compilationMode: 'infer'` |
-| **B. React 19 Actions pilot** | Runtime on 19.x | **Complete** on active forms/mutations — see modern-react-practices §2.9; companion orchestration intentionally unchanged |
+| **B. React 19 Actions pilot** | Runtime on 19.x | **Complete** on active forms/mutations — see modern-react-practices §2.9; companion orchestration uses `useTransition` per slot |
 
 Expo SDK 54 is **not** a Holzen signal — shipped product is a Vite SPA on Lovable.
 
 ## Consequences
 
 - **Positive:** Reviewers have a single policy; migration PRs avoid compiler/React 19 churn; Home remains the reference boundary pattern.
-- **Negative:** Manual memo boilerplate persists until Compiler `infer` mode; companion orchestration keeps imperative loading by design.
+- **Negative:** Manual memo boilerplate persists until Compiler `infer` mode.
 - **Follow-ups:** Profile home/pause before `compilationMode: 'infer'`; PR checklist in [modern-react-practices-holzen.md](../fundamentals/modern-react-practices-holzen.md) §6.
 
 ## Recovery

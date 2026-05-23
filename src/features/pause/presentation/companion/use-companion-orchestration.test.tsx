@@ -30,7 +30,7 @@ const {
     fetchedSlotsRef,
     setCacheRelaxations: vi.fn(),
     setCacheIds: vi.fn(),
-    companionSlotLoadingSetters: {},
+    companionSlotTransitionStarters: {},
     companionSlotErrorSetters: {},
     nudge: null,
     nudgeLoading: false,

@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useTransition } from 'react';
 import { toast as sonnerToast } from 'sonner';
 import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
 import type {
@@ -37,7 +37,7 @@ export function useCompanionInterventionBootstrap({
   setCacheRelaxations,
 }: UseCompanionInterventionBootstrapParams) {
   const [intervention, setIntervention] = useState<InterventionState | null>(null);
-  const [interventionLoading, setInterventionLoading] = useState(false);
+  const [interventionPending, startInterventionTransition] = useTransition();
   const [interventionError, setInterventionError] = useState(false);
 
   const interventionFetchKeyRef = useRef<string | null>(null);
@@ -59,12 +59,6 @@ export function useCompanionInterventionBootstrap({
     interventionSkippedRef.current = false;
     pendingRetryConfirmRef.current = null;
     interventionFetchKeyRef.current = null;
-
-    if (!pauseInstanceId) {
-      setInterventionLoading(false);
-      return;
-    }
-    setInterventionLoading(true);
   }, [pauseInstanceId]);
 
   useEffect(() => {
@@ -83,7 +77,7 @@ export function useCompanionInterventionBootstrap({
     retryCount,
     interventionFetchKeyRef,
     interventionSkippedRef,
-    setInterventionLoading,
+    startInterventionTransition,
     setInterventionError,
     setIntervention,
     loadOrchestrateSession,
@@ -94,7 +88,7 @@ export function useCompanionInterventionBootstrap({
 
   return {
     intervention,
-    interventionLoading,
+    interventionLoading: interventionPending,
     interventionError,
     setIntervention,
     setInterventionError,

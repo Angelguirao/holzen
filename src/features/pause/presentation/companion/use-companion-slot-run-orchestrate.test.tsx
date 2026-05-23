@@ -43,6 +43,9 @@ vi.mock('./pause-companion-orchestrate-io', () => ({
   logCompanionSlotOrchestrateInvoke: vi.fn(),
   trackCompanionGenerationInitiated: vi.fn(),
   setCompanionSlotLoading: vi.fn(),
+  startCompanionSlotTransition: vi.fn((_slot, _starters, callback) => {
+    void callback();
+  }),
   setCompanionSlotError: vi.fn(),
 }));
 
@@ -68,11 +71,11 @@ function baseParams() {
       setZoomOut: noop,
       autoSaveToLibrary: noop,
     },
-    companionSlotLoadingSetters: {
-      setSignalLoading: noop,
-      setNudgeLoading: noop,
-      setHistoryLoading: noop,
-      setZoomOutLoading: noop,
+    companionSlotTransitionStarters: {
+      signal: (cb) => { void cb(); },
+      grounding: (cb) => { void cb(); },
+      history: (cb) => { void cb(); },
+      zoomOut: (cb) => { void cb(); },
     },
     companionSlotErrorSetters: {
       setSignalError: noop,

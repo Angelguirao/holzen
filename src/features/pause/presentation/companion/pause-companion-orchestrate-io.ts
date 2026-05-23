@@ -39,8 +39,10 @@ import type { CompanionOrchestrateSessionContext } from '@/features/pause/applic
 import {
   setCompanionSlotError,
   setCompanionSlotLoading,
+  startCompanionSlotTransition,
   type CompanionSlotErrorSetters,
   type CompanionSlotLoadingSetters,
+  type CompanionSlotTransitionStarters,
 } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-ui-state';
 
 export { companionOrchestrator } from './pause-companion-orchestration-io';
@@ -55,6 +57,7 @@ export type {
   CompanionSlotCommitters,
   CompanionSlotErrorSetters,
   CompanionSlotLoadingSetters,
+  CompanionSlotTransitionStarters,
   CompanionSlotOrchestrateMode,
   CompanionSlotRelaxations,
   RunCompanionInterventionBootstrapPorts,
@@ -70,5 +73,6 @@ export {
   runCompanionSlotOrchestrate,
   setCompanionSlotError,
   setCompanionSlotLoading,
+  startCompanionSlotTransition,
   trackCompanionGenerationInitiated,
 };
