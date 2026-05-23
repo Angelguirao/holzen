@@ -10,11 +10,15 @@ import {
 } from "../_shared/with-request-logging.ts";
 import {
   holzenTransactionalEmailLogger,
+  isTransactionalEmailConfigured,
   sendTransactionalEmailBatch,
   type TransactionalEmail,
 } from "../../../_shared/transactional-email.ts";
-
-const DIGEST_MODEL = "google/gemini-2.5-flash-lite";
+import {
+  llmChatCompletionsWithFallback,
+  llmLogProvider,
+  resolveModelsForTask,
+} from "../../../_shared/llm-gateway.ts";
 
 /** Subset of `profiles` selected for the digest loop. */
 interface DigestProfile {
@@ -124,7 +128,6 @@ async function generateAIInsight(
   steadyCount: number,
   weekDir: string,
   absWeekChange: string,
-  LOVABLE_API_KEY: string,
   language: string | undefined,
   logAttempt: (params: Parameters<ReturnType<typeof createAttemptLogger>>[0]) => void,
   log: RequestLoggingContext["log"],
@@ -132,6 +135,7 @@ async function generateAIInsight(
 ): Promise<string | null> {
   if (pauseCount === 0) return null;
 
+  const model = resolveModelsForTask("cron_digest")[0];
   const t0 = Date.now();
   try {
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
@@ -150,20 +154,11 @@ Be observational, not prescriptive. No advice, no exclamation marks. Calm and gr
 - "Three pauses during a quiet week — you're building awareness beyond volatility."
 - "Anxiety appeared twice this week, both during drops. The pattern is worth noticing."${langInstruction}`;
 
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      fetchInitWithIncomingTrace(incoming, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: DIGEST_MODEL,
-          messages: [{ role: "user", content: prompt }],
-        }),
-      }),
-    );
+    const { response, creds } = await llmChatCompletionsWithFallback({
+      model,
+      body: { messages: [{ role: "user", content: prompt }] },
+      incomingRequest: incoming,
+    });
 
     if (!response.ok) {
       log.error("weekly_digest_ai", {
@@ -173,8 +168,8 @@ Be observational, not prescriptive. No advice, no exclamation marks. Calm and gr
       });
       logAttempt({
         companion_type: "digest",
-        provider: "lovable",
-        model: DIGEST_MODEL,
+        provider: llmLogProvider(creds),
+        model,
         status: "error",
         latency_ms: Date.now() - t0,
         error_message: `HTTP ${response.status}`,
@@ -185,8 +180,8 @@ Be observational, not prescriptive. No advice, no exclamation marks. Calm and gr
     const data = await response.json();
     logAttempt({
       companion_type: "digest",
-      provider: "lovable",
-      model: DIGEST_MODEL,
+      provider: llmLogProvider(creds),
+      model,
       status: "success",
       latency_ms: Date.now() - t0,
       input_tokens: data?.usage?.prompt_tokens,
@@ -201,8 +196,8 @@ Be observational, not prescriptive. No advice, no exclamation marks. Calm and gr
     });
     logAttempt({
       companion_type: "digest",
-      provider: "lovable",
-      model: DIGEST_MODEL,
+      provider: "google",
+      model,
       status: "error",
       latency_ms: Date.now() - t0,
       error_message: e instanceof Error ? e.message : String(e),
@@ -235,16 +230,13 @@ serve(
       { auth: { persistSession: false } }
     );
 
-    const LOVABLE_EMAIL_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_EMAIL_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    if (!isTransactionalEmailConfigured()) throw new Error("RESEND_API_KEY not configured");
 
-    let LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    let aiInsightEnabled = true;
 
-    // Feature flag + global budget guard. If the `digest` feature is off or
-    // budget is exhausted, we still send the email but skip the AI insight.
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
     const digestAiGuard = await guardAiFeature(supabase, "digest", {
-      providers: ["lovable"],
+      providers: ["google"],
     });
     if (!digestAiGuard.allowed) {
       log("weekly_digest_phase", {
@@ -252,7 +244,7 @@ serve(
         phase: "ai_insight_skipped",
         reason: digestAiGuard.reason,
       });
-      LOVABLE_API_KEY = undefined;
+      aiInsightEnabled = false;
     }
 
     // Get all users with email notifications enabled
@@ -320,7 +312,7 @@ serve(
 
       // Generate AI insight
       let aiInsight: string | null = null;
-      if (LOVABLE_API_KEY && pauseCount > 0) {
+      if (aiInsightEnabled && pauseCount > 0) {
         const logAttempt = createAttemptLogger(supabase, { userId: profile.user_id });
         aiInsight = await generateAIInsight(
           pauseCount,
@@ -328,7 +320,6 @@ serve(
           steadyCount,
           weekDir,
           absWeekChange,
-          LOVABLE_API_KEY,
           profile.language ?? undefined,
           logAttempt,
           log,
@@ -414,21 +405,20 @@ serve(
     // Idempotency key per day → cron re-runs within 24h don't double-send.
     const idempotencyDate = now.toISOString().slice(0, 10);
     const batch = await sendTransactionalEmailBatch(queued, {
-      apiKey: LOVABLE_EMAIL_API_KEY,
       source: "weekly-digest",
       idempotencyKey: `weekly-digest:${idempotencyDate}`,
       logger: holzenTransactionalEmailLogger(
         (m, d) =>
-          log("lovable_email_dep", {
+          log("transactional_email_dep", {
             holzen_event: "weekly_digest_cron",
-            phase: "lovable_email",
+            phase: "transactional_email",
             message: m,
             ...(d ?? {}),
           }),
         (m, data) =>
-          log.error("lovable_email_dep", {
+          log.error("transactional_email_dep", {
             holzen_event: "weekly_digest_cron",
-            phase: "lovable_email_error",
+            phase: "transactional_email_error",
             message: m,
             ...(data ?? {}),
           }),

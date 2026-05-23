@@ -1,14 +1,15 @@
-# Auth email hook
+# Auth email hook (Bruno)
 
-- **`auth-email-hook-preview`** — `POST .../auth-email-hook/preview` with **`Authorization: Bearer …`** using any ops secret accepted by the edge (`LOVABLE_API_KEY`, `CRON_SECRET`, `EMAIL_PREVIEW_SECRET`, or `SEND_EMAIL_HOOK_SECRET`). Renders HTML for template types: `signup`, `magiclink`, `recovery`, `invite`, `email_change`, `reauthentication`.
+- **`auth-email-hook-preview`** — `POST .../auth-email-hook/preview` with **`Authorization: Bearer …`** using any ops secret accepted by the edge (`CRON_SECRET`, `EMAIL_PREVIEW_SECRET`, or `SEND_EMAIL_HOOK_SECRET`). Renders HTML for template types: `signup`, `magiclink`, `recovery`, `invite`, `email_change`, `reauthentication`.
 
-The main **`auth-email-hook`** webhook accepts either:
+## Production webhook path
 
-- **Supabase Auth Send Email Hook** — signed with **`SEND_EMAIL_HOOK_SECRET`** (preferred after platform exit), or
-- **Legacy Lovable** — signed with **`LOVABLE_API_KEY`** (not reproducible from Bruno alone).
+**Supabase Send Email Hook** — signed with **`SEND_EMAIL_HOOK_SECRET`** (Standard Webhooks / Svix-style headers). Configure in Supabase Dashboard → Authentication → Hooks.
 
-## Getting `LOVABLE_API_KEY` for Bruno or `supabase functions serve`
+The hook body is not easily reproducible from Bruno alone; use Supabase's hook test flow or trigger a real auth email in staging.
 
-The value is **not** in this repository. It is stored as an **Edge Function secret** on your Supabase project (often auto-provisioned by Lovable). You typically **cannot** re-read the plaintext from Supabase after it is set; if you don’t have it anywhere, use **Dashboard → Edge Functions → Secrets** to **set/rotate** a value you control, or obtain it from your team / Lovable. If unavailable, **skip** the preview request — other Bruno folders do not need this variable.
+## Local preview
 
-See [../README.md](../README.md) § *LOVABLE_API_KEY — you won’t get it from this repo*.
+Set `EMAIL_PREVIEW_SECRET` (or `CRON_SECRET`) in `supabase/.env` and use the preview Bruno request with `Authorization: Bearer <secret>`.
+
+See [../README.md](../README.md) and [docs/ops/platform-exit-runbook.md](../../../docs/ops/platform-exit-runbook.md) § Auth & email.

@@ -25,43 +25,47 @@ Click-paths and config for the Holzen observability stack. This is the setup sou
 
 ## Inputs needed (gather before execution)
 
-**Where each value lives is not interchangeable.** `VITE_*` variables are inlined into the browser bundle at build time by Vite — they are public by definition. Lovable's Secrets vault rightly refuses them (storing them there would be a category error: a "secret" that Vite would immediately publish to every user). Edge-function secrets are the opposite: they stay server-side and must never appear in the bundle.
+**Where each value lives is not interchangeable.** `VITE_*` variables are inlined into the browser bundle at build time — they are public by definition. Edge-function secrets stay server-side and must never appear in the bundle.
 
-### Frontend (committed to `src/config/public-env.ts` as hardcoded fallbacks — values are public)
+### Frontend (Vercel / CI build — not Supabase Edge secrets)
 
 | Variable | Value | Where obtained | Where set |
 |---|---|---|---|
-| `VITE_SENTRY_DSN` | Sentry DSN for frontend project — safe to commit; Sentry enforces allowed origins on the project side | Sentry → Settings → Projects → [project] → Client Keys (DSN) | `src/config/public-env.ts` → `FALLBACK_SENTRY_DSN` |
-| `VITE_POSTHOG_KEY` | PostHog project API key — safe to commit; write-scoped, domain-throttled | PostHog → Project Settings → Project API Key | `src/config/public-env.ts` → `FALLBACK_POSTHOG_KEY` |
-| `VITE_POSTHOG_HOST` | `https://us.i.posthog.com` (default) or EU equivalent | PostHog region setting | `src/config/public-env.ts` → `FALLBACK_POSTHOG_HOST` |
-| `VITE_APP_VERSION` | Git SHA (7-char). Auto-`dev` when unset | Build env (CI) | `process.env.VITE_APP_VERSION` at build time; falls back to `dev` |
-| `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` | Build-time only, for `@sentry/vite-plugin` source-map upload | Sentry → Settings → Account → API → Auth Tokens (scope: `project:releases`) | CI build env or local-only; never committed |
+| `VITE_SENTRY_DSN` | Sentry DSN for frontend project — safe to commit; Sentry enforces allowed origins on the project side | Sentry → Settings → Projects → [project] → Client Keys (DSN) | `src/config/public-env.ts` → `FALLBACK_SENTRY_DSN` **or** Vercel / GitHub Actions env |
+| `VITE_POSTHOG_KEY` | PostHog project API key — write-scoped, domain-throttled | PostHog → Project Settings → Project API Key | `src/config/public-env.ts` → `FALLBACK_POSTHOG_KEY` **or** Vercel / CI env |
+| `VITE_POSTHOG_HOST` | `https://us.i.posthog.com` (default) or EU equivalent | PostHog region setting | `src/config/public-env.ts` → `FALLBACK_POSTHOG_HOST` **or** Vercel / CI env |
+| `VITE_APP_VERSION` | Git SHA (7–12 char). Auto-`dev` when unset | **`VERCEL_GIT_COMMIT_SHA`** on Vercel; GitHub Actions on CI | Vercel project env or CI build env |
+| `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` | Build-time only, for `@sentry/vite-plugin` source-map upload | Sentry → Settings → Account → API → Auth Tokens (scope: `project:releases`) | **GitHub Actions** secrets (or local-only); never Edge secrets |
 
-**Why not Lovable Secrets for `VITE_*`?** They're inlined into the JS bundle. Lovable's UI blocks `VITE_*` secret names with the message *"VITE_ prefixed variables are build-time browser values and should be defined in .env files, not in secrets."* Because `.env` / `.env.*` are gitignored in this repo, the codebase convention is **hardcoded fallbacks in `src/config/public-env.ts`** (mirroring how `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` fallbacks live in `vite.config.ts`). To enable observability in the hosted build, edit `FALLBACK_SENTRY_DSN` / `FALLBACK_POSTHOG_KEY` in `src/config/public-env.ts` and push.
+**Hosted frontend (Vercel recommended):** set `VITE_*` in the Vercel project → Settings → Environment Variables for Production + Preview. Committed fallbacks in `src/config/public-env.ts` remain the dev/CI baseline when env vars are unset.
 
-**Defense in depth (required):** Set allowed origins on the Sentry project and on the PostHog project so the embedded keys can only be used from your own domains. This is standard practice — vendors expect public-in-bundle keys and provide origin-restriction as the security layer.
+**Defense in depth (required):** Set allowed origins on the Sentry project and on the PostHog project so embedded keys can only be used from your own domains.
 
-### Edge functions (Lovable secrets UI)
+### Edge functions (Supabase Dashboard → Edge Functions → Secrets)
 
 | Variable | Value |
 |---|---|
-| `SENTRY_DSN_EDGES` | Sentry DSN for edges. Recommended: same project as frontend (unified quota + release health). Alternative: separate project if you anticipate muting edge noise during incidents. Tag segmentation via `source:edge` vs `source:frontend` handles the same-project case. |
-| `SENTRY_RELEASE` | Git SHA of the deploy (same value as `VITE_APP_VERSION`). Enables cross-surface release correlation. |
-| `SENTRY_ENVIRONMENT` | `production` or `preview` |
+| `SENTRY_DSN_EDGES` | Sentry DSN for edges. Recommended: same project as frontend (unified quota + release health). Tag segmentation via `source:edge` vs `source:frontend`. |
+| `SENTRY_RELEASE` | Git SHA of the deploy (same value as `VITE_APP_VERSION`). Set by `npm run stamp:release` at deploy. |
+| `SENTRY_ENVIRONMENT` | `production` or `staging` |
 | `LOG_DRAIN_URL` | BetterStack log ingest endpoint (`https://in.logs.betterstack.com`) |
 | `LOG_DRAIN_TOKEN` | BetterStack source token (not the API token) |
 | `SLACK_WEBHOOK_URL` | Slack Incoming Webhook URL for `#holzen-alerts` |
-| `LOVABLE_API_KEY` | Already present; required for Lovable Email + AI gateway calls |
+| `GOOGLE_AI_API_KEY` | Primary LLM (Gemini direct) — see `_shared/llm-gateway.ts` |
+| `OPENROUTER_API_KEY` | Optional LLM failover |
+| `RESEND_API_KEY` | Transactional email (required post platform-exit) |
+| `RESEND_WEBHOOK_SECRET` | Resend bounce/complaint webhook signing |
+| `SEND_EMAIL_HOOK_SECRET` | Supabase Auth Send Email Hook secret |
 
-If any edge secret is absent, the corresponding forwarder silently no-ops. Never hard-fails user flows.
+If any edge secret is absent, the corresponding forwarder silently no-ops. Never hard-fails user flows (except auth email when `RESEND_API_KEY` is missing).
 
 ## 1. Slack channel + webhook
 
 1. Slack → Create channel `#holzen-alerts`. Private is fine; add whoever needs the pages.
 2. [api.slack.com/apps](https://api.slack.com/apps) → **Create New App → From scratch** → name `Holzen Alerts`.
 3. Enable **Incoming Webhooks** → **Add New Webhook to Workspace** → pick `#holzen-alerts`.
-4. Copy the webhook URL (`https://hooks.slack.com/services/...`). Store as `SLACK_WEBHOOK_URL` in Lovable secrets.
-5. Optional `alerts@<yourdomain>` for vendors without Slack integration (Anthropic budget emails, Lovable limit warnings).
+4. Copy the webhook URL (`https://hooks.slack.com/services/...`). Store as `SLACK_WEBHOOK_URL` in **Supabase Edge secrets** (staging + prod).
+5. Optional `alerts@<yourdomain>` for vendors without Slack integration (Anthropic budget emails, Supabase usage alerts).
 
 Test once from any shell with network access:
 
@@ -75,14 +79,14 @@ curl -X POST -H 'Content-Type: application/json' \
 ### 2.1 Project
 
 1. [sentry.io](https://sentry.io) → Create project → platform **Browser JavaScript / React**. Name: `holzen`.
-2. Copy the DSN. Paste as `FALLBACK_SENTRY_DSN` in `src/config/public-env.ts` (frontend, committed) and — unless you want a dedicated edge project — also store as `SENTRY_DSN_EDGES` in the Lovable secrets UI (edges, server-side).
+2. Copy the DSN. Paste as `FALLBACK_SENTRY_DSN` in `src/config/public-env.ts` (frontend fallback) and store as `SENTRY_DSN_EDGES` in **Supabase Edge secrets**.
 3. Settings → Projects → `holzen` → **Security & Privacy** → enable **Scrub IP addresses** and **Data scrubbing**. Defaults handle PAN/SSN-like patterns; our `beforeSend` on both surfaces adds Holzen-specific keys (`prompt|reflection|content|message|body|input`).
 4. Settings → Projects → `holzen` → **Security & Privacy** → **Allowed Domains** → add your production + preview domains. The DSN is committed to the repo, so origin-restriction on the Sentry side is the security layer that prevents third parties from spamming your quota.
 5. Settings → Projects → `holzen` → **Release Health** → enable.
 
 ### 2.2 Source maps (build-time)
 
-1. Settings → Account → API → **Auth Tokens** → Create with scope `project:releases`. Store as `SENTRY_AUTH_TOKEN` in the CI build env (not Lovable runtime).
+1. Settings → Account → API → **Auth Tokens** → Create with scope `project:releases`. Store as `SENTRY_AUTH_TOKEN` in **GitHub Actions** secrets (and optionally Vercel for preview builds).
 2. Vite build uploads source maps automatically when `SENTRY_AUTH_TOKEN` + `SENTRY_ORG` + `SENTRY_PROJECT` are present (see `vite.config.ts`). Missing token = plugin is a no-op.
 
 ### 2.3 Slack integration
@@ -150,7 +154,7 @@ Do **not** create events in the PostHog UI. Events are emitted from the app per 
 ### 4.1 Source
 
 1. [betterstack.com/logs](https://betterstack.com/logs) → **Sources** → **Add source** → platform **HTTP** (or "Custom").
-2. Name: `holzen-edges`. Copy the **HTTP endpoint URL** (`https://in.logs.betterstack.com`) → `LOG_DRAIN_URL`, and the **source token** → `LOG_DRAIN_TOKEN`. Store both in Lovable secrets.
+2. Name: `holzen-edges`. Copy the **HTTP endpoint URL** (`https://in.logs.betterstack.com`) → `LOG_DRAIN_URL`, and the **source token** → `LOG_DRAIN_TOKEN`. Store both in **Supabase Edge secrets**.
 
 ### 4.2 Slack integration
 
@@ -222,16 +226,17 @@ Mirror of the **Part A** table in [pg-cron-heartbeat-wiring.md](../backlog/pg-cr
 
 Override the base URL (e.g. to a non-BetterStack provider) via `heartbeat._base_url` in `app_config`.
 
-## 7. Anthropic + Lovable limit alerts
+## 7. Vendor budget alerts
 
 - Anthropic Console → Billing → **Budget alerts** at 50 / 80 / 100% → email to `alerts@<yourdomain>`.
-- Lovable dashboard → Billing / Limits → whatever hard caps Lovable exposes → email to `alerts@<yourdomain>`.
+- Google AI / OpenRouter dashboards → set spend alerts where available → email to `alerts@<yourdomain>`.
+- Supabase project → Settings → Billing → usage alerts → email to `alerts@<yourdomain>`.
 
 Neither vendor offers native Slack integration for billing. Route email → `alerts@...` → forward to Slack via your email client's rule or a Slack email address (`#holzen-alerts` → More → Open channel details → **Integrations → Send emails to this channel**).
 
 ## 8. Release tagging
 
-`VITE_APP_VERSION` (frontend) and `SENTRY_RELEASE` (edges) must match for cross-surface correlation. A CI step sets both from the same Git SHA.
+`VITE_APP_VERSION` (frontend, set in Vercel/CI) and `SENTRY_RELEASE` (edges, set via `npm run stamp:release` at deploy) must match for cross-surface correlation.
 
 - Frontend build: Vite `define` injects `__APP_VERSION__`; `src/lib/sentry.ts` uses it as the Sentry `release`; PostHog registers it as super-property `$app_version`.
 - Edge functions: `observe.ts` includes `release` in every forwarded log line; `supabase/functions/_shared/sentry.ts` uses `SENTRY_RELEASE` as Sentry `release`.
@@ -244,7 +249,7 @@ After setup, a single test flow must hit every surface. See smoke test in [incid
 
 ## 10. When to promote / reconsider
 
-- **Dashboard access to Supabase** (claim via Lovable) → promote to **native log drain**; retire the in-function HTTP forwarder. `observability-setup.md` stays; BetterStack alert rules stay.
+- **Dashboard access to Supabase** (owned project) → promote to **native log drain** when available; retire the in-function HTTP forwarder. `observability-setup.md` stays; BetterStack alert rules stay.
 - **Edge log volume > 5M lines / month** → add batching in `observe.ts` forwarder (§backlog item in the plan).
 - **Error volume > 5k / month (Sentry free tier)** → choose: upgrade Sentry plan, tighten `beforeSend` skip-list, or use Sentry sampling (`Sentry.init({ sampleRate: 0.5 })`).
 - **EU users become primary cohort** → switch PostHog region to EU and revisit consent (see [pii-masking-review.md](pii-masking-review.md)).

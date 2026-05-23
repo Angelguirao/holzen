@@ -1,8 +1,6 @@
 /**
- * Shared transactional email helper — Resend (preferred) or legacy Lovable Email API.
+ * Shared transactional email helper — Resend only.
  */
-import { sendLovableEmail as legacyLovableEmailApi } from "npm:@lovable.dev/email-js";
-
 /** Subset of payload fields we use across edge functions. */
 export interface TransactionalEmail {
   from: string;
@@ -29,10 +27,8 @@ const NOOP_LOGGER: EmailDeliveryLogger = {
 const DEFAULT_SENDER_DOMAIN = "notify.holzen.app";
 
 export interface SendOptions {
-  /** Override API key (Resend `re_*` or legacy `LOVABLE_API_KEY`). */
+  /** Override Resend API key (`re_*`). */
   apiKey?: string;
-  /** Optional legacy Lovable endpoint override (dev/testing). */
-  sendUrl?: string;
   /** Optional sender domain override; defaults to notify.holzen.app. */
   senderDomain?: string;
   /** Deduplicate retries of the same send. */
@@ -63,31 +59,22 @@ export interface BatchResult {
 }
 
 export class TransactionalEmailConfigurationError extends Error {
-  constructor(message = "RESEND_API_KEY or LOVABLE_API_KEY not configured") {
+  constructor(message = "RESEND_API_KEY not configured") {
     super(message);
     this.name = "TransactionalEmailConfigurationError";
   }
 }
 
-/** True when Resend or legacy Lovable email delivery is configured. */
+/** True when Resend email delivery is configured. */
 export function isTransactionalEmailConfigured(): boolean {
-  return Boolean(
-    Deno.env.get("RESEND_API_KEY")?.trim() ||
-      Deno.env.get("LOVABLE_API_KEY")?.trim(),
-  );
+  return Boolean(Deno.env.get("RESEND_API_KEY")?.trim());
 }
 
-type EmailBackend = "resend" | "legacy_lovable";
-
-function resolveEmailBackend(opts: SendOptions): { backend: EmailBackend; apiKey: string } {
+function resolveResendApiKey(opts: SendOptions): string {
   const resend = opts.apiKey?.startsWith("re_")
     ? opts.apiKey
     : Deno.env.get("RESEND_API_KEY")?.trim();
-  if (resend) return { backend: "resend", apiKey: resend };
-
-  const legacy = opts.apiKey ?? Deno.env.get("LOVABLE_API_KEY") ?? "";
-  if (legacy) return { backend: "legacy_lovable", apiKey: legacy };
-
+  if (resend) return resend;
   throw new TransactionalEmailConfigurationError();
 }
 
@@ -123,7 +110,6 @@ async function sendViaResend(
 
 function resolveSenderDomain(override?: string): string {
   return override ??
-    Deno.env.get("LOVABLE_SENDER_DOMAIN") ??
     Deno.env.get("EMAIL_SENDER_DOMAIN") ??
     DEFAULT_SENDER_DOMAIN;
 }
@@ -185,12 +171,11 @@ export async function sendTransactionalEmail(
   email: TransactionalEmail,
   opts: SendOptions = {},
 ): Promise<SendResult> {
-  const emailBackend = resolveEmailBackend(opts);
+  const apiKey = resolveResendApiKey(opts);
   const logger = opts.logger ?? NOOP_LOGGER;
   const source = opts.source ?? "transactional-email";
   const maxRetries = opts.maxRetries ?? 3;
   const baseDelayMs = opts.baseDelayMs ?? 500;
-  const senderDomain = email.sender_domain ?? resolveSenderDomain(opts.senderDomain);
   const to = Array.isArray(email.to) ? email.to[0] : email.to;
   const plainText =
     email.text && email.text.trim().length > 0
@@ -200,38 +185,12 @@ export async function sendTransactionalEmail(
   let status = 0;
   let lastError: string | undefined;
   const start = Date.now();
-  const depName = emailBackend.backend === "resend" ? "resend-email" : "legacy-lovable-email";
+  const depName = "resend-email";
 
   for (let i = 0; i <= maxRetries; i++) {
     attempts = i + 1;
     try {
-      if (emailBackend.backend === "resend") {
-        const res = await sendViaResend(email, emailBackend.apiKey, to, plainText);
-        logger.log("dependency_call", {
-          dep: depName,
-          status: "ok",
-          operation: "emails.send",
-          source,
-          duration_ms: Date.now() - start,
-          attempts,
-        });
-        return { ok: true, id: res?.message_id, status: 200, attempts };
-      }
-
-      const res = await legacyLovableEmailApi(
-        {
-          to,
-          from: email.from,
-          sender_domain: senderDomain,
-          subject: email.subject,
-          html: email.html,
-          text: plainText,
-          purpose: email.purpose ?? "transactional",
-          label: email.label ?? source,
-          idempotency_key: opts.idempotencyKey,
-        },
-        { apiKey: emailBackend.apiKey, sendUrl: opts.sendUrl },
-      );
+      const res = await sendViaResend(email, apiKey, to, plainText);
       logger.log("dependency_call", {
         dep: depName,
         status: "ok",

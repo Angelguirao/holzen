@@ -91,7 +91,7 @@ async function sendRewardEmail(
   referralCount: number,
   referrerId: string,
 ) {
-  if (!Deno.env.get("RESEND_API_KEY") && !Deno.env.get("LOVABLE_API_KEY")) {
+  if (!Deno.env.get("RESEND_API_KEY")?.trim()) {
     referralStep(log, "No email API key set, skipping reward email");
     return;
   }

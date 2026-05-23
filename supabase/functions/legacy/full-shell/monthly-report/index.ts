@@ -7,11 +7,15 @@ import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts"
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
   holzenTransactionalEmailLogger,
+  isTransactionalEmailConfigured,
   sendTransactionalEmailBatch,
   type TransactionalEmail,
 } from "../../../_shared/transactional-email.ts";
-
-const REPORT_MODEL = "google/gemini-2.5-flash-lite";
+import {
+  llmChatCompletionsWithFallback,
+  llmLogProvider,
+  resolveModelsForTask,
+} from "../../../_shared/llm-gateway.ts";
 
 /** Subset of `profiles` selected for the monthly report loop. */
 interface MonthlyReportProfile {
@@ -116,16 +120,13 @@ serve(
       { auth: { persistSession: false } }
     );
 
-    const LOVABLE_EMAIL_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_EMAIL_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    if (!isTransactionalEmailConfigured()) throw new Error("RESEND_API_KEY not configured");
 
-    let LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    let aiInsightEnabled = true;
 
-    // Feature flag + global budget guard. On block, we still send the email
-    // summary but drop the AI paragraph.
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
     const reportsAiGuard = await guardAiFeature(supabase, "reports", {
-      providers: ["lovable"],
+      providers: ["google"],
     });
     if (!reportsAiGuard.allowed) {
       log("monthly_report_phase", {
@@ -133,7 +134,7 @@ serve(
         phase: "ai_summary_skipped",
         reason: reportsAiGuard.reason,
       });
-      LOVABLE_API_KEY = undefined;
+      aiInsightEnabled = false;
     }
 
     // Only run on the 1st of the month
@@ -217,9 +218,10 @@ serve(
 
       // AI monthly insight
       let aiInsight = "";
-      if (LOVABLE_API_KEY && pauseCount > 0) {
+      if (aiInsightEnabled && pauseCount > 0) {
         const logAttempt = createAttemptLogger(supabase, { userId: profile.user_id });
         const t0 = Date.now();
+        const model = resolveModelsForTask("cron_digest")[0];
         try {
           const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
           const langCode = profile.language || "en";
@@ -234,27 +236,18 @@ serve(
 - Top tags: ${topTags.map(([t, c]) => `${t}(${c})`).join(", ") || "none"}
 Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
 
-          const aiRes = await fetch(
-            "https://ai.gateway.lovable.dev/v1/chat/completions",
-            fetchInitWithIncomingTrace(req, {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${LOVABLE_API_KEY}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                model: REPORT_MODEL,
-                messages: [{ role: "user", content: prompt }],
-              }),
-            }),
-          );
+          const { response, creds } = await llmChatCompletionsWithFallback({
+            model,
+            body: { messages: [{ role: "user", content: prompt }] },
+            incomingRequest: req,
+          });
 
-          if (aiRes.ok) {
-            const aiData = await aiRes.json();
+          if (response.ok) {
+            const aiData = await response.json();
             logAttempt({
               companion_type: "reports",
-              provider: "lovable",
-              model: REPORT_MODEL,
+              provider: llmLogProvider(creds),
+              model,
               status: "success",
               latency_ms: Date.now() - t0,
               input_tokens: aiData?.usage?.prompt_tokens,
@@ -267,11 +260,11 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
           } else {
             logAttempt({
               companion_type: "reports",
-              provider: "lovable",
-              model: REPORT_MODEL,
+              provider: llmLogProvider(creds),
+              model,
               status: "error",
               latency_ms: Date.now() - t0,
-              error_message: `HTTP ${aiRes.status}`,
+              error_message: `HTTP ${response.status}`,
             });
           }
         } catch (e) {
@@ -282,8 +275,8 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
           });
           logAttempt({
             companion_type: "reports",
-            provider: "lovable",
-            model: REPORT_MODEL,
+            provider: "google",
+            model,
             status: "error",
             latency_ms: Date.now() - t0,
             error_message: e instanceof Error ? e.message : String(e),
@@ -372,21 +365,20 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
     // duplicates in Lovable Email.
     const idempotencyMonth = now.toISOString().slice(0, 7);
     const batch = await sendTransactionalEmailBatch(queued, {
-      apiKey: LOVABLE_EMAIL_API_KEY,
       source: "monthly-report",
       idempotencyKey: `monthly-report:${idempotencyMonth}`,
       logger: holzenTransactionalEmailLogger(
         (m, d) =>
-          log("lovable_email_dep", {
+          log("transactional_email_dep", {
             holzen_event: "monthly_report_cron",
-            phase: "lovable_email",
+            phase: "transactional_email",
             message: m,
             ...(d ?? {}),
           }),
         (m, data) =>
-          log.error("lovable_email_dep", {
+          log.error("transactional_email_dep", {
             holzen_event: "monthly_report_cron",
-            phase: "lovable_email_error",
+            phase: "transactional_email_error",
             message: m,
             ...(data ?? {}),
           }),

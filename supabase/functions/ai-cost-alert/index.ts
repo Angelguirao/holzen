@@ -411,7 +411,7 @@ serve(
         holzen_event: "ai_cost_alert_cron",
         phase: "email_api_key_missing",
       });
-      return new Response(JSON.stringify({ error: "RESEND_API_KEY or LOVABLE_API_KEY not configured" }), {
+      return new Response(JSON.stringify({ error: "RESEND_API_KEY not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

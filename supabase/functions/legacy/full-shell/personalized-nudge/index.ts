@@ -6,6 +6,7 @@ import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts"
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
   holzenTransactionalEmailLogger,
+  isTransactionalEmailConfigured,
   sendTransactionalEmailBatch,
   type TransactionalEmail,
 } from "../../../_shared/transactional-email.ts";
@@ -50,8 +51,7 @@ serve(
       { auth: { persistSession: false } }
     );
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    if (!isTransactionalEmailConfigured()) throw new Error("RESEND_API_KEY not configured");
 
     // 1. Check current BTC volatility
     const res = await fetch(
@@ -223,21 +223,20 @@ serve(
     // 24h, Lovable dedupes messages and users never get duplicate nudges.
     const dateKey = new Date().toISOString().slice(0, 10);
     const batch = await sendTransactionalEmailBatch(queued, {
-      apiKey: LOVABLE_API_KEY,
       source: "personalized-nudge",
       idempotencyKey: `personalized-nudge:${dateKey}:${runDirection}`,
       logger: holzenTransactionalEmailLogger(
         (m, d) =>
-          log("lovable_email_dep", {
+          log("transactional_email_dep", {
             holzen_event: "personalized_nudge_cron",
-            phase: "lovable_email",
+            phase: "transactional_email",
             message: m,
             ...(d ?? {}),
           }),
         (m, data) =>
-          log.error("lovable_email_dep", {
+          log.error("transactional_email_dep", {
             holzen_event: "personalized_nudge_cron",
-            phase: "lovable_email_error",
+            phase: "transactional_email_error",
             message: m,
             ...(data ?? {}),
           }),
