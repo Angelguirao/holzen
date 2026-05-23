@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest';
+import type { BtcPriceData } from '@/features/market/public';
 import { buildManualPauseOpenParams } from './build-manual-pause-open-params';
 
-const baseMarket = {
+const baseMarket: BtcPriceData = {
+  coinId: 'bitcoin',
+  currentPrice: 100000,
+  price24hAgo: 106000,
+  direction: 'down',
+  currency: 'USD',
   changePercent: -6,
   cumulativeChangePercent: -8,
-  fearGreed: { label: 'Fear' as const },
+  fearGreed: { value: 25, label: 'Fear' },
   onChain: {
     mempoolSize: 100,
     fastestFee: 20,

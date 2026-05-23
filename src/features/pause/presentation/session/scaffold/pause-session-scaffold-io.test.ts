@@ -73,7 +73,7 @@ describe('pause-session-scaffold-io', () => {
     const derived = buildPauseSessionScaffoldRitualDerived({
       ritualEntry: 'deep',
       step: 'reflect',
-      t: (key: string) => key,
+      t: ((key: string) => key) as unknown as import('i18next').TFunction,
     });
 
     expect(derived.macroProgressLine).toBeDefined();

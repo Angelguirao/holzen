@@ -73,7 +73,7 @@ describe('pause-reflect-generation-io', () => {
       severityAbsPct: 50,
       profile: { display_name: 'Test' },
       signal: new AbortController().signal,
-    };
+    } as unknown as Parameters<typeof pauseReflectGeneration>[0];
 
     await pauseReflectGeneration(input);
 
@@ -81,7 +81,7 @@ describe('pause-reflect-generation-io', () => {
   });
 
   it('accepts an injected ReflectGenerator', async () => {
-    const customGenerator = { port: 'custom' } as typeof reflectGenerator;
+    const customGenerator = { port: 'custom' } as unknown as typeof reflectGenerator;
     runReflectGenerationMock.mockResolvedValue({ status: 'cached', message: 'cached' });
 
     const input = {
@@ -92,7 +92,7 @@ describe('pause-reflect-generation-io', () => {
       severityAbsPct: 10,
       profile: {},
       signal: new AbortController().signal,
-    };
+    } as unknown as Parameters<typeof pauseReflectGeneration>[0];
 
     await pauseReflectGeneration(input, customGenerator);
 

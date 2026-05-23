@@ -60,10 +60,6 @@ import {
   resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
-  buildPauseSessionStepRitualBundle,
-  buildPauseSessionStepShellBundle,
-} from '@/features/pause/presentation/session/pause-session-step-handlers-io';
-import {
   pauseReflectFavoriteToggle,
   pauseReflectFavoriteToggleWithRepository,
   pauseReflectNoteUpdate,
