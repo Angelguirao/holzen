@@ -20,10 +20,12 @@ const TABLE: Record<PauseArchiveSegment, 'v_pause_archive_pauses' | 'v_pause_arc
   echoes: 'v_pause_archive_echoes',
 };
 
-export {
+import {
   PAUSE_ARCHIVE_LIST_QUERY_PREFIX,
   pauseArchiveListQueryPrefix,
 } from './archive-query-keys';
+
+export { PAUSE_ARCHIVE_LIST_QUERY_PREFIX, pauseArchiveListQueryPrefix };
 
 export function pauseArchiveInfiniteQueryKey(
   userId: string,

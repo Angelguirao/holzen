@@ -6,14 +6,13 @@ import {
 } from '@/features/pause/domain/companion/companion-slot-favorites-metadata';
 
 /** Toggle one companion slot favorite on `pause_instances.metadata` (RLS on instance row). */
-export async function toggleCompanionSlotFavoriteOnInstance(
-  pauseInstanceId: string,
-  sourceType: string,
-  options?: {
-    /** Called with the new bucket before the persist write (optimistic UI). */
-    onBucketComputed?: (bucket: Record<string, boolean>) => void;
-  },
-): Promise<boolean> {
+export async function toggleCompanionSlotFavoriteOnInstance(params: {
+  pauseInstanceId: string;
+  sourceType: string;
+  /** Called with the new bucket before the persist write (optimistic UI). */
+  onBucketComputed?: (bucket: Record<string, boolean>) => void;
+}): Promise<boolean> {
+  const { pauseInstanceId, sourceType, onBucketComputed } = params;
   const { data: row, error: fetchErr } = await supabase
     .from('pause_instances')
     .select('metadata')
@@ -24,7 +23,7 @@ export async function toggleCompanionSlotFavoriteOnInstance(
   const meta = { ...((row.metadata as Record<string, unknown>) ?? {}) };
   const bucket = computeCompanionSlotFavoriteToggle(meta, sourceType);
   meta[COMPANION_SLOT_FAVORITES_METADATA_KEY] = bucket;
-  options?.onBucketComputed?.(bucket);
+  onBucketComputed?.(bucket);
 
   await supabase
     .from('pause_instances')
