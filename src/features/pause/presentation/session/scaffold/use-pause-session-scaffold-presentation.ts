@@ -11,7 +11,7 @@ import { usePauseSessionStepTransition } from '../use-pause-session-step-transit
 
 export type UsePauseSessionScaffoldPresentationParams = Omit<
   PauseSessionScaffoldRitualPayloadsParams,
-  'prefersReducedMotion'
+  'prefersReducedMotion' | 'stepTransition'
 > & {
   t: TFunction;
   btcData: BtcPriceData | null;
