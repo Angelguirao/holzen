@@ -118,5 +118,5 @@ Track backlog: [artifacts/architecture-migration/README.md](../artifacts/archite
 |-----|------|
 | [frontend-module-layout.md](frontend-module-layout.md) | Waves, CI, monorepo north star |
 | [naming-conventions-holzen.md](naming-conventions-holzen.md) | File and export names |
-| [implementation-notes-workflow.md](implementation-notes-workflow.md) | Running log during migration |
+| [implementation-notes-workflow.md](implementation-notes-workflow.md) | Shared running log during non-trivial client work |
 | [.cursor/rules/architecture-migration.mdc](../../.cursor/rules/architecture-migration.mdc) | Agent session workflow |

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Holzen — client implementation notes</title>
+  <style>
+    :root { --muted: #64748b; --border: #e2e8f0; --accent: #0f766e; --surface: #f8fafc; }
+    body { font-family: system-ui, sans-serif; line-height: 1.55; max-width: 52rem; margin: 2rem auto; padding: 0 1.25rem; color: #0f172a; }
+    h1 { font-size: 1.5rem; font-weight: 600; }
+    .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+    .meta a { color: var(--accent); }
+    h2 { font-size: 1.1rem; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35rem; }
+    h3.initiative { font-size: 1rem; margin: 2rem 0 0.75rem; color: #334155; }
+    .guide, .phase-status { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; }
+    .guide ul, .phase-status ul { margin: 0.5rem 0 0; padding-left: 1.25rem; }
+    .phase-status table, .initiatives-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 0.5rem; }
+    .phase-status th, .phase-status td, .initiatives-table th, .initiatives-table td { text-align: left; padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .phase-status th, .initiatives-table th { font-weight: 600; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.02em; }
+    article.note { border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; }
+    article.note header { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.75rem; align-items: center; }
+    article.note .initiative-tag { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; padding: 0.15rem 0.45rem; border-radius: 4px; background: #ecfdf5; color: #0f766e; border: 1px solid #99f6e4; }
+    article.note .status { font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
+    article.note .status.open { color: #b45309; }
+    article.note .status.resolved { color: #15803d; }
+    article.note .status.wont-fix { color: var(--muted); }
+    article.note h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+    article.note dl { margin: 0; }
+    article.note dt { font-weight: 600; margin-top: 0.65rem; font-size: 0.85rem; }
+    article.note dd { margin: 0.15rem 0 0 0; }
+    .toc > ul { padding-left: 1.25rem; }
+    .toc .notes-index { font-size: 0.9rem; color: var(--muted); margin-top: 0.35rem; }
+    .toc .notes-index ul { padding-left: 1.25rem; margin: 0.25rem 0 0; }
+    .empty-initiative { color: var(--muted); font-size: 0.9rem; font-style: italic; margin: 0.5rem 0 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Client implementation notes</h1>
+  <p class="meta">
+    <strong>Scope:</strong> active <code>src/</code> client work — any initiative where specs are ambiguous or transitional<br />
+    <strong>Artifact README:</strong> <a href="README.md">client-implementation/README.md</a><br />
+    <strong>Workflow:</strong> <a href="../../fundamentals/implementation-notes-workflow.md">implementation-notes-workflow.md</a><br />
+    <strong>Not for:</strong> one-line fixes, routine renames, per-commit slice journals (use git + PR description)
+  </p>
+
+  <nav class="toc">
+    <h2>Contents</h2>
+    <ul>
+      <li><a href="#how-to-use">How to use this log</a></li>
+      <li><a href="#active-initiatives">Active initiatives</a></li>
+      <li>
+        <a href="#notes">Running notes</a>
+        <div class="notes-index">
+          <ul>
+            <li><a href="#initiative-architecture-migration">Architecture migration</a></li>
+            <li><a href="#initiative-platform-exit">Platform exit</a></li>
+            <li><a href="#initiative-general">General / cross-cutting</a></li>
+          </ul>
+        </div>
+      </li>
+    </ul>
+  </nav>
+
+  <h2 id="how-to-use">How to use this log</h2>
+  <div class="guide">
+    <p>Single append-only audit trail for <strong>interpretation</strong> across initiatives — when owner docs, tickets, or ADRs do not spell out what to build.</p>
+    <ul>
+      <li><strong>Append</strong> an <code>&lt;article class="note"&gt;</code> when work involves ambiguity, intentional spec deviation, a tradeoff reviewers should see, or an unresolved question.</li>
+      <li><strong>Tag</strong> every note with an <strong>initiative</strong> (see Active initiatives). Put notes under the matching <code>&lt;h3 id="initiative-…"&gt;</code> section.</li>
+      <li><strong>Skip</strong> routine implementation, test-only CI pins, merge cleanup, and behavior-unchanged renames.</li>
+      <li><strong>One note per decision</strong>, not one note per commit.</li>
+      <li>Record <strong>date</strong>, <strong>slice title</strong>, <strong>spec / ticket ref</strong>, and <strong>status</strong> (<code>open</code> | <code>resolved</code> | <code>wont-fix</code>).</li>
+      <li>When resolved, add a <strong>Resolution</strong> under the same note — do not delete the original.</li>
+      <li>Update this page’s <strong>Contents</strong> note index when adding a note with a new anchor id.</li>
+      <li>Permanent target changes → update the <strong>owner spec</strong> in the same PR.</li>
+    </ul>
+    <p>Initiative backlogs live in linked READMEs (e.g. <a href="../architecture-migration/README.md">architecture-migration</a>); this file holds <em>decisions</em>, not task lists.</p>
+  </div>
+
+  <h2 id="active-initiatives">Active initiatives</h2>
+  <div>
+    <table class="initiatives-table">
+      <thead>
+        <tr><th>Initiative</th><th>Owner spec / doc</th><th>Backlog</th><th>Notes section</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>architecture-migration</code></td>
+          <td><a href="../../fundamentals/holzen-application-architecture.md">holzen-application-architecture.md</a>, <a href="../../systems/pause-client-architecture.md">pause-client-architecture.md</a></td>
+          <td><a href="../architecture-migration/README.md">architecture-migration/README.md</a></td>
+          <td><a href="#initiative-architecture-migration">#initiative-architecture-migration</a></td>
+        </tr>
+        <tr>
+          <td><code>platform-exit</code></td>
+          <td><a href="../../ops/lovable-staging-and-platform-exit.md">lovable-staging-and-platform-exit.md</a></td>
+          <td>Same doc + deployment guide</td>
+          <td><a href="#initiative-platform-exit">#initiative-platform-exit</a></td>
+        </tr>
+        <tr>
+          <td><code>general</code></td>
+          <td><a href="../../README.md">docs/README.md</a> canonical table</td>
+          <td>—</td>
+          <td><a href="#initiative-general">#initiative-general</a></td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.9rem;color:var(--muted);margin-top:0.75rem;">Add a row + <code>h3</code> section when a new multi-slice epic starts. Remove from Active when the epic closes (keep historical notes).</p>
+  </div>
+
+  <h2 id="notes">Running notes</h2>
+  <p>Newest entries first within each initiative. Copy the template at the bottom when adding a note.</p>
+
+  <h3 class="initiative" id="initiative-architecture-migration">Architecture migration</h3>
+  <p>Align active <code>src/</code> with bounded-context architecture; pause = reference impl; pause-first per slice tier. <a href="../architecture-migration/README.md">Backlog</a>.</p>
+
+  <div class="phase-status">
+    <p><strong>Agreed baseline</strong> (interpretation target — not deviations):</p>
+    <ul>
+      <li>North star: all active <code>src/</code> aligns with P1–P9 and shared module skeleton (pause §9).</li>
+      <li>Scheduling: finish pause at each slice tier before the same tier elsewhere.</li>
+      <li>Ritual layout: <code>ritual/reflect/</code>, <code>ritual/frame/</code>; companions in <code>features/pause</code>.</li>
+      <li>UI: JSX in <code>screens/</code>; hooks in <code>features/&lt;ctx&gt;/presentation/</code>.</li>
+      <li>Collections tab → legacy; <code>companion_catalog</code> + slot favorites stay shipped.</li>
+    </ul>
+    <table>
+      <thead><tr><th>Phase</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>0 — Client-architecture docs</td><td>Complete</td></tr>
+        <tr><td>A — Pause convergence</td><td>Core backlog complete (May 2026); Tier 1 shims + presentation hygiene ongoing</td></tr>
+        <tr><td>B — Cross-context</td><td>Not started (pause-first gate)</td></tr>
+        <tr><td>C — Repo-wide presentation</td><td>In progress alongside A</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <article class="note" id="note-phase-a-complete">
+    <header>
+      <span class="initiative-tag">architecture-migration</span>
+      <span>2026-05-23</span>
+      <span>Phase A — pause backlog</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Phase A pause convergence — core backlog complete</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Ritual folder moves, Collections strip, <code>public*</code> peel, <code>PauseRepository</code> for RPC/analytics_events I/O, archive query grouping — incremental (leaf-first), not big-bang.</dd>
+      <dt>Deviation</dt>
+      <dd>None intentional — converges toward <a href="../../systems/pause-client-architecture.md">pause-client-architecture.md</a> §3–§8.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Many small commits vs one rewrite — picked incremental for review and merge safety.</dd>
+      <dt>Resolution</dt>
+      <dd><a href="../architecture-migration/README.md">README</a> backlog marked complete May 2026. Remaining work: Tier 1 shims, presentation splits, CI flow anchors.</dd>
+    </dl>
+  </article>
+
+  <article class="note" id="note-telemetry-boundary">
+    <header>
+      <span class="initiative-tag">architecture-migration</span>
+      <span>2026-05-22</span>
+      <span>pause-client-architecture §5, §8</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>PostHog product telemetry vs <code>PauseRepository</code></h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>RPC + <code>analytics_events</code> via <code>PauseRepository</code>; PostHog product telemetry in application modules / adapters (e.g. <code>pause-product-analytics</code>) — not <code>PauseAnalyticsRepository</code>.</dd>
+      <dt>Deviation</dt>
+      <dd>None.</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Single analytics port vs split boundaries — picked split (server truth vs client projection).</dd>
+      <dt>Resolution</dt>
+      <dd>Documented in architecture-migration README (May 2026).</dd>
+    </dl>
+  </article>
+
+  <article class="note" id="note-public-barrel">
+    <header>
+      <span class="initiative-tag">architecture-migration</span>
+      <span>2026-05-20</span>
+      <span>pause-client-architecture §6</span>
+      <span class="status open">open</span>
+    </header>
+    <h3><code>public.ts</code> barrel convergence</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Peel to <code>public-queries</code> / <code>public-rpc</code> / <code>public-hooks</code> per slice; soft target until stable.</dd>
+      <dt>Open questions</dt>
+      <dd>Add <code>check:public-barrel-size</code> when pause + Phase B barrels stabilize?</dd>
+    </dl>
+  </article>
+
+  <article class="note" id="note-collections-strip">
+    <header>
+      <span class="initiative-tag">architecture-migration</span>
+      <span>2026-05-20</span>
+      <span>pause-client-architecture §7</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Collections MVP scope</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>Spec-first in <code>active-surface.md</code>, then strip Collections UI to legacy.</dd>
+      <dt>Resolution</dt>
+      <dd>Strip complete. Open: Tier B status for <code>collections</code> / <code>collection_items</code> tables?</dd>
+    </dl>
+  </article>
+
+  <article class="note" id="note-scope-vs-scheduling">
+    <header>
+      <span class="initiative-tag">architecture-migration</span>
+      <span>2026-05-20</span>
+      <span>holzen-application-architecture</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Initiative scope vs pause-first scheduling</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>North star = all active <code>src/</code>; scheduling = pause-first per tier. Pause is reference impl, not the only domain.</dd>
+      <dt>Resolution</dt>
+      <dd>Captured in architecture-migration README and agent rule.</dd>
+    </dl>
+  </article>
+
+  <article class="note" id="note-incremental-migration">
+    <header>
+      <span class="initiative-tag">architecture-migration</span>
+      <span>2026-05-20</span>
+      <span>pause-client-architecture §3, §10</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Incremental folder migration (leaf-first)</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd><code>ritual/reflect|frame/</code> target; move legacy paths slice-by-slice, smallest leaves first.</dd>
+      <dt>Resolution</dt>
+      <dd>Phase A folder moves complete (May 2026).</dd>
+      <dt>Open questions</dt>
+      <dd>CI guard against new files outside <code>ritual/</code> under pause application?</dd>
+    </dl>
+  </article>
+
+  <h3 class="initiative" id="initiative-platform-exit">Platform exit</h3>
+  <p class="empty-initiative">No decision-level notes yet. Log ambiguous choices for Lovable staging, auth email, Resend webhooks, CI hybrid paths, etc. Owner: <a href="../../ops/lovable-staging-and-platform-exit.md">lovable-staging-and-platform-exit.md</a>.</p>
+
+  <h3 class="initiative" id="initiative-general">General / cross-cutting</h3>
+  <p class="empty-initiative">Feature epics, auth UX, settings flows, and other work that does not fit a named initiative — use initiative tag <code>general</code> and link the owner doc from the AGENTS change map.</p>
+
+  <!--
+  ── Template: copy above the closing comment; newest first within initiative ──
+  Update Contents → Running notes if adding a new anchor id.
+
+  <article class="note" id="note-your-slug">
+    <header>
+      <span class="initiative-tag">general</span>   <!-- or architecture-migration | platform-exit -->
+      <span>YYYY-MM-DD</span>
+      <span>Slice title · spec § or ticket</span>
+      <span class="status open">open</span>
+    </header>
+    <h3>Short decision title</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>What you chose and why (link spec).</dd>
+      <dt>Deviation</dt>
+      <dd>Intentional departure, or "None".</dd>
+      <dt>Tradeoffs</dt>
+      <dd>Alternatives considered.</dd>
+      <dt>Open questions</dt>
+      <dd>Needs confirmation before changing spec.</dd>
+    </dl>
+  </article>
+  -->
+</body>
+</html>

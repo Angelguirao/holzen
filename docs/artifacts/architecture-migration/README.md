@@ -45,10 +45,10 @@ Index + full-`src` rings: [client-architecture-overview.md](../../fundamentals/c
 
 ## Running log
 
-[implementation-notes.html](./implementation-notes.html) — design decisions, deviations, tradeoffs, open questions (decision-level entries; not a per-commit journal).
+**Canonical:** [client-implementation/implementation-notes.html](../client-implementation/implementation-notes.html) — tag notes `architecture-migration`; section [#initiative-architecture-migration](../client-implementation/implementation-notes.html#initiative-architecture-migration).
 
 Workflow: [implementation-notes-workflow.md](../../fundamentals/implementation-notes-workflow.md). Agent rule: [.cursor/rules/architecture-migration.mdc](../../../.cursor/rules/architecture-migration.mdc).
 
-**Archive (May 2026 reset):** prior slice-by-slice log (~1k+ entries) lives in git at `66d3ad703170` — `docs/artifacts/architecture-migration/implementation-notes.html` before reset.
+**Archive (May 2026 reset):** prior per-commit slice log (~1k+ entries) — git at `66d3ad703170` (`architecture-migration/implementation-notes.html` before reset).
 
 **Doc reconciliation (May 2026):** through eleventh-pass. **Tenth-pass:** `useHolzen` producer paths, Phase B learning path, archive query filenames. **Eleventh-pass (pre–Phase A code):** navigating §12 edge call sites (auth/public-rpc, legacy full-IA rows); refactoring-strategy + modern-react + hook-splitting backlog aligned with shipped `useHolzen` split; codebase-size auth path; observability auth row. **Shipped routes/tabs:** always [active-surface.md](../../ops/active-surface.md) over [information-architecture.md](../../design/information-architecture.md) §1–§3.

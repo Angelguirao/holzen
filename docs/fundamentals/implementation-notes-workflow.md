@@ -1,10 +1,12 @@
 # Implementation notes workflow
 
 **Status:** accepted (May 2026)  
-**Audience:** humans and agents implementing non-trivial specs (architecture migrations, feature slices, cross-cutting refactors)  
-**Pairs with:** [documentation-strategy.md](documentation-strategy.md), [pause-client-architecture.md](../systems/pause-client-architecture.md), [.cursor/rules/architecture-migration.mdc](../../.cursor/rules/architecture-migration.mdc)
+**Audience:** humans and agents implementing non-trivial client work (architecture migrations, feature epics, platform exit, cross-cutting refactors)  
+**Pairs with:** [documentation-strategy.md](documentation-strategy.md), [client-implementation/README.md](../artifacts/client-implementation/README.md)
 
-When implementing a **spec** (architecture target doc, ADR, or scoped ticket), maintain a **running implementation notes** file alongside the work. It is the audit trail for **interpretation**, not a second spec.
+When implementing a **spec** (owner doc, ADR, or scoped ticket), maintain the **shared** implementation notes file alongside the work. It is the audit trail for **interpretation**, not a second spec and not a commit journal.
+
+**Canonical log:** [docs/artifacts/client-implementation/implementation-notes.html](../artifacts/client-implementation/implementation-notes.html)
 
 ---
 
@@ -12,30 +14,39 @@ When implementing a **spec** (architecture target doc, ADR, or scoped ticket), m
 
 | Use implementation notes | Skip |
 |--------------------------|------|
-| Multi-commit migration (`cursor/arch-migrate-src-ca70`) | One-line typo fix |
+| Multi-commit epic (migration, platform exit, large feature) | One-line typo fix |
 | Spec says “target” but tree is transitional | Pure doc typo |
 | Ambiguity requires a choice reviewers should see | Behavior unchanged rename |
-| Intentional deviation from spec | |
+| Intentional deviation from spec | Routine implementation of an already-recorded decision |
+| Cross-cutting pattern choice (auth actions, hook placement, analytics boundary) | Test-only CI parity pins, merge-conflict cleanup |
 
-**One notes file per initiative** (branch or epic), not per commit. Append as you work; do not rewrite history unless correcting errors.
+**One shared log** for active client work; **tag each note with an initiative** (`architecture-migration`, `platform-exit`, `general`, or a new slug). Append as you work; do not rewrite history unless correcting errors.
 
-**Do not log:** routine file moves that follow an already-recorded decision, test-only CI parity pins, merge-conflict cleanup, or behavior-unchanged renames — git history and PR descriptions are enough. One `<article class="note">` per **interpretation**, not per commit.
+**Do not log:** one note per commit. One `<article class="note">` per **interpretation** worth a reviewer seeing.
 
 ---
 
 ## 2. Where files live
 
 ```text
+docs/artifacts/client-implementation/
+  implementation-notes.html    # canonical shared log (all initiatives)
+  README.md                    # index + initiative links
+
 docs/artifacts/<initiative-slug>/
-  implementation-notes.html    # human-readable running log (canonical for agents)
-  README.md                    # one line: what initiative, link to spec
+  README.md                    # optional: backlog, phases, link to log anchor
+  implementation-notes.html    # optional redirect only — prefer shared log
 ```
 
-| Initiative | Path | Spec (owner) |
-|------------|------|--------------|
-| Client architecture migration | [docs/artifacts/architecture-migration/](../artifacts/architecture-migration/) | [pause-client-architecture.md](../systems/pause-client-architecture.md) (reference impl + §9 template) + [holzen-application-architecture.md](holzen-application-architecture.md) (full `src/` north star) |
+| Initiative | Backlog README | Log section | Owner spec |
+|------------|----------------|-------------|------------|
+| Architecture migration | [architecture-migration/](../artifacts/architecture-migration/) | `#initiative-architecture-migration` | [holzen-application-architecture.md](holzen-application-architecture.md), [pause-client-architecture.md](../systems/pause-client-architecture.md) |
+| Platform exit | [lovable-staging-and-platform-exit.md](../ops/lovable-staging-and-platform-exit.md) | `#initiative-platform-exit` | Same |
+| Other / feature epic | Ticket or owner doc | `#initiative-general` or new `h3` section | [docs/README.md](../README.md) canonical table |
 
-Commit the notes file **in the same PR** as the code when you add a decision, deviation, tradeoff, or open question. Empty sections are fine until something worth recording appears.
+When a new multi-slice epic starts: add a row to **Active initiatives** in the HTML, add an `<h3 id="initiative-…">` section, and optionally create `docs/artifacts/<slug>/README.md` for backlog only.
+
+Commit note updates **in the same PR** as the code when you add a decision, deviation, tradeoff, or open question.
 
 ---
 
@@ -45,12 +56,13 @@ Every note is one `<article class="note">` with:
 
 | Section | Content |
 |---------|---------|
+| **Initiative tag** | `<span class="initiative-tag">…</span>` in header |
 | **Design decisions** | Spec was ambiguous; what you chose and why |
 | **Deviations** | Intentional departure from spec (with spec section ref) |
 | **Tradeoffs** | Alternatives considered; why the picked option |
 | **Open questions** | Needs product/architect confirmation before changing spec |
 
-Also record: **date**, **commit or slice title**, **spec section** (link or §), **status** (`open` | `resolved` | `wont-fix`).
+Also record: **date**, **slice title**, **spec / ticket ref**, **status** (`open` | `resolved` | `wont-fix`).
 
 When a question is resolved, add a **Resolution** paragraph under the same note — do not delete the original.
 
@@ -59,36 +71,37 @@ When a question is resolved, add a **Resolution** paragraph under the same note 
 ## 4. Agent workflow (“Implement &lt;SPEC&gt;”)
 
 1. **Read spec** — owner doc from [docs/README.md](../README.md) canonical table or AGENTS change map.
-2. **Open or create** `docs/artifacts/<initiative>/implementation-notes.html`.
-3. **Before each slice:** skim spec + notes for open questions that block the slice.
-4. **After each slice** (same commit or immediate follow-up commit): append notes if any of the four categories applied; otherwise no entry needed.
-5. **If deviation is permanent:** update the **owner spec** in a follow-up commit when agreed — notes are the staging area, not a substitute for fixing drift in canonical docs.
+2. **Open** [client-implementation/implementation-notes.html](../artifacts/client-implementation/implementation-notes.html) — Ongoing open questions.
+3. **Before each slice:** skim spec + notes for blockers.
+4. **After each slice** (when warranted): append a tagged note under the right initiative section; update Contents index if new anchor id.
+5. **If deviation is permanent:** update the **owner spec** in a follow-up commit when agreed — notes are the staging area.
 
-Prompt pattern for Cursor / Cloud Agent:
+Prompt pattern:
 
 ```text
-Implement <SPEC>. Maintain docs/artifacts/<initiative>/implementation-notes.html
-with design decisions, deviations, tradeoffs, and open questions as you work.
-Follow architecture-migration.mdc and the spec owner doc.
+Implement <SPEC>. When specs are ambiguous, append to
+docs/artifacts/client-implementation/implementation-notes.html
+(tag initiative, record decisions/deviations/tradeoffs/open questions).
+Follow task-entry-workflow and the spec owner doc.
 ```
 
 ---
 
-## 5. Keeping architecture aligned (enforcement ladder)
+## 5. Enforcement ladder (client work)
 
-Architecture is enforced in **layers** — notes complement automation; they do not replace it.
+Notes complement automation; they do not replace it.
 
 | Layer | Mechanism | Catches |
 |-------|-----------|---------|
-| **1. Spec** | Owner docs (`pause-client-architecture.md`, `pause-system.md`, `active-surface.md`) | Wrong mental model |
-| **2. Agent rules** | `.cursor/rules/architecture-migration.mdc`, `change-context.mdc` | Session drift before edit |
-| **3. Implementation notes** | `implementation-notes.html` | Ambiguity, intentional deviation, unresolved questions |
-| **4. CI / scripts** | `check:feature-imports`, `check:architecture-alignment`, `check:active-surface`, `check:no-root-components` | Deep imports, legacy, wrong layers |
+| **1. Spec** | Owner docs (`pause-client-architecture.md`, system docs, `active-surface.md`) | Wrong mental model |
+| **2. Agent rules** | `task-entry-workflow.mdc`, `change-context.mdc`, context-specific rules | Session drift before edit |
+| **3. Implementation notes** | Shared `implementation-notes.html` | Ambiguity, deviation, unresolved questions |
+| **4. CI / scripts** | `check:feature-imports`, `check:architecture-alignment`, etc. | Deep imports, legacy, wrong layers |
 | **5. Pre-push** | `npm run check:prepush` (when available) | Full gate before merge |
-| **6. PR review** | [client-src-layout.md](client-src-layout.md) checklist + [react-spa-review-template.md](../reviews/react-spa-review-template.md) | Flow, authority, shipped surface |
-| **7. Spec sync** | Same PR updates owner doc when behavior or **target** structure changes | Doc/code drift |
+| **6. PR review** | [client-src-layout.md](client-src-layout.md), [react-spa-review-template.md](../reviews/react-spa-review-template.md) | Flow, authority, shipped surface |
+| **7. Spec sync** | Same PR updates owner doc when target changes | Doc/code drift |
 
-**Habit:** if CI passes but you made a **design choice** the spec did not mention, log it in implementation notes. If the choice **changes the target**, update the spec in that PR or file an open question.
+**Habit:** if CI passes but you made a **design choice** the spec did not mention, log it. If the choice **changes the target**, update the spec or file an open question.
 
 ---
 
@@ -96,10 +109,12 @@ Architecture is enforced in **layers** — notes complement automation; they do 
 
 | Doc kind | Role |
 |----------|------|
-| **Owner spec** (e.g. `pause-client-architecture.md`) | Normative **target** — update when target changes |
-| **Implementation notes** | **Running delta** — how this branch interpreted the target today |
+| **Owner spec** | Normative **target** — update when target changes |
+| **Implementation notes** | **Running delta** — how we interpreted the target today |
+| **Initiative README** | Backlog, phases, links — not decision log |
 | **ADRs** (`docs/decisions/`) | Irreversible or costly choices — promote from notes when decided |
 | **Backlog** (`docs/backlog/`) | Future work — not normative for current behavior |
+| **Git / PR** | What changed, when — not why when spec was silent |
 
 Do not duplicate long spec prose inside HTML notes — link to the spec section instead.
 
@@ -107,6 +122,7 @@ Do not duplicate long spec prose inside HTML notes — link to the spec section 
 
 ## 7. Related
 
-- [pause-client-architecture.md](../systems/pause-client-architecture.md) — current migration spec
+- [client-implementation/implementation-notes.html](../artifacts/client-implementation/implementation-notes.html) — live log
+- [architecture-migration/README.md](../artifacts/architecture-migration/README.md) — migration backlog
 - [refactoring-strategy.md](refactoring-strategy.md) — slice discipline
 - [naming-conventions-holzen.md](naming-conventions-holzen.md) — naming during migration
