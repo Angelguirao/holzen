@@ -19,7 +19,9 @@ export default function PauseSessionScreen() {
         checkoutLoading={vm.checkoutLoading}
         trialLoading={vm.trialLoading}
         onReactivate={() => void vm.startReactivationCheckout()}
-        onStartTrial={() => void vm.ensureTrial().then(() => vm.refreshSubscription())}
+        onStartTrial={() => {
+          void Promise.resolve(vm.ensureTrial()).then(() => vm.refreshSubscription());
+        }}
         onReturn={vm.handleReturn}
       />
     );
