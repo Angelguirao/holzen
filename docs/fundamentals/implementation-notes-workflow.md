@@ -19,6 +19,8 @@ When implementing a **spec** (architecture target doc, ADR, or scoped ticket), m
 
 **One notes file per initiative** (branch or epic), not per commit. Append as you work; do not rewrite history unless correcting errors.
 
+**Do not log:** routine file moves that follow an already-recorded decision, test-only CI parity pins, merge-conflict cleanup, or behavior-unchanged renames — git history and PR descriptions are enough. One `<article class="note">` per **interpretation**, not per commit.
+
 ---
 
 ## 2. Where files live
