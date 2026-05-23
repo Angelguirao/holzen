@@ -221,6 +221,8 @@ If none apply, prefer a **boundary** (lower state, memo shell, lazy branch) inst
 
 **Do not** replace TanStack Query or pause/companion mutation paths with form Actions wholesale.
 
+**CI closure:** `npm run check:react19-leverage` — fails if active `src/` reintroduces manual `loading`/`submitting`/`busy`/`saving` mutation flags outside the allowlist in `scripts/check-react19-leverage.mjs` (companion orchestration, admin, auth boot).
+
 ---
 
 ## 3. What modern React usually considers overengineering

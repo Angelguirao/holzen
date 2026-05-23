@@ -48,7 +48,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run build` | Production build (**`prebuild`** → **`npm run check:version-sync`**) |
 | `npm run preview` | Serve built output locally |
 | `npm run test` | Vitest (jsdom), single run |
-| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, `check:active-surface`, `check:no-phase-labels`, `check:invoke-edge-allowlist`, `check:bundle-shipped`, `check:bruno-active-manifest`, Vitest with coverage + JUnit |
+| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, `check:active-surface`, `check:react19-leverage`, `check:no-phase-labels`, `check:invoke-edge-allowlist`, `check:bundle-shipped`, `check:bruno-active-manifest`, Vitest with coverage + JUnit |
 | `npm run check:no-phase-labels` | Plan §5.0 — fail on `mvp` / `pre-mvp` tokens in active `src/`, ops, Bruno, CI scripts (allowlisted migration filename + branch) |
 | `npm run check:bundle-shipped` | After **`build`**: no `BadgesPanelV2` / `ToolsHub` in `dist/assets` (pause-first strip guard; in **`test:ci`** and **`check:prepush`**) |
 | `npm run check:bruno-active-manifest` | Every `[functions.*]` in `config.toml` is listed in `bruno/active/functions-catalog.md` (in **`test:ci`**) |
