@@ -408,6 +408,8 @@ Root `tsconfig.json` references project refs per package, or a single base + per
 
 ### CI checks (phased)
 
+Full capability map and manual scorecard: [architectural-fitness-functions.md](architectural-fitness-functions.md).
+
 | Script | When | Purpose |
 |--------|------|---------|
 | `check:active-surface` | now | No legacy imports, shipped surface |
