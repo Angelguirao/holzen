@@ -6,10 +6,10 @@ import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
-  holzenLovableEmailLogger,
-  sendLovableEmailBatch,
-  type LovableEmail,
-} from "../_shared/lovable-email.ts";
+  holzenTransactionalEmailLogger,
+  sendTransactionalEmailBatch,
+  type TransactionalEmail,
+} from "../../../_shared/transactional-email.ts";
 
 const REPORT_MODEL = "google/gemini-2.5-flash-lite";
 
@@ -171,7 +171,7 @@ serve(
 
     // Collect all rendered emails and ship them in one batched Lovable Email call at
     // the end (one HTTP round trip per 100 recipients, with retry/backoff).
-    const queued: LovableEmail[] = [];
+    const queued: TransactionalEmail[] = [];
     const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
     for (const profile of eligible) {
@@ -371,11 +371,11 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
     // but if Supabase retries the invocation within 24h, the same key blocks
     // duplicates in Lovable Email.
     const idempotencyMonth = now.toISOString().slice(0, 7);
-    const batch = await sendLovableEmailBatch(queued, {
+    const batch = await sendTransactionalEmailBatch(queued, {
       apiKey: LOVABLE_EMAIL_API_KEY,
       source: "monthly-report",
       idempotencyKey: `monthly-report:${idempotencyMonth}`,
-      logger: holzenLovableEmailLogger(
+      logger: holzenTransactionalEmailLogger(
         (m, d) =>
           log("lovable_email_dep", {
             holzen_event: "monthly_report_cron",

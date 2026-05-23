@@ -5,7 +5,7 @@
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { redactEmailForLog } from "./email-log-helpers.ts";
-import { sendLovableEmailMessage, type LovableEmailLogger } from "./lovable-email.ts";
+import { sendTransactionalEmail, type EmailDeliveryLogger } from "./transactional-email.ts";
 
 /** Matches `ReturnType<typeof createLogger>` — callers pass `log` from `withRequestLogging`. */
 export interface ReferralRecordLogger {
@@ -63,7 +63,7 @@ function referralStep(
   }
 }
 
-function lovableLoggerBridge(log: ReferralRecordLogger): LovableEmailLogger {
+function emailLoggerBridge(log: ReferralRecordLogger): EmailDeliveryLogger {
   return {
     log: (msg, data) => {
       log("lovable_email", {
@@ -118,7 +118,7 @@ async function sendRewardEmail(
   // Each (referrer, reward milestone) is unique — even if the referral job
   // retries (webhook replay, cron), the same idempotency key means Lovable
   // only delivers this reward email once per 24h window.
-  const result = await sendLovableEmailMessage(
+  const result = await sendTransactionalEmail(
     {
       from: "Holzen <notify@holzen.app>",
       to: [email],
@@ -128,7 +128,7 @@ async function sendRewardEmail(
     {
       source: "referral-reward",
       idempotencyKey: `referral-reward:${referrerId}:${rewardType}`,
-      logger: lovableLoggerBridge(log),
+      logger: emailLoggerBridge(log),
     },
   );
 
@@ -139,7 +139,7 @@ async function sendRewardEmail(
       attempts: result.attempts,
     });
   }
-  // Failures are already logged by sendLovableEmailMessage via the logger above.
+  // Failures are already logged by sendTransactionalEmail via the logger above.
 }
 
 async function grantReward(

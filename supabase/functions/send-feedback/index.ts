@@ -4,7 +4,7 @@ import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { EdgeError } from "../_shared/edge-error.ts";
 import { logDependencyCall } from "../_shared/deps.ts";
 import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
-import { sendLovableEmailMessage } from "../_shared/lovable-email.ts";
+import { sendTransactionalEmail } from "../_shared/transactional-email.ts";
 
 const escapeHtml = (str: string) =>
   str
@@ -132,7 +132,7 @@ serve(
       // Fire-and-forget: the Lovable helper retries on 429/5xx internally and
       // uses `cid` as an idempotency key so any duplicate POST from the
       // browser is de-duped by Lovable inside the 24h window.
-      void sendLovableEmailMessage(
+      void sendTransactionalEmail(
         {
           from: "Holzen Feedback <notify@notify.holzen.app>",
           to: ["hello@holzen.app"],
@@ -144,7 +144,7 @@ serve(
           idempotencyKey: `send-feedback:${cid}`,
           logger: { log: (m, d) => log(m, d), error: (m, d) => log.error(m, d) },
         },
-      ).catch(() => { /* already logged by sendLovableEmailMessage */ });
+      ).catch(() => { /* already logged by sendTransactionalEmail */ });
     }
 
     return new Response(JSON.stringify({ success: true }), {

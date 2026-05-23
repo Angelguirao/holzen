@@ -14,7 +14,7 @@ Holzen is leaving Lovable Cloud entirely. Code changes in-repo:
 |------|--------|
 | Supabase Google OAuth (replaces `cloud-auth-js`) | Done in `AuthScreen` |
 | Direct Gemini + OpenRouter failover (`llm-gateway.ts`) | Active edges migrated |
-| Resend email path | `lovable-email.ts` prefers `RESEND_API_KEY` |
+| Resend email path | `transactional-email.ts` prefers `RESEND_API_KEY` |
 | GitHub Actions CI | `.github/workflows/ci.yml` |
 | Staging deploy scripts | `npm run staging:deploy`, `staging-supabase-setup.md` |
 | `lovable-tagger` | Removed from Vite |
