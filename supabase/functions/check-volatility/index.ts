@@ -11,7 +11,10 @@ import {
   fetchOnChainSnapshot,
   pauseRecencyInputs,
 } from "../_shared/pause-cron-parity.ts";
-import { isCumulativeMoveTriggered } from "../_shared/volatility-thresholds.ts";
+import {
+  isCumulativeMoveTriggered,
+  isVolatilityThresholdBreached,
+} from "../_shared/volatility-thresholds.ts";
 import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import {
   withRequestLogging,
@@ -345,18 +348,13 @@ serve(
       return new Date(snoozedUntil).getTime() > Date.now();
     }
 
+    function profileVolatilityBreached(p: VolatilityProfile): boolean {
+      const metrics = metricsForProfile(p, usdPeek);
+      return isVolatilityThresholdBreached(p, metrics);
+    }
+
     const eligible = profileRows.filter((p) => {
-      const b = metricsForProfile(p, usdPeek);
-      const absChange = Math.abs(b.changePercent);
-      const effectiveThreshold = b.direction === "down"
-        ? (p.threshold_down ?? p.threshold ?? 5)
-        : (p.threshold ?? 5);
-      const dailyTriggered = absChange >= effectiveThreshold;
-      const cumulativeTriggered = isCumulativeMoveTriggered(
-        b.cumulativeChangePercent,
-        p.cumulative_threshold,
-      );
-      if (!dailyTriggered && !cumulativeTriggered) return false;
+      if (!profileVolatilityBreached(p)) return false;
       if (isInQuietHours(p)) return false;
       if (isSnoozed(p)) return false;
       if (!p.last_trigger_at) return true;
@@ -370,6 +368,63 @@ serve(
       eligible: eligible.length,
       total_profiles: profileRows.length,
     });
+
+    const profileByUserId = new Map(profileRows.map((p) => [p.user_id, p]));
+    const { data: openCronPauseRows, error: openCronPauseErr } = await supabase
+      .from("pause_instances")
+      .select("user_id")
+      .eq("source", "cron_volatility")
+      .in("state", ["active", "pending"]);
+    if (openCronPauseErr) throw openCronPauseErr;
+
+    const calmSweepUserIds = [
+      ...new Set(
+        (openCronPauseRows ?? [])
+          .map((row) => row.user_id as string)
+          .filter((userId) => {
+            const profile = profileByUserId.get(userId);
+            return profile != null && !profileVolatilityBreached(profile);
+          }),
+      ),
+    ];
+
+    const calmSweepResults = await Promise.all(
+      calmSweepUserIds.map(async (userId) => {
+        const { data: expiredCount, error: sweepErr } = await supabase.rpc(
+          "pause_expire_cron_volatility_context_lost",
+          { p_user_id: userId },
+        );
+        if (sweepErr) {
+          log.error("check_volatility_calm_sweep", {
+            holzen_event: "check_volatility_cron",
+            phase: "pause_expire_cron_volatility_context_lost_failed",
+            user_id_prefix: String(userId).slice(0, 8),
+            ...unknownErrorForLog(sweepErr),
+          });
+          return 0;
+        }
+        const n = typeof expiredCount === "number" ? expiredCount : 0;
+        if (n > 0) {
+          log("check_volatility_calm_sweep", {
+            holzen_event: "check_volatility_cron",
+            phase: "context_lost_expired",
+            user_id_prefix: String(userId).slice(0, 8),
+            expired_rows: n,
+          });
+        }
+        return n;
+      }),
+    );
+    const contextLostExpired = calmSweepResults.reduce((sum, n) => sum + n, 0);
+
+    if (calmSweepUserIds.length > 0) {
+      log("check_volatility_phase", {
+        holzen_event: "check_volatility_cron",
+        phase: "calm_market_sweep",
+        candidates: calmSweepUserIds.length,
+        expired_rows: contextLostExpired,
+      });
+    }
 
     const vapidReady = await initWebPushVapidFromEnv(log);
 
@@ -574,6 +629,7 @@ serve(
     return new Response(
       JSON.stringify({
         triggered,
+        contextLostExpired,
         btcChangeUsd: usdPeek.changePercent,
         marketPairsLoaded: pairRows.filter((r) => r.m).length,
       }),
