@@ -1,7 +1,7 @@
 # ADR: Render boundaries now; defer React Compiler and React 19
 
 **Date:** 2026-05-23  
-**Status:** accepted
+**Status:** accepted (React 19 runtime upgraded 2026-05-23 on `feature/lovableMigration`; Actions/Compiler adoption still incremental)
 
 ## Context
 
@@ -32,9 +32,9 @@ Adopting React Compiler or upgrading to React 19 during migration adds a second 
 
 2. **Do not adopt React Compiler** until post-migration stabilization.
 
-3. **Do not upgrade to React 19** until post-migration stabilization.
+3. **React 19 runtime** — upgraded on `feature/lovableMigration` (May 2026): `react` / `react-dom` 19.x, `@types/react*` 19, `vaul` 1.x, `react-day-picker` 9.x. **No** mass refactor to Actions/Compiler in the same change.
 
-4. **Keep TanStack Query + `invokeEdge`** as the mutation model. Do not refactor toward `<form action>` / Actions during migration.
+4. **Keep TanStack Query + `invokeEdge`** as the mutation model. Do not refactor toward `<form action>` / Actions during architecture migration unless a touched slice is a deliberate pilot.
 
 5. **Do not mass-delete** existing `useMemo` / `useCallback` in Home, Pause session, or companion hooks unless the file is already in scope and profiling or review justifies it.
 
@@ -43,7 +43,7 @@ Adopting React Compiler or upgrading to React 19 during migration adds a second 
 | Track | Trigger | Action |
 |-------|---------|--------|
 | **A. React Compiler pilot** | `src/` migration stable; test + build green | Add `babel-plugin-react-compiler` to Vite; lint/annotation mode first; profile Home + pause session; remove redundant memos only with tests |
-| **B. React 19 upgrade** | Track A done or skipped; Lovable/Vite deps confirmed | Bump React + types; pilot **one** simple settings mutation with `useActionState` / `useOptimistic`; keep Query for reads and complex flows |
+| **B. React 19 Actions pilot** | Runtime on 19.x; migration tiers stable | **One** simple settings mutation with `useActionState` / `useOptimistic`; keep Query for reads and complex flows |
 
 Expo SDK 54 is **not** a Holzen signal — shipped product is a Vite SPA on Lovable.
 
