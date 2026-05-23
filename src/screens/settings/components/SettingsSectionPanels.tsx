@@ -33,6 +33,7 @@ import {
 import { useSettingsState } from '@/screens/settings/hooks/use-settings-state';
 import { GroundingTagInput } from '@/screens/settings/components/GroundingTagInput';
 import { ChangeEmailSection } from '@/screens/settings/components/ChangeEmailSection';
+import { ChangePasswordSection } from '@/screens/settings/components/ChangePasswordSection';
 import { HoldGoalWidget } from '@/screens/home/components/HoldGoalWidget';
 import {
   Select,
@@ -826,12 +827,6 @@ export function SettingsAccountPanel() {
     t,
     user,
     signOut,
-    newPassword,
-    setNewPassword,
-    confirmPassword,
-    setConfirmPassword,
-    changePassword,
-    changingPassword,
     exporting,
     exportData,
     deleteAccount,
@@ -846,44 +841,7 @@ export function SettingsAccountPanel() {
 
             <ChangeEmailSection />
 
-            {/* Password */}
-            <div className="space-y-3">
-              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.passwordLabel')}</p>
-              <Input
-                id="settings-new-password"
-                name="new-password"
-                type="password"
-                autoComplete="new-password"
-                placeholder={t('settings.newPasswordPlaceholder')}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                minLength={8}
-                pattern="(?=.*[A-Za-z])(?=.*\d).{8,}"
-                className="text-xs font-mono"
-              />
-              <p className="flex items-start gap-1.5 text-[11px] leading-relaxed text-muted-foreground">
-                <Info className="h-3 w-3 mt-0.5 shrink-0" aria-hidden="true" />
-                <span>Must be at least 8 characters and include a letter and a number.</span>
-              </p>
-              <Input
-                id="settings-confirm-password"
-                name="new-password"
-                type="password"
-                autoComplete="new-password"
-                placeholder={t('settings.confirmPasswordPlaceholder')}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="text-xs font-mono"
-              />
-              <Button
-                onClick={changePassword}
-                disabled={changingPassword || !newPassword}
-                size="sm"
-                className="w-full font-mono text-xs !mt-4"
-              >
-                {changingPassword ? t('settings.updatingPassword') : t('settings.updatePassword')}
-              </Button>
-            </div>
+            <ChangePasswordSection />
 
             {/* Data export */}
             <div className="space-y-3">
