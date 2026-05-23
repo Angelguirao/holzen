@@ -104,6 +104,15 @@ const LandingScreen = () => {
         title="Holzen — When Bitcoin moves, pause before you do"
         description="Holzen watches Bitcoin volatility and sends AI pause prompts to help you slow down before acting on impulse. Mood tracking, journaling, and behavioral insights."
         path="/welcome"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: FAQ.map((item) => ({
+            '@type': 'Question',
+            name: item.q,
+            acceptedAnswer: { '@type': 'Answer', text: item.a },
+          })),
+        }}
       />
 
       {/* ─── HERO ─── */}
