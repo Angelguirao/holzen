@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useTransition } from 'react';
 import type { TFunction } from 'i18next';
 import { toast } from 'sonner';
 import {
@@ -19,50 +19,54 @@ export function usePendingPauseOfferMutations(options: {
   t: TFunction;
 }) {
   const { pending, onAfterMutation, navigateAfterAdopt, refreshPendingOffer, t } = options;
-  const [busy, setBusy] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  const handleAdopt = useCallback(async (): Promise<boolean> => {
-    if (!pending || busy) return false;
-    setBusy(true);
-    try {
-      const r = await pauseAdoptPendingOffer();
-      if (r.status !== 'ok') {
-        toast.error(t('pause.pendingAdoptFailed', { defaultValue: 'Could not switch to the new pause. Try again.' }));
-        return false;
-      }
-      trackPausePendingAdopted(r.instanceId);
-      await Promise.resolve(onAfterMutation());
-      navigateAfterAdopt?.(r.instanceId);
-      await refreshPendingOffer();
-      return true;
-    } catch {
-      toast.error(t('pause.pendingAdoptFailed', { defaultValue: 'Could not switch to the new pause. Try again.' }));
-      return false;
-    } finally {
-      setBusy(false);
-    }
-  }, [pending, busy, t, onAfterMutation, navigateAfterAdopt, refreshPendingOffer]);
+  const handleAdopt = useCallback((): Promise<boolean> => {
+    if (!pending || isPending) return Promise.resolve(false);
+    return new Promise((resolve) => {
+      startTransition(async () => {
+        try {
+          const r = await pauseAdoptPendingOffer();
+          if (r.status !== 'ok') {
+            toast.error(t('pause.pendingAdoptFailed', { defaultValue: 'Could not switch to the new pause. Try again.' }));
+            resolve(false);
+            return;
+          }
+          trackPausePendingAdopted(r.instanceId);
+          await Promise.resolve(onAfterMutation());
+          navigateAfterAdopt?.(r.instanceId);
+          await refreshPendingOffer();
+          resolve(true);
+        } catch {
+          toast.error(t('pause.pendingAdoptFailed', { defaultValue: 'Could not switch to the new pause. Try again.' }));
+          resolve(false);
+        }
+      });
+    });
+  }, [pending, isPending, t, onAfterMutation, navigateAfterAdopt, refreshPendingOffer, startTransition]);
 
-  const handleDecline = useCallback(async (): Promise<boolean> => {
-    if (!pending || busy) return false;
-    setBusy(true);
-    try {
-      const r = await pauseDeclinePendingOffer();
-      if (r.status !== 'ok') {
-        toast.error(t('pause.pendingDeclineFailed', { defaultValue: 'Could not dismiss the offer. Try again.' }));
-        return false;
-      }
-      trackPausePendingDeclined(pending.id);
-      await Promise.resolve(onAfterMutation());
-      await refreshPendingOffer();
-      return true;
-    } catch {
-      toast.error(t('pause.pendingDeclineFailed', { defaultValue: 'Could not dismiss the offer. Try again.' }));
-      return false;
-    } finally {
-      setBusy(false);
-    }
-  }, [pending, busy, t, onAfterMutation, refreshPendingOffer]);
+  const handleDecline = useCallback((): Promise<boolean> => {
+    if (!pending || isPending) return Promise.resolve(false);
+    return new Promise((resolve) => {
+      startTransition(async () => {
+        try {
+          const r = await pauseDeclinePendingOffer();
+          if (r.status !== 'ok') {
+            toast.error(t('pause.pendingDeclineFailed', { defaultValue: 'Could not dismiss the offer. Try again.' }));
+            resolve(false);
+            return;
+          }
+          trackPausePendingDeclined(pending.id);
+          await Promise.resolve(onAfterMutation());
+          await refreshPendingOffer();
+          resolve(true);
+        } catch {
+          toast.error(t('pause.pendingDeclineFailed', { defaultValue: 'Could not dismiss the offer. Try again.' }));
+          resolve(false);
+        }
+      });
+    });
+  }, [pending, isPending, t, onAfterMutation, refreshPendingOffer, startTransition]);
 
-  return { busy, handleAdopt, handleDecline };
+  return { busy: isPending, handleAdopt, handleDecline };
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
@@ -10,7 +10,6 @@ import {
   reflectGenerator,
   resolveEffectiveReflectionCopy,
   resolveReflectGenerationPrefetch,
-  shouldClearReflectGenerationLoading,
   shouldCommitReflectGeneration,
 } from './pause-reflect-generation-io';
 import type { UsePauseReflectGenerationParams } from './use-pause-reflect-generation-types';
@@ -30,10 +29,8 @@ export function usePauseReflectGeneration({
   const profile = useProfile();
 
   const [reflectionMessage, setReflectionMessage] = useState(initialReflectionMessage);
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  /** Monotonic id of the in-flight generation; only that run may clear loading / commit. */
-  const activeRunRef = useRef(0);
   /** Bumped when `pauseInstanceId` changes so stale async work cannot commit. */
   const validityRef = useRef(0);
   /** Aborts the in-flight `holzen-reflect` when superseded, `pauseInstanceId` changes, `enabled` turns false, or the effect cleans up. */
@@ -64,7 +61,7 @@ export function usePauseReflectGeneration({
     );
   }, [enabled, navSeedEmpty, artifactReflectionText]);
 
-  const runGeneration = useCallback(async () => {
+  const runGeneration = useCallback(() => {
     const prefetch = resolveReflectGenerationPrefetch(
       reflectGenerationPrerequisite({
         enabled,
@@ -77,7 +74,6 @@ export function usePauseReflectGeneration({
 
     if (prefetch.kind === 'stop') return;
     if (prefetch.kind === 'missing_context') {
-      setLoading(false);
       setError(
         t('pause.reflectMissingContext', {
           defaultValue:
@@ -88,45 +84,40 @@ export function usePauseReflectGeneration({
     }
     if (prefetch.kind === 'seed') {
       setReflectionMessage(prefetch.message);
-      setLoading(false);
       return;
     }
 
     const validityTicket = validityRef.current;
     const instanceForThisRun = pauseInstanceId!;
-    const runId = ++activeRunRef.current;
     reflectGenAbortRef.current?.abort();
     const ac = new AbortController();
     reflectGenAbortRef.current = ac;
-    setLoading(true);
-    setError(null);
 
-    try {
-      const result = await pauseReflectGeneration(
-        {
-          pauseInstanceId: instanceForThisRun,
-          userId: user!.id,
-          context: context!.trim(),
-          initialReflectionMessage,
-          severityAbsPct,
-          profile,
-          signal: ac.signal,
-        },
-        reflectGenerator,
-      );
-      if (!shouldCommitReflectGeneration(validityTicket, validityRef.current)) return;
-      const message = messageFromReflectGenerationResult(result);
-      if (message != null) setReflectionMessage(message);
-    } catch (e: unknown) {
-      if (!shouldCommitReflectGeneration(validityTicket, validityRef.current)) return;
-      const raw = e instanceof Error ? e.message : String(e);
-      setError(reflectGenerationUserErrorMessage(raw));
-    } finally {
-      if (shouldClearReflectGenerationLoading(runId, activeRunRef.current)) {
-        setLoading(false);
+    startTransition(async () => {
+      setError(null);
+      try {
+        const result = await pauseReflectGeneration(
+          {
+            pauseInstanceId: instanceForThisRun,
+            userId: user!.id,
+            context: context!.trim(),
+            initialReflectionMessage,
+            severityAbsPct,
+            profile,
+            signal: ac.signal,
+          },
+          reflectGenerator,
+        );
+        if (!shouldCommitReflectGeneration(validityTicket, validityRef.current)) return;
+        const message = messageFromReflectGenerationResult(result);
+        if (message != null) setReflectionMessage(message);
+      } catch (e: unknown) {
+        if (!shouldCommitReflectGeneration(validityTicket, validityRef.current)) return;
+        const raw = e instanceof Error ? e.message : String(e);
+        setError(reflectGenerationUserErrorMessage(raw));
       }
-    }
-  }, [t, enabled, pauseInstanceId, user, context, initialReflectionMessage, severityAbsPct, profile]);
+    });
+  }, [t, enabled, pauseInstanceId, user, context, initialReflectionMessage, severityAbsPct, profile, startTransition]);
 
   useEffect(() => {
     if (!enabled) {
@@ -135,7 +126,7 @@ export function usePauseReflectGeneration({
         reflectGenAbortRef.current?.abort();
       };
     }
-    void runGeneration();
+    runGeneration();
     return () => {
       reflectGenAbortRef.current?.abort();
     };
@@ -143,12 +134,12 @@ export function usePauseReflectGeneration({
 
   const retry = useCallback(() => {
     validityRef.current += 1;
-    void runGeneration();
+    runGeneration();
   }, [runGeneration]);
 
   return {
     reflectionMessage,
-    loading,
+    loading: isPending,
     error,
     retry,
   };

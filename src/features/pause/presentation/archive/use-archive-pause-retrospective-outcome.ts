@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useTransition } from 'react';
 import type { TFunction } from 'i18next';
 import { toast } from 'sonner';
 import { hapticFeedback } from '@/lib/haptics';
@@ -24,46 +24,39 @@ export function useArchivePauseRetrospectiveOutcome({
   onSuccess,
   t,
 }: UseArchivePauseRetrospectiveOutcomeParams) {
-  const [submitting, setSubmitting] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const submittingRef = useRef(false);
-
-  const submit = useCallback(
-    async (outcome: string) => {
-      if (!instanceId || submittingRef.current) return;
-      submittingRef.current = true;
-      setSubmitting(true);
-      try {
-        hapticFeedback('medium');
-        await pauseArchiveLogRetrospectiveOutcome({ instanceId, outcome });
-        trackPauseOutcomeRetrospective({ pauseInstanceId: instanceId, outcome });
-        invalidatePauseStatsDataForUser(userId);
-        hapticFeedback('success');
-        toast.success(
-          t('archive.retrospectiveOutcomeSaved', { defaultValue: 'Decision saved for this pause.' }),
-        );
-        onOpenChange(false);
-        await onSuccess?.();
-      } catch {
-        hapticFeedback('warning');
-        toast.error(
-          t('archive.retrospectiveOutcomeFailed', {
-            defaultValue: 'Could not save — check your connection and try again.',
-          }),
-        );
-      } finally {
-        submittingRef.current = false;
-        setSubmitting(false);
-      }
-    },
-    [instanceId, onOpenChange, onSuccess, t, userId],
-  );
 
   const handleDecide = useCallback(
     (outcome: string) => {
-      void submit(outcome);
+      if (!instanceId || submittingRef.current) return;
+      submittingRef.current = true;
+      startTransition(async () => {
+        try {
+          hapticFeedback('medium');
+          await pauseArchiveLogRetrospectiveOutcome({ instanceId, outcome });
+          trackPauseOutcomeRetrospective({ pauseInstanceId: instanceId, outcome });
+          invalidatePauseStatsDataForUser(userId);
+          hapticFeedback('success');
+          toast.success(
+            t('archive.retrospectiveOutcomeSaved', { defaultValue: 'Decision saved for this pause.' }),
+          );
+          onOpenChange(false);
+          await onSuccess?.();
+        } catch {
+          hapticFeedback('warning');
+          toast.error(
+            t('archive.retrospectiveOutcomeFailed', {
+              defaultValue: 'Could not save — check your connection and try again.',
+            }),
+          );
+        } finally {
+          submittingRef.current = false;
+        }
+      });
     },
-    [submit],
+    [instanceId, onOpenChange, onSuccess, t, userId, startTransition],
   );
 
-  return { submitting, handleDecide };
+  return { submitting: isPending, handleDecide };
 }
