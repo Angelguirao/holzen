@@ -239,6 +239,10 @@ mustExist(
   'src/features/pause/presentation/feel',
   'pause/presentation/feel/',
 );
+mustNotExist(
+  'src/features/pause/presentation/reflect/mood',
+  'pause/presentation/reflect/mood/ (use presentation/feel/)',
+);
 mustExist(
   'src/features/pause/presentation/reflect/pending-offer',
   'pause/presentation/reflect/pending-offer/',

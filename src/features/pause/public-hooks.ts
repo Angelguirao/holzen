@@ -12,7 +12,7 @@ export {
   PAUSE_SESSION_STEP_TRANSITION_EASE,
   type PauseSessionStepTransitionConfig,
   type PauseSessionSwipeDirection,
-} from './application/use-cases/session/step-transition';
+} from './public-session-ritual';
 export { computePauseGoBackPlan } from './public-ritual-brief';
 export {
   BRIEF_INTEGRATE_RING_CIRC,
@@ -25,15 +25,15 @@ export {
   formatPauseOpenMaxRemaining,
   pauseOpenMaxDeadlineMs,
   PAUSE_OPEN_MAX_AGE_MS,
-} from './application/use-cases/session/open-max-countdown';
+} from './public-session';
 export { pauseWindowShowsClockCountdown } from './domain/pause-state';
 export type { ArchiveMainSegment } from './domain/archive-segment';
 export {
   PAUSE_MOOD_GROUPS,
   PAUSE_MOOD_VALUES,
   isPauseMoodValue,
-} from './domain/mood-value';
-export type { MoodValue } from './domain/mood-value';
+  type MoodValue,
+} from './public-ritual-feel';
 export {
   resolveDoneWallpaperMood,
   type DoneWallpaperMoodInput,
@@ -42,15 +42,13 @@ export type { BriefPauseStep, RitualDepth } from './domain/ritual-types';
 export {
   BRIEF_PAUSE_ORDER,
   computeBriefMacroProgressPosition,
-} from './domain/brief-ritual-steps';
-export {
   PAUSE_DEEP_RITUAL_STEPS,
   PAUSE_DEEP_DISPLAY_STEP_COUNT,
   STEPS,
   pauseDeepDisplayProgressIndex,
   pauseDeepMacroStepNumber,
   type PauseStep,
-} from './domain/pause-ritual-steps';
+} from './public-ritual-progress';
 export {
   getPendingPauseOfferDisplay,
   type PendingPauseOfferDisplay,
@@ -74,7 +72,7 @@ export {
   BREATH_RING_R,
   resolveHoldMandalaLayerWeights,
   type HoldMandalaLayerWeights,
-} from './application/use-cases/ritual/breathe/breath-orb-geometry';
+} from './public-ritual-breathe';
 export type { PauseBreathingPhase } from './public-ritual-breathe';
 export {
   resolveTriangleKickerDisplay,
@@ -112,15 +110,11 @@ export {
   type PauseScienceSource,
   type PauseScienceStepConfig,
   type PauseScienceStepKey,
-} from './domain/pause-science/pause-science-steps';
-export { stepHighlightsScienceRow } from './domain/pause-science/pause-science-step-highlight';
-export { briefStepToPauseScienceStep } from './domain/pause-science/brief-step-to-pause-science-step';
-export type { FeelStepTile } from './domain/feel-step-tile';
-export { PAUSE_FEEL_STEP_TILE_ROWS } from './domain/pause-feel-step-tiles';
-export {
-  PAUSE_FEEL_INTENSITY_KEYS,
-  type PauseFeelIntensityKey,
-} from './domain/pause-feel-intensity';
+  stepHighlightsScienceRow,
+  briefStepToPauseScienceStep,
+} from './public-ritual-progress';
+export type { FeelStepTile } from './public-ritual-feel';
+export { PAUSE_FEEL_STEP_TILE_ROWS, PAUSE_FEEL_INTENSITY_KEYS, type PauseFeelIntensityKey } from './public-ritual-feel';
 export {
   computeBreathingPhaseAdvance,
   resumePauseAudioContext,
@@ -135,17 +129,17 @@ export {
   type ScoreImpactVariant,
   type ScoreImpactViewMode,
 } from './public-ritual-reflect';
-export type { PauseBreathingHandle } from './presentation/session/breath/pause-breathing-handle';
+export type { PauseBreathingHandle } from './public-session-ritual';
 export type {
   PauseSessionBriefRitualBodyProps,
   PauseSessionDeepRitualBodyProps,
-} from './presentation/session/ritual-body-props';
+} from './public-session-ritual';
 export { usePendingPauseOfferMutations } from './public-session';
 export {
   usePauseBriefDoneCheckIn,
   type UsePauseBriefDoneCheckInParams,
 } from './presentation/ritual/done/use-pause-brief-done-check-in';
-export { usePauseBriefIntegrateCountdown } from './presentation/session/use-pause-brief-integrate-countdown';
+export { usePauseBriefIntegrateCountdown } from './public-session-ritual';
 export { usePauseBreathSegmentRpcLoggers } from './presentation/session/breath/use-pause-breath-segment-rpc-loggers';
 export {
   useBulkHoldPending,
@@ -255,6 +249,10 @@ export {
   useReflectionShareHandlers,
   type UseReflectionShareHandlersParams,
   usePauseFavoriteToggle,
+  usePauseSessionPersistToStorage,
+  usePauseSessionRitualStorageSync,
+} from './public-ritual-reflect';
+export {
   usePauseSessionMoodChromeHandlers,
   usePauseSessionMoodAndPersist,
   type UsePauseSessionMoodAndPersistParams,
@@ -264,9 +262,7 @@ export {
   PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS,
   usePauseFeelShiftLogDedupeRefs,
   usePauseSessionDepthAndBriefCopy,
-  usePauseSessionPersistToStorage,
-  usePauseSessionRitualStorageSync,
-} from './public-ritual-reflect';
+} from './public-ritual-feel';
 export {
   usePauseSessionBreathStepHandlers,
   usePauseSessionBreathHandlers,
@@ -429,4 +425,4 @@ export {
   usePauseSessionScreen,
   usePauseSessionScreenViewModel,
   type PauseSessionScreenViewModel,
-} from './presentation/session/use-pause-session-screen';
+} from './public-session-ritual';
