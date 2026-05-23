@@ -69,7 +69,7 @@ export function useManualPauseTrigger({
         mood: mood ?? '(none)',
       });
 
-      const { assetId, ctx, severityBand, silentMsg, ...openParams } = buildManualPauseOpenParams({
+      const built = buildManualPauseOpenParams({
         userId: user.id,
         silentMode,
         mood,
@@ -77,6 +77,8 @@ export function useManualPauseTrigger({
         cumulativeThreshold,
         profileTrackedAssetId,
       });
+      const { assetId, ctx, silentMsg, ...openParams } = built;
+      const { severityBand } = built;
 
       const previewPorts = {
         setError,
