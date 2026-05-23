@@ -11,6 +11,10 @@ interface PageMetaProps {
   description: string;
   path?: string;
   noindex?: boolean;
+  /** Open Graph type. Defaults to "website"; use "article" for blog posts. */
+  type?: "website" | "article";
+  /** Optional JSON-LD object (or array of objects) injected per-route. */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const MANAGED_META_KEYS = [
@@ -18,12 +22,15 @@ const MANAGED_META_KEYS = [
   "og:title",
   "og:description",
   "og:url",
+  "og:type",
   "twitter:title",
   "twitter:description",
   "robots",
 ] as const;
 
-export function PageMeta({ title, description, path, noindex }: PageMetaProps) {
+const JSON_LD_ATTR = "data-pagemeta-jsonld";
+
+export function PageMeta({ title, description, path, noindex, type, jsonLd }: PageMetaProps) {
   useEffect(() => {
     document.title = title;
     setMeta("description", description, "name");
@@ -31,6 +38,7 @@ export function PageMeta({ title, description, path, noindex }: PageMetaProps) {
     setMeta("og:description", description, "property");
     setMeta("twitter:title", title, "name");
     setMeta("twitter:description", description, "name");
+    setMeta("og:type", type ?? "website", "property");
 
     if (path !== undefined) {
       setCanonical(`${SITE_ORIGIN}${path}`);
@@ -43,6 +51,17 @@ export function PageMeta({ title, description, path, noindex }: PageMetaProps) {
       removeMeta("robots", "name");
     }
 
+    if (jsonLd) {
+      const blocks = Array.isArray(jsonLd) ? jsonLd : [jsonLd];
+      blocks.forEach((block, i) => {
+        const script = document.createElement("script");
+        script.type = "application/ld+json";
+        script.setAttribute(JSON_LD_ATTR, String(i));
+        script.textContent = JSON.stringify(block);
+        document.head.appendChild(script);
+      });
+    }
+
     return () => {
       document.title = DEFAULT_SITE_TITLE;
       setMeta("description", DEFAULT_SITE_DESCRIPTION, "name");
@@ -50,11 +69,15 @@ export function PageMeta({ title, description, path, noindex }: PageMetaProps) {
       setMeta("og:description", DEFAULT_SITE_DESCRIPTION, "property");
       setMeta("twitter:title", DEFAULT_SITE_TITLE, "name");
       setMeta("twitter:description", DEFAULT_SITE_DESCRIPTION, "name");
+      setMeta("og:type", "website", "property");
       setCanonical(`${SITE_ORIGIN}/`);
       setMeta("og:url", `${SITE_ORIGIN}/`, "property");
       removeMeta("robots", "name");
+      document
+        .querySelectorAll(`script[${JSON_LD_ATTR}]`)
+        .forEach((el) => el.remove());
     };
-  }, [title, description, path, noindex]);
+  }, [title, description, path, noindex, type, jsonLd]);
 
   return null;
 }
