@@ -1,39 +1,21 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { JourneyStreakCard } from '@/screens/journey/components/JourneyStreakCard';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/hooks/use-auth';
-import { getJourneyPauseInstancesQueryOptions } from '@/features/pause/public-queries';
-import { trackEvent } from '@/lib/posthog';
+import { useJourneyPauseInstances } from '@/features/pause/public-hooks';
+import { trackJourneyOverviewViewed } from '@/screens/journey/lib/journey-screen-telemetry';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function JourneyOverview() {
   const { t } = useTranslation();
-  const { user } = useAuth();
-  const userId = user?.id;
+  const { rows, isLoading, completedCount, streakDays } = useJourneyPauseInstances();
   const viewedRef = useRef(false);
-
-  const { data: rows = [], isLoading } = useQuery(getJourneyPauseInstancesQueryOptions(userId));
-
-  const completedCount = rows.filter((r) => r.state === 'completed').length;
-
-  const streakDays = useMemo(() => {
-    const completed = rows.filter((r) => r.state === 'completed');
-    const dayKeys = new Set<string>();
-    for (const r of completed) {
-      const iso = r.completed_at ?? r.engaged_at ?? r.created_at;
-      const d = new Date(iso);
-      dayKeys.add(new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString());
-    }
-    return dayKeys.size;
-  }, [rows]);
 
   useEffect(() => {
     if (viewedRef.current || isLoading) return;
     viewedRef.current = true;
-    trackEvent('journey.overview_viewed', {
+    trackJourneyOverviewViewed({
       streak_days: streakDays,
       completed_pause_count: completedCount,
     });

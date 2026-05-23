@@ -1,6 +1,6 @@
 # Journey overview (`/journey`)
 
-**Route:** `/journey` — single overview screen ([`JourneyOverview.tsx`](../../src/pages/journey/JourneyOverview.tsx)). No stats/badges/activity tabs in the shipped shell.
+**Route:** `/journey` — single overview screen ([`JourneyOverviewScreen.tsx`](../../src/screens/journey/JourneyOverviewScreen.tsx)). No stats/badges/activity tabs in the shipped shell.
 
 ## Data sources
 

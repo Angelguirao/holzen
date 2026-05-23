@@ -1,5 +1,5 @@
-import { invokeEdge } from '@/lib/invoke-edge';
 import type { CheckoutEvent } from '@/features/subscription/domain/checkout-event';
+import { invokeListCheckoutEvents } from '../edge/subscription-query-edge';
 
 export const CHECKOUT_EVENTS_QUERY_PREFIX = ['billing'] as const;
 
@@ -11,9 +11,7 @@ export const CHECKOUT_EVENTS_QUERY_KEY = [
 ] as const;
 
 export async function fetchCheckoutEvents(): Promise<CheckoutEvent[]> {
-  const { data, error } = await invokeEdge<{ events?: CheckoutEvent[] }>('list-checkout-events', {
-    body: {},
-  });
+  const { data, error } = await invokeListCheckoutEvents();
   if (error) throw error;
   return data?.events ?? [];
 }

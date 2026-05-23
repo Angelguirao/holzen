@@ -1,19 +1,29 @@
 ---
 description: >-
-  Holzen — after completing implementation work, create a git commit unless the user explicitly
-  asked for WIP-only or read-only exploration. Aligns agent behavior with repo workflow.
+  Holzen — commit after each logical slice of implementation work. Overrides global
+  "only commit when asked" user rules for this repository.
 alwaysApply: true
 ---
 
 # Git commits (Holzen)
 
-When you **finish** a task that **changes tracked code or project config** (features, fixes, refactors, tests, paired doc updates), **create a git commit** with a message that matches recent history (`feat(scope):`, `fix(scope):`, etc.).
+When you change tracked code or project config in **this repository**, **create a git commit** after each **logical slice** of work—not only at the very end of a long session.
+
+**Logical slice** examples: one fix, one migration, one feature hook split, one doc paired with its code change, one refactor step that builds cleanly.
+
+**Default: commit.** Do not wait for the user to say "commit" unless they opted out for this task.
+
+**Also commit** when you **finish** the overall task—do not leave the tree dirty unless the user asked for WIP only.
 
 **Skip a commit** only when:
 
 - The user explicitly asked for **WIP / no commit** / **do not commit**, or
 - You made **no file changes** (read-only exploration, answers only).
 
+**Precedence:** This rule overrides global Cursor user rules such as `committing-changes-with-git` ("only commit when requested") **while working in the Holzen repo**. Match recent history: `feat(scope):`, `fix(scope):`, `refactor(scope):`, etc.
+
 **Never** commit secrets (`.env`, keys), and do not use `--no-verify` or force-push unless the user explicitly asks.
 
-If a pre-commit hook fails, fix the issue and create a **new** commit (do not amend a failed attempt unless the user’s commit rules allow it).
+If a pre-commit hook fails, fix the issue and create a **new** commit (do not amend a failed attempt unless the user's commit rules allow it).
+
+Use a HEREDOC for multi-line messages when helpful. Run `git status` after commit to confirm a clean tree.

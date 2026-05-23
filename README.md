@@ -86,7 +86,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 ## Repository layout
 
 - **`src/`** — Application code. Import alias **`@`** maps to `./src` (see `vite.config.ts` and `vitest.config.ts`).
-- **`src/pages/`** — Route-level screens (home, library, practices, settings, blog, admin, etc.); routing is defined in `src/App.tsx`.
+- **`src/screens/`** — Route-level presentation (home, archive, pause, settings, marketing, admin, etc.); routing is defined in `src/App.tsx`.
 - **`src/components/`** — Shared UI, including `components/ui` (shadcn-style primitives).
 - **`supabase/migrations/`** — SQL migrations for the hosted database.
 - **`supabase/functions/`** — Edge functions (Deno): checkout, subscriptions, notifications, AI companions, journaling helpers, and related HTTP APIs. They run on Supabase in production; **secrets** (Stripe, Lovable email/AI keys, VAPID, etc.) are configured in the Supabase dashboard, not in the frontend `.env`.

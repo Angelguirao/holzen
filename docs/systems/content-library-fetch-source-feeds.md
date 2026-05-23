@@ -2,7 +2,7 @@
 
 > **Ingest edge not deployed at pause-first launch (2026-05).** `fetch-source-feeds` lives under `supabase/functions/legacy/`. Shipped companions read **`companion_catalog`** (renamed from `content_library` in cutover) via the catalog phase — see [active-surface.md](../ops/active-surface.md).
 
-This document describes the **Edge function** [`supabase/functions/fetch-source-feeds/index.ts`](../../supabase/functions/fetch-source-feeds/index.ts) and how it fills [`content_library`](../../supabase/migrations/20260321000003_content_library.sql) from admin-configured [`signal_sources`](../../src/components/admin/SourceCatalogViewer.tsx).
+This document describes the **Edge function** [`supabase/functions/fetch-source-feeds/index.ts`](../../supabase/functions/fetch-source-feeds/index.ts) and how it fills [`content_library`](../../supabase/migrations/20260321000003_content_library.sql) from admin-configured [`signal_sources`](../../src/screens/admin/components/SourceCatalogViewer.tsx).
 
 ## Role in the product
 
@@ -94,7 +94,7 @@ Stable grep tokens: **`fetch_feeds_batch`**, **`fetch_feeds_discover`**, **`fetc
 
 - **Shared helpers:** [`feed-ingest.ts`](../../supabase/functions/_shared/feed-ingest.ts) — RSS/Atom parsing, Map, URL normalization.
 - **Dedup:** [`content-dedup.ts`](../../supabase/functions/_shared/content-dedup.ts).
-- **Attribution in Signal UI:** [`essayToSignal`](../../supabase/functions/_shared/content-library.ts), [`SignalDisplay.tsx`](../../src/components/SignalDisplay.tsx).
+- **Attribution in Signal UI:** [`essayToSignal`](../../supabase/functions/_shared/content-library.ts), [`SignalDisplay.tsx`](../../src/screens/pause/components/SignalDisplay.tsx).
 
 ## Related docs
 

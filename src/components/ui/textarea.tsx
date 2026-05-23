@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
-import { writingTextareaClassName } from "@/lib/writing-surface";
+import { writingTextareaClassName } from "@/components/ui/writing-textarea";
 
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
 

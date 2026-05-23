@@ -3,7 +3,7 @@ import type { FetchedPauseInstance } from '@/features/pause/domain/session-model
 import {
   buildFetchedPauseInstanceFromFetch,
   type PauseInstanceContextSnapshotRow,
-} from '@/features/pause/application/session/fetched-instance-from-fetch';
+} from '@/features/pause/application/use-cases/session/fetched-instance-from-fetch';
 
 export const PAUSE_SESSION_QUERY_PREFIX = ['pause-session'] as const;
 

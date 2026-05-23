@@ -1,10 +1,10 @@
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { PageHeading } from '@/app/components/PageHeading';
+import { PageHeading } from '@/components/ui/page-heading';
 import { LetterToFutureSelf } from '@/legacy/full-shell/src/components/LetterToFutureSelf';
-import { ProLock } from '@/app/components/ProLock';
+import { ProLock } from '@/components/ui/pro-lock';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useHolzen } from '@/hooks/use-holzen';
+import { useHolzen } from '@/app/components/HolzenProvider';
 
 /**
  * Pro feature: letters to your future self (BTC context). Lives under Tools, not Journey.

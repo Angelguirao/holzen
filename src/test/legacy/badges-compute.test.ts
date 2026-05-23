@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { computeBadges } from '@/lib/badges/compute';
-import type { PauseFullRow } from '@/lib/pause-stats-data-query';
-import type { PauseCompanionEventRow } from '@/lib/pause-state';
+import { computeBadges } from '@/legacy/full-shell/src/lib/badges/compute';
+import type { PauseFullRow } from '@/legacy/full-shell/src/lib/pause-stats-data-query';
+import type { PauseCompanionEventRow } from '@/features/pause/public';
 
 function makeRow(overrides: Partial<PauseFullRow>): PauseFullRow {
   return {

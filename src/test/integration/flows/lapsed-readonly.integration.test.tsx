@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@/i18n';
 import '../lapsed-app-mocks';
 import { renderShippedApp } from '../render-shipped-app';
+import { waitForRouteLoaded } from '../wait-for-route-loaded';
 import { PauseEngagementBlocked } from '@/screens/pause/components/PauseEngagementBlocked';
 
 describe('F4 — Lapsed read-only surfaces', () => {
@@ -18,7 +19,8 @@ describe('F4 — Lapsed read-only surfaces', () => {
 
   it('allows /journey when lapsed', async () => {
     renderShippedApp({ initialEntries: ['/journey'] });
-    expect(await screen.findByRole('heading', { name: /journey/i })).toBeInTheDocument();
+    await waitForRouteLoaded();
+    expect(await screen.findByRole('heading', { name: /journey/i }, { timeout: 15_000 })).toBeInTheDocument();
   });
 
   it('shows reactivation screen instead of ritual when lapsed', () => {

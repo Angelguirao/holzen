@@ -107,7 +107,7 @@ An **application use case** is one coherent action: *log pause step*, *ensure tr
 
 ### P7 — Bounded contexts do not reach into each other’s guts
 
-Contexts such as **pause**, **subscription**, **companion**, **archive**, **settings**, **market** expose a **small public API** (`public.ts` or package `exports`). Internal folders are private.
+Contexts such as **pause**, **subscription**, **notifications**, **user**, **market**, **auth** expose a **small public API** (`public.ts`, `public-queries`, `public-hooks`). Internal folders are private.
 
 **Therefore:** Cross-context imports go through **published** symbols only; CI checks package/graph boundaries when available.
 
@@ -204,6 +204,8 @@ sequenceDiagram
 
 ---
 
+**Client folder map (presentation layers):** [client-src-layout.md](client-src-layout.md) — Mermaid diagram, placement rules, PR alignment checklist.
+
 ## 7. Screens vs bounded contexts (read this before naming packages)
 
 Three ideas often get conflated:
@@ -224,6 +226,7 @@ Three ideas often get conflated:
 | **subscription** | Entitlement, Stripe, trial, paywall, `user_can_engage_pause` projection | auth/billing + [active-surface.md](../ops/active-surface.md) |
 | **market** | BTC/volatility context, thresholds, display prefs; **creates** pause offers via cron | navigating-the-codebase, `check-volatility` |
 | **user** | Profile row, signal source prefs, quiet windows (settings **content**, not the settings shell) | settings + signals docs |
+| **notifications** | Multi-channel delivery: in-app inbox, web push registration, coordination with email; bell + settings channel UI | [notifications-delivery.md](../systems/notifications-delivery.md) |
 | **auth** | Session lifecycle | [auth-and-referral-system.md](../systems/auth/auth-and-referral-system.md) |
 | **roadmap** | Voting on roadmap items (small; may stay in `apps/web` only) | active-surface |
 | **admin** | Internal ops (supporting; not user product domain) | admin edges in manifest |
@@ -236,8 +239,8 @@ There is **no** `@holzen/home`, `@holzen/archive`, `@holzen/journey`, or `@holze
 
 | Screen | Composes |
 |--------|----------|
-| **Home** | pause (card, triggers), market, subscription, user, onboarding flow |
-| **Archive** | pause read models (past instances, collections) |
+| **Home** | pause (card, triggers), market, subscription, user, notifications (bell in shell), onboarding flow |
+| **Archive** | pause read models (past instances, echoes — **not** user collections; see [pause-client-architecture.md](../systems/pause-client-architecture.md) §7) |
 | **Journey** | pause aggregates / overview |
 | **Settings** | user + subscription + presentation |
 | **PauseSession** (`/pause`) | pause ritual (all steps) |
@@ -266,10 +269,12 @@ Treat **companion** as a **module inside `@holzen/pause`**, not a peer package �
 
 ### 8.1 Suggested interior of `@holzen/pause`
 
-Organize by **ritual concern**, not by old `src/hooks` filenames:
+**Canonical detail:** [pause-client-architecture.md](../systems/pause-client-architecture.md) (target tree, public barrels, collections → legacy, cross-context template).
+
+Organize by **ritual concern**, not by old `src/hooks` filenames or by “AI vs non-AI”:
 
 ```text
-packages/pause/src/
+packages/pause/src/   # today: src/features/pause/
   domain/
     instance.ts                 # states, transitions (mirrors pause-state.ts)
     ritual-steps.ts             # PauseStep, BriefPauseStep, canAdvanceFromStep
@@ -277,30 +282,28 @@ packages/pause/src/
     companion-slots.ts          # allowed types per template (volatility_v1)
   application/
     use-cases/
-      session/
-        hydrate-pause-session.ts
-        persist-session-snapshot.ts
-        exit-pause-session.ts
+      trigger/                  # manual open, pending offer
+      session/                  # hydrate, persist, exit
       ritual/
-        log-pause-step.ts
-        log-companion-event.ts
-        navigate-ritual-step.ts
-      breathing/
-        advance-breath-phase.ts
-      reflect/
-        generate-reflection.ts    # holzen-reflect
-      companions/
-        orchestrate-companion-slots.ts
-        fetch-grounding-enrichment.ts
-      terminal/
-        log-outcome-and-await-completed.ts
+        feel/
+        breathe/
+        reflect/                # reflection_step + holzen-reflect generation
+        frame/                  # intervention, slot orchestrate, grounding-enrich
+        decide/
+        done/
+      archive/                  # pauses/echoes reads (not user collections)
   ports/
     PauseRepository.ts
     ReflectGenerator.ts
     CompanionOrchestrator.ts
     PauseSessionStorage.ts
   public.ts
+  public-queries.ts
+  public-hooks.ts
+  public-rpc.ts
 ```
+
+**Do not** use peer top-level `companion/` and `reflect/` folders — both are ritual modules under `ritual/`. **Do not** keep user **library collections** in active MVP code ([pause-client-architecture.md](../systems/pause-client-architecture.md) §7).
 
 **Presentation** for ritual UI (`PauseBreathing`, `PauseFrame`, `PauseReflect`, …) can live in:
 
@@ -311,7 +314,7 @@ Full-screen `/companion/*` pages are **pause presentation** for a single slot (e
 
 ### 8.2 What about `companion-orchestrate` on the server?
 
-Edge functions remain in `supabase/functions/` — that is **infrastructure**. On the client, **`CompanionOrchestrator` port** + adapter in `packages/infrastructure` implements the HTTP call. The **use case** `orchestrateCompanionSlots` lives under **`pause/application/companion/`**.
+Edge functions remain in `supabase/functions/` — that is **infrastructure**. On the client, **`CompanionOrchestrator` port** + adapter in `infrastructure/edge/` implements the HTTP call. Frame use cases (orchestrate, intervention, retry) live under **`pause/application/use-cases/ritual/frame/`** ([pause-client-architecture.md](../systems/pause-client-architecture.md) §3).
 
 Pipeline narrative stays in [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md); **ownership** stays under **pause**.
 
@@ -332,7 +335,11 @@ If the **edge** tree is huge, use `supabase/functions/_shared/pause/` and `_shar
 2. **One front door for mutations** — use cases call `pause_log_step` / `pause_log_companion`; components never RPC directly.  
 3. **Step-mapped use cases** — names match product beats (Feel, Breathe, Reflect, Frame, Decide) and RPC `step_type` where applicable.  
 4. **Companions subordinate to instance** — every orchestrate/reflect/grounding call includes `pauseInstanceId`; no global companion store.  
-5. **Read models explicit** — Archive/Journey queries live under `pause/infrastructure/queries/` (or `application/queries/`), not scattered in screen files.
+5. **Read models explicit** — Archive/Journey queries live under `pause/infrastructure/queries/` (or `application/queries/`), not scattered in screen files. User **collections** are not MVP — see [pause-client-architecture.md](../systems/pause-client-architecture.md) §7.
+
+### 8.5 Context module template (other bounded contexts)
+
+Pause is the **reference** client module. **`subscription`**, **`auth`**, **`market`**, **`user`**, and **`notifications`** should mirror the same skeleton (`domain` → `application/use-cases/<concern>/` → `ports` → `infrastructure` → `presentation` → `public*`) with use-case folders named from **`docs/systems/*` vocabulary**, not from nav tabs or transport layers. Full table: [pause-client-architecture.md](../systems/pause-client-architecture.md) §9.
 
 ---
 
@@ -355,7 +362,7 @@ External reading is **optional**; this table is the project’s **curated** stan
 
 ## 10. Target repository shape (pre-launch baseline)
 
-The **current** tree (`src/pages`, flat `src/hooks`, flat `src/lib`) is **transitional**. The **target** shape below implements these principles. Operational detail: [frontend-module-layout.md](frontend-module-layout.md).
+The **current** tree (flat `src/lib`, screen-local hooks) is **transitional**. Presentation lives in `src/screens/`; the former `src/pages/` shim was removed (May 2026). The **target** shape below implements these principles. Operational detail: [frontend-module-layout.md](frontend-module-layout.md).
 
 ```text
 apps/
@@ -413,7 +420,7 @@ Flag in PR review when you see:
 
 - [ ] **Authoritative transition** implemented only in React (no RPC/RLS/edge backstop).
 - [ ] **`supabase.from` or `functions.invoke` in a component** (presentation bypassing application).
-- [ ] **God hook** (>~150 lines) mixing fetch, navigation, analytics, and policy — extract use case.
+- [ ] **God hook** (>~200 lines) mixing fetch, navigation, analytics, and policy — extract use case.
 - [ ] **Types exported from `.tsx`** imported by `lib/` or other contexts — move to `domain/types` or `contracts`.
 - [ ] **Deep import** across contexts (`@/features/pause/infrastructure/...` from settings).
 - [ ] **Duplicate cache**: TanStack Query + global store for the same entity.
@@ -451,7 +458,7 @@ holzen-application-architecture.md     ← you are here (principles)
         ├── decisions/2026-05-17-modular-monolith-hexagonal-client.md
         ├── modern-react-practices-holzen.md       (React industry norms vs Holzen)
         ├── react-screen-orchestration.md          (React mechanics)
-        ├── refactoring-strategy.md                (incremental moves; superseded for greenfield by §9)
+        ├── refactoring-strategy.md                (incremental moves; superseded for greenfield by §10)
         ├── docs/systems/*                         (per-context behavior)
         └── ops/active-surface.md                  (shipped manifest)
 ```
@@ -469,7 +476,7 @@ When **behavior** of pause changes, update **`pause-system.md`**. When **why we 
 | Principle amendment | PR discussion + edit this doc + ADR if structure-wide |
 | Folder-only refactor | Update [frontend-module-layout.md](frontend-module-layout.md); no principle edit |
 
-**Supersession:** [refactoring-strategy.md](refactoring-strategy.md) remains valid for **small extractions** inside the old tree until the monorepo migration completes; greenfield work should follow §9.
+**Supersession:** [refactoring-strategy.md](refactoring-strategy.md) remains valid for **small extractions** inside the transitional tree until the monorepo migration completes; greenfield work should follow **§10** (target repository shape) and per-context [pause-client-architecture.md](../systems/pause-client-architecture.md) §9.
 
 ---
 

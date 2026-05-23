@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Anchor, Clock, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { toast } from 'sonner';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { Button } from '@/components/ui/button';

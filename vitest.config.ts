@@ -8,7 +8,10 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
-    include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    include: [
+      "src/**/*.{test,spec}.{ts,tsx}",
+      "supabase/functions/_shared/**/*.{test,spec}.{ts,tsx}",
+    ],
     exclude: ["src/legacy/**", "src/test/legacy/**", "node_modules/**"],
     /**
      * Coverage configuration — designed for CI (`npm run test:ci`).
@@ -25,7 +28,7 @@ export default defineConfig({
      * re-opens celebratory dialogs.
      *
      * The thresholds are intentionally just below the current measured
-     * coverage from `src/test/checkout-*` — high enough to catch regressions
+     * coverage from `CheckoutConfirmation.*.test.tsx` — high enough to catch regressions
      * (e.g. a new branch added without a matching test) but with a small
      * cushion so unrelated cosmetic edits don't trip CI.
      */
@@ -37,14 +40,14 @@ export default defineConfig({
       // is renamed/removed and stops touching them — that way CI fails
       // loudly instead of silently dropping coverage.
       include: [
-        "src/components/CheckoutConfirmation.tsx",
-        "src/lib/checkout-suppression-window.ts",
+        "src/features/subscription/presentation/CheckoutConfirmation.tsx",
+        "src/features/subscription/application/checkout-suppression-window.ts",
       ],
       // Per-file thresholds, scoped to the two guard files. `100` for any
       // metric is a hard ceiling we don't want to lock in — leave a small
       // margin so trivial edits don't fail CI.
       thresholds: {
-        "src/components/CheckoutConfirmation.tsx": {
+        "src/features/subscription/presentation/CheckoutConfirmation.tsx": {
           // Measured baseline (Apr 2026): stmts 85.26 / branches 70.49 /
           // funcs 78.94 / lines 85.26. Floors set ~5pt below to absorb
           // benign edits without forcing a test for every cosmetic tweak.
@@ -53,7 +56,7 @@ export default defineConfig({
           functions: 73,
           lines: 80,
         },
-        "src/lib/checkout-suppression-window.ts": {
+        "src/features/subscription/application/checkout-suppression-window.ts": {
           // Measured baseline (Apr 2026): stmts 90.10 / branches 65.16 /
           // funcs 77.77 / lines 90.10. Branch coverage is lower because
           // several `try/catch` arms exist purely as belt-and-braces

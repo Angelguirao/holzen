@@ -139,7 +139,7 @@ The intervention type does not change the session theme, and the session theme d
 | Question generator | `supabase/functions/_shared/generators/question.ts` |
 | Session intent | `supabase/functions/_shared/session-intent.ts` |
 | Orchestrator | `supabase/functions/companion-orchestrate/index.ts` |
-| UI | `src/components/CompanionSection.tsx` (intervention block + cross-ref badges) |
+| UI | `src/screens/pause/components/CompanionSection.tsx` (intervention block + cross-ref badges) |
 
 ---
 

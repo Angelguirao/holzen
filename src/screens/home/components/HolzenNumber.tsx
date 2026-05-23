@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { motion, useReducedMotion } from 'framer-motion';
-import { getHolzenNumberQueryOptions } from '@/lib/holzen-number-query';
+import { getHolzenNumberQueryOptions } from '@/features/user/public-queries';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 
 /**

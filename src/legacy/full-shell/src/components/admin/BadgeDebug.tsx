@@ -1,16 +1,16 @@
 import { useMemo } from 'react';
 import { Check, X, Lock } from 'lucide-react';
-import { useAuth } from '@/hooks/use-auth';
-import { usePauseStatsData } from '@/hooks/use-pause-stats-data';
-import { useHoldGoalProfile } from '@/hooks/use-hold-goal';
-import { useBadges } from '@/hooks/use-badges';
+import { useAuth } from '@/features/auth/public';
+import { usePauseStatsData } from '@/legacy/full-shell/src/hooks/use-pause-stats-data';
+import { useHoldGoalProfile } from '@/features/user/public-hooks';
+import { useBadges } from '@/legacy/full-shell/src/hooks/use-badges';
 import {
   BADGE_DEFINITIONS,
   CORE_SKILL_KEYS,
   LEGACY_CALENDAR,
   HALVING_DATES,
   type BadgeFamily,
-} from '@/lib/badges/definitions';
+} from '@/legacy/full-shell/src/lib/badges/definitions';
 import { cn } from '@/lib/utils';
 
 /**

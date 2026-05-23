@@ -62,7 +62,7 @@ These are the concepts that most directly help you review auth + routing correct
   - protected pages (e.g. `/pause`, `/admin`): redirect to `/welcome` if unauthenticated
   - public-only pages (e.g. `/welcome`, `/auth`): redirect to `/` if authenticated
 
-### `src/components/AppLayout.tsx` — the protected shell
+### `src/app/components/AppLayout.tsx` — the protected shell
 
 - Renders the "app shell" that sits under protected routes.
 - Hosts shared UI elements like the notification bell and pause auto-trigger banner.
@@ -74,7 +74,7 @@ These are the concepts that most directly help you review auth + routing correct
 - Defines how auth state is stored (localStorage) and refreshed (auto token refresh).
 - This determines whether the app can assume "user survives reload" behavior.
 
-### `src/hooks/use-auth.tsx` — source of truth for `useAuth()`
+### `@/features/auth/public` — `AuthProvider` / `useAuth()`
 
 - `AuthProvider` is the single shared authority for:
   - `user`

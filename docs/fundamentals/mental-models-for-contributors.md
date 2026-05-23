@@ -69,7 +69,7 @@ If you wonder **“why not Next.js / a full framework?”**, see [spa-framework-
 
 **Important:** Hooks are **not** microservices or daemons. Each **call** is tied to **one place in the component tree**. Two different screens calling `useHolzen()` get **separate** state unless you lift state up or use global stores (this app mostly uses hooks + Supabase, not Redux).
 
-**In Holzen:** Feature logic often lives in `src/hooks/`; pages compose hooks and pass data into `src/components/`. See [navigating-the-codebase.md](navigating-the-codebase.md) (section *Data and “feature” state*).
+**In Holzen:** Domain logic lives in `src/features/<context>/` (hooks via `public-hooks` or screen-local `screens/<route>/hooks/`); routes compose hooks and pass data into `src/components/`. See [navigating-the-codebase.md](navigating-the-codebase.md) (section *Data and “feature” state*).
 
 ---
 

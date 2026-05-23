@@ -1,6 +1,6 @@
 # Marketing / public screens
 
-Public routes (no auth shell). Landing section components live under `components/`.
+Public routes (no auth shell). Shared marketing chrome: `components/PublicFooter.tsx`. Other section components under `components/`.
 
 | Screen | Route |
 |--------|-------|
@@ -17,6 +17,6 @@ Public routes (no auth shell). Landing section components live under `components
 | `ReserveScreen` | `/reserve` |
 | `UnsubscribeScreen` | `/unsubscribe` |
 
-`pages/*.tsx` — thin re-exports for Lovable/route stability. `App.tsx` lazy-loads `screens/marketing/*Screen` directly.
+`App.tsx` lazy-loads `screens/marketing/*Screen` directly.
 
 Internal ops routes live under [`screens/ops/`](../ops/README.md).

@@ -137,15 +137,15 @@ When `selectIntervention` picks **pattern** as the primary intervention:
 | Area | Path |
 |------|------|
 | Generator | `supabase/functions/_shared/generators/history.ts` |
-| Era pool + `pickEra` helper | `supabase/functions/_shared/history-util.ts` (pure, unit-tested in `src/test/history-util.test.ts`) |
+| Era pool + `pickEra` helper | `supabase/functions/_shared/history-util.ts` (pure, unit-tested in `supabase/functions/_shared/history-util.test.ts`) |
 | Orchestrator | `supabase/functions/companion-orchestrate/index.ts` |
 | Session intent | `supabase/functions/_shared/session-intent.ts` |
 | Quality gate | `supabase/functions/_shared/quality.ts` |
 | Phase config | `supabase/functions/_shared/phase-config.ts` |
 | Content library | `supabase/functions/_shared/content-library.ts` |
-| Client invoke | `src/hooks/use-companion-data.ts` |
-| Full-screen view | `src/pages/CompanionHistoryPage.tsx` — route `/companion/history/:pauseInstanceId` |
-| UI | `src/components/CompanionSection.tsx` (Look Back card via `HistoricalInsightDisplay`) |
+| Client invoke | `src/features/pause/presentation/use-companion-data.ts` (export: `public-hooks`) |
+| Full-screen view | `src/screens/pause/CompanionHistoryPage.tsx` — route `/companion/history/:pauseInstanceId` |
+| UI | `src/screens/pause/components/CompanionSection.tsx` (Look Back card via `HistoricalInsightDisplay`) |
 
 ---
 

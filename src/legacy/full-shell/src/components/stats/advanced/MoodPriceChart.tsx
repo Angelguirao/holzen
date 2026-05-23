@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { PauseFullRow } from '@/lib/pause-stats-data-query';
+import type { PauseFullRow } from '@/legacy/full-shell/src/lib/pause-stats-data-query';
 
 interface Props {
   rows: readonly PauseFullRow[];

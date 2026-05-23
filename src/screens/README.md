@@ -2,31 +2,34 @@
 
 Route-scoped UI and thin orchestration live here. **Domain rules** stay in `src/features/<context>/`.
 
-**Canonical:** [docs/fundamentals/frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) §11 (waves 5b–5i), [docs/fundamentals/react-screen-orchestration.md](../../docs/fundamentals/react-screen-orchestration.md).
+**Canonical:** [docs/fundamentals/client-src-layout.md](../../docs/fundamentals/client-src-layout.md), [docs/fundamentals/frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) §11 (waves 5b–5i), [docs/fundamentals/react-screen-orchestration.md](../../docs/fundamentals/react-screen-orchestration.md), [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md) (kebab component files, prefixes).
 
 ## Related folders
 
 | Folder | Role |
 |--------|------|
 | `src/app/components/` | Cross-route shell (layout, bottom nav, page meta) — see [src/app/README.md](../app/README.md) |
-| `src/components/ui/` | Design system (shadcn) |
+| `src/components/` | Design system (`ui/`) + shared icons — [components/README.md](../components/README.md) |
 
 ## Layout
 
 ```text
 screens/<route>/
   components/     # presentation for this route only
-  hooks/          # orchestration used only by this screen (optional)
-  *Screen.tsx     # optional main export (pages/ may re-export)
+  hooks/          # screen-local orchestration (optional — Home, Settings; not pause)
+  lib/            # pure screen helpers (optional)
+  *Screen.tsx     # route entry (lazy-loaded from App.tsx)
 ```
+
+Co-locate Vitest beside the file under test. **Pause:** ritual conductors live in `features/pause/presentation/` — import `@/features/pause/public-hooks` from `PauseSessionScreen` (no `screens/pause/hooks/`). Cross-route flows: [`src/test/integration/`](../test/integration/README.md).
 
 | Screen folder | Routes / product area | Screen map doc |
 |---------------|----------------------|----------------|
 | `home/` | `/` — **`HomeScreen`**, `components/`, `hooks/` (incl. `useHolzen`) | [docs/screens/home.md](../../docs/screens/home.md) |
-| `pause/` | `/pause`, `/companion/*` — **`PauseSessionScreen`**, `components/`, `hooks/` | [docs/screens/pause.md](../../docs/screens/pause.md) |
-| `archive/` | Archive tab — **`ArchiveScreen`**, `hooks/`, `components/` (+ `library/`) | [README](archive/README.md), [IA](../../docs/design/information-architecture.md) |
+| `pause/` | `/pause`, `/companion/*` — **`PauseSessionScreen`**, `components/`; orchestration → `@/features/pause/public-hooks` | [docs/screens/pause.md](../../docs/screens/pause.md) |
+| `archive/` | Archive tab — **`ArchiveScreen`**, `components/` (+ `components/library/` for current-pause card — not MVP Collections) | [README](archive/README.md), [active-surface](../../docs/ops/active-surface.md), [IA](../../docs/design/information-architecture.md) |
 | `journey/` | Journey tab — **`components/` migrated (5e)** | [docs/screens/journey-overview.md](../../docs/screens/journey-overview.md) |
-| `settings/` | Settings hub — **`SettingsStateLayout`**, `hooks/`, `components/`; thin `pages/settings/` | [README](settings/README.md) |
+| `settings/` | Settings hub — **`SettingsStateLayout`**, `hooks/`, `components/` | [README](settings/README.md) |
 | `marketing/` | Public pages — **`AboutScreen`**, landing **`components/`** | [README](marketing/README.md) |
 | `admin/` | `/admin` — **`AdminScreen`**, `hooks/`, **`components/`** | [README](admin/README.md) |
 | `ops/` | Dev/ops (`/smoke-test`, `/edge-coverage`, …) | [README](ops/README.md) |
@@ -45,6 +48,8 @@ screens/<route>/
 |---------|------------|
 | Pause ritual UI | `screens/pause/components/` |
 | Pause rules / RPC | `features/pause/` |
-| Home dashboard UI + hooks | `screens/home/components/` (incl. market widgets, onboarding), `hooks/` |
-| Route wiring | `src/pages/` + `App.tsx` |
-| Primitives | `components/ui/` |
+| Home dashboard UI + hooks | `screens/home/components/` (`HoldGoalWidget`, `InstallHolzenCard`, `ThresholdFrequencyEstimator`, onboarding), `hooks/` |
+| Settings prefs UI | `screens/settings/components/` (`ThresholdSetting`, `QuietWindowsManager`, …) |
+| Route wiring | `App.tsx` → `screens/<route>/*Screen.tsx` |
+| Primitives / mood glyphs | [components/README.md](../components/README.md) (`ui/`, `icons/`) |
+| Home → Pause flow (layers + RPC/edge) | [client-src-layout.md](../../docs/fundamentals/client-src-layout.md) § Reference flow |

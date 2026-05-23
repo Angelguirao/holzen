@@ -7,9 +7,9 @@
 | When | Slice |
 |------|--------|
 | 2026-04 | **`Home`:** `NeedAMomentButton`, `AutoCooldownIndicator`, and `ProLockedWidget` moved to **`src/screens/home/components/HomePauseChrome.tsx`**. |
-| 2026-04 | **`PauseSession`:** localStorage + types → **`src/lib/pause-session-storage.ts`**; loading/error full-screen → **`PauseSessionGate`**; curtain / gradient / chrome → **`PauseSessionScaffold`**. |
-| 2026-04 | **`use-holzen`:** pure helpers → **`reflection-persist-error`**, **`holzen-manual-cooldown`**, **`pause-context-from-btc`**, **`btc-move-severity`**, **`next-cron-quarter`** (`src/lib/`). Hook still owns orchestration + state. |
-| 2026-04 | **`use-companion-data`:** **`src/lib/companion-*`** helpers (orchestrate types, reflection cache, mood history, sources, recency, completion sync/maps, slot-apply, URL) + **`use-companion-library-favorites.ts`** for per-slot hearts stored on **`pause_instances.metadata`**. Hook keeps orchestration + companion state. |
+| 2026-04 | **`PauseSession`:** localStorage + types → **`src/features/pause/infrastructure/session/persisted-session-storage.ts`**; loading/error full-screen → **`PauseSessionGate`**; curtain / gradient / chrome → **`PauseSessionScaffold`**. |
+| 2026-04 | **`useHolzen` producer split:** pure helpers → **`reflection-persist-error`** (`features/pause/application/use-cases/`), **`manual-cooldown`** (`features/market/application/`), market context + severity in **`features/market`** / **`features/pause/public`**. Conductors → **`features/pause/presentation/use-holzen-home-context-state.ts`** + **`use-holzen-manual-trigger-orchestration.ts`**; **`useHolzen()`** exported from **`HolzenProvider`**. |
+| 2026-04 | **`use-companion-data`:** helpers consolidated under **`features/pause/`** (orchestrate types, reflection cache, mood history, sources, recency, completion sync/maps, slot-apply, URL) + favorites on **`pause_instances.metadata`**. Hook in **`features/pause/presentation/`**; use cases transitional at **`application/use-cases/companion/`** → target **`ritual/frame/`**. |
 
 ## Goal
 
@@ -17,12 +17,13 @@ Improve **maintainability and testability** by breaking up **oversized page modu
 
 ## Rationale
 
-The app already follows sound patterns (function components, custom hooks, route guards). Several **pages** carry most of a flow in one file (e.g. **`Home`**, **`PauseSession`**), and **`use-holzen`** bundles BTC context, reflection generation, cooldowns, and profile updates. That is **shippable** but makes **reviews, refactors, and unit tests** harder than necessary.
+The app already follows sound patterns (function components, custom hooks, route guards). Several **pages** carry most of a flow in one file (e.g. **`Home`**, **`PauseSession`**), and **`useCompanionData`** still bundles companion orchestration. That is **shippable** but makes **reviews, refactors, and unit tests** harder than necessary.
 
 ## Direction
 
-- **Pages:** Extract **presentational** subcomponents and small hooks colocated under `src/components/<feature>/` or `src/pages/<Feature>/parts/` — follow existing patterns (`pause/Pause*` components).
-- **`use-holzen`:** Consider splitting only where boundaries are clear (e.g. cooldown helpers vs `generateMessage` vs BTC fetch), after tests or a stable API for callers.
+- **Screens:** Extract **presentational** subcomponents and small hooks under `src/screens/<route>/components/` and `hooks/` — follow `screens/pause/components/Pause*` patterns. See [client-src-layout.md](../fundamentals/client-src-layout.md).
+- **`useCompanionData`:** Continue peeling use cases toward `ritual/frame/` incrementally (Phase A backlog).
+- **`useHolzen`:** Producer split **shipped** — further splits only if caller boundaries justify them ([refactoring-strategy.md](../fundamentals/refactoring-strategy.md) §4).
 - **Scope:** Touch **one vertical slice per PR**; avoid drive-by renames across the tree.
 
 ## Related

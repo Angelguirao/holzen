@@ -49,28 +49,28 @@ Full diagram, metadata, boot-recovery, and domain notes: **[index-html-and-spa-s
 
 ## 4. Routing and layout (`src/App.tsx`)
 
-Routes are declared in one file. **Page components** under `src/pages/` are **`React.lazy`**-loaded; **`Suspense`** around **`Routes`** shows a small full-screen fallback while a chunk downloads. Two patterns matter:
+Routes are declared in **`src/App.tsx`**. Screen modules under **`src/screens/`** are **`React.lazy`**-loaded. **`Suspense`** around **`Routes`** shows a small full-screen fallback while a chunk downloads. Two patterns matter:
 
-- **`ProtectedRoute`** — If auth is still loading, show `AuthLoading`. If no user, redirect to `/welcome`. Otherwise render children.
+- **`ProtectedRoute`** — If auth is still loading, show `AuthLoading` (`src/app/components/`). If no user, redirect to `/welcome`. Otherwise render children.
 - **`PublicOnlyRoute`** — Logged-in users are redirected to `/`.
 
-**Main shell:** routes under `/`, `/archive`, `/tools` (tools index / `ToolsHub`), `/journey/*` (Journey hub; `/journey` redirects to `/journey/stats`), `/settings` (plus `/settings/about`, `/settings/billing-history`) use **`AppLayout`**: max-width column, **`<header>`** (“Holzen” + `NotificationBell`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`** (five tabs: Home, Archive, Tools, Journey, Settings). `AppLayout` also wires `useHolzen`, `useLanguageSync`, and `useAutoTrigger` (pause-ready banner on non-home routes).
+**Main shell (four tabs):** `/`, `/archive`, `/journey`, `/settings` (+ nested `/settings/about`, `/settings/billing-history`, `/settings/:section`) use **`AppLayout`** (`src/app/components/AppLayout.tsx`): max-width column, header (“Holzen” + `NotificationBell` from `features/notifications/public-hooks`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`** (Home, Archive, Journey, Settings). `AppLayout` uses `useShellProfile` + `ShellPauseChrome` (pause modal/banner; `useHolzen` only inside that component) and passes pause-ready state via outlet context; **`HolzenProvider`** ([`src/app/components/HolzenProvider.tsx`](../../src/app/components/HolzenProvider.tsx)) wraps signed-in routes (`useHolzenHomeContextState` in pause presentation).
 
-**Full-screen tool routes** (no `AppLayout`): `/pause`, the **`/tools/*`** tree (`/tools/breathe`, `/tools/ground` with nested `history` for the grounding journal via `ToolsGroundLayout`, `/tools/practice/*`), full-view companion pages under `/companion/...`, and `/admin*`. There are no alternate short paths for the same screens — bookmark **`/tools/...`**.
+**Full-screen authenticated routes** (no `AppLayout`, `RobotsNoIndex`): `/pause`, companion deep links `/companion/{zoom-out,history,signal,grounding}/:pauseInstanceId`, `/admin`, `/admin/smoke-test`, `/admin/sentry-alerts`, `/admin/edge-coverage`.
 
-**Journey** lives only at **`/journey/:tab`** (and `/journey` → `/journey/stats`). Letter deep links from notifications use **`/tools/letters?letter=`**.
+**Public / utility:** `/welcome` (landing), `/auth`, `/reset-password`, `/unsubscribe`, `/terms`, `/privacy`, `/about`, `/blog`, `/blog/:slug`, `/roadmap`, `/reserve`.
 
-**Redirects:** `/index` → `/`, `/journey` → `/journey/stats`.
+**Redirects:** `/index` → `/`.
 
-**Public pages:** `/welcome` (landing), `/auth`, `/reset-password`, `/terms`, `/privacy`, `/about`, `/blog`, `/blog/:slug`, `/roadmap`, `/reserve`.
+**Dead IA (pause-first):** `/tools/*`, `/library`, old journey stats paths, etc. → **`NotFound`** (no legacy redirects). Full pre-strip map: git tag `full-ia-pre-strip` / [active-surface.md](../ops/active-surface.md).
 
-**Catch-all:** `*` → `NotFound`.
+**Catch-all:** `*` → `NotFound` (`screens/marketing/NotFoundScreen`).
 
 ---
 
-## 5. Authentication (`src/hooks/use-auth.tsx`)
+## 5. Authentication (`src/features/auth/public`)
 
-- **`AuthProvider`** subscribes to `supabase.auth.onAuthStateChange` and seeds state from `getSession()`.
+- **`AuthProvider`** (`features/auth/public.ts`) subscribes to `supabase.auth.onAuthStateChange` and seeds state from `getSession()`.
 - On **`SIGNED_IN`**, if `localStorage` has `holzen_ref`, the app inserts **`referral_pending_jobs`** then invokes **`record-referral`**; **`holzen_ref`** is cleared on success or invalid code (see **`docs/systems/auth/auth-and-referral-system.md`**).
 - **`useAuth()`** exposes `user`, `loading`, `signOut`.
 
@@ -82,19 +82,19 @@ The Supabase browser client is **`src/integrations/supabase/client.ts`** (typed 
 
 | Concern | Typical location |
 |--------|-------------------|
-| User profile, language, pause AI prefs (`reflection_style` / `reflection_tone` on `profiles`), thresholds | `use-profile.ts` + `profiles` table |
-| BTC context, manual pause, companion orchestration triggers | `use-holzen.ts` |
-| Companion payloads for the active pause | `use-companion-data.ts` |
-| Subscription / Stripe checkout | `use-subscription.ts` |
-| Library content | `use-library.ts` |
-| Push (VAPID, registration) | `use-push-notifications.ts` |
-| Admin metrics | `use-admin-stats.ts` |
+| User profile, language, pause AI prefs (`reflection_style` / `reflection_tone` on `profiles`), thresholds | `@/features/user/public-hooks` (`useProfile`) + `profiles` table |
+| BTC context, manual pause, companion orchestration triggers | `HolzenProvider` / `useHolzenHomeContextState` (`@/features/pause/public-hooks`) |
+| Companion payloads for the active pause | `useCompanionData` (`@/features/pause/public-hooks`) |
+| Subscription / Stripe checkout | `@/features/subscription/public-hooks` (`useSubscription`) |
+| User collections (legacy full IA) | `src/legacy/archive-collections/` — **not** pause-first MVP |
+| Push (VAPID, registration) | `@/features/notifications/public-hooks` (`usePushNotifications`) |
+| Admin metrics | `screens/admin/hooks/` (or `@/features/*` as migrated) |
 
 TanStack Query is available app-wide (`QueryClient` in `App.tsx`); individual hooks may use `useEffect` + Supabase directly — follow the nearest feature.
 
-**Architecture (truth vs projection):** [client-server-architecture-holzen.md](client-server-architecture-holzen.md) — how Postgres/RLS/edge relate to the SPA cache and UI-only state.
+**Architecture (truth vs projection):** [client-server-architecture-holzen.md](client-server-architecture-holzen.md) — how Postgres/RLS/edge relate to the SPA cache and UI-only state. **Folder layers:** [client-src-layout.md](client-src-layout.md).
 
-**Shared client fetch patterns (dedupe):** subscription status is centralized in **`use-subscription.ts`** (`useQuery` so all consumers share one `check-subscription` request/cache). BTC / market reads go through **`fetchBtcData`** in **`src/lib/btc.ts`**, which coalesces concurrent calls per currency. **`use-profile.ts`** loads the signed-in **`profiles`** row via TanStack Query (`getProfileRowQueryOptions` / `PROFILE_QUERY_KEY` / `['profile', userId]`) so every **`useHolzen()`** tree shares one in-flight fetch and cache entry; **`HomeGoalWhyCard`** subscribes with the same options (no second `profiles` read for hold-goal header data). Successful **`profiles`** writes **`invalidateQueries`** that key so parallel trees refetch server truth (see [home-fetch-deduplication.md](../backlog/home-fetch-deduplication.md)).
+**Shared client fetch patterns (dedupe):** subscription status is centralized in **`@/features/subscription/public-hooks`** (`useSubscription` + `useQuery` so all consumers share one `check-subscription` request/cache). BTC / market reads go through **`fetchBtcData`** in **`src/features/market/infrastructure/fetch-market-data.ts`** (export `@/features/market/public`), which coalesces concurrent calls per currency. Profile row loads via **`@/features/user/public-hooks`** (`useProfile` + `getProfileRowQueryOptions`) so every **`useHolzen()`** tree shares one in-flight fetch and cache entry; **`HomeGoalWhyCard`** subscribes with the same options (no second `profiles` read for hold-goal header data). Successful **`profiles`** writes **`invalidateQueries`** that key so parallel trees refetch server truth (see [home-fetch-deduplication.md](../backlog/home-fetch-deduplication.md)).
 
 ### 6.1 TanStack Query vs `useEffect` + Supabase
 
@@ -104,35 +104,43 @@ Both are valid. Use this to choose and to match nearby code:
 
 | Prefer | When |
 |--------|------|
-| **`useQuery` / `useMutation`** | Data is **shared across routes or components**, benefits from a **stable cache key**, or needs **invalidation** after mutations (e.g. subscription status — **`use-subscription.ts`**; signed-in **`profiles`** row — **`use-profile.ts`**; blog posts — **`Blog.tsx`**, **`BlogPost.tsx`**). |
-| **`useEffect` + `supabase` (or `fetch`)** | State is **owned by one hook/screen** with **no shared cache benefit**, or logic is **tightly coupled** to non-cache concerns (orchestration in **`use-holzen.ts`**, companion pipeline in **`use-companion-data.ts`**). **`use-profile.ts`** still maps the loaded row into many `useState` fields via an effect after the **`profiles`** query succeeds. |
+| **`useQuery` / `useMutation`** | Data is **shared across routes or components**, benefits from a **stable cache key**, or needs **invalidation** after mutations (e.g. subscription — **`@/features/subscription/public-hooks`**; **`profiles`** row — **`@/features/user/public-hooks`**; blog posts — marketing screens). |
+| **`useEffect` + `supabase` (or `fetch`)** | State is **owned by one hook/screen** with **no shared cache benefit**, or logic is **tightly coupled** to non-cache concerns (orchestration in **`useHolzenHomeContextState`**, companion pipeline in **`useCompanionData`**). **`useProfile`** still maps the loaded row into many `useState` fields via an effect after the **`profiles`** query succeeds. |
 | **Module-level coalescing** | Heavy **third-party** reads where Query is not yet adopted — **`fetchBtcData`** dedupes in-flight requests per currency without a shared query cache. |
 
 Do **not** add global **`QueryClient` defaultOptions** lightly: they affect every future `useQuery`. Prefer explicit options on each query until team-wide defaults are agreed ([data-fetching-conventions.md](../backlog/data-fetching-conventions.md)). **Migrate opportunistically** when editing a feature, not in a standalone rewrite.
 
 ---
 
-## 7. Screens and pages (post–wave 5)
+## 7. Screens (`src/screens/`)
 
-**Implementation** lives under **`src/screens/<route>/`** (`*Screen.tsx`, `components/`, `hooks/`). **`src/pages/**/*.tsx`** are **thin re-exports only** (`npm run check:thin-pages`). **`App.tsx`** lazy-loads screen entrypoints.
+**Canonical UI** lives under **`src/screens/<route>/`** ([screens/README.md](../../src/screens/README.md)). **`App.tsx`** lazy-imports `*Screen.tsx` files directly — edit the screen module, not a separate pages shim.
 
-| Area | Screen folder | Notes |
+| Area | Screen module | Routes |
 |------|---------------|--------|
-| Core tabs | `screens/home`, `archive`, `journey`, `settings` | Pause-first shell |
-| Pause + companions | `screens/pause` | `/pause`, `/companion/*` |
-| Public / marketing | `screens/marketing` | `/welcome`, `/auth`, legal, blog |
-| Admin | `screens/admin` | `/admin` |
-| Internal ops | `screens/ops` | Edge coverage, smoke test, Sentry alerts |
+| Home | `screens/home/HomeScreen.tsx` | `/` |
+| Archive | `screens/archive/ArchiveScreen.tsx` | `/archive` |
+| Journey | `screens/journey/JourneyOverviewScreen.tsx` | `/journey` |
+| Settings | `screens/settings/*` | `/settings`, `/settings/:section`, billing, about |
+| Pause | `screens/pause/PauseSessionScreen.tsx` + `components/` | `/pause` |
+| Companions | `screens/pause/Companion*Page.tsx` | `/companion/*/:pauseInstanceId` |
+| Marketing | `screens/marketing/*Screen.tsx` | `/welcome`, `/auth`, legal, blog, … |
+| Admin / ops | `screens/admin/`, `screens/ops/` | `/admin`, smoke-test, edge-coverage, … |
 
-Index: [src/screens/README.md](../../src/screens/README.md).
+Pre-strip pages (`ToolsHub`, `Library`, immersive `/tools/*`, …) live under **`src/legacy/`** — not routed in the shipped app.
 
 ---
 
-## 8. Components and app shell
+## 8. Presentation folders (not one `components/` junk drawer)
 
-- **`src/components/ui/`** — shadcn/Radix primitives only at the `components/` root (enforced by `check:no-root-components`).
-- **`src/app/components/`** — cross-route shell: `AppLayout`, `BottomNav`, `ErrorBoundary`, `CookieConsent`, checkout/feedback chrome, etc. See [src/app/README.md](../../src/app/README.md).
-- **Per-screen UI** — under `src/screens/<route>/components/`, not `src/components/<feature>/`.
+| Folder | Role | README |
+|--------|------|--------|
+| `src/components/ui/` | Design system (shadcn/Radix + Holzen composites) | [components/README.md](../../src/components/README.md) |
+| `src/components/icons/` | Mood / outcome glyphs (pause ritual) | same |
+| `src/app/components/` | Cross-route shell (layout, nav, meta, checkout, feedback) | [app/README.md](../../src/app/README.md) |
+| `src/screens/<route>/components/` | Route-specific UI | [screens/README.md](../../src/screens/README.md) |
+
+**Rule:** no new `src/components/*.tsx` at repo root — CI `check:no-root-components`.
 
 ---
 
@@ -167,19 +175,19 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 | Function | Call sites (representative) |
 |----------|-----------------------------|
-| `holzen-reflect` | `use-pause-reflect-generation.ts` → `pause-reflect-artifact.ts` (`invokeEdge`) |
-| `companion-orchestrate` | `use-companion-data.ts` |
-| `suggest-grounding` | `Home.tsx`, `Ground.tsx` |
-| `journal-prompt` | `GuidedJournal.tsx` |
+| `holzen-reflect` | `features/pause/presentation/reflect/generation/use-pause-reflect-generation.ts` → `features/pause/infrastructure/edge/reflect/reflection-artifact.ts` (`invokeEdge`) |
+| `companion-orchestrate` | `features/pause/presentation/companion/use-companion-data.ts` |
+| `suggest-grounding` | **Legacy full IA** — `src/legacy/full-shell/src/pages/Ground.tsx` (route **404** pause-first) |
+| `journal-prompt` | **Legacy full IA** — `src/legacy/full-shell/src/components/practice/GuidedJournal.tsx` |
 | `send-feedback` | `FeedbackForm.tsx`, `OfflineBanner.tsx` |
-| `generate-wallpaper` | `ReflectionWallpaper.tsx` |
-| `holzen-number` | `HolzenNumber.tsx` |
-| `reflection-insights` | `AIInsightsPanel.tsx` |
-| `check-subscription`, `create-checkout`, `customer-portal` | `use-subscription.ts` |
-| `register-push` | `use-push-notifications.ts` |
-| `delete-account` | `Settings.tsx` |
-| `badge-notify` | `use-badge-sync.ts` |
-| `record-referral` | `use-auth.tsx` |
+| `generate-wallpaper` | **Legacy full IA** — `src/legacy/full-shell/src/components/ReflectionWallpaper.tsx` |
+| `holzen-number` | `screens/home/components/HolzenNumber.tsx` → `@/features/user/public-queries` / `public-rpc` |
+| `reflection-insights` | **Legacy full IA** — `src/legacy/full-shell/src/components/AIInsightsPanel.tsx` (route **404** pause-first) |
+| `check-subscription`, `create-checkout`, `customer-portal` | `@/features/subscription/public-hooks` |
+| `register-push` | `@/features/notifications/public-hooks` (`usePushNotifications`) |
+| `delete-account` | `screens/settings/hooks/use-settings-model.ts` → `@/features/auth/public-rpc` |
+| `badge-notify` | **Legacy full IA** — `src/legacy/full-shell/src/hooks/use-badge-sync.ts` (edge unscheduled in pause-first) |
+| `record-referral` | `@/features/auth/public` (`AuthProvider` on `SIGNED_IN`) |
 
 **Cron / server / webhook style** (not an exhaustive list — see `cron-setup.md` and each `index.ts`): e.g. `check-volatility`, `refresh-btc-prices`, `backfill-btc-prices` (manual `btc_price_cache` gap fill), `fetch-source-feeds`, `weekly-digest`, `deliver-letters`, `auth-email-hook`, etc.
 
@@ -193,7 +201,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 ---
 
-## 13. Admin (`src/pages/Admin.tsx`)
+## 13. Admin (`src/screens/admin/AdminScreen.tsx`)
 
 - Route `/admin` is **protected by login** like any other `ProtectedRoute`.
 - **Authorization:** `useIsAdmin` reads `profiles.is_admin` when present; if the column/query fails, it falls back to **`VITE_ADMIN_USER_IDS`** (comma-separated user UUIDs).
@@ -209,7 +217,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 - **`npm run check:view-migrations`** — Blocks unsafe `CREATE OR REPLACE VIEW` column renames in **`supabase/migrations/`** (also run from **`check:prepush`**).
 - **`npm run build`** — Runs **`npm run check:version-sync`** first (`prebuild`): **`package.json` `version`** must match the latest **`changelog_entries`** row for the configured Supabase project.
 - **`npm run stamp:release`** — Writes the current **12-character** Git commit id into **`supabase/functions/_shared/release.ts`** (`EDGE_RELEASE`) for edge Sentry/BetterStack releases (also invoked at the start of **`check:prepush`**). See [AGENTS.md](../AGENTS.md) for the full script table.
-- **`src/test/`** — `setup.ts` plus tests for sanitization, fallbacks, companion types, etc.
+- **Tests** — Vitest discovers `src/**/*.{test,spec}.{ts,tsx}`; co-locate unit tests with `features/` and `screens/`; use **`src/test/`** for `setup.ts`, **integration flows** (`integration/flows/`), shared **fixtures**, and cross-cutting util tests — see [client-src-layout.md](client-src-layout.md) (Testing) and [src/test/README.md](../../src/test/README.md).
 - **`npm run lint`** — ESLint; the repo may have many pre-existing warnings/errors — avoid adding new ones in touched files ([AGENTS.md](../AGENTS.md)).
 
 ---
@@ -274,27 +282,27 @@ Goal: one **vertical slice** you can trace in **docs → code → Network tab** 
 | Step | What to do |
 |------|------------|
 | 1. **Docs** | Read [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) **§1–2** (skim), **§4–5** (focus). Optional: [phase-2-manual-pause-pipeline.md](../reviews/phase-2-manual-pause-pipeline.md) for producer/consumer contracts. |
-| 2. **Routes** | In `src/App.tsx`, find **`/pause`** → `PauseSession`. Note how **`Home`** also ties to pause (hooks, navigation). |
-| 3. **Hooks** | Read in order: `src/hooks/use-holzen.ts` (`manualTrigger` → `generateMessage`, opens **`pause_instances`**) → `src/hooks/use-pause-reflect-generation.ts` (**`holzen-reflect`** while **`PauseSession`** keeps the reflect hook on **Reflect → Frame → second Breathe → Decide** in the deep ritual) → `src/hooks/use-companion-data.ts` (orchestrator invoke). Bounded **`use-holzen`** helpers live in **`src/lib/`**: `reflection-persist-error`, `holzen-manual-cooldown`, `pause-context-from-btc`, `btc-move-severity`, `next-cron-quarter`. **`use-companion-data`** pulls types/cache/mood/source-catalog/recency/completion helpers from **`companion-orchestrate-types`**, **`companion-reflection-cache`**, **`companion-mood-history`**, **`companion-orchestrate-sources`**, **`companion-recency-hints`**, **`companion-completion-sync`**, **`companion-completion-maps`**, **`companion-orchestrate-slot-apply`**, **`companion-url`**. Open `src/pages/PauseSession.tsx` (hydration + steps); persistence in `pause-session-storage.ts`, gates in `PauseSessionGate`, shell in `PauseSessionScaffold`. Companion slot hearts (favorites on cards): **`use-companion-library-favorites.ts`** (stores flags under **`pause_instances.metadata`**). |
+| 2. **Routes** | In `src/App.tsx`, find **`/pause`** → `screens/pause/PauseSessionScreen.tsx`. Trace Home → Pause layers in [client-src-layout.md](client-src-layout.md) § Reference flow. |
+| 3. **Hooks** | Read in order: [`HolzenProvider`](../../src/app/components/HolzenProvider.tsx) / `useHolzenHomeContextState` → [`usePauseReflectGeneration`](../../src/features/pause/presentation/reflect/generation/use-pause-reflect-generation.ts) (**`holzen-reflect`** on the deep ritual **Reflect → Frame → second Breathe → Decide** window) → [`useCompanionData`](../../src/features/pause/presentation/companion/use-companion-data.ts) (orchestrator invoke). Import from **`@/features/pause/public-hooks`** in screens — not `screens/pause/hooks/` (removed). Open **`PauseSessionScreen.tsx`** (`usePauseSessionScreen` + `screens/pause/components/pause-scaffold-chrome-registry.tsx`) and `screens/pause/components/`. |
 | 4. **Edge** | In this doc **§12**, confirm **`holzen-reflect`** and **`companion-orchestrate`** invoke map. Optionally open `supabase/functions/holzen-reflect/index.ts` and `companion-orchestrate/index.ts` **headers only** (auth, entry). |
 | 5. **Click + Network** | With the app running, go to **`/pause`**, run a **non-silent** manual pause, advance the **deep** ritual to **Reflect**. In DevTools **Network**, expect **`holzen-reflect`** to start around **Reflect** (the request may still be **in flight** or complete while you are on **Frame**, second **Breathe**, or **Decide**) and **`companion-orchestrate`** per the pause system doc (§4.1). |
 | 6. **DB** | Skim **`supabase/migrations/`** for `profiles`, `pause_instances`, `pause_ai_artifacts` — name recognition only. |
 | 7. **HTTP-only** (optional) | [bruno/README.md](../../bruno/README.md) `pause-pipeline/`: same functions in isolation; **not** a full UI substitute. |
 
-Stop when you can explain **in one sentence** each: what **`use-holzen`** does vs what **`use-companion-data`** does, and **where** **`holzen-reflect`** runs (deep ritual: **Reflect → Frame → second Breathe → Decide** hook window in **`PauseSession`**) vs **`companion-orchestrate`**.
+Stop when you can explain **in one sentence** each: what **`useHolzenHomeContextState`** does vs what **`useCompanionData`** does, and **where** **`holzen-reflect`** runs (deep ritual: **Reflect → Frame → second Breathe → Decide** hook window in **`PauseSession`**) vs **`companion-orchestrate`**.
 
 ---
 
 ### Phase B — Whole app
 
-Goal: **map** the rest of the surface area without drowning in files. Use **§4** (routing) and **§6–7** (hooks + pages) in *this* doc as the index.
+Goal: **map** the rest of the surface area without drowning in files. Use **§4** (routing) and **§6–7** (hooks + screens) in *this* doc as the index.
 
 | Step | What to do |
 |------|------------|
-| 1. **Route map** | Re-read **§4** above — list every **main** route (`/`, `/archive`, `/journey/*`, `/settings`, `/tools`, `/pause`, immersive `/tools/*` practices, `/admin`, public routes). For each **bucket**, note the **page file** under `src/pages/`. |
-| 2. **Auth shell** | **§5** — `use-auth`, `ProtectedRoute` / `PublicOnlyRoute`. Trace **`/welcome`** vs **`/`** once in `App.tsx`. Optional: [route-gating-system.md](../systems/routing/route-gating-system.md). |
-| 3. **Feature hooks** | **§6** table — for each row you care about, open the hook and **one** page that uses it (`use-library` + `Library`, `use-subscription` + billing/settings, `use-push-notifications`, etc.). |
-| 4. **Components** | **§8** — skim `src/components/ui/` (primitives) vs feature folders (`pause/`, `practice/`, …). |
+| 1. **Route map** | Re-read **§4** above — list every **shipped** route (`/`, `/archive`, `/journey`, `/settings`, `/pause`, companion deep links, `/admin`, public marketing). **Dead IA** (`/tools/*`, `/library`, …) → **404** — see [active-surface.md](../ops/active-surface.md). |
+| 2. **Auth shell** | **§5** — `@/features/auth/public` (`useAuth`, `AuthProvider`), `ProtectedRoute` / `PublicOnlyRoute`. Trace **`/welcome`** vs **`/`** once in `App.tsx`. Optional: [route-gating-system.md](../systems/routing/route-gating-system.md). |
+| 3. **Feature hooks** | **§6** table — for each row you care about, open the hook and **one** screen that uses it (`useSubscription` + Settings billing, `useProfile` + Settings, `usePushNotifications` + bell/settings, `useHolzen` + Home pause card). |
+| 4. **Components** | **§8** — skim `components/ui/`, `app/components/`, and one `screens/<route>/components/` folder (e.g. `pause/`). |
 | 5. **Edge functions** | **§12** — read the full table once; you do not need every `index.ts` until you touch a feature. [cron-setup.md](../ops/cron-setup.md) when you move to **server-triggered** pause and workers. |
 | 6. **Systems docs** | [docs/README.md](../README.md) — pick **auth**, **routing**, **pause** when you need depth; phased **reviews** in order if you care about security/pipeline history. |
 

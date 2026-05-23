@@ -33,7 +33,7 @@ re-deriving the same mental model from scattered files.
 
 ### 1. Referral recording robustness (Phase 1)
 
-- Root cause: `src/hooks/use-auth.tsx` initiated `supabase.functions.invoke('record-referral', ...)` without awaiting it and without attaching a `.catch(...)`. It also removed `holzen_ref` from localStorage before the invoke result was known.
+- Root cause (2024): `src/hooks/use-auth.tsx` *(now `@/features/auth/public`)* initiated `supabase.functions.invoke('record-referral', ...)` without awaiting it and without attaching a `.catch(...)`. It also removed `holzen_ref` from localStorage before the invoke result was known.
 - Impact:
   - potential unhandled rejection/noisy error path,
   - referral code lost permanently on failure → referral rewards might not trigger.

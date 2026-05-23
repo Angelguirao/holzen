@@ -2,7 +2,7 @@
 
 Holzen keeps **root Vite** (`vite.config.ts`, `src/`, Lovable publish) while adopting bounded-context structure under `src/features/<context>/`.
 
-**Canonical rules:** [docs/fundamentals/frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) (§0 Lovable, §10 transitional), [docs/fundamentals/holzen-application-architecture.md](../../docs/fundamentals/holzen-application-architecture.md).
+**Canonical rules:** [docs/fundamentals/frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) (§0 Lovable, §10 transitional), [docs/fundamentals/client-architecture-overview.md](../../docs/fundamentals/client-architecture-overview.md), [docs/fundamentals/holzen-application-architecture.md](../../docs/fundamentals/holzen-application-architecture.md), [docs/systems/pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) (pause reference module), [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
 
 ## Layout per context
 
@@ -13,21 +13,28 @@ features/<context>/
     use-cases/      # named actions; call ports only
   ports/            # interfaces infrastructure implements
   public.ts         # cross-feature exports (no eager Supabase)
-  public-queries.ts # optional: TanStack query modules for app hooks/screens
+  public-queries.ts # optional: TanStack query modules
+  public-hooks.ts   # optional: React hooks (screens, app, components, tests)
 ```
 
-**Screens** (Home, Archive, Settings, Pause UI) stay in `src/pages/` and `src/components/` until a deliberate move to `src/screens/` — Lovable and existing checks assume root `src/`.
+**Screens** (Home, Archive, Journey, Settings, Pause, marketing, admin) live in [`src/screens/`](../screens/README.md). **Design system** (`components/ui/`, `icons/`) and **app shell** (`app/components/`) are separate — see [components/README.md](../components/README.md) and [app/README.md](../app/README.md).
 
 ## New code
 
-- Put **pause ritual** logic in `features/pause/` (companions and reflect are subfolders under `application/`, not a separate feature).
-- Put **subscription**, **market**, **user**, **auth** in their own `features/<name>/` as you migrate.
+- Put **pause ritual** logic in `features/pause/` — interior target: [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) (`ritual/reflect/`, `ritual/frame/`; companions inside pause, not a separate feature).
+- Put **subscription**, **market**, **user**, **notifications**, **auth** in their own `features/<name>/` as you migrate.
 - **user** and **subscription** use `public-queries.ts` for profile/snapshot TanStack modules; `public.ts` stays Supabase-free.
 - **auth** — `AuthProvider` / `useAuth` exported from `features/auth/public.ts` (implementation in `presentation/`).
-- Do **not** add new root-level `src/hooks/use-<feature>-*` or `src/lib/<feature>-*` for migrated contexts.
+- Do **not** add feature-specific root `src/hooks/` (removed May 2026 — use `features/<context>/presentation` or `screens/<route>/hooks`). Cross-cutting hooks: `src/app/hooks/` (e.g. `use-feature-flag`) and `src/lib/` utilities.
+- Do **not** add new `src/lib/<feature>-*` modules for bounded contexts — use `features/` or `screens/<route>/lib/`.
+- Import domain hooks from `@/features/<ctx>/public-hooks` (not `presentation/` paths from `components/`).
+
+## Tests
+
+Co-locate Vitest files with the module under test (`domain/foo.test.ts`, `application/use-cases/session/bar.test.ts`). Cross-route flows stay in [`src/test/integration/`](../test/integration/README.md). Rules: [client-src-layout.md](../../docs/fundamentals/client-src-layout.md) (Testing), [src/test/README.md](../test/README.md).
 
 ## CI
 
-`npm run check:feature-imports` — layer rules on `src/features/**/*.ts`; blocks deep feature imports and migrated `@/lib/pause-*` shims in active `hooks/`, `pages/`, `components/`, and `test/`.
+`npm run check:feature-imports` — layer rules on `src/features/**/*.ts`; blocks deep feature imports and migrated `@/lib/pause-*` shims in active `screens/`, `components/`, `app/`, and `test/`.
 
-`npm run check:architecture-alignment` — waves 0–4 scaffold gate (five contexts, legacy excluded, runs `check:feature-imports`); in **`test:ci`**.
+`npm run check:architecture-alignment` — waves 0–4 scaffold gate (six contexts, legacy excluded, runs `check:feature-imports`); in **`test:ci`**.

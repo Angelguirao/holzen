@@ -9,8 +9,8 @@ import type {
   PauseStepEventRow,
   PauseState,
   PauseExpiredReason,
-} from '@/lib/pause-state';
-import { buildDemoFixture, isDemoModeActive } from '@/lib/stats/demo-fixture';
+} from '@/features/pause/public';
+import { buildDemoFixture, isDemoModeActive } from '@/legacy/full-shell/src/lib/stats/demo-fixture';
 import type { UseQueryOptions } from '@tanstack/react-query';
 
 export interface PauseFullRow {

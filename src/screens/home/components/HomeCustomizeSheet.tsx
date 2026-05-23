@@ -23,8 +23,8 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
   ALL_HOME_SECTION_IDS,
   isHomeSectionAlwaysVisibleInLayout,
-} from '@/lib/home-section-visibility-constants';
-import { GOAL_WHY_SECTION_ID, normalizeHomeSectionOrder } from '@/lib/home-section-order-normalize';
+} from '@/screens/home/lib/home-section-visibility-constants';
+import { GOAL_WHY_SECTION_ID, normalizeHomeSectionOrder } from '@/screens/home/lib/home-section-order-normalize';
 
 export interface HomeCustomizeSheetProps {
   open: boolean;

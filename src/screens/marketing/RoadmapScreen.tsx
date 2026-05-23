@@ -2,15 +2,15 @@ import { useTranslation } from 'react-i18next';
 import { useState, useCallback, useMemo } from 'react';
 import type { InfiniteData } from '@tanstack/react-query';
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/features/auth/public';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ChevronUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { PageMeta } from '@/app/components/PageMeta';
-import { PublicFooter } from '@/app/components/PublicFooter';
-import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
-import { PageHeading } from '@/app/components/PageHeading';
+import { PublicFooter } from '@/screens/marketing/components/PublicFooter';
+import { useInfiniteScroll } from '@/app/hooks/use-infinite-scroll';
+import { PageHeading } from '@/components/ui/page-heading';
 import {
   deleteRoadmapVote,
   getRoadmapItemsInfiniteQueryOptions,
@@ -19,7 +19,7 @@ import {
   roadmapVotesQueryKey,
   ROADMAP_ITEMS_QUERY_KEY,
   type RoadmapListItem,
-} from '@/lib/roadmap-query';
+} from '@/features/user/public-queries';
 
 const CATEGORIES = ['all', 'self', 'together', 'intelligence', 'reach'] as const;
 

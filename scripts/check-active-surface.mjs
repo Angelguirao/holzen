@@ -16,16 +16,13 @@ const FORBIDDEN_PATTERNS = [
   { re: /@\/lib\/stats\//, label: '@/lib/stats/*' },
   { re: /@\/pages\/Profile/, label: '@/pages/Profile' },
   { re: /@\/pages\/ToolsHub/, label: '@/pages/ToolsHub' },
-  { re: /@\/hooks\/use-pause-stats-data/, label: '@/hooks/use-pause-stats-data' },
-  { re: /@\/hooks\/use-badge-sync/, label: '@/hooks/use-badge-sync' },
-  { re: /@\/hooks\/use-badges/, label: '@/hooks/use-badges' },
-  { re: /@\/hooks\/use-tools-hub-data/, label: '@/hooks/use-tools-hub-data' },
+  { re: /@\/hooks\//, label: '@/hooks/* (removed — use features/*/public-hooks, lib/use-*, components/ui, app/hooks, or legacy/full-shell/src/hooks)' },
   { re: /@\/components\/PracticeWidget/, label: '@/components/PracticeWidget (legacy full-shell)' },
   { re: /@\/components\/LetterToFutureSelf/, label: '@/components/LetterToFutureSelf (legacy full-shell)' },
   { re: /@\/components\/BadgeCelebration/, label: '@/components/BadgeCelebration (legacy full-shell)' },
   { re: /@\/components\/InsightsPanel/, label: '@/components/InsightsPanel (legacy full-shell)' },
   { re: /@\/components\/library\/HistoryContent/, label: '@/components/library/HistoryContent (legacy full-shell)' },
-  { re: /@\/hooks\/use-practice-suggestion/, label: '@/hooks/use-practice-suggestion (legacy full-shell)' },
+  { re: /@\/legacy\/full-shell\/src\/hooks\/use-practice-suggestion/, label: '@/legacy/.../use-practice-suggestion from active tree' },
   { re: /@\/lib\/practice-suggestion/, label: '@/lib/practice-suggestion (legacy full-shell)' },
   { re: /@\/lib\/practice-entries-weekly-count-query/, label: '@/lib/practice-entries-weekly-count-query (legacy full-shell)' },
   { re: /@\/lib\/practice-primary-suggestion-query/, label: '@/lib/practice-primary-suggestion-query (legacy full-shell)' },
@@ -48,8 +45,18 @@ const TIER_B_TABLES = [
   'night_reflections',
 ];
 
+/** User Archive collections — quarantined in `src/legacy/archive-collections/` (not MVP). */
+const CLIENT_QUARANTINED_TABLES = ['collections', 'collection_items'];
+
 const TIER_B_FROM_RES = TIER_B_TABLES.map(
   (t) => ({ re: new RegExp(`\\.from\\(['"]${t}['"]\\)`), label: `.from('${t}') (Tier B — use legacy/full-shell)` }),
+);
+
+const QUARANTINED_FROM_RES = CLIENT_QUARANTINED_TABLES.map(
+  (t) => ({
+    re: new RegExp(`\\.from\\(['"]${t}['"]\\)`),
+    label: `.from('${t}') (user collections — use legacy/archive-collections)`,
+  }),
 );
 
 const SKIP_TIER_B_FILES = new Set([
@@ -78,7 +85,7 @@ for (const file of walk(srcRoot)) {
     }
   }
   if (!SKIP_TIER_B_FILES.has(rel)) {
-    for (const { re, label } of TIER_B_FROM_RES) {
+    for (const { re, label } of [...TIER_B_FROM_RES, ...QUARANTINED_FROM_RES]) {
       if (re.test(text)) {
         violations.push({ file: rel, label });
       }

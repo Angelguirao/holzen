@@ -2,10 +2,10 @@
 
 > **Not in shipped pause-first scope (2026-05).** Reference implementation: git tag `full-ia-pre-strip` or `src/legacy/full-shell/`. Shipped surface: [active-surface.md](../ops/active-surface.md).
 
-> **Status:** the "Recommended target model (skills-aligned badges)" at the
-> bottom of this doc is **shipped** as the 4-family / 14-active model.
-> `Profile > Badges` renders
-> [`BadgesPanelV2`](../../src/components/BadgesPanelV2.tsx), definitions in
+> **Status (legacy full shell only — tag `full-ia-pre-strip` / `src/legacy/full-shell/`):** the "Recommended target model (skills-aligned badges)" at the
+> bottom of this doc is **shipped there** as the 4-family / 14-active model.
+> Journey → **Badges** (`Profile > Badges`) renders
+> [`BadgesPanelV2`](../../src/legacy/full-shell/src/components/BadgesPanelV2.tsx), definitions in
 > [`src/lib/badges/definitions.ts`](../../src/lib/badges/definitions.ts),
 > computation in [`src/lib/badges/compute.ts`](../../src/lib/badges/compute.ts).
 > **Progress and `earned` in the panel are computed client-side** from the same pause bundle as Stats; **`user_badges`** stores earned rows for sync and notifications — see **Pause V2 — where badges are computed and persisted** below. Pause lifecycle: [`pause-system.md`](pause-system.md); scoring bundle overlap: [`stats-system.md`](stats-system.md).
@@ -17,19 +17,19 @@
 
 ### Inputs (same bundle as Stats)
 
-[`BadgesPanelV2`](../../src/components/BadgesPanelV2.tsx) calls [`usePauseStatsData`](../../src/hooks/use-pause-stats-data.ts) and passes `rows`, `stepEvents`, and `companionEvents` into [`useBadges`](../../src/hooks/use-badges.ts). That is the **same** `v_pause_full` + step + companion fetch used by Journey → Stats (not a separate badge query for progress).
+[`BadgesPanelV2`](../../src/legacy/full-shell/src/components/BadgesPanelV2.tsx) calls [`usePauseStatsData`](../../src/legacy/full-shell/src/hooks/use-pause-stats-data.ts) and passes `rows`, `stepEvents`, and `companionEvents` into [`useBadges`](../../src/legacy/full-shell/src/hooks/use-badges.ts). That is the **same** `v_pause_full` + step + companion fetch used by Journey → Stats (not a separate badge query for progress).
 
 [`computeBadges`](../../src/lib/badges/compute.ts) is a **pure function**: `(rows, stepEvents, companionEvents, holdGoal, …) →` per-badge `{ current, earned, progress }`. There are **no** Postgres triggers maintaining badge progress counters.
 
 ### Persistence (`user_badges`)
 
-[`useBadgeSync`](../../src/hooks/use-badge-sync.ts) compares computed earned IDs to rows in **`user_badges`**, **upserts** missing `(user_id, badge_id)` pairs, invalidates the badge-id query, and drives celebration / optional push (`badge-notify` edge) for **new** earns.
+[`useBadgeSync`](../../src/legacy/full-shell/src/hooks/use-badge-sync.ts) compares computed earned IDs to rows in **`user_badges`**, **upserts** missing `(user_id, badge_id)` pairs, invalidates the badge-id query, and drives celebration / optional push (`badge-notify` edge) for **new** earns.
 
 ### After a pause completes
 
-[`invalidatePauseStatsDataForUser`](../../src/lib/pause-stats-invalidate.ts) (called from pause completion paths — see [`pause-api.ts`](../../src/lib/pause-api.ts) / decide handler) invalidates the pause-stats TanStack key. The bundle refetches → **`useBadges` recomputes** → **`useBadgeSync`** may insert new `user_badges` rows when eligibility crosses a threshold.
+[`invalidatePauseStatsDataForUser`](../../src/features/pause/application/queries/invalidate-pause-stats.ts) (exported from `@/features/pause/public`; called from pause completion paths — e.g. decide handler, RPC client) invalidates the pause-stats TanStack key. The bundle refetches → **`useBadges` recomputes** → **`useBadgeSync`** may insert new `user_badges` rows when eligibility crosses a threshold.
 
-**Brief ritual done** lists badges that are **newly eligible** (computed earned IDs not yet in `user_badges`) in [`PauseDoneBriefJourneyRecap`](../../src/components/pause/PauseDoneBriefJourneyRecap.tsx); [`suppressBadgeCelebrationOverlayThisSession`](../../src/hooks/use-badge-sync.ts) avoids duplicating the celebration overlay when the user later opens Journey → Badges (push / upsert still run from `useBadgeSync`).
+**Brief ritual done** lists badges that are **newly eligible** (computed earned IDs not yet in `user_badges`) in [`PauseDoneBriefJourneyRecap`](../../src/legacy/full-shell/src/components/pause/PauseDoneBriefJourneyRecap.tsx); [`suppressBadgeCelebrationOverlayThisSession`](../../src/legacy/full-shell/src/hooks/use-badge-sync.ts) avoids duplicating the celebration overlay when the user later opens Journey → Badges (push / upsert still run from `useBadgeSync`).
 
 ### Definition inventory (shipped)
 
@@ -292,8 +292,8 @@ In parallel, DB notifications feed also receives badge items via trigger on `use
 - **Definitions:** **24** rows in `BADGE_DEFINITIONS` (`definitions.ts`) — 3 foundation, 15 core-skill tiers, 3 mastery, 3 legacy.
 - **Pro-only definitions:** **3** (entire mastery family).
 - **Non-Pro definitions:** **21** (foundation + core ladders + legacy).
-- **Panel:** [`BadgesPanelV2`](../../src/components/BadgesPanelV2.tsx); **compute:** [`computeBadges`](../../src/lib/badges/compute.ts); **sync:** [`useBadgeSync`](../../src/hooks/use-badge-sync.ts) → `user_badges`.
-- **Refresh after pause:** same [`invalidatePauseStatsDataForUser`](../../src/lib/pause-stats-invalidate.ts) path as Stats (pause-stats query refetch → `useBadges` recomputes).
+- **Panel (legacy):** [`BadgesPanelV2`](../../src/legacy/full-shell/src/components/BadgesPanelV2.tsx); **compute:** [`computeBadges`](../../src/lib/badges/compute.ts); **sync:** [`useBadgeSync`](../../src/legacy/full-shell/src/hooks/use-badge-sync.ts) → `user_badges` (not in pause-first bundle).
+- **Refresh after pause:** same [`invalidatePauseStatsDataForUser`](../../src/features/pause/application/queries/invalidate-pause-stats.ts) path as Stats (pause-stats query refetch → `useBadges` recomputes).
 
 ---
 

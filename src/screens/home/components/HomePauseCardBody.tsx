@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Loader2, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SubscriptionSkeleton } from '@/app/components/SubscriptionSkeleton';
+import { SubscriptionSkeleton } from '@/screens/home/components/SubscriptionSkeleton';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { HomePauseEmptyFlow } from '@/screens/home/components/HomePauseEmptyFlow';
 import { HomePauseBlockingErrorPanel } from '@/screens/home/components/HomePauseBlockingErrorPanel';
@@ -9,9 +9,9 @@ import { HomePauseContextMeta } from '@/screens/home/components/HomePauseContext
 import { BulkHoldCard } from '@/screens/home/components/BulkHoldCard';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
-import { shouldSurfacePauseWidgetError } from '@/lib/home-pause-widget-error';
+import { shouldSurfacePauseWidgetError } from '@/features/pause/public-home';
 import type { BtcPriceData } from '@/features/market/public';
-import { usePendingPauseOffer } from '@/screens/pause/hooks/use-pending-pause-offer';
+import { usePendingPauseOffer } from '@/features/pause/public-home';
 import type { Entitlement } from '@/features/subscription/public';
 
 interface HomePauseCardBodyProps {

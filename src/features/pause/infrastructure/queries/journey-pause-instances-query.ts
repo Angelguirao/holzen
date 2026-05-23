@@ -4,14 +4,14 @@ import type { JourneyPauseRow } from '@/features/pause/domain/journey-pause-row'
 import {
   JOURNEY_PAUSE_INSTANCES_NONE_KEY,
   journeyPauseInstancesQueryKey,
-} from '@/features/pause/application/queries/journey-pause-instances-keys';
+} from './journey-pause-instances-query-key';
 
 export {
   JOURNEY_PAUSE_INSTANCES_DISABLED_USER_ID,
   JOURNEY_PAUSE_INSTANCES_NONE_KEY,
   JOURNEY_PAUSE_INSTANCES_QUERY_PREFIX,
   journeyPauseInstancesQueryKey,
-} from '@/features/pause/application/queries/journey-pause-instances-keys';
+} from './journey-pause-instances-query-key';
 
 export type { JourneyPauseRow } from '@/features/pause/domain/journey-pause-row';
 

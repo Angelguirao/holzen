@@ -1,4 +1,5 @@
-# Bulk git mv to src/legacy/full-shell/ (pause-first Step 3)
+# Bulk git mv to src/legacy/full-shell/ (pause-first Step 3). Historical only —
+# active src/pages/ was removed May 2026; shipped UI is under src/screens/.
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root

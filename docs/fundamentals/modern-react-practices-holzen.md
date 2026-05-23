@@ -29,6 +29,7 @@ There is **no single** “React architecture standard,” but most strong teams 
 | **Typed boundaries** | Schemas at wire/API edges (Zod, etc.), not “trust TS everywhere” |
 | **Avoid premature global complexity** | No Redux-by-default, no microfrontends-by-default |
 | **React as rendering** | UI composes; policy and persistence live server-side + named use cases |
+| **Render boundaries over memo sprawl** | Structure the tree so unrelated updates do not repaint heavy subtrees; `useMemo`/`useCallback` support boundaries, not replace them |
 
 The ecosystem moved **away from**:
 
@@ -51,11 +52,11 @@ The ecosystem moved **away from**:
 
 **Holzen target:** `packages/<context>/` + `apps/web/src/screens/` — see [frontend-module-layout.md](frontend-module-layout.md). **Pause** is the large context; companions live **inside** pause, not a separate domain package.
 
-**Holzen today (transitional):** flat `src/hooks/`, `src/lib/`, mixed `src/components/` — **misaligned**; migration in progress.
+**Holzen today:** `src/features/<context>/`, `src/screens/<route>/hooks/`, cross-cutting hooks in `src/app/hooks/` (install prompt, auto-trigger, language sync; **`src/hooks/` removed May 2026**), platform utilities in `src/lib/` (PostHog, Sentry, `invokeEdge`, routes), UI primitives in `src/components/ui/`.
 
 | Check | Target | Today |
 |-------|--------|-------|
-| New ritual logic lands under pause package/feature | ✅ required | ⚠️ often `src/lib/pause-*` + `use-pause-*` |
+| New ritual logic lands under pause feature module | ✅ required | ✅ converged — reflect + frame use cases under `application/use-cases/ritual/reflect/` and `ritual/frame/` ([pause-client-architecture.md](../systems/pause-client-architecture.md) §10.1) |
 | Nav tabs are screens, not packages | ✅ | ⚠️ naming implied otherwise in old layout |
 | Delete a feature = delete one folder/package | ✅ | ❌ cross-cutting imports |
 
@@ -69,9 +70,9 @@ The ecosystem moved **away from**:
 
 | Check | Target | Today |
 |-------|--------|-------|
-| Feature-specific hook not in root `hooks/` | ✅ | ❌ flat `src/hooks/` |
+| Feature-specific hook not in root `hooks/` | ✅ | ✅ `features/*/public-hooks` + screen hooks |
 | “Shared” justified in PR (2+ consumers) | ✅ | ⚠️ root `components/` clutter |
-| Archive/journey queries with pause reads | ✅ | ⚠️ scattered `*-query.ts` in `src/lib/` |
+| Archive/journey queries with pause reads | ✅ | ⚠️ mostly in `features/pause/infrastructure/queries/` (group under `archive/` still open) |
 
 ---
 
@@ -84,7 +85,7 @@ The ecosystem moved **away from**:
 | Data kind | Holzen pattern |
 |-----------|----------------|
 | Profiles, subscription, blog, many lists | `useQuery` / `queryOptions` |
-| Pause orchestration, `use-holzen`, `use-companion-data` | Often `useEffect` + Supabase (migrate opportunistically) |
+| Pause orchestration, `useHolzen` / `useCompanionData` | Often `useEffect` + Supabase (migrate opportunistically); `useHolzen` split across pause `presentation/` conductors |
 | Modal open, step UI, form drafts | `useState` / session storage |
 | **Forbidden** | Same entity in Query **and** a global client store |
 
@@ -92,7 +93,7 @@ The ecosystem moved **away from**:
 |-------|--------|-------|
 | New **shared** server read uses Query | ✅ | ⚠️ mixed |
 | No second source of truth beside Query cache | ✅ | ⚠️ watch god hooks |
-| Invalidate/patch cache after mutations | ✅ | ✅ in newer paths (`use-subscription`, pause invalidation helpers) |
+| Invalidate/patch cache after mutations | ✅ | ✅ in newer paths (`useSubscription` via `@/features/subscription/public-hooks`, pause invalidation helpers) |
 
 ---
 
@@ -136,7 +137,7 @@ Hooks should **not** grow unbounded RPC + navigation + analytics; extract **use 
 | Check | Target | Today |
 |-------|--------|-------|
 | Page/screen mostly composes | ✅ per [react-screen-orchestration.md](react-screen-orchestration.md) | ⚠️ some large pages |
-| God hook split (use case or sub-hook) | ✅ | ❌ `use-holzen`, `use-companion-data` |
+| God hook split (use case or sub-hook) | ✅ | ⚠️ `useHolzen` producer split shipped; `use-companion-data` still converging toward `ritual/frame/` use cases |
 | No `supabase.from` in `.tsx` | ✅ | ⚠️ audit on touch |
 
 ---
@@ -185,6 +186,39 @@ Hooks should **not** grow unbounded RPC + navigation + analytics; extract **use 
 
 ---
 
+### 2.9 Render boundaries, React Compiler, React 19
+
+**Industry:** React performance is primarily about **where updates stop** in the component tree (state placement, `React.memo`, composition, lazy branches, narrow context). `useMemo` / `useCallback` are often **glue** so memoized children see stable props — not the main strategy. **React Compiler** automates much of that glue at build time. **React 19** adds Actions, `useActionState`, and `useOptimistic` for simpler async form/mutation UX.
+
+**Holzen policy:** [2026-05-23 ADR](../decisions/2026-05-23-render-boundaries-defer-react-compiler-19.md) — **boundaries now; Compiler and React 19 deferred** until the active `src/` architecture migration stabilizes.
+
+| Topic | Holzen today | Policy |
+|-------|--------------|--------|
+| Render boundaries | **Yes** on Home (`memo(HomeDashboardLayout)`, stable layout props, lazy Zen) | Extend when touching hot screens; see [react-screen-orchestration.md](react-screen-orchestration.md) |
+| Manual `useMemo` / `useCallback` | Widespread in pause/home/companion | **No new** memos without justification; **no mass removal** during migration |
+| React Compiler | Not configured (Vite + SWC) | Pilot **after** migration — separate track |
+| React 19 / Actions | React **18.3.1** | Upgrade **after** migration; keep Query + `invokeEdge` for ritual/companion flows |
+| react-hook-form + Zod | Settings/admin forms | Keep for complex validated forms; Actions only for **future** simple pilots |
+
+**When adding `useMemo` / `useCallback` (review gate):**
+
+1. Feeding a **`React.memo`** child with stable props or handlers?
+2. Caching **measurably expensive** derivation?
+3. Satisfying **`useEffect`** dependency stability?
+
+If none apply, prefer a **boundary** (lower state, memo shell, lazy branch) instead.
+
+**Post-migration pilot candidates (optional, not scheduled):**
+
+| Pilot | Surface | Goal |
+|-------|---------|------|
+| React Compiler | Vite build + Home / pause session | Less manual memo; verify tests + profiling |
+| React 19 Actions | One simple settings toggle or single-field patch | Evaluate `useActionState` / `useOptimistic` without replacing Query reads |
+
+**Do not** block architecture migration on Compiler or React 19. **Do not** replace TanStack Query or pause/companion mutation paths with form Actions in the first React 19 PR.
+
+---
+
 ## 3. What modern React usually considers overengineering
 
 | Pattern | Holzen stance |
@@ -212,6 +246,8 @@ Use in PR description or pre-launch audits. **Target** = after [frontend-module-
 | Typed boundaries | **Strong** (contracts package) | **Partial** | [holzen-application-architecture.md](holzen-application-architecture.md) P8 |
 | RSC / Next | **N/A (SPA)** | N/A | ADR + backlog |
 | Modular monolith | **Strong** | **Planned** | [2026-05-17 ADR](../decisions/2026-05-17-modular-monolith-hexagonal-client.md) |
+| Render boundaries (vs memo sprawl) | **Strong** (Home reference) | **Partial** (many legacy memos) | §2.9 + [react-screen-orchestration.md](react-screen-orchestration.md) |
+| React Compiler / React 19 | **Deferred** (post-migration) | **Not adopted** | [2026-05-23 ADR](../decisions/2026-05-23-render-boundaries-defer-react-compiler-19.md) |
 | Server authority (not React rules) | **Strong** | **Strong** | [client-server-architecture-holzen.md](client-server-architecture-holzen.md) |
 
 **Overall:** Product and **server** architecture are ahead of **client folder** architecture. Pre-launch work should **close the gap** without adopting frontend patterns Holzen explicitly rejects (§3).
@@ -233,15 +269,15 @@ packages/shared-kernel/      # minimal shared types
   presentation/ui/           # design system (today: src/components/ui)
 ```
 
-**Inside `packages/pause`** (colocation):
+**Inside `packages/pause`** (colocation — **today:** same interior under `src/features/pause/`; on-disk vs target in [pause-client-architecture.md](../systems/pause-client-architecture.md) §10):
 
 ```text
-application/use-cases/ritual/
-application/use-cases/companion/
+application/use-cases/ritual/reflect/   # reflect use cases (Phase A complete May 2026)
+application/use-cases/ritual/frame/     # companion orchestration (Phase A complete May 2026)
 presentation/   OR   apps/web/src/screens/pause/
 ```
 
-Pick **one** presentation rule — [frontend-module-layout.md](frontend-module-layout.md) §3.
+Pick **one** presentation rule — [pause-client-architecture.md](../systems/pause-client-architecture.md) §3 (canonical) and [frontend-module-layout.md](frontend-module-layout.md) §3 (north-star packages).
 
 ---
 
@@ -258,7 +294,8 @@ Add to [react-spa-review-template.md](../reviews/react-spa-review-template.md) f
 - [ ] **Boundary types:** wire changes update `contracts` or generated types.
 - [ ] **Pause ritual:** step/RPC changes align with [pause-system.md](../systems/pause-system.md).
 - [ ] **Bundle:** heavy routes lazy-loaded where applicable.
-- [ ] **Not overengineering:** no new package/context/store without justification in PR text.
+- [ ] **Render boundary:** state as low as practical; `React.memo` on heavy shells; new `useMemo`/`useCallback` justified (memo child, expensive derive, or effect deps) — see §2.9.
+- [ ] **Not overengineering:** no new package/context/store without justification in PR text; no React Compiler / React 19 drive-by during architecture migration.
 
 ---
 
@@ -267,9 +304,9 @@ Add to [react-spa-review-template.md](../reviews/react-spa-review-template.md) f
 Order that satisfies **both** this doc and [frontend-module-layout.md](frontend-module-layout.md):
 
 1. **Screens** — `apps/web/src/screens/*` (Home, Archive, Pause, …).
-2. **`packages/pause`** — domain + use cases first; companions under `application/companion/`.
+2. **`packages/pause`** (today: `src/features/pause/`) — domain + use cases first; reflect + frame under `application/use-cases/ritual/reflect/` and `ritual/frame/` ([pause-client-architecture.md](../systems/pause-client-architecture.md) §3, §10).
 3. **`packages/infrastructure`** — adapters; Query `queryOptions` factories move here.
-4. **Thin hooks** — screens call use cases; delete logic from root `src/hooks` as you go.
+4. **Thin hooks** — screens call use cases. **Home/settings:** orchestration in `screens/<route>/hooks/` where screen-local. **Pause:** conductors in `features/pause/presentation/` per [pause-client-architecture.md](../systems/pause-client-architecture.md) §3.2 (no `screens/pause/hooks/`).
 5. **`contracts`** — when touching edge/RPC JSON.
 6. **CI** — `check:package-boundaries` / `check:feature-imports`.
 
@@ -286,6 +323,7 @@ Order that satisfies **both** this doc and [frontend-module-layout.md](frontend-
 | Use cases vs hooks | [holzen-application-architecture.md](holzen-application-architecture.md) §4, §8 |
 | Incremental extractions (old tree) | [refactoring-strategy.md](refactoring-strategy.md) |
 | Flow-first PR review | [react-spa-review-template.md](../reviews/react-spa-review-template.md) |
+| Render boundaries; defer Compiler / React 19 | [2026-05-23 ADR](../decisions/2026-05-23-render-boundaries-defer-react-compiler-19.md); this doc §2.9 |
 | Optional SSR/framework | [spa-framework-evaluation.md](../backlog/spa-framework-evaluation.md) |
 
 ---

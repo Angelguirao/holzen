@@ -1,0 +1,37 @@
+/**
+ * Reflect/Frame focus-bed presentation I/O.
+ * Imports Web Audio helpers from domain directly (parity with
+ * `pause-reflect-generation-io` → domain + run-reflect-generation; not ambience-flow umbrella).
+ * Sibling parity: `pause-reflect-ambience-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io` (presentation + application);
+ * `pause-reflect-ambience-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io` (presentation + application);
+ * `pause-reflect-ambience-flows-io-sibling-parity.test.ts` + `flows/pause-reflect-flows-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (application mirrors:
+ * `application/.../ambience/pause-reflect-ambience-flows-io-sibling-parity.test.ts` and
+ * `application/.../flows/pause-reflect-flows-ambience-io-sibling-parity.test.ts`; reciprocal inline pins in
+ * `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-ambience-io-parity.test.ts`);
+ * `pause-reflect-ambience-feel-io-sibling-parity.test.ts` ↔ `pause-feel-io` (application mirror:
+ * `application/.../ambience/pause-reflect-ambience-feel-io-sibling-parity.test.ts`; reciprocal inline:
+ * `pause-reflect-ambience-io-parity.test.ts` ↔ `pause-feel-io-parity.test.ts`);
+ * `pause-reflect-ambience-share-io-sibling-parity.test.ts` + `share/pause-reflect-share-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io` (application mirrors:
+ * `application/.../ambience/pause-reflect-ambience-share-io-sibling-parity.test.ts`,
+ * `application/.../share/pause-reflect-share-ambience-io-sibling-parity.test.ts`);
+ * `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (presentation + application);
+ * presentation parity (colocated): `pause-reflect-ambience-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`,
+ * `pause-reflect-hub-io-parity.test.ts`, `pause-reflect-generation-io-parity.test.ts`,
+ * `pause-feel-io-parity.test.ts`, and `pause-reflect-telemetry-io-parity.test.ts`;
+ * reciprocal inline pins ↔ colocated `pause-reflect-flows-io-parity.test.ts`;
+ * `pause-reflect-steps-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (presentation + application);
+ * application parity: `application/.../ambience/pause-reflect-ambience-io-parity.test.ts` (colocated beside ambience-flow) ↔ this module;
+ * `pause-reflect-steps-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (presentation + application);
+ * `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io` (application mirror:
+ * `application/.../ambience/pause-reflect-ambience-telemetry-io-sibling-parity.test.ts`; reciprocal inline:
+ * `pause-reflect-ambience-io-parity.test.ts` ↔ `pause-reflect-telemetry-io-parity.test.ts` (application + presentation));
+ * reciprocal inline pins: `pause-reflect-ambience-io.test.ts` ↔ `pause-reflect-pending-offer-io.test.ts`,
+ * `pause-reflect-ambience-io.re-exports.test.ts` ↔ `pause-reflect-pending-offer-io.re-exports.test.ts`,
+ * `pause-reflect-steps-io.test.ts`, and `pause-reflect-telemetry-io.test.ts`;
+ * inline pins: `pause-reflect-generation-io.test.ts`, `pause-reflect-flows-io.test.ts`;
+ * flow↔io wrapper sibling: `pause-reflect-ambience-flow-io-wrapper-sibling-parity.test.ts` (application + presentation).
+ */
+export {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '@/features/pause/domain/ritual/breathe/reflect-frame-focus-ambience';

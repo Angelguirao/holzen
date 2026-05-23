@@ -2,14 +2,14 @@ import { Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router-dom';
 import { BottomNav, isPrimaryTabActive } from './BottomNav';
-import { NotificationBell } from '@/app/components/NotificationBell';
-import { PauseReadyBanner } from '@/app/components/PauseReadyBanner';
-import { CheckoutConfirmation } from '@/app/components/CheckoutConfirmation';
-import { PaywallSubscribedTracker } from '@/app/components/PaywallSubscribedTracker';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
-import { PendingPauseOfferShell } from '@/screens/pause/components/PendingPauseOfferShell';
-import { useLanguageSync } from '@/hooks/use-language-sync';
-import { useAutoTrigger } from '@/hooks/use-auto-trigger';
+import { ShellPauseChrome } from '@/app/components/ShellPauseChrome';
+import {
+  CheckoutConfirmation,
+  PaywallSubscribedTracker,
+} from '@/features/subscription/public-hooks';
+import { NotificationBell } from '@/features/notifications/public-hooks';
+import { useShellProfile } from '@/app/hooks/use-shell-profile';
+import { useAutoTrigger } from '@/app/hooks/use-auto-trigger';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -69,6 +69,18 @@ function useTabChunkPrefetch() {
   }, []);
 }
 
+/**
+ * Authenticated four-tab shell (header, main outlet, bottom nav).
+ *
+ * **Orchestration (intentional):** this file mounts cross-context chrome that must
+ * survive tab switches — not domain logic owned by a single screen.
+ * - `useShellProfile` — profile load errors + i18n (via `useProfile`, not Home’s `useHolzen`)
+ * - `ShellPauseChrome` — pending offer modal + pause-ready banner (`useHolzen` isolated there)
+ * - `CheckoutConfirmation` / `PaywallSubscribedTracker` — subscription return UX on any tab
+ * - `NotificationBell` — inbox header (`features/notifications`)
+ *
+ * See [app/README.md](../README.md) placement table.
+ */
 /** Primary-tab label for the shell header center (Home intentionally has none). */
 function shellCenterNavLabel(pathname: string, t: (key: string) => string): string | null {
   if (pathname === '/' || pathname === '/index') return null;
@@ -80,23 +92,16 @@ function shellCenterNavLabel(pathname: string, t: (key: string) => string): stri
 
 export function AppLayout() {
   const { t } = useTranslation();
-  const { language, profileLoadError, retryProfileLoad, resyncOpenPauseFromDb } = useHolzen();
-  useLanguageSync(language);
+  const { profileLoadError, retryProfileLoad } = useShellProfile();
   useTabChunkPrefetch();
   const { pauseReady, dismiss } = useAutoTrigger();
   const location = useLocation();
-  const isHome = location.pathname === '/' || location.pathname === '/index';
   const centerNavLabel = shellCenterNavLabel(location.pathname, t);
 
   return (
     <div className="min-h-screen flex items-start justify-center p-6 pb-20">
       <RobotsNoIndex />
-      <PendingPauseOfferShell
-        onAfterMutation={() => void resyncOpenPauseFromDb()}
-        autoOpen={location.pathname !== '/pause'}
-      />
-      {/* Show banner on non-Home pages when auto-trigger fires */}
-      {!isHome && <PauseReadyBanner visible={pauseReady} onDismiss={dismiss} />}
+      <ShellPauseChrome pauseReady={pauseReady} onDismissPauseReady={dismiss} />
       <CheckoutConfirmation />
       <PaywallSubscribedTracker />
       <div className="w-full max-w-sm">

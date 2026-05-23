@@ -2,11 +2,11 @@ import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '@/hooks/use-auth';
-import { getCompletedPauseCountQueryOptions } from '@/lib/completed-pause-count-query';
-import { useSubscription } from '@/hooks/use-subscription';
-import { useHoldGoalProfile } from '@/hooks/use-hold-goal';
-import { type ProfileTab } from '@/lib/router-location-state';
+import { useAuth } from '@/features/auth/public';
+import { getCompletedPauseCountQueryOptions } from '@/features/pause/public-queries';
+import { useSubscription } from '@/features/subscription/public-hooks';
+import { useHoldGoalProfile } from '@/features/user/public-hooks';
+import { type ProfileTab } from '@/legacy/full-shell/src/lib/router-location-state';
 import { journeyPath, isProfileTab } from '@/lib/app-routes';
 import { getHistoryCalendarActivitiesQueryOptions } from '@/legacy/full-shell/src/lib/history-calendar-activities-fetch';
 import { BarChart3, Sparkles, Award, CalendarDays } from 'lucide-react';
@@ -14,7 +14,7 @@ import HistoryContent from '@/legacy/full-shell/src/components/library/HistoryCo
 import { StatsContentV2 } from '@/legacy/full-shell/src/components/stats/StatsContentV2';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AIInsightsPanel } from '@/legacy/full-shell/src/components/AIInsightsPanel';
-import { ProLock } from '@/app/components/ProLock';
+import { ProLock } from '@/components/ui/pro-lock';
 import { BadgesPanelV2 } from '@/legacy/full-shell/src/components/BadgesPanelV2';
 
 const Profile = () => {

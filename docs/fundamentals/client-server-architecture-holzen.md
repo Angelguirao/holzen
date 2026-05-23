@@ -1,6 +1,6 @@
 # Client–server architecture (Holzen)
 
-This note is the **canonical place** for **where authority lives** in Holzen: how the **browser SPA**, **Supabase (Postgres + RLS + edge functions)**, and **shared TypeScript** fit together. It complements [holzen-application-architecture.md](holzen-application-architecture.md) (principles, bounded contexts, use cases, target structure), [navigating-the-codebase.md](navigating-the-codebase.md) (concrete file map), [react-screen-orchestration.md](react-screen-orchestration.md) (large-screen React patterns), and [mental-models-for-contributors.md](mental-models-for-contributors.md) (glossary and SPA basics).
+This note is the **canonical place** for **where authority lives** in Holzen: how the **browser SPA**, **Supabase (Postgres + RLS + edge functions)**, and **shared TypeScript** fit together. It complements [holzen-application-architecture.md](holzen-application-architecture.md) (principles, bounded contexts, use cases, target structure), [client-src-layout.md](client-src-layout.md) (**`src/` folder layers** and alignment checklist), [navigating-the-codebase.md](navigating-the-codebase.md) (concrete file map), [react-screen-orchestration.md](react-screen-orchestration.md) (large-screen React patterns), and [mental-models-for-contributors.md](mental-models-for-contributors.md) (glossary and SPA basics).
 
 **Pause-first strip (2026-05):** `src/legacy/` and `supabase/functions/legacy/` are **read-only reference** for the pre-strip full product — not a second runtime or alternate backend. Active code must match [active-surface.md](../ops/active-surface.md).
 
@@ -44,8 +44,9 @@ The labels **domain / application / infrastructure** are useful **mental** bucke
 
 | Layer | Meaning here | Typical locations |
 |-------|----------------|-------------------|
-| **UI** | Components and pages: render state, forward user intent | `src/pages/`, `src/components/` |
-| **Application** | Hooks that orchestrate: queries/mutations, navigation, composing multiple data sources | `src/hooks/`, feature hooks colocated with screens |
+| **UI** | Components and screens: render state, forward user intent | `src/screens/<route>/`, `src/app/components/`, `src/components/ui/` (+ `icons/`) |
+| **Application (orchestration)** | Hooks that orchestrate: queries/mutations, navigation, composing multiple data sources | `src/screens/<route>/hooks/`, `src/features/*/public-hooks`, `src/app/hooks/` (e.g. feature flags) — **not** new `src/lib/use-<domain>*.ts` shims |
+| **Application (use cases)** | Named product intentions — **hexagonal layer inside `features/<ctx>/`** | `src/features/<ctx>/application/use-cases/` — **not** the same as hook “application” above |
 | **Infrastructure** | Browser I/O: Supabase client, `invokeEdge`, `fetch`, `localStorage` | `src/integrations/supabase/`, `src/lib/*-api.ts` patterns |
 | **Domain (advisory)** | Pure helpers: “should we show this CTA?”, formatting, client-side validation **before** submit | `src/lib/` (unit-testable; **not** the final word on permission) |
 
