@@ -11,6 +11,7 @@ interface BulkHoldReviewBodyProps {
 }
 
 export function BulkHoldReviewBody({ sections, draftOutcomes, onOutcomeChange, onOpenArchive }: BulkHoldReviewBodyProps) {
+  "use memo";
   const { t, i18n } = useTranslation();
 
   return (

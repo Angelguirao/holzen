@@ -12,6 +12,7 @@ interface BulkHoldSuccessBodyProps {
 }
 
 export function BulkHoldSuccessBody({ heldCount, onViewEchoes }: BulkHoldSuccessBodyProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

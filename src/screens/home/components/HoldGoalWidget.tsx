@@ -63,6 +63,7 @@ export function HoldGoalWidget({
   onHoldGoalPresenceChange?: (hasGoal: boolean) => void;
   onCompactHeadlineChange?: (headline: string | null) => void;
 }) {
+  "use memo";
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { currency } = useHolzen();

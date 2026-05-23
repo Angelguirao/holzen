@@ -33,6 +33,7 @@ type SheetMode = 'prompt' | 'review' | 'success';
  * and migration `20260505120000_pause_log_step_expired_outcome_rescue.sql`.
  */
 export function BulkHoldCard() {
+  "use memo";
   const { user } = useAuth();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();

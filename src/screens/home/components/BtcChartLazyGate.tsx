@@ -7,6 +7,7 @@ const BtcChartLazy = lazy(async () => {
 });
 
 function ChartSkeleton() {
+  "use memo";
   return (
     <div className="space-y-2" aria-hidden>
       <Skeleton className="h-3 w-20" />
@@ -25,6 +26,7 @@ interface Props {
  * Defers Recharts + CoinGecko chart fetch until near viewport — cuts main-thread layout work on cold Home paint.
  */
 export function BtcChartLazyGate({ hidden = false, currency = 'USD', coinId = 'bitcoin' }: Props) {
+  "use memo";
   const containerRef = useRef<HTMLDivElement>(null);
   const [mountChart, setMountChart] = useState(false);
 

@@ -8,6 +8,7 @@ import { homeInWidget } from '@/screens/home/components/home-widget-styles';
  * "X% of Holzen users held steady today"
  */
 export function HolzenNumber({ variant = 'default' }: { variant?: 'default' | 'compact' }) {
+  "use memo";
   const prefersReduced = useReducedMotion();
   const { data, isPending } = useQuery(getHolzenNumberQueryOptions());
 

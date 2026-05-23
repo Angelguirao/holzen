@@ -6,8 +6,8 @@ import type { Plugin } from "vite";
  * ADR 2026-05-23 track A.
  */
 const REACT_COMPILER_PILOT_INCLUDE = [
-  /[/\\]src[/\\]screens[/\\]home[/\\]components[/\\][^/\\]+\.tsx$/,
-  /[/\\]src[/\\]screens[/\\]pause[/\\]components[/\\][^/\\]+\.tsx$/,
+  /[/\\]src[/\\]screens[/\\]home[/\\]components[/\\].+\.tsx$/,
+  /[/\\]src[/\\]screens[/\\]pause[/\\]components[/\\].+\.tsx$/,
 ] as const;
 
 /**

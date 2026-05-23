@@ -18,6 +18,7 @@ interface Props {
 }
 
 export function BtcChart({ hidden = false, currency = 'USD', coinId = 'bitcoin' }: Props) {
+  "use memo";
   const [retryNonce, setRetryNonce] = useState(0);
 
   const { data, isPending, isError } = useQuery(

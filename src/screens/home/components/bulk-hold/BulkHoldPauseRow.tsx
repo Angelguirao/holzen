@@ -20,6 +20,7 @@ interface BulkHoldPauseRowProps {
 }
 
 export function BulkHoldPauseRow({ pause, language, value, onValueChange }: BulkHoldPauseRowProps) {
+  "use memo";
   const { t } = useTranslation();
   const snap = pause.context_snapshot;
   const pct = parseBulkHoldChange24hPct(snap);
