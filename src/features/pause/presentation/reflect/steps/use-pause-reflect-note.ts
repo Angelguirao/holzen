@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useTransition } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
 import { pauseReflectNoteUpdate } from './pause-reflect-steps-io';
@@ -14,7 +14,7 @@ export function usePauseReflectNote(pauseInstanceId: string) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [note, setNote] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const { data: serverNote = '' } = useQuery(getLatestPauseReflectNoteQueryOptions(pauseInstanceId));
 
@@ -23,30 +23,29 @@ export function usePauseReflectNote(pauseInstanceId: string) {
   }, [pauseInstanceId, serverNote]);
 
   const commit = useCallback(
-    async (next: string) => {
-      setSaving(true);
-      try {
-        const outcome = await pauseReflectNoteUpdate({
-          pauseInstanceId,
-          text: next,
-        });
-        if (outcome.status === 'sync_failed') return;
-        if (user?.id) {
-          void queryClient.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(user.id) });
+    (next: string) => {
+      startTransition(async () => {
+        try {
+          const outcome = await pauseReflectNoteUpdate({
+            pauseInstanceId,
+            text: next,
+          });
+          if (outcome.status === 'sync_failed') return;
+          if (user?.id) {
+            void queryClient.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(user.id) });
+          }
+          void queryClient.invalidateQueries({
+            queryKey: pauseReflectStepLatestQueryKey(pauseInstanceId, PAUSE_REFLECT_STEP_NOTE),
+          });
+        } catch {
+          /* ignore */
         }
-        void queryClient.invalidateQueries({
-          queryKey: pauseReflectStepLatestQueryKey(pauseInstanceId, PAUSE_REFLECT_STEP_NOTE),
-        });
-      } catch {
-        /* ignore */
-      } finally {
-        setSaving(false);
-      }
+      });
     },
-    [pauseInstanceId, queryClient, user?.id],
+    [pauseInstanceId, queryClient, user?.id, startTransition],
   );
 
-  const commitOnBlur = useCallback(() => void commit(note), [commit, note]);
+  const commitOnBlur = useCallback(() => commit(note), [commit, note]);
 
-  return { note, setNote, saving, commitOnBlur };
+  return { note, setNote, saving: isPending, commitOnBlur };
 }
