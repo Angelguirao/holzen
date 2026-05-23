@@ -69,6 +69,14 @@ export class TransactionalEmailConfigurationError extends Error {
   }
 }
 
+/** True when Resend or legacy Lovable email delivery is configured. */
+export function isTransactionalEmailConfigured(): boolean {
+  return Boolean(
+    Deno.env.get("RESEND_API_KEY")?.trim() ||
+      Deno.env.get("LOVABLE_API_KEY")?.trim(),
+  );
+}
+
 type EmailBackend = "resend" | "legacy_lovable";
 
 function resolveEmailBackend(opts: SendOptions): { backend: EmailBackend; apiKey: string } {

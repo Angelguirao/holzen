@@ -1,7 +1,12 @@
 import * as React from "https://esm.sh/react@18.3.1"
 import { renderAsync } from "https://esm.sh/@react-email/components@0.0.22?deps=react@18.3.1,react-dom@18.3.1"
-import { sendLovableEmail, parseEmailWebhookPayload } from "https://esm.sh/@lovable.dev/email-js"
+import { parseEmailWebhookPayload } from "https://esm.sh/@lovable.dev/email-js"
 import { WebhookError, verifyWebhookRequest } from "https://esm.sh/@lovable.dev/webhooks-js"
+import {
+  holzenTransactionalEmailLogger,
+  isTransactionalEmailConfigured,
+  sendTransactionalEmail,
+} from "../_shared/transactional-email.ts";
 import { SignupEmail } from '../_shared/email-templates/signup.tsx'
 import { InviteEmail } from '../_shared/email-templates/invite.tsx'
 import { MagicLinkEmail } from '../_shared/email-templates/magic-link.tsx'
@@ -312,11 +317,25 @@ async function handleWebhook(req: Request, log: RequestLoggingContext["log"]): P
     plainText: true,
   })
 
-  // Send email via Lovable Email API
-  // The callback URL is provided in the payload by Lovable, ensuring correct routing
-  // for both production and local development
+  if (!isTransactionalEmailConfigured()) {
+    try {
+      log.error("auth_email_hook_missing_email_delivery", {
+        holzen_event: "auth_email_hook_missing_email_delivery",
+        run_id,
+      });
+    } catch {
+      /* non-fatal */
+    }
+    return new Response(JSON.stringify({ error: 'Server configuration error' }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
+  // Legacy Lovable send API requires callback_url from the webhook payload.
   const callbackUrl = payload.data.callback_url
-  if (!callbackUrl) {
+  const useResend = Boolean(Deno.env.get("RESEND_API_KEY")?.trim())
+  if (!useResend && !callbackUrl) {
     try {
       log.error("auth_email_hook_missing_callback_url", {
         holzen_event: "auth_email_hook_missing_callback_url",
@@ -347,28 +366,35 @@ async function handleWebhook(req: Request, log: RequestLoggingContext["log"]): P
     });
   }
 
-  let result: { message_id?: string }
-  try {
-    result = await sendLovableEmail(
-      {
-        run_id,
-        to: toEmail,
-        from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
-        sender_domain: SENDER_DOMAIN,
-        subject: EMAIL_SUBJECTS[emailType] || 'Notification',
-        html,
-        text,
-        purpose: 'transactional',
-      },
-      { apiKey, sendUrl: callbackUrl }
-    )
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to send email'
+  const sendResult = await sendTransactionalEmail(
+    {
+      to: toEmail,
+      from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+      sender_domain: SENDER_DOMAIN,
+      subject: EMAIL_SUBJECTS[emailType] || 'Notification',
+      html,
+      text,
+      purpose: 'transactional',
+      label: `auth-${emailType}`,
+    },
+    {
+      source: 'auth-email-hook',
+      idempotencyKey: `auth-email:${run_id}`,
+      sendUrl: callbackUrl,
+      logger: holzenTransactionalEmailLogger(
+        (m, d) => log("auth_email_hook_dep", { holzen_event: "auth_email_hook_dep", message: m, run_id, ...(d ?? {}) }),
+        (m, d) => log.error("auth_email_hook_dep", { holzen_event: "auth_email_hook_dep", message: m, run_id, ...(d ?? {}) }),
+      ),
+    },
+  )
+
+  if (!sendResult.ok) {
     try {
       log.error("auth_email_hook_send_api_failed", {
         holzen_event: "auth_email_hook_send_api_failed",
         run_id,
-        detail: message.slice(0, 500),
+        http_status: sendResult.status,
+        detail: (sendResult.error ?? 'Failed to send email').slice(0, 500),
       });
     } catch {
       /* non-fatal */
@@ -382,7 +408,7 @@ async function handleWebhook(req: Request, log: RequestLoggingContext["log"]): P
   try {
     log("auth_email_hook_sent", {
       holzen_event: "auth_email_hook_sent",
-      message_id: result.message_id,
+      message_id: sendResult.id,
       run_id,
     });
   } catch {
@@ -390,7 +416,7 @@ async function handleWebhook(req: Request, log: RequestLoggingContext["log"]): P
   }
 
   return new Response(
-    JSON.stringify({ success: true, message_id: result.message_id }),
+    JSON.stringify({ success: true, message_id: sendResult.id }),
     { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
   )
 }
