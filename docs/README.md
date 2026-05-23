@@ -32,6 +32,8 @@ This folder contains human-readable notes that complement the source code and in
 | **Lovable sync risk, staging, platform exit** | [ops/lovable-staging-and-platform-exit.md](ops/lovable-staging-and-platform-exit.md) | Why merges hit prod DB; CI gaps; phased exit / hybrid paths. Pairs with [deployment-sync-guide.md](ops/deployment-sync-guide.md). |
 | `index.html`, SPA shell, default SEO/PWA meta | [fundamentals/index-html-and-spa-shell.md](fundamentals/index-html-and-spa-shell.md) | Canonical origin `https://holzen.app`; pairs with §3 in navigating-the-codebase. |
 | Pause lifecycle (instances, events, artifacts, state machine) | [systems/pause-system.md](systems/pause-system.md) | Canonical **data model** and invariants (Pause V2). |
+| **Pause client module** (features/pause layout, ritual folders, public barrels, collections → legacy) | [systems/pause-client-architecture.md](systems/pause-client-architecture.md) | Pairs with pause-system (server) and [screens/pause.md](screens/pause.md); template for other contexts §9. |
+| **Full client `src/` rings + per-context client targets** | [fundamentals/client-architecture-overview.md](fundamentals/client-architecture-overview.md) | Index of `*-client-architecture.md` (subscription, auth, market, user, notifications); pairs with [client-src-layout.md](fundamentals/client-src-layout.md). |
 | Pause AI pipeline (triggers, edge functions, generators, storage, hooks) | [systems/pause/ai-powered-pause-system.md](systems/pause/ai-powered-pause-system.md) | **Current** Pause V2 pipeline narrative; complements `pause-system.md` (starts with a V2 banner — not a pre‑V2 archive). |
 | How a subsystem behaves (contracts, flows) | [systems/](systems/) | One primary doc per concern; cross-link related systems. |
 | Irreversible or costly-to-reverse choices | [decisions/](decisions/) | Short ADR-style notes; see [decisions/README.md](decisions/README.md). |
@@ -39,12 +41,14 @@ This folder contains human-readable notes that complement the source code and in
 | What to watch when things break (cron, retries, logs) | [ops/](ops/) | [ops/observability-and-failures.md](ops/observability-and-failures.md) is the checklist index; [ops/logging-strategy.md](ops/logging-strategy.md) defines logging conventions. |
 | Step-by-step HTTP review (Postman / Bruno) | [fundamentals/http-review-playbooks.md](fundamentals/http-review-playbooks.md) | Optional [bruno/](../bruno/) folder for git-friendly collections. |
 | Design system migration (Nox) | [design/nox/](design/nox/) + **[DESIGN.md](../DESIGN.md)** (root) | Figma is canonical for visual values; markdown owns migration rules, mapping, and extension policy. **DESIGN.md** is the agent-oriented token + rules file ([Google format](https://github.com/google-labs-code/design.md)); runtime CSS is still **`src/index.css`**. |
-| App information architecture (routes, primary nav) | [design/information-architecture.md](design/information-architecture.md) | Product-level map of shipped routing, bottom nav, and **§1.7** PostHog `navigation.*` events; keep aligned with `src/App.tsx`, `AGENTS.md`, and [ops/event-taxonomy.md](ops/event-taxonomy.md) when events change. |
+| App information architecture (routes, primary nav) | [design/information-architecture.md](design/information-architecture.md) | Product IA narrative; **§1–§3 = full-IA pre-strip reference**; **live shipped routes/tabs → [active-surface.md](ops/active-surface.md)**; PostHog `navigation.*` → [event-taxonomy.md](ops/event-taxonomy.md). |
 | **React screen composition** (orchestration, hooks, memoization, reuse) | [fundamentals/react-screen-orchestration.md](fundamentals/react-screen-orchestration.md) | Principles abstracted from Home refactor; **beginner-friendly** vocabulary, Rules of Hooks examples, toolbox, **guided tour of `HomeScreen`**; apply to other `src/screens/*` surfaces. |
 | **Application architecture** (principles, bounded contexts, use cases, target packages, alternatives) | [fundamentals/holzen-application-architecture.md](fundamentals/holzen-application-architecture.md) | Repo map: [frontend-module-layout.md](fundamentals/frontend-module-layout.md); ADR: [decisions/2026-05-17-modular-monolith-hexagonal-client.md](decisions/2026-05-17-modular-monolith-hexagonal-client.md). |
 | **Modern React practices** (industry norms, Holzen scorecard, PR checklist) | [fundamentals/modern-react-practices-holzen.md](fundamentals/modern-react-practices-holzen.md) | Pairs with [react-screen-orchestration.md](fundamentals/react-screen-orchestration.md) and §6.1 in navigating-the-codebase. |
 | **Client vs server responsibility** (truth, projection, Query vs UI state) | [fundamentals/client-server-architecture-holzen.md](fundamentals/client-server-architecture-holzen.md) | Pair with holzen-application-architecture and [navigating-the-codebase.md](fundamentals/navigating-the-codebase.md) §6.1. |
 | **`src/` folder layout** (presentation layers, import direction, PR review checklist) | [fundamentals/client-src-layout.md](fundamentals/client-src-layout.md) | Folder READMEs under `src/app`, `src/screens`, `src/components` link here; do not duplicate the diagram in AGENTS. |
+| **Client file & export naming** (features, screens, branches, anti-patterns) | [fundamentals/naming-conventions-holzen.md](fundamentals/naming-conventions-holzen.md) | Summary table in [frontend-module-layout.md](fundamentals/frontend-module-layout.md) §5; agents: `.cursor/rules/architecture-migration.mdc`. |
+| **Implementation notes** (running log: decisions, deviations, tradeoffs, questions) | [fundamentals/implementation-notes-workflow.md](fundamentals/implementation-notes-workflow.md) | Active migration: [artifacts/architecture-migration/implementation-notes.html](artifacts/architecture-migration/implementation-notes.html) |
 | **Live browser 360°** (MCP: network, console, Lighthouse, performance) | [fundamentals/browser-360-mcp-playbook.md](fundamentals/browser-360-mcp-playbook.md) | Pairs with source reading; optional snapshot reports under [reports/](reports/). |
 | **UI / journeys** (click-through flows in the real app) | [backlog/e2e-browser-automation.md](backlog/e2e-browser-automation.md) | **Not** a substitute for HTTP review: use **Playwright**, **Cypress**, or **Vitest + React Testing Library** for full product flows; Bruno is for **API** review only. |
 
@@ -60,7 +64,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 - `fundamentals/navigating-the-codebase.md` — repo tour: boot flow, routing, auth, hooks, Supabase basics.
 - `fundamentals/index-html-and-spa-shell.md` — Vite HTML entry, SPA shell diagram, boot-recovery, `holzen.app` vs Lovable preview URLs.
-- `fundamentals/refactoring-strategy.md` — incremental refactors: **React** pages/hooks (`src/lib` vs components) plus **full-stack touchpoints** (migrations, RLS, edges); pairs with [backlog/react-page-and-hook-splitting.md](backlog/react-page-and-hook-splitting.md).
+- `fundamentals/refactoring-strategy.md` — incremental refactors: extract to **features** / screen `lib/` (not new `@/lib/<context>-*` shims) plus **full-stack touchpoints** (migrations, RLS, edges); pairs with [backlog/react-page-and-hook-splitting.md](backlog/react-page-and-hook-splitting.md).
 - **`fundamentals/react-screen-orchestration.md`** — **reusable playbook** (includes React beginner vocabulary + bad/good hook examples + **step-by-step `Home.tsx` walkthrough**): page as conductor, hook/lib splits, Rules of Hooks + early returns, lazy branches, memoized props, typing at source; concrete maps in [screens/home.md](screens/home.md) and [screens/pause.md](screens/pause.md).
 - `fundamentals/mental-models-for-contributors.md` — glossary + vocabulary for SPAs, React, TypeScript, Vite, Supabase (RLS, edge functions); links to official docs and learning resources.
 - **`fundamentals/holzen-application-architecture.md`** — **principles constitution**: bounded contexts, use cases, ports/adapters, CQRS-lite, inspirations, alternatives, anti-patterns; target monorepo shape.
@@ -69,6 +73,8 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 - `decisions/2026-05-17-modular-monolith-hexagonal-client.md` — **accepted ADR** for pre-launch client restructure.
 - `fundamentals/client-server-architecture-holzen.md` — **truth vs projection**: authority on server, TanStack Query vs ephemeral UI state, shared types without shared domain logic.
 - **`fundamentals/client-src-layout.md`** — **client folder map**: `app` / `screens` / `components` / `features` diagram, placement rules, ongoing alignment review.
+- **`fundamentals/implementation-notes-workflow.md`** — running **implementation-notes.html** during multi-slice work; architecture enforcement ladder.
+- **`artifacts/architecture-migration/`** — live notes for `cursor/arch-migrate-src-ca70` ([implementation-notes.html](artifacts/architecture-migration/implementation-notes.html)).
 - `fundamentals/codebase-size-and-review-practices.md` — codebase size snapshot and review best-practices.
 - `fundamentals/documentation-strategy.md` — meta: choosing `systems/` vs `ops/` vs `backlog/`, default HTTP documentation (Bruno + playbooks), when OpenAPI is worth it, edge-function wiring checklist (pointers to AGENTS and ops docs).
 - `fundamentals/http-review-playbooks.md` — step-by-step Postman/Bruno flows, Supabase `invoke` headers, pairing with Edge logs; [bruno/](../bruno/) collection, [bruno/SCOPE.md](../bruno/SCOPE.md) (HTTP vs full app), [bruno/functions-catalog.md](../bruno/functions-catalog.md) (full **`config.toml`** name list + Bruno smoke subset).
@@ -78,7 +84,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 ## Screens (in-app surfaces)
 
 - `screens/home.md` — **`/`** dashboard: modes (zen vs full), widgets, subscription/checkout interplay, pause error surfacing, analytics touchpoints.
-- `screens/pause.md` — **`/pause`** full-screen volatility ritual: gate, depth picker, brief vs deep scaffold, `pause-api` wiring, exit navigation, analytics notes.
+- `screens/pause.md` — **`/pause`** full-screen volatility ritual: gate, depth picker, brief vs deep scaffold, `@/features/pause/public-rpc` wiring, exit navigation, analytics notes.
 
 ## Reports (snapshots)
 
@@ -102,7 +108,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 ## Backlog
 
-- `backlog/backlog.md` — pending improvements; **work queue (pick by goal)**, master table, quick finder by theme, alphabetical index. Individual tickets under `backlog/*.md` (includes **frontend structure** items: typed navigation state, page/hook splits, data-fetching conventions, Lighthouse a11y, preconnect, Recharts). Browser **360°** methodology: [fundamentals/browser-360-mcp-playbook.md](fundamentals/browser-360-mcp-playbook.md).
+- `backlog/backlog.md` — pending improvements; **work queue (pick by goal)**, master table, quick finder by theme, alphabetical index. Individual tickets under `backlog/*.md` (includes **frontend structure** items: typed navigation state, page/hook splits, data-fetching conventions, Lighthouse a11y, preconnect, Recharts). **Note:** backlog tickets may cite pre-migration paths (`src/hooks/`, `src/pages/`); verify against [client-src-layout.md](fundamentals/client-src-layout.md) and [pause-client-architecture.md](systems/pause-client-architecture.md) §10 before editing code. Browser **360°** methodology: [fundamentals/browser-360-mcp-playbook.md](fundamentals/browser-360-mcp-playbook.md).
 - `backlog/e2e-browser-automation.md` — **UI / journeys** (click-through pause, journal, settings): Playwright/Cypress or Vitest+RTL — not Bruno; see [bruno/SCOPE.md](../bruno/SCOPE.md) for HTTP vs full app.
 
 ## Reviews
@@ -124,14 +130,17 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 - `systems/auth/auth-and-referral-system.md` — Auth system (Supabase) + optional referral side-effect
 - `systems/routing/route-gating-system.md` — protected vs public-only vs ungated routes; `ProtectedRoute` / `PublicOnlyRoute` contracts
 - `systems/pause-system.md` — end-to-end architecture of the Pause V2 lifecycle (instances, events, artifacts, stats, badges).
+- **`systems/pause-client-architecture.md`** — target **`features/pause`** layout (ritual/reflect, ritual/frame), public barrels, collections → legacy, module template for other contexts.
+- **`fundamentals/client-architecture-overview.md`** — full **`src/`** rings (app, screens, components, features, lib) + index of per-context `*-client-architecture.md` scaffolds.
+- **`systems/subscription-client-architecture.md`**, **`auth-client-architecture.md`**, **`market-client-architecture.md`**, **`user-client-architecture.md`**, **`notifications-client-architecture.md`** — Phase B client targets (scaffolds; expand per slice).
 - `systems/pause/ai-powered-pause-system.md` — Pause V2 **AI and edge** pipeline (triggers, `holzen-reflect`, `companion-orchestrate`, generators, cron); narrative companion to `pause-system.md`.
 - `systems/costs/ai-cost-model.md` — **canonical** cost + guardrail reference. All AI-powered edge functions, cost ceilings, panic mode, feature flags, scenario modeling, runbooks, auto-top-up.
 - `systems/pause/pause-session-cost-estimates.md` — pause-flow case study. Defer to `systems/costs/ai-cost-model.md` for anything cross-feature.
 - `systems/pause/companions/` — deep dives per companion type (see [companions/signal.md](systems/pause/companions/signal.md) for Signal).
 - `systems/pause/past-reflections.md` — shared "user words" read model behind Zoom Out's Echo and Daily Practice Replay (notes + replay entries, never AI text).
 - `systems/content-library-fetch-source-feeds.md` — **`fetch-source-feeds`** pipeline: RSS/Map discovery → scrape → Gemini → `content_library`; admin setup and **JSON** log grep tokens (`fn`, **`fetch_feeds_*`** **`msg`**).
-- `systems/stats-system.md` — current Profile > Stats reference in UI order, plus a recommended skills-first target model.
-- `systems/badges-system.md` — current Profile > Badges reference in UI order, plus a recommended skills-aligned target model.
+- `systems/stats-system.md` — **legacy full-shell only** (not pause-first): Profile → Stats / skills-first model reference in UI order (`src/legacy/full-shell/`).
+- `systems/badges-system.md` — **legacy full-shell only** (not pause-first): Profile → Badges reference in UI order (`src/legacy/full-shell/`).
 
 ## Postmortems
 

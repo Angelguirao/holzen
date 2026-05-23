@@ -1,4 +1,4 @@
-import type { PauseStep } from '@/features/pause/public';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import {
   PAUSE_RITUAL_SCHEMA_VERSION,
 } from '@/features/pause/domain/ritual-types';

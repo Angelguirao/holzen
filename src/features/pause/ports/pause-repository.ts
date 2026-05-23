@@ -36,4 +36,11 @@ export interface PauseRepository {
   }): Promise<PauseLogCompanionResult>;
 
   dismissCurrent(): Promise<PauseState | null>;
+
+  /** Companion slot heart — `pause_instances.metadata` (not `pause_log_step`). */
+  toggleCompanionSlotFavorite(params: {
+    pauseInstanceId: string;
+    sourceType: string;
+    onBucketComputed?: (bucket: Record<string, boolean>) => void;
+  }): Promise<boolean>;
 }

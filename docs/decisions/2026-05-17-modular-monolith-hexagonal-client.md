@@ -75,7 +75,7 @@ Moving the SPA to `apps/web` **today** would break publish (no root `index.html`
 |------|----------------|
 | Flesh out [frontend-module-layout.md](../fundamentals/frontend-module-layout.md) as structure lands | Same PR series as scaffold |
 | `src/features/pause/` skeleton + `check:feature-imports` | Done on `feature/refactoring6` |
-| Waves 1–4 (`src/features/*`, active app → `public`, lib shims, legacy quarantined) | Done on `feature/refactoring6` — see [frontend-module-layout.md](../fundamentals/frontend-module-layout.md) §11 |
+| Waves 1–4 (`src/features/*`, active app → `public`, lib shims, legacy quarantined) | **Wave 1 interior in progress** on `feature/refactoring6` — see [frontend-module-layout.md](../fundamentals/frontend-module-layout.md) §11; Phase A backlog in [architecture-migration/README.md](../artifacts/architecture-migration/README.md) |
 | Scaffold `pnpm-workspace.yaml`, `apps/web`, empty `packages/*` | **Gated** — only after §8 extraction trigger |
 | `packages/contracts` for top edges + critical RPCs | Early in pause/companion wave |
 | ADR supersession only if we adopt Next.js or split services | Future |

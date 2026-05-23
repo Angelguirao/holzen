@@ -1,0 +1,151 @@
+---
+description: >-
+  Incremental Holzen src/ architecture migration — full active src alignment,
+  pause-first scheduling per slice tier, one vertical slice per commit.
+  Naming per naming-conventions-holzen.md. Use when refactoring features/screens/lib.
+alwaysApply: false
+---
+
+# Architecture migration session (Holzen)
+
+**Incremental, behavior-preserving** alignment of active `src/` with documented architecture — not a big-bang rewrite. **Lovable:** Vite root stays at repo root; do **not** move SPA to `apps/web` or extract `packages/*` unless explicitly asked.
+
+## Initiative scope vs scheduling priority
+
+Two ideas — do not conflate them:
+
+| | Meaning |
+|---|---------|
+| **Initiative scope (north star)** | Align **all active `src/`** — app, screens, components, features, lib ([client-architecture-overview.md](../../docs/fundamentals/client-architecture-overview.md)) — with P1–P9 and the shared module skeleton ([pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) §9). |
+| **Scheduling priority (what to do next)** | **Pause-first** at each slice tier: finish pause violations at the current tier before taking the same tier in another context — unless the user names a different target. |
+
+**Pause is the reference implementation** (largest context). It is **not** the only domain on this branch. After pause is clean at a tier, apply the same slice pattern to subscription, auth, market, etc.
+
+**Phases** (same branch): (0) client-architecture doc scaffolds → (A) pause convergence → (B) cross-context → (C) app/screens/lib hygiene. Backlog: [docs/artifacts/architecture-migration/README.md](../../docs/artifacts/architecture-migration/README.md).
+
+## Constitution (read before editing)
+
+**Conflict hierarchy** — when docs disagree, prefer the higher row:
+
+| Priority | Doc | Owns |
+|----------|-----|------|
+| 1 | [docs/README.md](../../docs/README.md) canonical table | Which doc is source of truth per topic |
+| 2 | [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) §3 | Pause **interior** folder taxonomy (`ritual/reflect/`, `ritual/frame/`) |
+| 3 | [client-src-layout.md](../../docs/fundamentals/client-src-layout.md) | app / screens / features placement |
+| 4 | [active-surface.md](../../docs/ops/active-surface.md) | Shipped routes, tables, legacy quarantine |
+| 4b | [information-architecture.md](../../docs/design/information-architecture.md) | Product IA narrative — **§1–§3 = full-IA reference**; live routes → active-surface |
+| 5 | **This rule** + [architecture-migration README](../../docs/artifacts/architecture-migration/README.md) | Slice workflow, scheduling, backlog |
+| 6 | [implementation-notes.html](../../docs/artifacts/architecture-migration/implementation-notes.html) | Resolved deviations during migration |
+| 7 | [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) | CI checks, migration waves, monorepo north star — **not** pause interior naming |
+| 8 | [refactoring-strategy.md](../../docs/fundamentals/refactoring-strategy.md) | Split mechanics only — extract to **features**, not new `@/lib/<context>-*` |
+
+**Mandatory reads (every slice):**
+
+1. [architecture-migration/README.md](../../docs/artifacts/architecture-migration/README.md) backlog + [implementation-notes.html](../../docs/artifacts/architecture-migration/implementation-notes.html)
+2. [client-architecture-overview.md](../../docs/fundamentals/client-architecture-overview.md) + [docs/README.md](../../docs/README.md) canonical table
+3. [client-src-layout.md](../../docs/fundamentals/client-src-layout.md), [client-server-architecture-holzen.md](../../docs/fundamentals/client-server-architecture-holzen.md), [implementation-notes-workflow.md](../../docs/fundamentals/implementation-notes-workflow.md), [active-surface.md](../../docs/ops/active-surface.md)
+4. **Pause slices:** [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) — overrides `frontend-module-layout.md` §3 for pause interior
+5. **Fetch/cache slices:** [navigating-the-codebase.md](../../docs/fundamentals/navigating-the-codebase.md) §6.1
+6. **Phase B (non-pause):** matching `*-client-architecture.md` + `src/features/<ctx>/README.md`
+
+Then:
+
+1. Skim matching row in [AGENTS.md](../../AGENTS.md) → **Change map**.
+2. Principles **P1–P9:** [holzen-application-architecture.md](../../docs/fundamentals/holzen-application-architecture.md).
+3. Placement: [client-src-layout.md](../../docs/fundamentals/client-src-layout.md), [frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) §10.
+4. **Naming (mandatory for new/moved files):** [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
+5. **Pause client target (when touching pause):** [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) — ritual/reflect + ritual/frame; collections → legacy.
+6. Screen/hook splits: [refactoring-strategy.md](../../docs/fundamentals/refactoring-strategy.md), [react-screen-orchestration.md](../../docs/fundamentals/react-screen-orchestration.md) — extract to **features**, not new context shims in `src/lib/`.
+7. Shipped scope: [active-surface.md](../../docs/ops/active-surface.md) — no `@/legacy/**`, no Tier B schema.
+
+## Pick ONE vertical slice (priority table)
+
+Work **one** slice per session unless the user names a target.
+
+**Default product priority:** **pause** (ritual, companions, reflect, session hooks, `/pause` and companion routes) — Holzen’s core shipped journey. When pause has open violations at the current slice tier, **pick pause first**.
+
+Only move to another bounded context (subscription, auth, market, user, notifications, admin, app shell) when:
+- the user names a target, or
+- pause has **no** remaining violation at that priority tier (scan confirms pause is clean for shims / god-hooks / inline Supabase / UI splits / context placement / ritual folder targets).
+
+When working a **non-pause** context slice, read that context’s **`*-client-architecture.md`** ([client-architecture-overview.md](../../docs/fundamentals/client-architecture-overview.md) index), AGENTS change-map row, and `src/features/<ctx>/README.md`; use pause §9 as structural template, not pause ritual folder names.
+
+| Priority | Slice | Typical moves |
+|----------|--------|----------------|
+| 1 | `src/lib/*` shims | Re-export from `features/<ctx>/public*`; delete shim when call sites updated |
+| 2 | Screen god-hooks | Pure logic → `application` use cases; I/O → ports + `infrastructure`; thin conductor |
+| 3 | Inline Supabase/edge in screens | Feature use case + adapter; screen imports `public*` only |
+| 4 | Misplaced UI | Route → `screens/<route>/components/`; shell → `app/components/`; primitive → `components/ui/` |
+| 5 | Wrong bounded context | e.g. companions in `features/pause`, not `features/home` / `features/companion` |
+
+**Do not** create `features/home`, `features/archive`, or route-named feature packages.
+
+## Discovery (pause-first, then repo)
+
+Run discovery **across active `src/`**, but **filter and rank pause (`features/pause`, `screens/pause`, pause-related shims) before** other contexts.
+
+```bash
+# Shims & forbidden lib patterns (pause/companion first in review)
+rg '@/lib/(pause|companion|holzen|subscription)-' src --glob '!**/legacy/**'
+rg "from '@/lib/[^']+'" src/screens/pause src/features/pause
+rg "from '@/lib/[^']+'" src/screens src/app src/components -g '!**/ui/**'
+
+# Presentation violations — pause screens first
+rg 'supabase\.from' src/screens/pause --glob '*.tsx'
+rg 'supabase\.from' src --glob '*.tsx'
+rg '@/features/[^/]+/application' src/screens/pause src/features/pause/presentation
+rg '@/features/[^/]+/application' src/screens src/app src/components src/test
+
+# God hooks (>~200 LOC) — pause presentation + pause screens first
+find src/features/pause src/screens/pause -name 'use-*.ts' -o -name 'use-*.tsx' | xargs wc -l 2>/dev/null | sort -rn | head -15
+find src/features src/screens -name 'use-*.ts' -o -name 'use-*.tsx' | xargs wc -l 2>/dev/null | sort -rn | head -15
+
+# Checks (baseline)
+npm run check:feature-imports
+npm run check:architecture-alignment
+```
+
+**Pick order:** highest-priority slice tier → **largest pause violation** at that tier → user-named target → same tier in another context.
+
+## Normative rules (mental PR reject)
+
+- **Layers:** `app` → `screens` → (`components` | `features`). Features never import screens. `components/ui` never imports features.
+- **Cross-context:** only `@/features/<ctx>/public`, `public-queries`, `public-hooks`, `public-rpc`.
+- **No** new root `src/components/*.tsx` (except `ui/` + allowlist).
+- **No** new `src/lib/<feature>-*` for bounded contexts.
+- **Authority (P1):** RLS/RPC/edge — not button `disabled` only. `invokeEdge` + **`x-cid`**.
+- **Presentation (P5):** no `supabase.from` in `.tsx`; named use cases behind ports.
+- **Reads (P6):** TanStack Query via `public-queries`; no duplicate `useEffect`+Supabase fetch.
+- **Observability:** new/renamed PostHog → `event-taxonomy.md`; new flags → `feature-flags.md`.
+
+## Workflow
+
+1. **Read spec** — [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) (+ change-map row in AGENTS).
+2. **Maintain notes** — append to [docs/artifacts/architecture-migration/implementation-notes.html](../../docs/artifacts/architecture-migration/implementation-notes.html) when you make design decisions, deviate from spec, trade off alternatives, or have open questions ([implementation-notes-workflow.md](../../docs/fundamentals/implementation-notes-workflow.md)).
+3. **Discover** — list violations for chosen slice (see commands above).
+4. **Plan** — ≤5 files moved/created; behavior parity explicit; names per [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
+5. **Implement** — smallest diff; tests beside moved pure modules.
+6. **Verify:** `npm run test` (or targeted vitest), `check:feature-imports`, `check:architecture-alignment`, `check:active-surface`, `npx eslint` on touched paths only.
+7. **Flow check** — trace the **pause** journey when pause code changed (manual trigger → `/pause` → RPC → edge for reflect/companion); use skill `holzen-flow-review`. For non-pause slices, trace the relevant shipped journey instead.
+8. **Commit** — include notes update in the same commit when a note entry was added.
+
+## Output format
+
+## Slice  
+## Changes  
+## Checklist (client-src-layout 1–5)  
+## Verification  
+## Implementation notes (if any new entries)  
+## Follow-ups  
+
+## Git / branches
+
+- Base: **`feature/refactoring6`** unless user says otherwise.
+- **One branch:** keep working on **`cursor/arch-migrate-src-ca70`** (or the user’s existing migration branch). Do **not** create a new branch per slice unless the user asks.
+- **Commit + push** after each completed slice; update the **same** open PR.
+- Rename a too-narrow branch once via `git branch -m` + push + GitHub branch rename (PR head follows).
+
+## Hard stops
+
+- No `@/legacy/**`, Tier B tables/columns, `apps/web`, monorepo packages without explicit instruction.
+- No whole-repo format/lint drive-by.

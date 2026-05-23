@@ -1,0 +1,251 @@
+import { describe, expect, it } from 'vitest';
+
+import {
+  buildManualPauseCreateOrReuseParams,
+  MANUAL_PAUSE_VOLATILITY_TEMPLATE,
+} from '@/features/pause/domain/reflect/generation/build-manual-pause-create-or-reuse-params';
+import { buildManualPauseOpenParams as buildOpenParamsDirect } from '@/features/pause/domain/reflect/generation/build-manual-pause-open-params';
+import { buildManualPauseMarketContext as buildMarketContextDirect } from '@/features/pause/domain/reflect/generation/build-manual-pause-market-context';
+import {
+  messageFromReflectGenerationResult,
+  resolveReflectGenerationPrefetch,
+  shouldClearReflectGenerationLoading,
+  shouldCommitReflectGeneration,
+} from '@/features/pause/domain/reflect/generation/reflect-generation-hook-flow';
+import { reflectGenerationPrerequisite } from '@/features/pause/domain/reflect/generation/reflect-generation-prerequisites';
+import { reflectGenerationUserErrorMessage } from '@/features/pause/domain/reflect/generation/reflect-generation-errors';
+import { resolveEffectiveReflectionCopy } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-copy';
+
+import {
+  messageFromReflectGenerationResult as messageFromResultFromHookFlow,
+  reflectGenerationPrerequisite as prerequisiteFromHookFlow,
+  reflectGenerationUserErrorMessage as userErrorFromHookFlow,
+  resolveEffectiveReflectionCopy as resolveCopyFromHookFlow,
+  resolveReflectGenerationPrefetch as resolvePrefetchFromHookFlow,
+  runReflectGeneration as runReflectGenerationFromHookFlow,
+  shouldClearReflectGenerationLoading as shouldClearLoadingFromHookFlow,
+  shouldCommitReflectGeneration as shouldCommitFromHookFlow,
+} from './holzen-reflect/pause-reflect-generation-hook-flow';
+import {
+  buildManualPauseCreateOrReuseParams as buildCreateOrReuseFromManualOpenFlow,
+  buildManualPauseMarketContext as buildMarketContextFromManualOpenFlow,
+  buildManualPauseOpenParams as buildOpenParamsFromManualOpenFlow,
+  dismissOpenPauseHome as dismissFromManualOpenFlow,
+  MANUAL_PAUSE_VOLATILITY_TEMPLATE as volatilityTemplateFromManualOpenFlow,
+  openManualPauseFromHome as openManualFromManualOpenFlow,
+  runOpenManualPauseSilentModeAfterCreate as runSilentModeFromManualOpenFlow,
+  runPersistSilentReflectionStub as runPersistStubFromManualOpenFlow,
+} from './manual-open/pause-reflect-generation-manual-open-flow';
+import { dismissOpenPauseHome } from './manual-open/dismiss-open-pause-home';
+import { openManualPauseFromHome } from './manual-open/open-manual-pause-from-home';
+import { runOpenManualPauseSilentModeAfterCreate } from './manual-open/run-open-manual-pause-silent-mode-after-create';
+import { runPersistSilentReflectionStub } from './manual-open/run-persist-silent-reflection-stub';
+import { runReflectGeneration as runReflectGenerationDirect } from './holzen-reflect/run-reflect-generation';
+import {
+  startPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience,
+} from '../ambience/pause-reflect-ambience-flow';
+import {
+  buildShiftEmotionFrameHubLogBundle as buildHubLogBundleFromHubFlow,
+  resolveShiftFrameHubDonePresentation as resolveHubPresentationFromHubFlow,
+  runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
+} from '../hub/pause-reflect-hub-flow';
+import {
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+  runPauseOutcomeLog,
+} from '../flows/pause-reflect-flows-flow';
+import {
+  runPauseFavoriteToggle as runFavoriteFromStepsFlow,
+  runPauseReflectNoteUpdate as runNoteFromStepsFlow,
+  runPauseReflectTagUpdate as runTagFromStepsFlow,
+  runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
+  shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
+  shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
+} from '../steps/pause-reflect-steps-flow';
+import {
+  buildFeelTilesMoodLogOptions as buildFeelTilesFromMoodFlow,
+  runInitialEmotionSelect as runEmotionSelectFromMoodFlow,
+  runInitialEmotionSkip as runEmotionSkipFromMoodFlow,
+} from '../../feel/pause-feel-flow';
+import {
+  trackPauseReflectPostItOpen as trackPostItFromTelemetryFlow,
+  trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
+  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
+} from '../telemetry/pause-reflect-telemetry-flow';
+import {
+  getPendingPauseOfferDisplay as getPendingDisplayFromPendingOfferFlow,
+  runAdoptPendingPauseOffer as runAdoptFromPendingOfferFlow,
+  runDeclinePendingPauseOffer as runDeclineFromPendingOfferFlow,
+  trackPausePendingAdopted as trackAdoptedFromPendingOfferFlow,
+  trackPausePendingDeclined as trackDeclinedFromPendingOfferFlow,
+  trackPauseSessionAbandoned as trackAbandonedFromPendingOfferFlow,
+} from '../pending-offer/pause-reflect-pending-offer-flow';
+
+import {
+  buildManualPauseCreateOrReuseParams as buildCreateOrReuseFromFlow,
+  buildManualPauseMarketContext as buildMarketContextFromFlow,
+  buildManualPauseOpenParams as buildOpenParamsFromFlow,
+  dismissOpenPauseHome as dismissFromFlow,
+  MANUAL_PAUSE_VOLATILITY_TEMPLATE as volatilityTemplateFromFlow,
+  messageFromReflectGenerationResult as messageFromResultFromFlow,
+  openManualPauseFromHome as openManualFromFlow,
+  reflectGenerationPrerequisite as prerequisiteFromFlow,
+  reflectGenerationUserErrorMessage as userErrorFromFlow,
+  resolveEffectiveReflectionCopy as resolveCopyFromFlow,
+  resolveReflectGenerationPrefetch as resolvePrefetchFromFlow,
+  runOpenManualPauseSilentModeAfterCreate as runSilentModeFromFlow,
+  runPersistSilentReflectionStub as runPersistStubFromFlow,
+  runReflectGeneration,
+  shouldClearReflectGenerationLoading as shouldClearLoadingFromFlow,
+  shouldCommitReflectGeneration as shouldCommitFromFlow,
+} from './pause-reflect-generation-flow';
+
+describe('pause-reflect-generation-flow', () => {
+  it('re-exports holzen-reflect domain helpers, run-reflect-generation, and manual-open leaf use cases', () => {
+    expect(typeof resolvePrefetchFromFlow).toBe('function');
+    expect(typeof shouldClearLoadingFromFlow).toBe('function');
+    expect(typeof shouldCommitFromFlow).toBe('function');
+    expect(typeof messageFromResultFromFlow).toBe('function');
+    expect(typeof prerequisiteFromFlow).toBe('function');
+    expect(typeof userErrorFromFlow).toBe('function');
+    expect(typeof resolveCopyFromFlow).toBe('function');
+    expect(typeof runReflectGeneration).toBe('function');
+    expect(typeof buildCreateOrReuseFromFlow).toBe('function');
+    expect(typeof buildOpenParamsFromFlow).toBe('function');
+    expect(typeof buildMarketContextFromFlow).toBe('function');
+    expect(typeof openManualFromFlow).toBe('function');
+    expect(typeof dismissFromFlow).toBe('function');
+    expect(typeof runSilentModeFromFlow).toBe('function');
+    expect(typeof runPersistStubFromFlow).toBe('function');
+
+    expect(resolvePrefetchFromFlow).toBe(resolveReflectGenerationPrefetch);
+    expect(shouldClearLoadingFromFlow).toBe(shouldClearReflectGenerationLoading);
+    expect(shouldCommitFromFlow).toBe(shouldCommitReflectGeneration);
+    expect(messageFromResultFromFlow).toBe(messageFromReflectGenerationResult);
+    expect(prerequisiteFromFlow).toBe(reflectGenerationPrerequisite);
+    expect(userErrorFromFlow).toBe(reflectGenerationUserErrorMessage);
+    expect(resolveCopyFromFlow).toBe(resolveEffectiveReflectionCopy);
+    expect(runReflectGeneration).toBe(runReflectGenerationDirect);
+    expect(buildCreateOrReuseFromFlow).toBe(buildManualPauseCreateOrReuseParams);
+    expect(buildOpenParamsFromFlow).toBe(buildOpenParamsDirect);
+    expect(buildMarketContextFromFlow).toBe(buildMarketContextDirect);
+    expect(volatilityTemplateFromFlow).toBe(MANUAL_PAUSE_VOLATILITY_TEMPLATE);
+    expect(openManualFromFlow).toBe(openManualPauseFromHome);
+    expect(dismissFromFlow).toBe(dismissOpenPauseHome);
+    expect(runSilentModeFromFlow).toBe(runOpenManualPauseSilentModeAfterCreate);
+    expect(runPersistStubFromFlow).toBe(runPersistSilentReflectionStub);
+  });
+
+  it('umbrella bindings match generation subcluster CI anchors (leaf parity)', () => {
+    expect(resolvePrefetchFromFlow).toBe(resolvePrefetchFromHookFlow);
+    expect(shouldClearLoadingFromFlow).toBe(shouldClearLoadingFromHookFlow);
+    expect(shouldCommitFromFlow).toBe(shouldCommitFromHookFlow);
+    expect(messageFromResultFromFlow).toBe(messageFromResultFromHookFlow);
+    expect(prerequisiteFromFlow).toBe(prerequisiteFromHookFlow);
+    expect(userErrorFromFlow).toBe(userErrorFromHookFlow);
+    expect(resolveCopyFromFlow).toBe(resolveCopyFromHookFlow);
+    expect(runReflectGeneration).toBe(runReflectGenerationFromHookFlow);
+
+    expect(buildCreateOrReuseFromFlow).toBe(buildCreateOrReuseFromManualOpenFlow);
+    expect(buildOpenParamsFromFlow).toBe(buildOpenParamsFromManualOpenFlow);
+    expect(buildMarketContextFromFlow).toBe(buildMarketContextFromManualOpenFlow);
+    expect(volatilityTemplateFromFlow).toBe(volatilityTemplateFromManualOpenFlow);
+    expect(openManualFromFlow).toBe(openManualFromManualOpenFlow);
+    expect(dismissFromFlow).toBe(dismissFromManualOpenFlow);
+    expect(runSilentModeFromFlow).toBe(runSilentModeFromManualOpenFlow);
+    expect(runPersistStubFromFlow).toBe(runPersistStubFromManualOpenFlow);
+  });
+
+  it('sibling cluster: ambience-flow exports stay distinct from generation umbrella exports', () => {
+    expect(runReflectGeneration).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(runReflectGeneration).not.toBe(stopPauseReflectFrameFocusAmbience);
+    expect(openManualFromFlow).not.toBe(startPauseReflectFrameFocusAmbience);
+    expect(dismissFromFlow).not.toBe(stopPauseReflectFrameFocusAmbience);
+  });
+
+  it('sibling cluster: hub-flow exports stay distinct from generation umbrella exports', () => {
+    expect(runReflectGeneration).not.toBe(runShiftHubDoneFromHubFlow);
+    expect(openManualFromFlow).not.toBe(buildHubLogBundleFromHubFlow);
+    expect(dismissFromFlow).not.toBe(resolveHubPresentationFromHubFlow);
+    expect(reflectGenerationPrerequisite).not.toBe(runShiftHubDoneFromHubFlow);
+    expect(runReflectGeneration).not.toBe(buildHubLogBundleFromHubFlow);
+  });
+
+  it('sibling cluster: flows-flow exports stay distinct from generation umbrella exports', () => {
+    expect(runReflectGeneration).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(runReflectGeneration).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
+    expect(runReflectGeneration).not.toBe(runPauseOutcomeLog);
+    expect(openManualFromFlow).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
+    expect(dismissFromFlow).not.toBe(runPauseOutcomeLog);
+  });
+
+  /**
+   * Reciprocal inline pins ↔ `pause-reflect-steps-flow.test.ts` (generation-flow cluster).
+   * Dedicated sibling file: `pause-reflect-steps-generation-flow-sibling-parity.test.ts`.
+   */
+  it('sibling cluster: steps-flow exports stay distinct from generation umbrella exports', () => {
+    expect(runReflectGeneration).not.toBe(runFavoriteFromStepsFlow);
+    expect(runReflectGeneration).not.toBe(runNoteFromStepsFlow);
+    expect(reflectGenerationPrerequisite).not.toBe(runTagFromStepsFlow);
+    expect(openManualFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+    expect(runReflectGeneration).not.toBe(shouldShowFavoriteFromStepsFlow);
+    expect(openManualFromFlow).not.toBe(shouldLogFromStepsFlow);
+    expect(dismissFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+    expect(messageFromResultFromFlow).not.toBe(runFavoriteFromStepsFlow);
+    expect(messageFromResultFromFlow).not.toBe(runNoteFromStepsFlow);
+    expect(shouldCommitFromFlow).not.toBe(runNoteFromStepsFlow);
+    expect(shouldCommitFromFlow).not.toBe(runTagFromStepsFlow);
+    expect(prerequisiteFromFlow).not.toBe(shouldLogFromStepsFlow);
+    expect(resolvePrefetchFromFlow).not.toBe(runTagFromStepsFlow);
+    expect(userErrorFromFlow).not.toBe(runReflectionStepFromStepsFlow);
+    expect(runReflectGeneration).not.toBe(shouldLogFromStepsFlow);
+    expect(openManualFromFlow).not.toBe(shouldShowFavoriteFromStepsFlow);
+    // Full cross-flow pins: `pause-reflect-steps-generation-flow-sibling-parity.test.ts`.
+  });
+
+  it('sibling cluster: mood-flow exports stay distinct from generation umbrella exports', () => {
+    expect(runReflectGeneration).not.toBe(runEmotionSelectFromMoodFlow);
+    expect(runReflectGeneration).not.toBe(runEmotionSkipFromMoodFlow);
+    expect(openManualFromFlow).not.toBe(buildFeelTilesFromMoodFlow);
+    expect(dismissFromFlow).not.toBe(runEmotionSelectFromMoodFlow);
+    expect(reflectGenerationPrerequisite).not.toBe(buildFeelTilesFromMoodFlow);
+    expect(openManualFromFlow).not.toBe(runEmotionSkipFromMoodFlow);
+  });
+
+  it('sibling cluster: telemetry-flow exports stay distinct from generation umbrella exports', () => {
+    expect(runReflectGeneration).not.toBe(trackPostItFromTelemetryFlow);
+    expect(runReflectGeneration).not.toBe(trackShareTapFromTelemetryFlow);
+    expect(runReflectGeneration).not.toBe(trackWallpaperFromTelemetryFlow);
+    expect(openManualFromFlow).not.toBe(trackPostItFromTelemetryFlow);
+    expect(reflectGenerationPrerequisite).not.toBe(trackShareTapFromTelemetryFlow);
+    expect(shouldCommitReflectGeneration).not.toBe(trackWallpaperFromTelemetryFlow);
+  });
+
+  it('sibling cluster: manual-open-flow exports stay distinct from holzen-reflect hook exports', () => {
+    expect(runReflectGeneration).not.toBe(openManualFromManualOpenFlow);
+    expect(runReflectGeneration).not.toBe(dismissFromManualOpenFlow);
+    expect(prerequisiteFromFlow).not.toBe(runSilentModeFromManualOpenFlow);
+    expect(openManualFromFlow).not.toBe(runReflectGenerationFromHookFlow);
+    expect(dismissFromFlow).not.toBe(messageFromResultFromHookFlow);
+    expect(runPersistStubFromFlow).not.toBe(runReflectGenerationFromHookFlow);
+  });
+
+  it('sibling cluster: pending-offer-flow exports stay distinct from generation umbrella exports', () => {
+    expect(runReflectGeneration).not.toBe(runAdoptFromPendingOfferFlow);
+    expect(runReflectGeneration).not.toBe(runDeclineFromPendingOfferFlow);
+    expect(openManualFromFlow).not.toBe(getPendingDisplayFromPendingOfferFlow);
+    expect(dismissFromFlow).not.toBe(trackAdoptedFromPendingOfferFlow);
+    expect(resolveReflectGenerationPrefetch).not.toBe(trackDeclinedFromPendingOfferFlow);
+    expect(runReflectGeneration).not.toBe(trackAbandonedFromPendingOfferFlow);
+  });
+
+  it('sibling cluster: hook-flow exports stay distinct from generation manual-open exports', () => {
+    expect(runReflectGenerationFromHookFlow).not.toBe(openManualFromFlow);
+    expect(runReflectGenerationFromHookFlow).not.toBe(dismissFromFlow);
+    expect(messageFromResultFromHookFlow).not.toBe(openManualFromFlow);
+    expect(prerequisiteFromHookFlow).not.toBe(dismissFromFlow);
+    expect(runReflectGeneration).toBe(runReflectGenerationFromHookFlow);
+    expect(openManualFromFlow).not.toBe(runReflectGenerationFromHookFlow);
+  });
+});

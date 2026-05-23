@@ -3,7 +3,7 @@ import { Bug, Lightbulb, HelpCircle, Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
-import { invokeEdge } from '@/lib/invoke-edge';
+import { sendFeedback } from '@/features/user/public-rpc';
 import { toast } from 'sonner';
 import { enqueueAction } from '@/lib/offline-queue';
 import { useTranslation } from 'react-i18next';
@@ -119,7 +119,7 @@ export function FeedbackWidget() {
     }
 
     setSubmitting(true);
-    const { error } = await invokeEdge('send-feedback', { body: payload });
+    const { error } = await sendFeedback(payload);
     setSubmitting(false);
 
     if (error) {

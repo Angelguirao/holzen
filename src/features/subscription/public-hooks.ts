@@ -9,3 +9,6 @@ export {
   type Entitlement,
 } from './presentation/use-subscription';
 export { useProGate } from './presentation/use-pro-gate';
+/** App shell — checkout return dialog and post-checkout analytics (mounted from `AppLayout`). */
+export { CheckoutConfirmation } from './presentation/CheckoutConfirmation';
+export { PaywallSubscribedTracker } from './presentation/PaywallSubscribedTracker';

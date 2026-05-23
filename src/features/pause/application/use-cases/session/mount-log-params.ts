@@ -1,11 +1,9 @@
 import type { PauseSessionHydrationState } from '@/features/pause/application/use-cases/session/hydration';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
-import {
-  initialBriefPauseStepFromRestored,
-  initialPhaseFromRestored,
-  initialRitualEntry,
-} from './step-map';
+import { initialPhaseFromRestored } from '@/features/pause/application/use-cases/ritual/decide/restored-decide-ritual-state';
+import { initialRitualEntry } from '@/features/pause/application/use-cases/session/initial-ritual-entry';
+import { initialBriefPauseStepFromRestored } from '@/features/pause/application/use-cases/session/restored-brief-ritual-state';
 
 /**
  * First-paint snapshot for `[holzen:pause] mount` (see `usePauseSessionMountLog`).

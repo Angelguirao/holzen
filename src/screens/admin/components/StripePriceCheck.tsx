@@ -8,27 +8,12 @@
  */
 import { useCallback, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Loader2, RefreshCw, XCircle } from 'lucide-react';
-import { invokeEdge } from '@/lib/invoke-edge';
+import {
+  checkAdminStripePrices,
+  type AdminStripePriceCheckResponse,
+  type AdminStripePriceCheckResult,
+} from '@/features/subscription/public-rpc';
 import { useToast } from '@/components/ui/use-toast';
-
-type Result = {
-  secret: string;
-  label: string;
-  ok: boolean;
-  value: string | null;
-  error: string | null;
-  active?: boolean;
-  type?: string;
-  expected_type?: string;
-  amount?: number | null;
-  currency?: string | null;
-};
-
-type Response = {
-  ok: boolean;
-  error?: string;
-  results: Result[];
-};
 
 function maskId(value: string | null): string {
   if (!value) return '—';
@@ -36,7 +21,7 @@ function maskId(value: string | null): string {
   return `${value.slice(0, 8)}…${value.slice(-4)}`;
 }
 
-function formatAmount(r: Result): string | null {
+function formatAmount(r: AdminStripePriceCheckResult): string | null {
   if (r.amount == null || !r.currency) return null;
   try {
     return new Intl.NumberFormat('en-US', {
@@ -51,12 +36,12 @@ function formatAmount(r: Result): string | null {
 export function StripePriceCheck() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<Response | null>(null);
+  const [data, setData] = useState<AdminStripePriceCheckResponse | null>(null);
 
   const run = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: res, error } = await invokeEdge<Response>('admin-check-stripe-prices', { body: {} });
+      const { data: res, error } = await checkAdminStripePrices();
       if (error) throw error;
       setData(res ?? null);
       if (res?.ok) {

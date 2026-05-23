@@ -2,9 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, Pause } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useCurrentPause } from '@/screens/archive/hooks/use-current-pause';
-import { usePendingPauseOffer } from '@/screens/pause/hooks/use-pending-pause-offer';
-import { pauseWindowShowsClockCountdown } from '@/features/pause/public';
+import { useCurrentPause } from '@/features/pause/public-hooks';
+import { usePendingPauseOffer } from '@/features/pause/public-home';
+import { pauseWindowShowsClockCountdown } from '@/features/pause/public-hooks';
 import { PauseEngagedOpenMaxCountdown } from '@/screens/pause/components/PauseEngagedOpenMaxCountdown';
 import { cn } from '@/lib/utils';
 

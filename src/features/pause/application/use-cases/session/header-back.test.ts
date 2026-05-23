@@ -2,11 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   computePauseHeaderBackIntent,
   isPauseSessionHeaderBackVisible,
-} from '@/features/pause/public';
-import type {
-  PauseHeaderBackIntentInput,
-  PauseSessionHeaderBackInput,
-} from '@/features/pause/public';
+  type PauseHeaderBackIntentInput,
+  type PauseSessionHeaderBackInput,
+} from './header-back';
 
 const base = (over: Partial<PauseSessionHeaderBackInput> = {}): PauseSessionHeaderBackInput => ({
   phase: 'session',

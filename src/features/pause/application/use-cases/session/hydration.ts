@@ -1,4 +1,4 @@
-import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import type { PauseSeverity } from './location-state';
 import {
   DEFAULT_COMPANIONS,
@@ -6,13 +6,13 @@ import {
   type FetchedPauseInstance,
   type PersistedSession,
 } from '@/features/pause/domain/session-model';
-import { hasPersistedPauseSessionPayload } from '@/features/pause/application/use-cases/session/persisted-session-guards';
+import { hasPersistedPauseSessionPayload } from '@/features/pause/domain/session/persisted-session-guards';
 
 /**
  * Pure hydration merge for `/pause`: which reflection payload wins (restore vs nav vs Holzen) and
  * when to enter **fetch** (load instance by id) vs **empty** vs **ready**.
  *
- * **Orchestration:** `screens/pause/hooks/use-pause-session-shell.ts` calls these helpers; do not reorder branches
+ * **Orchestration:** `presentation/session/use-pause-session-shell-bootstrap.ts` calls these helpers; do not reorder branches
  * in `computePauseSessionHydration` without product review (see existing note on that function).
  * **Contract:** `docs/systems/pause-system.md` section 7.2; **code map:** same doc, section 10.
  */

@@ -5,7 +5,7 @@ import {
   bulkHoldQueryWindowIso,
   type BulkHoldPendingPause,
 } from '../../domain/bulk-hold';
-import { PAUSE_QUERY_PREFIX } from '../../application/queries/pause-query-namespace';
+import { PAUSE_QUERY_PREFIX } from './pause-query-namespace';
 
 export const PAUSE_BULK_HOLD_QUERY_PREFIX = [...PAUSE_QUERY_PREFIX, 'bulk-hold'] as const;
 

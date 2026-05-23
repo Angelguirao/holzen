@@ -27,10 +27,15 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 | `components/PauseReadyBanner.tsx` | Cross-tab “pause ready” strip (non-Home) |
 | `components/AuthLoading.tsx` | Auth bootstrap spinner (router gates) |
 | `components/FeedbackWidget.tsx` | Global error-report sheet (signed-in) |
+| `components/HolzenProvider.tsx` | Shared pause/profile/market context (`useHolzen`) for signed-in shell |
 | `components/ShellPauseChrome.tsx` | Pending pause offer + pause-ready banner (`useHolzen` isolated here) |
 
 | `hooks/use-is-admin.ts` | Client admin gate for `/admin` and ops pages |
 | `hooks/use-shell-profile.ts` | Profile load error + i18n for shell (no `useHolzen`) |
+| `hooks/use-infinite-scroll.ts` | IntersectionObserver sentinel for infinite lists |
+| `hooks/use-pull-to-refresh.ts` | Touch pull-to-refresh (Archive, Home) |
+| `hooks/use-latest-ref.ts` | Stable ref to latest render value |
+| `hooks/use-feature-flag.ts` | PostHog feature flags (`ready` + default) |
 
 ## Placement rationale (what lives elsewhere)
 

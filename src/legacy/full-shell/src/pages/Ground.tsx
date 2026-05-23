@@ -5,7 +5,7 @@ import { Play, Pause, Anchor, Loader2, ExternalLink, Eye, EyeOff, Sparkles } fro
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
+import { useHolzen } from '@/app/components/HolzenProvider';
 import { useAuth } from '@/features/auth/public';
 import { hapticFeedback } from '@/lib/haptics';
 import { playGroundingChime } from '@/legacy/full-shell/src/lib/grounding-chime';

@@ -1,25 +1,10 @@
-import { invokeEdge } from '@/lib/invoke-edge';
+import {
+  invokeGroundingEnrich,
+  type GroundingEnrichment,
+  type GroundingEnrichBody,
+} from '../edge/grounding-enrich-edge';
 
-/**
- * Shape returned by the `grounding-enrich` edge function. All fields are
- * nullable / possibly-empty so the UI can degrade gracefully when upstream
- * providers (Crossref, Semantic Scholar, Gemini) fail — we never block the
- * page waiting on them.
- */
-export interface GroundingEnrichment {
-  citation_hash: string;
-  doi: string | null;
-  url: string | null;
-  abstract: string | null;
-  researchers: Array<{ name: string; bio: string }>;
-  citation_count: number | null;
-  source_provenance: {
-    abstract_source?: string | null;
-    bio_source?: string | null;
-    citation_count_source?: string | null;
-  };
-  cached: boolean;
-}
+export type { GroundingEnrichment };
 
 export interface GroundingEnrichmentInput {
   citation: string | null | undefined;
@@ -50,14 +35,12 @@ export async function fetchGroundingEnrichment(
 ): Promise<GroundingEnrichment | null> {
   const citation = input.citation?.trim() ?? '';
   if (!citation) return null;
-  const { data, error } = await invokeEdge<GroundingEnrichment>('grounding-enrich', {
-    body: {
-      citation,
-      url: input.url ?? null,
-      doi: input.doi ?? null,
-    },
-    signal,
-  });
+  const body: GroundingEnrichBody = {
+    citation,
+    url: input.url ?? null,
+    doi: input.doi ?? null,
+  };
+  const { data, error } = await invokeGroundingEnrich(body, signal);
   if (error) throw error;
   return data ?? null;
 }

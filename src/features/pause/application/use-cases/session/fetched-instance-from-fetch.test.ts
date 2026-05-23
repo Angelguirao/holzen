@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildFetchedPauseInstanceFromFetch } from '@/features/pause/public';
+import { buildFetchedPauseInstanceFromFetch } from './fetched-instance-from-fetch';
 
 describe('buildFetchedPauseInstanceFromFetch', () => {
   it('maps reflection, context snapshot, and companion artifact kinds', () => {
@@ -45,6 +45,13 @@ describe('buildFetchedPauseInstanceFromFetch', () => {
       [],
     );
     expect(out.context).toBeNull();
+  });
+
+  it('treats whitespace-only reflection_text as empty', () => {
+    const out = buildFetchedPauseInstanceFromFetch('p-whitespace', { context_snapshot: null }, [
+      { kind: 'reflection_text', content: { message: '   ' } },
+    ]);
+    expect(out.reflection_message).toBe('');
   });
 
   it('passes through engaged_at from instance row', () => {

@@ -1,4 +1,5 @@
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+import { toggleCompanionSlotFavoriteOnInstance } from '@/features/pause/infrastructure/pause-instance-metadata-client';
 import {
   pauseAdoptPendingOffer,
   pauseCreateOrReuse,
@@ -16,4 +17,5 @@ export const supabasePauseRepository: PauseRepository = {
   logStep: pauseLogStep,
   logCompanion: pauseLogCompanion,
   dismissCurrent: pauseDismissCurrent,
+  toggleCompanionSlotFavorite: toggleCompanionSlotFavoriteOnInstance,
 };

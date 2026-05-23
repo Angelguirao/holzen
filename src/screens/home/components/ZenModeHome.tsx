@@ -10,10 +10,10 @@ import { HomePauseBlockingErrorPanel } from '@/screens/home/components/HomePause
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SubscriptionSkeleton } from '@/screens/home/components/SubscriptionSkeleton';
-import type { CompanionData, CompanionPrefs } from '@/screens/pause/components/CompanionSection';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/public-ritual-frame';
 import type { BtcPriceData } from '@/features/market/public';
 import type { BtcMoveSeverity } from '@/features/market/public';
-import { shouldSurfacePauseWidgetError } from '@/screens/home/lib/home-pause-widget-error';
+import { shouldSurfacePauseWidgetError } from '@/features/pause/public-home';
 import type { Entitlement } from '@/features/subscription/public';
 
 export interface ZenModeHomeProps {

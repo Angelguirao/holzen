@@ -1,13 +1,6 @@
-import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/features/auth/public';
-import {
-  dedupeBiases,
-  type RelatedBias,
-} from './related-biases-util';
-import { getRelatedBiasesGroundNudgeQueryOptions } from '@/features/pause/public-queries';
+import { useRelatedBiasesThisMonth } from '@/features/pause/public-ritual-frame';
 
 interface Props {
   /** Pause instance currently viewed — excluded from the list. */
@@ -30,20 +23,7 @@ export function RelatedBiasesThisMonth({
   className = '',
 }: Props) {
   const { t } = useTranslation();
-  const { user } = useAuth();
-  const userId = user?.id;
-
-  const { data: rawRows } = useQuery(getRelatedBiasesGroundNudgeQueryOptions(userId));
-
-  const biases = useMemo((): RelatedBias[] | null => {
-    if (!userId) return null;
-    if (rawRows === undefined) return null;
-    return dedupeBiases(rawRows, {
-      currentPauseInstanceId: currentPauseInstanceId ?? null,
-      currentTitle: currentTitle ?? null,
-      limit: 8,
-    });
-  }, [userId, rawRows, currentPauseInstanceId, currentTitle]);
+  const { biases } = useRelatedBiasesThisMonth({ currentPauseInstanceId, currentTitle });
 
   if (!biases || biases.length === 0) return null;
 

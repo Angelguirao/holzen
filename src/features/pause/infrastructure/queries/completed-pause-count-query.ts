@@ -4,14 +4,14 @@ import { holzenLog } from '@/lib/holzen-console';
 import {
   COMPLETED_PAUSE_COUNT_NONE_KEY,
   COMPLETED_PAUSE_COUNT_QUERY_KEY,
-} from '@/features/pause/application/queries/completed-pause-count-keys';
+} from './completed-pause-count-query-key';
 
 export {
   COMPLETED_PAUSE_COUNT_DISABLED_USER_ID,
   COMPLETED_PAUSE_COUNT_NONE_KEY,
   COMPLETED_PAUSE_COUNT_QUERY_PREFIX,
   COMPLETED_PAUSE_COUNT_QUERY_KEY,
-} from '@/features/pause/application/queries/completed-pause-count-keys';
+} from './completed-pause-count-query-key';
 
 const COMPLETED_PAUSE_COUNT_STALE_MS = 60_000;
 
