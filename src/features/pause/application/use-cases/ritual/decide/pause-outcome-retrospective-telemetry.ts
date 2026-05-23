@@ -1,4 +1,4 @@
-import { trackEvent } from '@/lib/posthog';
+import { trackEvent } from '@/features/pause/application/pause-product-analytics';
 
 export type PauseOutcomeRetrospectiveSurface = 'archive';
 

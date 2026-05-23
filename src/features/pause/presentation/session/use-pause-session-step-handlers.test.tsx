@@ -66,7 +66,7 @@ const {
   };
 });
 
-vi.mock('../reflect/mood/use-pause-session-mood-chrome-handlers', () => ({
+vi.mock('../feel/use-pause-session-mood-chrome-handlers', () => ({
   usePauseSessionMoodChromeHandlers: usePauseSessionMoodChromeHandlersMock,
 }));
 

@@ -29,6 +29,7 @@ There is **no single** “React architecture standard,” but most strong teams 
 | **Typed boundaries** | Schemas at wire/API edges (Zod, etc.), not “trust TS everywhere” |
 | **Avoid premature global complexity** | No Redux-by-default, no microfrontends-by-default |
 | **React as rendering** | UI composes; policy and persistence live server-side + named use cases |
+| **Render boundaries over memo sprawl** | Structure the tree so unrelated updates do not repaint heavy subtrees; `useMemo`/`useCallback` support boundaries, not replace them |
 
 The ecosystem moved **away from**:
 
@@ -185,6 +186,39 @@ Hooks should **not** grow unbounded RPC + navigation + analytics; extract **use 
 
 ---
 
+### 2.9 Render boundaries, React Compiler, React 19
+
+**Industry:** React performance is primarily about **where updates stop** in the component tree (state placement, `React.memo`, composition, lazy branches, narrow context). `useMemo` / `useCallback` are often **glue** so memoized children see stable props — not the main strategy. **React Compiler** automates much of that glue at build time. **React 19** adds Actions, `useActionState`, and `useOptimistic` for simpler async form/mutation UX.
+
+**Holzen policy:** [2026-05-23 ADR](../decisions/2026-05-23-render-boundaries-defer-react-compiler-19.md) — **boundaries now; Compiler and React 19 deferred** until the active `src/` architecture migration stabilizes.
+
+| Topic | Holzen today | Policy |
+|-------|--------------|--------|
+| Render boundaries | **Yes** on Home (`memo(HomeDashboardLayout)`, stable layout props, lazy Zen) | Extend when touching hot screens; see [react-screen-orchestration.md](react-screen-orchestration.md) |
+| Manual `useMemo` / `useCallback` | Widespread in pause/home/companion | **No new** memos without justification; **no mass removal** during migration |
+| React Compiler | Not configured (Vite + SWC) | Pilot **after** migration — separate track |
+| React 19 / Actions | React **18.3.1** | Upgrade **after** migration; keep Query + `invokeEdge` for ritual/companion flows |
+| react-hook-form + Zod | Settings/admin forms | Keep for complex validated forms; Actions only for **future** simple pilots |
+
+**When adding `useMemo` / `useCallback` (review gate):**
+
+1. Feeding a **`React.memo`** child with stable props or handlers?
+2. Caching **measurably expensive** derivation?
+3. Satisfying **`useEffect`** dependency stability?
+
+If none apply, prefer a **boundary** (lower state, memo shell, lazy branch) instead.
+
+**Post-migration pilot candidates (optional, not scheduled):**
+
+| Pilot | Surface | Goal |
+|-------|---------|------|
+| React Compiler | Vite build + Home / pause session | Less manual memo; verify tests + profiling |
+| React 19 Actions | One simple settings toggle or single-field patch | Evaluate `useActionState` / `useOptimistic` without replacing Query reads |
+
+**Do not** block architecture migration on Compiler or React 19. **Do not** replace TanStack Query or pause/companion mutation paths with form Actions in the first React 19 PR.
+
+---
+
 ## 3. What modern React usually considers overengineering
 
 | Pattern | Holzen stance |
@@ -212,6 +246,8 @@ Use in PR description or pre-launch audits. **Target** = after [frontend-module-
 | Typed boundaries | **Strong** (contracts package) | **Partial** | [holzen-application-architecture.md](holzen-application-architecture.md) P8 |
 | RSC / Next | **N/A (SPA)** | N/A | ADR + backlog |
 | Modular monolith | **Strong** | **Planned** | [2026-05-17 ADR](../decisions/2026-05-17-modular-monolith-hexagonal-client.md) |
+| Render boundaries (vs memo sprawl) | **Strong** (Home reference) | **Partial** (many legacy memos) | §2.9 + [react-screen-orchestration.md](react-screen-orchestration.md) |
+| React Compiler / React 19 | **Deferred** (post-migration) | **Not adopted** | [2026-05-23 ADR](../decisions/2026-05-23-render-boundaries-defer-react-compiler-19.md) |
 | Server authority (not React rules) | **Strong** | **Strong** | [client-server-architecture-holzen.md](client-server-architecture-holzen.md) |
 
 **Overall:** Product and **server** architecture are ahead of **client folder** architecture. Pre-launch work should **close the gap** without adopting frontend patterns Holzen explicitly rejects (§3).
@@ -258,7 +294,8 @@ Add to [react-spa-review-template.md](../reviews/react-spa-review-template.md) f
 - [ ] **Boundary types:** wire changes update `contracts` or generated types.
 - [ ] **Pause ritual:** step/RPC changes align with [pause-system.md](../systems/pause-system.md).
 - [ ] **Bundle:** heavy routes lazy-loaded where applicable.
-- [ ] **Not overengineering:** no new package/context/store without justification in PR text.
+- [ ] **Render boundary:** state as low as practical; `React.memo` on heavy shells; new `useMemo`/`useCallback` justified (memo child, expensive derive, or effect deps) — see §2.9.
+- [ ] **Not overengineering:** no new package/context/store without justification in PR text; no React Compiler / React 19 drive-by during architecture migration.
 
 ---
 
@@ -286,6 +323,7 @@ Order that satisfies **both** this doc and [frontend-module-layout.md](frontend-
 | Use cases vs hooks | [holzen-application-architecture.md](holzen-application-architecture.md) §4, §8 |
 | Incremental extractions (old tree) | [refactoring-strategy.md](refactoring-strategy.md) |
 | Flow-first PR review | [react-spa-review-template.md](../reviews/react-spa-review-template.md) |
+| Render boundaries; defer Compiler / React 19 | [2026-05-23 ADR](../decisions/2026-05-23-render-boundaries-defer-react-compiler-19.md); this doc §2.9 |
 | Optional SSR/framework | [spa-framework-evaluation.md](../backlog/spa-framework-evaluation.md) |
 
 ---

@@ -63,7 +63,7 @@ import {
   pauseInitialEmotionSkip,
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import * as pendingOfferIo from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   getPendingPauseOfferDisplay as getDisplayFromPendingOfferIo,
@@ -267,8 +267,8 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (application + presentation).
-   * Dedicated sibling file: `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts`.
+   * Reciprocal inline pins ↔ `pause-feel-io-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-feel-pending-offer-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: mood-io initial-emotion exports stay distinct from pending-offer-io', () => {
     expect(pauseAdoptPendingOffer).not.toBe(pauseInitialEmotionSelect);
@@ -279,8 +279,8 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
     expect(pauseAdoptPendingOffer).not.toBe(buildFeelTilesMoodLogOptions);
     expect(pauseDeclinePendingOffer).not.toBe(pauseInitialEmotionSelect);
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(pauseInitialEmotionSkipWithRepository);
-    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
-    // Full pins: `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts`.
+    // Reciprocal inline pins: `pause-feel-io-parity.test.ts`.
+    // Full pins: `pause-feel-pending-offer-io-sibling-parity.test.ts`.
   });
 
   /**

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import type { MoodValue } from '@/features/pause/public-ritual-reflect';
+import type { MoodValue } from '@/features/pause/public-ritual-feel';
 import { PauseDoneBriefCheckInFooter } from '@/screens/pause/components/pause-done-brief-check-in-footer';
 import { PauseDoneBriefCheckInIntensity } from '@/screens/pause/components/pause-done-brief-check-in-intensity';
 import { PauseDoneBriefCheckInMoodRow } from '@/screens/pause/components/pause-done-brief-check-in-mood-row';

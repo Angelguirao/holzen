@@ -54,7 +54,7 @@ import {
   buildFeelTilesMoodLogOptions,
   pauseInitialEmotionSelect,
   pauseInitialEmotionSkip,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
@@ -181,15 +181,15 @@ describe('pause-reflect-generation-io parity (application)', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (presentation).
-   * Dedicated sibling file: `pause-reflect-generation-mood-io-sibling-parity.test.ts` (application + presentation).
+   * Reciprocal inline pins ↔ `pause-feel-io-parity.test.ts` (presentation).
+   * Dedicated sibling file: `pause-reflect-generation-feel-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: mood-io exports stay distinct from generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(pauseInitialEmotionSelect);
     expect(runReflectGeneration).not.toBe(pauseInitialEmotionSkip);
     expect(reflectGenerationPrerequisite).not.toBe(buildFeelTilesMoodLogOptions);
     expect(reflectGenerator).not.toBe(pauseInitialEmotionSelect);
-    // Reciprocal inline pins: `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/feel/pause-feel-io-parity.test.ts`.
   });
 
   /**

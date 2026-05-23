@@ -5,7 +5,7 @@ import { PauseSessionScaffoldShell } from '@/screens/pause/components/PauseSessi
 import { PauseSessionGateContent } from '@/screens/pause/components/PauseSessionGateContent';
 import { PauseSessionDepthPickerStack } from '@/screens/pause/components/PauseSessionDepthPickerStack';
 import { PauseLeaveWithPendingSheet } from '@/screens/pause/components/PauseLeaveWithPendingSheet';
-import { usePauseSessionScreen } from '@/features/pause/public-hooks';
+import { usePauseSessionScreen } from '@/features/pause/public-session-ritual';
 import { pauseSessionScaffoldChromeRegistry } from '@/screens/pause/components/pause-scaffold-chrome-registry';
 
 /** `/pause` route — presentation only; orchestration in `usePauseSessionScreen`. */

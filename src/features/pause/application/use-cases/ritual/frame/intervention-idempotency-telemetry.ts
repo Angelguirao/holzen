@@ -1,5 +1,5 @@
 import { holzenLog } from '@/lib/holzen-console';
-import { trackEvent } from '@/lib/posthog';
+import { trackEvent } from '@/features/pause/application/pause-product-analytics';
 
 /**
  * PostHog + `[holzen:companion]` console metrics for intervention idempotency:

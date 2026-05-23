@@ -2,7 +2,7 @@ import type {
   TrackManualPauseInstanceCreatedPayload,
   TrackPauseManualCompletedPayload,
 } from '@/features/pause/domain/reflect/generation/manual-pause-home-telemetry-types';
-import { trackEvent } from '@/lib/posthog';
+import { trackEvent } from '@/features/pause/application/pause-product-analytics';
 
 export type {
   TrackManualPauseInstanceCreatedPayload,

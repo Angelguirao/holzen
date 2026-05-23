@@ -23,7 +23,7 @@
  * `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io` (application mirror:
  * `application/.../hub/pause-reflect-hub-telemetry-io-sibling-parity.test.ts`; reciprocal inline:
  * `pause-reflect-hub-io-parity.test.ts` ↔ `pause-reflect-telemetry-io-parity.test.ts` presentation colocated), and
- * `pause-reflect-mood-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io`.
+ * `pause-feel-telemetry-io-sibling-parity.test.ts` ↔ `pause-feel-io`.
  * Flow↔I/O wrapper: `pause-reflect-telemetry-flow-io-wrapper-sibling-parity.test.ts` (application + presentation).
  */
 export {

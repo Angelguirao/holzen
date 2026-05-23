@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { PAUSE_FEEL_INTENSITY_KEYS } from '@/features/pause/public-ritual-reflect';
+import { PAUSE_FEEL_INTENSITY_KEYS } from '@/features/pause/public-ritual-feel';
 import { cn } from '@/lib/utils';
 import { Slider } from '@/components/ui/slider';
 

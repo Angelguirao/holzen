@@ -9,7 +9,7 @@ import {
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkip,
   pauseInitialEmotionSkipWithRepository,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
@@ -113,7 +113,7 @@ describe('pause-reflect-hub-io', () => {
     expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseInitialEmotionSelectWithRepository);
     expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseInitialEmotionSkip);
     expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseInitialEmotionSkipWithRepository);
-    // Full cross-I/O pins: `pause-reflect-mood-hub-io-sibling-parity.test.ts`.
+    // Full cross-I/O pins: `pause-feel-hub-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: steps-io exports stay distinct from hub-io', () => {

@@ -31,3 +31,10 @@ export {
 
 /** Pending-offer adopt/decline (session shell + blocking modal). */
 export { usePendingPauseOfferMutations } from './presentation/reflect/pending-offer/use-pending-pause-offer-mutations';
+
+/** Engaged pause open-max countdown (shell chrome). */
+export {
+  formatPauseOpenMaxRemaining,
+  pauseOpenMaxDeadlineMs,
+  PAUSE_OPEN_MAX_AGE_MS,
+} from './application/use-cases/session/open-max-countdown';

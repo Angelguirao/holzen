@@ -21,9 +21,9 @@
  * `pause-reflect-steps-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (presentation + application);
  * `pause-reflect-pending-offer-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (presentation + application; flow↔io wrapper namespace pins);
  * application reciprocal inline pins: `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`;
- * `pause-reflect-mood-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io` (application mirror:
- * `application/.../mood/pause-reflect-mood-pending-offer-io-sibling-parity.test.ts`; reciprocal inline:
- * `pause-reflect-mood-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`);
+ * `pause-feel-pending-offer-io-sibling-parity.test.ts` ↔ `pause-feel-io` (application mirror:
+ * `application/.../mood/pause-feel-pending-offer-io-sibling-parity.test.ts`; reciprocal inline:
+ * `pause-feel-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`);
  * `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io` (presentation + application);
  * presentation reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`;
  * reciprocal inline pins on `pause-reflect-pending-offer-io.test.ts` ↔ `pause-reflect-flows-io.test.ts` (pending-offer RPC vs reflect+decide),

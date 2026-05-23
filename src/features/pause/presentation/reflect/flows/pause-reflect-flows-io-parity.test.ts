@@ -89,7 +89,7 @@ import {
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
   resolvePauseSessionChromeCloseAction,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
@@ -300,8 +300,8 @@ describe('pause-reflect-flows-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts` (reflect+decide vs initial-emotion mood).
-   * Dedicated sibling file: `pause-reflect-flows-mood-io-sibling-parity.test.ts` (application + presentation).
+   * Reciprocal inline pins ↔ `presentation/feel/pause-feel-io-parity.test.ts` (reflect+decide vs initial-emotion mood).
+   * Dedicated sibling file: `pause-reflect-flows-feel-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: mood-io exports stay distinct from flows-io', () => {
     expect(pauseReflectOutcomeLog).not.toBe(pauseInitialEmotionSelect);
@@ -314,8 +314,8 @@ describe('pause-reflect-flows-io parity', () => {
     expect(getSessionQuote).not.toBe(pauseInitialEmotionSkip);
     expect(showPauseOutcomeNotCompletedToast).not.toBe(buildFeelTilesMoodLogOptions);
     expect(showPauseOutcomeSaveFailedToast).not.toBe(resolvePauseSessionChromeCloseAction);
-    // Reciprocal inline pins: `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
-    // Full pins: `pause-reflect-flows-mood-io-sibling-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/feel/pause-feel-io-parity.test.ts`.
+    // Full pins: `pause-reflect-flows-feel-io-sibling-parity.test.ts`.
   });
 
   /**

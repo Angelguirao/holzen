@@ -1,6 +1,6 @@
 /**
  * Application-layer I/O parity for ritual reflect session UI telemetry (parity with
- * `pause-reflect-mood-io-parity.test.ts`; presentation pins stay colocated beside
+ * `pause-feel-io-parity.test.ts`; presentation pins stay colocated beside
  * `pause-reflect-telemetry-io.ts`).
  * Imports `pause-reflect-telemetry-flow` CI umbrella for `.toBe` identity pins only —
  * production telemetry I/O keeps `pause-reflect-session-ui-telemetry` leaf imports.
@@ -89,13 +89,13 @@ import {
   pauseInitialEmotionSkipWithRepository,
   reflectPauseRepository,
   resolvePauseSessionChromeCloseAction,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   buildFeelTilesMoodLogOptions as buildFeelTilesFromMoodFlow,
   resolvePauseSessionChromeCloseAction as resolveChromeCloseFromMoodFlow,
   runInitialEmotionSelect as runInitialEmotionSelectFromMoodFlow,
   runInitialEmotionSkip as runInitialEmotionSkipFromMoodFlow,
-} from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow';
+} from '@/features/pause/application/use-cases/ritual/feel/pause-feel-flow';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
@@ -250,7 +250,7 @@ describe('pause-reflect-telemetry-io parity (application)', () => {
 
   /**
    * Reciprocal inline pins ↔ `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
-   * Dedicated sibling file: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts` (application + presentation).
+   * Dedicated sibling file: `pause-feel-telemetry-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: mood-io exports stay distinct from session reflect telemetry-io', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(pauseInitialEmotionSelectFromMoodIo);

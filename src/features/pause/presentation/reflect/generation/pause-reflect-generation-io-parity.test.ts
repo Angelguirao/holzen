@@ -86,7 +86,7 @@ import {
   pauseInitialEmotionSelect,
   pauseInitialEmotionSkip,
   pauseInitialEmotionSelectWithRepository,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
@@ -123,7 +123,7 @@ import * as homeReflectIo from '@/features/pause/presentation/reflect/generation
  * Imports `pause-reflect-generation-flow` CI umbrella and domain hook bundle for `.toBe` identity pins only — production generation I/O keeps leaf imports.
  * Application-layer sibling parity tests remain under `application/.../ritual/reflect/generation/` when they assert flow umbrellas.
  * Hub-io sibling: `pause-reflect-generation-hub-io-sibling-parity.test.ts` (application + presentation);
- * mood-io sibling: `pause-reflect-generation-mood-io-sibling-parity.test.ts` (application + presentation);
+ * mood-io sibling: `pause-reflect-generation-feel-io-sibling-parity.test.ts` (application + presentation);
  * flows-io sibling: `pause-reflect-flows-generation-io-sibling-parity.test.ts`;
  * telemetry-io sibling: `pause-reflect-generation-telemetry-io-sibling-parity.test.ts`;
  * share-io sibling: `pause-reflect-generation-share-io-sibling-parity.test.ts`;
@@ -200,8 +200,8 @@ describe('pause-reflect-generation-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (holzen-reflect vs initial-emotion RPC).
-   * Dedicated sibling file: `pause-reflect-generation-mood-io-sibling-parity.test.ts` (application + presentation).
+   * Reciprocal inline pins ↔ `pause-feel-io-parity.test.ts` (holzen-reflect vs initial-emotion RPC).
+   * Dedicated sibling file: `pause-reflect-generation-feel-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: mood-io exports stay distinct from generation-io', () => {
     expect(pauseReflectGeneration).not.toBe(pauseInitialEmotionSelect);
@@ -212,8 +212,8 @@ describe('pause-reflect-generation-io parity', () => {
     expect(messageFromReflectGenerationResult).not.toBe(applyBriefDepthPickerRitualEntry);
     expect(reflectGenerator).not.toBe(pauseInitialEmotionSelect);
     expect(pauseReflectGeneration).not.toBe(buildFeelTilesMoodLogOptions);
-    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
-    // Full pins: `pause-reflect-generation-mood-io-sibling-parity.test.ts`.
+    // Reciprocal inline pins: `pause-feel-io-parity.test.ts`.
+    // Full pins: `pause-reflect-generation-feel-io-sibling-parity.test.ts`.
   });
 
   /**

@@ -6,7 +6,7 @@ import {
   deleteCompanionCacheRowsByIds,
   demoteCompanionCacheEntry,
   promoteCompanionCacheEntry,
-  setCompanionCacheSourceUntrusted as setCompanionCacheSourceUntrustedMutation,
+  setCompanionCacheSourceUntrustedMutation,
 } from '@/screens/admin/public-queries';
 import type { CacheEntryRow } from '@/screens/admin/public-queries';
 import { Checkbox } from '@/components/ui/checkbox';
