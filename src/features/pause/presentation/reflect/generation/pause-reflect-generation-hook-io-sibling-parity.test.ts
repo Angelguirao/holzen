@@ -41,14 +41,14 @@ import * as generationIo from './pause-reflect-generation-io';
  */
 describe('pause-reflect-generation-io ↔ holzen-reflect hook leaf sibling parity', () => {
   it('generation-io re-exports holzen-reflect domain hook leaves and runReflectGeneration sibling', () => {
-    const prefetch: ReflectGenerationPrefetch = { shouldPrefetch: false };
+    const prefetch: ReflectGenerationPrefetch = { kind: 'stop' };
     expect(resolveReflectGenerationPrefetch).toBe(resolvePrefetchFromDomain);
     expect(shouldCommitReflectGeneration).toBe(shouldCommitFromDomain);
     expect(shouldClearReflectGenerationLoading).toBe(shouldClearFromDomain);
     expect(messageFromReflectGenerationResult).toBe(messageFromDomain);
     expect(reflectGenerationPrerequisite).toBe(prerequisiteFromDomain);
     expect(runReflectGeneration).toBe(runReflectGenerationLeaf);
-    expect(prefetch).toEqual({ shouldPrefetch: false });
+    expect(prefetch).toEqual({ kind: 'stop' });
   });
 
   it('generation-io wrapper and port stay off manual-open Home exports', () => {
