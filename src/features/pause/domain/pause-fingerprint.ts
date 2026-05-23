@@ -2,7 +2,7 @@
  * Client-side mirror of the edge-side context fingerprint helper.
  *
  * Kept in sync manually with `supabase/functions/_shared/pause.ts`:
- *   - `bucketChangePercent` rounds signed market percents into stable buckets.
+ *   - `bucketChangePercent` truncates signed market percents to whole points.
  *   - `computeContextFingerprint` hashes the regime-relevant context parts.
  *
  * Two identical implementations exist (browser + Deno) because there's no
@@ -11,18 +11,10 @@
  * smoke tests once we stand them up.
  */
 
+/** Truncate to whole percentage points so 5.1% and 5.9% share one regime. */
 export function bucketChangePercent(pct: number): number {
   if (!Number.isFinite(pct)) return 0;
-  const abs = Math.abs(pct);
-  const sign = pct < 0 ? -1 : 1;
-  let bucket: number;
-  if (abs < 1) bucket = 0;
-  else if (abs < 3) bucket = 2;
-  else if (abs < 5) bucket = 4;
-  else if (abs < 7) bucket = 6;
-  else if (abs < 10) bucket = 8;
-  else bucket = Math.floor(abs / 2) * 2;
-  return sign * bucket;
+  return Math.trunc(pct);
 }
 
 /**
