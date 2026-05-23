@@ -480,7 +480,7 @@ export function AppConfigTools() {
                 setState(optimistic);
                 mark(`feature:${k}`, true);
                 try {
-                  await saveRow('feature_flags', nextFlags);
+                  await upsertAppConfigRow('feature_flags', nextFlags);
                   setInitial(optimistic);
                   syncBundleQueryCache(optimistic);
                   toast({ title: 'Saved', description: `feature:${k}` });
