@@ -7,6 +7,7 @@ import webpush from "https://esm.sh/web-push@3.6.7";
 import { sendWebPushWithCid, type PushSubscriptionRecord } from "./cid-clients.ts";
 import {
   holzenTransactionalEmailLogger,
+  isTransactionalEmailConfigured,
   sendTransactionalEmail,
 } from "./transactional-email.ts";
 import { unknownErrorForLog, webPushStatusCode } from "./log-unknown-error.ts";
@@ -84,7 +85,7 @@ async function sendPauseOfferEmail(
   log: PauseOfferDeliveryLog,
   holzenEvent: string,
 ): Promise<boolean> {
-  if (!Deno.env.get("RESEND_API_KEY") && !Deno.env.get("LOVABLE_API_KEY")) {
+  if (!isTransactionalEmailConfigured()) {
     log.error("notifications_deliver_email", {
       holzen_event: holzenEvent,
       phase: "email_api_key_not_configured",

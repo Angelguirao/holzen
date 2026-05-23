@@ -33,6 +33,8 @@ npm run staging:db-push      # supabase db push
 npm run staging:deploy       # db push + all active edge functions
 ```
 
+**Production (after staging sign-off):** link prod ref, then `npm run prod:deploy` for manual deploys — prefer [deploy-production.yml](../../.github/workflows/deploy-production.yml) on merge to `main`. See [production-supabase-setup.md](production-supabase-setup.md).
+
 Or manually:
 
 ```sh
