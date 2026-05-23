@@ -21,6 +21,7 @@ export function PauseReflectStepNav({
   onContinue,
   onBack,
 }: PauseReflectStepNavProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

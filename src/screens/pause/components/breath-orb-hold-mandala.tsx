@@ -15,6 +15,7 @@ export type BreathOrbHoldMandalaProps = {
 
 /** Hold-phase mandala SVG layers (hex, inner ring, card dots, pause marks). */
 export function BreathOrbHoldMandala({ holdProgress, prefersReducedMotion }: BreathOrbHoldMandalaProps) {
+  "use memo";
   const { wHex, wInner, wCard, wMark, hexDashOffset, innerDashOffset, hexPath } =
     resolveHoldMandalaLayerWeights({
       holdProgress,

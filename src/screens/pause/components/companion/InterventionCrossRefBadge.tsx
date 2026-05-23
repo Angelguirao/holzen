@@ -30,6 +30,7 @@ interface Props {
  * themselves without touching callsites.
  */
 export function InterventionCrossRefBadge({ companion, intervention, className = '' }: Props) {
+  "use memo";
   const { t } = useTranslation();
   if (!intervention) return null;
 

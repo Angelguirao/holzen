@@ -21,6 +21,7 @@ export function PauseBriefIntegrate({
   onSwitchToDeepPause,
   deepPauseLocked,
 }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const { remaining, suppressAutoComplete } = usePauseBriefIntegrateCountdown(done, onComplete);
 

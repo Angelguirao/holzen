@@ -20,6 +20,7 @@ interface Props {
 }
 
 export function BreathingExercise({ severity = 'mild', onComplete, onClose, autoOpen = false }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const [overlayOpen, setOverlayOpen] = useState(autoOpen);
   const [patternIndex, setPatternIndex] = useState(() =>

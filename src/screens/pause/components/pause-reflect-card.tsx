@@ -30,6 +30,7 @@ export function PauseReflectCard({
   onToggleFavorite,
   subscribed,
 }: PauseReflectCardProps) {
+  "use memo";
   const { t } = useTranslation();
   const { artifactHaiku } = usePauseArtifactHaiku({
     pauseInstanceId,

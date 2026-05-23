@@ -1,19 +1,13 @@
-import { useState } from 'react';
+import { useActionState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import {
   emailUnsubscribeLinkQueryKey,
   getEmailUnsubscribeLinkQueryOptions,
-  submitEmailUnsubscribe,
 } from '@/features/auth/public-queries';
-
-type ConfirmState =
-  | { kind: 'idle' }
-  | { kind: 'submitting' }
-  | { kind: 'success' }
-  | { kind: 'already' }
-  | { kind: 'error'; message: string };
+import { emailUnsubscribeAction } from '@/screens/marketing/unsubscribe-action';
 
 export { emailUnsubscribeLinkQueryKey };
 
@@ -21,34 +15,20 @@ export default function UnsubscribeScreen() {
   const [params] = useSearchParams();
   const token = params.get('token');
   const queryClient = useQueryClient();
-  const [confirm, setConfirm] = useState<ConfirmState>({ kind: 'idle' });
+  const [state, formAction, isPending] = useActionState(emailUnsubscribeAction, {});
 
   const linkQuery = useQuery(getEmailUnsubscribeLinkQueryOptions(token));
 
-  const onConfirm = async () => {
+  useEffect(() => {
     if (!token) return;
-    setConfirm({ kind: 'submitting' });
-    const { data, error } = await submitEmailUnsubscribe(token);
-    if (error) {
-      setConfirm({ kind: 'error', message: error.message });
-      return;
-    }
-    if (data?.success) {
+    if (state.success || state.already) {
       void queryClient.invalidateQueries({ queryKey: emailUnsubscribeLinkQueryKey(token) });
-      setConfirm({ kind: 'success' });
-      return;
     }
-    if (data?.reason === 'already_unsubscribed') {
-      void queryClient.invalidateQueries({ queryKey: emailUnsubscribeLinkQueryKey(token) });
-      setConfirm({ kind: 'already' });
-      return;
-    }
-    setConfirm({ kind: 'error', message: 'Unable to process request.' });
-  };
+  }, [state.success, state.already, token, queryClient]);
 
   const showInvalid = !token || linkQuery.isError || linkQuery.data === 'invalid';
-  const showLoading = Boolean(token) && linkQuery.isPending && confirm.kind === 'idle';
-  const linkAlready = linkQuery.data === 'already' && confirm.kind === 'idle';
+  const showLoading = Boolean(token) && linkQuery.isPending && !state.success && !state.already && !state.error && !isPending;
+  const linkAlready = linkQuery.data === 'already' && !state.success && !state.already && !state.error;
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
@@ -59,38 +39,41 @@ export default function UnsubscribeScreen() {
           <p className="text-sm font-mono text-muted-foreground">Checking your link…</p>
         )}
 
-        {confirm.kind === 'idle' && linkQuery.data === 'valid' && (
+        {!showLoading && !state.success && !state.already && !state.error && linkQuery.data === 'valid' && (
           <>
             <h1 className="text-base font-mono text-foreground">Unsubscribe from emails</h1>
             <p className="text-sm text-muted-foreground leading-relaxed">
               You won't receive transactional emails from Holzen anymore. You can re-subscribe
               by contacting support.
             </p>
-            <Button onClick={onConfirm} className="font-mono text-xs">
-              Confirm unsubscribe
-            </Button>
+            <form action={formAction}>
+              <input type="hidden" name="token" value={token ?? ''} />
+              <LoadingButton type="submit" className="font-mono text-xs" loading={isPending}>
+                Confirm unsubscribe
+              </LoadingButton>
+            </form>
           </>
         )}
 
-        {confirm.kind === 'submitting' && (
+        {isPending && (
           <p className="text-sm font-mono text-muted-foreground">Processing…</p>
         )}
 
-        {confirm.kind === 'success' && (
+        {state.success && (
           <>
             <h1 className="text-base font-mono text-foreground">You're unsubscribed.</h1>
             <p className="text-sm text-muted-foreground">Hold steady.</p>
           </>
         )}
 
-        {(confirm.kind === 'already' || linkAlready) && (
+        {(state.already || linkAlready) && (
           <>
             <h1 className="text-base font-mono text-foreground">Already unsubscribed</h1>
             <p className="text-sm text-muted-foreground">This email is no longer on our list.</p>
           </>
         )}
 
-        {showInvalid && confirm.kind === 'idle' && (
+        {showInvalid && !state.success && !state.already && !state.error && !isPending && (
           <>
             <h1 className="text-base font-mono text-foreground">Invalid or expired link</h1>
             <p className="text-sm text-muted-foreground">
@@ -99,10 +82,18 @@ export default function UnsubscribeScreen() {
           </>
         )}
 
-        {confirm.kind === 'error' && (
+        {state.error && (
           <>
             <h1 className="text-base font-mono text-foreground">Something went wrong</h1>
-            <p className="text-sm text-muted-foreground">{confirm.message}</p>
+            <p className="text-sm text-muted-foreground">{state.error}</p>
+            {token && linkQuery.data === 'valid' && (
+              <form action={formAction}>
+                <input type="hidden" name="token" value={token} />
+                <Button type="submit" variant="outline" className="font-mono text-xs">
+                  Try again
+                </Button>
+              </form>
+            )}
           </>
         )}
       </div>

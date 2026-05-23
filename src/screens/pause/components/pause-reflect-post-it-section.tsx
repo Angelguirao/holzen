@@ -14,6 +14,7 @@ export type PauseReflectPostItSectionProps = {
 
 /** Pro reflect: optional post-it note and tags (expandable). */
 export function PauseReflectPostItSection({ pauseInstanceId }: PauseReflectPostItSectionProps) {
+  "use memo";
   const { t } = useTranslation();
   const [postItOpen, setPostItOpen] = useState(false);
   const { onPostItOpen } = usePauseReflectUiTelemetry(pauseInstanceId, 'pause_reflect');

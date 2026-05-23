@@ -1,22 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useActionState, useEffect, useState, useTransition } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { X, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import {
-  checkSignupGateForApp,
-  resetPasswordForEmail,
-  signInWithEmailPassword,
-  signInWithOAuthGoogle,
-  signUpWithEmailPassword,
-} from '@/features/auth/public';
+import { signInWithOAuthGoogle } from '@/features/auth/public';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { PageHeading } from '@/components/ui/page-heading';
+import { emailAuthAction, forgotPasswordAction } from '@/screens/marketing/auth-actions';
 
 type AuthView = 'sign-in' | 'sign-up' | 'forgot-password';
 
@@ -30,71 +25,42 @@ const AuthScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [confirmSent, setConfirmSent] = useState(false);
   const [resetSent, setResetSent] = useState(false);
-  const getErrorMessage = (error: unknown) =>
-    error instanceof Error ? error.message : t('common.unexpectedError', { defaultValue: 'Something went wrong' });
+  const [emailAuthState, emailAuthFormAction, emailAuthPending] = useActionState(emailAuthAction, {});
+  const [forgotState, forgotFormAction, forgotPending] = useActionState(forgotPasswordAction, {});
+  const [isGooglePending, startGoogleTransition] = useTransition();
 
-  const handleEmailAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-    try {
-      if (view === 'sign-up') {
-        const gate = await checkSignupGateForApp();
-        if (!gate.allow) {
-          if (gate.reason === 'daily_cap') {
-            setError(t(
-              'auth.signupsDailyCap',
-              "Today's signup limit has been reached. Please try again tomorrow.",
-            ));
-          } else {
-            setError(
-              t('auth.signupsPaused', { defaultValue: 'Signups are temporarily paused. Please try again later.' }),
-            );
-          }
-          setLoading(false);
-          return;
-        }
-        const { error } = await signUpWithEmailPassword(email, password, window.location.origin);
-        if (error) throw error;
-        setConfirmSent(true);
-      } else {
-        const { error } = await signInWithEmailPassword(email, password);
-        if (error) throw error;
-      }
-    } catch (e: unknown) {
-      setError(getErrorMessage(e));
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (emailAuthState.confirmSent) {
+      setConfirmSent(true);
+      return;
     }
-  };
+    if (emailAuthState.errorKey) {
+      setError(t(emailAuthState.errorKey, { defaultValue: emailAuthState.errorKey }));
+    } else if (emailAuthState.error) {
+      setError(emailAuthState.error);
+    }
+  }, [emailAuthState, t]);
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-    try {
-      const { error } = await resetPasswordForEmail(email, `${window.location.origin}/reset-password`);
-      if (error) throw error;
+  useEffect(() => {
+    if (forgotState.resetSent) {
       setResetSent(true);
-    } catch (e: unknown) {
-      setError(getErrorMessage(e));
-    } finally {
-      setLoading(false);
+      return;
     }
-  };
+    if (forgotState.errorKey) {
+      setError(t(forgotState.errorKey, { defaultValue: forgotState.errorKey }));
+    } else if (forgotState.error) {
+      setError(forgotState.error);
+    }
+  }, [forgotState, t]);
 
-  const handleGoogle = async () => {
+  const handleGoogle = () => {
     setError(null);
-    setLoading(true);
-    try {
-      const { error } = await signInWithOAuthGoogle(window.location.origin);
-      if (error) setError(error.message);
-    } finally {
-      setLoading(false);
-    }
+    startGoogleTransition(async () => {
+      const { error: oauthError } = await signInWithOAuthGoogle(window.location.origin);
+      if (oauthError) setError(oauthError.message);
+    });
   };
 
   if (confirmSent) {
@@ -126,7 +92,11 @@ const AuthScreen = () => {
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-sm space-y-8">
           <PageHeading title={t('common.holzen')} subtitle={t('auth.resetYourPassword')} />
-          <form onSubmit={handleForgotPassword} className="space-y-4">
+          <form
+            action={forgotFormAction}
+            onSubmit={() => setError(null)}
+            className="space-y-4"
+          >
             <div className="space-y-2">
               <Label htmlFor="auth-forgot-email" className="text-base font-sans">{t('auth.email')}</Label>
               <Input
@@ -141,7 +111,7 @@ const AuthScreen = () => {
               />
             </div>
             {error && <p className="text-xs text-destructive font-mono">{error}</p>}
-            <LoadingButton type="submit" className="w-full text-base font-sans font-normal" loading={loading}>{t('auth.sendResetLink')}</LoadingButton>
+            <LoadingButton type="submit" className="w-full text-base font-sans font-normal" loading={forgotPending}>{t('auth.sendResetLink')}</LoadingButton>
           </form>
           <button onClick={() => { setView('sign-in'); setError(null); }} className="text-muted-foreground underline text-sm font-sans w-full text-center">{t('auth.backToSignIn')}</button>
         </div>
@@ -166,9 +136,9 @@ const AuthScreen = () => {
           </p>
         </header>
 
-        <Button variant="outline" className="w-full text-base font-sans font-normal" onClick={handleGoogle}>
+        <LoadingButton variant="outline" className="w-full text-base font-sans font-normal" onClick={handleGoogle} loading={isGooglePending}>
           {t('auth.continueWithGoogle')}
-        </Button>
+        </LoadingButton>
 
         <div className="flex items-center gap-3">
           <Separator className="flex-1" />
@@ -176,7 +146,12 @@ const AuthScreen = () => {
           <Separator className="flex-1" />
         </div>
 
-        <form onSubmit={handleEmailAuth} className="space-y-4">
+        <form
+          action={emailAuthFormAction}
+          onSubmit={() => setError(null)}
+          className="space-y-4"
+        >
+          <input type="hidden" name="intent" value={view} />
           <div className="space-y-2">
             <Label htmlFor="auth-email" className="text-base font-sans">{t('auth.email')}</Label>
             <Input
@@ -219,7 +194,7 @@ const AuthScreen = () => {
             )}
           </div>
           {error && <p className="text-xs text-destructive font-mono">{error}</p>}
-          <LoadingButton type="submit" className="w-full text-base font-sans font-normal" loading={loading}>
+          <LoadingButton type="submit" className="w-full text-base font-sans font-normal" loading={emailAuthPending}>
             {view === 'sign-up' ? t('common.signUp') : t('common.signIn')}
           </LoadingButton>
         </form>

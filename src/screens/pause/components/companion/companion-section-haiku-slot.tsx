@@ -23,6 +23,7 @@ export function CompanionSectionHaikuSlot({
   onFirstExpandComplete,
   proFavorite,
 }: CompanionSectionHaikuSlotProps) {
+  "use memo";
   return (
     <CompanionCard
       id="haiku"

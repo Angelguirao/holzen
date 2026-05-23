@@ -10,6 +10,7 @@ export function PauseDepthPickerFooterLinks({
   onAboutPauses,
   onOpenStepScience,
 }: PauseDepthPickerFooterLinksProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

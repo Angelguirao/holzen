@@ -35,6 +35,7 @@ export function CompanionOrchestratedSlotChrome({
   routeSegment,
   children,
 }: CompanionOrchestratedSlotChromeProps) {
+  "use memo";
   return (
     <>
       {children}

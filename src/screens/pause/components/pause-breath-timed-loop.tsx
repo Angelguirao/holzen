@@ -40,6 +40,7 @@ export function PauseBreathTimedLoop({
   totalCycles,
   phaseIndex,
 }: PauseBreathTimedLoopProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

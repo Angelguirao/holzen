@@ -35,6 +35,7 @@ export function PauseReflect({
   onContinue,
   onBack,
 }: Props) {
+  "use memo";
   const { t } = useTranslation();
 
   usePauseReflectionStepLog({

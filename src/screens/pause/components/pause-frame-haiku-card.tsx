@@ -24,6 +24,7 @@ export function PauseFrameHaikuCard({
   haikuFetch,
   displayBody,
 }: PauseFrameHaikuCardProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

@@ -683,6 +683,7 @@ export function SettingsSubscriptionPanel() {
     checkoutLoadingTarget,
     startCheckoutFromSettings,
     openPortal,
+    portalLoading,
   } = useSettingsState();
   return (
     <>
@@ -749,14 +750,15 @@ export function SettingsSubscriptionPanel() {
                       </LoadingButton>
                     </div>
                   )}
-                  <Button
+                  <LoadingButton
                     onClick={openPortal}
                     variant="outline"
                     size="sm"
                     className="w-full text-sm font-sans"
+                    loading={portalLoading}
                   >
                     {t('settings.manageSubscription')}
-                  </Button>
+                  </LoadingButton>
                   <div>
                     <Link to="/settings/billing-history" className="text-xs font-mono text-muted-foreground underline">View checkout history</Link>
                   </div>

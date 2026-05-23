@@ -20,6 +20,7 @@ const COMPANIONS = [
 
 /** @deprecated Not used by the onboarding flow in `Onboarding.tsx`; retained for reference or future reuse. */
 export function OnboardingCompanions({ stagger }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -93,6 +94,7 @@ export function OnboardingCompanions({ stagger }: Props) {
 }
 
 function CompanionPreview({ id }: { id: string }) {
+  "use memo";
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
 

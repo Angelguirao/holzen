@@ -10,6 +10,7 @@ export type PauseReflectFavoriteButtonProps = {
 
 /** Pro-only favorite toggle on the reflection card header row. */
 export function PauseReflectFavoriteButton({ isFavorite, onToggleFavorite }: PauseReflectFavoriteButtonProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

@@ -21,6 +21,7 @@ export function HomeExpandChevronButton({
   ariaLabel,
   title: titleProp,
 }: HomeExpandChevronButtonProps) {
+  "use memo";
   const title = titleProp ?? ariaLabel;
   return (
     <button

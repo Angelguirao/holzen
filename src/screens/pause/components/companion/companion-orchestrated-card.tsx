@@ -48,6 +48,7 @@ export function CompanionOrchestratedCard({
   routeSegment,
   children,
 }: CompanionOrchestratedCardProps) {
+  "use memo";
   return (
     <CompanionCard
       id={id}

@@ -8,6 +8,7 @@ interface Props {
 
 /** Full-screen companion “chapter” — no bottom nav (matches /pause routing). */
 export function CompanionFocusLayout({ title, onBack, children }: Props) {
+  "use memo";
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="shrink-0 flex items-center gap-3 px-4 py-3 border-b border-border/30">

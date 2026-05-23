@@ -18,6 +18,7 @@ export type PauseDoneBriefProps = {
 
 /** Brief ritual completion screen (outcome, journey copy, optional post-pause check-in). */
 export function PauseDoneBrief({ decision, pauseData, pauseInstanceId, onSaveToJourney }: PauseDoneBriefProps) {
+  "use memo";
   const { t } = useTranslation();
   const { subscribed } = useSubscription();
   const {

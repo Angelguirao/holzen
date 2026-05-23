@@ -14,6 +14,7 @@ function voteButtonClass(
   side: CompanionFeedbackVote,
   compact: boolean,
 ): string {
+  "use memo";
   const pad = compact ? 'p-0.5' : 'p-1';
   if (vote === side) {
     return `${pad} rounded transition-colors ${
@@ -42,6 +43,7 @@ export function CompanionFeedbackVoteButtons({
   onVote,
   compact = false,
 }: CompanionFeedbackVoteButtonsProps) {
+  "use memo";
   const iconClass = compact ? 'h-2.5 w-2.5' : 'h-3 w-3';
 
   return (

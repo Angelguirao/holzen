@@ -7,6 +7,7 @@ export type ScoreImpactRowListProps = {
 
 /** Qualitative score impact rows (icon + label + reason). */
 export function ScoreImpactRowList({ impacts }: ScoreImpactRowListProps) {
+  "use memo";
   return (
     <div className="space-y-2.5">
       {impacts.map((imp) => (

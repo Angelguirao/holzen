@@ -7,6 +7,7 @@ export type PauseDoneDefaultReinforcementCardProps = {
 
 /** Deep Done: optional reinforcement quote card. */
 export function PauseDoneDefaultReinforcementCard({ quote }: PauseDoneDefaultReinforcementCardProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

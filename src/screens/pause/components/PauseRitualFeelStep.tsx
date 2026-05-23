@@ -27,6 +27,7 @@ export function PauseRitualFeelStep({
   onSelect,
   onContinue,
 }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const [localTile, setLocalTile] = useState<FeelStepTile | null>(selectedTile);
   const [localIntensity, setLocalIntensity] = useState(() => feelIntensity ?? 3);

@@ -22,6 +22,7 @@ export function DeepBreathPostPatternInterstitial({
   onContinueAfterBreath,
   onRepeatPattern,
 }: DeepBreathPostPatternInterstitialProps) {
+  "use memo";
   const { t } = useTranslation();
   const isFirst = segment === 'first';
 

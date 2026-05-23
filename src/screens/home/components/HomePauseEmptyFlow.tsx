@@ -24,6 +24,7 @@ export function HomePauseEmptyFlow({
   manualCooldownRemaining,
   pauseLoading,
 }: Props) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

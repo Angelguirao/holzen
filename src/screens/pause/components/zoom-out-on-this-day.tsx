@@ -10,6 +10,7 @@ export type ZoomOutOnThisDayProps = {
 
 /** BTC price comparison rows for the zoom-out companion slot. */
 export function ZoomOutOnThisDay({ currentPrice, onThisDay, partial, formatPrice }: ZoomOutOnThisDayProps) {
+  "use memo";
   if (!currentPrice || onThisDay.length === 0) return null;
 
   return (

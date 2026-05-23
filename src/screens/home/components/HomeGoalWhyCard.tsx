@@ -27,6 +27,7 @@ export function HomeGoalWhyCard({
   detailsExpanded: boolean;
   onHoldGoalSummaryChange?: (summary: string | null) => void;
 }) {
+  "use memo";
   const { t } = useTranslation();
   const { motivations } = useHolzen();
   const { user } = useAuth();

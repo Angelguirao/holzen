@@ -14,6 +14,7 @@ export type PauseDecideMirrorProps = {
 
 /** Decision mirror interstitial before confirming buy/sell. */
 export function PauseDecideMirror({ mirrorDecision, onConfirm, onCancel, onBack }: PauseDecideMirrorProps) {
+  "use memo";
   const { t } = useTranslation();
   const mirrorKey = mirrorDecision === 'sold' ? 'sell' : 'buy';
 

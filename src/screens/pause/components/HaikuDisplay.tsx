@@ -3,6 +3,7 @@ interface Props {
 }
 
 export function HaikuDisplay({ haiku }: Props) {
+  "use memo";
   const lines = haiku.split(/\\n|\n/).map(l => l.trim()).filter(Boolean);
 
   return (

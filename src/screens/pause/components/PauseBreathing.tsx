@@ -71,6 +71,7 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
   },
   ref,
 ) {
+  "use memo";
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
 

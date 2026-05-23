@@ -7,6 +7,7 @@ interface Props {
 }
 
 export function PauseTags({ pauseInstanceId }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const { tags, draft, setDraft, addDraft, removeTag } = usePauseReflectTags(pauseInstanceId);
 

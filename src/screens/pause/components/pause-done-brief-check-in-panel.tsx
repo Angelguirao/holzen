@@ -31,6 +31,7 @@ export function PauseDoneBriefCheckInPanel({
   pauseData,
   onSaveToJourney,
 }: PauseDoneBriefCheckInPanelProps) {
+  "use memo";
   const { t } = useTranslation();
 
   const checkInRowRightHint = t('pause.brief.done.checkInRowRightHint', {

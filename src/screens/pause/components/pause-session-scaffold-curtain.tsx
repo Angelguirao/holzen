@@ -6,6 +6,7 @@ export type PauseSessionScaffoldCurtainProps = {
 
 /** Initial full-screen curtain before the pause session fades in. */
 export function PauseSessionScaffoldCurtain({ curtainLifted }: PauseSessionScaffoldCurtainProps) {
+  "use memo";
   return (
     <AnimatePresence>
       {!curtainLifted ? (

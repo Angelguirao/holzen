@@ -58,6 +58,7 @@ export function PauseBreathingBody({
   onRepeatDeepFirstBreathPattern,
   onRepeatDeepSecondBreathPattern,
 }: PauseBreathingBodyProps) {
+  "use memo";
   return (
     <motion.div
       className={pauseStepLayout.columnCenter}

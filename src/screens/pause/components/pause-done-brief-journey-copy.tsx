@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 /** Brief Done: Journey framing and stats explainer copy. */
 export function PauseDoneBriefJourneyCopy() {
+  "use memo";
   const { t } = useTranslation();
 
   return (

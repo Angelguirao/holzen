@@ -20,6 +20,7 @@ interface Props {
 }
 
 export function OnboardingWhy({ selected, onToggle, stagger }: Props) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

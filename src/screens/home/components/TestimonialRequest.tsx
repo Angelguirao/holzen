@@ -1,20 +1,20 @@
-import { useState, useEffect, useTransition } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/features/auth/public';
-import { submitUserTestimonial } from '@/features/user/public-queries';
 import { useHolzen } from '@/app/components/HolzenProvider';
 import { toast } from 'sonner';
+import { submitTestimonialAction } from '@/screens/home/testimonial-action';
 
 const DISMISS_KEY = 'holzen_testimonial_dismissed';
 const SUBMITTED_KEY = 'holzen_testimonial_submitted';
 
 // Show after 10+ completed pauses, not dismissed, not already submitted
 function shouldShow(completedPauseCount: number): boolean {
+  "use memo";
   if (completedPauseCount < 10) return false;
   if (localStorage.getItem(SUBMITTED_KEY)) return false;
   const dismissed = localStorage.getItem(DISMISS_KEY);
@@ -39,7 +39,7 @@ export function TestimonialRequest({ completedPauseCount }: Props) {
   const [visible, setVisible] = useState(false);
   const [quote, setQuote] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [isPending, startTransition] = useTransition();
+  const [state, formAction, isPending] = useActionState(submitTestimonialAction, {});
 
   useEffect(() => {
     setVisible(shouldShow(completedPauseCount));
@@ -49,28 +49,22 @@ export function TestimonialRequest({ completedPauseCount }: Props) {
     if (firstName) setDisplayName(firstName);
   }, [firstName]);
 
+  useEffect(() => {
+    if (state.success) {
+      localStorage.setItem(SUBMITTED_KEY, 'true');
+      toast.success(t('testimonial.thanks'));
+      setVisible(false);
+    } else if (state.error) {
+      toast.error(t('testimonial.failed'));
+    }
+  }, [state.success, state.error, t]);
+
   const dismiss = () => {
     localStorage.setItem(DISMISS_KEY, new Date().toISOString());
     setVisible(false);
   };
 
-  const submit = () => {
-    if (!user || !quote.trim() || !displayName.trim()) return;
-    startTransition(async () => {
-      const { error } = await submitUserTestimonial({
-        userId: user.id,
-        displayName,
-        quote,
-      });
-      if (error) {
-        toast.error(t('testimonial.failed'));
-      } else {
-        localStorage.setItem(SUBMITTED_KEY, 'true');
-        toast.success(t('testimonial.thanks'));
-        setVisible(false);
-      }
-    });
-  };
+  if (!user) return null;
 
   return (
     <AnimatePresence>
@@ -91,34 +85,39 @@ export function TestimonialRequest({ completedPauseCount }: Props) {
             </button>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">{t('testimonial.subtitle')}</p>
-          <input
-            type="text"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            placeholder={t('testimonial.nameLabel')}
-            className="w-full text-xs rounded-md border border-border bg-background px-3 py-2 text-foreground placeholder:text-muted-foreground/50"
-            maxLength={50}
-          />
-          <Textarea
-            value={quote}
-            onChange={(e) => setQuote(e.target.value)}
-            placeholder={t('testimonial.placeholder')}
-            className="text-xs min-h-[60px] resize-none"
-            maxLength={280}
-          />
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] text-muted-foreground">{quote.length}/280</span>
-            <LoadingButton
-              size="sm"
-              onClick={submit}
-              loading={isPending}
-              disabled={!quote.trim() || !displayName.trim()}
-              className="text-xs font-mono gap-1.5"
-            >
-              <Send className="h-3 w-3" />
-              {t('testimonial.submit')}
-            </LoadingButton>
-          </div>
+          <form action={formAction} className="space-y-3">
+            <input type="hidden" name="userId" value={user.id} />
+            <input
+              type="text"
+              name="displayName"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder={t('testimonial.nameLabel')}
+              className="w-full text-xs rounded-md border border-border bg-background px-3 py-2 text-foreground placeholder:text-muted-foreground/50"
+              maxLength={50}
+            />
+            <Textarea
+              name="quote"
+              value={quote}
+              onChange={(e) => setQuote(e.target.value)}
+              placeholder={t('testimonial.placeholder')}
+              className="text-xs min-h-[60px] resize-none"
+              maxLength={280}
+            />
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-muted-foreground">{quote.length}/280</span>
+              <LoadingButton
+                type="submit"
+                size="sm"
+                loading={isPending}
+                disabled={!quote.trim() || !displayName.trim()}
+                className="text-xs font-mono gap-1.5"
+              >
+                <Send className="h-3 w-3" />
+                {t('testimonial.submit')}
+              </LoadingButton>
+            </div>
+          </form>
         </motion.div>
       )}
     </AnimatePresence>

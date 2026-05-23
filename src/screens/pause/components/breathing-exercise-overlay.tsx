@@ -47,6 +47,7 @@ export function BreathingExerciseOverlay({
   onSelectPattern,
   onStart,
 }: BreathingExerciseOverlayProps) {
+  "use memo";
   const { t } = useTranslation();
   const { ringColor, ringBorder } = ringColors;
 

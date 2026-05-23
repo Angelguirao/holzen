@@ -15,6 +15,7 @@ interface Props {
  * not competes with it. Copy keys live under `companions.fullview.readTime.*`.
  */
 export function ReadTime({ chars, className = '' }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const est = estimateReadTime(chars);
 

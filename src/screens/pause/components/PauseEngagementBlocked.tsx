@@ -23,6 +23,7 @@ export function PauseEngagementBlocked({
   onStartTrial,
   onReturn,
 }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const lapsed = entitlement === 'lapsed';
 

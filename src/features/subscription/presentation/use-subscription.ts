@@ -80,6 +80,7 @@ export function useSubscription() {
   const userId = user?.id ?? null;
   const [isCheckoutPending, startCheckoutTransition] = useTransition();
   const [isTrialPending, startTrialTransition] = useTransition();
+  const [isPortalPending, startPortalTransition] = useTransition();
   const [checkoutLoadingTarget, setCheckoutLoadingTarget] = useState<
     'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' | null
   >(null);
@@ -264,21 +265,23 @@ export function useSubscription() {
     });
   }, [userId, queryClient, t, startTrialTransition]);
 
-  const openPortal = useCallback(async () => {
+  const openPortal = useCallback(() => {
     holzenLog.subscription('portal', { action: 'open' });
-    try {
-      const { data, error } = await openCustomerPortal();
-      if (error) throw error;
-      if (data?.url) {
-        window.open(data.url, '_blank');
-        return;
+    startPortalTransition(async () => {
+      try {
+        const { data, error } = await openCustomerPortal();
+        if (error) throw error;
+        if (data?.url) {
+          window.open(data.url, '_blank');
+          return;
+        }
+        toast.error(t('home.subscription.portalNoUrl'));
+      } catch (e) {
+        console.error('Portal error:', e);
+        toast.error(t('home.subscription.portalFailed'));
       }
-      toast.error(t('home.subscription.portalNoUrl'));
-    } catch (e) {
-      console.error('Portal error:', e);
-      toast.error(t('home.subscription.portalFailed'));
-    }
-  }, [t]);
+    });
+  }, [t, startPortalTransition]);
 
   /**
    * Programmatic invalidation used by code paths *other* than the user's
@@ -366,6 +369,7 @@ export function useSubscription() {
       loading: false,
       checkoutLoading: isCheckoutPending,
       trialLoading: isTrialPending,
+      portalLoading: isPortalPending,
       checkoutLoadingTarget,
       startCheckout,
       ensureTrial,
@@ -404,6 +408,7 @@ export function useSubscription() {
     loading,
     checkoutLoading: isCheckoutPending,
     trialLoading: isTrialPending,
+    portalLoading: isPortalPending,
     checkoutLoadingTarget,
     startCheckout,
     ensureTrial,

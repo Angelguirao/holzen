@@ -1,7 +1,7 @@
 # ADR: Render boundaries now; defer React Compiler and React 19
 
 **Date:** 2026-05-23  
-**Status:** accepted (React 19 runtime upgraded 2026-05-23 on `feature/lovableMigration`; Actions/Compiler adoption still incremental)
+**Status:** accepted — React 19 runtime + incremental adoption **complete on active surfaces** (May 2026); Compiler annotation pilot **complete** on home/pause `components/**`; `infer` mode deferred until profiling.
 
 ## Context
 
@@ -42,8 +42,8 @@ Adopting React Compiler or upgrading to React 19 during migration adds a second 
 
 | Track | Trigger | Action |
 |-------|---------|--------|
-| **A. React Compiler pilot** | `src/` migration stable; test + build green | **In progress** — annotation mode on Home + pause scaffold (`vite.react-compiler.ts`); profile before widening |
-| **B. React 19 Actions pilot** | Runtime on 19.x | **In progress** — optimistic toggles + `useActionState` forms (see modern-react-practices §2.9) |
+| **A. React Compiler pilot** | `src/` migration stable; test + build green | **Annotation complete** on home/pause `components/**`; profile before `compilationMode: 'infer'` |
+| **B. React 19 Actions pilot** | Runtime on 19.x | **Complete** on active forms/mutations — see modern-react-practices §2.9; companion orchestration intentionally unchanged |
 
 Expo SDK 54 is **not** a Holzen signal — shipped product is a Vite SPA on Lovable.
 

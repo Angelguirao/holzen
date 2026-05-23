@@ -19,6 +19,7 @@ export type ZoomOutEchoPanelProps = {
 
 /** User-authored echo (notes/replays) with optional thread CTA. */
 export function ZoomOutEchoPanel({ echo, onGoToReplay }: ZoomOutEchoPanelProps) {
+  "use memo";
   const { t } = useTranslation();
   const [quoteExpanded, setQuoteExpanded] = useState(false);
 

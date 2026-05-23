@@ -20,6 +20,7 @@ interface Props {
 }
 
 export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeError = false, onRetry }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const hasNudgeSystem = nudge !== undefined || nudgeLoading || nudgeError;
   const displayTitle = nudge?.title ?? (!hasNudgeSystem || nudgeError ? title : '');

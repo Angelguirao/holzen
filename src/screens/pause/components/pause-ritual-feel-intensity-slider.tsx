@@ -10,6 +10,7 @@ export type PauseRitualFeelIntensitySliderProps = {
 
 /** Feel step intensity slider (1–5) with label row. */
 export function PauseRitualFeelIntensitySlider({ intensity, onIntensityChange }: PauseRitualFeelIntensitySliderProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

@@ -34,6 +34,7 @@ export function PauseLeaveWithPendingSheet({
   onAdoptNew,
   onDismissPendingOffer,
 }: PauseLeaveWithPendingSheetProps) {
+  "use memo";
   const { t } = useTranslation();
 
   const { contextText, previewMessage, showPreviewLine } = getPendingPauseOfferDisplay(pending);

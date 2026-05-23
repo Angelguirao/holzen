@@ -11,6 +11,7 @@ export function OnboardingCommitment({
   onHoldGoalPresenceChange,
   stagger,
 }: Props) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

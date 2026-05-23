@@ -13,6 +13,7 @@ export function CompanionFeedbackRegenerateButton({
   regenBusy,
   onClick,
 }: CompanionFeedbackRegenerateButtonProps) {
+  "use memo";
   const { t } = useTranslation();
 
   if (compact) {

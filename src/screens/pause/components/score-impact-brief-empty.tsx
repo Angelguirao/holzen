@@ -11,6 +11,7 @@ export type ScoreImpactBriefEmptyProps = {
 
 /** Brief Done contribution block when `buildPauseScoreImpacts` returns no rows. */
 export function ScoreImpactBriefEmpty({ title, motionDelay, hideTitle, className }: ScoreImpactBriefEmptyProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

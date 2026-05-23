@@ -17,6 +17,7 @@ type Props = {
  * Only mount when the pause is **engaged** and `engaged_at` is known.
  */
 export function PauseEngagedOpenMaxCountdown({ engagedAtIso, tickMs = 30_000, className }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const [now, setNow] = useState(() => Date.now());
 

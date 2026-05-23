@@ -20,6 +20,7 @@ interface Props {
 }
 
 export function MoodCheck({ onSelect, onSkip, variant = 'before', hideHeading = false }: Props) {
+  "use memo";
   const { t } = useTranslation();
 
   const heading = variant === 'after'

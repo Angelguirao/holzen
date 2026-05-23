@@ -115,6 +115,7 @@ export function CompanionSectionOrchestratedSlots({
   regenerateCompanion,
   proFavorite,
 }: CompanionSectionOrchestratedSlotsProps) {
+  "use memo";
   const { hasSignal, hasGrounding, hasZoomOut, hasHistory } = visibility;
 
   return (

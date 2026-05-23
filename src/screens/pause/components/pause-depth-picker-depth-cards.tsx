@@ -13,6 +13,7 @@ export function PauseDepthPickerDepthCards({
   onDeep,
   deepPauseLocked = false,
 }: PauseDepthPickerDepthCardsProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

@@ -32,6 +32,7 @@ interface Props {
  * context) while the user still has an active ritual.
  */
 export function PendingPauseOfferShell({ onAfterMutation, navigateAfterAdopt, autoOpen = true }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const { pending, refresh } = usePendingPauseOffer();
   const { busy, handleAdopt, handleDecline } = usePendingPauseOfferMutations({

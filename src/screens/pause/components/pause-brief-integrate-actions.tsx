@@ -16,6 +16,7 @@ export function PauseBriefIntegrateActions({
   onSwitchToDeepPause,
   onUserNavigate,
 }: PauseBriefIntegrateActionsProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

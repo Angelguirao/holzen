@@ -17,6 +17,7 @@ export function PauseRitualBackRow({
   transitionDelay = 0.5,
   transitionDuration = 0.8,
 }: PauseRitualBackRowProps) {
+  "use memo";
   const { t } = useTranslation();
 
   if (!onBack) return null;

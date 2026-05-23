@@ -39,6 +39,7 @@ export function CompanionFeedback({
   onRegenerate,
   regenerating,
 }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const { isPro, requirePro, startCheckout } = useProGate();
   const { companionRemaining, flexCreditsBalance, applyOptimisticDecrement, refresh: refreshSubscription } =

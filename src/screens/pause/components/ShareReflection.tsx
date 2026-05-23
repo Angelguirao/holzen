@@ -21,6 +21,7 @@ interface Props {
 
 export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
   function ShareReflection({ message, context, haiku, onMenuOpen }, ref) {
+    "use memo";
     const { t } = useTranslation();
     const { copyText, shareImage, shareToX, shareToWhatsApp, shareToTelegram } =
       useReflectionShareHandlers({ message, context, haiku, t });

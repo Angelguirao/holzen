@@ -8,6 +8,7 @@ export type PauseDoneDefaultStreakHeroProps = {
 
 /** Deep Done: streak flame animation, streak copy, and decision recap. */
 export function PauseDoneDefaultStreakHero({ decision }: PauseDoneDefaultStreakHeroProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

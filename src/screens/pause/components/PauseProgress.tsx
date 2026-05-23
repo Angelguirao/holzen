@@ -29,6 +29,7 @@ export function PauseProgress({
   variant = 'segment',
   breathSecondLabelVariant = 'breathe',
 }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const breath2Label =
     breathSecondLabelVariant === 'shift'

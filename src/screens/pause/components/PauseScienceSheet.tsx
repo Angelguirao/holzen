@@ -10,6 +10,7 @@ interface PauseScienceScrollBodyProps {
 
 /** Scrollable “science behind the pause” body for use inside a bottom sheet / drawer. */
 export function PauseScienceScrollBody(props?: PauseScienceScrollBodyProps) {
+  "use memo";
   const { currentStep } = props ?? {};
   const { t } = useTranslation();
 

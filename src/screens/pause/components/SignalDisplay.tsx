@@ -18,6 +18,7 @@ interface SignalDisplayProps {
 }
 
 export function SignalDisplay({ signal, loading, error, onRetry }: SignalDisplayProps) {
+  "use memo";
   if (loading) {
     return (
       <div className="space-y-2">
