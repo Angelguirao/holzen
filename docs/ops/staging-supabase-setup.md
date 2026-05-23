@@ -54,6 +54,8 @@ Supabase Dashboard → Project Settings → Edge Functions → Secrets.
 | `OPENROUTER_API_KEY` | Optional Gemini failover |
 | `PERPLEXITY_API_KEY` | Perplexity API key |
 | `RESEND_API_KEY` | Resend (preferred over `LOVABLE_API_KEY`) |
+| `RESEND_WEBHOOK_SECRET` | Resend dashboard webhook signing secret (bounces/complaints → `handle-email-suppression`) |
+| `SEND_EMAIL_HOOK_SECRET` | Supabase Auth Send Email Hook secret (→ `auth-email-hook`) |
 | `STRIPE_SECRET_KEY` | Stripe **test** secret |
 | `STRIPE_WEBHOOK_SECRET` | Stripe test webhook signing secret |
 | `CRON_SECRET` | Random string; match if you enable cron on staging |

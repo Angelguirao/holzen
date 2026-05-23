@@ -1,6 +1,7 @@
 import * as React from 'npm:react@18.3.1'
 import { renderAsync } from 'npm:@react-email/components@0.0.22'
 import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
+import { authorizeOpsBearer } from "../_shared/ops-bearer-auth.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 
 const corsHeaders = {
@@ -9,28 +10,14 @@ const corsHeaders = {
 }
 
 // Renders all registered templates with their previewData.
-// Gated by LOVABLE_API_KEY — only the Go API calls this.
+// Gated by ops bearer secrets (LOVABLE_API_KEY, CRON_SECRET, EMAIL_PREVIEW_SECRET, …).
 
 Deno.serve(withRequestLogging("preview-transactional-email", async ({ req, log }) => {
-  const apiKey = Deno.env.get('LOVABLE_API_KEY')
-  if (!apiKey) {
-    return new Response(
-      JSON.stringify({ error: 'Server configuration error' }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    )
-  }
-
-  // Verify the caller is authorized with LOVABLE_API_KEY
-  const authHeader = req.headers.get('Authorization')
-  const token = authHeader?.replace(/^Bearer\s+/i, '')
-  if (token !== apiKey) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+  if (!authorizeOpsBearer(req.headers.get("Authorization"))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   const templateNames = Object.keys(TEMPLATES)

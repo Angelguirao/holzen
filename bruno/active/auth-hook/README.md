@@ -1,8 +1,11 @@
 # Auth email hook
 
-- **`auth-email-hook-preview`** — `POST .../auth-email-hook/preview` with **`Authorization: Bearer {{LOVABLE_API_KEY}}`** (same secret the Edge function loads from **`LOVABLE_API_KEY`** in the Supabase runtime). Renders HTML for template types: `signup`, `magiclink`, `recovery`, `invite`, `email_change`, `reauthentication`.
+- **`auth-email-hook-preview`** — `POST .../auth-email-hook/preview` with **`Authorization: Bearer …`** using any ops secret accepted by the edge (`LOVABLE_API_KEY`, `CRON_SECRET`, `EMAIL_PREVIEW_SECRET`, or `SEND_EMAIL_HOOK_SECRET`). Renders HTML for template types: `signup`, `magiclink`, `recovery`, `invite`, `email_change`, `reauthentication`.
 
-The main **`auth-email-hook`** webhook requires a **signed** Lovable payload — not reproducible from Bruno alone.
+The main **`auth-email-hook`** webhook accepts either:
+
+- **Supabase Auth Send Email Hook** — signed with **`SEND_EMAIL_HOOK_SECRET`** (preferred after platform exit), or
+- **Legacy Lovable** — signed with **`LOVABLE_API_KEY`** (not reproducible from Bruno alone).
 
 ## Getting `LOVABLE_API_KEY` for Bruno or `supabase functions serve`
 
