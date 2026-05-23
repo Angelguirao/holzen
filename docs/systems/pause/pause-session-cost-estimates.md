@@ -11,11 +11,11 @@
 > **case study** for the pause flow specifically; use it for pause-path
 > deep-dives but defer to the cost-model doc for anything cross-cutting.
 
-This document estimates **third-party API spend** for a Holzen pause session when content is **live-generated** (no companion cache hits, no curated fallbacks). It ties numbers to [Perplexity Sonar API pricing](https://docs.perplexity.ai/docs/getting-started/pricing) and [Lovable AI / Cloud usage billing](https://docs.lovable.dev/integrations/ai), and to how the repo actually calls those services.
+This document estimates **third-party API spend** for a Holzen pause session when content is **live-generated** (no companion cache hits, no curated fallbacks). It ties numbers to [Perplexity Sonar API pricing](https://docs.perplexity.ai/docs/getting-started/pricing) and [Google Gemini / OpenRouter pricing](https://ai.google.dev/pricing) (via [`_shared/llm-gateway.ts`](../../../supabase/functions/_shared/llm-gateway.ts)), and to how the repo actually calls those services.
 
-**Not included here:** Lovable **workspace subscription**, **Cloud hosting** (database compute, egress, instance size), **Supabase** plan fees, **Stripe**, email (Lovable Email), push (VAPID), or CoinGecko usage inside `check-volatility`. Those are real costs but are billed on different dashboards. Lovable documents Cloud vs AI balance separately in [Usage-based Cloud and AI pricing](https://docs.lovable.dev/integrations/cloud#usage-based-cloud-and-ai-pricing).
+**Not included here:** Supabase plan fees, **Stripe**, email (Resend), push (VAPID), or CoinGecko usage inside `check-volatility`. Those are real costs but are billed on different dashboards.
 
-**Admin “Cost” card** in `/admin` sums `generation_attempts.estimated_cost_usd` (see `v_companion_cost_per_day`). That uses the same **token + Per-request fee** model as `supabase/functions/_shared/observe.ts`; it is an **estimate**, not an invoice. Question-mode generation (`generateQuestion`) does **not** currently log `generation_attempts`, so a small slice of Lovable usage can be missing from that dashboard.
+**Admin “Cost” card** in `/admin` sums `generation_attempts.estimated_cost_usd` (see `v_companion_cost_per_day`). That uses the same **token + Per-request fee** model as `supabase/functions/_shared/observe.ts`; it is an **estimate**, not an invoice. Question-mode generation (`generateQuestion`) does **not** currently log `generation_attempts`, so a small slice of Gemini usage can be missing from that dashboard.
 
 ---
 
@@ -23,7 +23,7 @@ This document estimates **third-party API spend** for a Holzen pause session whe
 
 ### 1.1 Reflection step (message + optional haiku)
 
-- **Manual path:** `holzen-reflect` → `generateUnifiedReflection` → Lovable AI Gateway `https://ai.gateway.lovable.dev/v1/chat/completions` when the deep ritual reaches **Reflect** (`use-pause-reflect-generation` in **`PauseSession`**, typically still **enabled** on **Frame**, second **Breathe**, and **Decide** so the call can finish off the Reflect card).
+- **Manual path:** `holzen-reflect` → `generateUnifiedReflection` → **`llm-gateway`** (Google Gemini direct, OpenRouter failover) when the deep ritual reaches **Reflect** (`use-pause-reflect-generation` in **`PauseSession`**, typically still **enabled** on **Frame**, second **Breathe**, and **Decide** so the call can finish off the Reflect card).
 - **Automatic path:** same **`holzen-reflect`** call in the browser when the user reaches **Reflect** for cron-created instances (**no** inline `generateUnifiedReflection` inside `check-volatility` on claim); same **`PauseSession`** enable window as manual.
 
 Models tried (in order): `google/gemini-3-flash-preview`, then `google/gemini-2.5-flash` on failure (`reflection-generate.ts`).
@@ -35,14 +35,14 @@ Models tried (in order): `google/gemini-3-flash-preview`, then `google/gemini-2.
 
 Generators (in `supabase/functions/_shared/generators/`):
 
-| Companion        | Perplexity (`sonar-pro`) | Lovable / Gemini (structuring or deep-time) |
-|-----------------|---------------------------|-----------------------------------------------|
+| Companion        | Perplexity (`sonar-pro`) | Gemini via `llm-gateway` (structuring or deep-time) |
+|-----------------|---------------------------|--------------------------------------------------------|
 | **Signal**      | Yes; 1–3 chat calls possible (retries without domain filter / wide search) | Yes; `google/gemini-2.5-flash` → `google/gemini-2.5-flash-lite` |
 | **Grounding**   | Yes; 1–2 calls (retry without domain filter) | Same Gemini pair as Signal |
 | **History**     | Yes; 1 call typical       | Same Gemini pair |
 | **Zoom Out**    | No (BTC prices from `btc_price_cache`, filled by `refresh-btc-prices`) | Same Gemini pair for deep-time JSON |
 
-**Intervention question mode** adds another Lovable call (`google/gemini-3-flash-preview`) from `generateQuestion.ts`; it is **not** logged to `generation_attempts` today.
+**Intervention question mode** adds another Gemini call (`google/gemini-3-flash-preview`) from `generateQuestion.ts` via `llm-gateway`; it is **not** logged to `generation_attempts` today.
 
 Default profile flags used when automatic pause runs (`check-volatility`): `companion_signal`, `companion_grounding`, `companion_history`, `companion_zoom_out` default to **true** unless the user turned them off.
 
@@ -60,9 +60,9 @@ From [Perplexity pricing — Sonar API](https://docs.perplexity.ai/docs/getting-
 
 Holzen’s `observe.ts` uses the same order of magnitude: `sonar-pro` → `[3, 15]` per 1M tokens and **$0.006** per request (`DEFAULT_PERPLEXITY_REQUEST_FEE_USD`). If the API uses **medium** or **high** search context, Perplexity’s per-request fee is higher ($0.010 or $0.014 per request for Sonar Pro); the code does not model that unless you set `PERPLEXITY_REQUEST_FEE_USD_JSON`.
 
-### 2.2 Lovable AI (Gemini via gateway)
+### 2.2 Gemini (direct + OpenRouter via `llm-gateway`)
 
-[Lovable AI — Usage and pricing](https://docs.lovable.dev/integrations/ai) confirms gateway billing is parity with the underlying provider ("exactly the same as going directly to the LLM provider"). [Cloud & AI balance](https://docs.lovable.dev/integrations/cloud#usage-based-cloud-and-ai-pricing) is where workspace AI spend accrues.
+Holzen calls Gemini through **`GOOGLE_AI_API_KEY`** (primary) with optional **`OPENROUTER_API_KEY`** failover. Billing is per the [Google AI](https://ai.google.dev/pricing) and [OpenRouter](https://openrouter.ai/docs/pricing) dashboards — no Lovable gateway markup.
 
 Holzen maps Gemini-style models in `observe.ts` at **current GA rates** (re-verified 2026-04-19):
 
@@ -86,7 +86,7 @@ features, see [`docs/systems/costs/ai-cost-model.md`](../costs/ai-cost-model.md)
 \text{USD} \approx \frac{\text{prompt\_tokens}}{10^6}\times 3 + \frac{\text{completion\_tokens}}{10^6}\times 15 + 0.006
 \]
 
-**Gemini via Lovable (one successful completion, using observe defaults for 2.5 Flash at current GA rates):**
+**Gemini via `llm-gateway` (one successful completion, using observe defaults for 2.5 Flash at current GA rates):**
 
 \[
 \text{USD} \approx \frac{\text{prompt\_tokens}}{10^6}\times 0.30 + \frac{\text{completion\_tokens}}{10^6}\times 2.50
@@ -191,7 +191,7 @@ The **15-minute** cadence in ops docs is the **volatility cron** schedule and al
 ## 7. How to reconcile with real bills
 
 1. **Perplexity:** Use the provider dashboard for **actual** Sonar Pro token and request/context charges.
-2. **Lovable:** Use **Settings → Cloud & AI balance** for **AI** line items ([docs](https://docs.lovable.dev/integrations/cloud#usage-based-cloud-and-ai-pricing)).
+2. **Gemini / OpenRouter:** Use Google AI Studio / Cloud billing and OpenRouter usage for **LLM** line items.
 3. **Holzen Admin:** Compare trends in **Cost** to `generation_attempts`; tune `COST_MAP_OVERRIDE` / `PERPLEXITY_REQUEST_FEE_USD_JSON` if your negotiated rates differ.
 
 ---
