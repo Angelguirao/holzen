@@ -7,9 +7,9 @@
  * Sibling surfaces: `pause-reflect-flows-steps-io-sibling-parity.test.ts`,
  * `pause-reflect-steps-flows-io-sibling-parity.test.ts` ↔ `pause-reflect-flows-io` (reciprocal inline pins in
  * `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-flows-io.test.ts`);
- * `pause-reflect-steps-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io` (presentation + application);
- * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-mood-io.test.ts`;
- * presentation parity: `pause-reflect-steps-io-parity.test.ts` ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`;
+ * `pause-reflect-steps-feel-io-sibling-parity.test.ts` ↔ `pause-feel-io` (presentation + application);
+ * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-feel-io.test.ts`;
+ * presentation parity: `pause-reflect-steps-io-parity.test.ts` ↔ `presentation/feel/pause-feel-io-parity.test.ts`;
  * `pause-reflect-steps-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io`;
  * reciprocal inline pins: `pause-reflect-steps-io.test.ts` ↔ `pause-reflect-hub-io.test.ts`;
  * presentation parity: `pause-reflect-steps-io-parity.test.ts` ↔ `pause-reflect-hub-io-parity.test.ts` (hub cluster);

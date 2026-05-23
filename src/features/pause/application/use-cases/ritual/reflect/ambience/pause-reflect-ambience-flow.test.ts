@@ -38,7 +38,7 @@ import {
   resolvePauseSessionChromeCloseAction as resolveChromeCloseFromMoodFlow,
   runInitialEmotionSelect as runSelectFromMoodFlow,
   runInitialEmotionSkip as runSkipFromMoodFlow,
-} from '../mood/pause-reflect-mood-flow';
+} from '../../feel/pause-feel-flow';
 
 import {
   startPauseReflectFrameFocusAmbience,
@@ -104,8 +104,8 @@ describe('pause-reflect-ambience-flow', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-mood-flow.test.ts` (ambience-flow cluster).
-   * Dedicated sibling file: `pause-reflect-ambience-mood-flow-sibling-parity.test.ts`
+   * Reciprocal inline pins ↔ `pause-feel-flow.test.ts` (ambience-flow cluster).
+   * Dedicated sibling file: `pause-reflect-ambience-feel-flow-sibling-parity.test.ts`
    * (+ presentation mirror under `presentation/reflect/ambience/`).
    */
   it('sibling cluster: mood-flow exports stay distinct from ambience-flow exports', () => {
@@ -114,6 +114,6 @@ describe('pause-reflect-ambience-flow', () => {
     expect(startPauseReflectFrameFocusAmbience).not.toBe(buildFeelTilesFromMoodFlow);
     expect(stopPauseReflectFrameFocusAmbience).not.toBe(applyBriefFromMoodFlow);
     expect(startPauseReflectFrameFocusAmbience).not.toBe(resolveChromeCloseFromMoodFlow);
-    // Full cross-flow pins: `pause-reflect-ambience-mood-flow-sibling-parity.test.ts`.
+    // Full cross-flow pins: `pause-reflect-ambience-feel-flow-sibling-parity.test.ts`.
   });
 });

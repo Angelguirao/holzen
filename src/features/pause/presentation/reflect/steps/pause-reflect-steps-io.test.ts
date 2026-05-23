@@ -30,7 +30,7 @@ import {
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
   reflectPauseRepository as moodReflectPauseRepository,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
@@ -303,8 +303,8 @@ describe('pause-reflect-steps-io', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-mood-io.test.ts` (step mutations vs initial-emotion mood).
-   * Dedicated sibling file: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (presentation + application).
+   * Reciprocal inline pins ↔ `pause-feel-io.test.ts` (step mutations vs initial-emotion mood).
+   * Dedicated sibling file: `pause-reflect-steps-feel-io-sibling-parity.test.ts` (presentation + application).
    */
   it('sibling cluster: mood-io exports stay distinct from steps-io', () => {
     expect(pauseReflectFavoriteToggle).not.toBe(pauseInitialEmotionSelect);
@@ -317,8 +317,8 @@ describe('pause-reflect-steps-io', () => {
     expect(shouldShowFavoriteProHint).not.toBe(buildFeelTilesMoodLogOptions);
     expect(shouldLogPauseReflectionStep).not.toBe(pauseInitialEmotionSkip);
     expect(reflectPauseRepository).toBe(moodReflectPauseRepository);
-    // Reciprocal inline pins: `pause-reflect-mood-io.test.ts`.
-    // Full cross-I/O pins: `pause-reflect-steps-mood-io-sibling-parity.test.ts`.
+    // Reciprocal inline pins: `pause-feel-io.test.ts`.
+    // Full cross-I/O pins: `pause-reflect-steps-feel-io-sibling-parity.test.ts`.
   });
 
   it('sibling cluster: hub-io exports stay distinct from steps-io', () => {

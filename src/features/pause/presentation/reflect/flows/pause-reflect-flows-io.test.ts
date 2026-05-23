@@ -46,7 +46,7 @@ import {
   buildFeelTilesMoodLogOptions,
   pauseInitialEmotionSelect,
   pauseInitialEmotionSkip,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import { pauseReflectionShareImage } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   trackPauseReflectPostItOpen,
@@ -249,7 +249,7 @@ describe('pause-reflect-flows-io', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseInitialEmotionSelect);
     expect(buildPauseScoreImpacts).not.toBe(pauseInitialEmotionSkip);
     expect(buildPauseScoreImpacts).not.toBe(buildFeelTilesMoodLogOptions);
-    // Reciprocal inline pins: `pause-reflect-mood-io.test.ts`.
+    // Reciprocal inline pins: `pause-feel-io.test.ts`.
   });
 
   /**

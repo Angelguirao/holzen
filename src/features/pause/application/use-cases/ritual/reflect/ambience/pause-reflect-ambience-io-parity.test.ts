@@ -67,7 +67,7 @@ import {
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
   reflectPauseRepository as moodReflectPauseRepository,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
@@ -81,8 +81,8 @@ import {
  * reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts` (hub cluster).
  * Generation-io sibling pins: `pause-reflect-ambience-generation-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `pause-reflect-generation-io-parity.test.ts` (generation cluster).
- * Mood-io sibling pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (mood cluster).
+ * Mood-io sibling pins: `pause-reflect-ambience-feel-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `pause-feel-io-parity.test.ts` (mood cluster).
  * Telemetry-io sibling pins: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`.
  * Steps-io cross-surface: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
@@ -181,8 +181,8 @@ describe('pause-reflect-ambience-io parity (application)', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts`.
-   * Dedicated sibling file: `pause-reflect-ambience-mood-io-sibling-parity.test.ts` (application + presentation).
+   * Reciprocal inline pins ↔ `pause-feel-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-ambience-feel-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: mood-io exports stay distinct from ambience-io frame-focus bed', () => {
     expect(startFromAmbienceIo).not.toBe(pauseInitialEmotionSelect);
@@ -192,8 +192,8 @@ describe('pause-reflect-ambience-io parity (application)', () => {
     expect(startFromAmbienceIo).not.toBe(buildFeelTilesMoodLogOptions);
     expect(stopFromAmbienceIo).not.toBe(buildFeelTilesMoodLogOptions);
     expect(startFromAmbienceIo).not.toBe(moodReflectPauseRepository);
-    // Reciprocal inline pins: `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
-    // Full pins: `pause-reflect-ambience-mood-io-sibling-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/feel/pause-feel-io-parity.test.ts`.
+    // Full pins: `pause-reflect-ambience-feel-io-sibling-parity.test.ts`.
   });
 
   /**

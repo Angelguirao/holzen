@@ -1,7 +1,7 @@
 /**
  * Reflect+decide flows presentation I/O (preflight, decide outcome RPC, outcome toasts).
  * Imports reflect/decide helpers from domain + ritual/decide leaf modules (score impacts
- * from `score-impacts` / `score-impact-presentation`; parity with `pause-reflect-mood-io`).
+ * from `score-impacts` / `score-impact-presentation`; parity with `pause-feel-io`).
  * `PauseImpactData` via `pause-session-decide-io` (session decide beat).
  * Parity pins: `pause-reflect-flows-io.test.ts` (outcome wrapper distinctness + RPC delegation; ambience-io + pending-offer-io reciprocal inline pins),
  * `pause-reflect-flows-io-parity.test.ts` (colocated in this folder; application mirror
@@ -34,9 +34,9 @@
  * `pause-reflect-flows-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io` (application
  * `pause-reflect-flows-generation-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
  * `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-generation-io-parity.test.ts`), and
- * `pause-reflect-flows-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io` (application
- * `pause-reflect-flows-mood-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
- * `pause-reflect-flows-io-parity.test.ts` ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`),
+ * `pause-reflect-flows-feel-io-sibling-parity.test.ts` ↔ `pause-feel-io` (application
+ * `pause-reflect-flows-feel-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
+ * `pause-reflect-flows-io-parity.test.ts` ↔ `presentation/feel/pause-feel-io-parity.test.ts`),
  * `pause-session-step-handlers-flows-io-sibling-parity.test.ts` ↔ `pause-session-step-handlers-io` (cross-surface;
  * application mirror: `pause-session-step-handlers-flows-io-sibling-parity.test.ts` under `application/.../session/`),
  * `pause-reflect-flows-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow` (application + presentation;

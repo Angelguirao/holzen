@@ -4,7 +4,7 @@
  * (reciprocal inline pins + flow-anchor sibling clusters).
  * Imports `pause-reflect-telemetry-flow` CI umbrella for `.toBe` identity pins only — production telemetry I/O keeps `pause-reflect-session-ui-telemetry` leaf imports.
  * Application flow-cluster sibling pins: `pause-reflect-flows-flow`, `pause-reflect-steps-flow`, `pause-reflect-generation-flow`, `pause-reflect-share-flow`.
- * Mood-io sibling: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts` (application + presentation); reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts`.
+ * Mood-io sibling: `pause-feel-telemetry-io-sibling-parity.test.ts` (application + presentation); reciprocal inline pins ↔ `pause-feel-io-parity.test.ts`.
  * Hub-io sibling: `pause-reflect-hub-telemetry-io-sibling-parity.test.ts` (application + presentation); reciprocal inline pins ↔ `pause-reflect-hub-io-parity.test.ts`.
  * Ambience-io sibling: `pause-reflect-ambience-telemetry-io-sibling-parity.test.ts` (application + presentation); reciprocal inline pins ↔ `pause-reflect-ambience-io-parity.test.ts`.
  * Share-io sibling: `pause-reflect-share-telemetry-io-sibling-parity.test.ts` (application + presentation); reciprocal inline pins ↔ `pause-reflect-share-io-parity.test.ts`.
@@ -97,13 +97,13 @@ import {
   pauseInitialEmotionSkipWithRepository,
   reflectPauseRepository,
   resolvePauseSessionChromeCloseAction,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   buildFeelTilesMoodLogOptions as buildFeelTilesFromMoodFlow,
   resolvePauseSessionChromeCloseAction as resolveChromeCloseFromMoodFlow,
   runInitialEmotionSelect as runInitialEmotionSelectFromMoodFlow,
   runInitialEmotionSkip as runInitialEmotionSkipFromMoodFlow,
-} from '@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow';
+} from '@/features/pause/application/use-cases/ritual/feel/pause-feel-flow';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
@@ -260,8 +260,8 @@ describe('pause-reflect-telemetry-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (session reflect telemetry vs feel-step mood RPC).
-   * Dedicated sibling file: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts` (application + presentation).
+   * Reciprocal inline pins ↔ `pause-feel-io-parity.test.ts` (session reflect telemetry vs feel-step mood RPC).
+   * Dedicated sibling file: `pause-feel-telemetry-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: mood-io exports stay distinct from session reflect telemetry-io', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(pauseInitialEmotionSelectFromMoodIo);
@@ -271,12 +271,12 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackShareTapFromTelemetryIo).not.toBe(buildFeelTilesMoodLogOptions);
     expect(trackWallpaperFromTelemetryIo).not.toBe(resolvePauseSessionChromeCloseAction);
     expect(trackPauseReflectPostItOpen).not.toBe(reflectPauseRepository);
-    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
-    // Full pins: `pause-reflect-mood-telemetry-io-sibling-parity.test.ts`.
+    // Reciprocal inline pins: `pause-feel-io-parity.test.ts`.
+    // Full pins: `pause-feel-telemetry-io-sibling-parity.test.ts`.
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (application mood-flow CI anchor).
+   * Reciprocal inline pins ↔ `pause-feel-io-parity.test.ts` (application mood-flow CI anchor).
    */
   it('sibling cluster: mood-flow leaf exports stay distinct from session reflect telemetry umbrella', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(runInitialEmotionSelectFromMoodFlow);
@@ -285,7 +285,7 @@ describe('pause-reflect-telemetry-io parity', () => {
     expect(trackPostItDirect).not.toBe(resolveChromeCloseFromMoodFlow);
     expect(trackShareTapDirect).not.toBe(runInitialEmotionSelectFromMoodFlow);
     expect(trackWallpaperDirect).not.toBe(runInitialEmotionSkipFromMoodFlow);
-    // Reciprocal inline pins: `pause-reflect-mood-io-parity.test.ts`.
+    // Reciprocal inline pins: `pause-feel-io-parity.test.ts`.
   });
 
   /**

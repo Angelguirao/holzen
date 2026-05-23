@@ -39,8 +39,8 @@ vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-r
  * `pause-reflect-steps-note-tag-flow-sibling-parity.test.ts`.
  * Flows-io cross-surface: colocated `pause-reflect-flows-io-parity.test.ts` ↔ this file;
  * `pause-reflect-flows-steps-io-sibling-parity.test.ts` (application + presentation).
- * Steps-io ↔ mood-io: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation);
- * reciprocal inline pins ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
+ * Steps-io ↔ mood-io: `pause-reflect-steps-feel-io-sibling-parity.test.ts` (application + presentation);
+ * reciprocal inline pins ↔ `presentation/feel/pause-feel-io-parity.test.ts`.
  * Steps-io ↔ ambience-io: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `ambience/pause-reflect-ambience-io-parity.test.ts` and `steps/pause-reflect-steps-io-parity.test.ts` (application + presentation).
  * Steps-io ↔ telemetry-io: `pause-reflect-steps-telemetry-io-sibling-parity.test.ts` (application + presentation);
@@ -88,7 +88,7 @@ import {
   pauseInitialEmotionSkip,
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
@@ -315,8 +315,8 @@ describe('pause-reflect-steps-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts` (step RPC wrappers vs initial-emotion mood).
-   * Dedicated sibling file: `pause-reflect-steps-mood-io-sibling-parity.test.ts` (application + presentation).
+   * Reciprocal inline pins ↔ `presentation/feel/pause-feel-io-parity.test.ts` (step RPC wrappers vs initial-emotion mood).
+   * Dedicated sibling file: `pause-reflect-steps-feel-io-sibling-parity.test.ts` (application + presentation).
    */
   it('sibling cluster: mood-io exports stay distinct from steps-io wrappers', () => {
     expect(pauseReflectFavoriteToggle).not.toBe(pauseInitialEmotionSelect);
@@ -328,7 +328,7 @@ describe('pause-reflect-steps-io parity', () => {
     expect(pauseReflectionStepLogOnceWithRepository).not.toBe(pauseInitialEmotionSkip);
     expect(shouldShowFromStepsIo).not.toBe(buildFeelTilesMoodLogOptions);
     expect(shouldLogFromStepsIo).not.toBe(pauseInitialEmotionSkip);
-    // Reciprocal inline pins: `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/feel/pause-feel-io-parity.test.ts`.
   });
 
   /**

@@ -16,7 +16,7 @@ import {
 
 /**
  * Presentation sibling parity: ambience-io vs share-io (parity with
- * `pause-reflect-ambience-mood-io-sibling-parity.test.ts`,
+ * `pause-reflect-ambience-feel-io-sibling-parity.test.ts`,
  * `pause-reflect-hub-share-io-sibling-parity.test.ts`, and application
  * `pause-reflect-ambience-share-io-sibling-parity.test.ts` under `application/.../ambience/`).
  */

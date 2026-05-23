@@ -23,7 +23,7 @@ import * as generationIo from '@/features/pause/presentation/reflect/generation/
 /**
  * Presentation sibling parity: ambience-io vs generation-io (parity with application
  * `pause-reflect-ambience-generation-flow-sibling-parity.test.ts` and
- * `pause-reflect-generation-mood-io-sibling-parity.test.ts`;
+ * `pause-reflect-generation-feel-io-sibling-parity.test.ts`;
  * complements reciprocal inline pins on `pause-reflect-ambience-io-parity.test.ts` ↔
  * `pause-reflect-generation-io-parity.test.ts`).
  */

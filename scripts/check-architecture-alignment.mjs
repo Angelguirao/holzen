@@ -91,8 +91,8 @@ mustExist(
   'pause/application/use-cases/ritual/reflect/hub/',
 );
 mustExist(
-  'src/features/pause/application/use-cases/ritual/reflect/mood',
-  'pause/application/use-cases/ritual/reflect/mood/',
+  'src/features/pause/application/use-cases/ritual/feel',
+  'pause/application/use-cases/ritual/feel/',
 );
 mustExist(
   'src/features/pause/application/use-cases/ritual/reflect/pending-offer',
@@ -115,24 +115,24 @@ mustExist(
   'pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow.ts',
 );
 mustExist(
-  'src/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow.ts',
-  'pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow.ts',
+  'src/features/pause/application/use-cases/ritual/feel/pause-initial-emotion-log-flow.ts',
+  'pause/application/use-cases/ritual/feel/pause-initial-emotion-log-flow.ts',
 );
 mustExist(
-  'src/features/pause/application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow.ts',
-  'pause/application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow.ts',
+  'src/features/pause/application/use-cases/ritual/feel/pause-feel-tiles-flow.ts',
+  'pause/application/use-cases/ritual/feel/pause-feel-tiles-flow.ts',
 );
 mustExist(
-  'src/features/pause/application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow.ts',
-  'pause/application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow.ts',
+  'src/features/pause/application/use-cases/ritual/feel/pause-depth-picker-feel-flow.ts',
+  'pause/application/use-cases/ritual/feel/pause-depth-picker-feel-flow.ts',
 );
 mustExist(
-  'src/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow.ts',
-  'pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow.ts',
+  'src/features/pause/application/use-cases/ritual/feel/pause-initial-emotion-presentation-flow.ts',
+  'pause/application/use-cases/ritual/feel/pause-initial-emotion-presentation-flow.ts',
 );
 mustExist(
-  'src/features/pause/application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow.ts',
-  'pause/application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow.ts',
+  'src/features/pause/application/use-cases/ritual/feel/pause-session-mood-chrome-flow.ts',
+  'pause/application/use-cases/ritual/feel/pause-session-mood-chrome-flow.ts',
 );
 mustExist(
   'src/features/pause/application/use-cases/ritual/reflect/hub/pause-shift-frame-hub-presentation-flow.ts',
@@ -236,8 +236,8 @@ mustExist(
   'pause/presentation/reflect/hub/',
 );
 mustExist(
-  'src/features/pause/presentation/reflect/mood',
-  'pause/presentation/reflect/mood/',
+  'src/features/pause/presentation/feel',
+  'pause/presentation/feel/',
 );
 mustExist(
   'src/features/pause/presentation/reflect/pending-offer',
@@ -271,7 +271,7 @@ mustExist('src/features/pause/domain/reflect/flows', 'pause/domain/reflect/flows
 mustExist('src/features/pause/domain/reflect/generation', 'pause/domain/reflect/generation/');
 mustExist('src/features/pause/domain/reflect/steps', 'pause/domain/reflect/steps/');
 mustExist('src/features/pause/domain/reflect/hub', 'pause/domain/reflect/hub/');
-mustExist('src/features/pause/domain/reflect/mood', 'pause/domain/reflect/mood/');
+mustExist('src/features/pause/domain/feel', 'pause/domain/feel/');
 mustExist('src/features/pause/domain/reflect/share', 'pause/domain/reflect/share/');
 mustExist('src/features/pause/domain/reflect/scaffold', 'pause/domain/reflect/scaffold/');
 mustExist('src/features/pause/infrastructure/queries/reflect', 'pause/infrastructure/queries/reflect/');
@@ -909,17 +909,17 @@ const LEGACY_PAUSE_SESSION_RITUAL_RESTORE_BRIEF_IMPORTS = [
   "from '../application/use-cases/session/pause-session-brief-flow'",
 ];
 
-/** Reflect mood umbrella flow — compose domain + leaf use case only (not mood subcluster flow anchors). */
+/** Feel ritual umbrella flow — compose domain + leaf use case only (not mood subcluster flow anchors). */
 const LEGACY_PAUSE_REFLECT_MOOD_FLOW_SUBCLUSTER_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow',
-  "from './pause-depth-picker-mood-flow'",
-  "from '../pause-depth-picker-mood-flow'",
-  "from './pause-feel-tiles-mood-flow'",
-  "from '../pause-feel-tiles-mood-flow'",
+  '@/features/pause/application/use-cases/ritual/feel/pause-depth-picker-feel-flow',
+  '@/features/pause/application/use-cases/ritual/feel/pause-feel-tiles-flow',
+  '@/features/pause/application/use-cases/ritual/feel/pause-initial-emotion-presentation-flow',
+  '@/features/pause/application/use-cases/ritual/feel/pause-initial-emotion-log-flow',
+  '@/features/pause/application/use-cases/ritual/feel/pause-session-mood-chrome-flow',
+  "from './pause-depth-picker-feel-flow'",
+  "from '../pause-depth-picker-feel-flow'",
+  "from './pause-feel-tiles-flow'",
+  "from '../pause-feel-tiles-flow'",
   "from './pause-initial-emotion-presentation-flow'",
   "from '../pause-initial-emotion-presentation-flow'",
   "from './pause-initial-emotion-log-flow'",
@@ -1614,30 +1614,30 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_GENERATION_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/generation/pause-reflect-generation-hook-flow'",
 ];
 
-/** Reflect mood I/O — import via mood subcluster flows only (not pause-reflect-mood-flow umbrella). */
+/** Feel ritual I/O — import via mood subcluster flows only (not pause-feel-flow umbrella). */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_UMBRELLA_FLOW_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow',
-  "from './application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow'",
-  "from '../application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow'",
+  '@/features/pause/application/use-cases/ritual/feel/pause-feel-flow',
+  "from './application/use-cases/ritual/feel/pause-feel-flow'",
+  "from '../application/use-cases/ritual/feel/pause-feel-flow'",
 ];
 
-/** Reflect mood I/O — import domain + leaf use cases directly (not mood subcluster flow anchors). */
+/** Feel ritual I/O — import domain + leaf use cases directly (not mood subcluster flow anchors). */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_SUBCLUSTER_FLOW_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow',
-  "from './application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow'",
-  "from '../application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow'",
-  "from './application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow'",
-  "from '../application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow'",
-  "from './application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow'",
-  "from '../application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow'",
-  "from './application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow'",
-  "from '../application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow'",
-  "from './application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow'",
-  "from '../application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow'",
+  '@/features/pause/application/use-cases/ritual/feel/pause-depth-picker-feel-flow',
+  '@/features/pause/application/use-cases/ritual/feel/pause-feel-tiles-flow',
+  '@/features/pause/application/use-cases/ritual/feel/pause-initial-emotion-presentation-flow',
+  '@/features/pause/application/use-cases/ritual/feel/pause-initial-emotion-log-flow',
+  '@/features/pause/application/use-cases/ritual/feel/pause-session-mood-chrome-flow',
+  "from './application/use-cases/ritual/feel/pause-depth-picker-feel-flow'",
+  "from '../application/use-cases/ritual/feel/pause-depth-picker-feel-flow'",
+  "from './application/use-cases/ritual/feel/pause-feel-tiles-flow'",
+  "from '../application/use-cases/ritual/feel/pause-feel-tiles-flow'",
+  "from './application/use-cases/ritual/feel/pause-initial-emotion-presentation-flow'",
+  "from '../application/use-cases/ritual/feel/pause-initial-emotion-presentation-flow'",
+  "from './application/use-cases/ritual/feel/pause-initial-emotion-log-flow'",
+  "from '../application/use-cases/ritual/feel/pause-initial-emotion-log-flow'",
+  "from './application/use-cases/ritual/feel/pause-session-mood-chrome-flow'",
+  "from '../application/use-cases/ritual/feel/pause-session-mood-chrome-flow'",
 ];
 
 /** Ritual done presentation (non-I/O) — import post-pause emotion log via pause-ritual-done-io only. */
@@ -1674,19 +1674,19 @@ const LEGACY_PAUSE_PRESENTATION_RITUAL_DONE_DOMAIN_IMPORTS = [
   "from '../domain/ritual/done/",
 ];
 
-/** Reflect mood presentation — import domain mood helpers via pause-reflect-mood-io only. */
+/** Feel ritual presentation — import domain mood helpers via pause-feel-io only. */
 const LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_DOMAIN_IMPORTS = [
-  '@/features/pause/domain/reflect/mood/',
-  '@/features/pause/application/use-cases/ritual/reflect/mood/run-initial-emotion-log',
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-log-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-feel-tiles-mood-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-depth-picker-mood-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-initial-emotion-presentation-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/mood/pause-session-mood-chrome-flow',
-  "from './domain/reflect/mood/",
-  "from '../domain/reflect/mood/",
-  "from './application/use-cases/ritual/reflect/mood/run-initial-emotion-log'",
-  "from '../application/use-cases/ritual/reflect/mood/run-initial-emotion-log'",
+  '@/features/pause/domain/feel/',
+  '@/features/pause/application/use-cases/ritual/feel/run-initial-emotion-log',
+  '@/features/pause/application/use-cases/ritual/feel/pause-initial-emotion-log-flow',
+  '@/features/pause/application/use-cases/ritual/feel/pause-feel-tiles-flow',
+  '@/features/pause/application/use-cases/ritual/feel/pause-depth-picker-feel-flow',
+  '@/features/pause/application/use-cases/ritual/feel/pause-initial-emotion-presentation-flow',
+  '@/features/pause/application/use-cases/ritual/feel/pause-session-mood-chrome-flow',
+  "from './domain/feel/",
+  "from '../domain/feel/",
+  "from './application/use-cases/ritual/feel/run-initial-emotion-log'",
+  "from '../application/use-cases/ritual/feel/run-initial-emotion-log'",
 ];
 
 /** Flat session pending-offer presentation — use presentation/reflect/pending-offer/. */
@@ -2299,11 +2299,11 @@ for (const file of walkTs(join(root, 'src'))) {
       }
     }
   }
-  if (rel === 'src/features/pause/application/use-cases/ritual/reflect/mood/pause-reflect-mood-flow.ts') {
+  if (rel === 'src/features/pause/application/use-cases/ritual/feel/pause-feel-flow.ts') {
     for (const needle of LEGACY_PAUSE_REFLECT_MOOD_FLOW_SUBCLUSTER_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: reflect mood umbrella flow must import domain + run-initial-emotion-log directly (${needle})`,
+          `${rel}: feel ritual umbrella flow must import domain + run-initial-emotion-log directly (${needle})`,
         );
       }
     }
@@ -2533,19 +2533,19 @@ for (const file of walkTs(join(root, 'src'))) {
     }
   }
   if (
-    rel.endsWith('pause-reflect-mood-io.ts') ||
-    rel.endsWith('pause-reflect-mood-io.test.ts') ||
-    rel.endsWith('pause-reflect-mood-io.re-exports.test.ts') ||
-    rel.endsWith('pause-reflect-mood-io-parity.test.ts')
+    rel.endsWith('pause-feel-io.ts') ||
+    rel.endsWith('pause-feel-io.test.ts') ||
+    rel.endsWith('pause-feel-io.re-exports.test.ts') ||
+    rel.endsWith('pause-feel-io-parity.test.ts')
   ) {
     if (
-      !rel.endsWith('pause-reflect-mood-io.re-exports.test.ts') &&
-      !rel.endsWith('pause-reflect-mood-io-parity.test.ts')
+      !rel.endsWith('pause-feel-io.re-exports.test.ts') &&
+      !rel.endsWith('pause-feel-io-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_UMBRELLA_FLOW_IMPORTS) {
         if (text.includes(needle)) {
           failures.push(
-            `${rel}: reflect mood I/O must not import mood umbrella (${needle})`,
+            `${rel}: feel ritual I/O must not import mood umbrella (${needle})`,
           );
         }
       }
@@ -2553,22 +2553,22 @@ for (const file of walkTs(join(root, 'src'))) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_IO_SUBCLUSTER_FLOW_IMPORTS) {
       if (text.includes(needle)) {
         failures.push(
-          `${rel}: reflect mood I/O must import domain mood helpers + run-initial-emotion-log directly (${needle})`,
+          `${rel}: feel ritual I/O must import domain mood helpers + run-initial-emotion-log directly (${needle})`,
         );
       }
     }
   }
-  if (rel.startsWith('src/features/pause/presentation/reflect/mood/')) {
+  if (rel.startsWith('src/features/pause/presentation/feel/')) {
     if (
-      !rel.endsWith('pause-reflect-mood-io.ts') &&
-      !rel.endsWith('pause-reflect-mood-io.test.ts') &&
-      !rel.endsWith('pause-reflect-mood-io.re-exports.test.ts') &&
-      !rel.endsWith('pause-reflect-mood-io-parity.test.ts') &&
-      !rel.endsWith('pause-reflect-mood-flow-io-wrapper-sibling-parity.test.ts')
+      !rel.endsWith('pause-feel-io.ts') &&
+      !rel.endsWith('pause-feel-io.test.ts') &&
+      !rel.endsWith('pause-feel-io.re-exports.test.ts') &&
+      !rel.endsWith('pause-feel-io-parity.test.ts') &&
+      !rel.endsWith('pause-feel-flow-io-wrapper-sibling-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_MOOD_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {
-          failures.push(`${rel}: legacy reflect mood import (${needle})`);
+          failures.push(`${rel}: legacy feel ritual import (${needle})`);
         }
       }
     }
@@ -2738,7 +2738,7 @@ for (const file of walkTs(join(root, 'src'))) {
       rel.endsWith('pause-reflect-ambience-io-parity.test.ts') ||
       rel.endsWith('pause-reflect-ambience-pending-offer-flow-sibling-parity.test.ts') ||
       rel.endsWith('pause-reflect-ambience-share-flow-sibling-parity.test.ts') ||
-      rel.endsWith('pause-reflect-ambience-mood-flow-sibling-parity.test.ts') ||
+      rel.endsWith('pause-reflect-ambience-feel-flow-sibling-parity.test.ts') ||
       rel.endsWith('pause-reflect-ambience-flow-io-wrapper-sibling-parity.test.ts');
     if (!ambienceIoAllowlisted) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_AMBIENCE_IMPORTS) {
@@ -2755,7 +2755,7 @@ for (const file of walkTs(join(root, 'src'))) {
     rel.endsWith('pause-reflect-ambience-io-parity.test.ts') ||
     rel.endsWith('pause-reflect-ambience-pending-offer-flow-sibling-parity.test.ts') ||
     rel.endsWith('pause-reflect-ambience-share-flow-sibling-parity.test.ts') ||
-    rel.endsWith('pause-reflect-ambience-mood-flow-sibling-parity.test.ts') ||
+    rel.endsWith('pause-reflect-ambience-feel-flow-sibling-parity.test.ts') ||
     rel.endsWith('pause-reflect-ambience-flow-io-wrapper-sibling-parity.test.ts')
   ) {
     if (
@@ -2763,7 +2763,7 @@ for (const file of walkTs(join(root, 'src'))) {
       !rel.endsWith('pause-reflect-ambience-io-parity.test.ts') &&
       !rel.endsWith('pause-reflect-ambience-pending-offer-flow-sibling-parity.test.ts') &&
       !rel.endsWith('pause-reflect-ambience-share-flow-sibling-parity.test.ts') &&
-      !rel.endsWith('pause-reflect-ambience-mood-flow-sibling-parity.test.ts') &&
+      !rel.endsWith('pause-reflect-ambience-feel-flow-sibling-parity.test.ts') &&
       !rel.endsWith('pause-reflect-ambience-flow-io-wrapper-sibling-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_AMBIENCE_IO_FLOW_IMPORTS) {
@@ -2983,7 +2983,7 @@ for (const file of walkTs(join(root, 'src'))) {
       !rel.endsWith('pause-reflect-flows-ambience-flow-sibling-parity.test.ts') &&
       !rel.endsWith('pause-reflect-flows-decide-flow-sibling-parity.test.ts') &&
       !rel.endsWith('pause-reflect-flows-hub-flow-sibling-parity.test.ts') &&
-      !rel.endsWith('pause-reflect-flows-mood-flow-sibling-parity.test.ts')
+      !rel.endsWith('pause-reflect-flows-feel-flow-sibling-parity.test.ts')
     ) {
       for (const needle of LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS) {
         if (text.includes(needle)) {

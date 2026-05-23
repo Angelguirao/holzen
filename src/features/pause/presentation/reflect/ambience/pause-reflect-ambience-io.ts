@@ -8,16 +8,16 @@
  * `application/.../ambience/pause-reflect-ambience-flows-io-sibling-parity.test.ts` and
  * `application/.../flows/pause-reflect-flows-ambience-io-sibling-parity.test.ts`; reciprocal inline pins in
  * `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-ambience-io-parity.test.ts`);
- * `pause-reflect-ambience-mood-io-sibling-parity.test.ts` ↔ `pause-reflect-mood-io` (application mirror:
- * `application/.../ambience/pause-reflect-ambience-mood-io-sibling-parity.test.ts`; reciprocal inline:
- * `pause-reflect-ambience-io-parity.test.ts` ↔ `pause-reflect-mood-io-parity.test.ts`);
+ * `pause-reflect-ambience-feel-io-sibling-parity.test.ts` ↔ `pause-feel-io` (application mirror:
+ * `application/.../ambience/pause-reflect-ambience-feel-io-sibling-parity.test.ts`; reciprocal inline:
+ * `pause-reflect-ambience-io-parity.test.ts` ↔ `pause-feel-io-parity.test.ts`);
  * `pause-reflect-ambience-share-io-sibling-parity.test.ts` + `share/pause-reflect-share-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io` (application mirrors:
  * `application/.../ambience/pause-reflect-ambience-share-io-sibling-parity.test.ts`,
  * `application/.../share/pause-reflect-share-ambience-io-sibling-parity.test.ts`);
  * `pause-reflect-ambience-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (presentation + application);
  * presentation parity (colocated): `pause-reflect-ambience-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`,
  * `pause-reflect-hub-io-parity.test.ts`, `pause-reflect-generation-io-parity.test.ts`,
- * `pause-reflect-mood-io-parity.test.ts`, and `pause-reflect-telemetry-io-parity.test.ts`;
+ * `pause-feel-io-parity.test.ts`, and `pause-reflect-telemetry-io-parity.test.ts`;
  * reciprocal inline pins ↔ colocated `pause-reflect-flows-io-parity.test.ts`;
  * `pause-reflect-steps-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (presentation + application);
  * application parity: `application/.../ambience/pause-reflect-ambience-io-parity.test.ts` (colocated beside ambience-flow) ↔ this module;

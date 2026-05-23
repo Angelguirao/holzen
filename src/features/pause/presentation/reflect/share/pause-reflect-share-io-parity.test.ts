@@ -56,7 +56,7 @@ import {
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import * as shareIo from './pause-reflect-share-io';
 import * as hubIo from '../hub/pause-reflect-hub-io';
-import * as moodIo from '../mood/pause-reflect-mood-io';
+import * as moodIo from '../../feel/pause-feel-io';
 import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
@@ -81,7 +81,7 @@ import {
   pauseInitialEmotionSkip,
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   pauseReflectFavoriteToggle,
   pauseReflectNoteUpdate,
@@ -288,8 +288,8 @@ describe('pause-reflect-share-io parity', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `pause-reflect-mood-io-parity.test.ts` (colocated under `presentation/reflect/mood/`).
-   * Dedicated sibling file: `pause-reflect-share-mood-io-sibling-parity.test.ts` (application + presentation).
+   * Reciprocal inline pins ↔ `pause-feel-io-parity.test.ts` (colocated under `presentation/feel/`).
+   * Dedicated sibling file: `pause-reflect-share-feel-io-sibling-parity.test.ts` (application + presentation).
    */
   it('presentation share-io, hub-io, and mood-io I/O namespaces stay separated (reciprocal inline)', () => {
     expect('pauseShiftEmotionFrameHubDone' in shareIo).toBe(false);
@@ -315,7 +315,7 @@ describe('pause-reflect-share-io parity', () => {
     expect('buildReflectionShareTweetUrl' in moodIo).toBe(false);
     expect('buildReflectionShareTelegramUrl' in moodIo).toBe(false);
     expect('buildReflectionShareWhatsAppUrl' in moodIo).toBe(false);
-    // Reciprocal inline pins: `hub/pause-reflect-hub-io-parity.test.ts`, `mood/pause-reflect-mood-io-parity.test.ts`.
+    // Reciprocal inline pins: `hub/pause-reflect-hub-io-parity.test.ts`, `mood/pause-feel-io-parity.test.ts`.
   });
 
   it('sibling cluster: mood-io exports stay distinct from share-io builders', () => {

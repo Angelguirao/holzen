@@ -21,7 +21,7 @@ import * as hubIo from '@/features/pause/presentation/reflect/hub/pause-reflect-
 /**
  * Application sibling parity: ambience-io vs hub-io (parity with presentation
  * `pause-reflect-ambience-hub-io-sibling-parity.test.ts` and
- * `pause-reflect-mood-hub-io-sibling-parity.test.ts`).
+ * `pause-feel-hub-io-sibling-parity.test.ts`).
  * Reciprocal inline pins: `pause-reflect-ambience-io-parity.test.ts` ↔
  * `pause-reflect-hub-io-parity.test.ts`.
  */

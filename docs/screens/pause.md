@@ -51,8 +51,8 @@ Presentation hooks (`src/features/pause/presentation/session/`, `presentation/re
 
 ## User-visible modes (high level)
 
-1. **Gate** — `PauseSessionGate`: profile not ready, instance fetch in flight, fetch failure, or “no shell message” vs waiting for hydration (predicates in [`waiting-for-instance-fetch.ts`](../../src/features/pause/domain/session/waiting-for-instance-fetch.ts) and [`pause-depth-picker-active.ts`](../../src/features/pause/domain/reflect/mood/pause-depth-picker-active.ts); shell bootstrap imports domain directly).
-2. **Depth picker** — user has a coalesced reflection message but `ritualEntry === 'picker'` (`PauseSessionDepthPickerStack`; predicate in [`pause-depth-picker-active.ts`](../../src/features/pause/domain/reflect/mood/pause-depth-picker-active.ts)).
+1. **Gate** — `PauseSessionGate`: profile not ready, instance fetch in flight, fetch failure, or “no shell message” vs waiting for hydration (predicates in [`waiting-for-instance-fetch.ts`](../../src/features/pause/domain/session/waiting-for-instance-fetch.ts) and [`pause-depth-picker-active.ts`](../../src/features/pause/domain/feel/pause-depth-picker-active.ts); shell bootstrap imports domain directly).
+2. **Depth picker** — user has a coalesced reflection message but `ritualEntry === 'picker'` (`PauseSessionDepthPickerStack`; predicate in [`pause-depth-picker-active.ts`](../../src/features/pause/domain/feel/pause-depth-picker-active.ts)).
 3. **Brief ritual** — four macro steps (`BriefPauseStep`); body in `PauseSessionBriefRitualBody`.
 4. **Deep ritual** — full `PauseStep` rail; body in `PauseSessionDeepRitualBody` (Feel, Breathe, Reflect, Frame, second Breathe, Choose bridge, Decide).
 5. **Done** — `phase === 'done'`; `PauseDone` with impact data after successful outcome path (see [pause-system §7.5](../systems/pause-system.md)).

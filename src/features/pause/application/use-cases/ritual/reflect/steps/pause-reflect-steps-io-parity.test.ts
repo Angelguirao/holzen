@@ -57,7 +57,7 @@ import {
   pauseInitialEmotionSkip,
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
-} from '@/features/pause/presentation/reflect/mood/pause-reflect-mood-io';
+} from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
@@ -114,8 +114,8 @@ import {
  * (default + *WithRepository delegation parity for run-* leaves + repository).
  * Ambience-io sibling: `pause-reflect-steps-ambience-io-sibling-parity.test.ts` (application + presentation);
  * reciprocal inline pins ↔ `ambience/pause-reflect-ambience-io-parity.test.ts` (application + presentation).
- * Mood-io sibling: `pause-reflect-steps-mood-io-sibling-parity.test.ts`;
- * reciprocal inline pins ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
+ * Mood-io sibling: `pause-reflect-steps-feel-io-sibling-parity.test.ts`;
+ * reciprocal inline pins ↔ `presentation/feel/pause-feel-io-parity.test.ts`.
  * Telemetry-io sibling: `pause-reflect-steps-telemetry-io-sibling-parity.test.ts`;
  * reciprocal inline pins ↔ `telemetry/pause-reflect-telemetry-io-parity.test.ts`.
  * Flows-io sibling: `pause-reflect-flows-steps-io-sibling-parity.test.ts`;
@@ -269,8 +269,8 @@ describe('pause-reflect-steps-io parity (application)', () => {
   });
 
   /**
-   * Reciprocal inline pins ↔ `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
-   * Dedicated sibling file: `pause-reflect-steps-mood-io-sibling-parity.test.ts`.
+   * Reciprocal inline pins ↔ `presentation/feel/pause-feel-io-parity.test.ts`.
+   * Dedicated sibling file: `pause-reflect-steps-feel-io-sibling-parity.test.ts`.
    */
   it('sibling cluster: mood-io exports stay distinct from steps-io wrappers', () => {
     expect(pauseReflectFavoriteToggle).not.toBe(pauseInitialEmotionSelect);
@@ -278,7 +278,7 @@ describe('pause-reflect-steps-io parity (application)', () => {
     expect(pauseReflectionStepLogOnce).not.toBe(buildFeelTilesMoodLogOptions);
     expect(pauseReflectFavoriteToggleWithRepository).not.toBe(pauseInitialEmotionSelectWithRepository);
     expect(pauseReflectionStepLogOnceWithRepository).not.toBe(pauseInitialEmotionSkipWithRepository);
-    // Reciprocal inline pins: `presentation/reflect/mood/pause-reflect-mood-io-parity.test.ts`.
+    // Reciprocal inline pins: `presentation/feel/pause-feel-io-parity.test.ts`.
   });
 
   /**

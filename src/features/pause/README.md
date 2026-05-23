@@ -14,7 +14,7 @@ features/pause/
   application/use-cases/
     session/
     ritual/
-      feel/ breathe/ reflect/ frame/ decide/ done/
+      feel/ breathe/ reflect/ frame/ decide/ done/   # feel = product Feel beat (not under reflect/)
     archive/                      # Pauses + Echoes reads (not user collections — legacy)
   ports/                          # PauseRepository, ReflectGenerator, ReflectionStepLogStorage, …
   infrastructure/                 # supabase, edge, queries/
