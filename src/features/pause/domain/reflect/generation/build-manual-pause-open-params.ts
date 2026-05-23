@@ -30,7 +30,6 @@ export function buildManualPauseOpenParams(
     assetId,
     ctx,
     severityBand,
-    onChainBand,
     silentMsg,
     userId: input.userId,
     silentMode: input.silentMode,
