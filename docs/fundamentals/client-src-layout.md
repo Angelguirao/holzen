@@ -2,7 +2,7 @@
 
 **Status:** accepted (post wave 5j, May 2026)  
 **Audience:** contributors and agents placing UI or client domain code  
-**Pairs with:** [client-server-architecture-holzen.md](client-server-architecture-holzen.md) (truth vs projection), [frontend-module-layout.md](frontend-module-layout.md) (waves, CI, monorepo north star), [holzen-application-architecture.md](holzen-application-architecture.md) (principles §7–8)
+**Pairs with:** [client-server-architecture-holzen.md](client-server-architecture-holzen.md) (truth vs projection), [client-architecture-overview.md](client-architecture-overview.md) (full `src/` rings + per-context index), [frontend-module-layout.md](frontend-module-layout.md) (waves, CI, monorepo north star), [holzen-application-architecture.md](holzen-application-architecture.md) (principles §7–8), [naming-conventions-holzen.md](naming-conventions-holzen.md) (file/export names)
 
 This doc is the **folder-level map** of active `src/`. It does **not** replace subsystem behavior docs under `docs/systems/` or the C4 **external** view in [architecture/c4-holzen.md](../architecture/c4-holzen.md).
 
@@ -41,7 +41,7 @@ flowchart TB
 | `src/screens/<route>/` | Presentation | Route UI, screen-only hooks | [screens/README.md](../../src/screens/README.md) |
 | `src/components/icons/` | Design system | Shared mood/outcome glyphs | [components/README.md](../../src/components/README.md) |
 | `src/features/<context>/` | Domain + application | Bounded context rules, use cases, ports | [features/README.md](../../src/features/README.md) |
-| `src/lib/` | Shared I/O + utilities | TanStack/query helpers, `use-feature-flag`, `use-pull-to-refresh`, `use-infinite-scroll`, `use-latest-ref`; prefer `features/*/public` for domain |
+| `src/lib/` | Shared I/O + utilities | TanStack/query helpers, `invokeEdge`, PostHog, routes; feature flags in `src/app/hooks/use-feature-flag.ts`; prefer `features/*/public` for domain |
 | `src/components/ui/` | Design system | Primitives + `use-toast`, `use-mobile` (see [components/README.md](../../src/components/README.md)) |
 | `src/app/hooks/` | Shell hooks | `use-auto-trigger`, `use-install-prompt`, `use-shell-profile`, … |
 | `src/legacy/` | Archive | Pre-strip full IA — **never import** in active code | [legacy/README.md](../../src/legacy/README.md) |
@@ -61,6 +61,8 @@ Use this checklist when opening a PR that touches `src/` (human or agent). Full 
 | 3 | **Which presentation bucket?** | Single route → `screens/…/components/`; shared primitive → `ui/`; shell → `app/` | New root `src/components/Foo.tsx` |
 | 4 | **Import direction?** | Screen → `@/features/<ctx>/public` | Feature → screen; `ui/` → feature |
 | 5 | **Shipped surface?** | Matches [active-surface.md](../ops/active-surface.md); no `@/legacy` | Tier B tables, dropped profile columns |
+| 6 | **Names match conventions?** | New files follow [naming-conventions-holzen.md](naming-conventions-holzen.md) | Route-as-package folder; new `@/lib/pause-*` shim |
+| 7 | **Spec + notes?** | Matches owner spec; ambiguous choices logged in [implementation-notes.html](../artifacts/architecture-migration/implementation-notes.html) if on migration branch | Silent deviation from [pause-client-architecture.md](../systems/pause-client-architecture.md) |
 
 **When docs drift:** update the **one owner** in [docs/README.md](../README.md) canonical table; update folder READMEs if placement rules change.
 
@@ -94,29 +96,29 @@ Traces one **shipped** vertical slice: user starts a manual pause from Home and 
 | RPC (authority) | Feature infra | `pauseCreateOrReuse` → Postgres `pause_create_or_reuse` |
 | Route change | Router | `navigate('/pause', { state: PauseSessionLocationState })` |
 
-`generateMessage` (in `use-holzen.ts`) builds context from BTC data (`features/market` query + `buildPauseContextFromMarket`, fingerprint helpers in `features/pause`), then calls **`pauseCreateOrReuse`** — it does **not** call `holzen-reflect` on Home. Non-silent manual opens clear the Home reflection stub and pass `pauseInstanceId` + context through location state.
+`useHolzenHomeContextState` / `useHolzenManualTriggerOrchestration` builds context from BTC data (`features/market` + `buildPauseContextFromMarket`, fingerprint helpers in `features/pause`), then calls **`pauseCreateOrReuse`** — it does **not** call `holzen-reflect` on Home. Non-silent manual opens clear the Home reflection stub and pass `pauseInstanceId` + context through location state.
 
 ### 2. `/pause` screen
 
 | Step | Layer | Code |
 |------|-------|------|
 | Route | App | `App.tsx` lazy-loads `PauseSessionScreen` (full-screen, no `AppLayout`) |
-| Conductor | Screen hook | `usePauseSessionScreen` composes shell, ritual, step handlers |
+| Conductor | Feature `public-hooks` | `usePauseSessionScreen` (`presentation/`) + route chrome registry in `screens/pause/components/` |
 | Subscription gate | Screen + feature | `useSubscription` / `useProGate`; blocks with `PauseEngagementBlocked` when `!canEngagePause` |
-| Hydration | Screen hooks + feature | `usePauseSessionShell`, location state, `v_pause_full` / session queries |
+| Hydration | Presentation + application | `usePauseSessionShellBootstrap`, location state (`public`), session fetch queries |
 | Ritual UI | Screen components | `PauseSessionGate` → depth picker or `PauseSessionScaffoldShell` → `PauseDecide`, etc. |
-| Step mutations | Screen hooks → feature | `pauseLogStep` / `pauseLogCompanion` via `features/pause/public-rpc` |
+| Step mutations | Presentation → `public-rpc` | `pauseLogStep` / `pauseLogCompanion` via `@/features/pause/public-rpc` |
 
-Step handlers under `screens/pause/hooks/` call **`pauseLogStep`** from `@/features/pause/public-rpc` (e.g. feel/shift, breath segments, decide outcome). Feature use cases such as **`logPauseStep`** (`application/use-cases/ritual/log-pause-step.ts`) go through **`PauseRepository`** (`ports/pause-repository.ts`, default adapter `infrastructure/supabase-pause-repository.ts`). RPC return value drives `engaged` / `completed` and PostHog `pause_engaged` / `pause_completed` inside `pause-rpc-client.ts`.
+Presentation hooks under `features/pause/presentation/` call **`pauseLogStep`** from `@/features/pause/public-rpc` (e.g. feel/shift, breath segments, decide outcome). Feature use cases such as **`logPauseStep`** (`application/use-cases/ritual/log/log-pause-step.ts`) go through **`PauseRepository`** (`ports/pause-repository.ts`, default adapter `infrastructure/supabase-pause-repository.ts`). RPC return value drives `engaged` / `completed` and PostHog `pause_engaged` / `pause_completed` inside `pause-rpc-client.ts`.
 
 ### 3. Deep ritual — AI (after instance exists)
 
 | Step | Layer | Code |
 |------|-------|------|
-| Reflect copy | Screen hook → feature | `usePauseReflectGeneration` → `generateReflectionAtReflectStep` |
+| Reflect copy | `public-hooks` → feature | `usePauseReflectGeneration` → `generateReflectionAtReflectStep` |
 | Edge | Feature infra | `invokeEdge('holzen-reflect', …)` (`x-cid` via `invoke-edge`) |
 | Persist artifacts | Feature infra | `pause_ai_artifacts` upsert (`reflection_text`, haiku, …) |
-| Companions | Screen hook → feature | `useCompanionData` → `invokeEdge('companion-orchestrate', …)` |
+| Companions | `public-hooks` → feature | `useCompanionData` → `invokeEdge('companion-orchestrate', …)` |
 | Full-view routes | Screen | `/companion/{signal,grounding,history,zoom-out}/:pauseInstanceId` |
 
 Brief ritual skips Frame/Reflect companions per [pause-system.md](../systems/pause-system.md); deep ritual runs reflect during the Reflect→Decide window and orchestrates companion slots per step.
@@ -167,7 +169,7 @@ Vitest runs `src/**/*.{test,spec}.{ts,tsx}` (jsdom, `src/test/setup.ts`). **Do n
 | Layer under test | Put the test file… |
 |------------------|-------------------|
 | `features/<ctx>/domain` or `application` | Beside the module (e.g. `gate-flags.test.ts` next to `gate-flags.ts`) |
-| `screens/<route>/hooks` or screen-only helpers | Beside the hook (e.g. `use-pause-session-go-back.test.tsx`) |
+| `features/<ctx>/presentation` or screen-only hooks | Beside the hook (e.g. `features/pause/presentation/session/use-pause-session-go-back.test.tsx`; Home: `screens/home/hooks/use-home-*.test.tsx`) |
 | `app/components` shell | Beside the component |
 | Transitional `src/lib/*` | Beside the lib file until the shim is removed |
 | **Shipped user journeys** (auth → home → pause, lapsed, settings) | `src/test/integration/flows/*.integration.test.tsx` |

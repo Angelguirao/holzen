@@ -140,12 +140,16 @@ packages/pause/src/
     companion-slots.ts
   application/
     use-cases/
+      trigger/
       session/
       ritual/
-      breathing/
-      reflect/
-      companions/
-      terminal/
+        feel/
+        breathe/
+        reflect/          # holzen-reflect beat (not a top-level package)
+        frame/            # companion-orchestrate + grounding-enrich (not @holzen/companion)
+        decide/
+        done/
+      archive/            # pause/echo list reads — not user collections (MVP)
     queries/              # archive list, journey overview — pause read models
   ports/
     PauseRepository.ts
@@ -157,11 +161,13 @@ packages/pause/src/
 
 | Ritual beat (UI) | Use-case area | Server / edge |
 |------------------|---------------|---------------|
-| Feel, Decide, Frame hub | `ritual/`, `terminal/` | `pause_log_step` |
-| Breathe (1 & 2) | `breathing/` | `breath_completed` payloads |
-| Reflect | `reflect/` | `holzen-reflect` → `pause_ai_artifacts` |
-| Frame slots (signal, history, …) | `companions/` | `companion-orchestrate`, `pause_log_companion` |
+| Feel, Decide, Done | `ritual/feel/`, `ritual/decide/`, `ritual/done/` | `pause_log_step` |
+| Breathe (1 & 2) | `ritual/breathe/` | `breath_completed` payloads |
+| Reflect | `ritual/reflect/` | `holzen-reflect` → `pause_ai_artifacts` |
+| Frame slots (signal, history, …) | `ritual/frame/` | `companion-orchestrate`, `pause_log_companion` |
 | Full-screen `/companion/*` | presentation in `apps/web/src/screens/pause/` | same instance id |
+
+**Canonical interior (active repo):** [pause-client-architecture.md](../systems/pause-client-architecture.md) §3 — this §3 table mirrors that doc for the north-star `packages/pause` tree.
 
 **Care rules:** one domain owner for step transitions; all mutations through use cases; no `supabase` in step components. Details: [holzen-application-architecture.md](holzen-application-architecture.md) §8.4.
 
@@ -206,6 +212,8 @@ packages/pause/src/
 
 ## 5. Naming conventions
 
+**Canonical detail:** [naming-conventions-holzen.md](naming-conventions-holzen.md) (screens kebab files, `public*` barrels, branch patterns, anti-patterns). This table is the quick reference.
+
 | Artifact | Convention | Example |
 |----------|--------------|---------|
 | Use case file | `kebab-case` verb phrase | `log-pause-step.ts` |
@@ -215,6 +223,7 @@ packages/pause/src/
 | Query module | `*-query.ts` in `infrastructure` or context `infrastructure/queries/` | `pause-archive-list-query.ts` |
 | Query key factory | `getPauseArchiveListQueryOptions` | matches [data-fetching-conventions](../backlog/data-fetching-conventions.md) |
 | Screen | `PascalCase` + `Screen` suffix | `HomeScreen.tsx` under `apps/web/src/screens/` |
+| Route component (new) | `kebab-case` file, `PascalCase` export | `pause-depth-picker-header.tsx` |
 | Public API | `public.ts` at package root | 5–20 exports max |
 | Package name | `@holzen/<context>` | `@holzen/pause` |
 
@@ -227,8 +236,8 @@ packages/pause/src/
 | Path | Responsibility |
 |------|----------------|
 | `app/App.tsx` | Router, `QueryClientProvider`, `AuthProvider`, lazy routes |
-| `pages/*.tsx` | `export { default } from '@holzen/home/screens/HomeScreen'` (one line) |
-| `modules/<route>/wire.ts` | Composition root: construct adapters, pass to hooks |
+| `screens/<route>/*Screen.tsx` | Route entrypoints (lazy-loaded from `App.tsx`; **`src/pages/` removed May 2026**) |
+| `modules/<route>/wire.ts` | Composition root: construct adapters, pass to hooks *(post-monorepo)* |
 | `modules/<route>/*.tsx` | Thin hooks that call use cases (or colocate in package `presentation/` later) |
 
 **Example composition root (sketch):**
@@ -283,12 +292,12 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 | Current (transitional) | Target |
 |------------------------|--------|
 | ~~`src/hooks/use-pause-*`~~ (removed) | `packages/pause` (§3 subdirs) + thin hooks in `apps/web` |
-| `src/screens/pause/hooks/use-companion-data.ts` | `packages/pause/application/use-cases/companion/` |
-| `src/screens/home/hooks/use-holzen.ts` | `packages/market` + `apps/web/screens/home` (wires pause triggers) |
+| `features/pause/presentation/use-companion-data.ts` | `features/pause/application/use-cases/ritual/frame/` (target; packages path when extracted) |
+| ~~`src/screens/home/hooks/use-holzen.ts`~~ → `features/pause/presentation/use-holzen-home-context-state.ts` (+ manual-trigger orchestration) | `packages/market` + `apps/web/screens/home` (wires pause triggers) |
 | ~~`src/hooks/use-subscription`~~ → `features/subscription/public-hooks` | `packages/subscription` |
 | ~~`src/hooks/use-auth`~~ → `@/features/auth/public` | `packages/auth` |
 | Archive library hooks | `features/pause/public-queries` + `screens/archive/hooks/` |
-| `src/lib/pause-*.ts`, `src/lib/companion-*.ts` | Thin re-exports → `features/pause/public` or `public-queries` (until legacy removed) |
+| ~~`src/lib/pause-*.ts`, `src/lib/companion-*.ts`~~ | **Removed from active tree (May 2026)** — pause domain in `features/pause/`; legacy copies under `src/legacy/full-shell/src/lib/` for full-IA recovery only |
 | `src/lib/*-query.ts` (subscription, market, user) | Re-exports → owning `features/*/public-queries` |
 | `src/lib/posthog.ts`, `sentry.ts`, `invoke-edge.ts`, `cid.ts` | `packages/infrastructure` or `shared-kernel` |
 | `src/screens/pause/components/*`, `Companion*.tsx` | `apps/web/src/screens/pause/` (5c); was `components/pause/*` |
@@ -304,7 +313,7 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 
 ## 10. Transitional layout (active — root Vite + `src/features/`)
 
-**This is the execution layout** while Lovable publish stays at the repo root. See `src/features/README.md` and `src/features/pause/`.
+**This is the execution layout** while Lovable publish stays at the repo root. See `src/features/README.md` and [pause-client-architecture.md](../systems/pause-client-architecture.md) for the reference pause module.
 
 ```text
 src/
@@ -316,22 +325,24 @@ src/
   components/ui/use-*.ts           # toast, mobile breakpoint
   app/hooks/                       # install prompt, auto-trigger, language sync
   features/
-    pause/
+    pause/                         # canonical interior: pause-client-architecture.md §3
       domain/
-      application/
-        use-cases/
-        companion/                 # ritual modules inside pause (§3)
-        reflect/
-        breathing/
+      application/use-cases/
+        trigger/ session/
+        ritual/feel|breathe|reflect|frame|decide|done/
+        archive/
       ports/
-      public.ts                    # cross-feature API (no eager Supabase)
-      public-queries.ts            # TanStack query modules (app hooks/screens)
+      infrastructure/
+      presentation/
+      public.ts public-queries.ts public-hooks.ts public-rpc.ts
     subscription/
     market/
     user/
     …
   integrations/supabase/           # until adapters move to features/*/infrastructure
 ```
+
+Other contexts follow the same **module skeleton**; group `use-cases/` by product concern from each context’s system doc ([pause-client-architecture.md](../systems/pause-client-architecture.md) §9).
 
 Same dependency rules as §2–3 for layers that exist. `npm run check:feature-imports` enforces layer rules under `src/features/**` and blocks deep `@/features/<ctx>/(application|infrastructure|domain|presentation)/` imports from active `src/lib`, `src/components`, `src/screens`, `src/app`, and `src/test` (allowed: `public`, `public-queries`, `public-rpc`, plus RPC lib shims `apply-bulk-hold-outcomes` / `pause-ritual-depth-upgrade`).
 
@@ -344,7 +355,7 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 | Wave | Scope | Exit criteria |
 |------|--------|----------------|
 | **0** | Docs + ADR (Lovable §) + `src/features/pause/` skeleton + `check:feature-imports` | `test:ci` green; root `npm run build` |
-| **1** | Migrate **pause** domain + use cases into `src/features/pause/` (small PRs) | Pause E2E green; companions under `application/use-cases/companion/` |
+| **1** | Migrate **pause** domain + use cases into `src/features/pause/` (small PRs) | **Done (Phase A, May 2026):** domain + presentation in `src/features/pause/`; reflect + frame use cases under `application/use-cases/ritual/reflect/` and `ritual/frame/` — CI forbids legacy `reflect/` + `companion/` paths ([pause-client-architecture.md](../systems/pause-client-architecture.md) §3, §10; [architecture-migration/README.md](../artifacts/architecture-migration/README.md)) |
 | **2** | `subscription`, `market`, `user`, `auth` features + shrink root `lib/` feature shims | Cross-feature: `public.ts` only; app hooks may use `public-queries.ts` where queries need Supabase |
 | **3** | Optional `src/features/*/infrastructure` adapters; keep Supabase types in `integrations/` until needed | Adapter tests |
 | **4** | `src/legacy` off main runtime path | **Done (transitional):** `tsconfig.app.json` + Vitest exclude `src/legacy/**`; `check:active-surface` blocks `@/legacy/*` in active tree; folder kept for `archive/full-ia-pre-strip` recovery only. Physical delete is optional / separate archive PR. |
@@ -355,7 +366,7 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 | **5e** | **Archive, Journey, Settings** | **Done** — `screens/{archive,journey,settings}/components/` |
 | **5f** | Companion routes | **Done** — `/companion/*` + companion UI under `screens/pause/` |
 | **5g** | Marketing / admin | **Done** — `screens/marketing/*Screen` + `components/`; `screens/admin/AdminScreen` |
-| **5h** | Orchestration | **Done (shipped surfaces)** — `use-home-*` + `HolzenProvider`/`useHolzen` → `screens/home/hooks/`; `use-pause-session-*` + ritual hooks → `screens/pause/hooks/`; `HomeScreen` / `PauseSessionScreen` |
+| **5h** | Orchestration | **Done (pause Phase A):** `use-home-*` + `HolzenProvider`/`useHolzen` → `screens/home/hooks/`; pause session/companion/reflect conductors → **`features/pause/presentation/`** (not `screens/pause/hooks/` — removed). Reflect + frame use cases under **`ritual/reflect/`** + **`ritual/frame/`** ([pause-client-architecture.md](../systems/pause-client-architecture.md) §10). |
 | **5i** | Shrink global layers | **Done (shipped)** — allowlist **37** root shell/shared components (was 59); home market widgets + onboarding + `MoodCheck` under screens; domain `MoodValue` in `features/pause` |
 | **5j** | App shell | **Done (shipped)** — `src/app/components/` (layout, nav, meta, error boundary, checkout/subscribe chrome, auth loading); allowlist **0** at `src/components/*.tsx` (was 37; only `components/ui/` remains); `check:no-screens-in-features` |
 | **5j+** | Screen hooks + route entrypoints | **Done** — all shipped routes under `screens/*/*Screen`; removed `src/pages/` shim (May 2026); `screens/ops/` for internal tools; removed `src/hooks/` (May 2026); `App.tsx` lazy-loads screens |
@@ -429,7 +440,7 @@ Root `tsconfig.json` references project refs per package, or a single base + per
 | `/` | `HomeScreen` | `pause`, `market`, `subscription`, `user` |
 | `/pause` | `PauseSessionScreen` | `pause` |
 | `/companion/*` | `Companion*Screen` | `pause` (slot presentation) |
-| `/archive` | `ArchiveScreen` | `pause` (read queries) |
+| `/archive` | `ArchiveScreen` | `pause` (read queries — Pauses/Echoes; not user collections MVP) |
 | `/journey` | `JourneyScreen` | `pause` (aggregates) |
 | `/settings/*` | `SettingsShell` | `user`, `subscription` |
 | `/welcome`, `/auth`, legal, blog | marketing/auth screens | `auth`, thin marketing |
@@ -445,7 +456,7 @@ Root `tsconfig.json` references project refs per package, or a single base + per
 - [ ] Use case added for new **user intention** (not only a hook).
 - [ ] Query keys live in **infrastructure/queries**, invoked from presentation via `useQuery`.
 - [ ] Contract schema updated if edge/RPC shape changed.
-- [ ] `pages/*.tsx` stays a **re-export** (no new logic).
+- [ ] Route entrypoints stay under `screens/<route>/*Screen.tsx` (lazy from `App.tsx`; no `src/pages/` shim).
 
 ---
 
@@ -454,6 +465,7 @@ Root `tsconfig.json` references project refs per package, or a single base + per
 | Doc | Role |
 |-----|------|
 | [holzen-application-architecture.md](holzen-application-architecture.md) | Principles, inspirations, anti-patterns |
+| [pause-client-architecture.md](../systems/pause-client-architecture.md) | **Pause client target** + context module template §9 |
 | [client-server-architecture-holzen.md](client-server-architecture-holzen.md) | Truth vs projection |
 | [react-screen-orchestration.md](react-screen-orchestration.md) | Thin screens, hook rules |
 | [refactoring-strategy.md](refactoring-strategy.md) | Small moves inside old tree until wave complete |

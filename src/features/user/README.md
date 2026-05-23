@@ -1,6 +1,6 @@
 # User feature module
 
-
+**Client target:** [docs/systems/user-client-architecture.md](../../../docs/systems/user-client-architecture.md)
 
 Profile, signals, quiet windows, settings-backed preferences.
 

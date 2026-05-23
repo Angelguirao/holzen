@@ -5,7 +5,7 @@ import {
   CHANGELOG_ENTRIES_QUERY_KEY,
   getChangelogEntriesInfiniteQueryOptions,
   prefetchChangelogEntriesFirstPage,
-} from '@/screens/marketing/lib/changelog-query';
+} from '@/features/user/public-queries';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -16,7 +16,7 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+import { useInfiniteScroll } from '@/app/hooks/use-infinite-scroll';
 
 export type ChangelogProps = {
   /** Fires when the user opens “What’s new” (before the dialog opens). */

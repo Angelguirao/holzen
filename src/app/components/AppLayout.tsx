@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router-dom';
 import { BottomNav, isPrimaryTabActive } from './BottomNav';
 import { ShellPauseChrome } from '@/app/components/ShellPauseChrome';
-import { CheckoutConfirmation } from '@/features/subscription/presentation/CheckoutConfirmation';
-import { PaywallSubscribedTracker } from '@/features/subscription/presentation/PaywallSubscribedTracker';
+import {
+  CheckoutConfirmation,
+  PaywallSubscribedTracker,
+} from '@/features/subscription/public-hooks';
 import { NotificationBell } from '@/features/notifications/public-hooks';
 import { useShellProfile } from '@/app/hooks/use-shell-profile';
 import { useAutoTrigger } from '@/app/hooks/use-auto-trigger';

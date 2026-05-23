@@ -1,6 +1,6 @@
 import { isMainPauseLibraryBookmark } from '@/features/pause/domain/normalize-library-source-type';
 
-export type ArchiveMainSegment = 'pauses' | 'echoes' | 'collections';
+export type ArchiveMainSegment = 'pauses' | 'echoes';
 
 /** Terminal rows that never reached DB `engaged` (`engaged_at` still null — early ritual gates not met). */
 const ECHO_ELIGIBLE_STATES = new Set(['expired', 'dismissed']);

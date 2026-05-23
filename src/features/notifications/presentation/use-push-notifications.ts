@@ -2,8 +2,12 @@ import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { invokeEdge } from "@/lib/invoke-edge";
 import { useAuth } from "@/features/auth/public";
+import {
+  getRegisterPushVapidKey,
+  registerPushSubscribe,
+  registerPushUnsubscribe,
+} from "../public-rpc";
 import {
   getPushSubscriptionQueryOptions,
   pushSubscriptionQueryKey,
@@ -35,10 +39,7 @@ export function usePushNotifications() {
     if (!user || !isSupported) return;
     setLoading(true);
     try {
-      const { data: keyData, error: keyError } = await invokeEdge<{ publicKey?: string }>(
-        "register-push",
-        { body: { action: "get-vapid-key" } },
-      );
+      const { data: keyData, error: keyError } = await getRegisterPushVapidKey();
       if (keyError || !keyData?.publicKey) throw new Error("Failed to get VAPID key");
 
       const reg = await navigator.serviceWorker.ready;
@@ -50,14 +51,9 @@ export function usePushNotifications() {
 
       const subJson = subscription.toJSON();
 
-      const { error } = await invokeEdge("register-push", {
-        body: {
-          action: "subscribe",
-          subscription: {
-            endpoint: subJson.endpoint,
-            keys: subJson.keys,
-          },
-        },
+      const { error } = await registerPushSubscribe({
+        endpoint: subJson.endpoint,
+        keys: subJson.keys,
       });
       if (error) throw error;
 
@@ -79,11 +75,8 @@ export function usePushNotifications() {
       if (subscription) {
         const subJson = subscription.toJSON();
 
-        const { error: unsubErr } = await invokeEdge("register-push", {
-          body: {
-            action: "unsubscribe",
-            subscription: { endpoint: subJson.endpoint },
-          },
+        const { error: unsubErr } = await registerPushUnsubscribe({
+          endpoint: subJson.endpoint,
         });
         if (unsubErr) throw unsubErr;
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { canAdvanceFromPauseStep } from '@/features/pause/public';
+import { canAdvanceFromPauseStep } from '@/features/pause/application/use-cases/session/navigation';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 
 const base = {

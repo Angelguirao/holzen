@@ -4,16 +4,12 @@ import {
   POST_CHECKOUT_SUBSCRIBE_FLAG,
   useSubscription,
 } from '@/features/subscription/public-hooks';
-import type { SubscriptionBillingInterval } from '@/features/subscription/public';
-import { trackEvent } from '@/lib/posthog';
+import {
+  paywallPlanFromBillingInterval,
+  trackPaywallSubscribed,
+} from '@/features/subscription/application/paywall-telemetry';
 
 const MAX_AGE_MS = 30 * 60 * 1000;
-
-function paywallPlanFromInterval(interval: SubscriptionBillingInterval | null): 'monthly' | 'yearly' | 'unknown' {
-  if (interval === 'month') return 'monthly';
-  if (interval === 'year') return 'yearly';
-  return 'unknown';
-}
 
 /**
  * Fires `paywall.subscribed` once after a Stripe subscription checkout return
@@ -56,11 +52,7 @@ export function PaywallSubscribedTracker() {
     } catch {
       /* ignore */
     }
-    try {
-      trackEvent('paywall.subscribed', { plan: paywallPlanFromInterval(subscriptionBillingInterval) });
-    } catch {
-      /* no-op */
-    }
+    trackPaywallSubscribed(paywallPlanFromBillingInterval(subscriptionBillingInterval));
   }, [user, loading, subscribed, subscriptionBillingInterval]);
 
   return null;

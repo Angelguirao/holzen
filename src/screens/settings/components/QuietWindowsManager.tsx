@@ -1,19 +1,18 @@
 import { useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
 import {
+  deleteQuietWindow,
   getQuietWindowsQueryOptions,
+  insertQuietWindow,
   quietWindowsQueryKey,
+  updateQuietWindow,
   type QuietWindow,
 } from '@/features/user/public-queries';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-
-type QuietWindowUpdate = Database['public']['Tables']['quiet_windows']['Update'];
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -30,8 +29,8 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
 
   const addWindow = async () => {
     if (!userId) return;
-    const { error } = await supabase.from('quiet_windows').insert({
-      user_id: userId,
+    const { error } = await insertQuietWindow({
+      userId,
       label: t('quietWindows.newLabel', { defaultValue: 'Work hours' }),
       start_hour: 9,
       end_hour: 17,
@@ -45,7 +44,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
   };
 
   const updateWindow = async (id: string, updates: Partial<QuietWindow>) => {
-    await supabase.from('quiet_windows').update(updates as QuietWindowUpdate).eq('id', id);
+    await updateQuietWindow(id, updates);
     if (!userId) return;
     queryClient.setQueryData<QuietWindow[]>(quietWindowsQueryKey(userId), (prev) => {
       if (!prev) return prev;
@@ -54,7 +53,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
   };
 
   const deleteWindow = async (id: string) => {
-    await supabase.from('quiet_windows').delete().eq('id', id);
+    await deleteQuietWindow(id);
     if (userId) {
       queryClient.setQueryData<QuietWindow[]>(quietWindowsQueryKey(userId), (prev) => {
         if (!prev) return prev;

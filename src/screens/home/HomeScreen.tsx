@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
+import { useHolzen } from '@/app/components/HolzenProvider';
 import AuthLoading from '@/app/components/AuthLoading';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { Onboarding } from '@/screens/home/components/Onboarding';
@@ -10,25 +10,27 @@ import { useHomeOptionalVisibility } from '@/screens/home/hooks/use-home-optiona
 import { HOME_WIDGET_DEFAULT_ORDER } from '@/screens/home/lib/home-section-visibility-constants';
 import { useHomeCheckoutWelcomeToast } from '@/screens/home/hooks/use-home-checkout-welcome-toast';
 import { useHomeZenMode } from '@/screens/home/hooks/use-home-zen-mode';
-import { useHomeCompletedPauseCount } from '@/screens/home/hooks/use-home-completed-pause-count';
-import { useHomeOutletPauseReady } from '@/screens/home/hooks/use-home-outlet-pause-ready';
 import { useHomeDocumentTitle } from '@/screens/home/hooks/use-home-document-title';
 import { useHomeHeroQuoteViewed } from '@/screens/home/hooks/use-home-hero-quote-viewed';
-import { useHomePauseAudio } from '@/screens/home/hooks/use-home-pause-audio';
-import { useHomeMarketDisplayPreferences } from '@/screens/home/hooks/use-home-market-display-preferences';
+import {
+  useCompletedPauseCount,
+  useDismissOutletPauseReady,
+  useHomePauseActions,
+  usePauseArrivalAudio,
+  usePauseContextHomePreviews,
+  useZenModeHomeRouteProps,
+} from '@/features/pause/public-home';
+import { useMarketDisplayPreferences } from '@/features/market/public-hooks';
 import { useState } from 'react';
 import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/features/auth/public';
 import { useHomeVisibleSections } from '@/screens/home/hooks/use-home-visible-sections';
 import { useHomeCustomizeBridge } from '@/screens/home/hooks/use-home-customize-bridge';
 import { useHomeMarketGoalHeaders } from '@/screens/home/hooks/use-home-market-goal-headers';
-import { useHomePauseActions } from '@/screens/home/hooks/use-home-pause-actions';
 import { useHomePauseCardProjection } from '@/screens/home/hooks/use-home-pause-card-projection';
 import { useHomeDashboardTodayWiring } from '@/screens/home/hooks/use-home-dashboard-today-wiring';
 import { getHomeSubscriptionGate } from '@/features/subscription/public';
-import { useHomePauseContextPreviews } from '@/screens/home/hooks/use-home-pause-context-previews';
 import { useHomePullFullReload } from '@/screens/home/hooks/use-home-pull-full-reload';
-import { useHomeZenModeRouteProps } from '@/screens/home/hooks/use-home-zen-route-props';
 import { useHomeDashboardLayoutProps } from '@/screens/home/hooks/use-home-dashboard-layout-props';
 import type { HomeAppLayoutOutletContext } from '@/screens/home/lib/home-app-layout-outlet';
 
@@ -92,9 +94,9 @@ const Home = () => {
   const outletCtx = useOutletContext<HomeAppLayoutOutletContext>();
   const pauseReady = outletCtx?.pauseReady ?? false;
   const dismissPauseReady = outletCtx?.dismissPauseReady;
-  useHomeOutletPauseReady(pauseReady, hasOpenPause, dismissPauseReady);
+  useDismissOutletPauseReady(pauseReady, hasOpenPause, dismissPauseReady);
   useHomeHeroQuoteViewed(profileLoaded, user?.id);
-  useHomePauseAudio(newPauseArrival, lastPauseInstanceId, clearNewPauseArrival);
+  usePauseArrivalAudio(newPauseArrival, lastPauseInstanceId, clearNewPauseArrival);
 
   const {
     priceHidden,
@@ -104,11 +106,11 @@ const Home = () => {
     togglePriceHidden,
     toggleBtcMode,
     toggleMarketChartExpanded,
-  } = useHomeMarketDisplayPreferences();
+  } = useMarketDisplayPreferences();
   const unitBasisModeSupported = trackedAssetId === 'bitcoin';
   const { zenMode, setZenModePersist } = useHomeZenMode(pathname);
-  const completedPauseCount = useHomeCompletedPauseCount(user);
-  const pauseContextHomePreview = useHomePauseContextPreviews(context);
+  const completedPauseCount = useCompletedPauseCount() ?? 0;
+  const pauseContextHomePreview = usePauseContextHomePreviews(context);
 
   const [goalWhyHoldSummary, setGoalWhyHoldSummary] = useState<string | null>(null);
 
@@ -216,7 +218,7 @@ const Home = () => {
     visibleOrderedSectionIds,
   );
 
-  const zenRouteProps = useHomeZenModeRouteProps({
+  const zenRouteProps = useZenModeHomeRouteProps({
     hasOpenPause,
     context,
     contextPreview: pauseContextHomePreview,

@@ -1,4 +1,4 @@
-import type { CompanionData, CompanionPrefs } from '@/features/pause/public';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import type { PauseSessionHydrationReady } from '@/features/pause/application/use-cases/session/hydration';
 import { DEFAULT_COMPANIONS, DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 

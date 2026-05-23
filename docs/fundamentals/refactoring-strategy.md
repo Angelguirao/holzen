@@ -6,6 +6,7 @@ This document is the **canonical description** of how Holzen approaches **increm
 
 It complements:
 
+- **[`docs/fundamentals/naming-conventions-holzen.md`](naming-conventions-holzen.md)** — file/export names for features, screens, `public*` barrels, and migration branches.
 - **[`docs/fundamentals/react-screen-orchestration.md`](react-screen-orchestration.md)** — **reusable playbook** for any large screen: conductor pattern, Rules of Hooks + early returns, lazy branches, memoized props, pure gates + tests (distilled from Home).
 - **[`docs/reviews/react-spa-review-template.md`](../reviews/react-spa-review-template.md)** — flow-first **review** checklist (PR + audit); use before deciding *what* to extract (includes Supabase / edge context).
 - **[`docs/backlog/react-page-and-hook-splitting.md`](../backlog/react-page-and-hook-splitting.md)** — living checklist of **slices shipped** and remaining opportunities.
@@ -18,16 +19,18 @@ It complements:
 
 ## Is the direction “correct”?
 
-**Yes, for this codebase.** The backlog explicitly rejects a **big-bang** rewrite in favor of **small, behavior-preserving extractions**. What has been shipped (Home chrome, PauseSession storage/scaffold, `use-holzen` pure helpers, `use-companion-data` + `src/lib/companion-*`) matches that contract:
+**Yes, for this codebase.** The backlog explicitly rejects a **big-bang** rewrite in favor of **small, behavior-preserving extractions**. What has been shipped (Home chrome, PauseSession storage/scaffold, **`useHolzen` producer split** into `features/pause/presentation/` + pure helpers in feature modules, `use-companion-data` in `features/pause/presentation/` with use cases under `application/use-cases/ritual/frame/`) matches that contract:
 
 | Principle | How we’re applying it |
 |-----------|------------------------|
 | **One vertical slice per change set** | Each bullet in the backlog table is an independently reviewable extraction, not a tree-wide rename. |
 | **Preserve product behavior** | Moves are structural (file boundaries), not semantic rewrites of pause / orchestrate / BTC flows. |
-| **Narrow hooks, don’t micro-fragment** | `use-holzen` and `use-companion-data` still **own orchestration and React state**; helpers are **pure or I/O-shaped** modules in `src/lib/`. |
+| **Hooks as orchestrators, feature modules as mechanics** | Custom hooks coordinate **when** things run and **what** gets set in React state; **pure logic** belongs in `features/<ctx>/domain/` or `application/use-cases/`; **route-specific UI rules** in `screens/<route>/lib/`; **`src/lib/`** only for cross-cutting platform utilities (PostHog, Sentry, `invokeEdge`, routes). **Do not** add new `@/lib/<context>-*` shims — see [architecture-migration.mdc](../../.cursor/rules/architecture-migration.mdc). |
 | **Colocate UI by route** | Pause/Home pieces live under `src/screens/<route>/components/`, not root `src/components/<feature>/` or a generic `widgets/` dump. |
 
 That is **appropriate** for a shipping product with a small surface area of “god” modules: you get **reviewability and test hooks** without destabilizing the app.
+
+**Default migration priority:** **pause** (`features/pause`, `screens/pause`, companion routes) until that area is clean at the current slice tier — layout target: [systems/pause-client-architecture.md](../systems/pause-client-architecture.md). Other contexts follow the same module skeleton (§9 of that doc). Agent workflow: [.cursor/rules/architecture-migration.mdc](../../.cursor/rules/architecture-migration.mdc).
 
 ---
 
@@ -39,29 +42,32 @@ That is **appropriate** for a shipping product with a small surface area of “g
 
 **Why:** Lowest risk—no change to data flow if props stay the same. Improves scanability of `HomeScreen.tsx` / `PauseSessionScreen.tsx`. Placement rules: [client-src-layout.md](client-src-layout.md).
 
-### 2. **Extract pure logic to `src/lib/` (not new hooks by default)**
+### 2. **Extract pure logic to the owning feature (not new `src/lib/<context>-*` shims)**
 
-**What:** Functions with clear inputs/outputs (cooldown math, severity from BTC %, persistence error copy, quarter-hour timing, orchestrate slot application) live in small modules; the hook **imports** them.
+**What:** Functions with clear inputs/outputs (cooldown math, severity from BTC %, persistence error copy, quarter-hour timing, orchestrate slot application) live in **`features/<ctx>/domain/`** or **`application/use-cases/`** (or **`screens/<route>/lib/`** for route-only UI rules); the hook **imports** them.
 
 **Why:**
 
 - Pure helpers are **easy to unit test** without mounting React.
 - Avoids an explosion of tiny hooks that each need mock providers.
-- Keeps **one place** that owns subscription to profile/BTC/reflection lifecycle (`use-holzen`) while still shrinking the file.
+- Keeps **one place** that owns subscription to profile/BTC/reflection lifecycle (`useHolzenHomeContextState` via **`HolzenProvider`**) while still shrinking conductor files.
+- Matches the migration north star: **no new** `@/lib/pause-*` / `@/lib/companion-*` — peel existing shims toward `features/pause/public*`.
 
-This aligns with **navigating-the-codebase §6.1**: not every concern needs `useQuery`; orchestration-heavy hooks may stay `useEffect`-driven while libs hold the testable core.
+**Legacy note:** Historical extractions landed in `src/lib/`; new work should **not** extend that pattern. Cross-cutting only: observability, Query client ref, feature flags, generic hooks in `src/lib/` or `src/app/hooks/`.
+
+This aligns with **navigating-the-codebase §6.1**: not every concern needs `useQuery`; orchestration-heavy hooks may stay `useEffect`-driven while domain/use-case modules hold the testable core.
 
 ### 3. **Extract “glue” that crosses HTTP/storage boundaries**
 
-**What:** e.g. `pause-session-storage.ts`, `companion-orchestrate-slot-apply.ts`, reflection companion cache parsing.
+**What:** e.g. `features/pause/infrastructure/session/persisted-session-storage.ts`, `features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply.ts`, reflection companion cache parsing.
 
 **Why:** Isolates **side effects and serialization** from UI and from the main hook loop, so bugs are easier to localize (storage vs orchestrate vs render).
 
-### 4. **Defer “split `use-holzen` into three hooks” until the API is painful**
+### 4. **Further `useHolzen` hook splits only when the API is painful**
 
-**What:** The backlog **does not** require splitting `useHolzen()` into `useBtc`, `useReflection`, etc. immediately.
+**What:** The **`useHolzen` producer split shipped (2026-04):** `use-holzen-home-context-state.ts`, `use-holzen-manual-trigger-orchestration.ts`, and `use-manual-pause-trigger.ts` under `features/pause/presentation/`, exported as **`useHolzen()`** from **`HolzenProvider`**. The backlog **does not** require splitting into `useBtc`, `useReflection`, etc. immediately.
 
-**Why:** Child hooks that share lots of **tightly coupled state** often trade one large file for **prop drilling or context churn**. Clear **lib** boundaries give most of the benefit first; a future hook split can follow **real** caller needs (e.g. two routes needing only BTC).
+**Why:** Child hooks that share lots of **tightly coupled state** often trade one large file for **prop drilling or context churn**. Clear **domain/use-case** boundaries give most of the benefit first; a future hook split can follow **real** caller needs (e.g. two routes needing only BTC).
 
 ---
 
@@ -71,20 +77,20 @@ This aligns with **navigating-the-codebase §6.1**: not every concern needs `use
 |----------|--------|
 | **Incremental PRs** | Favored — one slice per PR when possible. |
 | **Behavior parity** | Required — refactors should not change user-visible flows without an explicit product ticket. |
-| **Typed module boundaries** | Favored — `src/lib/*.ts` with explicit exports; avoid `any` in new surfaces. |
-| **Colocation** | Favored — feature components near feature; pause vs home vs library stay distinct. |
-| **Testability** | Pure `src/lib` first; component tests where ROI is high. |
+| **Typed module boundaries** | Favored — `features/<ctx>/domain/` and `application/use-cases/` with explicit exports; avoid `any` in new surfaces. |
+| **Colocation** | Favored — feature components near route; pause vs home vs archive stay distinct under `screens/`. |
+| **Testability** | Pure domain/use-case modules first; component tests where ROI is high. |
 | **ESLint / AGENTS** | Don’t widen debt in touched files; fix or narrow scope if a file is opened. |
 
 ---
 
 ## Architectural decisions (structural preferences)
 
-1. **Hooks as orchestrators, `lib` as mechanics**  
-   Custom hooks coordinate **when** things run and **what** gets set in React state; `src/lib` holds **how** to compute or format, and **adapters** to Supabase/orchestrate.
+1. **Hooks as orchestrators, feature modules as mechanics**  
+   Custom hooks coordinate **when** things run and **what** gets set in React state; **`features/<ctx>/`** holds domain + use cases; **`screens/<route>/lib/`** holds route UI rules; **`src/lib/`** holds cross-cutting platform utilities only (not new bounded-context shims).
 
 2. **Feature folders over generic layers**  
-   Prefer `components/home/`, `components/pause/`, `lib/companion-*` over a flat `components/shared` for everything.
+   Prefer `screens/<route>/components/`, `features/pause/application/use-cases/`, and **`public*`** barrels over a flat `components/shared` or growing `@/lib/<context>-*`.
 
 3. **Route-level code splitting is orthogonal**  
    [`route-level-code-splitting.md`](../backlog/route-level-code-splitting.md) controls **when** chunks load (`React.lazy`). This strategy controls **how fat** each chunk is inside a route—both can apply together.
@@ -108,7 +114,7 @@ This document is **comprehensive for structural client refactors**: extraction o
 
 | Concern | Where to look |
 |---------|----------------|
-| **Design system / IA** | [DESIGN.md](../../DESIGN.md), [design/nox/README.md](../design/nox/README.md), [design/information-architecture.md](../design/information-architecture.md) |
+| **Design system / IA** | [DESIGN.md](../../DESIGN.md), [design/nox/README.md](../design/nox/README.md), [ops/active-surface.md](../ops/active-surface.md) (shipped routes), [design/information-architecture.md](../design/information-architecture.md) (full-IA reference) |
 | **Accessibility** | Acceptance criteria on changed UI; systemic passes (e.g. [backlog/lighthouse-a11y-home.md](../backlog/lighthouse-a11y-home.md)) |
 | **i18n** | Match existing `useTranslation` / key patterns in the same feature |
 | **Analytics & flags** | [ops/event-taxonomy.md](../ops/event-taxonomy.md), [ops/feature-flags.md](../ops/feature-flags.md) when moving or renaming instrumented UI |

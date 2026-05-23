@@ -74,13 +74,12 @@ const DEEP_FEATURE_IMPORT =
   /from\s+['"]@\/features\/[^'"]+\/(application|infrastructure|domain|presentation)\//;
 
 const ALLOWED_DEEP_IMPORT_FILES = new Set([
-  'src/features/pause/application/use-cases/apply-bulk-hold-outcomes.test.ts',
+  'src/features/pause/application/use-cases/ritual/decide/apply-bulk-hold-outcomes.test.ts',
   'src/features/subscription/presentation/CheckoutConfirmation.close-reopen.test.tsx',
   'src/features/subscription/presentation/CheckoutConfirmation.cross-tab.test.tsx',
   'src/features/subscription/presentation/CheckoutConfirmation.guard.test.tsx',
   'src/features/subscription/presentation/CheckoutConfirmation.refresh-state.test.tsx',
   'src/test/subscription-checkout-no-refetch-on-back-nav.test.tsx',
-  'src/app/components/AppLayout.tsx',
 ]);
 
 /** Migrated pause/companion domain — active app must use feature public APIs, not lib shims. */

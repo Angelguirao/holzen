@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
-import { PRICING } from "./src/lib/pricing";
+import { PRICING } from "./src/features/subscription/domain/pricing";
 
 // Defaults when `VITE_SUPABASE_*` are unset: local `npm run dev`, and `vite build` without env
 // (e.g. Lovable preview). Override with `.env` / CI / Lovable Cloud vars for another project.
@@ -50,7 +50,7 @@ function resolveSiteOrigin(env: Record<string, string>): string {
   return FALLBACK_SITE_ORIGIN;
 }
 
-/** Replaces `index.html` SEO placeholders; keeps `src/lib/pricing.ts` as price source of truth. */
+/** Replaces `index.html` SEO placeholders; keeps subscription domain `PRICING` as source of truth. */
 function injectIndexHtmlSeo(html: string, siteOrigin: string): string {
   const ogImageUrl = `${siteOrigin}/og-image.png`;
   const offer = {

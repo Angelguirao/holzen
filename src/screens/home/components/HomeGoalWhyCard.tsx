@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { HoldGoalWidget } from '@/screens/home/components/HoldGoalWidget';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
+import { useHolzen } from '@/app/components/HolzenProvider';
 import { useAuth } from '@/features/auth/public';
 import { getProfileRowQueryOptions } from '@/features/user/public-queries';
 import {

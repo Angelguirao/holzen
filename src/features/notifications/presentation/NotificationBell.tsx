@@ -15,7 +15,7 @@ import { useAuth } from '@/features/auth/public';
 import { formatDistanceToNow } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { NotificationNavigateState } from '@/features/pause/public';
+import type { NotificationNavigateState } from '@/features/pause/public-navigation';
 
 const SWIPE_THRESHOLD = 80;
 

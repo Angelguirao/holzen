@@ -1,0 +1,112 @@
+/**
+ * Reflect+decide flows presentation I/O (preflight, decide outcome RPC, outcome toasts).
+ * Imports reflect/decide helpers from domain + ritual/decide leaf modules (score impacts
+ * from `score-impacts` / `score-impact-presentation`; parity with `pause-feel-io`).
+ * `PauseImpactData` via `pause-session-decide-io` (session decide beat).
+ * Parity pins: `pause-reflect-flows-io.test.ts` (outcome wrapper distinctness + RPC delegation; ambience-io + pending-offer-io reciprocal inline pins),
+ * `pause-reflect-flows-io-parity.test.ts` (colocated in this folder; application mirror
+ * `application/.../flows/pause-reflect-flows-io-parity.test.ts` beside `pause-reflect-flows-flow`),
+ * `pause-reflect-flows-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow` (colocated wrapper parity;
+ * application mirror beside `pause-reflect-flows-flow.ts`),
+ * `pause-reflect-flows-io-flow-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow`,
+ * `pause-reflect-flows-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow` (application + presentation),
+ * `pause-reflect-flows-decide-io-sibling-parity.test.ts` ↔ `pause-session-decide-io` (application
+ * `pause-reflect-flows-decide-flow-sibling-parity.test.ts` ↔ `pause-session-decide-flow`),
+ * `pause-reflect-flows-steps-io-sibling-parity.test.ts` ↔ `pause-reflect-steps-io` (application
+ * `pause-reflect-flows-steps-io-sibling-parity.test.ts` under `application/.../flows/`; steps-colocated
+ * `pause-reflect-steps-flows-io-sibling-parity.test.ts` application + presentation; reciprocal inline pins in
+ * `pause-reflect-flows-io.test.ts` ↔ `pause-reflect-steps-io.test.ts`; `pause-reflect-flows-io-parity.test.ts`
+ * ↔ `application/.../steps/pause-reflect-steps-io-parity.test.ts`),
+ * `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` ↔ `pause-reflect-telemetry-io` (application
+ * `pause-reflect-flows-telemetry-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
+ * `pause-reflect-flows-io-parity.test.ts` ↔ `presentation/reflect/telemetry/pause-reflect-telemetry-io-parity.test.ts`),
+ * `pause-reflect-flows-ambience-io-sibling-parity.test.ts` ↔ `pause-reflect-ambience-io` (application
+ * `pause-reflect-flows-ambience-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
+ * `pause-reflect-flows-io-parity.test.ts` ↔ `presentation/reflect/ambience/pause-reflect-ambience-io-parity.test.ts`),
+ * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` ↔ `pause-reflect-pending-offer-io` (application
+ * `pause-reflect-flows-pending-offer-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
+ * `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-pending-offer-io-parity.test.ts`),
+ * `pause-reflect-flows-hub-io-sibling-parity.test.ts` ↔ `pause-reflect-hub-io` (application
+ * `pause-reflect-flows-hub-io-sibling-parity.test.ts` under `application/.../flows/`),
+ * `pause-reflect-flows-share-io-sibling-parity.test.ts` ↔ `pause-reflect-share-io` (application
+ * `pause-reflect-flows-share-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
+ * `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-share-io-parity.test.ts` and `pause-reflect-share-io.test.ts`),
+ * `pause-reflect-flows-generation-io-sibling-parity.test.ts` ↔ `pause-reflect-generation-io` (application
+ * `pause-reflect-flows-generation-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
+ * `pause-reflect-flows-io-parity.test.ts` ↔ `pause-reflect-generation-io-parity.test.ts`), and
+ * `pause-reflect-flows-feel-io-sibling-parity.test.ts` ↔ `pause-feel-io` (application
+ * `pause-reflect-flows-feel-io-sibling-parity.test.ts` under `application/.../flows/`; reciprocal inline pins in
+ * `pause-reflect-flows-io-parity.test.ts` ↔ `presentation/feel/pause-feel-io-parity.test.ts`),
+ * `pause-session-step-handlers-flows-io-sibling-parity.test.ts` ↔ `pause-session-step-handlers-io` (cross-surface;
+ * application mirror: `pause-session-step-handlers-flows-io-sibling-parity.test.ts` under `application/.../session/`),
+ * `pause-reflect-flows-flow-io-wrapper-sibling-parity.test.ts` ↔ `pause-reflect-flows-flow` (application + presentation;
+ * colocated beside this module).
+ */
+import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
+import {
+  buildPauseScoreImpacts,
+  parseScoreImpactVolatilityPct,
+  type PauseScoreImpactRow,
+} from '@/features/pause/application/use-cases/ritual/decide/score-impacts';
+import {
+  resolveScoreImpactDisplayImpacts,
+  resolveScoreImpactViewMode,
+  scoreImpactMotionDelaySec,
+  type ScoreImpactVariant,
+  type ScoreImpactViewMode,
+} from '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation';
+import {
+  formatReinforcementQuoteFromSession,
+  resolvePauseDecideOutcomeFlow,
+} from '@/features/pause/domain/decide/pause-decide-outcome-flow';
+import {
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+  type PauseSessionReflectAndDecideViewInput,
+} from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow';
+import { runPauseOutcomeLog } from '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log';
+import {
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
+} from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
+import { getSessionQuote } from '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
+import { supabasePauseRepository } from '@/features/pause/public-rpc';
+
+/** Default `PauseRepository` for reflect+decide presentation hooks. */
+export const reflectPauseRepository = supabasePauseRepository;
+
+export {
+  buildPauseScoreImpacts,
+  formatReinforcementQuoteFromSession,
+  getSessionQuote,
+  parseScoreImpactVolatilityPct,
+  resolvePauseDecideOutcomeFlow,
+  resolvePauseSessionReflectAndDecideAfterGeneration,
+  resolvePauseSessionReflectAndDecidePreflight,
+  resolveScoreImpactDisplayImpacts,
+  resolveScoreImpactViewMode,
+  scoreImpactMotionDelaySec,
+  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeSaveFailedToast,
+  type PauseImpactData,
+  type PauseScoreImpactRow,
+  type PauseSessionReflectAndDecideViewInput,
+  type ScoreImpactVariant,
+  type ScoreImpactViewMode,
+};
+
+/** Default port + use case: decide step `outcome_logged` RPC. */
+export function pauseReflectOutcomeLog(
+  input: { pauseInstanceId: string | null; decision: string },
+): ReturnType<typeof runPauseOutcomeLog> {
+  return runPauseOutcomeLog(reflectPauseRepository, input);
+}
+
+/** Test seam: inject a custom `PauseRepository`. */
+export function pauseReflectOutcomeLogWithRepository(
+  repository: PauseRepository,
+  input: { pauseInstanceId: string | null; decision: string },
+): ReturnType<typeof runPauseOutcomeLog> {
+  return runPauseOutcomeLog(repository, input);
+}

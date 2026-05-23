@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
-import { getLandingTestimonialsQueryOptions } from '@/screens/marketing/lib/landing-testimonials-query';
+import { getLandingTestimonialsQueryOptions } from '@/features/user/public-queries';
 
 export function LandingTestimonials() {
   const { t } = useTranslation();

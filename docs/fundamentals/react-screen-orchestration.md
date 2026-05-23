@@ -45,14 +45,14 @@ Very large page files tend to:
 - **Good:** `Home.tsx` mostly says *which* hooks run and *which* child components receive *which* props.  
 - **Bad:** hundreds of lines of `if` / `switch` / inline calculations inside one return.
 
-If the file feels like a “kitchen sink,” **extract**: move chunks into **`useHomeSomething`** hooks or **`src/lib/something.ts`** helpers.
+If the file feels like a “kitchen sink,” **extract**: move chunks into **`useHomeSomething`** hooks, **`features/<ctx>/application/use-cases/`**, **`features/<ctx>/domain/`**, or **`screens/<route>/lib/`** for route-only UI rules. Reserve **`src/lib/`** for cross-cutting platform utilities (not new `@/lib/<context>-*` shims — see [architecture-migration.mdc](../../.cursor/rules/architecture-migration.mdc)).
 
 ### 2. Give behavior a name
 
 When logic has a **name** (`useHomePauseActions`, `getHomeSubscriptionGate`), you can:
 
 - **find** it later;
-- **test** it (especially pure functions in `src/lib/` with Vitest);
+- **test** it (especially pure functions in **`features/<ctx>/domain/`** or **`application/use-cases/`** with Vitest, or **`screens/<route>/lib/`** for UI rules);
 - **reuse** it from another screen if it fits.
 
 Anonymous logic buried in JSX is hard to test and easy to duplicate.
@@ -136,8 +136,8 @@ Holzen **`Home`** keeps many hooks **above** `if (!profileLoaded)` so order neve
 | The same `useMemo` deps repeated for related UI | One hook returning **one bundle** (e.g. `useHomeDashboardTodayWiring`) | “One place updates when those inputs change.” |
 | A big subtree re-renders when **unrelated** parent state changes | **`React.memo`** on the subtree + **stable props** | “Child ignores parent noise when its inputs did not change.” |
 | A **rare** mode (Zen, admin modal) | **`lazy` + `Suspense`** | “Don’t load that code until we might need it.” |
-| Rules from API / subscription booleans | **Pure `src/lib/` helpers + tests** | “Spreadsheet-style logic: same inputs → same outputs; easy to test.” |
-| `useOutletContext` shapes | **Shared TypeScript type** in `src/lib/` or `src/types/` | “One type definition, many readers.” |
+| Rules from API / subscription booleans | **Pure helpers in owning feature `domain/` or `screens/<route>/lib/` + tests** | “Spreadsheet-style logic: same inputs → same outputs; easy to test.” |
+| `useOutletContext` shapes | **Shared TypeScript type** in `features/<ctx>/domain/` or route `lib/` | “One type definition, many readers.” |
 | New PostHog events | **Update** [event taxonomy](../ops/event-taxonomy.md) | “Analytics is part of the contract.” |
 
 ---
@@ -146,7 +146,7 @@ Holzen **`Home`** keeps many hooks **above** `if (!profileLoaded)` so order neve
 
 1. **Name the modes** (loading, logged-out, empty, main, error).  
 2. **All hooks above any `return`** that depends on mode — or use a **child** for the signed-in tree.  
-3. **Move stable rules** to `src/lib/` + tests when they stop changing every week.  
+3. **Move stable rules** to **`features/<ctx>/domain/`** or **`screens/<route>/lib/`** + tests when they stop changing every week.  
 4. **Group related hooks** with clear names (`useSettingsForm`, `usePauseSession…`).  
 5. **One layout component per major visual** (dashboard vs compact), with **typed props** exported.  
 6. **Write `docs/screens/<name>.md`** with modes, main hooks, and odd tradeoffs.
@@ -172,12 +172,12 @@ Open [`src/screens/home/HomeScreen.tsx`](../../src/screens/home/HomeScreen.tsx) 
 
 ```1:37:src/screens/home/HomeScreen.tsx
 import { useTranslation } from 'react-i18next';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
+import { useHolzen } from '@/app/components/HolzenProvider';
 // ... many use-home-* hooks and layout components ...
 import type { HomeAppLayoutOutletContext } from '@/screens/home/lib/home-app-layout-outlet';
 ```
 
-**What to notice:** almost everything is **imported** from hooks, components, or `src/lib/`. The page file is not where the heavy logic lives — it **orchestrates** named modules.
+**What to notice:** almost everything is **imported** from hooks, screen-local components, `@/features/<ctx>/public*`, or shared `src/lib/` utilities. The page file is not where the heavy logic lives — it **orchestrates** named modules.
 
 ---
 
@@ -253,16 +253,16 @@ const Home = () => {
 
 ### Step 4 — Layout outlet + “always on” home behaviors
 
-```85:90:src/screens/home/HomeScreen.tsx
+```94:99:src/screens/home/HomeScreen.tsx
   const outletCtx = useOutletContext<HomeAppLayoutOutletContext>();
   const pauseReady = outletCtx?.pauseReady ?? false;
   const dismissPauseReady = outletCtx?.dismissPauseReady;
-  useHomeOutletPauseReady(pauseReady, message, loading, refreshProfile, dismissPauseReady);
+  useDismissOutletPauseReady(pauseReady, hasOpenPause, dismissPauseReady);
   useHomeHeroQuoteViewed(profileLoaded, user?.id);
-  useHomePauseAudio(newPauseArrival, message, clearNewPauseArrival);
+  usePauseArrivalAudio(newPauseArrival, lastPauseInstanceId, clearNewPauseArrival);
 ```
 
-**What to notice:** **`useOutletContext`** reads data from a **parent route layout** ([`AppLayout`](../../src/app/components/AppLayout.tsx)). The typed shape lives in [`src/lib/home-app-layout-outlet.ts`](../../src/lib/home-app-layout-outlet.ts). The following lines are small **effect-style** hooks (analytics, audio).
+**What to notice:** **`useOutletContext`** reads data from a **parent route layout** ([`AppLayout`](../../src/app/components/AppLayout.tsx)). The typed shape lives in [`src/screens/home/lib/home-app-layout-outlet.ts`](../../src/screens/home/lib/home-app-layout-outlet.ts). `useDismissOutletPauseReady` is exported from `@/features/pause/public-hooks`. The following lines are small **effect-style** hooks (analytics, audio).
 
 ---
 
@@ -282,10 +282,10 @@ const Home = () => {
   } = useHomeMarketDisplayPreferences();
   const unitBasisModeSupported = trackedAssetId === 'bitcoin';
   const { zenMode, setZenModePersist } = useHomeZenMode(pathname);
-  const completedPauseCount = useHomeCompletedPauseCount(user);
+  const completedPauseCount = useCompletedPauseCount() ?? 0;
 ```
 
-**What to notice:** each line group is **one concern**. `unitBasisModeSupported` is a **simple derived boolean** from `trackedAssetId` (no hook needed). `pathname` only exists to drive Zen mode persistence tied to the route. Reflection copy for the pause widget comes from **`useHolzen`** (`message`) and **`pause_ai_artifacts`** after **Reflect** — there is no Home “pinned preview” inset anymore.
+**What to notice:** each line group is **one concern**. `unitBasisModeSupported` is a **simple derived boolean** from `trackedAssetId` (no hook needed). `pathname` only exists to drive Zen mode persistence tied to the route. `useCompletedPauseCount` (pause `public-hooks`) shares the TanStack cache with other surfaces; Home coerces `null` to `0` for testimonial gating. Reflection copy for the pause widget comes from **`useHolzen`** and **`pause_ai_artifacts`** after **Reflect** — there is no Home “pinned preview” inset anymore.
 
 ---
 

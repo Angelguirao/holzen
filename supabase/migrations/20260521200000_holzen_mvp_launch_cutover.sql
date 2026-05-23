@@ -5,11 +5,23 @@ BEGIN;
 
 -- ---------------------------------------------------------------------------
 -- A. Non-pause notification triggers + functions
+-- (Guard tables: 20260518191412 may have already dropped Tier B tables on replay.)
 -- ---------------------------------------------------------------------------
-DROP TRIGGER IF EXISTS trg_notifications_user_badges ON public.user_badges;
-DROP TRIGGER IF EXISTS trg_notifications_night_reflections ON public.night_reflections;
-DROP TRIGGER IF EXISTS trg_notifications_future_letters ON public.future_letters;
-DROP TRIGGER IF EXISTS trg_notifications_reflection_insights ON public.reflection_insights;
+DO $$
+BEGIN
+  IF to_regclass('public.user_badges') IS NOT NULL THEN
+    EXECUTE 'DROP TRIGGER IF EXISTS trg_notifications_user_badges ON public.user_badges';
+  END IF;
+  IF to_regclass('public.night_reflections') IS NOT NULL THEN
+    EXECUTE 'DROP TRIGGER IF EXISTS trg_notifications_night_reflections ON public.night_reflections';
+  END IF;
+  IF to_regclass('public.future_letters') IS NOT NULL THEN
+    EXECUTE 'DROP TRIGGER IF EXISTS trg_notifications_future_letters ON public.future_letters';
+  END IF;
+  IF to_regclass('public.reflection_insights') IS NOT NULL THEN
+    EXECUTE 'DROP TRIGGER IF EXISTS trg_notifications_reflection_insights ON public.reflection_insights';
+  END IF;
+END $$;
 
 DROP FUNCTION IF EXISTS public.notifications_from_user_badges();
 DROP FUNCTION IF EXISTS public.notifications_from_night_reflections();

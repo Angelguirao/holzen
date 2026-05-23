@@ -3,14 +3,12 @@ import { WifiOff, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { processQueue } from '@/lib/offline-queue';
 import { pingSupabaseReachability } from '@/lib/supabase-reachability';
-import { invokeEdge } from '@/lib/invoke-edge';
+import { sendFeedback } from '@/features/user/public-rpc';
 import { toast } from 'sonner';
 
 async function handleQueuedAction(action: { type: string; payload: Record<string, unknown> }): Promise<boolean> {
   if (action.type === 'feedback') {
-    const { error } = await invokeEdge('send-feedback', {
-      body: action.payload,
-    });
+    const { error } = await sendFeedback(action.payload);
     return !error;
   }
   return false;

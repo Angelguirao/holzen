@@ -2,7 +2,7 @@
 
 Holzen keeps **root Vite** (`vite.config.ts`, `src/`, Lovable publish) while adopting bounded-context structure under `src/features/<context>/`.
 
-**Canonical rules:** [docs/fundamentals/frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) (§0 Lovable, §10 transitional), [docs/fundamentals/holzen-application-architecture.md](../../docs/fundamentals/holzen-application-architecture.md).
+**Canonical rules:** [docs/fundamentals/frontend-module-layout.md](../../docs/fundamentals/frontend-module-layout.md) (§0 Lovable, §10 transitional), [docs/fundamentals/client-architecture-overview.md](../../docs/fundamentals/client-architecture-overview.md), [docs/fundamentals/holzen-application-architecture.md](../../docs/fundamentals/holzen-application-architecture.md), [docs/systems/pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) (pause reference module), [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md).
 
 ## Layout per context
 
@@ -21,11 +21,11 @@ features/<context>/
 
 ## New code
 
-- Put **pause ritual** logic in `features/pause/` (`application/use-cases/` — companions, reflect, breathing inside pause, not a separate feature).
+- Put **pause ritual** logic in `features/pause/` — interior target: [pause-client-architecture.md](../../docs/systems/pause-client-architecture.md) (`ritual/reflect/`, `ritual/frame/`; companions inside pause, not a separate feature).
 - Put **subscription**, **market**, **user**, **notifications**, **auth** in their own `features/<name>/` as you migrate.
 - **user** and **subscription** use `public-queries.ts` for profile/snapshot TanStack modules; `public.ts` stays Supabase-free.
 - **auth** — `AuthProvider` / `useAuth` exported from `features/auth/public.ts` (implementation in `presentation/`).
-- Do **not** add feature-specific root `src/hooks/` (use `features/<context>/presentation` or `screens/<route>/hooks`). Cross-cutting hooks only: `src/hooks/use-feature-flag`, `use-pull-to-refresh`, etc.
+- Do **not** add feature-specific root `src/hooks/` (removed May 2026 — use `features/<context>/presentation` or `screens/<route>/hooks`). Cross-cutting hooks: `src/app/hooks/` (e.g. `use-feature-flag`) and `src/lib/` utilities.
 - Do **not** add new `src/lib/<feature>-*` modules for bounded contexts — use `features/` or `screens/<route>/lib/`.
 - Import domain hooks from `@/features/<ctx>/public-hooks` (not `presentation/` paths from `components/`).
 

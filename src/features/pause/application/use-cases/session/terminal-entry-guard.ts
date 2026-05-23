@@ -2,7 +2,7 @@ import type { PauseState } from '@/features/pause/domain/pause-state';
 import {
   hasPersistedPauseSessionPayload,
   type PersistedSessionAnchor,
-} from '@/features/pause/application/use-cases/session/persisted-session-guards';
+} from '@/features/pause/domain/session/persisted-session-guards';
 
 /** DB rows in a terminal lifecycle state (not `active`, `engaged`, or `pending`). */
 export const TERMINAL_PAUSE_DB_STATES = new Set<PauseState>(['completed', 'dismissed', 'expired']);

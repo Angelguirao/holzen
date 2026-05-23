@@ -1,6 +1,9 @@
 import type { PostgrestError, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { invokeEdge } from '@/lib/invoke-edge';
+import {
+  invokeRecordReferral,
+  sendWelcomeTransactionalEmail,
+} from './edge/auth-signed-in-edge';
 import { holzenLog } from '@/lib/holzen-console';
 
 interface UntypedInsertClient {
@@ -24,13 +27,11 @@ export async function runWelcomeEmailOnSignedIn(user: User): Promise<void> {
     (user.user_metadata?.first_name as string | undefined) ??
     (user.user_metadata?.full_name as string | undefined)?.split(' ')[0] ??
     null;
-  const { error: weErr } = await invokeEdge('send-transactional-email', {
-    body: {
-      templateName: 'welcome',
-      recipientEmail: email,
-      idempotencyKey: `welcome-${user.id}`,
-      templateData: firstName ? { firstName } : {},
-    },
+  const { error: weErr } = await sendWelcomeTransactionalEmail({
+    templateName: 'welcome',
+    recipientEmail: email,
+    idempotencyKey: `welcome-${user.id}`,
+    templateData: firstName ? { firstName } : {},
   });
   if (!weErr) localStorage.setItem(sentKey, '1');
   else holzenLog.auth('welcome email invoke failed', { message: weErr.message });
@@ -52,9 +53,7 @@ export async function runReferralOnSignedIn(user: User): Promise<void> {
     holzenLog.auth('referral_pending_jobs insert', { code: qErr.code, message: qErr.message });
   }
 
-  const { data, error: fnErr } = await invokeEdge('record-referral', {
-    body: { referral_code: refCode },
-  });
+  const { data, error: fnErr } = await invokeRecordReferral(refCode);
 
   if (fnErr) {
     console.error('[record-referral]', fnErr);

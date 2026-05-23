@@ -1,7 +1,7 @@
 import { useLocation } from 'react-router-dom';
 import { PauseReadyBanner } from '@/app/components/PauseReadyBanner';
 import { PendingPauseOfferShell } from '@/screens/pause/components/PendingPauseOfferShell';
-import { useHolzen } from '@/screens/home/hooks/use-holzen';
+import { useHolzen } from '@/app/components/HolzenProvider';
 
 type Props = {
   pauseReady: boolean;

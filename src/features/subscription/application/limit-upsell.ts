@@ -1,7 +1,7 @@
 import { toast } from 'sonner';
 import i18n from '@/i18n';
 import { PRICING } from '../domain/pricing';
-import { trackEvent } from '@/lib/posthog';
+import { trackPaywallViewed } from './paywall-telemetry';
 
 /**
  * Single source of truth for "limit reached → buy a Flex Pack" prompts.
@@ -48,11 +48,7 @@ export function showLimitReachedToast(opts: {
   /** Override the action label (defaults to "Buy Flex Pack S · $X.XX") */
   actionLabel?: string;
 }) {
-  try {
-    trackEvent('paywall.viewed', { source: 'limit-hit' });
-  } catch {
-    /* no-op */
-  }
+  trackPaywallViewed('limit-hit');
   const t = i18n.t.bind(i18n);
   const label = featureLabel(opts.feature);
   const action =

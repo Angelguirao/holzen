@@ -1,0 +1,70 @@
+---
+description: >-
+  Holzen task entry — classify bugs/features/Figma work, trace the flow, run placement
+  and review checklists before editing. Pairs with change-context.mdc.
+alwaysApply: true
+---
+
+# Holzen — task entry workflow
+
+Use this **before writing code** for bugs, new features, or Figma-driven UI. It complements [change-context.mdc](change-context.mdc) (change-map + invariants) and [deployment-sync.mdc](deployment-sync.mdc) (pre-push gates).
+
+## 1. Classify (30 seconds)
+
+1. Name the work: **bug** | **feature** | **Figma spec** | **refactor/migration**.
+2. Open the matching **Change map** row in [AGENTS.md](../../AGENTS.md) → **Read first** link. Skim that owner doc only — not the full docs index.
+3. Confirm [active-surface.md](../../docs/ops/active-surface.md): no `@/legacy/**`, no Tier B routes/tables unless explicitly in scope.
+
+**Cross-cutting invariants** (any size PR): see [change-context.mdc](change-context.mdc) — PostHog taxonomy, feature flags, edge manifest, migrations, `x-cid`.
+
+## 2. Pick the path
+
+| Kind | Read next | Before edit |
+|------|-----------|-------------|
+| **Bug** | Owner system doc + nearest **sibling** hook/screen in same feature | Trace **one flow** end-to-end (below); check authority is server-side (RLS/RPC/edge), not only React |
+| **Feature** | Owner doc + [client-src-layout.md](../../docs/fundamentals/client-src-layout.md) + [naming-conventions-holzen.md](../../docs/fundamentals/naming-conventions-holzen.md) | Placement checklist (§3); [modern-react-practices-holzen.md](../../docs/fundamentals/modern-react-practices-holzen.md) §6 if UI |
+| **Figma spec** | [DESIGN.md](../../DESIGN.md) + [docs/design/nox/](../../docs/design/nox/) + route owner doc | Reuse `components/ui/`; **`src/index.css`** wins at runtime; log token mismatches in implementation notes |
+| **Architecture migration** | [architecture-migration.mdc](architecture-migration.mdc) + [implementation-notes-workflow.md](../../docs/fundamentals/implementation-notes-workflow.md) | One vertical slice; update [implementation-notes.html](../../docs/artifacts/architecture-migration/implementation-notes.html) when ambiguous |
+
+## 3. Flow trace (mandatory for user-visible changes)
+
+Trace the **one journey** this task touches:
+
+`UI trigger → local/Query state → Supabase or invokeEdge → state update → loading/error/empty UI`
+
+Use [react-spa-review-template.md](../../docs/reviews/react-spa-review-template.md) **PR checklist** or skill `holzen-flow-review`. Do not polish screen-by-screen until the flow makes sense.
+
+**Placement quick check** ([client-src-layout.md](../../docs/fundamentals/client-src-layout.md)):
+
+| Green | Red flag |
+|-------|----------|
+| Logic in `features/<ctx>/`; screen is thin conductor | New `features/home` or route-named feature package |
+| Route UI → `screens/<route>/components/`; primitive → `ui/` | New root `src/components/Foo.tsx` |
+| Screen imports `@/features/<ctx>/public*` | Direct `supabase` / `invoke` in `.tsx` |
+| Names per naming-conventions doc | New `@/lib/<context>-*` shim |
+
+## 4. Implement like a neighbor
+
+Match **existing patterns** in the nearest sibling file (imports, hook split, Query keys, error handling). For screens: [react-screen-orchestration.md](../../docs/fundamentals/react-screen-orchestration.md). Extract to **features**, not new context shims in `src/lib/`.
+
+Multi-commit or ambiguous spec → append [implementation-notes.html](../../docs/artifacts/architecture-migration/implementation-notes.html) (decisions, deviations, tradeoffs, open questions).
+
+## 5. Verify before done
+
+Minimum when code changed: `npm run test`, `npm run build`, lint **touched files** only.
+
+Also run when relevant (see [deployment-sync.mdc](deployment-sync.mdc)): edge logging/coverage, view migrations, `check:prepush` when bash available.
+
+Doc/code drift → update the **one owner doc** from [docs/README.md](../../docs/README.md) canonical table in the same PR.
+
+## Agent prompt stubs
+
+```text
+Bug: Fix <X>. AGENTS change map → owner doc. Flow trace per react-spa-review-template. Match sibling patterns. active-surface scope.
+Feature: Implement <X>. Owner doc + client-src-layout + naming conventions. modern-react-practices §6 if UI. Paired artifacts per change-context.
+Figma: Implement <link> on <route>. DESIGN.md + Nox; ui/ primitives. Data/RPC per system owner doc. Note token gaps in implementation notes.
+```
+
+## Skip reading (unless task touches them)
+
+Full phased review docs, whole-repo lint, every fundamentals doc — use the change-map row only.

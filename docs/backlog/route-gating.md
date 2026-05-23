@@ -16,7 +16,7 @@ While `AuthProvider.loading` is true, **`ProtectedRoute`** / **`PublicOnlyRoute`
 ### Related code pointers
 
 - Route guards: `src/App.tsx` (`ProtectedRoute` / `PublicOnlyRoute`)
-- Auth state source: `src/hooks/use-auth.tsx` (`loading` lifecycle)
+- Auth state source: `@/features/auth/public` (`AuthProvider` / `useAuth`; `loading` lifecycle)
 - Loading UI: `src/components/AuthLoading.tsx`
 
 ### Acceptance criteria (met)

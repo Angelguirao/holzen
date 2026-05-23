@@ -1,11 +1,6 @@
-import { invokeEdge } from '@/lib/invoke-edge';
+import { fetchHolzenNumberEdge, type HolzenNumberData } from '../edge/holzen-number-edge';
 
-export interface HolzenNumberData {
-  total: number;
-  held_steady: number;
-  percent: number;
-  calculated_at: string;
-}
+export type { HolzenNumberData };
 
 export const HOLZEN_NUMBER_QUERY_PREFIX = ['public'] as const;
 
@@ -18,7 +13,7 @@ export const HOLZEN_NUMBER_QUERY_KEY = [
 
 export async function fetchHolzenNumber(): Promise<HolzenNumberData | null> {
   try {
-    const { data: result, error } = await invokeEdge<HolzenNumberData>('holzen-number');
+    const { data: result, error } = await fetchHolzenNumberEdge();
     if (error || !result) return null;
     return result as HolzenNumberData;
   } catch {

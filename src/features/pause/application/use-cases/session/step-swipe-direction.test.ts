@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { pauseStepSwipeDirection } from '@/features/pause/public';
+import { pauseStepSwipeDirection } from './step-swipe-direction';
 
 describe('pauseStepSwipeDirection', () => {
   it('is forward when advancing along STEPS', () => {
