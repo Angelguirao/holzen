@@ -25,6 +25,7 @@ export function PauseSessionScaffoldHeader({
   breathSecondLabelVariant = 'breathe',
   countdownSlot,
 }: PauseSessionScaffoldHeaderProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

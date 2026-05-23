@@ -36,6 +36,7 @@ export function PauseSessionScaffoldBody({
   onSaveToJourney,
   pauseInstanceIdForDone,
 }: PauseSessionScaffoldBodyProps) {
+  "use memo";
   return (
     <>
       {phase === 'session' && ritualEntry === 'brief' && <PauseSessionBriefRitualBody {...briefRitual} />}

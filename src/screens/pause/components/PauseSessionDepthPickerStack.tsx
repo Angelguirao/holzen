@@ -15,6 +15,7 @@ export function PauseSessionDepthPickerStack(props: {
   deepPauseLocked?: boolean;
   onClose: () => void;
 }) {
+  "use memo";
   const { t } = useTranslation();
   const { contextLine, onBrief, onDeep, deepPauseLocked = false, onClose } = props;
 

@@ -1,8 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
-import { deleteAccount as invokeDeleteAccount } from '@/features/auth/public-rpc';
-import { fetchSettingsDataExportBundle } from '@/features/pause/public-hooks';
-import { getProfileRowQueryOptions } from '@/features/user/public-queries';
 import { useHolzen } from '@/app/components/HolzenProvider';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useInstallPrompt } from '@/app/hooks/use-install-prompt';
@@ -20,7 +16,6 @@ import { isHapticEnabled, setHapticEnabled as persistHapticEnabled } from '@/lib
 
 export function useSettingsModel() {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
   const { user, signOut } = useAuth();
   const {
     threshold,
@@ -91,9 +86,6 @@ export function useSettingsModel() {
     unsubscribe: pushUnsubscribe,
     permissionGrantedNotSubscribed: pushPermissionGrantedIncomplete,
   } = usePushNotifications();
-  const [deleting, setDeleting] = useState(false);
-  const [exporting, setExporting] = useState(false);
-  const [zenMode, setZenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled);
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('holzen_sound_enabled') !== 'false');
   const [checkoutWindowMinutes, setCheckoutWindowMinutesState] = useState<number>(() =>
@@ -153,107 +145,6 @@ export function useSettingsModel() {
     profileLoaded,
     t,
   ]);
-
-  const exportData = async (format: 'json' | 'csv' = 'json') => {
-    if (!user) return;
-    setExporting(true);
-    try {
-      const userId = user.id;
-      const [profile, exportBundle] = await Promise.all([
-        queryClient.fetchQuery(getProfileRowQueryOptions(userId)),
-        fetchSettingsDataExportBundle(userId),
-      ]);
-
-      const pauseRows = exportBundle.pauses;
-      const stepEvents = exportBundle.stepEvents;
-      const companionEvents = exportBundle.companionEvents;
-      const artifacts = exportBundle.aiArtifacts;
-      const dateStr = new Date().toISOString().slice(0, 10);
-
-      if (format === 'csv') {
-        const refHeaders = [
-          'created_at',
-          'state',
-          'initial_mood',
-          'shift_mood',
-          'outcome',
-          'note_text',
-          'tags',
-          'is_favorite',
-          'counted_companion_types',
-          'reflection_text',
-        ];
-        const refRows = pauseRows.map((r) =>
-          refHeaders
-            .map((h) => {
-              const val = Array.isArray(r[h]) ? (r[h] as unknown[]).join('; ') : r[h] ?? '';
-              return `"${String(val).replace(/"/g, '""')}"`;
-            })
-            .join(','),
-        );
-        const refCsv = [refHeaders.join(','), ...refRows].join('\n');
-
-        const refBlob = new Blob([refCsv], { type: 'text/csv' });
-        const refUrl = URL.createObjectURL(refBlob);
-        const a1 = document.createElement('a');
-        a1.href = refUrl;
-        a1.download = `holzen-pauses-${dateStr}.csv`;
-        a1.click();
-        URL.revokeObjectURL(refUrl);
-
-        toast.success('CSV exported', { description: `${pauseRows.length} pauses.` });
-      } else {
-        const exportPayload = {
-          exported_at: new Date().toISOString(),
-          profile: profile
-            ? {
-                threshold: profile.threshold,
-                threshold_down: profile.threshold_down,
-                cooldown_hours: profile.cooldown_hours,
-                reflection_tone: profile.reflection_tone,
-                reflection_style: profile.reflection_style,
-                language: profile.language,
-                email_notifications: profile.email_notifications,
-                created_at: profile.created_at,
-              }
-            : null,
-          pauses: pauseRows,
-          step_events: stepEvents,
-          companion_events: companionEvents,
-          ai_artifacts: artifacts,
-        };
-
-        const blob = new Blob([JSON.stringify(exportPayload, null, 2)], {
-          type: 'application/json',
-        });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `holzen-export-${dateStr}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        toast.success('Data exported', { description: `${pauseRows.length} pauses.` });
-      }
-    } catch {
-      toast.error('Export failed');
-    } finally {
-      setExporting(false);
-    }
-  };
-
-  const deleteAccount = async () => {
-    if (!user) return;
-    setDeleting(true);
-    try {
-      const { error } = await invokeDeleteAccount();
-      if (error) throw error;
-      toast.success('Account deleted');
-      await signOut();
-    } catch {
-      toast.error('Failed to delete account');
-      setDeleting(false);
-    }
-  };
 
   const setHapticEnabled = useCallback((v: boolean) => {
     setHapticEnabledState(v);
@@ -319,10 +210,6 @@ export function useSettingsModel() {
     pushPermissionGrantedIncomplete,
     pushSubscribe,
     pushUnsubscribe,
-    deleting,
-    exporting,
-    zenMode,
-    setZenMode,
     hapticEnabled,
     setHapticEnabled,
     soundEnabled,
@@ -334,8 +221,6 @@ export function useSettingsModel() {
     btcMode,
     setBtcMode,
     hasUnseenChangelog,
-    exportData,
-    deleteAccount,
   };
 }
 

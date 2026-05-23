@@ -8,5 +8,6 @@ export type PauseSessionGateContentProps = {
 
 /** Children of `PauseSessionGate`: depth picker or active scaffold (`/pause` owns pending-offer UX). */
 export function PauseSessionGateContent({ sessionOnPicker, depthPickerSlot, scaffoldSlot }: PauseSessionGateContentProps) {
+  "use memo";
   return <>{sessionOnPicker ? depthPickerSlot : scaffoldSlot}</>;
 }

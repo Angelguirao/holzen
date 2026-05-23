@@ -58,6 +58,7 @@ export function PauseSessionScaffold({
   countdownSlot,
   children,
 }: Props) {
+  "use memo";
   /** Ritual audio off by default (wireframe: volume “off” until the user enables it). */
   const [uncontrolledMuted, setUncontrolledMuted] = useState(true);
   const muted = soundMutedControlled ?? uncontrolledMuted;
