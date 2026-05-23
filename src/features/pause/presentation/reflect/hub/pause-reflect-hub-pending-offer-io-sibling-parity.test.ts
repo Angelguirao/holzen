@@ -25,7 +25,7 @@ import {
 /**
  * Presentation sibling parity: hub-io vs pending-offer-io (parity with application
  * `application/.../hub/pause-reflect-hub-pending-offer-io-sibling-parity.test.ts`;
- * complements `pause-reflect-mood-hub-io-sibling-parity.test.ts` and
+ * complements `pause-feel-hub-io-sibling-parity.test.ts` and
  * `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts`).
  * Reciprocal inline pins: `pause-reflect-hub-io-parity.test.ts` ↔
  * `pause-reflect-pending-offer-io-parity.test.ts`.

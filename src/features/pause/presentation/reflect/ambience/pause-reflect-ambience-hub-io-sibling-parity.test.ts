@@ -21,7 +21,7 @@ import {
 /**
  * Presentation sibling parity: ambience-io vs hub-io (parity with
  * `pause-reflect-ambience-generation-io-sibling-parity.test.ts` and
- * `pause-reflect-mood-hub-io-sibling-parity.test.ts`;
+ * `pause-feel-hub-io-sibling-parity.test.ts`;
  * complements reciprocal inline pins on `pause-reflect-ambience-io-parity.test.ts` ↔
  * `pause-reflect-hub-io-parity.test.ts`).
  */

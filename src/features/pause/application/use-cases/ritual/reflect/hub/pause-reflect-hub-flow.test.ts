@@ -16,7 +16,7 @@ import {
   buildFeelTilesMoodLogOptions as buildFeelTilesFromMoodFlow,
   runInitialEmotionSelect as runInitialEmotionSelectFromMoodFlow,
   runInitialEmotionSkip as runInitialEmotionSkipFromMoodFlow,
-} from '../mood/pause-reflect-mood-flow';
+} from '../../feel/pause-feel-flow';
 import {
   runPauseFavoriteToggle as runFavoriteFromStepsFlow,
   runPauseReflectNoteUpdate as runNoteFromStepsFlow,

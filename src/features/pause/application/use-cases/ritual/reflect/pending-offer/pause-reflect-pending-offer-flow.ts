@@ -11,7 +11,7 @@
  * `pause-reflect-share-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-share-flow`;
  * `pause-reflect-generation-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-generation-flow`;
  * `pause-reflect-hub-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-hub-flow`;
- * `pause-reflect-mood-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-mood-flow`;
+ * `pause-feel-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-feel-flow`;
  * `pause-reflect-ambience-pending-offer-flow-sibling-parity.test.ts` ↔ `pause-reflect-ambience-flow`;
  * `pause-reflect-pending-offer-flow.test.ts` ↔ `pause-reflect-steps-flow` + `pause-reflect-share-flow` + `pause-reflect-generation-flow` + `pause-reflect-hub-flow` + `pause-reflect-flows-flow` (inline sibling pins; presentation-io wrappers in dedicated sibling file below);
  * `pause-reflect-share-flow.test.ts` (inline share ↔ pending-offer pins);

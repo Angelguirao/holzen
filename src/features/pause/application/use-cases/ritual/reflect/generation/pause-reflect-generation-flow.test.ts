@@ -67,7 +67,7 @@ import {
   buildFeelTilesMoodLogOptions as buildFeelTilesFromMoodFlow,
   runInitialEmotionSelect as runEmotionSelectFromMoodFlow,
   runInitialEmotionSkip as runEmotionSkipFromMoodFlow,
-} from '../mood/pause-reflect-mood-flow';
+} from '../../feel/pause-feel-flow';
 import {
   trackPauseReflectPostItOpen as trackPostItFromTelemetryFlow,
   trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,

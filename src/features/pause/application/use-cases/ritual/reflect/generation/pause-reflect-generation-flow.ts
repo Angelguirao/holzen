@@ -17,7 +17,7 @@
  * `pause-reflect-generation-share-io-sibling-parity.test.ts` (generation-io ↔ share-io; application + presentation; reciprocal inline pins in `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts` ↔ `pause-reflect-share-io-parity.test.ts`);
  * `pause-reflect-steps-generation-io-sibling-parity.test.ts` (steps-io ↔ generation-io; application + presentation; reciprocal inline pins in `pause-reflect-steps-io-parity.test.ts` ↔ `presentation/reflect/generation/pause-reflect-generation-io-parity.test.ts`);
  * `pause-reflect-generation-telemetry-flow-sibling-parity.test.ts` (generation-flow ↔ telemetry-flow);
- * `pause-reflect-generation-mood-flow-sibling-parity.test.ts` (generation-flow ↔ mood-flow);
+ * `pause-reflect-generation-feel-flow-sibling-parity.test.ts` (generation-flow ↔ mood-flow);
  * `pause-reflect-generation-pending-offer-flow-sibling-parity.test.ts` (generation-flow ↔ pending-offer-flow);
  * `pause-reflect-generation-pending-offer-io-sibling-parity.test.ts` (generation-io ↔ pending-offer-io; application + presentation);
  * `pause-reflect-generation-home-reflect-io-sibling-parity.test.ts` (generation-io ↔ home-reflect-io; application + presentation).
