@@ -36,6 +36,7 @@ export function BtcStatus({
   onToggleChartExpanded,
   chartChevronInPriceRow = true,
 }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const toggle = onToggleHidden;
   const quoteSym = trackedAssetSymbol(data?.coinId ?? coinIdProp ?? 'bitcoin');

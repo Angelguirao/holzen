@@ -196,8 +196,8 @@ Hooks should **not** grow unbounded RPC + navigation + analytics; extract **use 
 |-------|--------------|--------|
 | Render boundaries | **Yes** on Home (`memo(HomeDashboardLayout)`, stable layout props, lazy Zen) | Extend when touching hot screens; see [react-screen-orchestration.md](react-screen-orchestration.md) |
 | Manual `useMemo` / `useCallback` | Widespread in pause/home/companion | **No new** memos without justification; **no mass removal** during migration |
-| React Compiler | **Pilot:** annotation mode on all `screens/home|pause/components` with `"use memo"` opt-in (`vite.react-compiler.ts`) | Add `"use memo"` on next hot shell; profile before `infer` mode |
-| React 19 / Actions | **Shipped:** optimistic profile toggles (incl. currency, asset, language); pause/push/companion; settings forms + export/delete/sign-out; testimonial + credits (`useTransition`) | Keep Query + `invokeEdge` for ritual/companion |
+| React Compiler | **Pilot:** annotation mode on all `screens/home|pause/components/**` with `"use memo"` opt-in (`vite.react-compiler.ts`) | Market/hold-goal/bulk-hold shells annotated; profile before `infer` mode |
+| React 19 / Actions | **Shipped:** optimistic profile toggles (incl. currency, asset, language); pause/push/companion; settings forms + export/delete/sign-out; testimonial + credits + subscription checkout/trial (`useTransition`) | Keep Query + `invokeEdge` for ritual/companion |
 | react-hook-form + Zod | Settings/admin forms | Keep for complex validated forms |
 
 **When adding `useMemo` / `useCallback` (review gate):**
@@ -215,7 +215,7 @@ If none apply, prefer a **boundary** (lower state, memo shell, lazy branch) inst
 | React Compiler | Vite build + home/pause `components/` | **Pilot** (May 2026) — annotation mode, directory-scoped |
 | `useOptimistic` / `useTransition` | Pause favorite; snooze; profile toggles; push subscribe; companion vote | **Shipped** (May 2026) |
 | `useActionState` | Settings: change-email, change-password, feedback, export, delete, sign-out | **Shipped** (May 2026) |
-| `useTransition` | Companion vote; push subscribe; testimonial submit; credits refresh | **Shipped** (May 2026) |
+| `useTransition` | Companion vote; push subscribe; testimonial submit; credits refresh; subscription checkout + trial | **Shipped** (May 2026) |
 
 **Do not** replace TanStack Query or pause/companion mutation paths with form Actions wholesale. **Do** use React 19 hooks on the next simple mutation you touch.
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -78,8 +78,8 @@ export function useSubscription() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const userId = user?.id ?? null;
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [trialLoading, setTrialLoading] = useState(false);
+  const [isCheckoutPending, startCheckoutTransition] = useTransition();
+  const [isTrialPending, startTrialTransition] = useTransition();
   const [checkoutLoadingTarget, setCheckoutLoadingTarget] = useState<
     'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' | null
   >(null);
@@ -191,77 +191,78 @@ export function useSubscription() {
     });
   }, [loading, subscribed, tier, monthlyRemaining, monthlyUsed, companionRemaining, wallpaperRemaining, insightsRemaining, flexCreditsBalance]);
 
-  const startCheckout = useCallback(async (
+  const startCheckout = useCallback((
     target: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' = 'pro',
     options?: { reactivation?: boolean },
   ) => {
     holzenLog.subscription('checkout', { action: 'start', target });
-    setCheckoutLoading(true);
     setCheckoutLoadingTarget(target);
-    try {
-      sessionStorage.setItem(CHECKOUT_RETURN_KEY, String(Date.now()));
-      const isPack = target === 'flex_pack_s' || target === 'flex_pack_m';
-      const { data, error } = await createCheckoutSession(
-        isPack
-          ? { checkoutKind: target }
-          : {
-              checkoutKind: 'subscription',
-              planTier: target,
-              reactivation: options?.reactivation === true,
-            },
-      );
-      if (error) throw error;
+    startCheckoutTransition(async () => {
+      try {
+        sessionStorage.setItem(CHECKOUT_RETURN_KEY, String(Date.now()));
+        const isPack = target === 'flex_pack_s' || target === 'flex_pack_m';
+        const { data, error } = await createCheckoutSession(
+          isPack
+            ? { checkoutKind: target }
+            : {
+                checkoutKind: 'subscription',
+                planTier: target,
+                reactivation: options?.reactivation === true,
+              },
+        );
+        if (error) throw error;
 
-      if (data?.url) {
-        const checkoutUrl = data.url as string;
+        if (data?.url) {
+          const checkoutUrl = data.url as string;
 
-        try {
-          if (window.self !== window.top && window.top) {
-            window.top.location.href = checkoutUrl;
-          } else {
+          try {
+            if (window.self !== window.top && window.top) {
+              window.top.location.href = checkoutUrl;
+            } else {
+              window.location.href = checkoutUrl;
+            }
+          } catch {
             window.location.href = checkoutUrl;
           }
-        } catch {
-          window.location.href = checkoutUrl;
+          return;
         }
-        return;
+
+        toast.error(t('home.subscription.checkoutNoUrl'));
+        setCheckoutLoadingTarget(null);
+      } catch (e) {
+        console.error('Checkout error:', e);
+        toast.error(t('home.subscription.checkoutFailed'));
+        setCheckoutLoadingTarget(null);
       }
+    });
+  }, [t, startCheckoutTransition]);
 
-      toast.error(t('home.subscription.checkoutNoUrl'));
-      setCheckoutLoading(false);
-      setCheckoutLoadingTarget(null);
-    } catch (e) {
-      console.error('Checkout error:', e);
-      toast.error(t('home.subscription.checkoutFailed'));
-      setCheckoutLoading(false);
-      setCheckoutLoadingTarget(null);
-    }
-  }, [t]);
-
-  const ensureTrial = useCallback(async () => {
-    if (!userId) return;
+  const ensureTrial = useCallback((): Promise<void> => {
+    if (!userId) return Promise.resolve();
     holzenLog.subscription('trial', { action: 'ensure' });
-    setTrialLoading(true);
-    try {
-      const { data, error } = await ensureTrialSubscription();
-      if (error) throw error;
-      if (!data?.ok) throw new Error('Trial not started');
-      if (data.created) {
-        trackTrialStarted('ensure_trial');
-      }
-      subscriptionForceNext = true;
-      subscriptionNextFetchSource = 'invalidate';
-      await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
-    } catch (e) {
-      console.error('Trial error:', e);
-      toast.error(
-        t('home.subscription.trialFailed', { defaultValue: 'Could not start trial. Try again.' }),
-      );
-      throw e;
-    } finally {
-      setTrialLoading(false);
-    }
-  }, [userId, queryClient, t]);
+    return new Promise((resolve, reject) => {
+      startTrialTransition(async () => {
+        try {
+          const { data, error } = await ensureTrialSubscription();
+          if (error) throw error;
+          if (!data?.ok) throw new Error('Trial not started');
+          if (data.created) {
+            trackTrialStarted('ensure_trial');
+          }
+          subscriptionForceNext = true;
+          subscriptionNextFetchSource = 'invalidate';
+          await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
+          resolve();
+        } catch (e) {
+          console.error('Trial error:', e);
+          toast.error(
+            t('home.subscription.trialFailed', { defaultValue: 'Could not start trial. Try again.' }),
+          );
+          reject(e);
+        }
+      });
+    });
+  }, [userId, queryClient, t, startTrialTransition]);
 
   const openPortal = useCallback(async () => {
     holzenLog.subscription('portal', { action: 'open' });
@@ -363,8 +364,8 @@ export function useSubscription() {
     return {
       subscribed: false,
       loading: false,
-      checkoutLoading,
-      trialLoading,
+      checkoutLoading: isCheckoutPending,
+      trialLoading: isTrialPending,
       checkoutLoadingTarget,
       startCheckout,
       ensureTrial,
@@ -401,8 +402,8 @@ export function useSubscription() {
   return {
     subscribed,
     loading,
-    checkoutLoading,
-    trialLoading,
+    checkoutLoading: isCheckoutPending,
+    trialLoading: isTrialPending,
     checkoutLoadingTarget,
     startCheckout,
     ensureTrial,

@@ -22,6 +22,7 @@ const SNOOZE_OPTIONS = [
 
 /** Full-width link + popover (legacy Home layout). Prefer {@link SnoozeToolbarControl} in section headers. */
 export function SnoozeControl() {
+  "use memo";
   const { t } = useTranslation();
   const { snoozedUntil, isActive, snooze, cancelSnooze } = useSnooze();
   const [open, setOpen] = useState(false);
@@ -122,6 +123,7 @@ export function SnoozeControl() {
 
 /** Icon + popover for Home section headers (matches Market/BtcStatus hit targets). */
 export function SnoozeToolbarControl() {
+  "use memo";
   const { t } = useTranslation();
   const { snoozedUntil, isActive, snooze, cancelSnooze } = useSnooze();
   const [open, setOpen] = useState(false);
