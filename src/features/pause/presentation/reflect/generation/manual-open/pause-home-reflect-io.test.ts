@@ -41,9 +41,14 @@ describe('pause-home-reflect-io', () => {
   it('re-exports manual-open market context for Home presentation conductors', () => {
     const market = buildManualPauseMarketContext(
       {
+        coinId: 'bitcoin',
+        currentPrice: 100000,
+        price24hAgo: 98000,
+        direction: 'up',
+        currency: 'USD',
         changePercent: 2,
         cumulativeChangePercent: 3,
-        fearGreed: { label: 'Fear' },
+        fearGreed: { value: 25, label: 'Fear' },
         onChain: null,
       },
       5,
@@ -64,6 +69,11 @@ describe('pause-home-reflect-io', () => {
       userId: 'u1',
       silentMode: false,
       data: {
+        coinId: 'bitcoin',
+        currentPrice: 100000,
+        price24hAgo: 99000,
+        direction: 'up',
+        currency: 'USD',
         changePercent: 1,
         cumulativeChangePercent: 2,
         fearGreed: null,
@@ -100,7 +110,7 @@ describe('pause-home-reflect-io', () => {
 
   it('routes preview dismiss test seam through dismissOpenPauseHome', async () => {
     const clearPreview = vi.fn();
-    const repository = { dismiss: vi.fn() };
+    const repository = { dismiss: vi.fn() } as unknown as import('@/features/pause/ports/pause-repository').PauseRepository;
     await pauseDismissOpenPauseHomePreviewWithRepository(repository, {
       hasUser: false,
       clearPreview,
