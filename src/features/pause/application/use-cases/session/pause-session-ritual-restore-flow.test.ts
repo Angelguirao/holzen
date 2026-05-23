@@ -71,11 +71,11 @@ describe('pause-session-ritual-restore-flow', () => {
   it('re-exports restored decide hydration via restored-decide-ritual-state', () => {
     const restored = makeTestPersistedPauseSession({
       decision: 'hold',
-      phase: 'decide',
+      phase: 'done',
     });
 
     expect(initialDecisionFromFlow(restored)).toBe('hold');
-    expect(initialPhaseFromFlow(restored)).toBe('decide');
+    expect(initialPhaseFromFlow(restored)).toBe('done');
     expect(initialDecisionFromFlow(null)).toBeNull();
   });
 
