@@ -56,7 +56,7 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
       category: row.category,
     });
     setActing(null);
-    if (!result.ok) {
+    if (result.ok !== true) {
       toast({
         title: result.failedStep === 'insert' ? 'Add to catalog failed' : 'Marked approved failed',
         description: result.errorMessage,
