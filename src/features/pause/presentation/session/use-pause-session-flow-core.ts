@@ -5,9 +5,9 @@ import {
 } from './use-pause-session-shell-ritual';
 import {
   usePauseSessionStepHandlers,
-  type PauseSessionStepHandlersProvidersSlice,
   type PauseSessionStepHandlersResult,
 } from './use-pause-session-step-handlers';
+import type { PauseSessionStepHandlersProvidersSlice } from './pause-session-step-handler-types';
 
 export type PauseSessionFlowCoreProvidersSlice = PauseSessionShellRitualProvidersSlice &
   PauseSessionStepHandlersProvidersSlice;

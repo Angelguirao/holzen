@@ -57,7 +57,11 @@ export function useHolzenManualTriggerOrchestration({
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
       const parsed = parseManualTriggerCooldownFromStorageEvent(
-        { key: e.key, storageArea: e.storageArea, newValue: e.newValue },
+        {
+          key: e.key,
+          storageArea: e.storageArea === window.localStorage ? 'localStorage' : null,
+          newValue: e.newValue,
+        },
         manualCooldownKey,
       );
       if (parsed === 'ignore') return;

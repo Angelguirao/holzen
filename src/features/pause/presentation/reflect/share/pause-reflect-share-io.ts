@@ -31,10 +31,8 @@
  * Flow↔I/O wrapper: `pause-reflect-share-flow-io-wrapper-sibling-parity.test.ts` (application + presentation)
  * ↔ `pause-reflect-share-flow` CI umbrella.
  */
-import {
-  runReflectionShareImage,
-  type DeliverReflectionShareImageDeps,
-} from '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image';
+import { runReflectionShareImage } from '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image';
+import type { DeliverReflectionShareImageDeps } from '@/features/pause/application/use-cases/ritual/reflect/share/deliver-reflection-share-image';
 import {
   buildReflectionShareTelegramUrl,
   buildReflectionShareTweetUrl,
