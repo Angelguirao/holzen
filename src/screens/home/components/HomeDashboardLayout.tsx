@@ -16,8 +16,6 @@ export interface HomeDashboardLayoutCustomizeProps {
   onSetVisible: (id: string, value: boolean) => void;
   sectionTitle: (id: string) => string;
   sectionDescription: (id: string) => string;
-  zenMode: boolean;
-  onZenModeChange: (zen: boolean) => void;
   onResetAll: () => void;
   nightToggleDisabled: boolean;
   dndRemountKey: number;
@@ -42,7 +40,7 @@ export interface HomeDashboardLayoutProps {
   completedPauseCount: number;
 }
 
-/** Full Home dashboard shell: hero, widgets, customize sheet, testimonial (non-zen). */
+/** Full Home dashboard shell: hero, widgets, customize sheet, testimonial. */
 export const HomeDashboardLayout = memo(function HomeDashboardLayout({
   pullHandlers,
   pullDistance,
@@ -106,8 +104,6 @@ export const HomeDashboardLayout = memo(function HomeDashboardLayout({
         onSetVisible={customize.onSetVisible}
         sectionTitle={customize.sectionTitle}
         sectionDescription={customize.sectionDescription}
-        zenMode={customize.zenMode}
-        onZenModeChange={customize.onZenModeChange}
         onResetAll={customize.onResetAll}
         nightToggleDisabled={customize.nightToggleDisabled}
         dndRemountKey={customize.dndRemountKey}

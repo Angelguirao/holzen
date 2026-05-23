@@ -5,11 +5,9 @@ import { useSubscription } from '@/features/subscription/public-hooks';
 import { Onboarding } from '@/screens/home/components/Onboarding';
 import { useWidgetLayout } from '@/screens/home/components/HomeWidget';
 import { HomeDashboardLayout } from '@/screens/home/components/HomeDashboardLayout';
-import { HomeZenModeRoute } from '@/screens/home/components/HomeZenModeRoute';
 import { useHomeOptionalVisibility } from '@/screens/home/hooks/use-home-optional-visibility';
 import { HOME_WIDGET_DEFAULT_ORDER } from '@/screens/home/lib/home-section-visibility-constants';
 import { useHomeCheckoutWelcomeToast } from '@/screens/home/hooks/use-home-checkout-welcome-toast';
-import { useHomeZenMode } from '@/screens/home/hooks/use-home-zen-mode';
 import { useHomeDocumentTitle } from '@/screens/home/hooks/use-home-document-title';
 import { useHomeHeroQuoteViewed } from '@/screens/home/hooks/use-home-hero-quote-viewed';
 import {
@@ -18,11 +16,10 @@ import {
   useHomePauseActions,
   usePauseArrivalAudio,
   usePauseContextHomePreviews,
-  useZenModeHomeRouteProps,
 } from '@/features/pause/public-home';
 import { useMarketDisplayPreferences } from '@/features/market/public-hooks';
 import { useState } from 'react';
-import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
+import { useOutletContext, useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/public';
 import { useHomeVisibleSections } from '@/screens/home/hooks/use-home-visible-sections';
 import { useHomeCustomizeBridge } from '@/screens/home/hooks/use-home-customize-bridge';
@@ -38,7 +35,6 @@ const Home = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
   const {
     subscribed,
     loading: subLoading,
@@ -108,7 +104,6 @@ const Home = () => {
     toggleMarketChartExpanded,
   } = useMarketDisplayPreferences();
   const unitBasisModeSupported = trackedAssetId === 'bitcoin';
-  const { zenMode, setZenModePersist } = useHomeZenMode(pathname);
   const completedPauseCount = useCompletedPauseCount() ?? 0;
   const pauseContextHomePreview = usePauseContextHomePreviews(context);
 
@@ -132,8 +127,6 @@ const Home = () => {
     setVisible,
     resetLayout,
     resetSectionVisibility,
-    setZenModePersist,
-    zenMode,
     subscribed,
   });
 
@@ -157,7 +150,7 @@ const Home = () => {
     manualTrigger,
     manualCooldownRemaining,
     startCheckout,
-    dismissAnalyticsSurface: zenMode ? 'home_zen_reflection' : 'home_your_pause_widget',
+    dismissAnalyticsSurface: 'home_your_pause_widget',
   });
 
   const pauseProjection = useHomePauseCardProjection({
@@ -218,33 +211,6 @@ const Home = () => {
     visibleOrderedSectionIds,
   );
 
-  const zenRouteProps = useZenModeHomeRouteProps({
-    hasOpenPause,
-    context,
-    contextPreview: pauseContextHomePreview,
-    openPauseState,
-    loading,
-    error,
-    btcData,
-    onDismiss: pauseActions.handleDismiss,
-    onNeedPause: pauseActions.handleNeedAPause,
-    onManualTrigger: manualTrigger,
-    onPauseWithThis: pauseActions.handleNavigatePauseWithThis,
-    subscriptionReady,
-    hasAccess,
-    showLimitUpsell,
-    showPauseScheduling,
-    autoCooldownRemaining,
-    cooldownHours,
-    nextCronCheckIn,
-    manualCooldownRemaining,
-    checkoutLoading,
-    trialLoading,
-    entitlement,
-    onStartTrial: () => void ensureTrial(),
-    onReactivate: () => void startReactivationCheckout(),
-  });
-
   const dashboardLayout = useHomeDashboardLayoutProps({
     pullHandlers,
     pullDistance,
@@ -265,10 +231,6 @@ const Home = () => {
 
   if (!hasOnboarded) {
     return <Onboarding onComplete={completeOnboarding} />;
-  }
-
-  if (zenMode) {
-    return <HomeZenModeRoute {...zenRouteProps} />;
   }
 
   return <HomeDashboardLayout {...dashboardLayout} />;

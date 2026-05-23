@@ -20,18 +20,12 @@ export {
   shouldSurfacePauseWidgetError,
   type PauseHomeErrorKind,
 } from './domain/home/pause-home-widget-error';
-export {
-  buildZenModeHomeRouteProps,
-  type BuildZenModeHomeRoutePropsInput,
-  type ZenModeHomeRoutePropsProjection,
-} from './presentation/home/zen-mode/build-zen-mode-home-route-props';
 export { usePauseArrivalAudio } from './presentation/home/use-pause-arrival-audio';
 export {
   usePauseCardProjection,
   type PauseCardProjection,
   type UsePauseCardProjectionParams,
 } from './presentation/home/use-pause-card-projection';
-export { useZenModeHomeRouteProps } from './presentation/home/use-zen-mode-home-route-props';
 export { groupBulkHoldByLocalDay } from './presentation/home/bulk-hold/group-bulk-hold-by-local-day';
 export {
   formatBulkHoldContextQuote,

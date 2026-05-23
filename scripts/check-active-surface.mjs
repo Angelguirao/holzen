@@ -48,6 +48,16 @@ const TIER_B_TABLES = [
 /** User Archive collections — quarantined in `src/legacy/archive-collections/` (not MVP). */
 const CLIENT_QUARANTINED_TABLES = ['collections', 'collection_items'];
 
+/** Zen Home — quarantined in `src/legacy/zen-mode/` (not MVP). */
+const ZEN_MODE_FORBIDDEN = [
+  { re: /\bZenModeHome\b/, label: 'ZenModeHome (use legacy/zen-mode)' },
+  { re: /\bHomeZenModeRoute\b/, label: 'HomeZenModeRoute (use legacy/zen-mode)' },
+  { re: /\buseHomeZenMode\b/, label: 'useHomeZenMode (use legacy/zen-mode)' },
+  { re: /\buseZenModeHomeRouteProps\b/, label: 'useZenModeHomeRouteProps (use legacy/zen-mode)' },
+  { re: /\bbuildZenModeHomeRouteProps\b/, label: 'buildZenModeHomeRouteProps (use legacy/zen-mode)' },
+  { re: /holzen_zen_mode/, label: 'holzen_zen_mode localStorage (Zen mode not MVP)' },
+];
+
 const TIER_B_FROM_RES = TIER_B_TABLES.map(
   (t) => ({ re: new RegExp(`\\.from\\(['"]${t}['"]\\)`), label: `.from('${t}') (Tier B — use legacy/full-shell)` }),
 );
@@ -79,7 +89,7 @@ for (const file of walk(srcRoot)) {
   const rel = relative(root, file).replace(/\\/g, '/');
   if (rel.startsWith('src/legacy/')) continue;
   const text = readFileSync(file, 'utf8');
-  for (const { re, label } of FORBIDDEN_PATTERNS) {
+  for (const { re, label } of [...FORBIDDEN_PATTERNS, ...ZEN_MODE_FORBIDDEN]) {
     if (re.test(text)) {
       violations.push({ file: rel, label });
     }

@@ -217,7 +217,6 @@ export {
 export {
   usePauseArrivalAudio,
   usePauseCardProjection,
-  useZenModeHomeRouteProps,
   type PauseCardProjection,
   type UsePauseCardProjectionParams,
 } from './public-home';
