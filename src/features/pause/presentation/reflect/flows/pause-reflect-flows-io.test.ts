@@ -127,7 +127,7 @@ describe('pause-reflect-flows-io', () => {
         wroteNote: false,
         usedTags: false,
       },
-      (key) => key,
+      ((key: string) => key) as unknown as import('i18next').TFunction,
       'brief',
     );
     expect(impacts.length).toBeGreaterThan(0);
@@ -196,7 +196,7 @@ describe('pause-reflect-flows-io', () => {
   });
 
   it('pauseReflectOutcomeLogWithRepository forwards a custom repository', async () => {
-    const repository = { port: 'custom' } as import('@/features/pause/ports/pause-repository').PauseRepository;
+    const repository = { port: 'custom' } as unknown as import('@/features/pause/ports/pause-repository').PauseRepository;
     runPauseOutcomeLogMock.mockResolvedValue({ status: 'no_instance' });
 
     await pauseReflectOutcomeLogWithRepository(repository, {
