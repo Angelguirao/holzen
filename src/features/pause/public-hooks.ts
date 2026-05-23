@@ -1,5 +1,7 @@
 /**
- * Pause read-model React hooks — import from here in screens and tests.
+ * Pause read-model React hooks — cross-route screens (archive, journey, home, settings).
+ * `/pause` ritual UI: `public-session-ritual`, `public-ritual-progress`, `public-ritual-breathe`,
+ * `public-ritual-brief`, `public-ritual-feel`, `public-ritual-reflect`, `public-session`.
  * Ritual layout tokens: `public-session` (`pauseStepLayout`). Pure helpers: §6 slim `public.ts`.
  */
 export {
@@ -113,12 +115,12 @@ export {
 } from './domain/pause-science/pause-science-steps';
 export { stepHighlightsScienceRow } from './domain/pause-science/pause-science-step-highlight';
 export { briefStepToPauseScienceStep } from './domain/pause-science/brief-step-to-pause-science-step';
-export type { FeelStepTile } from './public-ritual-feel';
-export { PAUSE_FEEL_STEP_TILE_ROWS } from './public-ritual-feel';
+export type { FeelStepTile } from './domain/feel-step-tile';
+export { PAUSE_FEEL_STEP_TILE_ROWS } from './domain/pause-feel-step-tiles';
 export {
   PAUSE_FEEL_INTENSITY_KEYS,
   type PauseFeelIntensityKey,
-} from './public-ritual-feel';
+} from './domain/pause-feel-intensity';
 export {
   computeBreathingPhaseAdvance,
   resumePauseAudioContext,

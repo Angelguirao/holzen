@@ -6,7 +6,7 @@ import {
   BREATH_ORB_INNER_RING_R,
   BREATH_ORB_PX,
   resolveHoldMandalaLayerWeights,
-} from '@/features/pause/public-hooks';
+} from '@/features/pause/public-ritual-breathe';
 
 export type BreathOrbHoldMandalaProps = {
   holdProgress: number;
