@@ -197,7 +197,7 @@ Hooks should **not** grow unbounded RPC + navigation + analytics; extract **use 
 | Render boundaries | **Yes** on Home (`memo(HomeDashboardLayout)`, stable layout props, lazy Zen) | Extend when touching hot screens; see [react-screen-orchestration.md](react-screen-orchestration.md) |
 | Manual `useMemo` / `useCallback` | Widespread in pause/home/companion | **No new** memos without justification; **no mass removal** during migration |
 | React Compiler | Not configured (Vite + SWC) | Pilot **after** migration — separate track |
-| React 19 / Actions | React **18.3.1** | Upgrade **after** migration; keep Query + `invokeEdge` for ritual/companion flows |
+| React 19 / Actions | **React 19.2.x** (runtime) | Use new hooks **incrementally** on simple mutations; keep Query + `invokeEdge` for ritual/companion |
 | react-hook-form + Zod | Settings/admin forms | Keep for complex validated forms; Actions only for **future** simple pilots |
 
 **When adding `useMemo` / `useCallback` (review gate):**
@@ -247,7 +247,7 @@ Use in PR description or pre-launch audits. **Target** = after [frontend-module-
 | RSC / Next | **N/A (SPA)** | N/A | ADR + backlog |
 | Modular monolith | **Strong** | **Planned** | [2026-05-17 ADR](../decisions/2026-05-17-modular-monolith-hexagonal-client.md) |
 | Render boundaries (vs memo sprawl) | **Strong** (Home reference) | **Partial** (many legacy memos) | §2.9 + [react-screen-orchestration.md](react-screen-orchestration.md) |
-| React Compiler / React 19 | **Deferred** (post-migration) | **Not adopted** | [2026-05-23 ADR](../decisions/2026-05-23-render-boundaries-defer-react-compiler-19.md) |
+| React Compiler / React 19 | **Runtime on 19.x**; Compiler + Actions pilots deferred | **19.2.x shipped** | [2026-05-23 ADR](../decisions/2026-05-23-render-boundaries-defer-react-compiler-19.md) |
 | Server authority (not React rules) | **Strong** | **Strong** | [client-server-architecture-holzen.md](client-server-architecture-holzen.md) |
 
 **Overall:** Product and **server** architecture are ahead of **client folder** architecture. Pre-launch work should **close the gap** without adopting frontend patterns Holzen explicitly rejects (§3).
@@ -295,7 +295,7 @@ Add to [react-spa-review-template.md](../reviews/react-spa-review-template.md) f
 - [ ] **Pause ritual:** step/RPC changes align with [pause-system.md](../systems/pause-system.md).
 - [ ] **Bundle:** heavy routes lazy-loaded where applicable.
 - [ ] **Render boundary:** state as low as practical; `React.memo` on heavy shells; new `useMemo`/`useCallback` justified (memo child, expensive derive, or effect deps) — see §2.9.
-- [ ] **Not overengineering:** no new package/context/store without justification in PR text; no React Compiler / React 19 drive-by during architecture migration.
+- [ ] **Not overengineering:** no new package/context/store without justification in PR text; no React Compiler drive-by or mass Actions rewrite during architecture migration.
 
 ---
 
