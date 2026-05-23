@@ -6,6 +6,7 @@ import { readFileSync } from "node:fs";
 import { VitePWA } from "vite-plugin-pwa";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { PRICING } from "./src/features/subscription/domain/pricing";
+import { reactCompilerPilotPlugin } from "./vite.react-compiler";
 
 // Defaults when `VITE_SUPABASE_*` are unset: local `npm run dev`, and `vite build` without env
 // (e.g. Lovable preview). Override with `.env` / CI / Lovable Cloud vars for another project.
@@ -175,6 +176,7 @@ export default defineConfig(({ mode, command }) => {
           );
         },
       },
+      reactCompilerPilotPlugin(),
       react(),
       VitePWA({
         strategies: "injectManifest",

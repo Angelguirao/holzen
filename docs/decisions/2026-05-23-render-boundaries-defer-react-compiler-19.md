@@ -30,7 +30,7 @@ Adopting React Compiler or upgrading to React 19 during migration adds a second 
    - Use `React.lazy` + `Suspense` for rare/heavy branches.
    - Add `useMemo` / `useCallback` only when feeding a memo child, caching expensive derivation, or satisfying **`useEffect` dependencies** — not preemptively.
 
-2. **Do not adopt React Compiler** until post-migration stabilization.
+2. **React Compiler pilot** (May 2026): `babel-plugin-react-compiler` via `vite-plugin-babel`, **annotation mode** on `HomeDashboardLayout` + `PauseSessionScaffoldShell`. Disable with `HOLZEN_REACT_COMPILER=0`. Expand after profiling.
 
 3. **React 19 runtime** — upgraded on `feature/lovableMigration` (May 2026): `react` / `react-dom` 19.x, `@types/react*` 19, `vaul` 1.x, `react-day-picker` 9.x. **No** mass refactor to Actions/Compiler in the same change.
 
@@ -42,7 +42,7 @@ Adopting React Compiler or upgrading to React 19 during migration adds a second 
 
 | Track | Trigger | Action |
 |-------|---------|--------|
-| **A. React Compiler pilot** | `src/` migration stable; test + build green | Add `babel-plugin-react-compiler` to Vite; lint/annotation mode first; profile Home + pause session; remove redundant memos only with tests |
+| **A. React Compiler pilot** | `src/` migration stable; test + build green | **In progress** — annotation mode on Home + pause scaffold (`vite.react-compiler.ts`); profile before widening |
 | **B. React 19 Actions pilot** | Runtime on 19.x | **In progress** — optimistic toggles + `useActionState` forms (see modern-react-practices §2.9) |
 
 Expo SDK 54 is **not** a Holzen signal — shipped product is a Vite SPA on Lovable.
