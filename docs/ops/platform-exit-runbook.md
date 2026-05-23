@@ -113,7 +113,7 @@ GitHub Actions (see [`.github/workflows/`](../../.github/workflows/)):
 
 ### Frontend
 
-See **[vercel-frontend-setup.md](vercel-frontend-setup.md)** (recommended).
+See **[vercel-frontend-setup.md](vercel-frontend-setup.md)** (recommended) — setup steps plus **Vercel vs Render vs Cloudflare** decision notes.
 
 1. Import GitHub repo in Vercel — [vercel.json](../../vercel.json) sets Vite build + SPA rewrites
 2. Production env: `VITE_SUPABASE_*`, `VITE_APP_VERSION` = `$VERCEL_GIT_COMMIT_SHA`, observability `VITE_*`
