@@ -47,8 +47,8 @@ flowchart TB
 | **Google OAuth** | Was `@lovable.dev/cloud-auth-js` | **Supabase Auth** `signInWithOAuth('google')` — configure Google OAuth in Supabase Dashboard |
 | **AI (reflection + companions)** | `LOVABLE_API_KEY` → Lovable gateway | **`GOOGLE_AI_API_KEY`** (primary) + optional **`OPENROUTER_API_KEY`** (failover) via [`_shared/llm-gateway.ts`](../../supabase/functions/_shared/llm-gateway.ts) |
 | **Transactional email** | `@lovable.dev/email-js` | **`RESEND_API_KEY`** via [`_shared/transactional-email.ts`](../../supabase/functions/_shared/transactional-email.ts) (Resend path) |
-| **Auth emails** | `auth-email-hook` + Lovable webhooks | **Supabase Auth → Custom SMTP (Resend)** — disable Lovable hook |
-| **Bounce/suppression** | `handle-email-suppression` + Lovable HMAC | **Resend webhooks** → update handler or use Resend dashboard suppressions |
+| **Auth emails** | `auth-email-hook` + Lovable webhooks | **Supabase Auth Send Email Hook** → same `auth-email-hook` edge (`SEND_EMAIL_HOOK_SECRET` + `RESEND_API_KEY`); disable Lovable hook when live |
+| **Bounce/suppression** | `handle-email-suppression` + Lovable HMAC | **Resend webhooks** → same `handle-email-suppression` edge (`RESEND_WEBHOOK_SECRET`); Lovable HMAC path kept until cutover |
 | **Dev tagger** | `lovable-tagger` in Vite | Removed — no prod impact |
 
 Legacy edges under `supabase/functions/legacy/` may still reference Lovable; they are **not** in the pause-first bundle.
@@ -121,8 +121,9 @@ GitHub Actions (see [`.github/workflows/`](../../.github/workflows/)):
 ### Auth & email
 
 1. Supabase → Authentication → Providers → Google: client ID/secret from Google Cloud Console; redirect URLs = prod + staging + localhost
-2. Supabase → Auth → SMTP: Resend (or disable `auth-email-hook` once SMTP works)
-3. Stripe: webhook URL → prod `stripe-webhook` edge URL
+2. Supabase → Auth → **Hooks** → Send Email: point HTTPS URL at `auth-email-hook`; set `SEND_EMAIL_HOOK_SECRET` in Edge secrets (matches dashboard webhook secret)
+3. Resend → Webhooks: point at `handle-email-suppression`; set `RESEND_WEBHOOK_SECRET` in Edge secrets
+4. Stripe: webhook URL → prod `stripe-webhook` edge URL
 
 ### Observability
 

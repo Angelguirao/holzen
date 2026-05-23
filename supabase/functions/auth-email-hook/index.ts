@@ -2,11 +2,16 @@ import * as React from "https://esm.sh/react@18.3.1"
 import { renderAsync } from "https://esm.sh/@react-email/components@0.0.22?deps=react@18.3.1,react-dom@18.3.1"
 import { parseEmailWebhookPayload } from "https://esm.sh/@lovable.dev/email-js"
 import { WebhookError, verifyWebhookRequest } from "https://esm.sh/@lovable.dev/webhooks-js"
+import { authorizeOpsBearer } from "../_shared/ops-bearer-auth.ts";
 import {
   holzenTransactionalEmailLogger,
   isTransactionalEmailConfigured,
   sendTransactionalEmail,
 } from "../_shared/transactional-email.ts";
+import {
+  templatePropsFromSupabaseHook,
+  verifySupabaseAuthEmailHook,
+} from "../_shared/supabase-auth-email-hook.ts";
 import { SignupEmail } from '../_shared/email-templates/signup.tsx'
 import { InviteEmail } from '../_shared/email-templates/invite.tsx'
 import { MagicLinkEmail } from '../_shared/email-templates/magic-link.tsx'
@@ -36,7 +41,7 @@ type AuthEmailWebhookPayload = {
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type, x-lovable-signature, x-lovable-timestamp, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+    'authorization, x-client-info, apikey, content-type, x-lovable-signature, x-lovable-timestamp, webhook-id, webhook-timestamp, webhook-signature, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 }
 
 const EMAIL_SUBJECTS: Record<string, string> = {
@@ -113,10 +118,7 @@ async function handlePreview(req: Request): Promise<Response> {
     return new Response(null, { headers: previewCorsHeaders })
   }
 
-  const apiKey = Deno.env.get('LOVABLE_API_KEY')
-  const authHeader = req.headers.get('Authorization')
-
-  if (!apiKey || authHeader !== `Bearer ${apiKey}`) {
+  if (!authorizeOpsBearer(req.headers.get('Authorization'))) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { ...previewCorsHeaders, 'Content-Type': 'application/json' },
@@ -152,8 +154,175 @@ async function handlePreview(req: Request): Promise<Response> {
   })
 }
 
-// Webhook handler - verifies signature and sends email
-async function handleWebhook(req: Request, log: RequestLoggingContext["log"]): Promise<Response> {
+function isSupabaseAuthHook(req: Request): boolean {
+  return Boolean(req.headers.get("webhook-signature"));
+}
+
+async function renderAndSendAuthEmail(
+  emailType: string,
+  templateProps: AuthEmailTemplateProps,
+  toEmail: string,
+  runId: string,
+  log: RequestLoggingContext["log"],
+  callbackUrl?: string,
+): Promise<Response> {
+  const EmailTemplate = EMAIL_TEMPLATES[emailType]
+  if (!EmailTemplate) {
+    try {
+      log.error("auth_email_hook_unknown_type", {
+        holzen_event: "auth_email_hook_unknown_type",
+        email_type: emailType,
+        run_id: runId,
+      });
+    } catch {
+      /* non-fatal */
+    }
+    return new Response(
+      JSON.stringify({ error: `Unknown email type: ${emailType}` }),
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  }
+
+  const html = await renderAsync(React.createElement(EmailTemplate, templateProps))
+  const text = await renderAsync(React.createElement(EmailTemplate, templateProps), {
+    plainText: true,
+  })
+
+  if (!isTransactionalEmailConfigured()) {
+    try {
+      log.error("auth_email_hook_missing_email_delivery", {
+        holzen_event: "auth_email_hook_missing_email_delivery",
+        run_id: runId,
+      });
+    } catch {
+      /* non-fatal */
+    }
+    return new Response(JSON.stringify({ error: 'Server configuration error' }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
+  const useResend = Boolean(Deno.env.get("RESEND_API_KEY")?.trim())
+  if (!useResend && !callbackUrl) {
+    try {
+      log.error("auth_email_hook_missing_callback_url", {
+        holzen_event: "auth_email_hook_missing_callback_url",
+        run_id: runId,
+      });
+    } catch {
+      /* non-fatal */
+    }
+    return new Response(JSON.stringify({ error: 'Missing callback_url in payload' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
+  const sendResult = await sendTransactionalEmail(
+    {
+      to: toEmail,
+      from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+      sender_domain: SENDER_DOMAIN,
+      subject: EMAIL_SUBJECTS[emailType] || 'Notification',
+      html,
+      text,
+      purpose: 'transactional',
+      label: `auth-${emailType}`,
+    },
+    {
+      source: 'auth-email-hook',
+      idempotencyKey: `auth-email:${runId}`,
+      sendUrl: callbackUrl,
+      logger: holzenTransactionalEmailLogger(
+        (m, d) => log("auth_email_hook_dep", { holzen_event: "auth_email_hook_dep", message: m, run_id: runId, ...(d ?? {}) }),
+        (m, d) => log.error("auth_email_hook_dep", { holzen_event: "auth_email_hook_dep", message: m, run_id: runId, ...(d ?? {}) }),
+      ),
+    },
+  )
+
+  if (!sendResult.ok) {
+    try {
+      log.error("auth_email_hook_send_api_failed", {
+        holzen_event: "auth_email_hook_send_api_failed",
+        run_id: runId,
+        http_status: sendResult.status,
+        detail: (sendResult.error ?? 'Failed to send email').slice(0, 500),
+      });
+    } catch {
+      /* non-fatal */
+    }
+    return new Response(JSON.stringify({ error: 'Failed to send email' }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
+  try {
+    log("auth_email_hook_sent", {
+      holzen_event: "auth_email_hook_sent",
+      message_id: sendResult.id,
+      run_id: runId,
+    });
+  } catch {
+    /* non-fatal */
+  }
+
+  return new Response(
+    JSON.stringify({ success: true, message_id: sendResult.id }),
+    { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  )
+}
+
+async function handleSupabaseAuthWebhook(req: Request, log: RequestLoggingContext["log"]): Promise<Response> {
+  const rawBody = await req.text()
+  let payload
+  try {
+    payload = verifySupabaseAuthEmailHook(rawBody, req.headers)
+  } catch (error) {
+    try {
+      log.warn("auth_email_hook_supabase_verify_failed", {
+        holzen_event: "auth_email_hook_supabase_verify_failed",
+        detail: error instanceof Error ? error.message : String(error),
+      });
+    } catch {
+      /* non-fatal */
+    }
+    return new Response(JSON.stringify({ error: 'Invalid signature' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
+  const emailType = payload.email_data.email_action_type
+  const toEmail = payload.user.email?.trim() ?? ""
+  const runId = `supabase:${payload.email_data.token_hash}:${emailType}`
+
+  try {
+    log("auth_email_hook_received", {
+      holzen_event: "auth_email_hook_received",
+      provider: "supabase",
+      email_type: emailType,
+      recipient_redacted: redactEmailForLog(toEmail),
+      run_id: runId,
+    });
+  } catch {
+    /* non-fatal */
+  }
+
+  if (!toEmail) {
+    return new Response(JSON.stringify({ error: "Missing email in payload" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const templateProps = templatePropsFromSupabaseHook(payload, SITE_NAME, ROOT_DOMAIN)
+  return renderAndSendAuthEmail(emailType, templateProps, toEmail, runId, log)
+}
+
+// Lovable webhook handler — verifies signature and sends email
+async function handleLovableAuthWebhook(req: Request, log: RequestLoggingContext["log"]): Promise<Response> {
   const apiKey = Deno.env.get('LOVABLE_API_KEY')
 
   if (!apiKey) {
@@ -283,24 +452,6 @@ async function handleWebhook(req: Request, log: RequestLoggingContext["log"]): P
     /* non-fatal */
   }
 
-  const EmailTemplate = EMAIL_TEMPLATES[emailType]
-  if (!EmailTemplate) {
-    try {
-      log.error("auth_email_hook_unknown_type", {
-        holzen_event: "auth_email_hook_unknown_type",
-        email_type: emailType,
-        run_id,
-      });
-    } catch {
-      /* non-fatal */
-    }
-    return new Response(
-      JSON.stringify({ error: `Unknown email type: ${emailType}` }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
-  }
-
-  // Build template props from payload.data (HookData structure)
   const templateProps: AuthEmailTemplateProps = {
     siteName: SITE_NAME,
     siteUrl: `https://${ROOT_DOMAIN}`,
@@ -309,45 +460,6 @@ async function handleWebhook(req: Request, log: RequestLoggingContext["log"]): P
     token: payload.data.token,
     email: payload.data.email,
     newEmail: payload.data.new_email,
-  }
-
-  // Render React Email to HTML and plain text
-  const html = await renderAsync(React.createElement(EmailTemplate, templateProps))
-  const text = await renderAsync(React.createElement(EmailTemplate, templateProps), {
-    plainText: true,
-  })
-
-  if (!isTransactionalEmailConfigured()) {
-    try {
-      log.error("auth_email_hook_missing_email_delivery", {
-        holzen_event: "auth_email_hook_missing_email_delivery",
-        run_id,
-      });
-    } catch {
-      /* non-fatal */
-    }
-    return new Response(JSON.stringify({ error: 'Server configuration error' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
-  }
-
-  // Legacy Lovable send API requires callback_url from the webhook payload.
-  const callbackUrl = payload.data.callback_url
-  const useResend = Boolean(Deno.env.get("RESEND_API_KEY")?.trim())
-  if (!useResend && !callbackUrl) {
-    try {
-      log.error("auth_email_hook_missing_callback_url", {
-        holzen_event: "auth_email_hook_missing_callback_url",
-        run_id,
-      });
-    } catch {
-      /* non-fatal */
-    }
-    return new Response(JSON.stringify({ error: 'Missing callback_url in payload' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
   }
 
   const toEmail = typeof payload.data.email === "string" ? payload.data.email.trim() : "";
@@ -366,59 +478,35 @@ async function handleWebhook(req: Request, log: RequestLoggingContext["log"]): P
     });
   }
 
-  const sendResult = await sendTransactionalEmail(
-    {
-      to: toEmail,
-      from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
-      sender_domain: SENDER_DOMAIN,
-      subject: EMAIL_SUBJECTS[emailType] || 'Notification',
-      html,
-      text,
-      purpose: 'transactional',
-      label: `auth-${emailType}`,
-    },
-    {
-      source: 'auth-email-hook',
-      idempotencyKey: `auth-email:${run_id}`,
-      sendUrl: callbackUrl,
-      logger: holzenTransactionalEmailLogger(
-        (m, d) => log("auth_email_hook_dep", { holzen_event: "auth_email_hook_dep", message: m, run_id, ...(d ?? {}) }),
-        (m, d) => log.error("auth_email_hook_dep", { holzen_event: "auth_email_hook_dep", message: m, run_id, ...(d ?? {}) }),
-      ),
-    },
+  return renderAndSendAuthEmail(
+    emailType,
+    templateProps,
+    toEmail,
+    run_id,
+    log,
+    payload.data.callback_url,
   )
+}
 
-  if (!sendResult.ok) {
-    try {
-      log.error("auth_email_hook_send_api_failed", {
-        holzen_event: "auth_email_hook_send_api_failed",
-        run_id,
-        http_status: sendResult.status,
-        detail: (sendResult.error ?? 'Failed to send email').slice(0, 500),
-      });
-    } catch {
-      /* non-fatal */
+async function handleWebhook(req: Request, log: RequestLoggingContext["log"]): Promise<Response> {
+  if (isSupabaseAuthHook(req)) {
+    if (!Deno.env.get("SEND_EMAIL_HOOK_SECRET")?.trim()) {
+      return new Response(JSON.stringify({ error: 'Server configuration error' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
-    return new Response(JSON.stringify({ error: 'Failed to send email' }), {
+    return handleSupabaseAuthWebhook(req, log)
+  }
+
+  if (!Deno.env.get("LOVABLE_API_KEY")?.trim()) {
+    return new Response(JSON.stringify({ error: 'Server configuration error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
 
-  try {
-    log("auth_email_hook_sent", {
-      holzen_event: "auth_email_hook_sent",
-      message_id: sendResult.id,
-      run_id,
-    });
-  } catch {
-    /* non-fatal */
-  }
-
-  return new Response(
-    JSON.stringify({ success: true, message_id: sendResult.id }),
-    { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-  )
+  return handleLovableAuthWebhook(req, log)
 }
 
 Deno.serve(withRequestLogging("auth-email-hook", async ({ req, log }) => {
