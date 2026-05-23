@@ -3,7 +3,6 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { PRICING } from "./src/features/subscription/domain/pricing";
@@ -113,7 +112,9 @@ function resolveAppVersion({
 export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const useHostedFallback =
-    mode !== "localstack" && (command === "serve" || command === "build");
+    mode !== "localstack" &&
+    mode !== "staging" &&
+    (command === "serve" || command === "build");
   const supabaseUrl = useHostedFallback
     ? env.VITE_SUPABASE_URL || FALLBACK_SUPABASE_URL
     : env.VITE_SUPABASE_URL || "";
@@ -175,8 +176,6 @@ export default defineConfig(({ mode, command }) => {
         },
       },
       react(),
-      (mode === "development" || mode === "hosted" || mode === "localstack") &&
-        componentTagger(),
       VitePWA({
         strategies: "injectManifest",
         srcDir: "src",

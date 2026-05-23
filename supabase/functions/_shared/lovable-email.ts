@@ -1,11 +1,5 @@
 /**
- * Shared Lovable Email helper — one canonical place to call the Lovable Email
- * API from edge functions.
- *
- * Adds:
- *   - Exponential-backoff retries on 429 / 5xx (with retryAfterSeconds honored).
- *   - Optional idempotency keys so cron retries never double-send.
- *   - A batch helper used by digest/report cron jobs.
+ * Shared transactional email helper — Resend (preferred) or Lovable Email (legacy).
  */
 import { sendLovableEmail as sendLovableEmailApi } from "npm:@lovable.dev/email-js";
 
@@ -69,16 +63,58 @@ export interface BatchResult {
 }
 
 export class LovableEmailConfigurationError extends Error {
-  constructor(message = "LOVABLE_API_KEY not configured") {
+  constructor(message = "RESEND_API_KEY or LOVABLE_API_KEY not configured") {
     super(message);
     this.name = "LovableEmailConfigurationError";
   }
 }
 
+type EmailBackend = "resend" | "lovable";
+
+function resolveEmailBackend(opts: SendOptions): { backend: EmailBackend; apiKey: string } {
+  const resend = opts.apiKey?.startsWith("re_")
+    ? opts.apiKey
+    : Deno.env.get("RESEND_API_KEY")?.trim();
+  if (resend) return { backend: "resend", apiKey: resend };
+
+  const lovable = opts.apiKey ?? Deno.env.get("LOVABLE_API_KEY") ?? "";
+  if (lovable) return { backend: "lovable", apiKey: lovable };
+
+  throw new LovableEmailConfigurationError();
+}
+
+async function sendViaResend(
+  email: LovableEmail,
+  apiKey: string,
+  to: string,
+  text: string,
+): Promise<{ message_id?: string }> {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: email.from,
+      to: [to],
+      subject: email.subject,
+      html: email.html,
+      text,
+    }),
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    const err = new Error(`Resend HTTP ${res.status}: ${truncate(errText)}`) as Error & { status?: number };
+    err.status = res.status;
+    throw err;
+  }
+  const data = await res.json() as { id?: string };
+  return { message_id: data.id };
+}
+
 function resolveApiKey(override?: string): string {
-  const key = override ?? Deno.env.get("LOVABLE_API_KEY") ?? "";
-  if (!key) throw new LovableEmailConfigurationError();
-  return key;
+  return resolveEmailBackend({ apiKey: override }).apiKey;
 }
 
 function resolveSenderDomain(override?: string): string {
@@ -145,13 +181,17 @@ export async function sendLovableEmailMessage(
   email: LovableEmail,
   opts: SendOptions = {},
 ): Promise<SendResult> {
-  const apiKey = resolveApiKey(opts.apiKey);
+  const emailBackend = resolveEmailBackend(opts);
   const logger = opts.logger ?? NOOP_LOGGER;
   const source = opts.source ?? "lovable-email";
   const maxRetries = opts.maxRetries ?? 3;
   const baseDelayMs = opts.baseDelayMs ?? 500;
   const senderDomain = email.sender_domain ?? resolveSenderDomain(opts.senderDomain);
   const to = Array.isArray(email.to) ? email.to[0] : email.to;
+  const plainText =
+    email.text && email.text.trim().length > 0
+      ? email.text
+      : htmlToPlainText(email.html);
   let attempts = 0;
   let status = 0;
   let lastError: string | undefined;
@@ -160,6 +200,19 @@ export async function sendLovableEmailMessage(
   for (let i = 0; i <= maxRetries; i++) {
     attempts = i + 1;
     try {
+      if (emailBackend.backend === "resend") {
+        const res = await sendViaResend(email, emailBackend.apiKey, to, plainText);
+        logger.log("dependency_call", {
+          dep: "resend-email",
+          status: "ok",
+          operation: "emails.send",
+          source,
+          duration_ms: Date.now() - start,
+          attempts,
+        });
+        return { ok: true, id: res?.message_id, status: 200, attempts };
+      }
+
       const res = await sendLovableEmailApi(
         {
           to,
@@ -167,14 +220,12 @@ export async function sendLovableEmailMessage(
           sender_domain: senderDomain,
           subject: email.subject,
           html: email.html,
-          text: email.text && email.text.trim().length > 0
-            ? email.text
-            : htmlToPlainText(email.html),
+          text: plainText,
           purpose: email.purpose ?? "transactional",
           label: email.label ?? source,
           idempotency_key: opts.idempotencyKey,
         },
-        { apiKey, sendUrl: opts.sendUrl },
+        { apiKey: emailBackend.apiKey, sendUrl: opts.sendUrl },
       );
       logger.log("dependency_call", {
         dep: "lovable-email",

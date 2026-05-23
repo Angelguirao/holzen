@@ -44,7 +44,11 @@ export interface BuildOrchestrateCompanionTasksParams {
    * degraded affects all four (structuring + deep-time).
    */
   skipLivePerplexity?: boolean;
+  /** When true, skip live Gemini structuring / zoom-out (circuit breaker). */
+  skipLiveGemini?: boolean;
+  /** @deprecated Alias for skipLiveGemini */
   skipLiveLovable?: boolean;
+  budgetTier?: import("./llm-gateway.ts").LlmBudgetTier;
   /** profiles.tracked_asset_id — zoom-out BTC anniversary path only for bitcoin. */
   trackedAssetId?: string | null;
   /** Incoming edge request for W3C trace propagation (Perplexity live phase). */
@@ -62,10 +66,12 @@ export function buildOrchestrateCompanionTasks(
   // all four (structuring step on signal/grounding/history + zoom-out deep-time).
   // If either breaker trips, skip the live phase for affected tasks; cache +
   // library + curated fallback still run.
-  const skipLiveSignal = Boolean(p.skipLivePerplexity || p.skipLiveLovable);
-  const skipLiveGrounding = Boolean(p.skipLivePerplexity || p.skipLiveLovable);
-  const skipLiveHistory = Boolean(p.skipLivePerplexity || p.skipLiveLovable);
-  const skipLiveZoomOut = Boolean(p.skipLiveLovable);
+  const skipLiveGemini = Boolean(p.skipLiveGemini ?? p.skipLiveLovable);
+  const skipLiveSignal = Boolean(p.skipLivePerplexity || skipLiveGemini);
+  const skipLiveGrounding = Boolean(p.skipLivePerplexity || skipLiveGemini);
+  const skipLiveHistory = Boolean(p.skipLivePerplexity || skipLiveGemini);
+  const skipLiveZoomOut = Boolean(skipLiveGemini);
+  const budgetTier = p.budgetTier ?? "normal";
 
   if (p.shouldRunGrounding) {
     tasks.grounding = (async (): Promise<CompanionResult> => {
@@ -83,6 +89,7 @@ export function buildOrchestrateCompanionTasks(
         log: p.log,
         preferredBias: p.intent.groundingBias,
         skipLive: skipLiveGrounding,
+        budgetTier,
         incomingRequest: p.incomingRequest,
       });
       const latencyMs = Date.now() - t;
@@ -121,6 +128,7 @@ export function buildOrchestrateCompanionTasks(
         log: p.log,
         preferredMood: p.intent.historyMood,
         skipLive: skipLiveHistory,
+        budgetTier,
         incomingRequest: p.incomingRequest,
       });
       const latencyMs = Date.now() - t;
@@ -160,6 +168,7 @@ export function buildOrchestrateCompanionTasks(
         log: p.log,
         zoomOutAngle: p.intent.zoomOutAngle,
         skipLive: skipLiveZoomOut,
+        budgetTier,
         trackedAssetId: p.trackedAssetId,
         incomingRequest: p.incomingRequest,
       });
@@ -224,6 +233,7 @@ export function buildOrchestrateCompanionTasks(
         log: p.log,
         searchAngle: p.intent.signalAngle,
         skipLive: skipLiveSignal,
+        budgetTier,
         incomingRequest: p.incomingRequest,
       });
       const latencyMs = Date.now() - t;

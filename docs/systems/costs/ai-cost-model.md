@@ -39,12 +39,13 @@ negotiated rate differs.
 > If the generators ever pass `search_context_size: "medium" | "high"`, override
 > via `PERPLEXITY_REQUEST_FEE_USD_JSON`.
 
-### 1.2 Lovable AI Gateway — [pricing docs](https://docs.lovable.dev/integrations/ai)
+### 1.2 Google Gemini (direct + OpenRouter failover)
 
-Lovable states explicitly that gateway pricing equals the underlying provider
-list price: *"The cost of using Lovable AI is exactly the same as going
-directly to the LLM provider. There are no hidden fees."* Numbers below are
-Google Gemini API list rates ([source](https://ai.google.dev/gemini-api/docs/pricing)).
+Primary path: **`GOOGLE_AI_API_KEY`** → [Google Gemini OpenAI-compat API](https://ai.google.dev/gemini-api/docs/pricing). Optional failover: **`OPENROUTER_API_KEY`** → [OpenRouter](https://openrouter.ai/docs) (same model ids, used only on retryable errors).
+
+Legacy **`LOVABLE_API_KEY`** remains as last-resort during migration; remove once prod secrets are migrated.
+
+List rates below are Google API pricing ([source](https://ai.google.dev/gemini-api/docs/pricing)). OpenRouter may add a small platform fee on some routes — reconcile with their dashboard if you route significant traffic through it.
 
 
 | Model                           | Input $/1M | Output $/1M | Notes                                                                                 |

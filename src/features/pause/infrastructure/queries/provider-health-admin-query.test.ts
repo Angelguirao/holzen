@@ -22,6 +22,6 @@ describe('provider-health-admin-query', () => {
     const stats = await fetchProviderHealthStats();
     expect(from).toHaveBeenCalledWith('generation_attempts');
     expect(stats.perplexity.state).toBe('insufficient_sample');
-    expect(stats.lovable.state).toBe('insufficient_sample');
+    expect(stats.google.state).toBe('insufficient_sample');
   });
 });

@@ -26,7 +26,13 @@ import { type CacheServeRelaxation, parseMarketDirection, serveFromCache } from 
 import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
-import { fetchInitWithIncomingTrace } from "../forward-trace-headers.ts";
+import {
+  type LlmBudgetTier,
+  llmChatCompletionsWithFallback,
+  llmLogProvider,
+  resolveLlmCredentialChain,
+  resolveModelsForTask,
+} from "../llm-gateway.ts";
 import {
   searchCompanionCatalog,
   paperToGrounding,
@@ -68,6 +74,7 @@ export interface GenerateGroundingParams {
   forceLive?: boolean;
   /** Skip the live phase only — library/cache still serve. Used by circuit breaker. */
   skipLive?: boolean;
+  budgetTier?: LlmBudgetTier;
   log: (msg: string, extra?: Record<string, unknown>) => void;
   /** Edge `Request` for W3C trace propagation to Perplexity. */
   incomingRequest?: Request;
@@ -214,6 +221,7 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
     preferredBias,
     forceLive,
     skipLive,
+    budgetTier = "normal",
     log,
     incomingRequest,
   } = params;
@@ -256,8 +264,8 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
   const logAttempt = createAttemptLogger(svcClient, { userId });
 
   const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
+  const llmChain = resolveLlmCredentialChain();
+  if (!PERPLEXITY_API_KEY || llmChain.length === 0) {
     log("missing API keys, serving fallback");
     return serveFallback(svcClient, userId, marketDirectionForCache, undefined, log);
   }
@@ -451,33 +459,32 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
     temperature: 0.3,
   };
 
-  const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
+  const models = resolveModelsForTask("structure", budgetTier);
   type GroundingLiveData = NonNullable<GroundingResult["data"]>;
   let nudge: GroundingLiveData | null = null;
   let lastLovableModel: string | undefined;
+  let logProvider = "google";
 
   const AI_TIMEOUTS = [8000, 6000];
   for (let idx = 0; idx < models.length; idx++) {
     const model = models[idx];
     const aiController = new AbortController();
-    const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[idx]);
+    const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[Math.min(idx, AI_TIMEOUTS.length - 1)]);
     const attemptT0 = Date.now();
     try {
-      const res = await fetch(
-        "https://ai.gateway.lovable.dev/v1/chat/completions",
-        fetchInitWithIncomingTrace(incomingRequest, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ ...aiBody, model }),
-          signal: aiController.signal,
-        }),
-      );
+      const { response: res, creds } = await llmChatCompletionsWithFallback({
+        model,
+        body: aiBody,
+        incomingRequest,
+        signal: aiController.signal,
+      });
+      logProvider = llmLogProvider(creds);
       clearTimeout(aiTimeout);
       log(`AI ${model} responded ${res.status}`);
 
       if (!res.ok) {
         await res.text();
-        logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: `HTTP ${res.status}` });
+        logAttempt({ companion_type: "ground_nudge", provider: logProvider, model, status: "error", latency_ms: Date.now() - attemptT0, error_message: `HTTP ${res.status}` });
         if (model !== models[models.length - 1]) continue; break;
       }
 
@@ -486,7 +493,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
       const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
       const content = toolCall?.function?.arguments || data.choices?.[0]?.message?.content;
       if (!content) {
-        logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "empty content", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+        logAttempt({ companion_type: "ground_nudge", provider: logProvider, model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "empty content", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
         if (model !== models[models.length - 1]) continue; break;
       }
 
@@ -496,16 +503,16 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
         const m = (typeof content === "string" ? content : "").match(/\{[\s\S]*\}/);
         if (m) nudge = JSON.parse(m[0]) as GroundingLiveData;
         else {
-          logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+          logAttempt({ companion_type: "ground_nudge", provider: logProvider, model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
           if (model !== models[models.length - 1]) continue; else break;
         }
       }
-      logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+      logAttempt({ companion_type: "ground_nudge", provider: logProvider, model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
       lastLovableModel = model;
       break;
     } catch (e) {
       clearTimeout(aiTimeout);
-      logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: e instanceof DOMException && e.name === "AbortError" ? "timeout" : "error", latency_ms: Date.now() - attemptT0, error_message: String(e) });
+      logAttempt({ companion_type: "ground_nudge", provider: logProvider, model, status: e instanceof DOMException && e.name === "AbortError" ? "timeout" : "error", latency_ms: Date.now() - attemptT0, error_message: String(e) });
       if (model !== models[models.length - 1]) { log(`${model} failed, retrying`); continue; }
       break;
     }
@@ -522,7 +529,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
     if (nudge && lastLovableModel) {
       logAttempt({
         companion_type: "ground_nudge",
-        provider: "lovable",
+        provider: logProvider,
         model: lastLovableModel,
         status: "quality_gate_failed",
         latency_ms: 0,

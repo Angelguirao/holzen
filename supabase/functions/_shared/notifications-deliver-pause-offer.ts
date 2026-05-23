@@ -84,10 +84,10 @@ async function sendPauseOfferEmail(
   log: PauseOfferDeliveryLog,
   holzenEvent: string,
 ): Promise<boolean> {
-  if (!Deno.env.get("LOVABLE_API_KEY")) {
+  if (!Deno.env.get("RESEND_API_KEY") && !Deno.env.get("LOVABLE_API_KEY")) {
     log.error("notifications_deliver_email", {
       holzen_event: holzenEvent,
-      phase: "lovable_api_key_not_configured",
+      phase: "email_api_key_not_configured",
     });
     return false;
   }

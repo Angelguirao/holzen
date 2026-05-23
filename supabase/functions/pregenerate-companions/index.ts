@@ -5,6 +5,10 @@ import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import {
+  llmChatCompletionsWithFallback,
+  resolveLlmCredentialChain,
+} from "../_shared/llm-gateway.ts";
+import {
   canonicalContentUrl,
   contentSnippetFingerprint,
   isCompanionCacheDuplicate,
@@ -65,17 +69,23 @@ serve(
     const logAttempt = createAttemptLogger(svcClient);
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
+    const llmChain = resolveLlmCredentialChain();
+    if (!PERPLEXITY_API_KEY || llmChain.length === 0) {
       return new Response(JSON.stringify({ error: "Missing API keys" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Feature flag + panic mode guard. The cache-warmer is the single
-    // biggest blast-radius cron if a bug loops, so this check is especially
-    // important. Also respects panic_mode (which includes `pregenerate`).
+    const geminiChat = (payload: Record<string, unknown>, signal?: AbortSignal) => {
+      const model = String(payload.model ?? "google/gemini-2.5-flash");
+      const { model: _drop, ...body } = payload;
+      return llmChatCompletionsWithFallback({ model, body, incomingRequest: req, signal })
+        .then((r) => r.response);
+    };
+
+    const llmLogProviderName = llmChain[0]!.provider;
+
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
     const pregenGuard = await guardAiFeature(svcClient, "pregenerate", {
-      providers: ["perplexity", "lovable"],
+      providers: ["perplexity", "google"],
     });
     if (!pregenGuard.allowed) {
       hzLog(`pregenerate skipped: ${pregenGuard.reason}`);
@@ -228,12 +238,7 @@ serve(
 
         if (searchContent) {
           const aiT0 = Date.now();
-          const aiRes = await fetch(
-            "https://ai.gateway.lovable.dev/v1/chat/completions",
-            fetchInitWithIncomingTrace(req, {
-              method: "POST",
-              headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-              body: JSON.stringify({
+          const aiRes = await geminiChat({
                 model: "google/gemini-2.5-flash",
                 messages: [
                   { role: "system", content: "Extract ONE grounding nudge from the search results. Tone: calm, grounding, no advice. Title: evocative, 5-10 words. Body: 2-3 sentences with specific findings." },
@@ -259,16 +264,14 @@ serve(
                 }],
                 tool_choice: { type: "function", function: { name: "return_grounding_nudge" } },
                 temperature: 0.3,
-              }),
-            }),
-          );
+              });
 
             if (aiRes.ok) {
               const aiData = await aiRes.json();
               const gUsage = aiData.usage;
               logAttempt({
                 companion_type: "pregenerate",
-                provider: "lovable",
+                provider: llmLogProviderName,
                 model: "google/gemini-2.5-flash",
                 status: "success",
                 latency_ms: Date.now() - aiT0,
@@ -354,12 +357,7 @@ serve(
 
         if (searchContent) {
           const sigAiT0 = Date.now();
-          const aiRes = await fetch(
-            "https://ai.gateway.lovable.dev/v1/chat/completions",
-            fetchInitWithIncomingTrace(req, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
+          const aiRes = await geminiChat({
               model: "google/gemini-2.5-flash",
               messages: [
                 { role: "system", content: "Extract ONE philosophical Bitcoin insight. Tone: profound, calm, grounding. Not data-driven — idea-driven. Title: evocative, 5-10 words. Body: 2-3 sentences. No numbers, percentages, or price mentions." },
@@ -385,16 +383,14 @@ serve(
               }],
               tool_choice: { type: "function", function: { name: "return_signal" } },
               temperature: 0.5,
-            }),
-          }),
-          );
+            });
 
             if (aiRes.ok) {
               const aiData = await aiRes.json();
               const sigUsage = aiData.usage;
               logAttempt({
               companion_type: "pregenerate",
-              provider: "lovable",
+              provider: llmLogProviderName,
               model: "google/gemini-2.5-flash",
               status: "success",
               latency_ms: Date.now() - sigAiT0,
@@ -483,12 +479,7 @@ serve(
 
         if (searchContent) {
           const histAiT0 = Date.now();
-          const aiRes = await fetch(
-            "https://ai.gateway.lovable.dev/v1/chat/completions",
-            fetchInitWithIncomingTrace(req, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
+          const aiRes = await geminiChat({
               model: "google/gemini-2.5-flash",
               messages: [
                 { role: "system", content: `You are a financial historian. Extract ONE historical parallel from the search results. The title should be evocative (e.g., "When gold crashed 26% in 2013"). btcInsight: 2-3 sentences about what happened with specific dates and numbers. analogy: 1-2 sentences connecting it to Bitcoin holding. Include assetClass, period, source name.` },
@@ -496,16 +487,14 @@ serve(
               ],
               response_format: { type: "json_object" },
               temperature: 0.4,
-            }),
-          }),
-          );
+            });
 
             if (aiRes.ok) {
               const aiData = await aiRes.json();
               const histUsage = aiData.usage;
               logAttempt({
               companion_type: "pregenerate",
-              provider: "lovable",
+              provider: llmLogProviderName,
               model: "google/gemini-2.5-flash",
               status: "success",
               latency_ms: Date.now() - histAiT0,
@@ -573,12 +562,7 @@ serve(
     if (zoomToGenerate > 0) {
       try {
         const zoomT0 = Date.now();
-        const aiRes = await fetch(
-          "https://ai.gateway.lovable.dev/v1/chat/completions",
-          fetchInitWithIncomingTrace(req, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
+        const aiRes = await geminiChat({
               model: "google/gemini-2.5-flash",
               messages: [
                 { role: "system", content: `You provide deep-time civilizational perspective on Bitcoin. Frame everything against thousands or millions of years. Tone: calm, vast, philosophical. No market data, no price predictions, no trading advice. Return JSON with "title" (evocative, 5-8 words) and "body" (2-3 sentences).` },
@@ -586,16 +570,14 @@ serve(
               ],
               response_format: { type: "json_object" },
               temperature: 0.6,
-            }),
-          }),
-        );
+            });
 
         if (aiRes.ok) {
           const aiData = await aiRes.json();
           const zoomUsage = aiData.usage;
           logAttempt({
           companion_type: "pregenerate",
-          provider: "lovable",
+          provider: llmLogProviderName,
           model: "google/gemini-2.5-flash",
           status: "success",
           latency_ms: Date.now() - zoomT0,
