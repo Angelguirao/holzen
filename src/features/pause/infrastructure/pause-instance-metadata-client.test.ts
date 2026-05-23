@@ -22,7 +22,9 @@ describe('pause-instance-metadata-client', () => {
   it('toggleCompanionSlotFavoriteOnInstance updates metadata and calls onBucketComputed', async () => {
     const { toggleCompanionSlotFavoriteOnInstance } = await import('./pause-instance-metadata-client');
     const buckets: Record<string, boolean>[] = [];
-    const ok = await toggleCompanionSlotFavoriteOnInstance('pause-1', 'signal', {
+    const ok = await toggleCompanionSlotFavoriteOnInstance({
+      pauseInstanceId: 'pause-1',
+      sourceType: 'signal',
       onBucketComputed: (bucket) => buckets.push(bucket),
     });
     expect(ok).toBe(true);

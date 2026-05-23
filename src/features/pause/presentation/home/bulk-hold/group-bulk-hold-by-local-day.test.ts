@@ -1,11 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { TFunction } from 'i18next';
 
 import type { BulkHoldPendingPause } from '@/features/pause/domain/bulk-hold';
 
 import { groupBulkHoldByLocalDay } from './group-bulk-hold-by-local-day';
 
 describe('groupBulkHoldByLocalDay', () => {
-  const t = vi.fn((key: string, opts?: { defaultValue?: string }) => opts?.defaultValue ?? key);
+  const t = vi.fn(
+    (key: string, opts?: { defaultValue?: string }) => opts?.defaultValue ?? key,
+  ) as unknown as TFunction;
 
   it('groups items by local day and sorts newest day first', () => {
     const items = [

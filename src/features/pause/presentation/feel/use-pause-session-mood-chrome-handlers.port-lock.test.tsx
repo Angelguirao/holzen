@@ -29,7 +29,8 @@ vi.mock('./pause-feel-io', async (importOriginal) => {
 });
 
 vi.mock('../reflect/steps/pause-reflect-steps-io', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../steps/pause-reflect-steps-io')>();
+  const actual =
+    await importOriginal<typeof import('../reflect/steps/pause-reflect-steps-io')>();
   return {
     ...actual,
     pauseReflectFavoriteToggle: pauseReflectFavoriteToggleMock,

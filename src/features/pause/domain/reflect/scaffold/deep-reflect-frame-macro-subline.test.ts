@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { TFunction } from 'i18next';
 import { deepReflectOrFrameMacroSubline } from './deep-reflect-frame-macro-subline';
 
-const t = vi.fn((key: string, opts?: { defaultValue?: string }) => opts?.defaultValue ?? key);
+const t = vi.fn(
+  (key: string, opts?: { defaultValue?: string }) => opts?.defaultValue ?? key,
+) as unknown as TFunction;
 
 describe('deepReflectOrFrameMacroSubline', () => {
   it('returns reflect duration hint on reflect step', () => {

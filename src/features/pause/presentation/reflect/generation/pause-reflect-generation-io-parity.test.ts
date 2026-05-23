@@ -175,7 +175,7 @@ describe('pause-reflect-generation-io parity', () => {
       severityAbsPct: 50,
       profile: { display_name: 'Test' },
       signal: new AbortController().signal,
-    };
+    } as unknown as Parameters<typeof pauseReflectGeneration>[0];
 
     await pauseReflectGeneration(input);
 
@@ -192,9 +192,9 @@ describe('pause-reflect-generation-io parity', () => {
       severityAbsPct: 10,
       profile: {},
       signal: new AbortController().signal,
-    };
+    } as unknown as Parameters<typeof pauseReflectGeneration>[0];
 
-    await pauseReflectGeneration(input, customGenerator as typeof supabaseReflectGenerator);
+    await pauseReflectGeneration(input, customGenerator as unknown as typeof supabaseReflectGenerator);
 
     expect(runReflectGenerationDirect).toHaveBeenCalledWith(input, customGenerator);
   });

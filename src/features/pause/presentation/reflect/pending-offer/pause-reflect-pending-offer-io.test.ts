@@ -125,7 +125,7 @@ describe('pause-reflect-pending-offer-io', () => {
 
   it('re-exports getPendingPauseOfferDisplay from pending-pause-offer-display leaf module', () => {
     const display: PendingPauseOfferDisplay = getPendingPauseOfferDisplay({
-      context: 'btc',
+      context_snapshot: { context_text: 'btc' },
       preview_message: 'Take a breath',
     });
     expect(getPendingPauseOfferDisplayMock).toHaveBeenCalled();
