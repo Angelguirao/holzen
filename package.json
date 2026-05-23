@@ -44,6 +44,8 @@
     "gen:types": "node scripts/gen-supabase-types.mjs",
     "staging:db-push": "node scripts/staging-deploy.mjs db-push",
     "staging:deploy": "node scripts/staging-deploy.mjs deploy",
+    "prod:db-push": "node scripts/staging-deploy.mjs db-push",
+    "prod:deploy": "node scripts/staging-deploy.mjs deploy",
     "design:lint": "npx --yes @google/design.md lint DESIGN.md"
   },
   "dependencies": {

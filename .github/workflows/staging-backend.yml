@@ -22,6 +22,12 @@ jobs:
         with:
           version: latest
 
+      - name: Install (release stamp)
+        run: npm ci
+
+      - name: Stamp edge release
+        run: npm run stamp:release
+
       - name: Link staging project
         run: supabase link --project-ref "${{ secrets.SUPABASE_STAGING_PROJECT_REF }}"
         env:

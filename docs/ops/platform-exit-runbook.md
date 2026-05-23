@@ -92,10 +92,12 @@ GitHub Actions (see [`.github/workflows/`](../../.github/workflows/)):
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
 | `ci.yml` | PR | `npm run test:ci` |
-| `staging-backend.yml` | `workflow_dispatch` / PR label | `db push` + edge deploy to staging |
-| `deploy-production.yml` | push `main` (manual approval recommended) | prod backend + frontend |
+| `staging-backend.yml` | `workflow_dispatch` / push `staging` | `db push` + edge deploy to staging |
+| `deploy-production.yml` | `workflow_dispatch` / push `main` | Preflight (`test:ci` + build) then prod `db push` + edge deploy (**`production`** environment approval recommended) |
 
-**GitHub secrets:** `SUPABASE_ACCESS_TOKEN`, `SUPABASE_STAGING_PROJECT_REF`, `SUPABASE_PROD_PROJECT_REF`, plus build-time `VITE_SUPABASE_*` for frontend workflow.
+**GitHub secrets:** `SUPABASE_ACCESS_TOKEN`, `SUPABASE_STAGING_PROJECT_REF`, `SUPABASE_PROD_PROJECT_REF`, plus build-time `VITE_SUPABASE_*` for CI and frontend hosts.
+
+**Setup guides:** [staging-supabase-setup.md](staging-supabase-setup.md), [production-supabase-setup.md](production-supabase-setup.md).
 
 ---
 

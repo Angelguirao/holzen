@@ -37,6 +37,7 @@ Lovable may remain as an optional editor until fully dropped; **Lovable must not
 
 - Runbook: [platform-exit-runbook.md](../ops/platform-exit-runbook.md)
 - Staging setup: [staging-supabase-setup.md](../ops/staging-supabase-setup.md)
+- Production setup: [production-supabase-setup.md](../ops/production-supabase-setup.md)
 - Risk model: [lovable-staging-and-platform-exit.md](../ops/lovable-staging-and-platform-exit.md)
 
 ## Alternatives considered
