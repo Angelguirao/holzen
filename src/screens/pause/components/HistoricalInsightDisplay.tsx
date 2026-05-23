@@ -12,6 +12,7 @@ interface Props {
 }
 
 export function HistoricalInsightDisplay({ data, loading, error, onRetry }: Props) {
+  "use memo";
   if (loading) {
     return (
       <div className="space-y-3">

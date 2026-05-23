@@ -10,6 +10,7 @@ interface Props {
 }
 
 export function OnboardingThreshold({ threshold, onThresholdChange, stagger }: Props) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

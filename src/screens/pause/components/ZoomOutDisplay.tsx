@@ -23,6 +23,7 @@ interface Props {
 }
 
 export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();

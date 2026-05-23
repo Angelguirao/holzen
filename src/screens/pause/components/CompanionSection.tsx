@@ -24,6 +24,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   { companions, prefs, severity = 'mild', pauseInstanceId, context, reflectionMessage, mood, sectionLead },
   ref,
 ) {
+  "use memo";
   const { isPro } = useProGate();
 
   const {

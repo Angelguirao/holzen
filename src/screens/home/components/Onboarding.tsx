@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useTransition } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { OnboardingWhy } from '@/screens/home/components/onboarding/OnboardingWhy';
 import { OnboardingReady } from '@/screens/home/components/onboarding/OnboardingReady';
@@ -26,13 +26,14 @@ const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const TOTAL_STEPS = 2;
 
 export function Onboarding({ onComplete }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const { ensureTrial, trialLoading } = useSubscription();
   const [step, setStep] = useState(0);
   const [timezone] = useState(detectedTimezone);
   const [motivations, setMotivations] = useState<string[]>([]);
   const [direction, setDirection] = useState(1);
-  const [startingTrial, setStartingTrial] = useState(false);
+  const [isStartingTrial, startTrialFlow] = useTransition();
   const prefersReduced = useReducedMotion();
 
   const goTo = useCallback((next: number) => {
@@ -100,19 +101,14 @@ export function Onboarding({ onComplete }: Props) {
                 <OnboardingReady
                   motivations={motivations}
                   onStartTrial={() => {
-                    void (async () => {
-                      setStartingTrial(true);
-                      try {
-                        await onComplete(buildResult(), { setLocalOnboarded: false });
-                        await ensureTrial();
-                        await onComplete(buildResult());
-                        trackOnboardingCompleted(2);
-                      } finally {
-                        setStartingTrial(false);
-                      }
-                    })();
+                    startTrialFlow(async () => {
+                      await onComplete(buildResult(), { setLocalOnboarded: false });
+                      await ensureTrial();
+                      await onComplete(buildResult());
+                      trackOnboardingCompleted(2);
+                    });
                   }}
-                  trialLoading={trialLoading || startingTrial}
+                  trialLoading={trialLoading || isStartingTrial}
                   stagger={stagger}
                 />
               )}

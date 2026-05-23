@@ -10,6 +10,7 @@ export function BriefBreathAdvanceToIntegrate({
   onContinue,
   onAdvanceFailed,
 }: BriefBreathAdvanceToIntegrateProps) {
+  "use memo";
   const onContinueRef = useRef(onContinue);
   onContinueRef.current = onContinue;
   const onAdvanceFailedRef = useRef(onAdvanceFailed);

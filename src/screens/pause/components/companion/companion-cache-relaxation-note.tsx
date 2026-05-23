@@ -6,6 +6,7 @@ export type CompanionCacheRelaxationNoteProps = {
 
 /** Small mono status when a companion slot was served from a relaxed cache rule. */
 export function CompanionCacheRelaxationNote({ relaxationKey }: CompanionCacheRelaxationNoteProps) {
+  "use memo";
   const { t } = useTranslation();
   if (!relaxationKey) return null;
 

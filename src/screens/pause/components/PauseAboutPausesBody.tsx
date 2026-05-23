@@ -13,6 +13,7 @@ const SECTIONS = [
 ] as const;
 
 export function PauseAboutPausesBody() {
+  "use memo";
   const { t } = useTranslation();
 
   return (

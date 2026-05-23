@@ -18,6 +18,7 @@ export type PauseDoneDefaultProps = {
 
 /** Deep / default pause completion screen (streak celebration, score impact, return CTA). */
 export function PauseDoneDefault({ decision, onReturn, pauseData, pauseInstanceId }: PauseDoneDefaultProps) {
+  "use memo";
   const { t } = useTranslation();
   const { subscribed } = useSubscription();
   const wallpaperMood = resolveDoneWallpaperMood(pauseData);

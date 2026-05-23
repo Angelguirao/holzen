@@ -190,15 +190,15 @@ Hooks should **not** grow unbounded RPC + navigation + analytics; extract **use 
 
 **Industry:** React performance is primarily about **where updates stop** in the component tree (state placement, `React.memo`, composition, lazy branches, narrow context). `useMemo` / `useCallback` are often **glue** so memoized children see stable props — not the main strategy. **React Compiler** automates much of that glue at build time. **React 19** adds Actions, `useActionState`, and `useOptimistic` for simpler async form/mutation UX.
 
-**Holzen policy:** [2026-05-23 ADR](../decisions/2026-05-23-render-boundaries-defer-react-compiler-19.md) — **React 19.2.x runtime**; adopt `useOptimistic` / `useActionState` incrementally; keep Query + `invokeEdge` for reads and ritual/companion flows.
+**Holzen policy:** [2026-05-23 ADR](../decisions/2026-05-23-render-boundaries-defer-react-compiler-19.md) — **React 19.2.x runtime**; `useOptimistic` / `useActionState` / `useTransition` on **simple mutations and forms**; keep Query + `invokeEdge` for reads and ritual/companion orchestration.
 
 | Topic | Holzen today | Policy |
 |-------|--------------|--------|
 | Render boundaries | **Yes** on Home (`memo(HomeDashboardLayout)`, stable layout props, lazy Zen) | Extend when touching hot screens; see [react-screen-orchestration.md](react-screen-orchestration.md) |
 | Manual `useMemo` / `useCallback` | Widespread in pause/home/companion | **No new** memos without justification; **no mass removal** during migration |
-| React Compiler | **Pilot:** annotation mode on all `screens/home|pause/components/**` with `"use memo"` opt-in (`vite.react-compiler.ts`) | Market/hold-goal/bulk-hold shells annotated; profile before `infer` mode |
-| React 19 / Actions | **Shipped:** optimistic profile toggles (incl. currency, asset, language); pause/push/companion; settings forms + export/delete/sign-out; testimonial + credits + subscription checkout/trial (`useTransition`) | Keep Query + `invokeEdge` for ritual/companion |
-| react-hook-form + Zod | Settings/admin forms | Keep for complex validated forms |
+| React Compiler | **Pilot complete (annotation):** all `screens/home|pause/components/**` presentation exports opt in with `"use memo"` (`vite.react-compiler.ts`, `scripts/add-react-compiler-use-memo.mjs`) | Profile before `compilationMode: 'infer'`; skip `render*` helpers and hooks |
+| React 19 / Actions | **Shipped** on active surfaces — see table below | **Do not** mass-rewrite pause/companion orchestration to form Actions |
+| react-hook-form + Zod | Settings/admin complex forms | Keep where already used |
 
 **When adding `useMemo` / `useCallback` (review gate):**
 
@@ -208,16 +208,18 @@ Hooks should **not** grow unbounded RPC + navigation + analytics; extract **use 
 
 If none apply, prefer a **boundary** (lower state, memo shell, lazy branch) instead.
 
-**Post-migration pilot candidates (optional, not scheduled):**
+**React 19 adoption (active surfaces — May 2026):**
 
-| Pilot | Surface | Status |
-|-------|---------|--------|
-| React Compiler | Vite build + home/pause `components/` | **Pilot** (May 2026) — annotation mode, directory-scoped |
-| `useOptimistic` / `useTransition` | Pause favorite; snooze; profile toggles; push subscribe; companion vote | **Shipped** (May 2026) |
-| `useActionState` | Settings: change-email, change-password, feedback, export, delete, sign-out | **Shipped** (May 2026) |
-| `useTransition` | Companion vote; push subscribe; testimonial submit; credits refresh; subscription checkout + trial | **Shipped** (May 2026) |
+| Hook | Surfaces | Status |
+|------|----------|--------|
+| `useOptimistic` | Profile toggles; snooze; push subscribe; pause favorite; companion vote; ritual favorite | **Done** |
+| `useActionState` | Settings: email, password, feedback, export, delete, sign-out; Home testimonial; Auth email/forgot; reset-password; email unsubscribe | **Done** |
+| `useTransition` | Companion vote; push subscribe; credits refresh; subscription checkout/trial/portal; Auth Google OAuth; onboarding trial start | **Done** |
+| React Compiler `"use memo"` | All home + pause `components/**` presentation exports (excl. `render*` helpers) | **Done** (annotation mode) |
 
-**Do not** replace TanStack Query or pause/companion mutation paths with form Actions wholesale. **Do** use React 19 hooks on the next simple mutation you touch.
+**Explicitly out of scope (by design):** companion slot orchestration loading (`setCompanionSlotLoading`), pause ritual step mutations, TanStack Query fetch paths, admin bulk tools — keep existing patterns until a deliberate vertical slice.
+
+**Do not** replace TanStack Query or pause/companion mutation paths with form Actions wholesale.
 
 ---
 
@@ -251,7 +253,7 @@ This scorecard is the **manual** half of Holzen’s architectural fitness functi
 | RSC / Next | **N/A (SPA)** | N/A | ADR + backlog |
 | Modular monolith | **Strong** | **Planned** | [2026-05-17 ADR](../decisions/2026-05-17-modular-monolith-hexagonal-client.md) |
 | Render boundaries (vs memo sprawl) | **Strong** (Home reference) | **Partial** (many legacy memos) | §2.9 + [react-screen-orchestration.md](react-screen-orchestration.md) |
-| React Compiler / React 19 | **Runtime on 19.x**; Compiler deferred; Actions pilots shipped | **19.2.x + 3 pilots** | [2026-05-23 ADR](../decisions/2026-05-23-render-boundaries-defer-react-compiler-19.md) |
+| React Compiler / React 19 | **Runtime 19.x**; Compiler annotation on home/pause; Actions shipped on active forms | **Done** (May 2026) | [2026-05-23 ADR](../decisions/2026-05-23-render-boundaries-defer-react-compiler-19.md) |
 | Server authority (not React rules) | **Strong** | **Strong** | [client-server-architecture-holzen.md](client-server-architecture-holzen.md) |
 
 **Overall:** Product and **server** architecture are ahead of **client folder** architecture. Pre-launch work should **close the gap** without adopting frontend patterns Holzen explicitly rejects (§3).

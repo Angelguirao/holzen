@@ -26,6 +26,7 @@ export function ScoreImpact({
   /** When true with `variant="brief"`, the first qualitative row is omitted (e.g. shown in a meta row above). */
   excludeFirstFromList?: boolean;
 }) {
+  "use memo";
   const { t } = useTranslation();
 
   const impacts = useMemo(() => buildPauseScoreImpacts(data, t, variant), [data, t, variant]);

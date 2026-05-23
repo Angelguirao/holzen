@@ -23,6 +23,7 @@ interface Props {
  * the three inputs are known — we don't want to show an empty "because …" UI.
  */
 export function WhyThisCard({ mood, marketDirection, preferredBias, companion, className = '' }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 

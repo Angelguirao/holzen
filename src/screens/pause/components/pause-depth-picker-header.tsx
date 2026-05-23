@@ -8,6 +8,7 @@ type PauseDepthPickerHeaderProps = {
 };
 
 export function PauseDepthPickerHeader({ onAboutPauses, onClose }: PauseDepthPickerHeaderProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

@@ -22,6 +22,7 @@ export function PauseBreathingCompletion({
   onRepeatDeepFirstBreathPattern,
   onRepeatDeepSecondBreathPattern,
 }: PauseBreathingCompletionProps) {
+  "use memo";
   if (ritualVariant === 'brief') {
     return (
       <BriefBreathAdvanceToIntegrate onContinue={onContinueAfterBreath} onAdvanceFailed={onAdvanceFailed} />

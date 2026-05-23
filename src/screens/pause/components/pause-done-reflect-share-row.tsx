@@ -20,6 +20,7 @@ export function PauseDoneReflectShareRow({
   wallpaperMood,
   pauseInstanceId,
 }: PauseDoneReflectShareRowProps) {
+  "use memo";
   const msg = (reflectionMessage ?? '').trim();
   const { onShareMenuOpen } = usePauseReflectUiTelemetry(pauseInstanceId, 'pause_done');
   if (!subscribed || !msg) return null;

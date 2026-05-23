@@ -11,6 +11,7 @@ export type PauseFrameToolRowProps = {
 
 /** Frame step link row to a companion full-view route. */
 export function PauseFrameToolRow({ icon, label, href }: PauseFrameToolRowProps) {
+  "use memo";
   return (
     <Link
       to={href}

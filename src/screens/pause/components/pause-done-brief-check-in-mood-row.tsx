@@ -21,6 +21,7 @@ export function PauseDoneBriefCheckInMoodRow({
   moodEditorOpen,
   onMoodEditorOpenChange,
 }: PauseDoneBriefCheckInMoodRowProps) {
+  "use memo";
   const { t } = useTranslation();
 
   const moodLabel = mood != null ? t(`moodCheck.moods.${mood}`, { defaultValue: mood }) : null;

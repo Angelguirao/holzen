@@ -1,43 +1,40 @@
-import { useState, useEffect } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { subscribePasswordRecoveryReady, updateUserPassword } from '@/features/auth/public';
+import { subscribePasswordRecoveryReady } from '@/features/auth/public';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslation } from 'react-i18next';
 import { PageHeading } from '@/components/ui/page-heading';
+import { LoadingButton } from '@/components/ui/loading-button';
+import { resetPasswordAction } from '@/screens/marketing/reset-password-action';
 
 const ResetPasswordScreen = () => {
   const { t } = useTranslation();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [ready, setReady] = useState(false);
+  const [state, formAction, isPending] = useActionState(resetPasswordAction, {});
   const navigate = useNavigate();
-  const getErrorMessage = (error: unknown) =>
-    error instanceof Error ? error.message : t('common.unexpectedError', { defaultValue: 'Something went wrong' });
 
   useEffect(() => subscribePasswordRecoveryReady(() => setReady(true)), []);
 
-  const handleReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    if (password !== confirmPassword) { setError(t('auth.passwordsDoNotMatch')); return; }
-    if (password.length < 6) { setError(t('auth.passwordTooShort')); return; }
-    setLoading(true);
-    try {
-      const { error } = await updateUserPassword(password);
-      if (error) throw error;
+  useEffect(() => {
+    if (state.success) {
       setSuccess(true);
-      setTimeout(() => navigate('/', { replace: true }), 2000);
-    } catch (e: unknown) {
-      setError(getErrorMessage(e));
-    } finally {
-      setLoading(false);
+      const timer = setTimeout(() => navigate('/', { replace: true }), 2000);
+      return () => clearTimeout(timer);
     }
-  };
+    if (state.error === 'passwords_mismatch') {
+      setError(t('auth.passwordsDoNotMatch'));
+    } else if (state.error === 'password_too_short') {
+      setError(t('auth.passwordTooShort'));
+    } else if (state.error) {
+      setError(state.error);
+    }
+  }, [state.success, state.error, t, navigate]);
 
   if (success) {
     return (
@@ -55,12 +52,16 @@ const ResetPasswordScreen = () => {
       <div className="w-full max-w-sm space-y-8">
         <PageHeading title={t('common.holzen')} subtitle={ready ? t('auth.setNewPassword') : t('auth.verifyingResetLink')} />
         {ready && (
-          <form onSubmit={handleReset} className="space-y-4">
+          <form
+            action={formAction}
+            onSubmit={() => setError(null)}
+            className="space-y-4"
+          >
             <div className="space-y-2">
               <Label htmlFor="reset-password-new" className="text-xs font-mono">{t('auth.newPassword')}</Label>
               <Input
                 id="reset-password-new"
-                name="new-password"
+                name="password"
                 type="password"
                 autoComplete="new-password"
                 value={password}
@@ -74,7 +75,7 @@ const ResetPasswordScreen = () => {
               <Label htmlFor="reset-password-confirm" className="text-xs font-mono">{t('auth.confirmPassword')}</Label>
               <Input
                 id="reset-password-confirm"
-                name="new-password"
+                name="confirmPassword"
                 type="password"
                 autoComplete="new-password"
                 value={confirmPassword}
@@ -85,7 +86,7 @@ const ResetPasswordScreen = () => {
               />
             </div>
             {error && <p className="text-xs text-destructive font-mono">{error}</p>}
-            <Button type="submit" className="w-full text-base font-sans font-normal" disabled={loading}>{t('auth.updatePassword')}</Button>
+            <LoadingButton type="submit" className="w-full text-base font-sans font-normal" loading={isPending}>{t('auth.updatePassword')}</LoadingButton>
           </form>
         )}
       </div>

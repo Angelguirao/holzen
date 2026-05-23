@@ -22,6 +22,7 @@ export function RelatedBiasesThisMonth({
   currentTitle,
   className = '',
 }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const { biases } = useRelatedBiasesThisMonth({ currentPauseInstanceId, currentTitle });
 

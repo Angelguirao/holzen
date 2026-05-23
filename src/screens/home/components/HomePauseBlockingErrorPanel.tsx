@@ -23,6 +23,7 @@ export function HomePauseBlockingErrorPanel({
   onTryAgain,
   className,
 }: HomePauseBlockingErrorPanelProps) {
+  "use memo";
   const { t } = useTranslation();
   const { title, description } = pauseHomeErrorStrings(t, error);
 

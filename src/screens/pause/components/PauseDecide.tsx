@@ -17,6 +17,7 @@ interface Props {
 }
 
 export function PauseDecide({ onDecide, onBack, introKicker, hideChoicesBack }: Props) {
+  "use memo";
   const [mirrorDecision, setMirrorDecision] = useState<string | null>(null);
 
   const introLine = introKicker != null && introKicker.trim() !== '' ? introKicker : null;

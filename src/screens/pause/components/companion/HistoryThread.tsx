@@ -33,6 +33,7 @@ export function HistoryThread({
   limit = 5,
   className = '',
 }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const { rows } = useCompanionHistoryThread({ companion, currentPauseInstanceId, limit });
 

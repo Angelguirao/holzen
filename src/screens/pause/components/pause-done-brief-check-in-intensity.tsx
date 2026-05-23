@@ -10,6 +10,7 @@ export type PauseDoneBriefCheckInIntensityProps = {
 
 /** Brief Done check-in intensity slider (1–5) with compact label row. */
 export function PauseDoneBriefCheckInIntensity({ intensity, onIntensityChange }: PauseDoneBriefCheckInIntensityProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

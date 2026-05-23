@@ -14,6 +14,7 @@ export type PauseDecideChoicesProps = {
 
 /** Primary decide step: hold vs buy/sell (before decision mirror). */
 export function PauseDecideChoices({ introLine, onHold, onBought, onSold }: PauseDecideChoicesProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

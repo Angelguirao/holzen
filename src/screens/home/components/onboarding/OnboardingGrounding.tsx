@@ -16,6 +16,7 @@ const SUGGESTIONS = [
 ];
 
 export function OnboardingGrounding({ selected, onToggle, stagger }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);

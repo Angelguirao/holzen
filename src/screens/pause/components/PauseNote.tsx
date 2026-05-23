@@ -12,6 +12,7 @@ interface Props {
  * this instance.
  */
 export function PauseNote({ pauseInstanceId }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const { note, setNote, saving, commitOnBlur } = usePauseReflectNote(pauseInstanceId);
 

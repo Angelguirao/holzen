@@ -36,6 +36,7 @@ function companionFullViewHref(
   pauseInstanceId: string | null,
   segment: 'signal' | 'grounding' | 'zoom-out' | 'history',
 ): string {
+  "use memo";
   if (!pauseInstanceId) return '/pause';
   return `/companion/${segment}/${pauseInstanceId}`;
 }
@@ -54,6 +55,7 @@ export function PauseFrame({
   subscribed,
   onImDone,
 }: PauseFrameProps) {
+  "use memo";
   const { t } = useTranslation();
   const companionHaikuEnabled = companionPrefs.haiku;
   const sessionSeedEmpty = !reflectionMessage.trim();

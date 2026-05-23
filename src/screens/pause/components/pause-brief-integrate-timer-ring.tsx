@@ -13,6 +13,7 @@ export type PauseBriefIntegrateTimerRingProps = {
 
 /** Brief integrate step countdown ring (20s default). */
 export function PauseBriefIntegrateTimerRing({ remaining, done }: PauseBriefIntegrateTimerRingProps) {
+  "use memo";
   const { t } = useTranslation();
   const integrateHint = t('pause.brief.integrate.hint', { defaultValue: '' }).trim();
   const progress = briefIntegrateRemainingProgress(remaining, done);

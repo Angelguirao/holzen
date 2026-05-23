@@ -7,6 +7,7 @@ export type PauseDoneBriefOutcomeHeroProps = {
 
 /** Brief Done: saved confirmation + decision outcome headline. */
 export function PauseDoneBriefOutcomeHero({ decision }: PauseDoneBriefOutcomeHeroProps) {
+  "use memo";
   const { t } = useTranslation();
 
   const outcomeHeadline =

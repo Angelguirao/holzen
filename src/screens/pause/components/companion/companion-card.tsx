@@ -31,6 +31,7 @@ export function CompanionCard({
   onUpgrade,
   children,
 }: CompanionCardProps) {
+  "use memo";
   const { t } = useTranslation();
   const prefersReducedMotion = useReducedMotion();
 

@@ -7,6 +7,7 @@ interface SubscriptionSkeletonProps {
 }
 
 export function SubscriptionSkeleton({ className, variant = 'inline' }: SubscriptionSkeletonProps) {
+  "use memo";
   const align = variant === 'centered' ? 'mx-auto' : '';
 
   return (

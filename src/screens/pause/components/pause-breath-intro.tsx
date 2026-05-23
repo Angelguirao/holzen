@@ -24,6 +24,7 @@ export function PauseBreathIntro({
   onStart,
   onSkipBreath,
 }: PauseBreathIntroProps) {
+  "use memo";
   const { t } = useTranslation();
   const introKicker = t('pause.breathIntroKickerRitual', { defaultValue: 'Breathe' });
 

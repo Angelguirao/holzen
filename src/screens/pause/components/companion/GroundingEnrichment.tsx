@@ -16,6 +16,7 @@ interface Props {
  * link above already deliver the core experience.
  */
 export function GroundingEnrichment({ data, loading, error }: Props) {
+  "use memo";
   const { t } = useTranslation();
 
   if (loading) {

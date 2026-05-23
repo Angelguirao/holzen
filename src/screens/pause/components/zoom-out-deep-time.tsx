@@ -7,6 +7,7 @@ export type ZoomOutDeepTimeProps = {
 
 /** Civilizational / planetary perspective block in zoom-out. */
 export function ZoomOutDeepTime({ deepTime }: ZoomOutDeepTimeProps) {
+  "use memo";
   return (
     <div className="rounded-lg border border-primary/10 bg-primary/[0.03] px-4 py-3.5 space-y-2">
       <div className="flex items-center gap-1.5">

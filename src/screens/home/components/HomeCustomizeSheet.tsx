@@ -42,6 +42,7 @@ export interface HomeCustomizeSheetProps {
 }
 
 function isDraggableTailHomeSectionId(id: string): boolean {
+  "use memo";
   return id !== GOAL_WHY_SECTION_ID && (ALL_HOME_SECTION_IDS as readonly string[]).includes(id);
 }
 
@@ -55,6 +56,7 @@ function CustomizePinnedRow({
   title: string;
   description: string;
 }) {
+  "use memo";
   return (
     <div
       className={cn(
@@ -93,6 +95,7 @@ function CustomizeSortableRow({
   /** When true, `useSortable` is disabled (no transform from DnD). */
   disableSortable: boolean;
 }) {
+  "use memo";
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
     disabled: disableSortable,
@@ -161,6 +164,7 @@ export function HomeCustomizeSheet({
   nightToggleDisabled,
   dndRemountKey = 0,
 }: HomeCustomizeSheetProps) {
+  "use memo";
   const { t } = useTranslation();
 
   const sensors = useSensors(

@@ -8,6 +8,7 @@ interface Props {
 
 /** Brief ritual header stepper: visual progress only (no step jumping). */
 export function PauseBriefProgress({ currentStep }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const labels: Record<BriefPauseStep, string> = {
     feel: t('pause.brief.steps.feel', { defaultValue: 'Feel' }),

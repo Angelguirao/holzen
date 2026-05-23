@@ -8,6 +8,7 @@ import {
 
 /** Phase progress ring (wireframe-style) around the breathing orb. */
 export function BreathPhaseProgressRing({ progress }: { progress: number }) {
+  "use memo";
   const dashOffset = BREATH_RING_C * (1 - progress);
   return (
     <svg

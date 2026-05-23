@@ -26,6 +26,7 @@ export function BreathOrbVisual({
   holdProgress,
   prefersReducedMotion,
 }: Props) {
+  "use memo";
   return (
     <div
       className="relative flex items-center justify-center"

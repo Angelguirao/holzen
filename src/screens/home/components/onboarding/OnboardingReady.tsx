@@ -12,6 +12,7 @@ interface Props {
 }
 
 export function OnboardingReady({ motivations, onStartTrial, trialLoading, stagger }: Props) {
+  "use memo";
   const { t } = useTranslation();
 
   const whyRecap =

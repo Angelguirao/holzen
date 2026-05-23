@@ -11,6 +11,7 @@ export type CompanionOpenFullViewButtonProps = {
 
 /** Inline companion card CTA → dedicated full-view route. */
 export function CompanionOpenFullViewButton({ pauseInstanceId, routeSegment }: CompanionOpenFullViewButtonProps) {
+  "use memo";
   const { t } = useTranslation();
   const navigate = useNavigate();
 

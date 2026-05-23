@@ -52,6 +52,7 @@ export function SignalFullView({
   host = null,
   isTrusted = null,
 }: Props) {
+  "use memo";
   const { t } = useTranslation();
 
   if (loading) {

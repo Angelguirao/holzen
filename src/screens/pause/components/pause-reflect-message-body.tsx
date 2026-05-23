@@ -22,6 +22,7 @@ export function PauseReflectMessageBody({
   onReflectionRetry,
   artifactHaiku,
 }: PauseReflectMessageBodyProps) {
+  "use memo";
   const { t } = useTranslation();
   const view = resolvePauseReflectMessageView({ reflectionError, reflectionLoading, reflectionMessage });
 

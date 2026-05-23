@@ -16,6 +16,7 @@ export function PauseDoneBriefCheckInFooter({
   saveBusy,
   onSave,
 }: PauseDoneBriefCheckInFooterProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

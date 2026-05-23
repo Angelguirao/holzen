@@ -11,6 +11,7 @@ export type PauseRitualFeelTileGridProps = {
 
 /** 3×2 Feel tile grid for brief and deep pause rituals. */
 export function PauseRitualFeelTileGrid({ activeTile, onPickTile }: PauseRitualFeelTileGridProps) {
+  "use memo";
   const { t } = useTranslation();
 
   return (

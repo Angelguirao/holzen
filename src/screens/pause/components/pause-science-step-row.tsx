@@ -19,6 +19,7 @@ export type PauseScienceStepRowProps = {
 
 /** One ritual step block in the “science behind the pause” sheet. */
 export function PauseScienceStepRow({ step, highlighted }: PauseScienceStepRowProps) {
+  "use memo";
   const { t } = useTranslation();
   const Icon = STEP_ICONS[step.key];
 

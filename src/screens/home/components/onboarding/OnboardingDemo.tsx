@@ -17,6 +17,7 @@ type Phase = 'breathing' | 'reflection' | 'haiku' | 'decide' | 'done';
 
 /** @deprecated Not used by the onboarding flow in `Onboarding.tsx`; retained for reference or future reuse. */
 export function OnboardingDemo({ stagger }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const [phase, setPhase] = useState<Phase>(prefersReduced ? 'reflection' : 'breathing');

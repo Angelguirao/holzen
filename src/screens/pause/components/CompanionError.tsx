@@ -42,11 +42,13 @@ interface Props {
 
 /** Legacy library `source_type`; same empty state as Ground companion. */
 function normalizeCompanionType(type: string | undefined): string | undefined {
+  "use memo";
   if (!type) return undefined;
   return type === 'learning' ? 'grounding' : type;
 }
 
 export function CompanionError({ message, companionType, onRetry }: Props) {
+  "use memo";
   const { t } = useTranslation();
   const key = normalizeCompanionType(companionType);
   const empty = key ? COMPANION_EMPTY_STATES[key] : null;

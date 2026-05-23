@@ -47,6 +47,7 @@ export function GroundingFullView({
   preferredBias,
   enrichmentSlot,
 }: Props) {
+  "use memo";
   const { t } = useTranslation();
 
   if (loading) {

@@ -10,6 +10,7 @@ interface HomePauseContextMetaProps {
 
 /** Renders 24h move + Fear & Greed lines from `parsePauseContextForHomePreview`. */
 export function HomePauseContextMeta({ btc24h, marketSentiment, className }: HomePauseContextMetaProps) {
+  "use memo";
   if (!btc24h && !marketSentiment) return null;
   return (
     <div className={cn(homeInWidget.meta, 'space-y-1', className)}>

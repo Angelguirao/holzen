@@ -6,6 +6,7 @@ interface Props {
 }
 
 export function ErrorRetry({ message = 'Something went wrong', onRetry }: Props) {
+  "use memo";
   return (
     <div className="flex flex-col items-center justify-center gap-2 py-6 text-center">
       <p className="text-xs text-muted-foreground">{message}</p>
