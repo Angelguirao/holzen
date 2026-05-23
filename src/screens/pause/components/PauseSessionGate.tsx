@@ -29,6 +29,7 @@ export function PauseSessionGate({
   onReturn,
   children,
 }: Props) {
+  "use memo";
   const { t } = useTranslation();
 
   if (!shellReady && phase !== 'done') {

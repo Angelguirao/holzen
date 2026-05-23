@@ -25,6 +25,7 @@ export function PauseSessionScaffoldBodyChrome({
   muted,
   setMuted,
 }: PauseSessionScaffoldBodyChromeProps) {
+  "use memo";
   const { t } = useTranslation();
 
   const showMeta =

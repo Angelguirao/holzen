@@ -8,6 +8,7 @@ export type PauseSessionScaffoldShellProps = {
 
 /** Scrollable pause shell with gradient background and ambient motion orbs. */
 export function PauseSessionScaffoldShell({ prefersReducedMotion, children }: PauseSessionScaffoldShellProps) {
+  "use memo";
   return (
     <motion.div
       className="fixed inset-0 z-50 overflow-y-auto"

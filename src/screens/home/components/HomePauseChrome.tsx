@@ -124,6 +124,7 @@ export function NeedAMomentButton({
   loading: boolean;
   className?: string;
 }) {
+  "use memo";
   const [remaining, setRemaining] = useState(cooldownRemaining());
 
   useEffect(() => {
@@ -197,8 +198,9 @@ export function AutoCooldownIndicator({
   cooldownHours: number;
   nextCronCheckIn: () => number;
 }) {
+  "use memo";
   const { t } = useTranslation();
-  // Render absolute clock targets — "Ready at 14:32", "Next scan at 14:47" —
+  // Render absolute clock targets
   // instead of a live "X min left" countdown. The widget is then completely
   // static: no per-minute re-render, no blink. We re-snapshot exactly once,
   // when the displayed target moment passes.
@@ -365,6 +367,7 @@ export function AutoCooldownIndicator({
 }
 
 export function ProLockedWidget({ onUpgrade, checkoutLoading, feature }: { onUpgrade: () => void; checkoutLoading: boolean; feature?: string }) {
+  "use memo";
   const { t } = useTranslation();
   const descKey = feature ? `pro.desc_${feature}` : '';
   const description = feature && t(descKey) !== descKey ? t(descKey) : t('pro.upgradeDesc');

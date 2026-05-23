@@ -45,7 +45,11 @@ export function useProfile() {
     emailNotificationsCommitted,
     (_current, next: boolean) => next,
   );
-  const [reflectionTone, setReflectionToneState] = useState('stoic');
+  const [reflectionToneCommitted, setReflectionToneCommitted] = useState('stoic');
+  const [reflectionTone, addOptimisticReflectionTone] = useOptimistic(
+    reflectionToneCommitted,
+    (_current, next: string) => next,
+  );
   const [silentModeCommitted, setSilentModeCommitted] = useState(false);
   const [silentMode, addOptimisticSilentMode] = useOptimistic(
     silentModeCommitted,
@@ -53,7 +57,11 @@ export function useProfile() {
   );
   const [cooldownHours, setCooldownHoursState] = useState(6);
   const [customPrompt, setCustomPromptState] = useState<string | null>(null);
-  const [reflectionStyle, setReflectionStyleState] = useState('standard');
+  const [reflectionStyleCommitted, setReflectionStyleCommitted] = useState('standard');
+  const [reflectionStyle, addOptimisticReflectionStyle] = useOptimistic(
+    reflectionStyleCommitted,
+    (_current, next: string) => next,
+  );
   const [quietHoursStart, setQuietHoursStartState] = useState<number | null>(null);
   const [quietHoursEnd, setQuietHoursEndState] = useState<number | null>(null);
   const [firstName, setFirstNameState] = useState<string | null>(null);
@@ -106,11 +114,11 @@ export function useProfile() {
       setThresholdDownState(row.threshold_down ?? row.threshold);
       setCumulativeThresholdState(row.cumulative_threshold ?? 15);
       setEmailNotificationsCommitted(row.email_notifications ?? true);
-      setReflectionToneState(row.reflection_tone ?? 'stoic');
+      setReflectionToneCommitted(row.reflection_tone ?? 'stoic');
       setCooldownHoursState(row.cooldown_hours ?? 6);
       setSilentModeCommitted(row.silent_mode ?? false);
       setCustomPromptState(row.custom_prompt ?? null);
-      setReflectionStyleState(row.reflection_style ?? 'standard');
+      setReflectionStyleCommitted(row.reflection_style ?? 'standard');
       setQuietHoursStartState(row.quiet_hours_start ?? null);
       setQuietHoursEndState(row.quiet_hours_end ?? null);
       setFirstNameState(row.first_name ?? null);
@@ -175,11 +183,18 @@ export function useProfile() {
   }, [user, invalidateProfileQuery, emailNotificationsCommitted, addOptimisticEmailNotifications]);
 
   const setReflectionTone = useCallback(async (val: string) => {
-    setReflectionToneState(val);
+    const previous = reflectionToneCommitted;
+    addOptimisticReflectionTone(val);
     if (!user) return;
     const { error } = await updateProfileFields(user.id, { reflection_tone: val });
-    if (!error) invalidateProfileQuery();
-  }, [user, invalidateProfileQuery]);
+    if (!error) {
+      setReflectionToneCommitted(val);
+      invalidateProfileQuery();
+    } else {
+      setReflectionToneCommitted(previous);
+      addOptimisticReflectionTone(previous);
+    }
+  }, [user, invalidateProfileQuery, reflectionToneCommitted, addOptimisticReflectionTone]);
 
   const setSilentMode = useCallback(async (val: boolean) => {
     const previous = silentModeCommitted;
@@ -297,10 +312,17 @@ export function useProfile() {
     },
     reflectionStyle,
     setReflectionStyle: async (val: string) => {
-      setReflectionStyleState(val);
+      const previous = reflectionStyleCommitted;
+      addOptimisticReflectionStyle(val);
       if (!user) return;
       const { error } = await updateProfileFields(user.id, { reflection_style: val });
-      if (!error) invalidateProfileQuery();
+      if (!error) {
+        setReflectionStyleCommitted(val);
+        invalidateProfileQuery();
+      } else {
+        setReflectionStyleCommitted(previous);
+        addOptimisticReflectionStyle(previous);
+      }
     },
     quietHoursStart,
     quietHoursEnd,

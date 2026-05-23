@@ -34,6 +34,7 @@ import { useSettingsState } from '@/screens/settings/hooks/use-settings-state';
 import { GroundingTagInput } from '@/screens/settings/components/GroundingTagInput';
 import { ChangeEmailSection } from '@/screens/settings/components/ChangeEmailSection';
 import { ChangePasswordSection } from '@/screens/settings/components/ChangePasswordSection';
+import { SettingsAccountDataSection } from '@/screens/settings/components/SettingsAccountDataSection';
 import { HoldGoalWidget } from '@/screens/home/components/HoldGoalWidget';
 import {
   Select,
@@ -335,8 +336,6 @@ export function SettingsExperiencePanel() {
     trackedAssetId,
     currency,
     setCurrency,
-    zenMode,
-    setZenMode,
     checkoutWindowDraft,
     setCheckoutWindowDraft,
     commitCheckoutWindow,
@@ -403,27 +402,6 @@ export function SettingsExperiencePanel() {
                     <p className="mt-0.5 text-sm font-sans text-muted-foreground">{c.desc}</p>
                   </button>
                 ))}
-              </div>
-            </div>
-
-            {/* Zen Mode */}
-            <div className="space-y-3">
-              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.zenMode')}</p>
-              <p className="leading-relaxed text-foreground text-sm">
-                {t('settings.zenModeDesc')}
-              </p>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="zen-mode" className="text-muted-foreground text-base font-sans">
-                  {t('settings.enableZenMode')}
-                </Label>
-                <Switch
-                  id="zen-mode"
-                  checked={zenMode}
-                  onCheckedChange={(v) => {
-                    setZenMode(v);
-                    localStorage.setItem('holzen_zen_mode', String(v));
-                  }}
-                />
               </div>
             </div>
 
@@ -827,10 +805,6 @@ export function SettingsAccountPanel() {
     t,
     user,
     signOut,
-    exporting,
-    exportData,
-    deleteAccount,
-    deleting,
     canInstall,
     install,
   } = useSettingsState();
@@ -843,30 +817,7 @@ export function SettingsAccountPanel() {
 
             <ChangePasswordSection />
 
-            {/* Data export */}
-            <div className="space-y-3">
-              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.data')}</p>
-              <div className="flex gap-4">
-                <LoadingButton
-                  variant="link"
-                  onClick={() => exportData('json')}
-                  loading={exporting}
-                  loadingText={t('settings.exporting')}
-                  className="text-xs font-mono text-muted-foreground underline p-0 h-auto"
-                >
-                  {t('settings.exportJson')}
-                </LoadingButton>
-                <LoadingButton
-                  variant="link"
-                  onClick={() => exportData('csv')}
-                  loading={exporting}
-                  loadingText={t('settings.exporting')}
-                  className="text-xs font-mono text-muted-foreground underline p-0 h-auto"
-                >
-                  {t('settings.exportCsv')}
-                </LoadingButton>
-              </div>
-            </div>
+            <SettingsAccountDataSection />
 
             {/* Install */}
             {canInstall && (
@@ -896,34 +847,6 @@ export function SettingsAccountPanel() {
                   <AlertDialogCancel className="font-mono text-xs">{t('common.cancel')}</AlertDialogCancel>
                   <AlertDialogAction onClick={signOut} className="font-mono text-xs">
                     {t('common.signOut')}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-
-            {/* Delete */}
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <button className="text-xs font-mono text-destructive underline">
-                  {t('settings.deleteAccount')}
-                </button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="font-mono text-sm">{t('settings.deleteAccount')}</AlertDialogTitle>
-                  <AlertDialogDescription className="text-xs">
-                    {t('settings.deleteAccountDesc')}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="font-mono text-xs">{t('common.cancel')}</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={deleteAccount}
-                    disabled={deleting}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs"
-                  >
-                    {deleting && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
-                    {deleting ? t('settings.deleting') : t('settings.deleteForever')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
