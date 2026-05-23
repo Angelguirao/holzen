@@ -15,7 +15,7 @@ vi.mock(
 );
 
 describe('dismissOpenPauseHome', () => {
-  const repository = mockPauseRepository as PauseRepository;
+  const repository = mockPauseRepository as unknown as PauseRepository;
 
   it('clears preview without RPC when signed out', async () => {
     const clearPreview = vi.fn();

@@ -33,7 +33,9 @@ describe('deliverReflectionShareImage', () => {
 
   it('downloads when share is unavailable', async () => {
     const click = vi.fn();
-    const createDownloadAnchor = vi.fn(() => ({ href: '', download: '', click }) as HTMLAnchorElement);
+    const createDownloadAnchor = vi.fn(
+      () => ({ href: '', download: '', click }) as unknown as HTMLAnchorElement,
+    );
     const createObjectURL = vi.fn(() => 'blob:test');
     const revokeObjectURL = vi.fn();
 
