@@ -145,7 +145,8 @@ Policy: [ADR 2026-05-23](../decisions/2026-05-23-render-boundaries-defer-react-c
 |-------|------|-------|
 | Boundaries-first policy | Manual | State low; `React.memo` on heavy shells; no mass memo deletion during migration |
 | Three-question memo gate | Manual (§2.9) | New `useMemo`/`useCallback` only for memo child, expensive derive, or effect deps |
-| Compiler pilot | Build-time | `vite.react-compiler.ts` — annotation mode on `HomeDashboardLayout.tsx`, `PauseSessionScaffoldShell.tsx`; `HOLZEN_REACT_COMPILER=0` disables |
+| Compiler pilot | Build-time | `vite.react-compiler.ts` — annotation mode on home/pause `components/**` + `app/components/*.tsx`; `HOLZEN_REACT_COMPILER=0` disables |
+| React 19 leverage closure | CI | `npm run check:react19-leverage` — no manual mutation loading flags in active `src/` outside allowlist |
 | Build green with Compiler | Implicit | `npm run build` / `test:ci` |
 
 ### 5.5 Security and migration conventions
@@ -172,7 +173,6 @@ Ordered by impact ÷ effort. Do not implement here unless a separate task scopes
 | `check:feature-flags-doc` | Flag taxonomy | Mirror PostHog allowlist pattern |
 | Enable `check:i18n-active-keys` in CI | i18n completeness | When active tree is complete |
 | `check:sql-search-path` | Migration security | Regex on `supabase/migrations/*.sql` |
-| `check:react-compiler-pilot-list` | Compiler scope | Assert pilot list matches ADR |
 | Bundle size budget | Performance regression | Threshold on main chunk post-build |
 
 ---
