@@ -18,7 +18,7 @@ describe('hydrateCompanionSlotsFromArtifactCache', () => {
     const result = hydrateCompanionSlotsFromArtifactCache({
       cached: {
         signal: { title: 'S', body: 'b', source: 'live', url: 'https://x.test' },
-        intervention: { primary: 'trap', secondary: null },
+        intervention: { primary: 'trap' as never, secondary: null },
       },
       fetchedSlots: fetched,
       committers: {

@@ -203,7 +203,7 @@ describe('pause-feel-io parity (application)', () => {
     const customRepository = { port: 'customPauseRepository' };
     const input = {
       pauseInstanceId: 'inst-mood-app-custom',
-      mood: 'energized' as const,
+      mood: 'excited' as const,
       lastFeelLogKey: 'key-1',
     };
 
