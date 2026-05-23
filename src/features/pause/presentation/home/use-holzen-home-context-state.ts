@@ -55,19 +55,17 @@ export function useHolzenHomeContextState() {
     syncOpenPauseFromDb,
   } = useOpenPauseHomePreview(user);
 
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   /** True briefly after a new pause message is shown — Home uses it for one-shot chime. */
   const [newPauseArrival, setNewPauseArrival] = useState(false);
 
-  const { generateMessage } = useManualPauseTrigger({
+  const { generateMessage, loading } = useManualPauseTrigger({
     user,
     silentMode,
     cumulativeThreshold: profile.cumulativeThreshold,
     trackedAssetId: profile.trackedAssetId,
     syncOpenPauseFromDb,
     setError,
-    setLoading,
     setMessage,
     setContext,
     setCompanions,

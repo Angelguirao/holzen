@@ -8,6 +8,7 @@ import type { Plugin } from "vite";
 const REACT_COMPILER_PILOT_INCLUDE = [
   /[/\\]src[/\\]screens[/\\]home[/\\]components[/\\].+\.tsx$/,
   /[/\\]src[/\\]screens[/\\]pause[/\\]components[/\\].+\.tsx$/,
+  /[/\\]src[/\\]app[/\\]components[/\\][^/\\]+\.tsx$/,
 ] as const;
 
 /**

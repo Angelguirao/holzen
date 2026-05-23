@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useTransition } from 'react';
 import type { User } from '@supabase/supabase-js';
 import type { TFunction } from 'i18next';
 import { hapticFeedback } from '@/lib/haptics';
@@ -27,49 +27,47 @@ export function useBulkHoldApplyOutcomes({
   onSuccess,
   onPartial,
 }: UseBulkHoldApplyOutcomesParams) {
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [applyError, setApplyError] = useState<string | null>(null);
 
   const applyOutcomesAndFinish = useCallback(
-    async (rows: BulkHoldPendingPause[], resolver: (p: BulkHoldPendingPause) => BulkHoldOutcomeChoice) => {
+    (rows: BulkHoldPendingPause[], resolver: (p: BulkHoldPendingPause) => BulkHoldOutcomeChoice) => {
       if (!user || rows.length === 0) return;
 
-      setLoading(true);
-      setApplyError(null);
-      hapticFeedback('medium');
+      startTransition(async () => {
+        setApplyError(null);
+        hapticFeedback('medium');
 
-      const result = await pauseApplyBulkHoldOutcomes(rows, resolver);
+        const result = await pauseApplyBulkHoldOutcomes(rows, resolver);
 
-      if (result.status === 'failed') {
-        hapticFeedback('warning');
-        setApplyError(t('bulkHold.applyFailed'));
-        bumpRefetchNonce();
-        setLoading(false);
-        return;
-      }
+        if (result.status === 'failed') {
+          hapticFeedback('warning');
+          setApplyError(t('bulkHold.applyFailed'));
+          bumpRefetchNonce();
+          return;
+        }
 
-      if (result.status === 'partial') {
-        hapticFeedback('warning');
-        setPending(result.failedRows);
-        onPartial(result.failedRows);
-        setApplyError(t('bulkHold.applyPartialFailed', { count: result.failedRows.length }));
-        setLoading(false);
+        if (result.status === 'partial') {
+          hapticFeedback('warning');
+          setPending(result.failedRows);
+          onPartial(result.failedRows);
+          setApplyError(t('bulkHold.applyPartialFailed', { count: result.failedRows.length }));
+          invalidatePauseStatsDataForUser(user.id);
+          return;
+        }
+
+        hapticFeedback('success');
+        setPending([]);
+        setApplyError(null);
+        onSuccess(result.count);
         invalidatePauseStatsDataForUser(user.id);
-        return;
-      }
-
-      hapticFeedback('success');
-      setPending([]);
-      setApplyError(null);
-      onSuccess(result.count);
-      setLoading(false);
-      invalidatePauseStatsDataForUser(user.id);
+      });
     },
-    [user, t, setPending, bumpRefetchNonce, onSuccess, onPartial],
+    [user, t, setPending, bumpRefetchNonce, onSuccess, onPartial, startTransition],
   );
 
   return {
-    loading,
+    loading: isPending,
     applyError,
     setApplyError,
     applyOutcomesAndFinish,

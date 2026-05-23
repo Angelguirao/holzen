@@ -93,7 +93,6 @@ describe('useManualPauseTrigger', () => {
         trackedAssetId: 'bitcoin',
         syncOpenPauseFromDb: vi.fn().mockResolvedValue(undefined),
         setError: noopSet,
-        setLoading: noopSet,
         setMessage: noopSet,
         setContext: noopSet,
         setCompanions: noopSet,

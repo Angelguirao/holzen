@@ -1,4 +1,4 @@
-import { useCallback, type Dispatch, type SetStateAction } from 'react';
+import { useCallback, useTransition, type Dispatch, type SetStateAction } from 'react';
 import type { User } from '@supabase/supabase-js';
 import type { BtcPriceData } from '@/features/market/public';
 import {
@@ -27,7 +27,6 @@ export interface UseManualPauseTriggerParams {
   trackedAssetId: string;
   syncOpenPauseFromDb: () => Promise<void>;
   setError: Dispatch<SetStateAction<string | null>>;
-  setLoading: Dispatch<SetStateAction<boolean>>;
   setMessage: Dispatch<SetStateAction<string | null>>;
   setContext: Dispatch<SetStateAction<string | null>>;
   setCompanions: Dispatch<SetStateAction<CompanionData>>;
@@ -47,7 +46,6 @@ export function useManualPauseTrigger({
   trackedAssetId: profileTrackedAssetId,
   syncOpenPauseFromDb,
   setError,
-  setLoading,
   setMessage,
   setContext,
   setCompanions,
@@ -55,6 +53,8 @@ export function useManualPauseTrigger({
   setLastPauseInstanceId,
   setLastTriggerAt,
 }: UseManualPauseTriggerParams) {
+  const [isPending, startTransition] = useTransition();
+
   const generateMessage = useCallback(
     async (data: BtcPriceData, mood?: string): Promise<ManualPauseTriggerResult> => {
       if (!user) {
@@ -112,17 +112,21 @@ export function useManualPauseTrigger({
         return applyOpenResult(result);
       }
 
-      setLoading(true);
-      setError(null);
-      try {
-        const result = await openManualPauseFromHome(pauseHomeManualOpenPorts, openParams);
-        if (result.outcome === 'idle') {
-          holzenLog.manual('generateMessage: reuse/skip');
-        }
-        return applyOpenResult(result);
-      } finally {
-        setLoading(false);
-      }
+      return new Promise<ManualPauseTriggerResult>((resolve) => {
+        startTransition(async () => {
+          setError(null);
+          try {
+            const result = await openManualPauseFromHome(pauseHomeManualOpenPorts, openParams);
+            if (result.outcome === 'idle') {
+              holzenLog.manual('generateMessage: reuse/skip');
+            }
+            resolve(applyOpenResult(result));
+          } catch (e) {
+            holzenLog.manual('generateMessage: unexpected error', { error: String(e) });
+            resolve(MANUAL_PAUSE_TRIGGER_IDLE);
+          }
+        });
+      });
     },
     [
       user,
@@ -131,15 +135,15 @@ export function useManualPauseTrigger({
       profileTrackedAssetId,
       syncOpenPauseFromDb,
       setError,
-      setLoading,
       setMessage,
       setContext,
       setCompanions,
       setNewPauseArrival,
       setLastPauseInstanceId,
       setLastTriggerAt,
+      startTransition,
     ],
   );
 
-  return { generateMessage };
+  return { generateMessage, loading: isPending };
 }

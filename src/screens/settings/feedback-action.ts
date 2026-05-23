@@ -20,6 +20,10 @@ export async function submitFeedbackAction(
     return { error: 'empty' };
   }
 
+  const sentryEventId = String(formData.get('sentry_event_id') ?? '').trim();
+  const errorStack = String(formData.get('error_stack') ?? '').trim();
+  const posthogSessionId = String(formData.get('posthog_session_id') ?? '').trim();
+
   const payload = {
     category,
     message,
@@ -27,6 +31,9 @@ export async function submitFeedbackAction(
     user_agent: navigator.userAgent,
     cid: getCid(),
     app_version: __APP_VERSION__,
+    ...(sentryEventId ? { sentry_event_id: sentryEventId } : {}),
+    ...(errorStack ? { error_stack: errorStack } : {}),
+    ...(posthogSessionId ? { posthog_session_id: posthogSessionId } : {}),
   };
 
   if (!navigator.onLine) {
