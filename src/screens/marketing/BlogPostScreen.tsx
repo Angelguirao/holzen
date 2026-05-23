@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getBlogPostBySlugQueryOptions } from '@/features/user/public-queries';
 import { format } from 'date-fns';
 import { PageMeta } from '@/app/components/PageMeta';
+import { SITE_ORIGIN } from '@/config/site';
 import { useTranslation } from 'react-i18next';
 import { PageHeading } from '@/components/ui/page-heading';
 
@@ -26,10 +27,28 @@ const BlogPostScreen = () => {
   const postTitle = post?.title ? `${post.title} — Holzen Blog` : 'Holzen Blog';
   const postDesc = post?.excerpt || 'Read this article on the Holzen blog.';
   const postPath = slug ? `/blog/${slug}` : '/blog';
+  const articleJsonLd = post
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: post.title,
+        description: post.excerpt ?? undefined,
+        datePublished: post.published_at ?? undefined,
+        author: { '@type': 'Organization', name: 'Holzen' },
+        publisher: { '@type': 'Organization', name: 'Holzen' },
+        mainEntityOfPage: `${SITE_ORIGIN}${postPath}`,
+      }
+    : undefined;
 
   return (
     <div className="min-h-screen flex items-start justify-center px-6 py-16">
-      <PageMeta title={postTitle} description={postDesc} path={postPath} />
+      <PageMeta
+        title={postTitle}
+        description={postDesc}
+        path={postPath}
+        type="article"
+        jsonLd={articleJsonLd}
+      />
       <div className="w-full max-w-sm space-y-10">
         <motion.div {...m()}>
           <Link to="/blog" className="inline-flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors">
