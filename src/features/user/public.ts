@@ -11,3 +11,7 @@ export {
   type ExportDataActionState,
   type ExportDataFormat,
 } from './presentation/settings-export-data-io';
+export {
+  submitFeedbackAction,
+  type FeedbackActionState,
+} from './presentation/settings-feedback-io';
