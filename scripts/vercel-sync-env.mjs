@@ -50,7 +50,7 @@ add("VITE_POSTHOG_KEY", hosted.VITE_POSTHOG_KEY, "production");
 add("VITE_POSTHOG_HOST", hosted.VITE_POSTHOG_HOST, "production");
 
 // Preview vars require a real Git branch name (not production `main`). Repeat per active PR branch or use dashboard “All Previews”.
-const previewBranches = ["chore/vercel-production-setup", "feature/lovableMigration"];
+const previewBranches = ["chore/vercel-production-setup", "feature/lovableMigration", "staging"];
 for (const previewBranch of previewBranches) {
   console.log(`Preview (branch: ${previewBranch})…`);
   add("VITE_SUPABASE_URL", "https://ksplyxxdvandkwzundql.supabase.co", "preview", previewBranch);
