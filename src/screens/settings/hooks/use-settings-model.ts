@@ -4,15 +4,12 @@ import { useSubscription } from '@/features/subscription/public-hooks';
 import { useInstallPrompt } from '@/app/hooks/use-install-prompt';
 import { usePushNotifications } from '@/features/notifications/public-hooks';
 import { useLatestChangelogVersion } from '@/screens/settings/hooks/use-latest-changelog-version';
+import { useSettingsCheckoutWindow } from '@/screens/settings/hooks/use-settings-checkout-window';
+import { useSettingsLocalPrefs } from '@/screens/settings/hooks/use-settings-local-prefs';
+import { useSettingsProfileAutoSaveToast } from '@/screens/settings/hooks/use-settings-profile-auto-save-toast';
 import { trackPaywallViewed } from '@/features/subscription/public';
-import { toast } from 'sonner';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  getCheckoutSuppressionWindowMinutes,
-  setCheckoutSuppressionWindowMinutes,
-} from '@/features/subscription/public';
-import { isHapticEnabled, setHapticEnabled as persistHapticEnabled } from '@/lib/haptics';
 
 export function useSettingsModel() {
   const { t } = useTranslation();
@@ -56,7 +53,8 @@ export function useSettingsModel() {
     setGroundingActivities,
     profileLoaded,
   } = useHolzen();
-  void _language; // i18n language reserved for future
+  void _language;
+
   const {
     subscribed,
     loading: subLoading,
@@ -71,6 +69,7 @@ export function useSettingsModel() {
     entitlement,
     tier,
   } = useSubscription();
+
   const startCheckoutFromSettings = useCallback(
     (target: 'pro' | 'flex_pack_s' | 'flex_pack_m' = 'pro') => {
       trackPaywallViewed('settings');
@@ -78,6 +77,7 @@ export function useSettingsModel() {
     },
     [startCheckout],
   );
+
   const { canInstall, install } = useInstallPrompt();
   const {
     isSupported: pushSupported,
@@ -87,70 +87,56 @@ export function useSettingsModel() {
     unsubscribe: pushUnsubscribe,
     permissionGrantedNotSubscribed: pushPermissionGrantedIncomplete,
   } = usePushNotifications();
-  const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled);
-  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('holzen_sound_enabled') !== 'false');
-  const [checkoutWindowMinutes, setCheckoutWindowMinutesState] = useState<number>(() =>
-    getCheckoutSuppressionWindowMinutes(),
-  );
-  const [checkoutWindowDraft, setCheckoutWindowDraft] = useState<string>(() =>
-    String(getCheckoutSuppressionWindowMinutes()),
-  );
-  const commitCheckoutWindow = useCallback(
-    (raw: string) => {
-      const parsed = Number(raw);
-      if (!Number.isFinite(parsed)) {
-        setCheckoutWindowDraft(String(checkoutWindowMinutes));
-        return;
-      }
-      const stored = setCheckoutSuppressionWindowMinutes(parsed);
-      setCheckoutWindowMinutesState(stored);
-      setCheckoutWindowDraft(String(stored));
-    },
-    [checkoutWindowMinutes],
-  );
-  const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
+
+  const localPrefs = useSettingsLocalPrefs();
+  const checkoutWindow = useSettingsCheckoutWindow();
   const { hasNewVersion: hasUnseenChangelog } = useLatestChangelogVersion();
-  const initialLoadRef = useRef(true);
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
-  useEffect(() => {
-    if (!profileLoaded) return;
-    if (initialLoadRef.current) {
-      initialLoadRef.current = false;
-      return;
-    }
-    clearTimeout(saveTimeoutRef.current);
-    saveTimeoutRef.current = setTimeout(() => {
-      toast(t('settings.saved', { defaultValue: 'Saved' }), { duration: 1200, id: 'auto-save' });
-    }, 400);
-    return () => clearTimeout(saveTimeoutRef.current);
-  }, [
-    threshold,
-    thresholdDown,
-    cumulativeThreshold,
-    emailNotifications,
-    reflectionTone,
-    reflectionStyle,
-    silentMode,
-    cooldownHours,
-    customPrompt,
-    quietHoursStart,
-    quietHoursEnd,
-    firstName,
-    motivations,
-    mantra,
-    currency,
-    trackedAssetId,
-    groundingActivities,
-    companionPrefs,
-    profileLoaded,
-    t,
-  ]);
+  const profileSaveKey = useMemo(
+    () =>
+      JSON.stringify({
+        threshold,
+        thresholdDown,
+        cumulativeThreshold,
+        emailNotifications,
+        reflectionTone,
+        reflectionStyle,
+        silentMode,
+        cooldownHours,
+        customPrompt,
+        quietHoursStart,
+        quietHoursEnd,
+        firstName,
+        motivations,
+        mantra,
+        currency,
+        trackedAssetId,
+        groundingActivities,
+        companionPrefs,
+      }),
+    [
+      threshold,
+      thresholdDown,
+      cumulativeThreshold,
+      emailNotifications,
+      reflectionTone,
+      reflectionStyle,
+      silentMode,
+      cooldownHours,
+      customPrompt,
+      quietHoursStart,
+      quietHoursEnd,
+      firstName,
+      motivations,
+      mantra,
+      currency,
+      trackedAssetId,
+      groundingActivities,
+      companionPrefs,
+    ],
+  );
 
-  const setHapticEnabled = useCallback((v: boolean) => {
-    setHapticEnabledState(v);
-    persistHapticEnabled(v);
-  }, []);
+  useSettingsProfileAutoSaveToast(profileLoaded, profileSaveKey, t);
 
   return {
     t,
@@ -211,17 +197,9 @@ export function useSettingsModel() {
     pushPermissionGrantedIncomplete,
     pushSubscribe,
     pushUnsubscribe,
-    hapticEnabled,
-    setHapticEnabled,
-    soundEnabled,
-    setSoundEnabled,
-    checkoutWindowMinutes,
-    checkoutWindowDraft,
-    setCheckoutWindowDraft,
-    commitCheckoutWindow,
-    btcMode,
-    setBtcMode,
     hasUnseenChangelog,
+    ...localPrefs,
+    ...checkoutWindow,
   };
 }
 
