@@ -51,9 +51,8 @@ async function syncSubscriptionProfile(
   }
 
   const proPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO") ?? null;
-  const proPlusPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO_PLUS") ?? null;
 
-  await syncProfileFromStripeSubscription(svcClient, userId, sub, proPriceId, proPlusPriceId);
+  await syncProfileFromStripeSubscription(svcClient, userId, sub, proPriceId);
 
   log("subscription profile cache updated", {
     user_id: userId,
@@ -129,7 +128,6 @@ serve(
             userId,
             sub,
             Deno.env.get("STRIPE_PRICE_ID_PRO") ?? null,
-            Deno.env.get("STRIPE_PRICE_ID_PRO_PLUS") ?? null,
           );
           log("checkout subscription profile cache updated", {
             user_id: userId,
