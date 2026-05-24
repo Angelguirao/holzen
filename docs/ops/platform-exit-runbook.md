@@ -33,7 +33,7 @@ flowchart TB
 
 | Layer | After exit | Lovable role |
 |-------|------------|--------------|
-| **Code** | GitHub | Optional editor (sync only) |
+| **Code** | GitHub | Optional editor on `feature/*` only — see [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md) § Optional Lovable editor |
 | **Frontend** | **Vercel** (recommended) — or Netlify / Cloudflare Pages | None for prod |
 | **Database + Edge** | Owned Supabase project | **Disconnect** auto-sync |
 | **Secrets** | Supabase Dashboard + GitHub Actions | Export once, then remove |

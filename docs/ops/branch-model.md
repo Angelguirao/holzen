@@ -12,6 +12,8 @@ Canonical branch flow for platform exit (owned Supabase + Vercel). Pairs with [p
 
 **Promotion:** merge features → `staging` → smoke → merge `staging` → `main`. **Hotfixes:** branch from `main`, merge back to `main`, then merge `main` → `staging` to keep them aligned.
 
+**Optional Lovable editor:** Lovable may stay connected for UI work on **`feature/*` branches only** — never as prod host or migration path. Full rules: [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md) § Optional Lovable editor.
+
 ## One-time setup
 
 ### 1. Create `staging` branch
@@ -68,6 +70,10 @@ Frontend `VITE_*` for CI builds live in GitHub Actions and/or Vercel — not Sup
 | [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) | Pull requests |
 | [`.github/workflows/staging-backend.yml`](../../.github/workflows/staging-backend.yml) | Push to `staging`, `workflow_dispatch` |
 | [`.github/workflows/deploy-production.yml`](../../.github/workflows/deploy-production.yml) | Push to `main`, `workflow_dispatch` |
+
+## Optional `dev` branch
+
+Not required. Some teams add **`dev`** as a long-lived integration branch (`feature/* → dev → staging → main`). Holzen defaults to **feature → staging → main**; add `dev` only if you want an extra integration step before formal staging QA. Do **not** point `dev` at Lovable Cloud — use owned staging or local Docker. See [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md) § Three environments.
 
 ## Phase 4 secret cleanup
 
