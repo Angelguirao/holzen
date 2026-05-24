@@ -3498,6 +3498,7 @@ for (const script of [
   'check-no-supabase-in-app.mjs',
   'check-screen-form-action-barrels.mjs',
   'check-no-posthog-in-screens.mjs',
+  'check-no-posthog-in-app.mjs',
 ]) {
   const child = spawnSync(process.execPath, [`scripts/${script}`], {
     cwd: root,
