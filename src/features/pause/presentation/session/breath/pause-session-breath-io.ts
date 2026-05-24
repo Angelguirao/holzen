@@ -34,7 +34,7 @@ export {
   type PauseBreathSecondLabelVariant,
 } from '@/features/pause/domain/ritual/breathe/breath-second-label-variant';
 
-import { invalidateCompanionUiCompletionQuery } from '@/features/pause/infrastructure/queries/companion/companion-ui-completion-query-key';
+import { invalidateCompanionUiCompletionQuery } from '@/features/pause/public-queries';
 import {
   runEnsureBreathSegment1Logged,
   runEnsureBreathSegment2Logged,

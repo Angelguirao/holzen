@@ -9,7 +9,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'companionPauseRepository' },
 }));
 
-import { invalidateCompanionUiCompletionQuery as invalidateQueryDirect } from '@/features/pause/infrastructure/queries/companion/companion-ui-completion-query-key';
+import { invalidateCompanionUiCompletionQuery as invalidateQueryDirect } from '@/features/pause/public-queries';
 import { loadCompanionOrchestrateSession as loadSessionDirect } from '@/features/pause/application/use-cases/ritual/frame/load-companion-orchestrate-session';
 import { nextExpandedWithLazyFetch as nextExpandedDirect } from '@/features/pause/application/use-cases/ritual/frame/next-expanded-with-lazy-fetch';
 import {

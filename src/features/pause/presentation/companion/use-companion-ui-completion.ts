@@ -5,13 +5,11 @@ import {
   companionUiCompletionQueryKey,
   EMPTY_COMPANION_UI_COMPLETION,
   getCompanionUiCompletionQueryOptions,
+  invalidateCompanionUiCompletionQuery,
   type CompanionUiCompletionStep,
   type CompanionUiCompletionState,
 } from '@/features/pause/public-queries';
-import {
-  invalidateCompanionUiCompletionQuery,
-  pauseCompanionUiStepCompletion,
-} from './pause-companion-orchestration-io';
+import { pauseCompanionUiStepCompletion } from './pause-companion-orchestration-io';
 
 /**
  * Per-pause-instance companion UI step completion (TanStack Query + RPC persist).

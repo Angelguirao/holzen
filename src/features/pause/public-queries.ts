@@ -156,16 +156,6 @@ export {
   type SignalSourceRow,
 } from './infrastructure/queries/stats-bundle-admin-query';
 export {
-  BULK_HOLD_PENDING_DISABLED_USER_ID,
-  BULK_HOLD_PENDING_QUERY_LEAF,
-  BULK_HOLD_PENDING_QUERY_PREFIX,
-  bulkHoldPendingNoneQueryKey,
-  bulkHoldPendingQueryKey,
-  fetchBulkHoldPendingPauses,
-  getBulkHoldPendingQueryOptions,
-  PAUSE_BULK_HOLD_QUERY_PREFIX,
-} from './infrastructure/queries/bulk-hold-pending-query';
-export {
   PAUSE_ARCHIVE_LIST_QUERY_PREFIX,
   PAUSE_ARCHIVE_PAGE_SIZE,
   fetchPauseArchivePage,
@@ -182,7 +172,6 @@ export {
   buildPauseArchiveInfiniteInitialData,
   isPauseArchiveListInitialLoading,
 } from './domain/archive/pause-archive-list-ui-state';
-export { pauseArchiveRowAllowsRetrospectiveOutcome } from './domain/archive/retrospective-outcome-eligibility';
 export {
   getHolzenQueryClient,
   setHolzenQueryClient,
@@ -217,6 +206,7 @@ export {
   companionUiCompletionQueryKey,
   getCompanionUiCompletionQueryOptions,
 } from './infrastructure/queries/companion/companion-ui-completion-query';
+export { invalidateCompanionUiCompletionQuery } from './infrastructure/queries/companion/companion-ui-completion-query-key';
 export {
   EMPTY_COMPANION_UI_COMPLETION,
   loadCompanionUiCompletionState,

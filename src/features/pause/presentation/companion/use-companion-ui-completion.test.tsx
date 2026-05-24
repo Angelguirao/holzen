@@ -25,7 +25,6 @@ const {
 
 vi.mock('./pause-companion-orchestration-io', () => ({
   pauseCompanionUiStepCompletion: pauseCompanionUiStepCompletionMock,
-  invalidateCompanionUiCompletionQuery: invalidateCompanionUiCompletionQueryMock,
 }));
 
 vi.mock('@/features/pause/public-queries', () => ({
@@ -35,6 +34,7 @@ vi.mock('@/features/pause/public-queries', () => ({
     queryFn: async () => emptyCompletion,
   }),
   EMPTY_COMPANION_UI_COMPLETION: emptyCompletion,
+  invalidateCompanionUiCompletionQuery: invalidateCompanionUiCompletionQueryMock,
 }));
 
 vi.mock('@tanstack/react-query', () => ({
