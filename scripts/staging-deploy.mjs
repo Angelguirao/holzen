@@ -43,7 +43,7 @@ function runNode(label, script, scriptArgs = []) {
 }
 
 if (mode === "db-push" || mode === "deploy") {
-  run("supabase db push", ["db", "push"]);
+  run("supabase db push", ["db", "push", "--yes"]);
 } else if (mode === "functions") {
   runNode("deploy active edge functions", "scripts/deploy-active-edge-functions.mjs");
 } else if (mode !== "deploy") {

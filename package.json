@@ -54,6 +54,7 @@
     "staging:db-push": "node scripts/staging-deploy.mjs db-push",
     "staging:functions-deploy": "node scripts/staging-deploy.mjs functions",
     "staging:deploy": "node scripts/staging-deploy.mjs deploy",
+    "vercel:sync-env": "node scripts/vercel-sync-env.mjs",
     "prod:db-push": "node scripts/staging-deploy.mjs db-push",
     "prod:functions-deploy": "node scripts/staging-deploy.mjs functions",
     "prod:deploy": "node scripts/staging-deploy.mjs deploy",

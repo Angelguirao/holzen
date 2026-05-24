@@ -4,7 +4,7 @@ Holzen is a **Vite + React SPA** with client-side routing (`react-router-dom`). 
 
 Netlify and Cloudflare Pages work too — same build output (`dist/`). We document Vercel first because it matches how most teams deploy Vite/React apps and avoids a separate CI deploy job when the GitHub integration is enabled.
 
-**Related:** [production-supabase-setup.md](production-supabase-setup.md), [platform-exit-runbook.md](platform-exit-runbook.md), [branch-model.md](branch-model.md), [vercel.json](../../vercel.json).
+**Related:** [production-supabase-setup.md](production-supabase-setup.md), [stripe-environment-setup.md](stripe-environment-setup.md), [platform-exit-runbook.md](platform-exit-runbook.md), [branch-model.md](branch-model.md), [vercel.json](../../vercel.json). Env sync helper: `npm run vercel:sync-env` (reads `.env.hosted` / `.env.staging.local`).
 
 ---
 

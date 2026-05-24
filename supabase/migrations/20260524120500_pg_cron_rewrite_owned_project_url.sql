@@ -1,6 +1,7 @@
 -- Rewrite pg_cron commands that still target the retired Lovable Cloud project URL.
 -- Requires vault secret holzen_project_url = https://<ref>.supabase.co (no trailing slash).
--- See docs/ops/staging-supabase-setup.md §1b and docs/ops/cron-setup.md.
+-- Hosted Supabase: migration role may lack UPDATE on cron.job — run docs/ops/bootstrap-owned-project.sql
+-- cron rewrite block in SQL Editor (postgres) if this migration skips.
 
 SET search_path = public;
 
@@ -31,4 +32,6 @@ BEGIN
 EXCEPTION
   WHEN undefined_table OR invalid_schema_name THEN
     RAISE NOTICE 'pg_cron not available — skip URL rewrite';
+  WHEN insufficient_privilege THEN
+    RAISE NOTICE 'pg_cron URL rewrite skipped (insufficient_privilege) — run manual UPDATE in SQL Editor as postgres';
 END$$;
