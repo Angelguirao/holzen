@@ -43,7 +43,9 @@ for (const file of walk(srcRoot)) {
   for (const m of text.matchAll(T_RE)) {
     const key = m[1];
     if (key.includes("${")) continue;
-    if (!enKeys.has(key)) missing.push(`${rel}: ${key}`);
+    const hasKey =
+      enKeys.has(key) || enKeys.has(`${key}_one`) || enKeys.has(`${key}_other`);
+    if (!hasKey) missing.push(`${rel}: ${key}`);
   }
 }
 

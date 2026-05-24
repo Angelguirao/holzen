@@ -54,7 +54,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run check:bruno-active-manifest` | Every `[functions.*]` in `config.toml` is listed in `bruno/active/functions-catalog.md` (in **`test:ci`**) |
 | `npm run check:posthog-events-allowlist` | Active `trackEvent` names ⊆ `docs/ops/event-taxonomy.md` Active section (in **`test:ci`** / **`check:prepush`**) |
 | `npm run check:feature-flags-doc` | Active `useFeatureFlag('…')` keys ⊆ `docs/ops/feature-flags.md` Active flags table (in **`test:ci`** / **`check:prepush`**) |
-| `npm run check:i18n-active-keys` | Optional — `t('…')` keys in active `src/` must exist in `src/locales/en.json` (not in `test:ci` until tree is complete) |
+| `npm run check:i18n-active-keys` | Active `t('…')` keys must exist in `src/locales/en.json` (in **`test:ci`**) |
 | `npm run test:watch` | Vitest watch mode |
 | `npm run lint` | ESLint across the repo |
 | `npm run check:view-migrations` | Fail on unsafe `CREATE OR REPLACE VIEW` column renames in `supabase/migrations/` (runs in **`check:prepush`**). |

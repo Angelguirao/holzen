@@ -57,7 +57,11 @@
     "offlineBanner": "You're offline",
     "connectivityDegraded": "Can't reach Holzen right now — check your connection or try again shortly.",
     "profileLoadFailed": "We couldn't load your profile from the server. Some settings may be out of date until this succeeds.",
-    "profileWriteFailed": "We couldn't save that change. Please try again."
+    "profileWriteFailed": "We couldn't save that change. Please try again.",
+    "noResults": "No results",
+    "refresh": "Refresh",
+    "retry": "Retry",
+    "showLess": "Show less"
   },
   "auth": {
     "restoringSession": "Restoring your session…",
@@ -240,7 +244,8 @@
       "aiTemporarilyUnavailable": "The AI service is temporarily unavailable. Your settings and data are safe — try again in a moment.",
       "unexpectedError": "An unexpected error occurred. Your data is safe."
     },
-    "browseAllTools": "Browse all tools & experiences"
+    "browseAllTools": "Browse all tools & experiences",
+    "openingPause": "Opening your pause…"
   },
   "history": {
     "recent": "Recent",
@@ -282,7 +287,16 @@
     "overview": {
       "title": "Journey",
       "subtitle": "Your pause rhythm at a glance.",
-      "archiveCta": "Open your pause library"
+      "archiveCta": "Open your pause library",
+      "completed": {
+        "label": "Completed pauses"
+      },
+      "streak": {
+        "title": "Streak",
+        "desc": "Days with at least one completed pause.",
+        "current": "Current",
+        "longest": "Longest"
+      }
     }
   },
   "admin": {
@@ -411,8 +425,8 @@
     "firstName": "First name",
     "firstNameDesc": "Optional. Shown as a short welcome line under Home.",
     "firstNamePlaceholder": "Your first name",
-    "holdGoalTitle": "Hold goal",
-    "holdGoalDesc": "Time-bound, price target, or forever. Home shows a compact “Why you stay” summary — edit the full commitment here.",
+    "holdGoalTitle": "Your commitment",
+    "holdGoalDesc": "Optional time-bound or open-ended commitment anchor. This is not portfolio tracking — it supports your pause ritual.",
     "trackedAssetTitle": "Tracked asset",
     "trackedAssetDesc": "Volatility checks, Home market data, and pause context follow this asset. Legacy Bitcoin calendar badges apply only when Bitcoin is selected.",
     "trackedAssets": {
@@ -578,7 +592,30 @@
       "natureDesc": "Trees, water, sky",
       "exercise": "Exercise",
       "exerciseDesc": "Gym, yoga, stretching"
-    }
+    },
+    "aboutFeedback": "About & feedback",
+    "aboutSubpageHint": "Changelog, version, and contact the team.",
+    "allowanceCompanions": "Companions & guidance",
+    "allowanceFreePauses": "Free pauses",
+    "allowanceInsights": "Insights",
+    "allowanceNextReset": "Resets {{date}}",
+    "allowanceResetsOn": "Monthly allowance resets on {{date}}",
+    "allowanceWallpapers": "Wallpapers",
+    "checkoutWindow": "Checkout window",
+    "checkoutWindowDesc": "How long Stripe checkout stays open before it expires.",
+    "checkoutWindowLabel": "Checkout session length",
+    "checkoutWindowRange": "{{min}}–{{max}} minutes",
+    "cooldownHelpBody": "Automatic pauses wait at least this long after the previous one.",
+    "cooldownHelpTitle": "Cooldown help",
+    "creditsDashboard": "Credits & allowances",
+    "flexBalanceShort": "{{count}} flex credits",
+    "flexPackMCta": "Buy Flex Pack M",
+    "flexPackSCta": "Buy Flex Pack S",
+    "nextEligibleAt": "Next eligible {{when}}",
+    "planLifetime": "Lifetime",
+    "planPro": "Pro",
+    "planProPlus": "Pro Plus",
+    "signOutFailed": "Sign out failed"
   },
   "onboarding": {
     "heroText": "The market moves. You feel the pull to act. This app exists for the space between impulse and decision.",
@@ -630,10 +667,10 @@
       "historySample": "When gold dropped 26% in 2013, panic sellers locked in losses. Within 2 years, it consolidated and began a new ascent."
     },
     "commitmentKicker": "Your commitment",
-    "commitmentTitle": "Hold goal",
+    "commitmentTitle": "Your commitment",
     "commitmentIntro": "Set the commitment you are holding for. You can refine it anytime in Settings → You. Optional breathing mantra is also there after you have used pauses.",
     "commitmentFooterHint": "Skip if you prefer — you can set this later under Settings → You.",
-    "commitmentHoldLabel": "Hold goal",
+    "commitmentHoldLabel": "Commitment (optional)",
     "ready": {
       "title": "You're set",
       "recapWhy": "Your why",
@@ -646,7 +683,10 @@
       "startingTrial": "Starting trial…",
       "startTrialNoCard": "Start {{days}}-day free trial",
       "trialFinePrintNoCard": "Then ${{price}}/mo if you keep going · Cancel anytime"
-    }
+    },
+    "groundingAddMore": "Add another",
+    "groundingPlaceholder": "e.g. Walk outside without checking price",
+    "groundingSuggestions": "Suggestions"
   },
   "moodCheck": {
     "howAreYouFeelingNow": "How are you feeling now?",
@@ -662,7 +702,8 @@
       "detached": "Detached",
       "uncertain": "Uncertain",
       "fearful": "Fearful"
-    }
+    },
+    "afterDesc": "How do you feel now?"
   },
   "outcome": {
     "whatDidYouDo": "What did you do?",
@@ -862,7 +903,8 @@
           "abstractHeading": "Abstract",
           "researchersHeading": "Researchers",
           "citationCount_one": "Cited by {{count}} paper",
-          "citationCount_other": "Cited by {{count}} papers"
+          "citationCount_other": "Cited by {{count}} papers",
+          "citationCount": "{{count}} sources"
         },
         "relatedBiases": {
           "label": "Biases surfaced this month",
@@ -877,7 +919,8 @@
         "placeholder": "What is this card surfacing for you right now?",
         "contextHint": "Writing alongside: {{title}}"
       }
-    }
+    },
+    "loadError": "Could not load companion"
   },
   "landing": {
     "hero": "When Bitcoin moves, pause before you do.",
@@ -1241,7 +1284,10 @@
     "pauseCardOutcomePending": "Outcome not recorded",
     "pauseCardBreathDone": "Breathing completed",
     "pauseCardEngagementTypes": "Engagement",
-    "pauseCardMoreTypes": "+ more"
+    "pauseCardMoreTypes": "+ more",
+    "sortAlpha": "A–Z",
+    "sortNewest": "Newest",
+    "sortOldest": "Oldest"
   },
   "archive": {
     "pageTitle": "Archive — Holzen",
@@ -1263,7 +1309,7 @@
     "emptyFavs": "No favorites yet. Tap the heart on a pause card to save it here.",
     "emptyEchoesNone": "Nothing here yet. Echoes appear when a pause ends before you open Reflect.",
     "noResults": "No pauses match your filters.",
-    "pauseCardReadOnlyHint": "Saved for your record — use Home or Library to start a new pause.",
+    "pauseCardReadOnlyHint": "Saved for your record — use Home to start a new pause when you need one.",
     "pauseShowDetails": "Show details",
     "pauseHideDetails": "Hide details",
     "pauseRitualBrief": "Brief pause",
@@ -1283,13 +1329,10 @@
     "pauseDetailOutcome": "Decision",
     "pauseDetailCompanions": "Companions used",
     "pauseDetailReflection": "Reflection",
-    "pauseCardRetrospectiveHint": "This pause ended before a ritual decision was saved. You can still log hold, buy, or sell for your stats.",
-    "retrospectiveOpenCta": "Log decision",
-    "retrospectiveSheetTitle": "Log your decision",
-    "retrospectiveSheetBody": "This pause ended (expired or dismissed) before you finished Decide on the ritual screen. Your answer is saved for patterns and stats; the row stays expired or dismissed.",
-    "retrospectiveDecideKicker": "Archive",
-    "retrospectiveOutcomeSaved": "Decision saved for this pause.",
-    "retrospectiveOutcomeFailed": "Could not save — check your connection and try again."
+    "echoCardKind": "Echo",
+    "noPreviewYet": "No preview yet",
+    "pauseCardKind": "Pause",
+    "pauseUntitled": "Untitled pause"
   },
   "pause": {
     "lapsed": {
@@ -1315,8 +1358,8 @@
     "breathRoundLabel": "Round {{current}}/{{total}}",
     "startRitual": "Start a ritual",
     "orDecideNow": "or scroll down to decide without a ritual",
-    "whatWillYouDo": "What will you do?",
-    "decideSubcopy": "You're choosing from your center.",
+    "whatWillYouDo": "What did you choose?",
+    "decideSubcopy": "Record your decision — Holzen does not judge your strategy.",
     "youChose": "You chose deliberately.",
     "return": "Return",
     "leaveSessionTitle": "Leave ritual?",
@@ -1395,34 +1438,30 @@
         "completedSaved": "Completed and saved",
         "journeyShort": "This pause is now part of your Journey.",
         "journeyLead": "This pause is saved to your Journey.",
-        "journeyPersonalHeldWithMood": "You named {{mood}}, then chose to hold. Journey folds that into regulation and tolerance signals — averaged across pauses, not a one-time score jump.",
-        "journeyPersonalHeld": "You chose to hold. Journey logs that with the volatility snapshot so tolerance and regulation trends stay tied to what you actually did.",
-        "journeyPersonalSoldWithMood": "You named {{mood}}, then chose to sell. Journey records the action and how steady the window felt — alignment and tolerance stats learn from that pattern over time.",
-        "journeyPersonalSold": "You chose to sell. Journey pairs that action with context so your stats reflect what you repeat under pressure.",
-        "journeyPersonalBoughtWithMood": "You named {{mood}}, then chose to buy. Journey treats buys with the same context-aware lens — regulation and alignment pick up the habit, not a single spike.",
-        "journeyPersonalBought": "You chose to buy. Journey logs the move alongside market context so your inferred skills stay honest to your behavior.",
-        "personalityKicker": "Each pause strengthens the picture Holzen builds of you under pressure — the shape your Journey stats infer slowly from many pauses, not one headline.",
-        "personalityKickerHeld": "After a hold like this, every pause still nudges the picture Holzen builds of you under pressure — Journey infers that personality slowly from your pattern, not one headline.",
-        "personalityKickerSold": "After a sell like this, each pause still feeds the story your stats tell about tolerance and alignment — it sharpens across many decisions, not a single swing.",
-        "personalityKickerBought": "After a buy like this, each pause still refines how Journey reads your composure under urge — the shape emerges from repetition, not one dramatic number.",
-        "contributionWhenNoSnapshot": "Save to Journey to see this pause in your stats.",
-        "contributionTitle": "How this pause contributes",
+        "journeyPersonalHeldWithMood": "You named {{mood}}, then chose to hold.",
+        "journeyPersonalHeld": "You chose to hold after pausing.",
+        "journeyPersonalSoldWithMood": "You named {{mood}}, then chose to sell.",
+        "journeyPersonalSold": "You chose to sell after pausing.",
+        "journeyPersonalBoughtWithMood": "You named {{mood}}, then chose to buy.",
+        "journeyPersonalBought": "You chose to buy after pausing.",
+        "personalityKicker": "Each completed pause adds to your rhythm — Holzen celebrates the pause, not the trade.",
+        "personalityKickerHeld": "You paused and chose to hold. That conscious moment is what counts.",
+        "personalityKickerSold": "You paused and chose to sell. That conscious moment is what counts.",
+        "personalityKickerBought": "You paused and chose to buy. That conscious moment is what counts.",
+        "contributionWhenNoSnapshot": "Your pause is saved to Journey.",
+        "contributionTitle": "What you practiced",
         "contributionFallback": "This pause is now part of your Journey.",
-        "impactHeldCalm": "Choosing to hold adds a steady-outcome signal your Journey uses under distress tolerance.",
-        "impactBought": "Buys are scored against volatility context in Journey — this decision updates that pattern.",
-        "impactSold": "Sells register as realized action; Journey reflects them alongside how calm the window felt.",
-        "impactEntryMood": "You named how you felt before deciding — that anchors regulation trends when intensity is logged.",
+        "impactHeldCalm": "You chose to hold after pausing.",
+        "impactBought": "You recorded what you chose after pausing.",
+        "impactSold": "You recorded what you chose after pausing.",
+        "impactDecisionRecorded": "You recorded what you chose after pausing — that is the practice.",
+        "impactEntryMood": "You named how you felt before deciding.",
         "checkInSectionTitle": "How are you now?",
         "checkInRowLeft": "Check in again",
-        "checkInRowRightHint": "Optional: if how you feel now changed after deciding, adjust mood or intensity and tap Save so Journey reflects your after-state.",
-        "contributionFootnote": "These lines describe signals Journey uses over many pauses — not live point totals.",
-        "badgesChecking": "Checking badges…",
-        "newBadgesTitle": "Badges unlocked",
-        "newBadgesFootnote": "Saved to your profile — same list Journey → Badges would sync.",
-        "newBadgesNone": "No new badges this pause — you're still progressing toward the next ones. Open Journey → Badges anytime to see what's close.",
-        "practiceAffirmLead": "Stopping to decide is what matters here. Journey learns from your pauses over time — not a single grade on this moment.",
-        "statsPatternExplainer": "Holzen and skill bars in Stats summarize patterns across many completed pauses. They can move slowly and are never a verdict on whether pausing was the right call.",
-        "openStatsCta": "How scores work in Journey",
+        "checkInRowRightHint": "Optional: if how you feel now changed after deciding, adjust mood or intensity and tap Save.",
+        "contributionFootnote": "These lines describe how you practiced — not whether your trade was correct.",
+        "practiceAffirmLead": "Stopping to decide is what matters here. Journey tracks completed pauses and your rhythm over time.",
+        "statsPatternExplainer": "Journey shows your pause rhythm and completed count — not a grade on your trades.",
         "lastEmotionLabel": "Feel",
         "pickMood": "Tap pencil to choose",
         "editMoodAria": "Edit emotion",
@@ -1434,7 +1473,8 @@
         "outcomeBought": "You chose to Buy",
         "outcomeFallback": "Nice work"
       },
-      "breathIntroKicker": "Breathe"
+      "breathIntroKicker": "Breathe",
+      "stepsAria": "Pause ritual steps"
     },
     "depthPicker": {
       "contextMoved": "{{sym}} moved {{pct}}% in the last 24 hours.",
@@ -1579,11 +1619,17 @@
       "shareCopyFailed": "Could not copy. Try again.",
       "shareEmpty": "Nothing to share yet.",
       "wallpaperCopied": "Copied. Paste into your wallpaper or lock-screen widget when you edit it.",
-      "wallpaperHint": "Copy your reflection and paste it into a wallpaper or lock-screen quote widget."
+      "wallpaperHint": "Copy your reflection and paste it into a wallpaper or lock-screen quote widget.",
+      "generating": "Generating reflection…",
+      "noteLabel": "Private note",
+      "notePlaceholder": "Optional note for your library…",
+      "tagsLabel": "Tags",
+      "tagsPlaceholder": "Add tags…"
     },
     "done": {
       "reinforcementKicker": "Carry this with you"
-    }
+    },
+    "couldNotLoadPause": "Could not load this pause"
   },
   "letter": {
     "calmTitle": "Calm letter",
@@ -1676,15 +1722,16 @@
     "moodBreakdown": "Mood breakdown"
   },
   "holdGoal": {
-    "title": "Hold Goal",
-    "setAGoal": "Set a hold goal",
-    "setYourGoal": "Set Your Goal",
+    "title": "Commitment",
+    "setAGoal": "Set a commitment",
+    "setYourGoal": "Set your commitment",
     "clear": "Clear",
-    "clearTitle": "Clear hold goal",
-    "clearDesc": "This will remove your current hold goal. You can set a new one anytime.",
+    "clearTitle": "Clear commitment",
+    "clearDesc": "This will remove your current commitment. You can set a new one anytime.",
     "time": "Time",
-    "price": "Price",
     "forever": "Forever",
+    "legacyPriceTitle": "Previous price target",
+    "legacyPriceBody": "Price targets are no longer part of Holzen. Clear this or choose a time or forever commitment instead.",
     "startFrom": "Start from",
     "today": "Today",
     "holdForever": "Hold Forever",
@@ -2207,7 +2254,12 @@
     "triggerDrops": "trigger when BTC drops this much in 24h",
     "cumulative": "7-day cumulative threshold",
     "rolling7day": "trigger when BTC moves this much over 7 days (up or down)",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "estimator": {
+      "avg": "Average",
+      "raw": "Raw samples",
+      "result": "Estimated triggers per month"
+    }
   },
   "changelog": {
     "whatsNew": "What's new",
@@ -2237,7 +2289,11 @@
     "failedToSend": "Failed to send",
     "tryAgainLater": "Please try again later.",
     "sent": "Feedback sent",
-    "sentDesc": "Thank you! We'll get back to you."
+    "sentDesc": "Thank you! We'll get back to you.",
+    "close": "Close",
+    "diagnosticAttached": "Diagnostic attached",
+    "errorPrefill": "Could not load feedback form",
+    "removeDiagnostic": "Remove diagnostic"
   },
   "referral": {
     "milestone1": "1 referral",
@@ -2392,7 +2448,8 @@
     "desc_grounding": "Choose personal grounding activities and get AI-powered suggestions tailored to the market moment.",
     "desc_notifications": "Smart digests, night reflections, and quiet hours to control when and how Holzen reaches you.",
     "desc_save_moment": "Capture what a companion card surfaces for you as a journal note saved to your library.",
-    "desc_deep_pause": "The full ~7 min ritual — feel, breathe, reflect, frame, and decide — is included with Holzen Pro or your free trial."
+    "desc_deep_pause": "The full ~7 min ritual — feel, breathe, reflect, frame, and decide — is included with Holzen Pro or your free trial.",
+    "welcomeToast": "🎉 Welcome to Pro! All features are now unlocked."
   },
   "triggerOverlay": {
     "readyToPause": "You paused. That's the hardest part.",
@@ -2549,5 +2606,27 @@
     "wake": "Wake",
     "untilTomorrow": "Until tomorrow (8am)",
     "untilTomorrowActivated": "Snoozed until tomorrow 8am"
+  },
+  "limits": {
+    "buyFlexPackS": "Buy Flex Pack S · ${{price}}",
+    "reachedDesc": "Top up with {{count}} flex credits to continue this month.",
+    "reachedTitle": "{{feature}} limit reached"
+  },
+  "quietWindows": {
+    "add": "Add window",
+    "added": "Quiet window added",
+    "empty": "No extended quiet windows yet.",
+    "labelPlaceholder": "Label (e.g. Work hours)",
+    "newLabel": "Work hours",
+    "removed": "Quiet window removed",
+    "title": "Extended schedules"
+  },
+  "scoreImpact": {
+    "breathing": "Breathing completed",
+    "moodImproved": "Mood shifted toward composure",
+    "note": "Added a reflection note",
+    "tags": "Tagged this pause",
+    "title": "What you practiced",
+    "tools": "Used {{count}} perspective tool(s)"
   }
 }

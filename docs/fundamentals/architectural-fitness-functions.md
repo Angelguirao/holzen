@@ -104,6 +104,7 @@ Scripts live under `scripts/`. See script headers for exact rules and allowlists
 |--------|--------------|------------|
 | `check:posthog-events-allowlist` | Yes | `trackEvent` names ⊆ event taxonomy Active section |
 | `check:feature-flags-doc` | Yes | `useFeatureFlag` keys ⊆ feature-flags.md Active flags table |
+| `check:i18n-active-keys` | Yes | Active `t('…')` keys exist in `src/locales/en.json` |
 | `check:view-migrations` | Prepush | Safe `CREATE OR REPLACE VIEW` patterns |
 | `check:version-sync` | Prebuild | `package.json` version = latest changelog row |
 | `stamp-edge-release` / `check:release-stamp` | Prepush stamp step | Edge `EDGE_RELEASE` = Git SHA |
@@ -175,7 +176,7 @@ Ordered by impact ÷ effort. Do not implement here unless a separate task scopes
 |-----------|----------|-------|
 | ~~`check:no-supabase-in-screens`~~ | *(shipped)* | Wired in `check:architecture-alignment` |
 | ~~`check:feature-flags-doc`~~ | *(shipped)* | In `test:ci` + prepush |
-| Enable `check:i18n-active-keys` in CI | i18n completeness | When active tree is complete |
+| ~~Enable `check:i18n-active-keys` in CI~~ | *(shipped)* | In `test:ci` |
 | `check:sql-search-path` | Migration security | Regex on `supabase/migrations/*.sql` |
 | Bundle size budget | Performance regression | Threshold on main chunk post-build |
 
