@@ -154,39 +154,50 @@ Optional: assign a **branch domain** (e.g. `staging.holzen.app` → branch `stag
 
 ## 5.1 Pre-launch: gate production (not public-ready)
 
-Use when **prod is deployed** but you are **not ready for public traffic**. Gates **only the Vercel-hosted SPA** (`holzen.app`); Supabase Auth, Postgres, and Edge Functions stay publicly reachable with the anon key — fine for founder/test accounts, not a full backend lockdown.
+Use when **prod is deployed** but you are **not ready for public traffic**. Any gate on the **SPA only** leaves Supabase (auth, API, edges) public if someone has the anon key — acceptable for founder/test accounts, not a full backend lockdown.
 
-### Option A — Vercel Authentication (default on Hobby/Pro without Advanced)
+### Vercel Deployment Protection vs `holzen.app`
 
-**Password Protection** in the dashboard requires **Pro + Advanced Deployment Protection** (~$150/mo extra). Use **Vercel Authentication** instead:
+On the Holzen project, **Password Protection** and **Vercel Authentication** for **custom domains** (e.g. `holzen.app`, `www`) require **Pro + Advanced Deployment Protection** (~$150/mo add-on). The dashboard may show those toggles, but they do not apply to the branded domain without that plan.
 
-1. Project → **Settings** → **Deployment Protection**.
-2. **Vercel Authentication** → enable for **Production** (leave Preview open for PR QA if you want).
-3. **Project Members** (or team): invite anyone who should open `holzen.app` — they sign in with their Vercel account.
-4. Incognito test: `https://holzen.app` should **not** load the app without login (Vercel auth wall).
+**What still works without Advanced:**
 
-**External tester (no Vercel account):** on a deployment → **Share** → **Shareable Link** (bypasses protection for that URL only).
+| Surface | Password / Vercel Auth | Notes |
+|---------|------------------------|--------|
+| `*.vercel.app` deployment URL | Often yes | Enable protection on **Preview** / default hostname; QA on that URL, not `holzen.app` |
+| **`holzen.app` (custom domain)** | No (without Advanced) | Needs one of the options below |
 
-**CI / scripted smoke against protected prod:** **Protection Bypass for Automation** → add a secret → set `VERCEL_AUTOMATION_BYPASS_SECRET` in the Vercel project → send header `x-vercel-protection-bypass: <secret>` (or query param) from the runner. Holzen’s default path is smoke on **staging** previews instead.
+**With Advanced:** enable Password or Vercel Authentication on **Production**, incognito-test `https://holzen.app`, use **Shareable Links** or **Protection Bypass** (`VERCEL_AUTOMATION_BYPASS_SECRET` + `x-vercel-protection-bypass`) for outsiders / CI.
 
-### Option B — Password Protection (paid)
+### Option A — Detach or park the custom domain (free, immediate)
 
-If you subscribe to **Advanced Deployment Protection**: enable **Password Protection** for Production, set a shared password (password manager, not git). Same incognito check as above.
+1. **Vercel** → **Domains** → remove `holzen.app` / `www` from **Production**, **or**
+2. **DNS** (registrar) → point `holzen.app` to a static “not open yet” page (registrar parking, Cloudflare holding page, etc.).
 
-### Option C — Take the domain offline
+Prod build can stay on Vercel at `project-name.vercel.app` for internal use. Public visitors who only know `holzen.app` no longer hit the app.
 
-**Domains** → remove `holzen.app` from Production (or park DNS). Strongest “closed” without a Vercel plan upgrade; use **staging** preview URL for QA.
+### Option B — QA on protected `*.vercel.app` only
 
-### While gated
+Keep `holzen.app` detached or parked; enable Deployment Protection on **Preview** / use the team’s default **vercel.app** production alias if assigned. Founders test there until launch, then re-attach the custom domain and open protection off.
 
-- Do **not** merge to **`main`** unless you intend to update prod; keep work on **`staging`** ([branch-model.md](./branch-model.md)).
+### Option C — App-level access gate (works on custom domain)
+
+Ship a build-time flag (e.g. `VITE_SITE_ACCESS_CODE`) that shows a simple unlock screen before React boots or before routes render. Set the value only in Vercel **Production** env; remove at launch. Not as strong as edge protection (anon key still in bundle) but blocks casual browsers on `holzen.app`. Implement in-repo when you choose this path.
+
+### Option D — Pay for Advanced Deployment Protection
+
+Single vendor solution for password or Vercel Auth on `holzen.app`.
+
+### While not public
+
+- Do **not** merge to **`main`** unless you intend to update prod; work on **`staging`** ([branch-model.md](./branch-model.md)).
 - **Required reviewers** on GitHub **`production`** environment.
 - Optional: Supabase prod → Auth → disable new signups.
 
 ### Remove at launch
 
-1. Turn off **Vercel Authentication** / **Password Protection** on Production (or re-attach the domain).
-2. Incognito smoke: `holzen.app` loads the app with no Vercel gate.
+1. Re-attach `holzen.app` if detached; disable Vercel protection / remove app access env / restore DNS.
+2. Incognito: `holzen.app` loads Holzen with no gate.
 3. [launch-runbook.md](./launch-runbook.md) / [ship-checklist.md](./ship-checklist.md).
 
 ---
