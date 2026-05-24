@@ -1,45 +1,11 @@
 #!/usr/bin/env node
-/**
- * Fail CI when required GitHub Actions deploy secrets are missing.
- * Usage: node scripts/check-github-deploy-secrets.mjs --profile=staging|production
- */
-const profile = process.argv.find((a) => a.startsWith("--profile="))?.split("=")[1];
+/** @deprecated Use check-cicd-secrets.mjs — kept for existing workflow references. */
+import { spawnSync } from "node:child_process";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const REQUIRED = {
-  staging: [
-    "SUPABASE_ACCESS_TOKEN",
-    "SUPABASE_STAGING_PROJECT_REF",
-    "VERCEL_TOKEN",
-    "VERCEL_ORG_ID",
-    "VERCEL_PROJECT_ID",
-  ],
-  production: [
-    "SUPABASE_ACCESS_TOKEN",
-    "SUPABASE_PROD_PROJECT_REF",
-    "VERCEL_TOKEN",
-    "VERCEL_ORG_ID",
-    "VERCEL_PROJECT_ID",
-  ],
-};
-
-if (!profile || !REQUIRED[profile]) {
-  console.error(
-    `[check-github-deploy-secrets] Pass --profile=staging or --profile=production`,
-  );
-  process.exit(1);
-}
-
-const missing = REQUIRED[profile].filter((name) => !process.env[name]?.trim());
-
-if (missing.length) {
-  console.error(
-    `[check-github-deploy-secrets] Missing GitHub Actions secrets for ${profile}:`,
-  );
-  for (const name of missing) console.error(`  - ${name}`);
-  console.error(
-    "\nSee docs/ops/cicd-overview.md § GitHub Actions secrets.",
-  );
-  process.exit(1);
-}
-
-console.log(`✓ All required ${profile} deploy secrets are present`);
+const script = join(dirname(fileURLToPath(import.meta.url)), "check-cicd-secrets.mjs");
+const result = spawnSync(process.execPath, [script, ...process.argv.slice(2)], {
+  stdio: "inherit",
+});
+process.exit(result.status ?? 1);
