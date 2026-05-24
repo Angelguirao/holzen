@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /** Sync holzen Vercel env vars from local gitignored files. */
-import { execFileSync } from "node:child_process";
+import { execSync } from "node:child_process";
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -17,14 +17,27 @@ function parseEnv(path) {
   return map;
 }
 
-function add(name, value, environment) {
-  if (!value) return;
-  console.log(`→ ${name} (${environment})`);
-  execFileSync(
+function add(name, value, environment, gitBranch) {
+  if (!value && value !== "") return;
+  const branchLabel = gitBranch ? ` preview@${gitBranch}` : "";
+  console.log(`→ ${name} (${environment}${branchLabel})`);
+  const cmd = [
     "npx",
-    ["vercel@latest", "env", "add", name, environment, "--value", value, "--yes", "--no-sensitive", "--force"],
-    { cwd: root, stdio: "inherit", shell: true },
-  );
+    "vercel@latest",
+    "env",
+    "add",
+    name,
+    environment,
+    ...(gitBranch ? [gitBranch] : []),
+    "--value",
+    value,
+    "--yes",
+    "--no-sensitive",
+    "--force",
+  ]
+    .map((part) => (/\s/.test(part) ? JSON.stringify(part) : part))
+    .join(" ");
+  execSync(cmd, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 120_000 });
 }
 
 const hosted = parseEnv(join(root, ".env.hosted"));
@@ -40,13 +53,15 @@ add("VITE_ADMIN_USER_IDS", hosted.VITE_ADMIN_USER_IDS, "production");
 add("VITE_POSTHOG_KEY", hosted.VITE_POSTHOG_KEY, "production");
 add("VITE_POSTHOG_HOST", hosted.VITE_POSTHOG_HOST, "production");
 
-console.log("Preview…");
-add("VITE_SUPABASE_URL", "https://ksplyxxdvandkwzundql.supabase.co", "preview");
-add("VITE_SUPABASE_PROJECT_ID", "ksplyxxdvandkwzundql", "preview");
-add("VITE_SUPABASE_PUBLISHABLE_KEY", staging.VITE_SUPABASE_PUBLISHABLE_KEY, "preview");
-add("VITE_APP_VERSION", "$VERCEL_GIT_COMMIT_SHA", "preview");
-add("VITE_ADMIN_USER_IDS", staging.VITE_ADMIN_USER_IDS ?? "", "preview");
-add("VITE_POSTHOG_KEY", hosted.VITE_POSTHOG_KEY, "preview");
-add("VITE_POSTHOG_HOST", hosted.VITE_POSTHOG_HOST, "preview");
+// Preview vars scoped to `main` (CLI requires a branch; add others in dashboard if needed).
+const previewBranch = "main";
+console.log(`Preview (branch: ${previewBranch})…`);
+add("VITE_SUPABASE_URL", "https://ksplyxxdvandkwzundql.supabase.co", "preview", previewBranch);
+add("VITE_SUPABASE_PROJECT_ID", "ksplyxxdvandkwzundql", "preview", previewBranch);
+add("VITE_SUPABASE_PUBLISHABLE_KEY", staging.VITE_SUPABASE_PUBLISHABLE_KEY, "preview", previewBranch);
+add("VITE_APP_VERSION", "$VERCEL_GIT_COMMIT_SHA", "preview", previewBranch);
+add("VITE_ADMIN_USER_IDS", staging.VITE_ADMIN_USER_IDS ?? "", "preview", previewBranch);
+add("VITE_POSTHOG_KEY", hosted.VITE_POSTHOG_KEY, "preview", previewBranch);
+add("VITE_POSTHOG_HOST", hosted.VITE_POSTHOG_HOST, "preview", previewBranch);
 
 console.log("Done.");
