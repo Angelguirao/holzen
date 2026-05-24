@@ -19,7 +19,7 @@ export type LimitFeature =
   | 'insight'
   | 'free_pause';
 
-type StartCheckout = (target: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m') => void | Promise<void>;
+type StartCheckout = (target: 'pro' | 'flex_pack_s' | 'flex_pack_m') => void | Promise<void>;
 
 function featureLabel(feature: LimitFeature): string {
   const t = i18n.t.bind(i18n);

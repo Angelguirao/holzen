@@ -30,7 +30,7 @@ export function useHomePauseActions(args: {
   dismissMessage: () => void;
   manualTrigger: (mood?: string) => Promise<ManualPauseTriggerResult>;
   manualCooldownRemaining: () => number;
-  startCheckout: (target?: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m') => Promise<void>;
+  startCheckout: (target?: 'pro' | 'flex_pack_s' | 'flex_pack_m') => Promise<void>;
   /** PostHog `pause_open_dismissed.surface` — Zen reflection Done vs dashboard Your pause widget. */
   dismissAnalyticsSurface: PauseDismissAnalyticsSurface;
 }) {

@@ -2,7 +2,7 @@ export type SubscriptionBillingInterval = 'month' | 'year' | 'day' | 'week';
 
 export type SubscriptionSnapshot = {
   subscribed: boolean;
-  tier: 'free' | 'pro' | 'pro_plus' | 'lifetime';
+  tier: 'free' | 'pro' | 'lifetime';
   monthlyUsed: number;
   monthlyRemaining: number | undefined;
   companionLimit: number;
@@ -25,7 +25,7 @@ export type SubscriptionSnapshot = {
 
 export interface SubCache {
   subscribed: boolean;
-  tier: 'free' | 'pro' | 'pro_plus' | 'lifetime';
+  tier: 'free' | 'pro' | 'lifetime';
   monthlyUsed: number;
   monthlyRemaining: number | undefined;
   companionLimit: number;
