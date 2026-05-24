@@ -135,8 +135,8 @@ See `emit_job_heartbeat` for a working example.
 
 ## Pre-push checklist (functions touched)
 
-- [ ] `grep -nE "CREATE (OR REPLACE )?FUNCTION" supabase/migrations/<new>.sql`
-- [ ] Every match has `SET search_path = ...`.
+- [ ] `npm run check:sql-search-path` (or `grep -nE "CREATE (OR REPLACE )?FUNCTION" supabase/migrations/<new>.sql`)
+- [ ] Every match has `SET search_path = ...` (or a follow-up `ALTER FUNCTION ... SET search_path = public` in the same PR).
 - [ ] `SECURITY DEFINER` is present **only** where bypassing RLS is
       required, and the function validates the caller.
 - [ ] Read-only definer helpers used in RLS policies are marked

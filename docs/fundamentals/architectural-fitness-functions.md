@@ -58,7 +58,7 @@ Holzen thesis #4 — *boundaries are enforced* — is implemented largely throug
 | Analytics taxonomy | `check:posthog-events-allowlist` | [event-taxonomy.md](../ops/event-taxonomy.md) in same PR |
 | Feature flags taxonomy | `check:feature-flags-doc` | [feature-flags.md](../ops/feature-flags.md) in same PR |
 | API review catalog | `check:bruno-active-manifest` | `bruno/active/functions-catalog.md` |
-| Schema evolves safely | `check:view-migrations`, local `supabase db reset` (prepush) | [migration-view-safety.md](../ops/migration-view-safety.md), [migration-security-conventions.md](../ops/migration-security-conventions.md) |
+| Schema evolves safely | `check:view-migrations`, `check:sql-search-path`, local `supabase db reset` (prepush) | [migration-view-safety.md](../ops/migration-view-safety.md), [migration-security-conventions.md](../ops/migration-security-conventions.md) |
 | Release traceability | `check:version-sync`, `stamp-edge-release` / `check:release-stamp` | `VITE_APP_VERSION` = Git SHA in Lovable |
 | Performance / render boundaries | Build with React Compiler pilot (`vite.react-compiler.ts`) | [ADR 2026-05-23](../decisions/2026-05-23-render-boundaries-defer-react-compiler-19.md), [modern-react-practices-holzen.md](modern-react-practices-holzen.md) §2.9 + §6 |
 
@@ -106,6 +106,7 @@ Scripts live under `scripts/`. See script headers for exact rules and allowlists
 | `check:feature-flags-doc` | Yes | `useFeatureFlag` keys ⊆ feature-flags.md Active flags table |
 | `check:i18n-active-keys` | Yes | Active `t('…')` keys exist in `src/locales/en.json` |
 | `check:view-migrations` | Prepush | Safe `CREATE OR REPLACE VIEW` patterns |
+| `check:sql-search-path` | Yes (`test:ci`) + Prepush | Every migration function pins `public` in `search_path` |
 | `check:version-sync` | Prebuild | `package.json` version = latest changelog row |
 | `stamp-edge-release` / `check:release-stamp` | Prepush stamp step | Edge `EDGE_RELEASE` = Git SHA |
 | `npm run test` + `npm run build` | Prepush / CI | Behavior + production bundle |
@@ -156,7 +157,7 @@ Policy: [ADR 2026-05-23](../decisions/2026-05-23-render-boundaries-defer-react-c
 
 ### 5.5 Security and migration conventions
 
-[migration-security-conventions.md](../ops/migration-security-conventions.md) — `search_path`, `SECURITY DEFINER` validation: **code review today**; candidate for a future migration linter.
+[migration-security-conventions.md](../ops/migration-security-conventions.md) — `search_path` on functions: **`check:sql-search-path`**; `SECURITY DEFINER` caller validation remains code review.
 
 ### 5.6 Paired artifacts (manual)
 
@@ -177,7 +178,7 @@ Ordered by impact ÷ effort. Do not implement here unless a separate task scopes
 | ~~`check:no-supabase-in-screens`~~ | *(shipped)* | Wired in `check:architecture-alignment` |
 | ~~`check:feature-flags-doc`~~ | *(shipped)* | In `test:ci` + prepush |
 | ~~Enable `check:i18n-active-keys` in CI~~ | *(shipped)* | In `test:ci` |
-| `check:sql-search-path` | Migration security | Regex on `supabase/migrations/*.sql` |
+| ~~`check:sql-search-path`~~ | *(shipped)* | In `test:ci` + prepush |
 | Bundle size budget | Performance regression | Threshold on main chunk post-build |
 
 ---
