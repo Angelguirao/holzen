@@ -1,11 +1,12 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { changePasswordAction } from './change-password-action';
+import { changeEmailAction, changePasswordAction } from './settings-credentials-io';
 
-vi.mock('@/features/auth/public', () => ({
+vi.mock('@/features/auth/infrastructure/supabase-auth-operations', () => ({
   updateUserPassword: vi.fn(),
+  updateUserEmail: vi.fn(),
 }));
 
-import { updateUserPassword } from '@/features/auth/public';
+import { updateUserEmail, updateUserPassword } from '@/features/auth/infrastructure/supabase-auth-operations';
 
 describe('changePasswordAction', () => {
   beforeEach(() => {
@@ -43,5 +44,27 @@ describe('changePasswordAction', () => {
       error: 'update_failed',
       errorMessage: 'weak',
     });
+  });
+});
+
+describe('changeEmailAction', () => {
+  it('rejects invalid email', async () => {
+    const formData = new FormData();
+    formData.set('email', 'not-an-email');
+    await expect(changeEmailAction({}, formData)).resolves.toEqual({ error: 'Invalid email' });
+  });
+
+  it('returns success when auth update succeeds', async () => {
+    vi.mocked(updateUserEmail).mockResolvedValueOnce({ error: null });
+    const formData = new FormData();
+    formData.set('email', 'user@example.com');
+    await expect(changeEmailAction({}, formData)).resolves.toEqual({ success: true });
+  });
+
+  it('surfaces auth errors', async () => {
+    vi.mocked(updateUserEmail).mockResolvedValueOnce({ error: new Error('rate limited') });
+    const formData = new FormData();
+    formData.set('email', 'user@example.com');
+    await expect(changeEmailAction({}, formData)).resolves.toEqual({ error: 'rate limited' });
   });
 });

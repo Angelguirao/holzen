@@ -12,13 +12,11 @@ export interface AuthSessionState {
   signOut: () => Promise<void>;
 }
 
-export type { AuthFunnelUser } from './application/auth-funnel-events';
+export { readThrownMessage } from './application/read-thrown-message';
+export type { AuthFunnelUser } from './presentation/auth-session-io';
 export {
   SIGNUPS_ENABLED,
   checkSignupGate,
-  type SignupGateStatus,
-} from './infrastructure/signup-gate';
-export {
   checkSignupGateForApp,
   getAuthUser,
   resetPasswordForEmail,
@@ -26,14 +24,27 @@ export {
   signInWithOAuthGoogle,
   signOutAuth,
   signUpWithEmailPassword,
-  subscribePasswordRecoveryReady,
   updateUserEmail,
   updateUserPassword,
   type AuthMutationResult,
-} from './infrastructure/supabase-auth-operations';
+  type SignupGateStatus,
+} from './presentation/auth-session-io';
 export {
   deleteAccountAction,
   signOutAction,
   type DeleteAccountActionState,
   type SignOutActionState,
 } from './presentation/settings-account-io';
+export {
+  changeEmailAction,
+  changePasswordAction,
+  type ChangeEmailActionState,
+  type ChangePasswordActionState,
+} from './presentation/settings-credentials-io';
+export {
+  emailAuthAction,
+  forgotPasswordAction,
+  resetPasswordAction,
+  type AuthActionState,
+  type ResetPasswordActionState,
+} from './presentation/marketing-auth-actions-io';

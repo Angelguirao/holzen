@@ -1,3 +1,4 @@
+/** Map Supabase/auth errors to a user-visible string (presentation-safe, no I/O). */
 export function readThrownMessage(e: unknown, fallback: string): string {
   if (e instanceof Error && e.message) return e.message;
   if (e && typeof e === 'object' && 'message' in e) {
