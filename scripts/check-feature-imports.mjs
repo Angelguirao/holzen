@@ -28,6 +28,13 @@ const FORBIDDEN_IN_PORTS = [
   { re: /from\s+['"]@supabase\//, label: '@supabase/* in ports/' },
 ];
 
+const FORBIDDEN_IN_PRESENTATION = [
+  {
+    re: /from\s+['"]@\/integrations\/supabase\/client['"]/,
+    label: 'supabase client in presentation/ (use infrastructure + *-io.ts barrel)',
+  },
+];
+
 function walk(dir, files = []) {
   if (!existsSync(dir)) return files;
   for (const name of readdirSync(dir)) {
@@ -48,6 +55,7 @@ function rulesForLayer(layer) {
   if (layer === 'domain') return FORBIDDEN_IN_DOMAIN;
   if (layer === 'application') return FORBIDDEN_IN_APPLICATION;
   if (layer === 'ports') return FORBIDDEN_IN_PORTS;
+  if (layer === 'presentation') return FORBIDDEN_IN_PRESENTATION;
   return [];
 }
 

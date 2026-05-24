@@ -1,4 +1,4 @@
-import type { AuthChangeEvent } from '@supabase/supabase-js';
+import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { checkSignupGate, type SignupGateStatus } from './signup-gate';
 
@@ -55,6 +55,37 @@ export async function updateUserPassword(password: string): Promise<AuthMutation
 
 export async function updateUserEmail(email: string): Promise<AuthMutationResult> {
   const { error } = await supabase.auth.updateUser({ email });
+  return { error: error ?? null };
+}
+
+/** Auth session listener for `AuthProvider` (browser Supabase client). */
+export function subscribeAuthStateChange(
+  listener: (event: AuthChangeEvent, session: Session | null) => void,
+): () => void {
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange(listener);
+  return () => subscription.unsubscribe();
+}
+
+export async function getAuthSession(): Promise<Session | null> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  return session;
+}
+
+export async function getAuthUser(): Promise<User | null> {
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  if (error || !user) return null;
+  return user;
+}
+
+export async function signOutAuth(): Promise<AuthMutationResult> {
+  const { error } = await supabase.auth.signOut();
   return { error: error ?? null };
 }
 

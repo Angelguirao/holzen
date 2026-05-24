@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { signOutAuth } from '@/features/auth/public';
 
 export type SignOutActionState = {
   error?: 'sign_out_failed';
@@ -9,7 +9,7 @@ export async function signOutAction(
   _prev: SignOutActionState,
   _formData: FormData,
 ): Promise<SignOutActionState> {
-  const { error } = await supabase.auth.signOut();
+  const { error } = await signOutAuth();
   if (error) {
     return { error: 'sign_out_failed' };
   }

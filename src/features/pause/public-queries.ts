@@ -114,6 +114,11 @@ export type {
   PregenerateCacheTopupTypeConfig,
 } from './domain/pregenerate-cache-topup-config';
 export { upsertAppConfigRow } from './infrastructure/queries/app-config-admin-mutations';
+export {
+  EDGE_COVERAGE_HEARTBEATS_QUERY_KEY,
+  fetchHeartbeatConfigMap,
+  getEdgeCoverageHeartbeatsQueryOptions,
+} from './infrastructure/queries/edge-coverage-heartbeats-query';
 export type { TimePeriod } from './domain/admin-time-period';
 export {
   ADMIN_COST_GENERATION_ATTEMPTS_QUERY_PREFIX,

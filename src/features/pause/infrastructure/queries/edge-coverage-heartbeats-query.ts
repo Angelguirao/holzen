@@ -1,5 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ADMIN_QUERY_PREFIX } from '@/screens/admin/lib/admin-query-namespace';
+
+/** Matches admin query namespace used by ops edge coverage screen. */
+const ADMIN_QUERY_PREFIX = ['admin'] as const;
 
 export const EDGE_COVERAGE_HEARTBEATS_QUERY_PREFIX = [...ADMIN_QUERY_PREFIX, 'edge-coverage'] as const;
 
