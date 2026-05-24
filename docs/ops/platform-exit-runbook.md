@@ -70,7 +70,7 @@ Until backend deploy is yours, **every merge to the branch Lovable tracks still 
 See [staging-supabase-setup.md](staging-supabase-setup.md).
 
 1. `supabase link --project-ref <staging-ref>`
-2. `npm run staging:deploy` (or `staging:db-push` + manual `functions deploy`)
+2. `npm run staging:deploy` (or `staging:db-push` + `staging:functions-deploy`)
 3. Copy `.env.staging.example` → `.env.staging.local`; `npm run dev:staging`
 4. Supabase Auth → URL config: `http://localhost:8080/**`, staging site URL
 5. Bruno smoke: [bruno/active/](../../bruno/active/functions-catalog.md)
@@ -107,7 +107,7 @@ GitHub Actions (see [`.github/workflows/`](../../.github/workflows/)):
 
 1. Link prod project: `supabase link --project-ref <prod-ref>`
 2. Apply migrations: `supabase db push`
-3. Deploy all active functions: `supabase functions deploy`
+3. Deploy active functions: `npm run prod:functions-deploy` (31 edges from `config.toml`; skips `legacy/`)
 4. Set Edge secrets (mirror staging + **live** Stripe keys)
 5. Re-verify `pg_cron` vault + `CRON_SECRET` ([deployment-sync-guide.md](deployment-sync-guide.md))
 
