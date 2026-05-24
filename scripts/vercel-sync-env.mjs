@@ -18,25 +18,21 @@ function parseEnv(path) {
 }
 
 function add(name, value, environment, gitBranch) {
-  if (!value && value !== "") return;
+  if (value === undefined || value === null) return;
   const branchLabel = gitBranch ? ` preview@${gitBranch}` : "";
   console.log(`→ ${name} (${environment}${branchLabel})`);
+  const valueArg = JSON.stringify(String(value));
   const cmd = [
-    "npx",
-    "vercel@latest",
-    "env",
-    "add",
+    "npx vercel@latest env add",
     name,
     environment,
-    ...(gitBranch ? [gitBranch] : []),
+    ...(gitBranch ? [JSON.stringify(gitBranch)] : []),
     "--value",
-    value,
+    valueArg,
     "--yes",
     "--no-sensitive",
     "--force",
-  ]
-    .map((part) => (/\s/.test(part) ? JSON.stringify(part) : part))
-    .join(" ");
+  ].join(" ");
   execSync(cmd, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 120_000 });
 }
 
@@ -53,15 +49,17 @@ add("VITE_ADMIN_USER_IDS", hosted.VITE_ADMIN_USER_IDS, "production");
 add("VITE_POSTHOG_KEY", hosted.VITE_POSTHOG_KEY, "production");
 add("VITE_POSTHOG_HOST", hosted.VITE_POSTHOG_HOST, "production");
 
-// Preview vars scoped to `main` (CLI requires a branch; add others in dashboard if needed).
-const previewBranch = "main";
-console.log(`Preview (branch: ${previewBranch})…`);
-add("VITE_SUPABASE_URL", "https://ksplyxxdvandkwzundql.supabase.co", "preview", previewBranch);
-add("VITE_SUPABASE_PROJECT_ID", "ksplyxxdvandkwzundql", "preview", previewBranch);
-add("VITE_SUPABASE_PUBLISHABLE_KEY", staging.VITE_SUPABASE_PUBLISHABLE_KEY, "preview", previewBranch);
-add("VITE_APP_VERSION", "$VERCEL_GIT_COMMIT_SHA", "preview", previewBranch);
-add("VITE_ADMIN_USER_IDS", staging.VITE_ADMIN_USER_IDS ?? "", "preview", previewBranch);
-add("VITE_POSTHOG_KEY", hosted.VITE_POSTHOG_KEY, "preview", previewBranch);
-add("VITE_POSTHOG_HOST", hosted.VITE_POSTHOG_HOST, "preview", previewBranch);
+// Preview vars require a real Git branch name (not production `main`). Repeat per active PR branch or use dashboard “All Previews”.
+const previewBranches = ["chore/vercel-production-setup", "feature/lovableMigration"];
+for (const previewBranch of previewBranches) {
+  console.log(`Preview (branch: ${previewBranch})…`);
+  add("VITE_SUPABASE_URL", "https://ksplyxxdvandkwzundql.supabase.co", "preview", previewBranch);
+  add("VITE_SUPABASE_PROJECT_ID", "ksplyxxdvandkwzundql", "preview", previewBranch);
+  add("VITE_SUPABASE_PUBLISHABLE_KEY", staging.VITE_SUPABASE_PUBLISHABLE_KEY, "preview", previewBranch);
+  add("VITE_APP_VERSION", "$VERCEL_GIT_COMMIT_SHA", "preview", previewBranch);
+  add("VITE_ADMIN_USER_IDS", staging.VITE_ADMIN_USER_IDS ?? "", "preview", previewBranch);
+  add("VITE_POSTHOG_KEY", hosted.VITE_POSTHOG_KEY, "preview", previewBranch);
+  add("VITE_POSTHOG_HOST", hosted.VITE_POSTHOG_HOST, "preview", previewBranch);
+}
 
 console.log("Done.");
