@@ -124,9 +124,7 @@ serve(
         // Return cached result
         const cachedSubscribed = SUBSCRIBED_STATUSES.has(profile.subscription_status ?? "");
         const cachedStatus = profile.subscription_status ?? "free";
-        const tier = cachedSubscribed
-          ? (profile.subscription_tier === "pro_plus" ? "pro_plus" : "pro")
-          : "free";
+        const tier: "free" | "pro" | "lifetime" = cachedSubscribed ? "pro" : "free";
         const cachedEntitlement = entitlementFromHolzenStatus(cachedSubscribed, cachedStatus);
         const limits = tierLimits(tier);
         const monthStart = startOfUtcMonthDate();
@@ -171,7 +169,7 @@ serve(
     let hasActive = false;
     let subscriptionEnd: string | null = null;
     let subscriptionStatus = "free";
-    let subscriptionTier: "free" | "pro" | "pro_plus" | "lifetime" = "free";
+    let subscriptionTier: "free" | "pro" | "lifetime" = "free";
     let activePriceId: string | null = null;
     /** `price.recurring.interval` from the active line item, when set */
     let subscriptionBillingInterval: string | null = null;
@@ -179,7 +177,6 @@ serve(
     let trialEnd: string | null = null;
 
     const proPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO") ?? null;
-    const proPlusPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO_PLUS") ?? null;
 
     const hasStripeCustomer = customers.data.length > 0;
 
@@ -207,7 +204,6 @@ serve(
           hasActive: true,
           priceId: activePriceId,
           proPriceId,
-          proPlusPriceId,
         });
         const itemEnd = eligibleSub.items?.data?.[0]?.current_period_end;
         const raw = itemEnd ?? eligibleSub.current_period_end ?? eligibleSub.billing_cycle_anchor;

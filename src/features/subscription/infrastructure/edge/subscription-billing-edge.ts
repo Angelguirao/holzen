@@ -4,7 +4,6 @@ export type CreateCheckoutBody =
   | { checkoutKind: 'flex_pack_s' | 'flex_pack_m' }
   | {
       checkoutKind: 'subscription';
-      planTier: 'pro' | 'pro_plus';
       reactivation?: boolean;
     };
 
