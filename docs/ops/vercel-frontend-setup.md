@@ -152,32 +152,42 @@ Optional: assign a **branch domain** (e.g. `staging.holzen.app` → branch `stag
 
 ---
 
-## 5.1 Pre-launch: password-protect production
+## 5.1 Pre-launch: gate production (not public-ready)
 
-Use this when **prod is deployed** but you are **not ready for public traffic** (pause-first ship still in progress). It gates **only the Vercel-hosted SPA** (`holzen.app`); Supabase Auth, Postgres, and Edge Functions remain reachable to anyone with the project URL and anon key — acceptable for founder/test accounts, not a full security perimeter.
+Use when **prod is deployed** but you are **not ready for public traffic**. Gates **only the Vercel-hosted SPA** (`holzen.app`); Supabase Auth, Postgres, and Edge Functions stay publicly reachable with the anon key — fine for founder/test accounts, not a full backend lockdown.
 
-### Enable (Vercel dashboard)
+### Option A — Vercel Authentication (default on Hobby/Pro without Advanced)
 
-1. [vercel.com](https://vercel.com) → **Holzen** project → **Settings** → **Deployment Protection**.
-2. Under **Password Protection** (or **Protection** → **Password**), enable for **Production**.
-3. Set a strong shared password; store it in your team password manager (not in git).
-4. If you use **`www.holzen.app`**, confirm both apex and `www` are on **Production** (Domains) so both hit the protected deployment.
-5. Open an incognito window → `https://holzen.app` → confirm the password prompt appears before the app loads.
-6. Optional: leave **Preview** deployments **unprotected** so PR URLs stay easy for QA, or password-protect Previews too if URLs leak.
+**Password Protection** in the dashboard requires **Pro + Advanced Deployment Protection** (~$150/mo extra). Use **Vercel Authentication** instead:
 
-**Bypass for automation:** GitHub Actions deploys still succeed; protection applies to **browser visitors**, not the deploy API. Team members logged into Vercel may bypass per your plan’s **Vercel Authentication** rules — use password-only for external testers if needed.
+1. Project → **Settings** → **Deployment Protection**.
+2. **Vercel Authentication** → enable for **Production** (leave Preview open for PR QA if you want).
+3. **Project Members** (or team): invite anyone who should open `holzen.app` — they sign in with their Vercel account.
+4. Incognito test: `https://holzen.app` should **not** load the app without login (Vercel auth wall).
+
+**External tester (no Vercel account):** on a deployment → **Share** → **Shareable Link** (bypasses protection for that URL only).
+
+**CI / scripted smoke against protected prod:** **Protection Bypass for Automation** → add a secret → set `VERCEL_AUTOMATION_BYPASS_SECRET` in the Vercel project → send header `x-vercel-protection-bypass: <secret>` (or query param) from the runner. Holzen’s default path is smoke on **staging** previews instead.
+
+### Option B — Password Protection (paid)
+
+If you subscribe to **Advanced Deployment Protection**: enable **Password Protection** for Production, set a shared password (password manager, not git). Same incognito check as above.
+
+### Option C — Take the domain offline
+
+**Domains** → remove `holzen.app` from Production (or park DNS). Strongest “closed” without a Vercel plan upgrade; use **staging** preview URL for QA.
 
 ### While gated
 
 - Do **not** merge to **`main`** unless you intend to update prod; keep work on **`staging`** ([branch-model.md](./branch-model.md)).
-- Keep **required reviewers** on the GitHub **`production`** environment so Actions cannot ship prod without approval.
-- Optional: Supabase prod → Auth → disable new signups if you want zero new accounts during the gate.
+- **Required reviewers** on GitHub **`production`** environment.
+- Optional: Supabase prod → Auth → disable new signups.
 
 ### Remove at launch
 
-1. Deployment Protection → disable password on **Production**.
-2. Smoke `holzen.app` in incognito (no prompt).
-3. Tick launch checks in [launch-runbook.md](./launch-runbook.md) / [ship-checklist.md](./ship-checklist.md).
+1. Turn off **Vercel Authentication** / **Password Protection** on Production (or re-attach the domain).
+2. Incognito smoke: `holzen.app` loads the app with no Vercel gate.
+3. [launch-runbook.md](./launch-runbook.md) / [ship-checklist.md](./ship-checklist.md).
 
 ---
 
