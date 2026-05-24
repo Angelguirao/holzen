@@ -23,7 +23,7 @@ See **[SCOPE.md](SCOPE.md)** (HTTP vs SPA) and **[`active/functions-catalog.md`]
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Anon key |
 | `AUTH_EMAIL` / `AUTH_PASSWORD` | Test user |
 | `SERVICE_CRON_BEARER` | For `active/service-cron/` only |
-| `LOVABLE_API_KEY` | For `active/auth-hook/` preview only |
+| `EMAIL_PREVIEW_SECRET` | For `active/auth-hook/` preview only (or use `CRON_SECRET`) |
 
 After auth, `active/auth/00` and `01` set **`SUPABASE_ACCESS_TOKEN`** (and **`AUTH_USER_ID`** when present).
 

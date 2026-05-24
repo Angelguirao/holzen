@@ -37,9 +37,9 @@ npm install
 
 Environment variables (see [.env.example](.env.example)):
 
-- **Lovable Cloud only:** Preview/builds may get `VITE_SUPABASE_*` from Lovable, or rely on the **hosted fallbacks** in `vite.config.ts` when vars are unset (same as local `vite build`). You do not maintain a `.env` file in the Lovable UI for the default Holzen backend.
+- **Vercel (prod/preview):** Set `VITE_SUPABASE_*`, `VITE_SENTRY_DSN`, `VITE_POSTHOG_*`, `VITE_APP_VERSION` in the Vercel project. See [docs/ops/vercel-frontend-setup.md](docs/ops/vercel-frontend-setup.md).
 - **Default (local machine):** `cp .env.example .env` then `npm run dev` — uses your `.env` values. If `VITE_SUPABASE_*` are missing, **dev and `npm run build`** can fall back to the bundled Holzen hosted keys in `vite.config.ts` (never in `localstack` mode). Set real `VITE_SUPABASE_*` for another Supabase project or if you do not want those defaults in the bundle.
-- **Two files / two backends (optional on your machine):** Lovable Cloud does **not** read `.env.hosted`; that file is only for **`npm run dev:hosted`** when you want the app on your laptop to use **hosted** Supabase. If you **only** develop against **local Docker** Supabase, use **`.env.localstack`** / **`npm run dev:local`** and you can **ignore** `.env.hosted` entirely.
+- **Two files / two backends (optional on your machine):** **`.env.hosted.local`** is for **`npm run dev:hosted`** when you want the app on your laptop to use **staging or prod** Supabase. If you **only** develop against **local Docker** Supabase, use **`.env.localstack`** / **`npm run dev:local`** and you can **ignore** `.env.hosted` entirely.
   - **Hosted from local Vite:** copy [.env.hosted.example](.env.hosted.example) to **`.env.hosted.local`**, fill in URL + anon key, run **`npm run dev:hosted`**.
   - **Local Docker only:** copy [.env.localstack.example](.env.localstack.example) to **`.env.localstack.local`**, set the anon key from `npm run supabase:status`, run **`npm run dev:local`** (no hosted URL/key fallback for that mode).
 
@@ -58,7 +58,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | Script | Purpose |
 |--------|---------|
 | `npm run dev` | Vite dev server with HMR (default mode) |
-| `npm run dev:hosted` | Dev server using `.env.hosted` / `.env.hosted.local` (optional: hit **cloud** Supabase from your PC; not used by Lovable) |
+| `npm run dev:hosted` | Dev server using `.env.hosted` / `.env.hosted.local` (optional: hit **cloud** Supabase from your PC) |
 | `npm run dev:local` | Dev server using `.env.localstack` / `.env.localstack.local` (local Supabase only; no hosted fallback) |
 | `npm run build` | Production build (runs **`check:version-sync`** via **`prebuild`**) |
 | `npm run build:dev` | Build in development mode |
@@ -89,7 +89,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 - **`src/screens/`** — Route-level presentation (home, archive, pause, settings, marketing, admin, etc.); routing is defined in `src/App.tsx`.
 - **`src/components/`** — Shared UI, including `components/ui` (shadcn-style primitives).
 - **`supabase/migrations/`** — SQL migrations for the hosted database.
-- **`supabase/functions/`** — Edge functions (Deno): checkout, subscriptions, notifications, AI companions, journaling helpers, and related HTTP APIs. They run on Supabase in production; **secrets** (Stripe, Lovable email/AI keys, VAPID, etc.) are configured in the Supabase dashboard, not in the frontend `.env`.
+- **`supabase/functions/`** — Edge functions (Deno): checkout, subscriptions, notifications, AI companions, and related HTTP APIs. They run on Supabase in production; **secrets** (Stripe, Resend, Google AI / OpenRouter, VAPID, etc.) are configured in the Supabase dashboard, not in the frontend `.env`.
 - **`docs/`** — **[Docs index and onboarding path](docs/README.md)** (C4, fundamentals, systems, reviews); **[C4 architecture](docs/architecture/c4-holzen.md)** (context + container diagrams and optional Structurizr DSL); the Signal companion pipeline is in [docs/systems/pause/companions/signal.md](docs/systems/pause/companions/signal.md) (linked from the [pause system](docs/systems/pause/ai-powered-pause-system.md) doc).
 - **`public/`** — Static assets served as-is.
 
@@ -149,8 +149,10 @@ ESLint is enabled project-wide. The tree may report many existing issues; treat 
 
 **Edge functions:** After changing `supabase/functions/**/*.ts`, run **`npm run check:edge`** if you have [Deno](https://deno.land/) on your `PATH` — it runs `deno check` on each function’s `index.ts`. If Deno is missing, the script exits successfully and prints a skip message (so CI can call it without installing Deno unless you want stricter checks). Before shipping edge changes, ensure **`npm run stamp:release`** has been run (or run **`npm run check:prepush`**, which stamps and warns if **`release.ts`** drifted).
 
-## Lovable
+## Hosting & optional Lovable editor
 
-The project was initially scaffolded with [Lovable](https://lovable.dev); you can keep using that workflow alongside local development. **Lovable Cloud** can generate and manage **`VITE_SUPABASE_*` for previews and deploys** so you do not hand-edit `.env` in that environment. **Locally**, Git + Vite still use `.env` / `.env.*.local` on your machine when you run `npm run dev` (or the `dev:hosted` / `dev:local` scripts above). Publishing and custom domains are documented in [Lovable’s docs](https://docs.lovable.dev/features/custom-domain#custom-domain).
+**Production:** GitHub → **Vercel** (SPA) + **owned Supabase** (DB + Edge). Branch model: [docs/ops/branch-model.md](docs/ops/branch-model.md). Setup: [docs/ops/vercel-frontend-setup.md](docs/ops/vercel-frontend-setup.md) · [docs/ops/platform-exit-runbook.md](docs/ops/platform-exit-runbook.md).
 
-**When the repo syncs from GitHub into Lovable**, the linked Supabase project typically **applies new migrations and deploys edge function changes automatically** — that can affect **production** immediately, with no extra click. **Frontend** (this React app) still goes live for end users when you **publish** and confirm **Update** in Lovable’s publish flow. Merge backend changes with that split in mind; see [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) for `config.toml`, JWT defaults, and local vs hosted behavior. For **staging**, **visible CI**, and **moving off Lovable**, see [docs/ops/lovable-staging-and-platform-exit.md](docs/ops/lovable-staging-and-platform-exit.md).
+The project was initially scaffolded with [Lovable](https://lovable.dev). You may keep Lovable as an **optional visual editor** on feature branches only — not as prod host or migration path. See [docs/ops/lovable-staging-and-platform-exit.md](docs/ops/lovable-staging-and-platform-exit.md).
+
+Deploy behavior (migrations, edges, frontend): [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) §17 · [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md).

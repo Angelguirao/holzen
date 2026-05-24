@@ -107,9 +107,11 @@ If you prefer a long-lived **`dev`** branch, treat it like Carlos’s integratio
 
 ---
 
-## Why branches do not protect the database
+## Why branches do not protect the database (legacy Lovable sync)
 
-Branch discipline protects **what gets merged and synced**, not **where migrations run**. On GitHub → Lovable sync:
+> **After platform exit:** `staging` and `main` target **different Supabase projects** — branch merges no longer auto-apply migrations to prod unless CI is misconfigured. See [branch-model.md](branch-model.md).
+
+**Legacy:** On GitHub → Lovable sync, branch discipline protected **what gets merged**, not **where migrations ran**:
 
 | Artifact | On push to the tracked branch | Goes live without extra click? |
 |----------|-------------------------------|--------------------------------|
@@ -175,41 +177,22 @@ Leaving is not one switch—it is **four separable decisions**:
 
 ### 1. Database and backend deploy (highest impact)
 
-**Today:** Linked project in [supabase/config.toml](../../supabase/config.toml); Lovable sync applies migrations.
-
-**If you leave Lovable’s sync:**
-
-- You need a **Supabase project you control** (claim existing per [backup-restore-drill.md](backup-restore-drill.md), or new project + data migration).
-- Migrations ship via **`supabase link` + `supabase db push`** (or dashboard SQL), ideally **staging first, prod with approval**.
-- You gain: staging DB dry-runs, visible migration gates, PITR without support tickets (once owned).
-- You still carry: [migration-security-conventions.md](migration-security-conventions.md), [migration-view-safety.md](migration-view-safety.md), `pg_cron` + vault secrets, Stripe webhooks pointing at edge URLs.
+**Current (post-exit):** Owned Supabase projects for **staging** and **prod**. Migrations via CI / **`supabase db push`**, **staging first**, prod on `main` merge. See [branch-model.md](branch-model.md), [staging-supabase-setup.md](staging-supabase-setup.md), [production-supabase-setup.md](production-supabase-setup.md).
 
 ### 2. Edge functions and secrets
 
-**Today:** Secrets in **Lovable Cloud → Secrets** (and some Supabase auto-injected keys); not in repo `.env` for hosted runs ([deployment-sync-guide.md](deployment-sync-guide.md)).
-
-**After exit:**
-
-- Secrets in **Supabase Dashboard → Edge secrets** and/or **GitHub Actions secrets** for deploy.
-- Deploy with **`supabase functions deploy`** in CI (repo already has `config.toml`, `withRequestLogging`, `stamp:release` / `EDGE_RELEASE` for Sentry).
-- **Re-verify:** `CRON_SECRET` vs `pg_cron` vault, Stripe webhook signing secret, AI keys, `LOG_DRAIN_*`, `SENTRY_*` ([deployment-sync-guide.md](deployment-sync-guide.md) troubleshooting).
+**Current:** Secrets in **Supabase Dashboard → Edge Functions → Secrets** (per project). Deploy via CI / **`supabase functions deploy`**. Re-verify: `CRON_SECRET` vs `pg_cron` vault, Stripe webhook signing secret, `GOOGLE_AI_API_KEY`, `RESEND_API_KEY`, `LOG_DRAIN_*`, `SENTRY_*` ([deployment-sync-guide.md](deployment-sync-guide.md)).
 
 ### 3. Frontend hosting
 
-**Today:** Lovable builds/publishes SPA; `VITE_*` from Lovable env or [vite.config.ts](../../vite.config.ts) hosted fallbacks; example URL `holzen.lovable.app` ([hosting-production-compression.md](../backlog/hosting-production-compression.md)).
+**Current:** **Vercel** production on `main` merge. `VITE_*` in Vercel project env. See [vercel-frontend-setup.md](vercel-frontend-setup.md).
 
-**After exit (typical):** Static host—**Cloudflare Pages**, **Vercel**, **Netlify**, or **S3+CloudFront**—with:
-
-- Build: `npm run build` (runs `check:version-sync` against **`changelog_entries`** on the linked project—CI must point `VITE_SUPABASE_*` at the right project).
-- Env per environment: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SENTRY_DSN`, `VITE_POSTHOG_*`, `VITE_APP_VERSION` (= Git SHA) per [AGENTS.md](../../AGENTS.md) observability section.
-- **Auth redirect URLs** and **Stripe return URLs** updated if domain changes.
-- PWA/service worker: still [src/sw.ts](../../src/sw.ts) via Vite—no Lovable-specific requirement.
-
-You do **not** need to change React/Supabase architecture to leave Lovable; [spa-framework-evaluation.md](../backlog/spa-framework-evaluation.md) is unrelated unless you want a full-stack framework migration.
+- Build: `npm run build` (runs `check:version-sync` against **`changelog_entries`** — CI must point `VITE_SUPABASE_*` at the right project).
+- Env per environment: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SENTRY_DSN`, `VITE_POSTHOG_*`, `VITE_APP_VERSION` (= Git SHA) per [observability-setup.md](observability-setup.md).
 
 ### 4. Operational ownership
 
-[backup-restore-drill.md](backup-restore-drill.md) notes **Lovable-managed Supabase** limits direct PITR/dashboard until the project is claimed. Exiting improves backup drills, staging clones, and RLS/role audit in Supabase UI.
+[backup-restore-drill.md](backup-restore-drill.md) — owned Supabase enables direct PITR/dashboard. Exiting improves backup drills, staging clones, and RLS/role audit in Supabase UI.
 
 **Costs:** You own billing (Supabase + host + observability vendors), secret rotation, and [incident-response.md](incident-response.md).
 

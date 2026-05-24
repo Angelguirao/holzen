@@ -5,10 +5,9 @@ enforced, and how to respond when spend goes sideways. Supersedes the old
 pause-only estimates doc (which is now a focused case study — see link in §7).
 
 > **Scope.** Third-party AI API spend only: Perplexity (Sonar Pro, Sonar) and
-> Lovable AI Gateway (Google Gemini models). **Not** included: Lovable
-> workspace subscription, Cloud hosting, Supabase plan fees, Stripe, Lovable Email,
-> VAPID, CoinGecko usage. Those are real costs but bill on separate dashboards
-> and don't scale with AI usage.
+> **Google Gemini** (direct via `GOOGLE_AI_API_KEY`, optional OpenRouter failover).
+> **Not** included: Vercel/hosting, Supabase plan fees, Stripe, Resend email,
+> VAPID, CoinGecko usage. Those bill on separate dashboards and don't scale with AI usage.
 
 ---
 
@@ -68,6 +67,8 @@ provider dashboards per §8 before making capacity decisions.
 
 ## 2. Every AI-powered feature
 
+**Active (pause-first)** edges call **`llm-gateway.ts`** (Google → OpenRouter). **Legacy Tier B** edges under `supabase/functions/legacy/full-shell/` use the same gateway after platform-exit migration; some legacy paths may still call provider APIs directly until fully migrated.
+
 Every row is protected by `guardAiFeature()` (feature flag + panic mode +
 cost ceilings). Rows with "✓" for logging appear in the admin Cost tab's
 per-feature breakdown. Logging is how per-user daily caps know anything was
@@ -76,26 +77,26 @@ spent — a row without logging still runs but cannot be capped per-user.
 
 | Function                                          | Trigger                          | Provider / model(s)                                        | Logs `generation_attempts` | Fallback on block                          |
 | ------------------------------------------------- | -------------------------------- | ---------------------------------------------------------- | -------------------------- | ------------------------------------------ |
-| `holzen-reflect`                                  | user (SPA; deep ritual reflect hook **Reflect → Frame → second Breathe → Decide**, pause manual or cron-created) | Lovable `gemini-3-flash-preview` → `gemini-2.5-flash`      | ✓                          | Curated fallback pool                      |
-| `companion-orchestrate` → signal                  | user / cron                      | Perplexity `sonar-pro` + Lovable `gemini-2.5-flash(-lite)` | ✓                          | Library → cache → curated                  |
-| `companion-orchestrate` → grounding               | user / cron                      | Perplexity `sonar-pro` + Lovable `gemini-2.5-flash(-lite)` | ✓                          | Library → cache → curated                  |
-| `companion-orchestrate` → history                 | user / cron                      | Perplexity `sonar-pro` + Lovable `gemini-2.5-flash(-lite)` | ✓                          | Cache → curated                            |
-| `companion-orchestrate` → zoom-out                | user / cron                      | Lovable `gemini-2.5-flash(-lite)` (BTC prices from cache)  | ✓                          | Cache → curated                            |
-| `companion-orchestrate` → intervention (question) | user / cron                      | Lovable `gemini-3-flash-preview`                           | ✓ (conditional)            | Skip question                              |
+| `holzen-reflect`                                  | user (SPA; deep ritual reflect hook **Reflect → Frame → second Breathe → Decide**, pause manual or cron-created) | Gemini `gemini-3-flash-preview` → `gemini-2.5-flash` via `llm-gateway` | ✓                          | Curated fallback pool                      |
+| `companion-orchestrate` → signal                  | user / cron                      | Perplexity `sonar-pro` + Gemini `gemini-2.5-flash(-lite)` | ✓                          | Library → cache → curated                  |
+| `companion-orchestrate` → grounding               | user / cron                      | Perplexity `sonar-pro` + Gemini `gemini-2.5-flash(-lite)` | ✓                          | Library → cache → curated                  |
+| `companion-orchestrate` → history                 | user / cron                      | Perplexity `sonar-pro` + Gemini `gemini-2.5-flash(-lite)` | ✓                          | Cache → curated                            |
+| `companion-orchestrate` → zoom-out                | user / cron                      | Gemini `gemini-2.5-flash(-lite)` (BTC prices from cache)  | ✓                          | Cache → curated                            |
+| `companion-orchestrate` → intervention (question) | user / cron                      | Gemini `gemini-3-flash-preview`                           | ✓ (conditional)            | Skip question                              |
 | `regenerate-only`                                 | user (targeted refresh)          | One of the above generators                                | ✓                          | 503 with reason                            |
-| `journal-prompt`                                  | user                             | Lovable `gemini-2.5-flash`                                 | ✓                          | 503                                        |
-| `suggest-grounding`                               | user                             | Perplexity `sonar` + Lovable                               | ✓                          | 503                                        |
-| `suggest-ritual`                                  | user                             | Lovable `gemini-3-flash-preview`                           | ✓                          | Canned ritual template                     |
-| `generate-wallpaper`                              | user (Pro)                       | Lovable `gemini-2.5-flash-image`                           | ✓                          | 503                                        |
-| `night-reflection`                                | cron                             | Lovable `gemini-2.5-flash` → `gemini-2.5-flash-lite`       | ✓                          | Static localized fallback                  |
-| `reflection-insights`                             | cron / user                      | Lovable Gemini                                             | ✓                          | Skip run / 503                             |
-| `weekly-digest`                                   | cron                             | Lovable `gemini-2.5-flash-lite`                            | ✓                          | Digest email sent **without** AI insight   |
-| `monthly-report`                                  | cron                             | Lovable `gemini-2.5-flash-lite`                            | ✓                          | Report email sent **without** AI paragraph |
-| `grounding-enrich`                                | user                             | Lovable `gemini-2.5-flash` (cache hits skip)               | (via `createLogger`)       | 503                                        |
-| `admin-library-preview`                           | admin                            | Lovable `gemini-2.5-flash-lite`                            | ✓                          | 503                                        |
-| `pregenerate-companions`                          | cron                             | Fills `companion_cache` only (not `companion-orchestrate`); need-based top-up; Perplexity + Lovable per step when below target | ✓                   | Skip run                                   |
-| `fetch-source-feeds`                              | cron                             | Lovable + optional Perplexity                              | ✓                          | Skip run                                   |
-| `personalized-nudge`                              | cron                             | **none** — CoinGecko + Lovable Email only                  | N/A                        | N/A                                        |
+| `journal-prompt` *(legacy)*                       | user                             | Gemini `gemini-2.5-flash` via `llm-gateway`              | ✓                          | 503                                        |
+| `suggest-grounding` *(legacy)*                    | user                             | Perplexity `sonar` + Gemini                                | ✓                          | 503                                        |
+| `suggest-ritual` *(legacy)*                       | user                             | Gemini `gemini-3-flash-preview`                          | ✓                          | Canned ritual template                     |
+| `generate-wallpaper` *(legacy)*                   | user (Pro)                       | Gemini `gemini-2.5-flash-image`                            | ✓                          | 503                                        |
+| `night-reflection` *(legacy cron)*                | cron                             | Gemini `gemini-2.5-flash` → `gemini-2.5-flash-lite`      | ✓                          | Static localized fallback                  |
+| `reflection-insights` *(legacy)*                  | cron / user                      | Gemini via `llm-gateway`                                   | ✓                          | Skip run / 503                             |
+| `weekly-digest` *(legacy cron)*                   | cron                             | Gemini `gemini-2.5-flash-lite`                             | ✓                          | Digest email sent **without** AI insight   |
+| `monthly-report` *(legacy cron)*                  | cron                             | Gemini `gemini-2.5-flash-lite`                             | ✓                          | Report email sent **without** AI paragraph |
+| `grounding-enrich`                                | user                             | Gemini `gemini-2.5-flash` (cache hits skip)                | (via `createLogger`)       | 503                                        |
+| `admin-library-preview` *(legacy)*                | admin                            | Gemini `gemini-2.5-flash-lite`                             | ✓                          | 503                                        |
+| `pregenerate-companions`                          | cron                             | Fills `companion_cache` only; Perplexity + Gemini per step when below target | ✓                   | Skip run                                   |
+| `fetch-source-feeds` *(legacy cron)*              | cron                             | Gemini + optional Perplexity                               | ✓                          | Skip run                                   |
+| `personalized-nudge` *(legacy cron)*              | cron                             | **none** — CoinGecko + **Resend** email only               | N/A                        | N/A                                        |
 | `deliver-letters`                                 | cron                             | **none** — stored letters + push                           | N/A                        | N/A                                        |
 | `holzen-number`                                   | user                             | **none**                                                   | N/A                        | N/A                                        |
 
@@ -136,7 +137,7 @@ for rationale and revisit criteria.
 For capacity planning, this doc uses `~$0.21` as a realistic average when some
 sessions incur retries, larger contexts, or heavier prompt payloads.
 
-> Note: these Lovable-side numbers are ~2x higher than older internal
+> Note: Gemini-side numbers are ~2x higher than older internal
 > estimates from before the 2026-04-19 pricing refresh. See §10 changelog.
 
 ---
@@ -202,8 +203,8 @@ when spend bars stay elevated and conversion economics remain healthy.
 
 The defense-in-depth layers, outermost first:
 
-1. **Provider-side caps** — Perplexity auto-reload ceiling and Lovable
-   workspace monthly cap. See §8 for recommended numbers.
+1. **Provider-side caps** — Perplexity auto-reload ceiling and **Google AI /
+   OpenRouter** billing alerts. See §8 for recommended numbers.
 2. **Engineering global caps** — `app_config.budget_daily_usd_global`,
    `budget_monthly_usd_global`. Block requests when exceeded.
 3. **Engineering per-user caps** — `app_config.budget_daily_usd_per_user`.
@@ -340,11 +341,10 @@ The numbers in the Cost tab come from `generation_attempts.estimated_cost_usd`
 or the monthly cap was hit, top up manually.
 - Check Admin → Cost for unexpected spend in the last 24 h.
 
-### 7.3 Lovable AI 402
+### 7.3 Google AI / OpenRouter returns 402 or quota error
 
-- Same pattern: functions degrade on 402.
-- Open Lovable **Workspace Settings → Cloud & AI balance**. Apply auto
-top-up settings per §8 if not already in place.
+- Same pattern: functions degrade on 402 / quota errors via `llm-gateway` failover.
+- Open [Google AI Studio](https://aistudio.google.com/) billing or OpenRouter dashboard; verify auto-reload / limits per §8.
 - Worth checking all feature flags in Admin → Tools — the `wallpaper` flag
 gets the most out-sized individual call cost (image model).
 
@@ -416,24 +416,21 @@ Each $150 top-up buys ~750 Sonar Pro calls at the current midpoint. The
 $1,200 cap keeps provider billing aligned with the new engineering monthly cap,
 while still limiting blast radius during abnormal traffic.
 
-### 8.2 Lovable AI (Workspace → Cloud & AI balance → Auto top-up)
+### 8.2 Google AI (Google AI Studio / Cloud billing)
 
+Set billing alerts and budget caps in Google Cloud / AI Studio for the project tied to **`GOOGLE_AI_API_KEY`**. If significant traffic fails over to OpenRouter, mirror caps on the OpenRouter dashboard too.
 
-| Setting                   | Value    |
-| ------------------------- | -------- |
-| Reload when balance below | **$30**  |
-| Reload amount             | **$90**  |
-| Monthly spend cap         | **$600** |
+| Setting | Suggested starting point |
+| --- | --- |
+| Monthly budget alert | **$600** (adjust to ~2× expected Gemini burn) |
+| Hard cap / disable | Per your risk tolerance — engineering caps in `app_config` should trip first |
 
-
-Lovable spend is dominated by cheap Gemini flash tokens; wallpaper images
-are the outlier. $150/month covers ~3,800 wallpapers + all other Gemini
-usage at current scale.
+Gemini spend is dominated by cheap flash tokens; wallpaper images
+are the outlier.
 
 ### 8.3 What **not** to enable
 
-- Unlimited auto-reload on either provider.
-- Lovable workspace-subscription auto-upgrade.
+- Unlimited auto-reload on either provider without monthly caps.
 - Any provider-side "usage escalation" that bypasses monthly caps.
 
 The engineering layer (panic mode + cost ceilings) is the primary defense.
@@ -489,7 +486,7 @@ rates:
   - `gemini-3-flash-preview`: `[0.15, 0.60]` → `**[0.50, 3.00]**` (released Dec 2025).
   - `gemini-2.5-flash-lite`: `[0.075, 0.30]` → `**[0.10, 0.40]**`.
   - Perplexity, `gemini-2.5-flash-image`: unchanged.
-  Pre-drift doc had underestimated Lovable-side spend by ~2×. Scenario totals,
+  Pre-drift doc had underestimated Gemini-side spend by ~2×. Scenario totals,
   per-pause arithmetic, and ceiling-math updated to match.
 - **2026-04-19:** Initial version. Supersedes pause-only estimates doc as
 canonical. Covers all 17 AI-touching edge functions. Adds guardrail map,

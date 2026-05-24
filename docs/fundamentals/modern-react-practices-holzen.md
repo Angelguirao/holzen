@@ -160,7 +160,7 @@ Hooks should **not** grow unbounded RPC + navigation + analytics; extract **use 
 
 **Industry:** Next.js App Router — fetch on server, smaller client bundles.
 
-**Holzen choice:** **Vite SPA** for shipped product (Lovable publish, PWA, authenticated app). **Not aligned with RSC today** — intentional.
+**Holzen choice:** **Vite SPA** for shipped product (**Vercel** deploy, PWA, authenticated app). **Not aligned with RSC today** — intentional.
 
 | Topic | Holzen |
 |-------|--------|

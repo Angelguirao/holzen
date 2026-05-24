@@ -46,7 +46,7 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/sign
 
 1. **Perplexity (`sonar-pro`)** — Web-grounded search: system + user **`searchQuery`** (context, angle, exclusions, optional source hints). API options include **`temperature`**, **`top_p`**, and **`web_search_options.search_context_size`** to reduce identical results. **`search_domain_filter`** is set only when the catalog yields hostnames; otherwise omitted.
 2. **Citations** — Normalized from **`citations`**, **`search_results`**, and inline URLs (`perplexity-client.ts`); empty citation list can force fallback.
-3. **Structuring (Lovable AI gateway)** — Second model (e.g. Gemini) turns search text + citation list into **one card** (title, body, source, url, optional quote) via tool/function JSON.
+3. **Structuring (`llm-gateway` / Gemini)** — Second model (e.g. Gemini) turns search text + citation list into **one card** (title, body, source, url, optional quote) via tool/function JSON.
 4. **`validateSource`** — Reconciles attribution with URL hostname rules (`source-validation.ts`).
 5. **`qualityGate("signal", …)`** — Length, banned terms, Bitcoin-only constraints (`quality.ts`).
 6. **On success (`source: "live"`)** — Inserts into **`companion_cache`** when not a duplicate title (pool for future fallback / other users).

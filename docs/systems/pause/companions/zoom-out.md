@@ -65,7 +65,7 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/zoom
 **Phase 3: Live generation** (if cache misses):
 
 1. **Seed selection** — Selects from 33 predefined deep-time perspectives (see §5), grouped by category (money, geology, biology, tech adoption, civilizational, long-horizon, cosmic, Bitcoin-as-protocol). Optional `zoomOutAngle` override from session intent.
-2. **AI generation (Lovable AI gateway)** — Gemini model (`gemini-2.5-flash`, **10s** timeout; fallback to lite variant, **8s** timeout) generates a short deep-time narrative grounded in the seed.
+2. **AI generation (`llm-gateway` / Gemini)** — Gemini model (`gemini-2.5-flash`, **10s** timeout; fallback to lite variant, **8s** timeout) generates a short deep-time narrative grounded in the seed.
 3. **Prompt constraints** — Explicit "anchor in a span ≥100 years, ideally 1,000+", "never mention BTC prices / dollar amounts / percentages", and **"body ≤480 characters (hard ceiling 500)"**. The user message no longer carries price context — injecting `$`-amounts was causing `body_contains_market_data` rejects when Gemini echoed them back (the `zoom_out_deep_time` quality gate has `noMarketData: true`). Deep-time should be orthogonal to today's price anyway.
 4. **`qualityGate("zoom_out_deep_time", …)`** — Length (80–500 chars), no market data in body, no slop, no generic crypto language (`quality.ts`).
 5. **On success (`source: "live"`)** — Inserts deep-time text into `companion_cache` with `prompt_version: "v4"`; assembles composite result with prices + echo.
@@ -134,7 +134,7 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 | Dependency | Why | What breaks without it |
 |------------|-----|------------------------|
 | **`refresh-btc-prices` cron** | Keeps `btc_price_cache` fresh | "On this day" prices are stale or missing; `currentPrice` may be null |
-| **Lovable AI gateway** | Deep-time narrative generation | Falls through to curated fallback (prices + echo still work) |
+| **`llm-gateway` (Gemini)** | Deep-time narrative generation | Falls through to curated fallback (prices + echo still work) |
 
 ---
 

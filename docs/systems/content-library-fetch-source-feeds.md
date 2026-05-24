@@ -32,7 +32,7 @@ Steady-state cron is intentionally small (cost + Edge runtime). To **fill the li
 2. **Raise Edge secrets temporarily** (then lower after backfill):
    - `FETCH_FEEDS_MAX_SOURCES` — default `5`, max `40` (how many distinct sources per invocation).
    - `FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE` — default `2`, max `25` (new inserts per source per run).
-   - `FETCH_FEEDS_ARTICLE_DELAY_MS` — default `2000`; set `500` or `0` to speed up (be mindful of Firecrawl / Lovable rate limits).
+   - `FETCH_FEEDS_ARTICLE_DELAY_MS` — default `2000`; set `500` or `0` to speed up (be mindful of Firecrawl / provider rate limits).
 3. **Invoke repeatedly** — Manual runs (Dashboard / Bruno) plus `last_fetch_feeds_at` rotation so **all** sources get turns across runs.
 4. **Optional: seed SQL** — For a guaranteed baseline, insert curated rows directly into `content_library` via a migration or one-off SQL (bypasses API cost); keep quality_score + tags consistent with existing rows.
 
@@ -54,7 +54,9 @@ See [`.env.example`](../../.env.example) for commented examples.
 
 6. **Scrape** — For **each** discovered article URL: Firecrawl **`/v2/scrape`** requests **`markdown`** and **`links`** in one call. **`onlyMainContent`:** `false` for **essays** (keeps article headers with "First published on …"); `true` for non-essay source types. Response **`metadata`** (canonical / Open Graph, etc. — see [Firecrawl scrape](https://docs.firecrawl.dev/features/scrape)). Perplexity fallback returns text only (no Firecrawl extras). The model does **not** ingest raw RSS `<content:encoded>` for structuring; it sees **the page** markdown.
 
-7. **Structure** — Lovable gateway → **Gemini** (`google/gemini-2.5-flash-lite`) returns JSON: `title`, `author`, `summary`, `key_quote`, `url` (must match scraped page), optional `original_url` / `original_publication`. For essays, those fields are **inputs** to step 8; persistence order is **not** "model first" (see below).
+7. **Structure** — **`llm-gateway`** → **Gemini** (`google/gemini-2.5-flash-lite`) returns JSON: `title`, `author`, `summary`, `key_quote`, `url` (must match scraped page), optional `original_url` / `original_publication`. For essays, those fields are **inputs** to step 8; persistence order is **not** "model first" (see below).
+
+> **Tier B:** `fetch-source-feeds` lives under `supabase/functions/legacy/full-shell/` — not on the pause-first active surface.
 
 8. **`original_url` resolution (essays)** — **Why this order:** phrase matching uses the **full** scrape (reliable for explicit bylines). Gemini only sees an **excerpt**, so it can confuse body citations with syndication attribution. Firecrawl **metadata** is cheap but often same-host canonical on republishers. If none match, `original_url` stays **null** — the article is treated as native content (no false positives from body citation links).
 

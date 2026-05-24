@@ -50,7 +50,7 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/grou
 3. **`preferredBias` matching** — If session intent provides a bias hint, substring-matches against available topics.
 4. **Perplexity (`sonar-pro`, academic mode)** — Web-grounded search with `search_mode: "academic"` and optional domain filtering from catalog.
 5. **Retry** — If citations are empty with domain filter, retries without filter.
-6. **Structuring (Lovable AI gateway)** — Second model turns search text + citations into one card (title, body, citation in "Author(s) (Year), Title" format, url).
+6. **Structuring (`llm-gateway` / Gemini)** — Second model turns search text + citations into one card (title, body, citation in "Author(s) (Year), Title" format, url).
 7. **Specificity gate** — Quality gate requires researcher names OR years OR "et al." OR DOI references.
 8. **`qualityGate("ground_nudge", …)`** — Length, banned terms, Bitcoin-only constraints (`quality.ts`).
 9. **On success (`source: "live"`)** — Inserts into `companion_cache`; background URL validation.

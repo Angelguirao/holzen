@@ -71,7 +71,7 @@ If this path drifts from Phase 2 or from **`check-volatility`** / **`PauseSessio
 - **Scheduled HTTP**: cron invokes edge function URL for `check-volatility` (see `docs/ops/cron-setup.md` for headers/secrets).
 - **Edge function: `check-volatility`**: eligibility + BTC context + **`pause_create_or_reuse_as`** + profile/notification delivery (**Pause V2:** **no** `generateUnifiedReflection` / **no** `companion-orchestrate` on claim).
 - **Edge function: `companion-orchestrate`**: invoked from **`PauseSession`** via **`use-companion-data`** (user JWT) for intervention + lazy slots — **not** from `check-volatility` on automatic pause claim.
-- **External APIs**: CoinGecko (BTC charts), Fear & Greed, on-chain snapshot helpers; optional email via Lovable Email for notification copy.
+- **External APIs**: CoinGecko (BTC charts), Fear & Greed, on-chain snapshot helpers; optional email via **Resend** for notification copy.
 - **Web Push**: may be used in `check-volatility` for push delivery (see function body for full flow).
 
 ## Data models affected

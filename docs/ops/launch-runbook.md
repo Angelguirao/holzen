@@ -1,22 +1,23 @@
 # Pause-first launch runbook
 
-Human checklist for shipping `feature/mvpPauseCleanup` to production. **Quick ticks:** [ship-checklist.md](./ship-checklist.md). Canonical deploy narrative: [deployment-sync-guide.md](./deployment-sync-guide.md).
+Human checklist for shipping pause-first to production. **Quick ticks:** [ship-checklist.md](./ship-checklist.md). Canonical deploy narrative: [deployment-sync-guide.md](./deployment-sync-guide.md).
 
 ## Ship status (agent-complete vs human)
 
 | Step | Status |
 | --- | --- |
-| Steps 1–6 code + CI + docs | ✅ on `feature/mvpPauseCleanup` |
-| `git push` | ✅ tip **`038c7c84`** · set `VITE_APP_VERSION` / `SENTRY_RELEASE` to this SHA on publish |
-| Linked DB migrations + cutover verify | 🚢 you |
-| Lovable **Publish → Update** | 🚢 you |
+| Steps 1–6 code + CI + docs | ✅ on integration branch |
+| `git push` | Set `VITE_APP_VERSION` / `SENTRY_RELEASE` to deploy Git SHA |
+| Staging migrations + smoke | 🚢 you |
+| Merge `staging → main` | 🚢 you |
+| Vercel production deploy | 🚢 automatic on `main` merge |
 | §3.1 no real prod users (before destructive cutover) | 🚢 you |
 
 ## Preconditions
 
-- Steps 1–5 committed on `feature/mvpPauseCleanup` (tag `full-ia-pre-strip` exists).
+- Platform exit path documented: [platform-exit-runbook.md](./platform-exit-runbook.md) · [branch-model.md](./branch-model.md).
 - Stripe webhook includes `customer.subscription.created|updated|deleted` and subscription `checkout.session.completed`.
-- Lovable secrets match [observability-setup.md](./observability-setup.md) (`VITE_*`, edge `SENTRY_*`, `LOG_DRAIN_*`).
+- Observability secrets per [observability-setup.md](./observability-setup.md) — **Vercel** (`VITE_*`) + **Supabase Edge** (`SENTRY_*`, `LOG_DRAIN_*`).
 
 ## 1. Repo gate (local or CI)
 
@@ -48,40 +49,31 @@ Naming audit (plan §5.0):
 npm run check:no-phase-labels
 ```
 
-## 2. Push backend
+## 2. Push backend (staging first)
 
-**Done (2026-05-17):** `806009f3` on `origin/feature/mvpPauseCleanup`.
+Merge feature work to **`staging`**. CI or manual deploy applies migrations and edge functions to the **staging Supabase project**.
 
-If you need to push again:
+Confirm migrations applied, especially any destructive cutover migrations listed in your release notes.
 
-```bash
-git push -u origin feature/mvpPauseCleanup
-```
-
-GitHub sync applies `supabase/migrations/` and deploys edge functions. Confirm migrations applied, especially:
-
-- `20260516180000_subscription_lapsed_pause_engagement.sql` — lapsed status + `user_can_engage_pause`
-- `20260521200000_holzen_mvp_launch_cutover.sql` — Tier B drops, `content_library` → `companion_catalog`, telemetry baseline, cron unschedule (**destructive**)
-- `20260522130000_drop_companion_breathing.sql` — drops `profiles.companion_breathing` (plan §20.5)
-- `20260523140000_companion_catalog_serve_source.sql` — `serve_source` includes `catalog`
-- `20260523140100_companion_catalog_recreate_if_missing.sql` — safety recreate if an earlier cutover dropped the table
-- `20260523150000_keep_reflection_text_artifact_kind.sql` — reverts `opening_message` kind if an old cutover revision ran
-
-### Quick SQL checks (linked project)
+### Quick SQL checks (target project)
 
 ```sql
 -- Engagement helper exists
 SELECT proname FROM pg_proc WHERE proname = 'user_can_engage_pause';
 
 -- Lapsed users blocked from new pause (manual test user)
--- profiles.subscription_status should be 'lapsed' after trial ends without card
 SELECT user_id, subscription_status, subscription_tier FROM profiles WHERE subscription_status = 'lapsed' LIMIT 5;
 ```
 
-## 3. Lovable frontend
+After staging smoke passes, merge **`staging → main`** for production Supabase + Vercel.
 
-1. **Publish → Update** (required — GitHub sync does not update the SPA).
-2. Set `VITE_APP_VERSION` to current Git short SHA (match `SENTRY_RELEASE` on edges).
+## 3. Frontend (Vercel)
+
+1. **Production** deploys automatically when **`main`** merges (Vercel GitHub integration).
+2. Set **`VITE_APP_VERSION`** in Vercel to the deploy Git short SHA (match `SENTRY_RELEASE` / `EDGE_RELEASE` on edges).
+3. Confirm custom domain and SPA rewrites per [vercel-frontend-setup.md](./vercel-frontend-setup.md).
+
+**Do not** use Lovable **Publish → Update** for real users after cutover.
 
 ## 4. Bruno smoke (`bruno/active/`)
 
@@ -103,5 +95,5 @@ Do not use requests under `bruno/legacy/full-shell/` for launch ship checks (und
 
 ## Rollback
 
-- **Frontend:** Lovable republish previous build.
+- **Frontend:** Redeploy previous Vercel production deployment (Instant Rollback in Vercel dashboard).
 - **Backend:** revert merge commit; do not force-push `main`. Full IA recovery: tag `full-ia-pre-strip`, branch `archive/full-ia-pre-strip`, `src/legacy/`.

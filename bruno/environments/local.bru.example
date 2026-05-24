@@ -2,11 +2,12 @@ vars {
   VITE_SUPABASE_URL: http://127.0.0.1:54321
   AUTH_EMAIL: your-test-user@example.com
   AUTH_USER_ID: optional-after-sign-in
-  LOVABLE_API_KEY: optional-for-auth-email-preview-only
+  EMAIL_PREVIEW_SECRET: optional-for-auth-email-preview-only
 }
 vars:secret [
   VITE_SUPABASE_PUBLISHABLE_KEY,
   AUTH_PASSWORD,
   SUPABASE_ACCESS_TOKEN,
-  SERVICE_CRON_BEARER
+  SERVICE_CRON_BEARER,
+  EMAIL_PREVIEW_SECRET
 ]

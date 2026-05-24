@@ -1,25 +1,25 @@
 # Deployment & Sync Guide
 
-How Lovable Cloud auto-deploys when you push to GitHub, and how to avoid surprises.
+How GitHub merges deploy Holzen to **owned Supabase** + **Vercel**, and how to avoid surprises.
 
 **Repo integration:** This checklist is referenced from [AGENTS.md](../../AGENTS.md) (humans + AI) and enforced for Cursor via [`.cursor/rules/deployment-sync.mdc`](../../.cursor/rules/deployment-sync.mdc) (`alwaysApply`). Run it before every push that touches app code, migrations, or edge functions.
 
-**Staging / leaving Lovable:** Git branches do **not** isolate the database—migrations on the synced branch hit **production** immediately. For risk model, invisible CI, hybrid paths, and a phased exit checklist, see **[lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md)**.
+**Branch model:** `feature/* → staging → main`. See [branch-model.md](branch-model.md). **Platform exit:** [platform-exit-runbook.md](platform-exit-runbook.md) · [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md) (optional Lovable editor only — not prod host).
 
-## What happens on GitHub → Lovable sync
+## What happens on merge / deploy
 
-| Artifact | Deployed automatically? | Goes live immediately? |
-|----------|------------------------|------------------------|
-| `supabase/migrations/*.sql` | ✅ Yes — applied to **production DB** | ✅ Immediately |
-| `supabase/functions/*/index.ts` | ✅ Yes — deployed to Edge runtime | ✅ Immediately |
-| `supabase/config.toml` | ✅ Yes — merged into project config | ✅ Immediately |
-| Frontend (`src/`, `index.html`, etc.) | ❌ No — built but **not published** | Only after **Publish → Update** in Lovable UI |
+| Artifact | How it deploys | Goes live when |
+|----------|----------------|----------------|
+| `supabase/migrations/*.sql` | GitHub Actions or `supabase db push` to the **target project** (staging or prod) | On successful migration apply to that project |
+| `supabase/functions/*/index.ts` | Supabase CLI / linked CI deploy | After edge deploy completes |
+| `supabase/config.toml` | Merged into project config on deploy | With edge deploy |
+| Frontend (`src/`, `index.html`, etc.) | **Vercel** production deploy on merge to `main` (preview on PRs) | After Vercel build succeeds |
 
-**Key insight:** Backend changes (migrations + edge functions) hit production the moment GitHub syncs. Frontend changes are staged until you explicitly publish.
+**Key insight:** Point migrations and edge deploys at the **correct Supabase project** for the branch (`staging` vs `main`). Frontend release SHA (`VITE_APP_VERSION`) must match edge `SENTRY_RELEASE` / `EDGE_RELEASE`.
 
-### When Lovable (or CI) reports a migration error (ownership / “must be owner”)
+### When CI or Supabase reports a migration error (ownership / “must be owner”)
 
-GitHub → Lovable sync applies SQL using the linked Supabase project’s
+Migration apply uses the linked Supabase project’s
 migration role. If a migration fails with **“must be owner of table …”** (for
 example `pause_instances`), the batch can **stop partway**: later migrations
 do not run, while the Git tip still moves forward. **Do not** treat edge or
@@ -33,18 +33,18 @@ linked project and correct credentials, or a one-time
 restore. Re-run **`npm run supabase:reset`** locally after fixing historical
 files so `check:view-migrations` + full chain stay honest.
 
-## Hosted env files vs Cloud secrets
+## Hosted env files vs Edge secrets
 
 | What | Where it runs | Where you set it (hosted) | When changes take effect |
 |------|---------------|---------------------------|---------------------------|
-| `VITE_*` | Browser (built SPA) | Lovable project env / build inputs; local `.env` for dev | New frontend build + **Publish → Update** |
-| Edge secrets (`FETCH_FEEDS_*`, `CRON_SECRET`, Stripe keys, …) | Supabase Edge (cloud) | **Lovable Cloud → Secrets** (injected into the Edge runtime) | Same as any secret change: available on the next function invocation |
+| `VITE_*` | Browser (built SPA) | **Vercel** project env (prod/preview); local `.env` for dev | Next Vercel deploy (or local `npm run dev`) |
+| Edge secrets (`GOOGLE_AI_API_KEY`, `RESEND_API_KEY`, `CRON_SECRET`, Stripe keys, …) | Supabase Edge | **Supabase Dashboard → Edge Functions → Secrets** (per project) | Next function invocation after secret update |
 
-**Important:** Files like `.env.example`, `.env.hosted`, or `.env` in this repo **only affect the frontend build** when you run Vite locally (or when your CI loads them). They are **not** read by deployed Edge functions. For production Edge behavior, configure secrets in **Lovable Cloud → Secrets** (or Supabase Dashboard → Edge Function secrets for the linked project).
+**Important:** Files like `.env.example`, `.env.hosted`, or `.env` in this repo **only affect the frontend build** when you run Vite locally (or when Vercel/CI loads them). They are **not** read by deployed Edge functions. Configure edge secrets in the **Supabase dashboard** for staging and prod separately.
 
 **Local development only:** `supabase functions serve` can load `supabase/.env` (gitignored). That path does not apply to hosted runs.
 
-## Safe workflow for outside-Lovable development
+## Safe workflow for local / CI development
 
 ### 1. Migrations
 
@@ -87,22 +87,24 @@ verify_jwt = false
 **Common issues after sync:**
 - **401 on invoke** → missing `config.toml` entry, or `verify_jwt` still `true` for a cron/service function.
 - **"Function not found"** → the folder name doesn't match the config block name, or the function wasn't deployed (check Cloud → Edge Functions tab).
-- **Stale code** → Lovable may cache a previous deployment. Touch a file (add a comment) and push again, or redeploy from the Cloud UI.
+- **Stale code** → Redeploy from Supabase Dashboard → Edge Functions, or push a trivial commit to re-trigger CI.
 
-**Secrets:** Edge functions read secrets from the Supabase environment, not from repo `.env` files. See [Hosted env files vs Cloud secrets](#hosted-env-files-vs-cloud-secrets). If you add a new secret dependency:
+**Secrets:** Edge functions read secrets from the Supabase environment, not from repo `.env` files. See [Hosted env files vs Edge secrets](#hosted-env-files-vs-edge-secrets). If you add a new secret dependency:
 1. Document it in your PR / commit message.
-2. Add the secret via Lovable Cloud → Secrets **before** the code that uses it goes live.
+2. Add the secret via **Supabase Dashboard → Edge Functions → Secrets** **before** the code that uses it goes live (staging first, then prod).
 3. If the secret is missing at runtime, the function will fail silently or throw — check Edge Function logs.
 
 ### 3. Frontend
 
-Frontend is safe — it only goes live when you click **Publish → Update** in Lovable. Changing `VITE_*` values requires a new build and publish; see [Hosted env files vs Cloud secrets](#hosted-env-files-vs-cloud-secrets). But:
-- If your frontend references a new DB column or edge function, make sure the backend side is already deployed before publishing.
-- If you remove a column the frontend still references, the published app will break until you publish the updated frontend too.
+Vercel deploys on merge; preview builds run on PRs. Changing `VITE_*` in Vercel requires a redeploy. But:
+- If your frontend references a new DB column or edge function, deploy backend/migrations to that environment **before** shipping the frontend that depends on them.
+- If you remove a column the frontend still references, users on the old bundle will break until Vercel serves the new build.
+
+See [vercel-frontend-setup.md](vercel-frontend-setup.md).
 
 ### 4. config.toml
 
-- **Never change `project_id`** — it's managed by Lovable.
+- **`project_id`** in `config.toml` must match the Supabase project you deploy to (staging vs prod link).
 - Only add `[functions.*]` blocks for new edge functions.
 - Don't remove existing function blocks unless you're also deleting the function folder.
 
@@ -154,7 +156,7 @@ Define your own interface for the expected shape and cast through `unknown`. The
 **Prevention (workflow):**
 
 1. **Same-commit migrations + code:** Always use `as unknown as T` for queries touching new columns.
-2. **Two-commit approach (safest):** Push the migration first, wait for Lovable to sync and regenerate types, then push the code that uses the new columns.
+2. **Two-commit approach (safest):** Push the migration first, wait for staging/prod to apply it and regenerate types, then push the code that uses the new columns.
 3. **Wrap in try/catch** when the table or column genuinely might not exist yet (pre-migration graceful degradation).
 4. **`npm run gen:types`** — Regenerates `src/integrations/supabase/types.ts` from the **linked** project (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Run after schema-changing migrations so the repo matches production.
 
@@ -164,9 +166,9 @@ Some Edge functions assume columns already exist — e.g. **`fetch-source-feeds`
 
 **Mitigation:**
 
-1. **Normal GitHub → Lovable sync** usually applies migrations in timestamp order before traffic hits new code; if you see column errors right after sync, open **Database → Migrations** and confirm pending migrations are applied, then **re-invoke** the function or redeploy.
+1. **Normal CI / `db push`** usually applies migrations in timestamp order before traffic hits new code; if you see column errors right after deploy, open **Database → Migrations** and confirm pending migrations are applied, then **re-invoke** the function or redeploy.
 2. **High-stakes prod:** Ship **migrations-only** first (or run the SQL from new migration files in the SQL editor), verify schema, then merge the function commit — matches the guide's order-of-operations mindset.
-3. **Optional Edge secrets** (no deploy blocker if unset): `FETCH_FEEDS_MAX_SOURCES`, `FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE`, `FETCH_FEEDS_ARTICLE_DELAY_MS` — defaults apply; add in **Cloud → Secrets** only for launch backfills.
+3. **Optional Edge secrets** (no deploy blocker if unset): `FETCH_FEEDS_MAX_SOURCES`, `FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE`, `FETCH_FEEDS_ARTICLE_DELAY_MS` — defaults apply; add in **Supabase → Secrets** only for launch backfills.
 
 **`npm run check:edge`:** Runs `scripts/check-edge.mjs` (`deno check` on every `supabase/functions/*/index.ts` except `_shared`). It resolves the Deno binary from PATH, then `DENO_INSTALL/bin`, then `~/.deno/bin` (official installer default). Uses `--no-lock` so it does not write a root `deno.lock`. If Deno is missing entirely, the script exits 0 with a skip message.
 
@@ -184,10 +186,10 @@ Some Edge functions assume columns already exist — e.g. **`fetch-source-feeds`
 
 ### Migration failed on sync
 
-**Symptom:** Lovable shows a sync error, or the app crashes with "column X does not exist."
+**Symptom:** CI or Supabase shows a migration error, or the app crashes with "column X does not exist."
 
 **Diagnosis:**
-1. Open Lovable Cloud → Database to check the current schema.
+1. Open Supabase Dashboard → Database to check the current schema.
 2. Compare with your `supabase/migrations/` folder — is the latest migration applied?
 
 **Fix:**
@@ -218,24 +220,24 @@ Some Edge functions assume columns already exist — e.g. **`fetch-source-feeds`
 3. Missing DB column? A migration may not have been applied — see above.
 4. Import error? Ensure all `import` URLs use `https://esm.sh/` (not `npm:` specifiers).
 
-### Frontend shows stale data / missing features after publish
+### Frontend shows stale data / missing features after deploy
 
-**Symptom:** You published but the UI doesn't reflect your latest code.
+**Symptom:** Vercel deployed but the UI doesn't reflect your latest code.
 
 **Fix:**
 - Hard-refresh the browser (`Ctrl+Shift+R` / `Cmd+Shift+R`).
 - Check that the service worker isn't caching old assets — clear site data if needed.
-- Verify the publish actually completed in Lovable's publish history.
+- Verify the Vercel deployment succeeded and `VITE_APP_VERSION` matches the expected Git SHA.
 
-### Sync from GitHub seems stuck
+### GitHub → Vercel / Supabase deploy seems stuck
 
-**Symptom:** You pushed to GitHub but Lovable doesn't show the changes.
+**Symptom:** You merged but staging or prod didn't update.
 
 **Checklist:**
-1. Is the repo connected? Check Project Settings → GitHub.
-2. Did you push to the correct branch (the one Lovable tracks)?
-3. Check GitHub for webhook delivery status (Settings → Webhooks → Recent Deliveries).
-4. Try a manual sync: make a trivial change in Lovable and save, or push another commit.
+1. **Vercel:** Check the deployment for the commit on the correct branch (`main` = prod).
+2. **Supabase:** Confirm GitHub Actions (or manual `supabase db push` / `functions deploy`) ran for the target project.
+3. Check GitHub Actions logs for failed migration or edge deploy steps.
+4. Re-run the failed workflow or push an empty commit after fixing the root cause.
 
 ### CRON_SECRET mismatch (cron jobs return 401)
 
@@ -253,7 +255,7 @@ Some Edge functions assume columns already exist — e.g. **`fetch-source-feeds`
    ```sql
    SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'CRON_SECRET';
    ```
-3. Make sure the edge function secret matches exactly. Update via Cloud → Secrets if needed.
+3. Make sure the edge function secret matches exactly. Update via Supabase → Edge Functions → Secrets if needed.
 4. After updating, redeploy edge functions (push a commit or use Cloud UI).
 
 ## Order-of-operations for breaking changes

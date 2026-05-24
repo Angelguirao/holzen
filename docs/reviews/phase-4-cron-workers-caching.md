@@ -53,7 +53,7 @@ If these workers drift (stale prices, bad dedup, permissive auth), you get wrong
 
 ### `supabase/functions/fetch-source-feeds/index.ts` — active content library
 
-- Reads `signal_sources.url` (and related config); scrapes via Firecrawl when configured, else Perplexity fallback; structures entries via Lovable AI gateway into `content_library`.
+- Reads `signal_sources.url` (and related config); scrapes via Firecrawl when configured, else Perplexity fallback; structures entries via **`llm-gateway` / Gemini** into `content_library` *(legacy Tier B)*.
 - **Auth**: `SERVICE_CRON_BEARER` / `verifyServiceAuth` (service role or `CRON_SECRET`).
 - **Logs**: structured JSON — **`"fn":"fetch-source-feeds"`**; grep **`fetch_feeds_`** in **`msg`** / **`holzen_event`** (see [content-library-fetch-source-feeds.md](../systems/content-library-fetch-source-feeds.md)).
 - **Inserts**: `companion_types` mapping (`signal` vs `ground_nudge`), title/summary/citation/url/tags, `quality_score: 2`.
@@ -65,7 +65,7 @@ If these workers drift (stale prices, bad dedup, permissive auth), you get wrong
 - **Auth**: Bruno **`SERVICE_CRON_BEARER`** (service_role JWT or `CRON_SECRET`); Edge: [`verifyServiceAuth`](../../supabase/functions/_shared/auth.ts).
 - **Logs**: structured JSON — **`"fn":"pregenerate-companions"`** (request **`log`** from **`withRequestLogging`**).
 - **Lifecycle**: promote high-quality entries to permanent (`expires_at = null`); prune low-quality after 3 days; expire medium tiers after 30 days.
-- **Generation loop**: **need-based** top-up per type (targets in `app_config.pregenerate_cache_topup`); when below target, may run Perplexity + Lovable (or Lovable-only for deep-time zoom) to insert into `companion_cache` — this path does **not** call `companion-orchestrate`; dedup via title/URL/body vs existing cache rows. See [pregenerate.md](../systems/pause/companions/pregenerate.md).
+- **Generation loop**: **need-based** top-up per type (targets in `app_config.pregenerate_cache_topup`); when below target, may run Perplexity + Gemini via **`llm-gateway`** (or Gemini-only for deep-time zoom) to insert into `companion_cache` — this path does **not** call `companion-orchestrate`; dedup via title/URL/body vs existing cache rows. See [pregenerate.md](../systems/pause/companions/pregenerate.md).
 - **Feedback**: last 24h feedback events adjust `quality_score` within [0..3].
 
 ### `docs/ops/cron-setup.md`
@@ -75,7 +75,7 @@ If these workers drift (stale prices, bad dedup, permissive auth), you get wrong
 ## Runtime touchpoints: endpoints, events, and side effects
 
 - **Scheduled HTTP**: pg_cron (or equivalent) POSTs to each edge function URL with documented headers/secrets.
-- **External APIs**: CoinGecko (`refresh-btc-prices`); Firecrawl / Perplexity / Lovable gateway (`fetch-source-feeds`); AI generation inside `pregenerate-companions`.
+- **External APIs**: CoinGecko (`refresh-btc-prices`); Firecrawl / Perplexity / **`llm-gateway`** (`fetch-source-feeds`, legacy); AI generation inside `pregenerate-companions`.
 - **No direct user browser invoke** in normal flows — all three are worker-oriented.
 
 ## Data models affected
