@@ -116,6 +116,11 @@ async function main() {
   mkdirSync(cursorDir, { recursive: true });
   ensureFile(mcpExamplePath, mcpJsonPath, "mcp.json");
   ensureFile(secretsExamplePath, secretsPath, "mcp-secrets.env");
+  if (ensureFile(stagingSecretsExamplePath, stagingSecretsPath, ".env.staging.secrets")) {
+    console.log(
+      "Add GOOGLE_AI_API_KEY to .env.staging.secrets — used for Supabase edge + MCP sync.",
+    );
+  }
 
   let result = syncMcpSecrets();
 
