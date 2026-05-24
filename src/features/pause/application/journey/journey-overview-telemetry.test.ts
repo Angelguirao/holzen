@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { trackJourneyOverviewViewed } from './journey-screen-telemetry';
+import { trackJourneyOverviewViewed } from './journey-overview-telemetry';
 
 const trackEvent = vi.fn();
 
@@ -7,7 +7,7 @@ vi.mock('@/lib/posthog', () => ({
   trackEvent: (...args: unknown[]) => trackEvent(...args),
 }));
 
-describe('journey-screen-telemetry', () => {
+describe('journey-overview-telemetry', () => {
   beforeEach(() => {
     trackEvent.mockClear();
   });

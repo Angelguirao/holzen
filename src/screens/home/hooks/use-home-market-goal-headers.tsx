@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 import { useCallback, useMemo, useState } from 'react';
 import { HomeExpandChevronButton } from '@/screens/home/components/HomeExpandChevronButton';
-import { trackHomeGoalWhyExpandToggled } from '@/screens/home/lib/home-screen-telemetry';
+import { trackHomeGoalWhyExpandToggled } from '@/features/pause/public-home';
 
 export function useHomeMarketGoalHeaders(args: {
   t: TFunction;

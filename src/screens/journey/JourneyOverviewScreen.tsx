@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { JourneyStreakCard } from '@/screens/journey/components/JourneyStreakCard';
 import { Button } from '@/components/ui/button';
 import { useJourneyPauseInstances } from '@/features/pause/public-hooks';
-import { trackJourneyOverviewViewed } from '@/screens/journey/lib/journey-screen-telemetry';
+import { trackJourneyOverviewViewed } from '@/features/pause/public-hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function JourneyOverview() {
