@@ -16,7 +16,7 @@ Holzen does **not** run the full stack on one PaaS. After platform exit the spli
 |-------|--------|----------------|
 | **Frontend** | Vercel (recommended) or equivalent static host | Vite build → `dist/` SPA, CDN, SPA rewrites, PWA `sw.js` |
 | **Backend** | Owned **Supabase** | Postgres, Auth, RLS, Edge Functions, `pg_cron` |
-| **Backend deploy** | **GitHub Actions** | `db push` + `functions deploy` ([deploy-production.yml](../../.github/workflows/deploy-production.yml)) |
+| **Backend deploy** | **GitHub Actions** | `db push` + `functions deploy` → then Vercel via [vercel-ci-deploy.mjs](../../scripts/vercel-ci-deploy.mjs) ([cicd-overview.md](cicd-overview.md)) |
 
 The browser talks to Supabase (Postgres + `invokeEdge`). Auth, AI, email, and cron live on **Edge**, not on the frontend host. Picking a frontend provider is therefore about **static asset delivery and preview DX** — not about replacing Supabase.
 
@@ -56,7 +56,7 @@ Until one of those applies, **Vercel + Supabase + GitHub Actions** is the docume
 2. **Production branch:** `main`
 3. Vercel auto-detects **Vite** from [vercel.json](../../vercel.json) (`buildCommand`, `outputDirectory`)
 
-No `vercel deploy` CLI required for day-to-day use — pushes to `main` build and promote automatically.
+No `vercel deploy` CLI required for day-to-day **local** work — release branches deploy via GitHub Actions. PR previews still auto-deploy from the Vercel Git integration.
 
 ---
 
@@ -141,10 +141,14 @@ After first deploy, verify:
 
 | Layer | Owner | Trigger |
 |-------|--------|---------|
-| **Frontend** | Vercel | Push to `main` (or PR previews) |
-| **DB + Edge** | Supabase | [deploy-production.yml](../../.github/workflows/deploy-production.yml) on `main` (with approval) |
+| **Frontend** | Vercel | GitHub Actions `deploy-frontend` after backend ([cicd-overview.md](cicd-overview.md)) |
+| **DB + Edge** | Supabase | Same workflow, `deploy-backend` job first |
 
-Order for releases: merge → Vercel builds frontend automatically → approve **production** GitHub workflow for migrations + edge functions → confirm `VITE_APP_VERSION` / `SENTRY_RELEASE` both equal the same Git SHA.
+Order for releases: merge to `staging` or `main` → **preflight** (`test:ci` + build) → **backend** (migrations + edges) → **frontend** (Vercel prebuilt deploy) → confirm `VITE_APP_VERSION` / `SENTRY_RELEASE` / `EDGE_RELEASE` equal the Git SHA.
+
+Vercel Git auto-deploy is **disabled** for `main` and `staging` in [vercel.json](../../vercel.json) so the frontend cannot ship before the backend. **PR previews** on feature branches remain automatic.
+
+Optional: assign a **branch domain** (e.g. `staging.holzen.app` → branch `staging`) in Vercel for a stable staging URL.
 
 ---
 
@@ -171,4 +175,4 @@ Set the same `VITE_*` env vars in the Vercel project first.
 
 ## Why not only GitHub Actions for frontend?
 
-You can add a `vercel deploy --prod --token=…` step to CI, but the **GitHub ↔ Vercel integration** gives PR preview URLs, deployment comments, and instant rollbacks with less YAML. Backend stays on GitHub Actions because Supabase CLI deploy is not Vercel’s job.
+PR previews use the **GitHub ↔ Vercel integration** (preview URLs, deployment comments) without extra YAML. **`main` and `staging`** frontend deploys run in Actions **after** Supabase so backend and frontend stay ordered — see [cicd-overview.md](cicd-overview.md). Backend stays on GitHub Actions because Supabase CLI deploy is not Vercel’s job.

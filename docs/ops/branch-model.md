@@ -6,9 +6,9 @@ Canonical branch flow for platform exit (owned Supabase + Vercel). Pairs with [p
 
 | Branch | Deploy target | CI / deploy |
 |--------|---------------|-------------|
-| Feature branches (`feature/*`, `fix/*`) | None (PR checks only) | `ci.yml` on PR |
-| **`staging`** | Staging Supabase + optional Vercel Preview | `staging-backend.yml` on push; Vercel Preview if connected |
-| **`main`** | Production Supabase + Vercel Production | `deploy-production.yml` on push (with environment approval); Vercel Production |
+| Feature branches (`feature/*`, `fix/*`) | None (PR checks only) | `ci.yml` on PR; Vercel **PR preview** (auto) |
+| **`staging`** | Staging Supabase + Vercel Preview (`staging` branch) | [staging-backend.yml](../../.github/workflows/staging-backend.yml) on push (backend → frontend) |
+| **`main`** | Production Supabase + Vercel Production | [deploy-production.yml](../../.github/workflows/deploy-production.yml) on push (backend → frontend; **`production`** environment approval recommended) |
 
 **Promotion:** merge features → `staging` → smoke → merge `staging` → `main`. **Hotfixes:** branch from `main`, merge back to `main`, then merge `main` → `staging` to keep them aligned.
 
@@ -59,17 +59,28 @@ Same as `main`, but optionally allow direct pushes for fast staging iteration. M
 | `SUPABASE_ACCESS_TOKEN` | CLI link + deploy |
 | `SUPABASE_STAGING_PROJECT_REF` | Staging project |
 | `SUPABASE_PROD_PROJECT_REF` | Production project |
+| `VERCEL_TOKEN` | CI frontend deploy ([vercel-ci-deploy.mjs](../../scripts/vercel-ci-deploy.mjs)) |
+| `VERCEL_ORG_ID` | Vercel team/org id (from `vercel link` / `.vercel/project.json`) |
+| `VERCEL_PROJECT_ID` | Vercel project id |
+| `VITE_SUPABASE_STAGING_URL` | Staging preflight build in Actions |
+| `VITE_SUPABASE_STAGING_PUBLISHABLE_KEY` | Staging preflight build in Actions |
+| `VITE_SUPABASE_URL` | CI / prod preflight build |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | CI / prod preflight build |
 | `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` | Source map upload in CI (optional) |
 
-Frontend `VITE_*` for CI builds live in GitHub Actions and/or Vercel — not Supabase Edge secrets. See [observability-setup.md](observability-setup.md).
+Full matrix and flow: [cicd-overview.md](cicd-overview.md).
+
+Frontend runtime `VITE_*` for deployed sites live in **Vercel** project env — not Supabase Edge secrets. See [observability-setup.md](observability-setup.md).
 
 ## Workflows (reference)
 
 | Workflow | Trigger |
 |----------|---------|
-| [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) | Pull requests |
-| [`.github/workflows/staging-backend.yml`](../../.github/workflows/staging-backend.yml) | Push to `staging`, `workflow_dispatch` |
-| [`.github/workflows/deploy-production.yml`](../../.github/workflows/deploy-production.yml) | Push to `main`, `workflow_dispatch` |
+| [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) | Pull requests; push `main` / `staging` / `dev` |
+| [`.github/workflows/staging-backend.yml`](../../.github/workflows/staging-backend.yml) | Push to `staging`, `workflow_dispatch` — preflight → backend → Vercel preview |
+| [`.github/workflows/deploy-production.yml`](../../.github/workflows/deploy-production.yml) | Push to `main`, `workflow_dispatch` — preflight → backend → Vercel production |
+
+End-to-end diagram, secrets, and troubleshooting: **[cicd-overview.md](cicd-overview.md)**.
 
 ## Optional `dev` branch
 

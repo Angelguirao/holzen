@@ -30,8 +30,8 @@ Holzen uses the same **mental model** as common “Lovable + GitHub + static hos
 | Environment | Git branch | Frontend | Database | Who deploys backend |
 |-------------|------------|----------|----------|---------------------|
 | **Dev** | `feature/*` (local integration) | `localhost:8080` (`npm run dev`) or optional Lovable preview | Local Docker (`supabase:reset`) **or** staging keys for hosted preview | Nobody — migrations land via PR |
-| **Staging** | `staging` | Vercel **Preview** (staging `VITE_*`) | Owned **holzen-staging** | [staging-backend.yml](../../.github/workflows/staging-backend.yml) |
-| **Production** | `main` | Vercel **Production** | Owned **holzen-prod** | [deploy-production.yml](../../.github/workflows/deploy-production.yml) (approval) |
+| **Staging** | `staging` | Vercel **Preview** via Actions (`deploy-frontend` after backend) | Owned **holzen-staging** | [staging-backend.yml](../../.github/workflows/staging-backend.yml) |
+| **Production** | `main` | Vercel **Production** via Actions (after backend) | Owned **holzen-prod** | [deploy-production.yml](../../.github/workflows/deploy-production.yml) (approval) |
 
 **Not used after exit:** Lovable Cloud as a third hosted database, Lovable **Publish → Update** for prod, or Lovable auto-applying migrations on push to `main`.
 

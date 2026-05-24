@@ -4,18 +4,19 @@ How GitHub merges deploy Holzen to **owned Supabase** + **Vercel**, and how to a
 
 **Repo integration:** This checklist is referenced from [AGENTS.md](../../AGENTS.md) (humans + AI) and enforced for Cursor via [`.cursor/rules/deployment-sync.mdc`](../../.cursor/rules/deployment-sync.mdc) (`alwaysApply`). Run it before every push that touches app code, migrations, or edge functions.
 
-**Branch model:** `feature/* → staging → main`. See [branch-model.md](branch-model.md). **Platform exit:** [platform-exit-runbook.md](platform-exit-runbook.md) · [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md) (optional Lovable editor only — not prod host).
+**Branch model:** `feature/* → staging → main`. See [branch-model.md](branch-model.md). **CI/CD map:** [cicd-overview.md](cicd-overview.md). **Platform exit:** [platform-exit-runbook.md](platform-exit-runbook.md) · [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md) (optional Lovable editor only — not prod host).
 
 ## What happens on merge / deploy
 
 | Artifact | How it deploys | Goes live when |
 |----------|----------------|----------------|
-| `supabase/migrations/*.sql` | GitHub Actions or `supabase db push` to the **target project** (staging or prod) | On successful migration apply to that project |
-| `supabase/functions/*/index.ts` | Supabase CLI / linked CI deploy | After edge deploy completes |
-| `supabase/config.toml` | Merged into project config on deploy | With edge deploy |
-| Frontend (`src/`, `index.html`, etc.) | **Vercel** production deploy on merge to `main` (preview on PRs) | After Vercel build succeeds |
+| `supabase/migrations/*.sql` | GitHub Actions `deploy-backend` job → `supabase db push` | After migration apply succeeds on target project |
+| `supabase/functions/*/index.ts` | Same job → [`deploy-active-edge-functions.mjs`](../../scripts/deploy-active-edge-functions.mjs) | After edge deploy completes |
+| `supabase/config.toml` | Merged into project config on edge deploy | With edge deploy |
+| Frontend (`src/`, `index.html`, etc.) | GitHub Actions `deploy-frontend` → [`vercel-ci-deploy.mjs`](../../scripts/vercel-ci-deploy.mjs) **after** backend | After Vercel build succeeds |
+| PR previews | Vercel Git integration (automatic; not Actions) | On PR open/sync |
 
-**Key insight:** Point migrations and edge deploys at the **correct Supabase project** for the branch (`staging` vs `main`). Frontend release SHA (`VITE_APP_VERSION`) must match edge `SENTRY_RELEASE` / `EDGE_RELEASE`.
+**Key insight:** `main` and `staging` **do not** auto-deploy from Vercel Git ([vercel.json](../../vercel.json) `git.deploymentEnabled`) — Actions runs **backend first, then frontend** so the SPA never races migrations/edges. PR previews on feature branches still auto-deploy via Vercel.
 
 ### When CI or Supabase reports a migration error (ownership / “must be owner”)
 
