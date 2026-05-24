@@ -81,7 +81,8 @@ Scripts live under `scripts/`. See script headers for exact rules and allowlists
 | Script | In `test:ci` | Capability |
 |--------|--------------|------------|
 | `check:architecture-alignment` | Yes | Required `features/<ctx>/` skeleton; pause ritual paths; spawns feature-import + no-screens checks |
-| `check:feature-imports` | Via architecture-alignment | Hexagonal layer rules; `public*` barrels from app code; presentation hooks import `application/` only via `*-io.ts` barrels |
+| `check:feature-imports` | Via architecture-alignment | Hexagonal layer rules; `public*` barrels from app code; presentation hooks import `application/` only via `*-io.ts` barrels; no Supabase client in `presentation/` |
+| `check:no-supabase-in-screens` | Via architecture-alignment | No `@/integrations/supabase/client` in `src/screens/**` |
 | `check:no-screens-in-features` | Via architecture-alignment | Features must not import `@/screens/` |
 | `check:no-root-components` | Yes | No new `src/components/*.tsx` outside allowlist |
 
@@ -169,7 +170,7 @@ Ordered by impact ÷ effort. Do not implement here unless a separate task scopes
 
 | Candidate | Protects | Notes |
 |-----------|----------|-------|
-| `check:no-supabase-in-screens` | Thin UI / use-case boundary | `rg` Supabase usage in `src/screens/**/*.tsx` |
+| ~~`check:no-supabase-in-screens`~~ | *(shipped)* | Wired in `check:architecture-alignment` |
 | `check:feature-flags-doc` | Flag taxonomy | Mirror PostHog allowlist pattern |
 | Enable `check:i18n-active-keys` in CI | i18n completeness | When active tree is complete |
 | `check:sql-search-path` | Migration security | Regex on `supabase/migrations/*.sql` |

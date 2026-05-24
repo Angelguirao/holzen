@@ -1,6 +1,6 @@
+import { getAuthUser } from '@/features/auth/public';
 import { fetchSettingsDataExportBundle } from '@/features/pause/public-hooks';
 import { fetchProfileRowForUser } from '@/features/user/public-queries';
-import { supabase } from '@/integrations/supabase/client';
 
 export type ExportDataFormat = 'json' | 'csv';
 
@@ -106,9 +106,7 @@ export async function exportDataAction(
   const formatRaw = String(formData.get('format') ?? 'json');
   const format: ExportDataFormat = formatRaw === 'csv' ? 'csv' : 'json';
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) {
     return { error: 'not_authenticated' };
   }

@@ -1,11 +1,13 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
 import { holzenLog } from '@/lib/holzen-console';
 import type { AuthSessionState } from '@/features/auth/public';
 import {
+  getAuthSession,
   handleAuthFunnelEvents,
   identifyAuthenticatedUser,
+  signOutAuth,
+  subscribeAuthStateChange,
   syncAuthObservability,
 } from './auth-session-io';
 import { runSignedInSideEffects } from '../public-hooks';
@@ -21,9 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const unsubscribe = subscribeAuthStateChange(async (event, session) => {
       holzenLog.auth('onAuthStateChange', {
         event,
         hasSession: !!session,
@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    void getAuthSession().then((session) => {
       holzenLog.auth('getSession (initial)', {
         hasSession: !!session,
         userIdPrefix: session?.user?.id?.slice(0, 8) ?? null,
@@ -52,11 +52,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return unsubscribe;
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await signOutAuth();
   };
 
   return (

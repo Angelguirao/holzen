@@ -1,5 +1,5 @@
+import { getAuthUser, signOutAuth } from '@/features/auth/public';
 import { deleteAccount as invokeDeleteAccount } from '@/features/auth/public-rpc';
-import { supabase } from '@/integrations/supabase/client';
 
 export type DeleteAccountActionState = {
   error?: 'not_authenticated' | 'delete_failed';
@@ -10,9 +10,7 @@ export async function deleteAccountAction(
   _prev: DeleteAccountActionState,
   _formData: FormData,
 ): Promise<DeleteAccountActionState> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) {
     return { error: 'not_authenticated' };
   }
@@ -22,6 +20,6 @@ export async function deleteAccountAction(
     return { error: 'delete_failed' };
   }
 
-  await supabase.auth.signOut();
+  await signOutAuth();
   return { success: true };
 }

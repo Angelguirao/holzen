@@ -10,8 +10,8 @@ import {
   notificationsInboxQueryKey,
   type NotificationsInboxRow,
 } from '@/features/notifications/public-queries';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/public';
+import { subscribeNotificationsInbox } from './notifications-inbox-realtime-io';
 import { formatDistanceToNow } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -314,40 +314,28 @@ export function NotificationBell() {
   useEffect(() => {
     if (!user) return;
 
-    const channel = supabase
-      .channel(`notification-bell-${user.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${user.id}`,
-        },
-        (payload) => {
-          if (payload.eventType === 'DELETE') {
-            const oldRow = (payload.old ?? {}) as Record<string, unknown>;
-            const id = getString(oldRow.id);
-            if (id) removeNotification(id);
-            return;
-          }
+    return subscribeNotificationsInbox(user.id, (payload) => {
+      if (payload.eventType === 'DELETE') {
+        const id = getString(payload.old.id);
+        if (id) removeNotification(id);
+        return;
+      }
 
-          const row = (payload.new ?? {}) as NotificationsInboxRow;
-          if (row.dismissed_at) {
-            removeNotification(row.id);
-            return;
-          }
+      const row = payload.new;
+      if (!row) {
+        bumpInbox();
+        return;
+      }
 
-          const mapped = mapRowToNotification(row);
-          if (mapped) upsertNotification(mapped);
-          else bumpInbox();
-        },
-      )
-      .subscribe();
+      if (row.dismissed_at) {
+        removeNotification(row.id);
+        return;
+      }
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+      const mapped = mapRowToNotification(row);
+      if (mapped) upsertNotification(mapped);
+      else bumpInbox();
+    });
   }, [user, bumpInbox, mapRowToNotification, removeNotification, upsertNotification]);
 
   useEffect(() => {

@@ -20,9 +20,11 @@ export {
 } from './infrastructure/signup-gate';
 export {
   checkSignupGateForApp,
+  getAuthUser,
   resetPasswordForEmail,
   signInWithEmailPassword,
   signInWithOAuthGoogle,
+  signOutAuth,
   signUpWithEmailPassword,
   subscribePasswordRecoveryReady,
   updateUserEmail,

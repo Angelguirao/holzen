@@ -3561,7 +3561,11 @@ if (failures.length) {
   process.exit(1);
 }
 
-for (const script of ['check-feature-imports.mjs', 'check-no-screens-in-features.mjs']) {
+for (const script of [
+  'check-feature-imports.mjs',
+  'check-no-screens-in-features.mjs',
+  'check-no-supabase-in-screens.mjs',
+]) {
   const child = spawnSync(process.execPath, [`scripts/${script}`], {
     cwd: root,
     stdio: 'inherit',
