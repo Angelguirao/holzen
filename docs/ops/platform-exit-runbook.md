@@ -107,9 +107,10 @@ GitHub Actions (see [`.github/workflows/`](../../.github/workflows/)):
 
 1. Link prod project: `supabase link --project-ref <prod-ref>`
 2. Apply migrations: `supabase db push`
-3. Deploy active functions: `npm run prod:functions-deploy` (31 edges from `config.toml`; skips `legacy/`)
-4. Set Edge secrets (mirror staging + **live** Stripe keys)
-5. Re-verify `pg_cron` vault + `CRON_SECRET` ([deployment-sync-guide.md](deployment-sync-guide.md))
+3. **If legacy Lovable DB has live users:** one-time data cutover — [database-data-migration.md](database-data-migration.md) (`npm run db:migrate-prod` after `.env.db.local`)
+4. Deploy active functions: `npm run prod:functions-deploy` (31 edges from `config.toml`; skips `legacy/`)
+5. Set Edge secrets (mirror staging + **live** Stripe keys)
+6. Re-verify `pg_cron` vault + `CRON_SECRET` ([deployment-sync-guide.md](deployment-sync-guide.md))
 
 ### Frontend
 
