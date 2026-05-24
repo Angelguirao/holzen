@@ -7,6 +7,7 @@ vi.mock('@/features/pause/public-rpc', () => ({
 
 vi.mock('@/features/pause/public-queries', () => ({
   loadMoodHistoryForOrchestrate: vi.fn().mockResolvedValue([]),
+  invalidateCompanionUiCompletionQuery: vi.fn(),
 }));
 
 import * as orchestrateIo from './pause-companion-orchestrate-io';

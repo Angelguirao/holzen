@@ -6,7 +6,6 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { HomePauseEmptyFlow } from '@/screens/home/components/HomePauseEmptyFlow';
 import { HomePauseBlockingErrorPanel } from '@/screens/home/components/HomePauseBlockingErrorPanel';
 import { HomePauseContextMeta } from '@/screens/home/components/HomePauseContextMeta';
-import { BulkHoldCard } from '@/screens/home/components/BulkHoldCard';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
 import { shouldSurfacePauseWidgetError } from '@/features/pause/public-home';
@@ -82,8 +81,6 @@ export function HomePauseCardBody({
 
   return (
     <div className="space-y-4">
-      <BulkHoldCard />
-
       {!subLoading && !hasAccess ? (
         <div className="space-y-3">
           <p className={homeInWidget.bodyMuted}>

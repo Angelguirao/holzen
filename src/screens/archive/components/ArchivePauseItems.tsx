@@ -102,11 +102,7 @@ export function ArchivePauseItems({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.15 }}
                     >
-                      <ArchivePauseCard
-                        row={row}
-                        echoesPresentation={echoesPresentation}
-                        onOutcomeLogged={() => void refetch()}
-                      />
+                      <ArchivePauseCard row={row} echoesPresentation={echoesPresentation} />
                     </motion.div>
                   ))}
                 </div>

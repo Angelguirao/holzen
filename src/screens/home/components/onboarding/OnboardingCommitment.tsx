@@ -21,7 +21,7 @@ export function OnboardingCommitment({
           {t('onboarding.commitmentKicker', { defaultValue: 'Your commitment' })}
         </p>
         <h2 className="text-lg font-medium leading-snug text-foreground">
-          {t('onboarding.commitmentTitle', { defaultValue: 'Hold goal' })}
+          {t('onboarding.commitmentTitle', { defaultValue: 'Your commitment' })}
         </h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
           {t('onboarding.commitmentIntro')}

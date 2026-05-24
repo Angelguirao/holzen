@@ -167,14 +167,6 @@ mustExist(
   'pause/application/use-cases/ritual/decide/pause-decide-score-impacts-flow.ts',
 );
 mustExist(
-  'src/features/pause/application/use-cases/ritual/decide/pause-archive-decide-rpc-flow.ts',
-  'pause/application/use-cases/ritual/decide/pause-archive-decide-rpc-flow.ts',
-);
-mustExist(
-  'src/features/pause/application/use-cases/ritual/decide/pause-archive-decide-telemetry-flow.ts',
-  'pause/application/use-cases/ritual/decide/pause-archive-decide-telemetry-flow.ts',
-);
-mustExist(
   'src/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-log-flow.ts',
   'pause/application/use-cases/ritual/decide/pause-decide-outcome-log-flow.ts',
 );
@@ -762,13 +754,14 @@ const LEGACY_PAUSE_PRESENTATION_SESSION_DOMAIN_GUARDS_IMPORTS = [
   "from '../domain/session/waiting-for-instance-fetch'",
 ];
 
-/** Archive presentation (non-I/O) — import retrospective decide helpers via pause-archive-io only. */
+/** Archive presentation — retrospective decide stack removed May 2026; block resurrection imports. */
 const LEGACY_PAUSE_PRESENTATION_ARCHIVE_DECIDE_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome',
   '@/features/pause/application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry',
   '@/features/pause/application/use-cases/ritual/decide/pause-archive-decide-rpc-flow',
   '@/features/pause/application/use-cases/ritual/decide/pause-archive-decide-telemetry-flow',
   '@/features/pause/application/use-cases/ritual/decide/pause-archive-decide-flow',
+  '@/features/pause/presentation/archive/pause-archive-io',
   "from './application/use-cases/ritual/decide/log-retrospective-outcome'",
   "from './application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry'",
   "from './application/use-cases/ritual/decide/pause-archive-decide-rpc-flow'",
@@ -779,32 +772,8 @@ const LEGACY_PAUSE_PRESENTATION_ARCHIVE_DECIDE_IMPORTS = [
   "from '../application/use-cases/ritual/decide/pause-archive-decide-rpc-flow'",
   "from '../application/use-cases/ritual/decide/pause-archive-decide-telemetry-flow'",
   "from '../application/use-cases/ritual/decide/pause-archive-decide-flow'",
-];
-
-const LEGACY_PAUSE_PRESENTATION_ARCHIVE_IO_UMBRELLA_FLOW_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/decide/pause-archive-decide-flow',
-  "from './application/use-cases/ritual/decide/pause-archive-decide-flow'",
-  "from '../application/use-cases/ritual/decide/pause-archive-decide-flow'",
-];
-
-/** Archive decide I/O — import ritual/decide leaf modules directly (not archive decide subcluster flow anchors). */
-const LEGACY_PAUSE_PRESENTATION_ARCHIVE_IO_SUBCLUSTER_FLOW_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/decide/pause-archive-decide-rpc-flow',
-  '@/features/pause/application/use-cases/ritual/decide/pause-archive-decide-telemetry-flow',
-  "from './application/use-cases/ritual/decide/pause-archive-decide-rpc-flow'",
-  "from '../application/use-cases/ritual/decide/pause-archive-decide-rpc-flow'",
-  "from './application/use-cases/ritual/decide/pause-archive-decide-telemetry-flow'",
-  "from '../application/use-cases/ritual/decide/pause-archive-decide-telemetry-flow'",
-];
-
-/** Archive decide umbrella flow — compose RPC + telemetry subclusters only. */
-const LEGACY_PAUSE_ARCHIVE_DECIDE_FLOW_LEAF_IMPORTS = [
-  '@/features/pause/application/use-cases/ritual/decide/log-retrospective-outcome',
-  '@/features/pause/application/use-cases/ritual/decide/pause-outcome-retrospective-telemetry',
-  "from './log-retrospective-outcome'",
-  "from './pause-outcome-retrospective-telemetry'",
-  "from '../log-retrospective-outcome'",
-  "from '../pause-outcome-retrospective-telemetry'",
+  "from './pause-archive-io'",
+  "from '../pause-archive-io'",
 ];
 
 /** Session breath I/O — import ritual-audio leaf only (not pause-ritual-audio-breathe-flow). */
@@ -2233,37 +2202,7 @@ for (const file of walkTs(join(root, 'src'))) {
     }
   }
   if (
-    rel.endsWith('pause-archive-io.ts') ||
-    rel.endsWith('pause-archive-io.test.ts') ||
-    rel.endsWith('pause-archive-io.re-exports.test.ts') ||
-    rel.endsWith('pause-archive-io-parity.test.ts')
-  ) {
-    if (
-      !rel.endsWith('pause-archive-io.re-exports.test.ts') &&
-      !rel.endsWith('pause-archive-io-parity.test.ts')
-    ) {
-      for (const needle of LEGACY_PAUSE_PRESENTATION_ARCHIVE_IO_UMBRELLA_FLOW_IMPORTS) {
-        if (text.includes(needle)) {
-          failures.push(
-            `${rel}: archive decide I/O must not import archive decide umbrella (${needle})`,
-          );
-        }
-      }
-    }
-    for (const needle of LEGACY_PAUSE_PRESENTATION_ARCHIVE_IO_SUBCLUSTER_FLOW_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: archive decide I/O must import ritual/decide leaf modules directly (${needle})`,
-        );
-      }
-    }
-  }
-  if (
-    rel.startsWith('src/features/pause/presentation/archive/') &&
-    !rel.endsWith('pause-archive-io.ts') &&
-    !rel.endsWith('pause-archive-io.test.ts') &&
-    !rel.endsWith('pause-archive-io.re-exports.test.ts') &&
-    !rel.endsWith('pause-archive-io-parity.test.ts')
+    rel.startsWith('src/features/pause/presentation/archive/')
   ) {
     for (const needle of LEGACY_PAUSE_PRESENTATION_ARCHIVE_DECIDE_IMPORTS) {
       if (text.includes(needle)) {
@@ -2347,15 +2286,6 @@ for (const file of walkTs(join(root, 'src'))) {
     ]) {
       if (text.includes(needle)) {
         failures.push(`${rel}: ritual done umbrella flow must compose subcluster anchors (${needle})`);
-      }
-    }
-  }
-  if (rel === 'src/features/pause/application/use-cases/ritual/decide/pause-archive-decide-flow.ts') {
-    for (const needle of LEGACY_PAUSE_ARCHIVE_DECIDE_FLOW_LEAF_IMPORTS) {
-      if (text.includes(needle)) {
-        failures.push(
-          `${rel}: archive decide umbrella flow must compose RPC + telemetry subclusters (${needle})`,
-        );
       }
     }
   }

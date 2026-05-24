@@ -43,7 +43,7 @@ export function ScoreImpact({
   const title =
     variant === 'brief'
       ? t('pause.brief.done.contributionTitle', { defaultValue: 'How this pause contributes' })
-      : t('scoreImpact.title', { defaultValue: 'Score impact' });
+      : t('scoreImpact.title', { defaultValue: 'What you practiced' });
 
   if (viewMode === 'hidden') return null;
 

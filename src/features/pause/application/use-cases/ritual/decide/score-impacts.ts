@@ -27,7 +27,7 @@ export interface PauseScoreImpactRow {
   points: number;
 }
 
-/** Builds qualitative Journey / skill hints (same rules as `ScoreImpact`). */
+/** Builds qualitative pause-practice hints for the Done screen (process, not trade judgment). */
 export function buildPauseScoreImpacts(
   data: PauseImpactData,
   t: TFunction,
@@ -50,21 +50,6 @@ export function buildPauseScoreImpacts(
       direction: 'up',
       reason: t('scoreImpact.moodImproved', { defaultValue: 'Mood shifted toward composure' }),
       points: 5,
-    });
-  }
-
-  const vol = parseScoreImpactVolatilityPct(data.context);
-
-  if (vol >= 3 && data.decision === 'held') {
-    list.push({
-      label: t('holzenScore.distressTolerance', { defaultValue: 'Tolerance' }),
-      key: 'tolerance',
-      direction: 'up',
-      reason: t('scoreImpact.heldVolatility', {
-        defaultValue: 'Held steady during {{vol}}% move',
-        vol: vol.toFixed(1),
-      }),
-      points: Math.min(8, 3 + Math.round(vol)),
     });
   }
 
@@ -95,52 +80,16 @@ export function buildPauseScoreImpacts(
 
   if (variant === 'brief' && data.decision) {
     const hasRegulation = list.some((i) => i.key === 'regulation');
-    const hasTolerance = list.some((i) => i.key === 'tolerance');
 
-    if (data.decision === 'held' && !hasTolerance) {
-      list.push({
-        label: t('holzenScore.distressTolerance', { defaultValue: 'Tolerance' }),
-        key: 'tolerance-brief-held',
-        direction: 'up',
-        reason:
-          vol >= 3
-            ? t('scoreImpact.heldVolatility', {
-                defaultValue: 'Held steady during {{vol}}% move',
-                vol: vol.toFixed(1),
-              })
-            : t('pause.brief.done.impactHeldCalm', {
-                defaultValue:
-                  'Choosing to hold adds a steady-outcome signal your Journey uses under distress tolerance.',
-              }),
-        points: 3,
-      });
-    }
-
-    if (data.decision === 'bought') {
-      list.push({
-        label: t('holzenScore.distressTolerance', { defaultValue: 'Tolerance' }),
-        key: 'brief-bought',
-        direction: 'up',
-        reason: t('pause.brief.done.impactBought', {
-          defaultValue:
-            'Buys are scored against volatility context in Journey — this decision updates that pattern.',
-        }),
-        points: 3,
-      });
-    }
-
-    if (data.decision === 'sold') {
-      list.push({
-        label: t('holzenScore.distressTolerance', { defaultValue: 'Tolerance' }),
-        key: 'brief-sold',
-        direction: 'neutral',
-        reason: t('pause.brief.done.impactSold', {
-          defaultValue:
-            'Sells register as realized action; Journey reflects them alongside how calm the window felt.',
-        }),
-        points: 0,
-      });
-    }
+    list.push({
+      label: t('holzenScore.selfAwareness', { defaultValue: 'Awareness' }),
+      key: 'decision-recorded',
+      direction: 'up',
+      reason: t('pause.brief.done.impactDecisionRecorded', {
+        defaultValue: 'You recorded what you chose after pausing — that is the practice.',
+      }),
+      points: 2,
+    });
 
     if (data.mood && !hasRegulation) {
       list.push({
@@ -148,8 +97,7 @@ export function buildPauseScoreImpacts(
         key: 'regulation-brief-entry',
         direction: 'up',
         reason: t('pause.brief.done.impactEntryMood', {
-          defaultValue:
-            'You named how you felt before deciding — that anchors regulation trends when intensity is logged.',
+          defaultValue: 'You named how you felt before deciding.',
         }),
         points: 2,
       });

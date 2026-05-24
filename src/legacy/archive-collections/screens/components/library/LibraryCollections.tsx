@@ -33,7 +33,6 @@ export function LibraryCollections({ library }: Props) {
         onBack={() => setSelectedId(null)}
         onDeleteCollection={deleteCollection}
         onRemoveItem={removeFromCollection}
-        onPauseOutcomeLogged={() => void library.refetch()}
       />
     );
   }
