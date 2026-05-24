@@ -1,6 +1,6 @@
 /**
  * App shell components/hooks must not call PostHog directly — use app/lib/*-telemetry.ts
- * (FeedbackWidget and use-feature-flag are allowlisted).
+ * (use-feature-flag is allowlisted — needs getPostHog for flag reads).
  */
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
@@ -11,10 +11,7 @@ const appRoot = join(root, 'src', 'app');
 
 const POSTHOG_IMPORT = /from\s+['"]@\/lib\/posthog['"]/;
 
-const ALLOWLIST = new Set([
-  'src/app/components/FeedbackWidget.tsx',
-  'src/app/hooks/use-feature-flag.ts',
-]);
+const ALLOWLIST = new Set(['src/app/hooks/use-feature-flag.ts']);
 
 function walk(dir, files = []) {
   if (!existsSync(dir)) return files;

@@ -4,7 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import { submitFeedbackAction } from '@/features/user/public';
+import {
+  readPostHogSessionIdForFeedback,
+  submitFeedbackAction,
+  trackFeedbackSubmitted,
+  type FeedbackCategory,
+} from '@/features/user/public';
 
 const CATEGORIES = [
   { value: 'bug', labelKey: 'feedback.bug', icon: Bug, descKey: 'feedback.bugDesc' },
