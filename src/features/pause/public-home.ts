@@ -26,24 +26,6 @@ export {
   type PauseCardProjection,
   type UsePauseCardProjectionParams,
 } from './presentation/home/use-pause-card-projection';
-export { groupBulkHoldByLocalDay } from './presentation/home/bulk-hold/group-bulk-hold-by-local-day';
-export {
-  formatBulkHoldContextQuote,
-  formatBulkHoldLocalTime,
-  parseBulkHoldChange24hPct,
-  type BulkHoldOutcomeChoice,
-  type BulkHoldReviewSection,
-} from './domain/bulk-hold';
-export {
-  useBulkHoldPending,
-  bulkHoldPendingQueryKey,
-  type BulkHoldPendingPause,
-  type UseBulkHoldPendingOptions,
-} from './presentation/home/use-bulk-hold-pending';
-export {
-  useBulkHoldApplyOutcomes,
-  type UseBulkHoldApplyOutcomesParams,
-} from './presentation/home/use-bulk-hold-apply-outcomes';
 export {
   useCompletedPauseCount,
   COMPLETED_PAUSE_COUNT_QUERY_KEY,

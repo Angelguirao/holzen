@@ -43,7 +43,14 @@ Example: `WHERE created_at >= '2026-05-21T20:00:00.000Z'` on truncated tables is
 | Surface | MVP shipped | Notes |
 | --- | --- | --- |
 | **Hold** dashboard (`HomeDashboardLayout`, widget customize) | Yes | Default Home |
+| **Bulk hold** (retrospective outcome stack on Home) | **No (stripped)** | `src/legacy/bulk-hold/README.md` |
 | **Zen** minimal reflection Home | **No (stripped)** | `src/legacy/zen-mode/`; `npm run check:active-surface` blocks Zen symbols / `holzen_zen_mode` in active `src/`. Re-enable via [zen-mode README](../../src/legacy/zen-mode/README.md) |
+
+## Product stance (pause-first)
+
+Holzen **pauses** and rewards **completed rituals** (Journey streak + count). It does **not** judge hold/buy/sell strategy, portfolio targets, or retrospective trade-label hygiene. In-ritual **Decide** records what the user chose when finishing `/pause`; Archive is read-only for expired rows without a decision.
+
+**Not shipped:** Home bulk hold, Archive retrospective “Log decision”, hold-goal **price targets** (legacy DB rows show a migration nudge only). Full stats / alignment scoring: `src/legacy/full-shell/`.
 
 ## Subscription
 

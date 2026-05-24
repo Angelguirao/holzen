@@ -73,9 +73,9 @@ Do **not** add new PostHog events here without updating `[docs/ops/event-taxonom
 - **RPC ordering:** Decide / dismiss / `completed` wait semantics are easy to break — read [pause-system §7.5](../systems/pause-system.md) before changing Decide handlers.
 - **Migrations / edge:** if RPCs or HTTP entrypoints change, follow [deployment-sync-guide.md](../ops/deployment-sync-guide.md) and root [AGENTS.md](../../AGENTS.md).
 
-## Archive — retrospective decision (not `/pause`)
+## Archive — read-only (May 2026)
 
-The **Archive** Pauses and Echoes tabs use separate `**v_pause_archive_*`** lists (see [pause-system §9](../systems/pause-system.md)). For terminal rows **`expired` or `dismissed`** that still lack `**outcome_logged**`, the app offers **Log decision** on each card: it opens a sheet that calls `**pause_log_step**` with the same three retrospective outcomes as Home bulk-hold (**held / bought / sold** — `**src/screens/archive/components/ArchivePauseRetrospectiveOutcomeSheet.tsx**` reuses **PauseDecide**). That path does **not** navigate to `/pause`. For **many** expired instances at once, Home **`BulkHoldCard`** still provides the bulk review flow.
+The **Archive** Pauses and Echoes tabs use separate `**v_pause_archive_*`** lists (see [pause-system §9](../systems/pause-system.md)). Terminal rows without `**outcome_logged**` are **read-only** on the pause-first surface — no per-card **Log decision** sheet and no Home **Bulk hold** stack. Users record hold/buy/sell only via the in-ritual **Decide** step on `/pause`. Recovery notes: `src/legacy/archive-retrospective-outcome/README.md`, `src/legacy/bulk-hold/README.md`.
 
 ## Related reading
 

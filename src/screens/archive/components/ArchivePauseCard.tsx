@@ -3,13 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 import { ChevronDown, Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import {
-  pauseArchiveRowAllowsRetrospectiveOutcome,
-  type PauseArchiveRow,
-} from '@/features/pause/public-queries';
+import type { PauseArchiveRow } from '@/features/pause/public-queries';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Button } from '@/components/ui/button';
-import { ArchivePauseRetrospectiveOutcomeSheet } from '@/screens/archive/components/ArchivePauseRetrospectiveOutcomeSheet';
 
 function firstPreviewSource(row: PauseArchiveRow): string {
   const parts = [
@@ -30,17 +25,13 @@ function previewText(row: PauseArchiveRow, maxLen: number): string {
 type Props = {
   row: PauseArchiveRow;
   echoesPresentation?: boolean;
-  /** After a retrospective outcome is saved, refresh archive rows (and counts). */
-  onOutcomeLogged?: () => void | Promise<void>;
 };
 
-export function ArchivePauseCard({ row, echoesPresentation = false, onOutcomeLogged }: Props) {
+export function ArchivePauseCard({ row, echoesPresentation = false }: Props) {
   const { t } = useTranslation();
   const id = row.id;
   const collapsibleId = useId();
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const [outcomeSheetOpen, setOutcomeSheetOpen] = useState(false);
-  const showRetrospectiveCta = pauseArchiveRowAllowsRetrospectiveOutcome(row);
   const when = row.terminal_at ?? row.created_at;
   const timeAgo = useMemo(() => {
     if (!when) return '';
@@ -94,7 +85,6 @@ export function ArchivePauseCard({ row, echoesPresentation = false, onOutcomeLog
   if (!id) return null;
 
   return (
-    <>
     <Collapsible
       open={detailsOpen}
       onOpenChange={setDetailsOpen}
@@ -141,31 +131,11 @@ export function ArchivePauseCard({ row, echoesPresentation = false, onOutcomeLog
                 {t('archive.pauseNoInteractions', { defaultValue: 'No ritual steps logged' })}
               </p>
             )}
-            {showRetrospectiveCta ? (
-              <p className="text-[10px] leading-snug text-muted-foreground/70">
-                {t('archive.pauseCardRetrospectiveHint', {
-                  defaultValue:
-                    'This pause expired before you chose. You can still log what you did for your stats.',
-                })}
-              </p>
-            ) : (
-              <p className="text-[10px] leading-snug text-muted-foreground/70">
-                {t('archive.pauseCardReadOnlyHint', {
-                  defaultValue: 'Saved for your record — use Home or Library to start a new pause.',
-                })}
-              </p>
-            )}
-            {showRetrospectiveCta ? (
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                className="h-8 w-full text-xs font-medium"
-                onClick={() => setOutcomeSheetOpen(true)}
-              >
-                {t('archive.retrospectiveOpenCta', { defaultValue: 'Log decision' })}
-              </Button>
-            ) : null}
+            <p className="text-[10px] leading-snug text-muted-foreground/70">
+              {t('archive.pauseCardReadOnlyHint', {
+                defaultValue: 'Saved for your record — use Home to start a new pause when you need one.',
+              })}
+            </p>
             {preview ? (
               <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">{preview}</p>
             ) : (
@@ -232,12 +202,5 @@ export function ArchivePauseCard({ row, echoesPresentation = false, onOutcomeLog
         </div>
       </CollapsibleContent>
     </Collapsible>
-    <ArchivePauseRetrospectiveOutcomeSheet
-      row={row}
-      open={outcomeSheetOpen}
-      onOpenChange={setOutcomeSheetOpen}
-      onSuccess={onOutcomeLogged}
-    />
-    </>
   );
 }

@@ -12,9 +12,8 @@ import {
   type ProfileRow,
   type ProfilesHoldGoalUpdate,
 } from '@/features/user/public-queries';
-import { formatBtcPrice, SUPPORTED_CURRENCIES } from '@/features/market/public';
 import { computeHoldGoalCompactHeadline } from '@/features/user/public';
-import { Target, Calendar, Coins, Infinity as InfinityIcon, X, Check, Pencil } from 'lucide-react';
+import { Target, Calendar, Infinity as InfinityIcon, X, Check, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { differenceInDays, format } from 'date-fns';
@@ -32,20 +31,19 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
-type GoalType = 'time' | 'price' | 'forever';
-type TimeUnit = 'months' | 'years';
+type GoalType = 'time' | 'forever';
 
 interface HoldGoal {
-  type: GoalType;
+  type: GoalType | 'price';
   start: string;
   targetMonths?: number;
   targetPrice?: number;
   currency: string;
 }
 
+type TimeUnit = 'months' | 'years';
+
 const MAX_MONTHS = 1200;
-const MAX_PRICE = 100_000_000;
-const MIN_PRICE = 1;
 
 export function HoldGoalWidget({
   currentPrice,
@@ -170,13 +168,6 @@ export function HoldGoalWidget({
       if (unit === 'years' && val % 0.5 !== 0 && !Number.isInteger(val)) return 'Use whole or half years';
     }
 
-    if (type === 'price') {
-      const sym = SUPPORTED_CURRENCIES.find(c => c.code === currency)?.symbol ?? currency;
-      if (val < MIN_PRICE) return `Minimum ${sym}1`;
-      if (val > MAX_PRICE) return `Maximum ${sym}${MAX_PRICE.toLocaleString()}`;
-      if (currentPrice && val <= currentPrice) return 'Target should be above current price';
-    }
-
     return null;
   };
 
@@ -192,23 +183,11 @@ export function HoldGoalWidget({
   const stripSeparators = (val: string) => val.replace(/,/g, '');
 
   const handleInputChange = (value: string) => {
-    if (goalType === 'price') {
-      // Allow digits, commas, and one decimal point
-      const raw = stripSeparators(value);
-      if (raw && !/^\d*\.?\d*$/.test(raw)) return;
-      setInputValue(raw ? formatWithSeparators(raw) : '');
-      if (raw) {
-        setValidationError(validate(goalType, raw, timeUnit));
-      } else {
-        setValidationError(null);
-      }
+    setInputValue(value);
+    if (value) {
+      setValidationError(validate(goalType, value, timeUnit));
     } else {
-      setInputValue(value);
-      if (value) {
-        setValidationError(validate(goalType, value, timeUnit));
-      } else {
-        setValidationError(null);
-      }
+      setValidationError(null);
     }
   };
 
@@ -243,7 +222,7 @@ export function HoldGoalWidget({
       hold_goal_type: goalType,
       hold_goal_start: startDate.toISOString(),
       hold_goal_target_months: months,
-      hold_goal_target_price: goalType === 'price' ? val : null,
+      hold_goal_target_price: null,
       hold_goal_currency: currency,
     };
 
@@ -296,7 +275,7 @@ export function HoldGoalWidget({
         </div>
 
         <div className="flex rounded bg-muted/50 p-0.5">
-          {(['time', 'price', 'forever'] as const).map((tp) => (
+          {(['time', 'forever'] as const).map((tp) => (
             <button
               key={tp}
               onClick={() => { setGoalType(tp); setInputValue(''); setValidationError(null); }}
@@ -306,8 +285,8 @@ export function HoldGoalWidget({
                   : 'text-muted-foreground/50 hover:text-muted-foreground'
               }`}
             >
-              {tp === 'time' ? <Calendar className="h-2.5 w-2.5" /> : tp === 'price' ? <Coins className="h-2.5 w-2.5" /> : <InfinityIcon className="h-2.5 w-2.5" />}
-              {tp === 'time' ? t('holdGoal.time') : tp === 'price' ? t('holdGoal.price') : t('holdGoal.forever')}
+              {tp === 'time' ? <Calendar className="h-2.5 w-2.5" /> : <InfinityIcon className="h-2.5 w-2.5" />}
+              {tp === 'time' ? t('holdGoal.time') : t('holdGoal.forever')}
             </button>
           ))}
         </div>
@@ -392,18 +371,14 @@ export function HoldGoalWidget({
                 <Input
                   id="hold-goal-target"
                   name="hold-goal-target"
-                  type={goalType === 'price' ? 'text' : 'number'}
-                  inputMode={goalType === 'price' ? 'decimal' : 'numeric'}
+                  type="number"
+                  inputMode="numeric"
                   autoComplete="off"
                   value={inputValue}
                   onChange={(e) => handleInputChange(e.target.value)}
-                  placeholder={
-                    goalType === 'time'
-                      ? timeUnit === 'months' ? 'e.g. 6' : 'e.g. 2'
-                      : 'e.g. 150,000'
-                  }
+                  placeholder={timeUnit === 'months' ? 'e.g. 6' : 'e.g. 2'}
                   className={`h-9 text-sm tabular-nums ${validationError ? 'border-destructive/50' : ''}`}
-                  min={goalType === 'time' ? 0 : undefined}
+                  min={0}
                 />
                 <Button size="sm" onClick={saveGoal} disabled={!inputValue || !!validationError} className="h-8 px-3">
                   <Check className="h-3 w-3" />
@@ -415,9 +390,9 @@ export function HoldGoalWidget({
             </div>
 
             <p className={homeInWidget.metaFaint}>
-              {goalType === 'time'
-                ? t('holdGoal.howManyTime', { unit: timeUnit === 'months' ? t('holdGoal.months').toLowerCase() : t('holdGoal.years').toLowerCase() })
-                : t('holdGoal.atWhatPrice')}
+              {t('holdGoal.howManyTime', {
+                unit: timeUnit === 'months' ? t('holdGoal.months').toLowerCase() : t('holdGoal.years').toLowerCase(),
+              })}
             </p>
           </>
         )}
@@ -427,7 +402,13 @@ export function HoldGoalWidget({
 
   const editGoal = () => {
     if (!goal) return;
-    setGoalType(goal.type);
+    if (goal.type === 'price') {
+      setGoalType('time');
+      setTimeUnit('years');
+      setInputValue('');
+    } else {
+      setGoalType(goal.type);
+    }
     setStartDate(new Date(goal.start));
     if (goal.type === 'time' && goal.targetMonths) {
       if (goal.targetMonths >= 12 && goal.targetMonths % 12 === 0) {
@@ -437,8 +418,8 @@ export function HoldGoalWidget({
         setTimeUnit('months');
         setInputValue(String(goal.targetMonths));
       }
-    } else if (goal.type === 'price' && goal.targetPrice) {
-      setInputValue(formatWithSeparators(String(goal.targetPrice)));
+    } else if (goal.type === 'price') {
+      setInputValue('');
     } else {
       setInputValue('');
     }
@@ -617,89 +598,24 @@ export function HoldGoalWidget({
     );
   }
 
-  if (goal.type === 'price' && goal.targetPrice) {
+  if (goal.type === 'price') {
     const start = new Date(goal.start);
-    const target = goal.targetPrice;
-    const price = currentPrice ?? 0;
-    const progress = price > 0 ? Math.min((price / target) * 100, 100) : 0;
-    const reached = price >= target;
-    const diff = target - price;
     const elapsedDays = differenceInDays(new Date(), start);
-
-    if (isWire) {
-      const headline = computeHoldGoalCompactHeadline(
-        {
-          type: goal.type,
-          start: goal.start,
-          targetMonths: goal.targetMonths,
-          targetPrice: goal.targetPrice,
-          currency: goal.currency,
-        },
-        { currentPrice, t },
-      );
-      return (
-        <div className="flex gap-3">
-          <Coins className="h-6 w-6 shrink-0 text-muted-foreground" aria-hidden />
-          <div className="min-w-0 flex-1 space-y-2">
-            {headline && !wireCompact ? (
-              <p className="text-[13px] font-medium leading-snug text-foreground">{headline}</p>
-            ) : null}
-            {!wireCompact ? (
-              <>
-                <p className={homeInWidget.metaFaint}>
-                  {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} ·{' '}
-                  {t('holdGoal.daysHeld', { count: elapsedDays })} · {t('holdGoal.target')}:{' '}
-                  {formatBtcPrice(target, goal.currency)}
-                  {' · '}
-                  {t('holdGoal.current')}: {formatBtcPrice(price, goal.currency)}
-                </p>
-                <div className="flex items-center gap-2.5">
-                  <div className="h-[7px] min-w-0 flex-1 overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-foreground/90 transition-all duration-700"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                  <span className="max-w-[45%] shrink-0 truncate text-right text-xs font-medium tabular-nums text-muted-foreground">
-                    {formatBtcPrice(price, goal.currency)}
-                  </span>
-                </div>
-              </>
-            ) : null}
-          </div>
-        </div>
-      );
-    }
 
     return (
       <div className={`${homeInWidget.insetMuted} space-y-2.5`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Target className="h-3 w-3 text-muted-foreground" />
-            <p className={homeInWidget.kicker}>{t('holdGoal.title')}</p>
+            <p className={homeInWidget.kicker}>{t('holdGoal.legacyPriceTitle')}</p>
           </div>
           {goalActions}
         </div>
-
-        <div className="space-y-1.5">
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-sm font-semibold tabular-nums text-foreground/90">
-              {reached ? t('holdGoal.targetReached') : `${formatBtcPrice(diff, currency)} ${t('holdGoal.toGo')}`}
-            </span>
-            <span className={homeInWidget.meta}>
-              {t('holdGoal.target')}: {formatBtcPrice(target, currency)}
-            </span>
-          </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
-            <div
-              className={`h-full rounded-full transition-all duration-700 ${reached ? 'bg-primary' : 'bg-primary/50'}`}
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <p className={homeInWidget.metaFaint}>
-            {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} · {t('holdGoal.daysHeld', { count: elapsedDays })} · {t('holdGoal.current')}: {formatBtcPrice(price, currency)}
-          </p>
-        </div>
+        <p className="text-sm leading-relaxed text-muted-foreground">{t('holdGoal.legacyPriceBody')}</p>
+        <p className={homeInWidget.metaFaint}>
+          {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} ·{' '}
+          {t('holdGoal.daysHeld', { count: elapsedDays })}
+        </p>
       </div>
     );
   }

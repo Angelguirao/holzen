@@ -1,5 +1,4 @@
 import { differenceInDays } from 'date-fns';
-import { formatBtcPrice } from '@/features/market/public';
 import type { HoldGoalHeadlineGoal } from '@/features/user/domain/hold-goal-headline-goal';
 
 export type { HoldGoalHeadlineGoal } from '@/features/user/domain/hold-goal-headline-goal';
@@ -9,7 +8,7 @@ type HeadlineT = (key: string, options?: Record<string, unknown>) => string;
 function kindLabel(goalType: HoldGoalHeadlineGoal['type'], t: HeadlineT): string {
   if (goalType === 'forever') return t('holdGoal.forever');
   if (goalType === 'time') return t('holdGoal.time');
-  return t('holdGoal.price');
+  return t('holdGoal.legacyPriceTitle', { defaultValue: 'Previous price target' });
 }
 
 /**
@@ -44,15 +43,8 @@ export function computeHoldGoalCompactHeadline(
     return `${label} · ${metric}`;
   }
 
-  if (goal.type === 'price' && goal.targetPrice) {
-    const target = goal.targetPrice;
-    const price = currentPrice ?? 0;
-    const reached = price >= target;
-    const diff = target - price;
-    const metric = reached
-      ? t('holdGoal.targetReached')
-      : `${formatBtcPrice(diff, goal.currency)} ${t('holdGoal.toGo')}`;
-    return `${label} · ${metric}`;
+  if (goal.type === 'price') {
+    return `${label} · ${t('holdGoal.legacyPriceTitle', { defaultValue: 'Previous price target' })}`;
   }
 
   return null;

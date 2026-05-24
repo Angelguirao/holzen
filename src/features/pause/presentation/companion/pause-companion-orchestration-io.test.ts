@@ -38,6 +38,7 @@ vi.mock(
 
 vi.mock('@/features/pause/public-queries', () => ({
   loadMoodHistoryForOrchestrate: loadMoodHistoryForOrchestrateMock,
+  invalidateCompanionUiCompletionQuery: vi.fn(),
 }));
 
 vi.mock('./pause-companion-analytics-io', () => ({

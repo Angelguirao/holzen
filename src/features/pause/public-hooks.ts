@@ -142,26 +142,13 @@ export {
 export { usePauseBriefIntegrateCountdown } from './public-session-ritual';
 export { usePauseBreathSegmentRpcLoggers } from './presentation/session/breath/use-pause-breath-segment-rpc-loggers';
 export {
-  useBulkHoldPending,
-  bulkHoldPendingQueryKey,
-  type BulkHoldPendingPause,
-  type UseBulkHoldPendingOptions,
-  useBulkHoldApplyOutcomes,
-  type UseBulkHoldApplyOutcomesParams,
-} from './public-home';
-export {
   usePauseArchiveList,
   type PauseArchiveListSort,
   type PauseArchiveRow,
   type PauseArchiveSegment,
   type UsePauseArchiveListOptions,
 } from './presentation/archive/use-pause-archive-list';
-export { pauseArchiveRowAllowsRetrospectiveOutcome } from './public-queries';
 export { getArchivePausesTabHasRowsQueryOptions } from './public-queries';
-export {
-  useArchivePauseRetrospectiveOutcome,
-  type UseArchivePauseRetrospectiveOutcomeParams,
-} from './presentation/archive/use-archive-pause-retrospective-outcome';
 export {
   useJourneyPauseInstances,
   type JourneyPauseRow,
@@ -205,14 +192,6 @@ export {
   type HomePauseCardBodyPropsProjection,
   type PauseContextHomePreview,
   type PauseHomeErrorKind,
-} from './public-home';
-export {
-  groupBulkHoldByLocalDay,
-  formatBulkHoldContextQuote,
-  formatBulkHoldLocalTime,
-  parseBulkHoldChange24hPct,
-  type BulkHoldOutcomeChoice,
-  type BulkHoldReviewSection,
 } from './public-home';
 export {
   usePauseArrivalAudio,
