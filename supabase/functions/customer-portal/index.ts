@@ -36,15 +36,14 @@ serve(
     const ALLOWED_ORIGINS = new Set([
       "https://holzen.app",
       "https://www.holzen.app",
-      "https://holzen.lovable.app",
       "http://localhost:8080",
       "http://localhost:3000",
     ]);
     const DEFAULT_ORIGIN = "https://holzen.app";
     const requestOrigin = req.headers.get("origin") ?? "";
-    const isLovablePreview = /^https:\/\/[a-z0-9-]+\.lovable\.app$/.test(requestOrigin);
+    const isVercelPreview = /^https:\/\/holzen(-[a-z0-9-]+)?\.vercel\.app$/.test(requestOrigin);
     const origin =
-      ALLOWED_ORIGINS.has(requestOrigin) || isLovablePreview ? requestOrigin : DEFAULT_ORIGIN;
+      ALLOWED_ORIGINS.has(requestOrigin) || isVercelPreview ? requestOrigin : DEFAULT_ORIGIN;
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customers.data[0].id,
       return_url: `${origin}/`,

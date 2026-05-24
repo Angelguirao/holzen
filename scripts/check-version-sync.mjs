@@ -2,9 +2,10 @@
 
 import { readFile } from "node:fs/promises";
 
-const FALLBACK_SUPABASE_URL = "https://edgbwdecaoottowliimu.supabase.co";
+// holzen-prod — same fallback as vite.config.ts when VITE_SUPABASE_* is unset at build time.
+const FALLBACK_SUPABASE_URL = "https://geqkxsnyqvhtascjghuu.supabase.co";
 const FALLBACK_SUPABASE_PUBLISHABLE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkZ2J3ZGVjYW9vdHRvd2xpaW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzgyMzcsImV4cCI6MjA4ODMxNDIzN30.ZNh2feSmMhdZmEk6omdd8q5HDjBHytz-gzktI0txwM8";
+  "sb_publishable_q81zcl_HC0sLoPIsBxmDzg_r424f7BY";
 
 function resolveSupabaseConfig() {
   return {

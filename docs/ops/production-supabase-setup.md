@@ -8,9 +8,10 @@ One-time and ongoing steps for the **owned production project** after leaving Lo
 
 ## 1. Create or claim project
 
-1. Supabase Dashboard → project `holzen-prod` (or transfer ownership from Lovable per their docs)
-2. Note **project ref** — store in team password manager, not in git
+1. Supabase Dashboard → project **holzen-prod** (`geqkxsnyqvhtascjghuu`)
+2. Note publishable key in password manager — do not commit keys to git
 3. Enable **Point-in-Time Recovery** if available on your plan
+4. Set Vault `holzen_project_url` to `https://geqkxsnyqvhtascjghuu.supabase.co` (see [staging-supabase-setup.md](staging-supabase-setup.md) §1b)
 
 ---
 
@@ -18,7 +19,7 @@ One-time and ongoing steps for the **owned production project** after leaving Lo
 
 ```sh
 npx supabase login
-npx supabase link --project-ref YOUR_PROD_REF
+npx supabase link --project-ref geqkxsnyqvhtascjghuu
 npm run prod:deploy   # db push + all edge functions (after preflight locally)
 ```
 

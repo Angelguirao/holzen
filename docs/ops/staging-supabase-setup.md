@@ -8,19 +8,29 @@ One-time (and ongoing) steps for the **owned staging project** used while leavin
 
 ## 1. Create project
 
-1. Supabase Dashboard → New project → e.g. `holzen-staging`
-2. Note **project ref** (subdomain) — store in team password manager, not in git
+1. Supabase Dashboard → project **holzen-staging** (`ksplyxxdvandkwzundql`)
+2. Note publishable key in password manager — do not commit keys to git
 
 ---
+
+## 1b. Vault project URL (before crons run)
+
+After linking staging, store the project base URL in Vault so pg_cron jobs target **this** project (old migrations still embed the retired Lovable ref):
+
+```sql
+SELECT vault.create_secret('https://ksplyxxdvandkwzundql.supabase.co', 'holzen_project_url');
+```
+
+On **holzen-prod**, use `https://geqkxsnyqvhtascjghuu.supabase.co`. Migration `20260524120000_pg_cron_rewrite_owned_project_url.sql` rewrites active crons when this secret exists at apply time; if you add the secret later, re-run the `UPDATE cron.job … replace` block from that migration in the SQL Editor.
 
 ## 2. Link CLI locally
 
 ```sh
 npx supabase login
-npx supabase link --project-ref YOUR_STAGING_REF
+npx supabase link --project-ref ksplyxxdvandkwzundql
 ```
 
-Committed [`supabase/config.toml`](../../supabase/config.toml) keeps prod `project_id` for Lovable until cutover; **link metadata** in `.supabase/` points CLI at staging on your machine.
+Committed [`supabase/config.toml`](../../supabase/config.toml) `project_id` is **holzen-prod** (`geqkxsnyqvhtascjghuu`); **link metadata** in `.supabase/` points the CLI at staging on your machine when you `supabase link --project-ref ksplyxxdvandkwzundql`.
 
 Optional: set `SUPABASE_STAGING_PROJECT_REF` in shell or `.env.staging.local` for scripts.
 
