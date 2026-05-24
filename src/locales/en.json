@@ -31,6 +31,13 @@
     "intelligence": "Intelligence",
     "reach": "Reach"
   },
+  "comingSoon": {
+    "metaTitle": "Holzen — Coming soon",
+    "metaDescription": "Holzen helps Bitcoin holders pause before they act. We're not open to the public yet.",
+    "headline": "Coming soon",
+    "body": "We're building a pause-first space for when markets move. Sign-ups and the full app aren't available yet — check back soon.",
+    "contact": "hello@holzen.app"
+  },
   "common": {
     "back": "Back",
     "close": "Close",
