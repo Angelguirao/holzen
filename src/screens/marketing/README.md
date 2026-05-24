@@ -2,6 +2,8 @@
 
 Public routes (no auth shell). Shared marketing chrome: `components/PublicFooter.tsx`. Other section components under `components/`.
 
+| `hooks/` | Route conductors (`use-auth-screen`, `use-reset-password-screen`, `use-unsubscribe-screen`) |
+
 | Screen | Route |
 |--------|-------|
 | `LandingScreen` | `/welcome` (and public entry) |

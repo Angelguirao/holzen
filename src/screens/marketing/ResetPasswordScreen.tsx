@@ -1,40 +1,24 @@
-import { useActionState, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { subscribePasswordRecoveryReady } from '@/features/auth/public';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useTranslation } from 'react-i18next';
 import { PageHeading } from '@/components/ui/page-heading';
 import { LoadingButton } from '@/components/ui/loading-button';
-import { resetPasswordAction } from '@/screens/marketing/reset-password-action';
+import { useResetPasswordScreen } from '@/screens/marketing/hooks/use-reset-password-screen';
 
 const ResetPasswordScreen = () => {
-  const { t } = useTranslation();
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [ready, setReady] = useState(false);
-  const [state, formAction, isPending] = useActionState(resetPasswordAction, {});
-  const navigate = useNavigate();
-
-  useEffect(() => subscribePasswordRecoveryReady(() => setReady(true)), []);
-
-  useEffect(() => {
-    if (state.success) {
-      setSuccess(true);
-      const timer = setTimeout(() => navigate('/', { replace: true }), 2000);
-      return () => clearTimeout(timer);
-    }
-    if (state.error === 'passwords_mismatch') {
-      setError(t('auth.passwordsDoNotMatch'));
-    } else if (state.error === 'password_too_short') {
-      setError(t('auth.passwordTooShort'));
-    } else if (state.error) {
-      setError(state.error);
-    }
-  }, [state.success, state.error, t, navigate]);
+  const {
+    t,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    error,
+    setError,
+    success,
+    ready,
+    formAction,
+    isPending,
+  } = useResetPasswordScreen();
 
   if (success) {
     return (
