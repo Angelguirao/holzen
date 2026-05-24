@@ -82,7 +82,7 @@ export function useSubscription() {
   const [isTrialPending, startTrialTransition] = useTransition();
   const [isPortalPending, startPortalTransition] = useTransition();
   const [checkoutLoadingTarget, setCheckoutLoadingTarget] = useState<
-    'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' | null
+    'pro' | 'flex_pack_s' | 'flex_pack_m' | null
   >(null);
   const lastLoggedSubRef = useRef<{ subscribed: boolean; monthlyRemaining: number | undefined } | null>(null);
 
@@ -193,7 +193,7 @@ export function useSubscription() {
   }, [loading, subscribed, tier, monthlyRemaining, monthlyUsed, companionRemaining, wallpaperRemaining, insightsRemaining, flexCreditsBalance]);
 
   const startCheckout = useCallback((
-    target: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' = 'pro',
+    target: 'pro' | 'flex_pack_s' | 'flex_pack_m' = 'pro',
     options?: { reactivation?: boolean },
   ) => {
     holzenLog.subscription('checkout', { action: 'start', target });
@@ -207,7 +207,6 @@ export function useSubscription() {
             ? { checkoutKind: target }
             : {
                 checkoutKind: 'subscription',
-                planTier: target,
                 reactivation: options?.reactivation === true,
               },
         );

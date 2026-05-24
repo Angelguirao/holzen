@@ -9,7 +9,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const PLAN_TIERS = new Set(["pro", "pro_plus"]);
 const FLEX_PACK_TYPES = new Set<FlexPackType>(["flex_pack_s", "flex_pack_m"]);
 
 serve(
@@ -38,33 +37,25 @@ serve(
     }
 
     const origin = req.headers.get("origin") || "http://localhost:3000";
-    let requestedTier = "pro";
     let checkoutKind: "subscription" | FlexPackType = "subscription";
     let reactivation = false;
     try {
       const body = await req.json();
-      const rawTier = typeof body?.planTier === "string" ? body.planTier.trim().toLowerCase() : "pro";
-      requestedTier = PLAN_TIERS.has(rawTier) ? rawTier : "pro";
       const rawKind = typeof body?.checkoutKind === "string" ? body.checkoutKind.trim().toLowerCase() : "subscription";
       if (FLEX_PACK_TYPES.has(rawKind as FlexPackType)) {
         checkoutKind = rawKind as FlexPackType;
       }
       reactivation = body?.reactivation === true;
     } catch {
-      requestedTier = "pro";
       checkoutKind = "subscription";
     }
 
     const priceIdPro = Deno.env.get("STRIPE_PRICE_ID_PRO");
-    const priceIdProPlus = Deno.env.get("STRIPE_PRICE_ID_PRO_PLUS");
     const priceIdPackS = Deno.env.get("STRIPE_PRICE_ID_FLEX_PACK_S");
     const priceIdPackM = Deno.env.get("STRIPE_PRICE_ID_FLEX_PACK_M");
-    if (checkoutKind === "subscription" && requestedTier === "pro_plus" && !priceIdProPlus) {
-      throw new Error("Missing STRIPE_PRICE_ID_PRO_PLUS for pro_plus checkout");
-    }
 
     const selectedPriceId = checkoutKind === "subscription"
-      ? (requestedTier === "pro_plus" ? priceIdProPlus : priceIdPro)
+      ? priceIdPro
       : checkoutKind === "flex_pack_s"
         ? priceIdPackS
         : priceIdPackM;
@@ -87,11 +78,11 @@ serve(
           metadata: {
             user_id: user.id,
             checkout_kind: "subscription",
-            plan_tier: requestedTier,
+            plan_tier: "pro",
           },
           subscription_data: {
             description: "Holzen — Bitcoin self-awareness companion",
-            metadata: { plan_tier: requestedTier, user_id: user.id },
+            metadata: { plan_tier: "pro", user_id: user.id },
           },
         })
       : await stripe.checkout.sessions.create({

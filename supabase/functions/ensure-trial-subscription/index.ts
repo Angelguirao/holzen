@@ -100,7 +100,6 @@ serve(
         user.id,
         subscription,
         priceIdPro,
-        Deno.env.get("STRIPE_PRICE_ID_PRO_PLUS") ?? null,
       );
 
       log("trial_created", { subscription_id: subscription.id, status: subscription.status });

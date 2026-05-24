@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
-export type SubscriptionTier = "free" | "pro" | "pro_plus" | "lifetime";
+export type SubscriptionTier = "free" | "pro" | "lifetime";
 export type MeteredFeature = "premium_companion" | "wallpaper" | "reflection_insights";
 
 export interface TierLimits {
@@ -12,7 +12,6 @@ export interface TierLimits {
 const DEFAULT_LIMITS: Record<SubscriptionTier, TierLimits> = {
   free: { premium_companion: 0, wallpaper: 0, reflection_insights: 0 },
   pro: { premium_companion: 12, wallpaper: 5, reflection_insights: 4 },
-  pro_plus: { premium_companion: 30, wallpaper: 15, reflection_insights: 12 },
   // Lifetime should not hit package limits in normal usage.
   lifetime: { premium_companion: 999_999, wallpaper: 999_999, reflection_insights: 999_999 },
 };
@@ -59,7 +58,6 @@ export function resolveTierFromProfile(profile: {
 } | null | undefined): SubscriptionTier {
   if (profile?.lifetime_access) return "lifetime";
   if (!isActiveSubscriptionStatus(profile?.subscription_status)) return "free";
-  if (profile?.subscription_tier === "pro_plus") return "pro_plus";
   return "pro";
 }
 
@@ -71,10 +69,8 @@ export function tierFromStripePriceId(args: {
   hasActive: boolean;
   priceId: string | null;
   proPriceId: string | null;
-  proPlusPriceId: string | null;
 }): SubscriptionTier {
   if (!args.hasActive) return "free";
-  if (args.priceId && args.proPlusPriceId && args.priceId === args.proPlusPriceId) return "pro_plus";
   if (args.priceId && args.proPriceId && args.priceId === args.proPriceId) return "pro";
   // Backward compatibility: any active subscription defaults to Pro.
   return "pro";

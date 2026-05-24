@@ -631,7 +631,6 @@ export function CheckoutConfirmation() {
   }, [mode]);
 
   const tierLabel = useMemo(() => {
-    if (sub.tier === 'pro_plus') return 'Pro+';
     if (sub.tier === 'pro') return 'Pro';
     if (sub.tier === 'lifetime') return 'Lifetime';
     return 'Pro';
@@ -957,16 +956,9 @@ export function CheckoutConfirmation() {
             isTrialing,
             trialStart: trialStart ? dateFmt.format(trialStart) : null,
             firstChargeAt: firstChargeAt ? dateFmt.format(firstChargeAt) : null,
-            monthlyPrice:
-              sub.tier === 'pro_plus'
-                ? `$${PRICING.proPlusMonthlyPrice.toFixed(2)}`
-                : `$${PRICING.monthlyPrice.toFixed(2)}`,
-            companionUnlocks:
-              sub.tier === 'pro_plus'
-                ? PRICING.proPlusCompanionUnlocks
-                : PRICING.proCompanionUnlocks,
-            wallpapers:
-              sub.tier === 'pro_plus' ? PRICING.proPlusWallpapers : PRICING.proWallpapers,
+            monthlyPrice: `$${PRICING.monthlyPrice.toFixed(2)}`,
+            companionUnlocks: PRICING.proCompanionUnlocks,
+            wallpapers: PRICING.proWallpapers,
             flexCreditsBalance: currentBalance,
           }
         : {
@@ -1214,27 +1206,15 @@ export function CheckoutConfirmation() {
               />
               <SummaryRow
                 label="Monthly price"
-                value={
-                  sub.tier === 'pro_plus'
-                    ? `$${PRICING.proPlusMonthlyPrice.toFixed(2)}`
-                    : `$${PRICING.monthlyPrice.toFixed(2)}`
-                }
+                value={`$${PRICING.monthlyPrice.toFixed(2)}`}
               />
               <SummaryRow
                 label="Pause companions / month"
-                value={
-                  sub.tier === 'pro_plus'
-                    ? String(PRICING.proPlusCompanionUnlocks)
-                    : String(PRICING.proCompanionUnlocks)
-                }
+                value={String(PRICING.proCompanionUnlocks)}
               />
               <SummaryRow
                 label="Wallpapers / month"
-                value={
-                  sub.tier === 'pro_plus'
-                    ? String(PRICING.proPlusWallpapers)
-                    : String(PRICING.proWallpapers)
-                }
+                value={String(PRICING.proWallpapers)}
               />
               <SummaryRow
                 label="Flex credits balance"
