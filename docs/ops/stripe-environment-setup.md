@@ -54,7 +54,14 @@ Account: **Holzen** (connected). You need **Developers → API keys** and **Deve
 
 ## Supabase Edge secrets (both projects)
 
-Set in **Dashboard → Project Settings → Edge Functions → Secrets** (or `supabase secrets set --project-ref …`).
+Copy `.env.staging.secrets.example` → `.env.staging.secrets` (test Stripe) or `.env.prod.secrets.example` → `.env.prod.secrets` (live Stripe), fill values, then:
+
+```sh
+npm run staging:secrets-set   # holzen-staging
+npm run prod:secrets-set      # holzen-prod
+```
+
+Or set manually in **Dashboard → Project Settings → Edge Functions → Secrets**.
 
 | Secret | Staging | Production |
 |--------|---------|------------|

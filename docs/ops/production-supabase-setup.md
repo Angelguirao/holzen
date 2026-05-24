@@ -91,6 +91,8 @@ Do **not** set these on owned Supabase projects:
 
 Full inventory: [platform-exit-runbook.md](platform-exit-runbook.md) Phase 3–4.
 
+**Apply via CLI:** copy [.env.prod.secrets.example](../../.env.prod.secrets.example) → `.env.prod.secrets`, then `npm run prod:secrets-set`. Stripe details: [stripe-environment-setup.md](stripe-environment-setup.md).
+
 ---
 
 ## 5. Auth, email, and webhooks
