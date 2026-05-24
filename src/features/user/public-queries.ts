@@ -19,6 +19,7 @@ export {
   PROFILE_QUERY_KEY,
   type ProfileRow,
 } from './infrastructure/queries/profile-row-query';
+export { subscribeProfileLastContextUpdates } from './infrastructure/realtime/profile-last-context-realtime';
 export { getHoldGoalProfileQueryOptions } from './infrastructure/queries/hold-goal-profile-query';
 export {
   REFERRAL_QUERY_DISABLED_USER_ID,

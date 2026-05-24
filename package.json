@@ -31,6 +31,7 @@
     "check:feature-imports": "node scripts/check-feature-imports.mjs",
     "check:architecture-alignment": "node scripts/check-architecture-alignment.mjs",
     "check:no-supabase-in-screens": "node scripts/check-no-supabase-in-screens.mjs",
+    "check:no-supabase-in-app": "node scripts/check-no-supabase-in-app.mjs",
     "check:no-root-components": "node scripts/check-no-root-components.mjs",
     "check:posthog-events-allowlist": "node scripts/check-posthog-events-allowlist.mjs",
     "smoke:edge-logging": "node scripts/smoke-edge-logging.mjs",

@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/public';
-import { getProfileRowQueryOptions } from '@/features/user/public-queries';
+import {
+  getProfileRowQueryOptions,
+  subscribeProfileLastContextUpdates,
+} from '@/features/user/public-queries';
 
 /**
  * Listens for server-side auto-triggered pause notifications via realtime subscription
@@ -49,31 +51,13 @@ export function useAutoTrigger() {
   useEffect(() => {
     if (!userId) return;
 
-    const channel = supabase
-      .channel(`auto-trigger-${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'profiles',
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload) => {
-          if (!initializedRef.current) return;
-          const row = payload.new as { last_context?: string | null };
-          const newContext = row?.last_context;
-          if (newContext && newContext !== lastContextRef.current) {
-            lastContextRef.current = newContext;
-            setPauseReady(true);
-          }
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return subscribeProfileLastContextUpdates(userId, `auto-trigger-${userId}`, (newContext) => {
+      if (!initializedRef.current) return;
+      if (newContext && newContext !== lastContextRef.current) {
+        lastContextRef.current = newContext;
+        setPauseReady(true);
+      }
+    });
     // Depend only on user.id — the `user` object reference can change on token
     // refresh / re-emission and would otherwise tear down + resubscribe the channel.
   }, [userId]);
