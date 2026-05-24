@@ -72,6 +72,12 @@ else
   fail_check "unsafe view migration(s) detected — fix before pushing (see output above)"
 fi
 
+if node scripts/check-sql-search-path.mjs; then
+  ok "all migration functions pin public search_path"
+else
+  fail_check "function search_path check failed — see docs/ops/migration-security-conventions.md"
+fi
+
 # ---- 2. config.toml coverage -------------------------------------------------
 step "2/6  Edge functions registered in supabase/config.toml"
 

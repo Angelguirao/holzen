@@ -58,6 +58,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run test:watch` | Vitest watch mode |
 | `npm run lint` | ESLint across the repo |
 | `npm run check:view-migrations` | Fail on unsafe `CREATE OR REPLACE VIEW` column renames in `supabase/migrations/` (runs in **`check:prepush`**). |
+| `npm run check:sql-search-path` | Every migration function must pin `public` in `search_path` (in **`test:ci`** + **`check:prepush`**) |
 | `npm run check:edge` | Optional: `deno check` on all `supabase/functions/*/index.ts`; **skips** if Deno is missing. Resolves `deno` from PATH, then `DENO_INSTALL/bin`, then `~/.deno/bin` (official installer default). |
 | `npm run check:edge-logging` | Regex guardrail: HTTP-serving edge `index.ts` files must wrap handlers in `withRequestLogging` (BetterStack + Sentry). Runs in **`test:ci`** and **`check:prepush`**. |
 | `npm run check:edge-coverage-manifest` | Ensures `src/screens/ops/EdgeCoverageScreen.tsx` `COVERAGE` lists every `supabase/config.toml` `[functions.*]` name (and no extras). Run when adding/removing edge functions. |
