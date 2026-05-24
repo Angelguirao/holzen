@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { getPostHog, trackEvent } from '@/lib/posthog';
 import type { OpenFeedbackDetail } from '@/app/components/ErrorBoundary';
-import { submitFeedbackAction } from '@/screens/settings/feedback-action';
+import { submitFeedbackAction } from '@/features/user/public';
 
 type Category = 'bug' | 'feature' | 'question';
 

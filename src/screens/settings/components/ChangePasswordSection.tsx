@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
   changePasswordAction,
-} from '@/screens/settings/change-password-action';
+} from '@/features/auth/public';
 
 export function ChangePasswordSection() {
   const { t } = useTranslation();

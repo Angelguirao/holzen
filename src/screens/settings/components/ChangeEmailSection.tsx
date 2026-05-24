@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { changeEmailAction } from '@/screens/settings/change-email-action';
+import { changeEmailAction } from '@/features/auth/public';
 
 export function ChangeEmailSection() {
   const { t } = useTranslation();

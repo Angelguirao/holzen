@@ -12,7 +12,7 @@
 | `hooks/use-settings-state.ts` | Context consumer |
 | `settings-context.tsx` | React context |
 | `section-ids.ts` | Route section param types |
-| `read-thrown-message.ts` | Auth error message helper |
+| Account/credential actions | `@/features/auth/public`, `@/features/user/public` (presentation I/O barrels) |
 | `components/` | Section panels, hub UI, email change |
 | `hooks/` | `use-settings-model.ts`, `use-latest-changelog-version.ts`; auth/subscription via `@/features/*/public` and `public-hooks` |
 
