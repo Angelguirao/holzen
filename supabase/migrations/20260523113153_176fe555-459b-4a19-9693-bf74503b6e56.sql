@@ -43,7 +43,5 @@ DROP POLICY IF EXISTS "Authenticated users can read companion catalog" ON public
 CREATE POLICY "Admins can manage companion catalog" ON public.companion_catalog FOR ALL USING (public.is_admin());
 CREATE POLICY "Authenticated users can read companion catalog" ON public.companion_catalog FOR SELECT USING (auth.role() = 'authenticated');
 
-INSERT INTO supabase_migrations.schema_migrations (version, name, statements) VALUES
-  ('20260523140100','companion_catalog_recreate_if_missing', ARRAY['-- applied via combined migration']),
-  ('20260523150000','keep_reflection_text_artifact_kind', ARRAY['-- no-op: reflection_text retained'])
-ON CONFLICT (version) DO NOTHING;
+COMMENT ON TABLE public.companion_catalog IS
+  'Curated essays, papers, and events for companion catalog phase (recreate path when content_library was dropped).';
