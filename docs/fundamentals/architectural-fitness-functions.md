@@ -88,6 +88,7 @@ Scripts live under `scripts/`. See script headers for exact rules and allowlists
 | `check:no-screens-in-features` | Via architecture-alignment | Features must not import `@/screens/` |
 | `check:screen-form-action-barrels` | Via architecture-alignment | `src/screens/**/*-action.ts` re-exports only (no inline `export async function` I/O) |
 | `check:no-posthog-in-screens` | Via architecture-alignment | No direct `@/lib/posthog` in `src/screens/**` (feature telemetry I/O or `app/lib`) |
+| `check:no-posthog-in-app` | Via architecture-alignment | No direct `@/lib/posthog` in `src/app/**` except allowlisted widgets + `app/lib/*-telemetry.ts` |
 | `check:no-root-components` | Yes | No new `src/components/*.tsx` outside allowlist |
 
 ### 4.3 Edge platform

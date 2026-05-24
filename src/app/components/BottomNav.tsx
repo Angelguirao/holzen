@@ -3,7 +3,7 @@ import { Home, Folder, Compass, Settings as SettingsIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { APP_SHELL_TABS, JOURNEY_PREFIX, type AppShellTabKey } from '@/lib/app-routes';
-import { trackEvent } from '@/lib/posthog';
+import { trackPrimaryTabOpened } from '@/app/lib/navigation-telemetry';
 
 export type PrimaryTabKey = AppShellTabKey;
 
@@ -41,7 +41,7 @@ export function BottomNav() {
               end={to === '/'}
               onClick={() => {
                 if (!isPrimaryTabActive(pathname, key)) {
-                  trackEvent('navigation.primary_tab_opened', { tab: key });
+                  trackPrimaryTabOpened(key);
                 }
               }}
               className={() =>
