@@ -5,6 +5,11 @@ import { EdgeError } from "../_shared/edge-error.ts";
 import { logDependencyCall } from "../_shared/deps.ts";
 import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 import { sendTransactionalEmail } from "../_shared/transactional-email.ts";
+import {
+  prefixEmailSubject,
+  resolveFeedbackInbox,
+  resolveNotifyFromAddress,
+} from "../_shared/email-env.ts";
 
 const escapeHtml = (str: string) =>
   str
@@ -134,9 +139,9 @@ serve(
       // browser is de-duped by Lovable inside the 24h window.
       void sendTransactionalEmail(
         {
-          from: "Holzen Feedback <notify@notify.holzen.app>",
-          to: ["hello@holzen.app"],
-          subject: `${CATEGORY_EMOJI[category] || ""} [${category.toUpperCase()}] New feedback from ${escapeHtml(user.email || "")}`,
+          from: resolveNotifyFromAddress("Holzen Feedback"),
+          to: [resolveFeedbackInbox()],
+          subject: prefixEmailSubject(`${CATEGORY_EMOJI[category] || ""} [${category.toUpperCase()}] New feedback from ${escapeHtml(user.email || "")}`),
           html,
         },
         {

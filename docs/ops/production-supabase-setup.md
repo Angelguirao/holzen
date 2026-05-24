@@ -60,8 +60,8 @@ Copy staging values where appropriate; swap to **live** vendor keys where noted.
 | `GOOGLE_AI_API_KEY` | Primary Gemini |
 | `OPENROUTER_API_KEY` | Recommended failover |
 | `PERPLEXITY_API_KEY` | Companions / library ingest |
-| `RESEND_API_KEY` | Transactional + auth email sends |
-| `RESEND_WEBHOOK_SECRET` | Resend → `handle-email-suppression` |
+| `RESEND_API_KEY` | Production-only Resend API key |
+| `RESEND_WEBHOOK_SECRET` | Resend → prod `handle-email-suppression` |
 | `SEND_EMAIL_HOOK_SECRET` | Supabase Auth Send Email Hook → `auth-email-hook` |
 | `STRIPE_SECRET_KEY` | **Live** mode (`sk_live_…` or restricted `rk_live_…`) |
 | `STRIPE_WEBHOOK_SECRET` | Stripe Dashboard → **live** webhook → `…/functions/v1/stripe-webhook` on this project |
@@ -97,7 +97,7 @@ Full inventory: [platform-exit-runbook.md](platform-exit-runbook.md) Phase 3–4
 
 ## 5. Auth, email, and webhooks
 
-See [platform-exit-runbook.md](platform-exit-runbook.md) § Auth & email:
+See [platform-exit-runbook.md](platform-exit-runbook.md) § Auth & email and [resend-environment-setup.md](resend-environment-setup.md):
 
 1. **Google OAuth** — Supabase Auth → Providers → Google (prod redirect URLs)
 2. **Send Email Hook** — `https://<prod-ref>.supabase.co/functions/v1/auth-email-hook`

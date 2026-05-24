@@ -9,6 +9,7 @@ import webpush from "https://esm.sh/web-push@3.6.7";
 import { withRequestLogging, type RequestLoggingContext } from "../_shared/with-request-logging.ts";
 import { createCidSupabaseClient, sendWebPushWithCid } from "../_shared/cid-clients.ts";
 import { webPushStatusCode } from "../_shared/log-unknown-error.ts";
+import { resolveVapidMailto } from "../_shared/email-env.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -169,7 +170,7 @@ serve(
 
       if (pushSubs && pushSubs.length > 0) {
         const privateKey = await resolveVapidPrivateKey(vapidPrivateRaw, log);
-        webpush.setVapidDetails("mailto:noreply@holzen.app", vapidPublic, privateKey);
+        webpush.setVapidDetails(resolveVapidMailto(), vapidPublic, privateKey);
 
         const isSub = body.mode === "subscription";
         const title = isSub

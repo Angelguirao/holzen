@@ -6,6 +6,7 @@ import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { redactEmailForLog } from "./email-log-helpers.ts";
 import { sendTransactionalEmail, type EmailDeliveryLogger } from "./transactional-email.ts";
+import { prefixEmailSubject, resolveNotifyFromAddress } from "./email-env.ts";
 
 /** Matches `ReturnType<typeof createLogger>` — callers pass `log` from `withRequestLogging`. */
 export interface ReferralRecordLogger {
@@ -120,9 +121,9 @@ async function sendRewardEmail(
   // only delivers this reward email once per 24h window.
   const result = await sendTransactionalEmail(
     {
-      from: "Holzen <notify@holzen.app>",
+      from: resolveNotifyFromAddress(),
       to: [email],
-      subject: `Holzen — You earned ${rewardLabel}`,
+      subject: prefixEmailSubject(`Holzen — You earned ${rewardLabel}`),
       html,
     },
     {
