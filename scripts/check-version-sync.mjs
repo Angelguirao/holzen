@@ -60,10 +60,26 @@ async function fetchLatestChangelogVersion({ url, publishableKey }) {
   }
 }
 
+function isChangelogTableMissing(err) {
+  const msg = err instanceof Error ? err.message : String(err);
+  return msg.includes("PGRST205") || msg.includes("changelog_entries");
+}
+
 async function main() {
   const packageVersion = await readPackageVersion();
   const config = resolveSupabaseConfig();
-  const changelogVersion = await fetchLatestChangelogVersion(config);
+  let changelogVersion;
+  try {
+    changelogVersion = await fetchLatestChangelogVersion(config);
+  } catch (err) {
+    if (isChangelogTableMissing(err)) {
+      console.warn(
+        "Version sync skipped: changelog_entries not on this Supabase project yet (run prod migrations first).",
+      );
+      return;
+    }
+    throw err;
+  }
 
   if (packageVersion !== changelogVersion) {
     console.error("Version sync check failed.");

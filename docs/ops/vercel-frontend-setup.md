@@ -79,6 +79,42 @@ Project → Settings → Environment Variables:
 
 Preview deployments should point at **staging Supabase**, not production — use Vercel **Preview** environment scope for staging keys.
 
+To sync Production vars from local `.env.hosted` / `.env.staging.local`:
+
+```sh
+node scripts/vercel-sync-env.mjs
+```
+
+Preview vars may require the dashboard (“All Previews”) if the CLI asks for a Git branch and the repo is not linked yet.
+
+### Preview environment (dashboard copy-paste)
+
+In Vercel → **holzen** → Settings → Environment Variables, add each row to **Preview** and choose **All Previews** (not Production). Values for staging come from [`.env.staging.example`](../../.env.staging.example) / your gitignored `.env.staging.local`.
+
+| Variable | Value (Preview) | Notes |
+|----------|-----------------|--------|
+| `VITE_SUPABASE_PROJECT_ID` | `ksplyxxdvandkwzundql` | holzen-staging |
+| `VITE_SUPABASE_URL` | `https://ksplyxxdvandkwzundql.supabase.co` | |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Staging **publishable** key from Supabase → Project Settings → API | Never the service role key |
+| `VITE_APP_VERSION` | `$VERCEL_GIT_COMMIT_SHA` | Same as Production; ties to edge `SENTRY_RELEASE` |
+| `VITE_SITE_ORIGIN` | *(optional)* preview deployment URL | Omit to use `https://holzen.app` fallback from `vite.config.ts` |
+| `VITE_POSTHOG_KEY` | Same as prod or a staging PostHog project key | Optional for PR analytics |
+| `VITE_POSTHOG_HOST` | `https://eu.i.posthog.com` | Match prod if using one PostHog project |
+| `VITE_ADMIN_USER_IDS` | *(empty or comma UUIDs)* | Optional `/admin` gate on previews |
+| `VITE_SENTRY_DSN` | *(optional)* | Frontend errors on preview |
+
+**Production** (already set via CLI; re-sync with `node scripts/vercel-sync-env.mjs`):
+
+| Variable | Value (Production) |
+|----------|-------------------|
+| `VITE_SUPABASE_PROJECT_ID` | `geqkxsnyqvhtascjghuu` |
+| `VITE_SUPABASE_URL` | `https://geqkxsnyqvhtascjghuu.supabase.co` |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Prod publishable key (`.env.hosted`) |
+| `VITE_APP_VERSION` | `$VERCEL_GIT_COMMIT_SHA` |
+| `VITE_SITE_ORIGIN` | `https://holzen.app` |
+| `VITE_POSTHOG_KEY` / `VITE_POSTHOG_HOST` | From `.env.hosted` |
+| `VITE_ADMIN_USER_IDS` | From `.env.hosted` |
+
 ---
 
 ## 3. Custom domain

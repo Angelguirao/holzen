@@ -24,6 +24,7 @@ export {
   signInWithOAuthGoogle,
   signOutAuth,
   signUpWithEmailPassword,
+  subscribePasswordRecoveryReady,
   updateUserEmail,
   updateUserPassword,
   type AuthMutationResult,
