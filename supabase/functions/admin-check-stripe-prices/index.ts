@@ -18,7 +18,6 @@ const corsHeaders = {
 
 const REQUIRED = [
   { secret: "STRIPE_PRICE_ID_PRO", label: "Pro subscription", expected: "recurring" },
-  { secret: "STRIPE_PRICE_ID_PRO_PLUS", label: "Pro+ subscription", expected: "recurring" },
   { secret: "STRIPE_PRICE_ID_FLEX_PACK_S", label: "Flex pack S", expected: "one_time" },
   { secret: "STRIPE_PRICE_ID_FLEX_PACK_M", label: "Flex pack M", expected: "one_time" },
 ] as const;

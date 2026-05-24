@@ -46,7 +46,6 @@ function parseSubscriptionEndIso(sub: Stripe.Subscription): string | null {
 export function profileFieldsFromStripeSubscription(
   sub: Stripe.Subscription,
   proPriceId: string | null,
-  proPlusPriceId: string | null,
 ): {
   subscription_status: string;
   subscription_tier: SubscriptionTier;
@@ -61,7 +60,6 @@ export function profileFieldsFromStripeSubscription(
         hasActive: true,
         priceId,
         proPriceId,
-        proPlusPriceId,
       }),
       subscription_end: parseSubscriptionEndIso(sub),
     };
@@ -125,8 +123,7 @@ export async function syncProfileFromStripeSubscription(
   userId: string,
   sub: Stripe.Subscription,
   proPriceId: string | null,
-  proPlusPriceId: string | null,
 ): Promise<void> {
-  const fields = profileFieldsFromStripeSubscription(sub, proPriceId, proPlusPriceId);
+  const fields = profileFieldsFromStripeSubscription(sub, proPriceId);
   await writeProfileSubscriptionCache(svcClient, userId, fields);
 }
