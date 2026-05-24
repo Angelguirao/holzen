@@ -19,7 +19,11 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Require staging deploy secrets
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Require full staging environment
         env:
           VITE_SUPABASE_STAGING_URL: ${{ secrets.VITE_SUPABASE_STAGING_URL }}
           VITE_SUPABASE_STAGING_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_STAGING_PUBLISHABLE_KEY }}
@@ -28,7 +32,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: node scripts/check-cicd-secrets.mjs --profile=staging
+        run: node scripts/check-cicd-env.mjs --profile=staging --platform=all
 
   preflight:
     needs: validate-secrets

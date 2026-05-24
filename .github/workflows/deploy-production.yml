@@ -20,7 +20,11 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Require production deploy secrets
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Require full production environment
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
@@ -29,7 +33,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: node scripts/check-cicd-secrets.mjs --profile=production
+        run: node scripts/check-cicd-env.mjs --profile=production --platform=all
 
   preflight:
     needs: validate-secrets
