@@ -61,6 +61,9 @@
     "prod:functions-deploy": "node scripts/staging-deploy.mjs functions",
     "prod:deploy": "node scripts/staging-deploy.mjs deploy",
     "prod:secrets-set": "node scripts/supabase-secrets-set.mjs .env.prod.secrets geqkxsnyqvhtascjghuu",
+    "mcp:setup": "node scripts/setup-mcp.mjs",
+    "mcp:sync-secrets": "node scripts/sync-mcp-secrets.mjs",
+    "mcp:check": "node scripts/setup-mcp.mjs --check",
     "design:lint": "npx --yes @google/design.md lint DESIGN.md"
   },
   "dependencies": {
