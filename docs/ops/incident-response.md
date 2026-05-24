@@ -32,11 +32,11 @@ Pre-PMF we're a team of one. "On-call" means: Slack unmuted during waking hours;
    - `log_drain_configured: true` → forwarder wired.
    - `503 degraded` → DB unreachable. Focus there first.
 5. **Check last 3 deploys by release**. Sentry → Releases. A regression usually matches a deploy timestamp.
-   - Frontend: Lovable shows the latest published build.
-   - Edges: GitHub commit history; the last sync to Lovable is the latest deploy.
+   - **Frontend:** Vercel → Deployments (production on `main`). Note the Git SHA and compare to `VITE_APP_VERSION`.
+   - **Edges:** GitHub Actions deploy log or Supabase Edge Functions deploy history for the matching commit.
 6. **Form a hypothesis**. One of:
-   - **Deploy regression** — revert via Lovable (frontend) or create a fix commit for edges.
-   - **Provider outage** — check Anthropic / Perplexity / Lovable / Stripe status pages. See `dep.error` in BetterStack for the service name. Mitigate: flip an app-config flag if available (e.g. `guardAiFeature` → disable); communicate if user-facing.
+   - **Deploy regression** — Vercel Instant Rollback (frontend) or revert/fix commit for edges + migrations.
+   - **Provider outage** — check Google AI / OpenRouter / Perplexity / Resend / Stripe status pages. See `dep.error` in BetterStack for the service name. Mitigate: flip an app-config flag if available (e.g. `guardAiFeature` → disable); communicate if user-facing.
    - **DB issue** — RLS regression, unique-constraint violation, pg_cron silence. Query the DB directly; match `cid` against `analytics_events`, `generation_attempts`, `audit_log`.
    - **User-input class** — `auth_required`, `rate_limited`, `bad_input`, `not_found` should NOT create Sentry issues (skip-list in `scrubPiiEdge`). If they do, the skip-list regressed.
 7. **Mitigate**. Quickest reversible action first.
@@ -65,7 +65,7 @@ Pre-PMF we're a team of one. "On-call" means: Slack unmuted during waking hours;
 ### Scenario: UptimeRobot `/health` 503
 
 1. Open `/health` response. If `status: degraded, error: db_unreachable`, DB is the issue.
-2. Check Supabase (via Lovable if dashboard access absent) for ongoing incident.
+2. Check **Supabase Dashboard** (staging or prod) for ongoing platform incident or connection limits.
 3. If DB is fine but `/health` still 503, check edge function logs for boot failures (import errors, missing env).
 
 ### Scenario: Cron heartbeat miss

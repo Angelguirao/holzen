@@ -19,7 +19,7 @@ Click-paths and config for the Holzen observability stack. This is the setup sou
 | **BetterStack (Logtail)** | Edge log aggregation, search, alerting | All structured JSON from `observe.ts` + cron heartbeats |
 | **UptimeRobot** | Uptime monitoring | Frontend root URL + `/functions/v1/health` |
 | **Slack** (`#holzen-alerts`) | Unified alert inbox | All vendor alerts + feedback forwarder summaries |
-| **Backup email** (`alerts@...`) | Vendors without Slack integration | Anthropic budget, Supabase/Lovable limits |
+| **Backup email** (`alerts@...`) | Vendors without Slack integration | Google AI / OpenRouter budget, Supabase usage alerts |
 
 **Division of labor**: Sentry owns error workflow (group, resolve, regress). BetterStack owns log search, rate-based alerting, heartbeats. PostHog owns product signals. Postgres owns audit/compliance.
 
@@ -102,11 +102,11 @@ Edge CORS (`supabase/functions/_shared/cors.ts`) allow-lists those headers; `wit
 
 `createCidSupabaseClient(..., incomingRequest?)` forwards the same trace headers on service-role PostgREST/Auth HTTP calls when the optional **`Request`** is passed (see `_shared/forward-trace-headers.ts`); explicit `global.headers` from the caller still win.
 
-`fetchInitWithIncomingTrace(incomingRequest, init)` merges the same headers into a plain `fetch` **`RequestInit`** for outbound third-party calls (for example the Lovable AI gateway or price APIs) without overwriting keys already set in `init.headers`.
+`fetchInitWithIncomingTrace(incomingRequest, init)` merges the same headers into a plain `fetch` **`RequestInit`** for outbound third-party calls (for example **`llm-gateway`** Gemini/OpenRouter requests or price APIs) without overwriting keys already set in `init.headers`.
 
 BTC cache workers (`refresh-btc-prices`, `backfill-btc-prices`, `seed-btc-history`) and shared helpers such as **`fetchCoinGeckoHistoryPrice`** / **`warmMissingBtcPrices`** accept the incoming edge `Request` where applicable so CoinGecko, backup tickers, and CryptoCompare calls stay in the same trace when headers are present.
 
-**`callPerplexityChat(..., incoming?)`** forwards the same headers to Perplexity. **`companion-orchestrate`** passes the edge `Request` into signal, grounding, history, zoom-out, and **question-mode** `generateQuestion` (including regenerate-only) so live search and Lovable calls stay correlated with the client trace. **`generateUnifiedReflection`** accepts the same for **`holzen-reflect`** (browser Reflect step). Companion **structuring** steps (signal, grounding, history) forward the same headers on Lovable **`/chat/completions`**. **`fetchFeedXmlIfApplicable`** / **`firecrawlMapArticleUrls`** accept an optional incoming request for **`fetch-source-feeds`** outbound RSS and Firecrawl Map calls.
+**`callPerplexityChat(..., incoming?)`** forwards the same headers to Perplexity. **`companion-orchestrate`** passes the edge `Request` into signal, grounding, history, zoom-out, and **question-mode** `generateQuestion` (including regenerate-only) so live search and **`llm-gateway`** calls stay correlated with the client trace. **`generateUnifiedReflection`** accepts the same for **`holzen-reflect`** (browser Reflect step). Companion **structuring** steps (signal, grounding, history) forward the same headers on Gemini API calls via **`llm-gateway`**. **`fetchFeedXmlIfApplicable`** / **`firecrawlMapArticleUrls`** accept an optional incoming request for **`fetch-source-feeds`** *(legacy Tier B)* outbound RSS and Firecrawl Map calls.
 
 This is **not** a full OpenTelemetry SDK in-app — it aligns propagation and log fields with **W3C Trace Context** and common **OTel collector pivots** (`trace_id`, parent span id, trace flags / sampled) so downstream OTLP or log pipelines can reuse the same identifiers without a browser-side `@opentelemetry/*` bundle.
 
@@ -186,7 +186,7 @@ Each targets source `holzen-edges`:
 
 ## 6. Cron heartbeats (BetterStack Heartbeats)
 
-**Storage model.** Heartbeat UUIDs live in the existing `public.app_config` table (keys of the form `heartbeat.<job_name>`), seeded with empty strings by migration [`20260420190000_cron_heartbeats_app_config.sql`](../../supabase/migrations/20260420190000_cron_heartbeats_app_config.sql). The `ALTER DATABASE postgres SET app.heartbeat_*` pattern from the earlier migration requires superuser privileges that Lovable-managed Supabase does not expose — `app_config` is the workaround.
+**Storage model.** Heartbeat UUIDs live in the existing `public.app_config` table (keys of the form `heartbeat.<job_name>`), seeded with empty strings by migration [`20260420190000_cron_heartbeats_app_config.sql`](../../supabase/migrations/20260420190000_cron_heartbeats_app_config.sql). The `ALTER DATABASE postgres SET app.heartbeat_*` pattern from the earlier migration requires superuser privileges that hosted Supabase does not expose on all tiers — `app_config` is the workaround.
 
 The helper `public.emit_job_heartbeat('<job_name>')` looks up the UUID and no-ops if it's still empty, so the migration can ship before UUIDs exist.
 
