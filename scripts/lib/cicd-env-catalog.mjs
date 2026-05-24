@@ -444,3 +444,52 @@ export const PLATFORM_LABELS = {
   "supabase-edge-staging": "Supabase Edge secrets (holzen-staging)",
   "supabase-edge-production": "Supabase Edge secrets (holzen-prod)",
 };
+
+/**
+ * Example / placeholder values for missing-variable output (not secrets — patterns only).
+ * @type {Record<string, string | Record<string, string>>}
+ */
+export const SUGGESTED_VALUES = {
+  VITE_SUPABASE_URL: {
+    ci: "https://geqkxsnyqvhtascjghuu.supabase.co",
+    production: "https://geqkxsnyqvhtascjghuu.supabase.co",
+    staging: "https://ksplyxxdvandkwzundql.supabase.co",
+  },
+  VITE_SUPABASE_STAGING_URL: "https://ksplyxxdvandkwzundql.supabase.co",
+  VITE_SUPABASE_PUBLISHABLE_KEY: "<prod-anon-key-from-supabase-dashboard>",
+  VITE_SUPABASE_STAGING_PUBLISHABLE_KEY: "<staging-anon-key-from-supabase-dashboard>",
+  VITE_SUPABASE_PROJECT_ID: {
+    production: "geqkxsnyqvhtascjghuu",
+    staging: "ksplyxxdvandkwzundql",
+  },
+  VITE_APP_VERSION: "$VERCEL_GIT_COMMIT_SHA",
+  VITE_SITE_ORIGIN: "https://holzen.app",
+  VITE_POSTHOG_HOST: "https://eu.i.posthog.com",
+  SUPABASE_STAGING_PROJECT_REF: "ksplyxxdvandkwzundql",
+  SUPABASE_PROD_PROJECT_REF: "geqkxsnyqvhtascjghuu",
+  SUPABASE_ACCESS_TOKEN: "<token-from-supabase.com/dashboard/account/tokens>",
+  VERCEL_TOKEN: "<token-from-vercel.com/account/tokens>",
+  VERCEL_ORG_ID: "<orgId-from-.vercel/project.json>",
+  VERCEL_PROJECT_ID: "<projectId-from-.vercel/project.json>",
+  SENTRY_ENVIRONMENT: { staging: "staging", production: "production" },
+  SENTRY_ORG: "holzen",
+  SENTRY_PROJECT: "holzen",
+  STRIPE_SECRET_KEY: {
+    staging: "sk_test_…",
+    production: "sk_live_…",
+  },
+  CRON_SECRET: "<random-high-entropy-string>",
+  LOG_DRAIN_URL: "https://in.logs.betterstack.com",
+};
+
+/** @param {string} name @param {string} [profile] */
+export function getSuggestedValue(name, profile) {
+  const entry = SUGGESTED_VALUES[name];
+  if (!entry) return null;
+  if (typeof entry === "string") return entry;
+  if (profile && entry[profile]) return entry[profile];
+  if (entry.staging) return entry.staging;
+  if (entry.production) return entry.production;
+  if (entry.ci) return entry.ci;
+  return null;
+}
