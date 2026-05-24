@@ -703,21 +703,6 @@ export function SettingsSubscriptionPanel() {
                   </p>
                   {tier !== 'lifetime' && (
                     <div className="grid grid-cols-1 gap-2">
-                      {tier === 'pro' && (
-                        <LoadingButton
-                          onClick={() => startCheckoutFromSettings('pro_plus')}
-                          loading={checkoutLoading && checkoutLoadingTarget === 'pro_plus'}
-                          disabled={checkoutLoading && checkoutLoadingTarget !== 'pro_plus'}
-                          loadingText={t('settings.openingCheckout')}
-                          className="w-full text-sm font-sans"
-                          size="sm"
-                        >
-                          {t('settings.upgradeToProPlusCta', {
-                            price: PRICING.proPlusMonthlyPrice.toFixed(2),
-                            defaultValue: 'Upgrade to Pro+ · ${{price}}/month',
-                          })}
-                        </LoadingButton>
-                      )}
                       <LoadingButton
                         onClick={() => startCheckoutFromSettings('flex_pack_s')}
                         loading={checkoutLoading && checkoutLoadingTarget === 'flex_pack_s'}
