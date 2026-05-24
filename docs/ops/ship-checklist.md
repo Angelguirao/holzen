@@ -6,6 +6,7 @@ Tick before calling launch **done**. Canonical detail: [launch-runbook.md](./lau
 
 ## You — before destructive cutover (§3.1)
 
+- [ ] **Production password gate** on Vercel until launch-ready ([vercel-frontend-setup.md](./vercel-frontend-setup.md) §5.1) — disable when opening to the public
 - [ ] Confirm **no real production users** on prod project (test/founder accounts disposable)
 - [ ] Stripe webhook + price secrets set in **Supabase Edge secrets**
 - [ ] Observability secrets per [observability-setup.md](./observability-setup.md) (Vercel + Supabase + CI)
