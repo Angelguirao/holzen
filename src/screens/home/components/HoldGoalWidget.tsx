@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
-import { useHolzen } from '@/app/components/HolzenProvider';
+import { useProfile } from '@/features/user/public-hooks';
 import {
   clearProfileHoldGoal,
   getProfileRowQueryOptions,
@@ -64,7 +64,7 @@ export function HoldGoalWidget({
   "use memo";
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { currency } = useHolzen();
+  const { currency } = useProfile();
   const { user } = useAuth();
   const userId = user?.id;
 

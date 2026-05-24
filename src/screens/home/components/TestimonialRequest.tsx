@@ -5,7 +5,7 @@ import { MessageCircle, X, Send } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/features/auth/public';
-import { useHolzen } from '@/app/components/HolzenProvider';
+import { useProfile } from '@/features/user/public-hooks';
 import { toast } from 'sonner';
 import { submitTestimonialAction } from '@/features/user/public';
 
@@ -34,7 +34,7 @@ interface Props {
 export function TestimonialRequest({ completedPauseCount }: Props) {
   "use memo";
   const { user } = useAuth();
-  const { firstName } = useHolzen();
+  const { firstName } = useProfile();
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [quote, setQuote] = useState('');

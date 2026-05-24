@@ -1,5 +1,5 @@
 import { useAuth } from '@/features/auth/public';
-import { useHolzen } from '@/app/components/HolzenProvider';
+import { useProfile } from '@/features/user/public-hooks';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useInstallPrompt } from '@/app/hooks/use-install-prompt';
 import { usePushNotifications } from '@/features/notifications/public-hooks';
@@ -52,7 +52,7 @@ export function useSettingsModel() {
     groundingActivities,
     setGroundingActivities,
     profileLoaded,
-  } = useHolzen();
+  } = useProfile();
   void _language;
 
   const {
