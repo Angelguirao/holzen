@@ -7,6 +7,14 @@ import {
   sendTransactionalEmail,
 } from "../_shared/transactional-email.ts";
 import {
+  prefixEmailSubject,
+  resolveEmailBrandName,
+  resolveEmailFromAddress,
+  resolveEmailAppUrl,
+  resolveEmailRootDomain,
+  resolveEmailSenderDomain,
+} from "../_shared/email-env.ts";
+import {
   templatePropsFromSupabaseHook,
   verifySupabaseAuthEmailHook,
 } from "../_shared/supabase-auth-email-hook.ts";
@@ -46,35 +54,30 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<AuthEmailTemplateProps
   reauthentication: ReauthenticationEmail as unknown as React.ComponentType<AuthEmailTemplateProps>,
 }
 
-const SITE_NAME = "holzen"
-const SENDER_DOMAIN = "notify.holzen.app"
-const ROOT_DOMAIN = "holzen.app"
-const FROM_DOMAIN = "holzen.app"
-
-const SAMPLE_PROJECT_URL = "https://holzen.app"
+const SAMPLE_PROJECT_URL = resolveEmailAppUrl()
 const SAMPLE_EMAIL = "user@example.test"
 const SAMPLE_DATA: Record<string, object> = {
   signup: {
-    siteName: SITE_NAME,
+    siteName: resolveEmailBrandName(),
     siteUrl: SAMPLE_PROJECT_URL,
     recipient: SAMPLE_EMAIL,
     confirmationUrl: SAMPLE_PROJECT_URL,
   },
   magiclink: {
-    siteName: SITE_NAME,
+    siteName: resolveEmailBrandName(),
     confirmationUrl: SAMPLE_PROJECT_URL,
   },
   recovery: {
-    siteName: SITE_NAME,
+    siteName: resolveEmailBrandName(),
     confirmationUrl: SAMPLE_PROJECT_URL,
   },
   invite: {
-    siteName: SITE_NAME,
+    siteName: resolveEmailBrandName(),
     siteUrl: SAMPLE_PROJECT_URL,
     confirmationUrl: SAMPLE_PROJECT_URL,
   },
   email_change: {
-    siteName: SITE_NAME,
+    siteName: resolveEmailBrandName(),
     email: SAMPLE_EMAIL,
     newEmail: SAMPLE_EMAIL,
     confirmationUrl: SAMPLE_PROJECT_URL,
@@ -177,9 +180,9 @@ async function renderAndSendAuthEmail(
   const sendResult = await sendTransactionalEmail(
     {
       to: toEmail,
-      from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
-      sender_domain: SENDER_DOMAIN,
-      subject: EMAIL_SUBJECTS[emailType] || 'Notification',
+      from: resolveEmailFromAddress(),
+      sender_domain: resolveEmailSenderDomain(),
+      subject: prefixEmailSubject(EMAIL_SUBJECTS[emailType] || 'Notification'),
       html,
       text,
       purpose: 'transactional',
@@ -271,7 +274,11 @@ async function handleSupabaseAuthWebhook(req: Request, log: RequestLoggingContex
     });
   }
 
-  const templateProps = templatePropsFromSupabaseHook(payload, SITE_NAME, ROOT_DOMAIN)
+  const templateProps = templatePropsFromSupabaseHook(
+    payload,
+    resolveEmailBrandName(),
+    resolveEmailRootDomain(),
+  )
   return renderAndSendAuthEmail(emailType, templateProps, toEmail, runId, log)
 }
 

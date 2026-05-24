@@ -39,6 +39,11 @@ import {
   sendTransactionalEmailBatch,
   type TransactionalEmail,
 } from "../_shared/transactional-email.ts";
+import {
+  prefixEmailSubject,
+  resolveEmailAppUrl,
+  resolveNotifyFromAddress,
+} from "../_shared/email-env.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -229,6 +234,7 @@ function evaluateTriggers(snap: AlertSnapshot, cfg: AlertConfig): Trigger[] {
 }
 
 function renderHtml(snap: AlertSnapshot, cfg: AlertConfig, triggers: Trigger[]): string {
+  const appUrl = resolveEmailAppUrl();
   const triggerList = triggers
     .map((t) => `<li style="margin-bottom: 6px;"><strong>${t.kind}:</strong> ${t.reason}</li>`)
     .join("");
@@ -289,9 +295,9 @@ function renderHtml(snap: AlertSnapshot, cfg: AlertConfig, triggers: Trigger[]):
   <hr style="border: none; border-top: 1px solid #e5e2dc; margin: 24px 0;">
 
   <p style="font-size: 12px; color: #737373; line-height: 1.6;">
-    Next steps: open <a href="https://holzen.app/admin" style="color: #2a2a2a;">/admin → Cost</a>
+    Next steps: open <a href="${appUrl}/admin" style="color: #2a2a2a;">/admin → Cost</a>
     to investigate. If this is expected growth, raise the relevant cap in
-    <a href="https://holzen.app/admin" style="color: #2a2a2a;">/admin → Tools</a>. If it is anomalous,
+    <a href="${appUrl}/admin" style="color: #2a2a2a;">/admin → Tools</a>. If it is anomalous,
     consider panic mode or disabling a feature flag.
   </p>
 
@@ -311,9 +317,9 @@ async function sendAlert(
   log: RequestLoggingContext["log"],
 ): Promise<{ sent: number; errors: number }> {
   const emails: TransactionalEmail[] = recipients.map((to) => ({
-    from: "Holzen <notify@holzen.app>",
+    from: resolveNotifyFromAddress(),
     to: [to],
-    subject,
+    subject: prefixEmailSubject(subject),
     html,
   }));
   const batch = await sendTransactionalEmailBatch(emails, {

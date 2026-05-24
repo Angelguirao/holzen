@@ -10,6 +10,7 @@ import {
   sendTransactionalEmailBatch,
   type TransactionalEmail,
 } from "../../../_shared/transactional-email.ts";
+import { resolveEmailAppUrl, resolveNotifyFromAddress } from "../../../_shared/email-env.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -202,7 +203,7 @@ serve(
     ${copy.reminder}
   </p>
 
-  <a href="https://holzen.app" style="display: inline-block; font-size: 12px; font-family: 'IBM Plex Mono', monospace; color: #2a2a2a; border: 1px solid #d4d0c8; padding: 8px 16px; text-decoration: none; border-radius: 4px;">
+  <a href="${resolveEmailAppUrl()}" style="display: inline-block; font-size: 12px; font-family: 'IBM Plex Mono', monospace; color: #2a2a2a; border: 1px solid #d4d0c8; padding: 8px 16px; text-decoration: none; border-radius: 4px;">
     ${copy.cta}
   </a>
 
@@ -212,7 +213,7 @@ serve(
 </html>`;
 
       queued.push({
-        from: "Holzen <notify@holzen.app>",
+        from: resolveNotifyFromAddress(),
         to: [email],
         subject: copy.subject(direction, pct),
         html,

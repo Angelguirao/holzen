@@ -10,6 +10,11 @@ import {
   isTransactionalEmailConfigured,
   sendTransactionalEmail,
 } from "./transactional-email.ts";
+import {
+  prefixEmailSubject,
+  resolveNotifyFromAddress,
+  resolveVapidMailto,
+} from "./email-env.ts";
 import { unknownErrorForLog, webPushStatusCode } from "./log-unknown-error.ts";
 import type { RequestLoggingContext } from "./with-request-logging.ts";
 
@@ -66,7 +71,7 @@ export async function initWebPushVapidFromEnv(log: PauseOfferDeliveryLog): Promi
         }
       }
     }
-    webpush.setVapidDetails("mailto:noreply@holzen.app", vapidPublicKey, privateKey);
+    webpush.setVapidDetails(resolveVapidMailto(), vapidPublicKey, privateKey);
     return true;
   } catch (vapidErr) {
     log.error("notifications_deliver_vapid", {
@@ -109,9 +114,9 @@ async function sendPauseOfferEmail(
 
   const result = await sendTransactionalEmail(
     {
-      from: "Holzen <notify@holzen.app>",
+      from: resolveNotifyFromAddress(),
       to: [email],
-      subject: "Holzen — A moment to pause",
+      subject: prefixEmailSubject("Holzen — A moment to pause"),
       html,
     },
     {

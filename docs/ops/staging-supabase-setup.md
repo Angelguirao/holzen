@@ -76,9 +76,10 @@ npm run staging:secrets-set
 | `GOOGLE_AI_API_KEY` | Google AI Studio key (Gemini) |
 | `OPENROUTER_API_KEY` | Optional Gemini failover |
 | `PERPLEXITY_API_KEY` | Perplexity API key |
-| `RESEND_API_KEY` | Resend transactional email |
-| `RESEND_WEBHOOK_SECRET` | Resend dashboard webhook signing secret (bounces/complaints → `handle-email-suppression`) |
+| `RESEND_API_KEY` | Staging-only Resend API key |
+| `RESEND_WEBHOOK_SECRET` | Resend webhook signing secret → staging `handle-email-suppression` |
 | `SEND_EMAIL_HOOK_SECRET` | Supabase Auth Send Email Hook secret (→ `auth-email-hook`) |
+| `EMAIL_*` (optional) | Staging sender identity — see [resend-environment-setup.md](resend-environment-setup.md) |
 | `STRIPE_SECRET_KEY` | Stripe **test** secret (`sk_test_…` or restricted `rk_test_…`) |
 | `STRIPE_WEBHOOK_SECRET` | Stripe **test** webhook signing secret → `…/functions/v1/stripe-webhook` on this project |
 | `STRIPE_PRICE_ID_PRO` | Test-mode Pro subscription `price_…` (recurring) |
@@ -115,7 +116,9 @@ npm run dev:staging
 1. Enable **Send Email** hook, type **HTTPS**
 2. URL: `https://ksplyxxdvandkwzundql.supabase.co/functions/v1/auth-email-hook`
 3. Generate a hook secret in the Dashboard; paste the **same** value into Edge secret `SEND_EMAIL_HOOK_SECRET` (`npm run staging:secrets-set` or Dashboard → Edge Functions → Secrets)
-4. Requires `RESEND_API_KEY` on the project (hook sends via Resend templates in `auth-email-hook`)
+4. Requires `RESEND_API_KEY` on the project (hook sends via Resend in `auth-email-hook`)
+
+Email staging vs prod: [resend-environment-setup.md](resend-environment-setup.md).
 
 Without the hook + `RESEND_API_KEY`, sign-up / password-reset emails will not send on owned projects.
 

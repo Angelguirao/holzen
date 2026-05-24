@@ -14,6 +14,7 @@ import {
   sendTransactionalEmailBatch,
   type TransactionalEmail,
 } from "../../../_shared/transactional-email.ts";
+import { resolveNotifyFromAddress } from "../../../_shared/email-env.ts";
 import {
   llmChatCompletionsWithFallback,
   llmLogProvider,
@@ -395,7 +396,7 @@ serve(
 </html>`;
 
       queued.push({
-        from: "Holzen <notify@holzen.app>",
+        from: resolveNotifyFromAddress(),
         to: [email],
         subject: `Holzen — BTC ${weekDir} ${absWeekChange}% this week`,
         html,

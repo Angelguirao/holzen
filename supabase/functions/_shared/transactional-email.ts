@@ -1,6 +1,7 @@
 /**
  * Shared transactional email helper — Resend only.
  */
+import { resolveEmailSenderDomain as resolveSenderDomainFromEnv } from "./email-env.ts";
 /** Subset of payload fields we use across edge functions. */
 export interface TransactionalEmail {
   from: string;
@@ -23,8 +24,6 @@ const NOOP_LOGGER: EmailDeliveryLogger = {
   log: () => { /* noop */ },
   error: () => { /* noop */ },
 };
-
-const DEFAULT_SENDER_DOMAIN = "notify.holzen.app";
 
 export interface SendOptions {
   /** Override Resend API key (`re_*`). */
@@ -109,10 +108,10 @@ async function sendViaResend(
 }
 
 function resolveSenderDomain(override?: string): string {
-  return override ??
-    Deno.env.get("EMAIL_SENDER_DOMAIN") ??
-    DEFAULT_SENDER_DOMAIN;
+  return override ?? resolveSenderDomainFromEnv();
 }
+
+export { resolveEmailSenderDomain } from "./email-env.ts";
 
 function truncate(s: string, n = 200): string {
   return s.length > n ? s.slice(0, n) : s;
