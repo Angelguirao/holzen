@@ -5,18 +5,14 @@
 export const PRICING = {
   /** Monthly price in USD */
   monthlyPrice: 4.99,
-  /** Pro+ monthly price in USD */
-  proPlusMonthlyPrice: 9.99,
   /** @deprecated Pre–pause-first free tier; kept for legacy locale files only. */
   freeReflectionsPerMonth: 3,
   /** Free trial duration in days */
   trialDays: 7,
   /** Included premium companion unlocks per month */
   proCompanionUnlocks: 12,
-  proPlusCompanionUnlocks: 30,
   /** Included wallpaper generations per month */
   proWallpapers: 5,
-  proPlusWallpapers: 15,
   /** Flex credit packs */
   flexPackSCredits: 30,
   flexPackMCredits: 55,
