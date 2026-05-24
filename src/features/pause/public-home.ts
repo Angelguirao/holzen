@@ -1,7 +1,7 @@
 /**
  * Home pause widget read-model helpers (no Supabase).
  * Scheduling quarter-hour math: `public-scheduling`. Home widget reads + conductors (pending-offer, completed count, dismiss outlet, pause actions, context previews, manual trigger, HolzenProvider state) live here (§6 peel).
- * Screens/home, `HolzenProvider`, and pause pending-offer **read** UI import here. Adopt/decline mutations: `public-session`. Presentation imports barrels, not `application/*`.
+ * Screens/home and `PauseHomeProvider` **read** pause/market state here; profile via `user/public-hooks`. Adopt/decline mutations: `public-session`.
  */
 export {
   resolvePauseArrivalToneAction,

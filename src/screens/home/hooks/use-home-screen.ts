@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useAuth } from '@/features/auth/public';
+import { useProfile } from '@/features/user/public-hooks';
 import {
   useCompletedPauseCount,
   useDismissOutletPauseReady,
@@ -55,7 +56,6 @@ export function useHomeScreen() {
     message,
     context,
     companions,
-    companionPrefs,
     severity,
     lastPauseInstanceId,
     openPauseState,
@@ -64,18 +64,22 @@ export function useHomeScreen() {
     newPauseArrival,
     clearNewPauseArrival,
     dismissMessage,
-    hasOnboarded,
-    completeOnboarding,
     manualTrigger,
     manualCooldownRemaining,
     autoCooldownRemaining,
     nextCronCheckIn,
+  } = usePauseHomeContext();
+
+  const {
+    companionPrefs,
+    hasOnboarded,
+    completeOnboarding,
     cooldownHours,
     firstName,
     currency,
     trackedAssetId,
     profileLoaded,
-  } = usePauseHomeContext();
+  } = useProfile();
 
   const hasOpenPause = Boolean(lastPauseInstanceId);
 

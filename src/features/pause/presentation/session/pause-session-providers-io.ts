@@ -12,6 +12,7 @@
  * `pause-session-providers-io.re-exports.test.ts` (inline scaffold-io distinctness).
  */
 export {
+  buildPauseHolzenProvidersPickSource,
   pickPauseHolzenProvidersSlice,
   type PauseHolzenProvidersSlice,
   type PickPauseHolzenProvidersSliceSource,

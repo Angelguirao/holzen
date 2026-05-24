@@ -3501,6 +3501,7 @@ for (const script of [
   'check-no-posthog-in-app.mjs',
   'check-no-holzen-in-settings.mjs',
   'check-no-app-imports-in-features.mjs',
+  'check-no-profile-spread-in-pause-home.mjs',
 ]) {
   const child = spawnSync(process.execPath, [`scripts/${script}`], {
     cwd: root,

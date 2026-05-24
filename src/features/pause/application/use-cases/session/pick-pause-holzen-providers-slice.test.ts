@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { pickPauseHolzenProvidersSlice } from './pause-holzen-providers-slice';
+import {
+  buildPauseHolzenProvidersPickSource,
+  pickPauseHolzenProvidersSlice,
+} from './pause-holzen-providers-slice';
 
 describe('pickPauseHolzenProvidersSlice', () => {
   it('maps Holzen context fields into the pause provider slice', () => {
@@ -49,5 +52,38 @@ describe('pickPauseHolzenProvidersSlice', () => {
       btcData: null,
       trackedAssetId: 'bitcoin',
     });
+  });
+
+  it('buildPauseHolzenProvidersPickSource merges pause home + profile', () => {
+    const dismissMessage = async () => {};
+    const resyncOpenPauseFromDb = () => {};
+    const pause = {
+      dismissMessage,
+      message: 'Hi',
+      context: null,
+      companions: { haiku: null, groundingTitle: null, groundingBody: null },
+      lastPauseInstanceId: null,
+      severity: 'mild' as const,
+      btcData: null,
+      resyncOpenPauseFromDb,
+    };
+    const picked = pickPauseHolzenProvidersSlice(
+      buildPauseHolzenProvidersPickSource(pause, {
+        mantra: 'breathe',
+        companionPrefs: {
+          breathing: true,
+          haiku: true,
+          grounding: true,
+          signal: true,
+          zoomOut: true,
+          history: true,
+        },
+        profileLoaded: true,
+        trackedAssetId: 'bitcoin',
+      }),
+    );
+    expect(picked.mantra).toBe('breathe');
+    expect(picked.severity).toBe('mild');
+    expect(picked.trackedAssetId).toBe('bitcoin');
   });
 });

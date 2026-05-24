@@ -66,6 +66,8 @@ features/user/
 
 See [src/features/user/README.md](../../src/features/user/README.md). Interior less formalized than market/pause — Phase B target.
 
+**Pause home context (May 2026):** `PauseHomeProvider` / `usePauseHomeContext` expose pause + market orchestration only. Profile fields (`firstName`, `companionPrefs`, thresholds, etc.) come from `useProfile` in screens — not spread through pause home state.
+
 ---
 
 ## 7. Related

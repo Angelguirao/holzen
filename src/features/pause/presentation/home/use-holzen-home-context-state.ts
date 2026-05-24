@@ -3,7 +3,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getHolzenMarketDisplayQueryOptions,
   mapHolzenMarketDisplayError,
-  normalizeTrackedAssetId,
   severityFromBtcChangePercent,
 } from '@/features/market/public';
 import { useAuth } from '@/features/auth/public';
@@ -12,12 +11,14 @@ import { millisecondsUntilNextQuarterHour } from '@/features/pause/public-schedu
 import { useOpenPauseHomePreview } from '@/features/pause/presentation/reflect/generation/manual-open/use-open-pause-home-preview';
 import { useHolzenManualTriggerOrchestration } from './use-holzen-manual-trigger-orchestration';
 import { useManualPauseTrigger } from '@/features/pause/presentation/reflect/generation/manual-open/use-manual-pause-trigger';
+import type { PauseHomeContextValue } from '@/features/pause/domain/home/pause-home-context-value';
 
 /**
- * Shared Home + `/pause` context: profile, market display, open-pause preview, manual trigger.
+ * Shared Home + `/pause` context: market display, open-pause preview, manual trigger.
+ * Profile fields: `useProfile` from `@/features/user/public-hooks`.
  * Mounted from `PauseHomeProvider` (`public-home`) when the user is signed in.
  */
-export function useHolzenHomeContextState() {
+export function useHolzenHomeContextState(): PauseHomeContextValue {
   const { user } = useAuth();
   const profile = useProfile();
   const queryClient = useQueryClient();
@@ -89,12 +90,6 @@ export function useHolzenHomeContextState() {
 
   const nextCronCheckIn = useCallback(() => millisecondsUntilNextQuarterHour(), []);
 
-  const refreshProfile = useCallback(async () => {
-    // No-op in V2; the realtime subscription on pause_instances handles
-    // fresh pushes from cron. Retained for API parity with old callers.
-    return;
-  }, []);
-
   const btcData = btcQuery.data ?? null;
 
   const severity = severityFromBtcChangePercent(btcData?.changePercent);
@@ -110,15 +105,6 @@ export function useHolzenHomeContextState() {
   );
 
   return {
-    ...profile,
-    /** CoinGecko id allowlist — normalized so consumers see `TrackedAssetId`, not raw profile strings. */
-    trackedAssetId: normalizeTrackedAssetId(profile.trackedAssetId),
-    setCurrency: async (val: string) => {
-      await profile.setCurrency(val);
-    },
-    setTrackedAssetId: async (val: string) => {
-      await profile.setTrackedAssetId(val);
-    },
     btcData,
     message,
     context,
@@ -135,9 +121,6 @@ export function useHolzenHomeContextState() {
     manualCooldownRemaining,
     autoCooldownRemaining,
     nextCronCheckIn,
-    profileLoaded,
-    refreshProfile,
-    /** After `pause_adopt_pending_offer`, refresh Home open-pause preview from `v_pause_current`. */
     resyncOpenPauseFromDb: syncOpenPauseFromDb,
   };
 }

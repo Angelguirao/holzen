@@ -1,8 +1,9 @@
-import type { BtcPriceData } from '@/features/market/public';
+import { normalizeTrackedAssetId, type BtcPriceData } from '@/features/market/public';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
+import type { PauseHomeContextValue } from '@/features/pause/domain/home/pause-home-context-value';
 import type { PauseSeverity } from './location-state';
 
-/** Holzen home context fields required by `/pause` providers (injected from `useHolzen` in screens). */
+/** Pause home + profile fields required by `/pause` session providers. */
 export type PauseHolzenProvidersSlice = {
   mantra: string;
   dismissMessage: () => void | Promise<void>;
@@ -18,7 +19,7 @@ export type PauseHolzenProvidersSlice = {
   trackedAssetId: string;
 };
 
-/** Superset of {@link PauseHolzenProvidersSlice} fields on `useHolzen()` for explicit picking. */
+/** Explicit pick source — compose {@link PauseHomeContextValue} + profile fields in the conductor. */
 export type PickPauseHolzenProvidersSliceSource = {
   mantra: string | null;
   dismissMessage: PauseHolzenProvidersSlice['dismissMessage'];
@@ -34,7 +35,28 @@ export type PickPauseHolzenProvidersSliceSource = {
   trackedAssetId: PauseHolzenProvidersSlice['trackedAssetId'];
 };
 
-/** Maps shared Holzen context into the pause session provider slice (screen conductor helper). */
+type ProfilePickForPauseSession = {
+  mantra: string | null;
+  companionPrefs: CompanionPrefs;
+  profileLoaded: boolean;
+  trackedAssetId: string;
+};
+
+/** Merges pause home context + user profile for `pickPauseHolzenProvidersSlice`. */
+export function buildPauseHolzenProvidersPickSource(
+  pause: PauseHomeContextValue,
+  profile: ProfilePickForPauseSession,
+): PickPauseHolzenProvidersSliceSource {
+  return {
+    ...pause,
+    mantra: profile.mantra,
+    companionPrefs: profile.companionPrefs,
+    profileLoaded: profile.profileLoaded,
+    trackedAssetId: normalizeTrackedAssetId(profile.trackedAssetId),
+  };
+}
+
+/** Maps pause home + profile into the pause session provider slice. */
 export function pickPauseHolzenProvidersSlice(
   source: PickPauseHolzenProvidersSliceSource,
 ): PauseHolzenProvidersSlice {
