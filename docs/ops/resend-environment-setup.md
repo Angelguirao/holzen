@@ -36,6 +36,8 @@ Set in Dashboard → Edge Functions → Secrets, or via `npm run staging:secrets
 
 Use **restricted** Resend API keys when possible (send-only for edges, read-only for Cursor MCP).
 
+**Send-only keys** (`sending_access`) can deliver mail but **cannot** list domains, create webhooks, or use most Resend MCP management tools. Use a **full_access** key (or the Resend dashboard) once to create webhooks, then store only send-only keys on Supabase Edge.
+
 ---
 
 ## Email identity env vars (optional)
