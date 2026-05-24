@@ -6,7 +6,7 @@ import {
   trackHomeCustomizeOpened,
   trackHomeCustomizeResetLayout,
   trackHomeOptionalWidgetToggled,
-} from '@/screens/home/lib/home-screen-telemetry';
+} from '@/features/pause/public-home';
 import type { HomeDashboardLayoutCustomizeProps } from '@/screens/home/components/HomeDashboardLayout';
 import { isHomeSectionAlwaysVisibleInLayout } from '@/screens/home/lib/home-section-visibility-constants';
 

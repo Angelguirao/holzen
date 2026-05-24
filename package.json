@@ -31,6 +31,7 @@
     "check:feature-imports": "node scripts/check-feature-imports.mjs",
     "check:architecture-alignment": "node scripts/check-architecture-alignment.mjs",
     "check:screen-form-action-barrels": "node scripts/check-screen-form-action-barrels.mjs",
+    "check:no-posthog-in-screens": "node scripts/check-no-posthog-in-screens.mjs",
     "check:no-supabase-in-screens": "node scripts/check-no-supabase-in-screens.mjs",
     "i18n:list-missing": "node scripts/list-missing-i18n-keys.mjs",
     "check:no-supabase-in-app": "node scripts/check-no-supabase-in-app.mjs",

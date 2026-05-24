@@ -58,3 +58,11 @@ export {
   type UseHolzenManualTriggerOrchestrationParams,
 } from './presentation/home/use-holzen-manual-trigger-orchestration';
 export { useHolzenHomeContextState } from './presentation/home/use-holzen-home-context-state';
+export {
+  trackHomeCustomizeOpened,
+  trackHomeCustomizeResetLayout,
+  trackHomeGoalWhyExpandToggled,
+  trackHomeHeroQuoteViewed,
+  trackHomeOptionalWidgetToggled,
+  trackOnboardingCompleted,
+} from './presentation/home/home-screen-telemetry-io';

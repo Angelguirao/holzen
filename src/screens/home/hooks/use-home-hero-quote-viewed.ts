@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { heroQuoteIndexForDay, utcYmd } from '@/screens/home/lib/home-hero-quote';
-import { trackHomeHeroQuoteViewed } from '@/screens/home/lib/home-screen-telemetry';
+import { trackHomeHeroQuoteViewed } from '@/features/pause/public-home';
 
 export function useHomeHeroQuoteViewed(profileLoaded: boolean, userId: string | undefined): void {
   const tracked = useRef(false);

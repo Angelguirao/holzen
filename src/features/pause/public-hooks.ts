@@ -153,6 +153,10 @@ export {
   useJourneyPauseInstances,
   type JourneyPauseRow,
 } from './presentation/archive/use-journey-pause-instances';
+export {
+  trackJourneyOverviewViewed,
+  type JourneyOverviewViewedPayload,
+} from './presentation/journey/journey-overview-telemetry-io';
 export { logPwaInstallAnalyticsEvent } from './public-queries';
 export {
   fetchSettingsDataExportBundle,

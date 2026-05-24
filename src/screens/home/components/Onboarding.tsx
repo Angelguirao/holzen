@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { OnboardingWhy } from '@/screens/home/components/onboarding/OnboardingWhy';
 import { OnboardingReady } from '@/screens/home/components/onboarding/OnboardingReady';
 import { useSubscription } from '@/features/subscription/public-hooks';
-import { trackOnboardingCompleted } from '@/screens/home/lib/home-screen-telemetry';
+import { trackOnboardingCompleted } from '@/features/pause/public-home';
 
 interface OnboardingResult {
   threshold: number;

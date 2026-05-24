@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { trackAppRouteNotFound } from '@/screens/marketing/lib/marketing-screen-telemetry';
+import { trackAppRouteNotFound } from '@/app/lib/app-route-telemetry';
 import { RobotsNoIndex } from '@/app/components/PageMeta';
 
 const NotFoundScreen = () => {
