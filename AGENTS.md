@@ -52,7 +52,8 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run check:no-phase-labels` | Plan §5.0 — fail on `mvp` / `pre-mvp` tokens in active `src/`, ops, Bruno, CI scripts (allowlisted migration filename + branch) |
 | `npm run check:bundle-shipped` | After **`build`**: no `BadgesPanelV2` / `ToolsHub` in `dist/assets` (pause-first strip guard; in **`test:ci`** and **`check:prepush`**) |
 | `npm run check:bruno-active-manifest` | Every `[functions.*]` in `config.toml` is listed in `bruno/active/functions-catalog.md` (in **`test:ci`**) |
-| `npm run check:posthog-events-allowlist` | Active `trackEvent` names ⊆ `docs/ops/event-taxonomy.md` Active section (in **`check:prepush`**) |
+| `npm run check:posthog-events-allowlist` | Active `trackEvent` names ⊆ `docs/ops/event-taxonomy.md` Active section (in **`test:ci`** / **`check:prepush`**) |
+| `npm run check:feature-flags-doc` | Active `useFeatureFlag('…')` keys ⊆ `docs/ops/feature-flags.md` Active flags table (in **`test:ci`** / **`check:prepush`**) |
 | `npm run check:i18n-active-keys` | Optional — `t('…')` keys in active `src/` must exist in `src/locales/en.json` (not in `test:ci` until tree is complete) |
 | `npm run test:watch` | Vitest watch mode |
 | `npm run lint` | ESLint across the repo |
