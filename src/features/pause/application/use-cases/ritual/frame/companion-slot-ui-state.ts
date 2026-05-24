@@ -1,5 +1,9 @@
-import type { TransitionStartFunction } from 'react';
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
+
+/** Matches React `useTransition` start function without importing react in application/. */
+export type CompanionSlotTransitionStart = (
+  callback: () => void | Promise<void>,
+) => void;
 
 /** @deprecated Prefer `startCompanionSlotTransition` + `useTransition` pending flags. */
 export interface CompanionSlotLoadingSetters {
@@ -10,10 +14,10 @@ export interface CompanionSlotLoadingSetters {
 }
 
 export interface CompanionSlotTransitionStarters {
-  signal: TransitionStartFunction;
-  grounding: TransitionStartFunction;
-  history: TransitionStartFunction;
-  zoomOut: TransitionStartFunction;
+  signal: CompanionSlotTransitionStart;
+  grounding: CompanionSlotTransitionStart;
+  history: CompanionSlotTransitionStart;
+  zoomOut: CompanionSlotTransitionStart;
 }
 
 export interface CompanionSlotErrorSetters {
@@ -48,7 +52,7 @@ export function setCompanionSlotLoading(
 export function startCompanionSlotTransition(
   slot: RegenerateCompanionSlot,
   starters: CompanionSlotTransitionStarters,
-  callback: Parameters<TransitionStartFunction>[0],
+  callback: () => void | Promise<void>,
 ): void {
   switch (slot) {
     case 'signal':

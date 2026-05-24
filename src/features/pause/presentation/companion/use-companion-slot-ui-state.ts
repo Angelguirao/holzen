@@ -1,7 +1,7 @@
 import { useLayoutEffect, useMemo, useRef, useState, useTransition } from 'react';
 import type { CachedHistoricalInsightShape } from '@/features/pause/domain/historical-insight';
 import type { ZoomOutData } from '@/features/pause/domain/zoom-out-display';
-import type { CompanionSlotTransitionStarters } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-ui-state';
+import type { CompanionSlotTransitionStarters } from './pause-companion-orchestrate-io';
 import {
   EMPTY_COMPANION_SLOT_RELAXATIONS,
   type CompanionSlotAutosaveParams,
