@@ -48,3 +48,7 @@ export {
   type AuthActionState,
   type ResetPasswordActionState,
 } from './presentation/marketing-auth-actions-io';
+export {
+  emailUnsubscribeAction,
+  type UnsubscribeActionState,
+} from './presentation/email-unsubscribe-io';

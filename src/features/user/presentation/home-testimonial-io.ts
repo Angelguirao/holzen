@@ -1,4 +1,7 @@
-import { submitUserTestimonial } from '@/features/user/public-queries';
+/**
+ * Home testimonial request form action.
+ */
+import { submitUserTestimonial } from '@/features/user/infrastructure/queries/testimonial-mutations';
 
 export type TestimonialActionState = {
   error?: 'failed';

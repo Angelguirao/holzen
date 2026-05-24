@@ -15,3 +15,7 @@ export {
   submitFeedbackAction,
   type FeedbackActionState,
 } from './presentation/settings-feedback-io';
+export {
+  submitTestimonialAction,
+  type TestimonialActionState,
+} from './presentation/home-testimonial-io';
