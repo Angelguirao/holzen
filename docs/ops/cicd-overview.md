@@ -23,29 +23,28 @@ Canonical map of how Holzen validates, deploys, and correlates releases across *
 
 ```mermaid
 flowchart TB
-  subgraph pr [Pull request]
-    CI[ci.yml]
-    VP[Vercel PR preview auto]
-  end
-
   subgraph stg [Push to staging]
-    SP[preflight: test:ci + build]
     SV[validate-secrets]
+    SP[preflight: test:ci + build]
     SB[deploy-backend: db push + edges]
     SF[deploy-frontend: vercel preview]
-    SP --> SV --> SB --> SF
+    SV --> SP --> SB --> SF
   end
 
   subgraph prod [Push to main]
-    PP[preflight: test:ci + build]
     PV[validate-secrets]
+    PP[preflight: test:ci + build]
     PB[deploy-backend: db push + edges]
     PF[deploy-frontend: vercel production]
-    PP --> PV --> PB --> PF
+    PV --> PP --> PB --> PF
   end
 
-  pr --> CI
-  pr --> VP
+  subgraph pr [Pull request]
+    VS[validate-secrets]
+    CI[ci.yml test + build]
+    VP[Vercel PR preview auto]
+    VS --> CI
+  end
 ```
 
 ---
@@ -54,15 +53,15 @@ flowchart TB
 
 | File | Name | Trigger | Jobs |
 |------|------|---------|------|
-| [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) | CI | PR; push `main` / `staging` / `dev` | `test:ci`, `build` |
-| [`.github/workflows/staging-backend.yml`](../../.github/workflows/staging-backend.yml) | Staging deploy | Push `staging`; manual | `preflight` → `validate-secrets` → `deploy-backend` → `deploy-frontend` |
+| [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) | CI | PR; push `main` / `staging` / `dev` | `validate-secrets` → `test:ci` + `build` |
+| [`.github/workflows/staging-backend.yml`](../../.github/workflows/staging-backend.yml) | Staging deploy | Push `staging`; manual | `validate-secrets` → `preflight` → `deploy-backend` → `deploy-frontend` |
 | [`.github/workflows/deploy-production.yml`](../../.github/workflows/deploy-production.yml) | Production deploy | Push `main`; manual | Same chain; `production` environment approval recommended |
 
 ### Job details
 
-**preflight** — Same gate as merge quality: `npm run test:ci` (fitness checks + Vitest coverage) and `npm run build`. Staging preflight uses **staging** Supabase build secrets; production uses **prod** secrets.
+**validate-secrets** — **First job, fast fail.** Runs [`scripts/check-cicd-secrets.mjs`](../../scripts/check-cicd-secrets.mjs) before install/test/deploy. If any required GitHub Actions secret is missing, the workflow stops with a **named list**, **where to set each secret**, and **how to obtain the value**. In the Actions UI, each missing secret also appears as an annotated error on the job.
 
-**validate-secrets** — Fails loudly if required secrets are missing ([`scripts/check-github-deploy-secrets.mjs`](../../scripts/check-github-deploy-secrets.mjs)). No silent skip.
+**preflight** — Same gate as merge quality: `npm run test:ci` (fitness checks + Vitest coverage) and `npm run build`. Staging preflight uses **staging** Supabase build secrets; production uses **prod** secrets.
 
 **deploy-backend** — `npm run stamp:release` → `supabase link` → `supabase db push` → [`scripts/deploy-active-edge-functions.mjs`](../../scripts/deploy-active-edge-functions.mjs).
 
@@ -101,7 +100,24 @@ Configure in **Settings → Secrets and variables → Actions** (repository or e
 
 Preview/production runtime `VITE_*` for deployed sites are pulled from the **Vercel project** during `vercel pull` — sync via dashboard or `npm run vercel:sync-env`. See [vercel-frontend-setup.md](vercel-frontend-setup.md).
 
-Optional: `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` for source-map upload during build (Vercel env or Actions).
+Optional: `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` for source-map upload during build (Vercel env or Actions). These are **not** required — CI does not block if they are absent.
+
+### Local secret check
+
+Before pushing, verify GitHub has the secrets a workflow needs (values must live in GitHub — local `.env` is not read by Actions):
+
+```sh
+# CI profile (2 secrets)
+VITE_SUPABASE_URL=... VITE_SUPABASE_PUBLISHABLE_KEY=... npm run check:cicd-secrets -- --profile=ci
+
+# Staging deploy (7 secrets)
+npm run check:cicd-secrets -- --profile=staging   # after exporting vars in shell
+
+# Production deploy (7 secrets)
+npm run check:cicd-secrets -- --profile=production
+```
+
+The script prints the same fix instructions as a failed Actions run.
 
 ---
 
@@ -171,7 +187,7 @@ Verify in workflow logs or Vercel deployment metadata.
 
 | Symptom | Likely cause | Fix |
 |---------|--------------|-----|
-| Deploy workflow fails at `validate-secrets` | Missing GitHub secret | Add secrets from table above |
+| Workflow fails at `validate-secrets` / `Require * secrets` | Missing GitHub secret | Read the job log — each secret lists **Where** and **How**; or run `npm run check:cicd-secrets -- --profile=…` locally |
 | Migrations fail mid-batch | Ownership / SQL error | [deployment-sync-guide.md](deployment-sync-guide.md) § migration errors |
 | Frontend works, API 401 / column missing | Backend job failed or skipped | Check `deploy-backend` logs; re-run workflow |
 | PR has preview, `staging` branch does not | Vercel token or wrong branch | Confirm **Staging deploy** `deploy-frontend` job; check `VERCEL_*` secrets |

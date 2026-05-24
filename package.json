@@ -46,6 +46,7 @@
     "check:prepush": "bash scripts/pre-push-check.sh",
     "stamp:release": "node scripts/stamp-edge-release.mjs",
     "check:release-stamp": "node scripts/stamp-edge-release.mjs --check",
+    "check:cicd-secrets": "node scripts/check-cicd-secrets.mjs",
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "supabase:status": "supabase status",
