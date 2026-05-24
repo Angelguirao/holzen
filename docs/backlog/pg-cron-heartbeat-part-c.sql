@@ -18,7 +18,7 @@ SELECT cron.schedule(
   '30 */2 * * *',
   $$
     SELECT net.http_post(
-      url := 'https://edgbwdecaoottowliimu.supabase.co/functions/v1/badge-notify',
+      url := 'https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/badge-notify',
       headers := jsonb_build_object('Content-Type','application/json','Authorization','Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'CRON_SECRET')),
       body := '{}'::jsonb
     );
@@ -47,7 +47,7 @@ SELECT cron.schedule(
   '*/15 * * * *',
   $$
     SELECT net.http_post(
-      url := 'https://edgbwdecaoottowliimu.supabase.co/functions/v1/check-volatility',
+      url := 'https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/check-volatility',
       headers := jsonb_build_object('Content-Type','application/json','Authorization','Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'CRON_SECRET')),
       body := '{}'::jsonb
     );
@@ -64,7 +64,7 @@ SELECT cron.schedule(
   '0 10 * * *',
   $$
     SELECT net.http_post(
-      url := 'https://edgbwdecaoottowliimu.supabase.co/functions/v1/weekly-digest',
+      url := 'https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/weekly-digest',
       headers := jsonb_build_object('Content-Type','application/json','Authorization','Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'CRON_SECRET')),
       body := '{"time":"scheduled"}'::jsonb
     );
@@ -81,7 +81,7 @@ SELECT cron.schedule(
   '*/30 * * * *',
   $$
     SELECT net.http_post(
-      url := 'https://edgbwdecaoottowliimu.supabase.co/functions/v1/deliver-letters',
+      url := 'https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/deliver-letters',
       headers := jsonb_build_object('Content-Type','application/json','Authorization','Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'CRON_SECRET')),
       body := '{}'::jsonb
     );
@@ -98,7 +98,7 @@ SELECT cron.schedule(
   '0 6,18 * * *',
   $$
     SELECT net.http_post(
-      url := 'https://edgbwdecaoottowliimu.supabase.co/functions/v1/fetch-source-feeds',
+      url := 'https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/fetch-source-feeds',
       headers := jsonb_build_object('Content-Type','application/json','Authorization','Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'CRON_SECRET')),
       body := '{}'::jsonb
     );
@@ -115,7 +115,7 @@ SELECT cron.schedule(
   '0 10 1 * *',
   $$
     SELECT net.http_post(
-      url := 'https://edgbwdecaoottowliimu.supabase.co/functions/v1/monthly-report',
+      url := 'https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/monthly-report',
       headers := jsonb_build_object('Content-Type','application/json','Authorization','Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'CRON_SECRET')),
       body := '{"time":"scheduled"}'::jsonb
     );
@@ -132,7 +132,7 @@ SELECT cron.schedule(
   '0 * * * *',
   $$
     SELECT net.http_post(
-      url := 'https://edgbwdecaoottowliimu.supabase.co/functions/v1/night-reflection',
+      url := 'https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/night-reflection',
       headers := jsonb_build_object('Content-Type','application/json','Authorization','Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'CRON_SECRET')),
       body := '{}'::jsonb
     );
@@ -149,7 +149,7 @@ SELECT cron.schedule(
   '0 */12 * * *',
   $$
     SELECT net.http_post(
-      url := 'https://edgbwdecaoottowliimu.supabase.co/functions/v1/personalized-nudge',
+      url := 'https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/personalized-nudge',
       headers := jsonb_build_object('Content-Type','application/json','Authorization','Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'CRON_SECRET')),
       body := '{"time":"scheduled"}'::jsonb
     );
@@ -166,7 +166,7 @@ SELECT cron.schedule(
   '0 */6 * * *',
   $$
     SELECT net.http_post(
-      url := 'https://edgbwdecaoottowliimu.supabase.co/functions/v1/pregenerate-companions',
+      url := 'https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/pregenerate-companions',
       headers := jsonb_build_object('Content-Type','application/json','Authorization','Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'CRON_SECRET')),
       body := '{}'::jsonb
     );
@@ -190,7 +190,7 @@ SELECT cron.schedule(
       WHEN EXISTS (SELECT 1 FROM pgmq.q_auth_emails LIMIT 1)
         OR EXISTS (SELECT 1 FROM pgmq.q_transactional_emails LIMIT 1)
         THEN net.http_post(
-          url := 'https://edgbwdecaoottowliimu.supabase.co/functions/v1/process-email-queue',
+          url := 'https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/process-email-queue',
           headers := jsonb_build_object(
             'Content-Type', 'application/json',
             'Authorization', 'Bearer ' || (
@@ -215,7 +215,7 @@ SELECT cron.schedule(
   '*/15 * * * *',
   $$
     SELECT net.http_post(
-      url := 'https://edgbwdecaoottowliimu.supabase.co/functions/v1/refresh-btc-prices',
+      url := 'https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/refresh-btc-prices',
       headers := jsonb_build_object('Content-Type','application/json','Authorization','Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'CRON_SECRET')),
       body := '{}'::jsonb
     );

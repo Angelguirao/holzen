@@ -8,11 +8,12 @@ import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { PRICING } from "./src/features/subscription/domain/pricing";
 import { reactCompilerPilotPlugin } from "./vite.react-compiler";
 
-// Defaults when `VITE_SUPABASE_*` are unset: local `npm run dev`, and `vite build` without env
-// (e.g. Lovable preview). Override with `.env` / CI / Lovable Cloud vars for another project.
-// `localstack` never uses these — use `.env.localstack` / Docker Supabase only.
-const FALLBACK_SUPABASE_URL = "https://edgbwdecaoottowliimu.supabase.co";
-const FALLBACK_SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkZ2J3ZGVjYW9vdHRvd2xpaW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzgyMzcsImV4cCI6MjA4ODMxNDIzN30.ZNh2feSmMhdZmEk6omdd8q5HDjBHytz-gzktI0txwM8";
+// Defaults when `VITE_SUPABASE_*` are unset: local `npm run dev` / `dev:hosted`, and `vite build`
+// without env. holzen-prod (`geqkxsnyqvhtascjghuu`) — override via `.env*` / CI for staging previews.
+// `localstack` and `staging` modes never use these — use `.env.localstack*` / `.env.staging*` only.
+const FALLBACK_SUPABASE_URL = "https://geqkxsnyqvhtascjghuu.supabase.co";
+const FALLBACK_SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_q81zcl_HC0sLoPIsBxmDzg_r424f7BY";
 
 // Public observability config (Sentry DSN, PostHog key/host) lives in
 // `src/config/public-env.ts` alongside the rest of the public browser config.
