@@ -59,7 +59,9 @@ flowchart TB
 
 ### Job details
 
-**validate-secrets** — **First job, fast fail.** Runs [`scripts/check-cicd-secrets.mjs`](../../scripts/check-cicd-secrets.mjs) before install/test/deploy. If any required GitHub Actions secret is missing, the workflow stops with a **named list**, **where to set each secret**, and **how to obtain the value**. In the Actions UI, each missing secret also appears as an annotated error on the job.
+**validate-secrets** — **First job, fast fail.** Runs [`scripts/check-cicd-env.mjs`](../../scripts/check-cicd-env.mjs) across **GitHub Actions**, **Vercel**, and **Supabase Edge** (deploy profiles only) before install/test/deploy. Each missing variable prints **name**, **platform**, **where to set it**, **how to obtain the value**, and a **docs link**. GitHub Actions also shows per-variable error annotations on the job.
+
+Catalog source of truth: [`scripts/lib/cicd-env-catalog.mjs`](../../scripts/lib/cicd-env-catalog.mjs).
 
 **preflight** — Same gate as merge quality: `npm run test:ci` (fitness checks + Vitest coverage) and `npm run build`. Staging preflight uses **staging** Supabase build secrets; production uses **prod** secrets.
 
@@ -69,9 +71,46 @@ flowchart TB
 
 ---
 
+## Environment validation (all platforms)
+
+Holzen splits configuration across three surfaces. **Do not** put Edge secrets in GitHub or Vercel, and **do not** put `VITE_*` build vars in Supabase Edge secrets.
+
+| Surface | What it configures | Where to set | Validated by |
+|---------|-------------------|--------------|--------------|
+| **GitHub Actions secrets** | CI build + deploy orchestration tokens | GitHub → Settings → Secrets and variables → Actions | `check-cicd-env --platform=github` |
+| **Vercel env vars** | Runtime `VITE_*` for deployed SPA | Vercel → holzen → Settings → Environment Variables | `check-cicd-env --platform=vercel` (live API audit) |
+| **Supabase Edge secrets** | Edge function runtime (AI, email, Stripe, observability) | Supabase Dashboard → project → Edge Functions → Secrets | `check-cicd-env --platform=supabase` (CLI audit) |
+
+### Commands
+
+```sh
+# PR / CI — GitHub only (2 vars)
+npm run check:cicd-env -- --profile=ci --platform=github
+
+# Staging deploy — all three platforms
+npm run check:cicd-env -- --profile=staging --platform=all
+
+# Production deploy — all three platforms
+npm run check:cicd-env -- --profile=production --platform=all
+
+# Fail on recommended vars too (PostHog, Perplexity, flex Stripe prices, …)
+npm run check:cicd-env -- --profile=production --platform=all --strict-recommended
+```
+
+Export GitHub secret **values** into your shell when running locally (Actions injects them automatically). Vercel/Supabase audits use `VERCEL_*` + `SUPABASE_ACCESS_TOKEN` from the environment.
+
+### Tier semantics
+
+| Tier | CI behavior |
+|------|-------------|
+| **required** | Workflow **fails** until set |
+| **recommended** | Logged with fix instructions; **warn only** unless `--strict-recommended` |
+
+---
+
 ## GitHub Actions secrets
 
-Configure in **Settings → Secrets and variables → Actions** (repository or environment).
+Configure in **Settings → Secrets and variables → Actions** (repository secrets).
 
 ### Supabase (backend)
 
@@ -98,30 +137,85 @@ Configure in **Settings → Secrets and variables → Actions** (repository or e
 | `VITE_SUPABASE_URL` | CI on PR / prod preflight |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | CI on PR / prod preflight |
 
-Preview/production runtime `VITE_*` for deployed sites are pulled from the **Vercel project** during `vercel pull` — sync via dashboard or `npm run vercel:sync-env`. See [vercel-frontend-setup.md](vercel-frontend-setup.md).
-
-Optional: `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` for source-map upload during build (Vercel env or Actions). These are **not** required — CI does not block if they are absent.
-
-### Local secret check
-
-Before pushing, verify GitHub has the secrets a workflow needs (values must live in GitHub — local `.env` is not read by Actions):
-
-```sh
-# CI profile (2 secrets)
-VITE_SUPABASE_URL=... VITE_SUPABASE_PUBLISHABLE_KEY=... npm run check:cicd-secrets -- --profile=ci
-
-# Staging deploy (7 secrets)
-npm run check:cicd-secrets -- --profile=staging   # after exporting vars in shell
-
-# Production deploy (7 secrets)
-npm run check:cicd-secrets -- --profile=production
-```
-
-The script prints the same fix instructions as a failed Actions run.
+Optional on GitHub: `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` — prefer **Vercel** for source-map upload (see below).
 
 ---
 
-## Vercel configuration
+## Vercel project environment {#vercel-project-environment}
+
+Set in **Vercel → holzen → Settings → Environment Variables**. Sync helper: `npm run vercel:sync-env`.
+
+### Preview (staging SPA + PR previews)
+
+| Variable | Tier | Notes |
+|----------|------|--------|
+| `VITE_SUPABASE_URL` | required | Staging URL `https://ksplyxxdvandkwzundql.supabase.co` |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | required | Staging anon key |
+| `VITE_SUPABASE_PROJECT_ID` | required | `ksplyxxdvandkwzundql` |
+| `VITE_APP_VERSION` | required | `$VERCEL_GIT_COMMIT_SHA` |
+| `VITE_POSTHOG_KEY` | recommended | Product analytics |
+| `VITE_POSTHOG_HOST` | recommended | e.g. `https://eu.i.posthog.com` |
+| `VITE_SENTRY_DSN` | recommended | Frontend errors |
+
+### Production
+
+| Variable | Tier | Notes |
+|----------|------|--------|
+| `VITE_SUPABASE_URL` | required | Prod URL `https://geqkxsnyqvhtascjghuu.supabase.co` |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | required | Prod anon key |
+| `VITE_SUPABASE_PROJECT_ID` | required | `geqkxsnyqvhtascjghuu` |
+| `VITE_APP_VERSION` | required | `$VERCEL_GIT_COMMIT_SHA` |
+| `VITE_SITE_ORIGIN` | required | `https://holzen.app` |
+| `VITE_POSTHOG_KEY` / `VITE_POSTHOG_HOST` | recommended | Analytics |
+| `VITE_SENTRY_DSN` | recommended | Frontend errors |
+| `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJECT` | recommended | Build-time source maps |
+
+Detail: [vercel-frontend-setup.md](vercel-frontend-setup.md).
+
+---
+
+## Supabase Edge secrets
+
+Set per project: **Dashboard → Edge Functions → Secrets**. Apply from gitignored files:
+
+```sh
+cp .env.staging.secrets.example .env.staging.secrets   # fill values
+npm run staging:secrets-set
+
+cp .env.prod.secrets.example .env.prod.secrets
+npm run prod:secrets-set
+```
+
+### Required (staging + production)
+
+| Secret | Purpose |
+|--------|---------|
+| `RESEND_API_KEY` | Auth + transactional email |
+| `SEND_EMAIL_HOOK_SECRET` | Supabase Auth Send Email Hook |
+| `GOOGLE_AI_API_KEY` | Gemini / pause AI |
+| `STRIPE_SECRET_KEY` | Subscriptions (test on staging, live on prod) |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signature |
+| `STRIPE_PRICE_ID_PRO` | Pro subscription price |
+| `CRON_SECRET` | pg_cron → edge HTTP auth |
+| `SENTRY_DSN_EDGES` | Edge error reporting |
+| `SENTRY_ENVIRONMENT` | `staging` or `production` |
+| `LOG_DRAIN_URL` / `LOG_DRAIN_TOKEN` | BetterStack structured logs |
+| `SLACK_WEBHOOK_URL` | `#holzen-alerts` |
+
+### Recommended
+
+| Secret | Purpose |
+|--------|---------|
+| `RESEND_WEBHOOK_SECRET` | Bounce/complaint suppression |
+| `STRIPE_PRICE_ID_FLEX_PACK_S` / `_M` | Flex packs |
+| `OPENROUTER_API_KEY` | LLM failover |
+| `PERPLEXITY_API_KEY` | Companion / feed generators |
+
+Detail: [observability-setup.md](observability-setup.md), [resend-environment-setup.md](resend-environment-setup.md), [stripe-environment-setup.md](stripe-environment-setup.md).
+
+---
+
+## Vercel configuration (deploy behavior)
 
 ### Disabled auto-deploy for release branches
 
@@ -187,7 +281,7 @@ Verify in workflow logs or Vercel deployment metadata.
 
 | Symptom | Likely cause | Fix |
 |---------|--------------|-----|
-| Workflow fails at `validate-secrets` / `Require * secrets` | Missing GitHub secret | Read the job log — each secret lists **Where** and **How**; or run `npm run check:cicd-secrets -- --profile=…` locally |
+| Workflow fails at `validate-secrets` | Missing var on GitHub, Vercel, or Supabase | Read job log — each entry has **Where** + **How**; run `npm run check:cicd-env -- --profile=… --platform=all` |
 | Migrations fail mid-batch | Ownership / SQL error | [deployment-sync-guide.md](deployment-sync-guide.md) § migration errors |
 | Frontend works, API 401 / column missing | Backend job failed or skipped | Check `deploy-backend` logs; re-run workflow |
 | PR has preview, `staging` branch does not | Vercel token or wrong branch | Confirm **Staging deploy** `deploy-frontend` job; check `VERCEL_*` secrets |

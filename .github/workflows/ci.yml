@@ -20,11 +20,11 @@ jobs:
           node-version: "22"
           cache: npm
 
-      - name: Require CI secrets
+      - name: Require CI environment
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
-        run: node scripts/check-cicd-secrets.mjs --profile=ci
+        run: node scripts/check-cicd-env.mjs --profile=ci --platform=github
 
       - name: Install
         run: npm ci
