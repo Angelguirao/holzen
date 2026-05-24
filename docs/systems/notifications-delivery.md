@@ -12,7 +12,7 @@ Holzen reaches users through three channels on the active surface. This document
 |---------|---------|------------|---------------|---------------|
 | **In-app inbox** | Yes | Dismiss/read in bell (local + row `dismissed_at`) | `NotificationBell`, `notifications-inbox-query` | `notifications` table; rows from pause triggers (`notifications_from_pause_instances`) |
 | **Web push** | Yes | Settings → push toggle; browser permission | `usePushNotifications`, `register-push` | `check-volatility` sends after claim; `push_subscriptions` |
-| **Email** | Yes (pause/volatility) | `profiles.email_notifications` | Settings panel (via `useProfile` in **user**) | `check-volatility` → Lovable mail; `process-email-queue` cron |
+| **Email** | Yes (pause/volatility) | `profiles.email_notifications` | Settings panel (via `useProfile` in **user**) | `check-volatility` → **Resend** via `_shared/notifications-deliver-pause-offer.ts`; `process-email-queue` cron |
 
 **Not scheduled post-cutover:** digest, letters, badge, night-reflection notification types (rows/types removed or cron off — see [active-surface.md](../ops/active-surface.md)).
 

@@ -8,17 +8,17 @@ This document is the **operational map**: folders, packages, naming, import rule
 
 ---
 
-## 0. Lovable constraint (execution vs north star)
+## 0. Vite root constraint (execution vs north star)
 
-| | **Now (Lovable-managed publish)** | **North star (gated)** |
+| | **Now (Vercel + root Vite)** | **North star (gated)** |
 |---|-----------------------------------|-------------------------|
 | **Vite root** | Repository root (`vite.config.ts`, `index.html`, `src/`) | `apps/web` |
 | **Bounded contexts** | `src/features/<context>/` (same layers as packages) | `packages/<context>/` |
 | **Screens** | `src/screens/`; design system in `src/components/ui/` | `apps/web/src/screens/` |
 | **Boundary enforcement** | `npm run check:feature-imports` | `check:package-boundaries` + package `public.ts` |
-| **When to extract packages** | — | Second client, leave Lovable publish, or confirmed Lovable subdirectory-root support |
+| **When to extract packages** | — | Second client, confirmed CI/Vercel monorepo layout, or explicit ADR gate |
 
-Do **not** move the SPA to `apps/web` without passing the extraction gate in [ADR §8](../decisions/2026-05-17-modular-monolith-hexagonal-client.md). That breaks Publish → Update, `lovable-tagger`, and agent heuristics that assume root `src/App.tsx`.
+Do **not** move the SPA to `apps/web` without passing the extraction gate in [ADR §8](../decisions/2026-05-17-modular-monolith-hexagonal-client.md). Root `src/App.tsx` remains the Vercel build entry today.
 
 `supabase/` (migrations, edge functions) is unchanged either way.
 
@@ -94,7 +94,7 @@ holzen/
   turbo.json                    # optional: turbo run test build
 ```
 
-**Deployable today:** only `apps/web` (Lovable publish / static hosting). Packages are **libraries**, not separate services.
+**Deployable today:** root Vite SPA (**Vercel** / static hosting). Packages are **libraries**, not separate services.
 
 ---
 
@@ -313,7 +313,7 @@ Use this when moving files. Paths are indicative — adjust to actual filenames 
 
 ## 10. Transitional layout (active — root Vite + `src/features/`)
 
-**This is the execution layout** while Lovable publish stays at the repo root. See `src/features/README.md` and [pause-client-architecture.md](../systems/pause-client-architecture.md) for the reference pause module.
+**This is the execution layout** while the Vercel build stays at the repo root. See `src/features/README.md` and [pause-client-architecture.md](../systems/pause-client-architecture.md) for the reference pause module.
 
 ```text
 src/
@@ -354,7 +354,7 @@ Same dependency rules as §2–3 for layers that exist. `npm run check:feature-i
 
 | Wave | Scope | Exit criteria |
 |------|--------|----------------|
-| **0** | Docs + ADR (Lovable §) + `src/features/pause/` skeleton + `check:feature-imports` | `test:ci` green; root `npm run build` |
+| **0** | Docs + ADR (Vite root §) + `src/features/pause/` skeleton + `check:feature-imports` | `test:ci` green; root `npm run build` |
 | **1** | Migrate **pause** domain + use cases into `src/features/pause/` (small PRs) | **Done (Phase A, May 2026):** domain + presentation in `src/features/pause/`; reflect + frame use cases under `application/use-cases/ritual/reflect/` and `ritual/frame/` — CI forbids legacy `reflect/` + `companion/` paths ([pause-client-architecture.md](../systems/pause-client-architecture.md) §3, §10; [architecture-migration/README.md](../artifacts/architecture-migration/README.md)) |
 | **2** | `subscription`, `market`, `user`, `auth` features + shrink root `lib/` feature shims | Cross-feature: `public.ts` only; app hooks may use `public-queries.ts` where queries need Supabase |
 | **3** | Optional `src/features/*/infrastructure` adapters; keep Supabase types in `integrations/` until needed | Adapter tests |
@@ -427,11 +427,11 @@ Full capability map and manual scorecard: [architectural-fitness-functions.md](a
 
 ---
 
-## 13. Lovable and env
+## 13. Vercel build root and env
 
-**Today:** publish and dev use **repository root** — do not relocate `index.html` or `vite.config.ts` without ADR §8.
+**Today:** production and preview builds use **repository root** — do not relocate `index.html` or `vite.config.ts` without ADR §8.
 
-**After extraction:** publish root becomes `apps/web` (document in README / AGENTS when switched). `VITE_*` env vars load in `apps/web`; `packages/infrastructure` receives config via factory args, not `import.meta` in packages (keeps packages testable).
+**After extraction:** build root becomes `apps/web` (document in README / AGENTS when switched). `VITE_*` env vars load in Vercel project settings / `apps/web`; `packages/infrastructure` receives config via factory args, not `import.meta` in packages (keeps packages testable).
 
 ---
 

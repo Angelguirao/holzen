@@ -15,7 +15,7 @@ Set **`SERVICE_CRON_BEARER`** in your Bruno environment (**`environments/hosted.
 | Where you get credentials | What to paste into `SERVICE_CRON_BEARER` |
 |---------------------------|------------------------------------------|
 | **Supabase Dashboard** → Settings → API | **`service_role`** JWT (full secret string) |
-| **Lovable Cloud** (no dashboard) | The **`CRON_SECRET`** value your platform uses for Edge secrets — it is compared to the same secret on the server |
+| **Supabase Edge secrets** | The **`CRON_SECRET`** value in Dashboard → Edge Functions → Secrets — compared server-side by `verifyServiceAuth` |
 
 The Edge runtime compares the Bearer string to **`SUPABASE_SERVICE_ROLE_KEY`** and **`CRON_SECRET`** in the function environment ([`verifyServiceAuth`](../../supabase/functions/_shared/auth.ts)). The Bruno variable name is neutral because **both** server env vars are valid targets for the same header.
 

@@ -12,6 +12,8 @@
 
 **Pause-first shipped scope (2026-05):** For the shipped 4-tab product, prefer integration tests **F1–F9** in `src/test/integration/flows/` and [active-surface.md](../ops/active-surface.md) over Tier A rows that reference `/tools`, `/journey/stats`, or five-tab nav — those describe pre-strip full IA (tag `full-ia-pre-strip`).
 
+> **Platform exit (2026-05):** Production ships via **Vercel + owned Supabase**. Edge audit notes dated **2026-04-30** below describe pre-exit behavior (`LOVABLE_API_KEY`, Lovable email) — use current code + [platform-exit-runbook.md](../ops/platform-exit-runbook.md) for ops truth.
+
 ---
 
 ## Shipped MVP only (pause-first strip)
@@ -26,7 +28,7 @@ Use this slice when signing off **production** on `feature/mvpPauseCleanup` / po
 | **Edges** | [active-surface.md](../ops/active-surface.md) deployed list = `config.toml` = `EdgeCoverage.tsx`; Bruno [bruno/active/functions-catalog.md](../../bruno/active/functions-catalog.md) |
 | **DB cutover** | `20260521200000_holzen_mvp_launch_cutover.sql` applied; Tier B tables absent; **`companion_catalog`** + `grounding_enrichment_cache` **present** |
 | **Telemetry** | Post-cutover metrics use `telemetry_baseline_at` in active-surface; truncated tables empty |
-| **Ship** | [launch-runbook.md](../ops/launch-runbook.md) §14.3 + Lovable **Publish → Update** after push |
+| **Ship** | [launch-runbook.md](../ops/launch-runbook.md) — merge **`staging → main`**, Vercel production deploy |
 
 ---
 

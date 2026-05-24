@@ -197,7 +197,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 - **What you should do:** Keep **`config.toml` in sync with `supabase/functions/*`** (one block per function). After that, local serve and hosted deploys that ship this file should agree; if you still see **401** on `invoke`, check **session / `Authorization`**, **dashboard secrets**, and that the **deployed** revision actually includes your latest `config.toml`.
 
-- **Local vs hosted:** Both are driven by the **same committed `config.toml`** once deploys pick it up. **`npx supabase functions serve`** uses your working tree; **hosted** uses whatever was last deployed (Lovable sync, CI, or `supabase functions deploy`). Mismatch usually means **stale deploy** or a **function added without a new `config.toml` entry**.
+- **Local vs hosted:** Both are driven by the **same committed `config.toml`** once deploys pick it up. **`npx supabase functions serve`** uses your working tree; **hosted** uses whatever was last deployed (CI or `supabase functions deploy`). Mismatch usually means **stale deploy** or a **function added without a new `config.toml` entry**.
 
 ---
 
@@ -227,7 +227,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 | Script | Mode | Supabase env behavior (see `vite.config.ts`) |
 |--------|------|-----------------------------------------------|
 | `npm run dev` | `development` | Can use `.env`; **hosted fallbacks** if vars missing (`localstack` never). |
-| `npm run build` | `production` (default) | Same fallbacks if vars missing; override with `.env.production` / CI / Lovable env. |
+| `npm run build` | `production` (default) | Same fallbacks if vars missing; override with `.env.production` / CI / Vercel env. |
 | `npm run dev:hosted` | `hosted` | Loads env for hosted backend (e.g. `.env.hosted` / `.env.hosted.local` per README). |
 | `npm run dev:local` | `localstack` | **No** hosted URL/key fallback — forces explicit local Supabase values. |
 
@@ -237,23 +237,25 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 - **[ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md)** — Manual vs automatic pause, shared pause-session AI, `companion-orchestrate`, interventions, generators, drift and ops notes.
 - **[cron-setup.md](../ops/cron-setup.md)** — Scheduling edge functions (BTC refresh, feeds, digests, etc.).
-- **[deployment-sync-guide.md](../ops/deployment-sync-guide.md)** — GitHub ↔ Lovable sync, pre-push checklist, **`npm run check:prepush`**, and migration/edge troubleshooting.
+- **[deployment-sync-guide.md](../ops/deployment-sync-guide.md)** — Vercel + Supabase deploy, pre-push checklist, **`npm run check:prepush`**, and migration/edge troubleshooting.
 
 ---
 
-## 17. Lovable Cloud: what deploys when
+## 17. Deploy paths: Vercel + owned Supabase
 
-If you use [Lovable](https://lovable.dev) with GitHub sync to a linked Supabase project (see [README.md](../README.md#lovable)):
+**Production (after platform exit):** GitHub is source of truth. **`main`** merge deploys the SPA to **Vercel** and applies migrations / edge functions to the **production Supabase project** (via CI or CLI). **`staging`** branch targets the staging Supabase project for pre-prod QA.
 
-| Change in repo | Typical effect on live users |
-|----------------|------------------------------|
-| New or updated SQL under **`supabase/migrations/`** | Migrations run against the **linked** database when the platform syncs — treat as **production** unless you use a dedicated staging project. |
-| Changes under **`supabase/functions/`** | Edge functions **redeploy** on sync — same immediacy as migrations. |
-| Changes under **`src/`**, `public/`, etc. | **Frontend** updates only after you **publish** and confirm **Update** in Lovable’s publish UI (not automatic the moment you push). |
+| Change in repo | Typical effect |
+|----------------|----------------|
+| New or updated SQL under **`supabase/migrations/`** | Applied to the **target Supabase project** when CI / `db push` runs for that branch |
+| Changes under **`supabase/functions/`** | Edge functions **redeploy** to that project |
+| Changes under **`src/`**, `public/`, etc. | **Vercel** production build on **`main`** merge (preview builds on PRs) |
 
 **Locally**, nothing in this table runs by itself: your machine uses **`.env` / `.env.*.local`** and **`npm run dev`** (or `dev:hosted` / `dev:local`). Use **local Supabase** (`npm run supabase:start`, `supabase:reset`) to test migrations safely; use **`npx supabase functions serve`** (and [function secrets](https://supabase.com/docs/guides/functions/secrets)) to approximate hosted function behavior.
 
-**Strategic context** (why feature branches do not protect prod DB, staging project, visible CI, leaving Lovable): [lovable-staging-and-platform-exit.md](../ops/lovable-staging-and-platform-exit.md).
+**Optional Lovable editor:** You may use [Lovable](https://lovable.dev) on **feature branches only** for UI iteration — do **not** use **Publish → Update** for prod. See [lovable-staging-and-platform-exit.md](../ops/lovable-staging-and-platform-exit.md).
+
+**Legacy note:** Before platform exit, Lovable Cloud auto-synced migrations on GitHub push while the SPA required manual publish. That path is deprecated — [platform-exit-runbook.md](../ops/platform-exit-runbook.md).
 
 ---
 

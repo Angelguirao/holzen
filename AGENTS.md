@@ -12,7 +12,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 
 | If you change… | Read first (canonical) | Also update / verify in the same PR when relevant |
 |----------------|------------------------|-----------------------------------------------------|
-| App boot, routing, auth wiring, Lovable vs local | [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) | [docs/systems/routing/route-gating-system.md](docs/systems/routing/route-gating-system.md) if gates change |
+| App boot, routing, auth wiring, Vercel vs local | [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) | [docs/systems/routing/route-gating-system.md](docs/systems/routing/route-gating-system.md) if gates change |
 | Nav, IA, primary routes, bottom nav | [docs/ops/active-surface.md](docs/ops/active-surface.md) + `src/App.tsx` / `src/lib/app-routes.ts` | [docs/design/information-architecture.md](docs/design/information-architecture.md) (§1–§3 full-IA reference; §4.5–§4.6 pause-first); [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md) if `navigation.*` or product surface names in analytics change |
 | Pause lifecycle, instances, events, artifacts, stats hooks | [docs/systems/pause-system.md](docs/systems/pause-system.md) | RPCs/migrations listed under **Where to change what → Pause**; client layout [pause-client-architecture.md](docs/systems/pause-client-architecture.md); keep `invokeEdge` / `x-cid` intact |
 | Pause AI, companions, edge orchestration, cron | [docs/systems/pause/ai-powered-pause-system.md](docs/systems/pause/ai-powered-pause-system.md) | [docs/systems/costs/ai-cost-model.md](docs/systems/costs/ai-cost-model.md) when limits/flags/cost paths change |
@@ -31,7 +31,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | In-app inbox, web push, delivery channels | [docs/systems/notifications-delivery.md](docs/systems/notifications-delivery.md) | `src/features/notifications/`; bell via `public-hooks`; email toggle stays on **user** profile |
 | Content library ingest / RSS / admin | [docs/systems/content-library-fetch-source-feeds.md](docs/systems/content-library-fetch-source-feeds.md) | Edge + admin docs referenced there |
 | PR / release discipline, flow-first review | [docs/reviews/react-spa-review-template.md](docs/reviews/react-spa-review-template.md), [docs/reviews/end-to-end-review-master-checklist.md](docs/reviews/end-to-end-review-master-checklist.md) | Cursor skill `.cursor/skills/holzen-flow-review/SKILL.md` |
-| Ship to GitHub / Lovable / Supabase | [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md) | `.cursor/rules/deployment-sync.mdc` mirrors the minimum gate |
+| Ship to GitHub / Vercel / Supabase | [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md) | `.cursor/rules/deployment-sync.mdc` mirrors the minimum gate |
 | CI guardrails / architectural invariants (new `check:*` script) | [docs/fundamentals/architectural-fitness-functions.md](docs/fundamentals/architectural-fitness-functions.md) | Wire script in `package.json` + `test:ci` or `check:prepush`; update owner doc in same PR |
 | Lovable staging / platform exit (risk, CI, hybrid paths) | [docs/ops/lovable-staging-and-platform-exit.md](docs/ops/lovable-staging-and-platform-exit.md) | Pairs with deployment-sync-guide; not a substitute for pre-push checklist |
 | Pause-first shipped scope (MVP routes, edges, Tier B drops) | [docs/ops/active-surface.md](docs/ops/active-surface.md) | `.cursor/rules/active-surface.mdc`; no `@/legacy` imports in active `src/` |
@@ -94,7 +94,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | Cross-surface correlation | `src/lib/cid.ts` → per-tab `cid`, attached as `x-cid` header via `invokeEdge` wrapper; set as Sentry tag + PostHog super-property |
 | Web Vitals | `src/lib/web-vitals.ts` forwards CLS/INP/LCP/FCP/TTFB to Sentry + PostHog |
 | Edge request logging | `supabase/functions/_shared/with-request-logging.ts` wraps new functions; `_shared/deps.ts` for external call logging; `_shared/edge-error.ts` for standardized errors |
-| Edge log drain (BetterStack) | `supabase/functions/_shared/observe.ts` — `createLogger` POSTs each JSON line to `LOG_DRAIN_URL`; configure via Lovable secrets |
+| Edge log drain (BetterStack) | `supabase/functions/_shared/observe.ts` — `createLogger` POSTs each JSON line to `LOG_DRAIN_URL`; configure via Supabase Edge secrets |
 | Edge error reporting | `supabase/functions/_shared/sentry.ts` — `initSentryEdges` + `captureEdgeError`; wired from `withRequestLogging` catch + `observe.ts` `.error` path; no per-function init needed |
 | Audit log | `supabase/functions/_shared/audit.ts` + `audit_log` table — security-sensitive ops (account deletion, admin overrides, subscription state changes) |
 | Feedback widget | `src/app/components/FeedbackWidget.tsx` (floating button + sheet); `supabase/functions/send-feedback/index.ts` posts PII-safe summary to `SLACK_WEBHOOK_URL` |
@@ -107,9 +107,8 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 - **Migrations:** `supabase/migrations/` — SQL is the source of truth for schema; follow the project’s normal flow to apply (CLI linked project, dashboard, etc.).
 - **SQL function conventions (mandatory):** every function in `supabase/migrations/` must `SET search_path = public` (or `public, extensions` when calling `net.*` / extension code), and use `SECURITY DEFINER` **only** when bypassing RLS is required — and then validate the caller and strip privileged columns. See [docs/ops/migration-security-conventions.md](docs/ops/migration-security-conventions.md) for templates and the pre-push checklist; companion rules for views are in [docs/ops/migration-view-safety.md](docs/ops/migration-view-safety.md).
 - **Edge functions:** `supabase/functions/<name>/index.ts` (Deno). Shared helpers: `supabase/functions/_shared/`. Larger handlers (e.g. **`companion-orchestrate`**) also use **`_shared/companion-orchestrate-*.ts`** (types, parse, logging, skip-cache, tasks, assemble). Add **`[functions.<name>]`** in **`supabase/config.toml`** for **every** new function (same PR). Unlisted names use **Supabase defaults** and can **401** on `invoke` or disagree with `functions serve` until you add the block and redeploy. **401** → session/`Authorization`, dashboard secrets, deployed `config.toml`. After editing edge TS, run **`npm run check:edge`** when Deno is installed.
-- **Lovable + GitHub sync:** migrations and edge functions often **deploy to the linked project immediately** on sync; the **React app** still needs a **publish / Update** in Lovable. See [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) §17.
+- **Deploy path:** Migrations and edge functions deploy to **owned Supabase** (staging / prod) via CI or CLI; the **React app** deploys on **Vercel** when `main` merges. See [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) §17 and [docs/ops/vercel-frontend-setup.md](docs/ops/vercel-frontend-setup.md).
 - **Runtime:** Functions run on Supabase in deployed environments. You typically **do not** start them locally during ordinary frontend work unless you are explicitly developing/testing a function.
-- **Secrets** (Stripe, Lovable email/AI keys, VAPID, model keys, etc.) belong in the **Supabase dashboard** for edge functions — not in `VITE_*` or committed files.
 
 ## Environment variables
 
@@ -132,9 +131,9 @@ Never commit `.env` or service role keys.
 - **Commits (agents):** [`.cursor/rules/git-commits.mdc`](.cursor/rules/git-commits.mdc) — commit after each **logical slice** and at task end; default is commit without being asked. Overrides global "only commit when requested" user rules in this repo.
 - Use clear commit messages (what changed and why). Prefer `git` from the system install if it is not on `PATH` (e.g. `C:\Program Files\Git\bin\git.exe` on Windows).
 
-### Before every push to GitHub (Lovable sync)
+### Before every push to GitHub
 
-Pushing triggers **automatic** DB migrations and edge function deploys to the linked project; the **frontend** still needs a manual **Publish → Update** in Lovable.
+Merging to `staging` or `main` triggers Supabase migrations/edge deploy (per CI) and Vercel frontend deploy (on `main`). Match release SHA across Vercel (`VITE_APP_VERSION`) and edges (`SENTRY_RELEASE` / `EDGE_RELEASE`).
 
 **Run the pre-push checklist** in [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md) (boxed list + **`npm run check:prepush`** bash gate). Day-to-day minimum: **`npm run test`**, **`npm run build`** (**`prebuild`** → **`check:version-sync`**), lint on touched files. When edge code or **`config.toml`** / **`EdgeCoverage.tsx`** changes: also **`npm run check:edge`** (if Deno is installed), **`npm run check:edge-logging`**, **`npm run check:edge-coverage-manifest`**. After schema changes: **`npm run gen:types`** when you can authenticate to Supabase, and **`as unknown as T`** for new columns until types catch up. Cursor loads the same expectations via `.cursor/rules/deployment-sync.mdc`.
 
@@ -142,7 +141,7 @@ Pushing triggers **automatic** DB migrations and edge function deploys to the li
 
 - **Frontend errors → Sentry** with on-error Session Replay (fully masked: `maskAllText`, `blockAllMedia`, `maskAllInputs`). Tracing sample rate 0.1. No global Replay.
 - **Edge errors → Sentry** via `supabase/functions/_shared/sentry.ts` (shared helper, no per-function init). Captured from `withRequestLogging` catch and `observe.ts` `.error` path. `tracesSampleRate: 0`, no Replay. `beforeSend` skips expected `EdgeError` codes (`auth_required`, `rate_limited`, `bad_input`, `not_found`) to protect quota.
-- **Structured edge logs → BetterStack** via `observe.ts` in-function HTTP forwarder (Lovable-managed Supabase has no dashboard log drain).
+- **Structured edge logs → BetterStack** via `observe.ts` in-function HTTP forwarder (configure `LOG_DRAIN_URL` in Supabase Edge secrets).
 - **Product analytics + feature flags → PostHog** with `autocapture: false`, `session_recording.disabled: true`, `person_profiles: 'identified_only'`, `sanitize_properties`.
 - **Alerts → Slack (`#holzen-alerts`)** from Sentry + BetterStack + UptimeRobot + the feedback forwarder.
 - **Cron heartbeats → BetterStack Heartbeats** via `net.http_get` inside each `pg_cron` schedule.

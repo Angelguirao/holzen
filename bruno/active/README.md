@@ -28,6 +28,6 @@ Full catalog: [`functions-catalog.md`](functions-catalog.md). Human checklist: [
 | `billing/` | User JWT | Checkout, subscription, portal, `ensure-trial-subscription` |
 | `platform/` | User JWT or none | `health`, feedback, push, referral, **delete-account** (dangerous) |
 | `service-cron/` | `SERVICE_CRON_BEARER` | Shipped crons: volatility, BTC prices, pregenerate, backfill, seed, referral pending |
-| `auth-hook/` | `LOVABLE_API_KEY` | Email template preview only |
+| `auth-hook/` | `EMAIL_PREVIEW_SECRET` or `CRON_SECRET` | Email template preview only |
 
 All requests include **`x-cid: bruno-{{$timestamp}}-review`** for log correlation (parity with app `invokeEdge`).

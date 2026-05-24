@@ -14,7 +14,7 @@ This list is **not** the shipped surface. Names like `export-user-data`, `badge-
 
 | Name | Bruno folder | Auth notes |
 |------|----------------|------------|
-| auth-email-hook | `auth-hook/` | Preview: `LOVABLE_API_KEY`. Main webhook: signed Lovable payload only. |
+| auth-email-hook | `auth-hook/` | Preview: `EMAIL_PREVIEW_SECRET` or `CRON_SECRET`. Main webhook: Supabase Send Email Hook + `SEND_EMAIL_HOOK_SECRET`. |
 | badge-notify | `user-jwt/` | User JWT |
 | check-subscription | `billing/` | User JWT |
 | check-volatility | `service-cron/` | `SERVICE_CRON_BEARER` |

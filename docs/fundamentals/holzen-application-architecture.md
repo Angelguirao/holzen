@@ -392,7 +392,7 @@ docs/systems/                   # behavioral truth per context
 - `packages/infrastructure` implements `ports`; may import `contracts` and Supabase client.
 - `packages/<context>A` must not import `packages/<context>B` internals (only `public` exports).
 
-While **Lovable-managed publish** keeps Vite at the repo root, use `src/features/<context>/{domain,application,ports,public.ts}` with the same dependency rules (see [frontend-module-layout.md](frontend-module-layout.md) §0, §10). Extract to `packages/*` only when the ADR §8 gate is met — not as wave 1.
+While **Vercel + root Vite** keeps the SPA at the repo root, use `src/features/<context>/{domain,application,ports,public.ts}` with the same dependency rules (see [frontend-module-layout.md](frontend-module-layout.md) §0, §10). Extract to `packages/*` only when the ADR §8 gate is met — not as wave 1.
 
 ---
 
@@ -405,7 +405,7 @@ While **Lovable-managed publish** keeps Vite at the repo root, use `src/features
 | **Feature-Sliced Design verbatim** | Popular in React | Vocabulary mismatch; our core context is **pause**, not one slice per tab |
 | **Separate `@holzen/companion` package** | Large edge pipeline | Companions are pause-scoped in schema and ritual (§8); use submodules inside `@holzen/pause` |
 | **Package per nav tab** (home, archive, …) | Matches IA | Tabs are screens, not domains (§7) |
-| **Next.js / Remix instead of SPA** | SSR, colocated routes | Lovable publish path, PWA, mostly authenticated app — revisit only if SEO/SSR becomes launch-critical ([spa-framework-evaluation.md](../backlog/spa-framework-evaluation.md)) |
+| **Next.js / Remix instead of SPA** | SSR, colocated routes | Vercel SPA path, PWA, mostly authenticated app — revisit only if SEO/SSR becomes launch-critical ([spa-framework-evaluation.md](../backlog/spa-framework-evaluation.md)) |
 | **All logic in edge functions** | Thin client | Poor offline UX, chatty network, still need client state machine projection |
 | **All logic in client hooks** | Fast to ship | Fails P1; duplicate truth; untestable policy |
 | **Microservices (pause service, billing service)** | Independent scale | Operational cost; Supabase already centralizes data |

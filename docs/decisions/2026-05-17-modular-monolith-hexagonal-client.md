@@ -1,5 +1,7 @@
 # ADR: Modular monolith + hexagonal client (pre-launch)
 
+> **Platform exit (2026-05-23):** Holzen **no longer** publishes through Lovable Cloud. Production SPA is **Vercel**; root Vite layout remains. See [2026-05-23-platform-exit-lovable.md](./2026-05-23-platform-exit-lovable.md). The Lovable constraint below is **historical context** for why `apps/web` extraction was gated.
+
 **Date:** 2026-05-17  
 **Status:** accepted  
 **Principles:** [holzen-application-architecture.md](../fundamentals/holzen-application-architecture.md)  
