@@ -2,14 +2,15 @@
 /**
  * Create Stripe webhooks, resolve v1 price IDs, push secrets to Supabase.
  *
- * Auth (first match wins):
- * 1. Stripe CLI login → reads test_mode_api_key / live_mode_api_key from `stripe config --list`
- * 2. `.env.stripe.bootstrap` or env: STRIPE_TEST_SECRET_KEY, STRIPE_LIVE_SECRET_KEY
+ * Keys:
+ * - Test: full sk_test_… from ~/.config/stripe/config.toml after `npm run stripe:login`
+ * - Live checkout: rk_live_… from Stripe CLI Windows credential store (or sk_live_… in env)
+ * - Live webhooks: require sk_live_… (STRIPE_LIVE_SECRET_KEY) — CLI rk_live cannot create webhooks
  *
  * Usage: npm run stripe:bootstrap-secrets
  */
 import { existsSync, readFileSync } from "node:fs";
-import { homedir } from "node:os";
+import { homedir, platform } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -40,35 +41,28 @@ function loadBootstrapEnv() {
   }
 }
 
-function stripeCli() {
-  const candidates = [
-    process.env.STRIPE_CLI_PATH,
-    join(
-      homedir(),
-      "AppData/Local/Microsoft/WinGet/Packages/Stripe.StripeCli_Microsoft.Winget.Source_8wekyb3d8bbwe/stripe.exe",
-    ),
-  ].filter(Boolean);
-  return candidates.find((p) => existsSync(p));
+function readWindowsStripeLiveKey() {
+  if (platform() !== "win32") return null;
+  const ps1 = join(process.cwd(), "scripts/read-stripe-cli-live-key.ps1");
+  if (!existsSync(ps1)) return null;
+  const result = spawnSync(
+    "powershell",
+    ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ps1],
+    { encoding: "utf8" },
+  );
+  const key = result.stdout.trim();
+  if (key.startsWith("rk_live_") || key.startsWith("sk_live_")) return key;
+  return null;
 }
 
 function keysFromCli() {
-  const cli = stripeCli();
   const configPath = join(homedir(), ".config/stripe/config.toml");
-  if (!cli || !existsSync(configPath)) return null;
+  if (!existsSync(configPath)) return null;
 
   const toml = readFileSync(configPath, "utf8");
-  const test =
-    toml.match(/test_mode_api_key\s*=\s*['"](sk_test_[^'"]+)['"]/)?.[1] ||
-    process.env.STRIPE_TEST_SECRET_KEY;
-  const live =
-    toml.match(/live_mode_api_key\s*=\s*['"]((?:sk_live|rk_live)_[^'"]+)['"]/)?.[1] ||
-    process.env.STRIPE_LIVE_SECRET_KEY;
-  if (test?.includes("*") || live?.includes("*")) {
-    return {
-      test: test?.includes("*") ? process.env.STRIPE_TEST_SECRET_KEY : test,
-      live: live?.includes("*") ? process.env.STRIPE_LIVE_SECRET_KEY : live,
-    };
-  }
+  const test = toml.match(/test_mode_api_key\s*=\s*['"](sk_test_[^'"]+)['"]/)?.[1];
+  let live = toml.match(/live_mode_api_key\s*=\s*['"]((?:sk_live|rk_live)_[^'"]+)['"]/)?.[1];
+  if (!live || live.includes("*")) live = readWindowsStripeLiveKey();
   return { test, live };
 }
 
@@ -77,7 +71,8 @@ function resolveKeys() {
   const fromCli = keysFromCli();
   return {
     test: process.env.STRIPE_TEST_SECRET_KEY || fromCli?.test,
-    live: process.env.STRIPE_LIVE_SECRET_KEY || fromCli?.live,
+    liveCheckout: process.env.STRIPE_LIVE_SECRET_KEY || fromCli?.live,
+    liveAdmin: process.env.STRIPE_LIVE_SECRET_KEY || null,
   };
 }
 
@@ -104,15 +99,9 @@ function setSupabaseSecrets(projectRef, pairs) {
 
 async function resolvePrices(secretKey) {
   const prices = await stripeApi(secretKey, "GET", "/prices?limit=100&expand[]=data.product");
-  const pro = prices.data?.find(
-    (p) => p.active !== false && p.recurring && p.unit_amount === 499,
-  );
-  const flexS = prices.data?.find(
-    (p) => p.active !== false && !p.recurring && p.unit_amount === 249,
-  );
-  const flexM = prices.data?.find(
-    (p) => p.active !== false && !p.recurring && p.unit_amount === 399,
-  );
+  const pro = prices.data?.find((p) => p.active !== false && p.recurring && p.unit_amount === 499);
+  const flexS = prices.data?.find((p) => p.active !== false && !p.recurring && p.unit_amount === 249);
+  const flexM = prices.data?.find((p) => p.active !== false && !p.recurring && p.unit_amount === 399);
   if (!pro?.id || !flexS?.id || !flexM?.id) {
     throw new Error(
       `Missing v1 prices (need 499/mo, 249, 399). Found pro=${pro?.id} s=${flexS?.id} m=${flexM?.id}`,
@@ -127,8 +116,12 @@ async function ensureTestPrices(secretKey) {
   } catch {
     console.log("  creating missing test-mode v1 products/prices…");
     const proProduct = await stripeApi(secretKey, "POST", "/products", { name: "Holzen Pro" });
-    const flexSProduct = await stripeApi(secretKey, "POST", "/products", { name: "Holzen Flex Pack S" });
-    const flexMProduct = await stripeApi(secretKey, "POST", "/products", { name: "Holzen Flex Pack M" });
+    const flexSProduct = await stripeApi(secretKey, "POST", "/products", {
+      name: "Holzen Flex Pack S",
+    });
+    const flexMProduct = await stripeApi(secretKey, "POST", "/products", {
+      name: "Holzen Flex Pack M",
+    });
     await stripeApi(secretKey, "POST", "/prices", {
       product: proProduct.id,
       unit_amount: "499",
@@ -149,80 +142,87 @@ async function ensureTestPrices(secretKey) {
   }
 }
 
-async function ensureWebhook(secretKey, url) {
-  const listed = await stripeApi(secretKey, "GET", "/webhook_endpoints?limit=100");
+async function ensureWebhook(adminKey, url) {
+  const listed = await stripeApi(adminKey, "GET", "/webhook_endpoints?limit=100");
   const hit = listed.data?.find((w) => w.url === url && w.status !== "disabled");
   if (hit) {
-    console.log(`  webhook exists: ${hit.id} — rolling signing secret`);
-    const rolled = await stripeApi(secretKey, "POST", `/webhook_endpoints/${hit.id}/secret`);
-    return rolled.secret;
+    console.log(`  webhook exists: ${hit.id} (keeping existing STRIPE_WEBHOOK_SECRET)`);
+    return null;
   }
 
   const form = { url };
   EVENTS.forEach((ev, i) => {
     form[`enabled_events[${i}]`] = ev;
   });
-  const created = await stripeApi(secretKey, "POST", "/webhook_endpoints", form);
+  const created = await stripeApi(adminKey, "POST", "/webhook_endpoints", form);
   console.log(`  webhook created: ${created.id}`);
   return created.secret;
 }
 
-async function bootstrapMode({ label, secretKey, projectRef, webhookUrl }) {
-  if (!secretKey) throw new Error(`No secret key for ${label}`);
+async function bootstrapMode({ label, checkoutKey, webhookAdminKey, projectRef, webhookUrl }) {
+  if (!checkoutKey) throw new Error(`No checkout key for ${label}`);
   console.log(`\n=== ${label} ===`);
 
-  const priceIds = secretKey.startsWith("sk_test_")
-    ? await ensureTestPrices(secretKey)
-    : await resolvePrices(secretKey);
+  const priceIds = checkoutKey.startsWith("sk_test_")
+    ? await ensureTestPrices(checkoutKey)
+    : await resolvePrices(checkoutKey);
   console.log(`  STRIPE_PRICE_ID_PRO=${priceIds.pro}`);
   console.log(`  STRIPE_PRICE_ID_FLEX_PACK_S=${priceIds.flexS}`);
   console.log(`  STRIPE_PRICE_ID_FLEX_PACK_M=${priceIds.flexM}`);
 
-  const webhookSecret = await ensureWebhook(secretKey, webhookUrl);
-
-  setSupabaseSecrets(projectRef, [
-    `STRIPE_SECRET_KEY=${secretKey}`,
-    `STRIPE_WEBHOOK_SECRET=${webhookSecret}`,
+  const secrets = [
+    `STRIPE_SECRET_KEY=${checkoutKey}`,
     `STRIPE_PRICE_ID_PRO=${priceIds.pro}`,
     `STRIPE_PRICE_ID_FLEX_PACK_S=${priceIds.flexS}`,
     `STRIPE_PRICE_ID_FLEX_PACK_M=${priceIds.flexM}`,
-  ]);
+  ];
+
+  const webhookKey = webhookAdminKey || checkoutKey;
+  try {
+    const webhookSecret = await ensureWebhook(webhookKey, webhookUrl);
+    if (webhookSecret) secrets.push(`STRIPE_WEBHOOK_SECRET=${webhookSecret}`);
+  } catch (err) {
+    if (label.includes("LIVE") && !webhookAdminKey) {
+      console.log(`  webhook skipped: ${err instanceof Error ? err.message : err}`);
+      console.log(
+        "  checkout + prices pushed; add STRIPE_LIVE_SECRET_KEY=sk_live_… to .env.stripe.bootstrap and re-run for webhook",
+      );
+    } else {
+      throw err;
+    }
+  }
+
+  setSupabaseSecrets(projectRef, secrets);
 }
 
 const keys = resolveKeys();
 if (!keys.test) {
-  console.error(`
-Stripe test key not found. Run: npm run stripe:login
-Or set STRIPE_TEST_SECRET_KEY in .env.stripe.bootstrap
-`);
+  console.error("Stripe test key not found. Run: npm run stripe:login");
   process.exit(1);
 }
 
 try {
   await bootstrapMode({
     label: "TEST (staging)",
-    secretKey: keys.test,
+    checkoutKey: keys.test,
+    webhookAdminKey: keys.test,
     projectRef: STAGING_REF,
     webhookUrl: STAGING_WEBHOOK,
   });
-  if (!keys.live || keys.live.includes("*")) {
-    console.log(`
-=== LIVE (prod) — skipped ===
-Stripe CLI stores a restricted live key (masked). Add your full secret key once:
 
-  1. Stripe Dashboard → Developers → API keys → Reveal live key
-  2. Copy .env.stripe.bootstrap.example → .env.stripe.bootstrap
-  3. Set STRIPE_LIVE_SECRET_KEY=sk_live_...
-  4. Re-run: npm run stripe:bootstrap-secrets
-`);
+  if (!keys.liveCheckout) {
+    console.log("\nLive key not found. Run: npm run stripe:login");
     process.exit(0);
   }
+
   await bootstrapMode({
     label: "LIVE (prod)",
-    secretKey: keys.live,
+    checkoutKey: keys.liveCheckout,
+    webhookAdminKey: keys.liveAdmin,
     projectRef: PROD_REF,
     webhookUrl: PROD_WEBHOOK,
   });
+
   console.log("\nDone. Stripe secrets pushed to staging + prod.");
 } catch (err) {
   console.error(err instanceof Error ? err.message : err);
