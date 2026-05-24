@@ -56,6 +56,7 @@ Holzen thesis #4 — *boundaries are enforced* — is implemented largely throug
 | Edge deploy + observe | `check:edge-logging`, config.toml coverage, `check:edge-coverage-manifest`, `check:edge` | [edge-logging-conventions.md](../ops/edge-logging-conventions.md) |
 | Controlled client → edge surface | `check:invoke-edge-allowlist` | `invokeEdge` + `x-cid` on new call sites |
 | Analytics taxonomy | `check:posthog-events-allowlist` | [event-taxonomy.md](../ops/event-taxonomy.md) in same PR |
+| Feature flags taxonomy | `check:feature-flags-doc` | [feature-flags.md](../ops/feature-flags.md) in same PR |
 | API review catalog | `check:bruno-active-manifest` | `bruno/active/functions-catalog.md` |
 | Schema evolves safely | `check:view-migrations`, local `supabase db reset` (prepush) | [migration-view-safety.md](../ops/migration-view-safety.md), [migration-security-conventions.md](../ops/migration-security-conventions.md) |
 | Release traceability | `check:version-sync`, `stamp-edge-release` / `check:release-stamp` | `VITE_APP_VERSION` = Git SHA in Lovable |
@@ -81,7 +82,7 @@ Scripts live under `scripts/`. See script headers for exact rules and allowlists
 | Script | In `test:ci` | Capability |
 |--------|--------------|------------|
 | `check:architecture-alignment` | Yes | Required `features/<ctx>/` skeleton; pause ritual paths; spawns feature-import + no-screens checks |
-| `check:feature-imports` | Via architecture-alignment | Hexagonal layer rules; `public*` barrels from app code; presentation hooks import `application/` only via `*-io.ts` barrels; no Supabase client in `presentation/` |
+| `check:feature-imports` | Via architecture-alignment | Hexagonal layer rules; `public*` barrels from app code; presentation hooks import `application/` only via `*-io.ts` barrels; no Supabase client in `presentation/`; pause `presentation/` must not import `pause/infrastructure/` |
 | `check:no-supabase-in-screens` | Via architecture-alignment | No `@/integrations/supabase/client` in `src/screens/**` |
 | `check:no-supabase-in-app` | Via architecture-alignment | No `@/integrations/supabase/client` in `src/app/**` |
 | `check:no-screens-in-features` | Via architecture-alignment | Features must not import `@/screens/` |
@@ -102,6 +103,7 @@ Scripts live under `scripts/`. See script headers for exact rules and allowlists
 | Script | In `test:ci` | Capability |
 |--------|--------------|------------|
 | `check:posthog-events-allowlist` | Yes | `trackEvent` names ⊆ event taxonomy Active section |
+| `check:feature-flags-doc` | Yes | `useFeatureFlag` keys ⊆ feature-flags.md Active flags table |
 | `check:view-migrations` | Prepush | Safe `CREATE OR REPLACE VIEW` patterns |
 | `check:version-sync` | Prebuild | `package.json` version = latest changelog row |
 | `stamp-edge-release` / `check:release-stamp` | Prepush stamp step | Edge `EDGE_RELEASE` = Git SHA |
@@ -172,7 +174,7 @@ Ordered by impact ÷ effort. Do not implement here unless a separate task scopes
 | Candidate | Protects | Notes |
 |-----------|----------|-------|
 | ~~`check:no-supabase-in-screens`~~ | *(shipped)* | Wired in `check:architecture-alignment` |
-| `check:feature-flags-doc` | Flag taxonomy | Mirror PostHog allowlist pattern |
+| ~~`check:feature-flags-doc`~~ | *(shipped)* | In `test:ci` + prepush |
 | Enable `check:i18n-active-keys` in CI | i18n completeness | When active tree is complete |
 | `check:sql-search-path` | Migration security | Regex on `supabase/migrations/*.sql` |
 | Bundle size budget | Performance regression | Threshold on main chunk post-build |

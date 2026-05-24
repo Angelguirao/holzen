@@ -32,6 +32,8 @@ return value ? <HomeV2 /> : <HomeClassic />;
 
 Add rows as flags are introduced. Bump rollout % via PostHog UI; document changes in the table.
 
+`npm run check:feature-flags-doc` — every `useFeatureFlag('…')` in active `src/` (excluding `src/legacy/` and `src/test/`) must appear in the **Active flags** table above. Runs in **`test:ci`** and `scripts/pre-push-check.sh`.
+
 ## Naming convention
 
 `<domain>.<short_key>` lowercase snake-case.
