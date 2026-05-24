@@ -72,7 +72,7 @@ export function useSettingsModel() {
     tier,
   } = useSubscription();
   const startCheckoutFromSettings = useCallback(
-    (target: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' = 'pro') => {
+    (target: 'pro' | 'flex_pack_s' | 'flex_pack_m' = 'pro') => {
       trackPaywallViewed('settings');
       return startCheckout(target);
     },
