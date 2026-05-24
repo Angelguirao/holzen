@@ -152,6 +152,35 @@ Optional: assign a **branch domain** (e.g. `staging.holzen.app` → branch `stag
 
 ---
 
+## 5.1 Pre-launch: password-protect production
+
+Use this when **prod is deployed** but you are **not ready for public traffic** (pause-first ship still in progress). It gates **only the Vercel-hosted SPA** (`holzen.app`); Supabase Auth, Postgres, and Edge Functions remain reachable to anyone with the project URL and anon key — acceptable for founder/test accounts, not a full security perimeter.
+
+### Enable (Vercel dashboard)
+
+1. [vercel.com](https://vercel.com) → **Holzen** project → **Settings** → **Deployment Protection**.
+2. Under **Password Protection** (or **Protection** → **Password**), enable for **Production**.
+3. Set a strong shared password; store it in your team password manager (not in git).
+4. If you use **`www.holzen.app`**, confirm both apex and `www` are on **Production** (Domains) so both hit the protected deployment.
+5. Open an incognito window → `https://holzen.app` → confirm the password prompt appears before the app loads.
+6. Optional: leave **Preview** deployments **unprotected** so PR URLs stay easy for QA, or password-protect Previews too if URLs leak.
+
+**Bypass for automation:** GitHub Actions deploys still succeed; protection applies to **browser visitors**, not the deploy API. Team members logged into Vercel may bypass per your plan’s **Vercel Authentication** rules — use password-only for external testers if needed.
+
+### While gated
+
+- Do **not** merge to **`main`** unless you intend to update prod; keep work on **`staging`** ([branch-model.md](./branch-model.md)).
+- Keep **required reviewers** on the GitHub **`production`** environment so Actions cannot ship prod without approval.
+- Optional: Supabase prod → Auth → disable new signups if you want zero new accounts during the gate.
+
+### Remove at launch
+
+1. Deployment Protection → disable password on **Production**.
+2. Smoke `holzen.app` in incognito (no prompt).
+3. Tick launch checks in [launch-runbook.md](./launch-runbook.md) / [ship-checklist.md](./ship-checklist.md).
+
+---
+
 ## 6. Rollback
 
 - **Frontend:** Vercel → Deployments → Promote previous deployment (instant)

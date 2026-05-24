@@ -12,6 +12,7 @@ Human checklist for shipping pause-first to production. **Quick ticks:** [ship-c
 | Merge `staging → main` | 🚢 you |
 | Vercel production deploy | 🚢 automatic on `main` merge |
 | §3.1 no real prod users (before destructive cutover) | 🚢 you |
+| Vercel production password gate (pre-launch) | 🚢 you — [vercel-frontend-setup.md](./vercel-frontend-setup.md) §5.1 |
 
 ## Preconditions
 
