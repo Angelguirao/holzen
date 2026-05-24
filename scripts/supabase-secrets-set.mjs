@@ -1,25 +1,23 @@
 /**
- * Push edge secrets from a gitignored env file to the linked Supabase project.
+ * Push edge secrets from a gitignored env file to a Supabase project.
  *
  * Usage:
- *   cp .env.staging.secrets.example .env.staging.secrets
- *   # fill values, then:
  *   npm run staging:secrets-set
+ *   npm run prod:secrets-set
  *
- * Requires: npx supabase login + link --project-ref ksplyxxdvandkwzundql
+ * Or: node scripts/supabase-secrets-set.mjs .env.staging.secrets ksplyxxdvandkwzundql
  */
 import { readFileSync, existsSync } from "node:fs";
-import { execFileSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const envPath = join(root, ".env.staging.secrets");
+const envPath = join(root, process.argv[2] ?? ".env.staging.secrets");
+const projectRef = process.argv[3];
 
 if (!existsSync(envPath)) {
-  console.error(
-    "Missing .env.staging.secrets — copy .env.staging.secrets.example and fill values.",
-  );
+  console.error(`Missing ${envPath} — copy the matching *.example and fill values.`);
   process.exit(1);
 }
 
@@ -46,14 +44,20 @@ for (const line of raw.split(/\r?\n/)) {
 }
 
 if (pairs.length === 0) {
-  console.error("No non-empty secrets in .env.staging.secrets");
+  console.error(`No non-empty secrets in ${envPath}`);
   process.exit(1);
 }
 
-console.log(`Setting ${pairs.length} edge secret(s) on linked project…`);
-execFileSync("npx", ["supabase", "secrets", "set", ...pairs], {
+const args = ["supabase", "secrets", "set", ...pairs];
+if (projectRef) {
+  args.push("--project-ref", projectRef);
+}
+
+console.log(`Setting ${pairs.length} edge secret(s)${projectRef ? ` on ${projectRef}` : " on linked project"}…`);
+const result = spawnSync("npx", args, {
   cwd: root,
   stdio: "inherit",
   shell: process.platform === "win32",
 });
+if (result.status !== 0) process.exit(result.status ?? 1);
 console.log("Done.");

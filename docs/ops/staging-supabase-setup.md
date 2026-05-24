@@ -89,7 +89,7 @@ npm run staging:secrets-set
 
 Inventory prod/Lovable secrets against [observability-setup.md](observability-setup.md).
 
-**Stripe runbook:** [stripe-environment-setup.md](stripe-environment-setup.md) — test vs live, webhooks, verification.
+**Stripe / edge secrets:** copy [.env.staging.secrets.example](../../.env.staging.secrets.example) → `.env.staging.secrets`, then `npm run staging:secrets-set`. See [stripe-environment-setup.md](stripe-environment-setup.md).
 
 ---
 
