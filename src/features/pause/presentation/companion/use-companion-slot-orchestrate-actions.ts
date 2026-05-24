@@ -5,7 +5,7 @@ import type {
   CompanionSlotRelaxations,
 } from './pause-companion-orchestrate-io';
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
-import type { CompanionSlotTransitionStarters } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-ui-state';
+import type { CompanionSlotTransitionStarters } from './pause-companion-orchestrate-io';
 import { useCompanionSlotOrchestrateFailurePorts } from './use-companion-slot-orchestrate-failure-ports';
 import { useCompanionSlotRunOrchestrate } from './use-companion-slot-run-orchestrate';
 
