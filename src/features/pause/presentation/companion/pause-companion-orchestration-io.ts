@@ -9,7 +9,7 @@
  * reciprocal inline pins: `pause-companion-orchestration-io.test.ts` ↔ `pause-companion-frame-ui-io.test.ts`,
  * `pause-companion-orchestration-io.test.ts` ↔ `pause-companion-analytics-io.test.ts`.
  */
-import { invalidateCompanionUiCompletionQuery } from '@/features/pause/infrastructure/queries/companion/companion-ui-completion-query-key';
+import { invalidateCompanionUiCompletionQuery } from '@/features/pause/public-queries';
 import {
   loadCompanionOrchestrateSession,
   type LoadCompanionOrchestrateSessionInput,

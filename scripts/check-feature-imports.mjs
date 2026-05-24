@@ -99,12 +99,28 @@ for (const file of files) {
   }
 }
 
+/** Pause presentation uses public-queries for cache keys — not deep infrastructure paths. */
+const PAUSE_INFRA_IN_PRESENTATION =
+  /from\s+['"]@\/features\/pause\/infrastructure\//;
+
+for (const file of files) {
+  const rel = relative(root, file).replace(/\\/g, '/');
+  if (/\.(test|spec)\.(ts|tsx)$/.test(rel)) continue;
+  if (!rel.startsWith('src/features/pause/presentation/')) continue;
+  const text = readFileSync(file, 'utf8');
+  if (PAUSE_INFRA_IN_PRESENTATION.test(text)) {
+    violations.push({
+      file: rel,
+      label: 'pause presentation must not import infrastructure/ (use public-queries or public-rpc)',
+    });
+  }
+}
+
 /** Active app must use public / public-queries / public-rpc — not deep feature layers. */
 const DEEP_FEATURE_IMPORT =
   /from\s+['"]@\/features\/[^'"]+\/(application|infrastructure|domain|presentation)\//;
 
 const ALLOWED_DEEP_IMPORT_FILES = new Set([
-  'src/features/pause/application/use-cases/ritual/decide/apply-bulk-hold-outcomes.test.ts',
   'src/features/subscription/presentation/CheckoutConfirmation.close-reopen.test.tsx',
   'src/features/subscription/presentation/CheckoutConfirmation.cross-tab.test.tsx',
   'src/features/subscription/presentation/CheckoutConfirmation.guard.test.tsx',
