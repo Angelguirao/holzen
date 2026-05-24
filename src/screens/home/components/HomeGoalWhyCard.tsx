@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { HoldGoalWidget } from '@/screens/home/components/HoldGoalWidget';
-import { useHolzen } from '@/app/components/HolzenProvider';
+import { useProfile } from '@/features/user/public-hooks';
 import { useAuth } from '@/features/auth/public';
 import { getProfileRowQueryOptions } from '@/features/user/public-queries';
 import {
@@ -29,7 +29,7 @@ export function HomeGoalWhyCard({
 }) {
   "use memo";
   const { t } = useTranslation();
-  const { motivations } = useHolzen();
+  const { motivations } = useProfile();
   const { user } = useAuth();
   const userId = user?.id;
   const prefersReduced = useReducedMotion();

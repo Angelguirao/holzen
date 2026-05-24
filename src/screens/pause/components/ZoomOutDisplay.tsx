@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { useHolzen } from '@/app/components/HolzenProvider';
+import { useProfile } from '@/features/user/public-hooks';
 import { formatBtcPrice } from '@/features/market/public';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import type { ZoomOutData } from '@/features/pause/public-ritual-frame';
@@ -28,7 +28,7 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
   const { subscribed, startCheckout } = useSubscription();
-  const { currency } = useHolzen();
+  const { currency } = useProfile();
   const fmtPrice = (n: number) => formatBtcPrice(n, currency);
 
   const goToReplay = useCallback(() => {
