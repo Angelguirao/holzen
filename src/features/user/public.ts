@@ -19,3 +19,8 @@ export {
   submitTestimonialAction,
   type TestimonialActionState,
 } from './presentation/home-testimonial-io';
+export {
+  readPostHogSessionIdForFeedback,
+  trackFeedbackSubmitted,
+  type FeedbackCategory,
+} from './presentation/feedback-telemetry-io';
