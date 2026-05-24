@@ -1,6 +1,6 @@
 import { useParams, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useHolzen } from '@/app/components/HolzenProvider';
+import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useCompanionFullViewPage, useGroundingEnrichment } from '@/features/pause/public-ritual-frame';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
@@ -15,7 +15,7 @@ import { PageMeta } from '@/app/components/PageMeta';
 export default function CompanionGroundingPage() {
   const { pauseInstanceId: rid } = useParams<{ pauseInstanceId: string }>();
   const { t } = useTranslation();
-  const { companionPrefs, severity } = useHolzen();
+  const { companionPrefs, severity } = usePauseHomeContext();
 
   const {
     missingRouteId,

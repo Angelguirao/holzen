@@ -11,10 +11,9 @@ SELECT vault.create_secret(
   'Owned Supabase project base URL for pg_cron HTTP targets'
 );
 
--- After migrations + edge deploy (service_role from Dashboard → Settings → API):
+-- After migrations + edge deploy, store cron bearer in Vault (pick one):
 -- SELECT vault.create_secret('<SERVICE_ROLE_JWT>', 'holzen_cron_service_role');
+-- SELECT vault.create_secret('<random CRON_SECRET>', 'CRON_SECRET');
 
--- If holzen_project_url was added AFTER db push, re-run cron URL rewrite:
--- UPDATE cron.job
--- SET command = replace(command, 'https://edgbwdecaoottowliimu.supabase.co', '<YOUR_PROJECT_URL>')
--- WHERE command LIKE '%edgbwdecaoottowliimu%';
+-- Reschedule HTTP crons (do NOT rely on UPDATE cron.job — 42501 on hosted):
+-- npx supabase db query --linked --file scripts/sql/staging-reschedule-owned-crons.sql

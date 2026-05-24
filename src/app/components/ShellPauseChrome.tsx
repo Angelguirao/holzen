@@ -1,7 +1,7 @@
 import { useLocation } from 'react-router-dom';
 import { PauseReadyBanner } from '@/app/components/PauseReadyBanner';
 import { PendingPauseOfferShell } from '@/screens/pause/components/PendingPauseOfferShell';
-import { useHolzen } from '@/app/components/HolzenProvider';
+import { usePauseHomeContext } from '@/features/pause/public-home';
 
 type Props = {
   pauseReady: boolean;
@@ -12,12 +12,12 @@ type Props = {
  * Cross-tab pause chrome mounted from `AppLayout`: pending-offer modal,
  * auto-trigger banner (off Home), and open-pause resync after adopt/decline.
  *
- * Uses `useHolzen` only here so the rest of the shell stays profile/layout-focused.
+ * Uses `usePauseHomeContext` only here so the rest of the shell stays profile/layout-focused.
  * `pauseReady` / `onDismissPauseReady` come from `useAutoTrigger` in `AppLayout`
  * (shared with Home via router outlet context).
  */
 export function ShellPauseChrome({ pauseReady, onDismissPauseReady }: Props) {
-  const { resyncOpenPauseFromDb } = useHolzen();
+  const { resyncOpenPauseFromDb } = usePauseHomeContext();
   const location = useLocation();
   const isHome = location.pathname === '/' || location.pathname === '/index';
 

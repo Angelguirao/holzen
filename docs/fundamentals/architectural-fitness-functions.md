@@ -90,6 +90,7 @@ Scripts live under `scripts/`. See script headers for exact rules and allowlists
 | `check:no-posthog-in-screens` | Via architecture-alignment | No direct `@/lib/posthog` in `src/screens/**` (feature telemetry I/O or `app/lib`) |
 | `check:no-posthog-in-app` | Via architecture-alignment | No direct `@/lib/posthog` in `src/app/**` except allowlisted widgets + `app/lib/*-telemetry.ts` |
 | `check:no-holzen-in-settings` | Via architecture-alignment | No `HolzenProvider` / `useHolzen` in `src/screens/settings/**` — profile via `user/public-hooks` |
+| `check:no-app-imports-in-features` | Via architecture-alignment | No `@/app/*` imports under `src/features/**` |
 | `check:no-root-components` | Yes | No new `src/components/*.tsx` outside allowlist |
 
 ### 4.3 Edge platform
