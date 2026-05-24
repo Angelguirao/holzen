@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { exportDataAction } from './export-data-action';
+import { exportDataAction } from './settings-export-data-io';
 
 vi.mock('@/features/auth/public', () => ({
   getAuthUser: vi.fn(),
