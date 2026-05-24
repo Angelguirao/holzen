@@ -8,6 +8,7 @@
 | `BillingHistoryScreen.tsx` | Stripe billing history (`/settings/billing-history`) |
 | `SettingsRoot.tsx` | Pathless outlet for `/settings/*` |
 | `SettingsStateLayout.tsx` | Profile gate + `SettingsStateProvider` |
+| `components/panels/` | One file per settings section panel (re-exported via `SettingsSectionPanels.tsx`) |
 | `hooks/use-settings-model.ts` | Settings hub orchestration (composes local prefs, checkout window, auto-save) |
 | `hooks/use-settings-local-prefs.ts` | Haptic, sound, BTC display mode (localStorage) |
 | `hooks/use-settings-checkout-window.ts` | Checkout suppression window (subscription public API) |

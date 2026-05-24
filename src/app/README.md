@@ -36,6 +36,9 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 | `hooks/use-pull-to-refresh.ts` | Touch pull-to-refresh (Archive, Home) |
 | `hooks/use-latest-ref.ts` | Stable ref to latest render value |
 | `hooks/use-feature-flag.ts` | PostHog feature flags (`ready` + default) |
+| `hooks/use-feedback-widget.ts` | Error-boundary feedback sheet conductor |
+| `lib/navigation-telemetry.ts` | Shell nav PostHog (`navigation.primary_tab_opened`) |
+| `lib/app-route-telemetry.ts` | App 404 PostHog (`app.route_not_found`) |
 
 ## Placement rationale (what lives elsewhere)
 

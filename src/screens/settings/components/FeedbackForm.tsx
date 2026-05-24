@@ -19,7 +19,7 @@ const CATEGORIES = [
 
 export function FeedbackForm() {
   const { t } = useTranslation();
-  const [category, setCategory] = useState<string>('question');
+  const [category, setCategory] = useState<FeedbackCategory>('question');
   const [message, setMessage] = useState('');
   const [state, formAction, isPending] = useActionState(submitFeedbackAction, {});
 
@@ -28,12 +28,13 @@ export function FeedbackForm() {
       toast(t('feedback.savedOffline'), { description: t('feedback.savedOfflineDesc') });
       setMessage('');
     } else if (state.success) {
+      trackFeedbackSubmitted(category);
       toast.success(t('feedback.sent'), { description: t('feedback.sentDesc') });
       setMessage('');
     } else if (state.error === 'send_failed') {
       toast.error(t('feedback.failedToSend'), { description: t('feedback.tryAgainLater') });
     }
-  }, [state.success, state.offlineQueued, state.error, t]);
+  }, [state.success, state.offlineQueued, state.error, category, t]);
 
   return (
     <form action={formAction} className="space-y-3">
@@ -45,6 +46,7 @@ export function FeedbackForm() {
       </p>
 
       <input type="hidden" name="category" value={category} />
+      <input type="hidden" name="posthog_session_id" value={readPostHogSessionIdForFeedback() ?? ''} />
 
       <div className="grid grid-cols-3 gap-2">
         {CATEGORIES.map((c) => {
