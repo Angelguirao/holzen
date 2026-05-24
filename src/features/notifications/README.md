@@ -16,7 +16,7 @@ features/notifications/
       delivery/     # pause-offer-policy, delivery-channels
   ports/            # NotificationDeliveryGateway (server orchestration target)
   infrastructure/queries/
-  presentation/     # NotificationBell, usePushNotifications
+  presentation/     # NotificationBell (+ useNotificationBell, map/inbox helpers), usePushNotifications
   public.ts | public-queries.ts | public-hooks.ts
 ```
 
