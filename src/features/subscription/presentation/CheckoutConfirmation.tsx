@@ -1206,27 +1206,15 @@ export function CheckoutConfirmation() {
               />
               <SummaryRow
                 label="Monthly price"
-                value={
-                  sub.tier === 'pro_plus'
-                    ? `$${PRICING.proPlusMonthlyPrice.toFixed(2)}`
-                    : `$${PRICING.monthlyPrice.toFixed(2)}`
-                }
+                value={`$${PRICING.monthlyPrice.toFixed(2)}`}
               />
               <SummaryRow
                 label="Pause companions / month"
-                value={
-                  sub.tier === 'pro_plus'
-                    ? String(PRICING.proPlusCompanionUnlocks)
-                    : String(PRICING.proCompanionUnlocks)
-                }
+                value={String(PRICING.proCompanionUnlocks)}
               />
               <SummaryRow
                 label="Wallpapers / month"
-                value={
-                  sub.tier === 'pro_plus'
-                    ? String(PRICING.proPlusWallpapers)
-                    : String(PRICING.proWallpapers)
-                }
+                value={String(PRICING.proWallpapers)}
               />
               <SummaryRow
                 label="Flex credits balance"
