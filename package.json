@@ -57,6 +57,7 @@
     "staging:secrets-set": "node scripts/supabase-secrets-set.mjs .env.staging.secrets ksplyxxdvandkwzundql",
     "staging:reschedule-crons": "supabase db query --linked --file scripts/sql/staging-reschedule-owned-crons.sql",
     "vercel:sync-env": "node scripts/vercel-sync-env.mjs",
+    "vercel:ci-deploy": "node scripts/vercel-ci-deploy.mjs",
     "prod:db-push": "node scripts/staging-deploy.mjs db-push",
     "prod:functions-deploy": "node scripts/staging-deploy.mjs functions",
     "prod:deploy": "node scripts/staging-deploy.mjs deploy",

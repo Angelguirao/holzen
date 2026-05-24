@@ -22,9 +22,12 @@ Tick before calling launch **done**. Canonical detail: [launch-runbook.md](./lau
 
 ## You — frontend (Vercel)
 
-- [ ] **`main` merge** triggered Vercel production deploy
+- [ ] **`staging` push** triggered **Staging deploy** workflow (`deploy-frontend` job green)
+- [ ] **`main` merge** triggered **Production deploy** workflow (`deploy-frontend` job green)
 - [ ] `VITE_APP_VERSION` = Git short SHA for that deploy
 - [ ] `SENTRY_RELEASE` (edges) matches `EDGE_RELEASE` in `supabase/functions/_shared/release.ts` or tip SHA
+
+Detail: [cicd-overview.md](./cicd-overview.md)
 
 ---
 

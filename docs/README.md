@@ -4,7 +4,7 @@ This folder contains human-readable notes that complement the source code and in
 
 ## Start here (new contributors)
 
-**Shipping pause-first?** Tick [ops/ship-checklist.md](ops/ship-checklist.md) · deploy via **Vercel + owned Supabase** ([platform-exit-runbook.md](ops/platform-exit-runbook.md)).
+**Shipping pause-first?** Tick [ops/ship-checklist.md](ops/ship-checklist.md) · deploy via **GitHub Actions + Vercel + owned Supabase** ([cicd-overview.md](ops/cicd-overview.md) · [platform-exit-runbook.md](ops/platform-exit-runbook.md)).
 
 1. **[src/README.md](../src/README.md)** — what ships in active `src/` (4-tab pause-first surface).
 2. **[ops/active-surface.md](ops/active-surface.md)** — routes, edges, crons, dropped tables, PostHog events (canonical shipped manifest).
@@ -29,6 +29,7 @@ This folder contains human-readable notes that complement the source code and in
 | **Meta:** where docs go, HTTP doc posture (Bruno vs OpenAPI), edge checklist | [fundamentals/documentation-strategy.md](fundamentals/documentation-strategy.md) | Complements this index; does not duplicate the owner table. |
 | Supabase **`Database` types** (`src/integrations/supabase/types.ts`) | [AGENTS.md](../AGENTS.md) (`npm run gen:types`) | Regenerate after migrations; if types lag, use `as unknown as T` per [deployment-sync-guide.md](ops/deployment-sync-guide.md). |
 | Boot sequence, repo tour, deploy paths (Vercel + Supabase) | [fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md) | Do not duplicate long boot narratives in AGENTS. |
+| **CI/CD** (workflows, secrets, deploy order) | [ops/cicd-overview.md](ops/cicd-overview.md) | Branch model in [branch-model.md](ops/branch-model.md); pre-push in [deployment-sync-guide.md](ops/deployment-sync-guide.md). |
 | **Lovable sync risk, staging, platform exit** | [ops/lovable-staging-and-platform-exit.md](ops/lovable-staging-and-platform-exit.md) | Why merges hit prod DB; CI gaps; phased exit. Pairs with [platform-exit-runbook.md](ops/platform-exit-runbook.md), [vercel-frontend-setup.md](ops/vercel-frontend-setup.md), [production-supabase-setup.md](ops/production-supabase-setup.md). |
 | `index.html`, SPA shell, default SEO/PWA meta | [fundamentals/index-html-and-spa-shell.md](fundamentals/index-html-and-spa-shell.md) | Canonical origin `https://holzen.app`; pairs with §3 in navigating-the-codebase. |
 | Pause lifecycle (instances, events, artifacts, state machine) | [systems/pause-system.md](systems/pause-system.md) | Canonical **data model** and invariants (Pause V2). |
