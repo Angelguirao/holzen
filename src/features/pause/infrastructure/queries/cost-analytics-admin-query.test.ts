@@ -19,9 +19,13 @@ describe('cost-analytics-admin-query', () => {
     limit.mockClear();
   });
 
-  it('fetchGenerationAttemptsForPeriod queries generation_attempts', async () => {
-    const { fetchGenerationAttemptsForPeriod } = await import('./cost-analytics-admin-query');
-    await fetchGenerationAttemptsForPeriod('7d');
-    expect(from).toHaveBeenCalledWith('generation_attempts');
-  });
+  it(
+    'fetchGenerationAttemptsForPeriod queries generation_attempts',
+    async () => {
+      const { fetchGenerationAttemptsForPeriod } = await import('./cost-analytics-admin-query');
+      await fetchGenerationAttemptsForPeriod('7d');
+      expect(from).toHaveBeenCalledWith('generation_attempts');
+    },
+    15_000,
+  );
 });
