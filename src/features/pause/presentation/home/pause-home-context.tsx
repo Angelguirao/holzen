@@ -1,7 +1,8 @@
 import { createContext, createElement, useContext, type ReactNode } from 'react';
 import { useHolzenHomeContextState } from './use-holzen-home-context-state';
+import type { PauseHomeContextValue } from '@/features/pause/domain/home/pause-home-context-value';
 
-export type PauseHomeContextValue = ReturnType<typeof useHolzenHomeContextState>;
+export type { PauseHomeContextValue } from '@/features/pause/domain/home/pause-home-context-value';
 
 const PauseHomeContext = createContext<PauseHomeContextValue | null>(null);
 
