@@ -15,13 +15,13 @@ One-time (and ongoing) steps for the **owned staging project** used while leavin
 
 ## 1b. Vault project URL (before crons run)
 
-After linking staging, store the project base URL in Vault so pg_cron jobs target **this** project (old migrations still embed the retired Lovable ref):
+After linking staging, store the project base URL in Vault so pg_cron jobs target **this** project (old migrations still embed the retired Lovable ref). Copy-paste template: [bootstrap-owned-project.sql](./bootstrap-owned-project.sql).
 
 ```sql
 SELECT vault.create_secret('https://ksplyxxdvandkwzundql.supabase.co', 'holzen_project_url');
 ```
 
-On **holzen-prod**, use `https://geqkxsnyqvhtascjghuu.supabase.co`. Migration `20260524120000_pg_cron_rewrite_owned_project_url.sql` rewrites active crons when this secret exists at apply time; if you add the secret later, re-run the `UPDATE cron.job … replace` block from that migration in the SQL Editor.
+On **holzen-prod**, use `https://geqkxsnyqvhtascjghuu.supabase.co`. Migration `20260524120500_pg_cron_rewrite_owned_project_url.sql` rewrites active crons when this secret exists at apply time; if you add the secret later, re-run the `UPDATE cron.job … replace` block from that migration in the SQL Editor.
 
 ## 2. Link CLI locally
 
@@ -39,20 +39,14 @@ Optional: set `SUPABASE_STAGING_PROJECT_REF` in shell or `.env.staging.local` fo
 ## 3. Apply schema and deploy edges
 
 ```sh
-npm run staging:db-push      # supabase db push
-npm run staging:deploy       # db push + all active edge functions
+npm run staging:db-push           # migrations only
+npm run staging:functions-deploy  # 31 active edges (config.toml manifest)
+npm run staging:deploy            # both
 ```
 
 **Production (after staging sign-off):** link prod ref, then `npm run prod:deploy` for manual deploys — prefer [deploy-production.yml](../../.github/workflows/deploy-production.yml) on merge to `main`. See [production-supabase-setup.md](production-supabase-setup.md).
 
-Or manually:
-
-```sh
-npx supabase db push
-npx supabase functions deploy
-```
-
-Deploy only shipped functions if you need a subset — see [active-surface.md](active-surface.md).
+Deploy uses [scripts/deploy-active-edge-functions.mjs](../../scripts/deploy-active-edge-functions.mjs) — **`supabase/functions/legacy/**` is never deployed** to owned projects ([active-surface.md](active-surface.md)).
 
 ---
 

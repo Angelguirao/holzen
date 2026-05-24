@@ -20,7 +20,7 @@ One-time and ongoing steps for the **owned production project** after leaving Lo
 ```sh
 npx supabase login
 npx supabase link --project-ref geqkxsnyqvhtascjghuu
-npm run prod:deploy   # db push + all edge functions (after preflight locally)
+npm run prod:deploy   # db push + active edge functions (after preflight locally)
 ```
 
 Day-to-day prod backend deploys should go through [`.github/workflows/deploy-production.yml`](../../.github/workflows/deploy-production.yml) (merge to `main` + **production** environment approval).
