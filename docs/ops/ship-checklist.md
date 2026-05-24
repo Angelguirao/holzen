@@ -6,7 +6,7 @@ Tick before calling launch **done**. Canonical detail: [launch-runbook.md](./lau
 
 ## You — before destructive cutover (§3.1)
 
-- [ ] **Production not public** until launch-ready ([vercel-frontend-setup.md](./vercel-frontend-setup.md) §5.1 — park/detach `holzen.app`, protected `*.vercel.app`, app gate, or Advanced Deployment Protection) — open when launching
+- [ ] **Production not public** until launch-ready ([vercel-frontend-setup.md](./vercel-frontend-setup.md) §5.1 — e.g. `VITE_COMING_SOON=true` on Vercel Production only) — remove env and redeploy when launching
 - [ ] Confirm **no real production users** on prod project (test/founder accounts disposable)
 - [ ] Stripe webhook + price secrets set in **Supabase Edge secrets**
 - [ ] Observability secrets per [observability-setup.md](./observability-setup.md) (Vercel + Supabase + CI)

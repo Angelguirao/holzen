@@ -180,9 +180,21 @@ Prod build can stay on Vercel at `project-name.vercel.app` for internal use. Pub
 
 Keep `holzen.app` detached or parked; enable Deployment Protection on **Preview** / use the team’s default **vercel.app** production alias if assigned. Founders test there until launch, then re-attach the custom domain and open protection off.
 
-### Option C — App-level access gate (works on custom domain)
+### Option C — Coming soon page (works on `holzen.app`, no Vercel Advanced)
 
-Ship a build-time flag (e.g. `VITE_SITE_ACCESS_CODE`) that shows a simple unlock screen before React boots or before routes render. Set the value only in Vercel **Production** env; remove at launch. Not as strong as edge protection (anon key still in bundle) but blocks casual browsers on `holzen.app`. Implement in-repo when you choose this path.
+Set a **Production-only** build env var, redeploy frontend:
+
+| Variable | Production | Preview / Staging |
+|----------|------------|-------------------|
+| `VITE_COMING_SOON` | `true` | *(unset)* |
+
+Vercel → Project → **Settings** → **Environment Variables** → add `VITE_COMING_SOON` = `true` scoped to **Production** only → run **Production deploy** (merge to `main` with approval, or `workflow_dispatch`).
+
+Visitors on `holzen.app` see a minimal **Coming soon** screen (`ComingSoonScreen`) instead of auth, pause, or checkout. Staging previews and local dev stay on the full app when the var is unset.
+
+**Launch:** delete `VITE_COMING_SOON` (or set `false`) on Production → redeploy → incognito smoke shows the full app.
+
+**Limits:** Same as any SPA gate — Supabase anon key and edges remain public; this blocks normal product UI only.
 
 ### Option D — Pay for Advanced Deployment Protection
 
