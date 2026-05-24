@@ -258,3 +258,4 @@ When moving from explore to execute, pick a hybrid row first; full exit is Phase
 - [ ] **Claim** Supabase from Lovable or finish owned-project cutover + PITR drill
 - [ ] Vercel prod + custom domain; deprecate Lovable **Publish** ([vercel-frontend-setup.md](vercel-frontend-setup.md))
 - [ ] Configure Lovable as **optional editor** only (feature branches, no backend sync) — § Optional Lovable editor
+- [ ] Legacy prod data on `edgbwdecaoottowliimu` migrated to owned prod if needed — [database-data-migration.md](database-data-migration.md)

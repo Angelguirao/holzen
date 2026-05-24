@@ -39,6 +39,10 @@ skills-lock.json
 .env.*
 !.env.example
 !.env.*.example
+!.env.db.example
+
+# Database dump artifacts (PII) — scripts/db-*.sh
+backups/
 
 # Cursor MCP — local paths and API keys (copy mcp.json.example + mcp-secrets.env.example)
 .cursor/mcp.json
