@@ -1,10 +1,10 @@
-import { useHolzen } from '@/app/components/HolzenProvider';
+import { usePauseHomeContext } from '../home/pause-home-context';
 import { pickPauseHolzenProvidersSlice } from './pause-session-providers-io';
 import { usePauseSessionProvidersFromHolzenSlice } from './use-pause-session-providers';
 import type { PauseSessionProviders } from './pause-session-providers-types';
 
-/** `/pause` route — Holzen context + presentation provider bag. */
+/** `/pause` route — pause home context + presentation provider bag. */
 export function usePauseSessionProviders(): PauseSessionProviders {
-  const holzen = useHolzen();
+  const holzen = usePauseHomeContext();
   return usePauseSessionProvidersFromHolzenSlice(pickPauseHolzenProvidersSlice(holzen));
 }

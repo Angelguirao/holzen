@@ -59,6 +59,11 @@ export {
 } from './presentation/home/use-holzen-manual-trigger-orchestration';
 export { useHolzenHomeContextState } from './presentation/home/use-holzen-home-context-state';
 export {
+  PauseHomeProvider,
+  usePauseHomeContext,
+  type PauseHomeContextValue,
+} from './presentation/home/pause-home-context';
+export {
   trackHomeCustomizeOpened,
   trackHomeCustomizeResetLayout,
   trackHomeGoalWhyExpandToggled,

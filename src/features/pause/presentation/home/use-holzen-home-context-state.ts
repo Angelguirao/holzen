@@ -15,7 +15,7 @@ import { useManualPauseTrigger } from '@/features/pause/presentation/reflect/gen
 
 /**
  * Shared Home + `/pause` context: profile, market display, open-pause preview, manual trigger.
- * Mounted from `HolzenProvider` in the app shell when the user is signed in.
+ * Mounted from `PauseHomeProvider` (`public-home`) when the user is signed in.
  */
 export function useHolzenHomeContextState() {
   const { user } = useAuth();

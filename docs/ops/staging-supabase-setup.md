@@ -21,7 +21,16 @@ After linking staging, store the project base URL in Vault so pg_cron jobs targe
 SELECT vault.create_secret('https://ksplyxxdvandkwzundql.supabase.co', 'holzen_project_url');
 ```
 
-On **holzen-prod**, use `https://geqkxsnyqvhtascjghuu.supabase.co`. Migration `20260524120500_pg_cron_rewrite_owned_project_url.sql` rewrites active crons when this secret exists at apply time; if you add the secret later, re-run the `UPDATE cron.job … replace` block from that migration in the SQL Editor.
+On **holzen-prod**, use `https://geqkxsnyqvhtascjghuu.supabase.co`.
+
+**pg_cron URL rewrite:** Hosted Supabase often returns `42501 permission denied for table job` on `UPDATE cron.job` (SQL Editor and CLI). Use **unschedule + reschedule** instead:
+
+```sh
+# Vault: holzen_project_url + CRON_SECRET (or holzen_cron_service_role)
+npx supabase db query --linked --file scripts/sql/staging-reschedule-owned-crons.sql
+```
+
+See [cron-setup.md](cron-setup.md) for Vault bearer setup. Migration `20260524120500_…` attempts an in-place rewrite at apply time but skips when privileges are insufficient.
 
 ## 2. Link CLI locally
 
@@ -52,7 +61,15 @@ Deploy uses [scripts/deploy-active-edge-functions.mjs](../../scripts/deploy-acti
 
 ## 4. Edge secrets (staging)
 
-Supabase Dashboard → Project Settings → Edge Functions → Secrets.
+Supabase Dashboard → Project Settings → Edge Functions → Secrets, **or** from a gitignored file:
+
+```sh
+cp .env.staging.secrets.example .env.staging.secrets
+# fill RESEND_*, STRIPE_* (test), GOOGLE_AI_API_KEY, observability keys
+npm run staging:secrets-set
+```
+
+`CRON_SECRET` is already wired for staging pg_cron (Vault + Edge); store the value in your password manager if you rotate it.
 
 | Secret | Staging value |
 |--------|----------------|
@@ -86,12 +103,21 @@ npm run dev:staging
 
 ---
 
-## 6. Auth redirect URLs
+## 6. Auth (redirect URLs + Send Email Hook)
 
-Supabase → Authentication → URL configuration:
+**URL configuration** (Authentication → URL configuration):
 
-- Site URL: staging frontend origin (or `http://localhost:8080` for local-only)
-- Redirect URLs: `http://localhost:8080/**`, staging preview URLs
+- Site URL: `http://localhost:8080` for local dev, or your Vercel preview URL when testing hosted frontend
+- Redirect URLs: `http://localhost:8080/**`, `https://*.vercel.app/**` (preview), plus any custom staging domain
+
+**Send Email Hook** (Authentication → Hooks → Send Email):
+
+1. Enable **Send Email** hook, type **HTTPS**
+2. URL: `https://ksplyxxdvandkwzundql.supabase.co/functions/v1/auth-email-hook`
+3. Generate a hook secret in the Dashboard; paste the **same** value into Edge secret `SEND_EMAIL_HOOK_SECRET` (`npm run staging:secrets-set` or Dashboard → Edge Functions → Secrets)
+4. Requires `RESEND_API_KEY` on the project (hook sends via Resend templates in `auth-email-hook`)
+
+Without the hook + `RESEND_API_KEY`, sign-up / password-reset emails will not send on owned projects.
 
 ---
 
@@ -110,4 +136,14 @@ See PR template checklist in [`.github/pull_request_template.md`](../../.github/
 
 ## 8. Optional CI
 
-Configure GitHub secrets `SUPABASE_ACCESS_TOKEN` and `SUPABASE_STAGING_PROJECT_REF`, then run workflow **Staging backend** (`.github/workflows/staging-backend.yml`).
+Configure GitHub repository secrets (Settings → Secrets and variables → Actions):
+
+| Secret | Value |
+|--------|--------|
+| `SUPABASE_ACCESS_TOKEN` | Same personal access token from `npx supabase login` |
+| `SUPABASE_STAGING_PROJECT_REF` | `ksplyxxdvandkwzundql` |
+| `SUPABASE_PROD_PROJECT_REF` | `geqkxsnyqvhtascjghuu` (for production workflow) |
+
+Optional CI build secrets: `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` — see [observability-setup.md](observability-setup.md).
+
+Then run workflow **Staging backend** (`.github/workflows/staging-backend.yml`) or push to branch `staging`.

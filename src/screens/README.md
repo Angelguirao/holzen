@@ -25,7 +25,7 @@ Co-locate Vitest beside the file under test. **Pause:** ritual conductors live i
 
 | Screen folder | Routes / product area | Screen map doc |
 |---------------|----------------------|----------------|
-| `home/` | `/` — **`HomeScreen`**, `components/`, `hooks/` (incl. `useHolzen`) | [docs/screens/home.md](../../docs/screens/home.md) |
+| `home/` | `/` — **`HomeScreen`**, `components/`, `hooks/` (incl. `usePauseHomeContext`) | [docs/screens/home.md](../../docs/screens/home.md) |
 | `pause/` | `/pause`, `/companion/*` — **`PauseSessionScreen`**, `components/`; orchestration → `@/features/pause/public-hooks` | [docs/screens/pause.md](../../docs/screens/pause.md) |
 | `archive/` | Archive tab — **`ArchiveScreen`**, `components/` (+ `components/library/` for current-pause card — not MVP Collections) | [README](archive/README.md), [active-surface](../../docs/ops/active-surface.md), [IA](../../docs/design/information-architecture.md) |
 | `journey/` | Journey tab — **`components/` migrated (5e)** | [docs/screens/journey-overview.md](../../docs/screens/journey-overview.md) |

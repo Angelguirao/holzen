@@ -1,20 +1,18 @@
-import { createContext, createElement, useContext, type ReactNode } from 'react';
-import { useHolzenHomeContextState } from '@/features/pause/public-home';
+import type { ReactNode } from 'react';
+import {
+  PauseHomeProvider,
+  usePauseHomeContext,
+  type PauseHomeContextValue,
+} from '@/features/pause/public-home';
 
-export type HolzenContextValue = ReturnType<typeof useHolzenHomeContextState>;
+export type HolzenContextValue = PauseHomeContextValue;
 
-const HolzenContext = createContext<HolzenContextValue | null>(null);
-
-/** One shared pause/profile/market tree for the signed-in session (survives tab switches). */
+/** App-shell alias for {@link PauseHomeProvider} (signed-in pause + market context). */
 export function HolzenProvider({ children }: { children: ReactNode }) {
-  const value = useHolzenHomeContextState();
-  return createElement(HolzenContext.Provider, { value }, children);
+  return <PauseHomeProvider>{children}</PauseHomeProvider>;
 }
 
+/** @deprecated Prefer `usePauseHomeContext` from `@/features/pause/public-home`. */
 export function useHolzen(): HolzenContextValue {
-  const ctx = useContext(HolzenContext);
-  if (!ctx) {
-    throw new Error('useHolzen must be used within HolzenProvider');
-  }
-  return ctx;
+  return usePauseHomeContext();
 }

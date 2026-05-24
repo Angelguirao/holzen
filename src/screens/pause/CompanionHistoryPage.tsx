@@ -1,6 +1,6 @@
 import { useParams, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useHolzen } from '@/app/components/HolzenProvider';
+import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useCompanionFullViewPage } from '@/features/pause/public-ritual-frame';
 import { HistoricalInsightDisplay } from '@/screens/pause/components/HistoricalInsightDisplay';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
@@ -14,7 +14,7 @@ import { PageMeta } from '@/app/components/PageMeta';
 export default function CompanionHistoryPage() {
   const { pauseInstanceId: rid } = useParams<{ pauseInstanceId: string }>();
   const { t } = useTranslation();
-  const { companionPrefs, severity } = useHolzen();
+  const { companionPrefs, severity } = usePauseHomeContext();
 
   const {
     missingRouteId,

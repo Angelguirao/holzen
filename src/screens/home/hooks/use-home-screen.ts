@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
-import { useHolzen } from '@/app/components/HolzenProvider';
+import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useAuth } from '@/features/auth/public';
 import {
   useCompletedPauseCount,
@@ -75,7 +75,7 @@ export function useHomeScreen() {
     currency,
     trackedAssetId,
     profileLoaded,
-  } = useHolzen();
+  } = usePauseHomeContext();
 
   const hasOpenPause = Boolean(lastPauseInstanceId);
 
