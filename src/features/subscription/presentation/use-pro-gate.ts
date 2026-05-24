@@ -3,7 +3,7 @@ import { useSubscription } from './use-subscription';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import type { ProFeature } from '@/features/subscription/public';
-import { trackPaywallViewed } from '@/features/subscription/application/paywall-telemetry';
+import { trackPaywallViewed } from './subscription-paywall-io';
 
 /**
  * Hook for gating Pro-only features.

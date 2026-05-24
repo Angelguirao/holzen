@@ -3,11 +3,11 @@ import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { holzenLog } from '@/lib/holzen-console';
 import type { AuthSessionState } from '@/features/auth/public';
-import { handleAuthFunnelEvents } from '@/features/auth/application/auth-funnel-events';
 import {
+  handleAuthFunnelEvents,
   identifyAuthenticatedUser,
   syncAuthObservability,
-} from '@/features/auth/application/auth-observability';
+} from './auth-session-io';
 import { runSignedInSideEffects } from '../public-hooks';
 
 const AuthContext = createContext<AuthSessionState>({
