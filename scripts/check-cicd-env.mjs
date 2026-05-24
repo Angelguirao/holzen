@@ -21,6 +21,7 @@ import {
   VERCEL_TARGET_KEYS,
   formatWhere,
   getGithubSpec,
+  getSuggestedValue,
   getSupabaseEdgeSpec,
   getVercelSpec,
 } from "./lib/cicd-env-catalog.mjs";
@@ -55,8 +56,13 @@ function githubAnnotation(platformLabel, spec) {
   console.log(`::error title=Missing ${spec.name} (${platformLabel})::${escaped}`);
 }
 
-function printEntry(index, platformLabel, spec, tierLabel) {
+function printEntry(index, platformLabel, spec, tierLabel, profile) {
+  const suggested = getSuggestedValue(spec.name, profile);
   console.error(`── ${index}. ${spec.name} (${tierLabel}) ──`);
+  console.error(`   Variable name (exact, case-sensitive): ${spec.name}`);
+  if (suggested) {
+    console.error(`   Suggested value / pattern:            ${suggested}`);
+  }
   console.error(`   Platform: ${platformLabel}`);
   console.error(`   Purpose:  ${spec.label}`);
   console.error(`   Where:    ${spec.where}`);
@@ -65,6 +71,50 @@ function printEntry(index, platformLabel, spec, tierLabel) {
   console.error("");
   if (process.env.GITHUB_ACTIONS === "true") {
     githubAnnotation(platformLabel, spec);
+  }
+}
+
+function printMissingNamesSummary(results, strictRecommended) {
+  const groups = [];
+
+  for (const result of results) {
+    const label = PLATFORM_LABELS[result.platform] ?? result.platform;
+    const names = [
+      ...result.missingRequired.map((s) => s.name),
+      ...(strictRecommended ? result.missingRecommended.map((s) => s.name) : []),
+    ];
+    if (names.length === 0) continue;
+    groups.push({ label, names });
+  }
+
+  const recommendedOnly = [];
+  if (!strictRecommended) {
+    for (const result of results) {
+      const label = PLATFORM_LABELS[result.platform] ?? result.platform;
+      const names = result.missingRecommended.map((s) => s.name);
+      if (names.length === 0) continue;
+      recommendedOnly.push({ label, names });
+    }
+  }
+
+  if (groups.length === 0 && recommendedOnly.length === 0) return;
+
+  console.error("── Missing variable names (copy when creating secrets / env vars) ──");
+  console.error("");
+  for (const { label, names } of groups) {
+    console.error(`${label}:`);
+    for (const name of names) {
+      console.error(`  ${name}`);
+    }
+    console.error("");
+  }
+
+  if (recommendedOnly.length > 0) {
+    console.error("Recommended (warn only — not blocking):");
+    for (const { label, names } of recommendedOnly) {
+      console.error(`  ${label}: ${names.join(", ")}`);
+    }
+    console.error("");
   }
 }
 
@@ -250,12 +300,14 @@ function printReport(profile, results, strictRecommended) {
     console.error(`▸ ${label}`);
     console.error("");
     for (const spec of result.missingRequired) {
-      printEntry(index++, label, spec, "REQUIRED");
+      printEntry(index++, label, spec, "REQUIRED", profile);
     }
     for (const spec of result.missingRecommended) {
-      printEntry(index++, label, spec, "recommended");
+      printEntry(index++, label, spec, "recommended", profile);
     }
   }
+
+  printMissingNamesSummary(results, strictRecommended);
 
   console.error("── After fixing ──");
   console.error("   GitHub secrets  → Settings → Secrets and variables → Actions");
