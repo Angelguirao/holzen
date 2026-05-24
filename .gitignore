@@ -40,6 +40,13 @@ skills-lock.json
 !.env.example
 !.env.*.example
 
+# Cursor MCP — local paths and API keys (copy mcp.json.example + mcp-secrets.env.example)
+.cursor/mcp.json
+.cursor/mcp-secrets.env
+.cursor/ionos.env
+!.cursor/mcp.json.example
+!.cursor/mcp-secrets.env.example
+
 # Bruno — HTTP env files with secrets (copy from *.bru.example)
 bruno/environments/local.bru
 bruno/environments/hosted.bru
