@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/features/auth/public';
 import { useHolzen } from '@/app/components/HolzenProvider';
 import { toast } from 'sonner';
-import { submitTestimonialAction } from '@/screens/home/testimonial-action';
+import { submitTestimonialAction } from '@/features/user/public';
 
 const DISMISS_KEY = 'holzen_testimonial_dismissed';
 const SUBMITTED_KEY = 'holzen_testimonial_submitted';
