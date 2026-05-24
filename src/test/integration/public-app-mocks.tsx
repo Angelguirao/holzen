@@ -2,14 +2,18 @@ import type { ReactNode } from 'react';
 import { vi } from 'vitest';
 import '@/i18n';
 
-vi.mock('@/features/auth/public', () => ({
-  AuthProvider: ({ children }: { children: ReactNode }) => children,
-  useAuth: () => ({
-    user: null,
-    loading: false,
-    signOut: vi.fn(),
-  }),
-}));
+vi.mock('@/features/auth/public', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/auth/public')>();
+  return {
+    ...actual,
+    AuthProvider: ({ children }: { children: ReactNode }) => children,
+    useAuth: () => ({
+      user: null,
+      loading: false,
+      signOut: vi.fn(),
+    }),
+  };
+});
 
 vi.mock('@/features/subscription/public-hooks', () => ({
   useSubscription: () => ({

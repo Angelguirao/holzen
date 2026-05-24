@@ -30,6 +30,10 @@ supabase/.branches/
 *.sln
 *.sw?
 
+# Agent skills installer output (`npx skills add …`) — project skills live under `.cursor/skills/`
+.agents/
+skills-lock.json
+
 # Environment variables — never commit secrets
 .env
 .env.*
