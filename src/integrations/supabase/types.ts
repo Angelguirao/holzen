@@ -2940,6 +2940,10 @@ export type Database = {
         }
         Returns: Database["public"]["Enums"]["pause_state"]
       }
+      pause_expire_cron_volatility_context_lost: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
       pause_instance_is_brief_ritual: {
         Args: { p_pause_instance_id: string }
         Returns: boolean
