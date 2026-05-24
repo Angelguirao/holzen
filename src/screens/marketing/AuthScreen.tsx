@@ -1,67 +1,37 @@
-import { useActionState, useEffect, useState, useTransition } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { X, Info } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { signInWithOAuthGoogle } from '@/features/auth/public';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { PageHeading } from '@/components/ui/page-heading';
-import { emailAuthAction, forgotPasswordAction } from '@/screens/marketing/auth-actions';
-
-type AuthView = 'sign-in' | 'sign-up' | 'forgot-password';
+import { useAuthScreen } from '@/screens/marketing/hooks/use-auth-screen';
 
 const AuthScreen = () => {
-  const { t } = useTranslation();
-  const [searchParams] = useSearchParams();
-  const [view, setView] = useState<AuthView>(() => {
-    const v = searchParams.get('view');
-    return v === 'sign-up' ? 'sign-up' : 'sign-in';
-  });
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [confirmSent, setConfirmSent] = useState(false);
-  const [resetSent, setResetSent] = useState(false);
-  const [emailAuthState, emailAuthFormAction, emailAuthPending] = useActionState(emailAuthAction, {});
-  const [forgotState, forgotFormAction, forgotPending] = useActionState(forgotPasswordAction, {});
-  const [isGooglePending, startGoogleTransition] = useTransition();
-
-  useEffect(() => {
-    if (emailAuthState.confirmSent) {
-      setConfirmSent(true);
-      return;
-    }
-    if (emailAuthState.errorKey) {
-      setError(t(emailAuthState.errorKey, { defaultValue: emailAuthState.errorKey }));
-    } else if (emailAuthState.error) {
-      setError(emailAuthState.error);
-    }
-  }, [emailAuthState, t]);
-
-  useEffect(() => {
-    if (forgotState.resetSent) {
-      setResetSent(true);
-      return;
-    }
-    if (forgotState.errorKey) {
-      setError(t(forgotState.errorKey, { defaultValue: forgotState.errorKey }));
-    } else if (forgotState.error) {
-      setError(forgotState.error);
-    }
-  }, [forgotState, t]);
-
-  const handleGoogle = () => {
-    setError(null);
-    startGoogleTransition(async () => {
-      const { error: oauthError } = await signInWithOAuthGoogle(window.location.origin);
-      if (oauthError) setError(oauthError.message);
-    });
-  };
+  const {
+    t,
+    view,
+    setView,
+    toggleSignUpSignIn,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    error,
+    setError,
+    confirmSent,
+    setConfirmSent,
+    resetSent,
+    setResetSent,
+    emailAuthFormAction,
+    emailAuthPending,
+    forgotFormAction,
+    forgotPending,
+    handleGoogle,
+    isGooglePending,
+  } = useAuthScreen();
 
   if (confirmSent) {
     return (
@@ -113,7 +83,7 @@ const AuthScreen = () => {
             {error && <p className="text-xs text-destructive font-mono">{error}</p>}
             <LoadingButton type="submit" className="w-full text-base font-sans font-normal" loading={forgotPending}>{t('auth.sendResetLink')}</LoadingButton>
           </form>
-          <button onClick={() => { setView('sign-in'); setError(null); }} className="text-muted-foreground underline text-sm font-sans w-full text-center">{t('auth.backToSignIn')}</button>
+          <button onClick={() => setView('sign-in')} className="text-muted-foreground underline text-sm font-sans w-full text-center">{t('auth.backToSignIn')}</button>
         </div>
       </div>
     );
@@ -169,7 +139,7 @@ const AuthScreen = () => {
             <div className="flex items-center justify-between">
               <Label htmlFor="auth-password" className="text-base font-sans">{t('auth.password')}</Label>
               {view === 'sign-in' && (
-                <button type="button" onClick={() => { setView('forgot-password'); setError(null); }} className="text-muted-foreground underline text-sm font-sans">
+                <button type="button" onClick={() => setView('forgot-password')} className="text-muted-foreground underline text-sm font-sans">
                   {t('auth.forgotPassword')}
                 </button>
               )}
@@ -211,7 +181,7 @@ const AuthScreen = () => {
           </p>
         )}
 
-        <button onClick={() => { setView(view === 'sign-up' ? 'sign-in' : 'sign-up'); setError(null); }} className="underline w-full text-center text-base font-sans text-nox-text-link hover:text-nox-text-link/80">
+        <button onClick={toggleSignUpSignIn} className="underline w-full text-center text-base font-sans text-nox-text-link hover:text-nox-text-link/80">
           {view === 'sign-up' ? t('auth.alreadyHaveAccount') : t('auth.createAnAccount')}
         </button>
       </div>
