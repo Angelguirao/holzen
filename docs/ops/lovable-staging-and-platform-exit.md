@@ -23,6 +23,90 @@ Holzen is leaving Lovable Cloud entirely. Code changes in-repo:
 
 ---
 
+## Three environments (Holzen target)
+
+Holzen uses the same **mental model** as common “Lovable + GitHub + static host + Supabase” writeups (e.g. dev / staging / prod branches, features move up, hotfixes move down), but **different platform roles** after exit:
+
+| Environment | Git branch | Frontend | Database | Who deploys backend |
+|-------------|------------|----------|----------|---------------------|
+| **Dev** | `feature/*` (local integration) | `localhost:8080` (`npm run dev`) or optional Lovable preview | Local Docker (`supabase:reset`) **or** staging keys for hosted preview | Nobody — migrations land via PR |
+| **Staging** | `staging` | Vercel **Preview** (staging `VITE_*`) | Owned **holzen-staging** | [staging-backend.yml](../../.github/workflows/staging-backend.yml) |
+| **Production** | `main` | Vercel **Production** | Owned **holzen-prod** | [deploy-production.yml](../../.github/workflows/deploy-production.yml) (approval) |
+
+**Not used after exit:** Lovable Cloud as a third hosted database, Lovable **Publish → Update** for prod, or Lovable auto-applying migrations on push to `main`.
+
+Optional fourth branch **`dev`** (long-lived integration before `staging`) is fine but not required — see [branch-model.md](branch-model.md).
+
+---
+
+## Optional Lovable editor (safe role)
+
+You can keep Lovable as a **visual IDE** without keeping Lovable Cloud as runtime. GitHub remains source of truth; Vercel + owned Supabase remain deploy targets.
+
+```mermaid
+flowchart LR
+  subgraph editors [Editors_optional]
+    LV[Lovable_feature_branch]
+    CUR[Cursor_local]
+  end
+  GH[GitHub]
+  CI[CI_on_PR]
+  STG[staging_branch]
+  MAIN[main]
+  VS[Vercel]
+  SB[(Supabase)]
+  LV -->|sync_commits| GH
+  CUR -->|push| GH
+  GH --> CI
+  GH --> STG
+  STG --> MAIN
+  STG --> VS
+  MAIN --> VS
+  STG --> SB
+  MAIN --> SB
+```
+
+### Rules (non-negotiable)
+
+| Rule | Why |
+|------|-----|
+| Lovable tracks **`feature/*` only** — never `main` or `staging` | Prevents auto migration/edge deploy to prod |
+| **Disable** Lovable SQL/functions auto-sync to linked Supabase (Phase 0) | Migrations go staging → prod via GitHub Actions only |
+| **Do not** use **Publish → Update** for real users | Prod frontend is Vercel; release SHA must match edges |
+| Lovable preview uses **staging** `VITE_SUPABASE_*` (or local `.env.staging.local`) | No Lovable Cloud DB as a fourth environment |
+| Every Lovable change merges via **PR + `ci.yml`** | Same gates as Cursor |
+
+### Workflow when using Lovable
+
+1. Create or checkout `feature/your-change` (in Lovable or locally).
+2. Edit UI in Lovable; commits sync to that branch.
+3. Open PR → CI runs (`npm run test:ci` gates in [ci.yml](../../.github/workflows/ci.yml)).
+4. Merge to **`staging`** → staging Supabase + edge deploy; smoke on Vercel Preview.
+5. Merge **`staging` → `main`** → prod Supabase (with approval) + Vercel Production.
+
+**Hotfixes:** branch from `main` → fix → merge `main` → merge `main` down into `staging` (fixes move down).
+
+### Lovable project settings checklist
+
+- [ ] GitHub connected; **production branch in Lovable ≠ `main`** (or disconnect backend sync entirely)
+- [ ] Default working branch = current `feature/*` when editing in Lovable
+- [ ] Preview env vars = **staging** Supabase URL + anon key (never prod service role)
+- [ ] Team knows **Publish** is deprecated for Holzen prod
+
+Full branch protection and GitHub Environments: [branch-model.md](branch-model.md). Frontend host rationale: [vercel-frontend-setup.md](vercel-frontend-setup.md).
+
+### Compared to “Lovable Cloud = dev database”
+
+Some teams use **Lovable Cloud** as the dev Supabase project (free tier) with `dev` / `staging` / `main` and Netlify per branch. Holzen **replaces Lovable Cloud dev** with **local Docker + owned staging**, because:
+
+- You already run platform exit (Resend, direct Gemini, owned projects).
+- A fourth cloud DB adds drift and secret duplication.
+- Staging is the hosted sandbox; local is the cheap throwaway.
+
+If you prefer a long-lived **`dev`** branch, treat it like Carlos’s integration branch (`feature/* → dev → staging → main`) — still **without** Lovable Cloud as the database.
+
+---
+
 ## Why branches do not protect the database
 
 Branch discipline protects **what gets merged and synced**, not **where migrations run**. On GitHub → Lovable sync:
@@ -67,7 +151,7 @@ These are **local / pre-push** gates—not a hosted staging environment:
 | **Docker + `npm run supabase:reset`** | Replays all migrations on a throwaway local DB | Not production data; no RLS/data edge cases |
 | **`npm run check:view-migrations`** | Blocks unsafe `CREATE OR REPLACE VIEW` patterns | SQL syntax / data migration failures still possible |
 | **`npm run check:prepush`** | Tests, build, edge manifest/logging, optional local `db reset` | Requires **bash** (Git Bash/WSL on Windows); **not run by Lovable** |
-| **`npm run test:ci`** | Superset of CI-style checks (coverage, JUnit, active-surface guards) | **No `.github/workflows` in repo today** |
+| **`npm run test:ci`** | Superset of CI-style checks (coverage, JUnit, active-surface guards) | Run in [ci.yml](../../.github/workflows/ci.yml) on PR; still run locally before push |
 | **Order-of-operations docs** | Code-first for destructive changes; `as unknown as T` for new columns | Process, not infrastructure |
 | **[backup-restore-drill.md](backup-restore-drill.md)** | Quarterly PITR drill to a **staging project** | **Lovable-managed Supabase** limits dashboard/PITR until project is “claimed” |
 
@@ -77,13 +161,11 @@ These are **local / pre-push** gates—not a hosted staging environment:
 
 ---
 
-## Why CI/CD feels “invisible” in Lovable
+## Why CI/CD felt invisible on Lovable (historical)
 
-- There is **no GitHub Actions workflow** in this repository—`npm run test:ci` and `check:prepush` are **scripts you run locally** (or can wire to Actions yourself).
-- Lovable’s sync is effectively: **webhook → apply migrations + deploy edges** with limited visibility compared to a pipeline log (failures show in Lovable/Supabase UI, not as first-class PR checks unless you add them).
-- Frontend deploy is a **second channel** (Publish), so backend and frontend can be **out of sync** by design.
+Before GitHub Actions shipped in-repo, sync was effectively: **webhook → apply migrations + deploy edges** with limited PR visibility. Frontend deploy was a **second channel** (Publish), so backend and frontend could be **out of sync**.
 
-A visible pipeline would look like: **PR → CI (`test:ci` + optional staging migration) → merge → deploy prod (manual approval)**—none of that is enforced by Lovable today.
+**Today:** [ci.yml](../../.github/workflows/ci.yml) runs on PR; [staging-backend.yml](../../.github/workflows/staging-backend.yml) and [deploy-production.yml](../../.github/workflows/deploy-production.yml) deploy owned Supabase. Lovable is optional — see **Optional Lovable editor** above.
 
 ---
 
@@ -186,8 +268,10 @@ When moving from explore to execute, pick a hybrid row first; full exit is Phase
 
 ## Follow-up checklist (not scheduled)
 
-- [ ] Create/link **staging** Supabase project; run migrations there before merging to Lovable-tracked branch
-- [ ] Add **`.github/workflows`** running `npm run test:ci` on PR (optional: staging `db push` + functions deploy)
-- [ ] Inventory **Lovable Cloud secrets** vs [observability-setup.md](observability-setup.md); mirror in password manager + staging
-- [ ] **Claim** Supabase from Lovable or plan project migration + PITR drill
-- [ ] If leaving Lovable FE: choose static host, wire `VITE_*` + custom domain + auth/Stripe URL updates
+- [x] Add **`.github/workflows`** running `npm run test:ci` on PR ([ci.yml](../../.github/workflows/ci.yml))
+- [x] Create **`staging`** branch + [staging-backend.yml](../../.github/workflows/staging-backend.yml)
+- [ ] Run migrations on **staging** before merging to `main`; smoke [bruno/active/](../../bruno/active/functions-catalog.md)
+- [ ] Inventory secrets vs [observability-setup.md](observability-setup.md); mirror in password manager + staging/prod Supabase
+- [ ] **Claim** Supabase from Lovable or finish owned-project cutover + PITR drill
+- [ ] Vercel prod + custom domain; deprecate Lovable **Publish** ([vercel-frontend-setup.md](vercel-frontend-setup.md))
+- [ ] Configure Lovable as **optional editor** only (feature branches, no backend sync) — § Optional Lovable editor
