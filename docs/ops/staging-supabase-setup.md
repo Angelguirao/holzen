@@ -62,12 +62,17 @@ Supabase Dashboard → Project Settings → Edge Functions → Secrets.
 | `RESEND_API_KEY` | Resend transactional email |
 | `RESEND_WEBHOOK_SECRET` | Resend dashboard webhook signing secret (bounces/complaints → `handle-email-suppression`) |
 | `SEND_EMAIL_HOOK_SECRET` | Supabase Auth Send Email Hook secret (→ `auth-email-hook`) |
-| `STRIPE_SECRET_KEY` | Stripe **test** secret |
-| `STRIPE_WEBHOOK_SECRET` | Stripe test webhook signing secret |
+| `STRIPE_SECRET_KEY` | Stripe **test** secret (`sk_test_…` or restricted `rk_test_…`) |
+| `STRIPE_WEBHOOK_SECRET` | Stripe **test** webhook signing secret → `…/functions/v1/stripe-webhook` on this project |
+| `STRIPE_PRICE_ID_PRO` | Test-mode Pro subscription `price_…` (recurring) |
+| `STRIPE_PRICE_ID_FLEX_PACK_S` | Test-mode flex pack S `price_…` (one-time) |
+| `STRIPE_PRICE_ID_FLEX_PACK_M` | Test-mode flex pack M `price_…` (one-time) |
 | `CRON_SECRET` | Random string; match if you enable cron on staging |
 | `SENTRY_DSN_EDGES`, `LOG_DRAIN_*`, … | Staging or shared observability |
 
 Inventory prod/Lovable secrets against [observability-setup.md](observability-setup.md).
+
+**Stripe runbook:** [stripe-environment-setup.md](stripe-environment-setup.md) — test vs live, webhooks, verification.
 
 ---
 

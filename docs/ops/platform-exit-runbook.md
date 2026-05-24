@@ -127,7 +127,7 @@ Alternatives: Netlify or Cloudflare Pages with the same `npm run build` / `dist`
 1. Supabase → Authentication → Providers → Google: client ID/secret from Google Cloud Console; redirect URLs = prod + staging + localhost
 2. Supabase → Auth → **Hooks** → Send Email: point HTTPS URL at `auth-email-hook`; set `SEND_EMAIL_HOOK_SECRET` in Edge secrets (matches dashboard webhook secret)
 3. Resend → Webhooks: point at `handle-email-suppression`; set `RESEND_WEBHOOK_SECRET` in Edge secrets
-4. Stripe: webhook URL → prod `stripe-webhook` edge URL
+4. Stripe: webhook URL → prod `stripe-webhook` edge URL — full checklist [stripe-environment-setup.md](stripe-environment-setup.md)
 
 ### Observability
 

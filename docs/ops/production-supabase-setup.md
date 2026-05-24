@@ -63,8 +63,11 @@ Copy staging values where appropriate; swap to **live** vendor keys where noted.
 | `RESEND_API_KEY` | Transactional + auth email sends |
 | `RESEND_WEBHOOK_SECRET` | Resend → `handle-email-suppression` |
 | `SEND_EMAIL_HOOK_SECRET` | Supabase Auth Send Email Hook → `auth-email-hook` |
-| `STRIPE_SECRET_KEY` | **Live** mode |
-| `STRIPE_WEBHOOK_SECRET` | Stripe Dashboard → live webhook endpoint |
+| `STRIPE_SECRET_KEY` | **Live** mode (`sk_live_…` or restricted `rk_live_…`) |
+| `STRIPE_WEBHOOK_SECRET` | Stripe Dashboard → **live** webhook → `…/functions/v1/stripe-webhook` on this project |
+| `STRIPE_PRICE_ID_PRO` | Live Pro subscription `price_…` (recurring, $4.99/mo v1 packaging) |
+| `STRIPE_PRICE_ID_FLEX_PACK_S` | Live flex pack S `price_…` (one-time) |
+| `STRIPE_PRICE_ID_FLEX_PACK_M` | Live flex pack M `price_…` (one-time) |
 | `CRON_SECRET` | Must match `pg_cron` vault / Bruno cron invocations |
 | `SUPABASE_SERVICE_ROLE_KEY` | Auto-injected by Supabase; verify cron vault uses current JWT |
 
@@ -97,7 +100,7 @@ See [platform-exit-runbook.md](platform-exit-runbook.md) § Auth & email:
 1. **Google OAuth** — Supabase Auth → Providers → Google (prod redirect URLs)
 2. **Send Email Hook** — `https://<prod-ref>.supabase.co/functions/v1/auth-email-hook`
 3. **Resend webhook** — `https://<prod-ref>.supabase.co/functions/v1/handle-email-suppression` (events: `email.bounced`, `email.complained`)
-4. **Stripe webhook** — `https://<prod-ref>.supabase.co/functions/v1/stripe-webhook`
+4. **Stripe webhook** — `https://geqkxsnyqvhtascjghuu.supabase.co/functions/v1/stripe-webhook` (live mode; see [stripe-environment-setup.md](stripe-environment-setup.md))
 
 ---
 
