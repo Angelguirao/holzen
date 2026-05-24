@@ -196,6 +196,8 @@ Visitors on `holzen.app` see a minimal **Coming soon** screen (`ComingSoonScreen
 
 **Limits:** Same as any SPA gate — Supabase anon key and edges remain public; this blocks normal product UI only.
 
+**CI not ready?** Frontend-only deploy without GitHub Actions: [vercel-prod-frontend-only.md](./vercel-prod-frontend-only.md) (`npx vercel deploy --prod --yes`).
+
 ### Option D — Pay for Advanced Deployment Protection
 
 Single vendor solution for password or Vercel Auth on `holzen.app`.
