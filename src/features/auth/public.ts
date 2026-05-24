@@ -31,3 +31,9 @@ export {
   updateUserPassword,
   type AuthMutationResult,
 } from './infrastructure/supabase-auth-operations';
+export {
+  deleteAccountAction,
+  signOutAction,
+  type DeleteAccountActionState,
+  type SignOutActionState,
+} from './presentation/settings-account-io';

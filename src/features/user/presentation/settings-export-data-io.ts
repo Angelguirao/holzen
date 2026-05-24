@@ -1,3 +1,6 @@
+/**
+ * Settings data export form action — orchestrates auth, profile, and pause export bundle.
+ */
 import { getAuthUser } from '@/features/auth/public';
 import { fetchSettingsDataExportBundle } from '@/features/pause/public-hooks';
 import { fetchProfileRowForUser } from '@/features/user/public-queries';

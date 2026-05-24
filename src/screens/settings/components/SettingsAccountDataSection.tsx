@@ -14,9 +14,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { exportDataAction } from '@/screens/settings/export-data-action';
-import { deleteAccountAction } from '@/screens/settings/delete-account-action';
-import { signOutAction } from '@/screens/settings/sign-out-action';
+import { deleteAccountAction, signOutAction } from '@/features/auth/public';
+import { exportDataAction } from '@/features/user/public';
 
 export function SettingsAccountDataSection() {
   const { t } = useTranslation();
