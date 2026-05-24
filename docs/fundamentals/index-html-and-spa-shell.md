@@ -2,7 +2,7 @@
 
 Holzen is a **Vite + React single-page application (SPA)**. The browser loads **one** HTML document for the whole product; React Router switches screens without requesting new HTML from the server.
 
-**Canonical production origin:** `https://holzen.app` (custom domain). Lovable preview URLs (`*.lovable.app`) may still serve the same build for development; SEO and share metadata should point at **`holzen.app`**.
+**Canonical production origin:** `https://holzen.app` (Vercel custom domain). **Optional:** Lovable editor previews on `*.lovable.app` may still load the same bundle during feature work — SEO and share metadata should point at **`holzen.app`**.
 
 Related: [navigating-the-codebase.md](navigating-the-codebase.md) §3 (short boot summary), [mental-models-for-contributors.md](mental-models-for-contributors.md) (SPA mental model), [resource-hints-preconnect.md](../backlog/resource-hints-preconnect.md) (build-time `preconnect` injection).
 
@@ -65,7 +65,7 @@ Sets Tailwind’s `dark:` variant before CSS/JS load so the first paint matches 
 ### `src/main.tsx` — application entry
 
 - Initializes Sentry, correlation id, PostHog (no-ops when keys are empty).
-- **Static imports** of `i18n`, `App.tsx`, and `sw-update` (avoids dynamic-import failures on some Lovable preview hosts).
+- **Static imports** of `i18n`, `App.tsx`, and `sw-update` (avoids dynamic-import failures on some preview hosts).
 - `createRoot(document.getElementById('root')!).render(<App />)`.
 - Global `error` / `unhandledrejection` handlers and a **crash screen** if React never mounts.
 - In-app errors use `ErrorBoundary` in `App.tsx`.
@@ -80,13 +80,13 @@ Sets Tailwind’s `dark:` variant before CSS/JS load so the first paint matches 
 
 ---
 
-## Domain: `holzen.app` vs `holzen.lovable.app`
+## Domain: `holzen.app` vs preview hosts
 
 | Surface | Use |
 |---------|-----|
 | **`index.html`**, `public/sitemap.xml`, `public/robots.txt`, `PageMeta`, share copy | `https://holzen.app` |
-| **Stripe customer portal return URL** | `holzen.app` default; `holzen.lovable.app` and `*.lovable.app` previews remain in `ALLOWED_ORIGINS` (`customer-portal` edge) |
-| **Sentry / PostHog origin allowlists** | Both `holzen.app` and `*.lovable.app` where applicable — see [sentry-allowed-domains.md](../backlog/sentry-allowed-domains.md) |
+| **Stripe customer portal return URL** | `holzen.app` default; Vercel preview URLs and optional `*.lovable.app` remain in `ALLOWED_ORIGINS` (`customer-portal` edge) |
+| **Sentry / PostHog origin allowlists** | Production domain + preview origins as needed — see [sentry-allowed-domains.md](../backlog/sentry-allowed-domains.md) |
 
 When you change the canonical domain, set optional **`VITE_SITE_ORIGIN`** (build + runtime) or edit the fallback in **`vite.config.ts`** / **`src/config/site.ts`**. **`index.html`** uses `__SITE_ORIGIN__` placeholders replaced at build/dev by the `holzen-inject-index-html` plugin. Also update **`public/sitemap.xml`**, **`public/robots.txt`**, and email/share links as needed.
 
