@@ -4,10 +4,9 @@
  * Skips supabase/functions/legacy/** (Tier B — not shipped on owned projects).
  */
 import { existsSync } from "node:fs";
-import { join } from "node:path";
-import { spawnSync } from "node:child_process";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 import { readConfigTomlFunctionNames } from "./lib/read-config-toml-functions.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
