@@ -3496,6 +3496,7 @@ for (const script of [
   'check-no-screens-in-features.mjs',
   'check-no-supabase-in-screens.mjs',
   'check-no-supabase-in-app.mjs',
+  'check-screen-form-action-barrels.mjs',
 ]) {
   const child = spawnSync(process.execPath, [`scripts/${script}`], {
     cwd: root,

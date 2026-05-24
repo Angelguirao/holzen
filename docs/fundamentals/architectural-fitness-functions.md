@@ -86,6 +86,7 @@ Scripts live under `scripts/`. See script headers for exact rules and allowlists
 | `check:no-supabase-in-screens` | Via architecture-alignment | No `@/integrations/supabase/client` in `src/screens/**` |
 | `check:no-supabase-in-app` | Via architecture-alignment | No `@/integrations/supabase/client` in `src/app/**` |
 | `check:no-screens-in-features` | Via architecture-alignment | Features must not import `@/screens/` |
+| `check:screen-form-action-barrels` | Via architecture-alignment | `src/screens/**/*-action.ts` re-exports only (no inline `export async function` I/O) |
 | `check:no-root-components` | Yes | No new `src/components/*.tsx` outside allowlist |
 
 ### 4.3 Edge platform
@@ -176,6 +177,7 @@ Ordered by impact ÷ effort. Do not implement here unless a separate task scopes
 | Candidate | Protects | Notes |
 |-----------|----------|-------|
 | ~~`check:no-supabase-in-screens`~~ | *(shipped)* | Wired in `check:architecture-alignment` |
+| ~~`check:screen-form-action-barrels`~~ | *(shipped)* | `src/screens/**/*-action.ts` must re-export feature `*-io` actions only |
 | ~~`check:feature-flags-doc`~~ | *(shipped)* | In `test:ci` + prepush |
 | ~~Enable `check:i18n-active-keys` in CI~~ | *(shipped)* | In `test:ci` |
 | ~~`check:sql-search-path`~~ | *(shipped)* | In `test:ci` + prepush |
