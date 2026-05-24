@@ -69,6 +69,28 @@ for (const file of files) {
   }
 }
 
+/** Presentation hooks/components import application only via `*-io.ts` barrels (pause ritual I/O has extra rules in check-architecture-alignment). */
+const PRESENTATION_APPLICATION_IMPORT =
+  /from\s+['"]@\/features\/[^'"]+\/application\//;
+
+function isPresentationIoBarrel(rel) {
+  return /\/presentation\/.*-io\.(ts|tsx)$/.test(rel);
+}
+
+for (const file of files) {
+  const rel = relative(root, file).replace(/\\/g, '/');
+  if (/\.(test|spec)\.(ts|tsx)$/.test(rel)) continue;
+  if (layerFromPath(rel) !== 'presentation') continue;
+  if (isPresentationIoBarrel(rel)) continue;
+  const text = readFileSync(file, 'utf8');
+  if (PRESENTATION_APPLICATION_IMPORT.test(text)) {
+    violations.push({
+      file: rel,
+      label: 'presentation must import application via *-io.ts barrel',
+    });
+  }
+}
+
 /** Active app must use public / public-queries / public-rpc — not deep feature layers. */
 const DEEP_FEATURE_IMPORT =
   /from\s+['"]@\/features\/[^'"]+\/(application|infrastructure|domain|presentation)\//;

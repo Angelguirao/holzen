@@ -7,7 +7,7 @@ import {
 import {
   paywallPlanFromBillingInterval,
   trackPaywallSubscribed,
-} from '@/features/subscription/application/paywall-telemetry';
+} from './subscription-paywall-io';
 
 const MAX_AGE_MS = 30 * 60 * 1000;
 

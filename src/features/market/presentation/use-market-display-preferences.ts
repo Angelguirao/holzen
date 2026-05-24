@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { trackHomeMarketChartExpandToggled } from '@/features/market/application/market-display-telemetry';
+import { trackHomeMarketChartExpandToggled } from './market-display-io';
 
 function readIsTrue(key: string): boolean {
   try {

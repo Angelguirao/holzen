@@ -81,7 +81,7 @@ Scripts live under `scripts/`. See script headers for exact rules and allowlists
 | Script | In `test:ci` | Capability |
 |--------|--------------|------------|
 | `check:architecture-alignment` | Yes | Required `features/<ctx>/` skeleton; pause ritual paths; spawns feature-import + no-screens checks |
-| `check:feature-imports` | Via architecture-alignment | Hexagonal layer rules; `public*` barrels from app code |
+| `check:feature-imports` | Via architecture-alignment | Hexagonal layer rules; `public*` barrels from app code; presentation hooks import `application/` only via `*-io.ts` barrels |
 | `check:no-screens-in-features` | Via architecture-alignment | Features must not import `@/screens/` |
 | `check:no-root-components` | Yes | No new `src/components/*.tsx` outside allowlist |
 
