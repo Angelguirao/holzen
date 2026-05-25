@@ -57,7 +57,7 @@ npm run supabase:start
 npm run supabase:reset          # re-applies all migrations from scratch
 
 # Verify the migration works
-psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -f supabase/migrations/XXXX_my_change.sql
+psql "postgresql://postgres:postgres@127.0.0.1:55422/postgres" -f supabase/migrations/XXXX_my_change.sql
 ```
 
 **Naming:** Supabase sorts migrations lexicographically. Use the timestamp format:

@@ -124,7 +124,7 @@ After saving, copy the **Signing secret** → `STRIPE_WEBHOOK_SECRET` on the mat
 
 ```sh
 stripe login
-stripe listen --forward-to http://127.0.0.1:54321/functions/v1/stripe-webhook
+stripe listen --forward-to http://127.0.0.1:55421/functions/v1/stripe-webhook
 # paste printed whsec_… into local supabase secrets
 ```
 

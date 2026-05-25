@@ -29,7 +29,7 @@ Pick one tool and keep **one** canonical exported collection (or Bruno folder) i
 ## Supabase Edge Functions: URL and headers
 
 - **URL:** `{{VITE_SUPABASE_URL}}/functions/v1/<function-name>`  
-  Example: `http://127.0.0.1:54321/functions/v1/holzen-reflect` (local) or `https://<project-ref>.supabase.co/functions/v1/holzen-reflect` (hosted).
+  Example: `http://127.0.0.1:55421/functions/v1/holzen-reflect` (local) or `https://<project-ref>.supabase.co/functions/v1/holzen-reflect` (hosted).
 - **Typical headers** (same as the JS client’s `invoke`):
   - `Authorization: Bearer <SUPABASE_ACCESS_TOKEN>` — user session JWT from sign-in (see below); not stored in `.env`.
   - `apikey: <VITE_SUPABASE_PUBLISHABLE_KEY>` — same anon/publishable key as in `.env` / `.env.localstack.local` (public to the client; still treat repo copies carefully).
