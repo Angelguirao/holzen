@@ -69,6 +69,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run lint` | ESLint |
 | `npm run check:view-migrations` | Fail if a migration uses unsafe `CREATE OR REPLACE VIEW` renames (also run from `check:prepush`) |
 | `npm run supabase:start` | Local Supabase stack (Docker); same as `npx supabase start` |
+| `npm run supabase:functions:serve` | Serve local Edge Functions (reads `supabase/.env.local`, then `supabase/.env`, then OS env) |
 | `npm run supabase:status` | Print local API URL and anon key |
 | `npm run supabase:stop` | Stop local stack |
 | `npm run supabase:reset` | Reapply `supabase/migrations/` on local DB |
@@ -129,7 +130,31 @@ For everyday UI work you can point `.env` at a **hosted** Supabase project only 
 
 When migrations are ready, commit the SQL files under `supabase/migrations/` and apply them to your hosted project (e.g. [link the CLI](https://supabase.com/docs/guides/cli/local-development#link-your-project) to that project and `npx supabase db push`, or run the SQL via the dashboard), following your team’s process.
 
-**Edge functions:** You can run functions locally with `npx supabase functions serve`, but production behavior depends on **Supabase dashboard secrets** (Stripe, email, AI keys, etc.). Local testing may need those set for the CLI or a `.env` used by `supabase functions serve`—see [Supabase Functions local secrets](https://supabase.com/docs/guides/functions/secrets).
+### Full local stack
+
+For the most isolated setup, run all three pieces together:
+
+```sh
+npm run supabase:start
+npm run supabase:functions:serve
+npm run dev:local
+```
+
+- `npm run supabase:start` brings up the local platform (DB, auth, storage, Studio, API gateway).
+- `npm run supabase:functions:serve` serves your Edge Function handlers locally.
+- `npm run dev:local` runs the React app against the local Supabase URL/key in `.env.localstack.local`.
+
+The local API gateway exposes `http://127.0.0.1:55421/functions/v1`, but your function routes are only actually handled once the function server is running.
+
+**Edge function secrets:** Start from `supabase/.env.example`, then copy it to `supabase/.env` (shared local defaults) or `supabase/.env.local` (personal overrides). The CLI reads `supabase/.env.local`, then `supabase/.env`, then OS env. Add only the secrets needed for the flows you are testing locally: Stripe test keys, Resend/auth-email values, AI provider keys, VAPID keys, or observability overrides.
+
+**Vendor-backed flows:** Billing, transactional email, AI calls, and some ops paths still depend on third-party credentials even when the function code is running locally. For Stripe webhooks, you can forward events into the local stack with:
+
+```sh
+stripe listen --forward-to http://127.0.0.1:55421/functions/v1/stripe-webhook
+```
+
+**Edge functions:** You can also run functions locally with `npx supabase functions serve`, but production behavior depends on **Supabase dashboard secrets** (Stripe, email, AI keys, etc.). Local testing may need those set for the CLI or a `.env` used by `supabase functions serve`—see [Supabase Functions local secrets](https://supabase.com/docs/guides/functions/secrets).
 
 **No Docker:** Use a separate hosted project (staging), put its URL and anon key in `.env`, and apply migrations there before production.
 

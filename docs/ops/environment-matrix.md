@@ -22,7 +22,7 @@ Canonical source for Holzen environment variables, secret storage, naming conven
 | `npm run dev` with `.env` | Local Vite | Whatever `VITE_SUPABASE_*` points to | Follows the target project | Missing `VITE_SUPABASE_*` now fails fast in `vite.config.ts`; set them explicitly. |
 | `npm run dev:staging` | Local Vite | `holzen-staging` | Stripe **test** mode, staging email identity, staging observability tags | Best local setup for release QA against hosted infrastructure. |
 | `npm run dev:prod` | Local Vite | Usually `holzen-prod` | Can hit **live** Stripe / prod email if you use prod values | Treat as prod-like; do not test risky flows casually. |
-| `npm run dev:local` | Local Vite | Local Docker Supabase | Local-only unless you also run functions locally with `supabase/.env` | Requires explicit local URL/key values in `.env.localstack.local`. |
+| `npm run dev:local` | Local Vite | Local Docker Supabase | Local-only unless you also run `npm run supabase:functions:serve` with `supabase/.env` or `supabase/.env.local` | Requires explicit local URL/key values in `.env.localstack.local`. |
 | Feature-branch PR preview | Vercel Preview | `holzen-staging` | Stripe **test** mode, staging-ish behavior | PR previews are not isolated backends; they share staging Supabase. |
 | `staging` branch deploy | Vercel Preview branch alias | `holzen-staging` | Stripe **test** mode, staging Resend branding, `SENTRY_ENVIRONMENT=staging` | This is the canonical pre-prod environment. |
 | `main` deploy | Vercel Production | `holzen-prod` | Stripe **live** mode, production email defaults, `SENTRY_ENVIRONMENT=production` | `VITE_COMING_SOON` can gate the SPA, but it does not lock down Supabase. |
@@ -49,7 +49,8 @@ Important: the checked-in `supabase/config.toml` currently carries the prod ref,
 | `.env.localstack.local` | Local Vite against local Docker Supabase | Use explicit local URL/key values for `npm run dev:local`. |
 | `.env.staging.secrets` | Gitignored staging Edge secrets | Applied with `npm run staging:secrets-set`. |
 | `.env.prod.secrets` | Gitignored prod Edge secrets | Applied with `npm run prod:secrets-set`. |
-| `supabase/.env` | Local `supabase functions serve` secrets | Local only; not read in hosted Edge runs. |
+| `supabase/.env` | Shared local `supabase functions serve` secrets | Local only; not read in hosted Edge runs. |
+| `supabase/.env.local` | Personal local overrides for `supabase functions serve` | Loaded before `supabase/.env`; keep machine-specific values here. |
 | Vercel project env | Runtime/browser `VITE_*` for deployed SPA, plus build-only Sentry vars | Preview uses staging values; Production uses prod values. |
 | GitHub Actions secrets | Deploy tokens, project refs, CI preflight build vars | See [cicd-overview.md](cicd-overview.md). |
 | Supabase Edge secrets | Edge runtime secrets per project | Set separately on `holzen-staging` and `holzen-prod`. |
@@ -72,8 +73,14 @@ avoid Windows excluded-port conflicts that frequently affect the upstream
    - `VITE_SUPABASE_PROJECT_ID="local"`
    - `VITE_SUPABASE_URL="http://127.0.0.1:55421"`
    - `VITE_SUPABASE_PUBLISHABLE_KEY="<anon key from supabase:status>"`
-5. Start the app: `npm run dev:local`
-6. If you need local Edge Functions too, create `supabase/.env` with the required server secrets before `supabase functions serve`
+5. If you need local Edge Functions too, copy `supabase/.env.example` to `supabase/.env` or `supabase/.env.local`
+6. Fill only the secrets needed for the flows you are testing locally, then start functions: `npm run supabase:functions:serve`
+7. Start the app: `npm run dev:local`
+
+Notes:
+
+- `npm run supabase:start` exposes the local Edge Functions URL, but your handlers are only served once `npm run supabase:functions:serve` is running too.
+- Prefer `supabase/.env` for shared local defaults and `supabase/.env.local` for personal overrides.
 
 ### Local: app against staging
 
@@ -345,7 +352,7 @@ These exist in hosted Edge Functions without you creating matching secrets manua
 3. **Resend has no test/live mode split.** Separation comes from distinct API keys, webhook endpoints, and optional staging email identity overrides.
 4. **`VITE_COMING_SOON` gates only the SPA shell.** It does not disable Supabase auth, Edge Functions, or the anon key.
 5. **`npm run dev:prod` can be production-dangerous.** If `.env.prod.local` points at prod, local checkout or email flows can use live vendors.
-6. **`npm run dev:local` is the safest isolated mode.** It points at local Docker Supabase when `.env.localstack.local` is filled correctly, but vendor-backed Edge behavior still requires local function secrets if you run functions locally.
+6. **`npm run dev:local` is the safest isolated mode.** It points at local Docker Supabase when `.env.localstack.local` is filled correctly, but vendor-backed Edge behavior still requires `npm run supabase:functions:serve` plus local function secrets when you need those flows.
 7. **Edge secret updates do not require a frontend rebuild.** They take effect on subsequent function invocations. `VITE_*` changes do require a rebuild/redeploy.
 8. **Frontend observability defaults are asymmetric.** Sentry/PostHog can still initialize from committed fallback values in `src/config/public-env.ts` even if Vercel env vars are unset.
 
