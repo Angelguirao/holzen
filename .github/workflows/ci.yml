@@ -37,7 +37,7 @@ jobs:
         run: npm run test:ci
 
       - name: CI build (staging env)
-        run: npm run build
+        run: npm run build && npm run check:bundle-shipped
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_STAGING_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_STAGING_PUBLISHABLE_KEY }}

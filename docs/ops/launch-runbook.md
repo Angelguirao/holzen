@@ -33,7 +33,7 @@ npm run check:edge-logging
 npm run check:edge-coverage-manifest
 npm run test:ci
 npm run build
-npm run check:bundle-shipped   # also runs inside test:ci
+npm run check:bundle-shipped   # run after build (also in the CI build step)
 npm run check:bruno-active-manifest
 npm run check:posthog-events-allowlist
 npm run check:view-migrations
