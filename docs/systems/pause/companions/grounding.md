@@ -38,7 +38,7 @@ Grounding also serves as the **data source for trap interventions**: when `selec
 
 High-level order (source of truth: **`supabase/functions/_shared/generators/grounding.ts`**, **`PROMPT_VERSION`** v3):
 
-**Phase 1: Library — disabled for grounding.** Gated by the module-level constant `GROUNDING_LIBRARY_ENABLED = false` in `grounding.ts` (in addition to the global `COMPANION_PHASE_LIBRARY` env toggle). We short-circuit the phase entirely because `content_library` currently has no rows of `type: "paper"` and paper ingestion is parked; calling `searchLibrary` would only emit `library_search_rejected reason:"empty"` and add an unnecessary DB round-trip per grounding request. When ingestion resumes, flip the flag (or swap it for a `COMPANION_PHASE_LIBRARY_GROUNDING` env var) and the existing `searchLibrary` / `paperToGrounding` / `recordLibraryServe` path is ready to use.
+**Phase 1: Library — disabled for grounding.** Gated by the module-level constant `GROUNDING_LIBRARY_ENABLED = false` in `grounding.ts` (in addition to the global `COMPANION_PHASE_CATALOG` env toggle). We short-circuit the phase entirely because `content_library` currently has no rows of `type: "paper"` and paper ingestion is parked; calling `searchLibrary` would only emit `library_search_rejected reason:"empty"` and add an unnecessary DB round-trip per grounding request. When ingestion resumes, flip the flag (or swap it for a `COMPANION_PHASE_CATALOG_GROUNDING` env var) and the existing `searchLibrary` / `paperToGrounding` / `recordLibraryServe` path is ready to use.
 
 **Phase 2: Cache (strict)** — `serveFromCache` with `strict: true` checks `companion_cache` for fresh, quality-≥-2 rows with per-user dedup and market direction awareness. If found, returns (`source: "cache"`). If the strict pool is empty it returns `null` and emits `cache_strict_miss` (Edge log) so the flow falls through to Phase 3 instead of recycling seen rows.
 
@@ -57,7 +57,7 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/grou
 
 **Phase 4: Curated** — if all above fail, static fallback pool from `companion_fallbacks` DB / `fallback-seed.json`.
 
-Phase toggles: `COMPANION_PHASE_LIBRARY`, `COMPANION_PHASE_CACHE`, `COMPANION_PHASE_LIVE` (all enabled by default; see `_shared/phase-config.ts`). Note: grounding also has a module-local override (`GROUNDING_LIBRARY_ENABLED`) that forces Phase 1 off regardless of the global `COMPANION_PHASE_LIBRARY` setting — see Phase 1 above.
+Phase toggles: `COMPANION_PHASE_CATALOG`, `COMPANION_PHASE_CACHE`, `COMPANION_PHASE_LIVE` (all enabled by default; see `_shared/phase-config.ts`). Note: grounding also has a module-local override (`GROUNDING_LIBRARY_ENABLED`) that forces Phase 1 off regardless of the global `COMPANION_PHASE_CATALOG` setting — see Phase 1 above.
 
 ---
 

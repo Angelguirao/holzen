@@ -35,7 +35,7 @@ cd holzen
 npm install
 ```
 
-Environment variables (see [.env.example](.env.example)):
+Environment variables (see [.env.example](.env.example) and [docs/ops/environment-matrix.md](docs/ops/environment-matrix.md)):
 
 - **Vercel (prod/preview):** Set `VITE_SUPABASE_*`, `VITE_SENTRY_DSN`, `VITE_POSTHOG_*`, `VITE_APP_VERSION` in the Vercel project. See [docs/ops/vercel-frontend-setup.md](docs/ops/vercel-frontend-setup.md).
 - **Default (local machine):** `cp .env.example .env` then `npm run dev` — uses your `.env` values. If `VITE_SUPABASE_*` are missing, **dev and `npm run build`** can fall back to the bundled Holzen hosted keys in `vite.config.ts` (never in `localstack` mode). Set real `VITE_SUPABASE_*` for another Supabase project or if you do not want those defaults in the bundle.
