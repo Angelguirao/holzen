@@ -158,10 +158,10 @@ else
   fail_check "npm run check:bundle-shipped failed — BadgesPanelV2/ToolsHub leaked into dist/assets"
 fi
 
-if npm run check:bruno-active-manifest --silent && npm run check:posthog-events-allowlist --silent && npm run check:feature-flags-doc --silent && npm run check:i18n-active-keys --silent; then
-  ok "bruno manifest + PostHog allowlist + feature flags doc + i18n keys"
+if npm run check:bruno-active-manifest --silent && npm run check:posthog-events-allowlist --silent && npm run check:feature-flags-doc --silent && npm run check:env-docs --silent && npm run check:i18n-active-keys --silent; then
+  ok "bruno manifest + PostHog allowlist + feature flags doc + env docs + i18n keys"
 else
-  fail_check "bruno manifest, PostHog allowlist, feature flags doc, or i18n keys check failed"
+  fail_check "bruno manifest, PostHog allowlist, feature flags doc, env docs, or i18n keys check failed"
 fi
 
 # ---- 5. Local supabase db reset ---------------------------------------------

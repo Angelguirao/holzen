@@ -57,6 +57,7 @@ Holzen thesis #4 — *boundaries are enforced* — is implemented largely throug
 | Controlled client → edge surface | `check:invoke-edge-allowlist` | `invokeEdge` + `x-cid` on new call sites |
 | Analytics taxonomy | `check:posthog-events-allowlist` | [event-taxonomy.md](../ops/event-taxonomy.md) in same PR |
 | Feature flags taxonomy | `check:feature-flags-doc` | [feature-flags.md](../ops/feature-flags.md) in same PR |
+| Config/env inventory stays truthful | `check:env-docs` | [environment-matrix.md](../ops/environment-matrix.md) |
 | API review catalog | `check:bruno-active-manifest` | `bruno/active/functions-catalog.md` |
 | Schema evolves safely | `check:view-migrations`, `check:sql-search-path`, local `supabase db reset` (prepush) | [migration-view-safety.md](../ops/migration-view-safety.md), [migration-security-conventions.md](../ops/migration-security-conventions.md) |
 | Release traceability | `check:version-sync`, `stamp-edge-release` / `check:release-stamp` | `VITE_APP_VERSION` = Git SHA in Lovable |
@@ -110,6 +111,7 @@ Scripts live under `scripts/`. See script headers for exact rules and allowlists
 |--------|--------------|------------|
 | `check:posthog-events-allowlist` | Yes | `trackEvent` names ⊆ event taxonomy Active section |
 | `check:feature-flags-doc` | Yes | `useFeatureFlag` keys ⊆ feature-flags.md Active flags table |
+| `check:env-docs` | Yes | Runtime/build env names, example env files, and CI catalog entries stay aligned with `docs/ops/environment-matrix.md` |
 | `check:i18n-active-keys` | Yes | Active `t('…')` keys exist in `src/locales/en.json` |
 | `check:view-migrations` | Prepush | Safe `CREATE OR REPLACE VIEW` patterns |
 | `check:sql-search-path` | Yes (`test:ci`) + Prepush | Every migration function pins `public` in `search_path` |

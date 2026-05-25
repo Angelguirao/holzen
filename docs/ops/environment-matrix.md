@@ -186,6 +186,14 @@ These are public by design. They belong in local `.env*` files for local Vite, a
 - `VITE_SENTRY_DSN`, `VITE_POSTHOG_KEY`, and `VITE_POSTHOG_HOST` fall back to committed values in `src/config/public-env.ts` when unset.
 - `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` can be injected by `vite.config.ts` when unset and mode is not `localstack`. This is convenient for Holzen development, but dangerous if you assume "missing env" means "fully isolated."
 
+## Developer and build-only toggles
+
+These are not browser runtime vars, but they still affect build or local developer behavior and should stay documented.
+
+| Variable | Used for | Where set | Environment notes |
+|---|---|---|---|
+| `HOLZEN_REACT_COMPILER` | Disables the React Compiler pilot when set to `0` | Local shell, CI shell if needed | Developer/build-only toggle consumed by `vite.react-compiler.ts`; default behavior is enabled annotation-mode pilot. |
+
 ## GitHub Actions and CI variables
 
 These belong in **GitHub → repository → Settings → Secrets and variables → Actions**.
@@ -273,8 +281,10 @@ These exist in hosted Edge Functions without you creating matching secrets manua
 | `STRIPE_PRICE_ID_FLEX_PACK_S` | Flex pack S price | Stripe product/price | Recommended; mode-specific value. |
 | `STRIPE_PRICE_ID_FLEX_PACK_M` | Flex pack M price | Stripe product/price | Recommended; mode-specific value. |
 | `CRON_SECRET` | Shared secret for pg_cron and ops endpoints | Random high-entropy value | Must match the value used by cron/Vault wiring. |
+| `COINGECKO_API_KEY` | Optional CoinGecko API/demo key for market-price requests | CoinGecko dashboard or provider key page | Optional; when set, `_shared/coingecko.ts` adds the request header. |
 | `SENTRY_DSN_EDGES` | Edge error reporting | Sentry DSN | Usually same Sentry project as frontend. |
 | `SENTRY_RELEASE` | Edge release tag | Deploy-time Git SHA | Keep equal to `VITE_APP_VERSION` and `EDGE_RELEASE`. |
+| `APP_VERSION` | Legacy edge release alias | Deploy-time Git SHA | Compatibility fallback only; prefer `SENTRY_RELEASE` for active configuration. |
 | `SENTRY_ENVIRONMENT` | Edge environment tag | Manual value | `staging` on staging, `production` on prod. |
 | `LOG_DRAIN_URL` | BetterStack ingest endpoint | BetterStack source config | Required for edge log forwarding. |
 | `LOG_DRAIN_TOKEN` | BetterStack source token | BetterStack source config | Server-only. |
@@ -288,6 +298,7 @@ These exist in hosted Edge Functions without you creating matching secrets manua
 | `FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE` | Max inserted articles per source | Launch/backfill tuning; optional. |
 | `FETCH_FEEDS_ARTICLE_DELAY_MS` | Delay between article attempts | Lower values speed backfills but can increase provider pressure. |
 | `FETCH_FEEDS_LOG_ORIGINAL_INFER` | Toggle original-resolution logging | Optional debug/tuning flag. |
+| `CRYPTOCOMPARE_API_KEY` | Optional CryptoCompare key for long-range BTC history seeding | Used by `seed-btc-history`; optional header when calling CryptoCompare. |
 
 ### Legacy or non-active-surface secrets
 
@@ -340,5 +351,6 @@ Update the relevant pieces in the same PR:
    - `docs/ops/stripe-environment-setup.md`
    - `docs/ops/resend-environment-setup.md`
    - `docs/systems/pause/ai-powered-pause-system.md`
+5. Run `npm run check:env-docs`
 
 If the new variable affects CI, Preview, or Production readiness, also update [cicd-overview.md](cicd-overview.md).
