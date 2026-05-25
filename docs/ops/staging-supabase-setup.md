@@ -53,6 +53,8 @@ npm run staging:functions-deploy  # 31 active edges (config.toml manifest)
 npm run staging:deploy            # both
 ```
 
+These manual `staging:*` scripts relink the CLI to the staging ref before they push, so they do not depend on whatever project happened to be linked previously in your shell.
+
 **Production (after staging sign-off):** link prod ref, then `npm run prod:deploy` for manual deploys — prefer [deploy-production.yml](../../.github/workflows/deploy-production.yml) on merge to `main`. See [production-supabase-setup.md](production-supabase-setup.md).
 
 Deploy uses [scripts/deploy-active-edge-functions.mjs](../../scripts/deploy-active-edge-functions.mjs) — **`supabase/functions/legacy/**` is never deployed** to owned projects ([active-surface.md](active-surface.md)).

@@ -23,6 +23,8 @@ npx supabase link --project-ref geqkxsnyqvhtascjghuu
 npm run prod:deploy   # db push + active edge functions (after preflight locally)
 ```
 
+The manual `prod:*` scripts relink the CLI to the production ref before they push, so they do not depend on whichever remote project was linked earlier in your shell.
+
 Day-to-day prod backend deploys should go through [`.github/workflows/deploy-production.yml`](../../.github/workflows/deploy-production.yml) (merge to `main` + **production** environment approval).
 
 ---
