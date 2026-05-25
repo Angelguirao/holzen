@@ -15,6 +15,22 @@ Canonical source for Holzen environment variables, secret storage, naming conven
 | Local files are convenience layers, not production truth | `.env*` files drive local Vite and local CLI workflows. Hosted behavior comes from Vercel, GitHub, and Supabase. |
 | Update the catalog with the docs | When deploy-time envs change, update this doc and `scripts/lib/cicd-env-catalog.mjs` in the same PR. |
 
+## Who Reads What
+
+Use this table when you're unsure which runtime actually reads a variable.
+
+| Variable type | Local frontend | Local Edge Functions | Hosted frontend | Hosted Edge Functions |
+|---|---|---|---|---|
+| `VITE_*` browser/build vars | Local `.env*` files such as `.env.localstack.local`, `.env.staging.local`, `.env.prod.local`, or `.env` | Not used | Vercel environment variables | Not used |
+| Server-side secrets such as `STRIPE_SECRET_KEY`, `RESEND_API_KEY`, `GOOGLE_AI_API_KEY` | Never | `supabase/.env.local`, `supabase/.env`, or OS env while running `npm run supabase:functions:serve` | Never | Supabase Dashboard → Edge Functions → Secrets |
+
+Quick rule:
+
+- `import.meta.env.VITE_*` means the **frontend** reads it.
+- `Deno.env.get(...)` means an **Edge Function** reads it.
+- `supabase/.env*` is only for **local** Edge Function runtime.
+- Supabase dashboard secrets are only for **deployed** Edge Function runtime.
+
 ## Environment behavior at a glance
 
 | Surface | Frontend target | Backend target | Billing / email behavior | Main gotcha |
