@@ -92,7 +92,7 @@ GitHub Actions (see [`.github/workflows/`](../../.github/workflows/)):
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
 | `ci.yml` | PR; push `main` / `staging` / `dev` | `npm run test:ci` + build |
-| `staging-backend.yml` | `workflow_dispatch` / push `staging` | Preflight → backend → Vercel preview |
+| `staging-deploy.yml` | `workflow_dispatch` / push `staging` | Preflight → backend → Vercel preview |
 | `deploy-production.yml` | `workflow_dispatch` / push `main` | Preflight → backend → Vercel production (**`production`** environment approval recommended) |
 
 **GitHub secrets:** See [cicd-overview.md](cicd-overview.md) (Supabase, Vercel, `VITE_*` for preflight builds).

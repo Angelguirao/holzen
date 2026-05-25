@@ -44,7 +44,7 @@ curl.exe -s -w "\nHTTP:%{http_code}" -X POST \
   -H "Content-Type: application/json" -d "{}"
 ```
 
-CI alternative: [staging-backend.yml](../../.github/workflows/staging-backend.yml) and [deploy-production.yml](../../.github/workflows/deploy-production.yml).
+CI alternative: [staging-deploy.yml](../../.github/workflows/staging-deploy.yml) and [deploy-production.yml](../../.github/workflows/deploy-production.yml).
 
 ### 2. Stripe Dashboard access
 

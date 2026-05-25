@@ -432,7 +432,7 @@ export function formatWhere(where, ctx = {}) {
 export const PROFILE_HELP = {
   ci: "CI workflow (.github/workflows/ci.yml) — PR checks and production build gate",
   staging:
-    "Staging deploy (.github/workflows/staging-backend.yml) — push to `staging`",
+    "Staging deploy (.github/workflows/staging-deploy.yml) — push to `staging`",
   production:
     "Production deploy (.github/workflows/deploy-production.yml) — push to `main`",
 };

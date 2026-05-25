@@ -149,4 +149,4 @@ Configure GitHub repository secrets (Settings → Secrets and variables → Acti
 
 Optional CI build secrets: `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` — see [observability-setup.md](observability-setup.md).
 
-Then run workflow **Staging backend** (`.github/workflows/staging-backend.yml`) or push to branch `staging`.
+Then run workflow **Staging deploy** (`.github/workflows/staging-deploy.yml`) or push to branch `staging`.

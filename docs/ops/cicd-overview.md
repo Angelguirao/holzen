@@ -54,7 +54,7 @@ flowchart TB
 | File | Name | Trigger | Jobs |
 |------|------|---------|------|
 | [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) | CI | PR; push `main` / `staging` / `dev` | `validate-secrets` → `test:ci` + `build` |
-| [`.github/workflows/staging-backend.yml`](../../.github/workflows/staging-backend.yml) | Staging deploy | Push `staging`; manual | `validate-secrets` → `preflight` → `deploy-backend` → `deploy-frontend` |
+| [`.github/workflows/staging-deploy.yml`](../../.github/workflows/staging-deploy.yml) | Staging deploy | Push `staging`; manual | `validate-secrets` → `preflight` → `deploy-backend` → `deploy-frontend` |
 | [`.github/workflows/deploy-production.yml`](../../.github/workflows/deploy-production.yml) | Production deploy | Push `main`; manual | Same chain; `production` environment approval recommended |
 
 ### Job details

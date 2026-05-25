@@ -30,7 +30,7 @@ Holzen uses the same **mental model** as common “Lovable + GitHub + static hos
 | Environment | Git branch | Frontend | Database | Who deploys backend |
 |-------------|------------|----------|----------|---------------------|
 | **Dev** | `feature/*` (local integration) | `localhost:8080` (`npm run dev`) or optional Lovable preview | Local Docker (`supabase:reset`) **or** staging keys for hosted preview | Nobody — migrations land via PR |
-| **Staging** | `staging` | Vercel **Preview** via Actions (`deploy-frontend` after backend) | Owned **holzen-staging** | [staging-backend.yml](../../.github/workflows/staging-backend.yml) |
+| **Staging** | `staging` | Vercel **Preview** via Actions (`deploy-frontend` after backend) | Owned **holzen-staging** | [staging-deploy.yml](../../.github/workflows/staging-deploy.yml) |
 | **Production** | `main` | Vercel **Production** via Actions (after backend) | Owned **holzen-prod** | [deploy-production.yml](../../.github/workflows/deploy-production.yml) (approval) |
 
 **Not used after exit:** Lovable Cloud as a third hosted database, Lovable **Publish → Update** for prod, or Lovable auto-applying migrations on push to `main`.
@@ -167,7 +167,7 @@ These are **local / pre-push** gates—not a hosted staging environment:
 
 Before GitHub Actions shipped in-repo, sync was effectively: **webhook → apply migrations + deploy edges** with limited PR visibility. Frontend deploy was a **second channel** (Publish), so backend and frontend could be **out of sync**.
 
-**Today:** [ci.yml](../../.github/workflows/ci.yml) runs on PR; [staging-backend.yml](../../.github/workflows/staging-backend.yml) and [deploy-production.yml](../../.github/workflows/deploy-production.yml) deploy owned Supabase. Lovable is optional — see **Optional Lovable editor** above.
+**Today:** [ci.yml](../../.github/workflows/ci.yml) runs on PR; [staging-deploy.yml](../../.github/workflows/staging-deploy.yml) and [deploy-production.yml](../../.github/workflows/deploy-production.yml) deploy owned Supabase. Lovable is optional — see **Optional Lovable editor** above.
 
 ---
 
@@ -252,7 +252,7 @@ When moving from explore to execute, pick a hybrid row first; full exit is Phase
 ## Follow-up checklist (not scheduled)
 
 - [x] Add **`.github/workflows`** running `npm run test:ci` on PR ([ci.yml](../../.github/workflows/ci.yml))
-- [x] Create **`staging`** branch + [staging-backend.yml](../../.github/workflows/staging-backend.yml)
+- [x] Create **`staging`** branch + [staging-deploy.yml](../../.github/workflows/staging-deploy.yml)
 - [ ] Run migrations on **staging** before merging to `main`; smoke [bruno/active/](../../bruno/active/functions-catalog.md)
 - [ ] Inventory secrets vs [observability-setup.md](observability-setup.md); mirror in password manager + staging/prod Supabase
 - [ ] **Claim** Supabase from Lovable or finish owned-project cutover + PITR drill
