@@ -10,7 +10,7 @@ Canonical map of how Holzen validates, deploys, and correlates releases across *
 
 | Stage | Trigger | What runs | Goes live |
 |-------|---------|-----------|-----------|
-| **CI** | Pull request (and pushes to `main` / `staging` / `dev`) | `test:ci` + `build` | Nothing deploys |
+| **CI** | Pull request (and pushes to `main` / `staging` / `dev`) | `test:ci` + staging-style frontend build | Nothing deploys |
 | **Staging deploy** | Push to `staging` | Backend → frontend (ordered) | Staging Supabase + Vercel **Preview** for `staging` branch |
 | **Production deploy** | Push to `main` (+ optional approval) | Backend → frontend (ordered) | Prod Supabase + Vercel **Production** |
 | **PR previews** | Pull request to any branch | Vercel Git integration (automatic) | Ephemeral preview URL (staging Supabase keys) |
@@ -63,7 +63,7 @@ flowchart TB
 
 Catalog source of truth: [`scripts/lib/cicd-env-catalog.mjs`](../../scripts/lib/cicd-env-catalog.mjs).
 
-**preflight** — Same gate as merge quality: `npm run test:ci` (fitness checks + Vitest coverage) and `npm run build`. Staging preflight uses **staging** Supabase build secrets; production uses **prod** secrets.
+**preflight** — Same gate as merge quality: `npm run test:ci` (fitness checks + Vitest coverage) and `npm run build`. PR CI and staging preflight use **staging** Supabase build secrets; production uses **prod** secrets.
 
 **deploy-backend** — `npm run stamp:release` → `supabase link` → `supabase db push` → [`scripts/deploy-active-edge-functions.mjs`](../../scripts/deploy-active-edge-functions.mjs).
 
@@ -84,7 +84,7 @@ Holzen splits configuration across three surfaces. **Do not** put Edge secrets i
 ### Commands
 
 ```sh
-# PR / CI — GitHub only (2 vars)
+# PR / CI — GitHub only (2 vars, staging build secrets)
 npm run check:cicd-env -- --profile=ci --platform=github
 
 # Staging deploy — all three platforms
@@ -132,10 +132,10 @@ Configure in **Settings → Secrets and variables → Actions** (repository secr
 
 | Secret | Used by |
 |--------|---------|
-| `VITE_SUPABASE_STAGING_URL` | Staging preflight build |
-| `VITE_SUPABASE_STAGING_PUBLISHABLE_KEY` | Staging preflight build |
-| `VITE_SUPABASE_URL` | CI on PR / prod preflight |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | CI on PR / prod preflight |
+| `VITE_SUPABASE_STAGING_URL` | CI on PR + staging preflight build |
+| `VITE_SUPABASE_STAGING_PUBLISHABLE_KEY` | CI on PR + staging preflight build |
+| `VITE_SUPABASE_URL` | Prod preflight build |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Prod preflight build |
 
 Optional on GitHub: `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` — prefer **Vercel** for source-map upload (see below).
 
