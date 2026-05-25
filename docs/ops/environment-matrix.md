@@ -43,6 +43,115 @@ Canonical source for Holzen environment variables, secret storage, naming conven
 | Supabase Edge secrets | Edge runtime secrets per project | Set separately on `holzen-staging` and `holzen-prod`. |
 | Password manager | Long-lived source record for vendor keys and refs | Store the raw values here; copy them into Vercel / GitHub / Supabase as needed. |
 
+## Quick setup checklists
+
+Use this section when you want the shortest path to a working environment. The detailed explanations stay below.
+
+### Local: Docker-only Supabase
+
+1. Start local Supabase: `npm run supabase:start`
+2. Read the local URL and anon key: `npm run supabase:status`
+3. Copy `.env.localstack.example` to `.env.localstack.local`
+4. Fill:
+   - `VITE_SUPABASE_PROJECT_ID="local"`
+   - `VITE_SUPABASE_URL="http://127.0.0.1:54321"`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY="<anon key from supabase:status>"`
+5. Start the app: `npm run dev:local`
+6. If you need local Edge Functions too, create `supabase/.env` with the required server secrets before `supabase functions serve`
+
+### Local: app against staging
+
+1. Copy `.env.staging.example` to `.env.staging.local`
+2. Fill:
+   - `VITE_SUPABASE_PROJECT_ID="ksplyxxdvandkwzundql"`
+   - `VITE_SUPABASE_URL="https://ksplyxxdvandkwzundql.supabase.co"`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY="<staging publishable key>"`
+3. Optional for QA: set `VITE_HOLZEN_DEBUG=1`
+4. Start the app: `npm run dev:staging`
+5. Expect staging behavior: shared staging DB, Stripe test mode, staging email/observability setup
+
+### Local: app against production
+
+1. Copy `.env.hosted.example` to `.env.hosted.local`
+2. Fill:
+   - `VITE_SUPABASE_PROJECT_ID="geqkxsnyqvhtascjghuu"`
+   - `VITE_SUPABASE_URL="https://geqkxsnyqvhtascjghuu.supabase.co"`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY="<prod publishable key>"`
+3. Start the app: `npm run dev:hosted`
+4. Treat this as prod-like: billing, emails, and data changes can be real depending on the path you test
+
+### New staging environment bootstrap
+
+1. Create or confirm the Supabase project `holzen-staging` (`ksplyxxdvandkwzundql`)
+2. Link the CLI locally:
+   - `npx supabase login`
+   - `npx supabase link --project-ref ksplyxxdvandkwzundql`
+3. Set the Vault project URL / cron prerequisites as described in [staging-supabase-setup.md](staging-supabase-setup.md)
+4. Apply schema and active Edge Functions:
+   - `npm run staging:db-push`
+   - `npm run staging:functions-deploy`
+5. Copy `.env.staging.secrets.example` to `.env.staging.secrets`, fill the staging values, then run `npm run staging:secrets-set`
+6. In Supabase Auth, configure:
+   - site URL / redirect URLs
+   - Send Email Hook
+7. In Vercel Preview env, set:
+   - `VITE_SUPABASE_PROJECT_ID`
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY`
+   - `VITE_APP_VERSION`
+   - recommended observability vars (`VITE_SENTRY_DSN`, `VITE_POSTHOG_*`)
+8. In GitHub Actions, set:
+   - `SUPABASE_ACCESS_TOKEN`
+   - `SUPABASE_STAGING_PROJECT_REF`
+   - `VERCEL_TOKEN`
+   - `VERCEL_ORG_ID`
+   - `VERCEL_PROJECT_ID`
+   - `VITE_SUPABASE_STAGING_URL`
+   - `VITE_SUPABASE_STAGING_PUBLISHABLE_KEY`
+9. Verify with:
+   - `npm run check:cicd-env -- --profile=staging --platform=all`
+   - `npm run test`
+   - `npm run build`
+
+### New production environment bootstrap
+
+1. Create or confirm the Supabase project `holzen-prod` (`geqkxsnyqvhtascjghuu`)
+2. Confirm staging is already healthy
+3. Link the CLI locally if you need emergency/manual deploy capability:
+   - `npx supabase login`
+   - `npx supabase link --project-ref geqkxsnyqvhtascjghuu`
+4. Copy `.env.prod.secrets.example` to `.env.prod.secrets`, fill production values, then run `npm run prod:secrets-set`
+5. In Supabase Auth, configure production redirects, Send Email Hook, Resend webhook, and Stripe webhook
+6. In Vercel Production env, set:
+   - `VITE_SUPABASE_PROJECT_ID`
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY`
+   - `VITE_APP_VERSION`
+   - `VITE_SITE_ORIGIN`
+   - recommended observability vars (`VITE_SENTRY_DSN`, `VITE_POSTHOG_*`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`)
+7. In GitHub Actions, set:
+   - `SUPABASE_ACCESS_TOKEN`
+   - `SUPABASE_PROD_PROJECT_REF`
+   - `VERCEL_TOKEN`
+   - `VERCEL_ORG_ID`
+   - `VERCEL_PROJECT_ID`
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY`
+8. Protect the GitHub `production` environment with required reviewers
+9. Verify with:
+   - `npm run check:cicd-env -- --profile=production --platform=all`
+   - `npm run test`
+   - `npm run build`
+
+### New Vercel preview / PR preview setup
+
+1. Import the repo into Vercel or confirm the project is linked
+2. Set Preview env values to the **staging** Supabase project, not prod
+3. Set `VITE_APP_VERSION=$VERCEL_GIT_COMMIT_SHA`
+4. Optional but recommended: set `VITE_SENTRY_DSN`, `VITE_POSTHOG_KEY`, and `VITE_POSTHOG_HOST`
+5. Confirm `main` and `staging` auto-deploy are disabled in `vercel.json`, while feature-branch previews remain enabled
+6. Open a PR and confirm the preview is talking to staging, not prod
+
 ## Naming conventions
 
 1. **Browser/build vars:** prefix with `VITE_`.
