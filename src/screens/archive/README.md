@@ -9,6 +9,6 @@
 | `@/features/pause/public-hooks` (`useCurrentPause`) | Open pause row for banners/cards |
 | `components/` | Tab UI, filters, pause cards |
 
-User **Collections** UI lives in `@/legacy/archive-collections/` (not MVP).
+User **Collections** UI lives in `@/legacy/archive-collections/` (not in shipped scope).
 
 Route entry: `ArchiveScreen.tsx` (lazy-loaded from `App.tsx`).

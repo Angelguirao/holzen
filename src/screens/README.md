@@ -27,7 +27,7 @@ Co-locate Vitest beside the file under test. **Pause:** ritual conductors live i
 |---------------|----------------------|----------------|
 | `home/` | `/` — **`HomeScreen`**, `components/`, `hooks/` (incl. `usePauseHomeContext`) | [docs/screens/home.md](../../docs/screens/home.md) |
 | `pause/` | `/pause`, `/companion/*` — **`PauseSessionScreen`**, `components/`; orchestration → `@/features/pause/public-hooks` | [docs/screens/pause.md](../../docs/screens/pause.md) |
-| `archive/` | Archive tab — **`ArchiveScreen`**, `components/` (+ `components/library/` for current-pause card — not MVP Collections) | [README](archive/README.md), [active-surface](../../docs/ops/active-surface.md), [IA](../../docs/design/information-architecture.md) |
+| `archive/` | Archive tab — **`ArchiveScreen`**, `components/` (+ `components/library/` for current-pause card — not the stripped Collections UI) | [README](archive/README.md), [active-surface](../../docs/ops/active-surface.md), [IA](../../docs/design/information-architecture.md) |
 | `journey/` | Journey tab — **`components/` migrated (5e)** | [docs/screens/journey-overview.md](../../docs/screens/journey-overview.md) |
 | `settings/` | Settings hub — **`SettingsStateLayout`**, `hooks/`, `components/` | [README](settings/README.md) |
 | `marketing/` | Public pages — **`AboutScreen`**, landing **`components/`** | [README](marketing/README.md) |

@@ -17,7 +17,7 @@ Example: `WHERE created_at >= '2026-05-21T20:00:00.000Z'` on truncated tables is
 | Path | Screen |
 | --- | --- |
 | `/` | Home |
-| `/archive` | Archive (**Pauses** + **Echoes** tabs — user **Collections** tab not MVP; see below) |
+| `/archive` | Archive (**Pauses** + **Echoes** tabs — user **Collections** tab not in shipped scope; see below) |
 | `/journey` | Journey overview |
 | `/settings` | Settings hub + sections |
 
@@ -27,9 +27,9 @@ Example: `WHERE created_at >= '2026-05-21T20:00:00.000Z'` on truncated tables is
 
 **Dead IA (404 only):** `/tools`, `/tools/*`, `/library`, `/journey/stats`, `/journey/:tab`, …
 
-## Archive — MVP vs legacy collections
+## Archive — shipped scope vs legacy collections
 
-| Surface | MVP shipped | Notes |
+| Surface | Shipped now | Notes |
 | --- | --- | --- |
 | Archive **Pauses** / **Echoes** | Yes | `v_pause_archive_*`, `usePauseArchiveList` |
 | Archive **Collections** tab | **No (stripped)** | User `collections` / `collection_items` UI in `src/legacy/archive-collections/`; `npm run check:active-surface` blocks `.from('collections'|'collection_items')` in active `src/`. See [pause-client-architecture.md](../systems/pause-client-architecture.md) §7 |
@@ -40,7 +40,7 @@ Example: `WHERE created_at >= '2026-05-21T20:00:00.000Z'` on truncated tables is
 
 ## Home — Zen mode (legacy)
 
-| Surface | MVP shipped | Notes |
+| Surface | Shipped now | Notes |
 | --- | --- | --- |
 | **Hold** dashboard (`HomeDashboardLayout`, widget customize) | Yes | Default Home |
 | **Bulk hold** (retrospective outcome stack on Home) | **No (stripped)** | `src/legacy/bulk-hold/README.md` |
@@ -94,7 +94,7 @@ Listed in `supabase/config.toml` `[functions.*]` and `src/screens/ops/EdgeCovera
 
 ## Postgres — Tier C (shipped)
 
-`pause_*`, `collections` / `collection_items` *(DB tables may remain; **client Collections UI not MVP** — see Archive section above)*, trimmed `profiles`, `notifications`, `roadmap_items` / `roadmap_votes`, **`companion_catalog`** (curated companion pool; renamed from `content_library`), `companion_cache`, `companion_serves`, `companion_fallbacks`, `generation_attempts`, `signal_sources`, `user_signal_preferences`, `signal_source_suggestions`, `quiet_windows`, **`grounding_enrichment_cache`** (companion grounding enrichment), Stripe/credits, `btc_price_cache`, email infra, `audit_log`, `app_config`.
+`pause_*`, `collections` / `collection_items` *(DB tables may remain; **client Collections UI not in shipped scope** — see Archive section above)*, trimmed `profiles`, `notifications`, `roadmap_items` / `roadmap_votes`, **`companion_catalog`** (curated companion pool; renamed from `content_library`), `companion_cache`, `companion_serves`, `companion_fallbacks`, `generation_attempts`, `signal_sources`, `user_signal_preferences`, `signal_source_suggestions`, `quiet_windows`, **`grounding_enrichment_cache`** (companion grounding enrichment), Stripe/credits, `btc_price_cache`, email infra, `audit_log`, `app_config`.
 
 ## Schema notes
 
