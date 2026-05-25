@@ -2,21 +2,30 @@
 
 import { readFile } from "node:fs/promises";
 
-// holzen-prod — same fallback as vite.config.ts when VITE_SUPABASE_* is unset at build time.
-const FALLBACK_SUPABASE_URL = "https://geqkxsnyqvhtascjghuu.supabase.co";
-const FALLBACK_SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_q81zcl_HC0sLoPIsBxmDzg_r424f7BY";
+function readEnvValue(...names) {
+  for (const name of names) {
+    const value = process.env[name]?.trim();
+    if (value) return value;
+  }
+  return null;
+}
+
+function requireEnvValue(kind, ...names) {
+  const value = readEnvValue(...names);
+  if (value) return value;
+  throw new Error(
+    `Missing Supabase ${kind} for version sync. Set ${names.join(" or ")} before running npm run build.`,
+  );
+}
 
 function resolveSupabaseConfig() {
   return {
-    url:
-      process.env.VITE_SUPABASE_URL ||
-      process.env.SUPABASE_URL ||
-      FALLBACK_SUPABASE_URL,
-    publishableKey:
-      process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-      process.env.SUPABASE_PUBLISHABLE_KEY ||
-      FALLBACK_SUPABASE_PUBLISHABLE_KEY,
+    url: requireEnvValue("URL", "VITE_SUPABASE_URL", "SUPABASE_URL"),
+    publishableKey: requireEnvValue(
+      "publishable key",
+      "VITE_SUPABASE_PUBLISHABLE_KEY",
+      "SUPABASE_PUBLISHABLE_KEY",
+    ),
   };
 }
 

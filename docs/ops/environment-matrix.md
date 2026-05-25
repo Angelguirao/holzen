@@ -19,10 +19,10 @@ Canonical source for Holzen environment variables, secret storage, naming conven
 
 | Surface | Frontend target | Backend target | Billing / email behavior | Main gotcha |
 |---|---|---|---|---|
-| `npm run dev` with `.env` | Local Vite | Whatever `VITE_SUPABASE_*` points to | Follows the target project | If `VITE_SUPABASE_*` is missing and mode is not `localstack`, `vite.config.ts` can fall back to Holzen hosted values. |
+| `npm run dev` with `.env` | Local Vite | Whatever `VITE_SUPABASE_*` points to | Follows the target project | Missing `VITE_SUPABASE_*` now fails fast in `vite.config.ts`; set them explicitly. |
 | `npm run dev:staging` | Local Vite | `holzen-staging` | Stripe **test** mode, staging email identity, staging observability tags | Best local setup for release QA against hosted infrastructure. |
 | `npm run dev:prod` | Local Vite | Usually `holzen-prod` | Can hit **live** Stripe / prod email if you use prod values | Treat as prod-like; do not test risky flows casually. |
-| `npm run dev:local` | Local Vite | Local Docker Supabase | Local-only unless you also run functions locally with `supabase/.env` | No hosted URL/key fallback in `localstack` mode. |
+| `npm run dev:local` | Local Vite | Local Docker Supabase | Local-only unless you also run functions locally with `supabase/.env` | Requires explicit local URL/key values in `.env.localstack.local`. |
 | Feature-branch PR preview | Vercel Preview | `holzen-staging` | Stripe **test** mode, staging-ish behavior | PR previews are not isolated backends; they share staging Supabase. |
 | `staging` branch deploy | Vercel Preview branch alias | `holzen-staging` | Stripe **test** mode, staging Resend branding, `SENTRY_ENVIRONMENT=staging` | This is the canonical pre-prod environment. |
 | `main` deploy | Vercel Production | `holzen-prod` | Stripe **live** mode, production email defaults, `SENTRY_ENVIRONMENT=production` | `VITE_COMING_SOON` can gate the SPA, but it does not lock down Supabase. |
@@ -34,7 +34,7 @@ Canonical source for Holzen environment variables, secret storage, naming conven
 | `.env.example` | Default local browser/build vars and documented examples | Template only; never commit real secrets. |
 | `.env.staging.local` | Local Vite against staging Supabase | Preferred local hosted QA file. |
 | `.env.prod.local` | Local Vite against prod Supabase | Prod-like local sessions; use with care. |
-| `.env.localstack.local` | Local Vite against local Docker Supabase | No hosted fallback in this mode. |
+| `.env.localstack.local` | Local Vite against local Docker Supabase | Use explicit local URL/key values for `npm run dev:local`. |
 | `.env.staging.secrets` | Gitignored staging Edge secrets | Applied with `npm run staging:secrets-set`. |
 | `.env.prod.secrets` | Gitignored prod Edge secrets | Applied with `npm run prod:secrets-set`. |
 | `supabase/.env` | Local `supabase functions serve` secrets | Local only; not read in hosted Edge runs. |
@@ -168,7 +168,7 @@ These are public by design. They belong in local `.env*` files for local Vite, a
 | Variable | Used for | Where set | Where obtained | Environment notes |
 |---|---|---|---|---|
 | `VITE_SUPABASE_PROJECT_ID` | Client metadata and project-aware helpers | Local `.env*`, Vercel | Supabase project ref | `ksplyxxdvandkwzundql` on staging/preview, `geqkxsnyqvhtascjghuu` on prod. |
-| `VITE_SUPABASE_URL` | Browser Supabase base URL | Local `.env*`, Vercel, GitHub preflight | Supabase → Project Settings → API → Project URL | Required for custom projects. In non-`localstack` mode, missing values may fall back in `vite.config.ts`. |
+| `VITE_SUPABASE_URL` | Browser Supabase base URL | Local `.env*`, Vercel, GitHub preflight | Supabase → Project Settings → API → Project URL | Required for all Vite dev/build commands. Missing values now fail fast in `vite.config.ts`. |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Browser publishable/anon key | Local `.env*`, Vercel, GitHub preflight | Supabase → API → publishable / anon key | Never use the service role key here. |
 | `VITE_SITE_ORIGIN` | Canonical site origin for SEO / OG / links | Local `.env*`, Vercel Production | Product domain | Prod should be `https://holzen.app`; Preview can omit it. |
 | `VITE_APP_VERSION` | Release correlation across frontend, edges, Sentry, PostHog | Vercel, CI, optional local | `VERCEL_GIT_COMMIT_SHA` or current Git SHA | Must match edge `SENTRY_RELEASE` / `EDGE_RELEASE`. |
@@ -184,7 +184,7 @@ These are public by design. They belong in local `.env*` files for local Vite, a
 ### Public fallback behavior
 
 - `VITE_SENTRY_DSN`, `VITE_POSTHOG_KEY`, and `VITE_POSTHOG_HOST` fall back to committed values in `src/config/public-env.ts` when unset.
-- `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` can be injected by `vite.config.ts` when unset and mode is not `localstack`. This is convenient for Holzen development, but dangerous if you assume "missing env" means "fully isolated."
+- `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` do not have committed fallbacks. `vite.config.ts` and `scripts/check-version-sync.mjs` now fail fast when they are missing.
 
 ## Developer and build-only toggles
 
@@ -329,7 +329,7 @@ These exist in hosted Edge Functions without you creating matching secrets manua
 3. **Resend has no test/live mode split.** Separation comes from distinct API keys, webhook endpoints, and optional staging email identity overrides.
 4. **`VITE_COMING_SOON` gates only the SPA shell.** It does not disable Supabase auth, Edge Functions, or the anon key.
 5. **`npm run dev:prod` can be production-dangerous.** If `.env.prod.local` points at prod, local checkout or email flows can use live vendors.
-6. **`npm run dev:local` is the safest isolated mode.** It avoids hosted Supabase URL/key fallback, but vendor-backed Edge behavior still requires local function secrets if you run functions locally.
+6. **`npm run dev:local` is the safest isolated mode.** It points at local Docker Supabase when `.env.localstack.local` is filled correctly, but vendor-backed Edge behavior still requires local function secrets if you run functions locally.
 7. **Edge secret updates do not require a frontend rebuild.** They take effect on subsequent function invocations. `VITE_*` changes do require a rebuild/redeploy.
 8. **Frontend observability defaults are asymmetric.** Sentry/PostHog can still initialize from committed fallback values in `src/config/public-env.ts` even if Vercel env vars are unset.
 

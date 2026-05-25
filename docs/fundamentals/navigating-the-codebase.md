@@ -226,10 +226,11 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 | Script | Mode | Supabase env behavior (see `vite.config.ts`) |
 |--------|------|-----------------------------------------------|
-| `npm run dev` | `development` | Can use `.env`; **hosted fallbacks** if vars missing (`localstack` never). |
-| `npm run build` | `production` (default) | Same fallbacks if vars missing; override with `.env.production` / CI / Vercel env. |
+| `npm run dev` | `development` | Requires explicit `VITE_SUPABASE_*` in `.env` / `.env.development*`; missing values fail fast. |
+| `npm run build` | `production` (default) | Requires explicit `VITE_SUPABASE_*` (or `SUPABASE_*` for `check:version-sync`) from `.env.production` / CI / Vercel env. |
+| `npm run dev:staging` | `staging` | Loads env for the staging backend (e.g. `.env.staging` / `.env.staging.local` per README). |
 | `npm run dev:prod` | `prod` | Loads env for the prod-like backend (e.g. `.env.prod` / `.env.prod.local` per README). |
-| `npm run dev:local` | `localstack` | **No** hosted URL/key fallback — forces explicit local Supabase values. |
+| `npm run dev:local` | `localstack` | Forces explicit local Supabase values from `.env.localstack*`. |
 
 ---
 
@@ -251,7 +252,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 | Changes under **`supabase/functions/`** | Edge functions **redeploy** to that project |
 | Changes under **`src/`**, `public/`, etc. | **Vercel** production build on **`main`** merge (preview builds on PRs) |
 
-**Locally**, nothing in this table runs by itself: your machine uses **`.env` / `.env.*.local`** and **`npm run dev`** (or `dev:prod` / `dev:local`). Use **local Supabase** (`npm run supabase:start`, `supabase:reset`) to test migrations safely; use **`npx supabase functions serve`** (and [function secrets](https://supabase.com/docs/guides/functions/secrets)) to approximate hosted function behavior.
+**Locally**, nothing in this table runs by itself: your machine uses **`.env` / `.env.*.local`** and **`npm run dev`** (or `dev:staging` / `dev:prod` / `dev:local`). Use **local Supabase** (`npm run supabase:start`, `supabase:reset`) to test migrations safely; use **`npx supabase functions serve`** (and [function secrets](https://supabase.com/docs/guides/functions/secrets)) to approximate hosted function behavior.
 
 **Optional Lovable editor:** You may use [Lovable](https://lovable.dev) on **feature branches only** for UI iteration — do **not** use **Publish → Update** for prod. See [lovable-staging-and-platform-exit.md](../ops/lovable-staging-and-platform-exit.md).
 
@@ -271,7 +272,7 @@ These are observations from a structural pass — not a full security or QA audi
 
 ## 19. Learning path: pause first, then whole app
 
-**Once — run the app:** `cp .env.example .env`, fill Supabase URL + anon key, `npm install`, `npm run dev` (or `dev:prod` / `dev:local` per [README.md](../README.md)), open `http://localhost:8080`, **sign in**.
+**Once — run the app:** `cp .env.example .env`, fill Supabase URL + anon key, `npm install`, `npm run dev` (or `dev:staging` / `dev:prod` / `dev:local` per [README.md](../README.md)), open `http://localhost:8080`, **sign in**.
 
 If SPA/React vocabulary is still fuzzy, skim [mental-models-for-contributors.md](mental-models-for-contributors.md) first, then return here.
 
