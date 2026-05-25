@@ -48,12 +48,13 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run build` | Production build (**`prebuild`** → **`npm run check:version-sync`**) |
 | `npm run preview` | Serve built output locally |
 | `npm run test` | Vitest (jsdom), single run |
-| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, `check:active-surface`, `check:react19-leverage`, `check:no-phase-labels`, `check:invoke-edge-allowlist`, `check:bundle-shipped`, `check:bruno-active-manifest`, Vitest with coverage + JUnit |
+| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, `check:active-surface`, `check:react19-leverage`, `check:no-phase-labels`, `check:invoke-edge-allowlist`, `check:bundle-shipped`, `check:bruno-active-manifest`, `check:env-docs`, Vitest with coverage + JUnit |
 | `npm run check:no-phase-labels` | Plan §5.0 — fail on `mvp` / `pre-mvp` tokens in active `src/`, ops, Bruno, CI scripts (allowlisted migration filename + branch) |
 | `npm run check:bundle-shipped` | After **`build`**: no `BadgesPanelV2` / `ToolsHub` in `dist/assets` (pause-first strip guard; in **`test:ci`** and **`check:prepush`**) |
 | `npm run check:bruno-active-manifest` | Every `[functions.*]` in `config.toml` is listed in `bruno/active/functions-catalog.md` (in **`test:ci`**) |
 | `npm run check:posthog-events-allowlist` | Active `trackEvent` names ⊆ `docs/ops/event-taxonomy.md` Active section (in **`test:ci`** / **`check:prepush`**) |
 | `npm run check:feature-flags-doc` | Active `useFeatureFlag('…')` keys ⊆ `docs/ops/feature-flags.md` Active flags table (in **`test:ci`** / **`check:prepush`**) |
+| `npm run check:env-docs` | Runtime/build env names, example env files, and CI catalog entries must stay aligned with `docs/ops/environment-matrix.md` (in **`test:ci`** / **`check:prepush`**) |
 | `npm run check:i18n-active-keys` | Active `t('…')` keys must exist in `src/locales/en.json` (in **`test:ci`**) |
 | `npm run test:watch` | Vitest watch mode |
 | `npm run lint` | ESLint across the repo |
