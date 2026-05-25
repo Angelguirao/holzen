@@ -8,13 +8,6 @@ import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { PRICING } from "./src/features/subscription/domain/pricing";
 import { reactCompilerPilotPlugin } from "./vite.react-compiler";
 
-// Defaults when `VITE_SUPABASE_*` are unset: local `npm run dev` / `dev:hosted`, and `vite build`
-// without env. holzen-prod (`geqkxsnyqvhtascjghuu`) — override via `.env*` / CI for staging previews.
-// `localstack` and `staging` modes never use these — use `.env.localstack*` / `.env.staging*` only.
-const FALLBACK_SUPABASE_URL = "https://geqkxsnyqvhtascjghuu.supabase.co";
-const FALLBACK_SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_q81zcl_HC0sLoPIsBxmDzg_r424f7BY";
-
 // Public observability config (Sentry DSN, PostHog key/host) lives in
 // `src/config/public-env.ts` alongside the rest of the public browser config.
 // Vite auto-exposes any `VITE_*` env var to `import.meta.env`, so there is
@@ -49,6 +42,19 @@ function resolveSiteOrigin(env: Record<string, string>): string {
   const raw = env.VITE_SITE_ORIGIN?.trim();
   if (raw) return raw.replace(/\/$/, "");
   return FALLBACK_SITE_ORIGIN;
+}
+
+function requirePublicEnv(
+  env: Record<string, string>,
+  key: "VITE_SUPABASE_URL" | "VITE_SUPABASE_PUBLISHABLE_KEY",
+  mode: string,
+  command: string,
+): string {
+  const value = env[key]?.trim();
+  if (value) return value;
+  throw new Error(
+    `[vite-config] Missing ${key} for vite ${command} (${mode} mode). Set it in .env, .env.${mode}, or your CI/Vercel env.`,
+  );
 }
 
 /** Replaces `index.html` SEO placeholders; keeps subscription domain `PRICING` as source of truth. */
@@ -113,16 +119,13 @@ function resolveAppVersion({
 // https://vitejs.dev/config/
 export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const useHostedFallback =
-    mode !== "localstack" &&
-    mode !== "staging" &&
-    (command === "serve" || command === "build");
-  const supabaseUrl = useHostedFallback
-    ? env.VITE_SUPABASE_URL || FALLBACK_SUPABASE_URL
-    : env.VITE_SUPABASE_URL || "";
-  const supabaseKey = useHostedFallback
-    ? env.VITE_SUPABASE_PUBLISHABLE_KEY || FALLBACK_SUPABASE_PUBLISHABLE_KEY
-    : env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
+  const supabaseUrl = requirePublicEnv(env, "VITE_SUPABASE_URL", mode, command);
+  const supabaseKey = requirePublicEnv(
+    env,
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    mode,
+    command,
+  );
 
   // Release identifier shared with Sentry (frontend + edges) and PostHog (`$app_version`).
   // Resolution order so Lovable/local/CI all get a unique, useful release string without
@@ -169,7 +172,7 @@ export default defineConfig(({ mode, command }) => {
       {
         name: "holzen-inject-index-html",
         transformIndexHtml(html: string) {
-          let next = injectIndexHtmlSeo(html, siteOrigin);
+          const next = injectIndexHtmlSeo(html, siteOrigin);
           if (!next.includes("</head>")) return next;
           return next.replace(
             "</head>",
