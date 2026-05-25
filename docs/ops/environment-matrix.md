@@ -49,12 +49,16 @@ Use this section when you want the shortest path to a working environment. The d
 
 ### Local: Docker-only Supabase
 
+Holzen intentionally uses a non-default local Supabase port block (`5542x`) to
+avoid Windows excluded-port conflicts that frequently affect the upstream
+`5432x` defaults.
+
 1. Start local Supabase: `npm run supabase:start`
 2. Read the local URL and anon key: `npm run supabase:status`
 3. Copy `.env.localstack.example` to `.env.localstack.local`
 4. Fill:
    - `VITE_SUPABASE_PROJECT_ID="local"`
-   - `VITE_SUPABASE_URL="http://127.0.0.1:54321"`
+   - `VITE_SUPABASE_URL="http://127.0.0.1:55421"`
    - `VITE_SUPABASE_PUBLISHABLE_KEY="<anon key from supabase:status>"`
 5. Start the app: `npm run dev:local`
 6. If you need local Edge Functions too, create `supabase/.env` with the required server secrets before `supabase functions serve`
