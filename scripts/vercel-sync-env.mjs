@@ -36,18 +36,21 @@ function add(name, value, environment, gitBranch) {
   execSync(cmd, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 120_000 });
 }
 
-const hosted = parseEnv(join(root, ".env.hosted"));
+const prod = {
+  ...parseEnv(join(root, ".env.prod")),
+  ...parseEnv(join(root, ".env.prod.local")),
+};
 const staging = parseEnv(join(root, ".env.staging.local"));
 
 console.log("Production…");
 add("VITE_SUPABASE_URL", "https://geqkxsnyqvhtascjghuu.supabase.co", "production");
 add("VITE_SUPABASE_PROJECT_ID", "geqkxsnyqvhtascjghuu", "production");
-add("VITE_SUPABASE_PUBLISHABLE_KEY", hosted.VITE_SUPABASE_PUBLISHABLE_KEY, "production");
+add("VITE_SUPABASE_PUBLISHABLE_KEY", prod.VITE_SUPABASE_PUBLISHABLE_KEY, "production");
 add("VITE_APP_VERSION", "$VERCEL_GIT_COMMIT_SHA", "production");
 add("VITE_SITE_ORIGIN", "https://holzen.app", "production");
-add("VITE_ADMIN_USER_IDS", hosted.VITE_ADMIN_USER_IDS, "production");
-add("VITE_POSTHOG_KEY", hosted.VITE_POSTHOG_KEY, "production");
-add("VITE_POSTHOG_HOST", hosted.VITE_POSTHOG_HOST, "production");
+add("VITE_ADMIN_USER_IDS", prod.VITE_ADMIN_USER_IDS, "production");
+add("VITE_POSTHOG_KEY", prod.VITE_POSTHOG_KEY, "production");
+add("VITE_POSTHOG_HOST", prod.VITE_POSTHOG_HOST, "production");
 
 // Preview vars require a real Git branch name (not production `main`). Repeat per active PR branch or use dashboard “All Previews”.
 const previewBranches = ["chore/vercel-production-setup", "feature/lovableMigration", "staging"];
@@ -58,8 +61,8 @@ for (const previewBranch of previewBranches) {
   add("VITE_SUPABASE_PUBLISHABLE_KEY", staging.VITE_SUPABASE_PUBLISHABLE_KEY, "preview", previewBranch);
   add("VITE_APP_VERSION", "$VERCEL_GIT_COMMIT_SHA", "preview", previewBranch);
   add("VITE_ADMIN_USER_IDS", staging.VITE_ADMIN_USER_IDS ?? "", "preview", previewBranch);
-  add("VITE_POSTHOG_KEY", hosted.VITE_POSTHOG_KEY, "preview", previewBranch);
-  add("VITE_POSTHOG_HOST", hosted.VITE_POSTHOG_HOST, "preview", previewBranch);
+  add("VITE_POSTHOG_KEY", prod.VITE_POSTHOG_KEY, "preview", previewBranch);
+  add("VITE_POSTHOG_HOST", prod.VITE_POSTHOG_HOST, "preview", previewBranch);
 }
 
 console.log("Done.");

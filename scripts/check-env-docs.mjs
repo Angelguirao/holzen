@@ -35,7 +35,7 @@ const runtimeScanTargets = [
 const exampleEnvFiles = [
   ".env.example",
   ".env.staging.example",
-  ".env.hosted.example",
+  ".env.prod.example",
   ".env.localstack.example",
   ".env.staging.secrets.example",
   ".env.prod.secrets.example",

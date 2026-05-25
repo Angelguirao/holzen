@@ -46,7 +46,7 @@ Holzen already uses **three complementary channels**. The strategy is to **keep 
 
 **Holzen flow tracing:** [`src/lib/holzen-console.ts`](../../src/lib/holzen-console.ts) — **`[holzen:boot]`**, **`holzen:profile`**, **`[holzen:companion]`** (pause session lazy fetch / regenerate / intervention orchestrate), query cache, etc. **Turn everything on** (non-DEV builds too) using any of:
 
-1. **`VITE_HOLZEN_DEBUG=1`** in `.env.hosted.local` / `.env` (e.g. with **`npm run dev:hosted`**).
+1. **`VITE_HOLZEN_DEBUG=1`** in `.env.prod.local` / `.env` (e.g. with **`npm run dev:prod`**).
 2. Open the app with **`?holzenDebug=1`** once — enables **session** debug for that tab and removes the query param.
 3. **`localStorage.setItem('holzen:debug','1')`** + reload — persistent.
 
