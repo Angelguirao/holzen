@@ -24,7 +24,8 @@ This folder contains human-readable notes that complement the source code and in
 
 | Kind of information | Authoritative place | Notes |
 |---------------------|---------------------|--------|
-| Commands, env vars, “where to edit” table | [AGENTS.md](../AGENTS.md) | Keep tables here; link out for narratives. |
+| Commands and “where to edit” table | [AGENTS.md](../AGENTS.md) | Keep the quick lookup table here; link out for longer narratives. |
+| Environment variables, secret storage, and env behavior differences | [ops/environment-matrix.md](ops/environment-matrix.md) | Canonical env/config source across local, CI, Vercel, and Supabase Edge. |
 | **Pause-first shipped scope** (routes, edges, crons, dropped tables) | [ops/active-surface.md](ops/active-surface.md) | Pairs with [src/README.md](../src/README.md); enforced by `npm run check:active-surface`. |
 | **Meta:** where docs go, HTTP doc posture (Bruno vs OpenAPI), edge checklist | [fundamentals/documentation-strategy.md](fundamentals/documentation-strategy.md) | Complements this index; does not duplicate the owner table. |
 | Supabase **`Database` types** (`src/integrations/supabase/types.ts`) | [AGENTS.md](../AGENTS.md) (`npm run gen:types`) | Regenerate after migrations; if types lag, use `as unknown as T` per [deployment-sync-guide.md](ops/deployment-sync-guide.md). |
@@ -101,6 +102,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 ## Ops
 
 - `ops/deployment-sync-guide.md` — **GitHub → Vercel + Supabase**: what auto-deploys, safe workflow, pre-push checklist, **`npm run check:prepush`** (bash full gate), and troubleshooting (401s, migration failures, stale deploys, CRON_SECRET mismatches).
+- `ops/environment-matrix.md` — canonical **env/config inventory**: what each variable is for, where it lives, where to get it, naming rules, and how staging/preview/prod differ.
 - `ops/lovable-staging-and-platform-exit.md` — **staging DB + visible CI + leaving Lovable**: production migration risk, hybrid paths, phased exit checklist (strategic; not a day-to-day push guide).
 - `ops/cron-setup.md` — scheduled jobs: pg_cron + `net.http_post` callouts for pause-adjacent workers.
 - `ops/logging-strategy.md` — edge vs browser vs DB logging; `observe.ts` patterns; correlation and PII.

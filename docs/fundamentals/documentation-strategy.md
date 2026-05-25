@@ -18,7 +18,8 @@ When behavior or contracts change, update **one** primary doc (or code comment o
 | Why something broke and how we hardened it | `docs/postmortems/` |
 | Planned work, experiments, “nice to have” | `docs/backlog/` (not normative for current behavior) |
 | Running implementation log (decisions, deviations, tradeoffs, open questions) | [fundamentals/implementation-notes-workflow.md](implementation-notes-workflow.md) | [artifacts/client-implementation/implementation-notes.html](../artifacts/client-implementation/implementation-notes.html) |
-| Commands, env vars, “where to edit” for agents and quick lookup | [AGENTS.md](../../AGENTS.md) |
+| Commands and “where to edit” for agents and quick lookup | [AGENTS.md](../../AGENTS.md) |
+| Environment variables, secret storage, naming, and env differences | [ops/environment-matrix.md](../ops/environment-matrix.md) |
 | Executable HTTP calls (auth, edges, service cron) | [bruno/](../../bruno/) plus [http-review-playbooks.md](http-review-playbooks.md) |
 | Visual tokens and Nox migration rules | [DESIGN.md](../../DESIGN.md) and [docs/design/nox/](../design/nox/) |
 

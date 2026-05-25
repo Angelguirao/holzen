@@ -114,6 +114,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 
 ## Environment variables
 
+- Full environment inventory and per-environment behavior: [docs/ops/environment-matrix.md](docs/ops/environment-matrix.md).
 - **Required for a custom project:** `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (see `.env.example` and `src/integrations/supabase/client.ts`).
 - **Optional:** `VITE_ADMIN_USER_IDS` — comma-separated auth user UUIDs allowed to use `/admin`.
 - `vite.config.ts` uses `loadEnv`; when `VITE_*` are missing and mode is not `localstack`, **dev server and `vite build`** may inject Holzen hosted Supabase URL/key (see `vite.config.ts`). Set `VITE_SUPABASE_*` explicitly for another project or stricter CI.

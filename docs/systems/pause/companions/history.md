@@ -52,7 +52,7 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/hist
 
 **Phase 4: Curated** — if all above fail, static fallback pool from `companion_fallbacks` DB / `fallback-seed.json`.
 
-Phase toggles: `COMPANION_PHASE_LIBRARY`, `COMPANION_PHASE_CACHE`, `COMPANION_PHASE_LIVE` (all enabled by default; see `_shared/phase-config.ts`).
+Phase toggles: `COMPANION_PHASE_CATALOG`, `COMPANION_PHASE_CACHE`, `COMPANION_PHASE_LIVE` (all enabled by default; see `_shared/phase-config.ts`).
 
 ---
 
