@@ -105,7 +105,8 @@ See [vercel-frontend-setup.md](vercel-frontend-setup.md).
 
 ### 4. config.toml
 
-- **`project_id`** in `config.toml` must match the Supabase project you deploy to (staging vs prod link).
+- **`project_id`** in the checked-in `config.toml` is **not** the frontend target selector. Browser traffic follows `VITE_SUPABASE_*`, while CLI `--linked` commands follow the machine/CI link target from `supabase link --project-ref ...`.
+- In this repo, `config.toml` stays checked in with the prod ref; staging work is selected by linking staging locally or in CI.
 - Only add `[functions.*]` blocks for new edge functions.
 - Don't remove existing function blocks unless you're also deleting the function folder.
 

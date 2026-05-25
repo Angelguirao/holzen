@@ -2,7 +2,9 @@
  * Writes Supabase Database types to src/integrations/supabase/types.ts.
  *
  * Requires: `npx supabase login` once, or SUPABASE_ACCESS_TOKEN in the environment.
- * Uses the project linked in supabase/config.toml (--linked).
+ * Uses the Supabase CLI linked project (`--linked`).
+ * In this repo, the effective remote target comes from local/CI `supabase link`
+ * metadata, not just the checked-in `supabase/config.toml` `project_id`.
  *
  * Usage: npm run gen:types
  */
@@ -18,7 +20,8 @@ const banner = `/**
  * Supabase-generated \`Database\` types.
  *
  * Regenerate after migrations: \`npm run gen:types\`
- * (requires \`supabase login\` or \`SUPABASE_ACCESS_TOKEN\`; uses \`--linked\` + \`supabase/config.toml\`).
+ * (requires \`supabase login\` or \`SUPABASE_ACCESS_TOKEN\`; uses the Supabase CLI
+ * \`--linked\` target selected by local/CI \`supabase link\` metadata).
  *
  * If this file drifts from production, dropped tables/columns may still appear
  * until you re-run the generator. Application code targets Pause V2

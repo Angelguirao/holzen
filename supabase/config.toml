@@ -1,3 +1,8 @@
+# Checked-in repo default for Supabase CLI config state.
+# This is not the frontend target selector:
+# - the app uses `VITE_SUPABASE_*`
+# - CLI `--linked` commands use the machine/CI link target
+# Holzen keeps prod here; staging is selected with `supabase link --project-ref ...`.
 project_id = "geqkxsnyqvhtascjghuu"
 
 # Holzen pins a non-default local port block to avoid Windows excluded-port
