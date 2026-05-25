@@ -54,5 +54,5 @@ backups/
 # Bruno — HTTP env files with secrets (copy from *.bru.example)
 bruno/environments/local.bru
 bruno/environments/hosted.bru
-.env.hosted
+.env.prod
 .vercel

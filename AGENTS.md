@@ -73,7 +73,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run check:version-sync` | Ensures `package.json` **version** matches the latest **`changelog_entries`** row (REST); runs automatically as **`prebuild`** before **`npm run build`**. |
 | `npm run stamp:release` | Writes **`git rev-parse --short=12 HEAD`** into **`supabase/functions/_shared/release.ts`** (`EDGE_RELEASE`) for edge Sentry/BetterStack **`SENTRY_RELEASE`**. Idempotent. |
 | `npm run check:release-stamp` | Exits non-zero if **`EDGE_RELEASE`** in **`release.ts`** ≠ current **`git rev-parse --short=12 HEAD`** (read-only; same comparison the stamper uses). |
-| `npm run dev:hosted` / `npm run dev:local` · `npm run build:dev` · `supabase:*` | Hosted vs localstack Vite modes and Docker Supabase CLI wrappers — see [README.md](README.md) npm scripts. |
+| `npm run dev:staging` / `npm run dev:prod` / `npm run dev:local` · `npm run build:dev` · `supabase:*` | Staging vs prod-like vs localstack Vite modes and Docker Supabase CLI wrappers — see [README.md](README.md) npm scripts. |
 
 **Linting:** There are many **pre-existing** ESLint issues (~300). Do not treat cleaning the whole tree as part of a small task; avoid introducing *new* problems in files you touch.
 

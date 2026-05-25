@@ -41,7 +41,7 @@ files so `check:view-migrations` + full chain stay honest.
 | `VITE_*` | Browser (built SPA) | **Vercel** project env (prod/preview); local `.env` for dev | Next Vercel deploy (or local `npm run dev`) |
 | Edge secrets (`GOOGLE_AI_API_KEY`, `RESEND_API_KEY`, `CRON_SECRET`, Stripe keys, …) | Supabase Edge | **Supabase Dashboard → Edge Functions → Secrets** (per project) | Next function invocation after secret update |
 
-**Important:** Files like `.env.example`, `.env.hosted`, or `.env` in this repo **only affect the frontend build** when you run Vite locally (or when Vercel/CI loads them). They are **not** read by deployed Edge functions. Configure edge secrets in the **Supabase dashboard** for staging and prod separately.
+**Important:** Files like `.env.example`, `.env.prod`, or `.env` in this repo **only affect the frontend build** when you run Vite locally (or when Vercel/CI loads them). They are **not** read by deployed Edge functions. Configure edge secrets in the **Supabase dashboard** for staging and prod separately.
 
 **Local development only:** `supabase functions serve` can load `supabase/.env` (gitignored). That path does not apply to hosted runs.
 

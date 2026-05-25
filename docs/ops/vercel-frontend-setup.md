@@ -4,7 +4,7 @@ Holzen is a **Vite + React SPA** with client-side routing (`react-router-dom`). 
 
 Netlify and Cloudflare Pages work too — same build output (`dist/`). We document Vercel first because it matches how most teams deploy Vite/React apps and avoids a separate CI deploy job when the GitHub integration is enabled.
 
-**Related:** [production-supabase-setup.md](production-supabase-setup.md), [stripe-environment-setup.md](stripe-environment-setup.md), [platform-exit-runbook.md](platform-exit-runbook.md), [branch-model.md](branch-model.md), [vercel.json](../../vercel.json). Env sync helper: `npm run vercel:sync-env` (reads `.env.hosted` / `.env.staging.local`).
+**Related:** [production-supabase-setup.md](production-supabase-setup.md), [stripe-environment-setup.md](stripe-environment-setup.md), [platform-exit-runbook.md](platform-exit-runbook.md), [branch-model.md](branch-model.md), [vercel.json](../../vercel.json). Env sync helper: `npm run vercel:sync-env` (reads `.env.prod(.local)` / `.env.staging.local`).
 
 ---
 
@@ -79,7 +79,7 @@ Project → Settings → Environment Variables:
 
 Preview deployments should point at **staging Supabase**, not production — use Vercel **Preview** environment scope for staging keys.
 
-To sync Production vars from local `.env.hosted` / `.env.staging.local`:
+To sync Production vars from local `.env.prod` / `.env.prod.local` / `.env.staging.local`:
 
 ```sh
 node scripts/vercel-sync-env.mjs
@@ -109,11 +109,11 @@ In Vercel → **holzen** → Settings → Environment Variables, add each row to
 |----------|-------------------|
 | `VITE_SUPABASE_PROJECT_ID` | `geqkxsnyqvhtascjghuu` |
 | `VITE_SUPABASE_URL` | `https://geqkxsnyqvhtascjghuu.supabase.co` |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Prod publishable key (`.env.hosted`) |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Prod publishable key (`.env.prod` / `.env.prod.local`) |
 | `VITE_APP_VERSION` | `$VERCEL_GIT_COMMIT_SHA` |
 | `VITE_SITE_ORIGIN` | `https://holzen.app` |
-| `VITE_POSTHOG_KEY` / `VITE_POSTHOG_HOST` | From `.env.hosted` |
-| `VITE_ADMIN_USER_IDS` | From `.env.hosted` |
+| `VITE_POSTHOG_KEY` / `VITE_POSTHOG_HOST` | From `.env.prod` / `.env.prod.local` |
+| `VITE_ADMIN_USER_IDS` | From `.env.prod` / `.env.prod.local` |
 
 ---
 

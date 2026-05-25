@@ -39,8 +39,8 @@ Environment variables (see [.env.example](.env.example) and [docs/ops/environmen
 
 - **Vercel (prod/preview):** Set `VITE_SUPABASE_*`, `VITE_SENTRY_DSN`, `VITE_POSTHOG_*`, `VITE_APP_VERSION` in the Vercel project. See [docs/ops/vercel-frontend-setup.md](docs/ops/vercel-frontend-setup.md).
 - **Default (local machine):** `cp .env.example .env` then `npm run dev` — uses your `.env` values. If `VITE_SUPABASE_*` are missing, **dev and `npm run build`** can fall back to the bundled Holzen hosted keys in `vite.config.ts` (never in `localstack` mode). Set real `VITE_SUPABASE_*` for another Supabase project or if you do not want those defaults in the bundle.
-- **Two files / two backends (optional on your machine):** **`.env.hosted.local`** is for **`npm run dev:hosted`** when you want the app on your laptop to use **staging or prod** Supabase. If you **only** develop against **local Docker** Supabase, use **`.env.localstack`** / **`npm run dev:local`** and you can **ignore** `.env.hosted` entirely.
-  - **Hosted from local Vite:** copy [.env.hosted.example](.env.hosted.example) to **`.env.hosted.local`**, fill in URL + anon key, run **`npm run dev:hosted`**.
+- **Two files / two backends (optional on your machine):** **`.env.prod.local`** is for **`npm run dev:prod`** when you want the app on your laptop to use **production** Supabase. If you want **staging**, use **`.env.staging.local`** / **`npm run dev:staging`**. If you **only** develop against **local Docker** Supabase, use **`.env.localstack`** / **`npm run dev:local`** and you can **ignore** `.env.prod` entirely.
+  - **Prod-like from local Vite:** copy [.env.prod.example](.env.prod.example) to **`.env.prod.local`**, fill in URL + anon key, run **`npm run dev:prod`**.
   - **Local Docker only:** copy [.env.localstack.example](.env.localstack.example) to **`.env.localstack.local`**, set the anon key from `npm run supabase:status`, run **`npm run dev:local`** (no hosted URL/key fallback for that mode).
 
 The app reads **`VITE_SUPABASE_URL`** and **`VITE_SUPABASE_PUBLISHABLE_KEY`**. **`VITE_ADMIN_USER_IDS`** is optional (comma-separated auth user UUIDs); admin access may also be governed in the database (e.g. `is_admin` / `is_admin()`) depending on your setup.
@@ -58,7 +58,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | Script | Purpose |
 |--------|---------|
 | `npm run dev` | Vite dev server with HMR (default mode) |
-| `npm run dev:hosted` | Dev server using `.env.hosted` / `.env.hosted.local` (optional: hit **cloud** Supabase from your PC) |
+| `npm run dev:prod` | Dev server using `.env.prod` / `.env.prod.local` (optional: hit **production** Supabase from your PC) |
 | `npm run dev:local` | Dev server using `.env.localstack` / `.env.localstack.local` (local Supabase only; no hosted fallback) |
 | `npm run build` | Production build (runs **`check:version-sync`** via **`prebuild`**) |
 | `npm run build:dev` | Build in development mode |

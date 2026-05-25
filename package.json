@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:hosted": "vite --mode hosted",
+    "dev:prod": "vite --mode prod",
     "dev:local": "vite --mode localstack",
     "dev:staging": "vite --mode staging",
     "prebuild": "npm run check:version-sync",

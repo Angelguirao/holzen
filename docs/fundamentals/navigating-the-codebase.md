@@ -9,7 +9,7 @@ This guide walks a new contributor through the repository in roughly the order y
 ## 1. Orientation: what to read first
 
 1. **[src/README.md](../../src/README.md)** + **[active-surface.md](../ops/active-surface.md)** — what ships in the active tree.
-2. **[README.md](../README.md)** — Node version, `npm install`, environment files (`.env`, `.env.hosted.local`, `.env.localstack.local`), and npm scripts (`dev` on port **8080**, Supabase CLI wrappers).
+2. **[README.md](../README.md)** — Node version, `npm install`, environment files (`.env`, `.env.prod.local`, `.env.localstack.local`), and npm scripts (`dev` on port **8080**, Supabase CLI wrappers).
 3. **[AGENTS.md](../AGENTS.md)** — Where routes, pages, hooks, and Supabase artifacts live; import alias `@/` → `src/`; note on ESLint volume.
 4. **[architecture/c4-holzen.md](../architecture/c4-holzen.md)** — C4 **System Context** and **Container** diagrams (and [workspace.dsl](../architecture/workspace.dsl) for Structurizr).
 5. **This doc** — How those pieces connect at runtime.
@@ -228,7 +228,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 |--------|------|-----------------------------------------------|
 | `npm run dev` | `development` | Can use `.env`; **hosted fallbacks** if vars missing (`localstack` never). |
 | `npm run build` | `production` (default) | Same fallbacks if vars missing; override with `.env.production` / CI / Vercel env. |
-| `npm run dev:hosted` | `hosted` | Loads env for hosted backend (e.g. `.env.hosted` / `.env.hosted.local` per README). |
+| `npm run dev:prod` | `prod` | Loads env for the prod-like backend (e.g. `.env.prod` / `.env.prod.local` per README). |
 | `npm run dev:local` | `localstack` | **No** hosted URL/key fallback — forces explicit local Supabase values. |
 
 ---
@@ -251,7 +251,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 | Changes under **`supabase/functions/`** | Edge functions **redeploy** to that project |
 | Changes under **`src/`**, `public/`, etc. | **Vercel** production build on **`main`** merge (preview builds on PRs) |
 
-**Locally**, nothing in this table runs by itself: your machine uses **`.env` / `.env.*.local`** and **`npm run dev`** (or `dev:hosted` / `dev:local`). Use **local Supabase** (`npm run supabase:start`, `supabase:reset`) to test migrations safely; use **`npx supabase functions serve`** (and [function secrets](https://supabase.com/docs/guides/functions/secrets)) to approximate hosted function behavior.
+**Locally**, nothing in this table runs by itself: your machine uses **`.env` / `.env.*.local`** and **`npm run dev`** (or `dev:prod` / `dev:local`). Use **local Supabase** (`npm run supabase:start`, `supabase:reset`) to test migrations safely; use **`npx supabase functions serve`** (and [function secrets](https://supabase.com/docs/guides/functions/secrets)) to approximate hosted function behavior.
 
 **Optional Lovable editor:** You may use [Lovable](https://lovable.dev) on **feature branches only** for UI iteration — do **not** use **Publish → Update** for prod. See [lovable-staging-and-platform-exit.md](../ops/lovable-staging-and-platform-exit.md).
 
@@ -271,7 +271,7 @@ These are observations from a structural pass — not a full security or QA audi
 
 ## 19. Learning path: pause first, then whole app
 
-**Once — run the app:** `cp .env.example .env`, fill Supabase URL + anon key, `npm install`, `npm run dev` (or `dev:hosted` / `dev:local` per [README.md](../README.md)), open `http://localhost:8080`, **sign in**.
+**Once — run the app:** `cp .env.example .env`, fill Supabase URL + anon key, `npm install`, `npm run dev` (or `dev:prod` / `dev:local` per [README.md](../README.md)), open `http://localhost:8080`, **sign in**.
 
 If SPA/React vocabulary is still fuzzy, skim [mental-models-for-contributors.md](mental-models-for-contributors.md) first, then return here.
 
