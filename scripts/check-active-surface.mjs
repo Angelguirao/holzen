@@ -45,17 +45,17 @@ const TIER_B_TABLES = [
   'night_reflections',
 ];
 
-/** User Archive collections — quarantined in `src/legacy/archive-collections/` (not MVP). */
+/** User Archive collections — quarantined in `src/legacy/archive-collections/` (not in shipped scope). */
 const CLIENT_QUARANTINED_TABLES = ['collections', 'collection_items'];
 
-/** Zen Home — quarantined in `src/legacy/zen-mode/` (not MVP). */
+/** Zen Home — quarantined in `src/legacy/zen-mode/` (not in shipped scope). */
 const ZEN_MODE_FORBIDDEN = [
   { re: /\bZenModeHome\b/, label: 'ZenModeHome (use legacy/zen-mode)' },
   { re: /\bHomeZenModeRoute\b/, label: 'HomeZenModeRoute (use legacy/zen-mode)' },
   { re: /\buseHomeZenMode\b/, label: 'useHomeZenMode (use legacy/zen-mode)' },
   { re: /\buseZenModeHomeRouteProps\b/, label: 'useZenModeHomeRouteProps (use legacy/zen-mode)' },
   { re: /\bbuildZenModeHomeRouteProps\b/, label: 'buildZenModeHomeRouteProps (use legacy/zen-mode)' },
-  { re: /holzen_zen_mode/, label: 'holzen_zen_mode localStorage (Zen mode not MVP)' },
+  { re: /holzen_zen_mode/, label: 'holzen_zen_mode localStorage (Zen mode not in shipped scope)' },
 ];
 
 const TIER_B_FROM_RES = TIER_B_TABLES.map(
