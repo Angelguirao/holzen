@@ -7,7 +7,7 @@ Canonical branch flow for platform exit (owned Supabase + Vercel). Pairs with [p
 | Branch | Deploy target | CI / deploy |
 |--------|---------------|-------------|
 | Feature branches (`feature/*`, `fix/*`) | None (PR checks only) | `ci.yml` on PR; Vercel **PR preview** (auto) |
-| **`staging`** | Staging Supabase + Vercel Preview (`staging` branch) | [staging-backend.yml](../../.github/workflows/staging-backend.yml) on push (backend → frontend) |
+| **`staging`** | Staging Supabase + Vercel Preview (`staging` branch) | [staging-deploy.yml](../../.github/workflows/staging-deploy.yml) on push (backend → frontend) |
 | **`main`** | Production Supabase + Vercel Production | [deploy-production.yml](../../.github/workflows/deploy-production.yml) on push (backend → frontend; **`production`** environment approval recommended) |
 
 **Promotion:** merge features → `staging` → smoke → merge `staging` → `main`. **Hotfixes:** branch from `main`, merge back to `main`, then merge `main` → `staging` to keep them aligned.
@@ -49,7 +49,7 @@ Same as `main`, but optionally allow direct pushes for fast staging iteration. M
 
 | Environment | Used by | Recommended |
 |-------------|---------|-------------|
-| `staging` | `staging-backend.yml` | Required reviewers optional |
+| `staging` | `staging-deploy.yml` | Required reviewers optional |
 | `production` | `deploy-production.yml` | **Required reviewers** before deploy |
 
 ### 5. GitHub Actions secrets
@@ -77,7 +77,7 @@ Frontend runtime `VITE_*` for deployed sites live in **Vercel** project env — 
 | Workflow | Trigger |
 |----------|---------|
 | [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) | Pull requests; push `main` / `staging` / `dev` |
-| [`.github/workflows/staging-backend.yml`](../../.github/workflows/staging-backend.yml) | Push to `staging`, `workflow_dispatch` — preflight → backend → Vercel preview |
+| [`.github/workflows/staging-deploy.yml`](../../.github/workflows/staging-deploy.yml) | Push to `staging`, `workflow_dispatch` — preflight → backend → Vercel preview |
 | [`.github/workflows/deploy-production.yml`](../../.github/workflows/deploy-production.yml) | Push to `main`, `workflow_dispatch` — preflight → backend → Vercel production |
 
 End-to-end diagram, secrets, and troubleshooting: **[cicd-overview.md](cicd-overview.md)**.
