@@ -22,8 +22,8 @@ jobs:
 
       - name: Require CI environment
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_STAGING_URL: ${{ secrets.VITE_SUPABASE_STAGING_URL }}
+          VITE_SUPABASE_STAGING_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_STAGING_PUBLISHABLE_KEY }}
         run: node scripts/check-cicd-env.mjs --profile=ci --platform=github
 
       - name: Install
@@ -36,8 +36,8 @@ jobs:
       - name: test:ci
         run: npm run test:ci
 
-      - name: Production build
+      - name: CI build (staging env)
         run: npm run build
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_STAGING_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_STAGING_PUBLISHABLE_KEY }}

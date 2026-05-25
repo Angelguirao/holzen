@@ -360,7 +360,7 @@ const supabaseEdgeSpecs = {
 
 /** @type {Record<string, string[]>} */
 export const GITHUB_PROFILE_KEYS = {
-  ci: ["VITE_SUPABASE_URL", "VITE_SUPABASE_PUBLISHABLE_KEY"],
+  ci: ["VITE_SUPABASE_STAGING_URL", "VITE_SUPABASE_STAGING_PUBLISHABLE_KEY"],
   staging: [
     "VITE_SUPABASE_STAGING_URL",
     "VITE_SUPABASE_STAGING_PUBLISHABLE_KEY",
