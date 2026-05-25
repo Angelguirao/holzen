@@ -48,9 +48,9 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run build` | Production build (**`prebuild`** → **`npm run check:version-sync`**) |
 | `npm run preview` | Serve built output locally |
 | `npm run test` | Vitest (jsdom), single run |
-| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, `check:active-surface`, `check:react19-leverage`, `check:no-phase-labels`, `check:invoke-edge-allowlist`, `check:bundle-shipped`, `check:bruno-active-manifest`, `check:env-docs`, Vitest with coverage + JUnit |
+| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, `check:active-surface`, `check:react19-leverage`, `check:no-phase-labels`, `check:invoke-edge-allowlist`, `check:bruno-active-manifest`, `check:env-docs`, Vitest with coverage + JUnit |
 | `npm run check:no-phase-labels` | Plan §5.0 — fail on `mvp` / `pre-mvp` tokens in active `src/`, ops, Bruno, CI scripts (allowlisted migration filename + branch) |
-| `npm run check:bundle-shipped` | After **`build`**: no `BadgesPanelV2` / `ToolsHub` in `dist/assets` (pause-first strip guard; in **`test:ci`** and **`check:prepush`**) |
+| `npm run check:bundle-shipped` | After **`build`**: no `BadgesPanelV2` / `ToolsHub` in `dist/assets` (pause-first strip guard; in the **CI build step** and **`check:prepush`**) |
 | `npm run check:bruno-active-manifest` | Every `[functions.*]` in `config.toml` is listed in `bruno/active/functions-catalog.md` (in **`test:ci`**) |
 | `npm run check:posthog-events-allowlist` | Active `trackEvent` names ⊆ `docs/ops/event-taxonomy.md` Active section (in **`test:ci`** / **`check:prepush`**) |
 | `npm run check:feature-flags-doc` | Active `useFeatureFlag('…')` keys ⊆ `docs/ops/feature-flags.md` Active flags table (in **`test:ci`** / **`check:prepush`**) |
@@ -118,7 +118,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 - Full environment inventory and per-environment behavior: [docs/ops/environment-matrix.md](docs/ops/environment-matrix.md).
 - **Required for a custom project:** `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (see `.env.example` and `src/integrations/supabase/client.ts`).
 - **Optional:** `VITE_ADMIN_USER_IDS` — comma-separated auth user UUIDs allowed to use `/admin`.
-- `vite.config.ts` uses `loadEnv`; when `VITE_*` are missing and mode is not `localstack`, **dev server and `vite build`** may inject Holzen hosted Supabase URL/key (see `vite.config.ts`). Set `VITE_SUPABASE_*` explicitly for another project or stricter CI.
+- `vite.config.ts` uses `loadEnv`; `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` are required for Vite dev/build, and `scripts/check-version-sync.mjs` also needs explicit Supabase env (`VITE_*` or `SUPABASE_*`) during `npm run build`.
 
 Never commit `.env` or service role keys.
 
