@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils';
 
 /** Format ms as m:ss for short countdowns (e.g. next cron tick, manual cooldown under one minute). */
 function formatMsAsMS(ms: number): string {
-  "use memo";
   const totalSec = Math.max(0, Math.floor(ms / 1000));
   const m = Math.floor(totalSec / 60);
   const s = totalSec % 60;
@@ -22,7 +21,6 @@ function formatMsAsMS(ms: number): string {
  * shifts, and DateTimeFormat handles that consistently).
  */
 function resolveStableTimezone(): string {
-  "use memo";
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if (tz) return tz;
@@ -37,7 +35,6 @@ function resolveStableTimezone(): string {
  * displayed hour represents the *same instant* regardless of DST changes.
  */
 function createStableClockFormatter(): (ms: number) => string {
-  "use memo";
   const timeZone = resolveStableTimezone();
   const fmt = new Intl.DateTimeFormat('en-GB', {
     hour: '2-digit',
@@ -59,7 +56,6 @@ const SNAPSHOT_STORAGE_KEY = 'holzen_home_cooldown_snapshot_v1';
  * keeps us from rendering a stale "Ready at 09:12" hours after the fact.
  */
 function readPersistedSnapshot(): CooldownSnapshot | null {
-  "use memo";
   try {
     const raw = localStorage.getItem(SNAPSHOT_STORAGE_KEY);
     if (!raw) return null;
@@ -78,7 +74,6 @@ function readPersistedSnapshot(): CooldownSnapshot | null {
 }
 
 function writePersistedSnapshot(snap: CooldownSnapshot): void {
-  "use memo";
   try {
     localStorage.setItem(SNAPSHOT_STORAGE_KEY, JSON.stringify(snap));
   } catch { void 0; }
@@ -95,7 +90,6 @@ const CRON_INTERVAL_MS = 15 * 60_000;
  * quarter-hour boundary at or after cooldown ends.
  */
 function computeNextScanAt(now: number, cooldownMsRemaining: number, msUntilNextCron: number): number {
-  "use memo";
   // While idle, the next cron tick is the next meaningful scan.
   if (cooldownMsRemaining <= 0) return now + msUntilNextCron;
   // While cooling down, anchor to the cron grid: round the cooldown-end
@@ -112,7 +106,6 @@ function computeFreshSnapshot(
   cooldownRemaining: () => number,
   nextCronCheckIn: () => number,
 ): CooldownSnapshot {
-  "use memo";
   const rem = cooldownRemaining();
   const cron = nextCronCheckIn();
   const now = Date.now();
