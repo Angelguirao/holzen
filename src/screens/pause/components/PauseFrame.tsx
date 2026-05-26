@@ -36,7 +36,6 @@ function companionFullViewHref(
   pauseInstanceId: string | null,
   segment: 'signal' | 'grounding' | 'zoom-out' | 'history',
 ): string {
-  "use memo";
   if (!pauseInstanceId) return '/pause';
   return `/companion/${segment}/${pauseInstanceId}`;
 }

@@ -26,7 +26,6 @@ function findIndexAtOrBeforeTimestamp(
   targetTimestamp: number,
   maxIndex: number
 ): number {
-  "use memo";
   let lo = 0;
   let hi = maxIndex;
   let ans = 0;
@@ -49,7 +48,6 @@ function computeStatsDaily(
   thresholdUp: number,
   thresholdDown: number,
 ): VolatilityStats {
-  "use memo";
   const effectiveThreshold = Math.min(thresholdUp, thresholdDown);
   const last30 = dailyChanges.slice(-30);
   const crossings30d = last30.filter((c) => c >= effectiveThreshold).length;
@@ -72,7 +70,6 @@ function computeStatsSimulated(
   cooldownHours: number,
   avgDailyMove: number,
 ): VolatilityStats {
-  "use memo";
   const msPerDay = 24 * 60 * 60 * 1000;
   const msPer7Days = 7 * msPerDay;
   const cooldownMs = cooldownHours * 60 * 60 * 1000;
