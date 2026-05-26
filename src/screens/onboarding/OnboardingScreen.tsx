@@ -5,6 +5,8 @@ import { OnboardingFlow } from '@/screens/onboarding/components/OnboardingFlow';
 const OnboardingScreen = () => {
   const {
     threshold,
+    thresholdDown,
+    cumulativeThreshold,
     trackedAssetId,
     saveOnboardingDraft,
     completeOnboarding,
@@ -14,7 +16,9 @@ const OnboardingScreen = () => {
   return (
     <OnboardingFlow
       initialTrackedAssetId={trackedAssetId}
-      initialThreshold={threshold}
+      initialThresholdUp={threshold}
+      initialThresholdDown={thresholdDown}
+      initialCumulativeThreshold={cumulativeThreshold}
       onSaveDraft={saveOnboardingDraft}
       onStartTrial={ensureTrial}
       onComplete={completeOnboarding}

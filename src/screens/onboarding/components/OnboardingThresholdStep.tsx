@@ -1,20 +1,27 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Slider } from '@/components/ui/slider';
 import { trackedAssetSymbol } from '@/features/market/public';
-import { ThresholdFrequencyEstimator } from '@/screens/home/components/ThresholdFrequencyEstimator';
+import { ThresholdSetting } from '@/screens/settings/components/ThresholdSetting';
 
 interface Props {
   trackedAssetId: string;
-  threshold: number;
-  onThresholdChange: (value: number) => void;
+  thresholdUp: number;
+  onThresholdUpChange: (value: number) => void;
+  thresholdDown: number;
+  onThresholdDownChange: (value: number) => void;
+  cumulativeThreshold: number;
+  onCumulativeThresholdChange: (value: number) => void;
   stagger: (delay: number) => object;
 }
 
 export function OnboardingThresholdStep({
   trackedAssetId,
-  threshold,
-  onThresholdChange,
+  thresholdUp,
+  onThresholdUpChange,
+  thresholdDown,
+  onThresholdDownChange,
+  cumulativeThreshold,
+  onCumulativeThresholdChange,
   stagger,
 }: Props) {
   "use memo";
@@ -38,34 +45,22 @@ export function OnboardingThresholdStep({
           {t('onboarding.threshold.body', {
             asset: assetSymbol,
             defaultValue:
-              'Set the daily move that should trigger a pause. During onboarding, Holzen uses the same threshold for both rises and drops in {{asset}}.',
+              'Set the same thresholds Holzen uses in Settings so your first run matches the ongoing product behavior for {{asset}}.',
           })}
         </p>
       </motion.div>
 
       <motion.div {...stagger(0.25)}>
-        <p className="mb-6 text-4xl font-mono tracking-tight text-foreground">
-          +/- {threshold.toFixed(1)}%
-        </p>
-        <Slider
-          value={[threshold]}
-          onValueChange={([value]) => onThresholdChange(value)}
-          min={1}
-          max={20}
-          step={0.5}
-          className="w-full"
+        <ThresholdSetting
+          thresholdUp={thresholdUp}
+          onSetUp={onThresholdUpChange}
+          thresholdDown={thresholdDown}
+          onSetDown={onThresholdDownChange}
+          cumulativeThreshold={cumulativeThreshold}
+          onSetCumulative={onCumulativeThresholdChange}
+          trackedAssetId={trackedAssetId}
+          commitMode="live"
         />
-        <ThresholdFrequencyEstimator
-          thresholdUp={threshold}
-          thresholdDown={threshold}
-          className="mt-4"
-          coinId={trackedAssetId}
-        />
-        <p className="mt-3 text-[10px] text-muted-foreground/40">
-          {t('onboarding.threshold.footer', {
-            defaultValue: 'You can split upward and downward thresholds later in Settings.',
-          })}
-        </p>
       </motion.div>
     </div>
   );
