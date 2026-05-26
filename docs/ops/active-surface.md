@@ -23,7 +23,7 @@ Example: `WHERE created_at >= '2026-05-21T20:00:00.000Z'` on truncated tables is
 
 **Public:** `/roadmap` (voting), landing, auth, legal.
 
-**Full-screen (no bottom nav):** `/pause`, `/companion/*` (including `/companion/grounding/:pauseInstanceId` → `grounding-enrich`)
+**Full-screen (no bottom nav):** `/onboarding`, `/pause`, `/companion/*` (including `/companion/grounding/:pauseInstanceId` → `grounding-enrich`)
 
 **Dead IA (404 only):** `/tools`, `/tools/*`, `/library`, `/journey/stats`, `/journey/:tab`, …
 
@@ -108,7 +108,7 @@ Listed in `supabase/config.toml` `[functions.*]` and `src/screens/ops/EdgeCovera
 | --- | --- |
 | `app.route_not_found` | NotFound |
 | `journey.overview_viewed` | Journey overview |
-| `onboarding.completed` | Onboarding + trial ensure |
+| `onboarding.completed` | 3-step onboarding completed + trial ensure |
 | `trial.started` | New Stripe trial (`source: ensure_trial`) |
 | `trial.expired` | Entitlement → `lapsed` |
 

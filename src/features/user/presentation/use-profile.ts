@@ -242,39 +242,51 @@ export function useProfile() {
     }
   }, [user, invalidateProfileQuery, companionPrefsCommitted, addOptimisticCompanionPrefs]);
 
-  const completeOnboarding = useCallback(async (
-    result: {
-      threshold: number;
-      firstName: string | null;
-      timezone: string;
-      motivations: string[];
-      groundingActivities: string[];
-    },
-    options?: { setLocalOnboarded?: boolean },
-  ) => {
-    const setLocalOnboarded = options?.setLocalOnboarded ?? true;
-
-    if (setLocalOnboarded) {
-      setHasOnboarded(true);
-    }
-
-    setThresholdState(result.threshold);
-    if (result.firstName) setFirstNameState(result.firstName);
-    setMotivationsState(result.motivations);
-    setGroundingActivitiesState(result.groundingActivities);
+  const saveOnboardingDraft = useCallback(async (draft: {
+    trackedAssetId: string;
+    threshold: number;
+    thresholdDown: number;
+    timezone: string;
+  }) => {
+    const normalizedTrackedAssetId = normalizeTrackedAssetId(draft.trackedAssetId);
+    setThresholdState(draft.threshold);
+    setThresholdDownState(draft.thresholdDown);
+    setTrackedAssetIdCommitted(normalizedTrackedAssetId);
 
     if (!user) return;
 
     const { error } = await updateProfileFields(user.id, {
-      has_onboarded: true,
-      threshold: result.threshold,
-      first_name: result.firstName,
-      timezone: result.timezone,
-      motivations: result.motivations.length > 0 ? result.motivations : null,
-      grounding_activities: result.groundingActivities.length > 0 ? result.groundingActivities : [],
+      tracked_asset_id: normalizedTrackedAssetId,
+      threshold: draft.threshold,
+      threshold_down: draft.thresholdDown,
+      timezone: draft.timezone,
     });
-    if (!error) invalidateProfileQuery();
-  }, [user, invalidateProfileQuery]);
+
+    if (error) {
+      holzenLog.profile('onboarding draft save failed', { error: error.message });
+      toast.error(t('common.profileWriteFailed'));
+      throw error;
+    }
+
+    invalidateProfileQuery();
+  }, [user, invalidateProfileQuery, t]);
+
+  const completeOnboarding = useCallback(async () => {
+    if (!user) return;
+
+    const { error } = await updateProfileFields(user.id, {
+      has_onboarded: true,
+    });
+
+    if (error) {
+      holzenLog.profile('complete onboarding failed', { error: error.message });
+      toast.error(t('common.profileWriteFailed'));
+      throw error;
+    }
+
+    setHasOnboarded(true);
+    invalidateProfileQuery();
+  }, [user, invalidateProfileQuery, t]);
 
   const isInCooldown = useCallback(async () => {
     if (!user) return true;
@@ -431,6 +443,7 @@ export function useProfile() {
     profileLoadError,
     retryProfileLoad,
     hasOnboarded,
+    saveOnboardingDraft,
     completeOnboarding,
     isInCooldown,
     isInQuietHours,

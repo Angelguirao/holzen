@@ -2,7 +2,7 @@
 
 This guide walks a new contributor through the repository in roughly the order you would discover it while running the app locally. It complements [README.md](../README.md) (setup and scripts) and [AGENTS.md](../AGENTS.md) (conventions for automation). Deep dives on the AI pause pipeline and cron jobs live in [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) and [cron-setup.md](../ops/cron-setup.md).
 
-**Pause-first shipped path (2026-05):** sign in → **Home** (trial via `ensure-trial-subscription`) → **`/pause`** ritual → **Archive** to browse past pauses → **Journey** overview (streak/count) → **Settings**. Do not import `@/legacy/*`; full IA is tag `full-ia-pre-strip`. Manifest: [active-surface.md](../ops/active-surface.md).
+**Pause-first shipped path (2026-05):** sign in → **`/onboarding`** (asset, threshold, trial via `ensure-trial-subscription`) → **Home** → **`/pause`** ritual → **Archive** to browse past pauses → **Journey** overview (streak/count) → **Settings**. Do not import `@/legacy/*`; full IA is tag `full-ia-pre-strip`. Manifest: [active-surface.md](../ops/active-surface.md).
 
 ---
 
@@ -56,7 +56,7 @@ Routes are declared in **`src/App.tsx`**. Screen modules under **`src/screens/`*
 
 **Main shell (four tabs):** `/`, `/archive`, `/journey`, `/settings` (+ nested `/settings/about`, `/settings/billing-history`, `/settings/:section`) use **`AppLayout`** (`src/app/components/AppLayout.tsx`): max-width column, header (“Holzen” + `NotificationBell` from `features/notifications/public-hooks`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`** (Home, Archive, Journey, Settings). `AppLayout` uses `useShellProfile` + `ShellPauseChrome` (pause modal/banner; `useHolzen` only inside that component) and passes pause-ready state via outlet context; **`HolzenProvider`** ([`src/app/components/HolzenProvider.tsx`](../../src/app/components/HolzenProvider.tsx)) wraps signed-in routes (`useHolzenHomeContextState` in pause presentation).
 
-**Full-screen authenticated routes** (no `AppLayout`, `RobotsNoIndex`): `/pause`, companion deep links `/companion/{zoom-out,history,signal,grounding}/:pauseInstanceId`, `/admin`, `/admin/smoke-test`, `/admin/sentry-alerts`, `/admin/edge-coverage`.
+**Full-screen authenticated routes** (no `AppLayout`, `RobotsNoIndex`): `/onboarding`, `/pause`, companion deep links `/companion/{zoom-out,history,signal,grounding}/:pauseInstanceId`, `/admin`, `/admin/smoke-test`, `/admin/sentry-alerts`, `/admin/edge-coverage`.
 
 **Public / utility:** `/welcome` (landing), `/auth`, `/reset-password`, `/unsubscribe`, `/terms`, `/privacy`, `/about`, `/blog`, `/blog/:slug`, `/roadmap`, `/reserve`.
 
@@ -118,6 +118,7 @@ Do **not** add global **`QueryClient` defaultOptions** lightly: they affect ever
 
 | Area | Screen module | Routes |
 |------|---------------|--------|
+| Onboarding | `screens/onboarding/OnboardingScreen.tsx` | `/onboarding` |
 | Home | `screens/home/HomeScreen.tsx` | `/` |
 | Archive | `screens/archive/ArchiveScreen.tsx` | `/archive` |
 | Journey | `screens/journey/JourneyOverviewScreen.tsx` | `/journey` |

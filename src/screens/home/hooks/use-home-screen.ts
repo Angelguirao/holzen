@@ -72,8 +72,6 @@ export function useHomeScreen() {
 
   const {
     companionPrefs,
-    hasOnboarded,
-    completeOnboarding,
     cooldownHours,
     firstName,
     currency,
@@ -233,8 +231,6 @@ export function useHomeScreen() {
 
   return {
     profileLoaded,
-    hasOnboarded,
-    completeOnboarding,
     dashboardLayout,
   };
 }
