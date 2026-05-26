@@ -1,0 +1,13 @@
+---
+description: Respect explicit user-directed verification requests
+alwaysApply: true
+---
+
+# User-Directed Verification
+
+If the user says not to run tests, builds, lint, or similar verification commands unless asked, follow that preference for this repository.
+
+- Do not run `npm run test`, `npm run build`, lint, or other verification commands unless the user explicitly requests them.
+- This preference overrides the default "verify before done" guidance for this repo when the user has stated it in the conversation.
+- When you skip verification because of this preference, say so briefly in the final handoff.
+- Read-only inspection commands are still fine when needed.
