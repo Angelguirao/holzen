@@ -51,7 +51,7 @@ For **pg_cron**, use **Vault** + `vault.decrypted_secrets` in the `Authorization
 
 **Option A — Bruno (recommended):** run **`auth/00-sign-up-password`** if you have no user yet, then **`auth/01-sign-in-password`** (or only **`01`** if the user already exists). Sign-up uses `POST /auth/v1/signup`; sign-in uses `POST /auth/v1/token?grant_type=password`. Both set **`SUPABASE_ACCESS_TOKEN`** when the response includes a session. See [bruno/SCOPE.md](../../bruno/SCOPE.md) for greenfield vs email confirmation.
 
-**Option B — Manual:** run the app locally, sign in, open DevTools → **Application** → **Local Storage** and copy **`access_token`** from the Supabase session JSON, then paste into **`SUPABASE_ACCESS_TOKEN`** in Bruno (`local.bru` or `hosted.bru`, whichever environment is active).
+**Option B — Manual:** run the app locally, sign in, open DevTools → **Application** → **Local Storage** and copy **`access_token`** from the Supabase session JSON, then paste into **`SUPABASE_ACCESS_TOKEN`** in Bruno (`local.bru`, `staging.bru`, or `prod.bru`, whichever environment is active).
 
 Password auth does not cover magic link, OAuth, or MFA-only accounts—use Option B or a test user without those gates.
 
@@ -75,7 +75,7 @@ Never commit tokens, passwords, or service role keys.
 A starter collection lives at **`bruno/`** (see `bruno.json`; start in **`bruno/active/`**).
 
 1. **Open** the `bruno` folder in Bruno (not the repo root).
-2. Copy **`bruno/environments/local.bru.example`** → **`local.bru`**, or **`hosted.bru.example`** → **`hosted.bru`** for the hosted Supabase URL; fill `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, and **`AUTH_EMAIL` / `AUTH_PASSWORD`**; run **`active/auth/00-sign-up-password`** and/or **`active/auth/01-sign-in-password`**, or paste a JWT into **`SUPABASE_ACCESS_TOKEN`** in Bruno. Deployed catalog: [bruno/active/functions-catalog.md](../../bruno/active/functions-catalog.md).
+2. Copy **`bruno/environments/local.bru.example`** → **`local.bru`**, **`staging.bru.example`** → **`staging.bru`**, or **`prod.bru.example`** → **`prod.bru`**; fill `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, and **`AUTH_EMAIL` / `AUTH_PASSWORD`**; run **`active/auth/00-sign-up-password`** and/or **`active/auth/01-sign-in-password`**, or paste a JWT into **`SUPABASE_ACCESS_TOKEN`** in Bruno. Deployed catalog: [bruno/active/functions-catalog.md](../../bruno/active/functions-catalog.md).
 3. Run requests in order; pair with Edge Function logs.
 
 Details: [bruno/README.md](../../bruno/README.md).

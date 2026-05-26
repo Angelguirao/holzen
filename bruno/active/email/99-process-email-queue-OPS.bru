@@ -1,0 +1,17 @@
+meta {
+  name: 99 process-email-queue (OPS)
+  type: http
+  seq: 99
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/process-email-queue
+  body: none
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  Authorization: Bearer {{SUPABASE_SERVICE_ROLE_JWT}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+}

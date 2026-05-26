@@ -23,7 +23,7 @@ Catalog of deployed functions: [`active/functions-catalog.md`](active/functions-
 
 ### Greenfield auth
 
-1. Set **`AUTH_EMAIL`** / **`AUTH_PASSWORD`** in `environments/local.bru` or `hosted.bru`.
+1. Set **`AUTH_EMAIL`** / **`AUTH_PASSWORD`** in `environments/local.bru`, `staging.bru`, or `prod.bru`.
 2. Run **`active/auth/00-sign-up-password`** or **`01-sign-in-password`**.
 3. If no session (email confirmation), confirm user in Studio or sign in after confirm.
 

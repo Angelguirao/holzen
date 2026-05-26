@@ -1,0 +1,16 @@
+meta {
+  name: 01 preview-transactional-email
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/preview-transactional-email
+  body: none
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  Authorization: Bearer {{EMAIL_PREVIEW_SECRET}}
+}
