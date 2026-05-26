@@ -10,6 +10,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const targetPath = join(root, "supabase", ".env.local");
 const cliConfigPath = join(homedir(), ".config", "stripe", "config.toml");
 const cursorMcpSecretsPath = join(root, ".cursor", "mcp-secrets.env");
+const repoEnvPath = join(root, ".env");
+const repoEnvLocalPath = join(root, ".env.local");
+const sharedSupabaseEnvPath = join(root, "supabase", ".env");
 
 function parseArgs(argv) {
   const out = {};
@@ -36,6 +39,14 @@ function readExistingEnv() {
 function readOptionalDotenv(filePath) {
   if (!existsSync(filePath)) return {};
   return parseDotenv(readFileSync(filePath, "utf8"));
+}
+
+function firstNonEmpty(...values) {
+  for (const value of values) {
+    const trimmed = value?.trim?.();
+    if (trimmed) return trimmed;
+  }
+  return "";
 }
 
 function readStripeTestKeyFromCli() {
@@ -73,51 +84,223 @@ function generateSecret(bytes = 24) {
 
 function mergeValues(existing, flags, stripePriceIds) {
   const mcpSecrets = readOptionalDotenv(cursorMcpSecretsPath);
+  const repoEnv = readOptionalDotenv(repoEnvPath);
+  const repoEnvLocal = readOptionalDotenv(repoEnvLocalPath);
+  const sharedSupabaseEnv = readOptionalDotenv(sharedSupabaseEnvPath);
   const googleKey =
-    existing.GOOGLE_AI_API_KEY?.trim() ||
-    mcpSecrets.GOOGLE_AI_API_KEY?.trim() ||
-    mcpSecrets.GEMINI_API_KEY?.trim() ||
-    process.env.GOOGLE_AI_API_KEY?.trim() ||
-    process.env.GEMINI_API_KEY?.trim() ||
-    "";
-  const resendKey = existing.RESEND_API_KEY?.trim() || process.env.RESEND_API_KEY?.trim() || "";
-  const openRouterKey =
-    existing.OPENROUTER_API_KEY?.trim() || process.env.OPENROUTER_API_KEY?.trim() || "";
+    firstNonEmpty(
+      existing.GOOGLE_AI_API_KEY,
+      sharedSupabaseEnv.GOOGLE_AI_API_KEY,
+      repoEnvLocal.GOOGLE_AI_API_KEY,
+      repoEnv.GOOGLE_AI_API_KEY,
+      mcpSecrets.GOOGLE_AI_API_KEY,
+      mcpSecrets.GEMINI_API_KEY,
+      process.env.GOOGLE_AI_API_KEY,
+      process.env.GEMINI_API_KEY,
+    );
+  const resendKey = firstNonEmpty(
+    existing.RESEND_API_KEY,
+    sharedSupabaseEnv.RESEND_API_KEY,
+    repoEnvLocal.RESEND_API_KEY,
+    repoEnv.RESEND_API_KEY,
+    process.env.RESEND_API_KEY,
+  );
+  const openRouterKey = firstNonEmpty(
+    existing.OPENROUTER_API_KEY,
+    sharedSupabaseEnv.OPENROUTER_API_KEY,
+    repoEnvLocal.OPENROUTER_API_KEY,
+    repoEnv.OPENROUTER_API_KEY,
+    process.env.OPENROUTER_API_KEY,
+  );
+  const perplexityKey = firstNonEmpty(
+    existing.PERPLEXITY_API_KEY,
+    sharedSupabaseEnv.PERPLEXITY_API_KEY,
+    repoEnvLocal.PERPLEXITY_API_KEY,
+    repoEnv.PERPLEXITY_API_KEY,
+    process.env.PERPLEXITY_API_KEY,
+  );
   const stripeSecretKey =
-    existing.STRIPE_SECRET_KEY?.trim() ||
-    process.env.STRIPE_SECRET_KEY?.trim() ||
-    readStripeTestKeyFromCli();
+    firstNonEmpty(
+      existing.STRIPE_SECRET_KEY,
+      sharedSupabaseEnv.STRIPE_SECRET_KEY,
+      repoEnvLocal.STRIPE_SECRET_KEY,
+      repoEnv.STRIPE_SECRET_KEY,
+      process.env.STRIPE_SECRET_KEY,
+      readStripeTestKeyFromCli(),
+    );
   const stripeWebhookSecret =
-    flags["stripe-webhook-secret"]?.trim() ||
-    existing.STRIPE_WEBHOOK_SECRET?.trim() ||
-    process.env.STRIPE_WEBHOOK_SECRET?.trim() ||
-    "";
+    firstNonEmpty(
+      flags["stripe-webhook-secret"],
+      existing.STRIPE_WEBHOOK_SECRET,
+      sharedSupabaseEnv.STRIPE_WEBHOOK_SECRET,
+      repoEnvLocal.STRIPE_WEBHOOK_SECRET,
+      repoEnv.STRIPE_WEBHOOK_SECRET,
+      process.env.STRIPE_WEBHOOK_SECRET,
+    );
 
   return {
-    EMAIL_BRAND_NAME: existing.EMAIL_BRAND_NAME?.trim() || "Holzen Local",
-    EMAIL_APP_URL: existing.EMAIL_APP_URL?.trim() || "http://localhost:8080",
-    EMAIL_FROM_DOMAIN: existing.EMAIL_FROM_DOMAIN?.trim() || "resend.dev",
-    EMAIL_FROM_LOCAL: existing.EMAIL_FROM_LOCAL?.trim() || "onboarding",
-    EMAIL_NOTIFY_LOCAL: existing.EMAIL_NOTIFY_LOCAL?.trim() || "onboarding",
-    EMAIL_SENDER_DOMAIN: existing.EMAIL_SENDER_DOMAIN?.trim() || "resend.dev",
-    EMAIL_SUBJECT_PREFIX: existing.EMAIL_SUBJECT_PREFIX?.trim() || "[LOCAL]",
-    CRON_SECRET: existing.CRON_SECRET?.trim() || generateSecret(),
-    EMAIL_PREVIEW_SECRET: existing.EMAIL_PREVIEW_SECRET?.trim() || generateSecret(),
-    SEND_EMAIL_HOOK_SECRET: existing.SEND_EMAIL_HOOK_SECRET?.trim() || generateSecret(),
+    EMAIL_BRAND_NAME: firstNonEmpty(existing.EMAIL_BRAND_NAME, sharedSupabaseEnv.EMAIL_BRAND_NAME) || "Holzen Local",
+    EMAIL_APP_URL: firstNonEmpty(existing.EMAIL_APP_URL, sharedSupabaseEnv.EMAIL_APP_URL) || "http://localhost:8080",
+    EMAIL_FROM_DOMAIN: firstNonEmpty(existing.EMAIL_FROM_DOMAIN, sharedSupabaseEnv.EMAIL_FROM_DOMAIN) || "resend.dev",
+    EMAIL_FROM_LOCAL: firstNonEmpty(existing.EMAIL_FROM_LOCAL, sharedSupabaseEnv.EMAIL_FROM_LOCAL) || "onboarding",
+    EMAIL_NOTIFY_LOCAL: firstNonEmpty(existing.EMAIL_NOTIFY_LOCAL, sharedSupabaseEnv.EMAIL_NOTIFY_LOCAL) || "onboarding",
+    EMAIL_SENDER_DOMAIN: firstNonEmpty(existing.EMAIL_SENDER_DOMAIN, sharedSupabaseEnv.EMAIL_SENDER_DOMAIN) || "resend.dev",
+    EMAIL_SUBJECT_PREFIX: firstNonEmpty(existing.EMAIL_SUBJECT_PREFIX, sharedSupabaseEnv.EMAIL_SUBJECT_PREFIX) || "[LOCAL]",
+    CRON_SECRET: firstNonEmpty(existing.CRON_SECRET, sharedSupabaseEnv.CRON_SECRET) || generateSecret(),
+    EMAIL_PREVIEW_SECRET: firstNonEmpty(existing.EMAIL_PREVIEW_SECRET, sharedSupabaseEnv.EMAIL_PREVIEW_SECRET) || generateSecret(),
+    SEND_EMAIL_HOOK_SECRET: firstNonEmpty(existing.SEND_EMAIL_HOOK_SECRET, sharedSupabaseEnv.SEND_EMAIL_HOOK_SECRET) || generateSecret(),
     STRIPE_SECRET_KEY: stripeSecretKey,
     STRIPE_WEBHOOK_SECRET: stripeWebhookSecret,
-    STRIPE_PRICE_ID_PRO: existing.STRIPE_PRICE_ID_PRO?.trim() || stripePriceIds.pro,
-    STRIPE_PRICE_ID_FLEX_PACK_S: existing.STRIPE_PRICE_ID_FLEX_PACK_S?.trim() || stripePriceIds.flexS,
-    STRIPE_PRICE_ID_FLEX_PACK_M: existing.STRIPE_PRICE_ID_FLEX_PACK_M?.trim() || stripePriceIds.flexM,
+    STRIPE_PRICE_ID_PRO: firstNonEmpty(existing.STRIPE_PRICE_ID_PRO, sharedSupabaseEnv.STRIPE_PRICE_ID_PRO) || stripePriceIds.pro,
+    STRIPE_PRICE_ID_FLEX_PACK_S:
+      firstNonEmpty(existing.STRIPE_PRICE_ID_FLEX_PACK_S, sharedSupabaseEnv.STRIPE_PRICE_ID_FLEX_PACK_S) || stripePriceIds.flexS,
+    STRIPE_PRICE_ID_FLEX_PACK_M:
+      firstNonEmpty(existing.STRIPE_PRICE_ID_FLEX_PACK_M, sharedSupabaseEnv.STRIPE_PRICE_ID_FLEX_PACK_M) || stripePriceIds.flexM,
     RESEND_API_KEY: resendKey,
-    RESEND_WEBHOOK_SECRET:
-      existing.RESEND_WEBHOOK_SECRET?.trim() || process.env.RESEND_WEBHOOK_SECRET?.trim() || "",
+    RESEND_WEBHOOK_SECRET: firstNonEmpty(
+      existing.RESEND_WEBHOOK_SECRET,
+      sharedSupabaseEnv.RESEND_WEBHOOK_SECRET,
+      repoEnvLocal.RESEND_WEBHOOK_SECRET,
+      repoEnv.RESEND_WEBHOOK_SECRET,
+      process.env.RESEND_WEBHOOK_SECRET,
+    ),
     GOOGLE_AI_API_KEY: googleKey,
     OPENROUTER_API_KEY: openRouterKey,
-    OPENROUTER_HTTP_REFERER:
-      existing.OPENROUTER_HTTP_REFERER?.trim() || "http://localhost:8080",
-    OPENROUTER_APP_TITLE: existing.OPENROUTER_APP_TITLE?.trim() || "Holzen Local",
-    SENTRY_ENVIRONMENT: existing.SENTRY_ENVIRONMENT?.trim() || "local",
+    OPENROUTER_HTTP_REFERER: firstNonEmpty(
+      existing.OPENROUTER_HTTP_REFERER,
+      sharedSupabaseEnv.OPENROUTER_HTTP_REFERER,
+    ) || "http://localhost:8080",
+    OPENROUTER_APP_TITLE: firstNonEmpty(
+      existing.OPENROUTER_APP_TITLE,
+      sharedSupabaseEnv.OPENROUTER_APP_TITLE,
+    ) || "Holzen Local",
+    PERPLEXITY_API_KEY: perplexityKey,
+    COMPANION_PHASE_CATALOG: firstNonEmpty(
+      existing.COMPANION_PHASE_CATALOG,
+      sharedSupabaseEnv.COMPANION_PHASE_CATALOG,
+      repoEnvLocal.COMPANION_PHASE_CATALOG,
+      repoEnv.COMPANION_PHASE_CATALOG,
+      process.env.COMPANION_PHASE_CATALOG,
+    ) || "1",
+    COMPANION_PHASE_CACHE: firstNonEmpty(
+      existing.COMPANION_PHASE_CACHE,
+      sharedSupabaseEnv.COMPANION_PHASE_CACHE,
+      repoEnvLocal.COMPANION_PHASE_CACHE,
+      repoEnv.COMPANION_PHASE_CACHE,
+      process.env.COMPANION_PHASE_CACHE,
+    ) || "1",
+    COMPANION_PHASE_LIVE: firstNonEmpty(
+      existing.COMPANION_PHASE_LIVE,
+      sharedSupabaseEnv.COMPANION_PHASE_LIVE,
+      repoEnvLocal.COMPANION_PHASE_LIVE,
+      repoEnv.COMPANION_PHASE_LIVE,
+      process.env.COMPANION_PHASE_LIVE,
+    ) || "1",
+    DISABLE_COMPANION_FALLBACKS: firstNonEmpty(
+      existing.DISABLE_COMPANION_FALLBACKS,
+      sharedSupabaseEnv.DISABLE_COMPANION_FALLBACKS,
+      repoEnvLocal.DISABLE_COMPANION_FALLBACKS,
+      repoEnv.DISABLE_COMPANION_FALLBACKS,
+      process.env.DISABLE_COMPANION_FALLBACKS,
+    ) || "1",
+    FETCH_FEEDS_MAX_SOURCES: firstNonEmpty(
+      existing.FETCH_FEEDS_MAX_SOURCES,
+      sharedSupabaseEnv.FETCH_FEEDS_MAX_SOURCES,
+      repoEnvLocal.FETCH_FEEDS_MAX_SOURCES,
+      repoEnv.FETCH_FEEDS_MAX_SOURCES,
+      process.env.FETCH_FEEDS_MAX_SOURCES,
+    ) || "5",
+    FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE: firstNonEmpty(
+      existing.FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE,
+      sharedSupabaseEnv.FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE,
+      repoEnvLocal.FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE,
+      repoEnv.FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE,
+      process.env.FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE,
+    ) || "100",
+    FETCH_FEEDS_ARTICLE_DELAY_MS: firstNonEmpty(
+      existing.FETCH_FEEDS_ARTICLE_DELAY_MS,
+      sharedSupabaseEnv.FETCH_FEEDS_ARTICLE_DELAY_MS,
+      repoEnvLocal.FETCH_FEEDS_ARTICLE_DELAY_MS,
+      repoEnv.FETCH_FEEDS_ARTICLE_DELAY_MS,
+      process.env.FETCH_FEEDS_ARTICLE_DELAY_MS,
+    ) || "0",
+    FETCH_FEEDS_LOG_ORIGINAL_INFER: firstNonEmpty(
+      existing.FETCH_FEEDS_LOG_ORIGINAL_INFER,
+      sharedSupabaseEnv.FETCH_FEEDS_LOG_ORIGINAL_INFER,
+      repoEnvLocal.FETCH_FEEDS_LOG_ORIGINAL_INFER,
+      repoEnv.FETCH_FEEDS_LOG_ORIGINAL_INFER,
+      process.env.FETCH_FEEDS_LOG_ORIGINAL_INFER,
+    ) || "false",
+    COINGECKO_API_KEY: firstNonEmpty(
+      existing.COINGECKO_API_KEY,
+      sharedSupabaseEnv.COINGECKO_API_KEY,
+      repoEnvLocal.COINGECKO_API_KEY,
+      repoEnv.COINGECKO_API_KEY,
+      process.env.COINGECKO_API_KEY,
+    ),
+    CRYPTOCOMPARE_API_KEY: firstNonEmpty(
+      existing.CRYPTOCOMPARE_API_KEY,
+      sharedSupabaseEnv.CRYPTOCOMPARE_API_KEY,
+      repoEnvLocal.CRYPTOCOMPARE_API_KEY,
+      repoEnv.CRYPTOCOMPARE_API_KEY,
+      process.env.CRYPTOCOMPARE_API_KEY,
+    ),
+    VAPID_PUBLIC_KEY: firstNonEmpty(
+      existing.VAPID_PUBLIC_KEY,
+      sharedSupabaseEnv.VAPID_PUBLIC_KEY,
+      repoEnvLocal.VAPID_PUBLIC_KEY,
+      repoEnv.VAPID_PUBLIC_KEY,
+      process.env.VAPID_PUBLIC_KEY,
+    ),
+    VAPID_PRIVATE_KEY: firstNonEmpty(
+      existing.VAPID_PRIVATE_KEY,
+      sharedSupabaseEnv.VAPID_PRIVATE_KEY,
+      repoEnvLocal.VAPID_PRIVATE_KEY,
+      repoEnv.VAPID_PRIVATE_KEY,
+      process.env.VAPID_PRIVATE_KEY,
+    ),
+    SLACK_WEBHOOK_URL: firstNonEmpty(
+      existing.SLACK_WEBHOOK_URL,
+      sharedSupabaseEnv.SLACK_WEBHOOK_URL,
+      repoEnvLocal.SLACK_WEBHOOK_URL,
+      repoEnv.SLACK_WEBHOOK_URL,
+      process.env.SLACK_WEBHOOK_URL,
+    ),
+    SENTRY_DSN_EDGES: firstNonEmpty(
+      existing.SENTRY_DSN_EDGES,
+      sharedSupabaseEnv.SENTRY_DSN_EDGES,
+      repoEnvLocal.SENTRY_DSN_EDGES,
+      repoEnv.SENTRY_DSN_EDGES,
+      process.env.SENTRY_DSN_EDGES,
+    ),
+    SENTRY_RELEASE: firstNonEmpty(
+      existing.SENTRY_RELEASE,
+      sharedSupabaseEnv.SENTRY_RELEASE,
+      repoEnvLocal.SENTRY_RELEASE,
+      repoEnv.SENTRY_RELEASE,
+      process.env.SENTRY_RELEASE,
+    ),
+    SENTRY_ENVIRONMENT: firstNonEmpty(
+      existing.SENTRY_ENVIRONMENT,
+      sharedSupabaseEnv.SENTRY_ENVIRONMENT,
+      repoEnvLocal.SENTRY_ENVIRONMENT,
+      repoEnv.SENTRY_ENVIRONMENT,
+      process.env.SENTRY_ENVIRONMENT,
+    ) || "local",
+    LOG_DRAIN_URL: firstNonEmpty(
+      existing.LOG_DRAIN_URL,
+      sharedSupabaseEnv.LOG_DRAIN_URL,
+      repoEnvLocal.LOG_DRAIN_URL,
+      repoEnv.LOG_DRAIN_URL,
+      process.env.LOG_DRAIN_URL,
+    ),
+    LOG_DRAIN_TOKEN: firstNonEmpty(
+      existing.LOG_DRAIN_TOKEN,
+      sharedSupabaseEnv.LOG_DRAIN_TOKEN,
+      repoEnvLocal.LOG_DRAIN_TOKEN,
+      repoEnv.LOG_DRAIN_TOKEN,
+      process.env.LOG_DRAIN_TOKEN,
+    ),
   };
 }
 
@@ -157,8 +340,30 @@ function renderEnv(values) {
     "OPENROUTER_HTTP_REFERER=" + values.OPENROUTER_HTTP_REFERER,
     "OPENROUTER_APP_TITLE=" + values.OPENROUTER_APP_TITLE,
     "",
+    "# --- Companion / feed generation controls ---",
+    "PERPLEXITY_API_KEY=" + values.PERPLEXITY_API_KEY,
+    "COMPANION_PHASE_CATALOG=" + values.COMPANION_PHASE_CATALOG,
+    "COMPANION_PHASE_CACHE=" + values.COMPANION_PHASE_CACHE,
+    "COMPANION_PHASE_LIVE=" + values.COMPANION_PHASE_LIVE,
+    "DISABLE_COMPANION_FALLBACKS=" + values.DISABLE_COMPANION_FALLBACKS,
+    "FETCH_FEEDS_MAX_SOURCES=" + values.FETCH_FEEDS_MAX_SOURCES,
+    "FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE=" + values.FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE,
+    "FETCH_FEEDS_ARTICLE_DELAY_MS=" + values.FETCH_FEEDS_ARTICLE_DELAY_MS,
+    "FETCH_FEEDS_LOG_ORIGINAL_INFER=" + values.FETCH_FEEDS_LOG_ORIGINAL_INFER,
+    "",
+    "# --- Optional push / market data / alerts ---",
+    "COINGECKO_API_KEY=" + values.COINGECKO_API_KEY,
+    "CRYPTOCOMPARE_API_KEY=" + values.CRYPTOCOMPARE_API_KEY,
+    "VAPID_PUBLIC_KEY=" + values.VAPID_PUBLIC_KEY,
+    "VAPID_PRIVATE_KEY=" + values.VAPID_PRIVATE_KEY,
+    "SLACK_WEBHOOK_URL=" + values.SLACK_WEBHOOK_URL,
+    "",
     "# --- Optional observability ---",
+    "SENTRY_DSN_EDGES=" + values.SENTRY_DSN_EDGES,
+    "SENTRY_RELEASE=" + values.SENTRY_RELEASE,
     "SENTRY_ENVIRONMENT=" + values.SENTRY_ENVIRONMENT,
+    "LOG_DRAIN_URL=" + values.LOG_DRAIN_URL,
+    "LOG_DRAIN_TOKEN=" + values.LOG_DRAIN_TOKEN,
     "",
   ];
 
@@ -176,12 +381,14 @@ function summarize(values) {
   const hasEmailSending = Boolean(values.RESEND_API_KEY);
   const hasEmailWebhook = Boolean(values.RESEND_WEBHOOK_SECRET);
   const hasAi = Boolean(values.GOOGLE_AI_API_KEY || values.OPENROUTER_API_KEY);
+  const hasPerplexity = Boolean(values.PERPLEXITY_API_KEY);
 
   console.log("Local edge env bootstrapped:");
   console.log(`- Stripe local billing: ${hasStripe ? "ready" : "incomplete"}`);
   console.log(`- Email sending: ${hasEmailSending ? "ready" : "incomplete"}`);
   console.log(`- Email suppression webhook: ${hasEmailWebhook ? "ready" : "optional / missing"}`);
-  console.log(`- AI flows: ${hasAi ? "ready" : "incomplete"}`);
+  console.log(`- Gemini/OpenRouter flows: ${hasAi ? "ready" : "incomplete"}`);
+  console.log(`- Perplexity-backed companion/feed flows: ${hasPerplexity ? "ready" : "incomplete"}`);
 
   const missing = [];
   if (!values.STRIPE_SECRET_KEY) missing.push("STRIPE_SECRET_KEY");
@@ -193,6 +400,7 @@ function summarize(values) {
   if (!values.GOOGLE_AI_API_KEY && !values.OPENROUTER_API_KEY) {
     missing.push("GOOGLE_AI_API_KEY or OPENROUTER_API_KEY");
   }
+  if (!values.PERPLEXITY_API_KEY) missing.push("PERPLEXITY_API_KEY");
 
   if (missing.length > 0) {
     console.log("- Missing:");
