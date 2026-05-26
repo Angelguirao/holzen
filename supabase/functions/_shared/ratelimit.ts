@@ -27,7 +27,7 @@
  * Not counted: `intervention_selected`, `reflection_generated`, `companion_fallback_*`, `companion_feedback`, etc.
  */
 
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 /** Event names included in `checkRateLimit` sliding-window count (keep in sync with inserts). */
 export const CHECK_RATE_LIMIT_ANALYTICS_EVENTS = [

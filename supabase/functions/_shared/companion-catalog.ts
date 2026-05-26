@@ -5,7 +5,7 @@
  * Phase ordering: `_shared/phase-config.ts` (`COMPANION_PHASE_CATALOG`).
  */
 
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { COMPANION_SERVE_FRESHNESS_DAYS } from "./companion-serve-freshness.ts";
 
 export interface CatalogEntry {

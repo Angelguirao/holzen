@@ -10,7 +10,7 @@
  * Used by Zoom Out (`generators/zoom-out.ts` — Echo rail). Returns null
  * when the user has no qualifying past pause.
  */
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import {
   combineNoteAndReplayWords,
   parseDirectionFromContext,

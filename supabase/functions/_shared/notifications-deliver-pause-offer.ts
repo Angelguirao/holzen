@@ -2,7 +2,7 @@
  * Multi-channel delivery for automatic pause offers (email + web push).
  * In-app inbox rows come from `notifications_from_pause_instances` on pause insert — not here.
  */
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import webpush from "https://esm.sh/web-push@3.6.7";
 import { sendWebPushWithCid, type PushSubscriptionRecord } from "./cid-clients.ts";
 import {

@@ -2,7 +2,7 @@
  * Shared referral attribution + milestone rewards. Used by record-referral (HTTP) and process-referral-pending (cron).
  * Idempotent: duplicate referrals / rewards are safe.
  */
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { redactEmailForLog } from "./email-log-helpers.ts";
 import { sendTransactionalEmail, type EmailDeliveryLogger } from "./transactional-email.ts";

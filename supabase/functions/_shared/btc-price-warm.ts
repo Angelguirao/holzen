@@ -21,7 +21,7 @@
  *   exit early when they see the 15-min-fresh row.
  * - Idempotent via `upsert` on `btc_price_cache (date)`.
  */
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { fetchCoinGeckoHistoryPrice } from "./coingecko.ts";
 
 const DEFAULT_CONCURRENCY = 5;

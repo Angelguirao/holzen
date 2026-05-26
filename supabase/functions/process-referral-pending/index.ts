@@ -38,7 +38,7 @@ serve(
         phase: "service_auth_ok",
       });
 
-      const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.57.2");
+      const { createClient } = await import("npm:@supabase/supabase-js@2");
       const supabase = createClient(
         Deno.env.get("SUPABASE_URL") ?? "",
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",

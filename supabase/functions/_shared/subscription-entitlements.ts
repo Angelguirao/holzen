@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 export type SubscriptionTier = "free" | "pro" | "lifetime";
 export type MeteredFeature = "premium_companion" | "wallpaper" | "reflection_insights";
