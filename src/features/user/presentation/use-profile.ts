@@ -95,7 +95,7 @@ export function useProfile() {
     companionPrefsCommitted,
     (_current, next: CompanionPrefs) => next,
   );
-  const [hasOnboarded, setHasOnboarded] = useState(true);
+  const [hasOnboardedState, setHasOnboarded] = useState(true);
 
   const retryProfileLoad = useCallback(() => {
     void refetchProfile();
@@ -104,6 +104,7 @@ export function useProfile() {
   const profileLoaded = Boolean(
     userId && (profileQueryStatus === 'success' || profileQueryStatus === 'error'),
   );
+  const hasOnboarded = profileRow?.has_onboarded ?? hasOnboardedState;
   const profileLoadError = userId
     ? profileQueryError instanceof Error
       ? profileQueryError.message
@@ -285,8 +286,11 @@ export function useProfile() {
     }
 
     setHasOnboarded(true);
+    queryClient.setQueryData<ProfileRow | null>(PROFILE_QUERY_KEY(user.id), (current) =>
+      current ? { ...current, has_onboarded: true } : current,
+    );
     invalidateProfileQuery();
-  }, [user, invalidateProfileQuery, t]);
+  }, [user, queryClient, invalidateProfileQuery, t]);
 
   const isInCooldown = useCallback(async () => {
     if (!user) return true;
