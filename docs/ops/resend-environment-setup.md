@@ -131,6 +131,59 @@ npm run test   # includes src/test/shared/email-env.test.ts
 
 ---
 
+## Local development
+
+Local email testing uses the same Edge functions as hosted environments, but there
+are two important differences:
+
+1. **Mail is still delivered via Resend**, not via local SMTP/Mailpit.
+2. **Supabase Auth Send Email Hook is not auto-wired locally** the same way your
+   hosted staging/prod projects are, so full auth-email end-to-end testing is
+   usually easier on staging.
+
+Recommended local setup:
+
+1. Start the local stack and functions:
+
+   ```sh
+   npm run supabase:start
+   npm run supabase:functions:serve
+   npm run dev:local
+   ```
+
+2. Ensure `supabase/.env.local` contains at least:
+
+   ```env
+   RESEND_API_KEY=re_...
+   SEND_EMAIL_HOOK_SECRET=<local secret>
+   EMAIL_PREVIEW_SECRET=<local secret>
+   ```
+
+3. Preview templates safely without sending:
+
+   ```sh
+   curl http://127.0.0.1:55421/functions/v1/preview-transactional-email ^
+     -H "Authorization: Bearer <EMAIL_PREVIEW_SECRET>"
+   ```
+
+4. Drain queued transactional emails manually after enqueueing one:
+
+   ```sh
+   npm run supabase:email:drain-local -- --until-empty
+   ```
+
+Notes:
+
+- `send-transactional-email` **enqueues** mail; `process-email-queue` performs the
+  actual delivery.
+- `auth-email-hook` sends directly once the hook request is verified, but local
+  Supabase Auth hook wiring still needs explicit setup if you want the full
+  signup / magic-link path locally.
+- If you use `resend.dev`, sending is sandboxed; use your Resend account email or
+  Resend's documented test addresses instead of random mailbox providers.
+
+---
+
 ## Cursor MCP troubleshooting
 
 If MCP returns `API key is invalid`, re-enter the key in Cursor MCP settings. Repo `.cursor/mcp.json` stays empty — plugin auth is user-level.
