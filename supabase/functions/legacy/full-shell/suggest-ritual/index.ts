@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";

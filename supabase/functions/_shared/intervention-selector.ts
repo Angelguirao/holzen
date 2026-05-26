@@ -13,7 +13,7 @@
  * 5. Pattern (default) — safe fallback for new users
  */
 
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { buildMirror, type MirrorResult } from "./generators/mirror.ts";
 
 export type InterventionMode = "insight" | "question";

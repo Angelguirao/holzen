@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import type { InterventionPayload, OrchestrateResponse } from "./companion-orchestrate-types.ts";
 import { contentSatisfiesCompanion } from "./companion-orchestrate-parse.ts";
 import type { createLogger } from "./observe.ts";

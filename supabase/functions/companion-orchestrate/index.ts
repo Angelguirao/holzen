@@ -79,7 +79,7 @@ serve(
       });
     }
 
-    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.57.2");
+    const { createClient } = await import("npm:@supabase/supabase-js@2");
     const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";

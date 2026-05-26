@@ -3,7 +3,7 @@
  * Human admins approve into signal_sources — never auto-insert from here.
  */
 
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 function normalizeDedupeKey(rawUrl: string): string | null {
   try {

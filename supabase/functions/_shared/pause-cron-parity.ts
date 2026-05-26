@@ -4,7 +4,7 @@
  * (shared with the client via `@holzen-pause-context`).
  */
 
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import type { PauseContextFearGreed, PauseContextOnChain } from "./pause-context-suffix.ts";
 import { enrichPauseContextWithMarketData } from "./pause-context-suffix.ts";
 import { fetchInitWithIncomingTrace } from "./forward-trace-headers.ts";

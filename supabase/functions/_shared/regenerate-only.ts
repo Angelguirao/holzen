@@ -27,7 +27,7 @@ import { PROMPT_VERSION as GROUNDING_VERSION } from "./generators/grounding.ts";
 import { PROMPT_VERSION as HISTORY_VERSION } from "./generators/history.ts";
 import { PROMPT_VERSION as ZOOM_OUT_VERSION } from "./generators/zoom-out.ts";
 import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "./ai-user-messages.ts";
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
