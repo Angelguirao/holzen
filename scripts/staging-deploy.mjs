@@ -14,31 +14,11 @@
  *   npm run prod:deploy                — migrations + active edges (production)
  */
 import { spawnSync } from "node:child_process";
+import { formatSupabaseTarget, resolveSupabaseTarget } from "./lib/supabase-targets.mjs";
 
-const targetArg = (process.argv[2] ?? "staging").toLowerCase();
+const targetArg = process.argv[2] ?? "staging";
 const mode = process.argv[3] ?? "deploy";
-
-const TARGETS = {
-  staging: {
-    label: "staging",
-    projectRef: process.env.SUPABASE_STAGING_PROJECT_REF?.trim() || "ksplyxxdvandkwzundql",
-  },
-  prod: {
-    label: "production",
-    projectRef: process.env.SUPABASE_PROD_PROJECT_REF?.trim() || "geqkxsnyqvhtascjghuu",
-  },
-  production: {
-    label: "production",
-    projectRef: process.env.SUPABASE_PROD_PROJECT_REF?.trim() || "geqkxsnyqvhtascjghuu",
-  },
-};
-
-const target = TARGETS[targetArg];
-
-if (!target) {
-  console.error(`Unknown target: ${targetArg}. Use staging, prod, or production.`);
-  process.exit(1);
-}
+const target = resolveSupabaseTarget(targetArg);
 
 function run(label, args) {
   console.log(`\n▶ ${label}`);
@@ -74,7 +54,7 @@ function runNode(label, script, scriptArgs = []) {
   console.log(`✓ ${label}`);
 }
 
-console.log(`Target project: ${target.label} (${target.projectRef})`);
+console.log(`Target project: ${formatSupabaseTarget(target)}`);
 ensureLinkedProject();
 
 if (mode === "db-push" || mode === "deploy") {

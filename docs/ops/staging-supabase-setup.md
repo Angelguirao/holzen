@@ -27,7 +27,7 @@ On **holzen-prod**, use `https://geqkxsnyqvhtascjghuu.supabase.co`.
 
 ```sh
 # Vault: holzen_project_url + CRON_SECRET (or holzen_cron_service_role)
-npx supabase db query --linked --file scripts/sql/staging-reschedule-owned-crons.sql
+npm run staging:reschedule-crons
 ```
 
 See [cron-setup.md](cron-setup.md) for Vault bearer setup. Migration `20260524120500_…` attempts an in-place rewrite at apply time but skips when privileges are insufficient.
@@ -39,7 +39,7 @@ npx supabase login
 npx supabase link --project-ref ksplyxxdvandkwzundql
 ```
 
-Committed [`supabase/config.toml`](../../supabase/config.toml) `project_id` is **holzen-prod** (`geqkxsnyqvhtascjghuu`); **link metadata** in `.supabase/` points the CLI at staging on your machine when you `supabase link --project-ref ksplyxxdvandkwzundql`.
+Committed [`supabase/config.toml`](../../supabase/config.toml) `project_id` is the neutral local id **`holzen`**. Repo-local link metadata in `.supabase/project.json` points the raw CLI at staging on your machine when you `supabase link --project-ref ksplyxxdvandkwzundql`.
 
 Optional: set `SUPABASE_STAGING_PROJECT_REF` in shell or `.env.staging.local` for scripts.
 

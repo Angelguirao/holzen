@@ -105,8 +105,9 @@ See [vercel-frontend-setup.md](vercel-frontend-setup.md).
 
 ### 4. config.toml
 
-- **`project_id`** in the checked-in `config.toml` is **not** the frontend target selector. Browser traffic follows `VITE_SUPABASE_*`, while CLI `--linked` commands follow the machine/CI link target from `supabase link --project-ref ...`.
-- In this repo, `config.toml` stays checked in with the prod ref; staging work is selected by linking staging locally or in CI.
+- **`project_id`** in the checked-in `config.toml` is a neutral local CLI identifier, not a staging/prod selector.
+- Browser traffic follows `VITE_SUPABASE_*`.
+- Target-specific scripts (`staging:*`, `prod:*`, `gen:types`, `*:reschedule-crons`) use explicit project refs or relink the target for you before they run.
 - Only add `[functions.*]` blocks for new edge functions.
 - Don't remove existing function blocks unless you're also deleting the function folder.
 
@@ -160,7 +161,7 @@ Define your own interface for the expected shape and cast through `unknown`. The
 1. **Same-commit migrations + code:** Always use `as unknown as T` for queries touching new columns.
 2. **Two-commit approach (safest):** Push the migration first, wait for staging/prod to apply it and regenerate types, then push the code that uses the new columns.
 3. **Wrap in try/catch** when the table or column genuinely might not exist yet (pre-migration graceful degradation).
-4. **`npm run gen:types`** — Regenerates `src/integrations/supabase/types.ts` from the **linked** project (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Run after schema-changing migrations so the repo matches production.
+4. **`npm run gen:types`** — Regenerates `src/integrations/supabase/types.ts` from the explicit **production** project ref (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Use `npm run gen:types:staging` when you intentionally want staging instead.
 
 ### Migrations that unlock Edge code (same push)
 

@@ -1,9 +1,9 @@
 /**
  * Supabase-generated `Database` types.
  *
- * Regenerate after migrations: `npm run gen:types`
- * (requires `supabase login` or `SUPABASE_ACCESS_TOKEN`; uses the Supabase CLI
- * `--linked` target selected by local/CI `supabase link` metadata).
+ * Regenerate after migrations: `npm run gen:types` (production) or
+ * `npm run gen:types:staging` (staging).
+ * Generated from explicit target: production (geqkxsnyqvhtascjghuu).
  *
  * If this file drifts from production, dropped tables/columns may still appear
  * until you re-run the generator. Application code targets Pause V2

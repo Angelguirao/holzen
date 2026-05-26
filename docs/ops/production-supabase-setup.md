@@ -21,6 +21,7 @@ One-time and ongoing steps for the **owned production project** after leaving Lo
 npx supabase login
 npx supabase link --project-ref geqkxsnyqvhtascjghuu
 npm run prod:deploy   # db push + active edge functions (after preflight locally)
+npm run prod:reschedule-crons   # optional: rewire pg_cron after Vault/project URL changes
 ```
 
 The manual `prod:*` scripts relink the CLI to the production ref before they push, so they do not depend on whichever remote project was linked earlier in your shell.

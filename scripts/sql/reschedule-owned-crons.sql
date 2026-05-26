@@ -1,6 +1,6 @@
 -- Reschedule pause-first HTTP crons on an owned project (staging/prod).
 -- Requires vault secrets: holzen_project_url, CRON_SECRET (or holzen_cron_service_role).
--- Run: npx supabase db query --linked --file scripts/sql/staging-reschedule-owned-crons.sql
+-- Run: npm run staging:reschedule-crons (or npm run prod:reschedule-crons)
 -- Note: direct UPDATE cron.job often fails with 42501 on hosted Supabase; unschedule + schedule works.
 
 SELECT cron.unschedule(jobid)

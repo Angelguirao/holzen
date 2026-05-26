@@ -143,7 +143,7 @@ Optional on GitHub: `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` — pref
 
 ## Vercel project environment {#vercel-project-environment}
 
-Set in **Vercel → holzen → Settings → Environment Variables**. Sync helper: `npm run vercel:sync-env`.
+Set in **Vercel → holzen → Settings → Environment Variables**. Sync helper: `npm run vercel:sync-env` (Preview → **All Previews** by default; optional `--preview-branch=<branch>` for scoped overrides).
 
 ### Preview (staging SPA + PR previews)
 

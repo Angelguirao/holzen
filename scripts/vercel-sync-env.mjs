@@ -7,6 +7,26 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
+function parseArgs(argv) {
+  const previewBranches = [];
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg === "--preview-branch") {
+      const value = argv[i + 1]?.trim();
+      if (value) {
+        previewBranches.push(value);
+        i += 1;
+      }
+      continue;
+    }
+    if (arg.startsWith("--preview-branch=")) {
+      const value = arg.split("=")[1]?.trim();
+      if (value) previewBranches.push(value);
+    }
+  }
+  return { previewBranches };
+}
+
 function parseEnv(path) {
   const map = {};
   if (!existsSync(path)) return map;
@@ -41,6 +61,7 @@ const prod = {
   ...parseEnv(join(root, ".env.prod.local")),
 };
 const staging = parseEnv(join(root, ".env.staging.local"));
+const { previewBranches } = parseArgs(process.argv.slice(2));
 
 console.log("Production…");
 add("VITE_SUPABASE_URL", "https://geqkxsnyqvhtascjghuu.supabase.co", "production");
@@ -52,17 +73,23 @@ add("VITE_ADMIN_USER_IDS", prod.VITE_ADMIN_USER_IDS, "production");
 add("VITE_POSTHOG_KEY", prod.VITE_POSTHOG_KEY, "production");
 add("VITE_POSTHOG_HOST", prod.VITE_POSTHOG_HOST, "production");
 
-// Preview vars require a real Git branch name (not production `main`). Repeat per active PR branch or use dashboard “All Previews”.
-const previewBranches = ["chore/vercel-production-setup", "feature/lovableMigration", "staging"];
-for (const previewBranch of previewBranches) {
-  console.log(`Preview (branch: ${previewBranch})…`);
-  add("VITE_SUPABASE_URL", "https://ksplyxxdvandkwzundql.supabase.co", "preview", previewBranch);
-  add("VITE_SUPABASE_PROJECT_ID", "ksplyxxdvandkwzundql", "preview", previewBranch);
-  add("VITE_SUPABASE_PUBLISHABLE_KEY", staging.VITE_SUPABASE_PUBLISHABLE_KEY, "preview", previewBranch);
-  add("VITE_APP_VERSION", "$VERCEL_GIT_COMMIT_SHA", "preview", previewBranch);
-  add("VITE_ADMIN_USER_IDS", staging.VITE_ADMIN_USER_IDS ?? "", "preview", previewBranch);
-  add("VITE_POSTHOG_KEY", prod.VITE_POSTHOG_KEY, "preview", previewBranch);
-  add("VITE_POSTHOG_HOST", prod.VITE_POSTHOG_HOST, "preview", previewBranch);
+function syncPreviewEnvironment(gitBranch) {
+  console.log(gitBranch ? `Preview (branch: ${gitBranch})…` : "Preview (all previews)…");
+  add("VITE_SUPABASE_URL", "https://ksplyxxdvandkwzundql.supabase.co", "preview", gitBranch);
+  add("VITE_SUPABASE_PROJECT_ID", "ksplyxxdvandkwzundql", "preview", gitBranch);
+  add("VITE_SUPABASE_PUBLISHABLE_KEY", staging.VITE_SUPABASE_PUBLISHABLE_KEY, "preview", gitBranch);
+  add("VITE_APP_VERSION", "$VERCEL_GIT_COMMIT_SHA", "preview", gitBranch);
+  add("VITE_ADMIN_USER_IDS", staging.VITE_ADMIN_USER_IDS ?? "", "preview", gitBranch);
+  add("VITE_POSTHOG_KEY", prod.VITE_POSTHOG_KEY, "preview", gitBranch);
+  add("VITE_POSTHOG_HOST", prod.VITE_POSTHOG_HOST, "preview", gitBranch);
+}
+
+if (previewBranches.length === 0) {
+  syncPreviewEnvironment();
+} else {
+  for (const previewBranch of previewBranches) {
+    syncPreviewEnvironment(previewBranch);
+  }
 }
 
 console.log("Done.");

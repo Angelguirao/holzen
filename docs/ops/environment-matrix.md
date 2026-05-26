@@ -43,6 +43,8 @@ Quick rule:
 | `staging` branch deploy | Vercel Preview branch alias | `holzen-staging` | Stripe **test** mode, staging Resend branding, `SENTRY_ENVIRONMENT=staging` | This is the canonical pre-prod environment. |
 | `main` deploy | Vercel Production | `holzen-prod` | Stripe **live** mode, production email defaults, `SENTRY_ENVIRONMENT=production` | `VITE_COMING_SOON` can gate the SPA, but it does not lock down Supabase. |
 
+Quick check: `npm run env:doctor` prints the repo-local Supabase link state, frontend targets by mode, and local Docker status in one place.
+
 ## How target selection works
 
 The repo has three separate selectors, and they answer different questions:
@@ -50,10 +52,11 @@ The repo has three separate selectors, and they answer different questions:
 | Layer | What selects the target | What it controls |
 |---|---|---|
 | Frontend app | `VITE_SUPABASE_PROJECT_ID`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | Which Supabase project the browser talks to |
-| Supabase CLI `--linked` commands | `supabase link --project-ref ...` on your machine or in CI | Which remote project `db push`, `gen types --linked`, and similar CLI commands hit |
-| `supabase/config.toml` | Checked-in repo config | Local port layout, shared CLI config, and the `[functions.*]` manifest that gets deployed |
+| Supabase CLI target scripts | Explicit project refs in helper scripts such as `staging:*`, `prod:*`, `gen:types`, and `*:reschedule-crons` | Which remote project deploys, type generation, and admin SQL hit |
+| Raw Supabase CLI `--linked` commands | `supabase link --project-ref ...` on your machine or in CI | Only relevant when you intentionally bypass the target-specific helper scripts |
+| `supabase/config.toml` | Checked-in repo config | Neutral local project id, local port layout, and the `[functions.*]` manifest that gets deployed |
 
-Important: the checked-in `supabase/config.toml` currently carries the prod ref, but that does **not** force the frontend to use prod and does **not** prevent local staging work. Frontend traffic still follows `VITE_SUPABASE_*`, and CLI `--linked` commands still follow whichever project was linked most recently.
+Important: the checked-in `supabase/config.toml` now uses a neutral local `project_id` (`holzen`). It is no longer a staging/prod selector.
 
 ## Where values live
 
