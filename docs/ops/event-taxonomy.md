@@ -53,7 +53,7 @@ The Archive tab uses route `/archive` and reports `tab: 'archive'`.
 
 | Event | When | Properties | Owner |
 |---|---|---|---|
-| `onboarding.completed` | User finishes the 2-step onboarding flow and `ensure-trial-subscription` succeeds | `{ steps_completed: 2 }` | @holzen |
+| `onboarding.completed` | User finishes the 3-step onboarding flow and `ensure-trial-subscription` succeeds | `{ steps_completed: 3, tracked_asset_id: string, threshold_up: number, threshold_down: number }` | @holzen |
 
 ### subscription
 

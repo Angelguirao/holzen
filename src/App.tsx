@@ -8,6 +8,7 @@ import { setHolzenQueryClient } from "@/features/pause/public-queries";
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { reactRouterFutureFlags } from "@/lib/router-future";
 import { AuthProvider, useAuth } from "@/features/auth/public";
+import { useProfile } from "@/features/user/public-hooks";
 import { HolzenProvider } from "@/app/components/HolzenProvider";
 import { isAppShellPath } from "@/lib/app-routes";
 import { holzenLog } from "@/lib/holzen-console";
@@ -22,6 +23,7 @@ import { RobotsNoIndex } from "@/app/components/PageMeta";
 import { FeedbackWidget } from "@/app/components/FeedbackWidget";
 
 const Home = lazy(() => import("./screens/home/HomeScreen"));
+const Onboarding = lazy(() => import("./screens/onboarding/OnboardingScreen"));
 const Archive = lazy(() => import("./screens/archive/ArchiveScreen"));
 const JourneyOverview = lazy(() => import("./screens/journey/JourneyOverviewScreen"));
 const SettingsRoot = lazy(() => import("./screens/settings/SettingsRoot"));
@@ -65,6 +67,20 @@ function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   if (loading) return <AuthLoading />;
   if (user) return <Navigate to="/" replace />;
+  return <>{children}</>;
+}
+
+function OnboardedRoute({ children }: { children: React.ReactNode }) {
+  const { profileLoaded, hasOnboarded } = useProfile();
+  if (!profileLoaded) return <AuthLoading />;
+  if (!hasOnboarded) return <Navigate to="/onboarding" replace />;
+  return <>{children}</>;
+}
+
+function PendingOnboardingRoute({ children }: { children: React.ReactNode }) {
+  const { profileLoaded, hasOnboarded } = useProfile();
+  if (!profileLoaded) return <AuthLoading />;
+  if (hasOnboarded) return <Navigate to="/" replace />;
   return <>{children}</>;
 }
 
@@ -213,7 +229,7 @@ const App = () => (
             <FeedbackWidgetGate />
             <Suspense fallback={<RouteChunkFallback />}>
               <Routes>
-                <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+                <Route element={<ProtectedRoute><OnboardedRoute><AppLayout /></OnboardedRoute></ProtectedRoute>}>
                   <Route path="/" element={<Home />} />
                   <Route path="/index" element={<Navigate to="/" replace />} />
                   <Route path="/archive" element={<Archive />} />
@@ -227,7 +243,7 @@ const App = () => (
                     </Route>
                   </Route>
                 </Route>
-                <Route element={<ProtectedRoute><PrivateExperienceLayout /></ProtectedRoute>}>
+                <Route element={<ProtectedRoute><OnboardedRoute><PrivateExperienceLayout /></OnboardedRoute></ProtectedRoute>}>
                   <Route path="/pause" element={<PauseSession />} />
                   <Route path="/companion/zoom-out/:pauseInstanceId" element={<CompanionZoomOutPage />} />
                   <Route path="/companion/history/:pauseInstanceId" element={<CompanionHistoryPage />} />
@@ -237,6 +253,9 @@ const App = () => (
                   <Route path="/admin/smoke-test" element={<SmokeTest />} />
                   <Route path="/admin/sentry-alerts" element={<SentryAlerts />} />
                   <Route path="/admin/edge-coverage" element={<EdgeCoverage />} />
+                </Route>
+                <Route element={<ProtectedRoute><PendingOnboardingRoute><PrivateExperienceLayout /></PendingOnboardingRoute></ProtectedRoute>}>
+                  <Route path="/onboarding" element={<Onboarding />} />
                 </Route>
                 <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
                 <Route element={<UtilityNoIndexLayout />}>

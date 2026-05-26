@@ -48,7 +48,17 @@ describe('home-screen-telemetry', () => {
   });
 
   it('tracks onboarding completed', () => {
-    trackOnboardingCompleted(2);
-    expect(trackEvent).toHaveBeenCalledWith('onboarding.completed', { steps_completed: 2 });
+    trackOnboardingCompleted({
+      stepsCompleted: 3,
+      trackedAssetId: 'bitcoin',
+      thresholdUp: 5,
+      thresholdDown: 5,
+    });
+    expect(trackEvent).toHaveBeenCalledWith('onboarding.completed', {
+      steps_completed: 3,
+      tracked_asset_id: 'bitcoin',
+      threshold_up: 5,
+      threshold_down: 5,
+    });
   });
 });

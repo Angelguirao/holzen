@@ -25,6 +25,7 @@ Co-locate Vitest beside the file under test. **Pause:** ritual conductors live i
 
 | Screen folder | Routes / product area | Screen map doc |
 |---------------|----------------------|----------------|
+| `onboarding/` | First-run signed-in activation — **`OnboardingScreen`**, `components/` | route gating + active surface docs |
 | `home/` | `/` — **`HomeScreen`**, `components/`, `hooks/` (incl. `usePauseHomeContext`) | [docs/screens/home.md](../../docs/screens/home.md) |
 | `pause/` | `/pause`, `/companion/*` — **`PauseSessionScreen`**, `components/`; orchestration → `@/features/pause/public-hooks` | [docs/screens/pause.md](../../docs/screens/pause.md) |
 | `archive/` | Archive tab — **`ArchiveScreen`**, `components/` (+ `components/library/` for current-pause card — not the stripped Collections UI) | [README](archive/README.md), [active-surface](../../docs/ops/active-surface.md), [IA](../../docs/design/information-architecture.md) |
@@ -48,7 +49,8 @@ Co-locate Vitest beside the file under test. **Pause:** ritual conductors live i
 |---------|------------|
 | Pause ritual UI | `screens/pause/components/` |
 | Pause rules / RPC | `features/pause/` |
-| Home dashboard UI + hooks | `screens/home/components/` (`HoldGoalWidget`, `InstallHolzenCard`, `ThresholdFrequencyEstimator`, onboarding), `hooks/` |
+| Home dashboard UI + hooks | `screens/home/components/` (`HoldGoalWidget`, `InstallHolzenCard`, `ThresholdFrequencyEstimator`), `hooks/` |
+| First-run onboarding UI | `screens/onboarding/components/` |
 | Settings prefs UI | `screens/settings/components/` (`ThresholdSetting`, `QuietWindowsManager`, …) |
 | Route wiring | `App.tsx` → `screens/<route>/*Screen.tsx` |
 | Primitives / mood glyphs | [components/README.md](../components/README.md) (`ui/`, `icons/`) |

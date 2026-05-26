@@ -625,6 +625,13 @@
     "signOutFailed": "Sign out failed"
   },
   "onboarding": {
+    "asset": {
+      "kicker": "Your asset",
+      "title": "Pick the asset Holzen should watch first",
+      "body": "Holzen starts with Bitcoin. Next you'll choose how much BTC needs to move before Holzen interrupts the impulse.",
+      "btcBody": "Start with BTC so Holzen can watch volatility and prepare your first pause trigger.",
+      "footer": "Bitcoin is the first live option."
+    },
     "heroText": "The market moves. You feel the pull to act. This app exists for the space between impulse and decision.",
     "whatToCallYou": "What should we call you?",
     "firstNameOptional": "First name (optional)",
@@ -652,6 +659,12 @@
     "yourThreshold": "Your threshold",
     "thresholdQuestion": "How much does Bitcoin need to move (up or down) before you want to pause and reflect?",
     "changeThresholdLater": "You can set separate up & down thresholds later in Settings",
+    "threshold": {
+      "kicker": "Your trigger",
+      "title": "Choose when Holzen should interrupt the impulse",
+      "body": "Set the daily move that should trigger a pause. During onboarding, Holzen uses the same threshold for both rises and drops in {{asset}}.",
+      "footer": "You can split upward and downward thresholds later in Settings."
+    },
     "trialHint": "Or start with a {{trialDays}}-day free trial →",
     "companions": {
       "breathing": "Breathing",
@@ -680,6 +693,7 @@
     "commitmentHoldLabel": "Commitment (optional)",
     "ready": {
       "title": "You're set",
+      "recapAsset": "Tracked asset",
       "recapWhy": "Your why",
       "recapHoldGoal": "Hold goal",
       "recapHoldGoalSet": "Saved",
@@ -687,6 +701,7 @@
       "recapGrounding": "Grounds you",
       "recapThreshold": "Threshold",
       "trialBody": "Start your {{days}}-day trial to use Pause when volatility spikes. No card required — cancel anytime before it ends.",
+      "trialBodyConfigured": "Start your {{days}}-day trial and Holzen will watch {{asset}} for moves of about +/-{{threshold}}%. No card required - cancel anytime before it ends.",
       "startingTrial": "Starting trial…",
       "startTrialNoCard": "Start {{days}}-day free trial",
       "trialFinePrintNoCard": "Then ${{price}}/mo if you keep going · Cancel anytime"
