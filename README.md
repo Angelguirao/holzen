@@ -71,6 +71,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run supabase:start` | Local Supabase stack (Docker) plus local cron bootstrap/disable for shipped HTTP jobs |
 | `npm run supabase:env:local` | Bootstrap `supabase/.env.local` from local secrets sources (Stripe CLI, MCP env aliases, generated local-only secrets) |
 | `npm run supabase:cron:local` | Re-run local cron bootstrap after editing `supabase/.env.local` / `supabase/.env` |
+| `npm run supabase:email:drain-local` | Invoke the local `process-email-queue` worker using the local service-role JWT |
 | `npm run supabase:functions:serve` | Serve local Edge Functions (reads `supabase/.env.local`, then `supabase/.env`, then OS env) |
 | `npm run supabase:status` | Print local API URL and anon key |
 | `npm run supabase:stop` | Stop local stack |
