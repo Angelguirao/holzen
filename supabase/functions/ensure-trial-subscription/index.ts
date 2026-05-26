@@ -86,7 +86,11 @@ serve(
         customer: customerId,
         items: [{ price: priceIdPro }],
         trial_period_days: TRIAL_DAYS,
-        trial_settings: { end_behavior: "cancel" },
+        trial_settings: {
+          end_behavior: {
+            missing_payment_method: "cancel",
+          },
+        },
         metadata: { user_id: user.id, plan_tier: "pro", source: "ensure_trial" },
       });
 
