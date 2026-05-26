@@ -99,7 +99,9 @@ avoid Windows excluded-port conflicts that frequently affect the upstream
 Notes:
 
 - `npm run supabase:start` exposes the local Edge Functions URL, but your handlers are only served once `npm run supabase:functions:serve` is running too.
+- `npm run supabase:start` also neutralizes shipped local HTTP crons: with `CRON_SECRET` configured in `supabase/.env.local`, `supabase/.env`, or OS env, it rewires `check-volatility`, `pregenerate-companions`, and `refresh-btc-prices` to the local gateway; otherwise it disables those jobs locally so they do not keep calling stale remote URLs.
 - Prefer `supabase/.env` for shared local defaults and `supabase/.env.local` for personal overrides.
+- After editing `CRON_SECRET`, re-run `npm run supabase:cron:local` (or restart `npm run supabase:start`) to refresh the local cron wiring.
 
 ### Local: app against staging
 

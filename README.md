@@ -68,7 +68,8 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run test:watch` | Vitest in watch mode |
 | `npm run lint` | ESLint |
 | `npm run check:view-migrations` | Fail if a migration uses unsafe `CREATE OR REPLACE VIEW` renames (also run from `check:prepush`) |
-| `npm run supabase:start` | Local Supabase stack (Docker); same as `npx supabase start` |
+| `npm run supabase:start` | Local Supabase stack (Docker) plus local cron bootstrap/disable for shipped HTTP jobs |
+| `npm run supabase:cron:local` | Re-run local cron bootstrap after editing `supabase/.env.local` / `supabase/.env` |
 | `npm run supabase:functions:serve` | Serve local Edge Functions (reads `supabase/.env.local`, then `supabase/.env`, then OS env) |
 | `npm run supabase:status` | Print local API URL and anon key |
 | `npm run supabase:stop` | Stop local stack |
@@ -113,7 +114,9 @@ For everyday UI work you can point `.env` at a **hosted** Supabase project only 
    npm run supabase:start
    ```
 
-   (Equivalent: `npx supabase start`.)
+   This also neutralizes shipped local HTTP crons after startup:
+   - if `CRON_SECRET` is configured for local functions, it rewires them to the local gateway
+   - otherwise it disables those jobs locally so they do not keep calling stale remote URLs
 
 2. Read the **API URL** and **anon** key from that output, or run:
 
@@ -142,12 +145,15 @@ npm run dev:local
 ```
 
 - `npm run supabase:start` brings up the local platform (DB, auth, storage, Studio, API gateway).
+- `npm run supabase:start` also re-runs the local cron bootstrap so shipped HTTP cron jobs either point at the local gateway (`CRON_SECRET` configured) or stay disabled locally (`CRON_SECRET` missing).
 - `npm run supabase:functions:serve` serves your Edge Function handlers locally.
 - `npm run dev:local` runs the React app against the local Supabase URL/key in `.env.localstack.local`.
 
 The local API gateway exposes `http://127.0.0.1:55421/functions/v1`, but your function routes are only actually handled once the function server is running.
 
 **Edge function secrets:** Start from `supabase/.env.example`, then copy it to `supabase/.env` (shared local defaults) or `supabase/.env.local` (personal overrides). The CLI reads `supabase/.env.local`, then `supabase/.env`, then OS env. Add only the secrets needed for the flows you are testing locally: Stripe test keys, Resend/auth-email values, AI provider keys, VAPID keys, or observability overrides.
+
+**Local cron auth:** If you want cron-driven local Edge functions like `check-volatility`, `pregenerate-companions`, and `refresh-btc-prices` to run against your local function server, set `CRON_SECRET` in `supabase/.env.local` or `supabase/.env`, then run `npm run supabase:cron:local` (or restart `npm run supabase:start`). Without `CRON_SECRET`, those shipped HTTP cron jobs stay disabled locally on purpose.
 
 **Vendor-backed flows:** Billing, transactional email, AI calls, and some ops paths still depend on third-party credentials even when the function code is running locally. For Stripe webhooks, you can forward events into the local stack with:
 
