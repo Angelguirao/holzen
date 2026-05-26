@@ -69,6 +69,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run lint` | ESLint |
 | `npm run check:view-migrations` | Fail if a migration uses unsafe `CREATE OR REPLACE VIEW` renames (also run from `check:prepush`) |
 | `npm run supabase:start` | Local Supabase stack (Docker) plus local cron bootstrap/disable for shipped HTTP jobs |
+| `npm run supabase:env:local` | Bootstrap `supabase/.env.local` from local secrets sources (Stripe CLI, MCP env aliases, generated local-only secrets) |
 | `npm run supabase:cron:local` | Re-run local cron bootstrap after editing `supabase/.env.local` / `supabase/.env` |
 | `npm run supabase:functions:serve` | Serve local Edge Functions (reads `supabase/.env.local`, then `supabase/.env`, then OS env) |
 | `npm run supabase:status` | Print local API URL and anon key |
@@ -152,6 +153,8 @@ npm run dev:local
 The local API gateway exposes `http://127.0.0.1:55421/functions/v1`, but your function routes are only actually handled once the function server is running.
 
 **Edge function secrets:** Start from `supabase/.env.example`, then copy it to `supabase/.env` (shared local defaults) or `supabase/.env.local` (personal overrides). The CLI reads `supabase/.env.local`, then `supabase/.env`, then OS env. Add only the secrets needed for the flows you are testing locally: Stripe test keys, Resend/auth-email values, AI provider keys, VAPID keys, or observability overrides.
+
+**Bootstrap helper:** `npm run supabase:env:local` fills `supabase/.env.local` with reusable local defaults, generated local-only hook secrets, Stripe test-mode values from your Stripe CLI login, and Gemini aliases from `.cursor/mcp-secrets.env` when present. Pass `-- --stripe-webhook-secret <whsec_...>` after `stripe listen ...` to wire local webhook verification too.
 
 **Local cron auth:** If you want cron-driven local Edge functions like `check-volatility`, `pregenerate-companions`, and `refresh-btc-prices` to run against your local function server, set `CRON_SECRET` in `supabase/.env.local` or `supabase/.env`, then run `npm run supabase:cron:local` (or restart `npm run supabase:start`). Without `CRON_SECRET`, those shipped HTTP cron jobs stay disabled locally on purpose.
 
