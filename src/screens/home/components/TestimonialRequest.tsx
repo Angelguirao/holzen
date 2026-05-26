@@ -14,7 +14,6 @@ const SUBMITTED_KEY = 'holzen_testimonial_submitted';
 
 // Show after 10+ completed pauses, not dismissed, not already submitted
 function shouldShow(completedPauseCount: number): boolean {
-  "use memo";
   if (completedPauseCount < 10) return false;
   if (localStorage.getItem(SUBMITTED_KEY)) return false;
   const dismissed = localStorage.getItem(DISMISS_KEY);
