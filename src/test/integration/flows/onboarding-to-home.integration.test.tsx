@@ -33,9 +33,7 @@ describe('F1 — Sign up → onboard → trial', () => {
       <QueryClientProvider client={new QueryClient()}>
         <OnboardingFlow
           initialTrackedAssetId="bitcoin"
-          initialThresholdUp={5}
-          initialThresholdDown={5}
-          initialCumulativeThreshold={15}
+          initialThreshold={5}
           onSaveDraft={onSaveDraft}
           onStartTrial={ensureTrial}
           onComplete={onComplete}
@@ -61,9 +59,8 @@ describe('F1 — Sign up → onboard → trial', () => {
     });
     expect(onSaveDraft).toHaveBeenCalledWith({
       trackedAssetId: 'bitcoin',
-      thresholdUp: 5,
+      threshold: 5,
       thresholdDown: 5,
-      cumulativeThreshold: 15,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
   });

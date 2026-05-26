@@ -11,17 +11,14 @@ import { OnboardingThresholdStep } from '@/screens/onboarding/components/Onboard
 
 interface OnboardingDraft {
   trackedAssetId: string;
-  thresholdUp: number;
+  threshold: number;
   thresholdDown: number;
-  cumulativeThreshold: number;
   timezone: string;
 }
 
 interface Props {
   initialTrackedAssetId: string;
-  initialThresholdUp: number;
-  initialThresholdDown: number;
-  initialCumulativeThreshold: number;
+  initialThreshold: number;
   onSaveDraft: (draft: OnboardingDraft) => Promise<void>;
   onStartTrial: () => Promise<void>;
   onComplete: () => Promise<void>;
@@ -33,9 +30,7 @@ const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export function OnboardingFlow({
   initialTrackedAssetId,
-  initialThresholdUp,
-  initialThresholdDown,
-  initialCumulativeThreshold,
+  initialThreshold,
   onSaveDraft,
   onStartTrial,
   onComplete,
@@ -49,9 +44,7 @@ export function OnboardingFlow({
   const [trackedAssetId, setTrackedAssetId] = useState(
     normalizeTrackedAssetId(initialTrackedAssetId || 'bitcoin'),
   );
-  const [thresholdUp, setThresholdUp] = useState(initialThresholdUp || 5);
-  const [thresholdDown, setThresholdDown] = useState(initialThresholdDown || initialThresholdUp || 5);
-  const [cumulativeThreshold, setCumulativeThreshold] = useState(initialCumulativeThreshold || 15);
+  const [threshold, setThreshold] = useState(initialThreshold || 5);
   const [isStartingTrial, startTrialFlow] = useTransition();
 
   const goTo = useCallback((next: number) => {
@@ -62,12 +55,11 @@ export function OnboardingFlow({
   const buildDraft = useCallback(
     (): OnboardingDraft => ({
       trackedAssetId: normalizeTrackedAssetId(trackedAssetId),
-      thresholdUp,
-      thresholdDown,
-      cumulativeThreshold,
+      threshold,
+      thresholdDown: threshold,
       timezone: detectedTimezone,
     }),
-    [trackedAssetId, thresholdUp, thresholdDown, cumulativeThreshold],
+    [trackedAssetId, threshold],
   );
 
   const handleStartTrial = useCallback(() => {
@@ -80,7 +72,7 @@ export function OnboardingFlow({
         trackOnboardingCompleted({
           stepsCompleted: TOTAL_STEPS,
           trackedAssetId: draft.trackedAssetId,
-          thresholdUp: draft.thresholdUp,
+          thresholdUp: draft.threshold,
           thresholdDown: draft.thresholdDown,
         });
       } catch {
@@ -137,12 +129,8 @@ export function OnboardingFlow({
               {step === 1 ? (
                 <OnboardingThresholdStep
                   trackedAssetId={trackedAssetId}
-                  thresholdUp={thresholdUp}
-                  onThresholdUpChange={setThresholdUp}
-                  thresholdDown={thresholdDown}
-                  onThresholdDownChange={setThresholdDown}
-                  cumulativeThreshold={cumulativeThreshold}
-                  onCumulativeThresholdChange={setCumulativeThreshold}
+                  threshold={threshold}
+                  onThresholdChange={setThreshold}
                   stagger={stagger}
                 />
               ) : null}
@@ -150,8 +138,7 @@ export function OnboardingFlow({
               {step === 2 ? (
                 <OnboardingSubscriptionStep
                   trackedAssetId={trackedAssetId}
-                  thresholdUp={thresholdUp}
-                  thresholdDown={thresholdDown}
+                  threshold={threshold}
                   onStartTrial={handleStartTrial}
                   trialLoading={trialLoading || isStartingTrial}
                   stagger={stagger}
