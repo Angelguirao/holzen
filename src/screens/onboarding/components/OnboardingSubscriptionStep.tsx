@@ -7,7 +7,8 @@ import { PRICING } from '@/features/subscription/public';
 
 interface Props {
   trackedAssetId: string;
-  threshold: number;
+  thresholdUp: number;
+  thresholdDown: number;
   onStartTrial: () => void;
   trialLoading: boolean;
   stagger: (delay: number) => object;
@@ -15,7 +16,8 @@ interface Props {
 
 export function OnboardingSubscriptionStep({
   trackedAssetId,
-  threshold,
+  thresholdUp,
+  thresholdDown,
   onStartTrial,
   trialLoading,
   stagger,
@@ -23,6 +25,9 @@ export function OnboardingSubscriptionStep({
   "use memo";
   const { t } = useTranslation();
   const assetSymbol = trackedAssetSymbol(trackedAssetId);
+  const thresholdSummary = thresholdUp === thresholdDown
+    ? `+/- ${thresholdUp.toFixed(1)}%`
+    : `+${thresholdUp.toFixed(1)}% / -${thresholdDown.toFixed(1)}%`;
 
   return (
     <div className="space-y-6">
@@ -44,16 +49,16 @@ export function OnboardingSubscriptionStep({
         <span className="text-[10px] font-mono uppercase tracking-wide text-muted-foreground/50">
           {t('onboarding.ready.recapThreshold', { defaultValue: 'Pause trigger' })}
         </span>
-        <p className="text-sm leading-snug text-foreground/90">+/- {threshold.toFixed(1)}%</p>
+        <p className="text-sm leading-snug text-foreground/90">{thresholdSummary}</p>
       </motion.div>
 
       <motion.p className="text-sm leading-relaxed text-muted-foreground" {...stagger(0.25)}>
         {t('onboarding.ready.trialBodyConfigured', {
           days: PRICING.trialDays,
           asset: assetSymbol,
-          threshold: threshold.toFixed(1),
+          threshold: thresholdSummary,
           defaultValue:
-            'Start your {{days}}-day trial and Holzen will watch {{asset}} for moves of about +/-{{threshold}}%. No card required - cancel anytime before it ends.',
+            'Start your {{days}}-day trial and Holzen will watch {{asset}} using the threshold settings you just chose ({{threshold}}). No card required - cancel anytime before it ends.',
         })}
       </motion.p>
 

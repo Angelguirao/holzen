@@ -15,16 +15,28 @@ interface Props {
   cooldownHours?: number;
   /** CoinGecko coin id for volatility frequency estimates. */
   trackedAssetId?: string;
+  commitMode?: 'manual' | 'live';
 }
 
 export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function ThresholdSetting(
-  { thresholdUp, onSetUp, thresholdDown, onSetDown, cumulativeThreshold, onSetCumulative, cooldownHours, trackedAssetId = 'bitcoin' },
+  {
+    thresholdUp,
+    onSetUp,
+    thresholdDown,
+    onSetDown,
+    cumulativeThreshold,
+    onSetCumulative,
+    cooldownHours,
+    trackedAssetId = 'bitcoin',
+    commitMode = 'manual',
+  },
   ref
 ) {
   const { t } = useTranslation();
   const [upVal, setUpVal] = useState(thresholdUp);
   const [downVal, setDownVal] = useState(thresholdDown);
   const [cumVal, setCumVal] = useState(cumulativeThreshold);
+  const isLive = commitMode === 'live';
 
   useEffect(() => { setUpVal(thresholdUp); }, [thresholdUp]);
   useEffect(() => { setDownVal(thresholdDown); }, [thresholdDown]);
@@ -52,7 +64,10 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
 
         <Slider
           value={[upVal]}
-          onValueChange={([v]) => setUpVal(v)}
+          onValueChange={([v]) => {
+            setUpVal(v);
+            if (isLive) onSetUp(v);
+          }}
           min={1}
           max={20}
           step={0.5}
@@ -68,7 +83,7 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
           >
             {t('common.reset')}
           </Button>
-          {upVal !== thresholdUp && (
+          {!isLive && upVal !== thresholdUp && (
             <Button size="sm" onClick={() => onSetUp(upVal)} className="font-mono text-xs">
               {t('threshold.confirm')}
             </Button>
@@ -89,7 +104,10 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
 
         <Slider
           value={[downVal]}
-          onValueChange={([v]) => setDownVal(v)}
+          onValueChange={([v]) => {
+            setDownVal(v);
+            if (isLive) onSetDown(v);
+          }}
           min={1}
           max={20}
           step={0.5}
@@ -105,7 +123,7 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
           >
             {t('common.reset')}
           </Button>
-          {downVal !== thresholdDown && (
+          {!isLive && downVal !== thresholdDown && (
             <Button size="sm" onClick={() => onSetDown(downVal)} className="font-mono text-xs">
               {t('threshold.confirm')}
             </Button>
@@ -123,7 +141,10 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
 
         <Slider
           value={[cumVal]}
-          onValueChange={([v]) => setCumVal(v)}
+          onValueChange={([v]) => {
+            setCumVal(v);
+            if (isLive) onSetCumulative(v);
+          }}
           min={3}
           max={40}
           step={1}
@@ -139,7 +160,7 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
           >
             {t('common.reset')}
           </Button>
-          {cumVal !== cumulativeThreshold && (
+          {!isLive && cumVal !== cumulativeThreshold && (
             <Button size="sm" onClick={() => onSetCumulative(cumVal)} className="font-mono text-xs">
               {t('threshold.confirm')}
             </Button>

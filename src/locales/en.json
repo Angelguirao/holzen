@@ -662,7 +662,7 @@
     "threshold": {
       "kicker": "Your trigger",
       "title": "Choose when Holzen should interrupt the impulse",
-      "body": "Set the daily move that should trigger a pause. During onboarding, Holzen uses the same threshold for both rises and drops in {{asset}}.",
+      "body": "Set the same threshold controls Holzen uses in Settings so your first run matches the ongoing product behavior for {{asset}}.",
       "footer": "You can split upward and downward thresholds later in Settings."
     },
     "trialHint": "Or start with a {{trialDays}}-day free trial →",
@@ -701,7 +701,7 @@
       "recapGrounding": "Grounds you",
       "recapThreshold": "Threshold",
       "trialBody": "Start your {{days}}-day trial to use Pause when volatility spikes. No card required — cancel anytime before it ends.",
-      "trialBodyConfigured": "Start your {{days}}-day trial and Holzen will watch {{asset}} for moves of about +/-{{threshold}}%. No card required - cancel anytime before it ends.",
+      "trialBodyConfigured": "Start your {{days}}-day trial and Holzen will watch {{asset}} using the threshold settings you just chose ({{threshold}}). No card required - cancel anytime before it ends.",
       "startingTrial": "Starting trial…",
       "startTrialNoCard": "Start {{days}}-day free trial",
       "trialFinePrintNoCard": "Then ${{price}}/mo if you keep going · Cancel anytime"
@@ -2278,9 +2278,9 @@
     "rolling7day": "trigger when BTC moves this much over 7 days (up or down)",
     "confirm": "Confirm",
     "estimator": {
-      "avg": "Average",
-      "raw": "Raw samples",
-      "result": "Estimated triggers per month"
+      "avg": "Average daily move: {{avg}}%",
+      "raw": "{{raw}} signals detected · {{filtered}} filtered by {{cooldown}}h cooldown",
+      "result": "Estimated triggers per month: {{count}}"
     }
   },
   "changelog": {
