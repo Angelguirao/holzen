@@ -93,7 +93,7 @@ avoid Windows excluded-port conflicts that frequently affect the upstream
    - `VITE_SUPABASE_URL="http://127.0.0.1:55421"`
    - `VITE_SUPABASE_PUBLISHABLE_KEY="<anon key from supabase:status>"`
 5. If you need local Edge Functions too, copy `supabase/.env.example` to `supabase/.env` or `supabase/.env.local`
-6. Fill only the secrets needed for the flows you are testing locally, then start functions: `npm run supabase:functions:serve`
+6. Fill only the secrets needed for the flows you are testing locally, then start functions: `npm run supabase:functions:serve` (this repo passes `--env-file supabase/.env.local`)
 7. Start the app: `npm run dev:local`
 
 Notes:

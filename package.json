@@ -54,7 +54,7 @@
     "supabase:env:local": "node scripts/bootstrap-local-edge-env.mjs",
     "supabase:cron:local": "node scripts/supabase-local-crons.mjs",
     "supabase:email:drain-local": "node scripts/process-local-email-queue.mjs",
-    "supabase:functions:serve": "supabase functions serve",
+    "supabase:functions:serve": "supabase functions serve --env-file supabase/.env.local",
     "supabase:stop": "supabase stop",
     "supabase:status": "supabase status",
     "supabase:reset": "supabase db reset",
