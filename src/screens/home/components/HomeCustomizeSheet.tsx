@@ -42,7 +42,6 @@ export interface HomeCustomizeSheetProps {
 }
 
 function isDraggableTailHomeSectionId(id: string): boolean {
-  "use memo";
   return id !== GOAL_WHY_SECTION_ID && (ALL_HOME_SECTION_IDS as readonly string[]).includes(id);
 }
 

@@ -125,7 +125,6 @@ const COLLAPSED_KEY = 'holzen_home_section_collapsed_v1';
 const LEGACY_COLLAPSED_KEY = 'holzen_widget_collapsed';
 
 function loadOrder(defaultOrder: string[]): string[] {
-  "use memo";
   try {
     const raw = localStorage.getItem(ORDER_KEY);
     if (raw) {
@@ -144,7 +143,6 @@ function loadOrder(defaultOrder: string[]): string[] {
 }
 
 function loadCollapsed(): Record<string, boolean> {
-  "use memo";
   try {
     const raw = localStorage.getItem(COLLAPSED_KEY);
     if (raw) return JSON.parse(raw) as Record<string, boolean>;
