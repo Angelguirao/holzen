@@ -73,7 +73,8 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run supabase:status` | Print local API URL and anon key |
 | `npm run supabase:stop` | Stop local stack |
 | `npm run supabase:reset` | Reapply `supabase/migrations/` on local DB |
-| `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **linked** project (`supabase login` or `SUPABASE_ACCESS_TOKEN`) |
+| `npm run env:doctor` | Print current frontend targets, repo-local Supabase link state, and local Docker status |
+| `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the explicit **production** project ref; use `npm run gen:types:staging` for staging |
 | `npm run check:edge-logging` | Fail if an edge function serves HTTP without `withRequestLogging` (runs in `test:ci` / `check:prepush`) |
 | `npm run check:edge-coverage-manifest` | Fail if `EdgeCoverage.tsx` is missing any `supabase/config.toml` edge function name (runs in `test:ci` / `check:prepush`) |
 | `npm run check:edge` | Optional **Deno** typecheck of every `supabase/functions/*/index.ts`; **no-op** if `deno` is not installed |

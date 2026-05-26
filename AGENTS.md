@@ -67,12 +67,13 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run check:architecture-alignment` | Features layout, no screens-in-features (in **`test:ci`**) |
 | `npm run check:prepush` | Full scripted preflight (`scripts/pre-push-check.sh`). **Requires `bash`** (Git Bash / WSL on Windows). |
 | `npm run smoke:edge-logging` | Optional: HTTP smoke against deployed edges — verifies `x-cid` round-trip through `withRequestLogging` (see `supabase/functions/README.md`). |
-| `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **linked** Supabase project (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Run after DB migrations. |
+| `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **production** Supabase project ref (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Use `npm run gen:types:staging` when you intentionally want staging. |
 | `npm run design:lint` | Optional: validate root **[DESIGN.md](DESIGN.md)** ([`@google/design.md`](https://www.npmjs.com/package/@google/design.md)); uses `npx` (network on first run). |
 | `npm run test:coverage` | Vitest with coverage reports only (no JUnit; use **`test:ci`** for the full CI gate). |
 | `npm run check:version-sync` | Ensures `package.json` **version** matches the latest **`changelog_entries`** row (REST); runs automatically as **`prebuild`** before **`npm run build`**. |
 | `npm run stamp:release` | Writes **`git rev-parse --short=12 HEAD`** into **`supabase/functions/_shared/release.ts`** (`EDGE_RELEASE`) for edge Sentry/BetterStack **`SENTRY_RELEASE`**. Idempotent. |
 | `npm run check:release-stamp` | Exits non-zero if **`EDGE_RELEASE`** in **`release.ts`** ≠ current **`git rev-parse --short=12 HEAD`** (read-only; same comparison the stamper uses). |
+| `npm run env:doctor` | Prints repo-local Supabase link state, frontend targets by mode, and local Docker status. |
 | `npm run dev:staging` / `npm run dev:prod` / `npm run dev:local` · `npm run build:dev` · `supabase:*` | Staging vs prod-like vs localstack Vite modes and Docker Supabase CLI wrappers — see [README.md](README.md) npm scripts. |
 
 **Linting:** There are many **pre-existing** ESLint issues (~300). Do not treat cleaning the whole tree as part of a small task; avoid introducing *new* problems in files you touch.
@@ -107,7 +108,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 
 ## Supabase and edge functions
 
-- **Migrations:** `supabase/migrations/` — SQL is the source of truth for schema; follow the project’s normal flow to apply (CLI linked project, dashboard, etc.).
+- **Migrations:** `supabase/migrations/` — SQL is the source of truth for schema; follow the project’s normal flow to apply (target-specific scripts, explicit project refs, or dashboard SQL).
 - **SQL function conventions (mandatory):** every function in `supabase/migrations/` must `SET search_path = public` (or `public, extensions` when calling `net.*` / extension code), and use `SECURITY DEFINER` **only** when bypassing RLS is required — and then validate the caller and strip privileged columns. See [docs/ops/migration-security-conventions.md](docs/ops/migration-security-conventions.md) for templates and the pre-push checklist; companion rules for views are in [docs/ops/migration-view-safety.md](docs/ops/migration-view-safety.md).
 - **Edge functions:** `supabase/functions/<name>/index.ts` (Deno). Shared helpers: `supabase/functions/_shared/`. Larger handlers (e.g. **`companion-orchestrate`**) also use **`_shared/companion-orchestrate-*.ts`** (types, parse, logging, skip-cache, tasks, assemble). Add **`[functions.<name>]`** in **`supabase/config.toml`** for **every** new function (same PR). Unlisted names use **Supabase defaults** and can **401** on `invoke` or disagree with `functions serve` until you add the block and redeploy. **401** → session/`Authorization`, dashboard secrets, deployed `config.toml`. After editing edge TS, run **`npm run check:edge`** when Deno is installed.
 - **Deploy path:** Migrations and edge functions deploy to **owned Supabase** (staging / prod) via CI or CLI; the **React app** deploys on **Vercel** when `main` merges. See [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) §17 and [docs/ops/vercel-frontend-setup.md](docs/ops/vercel-frontend-setup.md).

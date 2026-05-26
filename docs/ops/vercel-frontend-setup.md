@@ -4,7 +4,7 @@ Holzen is a **Vite + React SPA** with client-side routing (`react-router-dom`). 
 
 Netlify and Cloudflare Pages work too — same build output (`dist/`). We document Vercel first because it matches how most teams deploy Vite/React apps and avoids a separate CI deploy job when the GitHub integration is enabled.
 
-**Related:** [production-supabase-setup.md](production-supabase-setup.md), [stripe-environment-setup.md](stripe-environment-setup.md), [platform-exit-runbook.md](platform-exit-runbook.md), [branch-model.md](branch-model.md), [vercel.json](../../vercel.json). Env sync helper: `npm run vercel:sync-env` (reads `.env.prod(.local)` / `.env.staging.local`).
+**Related:** [production-supabase-setup.md](production-supabase-setup.md), [stripe-environment-setup.md](stripe-environment-setup.md), [platform-exit-runbook.md](platform-exit-runbook.md), [branch-model.md](branch-model.md), [vercel.json](../../vercel.json). Env sync helper: `npm run vercel:sync-env` (reads `.env.prod(.local)` / `.env.staging.local`, writes Preview to **All Previews** by default).
 
 ---
 
@@ -85,7 +85,7 @@ To sync Production vars from local `.env.prod` / `.env.prod.local` / `.env.stagi
 node scripts/vercel-sync-env.mjs
 ```
 
-Preview vars may require the dashboard (“All Previews”) if the CLI asks for a Git branch and the repo is not linked yet.
+`npm run vercel:sync-env` writes Preview values to **All Previews** by default. Pass `--preview-branch=<branch>` only when you intentionally want branch-specific overrides.
 
 ### Preview environment (dashboard copy-paste)
 

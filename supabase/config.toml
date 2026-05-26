@@ -1,9 +1,8 @@
-# Checked-in repo default for Supabase CLI config state.
-# This is not the frontend target selector:
+# Neutral local project identifier for Supabase CLI state and Docker resources.
+# This is intentionally not a remote staging/prod ref:
 # - the app uses `VITE_SUPABASE_*`
-# - CLI `--linked` commands use the machine/CI link target
-# Holzen keeps prod here; staging is selected with `supabase link --project-ref ...`.
-project_id = "geqkxsnyqvhtascjghuu"
+# - remote CLI work uses explicit project refs or target-specific scripts
+project_id = "holzen"
 
 # Holzen pins a non-default local port block to avoid Windows excluded-port
 # conflicts that commonly affect the Supabase CLI defaults in the 5432x range.
