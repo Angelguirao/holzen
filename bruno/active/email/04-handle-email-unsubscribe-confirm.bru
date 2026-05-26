@@ -1,0 +1,23 @@
+meta {
+  name: 04 handle-email-unsubscribe (confirm)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/handle-email-unsubscribe
+  body: json
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "token": "{{EMAIL_UNSUBSCRIBE_TOKEN}}"
+  }
+}

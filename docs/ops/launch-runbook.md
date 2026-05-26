@@ -78,7 +78,7 @@ After staging smoke passes, merge **`staging → main`** for production Supabase
 
 ## 4. Bruno smoke (`bruno/active/`)
 
-With `hosted.bru` env (JWT + Supabase URL/key). Full sequence: [bruno/active/README.md](../../bruno/active/README.md).
+With `staging.bru` (preferred) or `prod.bru` env (JWT + Supabase URL/key). Full sequence: [bruno/active/README.md](../../bruno/active/README.md).
 
 1. `auth/01-sign-in-password`
 2. `platform/health` — 200

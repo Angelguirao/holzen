@@ -1,0 +1,32 @@
+meta {
+  name: 07 notify-checkout-confirmation
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/notify-checkout-confirmation
+  body: json
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  Authorization: Bearer {{SUPABASE_ACCESS_TOKEN}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "mode": "subscription",
+    "tierLabel": "Pro",
+    "isTrialing": true,
+    "trialStart": "May 26, 2026",
+    "firstChargeAt": "Jun 2, 2026",
+    "monthlyPrice": "$4.99",
+    "companionUnlocks": 12,
+    "wallpapers": 5,
+    "flexCreditsBalance": 0
+  }
+}

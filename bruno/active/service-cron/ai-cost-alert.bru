@@ -1,0 +1,17 @@
+meta {
+  name: ai-cost-alert
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/ai-cost-alert
+  body: none
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  Authorization: Bearer {{SERVICE_CRON_BEARER}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+}
