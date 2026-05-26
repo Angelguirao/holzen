@@ -51,6 +51,7 @@
     "check:cicd-env": "node scripts/check-cicd-env.mjs",
     "env:doctor": "node scripts/env-doctor.mjs",
     "supabase:start": "node scripts/supabase-start-local.mjs",
+    "supabase:env:local": "node scripts/bootstrap-local-edge-env.mjs",
     "supabase:cron:local": "node scripts/supabase-local-crons.mjs",
     "supabase:functions:serve": "supabase functions serve",
     "supabase:stop": "supabase stop",
