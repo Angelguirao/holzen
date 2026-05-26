@@ -245,24 +245,21 @@ export function useProfile() {
 
   const saveOnboardingDraft = useCallback(async (draft: {
     trackedAssetId: string;
-    thresholdUp: number;
+    threshold: number;
     thresholdDown: number;
-    cumulativeThreshold: number;
     timezone: string;
   }) => {
     const normalizedTrackedAssetId = normalizeTrackedAssetId(draft.trackedAssetId);
-    setThresholdState(draft.thresholdUp);
+    setThresholdState(draft.threshold);
     setThresholdDownState(draft.thresholdDown);
-    setCumulativeThresholdState(draft.cumulativeThreshold);
     setTrackedAssetIdCommitted(normalizedTrackedAssetId);
 
     if (!user) return;
 
     const { error } = await updateProfileFields(user.id, {
       tracked_asset_id: normalizedTrackedAssetId,
-      threshold: draft.thresholdUp,
+      threshold: draft.threshold,
       threshold_down: draft.thresholdDown,
-      cumulative_threshold: draft.cumulativeThreshold,
       timezone: draft.timezone,
     });
 
