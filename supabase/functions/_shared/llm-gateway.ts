@@ -145,6 +145,19 @@ function isRetryableLlmStatus(status: number): boolean {
   return status === 408 || status === 429 || status === 502 || status === 503 || status === 504;
 }
 
+/**
+ * Drain an LLM response body and return a fresh `Response` with the same status/headers
+ * so callers can still `.text()` / `.json()` after we read the stream for failover logging.
+ */
+export async function rewrapDrainedLlmResponse(response: Response): Promise<Response> {
+  const text = await response.text().catch(() => "");
+  return new Response(text, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+  });
+}
+
 export async function llmChatCompletions(
   creds: LlmCredentials,
   opts: {
@@ -216,7 +229,7 @@ export async function llmChatCompletionsWithFallback(
     if (!isRetryableLlmStatus(response.status)) {
       return { response, creds };
     }
-    await response.text().catch(() => undefined);
+    lastResponse = await rewrapDrainedLlmResponse(response);
   }
 
   return { response: lastResponse!, creds: lastCreds };

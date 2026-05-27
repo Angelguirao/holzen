@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   budgetTierFromSpendRatio,
+  rewrapDrainedLlmResponse,
   resolveModelsForTask,
 } from '../../../supabase/functions/_shared/llm-gateway.ts';
 
@@ -24,5 +25,16 @@ describe('llm-budget tier thresholds', () => {
     expect(budgetTierFromSpendRatio(0.7)).toBe('economy');
     expect(budgetTierFromSpendRatio(0.89)).toBe('economy');
     expect(budgetTierFromSpendRatio(0.9)).toBe('critical');
+  });
+});
+
+describe('rewrapDrainedLlmResponse', () => {
+  it('returns a response whose body callers can read after draining for failover', async () => {
+    const rewrapped = await rewrapDrainedLlmResponse(
+      new Response('provider error', { status: 503 }),
+    );
+    expect(rewrapped.status).toBe(503);
+    await expect(rewrapped.text()).resolves.toBe('provider error');
+    await expect(rewrapped.text()).resolves.toBe('provider error');
   });
 });

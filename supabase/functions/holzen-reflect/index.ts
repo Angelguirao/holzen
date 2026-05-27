@@ -78,7 +78,13 @@ serve(
     const trackObs = createObsTracker(svcClient, userId, "reflection", t0);
     const logAttempt = createAttemptLogger(svcClient, { userId });
 
-    const body = await req.json();
+    const rawText = await req.text();
+    let body: Record<string, unknown>;
+    try {
+      body = JSON.parse(rawText || "{}") as Record<string, unknown>;
+    } catch {
+      return errorResponse("Invalid JSON body", 400);
+    }
     const { context, tone, style, moodHistory, severity, language, recentHaikus, recentMessages } = body;
     const customPrompt = sanitizePromptInput(body.customPrompt, 500);
     const motivations = sanitizePromptArray(body.motivations, 10, 100);
