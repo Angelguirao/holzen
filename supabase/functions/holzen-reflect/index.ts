@@ -39,9 +39,6 @@ serve(
 
     const userId = user.id;
     const svcClient = await createServiceClient();
-    try {
-      await svcClient.from("analytics_events").insert({ user_id: userId, event: "pause_ai_call" });
-    } catch (_) { /* tracking failure is non-fatal */ }
 
     // Reflection is NOT subject to panic_mode (we want users to see a reflection
     // even when companions are bypassed — it's ~$0.001 per call). It IS subject
@@ -106,6 +103,10 @@ serve(
       return jsonResponse(fallback);
     }
 
+    try {
+      await svcClient.from("analytics_events").insert({ user_id: userId, event: "pause_ai_call" });
+    } catch (_) { /* tracking failure is non-fatal */ }
+
     const { result, lastStatus } = await generateUnifiedReflection({
       context,
       llm: resolveLlmCredentialChain()[0]!,
@@ -127,17 +128,20 @@ serve(
     });
 
     if (!result?.message) {
-      if (lastStatus === 429) {
-        return errorResponse("Rate limited. Try again later.", 429);
-      }
-      if (lastStatus === 402) {
-        return errorResponse("AI usage limit reached.", 402);
-      }
       if (companionFallbacksDisabled()) {
+        if (lastStatus === 429) {
+          return errorResponse("Rate limited. Try again later.", 429);
+        }
+        if (lastStatus === 402) {
+          return errorResponse("AI usage limit reached.", 402);
+        }
         return errorResponse(COMPANION_FALLBACKS_DISABLED_MESSAGE, 503);
       }
-      log("All AI models failed, serving curated fallback");
-      const fallback = pickRandom(REFLECTION_FALLBACKS);
+      log(
+        `reflection: live generation unavailable (HTTP ${lastStatus}), serving curated pool`,
+      );
+      const pool = await loadFallbackPool<{ message: string; haiku: string }>(svcClient, "reflection");
+      const fallback = pickRandom(pool.length > 0 ? pool : REFLECTION_FALLBACKS);
       trackObs("companion_fallback_curated");
       return jsonResponse(fallback);
     }
