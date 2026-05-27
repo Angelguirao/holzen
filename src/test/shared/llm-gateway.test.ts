@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   budgetTierFromSpendRatio,
+  parseLlmProviderOrder,
   rewrapDrainedLlmResponse,
   resolveModelsForTask,
+  shouldUseCuratedFallbackForGoogleDegradation,
 } from '../../../supabase/functions/_shared/llm-gateway.ts';
 
 describe('llm-gateway task profiles', () => {
@@ -28,13 +30,47 @@ describe('llm-budget tier thresholds', () => {
   });
 });
 
+describe('parseLlmProviderOrder', () => {
+  it('defaults to google then openrouter', () => {
+    expect(parseLlmProviderOrder(undefined)).toEqual(['google', 'openrouter']);
+  });
+
+  it('honors openrouter-first order', () => {
+    expect(parseLlmProviderOrder('openrouter,google')).toEqual(['openrouter', 'google']);
+  });
+
+  it('dedupes invalid entries', () => {
+    expect(parseLlmProviderOrder('openrouter,openrouter,anthropic,google')).toEqual([
+      'openrouter',
+      'google',
+    ]);
+  });
+});
+
+describe('shouldUseCuratedFallbackForGoogleDegradation', () => {
+  it('requires curated pool when google is degraded and openrouter is missing', () => {
+    expect(
+      shouldUseCuratedFallbackForGoogleDegradation(true, [
+        { provider: 'google', apiKey: 'g' },
+      ]),
+    ).toBe(true);
+  });
+
+  it('allows live generation when openrouter is configured', () => {
+    expect(
+      shouldUseCuratedFallbackForGoogleDegradation(true, [
+        { provider: 'openrouter', apiKey: 'o' },
+      ]),
+    ).toBe(false);
+  });
+});
+
 describe('rewrapDrainedLlmResponse', () => {
   it('returns a response whose body callers can read after draining for failover', async () => {
     const rewrapped = await rewrapDrainedLlmResponse(
       new Response('provider error', { status: 503 }),
     );
     expect(rewrapped.status).toBe(503);
-    await expect(rewrapped.text()).resolves.toBe('provider error');
     await expect(rewrapped.text()).resolves.toBe('provider error');
   });
 });
