@@ -4,6 +4,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { hapticFeedback } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { HaikuDisplay } from '@/screens/pause/components/HaikuDisplay';
+import { CompanionFrameIconTooltip } from '@/screens/pause/components/companion/companion-frame-icon-tooltip';
 
 export type PauseFrameHaikuCardProps = {
   open: boolean;
@@ -40,9 +41,11 @@ export function PauseFrameHaikuCard({
             onClick={() => hapticFeedback('light')}
           >
             <span className="flex min-w-0 items-center gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-primary/25 bg-primary/5">
-                <ImageIcon className="h-5 w-5 text-primary" aria-hidden />
-              </span>
+              <CompanionFrameIconTooltip content={t('pause.frame.companions.haikuHelp')}>
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-primary/25 bg-primary/5">
+                  <ImageIcon className="h-5 w-5 text-primary" aria-hidden />
+                </span>
+              </CompanionFrameIconTooltip>
               <span className="truncate">{t('pause.frame.haikuLabel', { defaultValue: 'Haiku' })}</span>
             </span>
             <ChevronDown

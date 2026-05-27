@@ -1,5 +1,9 @@
 import type { RegenerateCompanionSlot } from '@/features/pause/public-ritual-frame';
-import { CompanionCard, type CompanionCardProps } from '@/screens/pause/components/companion/companion-card';
+import {
+  CompanionCard,
+  type CompanionCardAppearance,
+  type CompanionCardProps,
+} from '@/screens/pause/components/companion/companion-card';
 import { CompanionOrchestratedSlotChrome } from '@/screens/pause/components/companion/companion-orchestrated-slot-chrome';
 import type { CompanionFullViewRouteSegment } from '@/screens/pause/components/companion/companion-open-full-view-button';
 
@@ -23,6 +27,7 @@ export type CompanionOrchestratedCardProps = {
   regenerateSlot: RegenerateCompanionSlot;
   onRegenerate: () => void;
   routeSegment: CompanionFullViewRouteSegment;
+  appearance?: CompanionCardAppearance;
   children: React.ReactNode;
 };
 
@@ -46,6 +51,7 @@ export function CompanionOrchestratedCard({
   regenerateSlot,
   onRegenerate,
   routeSegment,
+  appearance = 'default',
   children,
 }: CompanionOrchestratedCardProps) {
   "use memo";
@@ -63,6 +69,7 @@ export function CompanionOrchestratedCard({
       loading={loading}
       isFavorite={isFavorite}
       onToggleFavorite={onToggleFavorite}
+      appearance={appearance}
     >
       <CompanionOrchestratedSlotChrome
         pauseInstanceId={pauseInstanceId}

@@ -2,16 +2,24 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
+import { CompanionFrameIconTooltip } from '@/screens/pause/components/companion/companion-frame-icon-tooltip';
 
 export type PauseFrameToolRowProps = {
   icon: ReactNode;
   label: string;
   href: string;
+  iconHelp?: string;
 };
 
 /** Frame step link row to a companion full-view route. */
-export function PauseFrameToolRow({ icon, label, href }: PauseFrameToolRowProps) {
+export function PauseFrameToolRow({ icon, label, href, iconHelp }: PauseFrameToolRowProps) {
   "use memo";
+  const iconBox = (
+    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-primary/25 bg-primary/5">
+      {icon}
+    </span>
+  );
+
   return (
     <Link
       to={href}
@@ -19,9 +27,11 @@ export function PauseFrameToolRow({ icon, label, href }: PauseFrameToolRowProps)
       onClick={() => hapticFeedback('light')}
     >
       <span className="flex min-w-0 items-center gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-primary/25 bg-primary/5">
-          {icon}
-        </span>
+        {iconHelp ? (
+          <CompanionFrameIconTooltip content={iconHelp}>{iconBox}</CompanionFrameIconTooltip>
+        ) : (
+          iconBox
+        )}
         <span className="truncate">{label}</span>
       </span>
       <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
