@@ -1,6 +1,12 @@
-import { useCallback, useState, type Dispatch, type SetStateAction } from 'react';
-import { nextExpandedWithLazyFetch } from './pause-companion-orchestration-io';
+import { useCallback, useState } from 'react';
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
+
+type LazyToggleArgs = {
+  slot: RegenerateCompanionSlot;
+  data: unknown;
+  loading: boolean;
+  error: unknown;
+};
 
 export type CompanionSectionExpandSlot = 'haiku' | 'signal' | 'grounding' | 'zoomOut' | 'history';
 
@@ -23,6 +29,30 @@ export type UseCompanionSectionExpansionParams = {
   exclusiveExpand?: boolean;
 };
 
+type ExpansionMap = Record<CompanionSectionExpandSlot, boolean>;
+
+const CLOSED: ExpansionMap = {
+  haiku: false,
+  grounding: false,
+  signal: false,
+  zoomOut: false,
+  history: false,
+};
+
+function openExclusive(slot: CompanionSectionExpandSlot): ExpansionMap {
+  return { ...CLOSED, [slot]: true };
+}
+
+/** True when the user may expand (has payload, in-flight, error, or Pro access to fetch). */
+function canOpenLazySlot(args: LazyToggleArgs, canAccess: () => boolean): boolean {
+  if (args.data || args.loading || args.error) return true;
+  return canAccess();
+}
+
+function needsLazyFetch(args: LazyToggleArgs): boolean {
+  return !args.data && !args.loading && !args.error;
+}
+
 /** Expand/collapse state for inline `CompanionSection` cards (lazy fetch on first open). */
 export function useCompanionSectionExpansion({
   signal,
@@ -41,96 +71,91 @@ export function useCompanionSectionExpansion({
   canAccessCompanion,
   exclusiveExpand = false,
 }: UseCompanionSectionExpansionParams) {
-  const [expandedHaiku, setExpandedHaiku] = useState(false);
-  const [expandedLearning, setExpandedLearning] = useState(false);
-  const [expandedSignal, setExpandedSignal] = useState(false);
-  const [expandedZoomOut, setExpandedZoomOut] = useState(false);
-  const [expandedHistory, setExpandedHistory] = useState(false);
+  const [expansion, setExpansion] = useState<ExpansionMap>(CLOSED);
 
-  const collapseExcept = useCallback(
-    (keep: CompanionSectionExpandSlot | null) => {
-      if (keep !== 'haiku') setExpandedHaiku(false);
-      if (keep !== 'grounding') setExpandedLearning(false);
-      if (keep !== 'signal') setExpandedSignal(false);
-      if (keep !== 'zoomOut') setExpandedZoomOut(false);
-      if (keep !== 'history') setExpandedHistory(false);
+  const toggleSlot = useCallback(
+    (slot: CompanionSectionExpandSlot, lazy?: LazyToggleArgs) => {
+      let fetchSlot: RegenerateCompanionSlot | null = null;
+
+      setExpansion((prev) => {
+        if (prev[slot]) {
+          return { ...prev, [slot]: false };
+        }
+
+        if (lazy) {
+          if (!canOpenLazySlot(lazy, canAccessCompanion)) {
+            return prev;
+          }
+          if (needsLazyFetch(lazy)) {
+            fetchSlot = lazy.slot;
+          }
+        }
+
+        if (exclusiveExpand) {
+          return openExclusive(slot);
+        }
+        return { ...prev, [slot]: true };
+      });
+
+      if (fetchSlot) {
+        void fetchCompanion(fetchSlot);
+      }
     },
-    [],
+    [canAccessCompanion, exclusiveExpand, fetchCompanion],
   );
 
-  const makeLazyToggle = useCallback(
-    (
-      setExpanded: Dispatch<SetStateAction<boolean>>,
-      slot: RegenerateCompanionSlot,
-      expandKey: CompanionSectionExpandSlot,
-      data: unknown,
-      loading: boolean,
-      error: unknown,
-    ) =>
-      () => {
-        if (exclusiveExpand) collapseExcept(expandKey);
-        setExpanded((current) => {
-          if (current) return false;
-          return nextExpandedWithLazyFetch(false, {
-            data,
-            loading,
-            error,
-            canAccess: canAccessCompanion,
-            fetch: fetchCompanion,
-            slot,
-          });
-        });
-      },
-    [canAccessCompanion, collapseExcept, exclusiveExpand, fetchCompanion],
+  const toggleHaiku = useCallback(() => toggleSlot('haiku'), [toggleSlot]);
+
+  const toggleSignal = useCallback(
+    () =>
+      toggleSlot('signal', {
+        slot: 'signal',
+        data: signal,
+        loading: signalLoading,
+        error: signalError,
+      }),
+    [toggleSlot, signal, signalLoading, signalError],
   );
 
-  const toggleHaiku = useCallback(() => {
-    if (exclusiveExpand) collapseExcept('haiku');
-    setExpandedHaiku((current) => {
-      if (current) return false;
-      return true;
-    });
-  }, [collapseExcept, exclusiveExpand]);
+  const toggleGrounding = useCallback(
+    () =>
+      toggleSlot('grounding', {
+        slot: 'grounding',
+        data: nudge,
+        loading: nudgeLoading,
+        error: nudgeError,
+      }),
+    [toggleSlot, nudge, nudgeLoading, nudgeError],
+  );
 
-  const toggleSignal = makeLazyToggle(
-    setExpandedSignal,
-    'signal',
-    'signal',
-    signal,
-    signalLoading,
-    signalError,
+  const toggleZoomOut = useCallback(
+    () =>
+      toggleSlot('zoomOut', {
+        slot: 'zoomOut',
+        data: zoomOut,
+        loading: zoomOutLoading,
+        error: zoomOutError,
+      }),
+    [toggleSlot, zoomOut, zoomOutLoading, zoomOutError],
   );
-  const toggleGrounding = makeLazyToggle(
-    setExpandedLearning,
-    'grounding',
-    'grounding',
-    nudge,
-    nudgeLoading,
-    nudgeError,
-  );
-  const toggleZoomOut = makeLazyToggle(
-    setExpandedZoomOut,
-    'zoomOut',
-    'zoomOut',
-    zoomOut,
-    zoomOutLoading,
-    zoomOutError,
-  );
-  const toggleHistory = makeLazyToggle(
-    setExpandedHistory,
-    'history',
-    'history',
-    historyInsight,
-    historyLoading,
-    historyError,
+
+  const toggleHistory = useCallback(
+    () =>
+      toggleSlot('history', {
+        slot: 'history',
+        data: historyInsight,
+        loading: historyLoading,
+        error: historyError,
+      }),
+    [toggleSlot, historyInsight, historyLoading, historyError],
   );
 
   return {
-    expandedHaiku,
-    expandedLearning,
-    expandedSignal,
-    expandedZoomOut,
-    expandedHistory,
+    expandedHaiku: expansion.haiku,
+    expandedLearning: expansion.grounding,
+    expandedSignal: expansion.signal,
+    expandedZoomOut: expansion.zoomOut,
+    expandedHistory: expansion.history,
     toggleHaiku,
     toggleSignal,
     toggleGrounding,

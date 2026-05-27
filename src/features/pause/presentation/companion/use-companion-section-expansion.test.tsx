@@ -59,6 +59,43 @@ describe('useCompanionSectionExpansion', () => {
     expect(result.current.expandedHistory).toBe(true);
   });
 
+  it('toggle again closes the same slot', () => {
+    const { result } = renderHook(() =>
+      useCompanionSectionExpansion({ ...baseParams(), exclusiveExpand: true }),
+    );
+
+    act(() => {
+      result.current.toggleZoomOut();
+    });
+    expect(result.current.expandedZoomOut).toBe(true);
+
+    act(() => {
+      result.current.toggleZoomOut();
+    });
+    expect(result.current.expandedZoomOut).toBe(false);
+  });
+
+  it('exclusiveExpand does not collapse others when a gated slot fails to open', () => {
+    const { result } = renderHook(() =>
+      useCompanionSectionExpansion({
+        ...baseParams(),
+        exclusiveExpand: true,
+        canAccessCompanion: () => false,
+      }),
+    );
+
+    act(() => {
+      result.current.toggleHaiku();
+    });
+    expect(result.current.expandedHaiku).toBe(true);
+
+    act(() => {
+      result.current.toggleSignal();
+    });
+    expect(result.current.expandedHaiku).toBe(true);
+    expect(result.current.expandedSignal).toBe(false);
+  });
+
   it('without exclusiveExpand multiple slots can stay open', () => {
     const { result } = renderHook(() =>
       useCompanionSectionExpansion({ ...baseParams(), exclusiveExpand: false }),

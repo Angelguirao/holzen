@@ -38,8 +38,9 @@ export function CompanionSectionHaikuSlot({
       icon={COMPANION_SECTION_ICONS.haiku}
       expanded={expanded}
       onToggle={() => {
+        const opening = !expanded;
         onToggleExpand();
-        if (!completed) onFirstExpandComplete();
+        if (opening && !completed) onFirstExpandComplete();
       }}
       completed={completed}
       appearance={appearance}
