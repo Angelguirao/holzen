@@ -66,14 +66,13 @@ Zen and the inline pause card share this contract so reflection failures are not
 
 ## Your pause widget (Figma A–E + calm-waters)
 
-Home maps Postgres pause state to a **UI-only** read-model in [`resolveHomePauseWidgetMode`](../../src/features/pause/domain/home/home-pause-widget-mode.ts) via [`useHomePauseWidgetProjection`](../../src/features/pause/presentation/home/use-home-pause-widget-projection.ts). Postgres `engaged` ≠ Figma **C**: **C / C′** require [`hasReachedReflectForHome`](../../src/features/pause/domain/home/has-reached-reflect-for-home.ts) (`reflection_step` event or non-stub `reflection_text`).
+Home maps Postgres pause state to a **UI-only** read-model in [`resolveHomePauseWidgetMode`](../../src/features/pause/domain/home/home-pause-widget-mode.ts) via [`useHomePauseWidgetProjection`](../../src/features/pause/presentation/home/use-home-pause-widget-projection.ts). Postgres `engaged` ≠ Figma **C**: **C / C′** require [`hasReachedReflectForHome`](../../src/features/pause/domain/home/has-reached-reflect-for-home.ts) **and** a **deep** ritual (`!is_brief_ritual` from `v_pause_full`). **Continue** appears only in **C / C′** — never for engaged pre-Reflect.
 
 | UI mode | When | Header / CTA |
 |--------|------|----------------|
 | **A** | Idle, no open pause | YOUR PAUSE (collapsed) / manual scheduling when expanded |
-| **B** | `active` or pre-Reflect | Template opening line + **Pause with this** |
-| **B′** | `engaged` before Reflect | Same preview + **Continue** (no Discard) |
-| **C** | Reached Reflect | **Continue your pause** + Continue / Discard |
+| **B** | Open pause before Continue gate | Template opening line (pre-Reflect) or `reflection_text` (brief post-Reflect) + **Pause with this** |
+| **C** | Deep + reached Reflect | **Continue your pause** + Continue / Discard |
 | **C′** | C + pending offer | Dual sections + **Pause with new context** |
 | **D / D′** | Post-pause auto cooldown | **You paused** + Pause again / archive link |
 | **E** | Cooldown + new active offer | **New pause available** + validation copy |

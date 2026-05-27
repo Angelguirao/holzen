@@ -11,7 +11,6 @@ import {
   HomePauseEngagedBody,
   HomePauseEngagedPendingBody,
   HomePauseIdleExpandedBody,
-  HomePauseMidRitualBody,
   HomePauseOpenActiveBody,
   HomePausePostPauseBody,
 } from '@/screens/home/components/HomePauseWidgetBodies';
@@ -111,16 +110,6 @@ export function HomePauseWidgetBody(props: Props) {
           marketBlock={props.marketBlock}
           onPauseWithThis={props.onPauseWithThis}
           ctaLabelKey="home.pauseWidget.pauseWithThis"
-        />
-      );
-
-    case 'B_prime':
-      return (
-        <HomePauseMidRitualBody
-          previewLine={props.previewLine}
-          marketBlock={props.marketBlock}
-          onPauseWithThis={props.onPauseWithThis}
-          ctaLabelKey="home.pauseWidget.continue"
         />
       );
 

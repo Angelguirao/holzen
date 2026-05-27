@@ -45,17 +45,6 @@ export function HomePauseOpenActiveBody({
   );
 }
 
-/** State B′ — mid-ritual pre-Reflect. */
-export function HomePauseMidRitualBody(props: OpenBodyProps) {
-  return (
-    <HomePauseOpenActiveBody
-      {...props}
-      ctaLabelKey="home.pauseWidget.continue"
-      showSparkle={false}
-    />
-  );
-}
-
 type EngagedProps = Pick<
   HomePauseWidgetBodyProjection,
   'previewLine' | 'marketBlock' | 'onPauseWithThis' | 'onDismissOpenPause'

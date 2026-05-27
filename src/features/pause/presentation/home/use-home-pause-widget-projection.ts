@@ -69,6 +69,7 @@ export type UseHomePauseWidgetProjectionParams = {
   openPauseState: 'active' | 'engaged' | null;
   hasReflectionStep: boolean;
   reflectionMessage: string | null;
+  isBriefRitual: boolean;
   contextSnapshot: Record<string, unknown> | null;
   openPauseCreatedAt: string | null;
   contextText: string | null;
@@ -174,6 +175,7 @@ export function useHomePauseWidgetProjection(
         hasReflectionStep: params.hasReflectionStep,
         reflectionMessage: params.reflectionMessage,
         trackedAssetSymbol: assetSymbol,
+        isBriefRitual: params.isBriefRitual,
         hasPendingOffer: Boolean(pending),
         postPauseAutoCooldownRemainingMs,
         completedPauseCount: params.completedPauseCount ?? 0,
@@ -187,6 +189,7 @@ export function useHomePauseWidgetProjection(
       params.openPauseState,
       params.hasReflectionStep,
       params.reflectionMessage,
+      params.isBriefRitual,
       assetSymbol,
       pending,
       postPauseAutoCooldownRemainingMs,
@@ -199,7 +202,7 @@ export function useHomePauseWidgetProjection(
     const prev = prevModeRef.current;
     prevModeRef.current = widgetMode;
 
-    const autoExpandModes: HomePauseWidgetMode[] = ['B', 'B_prime', 'C', 'C_prime', 'E'];
+    const autoExpandModes: HomePauseWidgetMode[] = ['B', 'C', 'C_prime', 'E'];
     const enteredAutoExpand =
       prev !== null && autoExpandModes.includes(widgetMode) && !autoExpandModes.includes(prev);
 
