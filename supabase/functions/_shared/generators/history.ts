@@ -40,14 +40,28 @@ import {
 import { getPhaseConfig } from "../phase-config.ts";
 import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
 import { type HistoricalEra, pickEra } from "../history-util.ts";
+import { fetchBtcOnThisDayPrices } from "../btc-on-this-day-prices.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
 export const PROMPT_VERSION = "v3";
 
+export type HistoryInsightData = {
+  title: string;
+  btcInsight: string;
+  analogy: string;
+  assetClass: string;
+  period: string;
+  source?: string;
+  url?: string;
+  onThisDay?: { yearsAgo: number; price: number; date: string }[];
+  currentPrice?: number | null;
+  partial?: boolean;
+};
+
 // ── Public types ──
 
 export interface HistoryResult {
-  data: { title: string; btcInsight: string; analogy: string; assetClass: string; period: string; source?: string; url?: string } | null;
+  data: HistoryInsightData | null;
   /** `catalog` = served from `companion_catalog`; `cache` = served from runtime `companion_cache`. */
   source: "live" | "catalog" | "library" | "cache" | "curated" | "empty";
   cacheId: string | null;
@@ -164,9 +178,28 @@ async function serveFallback(
   return serveCurated(svcClient);
 }
 
+async function enrichHistoryWithBtcPrices(
+  svcClient: SupabaseClient,
+  context: string | undefined,
+  log: GenerateHistoryParams["log"],
+  result: HistoryResult,
+): Promise<HistoryResult> {
+  if (!result.data) return result;
+  const prices = await fetchBtcOnThisDayPrices(svcClient, context, log);
+  return {
+    ...result,
+    data: {
+      ...result.data,
+      onThisDay: prices.onThisDay,
+      currentPrice: prices.currentPrice,
+      partial: prices.partial,
+    },
+  };
+}
+
 // ── Public entry point ──
 
-export async function generateHistory(params: GenerateHistoryParams): Promise<HistoryResult> {
+async function generateHistoryCore(params: GenerateHistoryParams): Promise<HistoryResult> {
   const { svcClient, context, mood, recentTitles, userId, preferredMood, forceLive, skipLive, budgetTier = "normal", log, incomingRequest } =
     params;
   const marketDirection = parseMarketDirection(context);
@@ -473,4 +506,9 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
 
   if (userId) trackEvent(svcClient, userId, "historical_insight_ai_call");
   return { data: insight, source: "live", cacheId: null };
+}
+
+export async function generateHistory(params: GenerateHistoryParams): Promise<HistoryResult> {
+  const result = await generateHistoryCore(params);
+  return enrichHistoryWithBtcPrices(params.svcClient, params.context, params.log, result);
 }

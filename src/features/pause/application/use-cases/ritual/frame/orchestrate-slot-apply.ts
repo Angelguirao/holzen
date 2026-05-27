@@ -1,3 +1,6 @@
+import {
+  toHistoricalInsightDisplayData,
+} from '@/features/pause/application/use-cases/ritual/frame/historical-insight-payload';
 import type { CachedHistoricalInsightShape } from '@/features/pause/domain/historical-insight';
 import type { ZoomOutData } from '@/features/pause/domain/zoom-out-display';
 import { trackCompanionServed } from '@/features/pause/application/use-cases/ritual/frame/companion-generation-telemetry';
@@ -112,9 +115,10 @@ function commitOrchestrateSlotData(
       break;
     }
     case 'history': {
-      const d = data as CachedHistoricalInsightShape;
+      const d = toHistoricalInsightDisplayData(data);
+      if (!d) break;
       c.setHistoryInsight(d);
-      void c.autoSaveToLibrary({ title: d.title, body: d.btcInsight, sourceType: 'history_insight' });
+      void c.autoSaveToLibrary({ title: d.title ?? '', body: d.btcInsight ?? '', sourceType: 'history_insight' });
       break;
     }
     case 'zoomOut': {

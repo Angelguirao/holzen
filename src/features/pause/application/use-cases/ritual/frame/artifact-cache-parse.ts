@@ -1,4 +1,5 @@
 import type { CachedHistoricalInsightShape } from '@/features/pause/domain/historical-insight';
+import { toHistoricalInsightDisplayData } from '@/features/pause/application/use-cases/ritual/frame/historical-insight-payload';
 
 export interface CachedSignalShape {
   title: string;
@@ -56,7 +57,7 @@ export function parsePauseArtifactRows(rows: ArtifactRow[]): ParsedPauseArtifact
         url: (d.url as string) ?? '',
       };
     } else if (c.kind === 'historical_insight' && d) {
-      result.history = d as unknown as CachedHistoricalInsightShape;
+      result.history = toHistoricalInsightDisplayData(d);
     } else if ((c.kind === 'zoom_out' || c.kind === 'zoom_out_deep_time') && d) {
       if (!result.zoomOut) result.zoomOut = d as CachedZoomOutShape;
     } else if (c.kind === 'intervention' && d) {

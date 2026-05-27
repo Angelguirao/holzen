@@ -32,11 +32,8 @@ import {
 } from "../cache.ts";
 import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { getPhaseConfig } from "../phase-config.ts";
-import { BTC_ON_THIS_DAY_YEARS_BACK, btcOnThisDayYearOffsets } from "../btc-on-this-day-config.ts";
-import { warmMissingBtcPrices } from "../btc-price-warm.ts";
 import { fetchPastReflectionWithWords, type PastReflectionWithWords } from "../past-reflections.ts";
 import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
-import { errorMessageFromUnknown, getEdgeRuntime } from "../edge-runtime.ts";
 import { normalizeTrackedAssetId } from "../tracked-assets.ts";
 import {
   type LlmBudgetTier,
@@ -51,7 +48,13 @@ export const PROMPT_VERSION = "v4";
 
 // ── Public types ──
 
-/** Composite zoom-out payload returned to orchestrate / clients. */
+/** Zoom Out wire payload omits BTC anniversary rows (Look Back owns them). */
+const EMPTY_ZOOM_OUT_BTC = {
+  onThisDay: [] as { yearsAgo: number; price: number; date: string }[],
+  currentPrice: null as number | null,
+  partial: true,
+};
+
 export interface ZoomOutCompositeData {
   onThisDay: { yearsAgo: number; price: number; date: string }[];
   currentPrice: number | null;
@@ -88,106 +91,6 @@ export interface GenerateZoomOutParams {
   log: (msg: string, extra?: Record<string, unknown>) => void;
   /** Edge `Request` for W3C trace propagation to the Lovable AI gateway. */
   incomingRequest?: Request;
-}
-
-// ── Internals: CoinGecko price fetching ──
-
-interface PriceFetchResult {
-  onThisDay: { yearsAgo: number; price: number; date: string }[];
-  currentPrice: number | null;
-  rateLimited: boolean;
-  isPartial: boolean;
-}
-
-interface PriceCacheRow {
-  date: string;
-  price: number;
-}
-
-/**
- * Read BTC prices from btc_price_cache ONLY.
- *
- * No external API calls — prices are kept fresh by the refresh-btc-prices
- * cron job (every 15 min). This eliminates CoinGecko rate limit issues
- * during user sessions.
- */
-async function fetchHistoricalAndCurrentPrices(
-  svcClient: SupabaseClient,
-  context: string | undefined,
-  log: GenerateZoomOutParams["log"],
-): Promise<PriceFetchResult> {
-  const today = new Date();
-  const currentYear = today.getUTCFullYear();
-  const month = today.getUTCMonth();
-  const day = today.getUTCDate();
-  const todayKey = today.toISOString().slice(0, 10);
-
-  // Build date keys for today + 1..N calendar years ago (see btc-on-this-day-config)
-  const yearTargets = btcOnThisDayYearOffsets().map((y) => {
-    const d = new Date(Date.UTC(currentYear - y, month, day));
-    return { yearsAgo: y, dateKey: d.toISOString().slice(0, 10) };
-  });
-
-  const allDateKeys = [todayKey, ...yearTargets.map(t => t.dateKey)];
-
-  // Single DB query — fetch all needed prices from cache
-  const { data: cached } = await svcClient
-    .from("btc_price_cache")
-    .select("date, price")
-    .in("date", allDateKeys);
-
-  const rows = (cached ?? []) as PriceCacheRow[];
-  const priceMap = new Map<string, number>(rows.map((r) => [r.date, r.price]));
-
-  // Current price from today's cache entry
-  const currentPrice = priceMap.get(todayKey) ?? null;
-
-  // Historical "on this day" prices
-  const onThisDay: { yearsAgo: number; price: number; date: string }[] = [];
-  for (const target of yearTargets) {
-    const price = priceMap.get(target.dateKey);
-    if (typeof price === "number") {
-      onThisDay.push({ yearsAgo: target.yearsAgo, date: target.dateKey, price: Math.round(price) });
-    }
-  }
-
-  log(`prices from cache: current=${currentPrice ?? 'none'}, historical=${onThisDay.length}/${BTC_ON_THIS_DAY_YEARS_BACK}`);
-
-  // Background warm-on-read: if any anniversary dates were missing from the
-  // cache, kick off a non-blocking fill via `EdgeRuntime.waitUntil` so the next
-  // session has a full timeline. Current session still returns with whatever it
-  // has now — this costs the user nothing. The helper dedupes via a 15-min
-  // freshness check, so concurrent sessions with the same gap won't hammer
-  // CoinGecko. Only runs when the Supabase edge runtime exposes `waitUntil`.
-  const missingDateKeys = yearTargets
-    .filter((t) => !priceMap.has(t.dateKey))
-    .map((t) => t.dateKey);
-  const rt = getEdgeRuntime();
-  if (missingDateKeys.length > 0 && rt) {
-    try {
-      rt.waitUntil(
-        warmMissingBtcPrices(svcClient, missingDateKeys)
-          .then((warm) => {
-            log(
-              `btc warm-on-read: attempted=${warm.attempted} upserted=${warm.upserted} ` +
-                `rate_limited=${warm.rateLimited} other=${warm.other} skipped_recent=${warm.skippedRecent}`,
-            );
-          })
-          .catch((e) => {
-            log(`btc warm-on-read failed: ${errorMessageFromUnknown(e)}`);
-          }),
-      );
-    } catch (e) {
-      log(`btc warm-on-read scheduling failed: ${errorMessageFromUnknown(e)}`);
-    }
-  }
-
-  return {
-    onThisDay,
-    currentPrice: typeof currentPrice === "number" ? Math.round(currentPrice) : null,
-    rateLimited: false, // No API calls on the blocking path = no rate limits
-    isPartial: onThisDay.length < yearTargets.length,
-  };
 }
 
 // ── Internals: Echo (past pause user words) fetch — strict user-words-only ──
@@ -540,16 +443,13 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
     });
     if (cached) {
       log("zoomOut resolved from cache (phase 2)");
-      const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);
       let echoPast: PastReflectionWithWords | null = null;
       if (userId) echoPast = await fetchEchoReflection(svcClient, userId, context, log);
       return {
         data: {
-          onThisDay: prices.onThisDay,
-          currentPrice: prices.currentPrice,
+          ...EMPTY_ZOOM_OUT_BTC,
           echo: echoPayloadFromPast(echoPast),
           deepTime: cached.data as { title: string; body: string },
-          partial: prices.isPartial,
         },
         source: "cache",
         cacheId: cached.cacheId,
@@ -565,14 +465,11 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
       return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
     }
     const pool = await loadFallbackPool<{ title: string; body: string }>(svcClient, "zoom_out");
-    const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);
     return {
       data: {
-        onThisDay: prices.onThisDay,
-        currentPrice: prices.currentPrice,
+        ...EMPTY_ZOOM_OUT_BTC,
         echo: null,
         deepTime: pickRandom(pool),
-        partial: prices.isPartial,
       },
       source: "curated",
       cacheId: null,
@@ -583,39 +480,31 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
     return { data: null, source: "empty", cacheId: null, error: "circuit_breaker" };
   }
 
-  // ── 1. Fetch historical BTC prices with DB caching ──
-  const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);
-
-  // CoinGecko is no longer called during sessions — prices come from
-  // the refresh-btc-prices cron job via btc_price_cache.
-
-  // ── 2. Fetch past echo reflection (strict user-words-only — never AI text) ──
+  // ── 1. Fetch past echo reflection (strict user-words-only — never AI text) ──
   let echoPast: PastReflectionWithWords | null = null;
   if (userId) {
     echoPast = await fetchEchoReflection(svcClient, userId, context, log);
   }
 
-  // ── 3. Generate deep-time perspective via AI ──
+  // ── 2. Generate deep-time perspective via AI ──
   const deepTimeResult = await generateDeepTime(svcClient, {
     context,
     mood,
     recentTitles,
     zoomOutAngle,
-    currentPrice: prices.currentPrice,
-    onThisDay: prices.onThisDay,
+    currentPrice: null,
+    onThisDay: [],
     userId,
     budgetTier,
     log,
     incomingRequest,
   });
 
-  // ── 4. Build response ──
+  // ── 3. Build response (BTC anniversary rows live on Look Back, not Zoom Out) ──
   const result = {
-    onThisDay: prices.onThisDay,
-    currentPrice: prices.currentPrice,
+    ...EMPTY_ZOOM_OUT_BTC,
     echo: echoPayloadFromPast(echoPast),
     deepTime: deepTimeResult.deepTime,
-    partial: prices.isPartial,
   };
 
   if (userId && deepTimeResult.source === "live") {
