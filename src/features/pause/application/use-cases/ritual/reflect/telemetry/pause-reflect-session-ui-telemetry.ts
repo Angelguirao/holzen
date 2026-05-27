@@ -34,3 +34,50 @@ export function trackPauseReflectWallpaperTap(surface: PauseReflectTelemetrySurf
     /* no-op */
   }
 }
+
+export function trackPauseReflectBlockViewed(
+  pauseInstanceId: string | null,
+  props: { has_draft?: boolean; schema_version?: number },
+): void {
+  try {
+    trackEvent('pause_reflect_block_viewed', {
+      has_pause_id: !!pauseInstanceId,
+      has_draft: props.has_draft ?? false,
+      schema_version: props.schema_version ?? 2,
+    });
+  } catch {
+    /* no-op */
+  }
+}
+
+export function trackPauseReflectContextStripExpanded(
+  pauseInstanceId: string | null,
+  context: string | null | undefined,
+): void {
+  try {
+    const lower = (context ?? '').toLowerCase();
+    let direction = 'flat';
+    if (lower.includes('is down')) direction = 'down';
+    else if (lower.includes('is up')) direction = 'up';
+    trackEvent('pause_reflect_context_strip_expanded', {
+      has_pause_id: !!pauseInstanceId,
+      direction,
+    });
+  } catch {
+    /* no-op */
+  }
+}
+
+export function trackPauseReflectInquiryDisplayed(
+  pauseInstanceId: string | null,
+  props: { mood?: string },
+): void {
+  try {
+    trackEvent('pause_reflect_inquiry_displayed', {
+      has_pause_id: !!pauseInstanceId,
+      mood: props.mood,
+    });
+  } catch {
+    /* no-op */
+  }
+}

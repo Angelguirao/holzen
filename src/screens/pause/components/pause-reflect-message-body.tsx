@@ -1,22 +1,38 @@
+import { useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { HomePauseBlockingErrorPanel } from '@/screens/home/components/HomePauseBlockingErrorPanel';
-import { resolvePauseReflectMessageView } from '@/features/pause/public-ritual-reflect';
+import {
+  resolvePauseReflectMessageView,
+  reflectionContentFromLegacyMessage,
+} from '@/features/pause/public-ritual-reflect';
+import type { CurrentFeelForReflect, ReflectionContentV2 } from '@/features/pause/domain/reflect/generation/reflection-content-v2';
+import {
+  trackPauseReflectBlockViewed,
+  trackPauseReflectInquiryDisplayed,
+} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import { PauseReflectBlocks } from '@/screens/pause/components/pause-reflect-blocks';
 
 export type PauseReflectMessageBodyProps = {
+  pauseInstanceId: string | null;
   context: string | null;
   reflectionMessage: string;
+  reflectionContent: ReflectionContentV2 | null;
+  currentFeel?: CurrentFeelForReflect;
   reflectionLoading: boolean;
   reflectionError: string | null;
   onReflectionRetry?: () => void;
   artifactHaiku: string | null | undefined;
 };
 
-/** Reflection card main copy: context, error/loading/body, optional haiku line. */
+/** Reflection card main copy: structured blocks, error/loading, optional haiku. */
 export function PauseReflectMessageBody({
+  pauseInstanceId,
   context,
   reflectionMessage,
+  reflectionContent,
+  currentFeel,
   reflectionLoading,
   reflectionError,
   onReflectionRetry,
@@ -24,13 +40,31 @@ export function PauseReflectMessageBody({
 }: PauseReflectMessageBodyProps) {
   "use memo";
   const { t } = useTranslation();
-  const view = resolvePauseReflectMessageView({ reflectionError, reflectionLoading, reflectionMessage });
+  const view = resolvePauseReflectMessageView({
+    reflectionError,
+    reflectionLoading,
+    reflectionMessage,
+    reflectionContent,
+  });
+  const trackedRef = useRef(false);
+
+  const displayContent =
+    reflectionContent ??
+    (reflectionMessage.trim() ? reflectionContentFromLegacyMessage(reflectionMessage) : null);
+
+  useEffect(() => {
+    if (trackedRef.current || view !== 'body' || !displayContent) return;
+    trackedRef.current = true;
+    trackPauseReflectBlockViewed(pauseInstanceId, {
+      schema_version: displayContent.schemaVersion,
+    });
+    if (displayContent.inquiry.trim()) {
+      trackPauseReflectInquiryDisplayed(pauseInstanceId, { mood: currentFeel?.mood });
+    }
+  }, [view, displayContent, pauseInstanceId, currentFeel?.mood]);
 
   return (
     <div className="min-w-0 flex-1 space-y-2">
-      {context?.trim() ? (
-        <p className="text-xs font-mono uppercase tracking-wide text-muted-foreground">{context.trim()}</p>
-      ) : null}
       {view === 'error' ? (
         <HomePauseBlockingErrorPanel error={reflectionError!} onTryAgain={() => onReflectionRetry?.()} />
       ) : null}
@@ -46,8 +80,13 @@ export function PauseReflectMessageBody({
           <Skeleton className="h-4 w-5/6" />
         </div>
       ) : null}
-      {view === 'body' ? (
-        <p className="font-editorial text-base leading-relaxed text-foreground sm:text-lg">{reflectionMessage}</p>
+      {view === 'body' && displayContent ? (
+        <PauseReflectBlocks
+          pauseInstanceId={pauseInstanceId}
+          context={context}
+          content={displayContent}
+          currentFeel={currentFeel}
+        />
       ) : null}
       {artifactHaiku?.trim() ? (
         <p className="pt-1 text-sm italic leading-relaxed text-muted-foreground">{artifactHaiku.trim()}</p>

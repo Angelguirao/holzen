@@ -1,5 +1,9 @@
 import type { RefObject } from 'react';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
+import type {
+  CurrentFeelForReflect,
+  ReflectionContentV2,
+} from '@/features/pause/domain/reflect/generation/reflection-content-v2';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { PauseBreathingHandle } from '@/features/pause/presentation/session/breath/pause-breathing-handle';
@@ -56,6 +60,8 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   pauseInstanceId: string | null;
   context: string | null;
   message: string;
+  reflectionContent: ReflectionContentV2 | null;
+  currentFeel?: CurrentFeelForReflect;
   isFavorite: boolean;
   toggleFavorite: PauseSessionDeepRitualBodyProps['onToggleFavorite'];
   subscribed: boolean;
@@ -131,6 +137,8 @@ export function buildPauseSessionScaffoldRitualPayloads(
       pauseInstanceId: p.pauseInstanceId,
       context: p.context,
       reflectionMessage: p.message,
+      reflectionContent: p.reflectionContent,
+      currentFeel: p.currentFeel,
       isFavorite: p.isFavorite,
       onToggleFavorite: p.toggleFavorite,
       subscribed: p.subscribed,

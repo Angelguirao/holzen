@@ -40,6 +40,8 @@ export function PauseSessionDeepRitualBody({
   pauseInstanceId,
   context,
   reflectionMessage,
+  reflectionContent,
+  currentFeel,
   reflectionLoading,
   reflectionError,
   onReflectionRetry,
@@ -100,6 +102,8 @@ export function PauseSessionDeepRitualBody({
             pauseInstanceId={pauseInstanceId}
             context={context}
             reflectionMessage={reflectionMessage}
+            reflectionContent={reflectionContent ?? null}
+            currentFeel={currentFeel}
             reflectionLoading={reflectionLoading}
             reflectionError={reflectionError}
             onReflectionRetry={onReflectionRetry}

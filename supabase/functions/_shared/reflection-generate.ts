@@ -12,11 +12,25 @@ import {
   llmLogProvider,
   resolveModelsForTask,
 } from "./llm-gateway.ts";
+import { buildReflectionContextStripC0 } from "./reflection-context-strip-c0.ts";
+import { inquiryFallbackForMood } from "./reflection-fallback-v2.ts";
 
 /** Bump when the system prompt, tone rules, or quality gate changes. */
-export const REFLECTION_PROMPT_VERSION = "v5";
+export const REFLECTION_PROMPT_VERSION = "v6";
+
+export interface CurrentFeelInput {
+  mood: string;
+  intensity?: number;
+  tileId?: string;
+  tileLabel?: string;
+}
 
 export interface UnifiedReflectionResult {
+  schemaVersion: 2;
+  land: string;
+  hypothesis: string;
+  inquiry: string;
+  contextStrip: string;
   message: string;
   haiku: string | null;
   grounding_title: string | null;
@@ -38,6 +52,7 @@ export interface GenerateUnifiedReflectionParams {
   style?: string;
   language?: string;
   currency?: string;
+  currentFeel?: CurrentFeelInput;
   moodHistory?: MoodHistoryEntry[];
   severity?: number;
   recentHaikus?: string[];
@@ -120,11 +135,13 @@ const LANG_NAMES: Record<string, string> = {
   tr: "Turkish",
 };
 
-/** Injected into system prompt: model must return JSON with message + haiku only. */
+/** Injected into system prompt: model must return structured Reflect JSON (v6). */
 const REFLECTION_JSON_OUTPUT_INSTRUCTION =
   `You MUST respond with a JSON object only (no markdown). The object must contain exactly these keys:
-- "message": The reflection (2-4 lines max)
-- "haiku": A haiku (3 lines separated by newlines, 5-7-5 syllables)`;
+- "land": 1-2 sentences — emotional validation and lower urgency (no inquiry yet)
+- "hypothesis": 1 sentence — gentle guess about what might be underneath their feeling (use their mood/tile when provided)
+- "inquiry": Exactly one open question — what set them off / what story they are telling (no "?!" stacking)
+- "haiku": A haiku (3 lines separated by newlines, 5-7-5 syllables), or null if not appropriate`;
 
 const REFLECTION_NO_COMPANION_IN_MESSAGE = `
 - No education, philosophy, narrative, or historical reference in the reflection — those come in the intervention step.`;
@@ -257,62 +274,25 @@ function buildMessageDedup(recentMessages: string[] | undefined): string {
   return messageDedup;
 }
 
-function applyQualityGateAndHaikuTrim(
-  raw: { message?: string; haiku?: string | null },
+function gateReflectField(
+  text: string,
+  field: string,
+  maxLen: number,
   log: ((msg: string) => void) | undefined,
   logAttempt: ((e: Record<string, unknown>) => void) | undefined,
-): UnifiedReflectionResult | null {
-  if (!raw?.message) return null;
-  const msg = raw.message;
-  let qgFailed = false;
+): string | null {
+  const msg = text.trim();
+  if (!msg) return null;
   let qgReason = "";
-
-  if (containsSlop(msg)) {
-    qgFailed = true;
-    qgReason = "reflection_slop";
-  } else if (containsCryptoLanguage(msg)) {
-    qgFailed = true;
-    qgReason = "reflection_crypto_language";
-  } else if (msg.length < 20) {
-    qgFailed = true;
-    qgReason = "reflection_too_short";
-  } else if (msg.length > 500) {
-    qgFailed = true;
-    qgReason = "reflection_too_long";
-  } else if (msg.includes("!")) {
-    qgFailed = true;
-    qgReason = "reflection_exclamation";
-  } else if (/\$[\d,]+(\.\d+)?/.test(msg) || /\d+(\.\d+)?\s*BTC\b/i.test(msg)) {
-    qgFailed = true;
-    qgReason = "reflection_fabricated_price";
+  if (containsSlop(msg)) qgReason = `${field}_slop`;
+  else if (containsCryptoLanguage(msg)) qgReason = `${field}_crypto_language`;
+  else if (msg.length < (field === "inquiry" ? 12 : 15)) qgReason = `${field}_too_short`;
+  else if (msg.length > maxLen) qgReason = `${field}_too_long`;
+  else if (msg.includes("!")) qgReason = `${field}_exclamation`;
+  else if (/\$[\d,]+(\.\d+)?/.test(msg) || /\d+(\.\d+)?\s*BTC\b/i.test(msg)) {
+    qgReason = `${field}_fabricated_price`;
   }
-
-  const nonEmptyLines = msg.split("\n").filter((l) => l.trim().length > 0);
-  if (nonEmptyLines.length > 4) {
-    log?.(`reflection line count: ${nonEmptyLines.length} lines (expected ≤4) — consider tightening prompt`);
-    logAttempt?.({
-      companion_type: "reflection",
-      provider: "google",
-      model: "quality_gate",
-      status: "quality_gate_warning",
-      latency_ms: 0,
-      quality_gate_reason: "reflection_too_many_lines",
-    });
-  }
-
-  let haiku: string | null = raw.haiku || null;
-  if (haiku) {
-    const lines = haiku.split("\n").filter((l) => l.trim().length > 0);
-    if (lines.length !== 3) {
-      log?.(`haiku has ${lines.length} lines instead of 3, stripping`);
-      haiku = null;
-    } else if (lines.some((l) => l.trim().split(/\s+/).length < 2)) {
-      log?.("haiku has a line with fewer than 2 words, stripping");
-      haiku = null;
-    }
-  }
-
-  if (qgFailed) {
+  if (qgReason) {
     log?.(`reflection quality gate failed: ${qgReason}`);
     logAttempt?.({
       companion_type: "reflection",
@@ -324,15 +304,94 @@ function applyQualityGateAndHaikuTrim(
     });
     return null;
   }
+  return msg;
+}
+
+function trimHaiku(raw: string | null | undefined, log?: (msg: string) => void): string | null {
+  let haiku: string | null = raw || null;
+  if (!haiku) return null;
+  const lines = haiku.split("\n").filter((l) => l.trim().length > 0);
+  if (lines.length !== 3) {
+    log?.(`haiku has ${lines.length} lines instead of 3, stripping`);
+    return null;
+  }
+  if (lines.some((l) => l.trim().split(/\s+/).length < 2)) {
+    log?.("haiku has a line with fewer than 2 words, stripping");
+    return null;
+  }
+  return haiku;
+}
+
+function composeV2Message(land: string, hypothesis: string, inquiry: string): string {
+  return [land, hypothesis, inquiry].filter((s) => s.trim().length > 0).join("\n\n");
+}
+
+function applyQualityGateAndHaikuTrim(
+  raw: {
+    land?: string;
+    hypothesis?: string;
+    inquiry?: string;
+    message?: string;
+    haiku?: string | null;
+  },
+  opts: { context: string; severity: number; currentFeel?: CurrentFeelInput },
+  log: ((msg: string) => void) | undefined,
+  logAttempt: ((e: Record<string, unknown>) => void) | undefined,
+): UnifiedReflectionResult | null {
+  let land = (raw.land ?? raw.message ?? "").trim();
+  let hypothesis = (raw.hypothesis ?? "").trim();
+  let inquiry = (raw.inquiry ?? "").trim();
+
+  if (!land && !inquiry) return null;
+
+  if (!inquiry) {
+    inquiry = inquiryFallbackForMood(opts.currentFeel?.mood, opts.context);
+  }
+
+  const gatedLand = gateReflectField(land, "land", 320, log, logAttempt);
+  if (!gatedLand) return null;
+  land = gatedLand;
+
+  if (hypothesis) {
+    const gatedHyp = gateReflectField(hypothesis, "hypothesis", 220, log, logAttempt);
+    hypothesis = gatedHyp ?? "";
+  }
+
+  const gatedInquiry = gateReflectField(inquiry, "inquiry", 200, log, logAttempt);
+  if (!gatedInquiry) return null;
+  inquiry = gatedInquiry.endsWith("?") ? gatedInquiry : `${gatedInquiry}?`;
+
+  const message = composeV2Message(land, hypothesis, inquiry);
+  const contextStrip = buildReflectionContextStripC0(opts.context, opts.severity);
+  const haiku = trimHaiku(raw.haiku, log);
 
   return {
-    message: msg,
+    schemaVersion: 2,
+    land,
+    hypothesis,
+    inquiry,
+    contextStrip,
+    message,
     haiku,
     grounding_title: null,
     grounding_body: null,
     grounding_citation: null,
     grounding_url: null,
   };
+}
+
+function buildCurrentFeelBlock(currentFeel?: CurrentFeelInput): string {
+  if (!currentFeel?.mood) return "";
+  const lines = [`CURRENT FEEL (this pause — personalize land, hypothesis, and inquiry):`];
+  const intensity =
+    typeof currentFeel.intensity === "number" ? ` (${currentFeel.intensity}/5)` : "";
+  lines.push(`- Mood: ${currentFeel.mood}${intensity}`);
+  if (currentFeel.tileLabel?.trim()) {
+    lines.push(`- They tapped: ${currentFeel.tileLabel.trim()}`);
+  } else if (currentFeel.tileId?.trim()) {
+    lines.push(`- Feel tile: ${currentFeel.tileId.trim()}`);
+  }
+  return `\n\n${lines.join("\n")}`;
 }
 
 function buildCoreSystemPrompt(params: {
@@ -366,7 +425,12 @@ function buildCoreSystemPrompt(params: {
     haikuDedup,
   } = params;
 
-  return `${langInstruction}You generate a short reflection for someone during Bitcoin volatility — either opening a mindfulness app or receiving an alert. Your job is NOT to teach, inspire, or inform — it is to reduce urgency and validate what the user is feeling so they can think clearly.
+  return `${langInstruction}You generate the Reflect step for someone during Bitcoin volatility. Three jobs in one JSON response:
+1) LAND — calm the nervous system (validation, lower urgency).
+2) HYPOTHESIS — one gentle line about what might be underneath (not facts, not advice).
+3) INQUIRY — exactly one question so they can name what set them off or what story they are telling.
+
+Do NOT teach markets, cite news, or duplicate Frame companions (Signal/Grounding handle depth later).
 
 ${REFLECTION_JSON_OUTPUT_INSTRUCTION}
 
@@ -390,9 +454,11 @@ Do NOT name the index or its score directly. Weave the sentiment naturally into 
 
 Reflection rules:
 - Style: ${baseStyle}
-- ${toneKey === "blunt" ? "1 sentence preferred." : ""}
-- Lead with emotional validation — acknowledge what the user is feeling before anything else.
-- Reduce urgency. The goal is to slow down the impulse to act, not to provide perspective or wisdom.
+- ${toneKey === "blunt" ? "Keep land to one sentence." : ""}
+- ${baseStyle === "question" ? "Make inquiry the sharpest, most prominent line; land may be one short sentence." : ""}
+- Land: emotional validation first; reduce urgency; no inquiry in land.
+- Hypothesis: optional tone; never blame; use "might", "often", "sometimes".
+- Inquiry: one question only; no multi-part lectures.
 - Preserve agency: never say "you should". Never tell the user what to do.
 - No reassurance, excitement, trading advice, lists, or disclaimers.
 - No exclamation marks, emojis, motivational language, reward language.
@@ -431,6 +497,7 @@ export async function generateUnifiedReflection(
     tone = "stoic",
     style = "standard",
     language = "en",
+    currentFeel,
     moodHistory,
     severity: severityRaw,
     recentHaikus,
@@ -478,10 +545,13 @@ export async function generateUnifiedReflection(
   });
 
   const fullSystemPrompt = systemPromptBase + messageDedup;
+  const userContent = context + buildCurrentFeelBlock(currentFeel);
 
   return await generateWithJson({
     fullSystemPrompt,
-    context,
+    context: userContent,
+    severity,
+    currentFeel,
     log,
     logAttempt,
     incomingRequest,
@@ -492,12 +562,23 @@ export async function generateUnifiedReflection(
 async function generateWithJson(opts: {
   fullSystemPrompt: string;
   context: string;
+  severity: number;
+  currentFeel?: CurrentFeelInput;
   log?: (msg: string) => void;
   logAttempt?: (e: Record<string, unknown>) => void;
   incomingRequest?: Request;
   budgetTier?: LlmBudgetTier;
 }): Promise<GenerateUnifiedReflectionOutcome> {
-  const { fullSystemPrompt, context, log, logAttempt, incomingRequest, budgetTier = "normal" } = opts;
+  const {
+    fullSystemPrompt,
+    context,
+    severity,
+    currentFeel,
+    log,
+    logAttempt,
+    incomingRequest,
+    budgetTier = "normal",
+  } = opts;
   const aiBody = {
     messages: [
       { role: "system" as const, content: fullSystemPrompt },
@@ -509,7 +590,13 @@ async function generateWithJson(opts: {
 
   const TIMEOUTS = [12000, 8000];
   const models = resolveModelsForTask("reflect", budgetTier);
-  let parsed: { message?: string; haiku?: string | null } | null = null;
+  let parsed: {
+    land?: string;
+    hypothesis?: string;
+    inquiry?: string;
+    message?: string;
+    haiku?: string | null;
+  } | null = null;
   let lastStatus = 500;
 
   for (let i = 0; i < models.length; i++) {
@@ -583,7 +670,7 @@ async function generateWithJson(opts: {
         }
       }
 
-      if (parsed?.message) {
+      if (parsed?.land?.trim() || parsed?.message?.trim() || parsed?.inquiry?.trim()) {
         logAttempt?.({
           companion_type: "reflection",
           provider: logProvider,
@@ -601,7 +688,7 @@ async function generateWithJson(opts: {
         model,
         status: "error",
         latency_ms: Date.now() - attemptT0,
-        error_message: "missing message field",
+        error_message: "missing reflect fields",
         input_tokens: usage?.prompt_tokens,
         output_tokens: usage?.completion_tokens,
       });
@@ -628,6 +715,8 @@ async function generateWithJson(opts: {
     }
   }
 
-  const gated = parsed ? applyQualityGateAndHaikuTrim(parsed, log, logAttempt) : null;
+  const gated = parsed
+    ? applyQualityGateAndHaikuTrim(parsed, { context, severity, currentFeel }, log, logAttempt)
+    : null;
   return { result: gated, lastStatus };
 }

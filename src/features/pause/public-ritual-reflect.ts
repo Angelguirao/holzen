@@ -3,6 +3,11 @@
  * Feel-step hooks and mood constants: `public-ritual-feel.ts`.
  */
 export { resolveEffectiveReflectionCopy } from './domain/reflect/generation/resolve-effective-reflection-copy';
+export {
+  reflectionContentFromLegacyMessage,
+  type CurrentFeelForReflect,
+  type ReflectionContentV2,
+} from './domain/reflect/generation/reflection-content-v2';
 export { resolveFrameHaikuDisplayBody } from './domain/reflect/generation/resolve-frame-haiku-display-body';
 export {
   resolvePauseReflectMessageView,

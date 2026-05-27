@@ -6,6 +6,7 @@ import type { CompanionData } from '@/features/pause/domain/companion-card-types
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
+import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 
 /** Subset of `usePauseSessionProviders` passed into breath/reflect handlers. */
@@ -37,6 +38,7 @@ export type PauseSessionBreathReflectRitualSlice = {
   breathingFirstCompleted: boolean;
   breathingSecondCompleted: boolean;
   selectedMood: MoodValue | null;
+  selectedBriefFace: FeelStepTile | null;
   selectedMoodAfter: MoodValue | null;
   feelIntensity: number | null;
   shiftIntensity: number | null;

@@ -1,6 +1,10 @@
 import { buildReflectGenerationEdgeInvokeInput } from '@/features/pause/domain/reflect/generation/reflect-generation-edge-params';
-import type { ReflectGenerationProfileInput } from '@/features/pause/domain/reflect/generation/reflect-generation-edge-params';
+import type {
+  CurrentFeelForReflect,
+  ReflectGenerationProfileInput,
+} from '@/features/pause/domain/reflect/generation/reflect-generation-edge-params';
 import { isAbortLikeReflectError } from '@/features/pause/domain/reflect/generation/reflect-generation-errors';
+import { reflectionContentFromLegacyMessage } from '@/features/pause/domain/reflect/generation/reflection-content-v2';
 import type { ReflectGenerationResult } from '@/features/pause/domain/reflect/generation/reflect-generation-result';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 
@@ -11,6 +15,7 @@ export type RunReflectGenerationInput = {
   initialReflectionMessage: string;
   severityAbsPct: number;
   profile: ReflectGenerationProfileInput;
+  currentFeel?: CurrentFeelForReflect;
   signal: AbortSignal;
 };
 
@@ -24,12 +29,13 @@ export async function runReflectGeneration(
 ): Promise<ReflectGenerationResult> {
   const seed = input.initialReflectionMessage.trim();
   if (seed) {
-    return { status: 'seed', message: seed };
+    const content = reflectionContentFromLegacyMessage(seed);
+    return { status: 'seed', message: seed, content };
   }
 
-  const cached = await generator.fetchReflectionText(input.pauseInstanceId);
-  if (cached) {
-    return { status: 'cached', message: cached };
+  const cachedContent = await generator.fetchReflectionContent(input.pauseInstanceId);
+  if (cachedContent) {
+    return { status: 'cached', message: cachedContent.message, content: cachedContent };
   }
 
   try {
@@ -39,11 +45,12 @@ export async function runReflectGeneration(
       context: input.context.trim(),
       severityAbsPct: input.severityAbsPct,
       profile: input.profile,
+      currentFeel: input.currentFeel,
       signal: input.signal,
     });
     const recencyHints = await generator.loadRecencyHints();
-    const { message } = await generator.generateReflection(edgeInput, recencyHints);
-    return { status: 'generated', message };
+    const { message, content } = await generator.generateReflection(edgeInput, recencyHints);
+    return { status: 'generated', message, content };
   } catch (e: unknown) {
     if (isAbortLikeReflectError(e) || input.signal.aborted) {
       return { status: 'aborted' };

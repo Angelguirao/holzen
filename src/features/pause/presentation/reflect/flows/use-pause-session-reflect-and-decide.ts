@@ -1,4 +1,5 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
+import { buildCurrentFeelForReflect } from '@/features/pause/domain/reflect/generation/build-current-feel-for-reflect';
 import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
@@ -27,6 +28,7 @@ export function usePauseSessionReflectAndDecide({
   setPauseImpactData,
   setPhase,
   selectedMood,
+  selectedBriefFace,
   selectedMoodAfter,
   breathingFirstCompleted,
   breathingSecondCompleted,
@@ -41,8 +43,23 @@ export function usePauseSessionReflectAndDecide({
     btcData,
   });
 
+  const currentFeel = useMemo(
+    () =>
+      buildCurrentFeelForReflect({
+        mood: selectedMood,
+        intensity: feelIntensity,
+        tile: selectedBriefFace,
+        tileLabel:
+          selectedBriefFace != null
+            ? t(`pause.feelStep.tiles.${selectedBriefFace}`, { defaultValue: selectedBriefFace })
+            : null,
+      }),
+    [selectedMood, feelIntensity, selectedBriefFace, t],
+  );
+
   const {
     reflectionMessage: generatedReflectionMessage,
+    reflectionContent: generatedReflectionContent,
     loading: reflectionLoading,
     error: reflectionError,
     retry: retryReflection,
@@ -51,6 +68,7 @@ export function usePauseSessionReflectAndDecide({
     context,
     initialReflectionMessage: message,
     severityAbsPct,
+    currentFeel,
     enabled: reflectGenEnabled,
   });
 
@@ -85,6 +103,7 @@ export function usePauseSessionReflectAndDecide({
 
   return {
     effectiveReflectionMessage,
+    reflectionContent: generatedReflectionContent,
     reflectionLoading,
     reflectionError,
     retryReflection,

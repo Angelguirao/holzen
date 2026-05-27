@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { usePauseArtifactHaiku } from '@/features/pause/public-ritual-reflect';
+import type { CurrentFeelForReflect, ReflectionContentV2 } from '@/features/pause/public-ritual-reflect';
 import { PauseReflectFavoriteButton } from '@/screens/pause/components/pause-reflect-favorite-button';
 import { PauseReflectMessageBody } from '@/screens/pause/components/pause-reflect-message-body';
 import { PauseReflectPostItSection } from '@/screens/pause/components/pause-reflect-post-it-section';
@@ -8,6 +9,8 @@ export type PauseReflectCardProps = {
   pauseInstanceId: string | null;
   context: string | null;
   reflectionMessage: string;
+  reflectionContent: ReflectionContentV2 | null;
+  currentFeel?: CurrentFeelForReflect;
   reflectionLoading: boolean;
   reflectionError: string | null;
   onReflectionRetry?: () => void;
@@ -22,6 +25,8 @@ export function PauseReflectCard({
   pauseInstanceId,
   context,
   reflectionMessage,
+  reflectionContent,
+  currentFeel,
   reflectionLoading,
   reflectionError,
   onReflectionRetry,
@@ -46,8 +51,11 @@ export function PauseReflectCard({
       <div className="rounded-2xl border-2 border-primary bg-card/40 px-4 py-5 shadow-sm backdrop-blur-sm sm:px-6 sm:py-6">
         <div className="flex items-start justify-between gap-3">
           <PauseReflectMessageBody
+            pauseInstanceId={pauseInstanceId}
             context={context}
             reflectionMessage={reflectionMessage}
+            reflectionContent={reflectionContent}
+            currentFeel={currentFeel}
             reflectionLoading={reflectionLoading}
             reflectionError={reflectionError}
             onReflectionRetry={onReflectionRetry}

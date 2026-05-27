@@ -27,6 +27,9 @@
  * Flow↔I/O wrapper: `pause-reflect-telemetry-flow-io-wrapper-sibling-parity.test.ts` (application + presentation).
  */
 export {
+  trackPauseReflectBlockViewed,
+  trackPauseReflectContextStripExpanded,
+  trackPauseReflectInquiryDisplayed,
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
   trackPauseReflectWallpaperTap,

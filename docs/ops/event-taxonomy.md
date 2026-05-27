@@ -119,6 +119,9 @@ Include `pause_instance_id` on each event so journeys line up with Sentry + Bett
 | `pause_reflect_share_tap` | User opens the share menu from the Reflect step **or** the Done completion shell (after outcome). | `{ surface: 'pause_reflect' \| 'pause_done'; has_pause_id?: boolean }` | @holzen |
 | `pause_reflect_wallpaper_tap` | User starts wallpaper generation from the Reflect step **or** the Done completion shell. | `{ surface: 'pause_reflect' \| 'pause_done' }` | @holzen |
 | `pause_reflect_post_it_open` | User taps **Add your post-it** on the Reflect step (reveals note + tags). | `{ surface: 'pause_reflect'; has_pause_id: boolean }` | @holzen |
+| `pause_reflect_block_viewed` | Reflect step shows structured copy (land / name-it blocks). | `{ has_pause_id?: boolean; has_draft?: boolean; schema_version?: number }` | @holzen |
+| `pause_reflect_context_strip_expanded` | User expands **Why might markets move?** on Reflect. | `{ has_pause_id?: boolean; direction?: 'down' \| 'up' \| 'flat' }` | @holzen |
+| `pause_reflect_inquiry_displayed` | Inquiry question rendered on Reflect. | `{ has_pause_id?: boolean; mood?: string }` | @holzen |
 
 PII stance unchanged: no generated pause message text, no companion content, no mood/outcome payload values — just ids, types, and numeric metadata.
 

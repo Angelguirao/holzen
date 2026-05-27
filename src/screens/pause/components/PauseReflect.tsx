@@ -1,6 +1,10 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { usePauseReflectionStepLog } from '@/features/pause/public-ritual-reflect';
+import {
+  usePauseReflectionStepLog,
+  type CurrentFeelForReflect,
+  type ReflectionContentV2,
+} from '@/features/pause/public-ritual-reflect';
 import { pauseStepLayout } from '@/features/pause/public-session';
 import { PauseReflectCard } from '@/screens/pause/components/pause-reflect-card';
 import { PauseReflectStepNav } from '@/screens/pause/components/pause-reflect-step-nav';
@@ -9,6 +13,8 @@ interface Props {
   pauseInstanceId: string | null;
   context: string | null;
   reflectionMessage: string;
+  reflectionContent?: ReflectionContentV2 | null;
+  currentFeel?: CurrentFeelForReflect;
   reflectionLoading?: boolean;
   reflectionError?: string | null;
   onReflectionRetry?: () => void;
@@ -25,6 +31,8 @@ export function PauseReflect({
   pauseInstanceId,
   context,
   reflectionMessage,
+  reflectionContent = null,
+  currentFeel,
   reflectionLoading = false,
   reflectionError = null,
   onReflectionRetry,
@@ -58,7 +66,9 @@ export function PauseReflect({
           {t('pause.reflect.title', { defaultValue: 'Reflect' })}
         </p>
         <p className={pauseStepLayout.screenSubtitle}>
-          {t('pause.reflect.subtitle', { defaultValue: 'Take your time' })}
+          {t('pause.reflect.subtitle', {
+            defaultValue: 'Name what you feel, then one question.',
+          })}
         </p>
       </div>
 
@@ -66,6 +76,8 @@ export function PauseReflect({
         pauseInstanceId={pauseInstanceId}
         context={context}
         reflectionMessage={reflectionMessage}
+        reflectionContent={reflectionContent}
+        currentFeel={currentFeel}
         reflectionLoading={reflectionLoading}
         reflectionError={reflectionError}
         onReflectionRetry={onReflectionRetry}
@@ -79,6 +91,7 @@ export function PauseReflect({
         reflectionLoading={reflectionLoading}
         reflectionError={reflectionError}
         reflectionMessage={reflectionMessage}
+        reflectionContent={reflectionContent}
         onContinue={onContinue}
         onBack={onBack}
       />

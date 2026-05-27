@@ -1,3 +1,4 @@
+import { buildCurrentFeelForReflect } from '@/features/pause/domain/reflect/generation/build-current-feel-for-reflect';
 import { usePauseSessionScaffoldPresentation } from './use-pause-session-scaffold-presentation';
 import type {
   PauseSessionScaffoldVmChromeSlots,
@@ -61,6 +62,18 @@ export function usePauseSessionScaffoldVm(
     pauseInstanceId: shell.pauseInstanceId,
     context: shell.context,
     message: reflect.effectiveReflectionMessage,
+    reflectionContent: reflect.reflectionContent,
+    currentFeel: buildCurrentFeelForReflect({
+      mood: ritual.selectedMood,
+      intensity: ritual.feelIntensity,
+      tile: ritual.selectedBriefFace,
+      tileLabel:
+        ritual.selectedBriefFace != null
+          ? p.t(`pause.feelStep.tiles.${ritual.selectedBriefFace}`, {
+              defaultValue: ritual.selectedBriefFace,
+            })
+          : null,
+    }),
     isFavorite: ritual.isFavorite,
     toggleFavorite,
     subscribed,

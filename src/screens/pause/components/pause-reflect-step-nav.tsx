@@ -10,6 +10,7 @@ export type PauseReflectStepNavProps = {
   reflectionLoading: boolean;
   reflectionError: string | null;
   reflectionMessage: string;
+  reflectionContent?: import('@/features/pause/domain/reflect/generation/reflection-content-v2').ReflectionContentV2 | null;
   onContinue: () => void;
   onBack?: () => void;
 };
@@ -19,6 +20,7 @@ export function PauseReflectStepNav({
   reflectionLoading: _reflectionLoading,
   reflectionError,
   reflectionMessage,
+  reflectionContent,
   onContinue,
   onBack,
 }: PauseReflectStepNavProps) {
@@ -38,7 +40,11 @@ export function PauseReflectStepNav({
           variant="outline"
           className={pauseStepLayout.ritualPrimaryOutlineCta}
           onClick={onContinue}
-          disabled={isPauseReflectContinueDisabled({ reflectionError, reflectionMessage })}
+          disabled={isPauseReflectContinueDisabled({
+            reflectionError,
+            reflectionMessage,
+            reflectionContent,
+          })}
         >
           {t('pause.steps.continue', { defaultValue: 'Continue' })}
           <ChevronRight className="ml-1 h-4 w-4" aria-hidden />
