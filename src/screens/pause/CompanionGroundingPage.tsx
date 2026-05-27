@@ -46,7 +46,7 @@ export default function CompanionGroundingPage() {
 
   if (loadError) {
     return (
-      <CompanionFocusLayout title={t('companions.ground')} onBack={handleBack}>
+      <CompanionFocusLayout title={t('companions.groundTitle')} onBack={handleBack}>
         <PageMeta
           title={t('companions.fullview.grounding.meta')}
           description={t('companions.fullview.grounding.meta')}
@@ -66,7 +66,7 @@ export default function CompanionGroundingPage() {
   }
 
   return (
-    <CompanionFocusLayout title={t('companions.ground')} onBack={handleBack}>
+    <CompanionFocusLayout title={t('companions.groundTitle')} onBack={handleBack}>
       <PageMeta
         title={t('companions.fullview.grounding.meta')}
         description={t('companions.fullview.grounding.meta')}

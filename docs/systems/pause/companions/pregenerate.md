@@ -4,6 +4,8 @@
 
 It is **not** the same as a user tap or cron calling `companion-orchestrate` with multiple slots; pregenerate only **inserts pool rows** (and adjusts scores). **Haiku** is not pregenerated here.
 
+**Billing:** pregenerate is platform spend only — it does **not** debit any user’s **Companions & guidance** allowance (see [companion-metering.md](companion-metering.md)).
+
 ## Is it “working”?
 
 Yes, as an implemented and deployed path:
@@ -35,7 +37,7 @@ Yes, as an implemented and deployed path:
 
 When a user (or service job) invokes **`companion-orchestrate`**, the generators in `_shared/generators/{signal,grounding,history,zoom-out}.ts` can **read** matching rows from `companion_cache` according to [phase-config](../../../../supabase/functions/_shared/phase-config.ts). Pregenerate **feeds** that pool; it does not write to `pause_ai_artifacts` by itself.
 
-**Admin:** Companion cache table and hints about the warmer appear in the admin surface ([Admin.tsx](../../../../src/screens/admin/AdminScreen.tsx) copy references `pregenerate-companions`).
+**Admin:** Companion cache table and hints about the warmer appear in the admin surface ([AdminScreen.tsx](../../../../src/screens/admin/AdminScreen.tsx)). **Monitor → Cache hit rate by companion** (per `companion_type`, respects the period selector) is the primary ROI readout for pregenerate — higher cache % means fewer live orchestrate calls.
 
 ## Ops and cost
 

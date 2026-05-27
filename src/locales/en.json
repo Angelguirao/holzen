@@ -280,7 +280,7 @@
     "companions_other": "{{count}} companions",
     "signal": "Signal",
     "zoomOut": "Zoom out",
-    "historicalInsight": "Historical insight",
+    "historicalInsight": "Look Back",
     "echo": "Echo",
     "parallel": "parallel"
   },
@@ -516,10 +516,10 @@
     "companionLabels": {
       "breathing": "Breathing exercise",
       "haiku": "Haiku",
-      "grounding": "Grounding nudge",
+      "grounding": "Grounding",
       "signal": "Signal",
-      "zoomOut": "Zoom out",
-      "history": "Historical insight"
+      "zoomOut": "Zoom Out",
+      "history": "Look Back"
     },
     "ritualDescUpdated": "Pause sessions are guided sequences that slow you down before a financial decision.",
     "emailNotifications": "Email notifications",
@@ -682,7 +682,7 @@
       "zoomOutDesc": "Where were things 1, 3, 5 years ago?",
       "zoomOutSampleLabel": "1 year ago",
       "zoomOutSample": "BTC was $28,400 — today's price represents a 240% gain. What felt like crisis then became a buying opportunity.",
-      "history": "Historical Echo",
+      "history": "Look Back",
       "historyDesc": "Parallels from financial history",
       "historySampleLabel": "Similar moment",
       "historySample": "When gold dropped 26% in 2013, panic sellers locked in losses. Within 2 years, it consolidated and began a new ascent."
@@ -846,6 +846,10 @@
     "signal": "Read the signal →",
     "zoomOut": "Zoom out →",
     "lookBack": "Look back →",
+    "lookBackTitle": "Look Back",
+    "groundTitle": "Grounding",
+    "signalTitle": "Signal",
+    "zoomOutTitle": "Zoom Out",
     "helpfulQuestion": "Helpful?",
     "regenerate": "Regenerate",
     "regenerating": "Regenerating…",
@@ -1005,7 +1009,7 @@
       "groundingDesc": "Behavioral finance research in context",
       "zoomOut": "Zoom Out",
       "zoomOutDesc": "Deep-time perspective and your own words from past pauses",
-      "history": "Historical Echo",
+      "history": "Look Back",
       "historyDesc": "BTC on this day, historical parallels, and cross-asset analogies"
     },
     "whatYouGet": "What's included",
@@ -1013,7 +1017,7 @@
       "pause": "The Pause",
       "pauseDesc": "Science-sequenced ritual: feel, breathe, reflect, frame, breathe again, choose, then decide — triggered by real market volatility",
       "companions": "5 AI Companions",
-      "companionsDesc": "Haiku, Signal, Grounding, Zoom Out (historical BTC prices), and Historical Echo — different angles on the same pause, ready to explore or save",
+      "companionsDesc": "Haiku, Signal, Grounding, Zoom Out, and Look Back — different angles on the same pause, ready to explore or save",
       "detection": "Smart detection",
       "detectionDesc": "Separate up/down thresholds, 24h + 7-day cumulative, configurable cooldown",
       "mood": "Emotional tracking",

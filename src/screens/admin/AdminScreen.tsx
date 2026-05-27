@@ -91,7 +91,7 @@ export default function Admin() {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const { toast } = useToast();
   const {
-    cacheHits, costs, failures, feedback, cacheEntries, signalSources,
+    cacheHits, cacheHitsForPeriod, costs, failures, feedback, cacheEntries, signalSources,
     period, setPeriod, periodStats, prevPeriodStats, notificationStats,
     rejections, recentContent, sessions, libraryEntries,
     loading, error, refresh, refreshCacheEntries, refreshCompanionCacheUi, refreshRejections, lastUpdated,
@@ -516,12 +516,17 @@ export default function Admin() {
 
           {/* Cache Hit Rates */}
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Cache Hit Rates <span className="text-muted-foreground/40 normal-case">(30 days)</span></p>
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+              Cache hit rate by companion <span className="text-muted-foreground/40 normal-case">({periodLabel})</span>
+            </p>
             <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
-              One row per <code className="text-muted-foreground/55">companion_type</code> in serves. Two “Zoom” rows mean timeline zoom vs deep-time zoom are stored as different types.
+              Share of <code className="text-muted-foreground/55">companion_serves</code> served from the shared pool (
+              <code className="text-muted-foreground/55">companion_cache</code> or catalog), not live AI — primary ROI signal for{' '}
+              <code className="text-muted-foreground/55">pregenerate-companions</code>. One row per{' '}
+              <code className="text-muted-foreground/55">companion_type</code>; two Zoom rows = timeline vs deep-time.
             </p>
             <div className="space-y-1.5">
-              {cacheHits.map((row, i) => {
+              {cacheHitsForPeriod.map((row, i) => {
                 const pct = row.cache_hit_pct ?? 0;
                 const type = row.companion_type ?? 'unknown';
                 return (
@@ -534,15 +539,20 @@ export default function Admin() {
                       <div className="h-full rounded-full transition-all duration-500"
                         style={{ width: `${Math.min(pct, 100)}%`, backgroundColor: TYPE_COLORS[type] ?? 'hsl(var(--primary) / 0.4)' }} />
                     </div>
-                    <div className="flex gap-3 mt-1">
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
                       <span className="text-[9px] text-muted-foreground/50">live: {row.live_generated ?? 0}</span>
                       <span className="text-[9px] text-muted-foreground/50">cache: {row.cache_hits ?? 0}</span>
+                      {(row.library_hits ?? 0) > 0 && (
+                        <span className="text-[9px] text-muted-foreground/50">library: {row.library_hits}</span>
+                      )}
                       <span className="text-[9px] text-muted-foreground/50">curated: {row.curated_fallbacks ?? 0}</span>
                     </div>
                   </div>
                 );
               })}
-              {cacheHits.length === 0 && <p className="text-[10px] text-muted-foreground/50 text-center py-3">No serve data yet</p>}
+              {cacheHitsForPeriod.length === 0 && (
+                <p className="text-[10px] text-muted-foreground/50 text-center py-3">No serve data yet</p>
+              )}
             </div>
             <p className="text-[9px] font-mono text-muted-foreground/40 leading-relaxed">
               <span className="text-muted-foreground/50">live</span> = generated on demand. <span className="text-muted-foreground/50">cache</span> = row from <code className="text-muted-foreground/45">companion_cache</code> or a Library pick (library serves are still labeled cache in telemetry). <span className="text-muted-foreground/50">curated</span> = hardcoded fallback strings when DB pool is empty — not editable here; use <span className="text-muted-foreground/55">Library</span> + <span className="text-muted-foreground/55">Cache</span> tabs to manage DB-backed fallbacks.

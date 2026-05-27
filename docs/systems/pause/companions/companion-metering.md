@@ -40,11 +40,16 @@ Splitting into separate edge functions per companion would duplicate cron/auth/l
 
 ## Naming map (UI vs DB vs edge)
 
-| UI / settings | Client slot | `pause_ai_artifacts.kind` / cache `companion_type` |
-| --- | --- | --- |
-| Signal | `signal` | `signal` |
-| Grounding | `grounding` | `ground_nudge` |
-| Look Back / History | `history` | `historical_insight` |
-| Zoom Out | `zoomOut` | `zoom_out` / deep-time variants |
+**User-facing names** (Settings, Frame, full views): Signal, Grounding, Look Back, Zoom Out, Haiku.
 
-Older docs or code may still say “nudge”, “intervention”, or “library” — prefer the table above in new work.
+**Backend-only** (`companion_type`, artifacts, SQL, admin top-up keys) — do not surface in product copy:
+
+| Product name | Client slot | DB / cache `companion_type` | Artifact `kind` |
+| --- | --- | --- | --- |
+| Signal | `signal` | `signal` | `signal` |
+| Grounding | `grounding` | `ground_nudge` | `ground_nudge` |
+| Look Back | `history` | `historical_insight` | `historical_insight` |
+| Zoom Out | `zoomOut` | `zoom_out`, `zoom_out_deep_time` | `zoom_out`, `zoom_out_deep_time` |
+| Haiku | (reflect) | — | `haiku` |
+
+Older docs or code may still say “Historical Echo”, “nudge”, “intervention”, or “library” — use the product names in UI; keep DB identifiers in migrations, edge, and admin config only.

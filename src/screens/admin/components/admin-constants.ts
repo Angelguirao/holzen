@@ -1,7 +1,7 @@
 export const TYPE_LABELS: Record<string, string> = {
   signal: 'Signal',
   ground_nudge: 'Grounding',
-  historical_insight: 'History',
+  historical_insight: 'Look Back',
   /** Timeline / market-context zoom (distinct from deep-time variant in DB). */
   zoom_out: 'Zoom Out (timeline)',
   /** Deep-time / civilizational zoom — separate rows in analytics from timeline zoom. */
@@ -9,7 +9,7 @@ export const TYPE_LABELS: Record<string, string> = {
   reflection: 'Reflection',
   grounding: 'Grounding',
   learning: 'Grounding',
-  history_insight: 'History',
+  history_insight: 'Look Back',
   haiku: 'Haiku',
 };
 

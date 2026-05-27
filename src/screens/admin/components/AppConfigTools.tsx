@@ -31,8 +31,8 @@ const PREGENERATE_TOPUP_KEYS: PregenerateCacheTopupKey[] = [...PREGENERATE_CACHE
 const PREGENERATE_TOPUP_LABELS: Record<PregenerateCacheTopupKey, string> = {
   ground_nudge: 'Grounding',
   signal: 'Signal',
-  historical_insight: 'History',
-  zoom_out_deep_time: 'Zoom out (deep time)',
+  historical_insight: 'Look Back',
+  zoom_out_deep_time: 'Zoom Out (deep time)',
 };
 
 export function AppConfigTools() {
@@ -304,6 +304,7 @@ export function AppConfigTools() {
         </p>
         <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
           Targets for the scheduled <code className="text-muted-foreground/55">pregenerate-companions</code> job.
+          Warms the shared <code className="text-muted-foreground/55">companion_cache</code> pool (reused across users) — it does not use anyone&apos;s Companions &amp; guidance allowance.
           Each type: minimum &quot;healthy&quot; rows (quality ≥ 2, not expired) before the cron skips generation;
           max rows to add per run caps API spend. Picked up by edge within ~30s. Set max to 0 to disable top-up for that type.
         </p>
