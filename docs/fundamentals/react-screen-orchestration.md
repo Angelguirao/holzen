@@ -383,7 +383,7 @@ const Home = () => {
   });
 ```
 
-**What to notice:** [`useHomePauseActions`](../../src/screens/home/hooks/use-home-pause-actions.ts) returns **stable callbacks** used by Zen, the pause card, etc. `pauseProjection` (next step) **consumes** those callbacks — order in the file follows **data flow** (define actions, then pass them into UI projection).
+**What to notice:** [`useHomePauseActions`](../../src/features/pause/presentation/home/use-home-pause-actions.ts) returns **stable callbacks** for the pause widget (Zen legacy may still import from `public-home`). `pauseProjection` (next step) **consumes** those callbacks — order in the file follows **data flow** (define actions, then pass them into UI projection).
 
 ---
 
