@@ -97,6 +97,7 @@ export type UseHomePauseWidgetProjectionParams = {
   trackedAssetId: string;
   newPauseArrival: boolean;
   profileLastTriggerAt: string | null;
+  hasOpenPauseStepEvents: boolean;
 };
 
 function readExpandedPreference(): boolean | null {
@@ -142,17 +143,10 @@ export function useHomePauseWidgetProjection(
     refetchOnWindowFocus: false,
   });
 
-  const postPauseAutoCooldownRemainingMs = useMemo(() => {
-    if (params.hasOpenPause) {
-      return params.autoCooldownRemaining();
-    }
-    return computeAutoCooldownRemainingMs(params.profileLastTriggerAt, params.cooldownHours);
-  }, [
-    params.hasOpenPause,
-    params.autoCooldownRemaining,
-    params.profileLastTriggerAt,
-    params.cooldownHours,
-  ]);
+  const postPauseAutoCooldownRemainingMs = useMemo(
+    () => computeAutoCooldownRemainingMs(params.profileLastTriggerAt, params.cooldownHours),
+    [params.profileLastTriggerAt, params.cooldownHours],
+  );
 
   const showCalmWaters = Boolean(
     !params.hasOpenPause &&
@@ -182,6 +176,7 @@ export function useHomePauseWidgetProjection(
         hasPendingOffer: Boolean(pending),
         postPauseAutoCooldownRemainingMs,
         completedPauseCount: params.completedPauseCount ?? 0,
+        hasOpenPauseStepEvents: params.hasOpenPauseStepEvents,
         userExpanded,
       }),
     [
@@ -196,6 +191,7 @@ export function useHomePauseWidgetProjection(
       pending,
       postPauseAutoCooldownRemainingMs,
       params.completedPauseCount,
+      params.hasOpenPauseStepEvents,
       userExpanded,
     ],
   );
@@ -263,7 +259,7 @@ export function useHomePauseWidgetProjection(
     typeof pendingSnapshot?.context_text === 'string' ? pendingSnapshot.context_text : null;
 
   const pendingPreviewLine =
-    pending && (widgetMode === 'C_prime' || widgetMode === 'B')
+    pending && (widgetMode === 'C_prime' || widgetMode === 'B' || widgetMode === 'E')
       ? resolveHomePauseWidgetPreviewLine({
           hasReflectionStep: false,
           reflectionMessage: pending.preview_message,
@@ -274,7 +270,7 @@ export function useHomePauseWidgetProjection(
       : null;
 
   const pendingMarketBlock =
-    pending && (widgetMode === 'C_prime' || widgetMode === 'B')
+    pending && (widgetMode === 'C_prime' || widgetMode === 'B' || widgetMode === 'E')
       ? formatHomePauseMarketBlock({
           contextText: pendingContextText,
           btcData: params.btcData,
@@ -283,7 +279,8 @@ export function useHomePauseWidgetProjection(
         })
       : null;
 
-  const showPendingQueuedBanner = widgetMode === 'B' && Boolean(pending);
+  const showPendingQueuedBanner =
+    (widgetMode === 'B' || widgetMode === 'E') && Boolean(pending);
 
   const body: HomePauseWidgetBodyProjection = {
     widgetMode,

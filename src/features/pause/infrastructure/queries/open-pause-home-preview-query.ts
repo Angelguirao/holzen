@@ -13,20 +13,28 @@ export type OpenPauseHomePreview = {
   contextSnapshot: Record<string, unknown> | null;
   reflectionMessage: string | null;
   hasReflectionStep: boolean;
+  hasOpenPauseStepEvents: boolean;
   hasReachedReflect: boolean;
   isBriefRitual: boolean;
   companions: CompanionData;
 };
 
-async function fetchHasReflectionStep(pauseInstanceId: string): Promise<boolean> {
-  const { count, error } = await supabase
+async function fetchPauseStepEventCount(
+  pauseInstanceId: string,
+  stepType?: string,
+): Promise<number> {
+  let query = supabase
     .from('pause_step_events' as never)
     .select('id', { count: 'exact', head: true })
-    .eq('pause_instance_id', pauseInstanceId)
-    .eq('step_type', 'reflection_step');
+    .eq('pause_instance_id', pauseInstanceId);
 
-  if (error) return false;
-  return (count ?? 0) > 0;
+  if (stepType) {
+    query = query.eq('step_type', stepType);
+  }
+
+  const { count, error } = await query;
+  if (error) return 0;
+  return count ?? 0;
 }
 
 /**
@@ -68,13 +76,17 @@ export async function fetchOpenPauseHomePreview(userId: string): Promise<OpenPau
   );
   const assetSymbol = trackedAssetSymbol(assetId);
 
-  const [{ data: artifacts }, hasReflectionStep] = await Promise.all([
+  const [{ data: artifacts }, reflectionStepCount, stepEventCount] = await Promise.all([
     supabase
       .from('pause_ai_artifacts' as never)
       .select('kind, content')
       .eq('pause_instance_id', row.id),
-    fetchHasReflectionStep(row.id),
+    fetchPauseStepEventCount(row.id, 'reflection_step'),
+    fetchPauseStepEventCount(row.id),
   ]);
+
+  const hasReflectionStep = reflectionStepCount > 0;
+  const hasOpenPauseStepEvents = stepEventCount > 0;
 
   const artifactRows = (artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>;
   const reflectionMessage = reflectionTextMessageFromArtifactRows(artifactRows);
@@ -92,6 +104,7 @@ export async function fetchOpenPauseHomePreview(userId: string): Promise<OpenPau
     contextSnapshot,
     reflectionMessage,
     hasReflectionStep,
+    hasOpenPauseStepEvents,
     hasReachedReflect,
     isBriefRitual: row.is_brief_ritual === true,
     companions: companionDataFromArtifacts(artifactRows),

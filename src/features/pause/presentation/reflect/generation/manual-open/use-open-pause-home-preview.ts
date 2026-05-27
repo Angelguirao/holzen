@@ -23,6 +23,7 @@ export function useOpenPauseHomePreview(user: User | null) {
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
   const [contextSnapshot, setContextSnapshot] = useState<Record<string, unknown> | null>(null);
   const [hasReflectionStep, setHasReflectionStep] = useState(false);
+  const [hasOpenPauseStepEvents, setHasOpenPauseStepEvents] = useState(false);
   const [hasReachedReflect, setHasReachedReflect] = useState(false);
   const [isBriefRitual, setIsBriefRitual] = useState(false);
   const [openPauseCreatedAt, setOpenPauseCreatedAt] = useState<string | null>(null);
@@ -36,6 +37,7 @@ export function useOpenPauseHomePreview(user: User | null) {
     setCompanions(DEFAULT_COMPANIONS);
     setContextSnapshot(null);
     setHasReflectionStep(false);
+    setHasOpenPauseStepEvents(false);
     setHasReachedReflect(false);
     setIsBriefRitual(false);
     setOpenPauseCreatedAt(null);
@@ -67,6 +69,7 @@ export function useOpenPauseHomePreview(user: User | null) {
       setContextSnapshot(preview.contextSnapshot);
       setMessage(preview.reflectionMessage);
       setHasReflectionStep(preview.hasReflectionStep);
+      setHasOpenPauseStepEvents(preview.hasOpenPauseStepEvents);
       setHasReachedReflect(preview.hasReachedReflect);
       setIsBriefRitual(preview.isBriefRitual);
       setCompanions(preview.companions);
@@ -107,6 +110,7 @@ export function useOpenPauseHomePreview(user: User | null) {
     lastTriggerAt,
     contextSnapshot,
     hasReflectionStep,
+    hasOpenPauseStepEvents,
     hasReachedReflect,
     isBriefRitual,
     openPauseCreatedAt,
