@@ -26,7 +26,7 @@ type CompanionNudgePayload = {
   citation: string;
   url: string;
 } | null;
-import { LearningInput } from '@/screens/pause/components/LearningInput';
+import { GroundingDisplay } from '@/screens/pause/components/GroundingDisplay';
 import { SignalDisplay } from '@/screens/pause/components/SignalDisplay';
 import { ZoomOutDisplay } from '@/screens/pause/components/ZoomOutDisplay';
 import { HistoricalInsightDisplay } from '@/screens/pause/components/HistoricalInsightDisplay';
@@ -202,16 +202,18 @@ export function CompanionSectionOrchestratedSlots({
           routeSegment="grounding"
           appearance={appearance}
           iconHelp={iconHelps?.grounding}
-          showFullViewButton
+          showFullViewButton={frameAppearance ? false : showFullViewButton}
           {...proFavorite('grounding')}
         >
-          <LearningInput
+          <GroundingDisplay
             title={companions.groundingTitle ?? ''}
             body={companions.groundingBody ?? ''}
             nudge={nudge}
             nudgeLoading={nudgeLoading}
             nudgeError={nudgeError}
             onRetry={retryNudge}
+            variant={frameAppearance ? 'frame' : 'default'}
+            pauseInstanceId={pauseInstanceId}
           />
         </CompanionOrchestratedCard>
       ) : null,
