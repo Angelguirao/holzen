@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { PAUSE_FEATURED_INTERVENTION_ENABLED } from '@/features/pause/domain/pause-featured-intervention';
 import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
 import { fetchParsedPauseArtifactCache } from '@/features/pause/public-queries';
 import {
@@ -38,6 +39,7 @@ export function useCompanionInterventionFetch({
   setCacheRelaxations,
 }: UseCompanionInterventionFetchParams) {
   useEffect(() => {
+    if (!PAUSE_FEATURED_INTERVENTION_ENABLED) return;
     if (!pauseInstanceId) return;
 
     const key = `${pauseInstanceId}:${retryCount}`;

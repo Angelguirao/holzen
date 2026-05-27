@@ -1,11 +1,14 @@
 # Intervention (end-to-end)
 
-> **Pause V2:** This doc reflects the current model. Interventions are stored
-> in `pause_ai_artifacts` (kind `intervention`) keyed by `pause_instance_id`.
-> Legacy `reflections` / `reflection_companions` storage was removed.
+> **Pause-first shipped UI (2026):** The **featured intervention headline is not rendered**
+> (`InterventionSection` removed). The SPA does **not** call intervention-only orchestrate
+> (`PAUSE_FEATURED_INTERVENTION_ENABLED = false`). Edge `selectIntervention` remains for
+> `useIntervention: true` callers. Re-enable: [src/legacy/pause-featured-intervention/README.md](../../../src/legacy/pause-featured-intervention/README.md).
 
+> **Pause V2 storage:** Interventions are stored in `pause_ai_artifacts` (kind `intervention`)
+> keyed by `pause_instance_id`. Legacy `reflections` / `reflection_companions` was removed.
 
-The **intervention** is the featured cognitive headline at the top of the pause UI. It is **not** a companion card — it is a separate concept that sits above the companion card grid.
+The **intervention** is the featured cognitive headline at the top of the pause UI (when enabled). It is **not** a companion card — it is a separate concept that sits above the companion card grid.
 
 This page is the **intervention-level** view. For the full **orchestrator** contract, **companion cards**, **cost limits**, and the **end-to-end pipeline**, see the system doc: **[AI-powered pause system](../ai-powered-pause-system.md)** (especially **§5** `companion-orchestrate`, **§5.2** intervention selection, **§7** per-type reference).
 

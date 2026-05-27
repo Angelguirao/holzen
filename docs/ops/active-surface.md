@@ -62,6 +62,16 @@ Holzen **pauses** and rewards **completed rituals** (Journey streak + count). It
 
 Server: `user_can_engage_pause(uuid)`; guards on `pause_create_or_reuse` and `pause_log_step`. Sync: `check-subscription`, `stripe-webhook`, `ensure-trial-subscription`.
 
+## Pause companions — shipped vs dormant
+
+| Surface | Shipped | Notes |
+| --- | --- | --- |
+| **Reflect** (`holzen-reflect`) | Yes | Integrated prose v7 |
+| **Frame hub** (`PauseFrame`) | Yes | Links to `/companion/*` full views |
+| **Lazy companion slots** | Yes | `browser_lazy_fetch` on tap |
+| **Featured intervention headline** | **No** | `InterventionSection` stripped; client flag `PAUSE_FEATURED_INTERVENTION_ENABLED` — see [pause-featured-intervention README](../../src/legacy/pause-featured-intervention/README.md) |
+| **Intervention-only orchestrate on mount** | **No** | Was `browser_pause_intervention`; edge default `useIntervention` is now `false` |
+
 ## Deployed edges (shipped)
 
 Listed in `supabase/config.toml` `[functions.*]` and `src/screens/ops/EdgeCoverageScreen.tsx` `COVERAGE` (also [bruno/active/functions-catalog.md](../../bruno/active/functions-catalog.md)):
