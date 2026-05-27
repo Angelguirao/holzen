@@ -289,6 +289,8 @@ These exist in hosted Edge Functions without you creating matching secrets manua
 | `LLM_PROVIDER_ORDER` | Provider try order for `llm-gateway` | Manual | Default `openrouter`. Set `google,openrouter` only if you also use direct Gemini. |
 | `OPENROUTER_HTTP_REFERER` | OpenRouter attribution header | Manual value | Optional. |
 | `OPENROUTER_APP_TITLE` | OpenRouter attribution title | Manual value | Optional; defaults to `Holzen`. |
+| `GOOGLE_AI_API_KEY` | Direct Gemini (`google` in `LLM_PROVIDER_ORDER` only) | Google AI Studio | **Remove from Edge secrets** when OpenRouter-only. Code still reads it if order includes `google`. |
+| `GEMINI_API_KEY` | Alias for `GOOGLE_AI_API_KEY` in `llm-gateway.ts` | Same as Google key | Same; not used on default OpenRouter-only deploys. |
 | `PERPLEXITY_API_KEY` | Companion generation and feed ingest | Perplexity dashboard | Optional but recommended for the current AI stack. |
 | `COMPANION_PHASE_CATALOG` | Enable catalog phase | Manual flag (`1`/`0`) | Default on. |
 | `COMPANION_PHASE_CACHE` | Enable cache phase | Manual flag (`1`/`0`) | Default on. |
