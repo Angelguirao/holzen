@@ -1,4 +1,6 @@
+import { useMemo } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
+import { mergeHistoryBtcOverlay } from '@/features/pause/application/use-cases/ritual/frame/historical-insight-payload';
 import { useTranslation } from 'react-i18next';
 import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useProfile } from '@/features/user/public-hooks';
@@ -31,6 +33,7 @@ export default function CompanionHistoryPage() {
       historyLoading,
       historyError,
       retryHistory,
+      zoomOut,
       cacheIds,
       cacheRelaxations,
       regenerateCompanion,
@@ -41,6 +44,11 @@ export default function CompanionHistoryPage() {
     companionPrefs,
     severity,
   });
+
+  const historyDisplay = useMemo(
+    () => mergeHistoryBtcOverlay(historyInsight, zoomOut),
+    [historyInsight, zoomOut],
+  );
 
   if (missingRouteId) return <Navigate to="/" replace />;
 
@@ -73,13 +81,13 @@ export default function CompanionHistoryPage() {
         noindex
       />
       <div className="space-y-6">
-        {historyInsight && (
+        {historyDisplay && (
           <div className="flex items-center gap-2 flex-wrap">
             <ReadTime
               chars={
-                (historyInsight.title?.length ?? 0) +
-                (historyInsight.btcInsight?.length ?? 0) +
-                (historyInsight.analogy?.length ?? 0)
+                (historyDisplay.title?.length ?? 0) +
+                (historyDisplay.btcInsight?.length ?? 0) +
+                (historyDisplay.analogy?.length ?? 0)
               }
             />
             <WhyThisCard companion="history" mood={mood} className="ml-auto" />
@@ -87,17 +95,17 @@ export default function CompanionHistoryPage() {
         )}
 
         <HistoricalInsightDisplay
-          data={historyInsight}
+          data={historyDisplay}
           loading={historyLoading}
           error={historyError}
           onRetry={retryHistory}
         />
-        {historyInsight && cacheRelaxations.history && (
+        {historyDisplay && cacheRelaxations.history && (
           <p className="text-[10px] text-muted-foreground/55 font-mono leading-snug" role="status">
             {t(`companions.cacheRelaxation.${cacheRelaxations.history}`)}
           </p>
         )}
-        {historyInsight && revealed && (
+        {historyDisplay && revealed && (
           <div className="space-y-4 border-t border-border/20 pt-5 animate-in fade-in duration-500">
             <CompanionFeedback
               pauseInstanceId={pauseInstanceId}

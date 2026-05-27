@@ -5,7 +5,7 @@
 > legacy `reflection_companions` storage was removed in the V2 cutover.
 
 
-**History** (UI label: **Look Back**) is the pause **card** that surfaces a **historical insight**: a past event from Bitcoin or traditional finance that mirrors the current market situation, with a cross-asset analogy to provide perspective.
+**History** (UI label: **Look Back**) is the pause **card** for **market context + historical mirror**: **BTC on this day** price rows (from `btc_price_cache`), a researched **historical insight** for the current move, and a cross-asset analogy. Zoom Out keeps deep-time + echo waypoint only — see [zoom-out.md](zoom-out.md).
 
 This page is the **companion-level** view. For **manual vs automatic pause**, **interventions**, **cost limits**, and the full **orchestrator** contract, see the system doc: **[AI-powered pause system](../ai-powered-pause-system.md)** (especially **§5** `companion-orchestrate`, **§6** generators, **§7.10** History reference table).
 

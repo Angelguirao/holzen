@@ -5,7 +5,7 @@
 > Legacy reflection tables were removed.
 
 
-**Zoom Out** is the pause **card** that provides **temporal perspective**: historical BTC prices on this day in past years, an optional echo from the user's own past pauses, and a **deep-time** narrative that places the current moment against geological, civilizational, or technological timescales.
+**Zoom Out** is the pause **card** that provides **temporal perspective**: a **deep-time** narrative (geological, civilizational, or technological timescales) plus an optional **echo / waypoint** from the user's own past pauses. **BTC on-this-day prices** belong on **Look Back** (History), not in the inline Zoom Out slot — see [history.md](history.md).
 
 This page is the **companion-level** view. For **manual vs automatic pause**, **interventions**, **cost limits**, and the full **orchestrator** contract, see the system doc: **[AI-powered pause system](../ai-powered-pause-system.md)** (especially **§5** `companion-orchestrate`, **§6** generators, **§7.9** Zoom Out reference table).
 
@@ -101,9 +101,9 @@ Unlike other generators that return a single card, Zoom Out assembles a **compos
 
 ```
 {
-  onThisDay: [{ year, price, change }],  // 1–10 years of "on this day" prices (see btc-on-this-day-config)
-  currentPrice: number,                   // today's BTC price from cache
-  echo: {                                // past pause with user words (null if none)
+  onThisDay: [{ year, price, change }],  // still returned on the wire for Look Back enrichment / legacy merge
+  currentPrice: number,                   // today's BTC price from cache (UI: Look Back only)
+  echo: {                                // past pause with user words (null if none) — "waypoint" in Frame wireframes
     id, created_at, mood, outcome, context,
     aiPrompt,                             // reflection_text artifact (AI-generated; shown as context only)
     userWords: [{ kind: "note"|"replay", body, created_at }],

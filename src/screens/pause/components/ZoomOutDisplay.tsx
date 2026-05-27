@@ -3,15 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { useProfile } from '@/features/user/public-hooks';
-import { formatBtcPrice } from '@/features/market/public';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import type { ZoomOutData } from '@/features/pause/public-ritual-frame';
 import { companionHistoryPath } from '@/lib/app-routes';
 import { CompanionError } from '@/screens/pause/components/CompanionError';
 import { ZoomOutDeepTime } from '@/screens/pause/components/zoom-out-deep-time';
 import { ZoomOutEchoPanel } from '@/screens/pause/components/zoom-out-echo-panel';
-import { ZoomOutOnThisDay } from '@/screens/pause/components/zoom-out-on-this-day';
 
 export type { EchoUserWord, ZoomOutData, ZoomOutEchoData } from '@/features/pause/public-ritual-frame';
 
@@ -28,8 +25,6 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
   const { subscribed, startCheckout } = useSubscription();
-  const { currency } = useProfile();
-  const fmtPrice = (n: number) => formatBtcPrice(n, currency);
 
   const goToReplay = useCallback(() => {
     const echoId = data?.echo?.id;
@@ -64,33 +59,22 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
   }
   if (!data) return null;
 
-  const { onThisDay, currentPrice, echo, deepTime } = data;
-  const hasPrices = currentPrice && onThisDay.length > 0;
+  const { echo, deepTime } = data;
   const hasEcho = !!echo && (echo.userWords?.length ?? 0) > 0;
   const hasContent = !!deepTime || hasEcho;
-  const isEmpty = !hasPrices && !hasContent;
+  const isEmpty = !hasContent;
 
   return (
     <div className="space-y-4">
       {isEmpty ? (
         <div className="rounded-lg border border-border/30 bg-muted/20 px-4 py-3.5 space-y-1.5">
           <p className="text-xs font-mono text-muted-foreground/70 leading-relaxed">
-            Perspective takes time to build.
+            {t('pause.frame.zoomOutContent.emptyTitle')}
           </p>
           <p className="text-[10px] text-muted-foreground/40 leading-relaxed">
-            The more you pause and add notes, the richer your zoom-out view becomes. Historical price data and your
-            own words from past pauses will appear here over time.
+            {t('pause.frame.zoomOutContent.emptyBody')}
           </p>
         </div>
-      ) : null}
-
-      {hasPrices && currentPrice ? (
-        <ZoomOutOnThisDay
-          currentPrice={currentPrice}
-          onThisDay={onThisDay}
-          partial={data.partial}
-          formatPrice={fmtPrice}
-        />
       ) : null}
 
       {deepTime ? <ZoomOutDeepTime deepTime={deepTime} /> : null}
