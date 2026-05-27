@@ -38,9 +38,9 @@ negotiated rate differs.
 > If the generators ever pass `search_context_size: "medium" | "high"`, override
 > via `PERPLEXITY_REQUEST_FEE_USD_JSON`.
 
-### 1.2 Google Gemini (direct + OpenRouter failover)
+### 1.2 LLM via OpenRouter (Gemini slugs)
 
-Primary path: **`OPENROUTER_API_KEY`** → [OpenRouter](https://openrouter.ai/docs/pricing) with model ids such as `google/gemini-2.5-flash`. Optional direct Google only when **`LLM_PROVIDER_ORDER`** includes `google`.
+Primary path: **`OPENROUTER_API_KEY`** → [OpenRouter](https://openrouter.ai/docs/pricing) with explicit model ids such as `google/gemini-2.5-flash` (see `TASK_MODEL_CASCADE` in `llm-gateway.ts`). Optional direct Google only when **`LLM_PROVIDER_ORDER`** includes `google`.
 
 Legacy Tier B edges under `supabase/functions/legacy/` use **`llm-gateway.ts`** (Google → OpenRouter) and **`transactional-email.ts`** (Resend). They no longer require `LOVABLE_API_KEY`.
 
@@ -416,17 +416,18 @@ Each $150 top-up buys ~750 Sonar Pro calls at the current midpoint. The
 $1,200 cap keeps provider billing aligned with the new engineering monthly cap,
 while still limiting blast radius during abnormal traffic.
 
-### 8.2 Google AI (Google AI Studio / Cloud billing)
+### 8.2 OpenRouter (primary LLM billing)
 
-Set billing alerts and budget caps in Google Cloud / AI Studio for the project tied to **`GOOGLE_AI_API_KEY`**. If significant traffic fails over to OpenRouter, mirror caps on the OpenRouter dashboard too.
+Set spend limits and alerts on the [OpenRouter dashboard](https://openrouter.ai/) for the key in **`OPENROUTER_API_KEY`**. Engineering caps in `app_config` should trip before provider limits in normal operation.
 
 | Setting | Suggested starting point |
 | --- | --- |
-| Monthly budget alert | **$600** (adjust to ~2× expected Gemini burn) |
-| Hard cap / disable | Per your risk tolerance — engineering caps in `app_config` should trip first |
+| Monthly budget alert | **$600** (adjust to ~2× expected LLM burn) |
+| Hard cap / disable | Per your risk tolerance |
 
-Gemini spend is dominated by cheap flash tokens; wallpaper images
-are the outlier.
+If you still run **`LLM_PROVIDER_ORDER=google,openrouter`**, also set Google Cloud / AI Studio alerts on **`GOOGLE_AI_API_KEY`**.
+
+Gemini spend is dominated by cheap flash tokens; wallpaper images are the outlier.
 
 ### 8.3 What **not** to enable
 

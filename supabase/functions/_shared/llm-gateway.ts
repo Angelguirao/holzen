@@ -1,7 +1,13 @@
 /**
- * LLM gateway — task-aware model selection with provider cascade.
- * Order: `LLM_PROVIDER_ORDER` (default `openrouter` only). Set `google,openrouter` only if you use direct Gemini billing.
- * Failover: retryable HTTP statuses on one provider try the next credential in the chain (includes 402 billing).
+ * LLM gateway — OpenRouter-first, explicit model slugs per task (not `openrouter/auto`).
+ *
+ * Routing lanes (see docs/ops/llm-openrouter.md):
+ * - **Critical (JSON):** `reflect` — fixed cascade; parse failures retry next slug.
+ * - **Medium:** `structure`, `intervention`, `enrich` — tiered flash / flash-lite.
+ * - **Low:** `cron_digest` — always flash-lite; `image` — image model only.
+ *
+ * Provider order: `LLM_PROVIDER_ORDER` (default `openrouter`). Add `google` only for direct Gemini billing.
+ * Failover: retryable HTTP statuses try the next provider credential (includes 402 billing).
  */
 import { fetchInitWithIncomingTrace } from "./forward-trace-headers.ts";
 import type { LlmBudgetTier } from "./llm-budget.ts";
@@ -44,6 +50,7 @@ const GOOGLE_MODEL_MAP: Record<string, string> = {
   "google/gemini-2.5-flash-image": "gemini-2.0-flash-preview-image-generation",
 };
 
+/** Explicit OpenRouter slugs — never `openrouter/auto` (Reflect JSON + cost predictability). */
 const TASK_MODEL_CASCADE: Record<LlmTask, Record<LlmBudgetTier, readonly string[]>> = {
   reflect: {
     normal: ["google/gemini-3-flash-preview", "google/gemini-2.5-flash"],
@@ -107,14 +114,14 @@ function readLlmProviderOrderFromEnv(): LlmGatewayProvider[] {
 }
 
 /**
- * When the Google circuit breaker is open, skip curated fallback only if OpenRouter
- * is configured — live generation can still run on the failover provider.
+ * When the Gemini-family circuit breaker is open (`circuit-breaker` bucket `google`),
+ * skip curated fallback only if OpenRouter is configured — live gen can still run.
  */
 export function shouldUseCuratedFallbackForGoogleDegradation(
-  googleDegraded: boolean,
+  geminiCircuitOpen: boolean,
   chain: readonly LlmCredentials[],
 ): boolean {
-  if (!googleDegraded) return false;
+  if (!geminiCircuitOpen) return false;
   return !chain.some((c) => c.provider === "openrouter");
 }
 
