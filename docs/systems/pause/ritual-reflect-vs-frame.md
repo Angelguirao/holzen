@@ -109,8 +109,8 @@ The user has already had an internal beat on Reflect. Frame answers: **“Do I s
 |-----------|-----------|-----------------|
 | **Signal** | Cited reappraisal / “why markets move” | Perplexity + URLs; long read; user-initiated |
 | **Grounding** | Bias / science nudge with enrichment | Same; overlaps with “teach” boundary |
-| **History** | Past-self / historical insight | Narrative depth; optional |
-| **Zoom out** | Long-horizon / cosmic framing | Optional perspective layer |
+| **History** (Look back) | Past-era mirror + **BTC on this day** + cross-asset analogy | Market context + narrative depth; optional |
+| **Zoom out** | **Deep time** + echo waypoint from past pauses | Optional perspective layer; no BTC price table in inline card |
 
 **Shipped behavior:** Content generates **on tap** (`companion-orchestrate`, lazy fetch). Nothing runs at mount — Frame stays cheap and skippable.
 
@@ -136,8 +136,8 @@ The old **headline intervention** (mirror / trap / pattern / question at top of 
 | Non-cited context strip (“often people think…”) | Yes (collapsed) | No |
 | Cited market narrative | No | Signal |
 | Bias / research deep dive | No | Grounding |
-| Past-self story | No | History |
-| Long-horizon zoom-out copy | No | Zoom out |
+| Past-self story + BTC on-this-day prices | No | History (Look back) |
+| Long-horizon zoom-out copy + echo waypoint | No | Zoom out |
 
 The only “companion-like” material that belongs in Reflect is the **idea** of grounding — a **single question or hypothesis**, not the Grounding companion UI.
 
