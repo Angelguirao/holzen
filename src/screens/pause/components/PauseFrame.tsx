@@ -11,6 +11,8 @@ import {
 } from '@/features/pause/public-ritual-reflect';
 import {
   getCompanionSectionVisibility,
+  useCompanionData,
+  useCompanionSectionExpansion,
   type CompanionData,
   type CompanionPrefs,
 } from '@/features/pause/public-ritual-frame';
@@ -18,6 +20,7 @@ import { pauseStepLayout } from '@/features/pause/public-session';
 import { hapticFeedback } from '@/lib/haptics';
 import { COMPANION_SECTION_ICONS } from '@/screens/pause/components/companion/companion-section-icons';
 import { PauseFrameHaikuCard } from '@/screens/pause/components/pause-frame-haiku-card';
+import { PauseFrameSignalCard } from '@/screens/pause/components/pause-frame-signal-card';
 import { PauseFrameToolRow } from '@/screens/pause/components/pause-frame-tool-row';
 
 export interface PauseFrameProps {
@@ -82,7 +85,42 @@ export function PauseFrame({
     [companionPrefs, companions, pauseInstanceId],
   );
 
-  const SignalIcon = COMPANION_SECTION_ICONS.signal;
+  const {
+    signal,
+    signalLoading,
+    signalError,
+    retrySignal,
+    cacheIds,
+    cacheRelaxations,
+    regenerateCompanion,
+    canAccessCompanion,
+    fetchCompanion,
+    completion,
+    markCompleted,
+  } = useCompanionData({
+    companions,
+    prefs: companionPrefs,
+    pauseInstanceId,
+  });
+
+  const { expandedSignal, toggleSignal } = useCompanionSectionExpansion({
+    signal,
+    signalLoading,
+    signalError,
+    nudge: null,
+    nudgeLoading: false,
+    nudgeError: false,
+    zoomOut: null,
+    zoomOutLoading: false,
+    zoomOutError: false,
+    historyInsight: null,
+    historyLoading: false,
+    historyError: false,
+    fetchCompanion,
+    canAccessCompanion,
+    exclusiveExpand: true,
+  });
+
   const GroundingIcon = COMPANION_SECTION_ICONS.grounding;
   const ZoomOutIcon = COMPANION_SECTION_ICONS.zoomOut;
   const HistoryIcon = COMPANION_SECTION_ICONS.history;
@@ -124,11 +162,20 @@ export function PauseFrame({
         ) : null}
 
         {hasSignal ? (
-          <PauseFrameToolRow
-            icon={<SignalIcon className="h-5 w-5 text-primary" aria-hidden />}
+          <PauseFrameSignalCard
             label={t('pause.frame.signal', { defaultValue: 'Signal' })}
-            href={companionFullViewHref(pauseInstanceId, 'signal')}
-            iconHelp={t('pause.frame.companions.signalHelp')}
+            expanded={expandedSignal}
+            onToggleExpand={toggleSignal}
+            completed={Boolean(completion.signal)}
+            onFirstExpandComplete={() => markCompleted('signal')}
+            pauseInstanceId={pauseInstanceId}
+            signal={signal}
+            signalLoading={signalLoading}
+            signalError={signalError}
+            retrySignal={retrySignal}
+            cacheId={cacheIds.signal}
+            relaxationKey={cacheRelaxations.signal}
+            regenerateCompanion={regenerateCompanion}
           />
         ) : null}
 

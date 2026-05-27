@@ -166,7 +166,7 @@ export function CompanionCard({
             transition={{ duration: 0.3, ease: 'easeOut' }}
             className="overflow-hidden"
           >
-            <div className="px-1 pb-1 pt-3">{children}</div>
+            <div className={cn(frameChrome ? 'px-4 pb-4' : 'px-1 pb-1 pt-3')}>{children}</div>
           </motion.div>
         ) : null}
       </AnimatePresence>

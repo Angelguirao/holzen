@@ -18,6 +18,8 @@ export type CompanionOrchestratedSlotChromeProps = {
   onRegenerate: () => void;
   regenerating: boolean;
   routeSegment: CompanionFullViewRouteSegment;
+  /** Frame Signal inline card provides its own full-story CTA. */
+  showFullViewButton?: boolean;
   children: React.ReactNode;
 };
 
@@ -33,6 +35,7 @@ export function CompanionOrchestratedSlotChrome({
   onRegenerate,
   regenerating,
   routeSegment,
+  showFullViewButton = true,
   children,
 }: CompanionOrchestratedSlotChromeProps) {
   "use memo";
@@ -50,7 +53,7 @@ export function CompanionOrchestratedSlotChrome({
           regenerating={regenerating}
         />
       ) : null}
-      {pauseInstanceId && (hasContent || loading) ? (
+      {showFullViewButton && pauseInstanceId && (hasContent || loading) ? (
         <CompanionOpenFullViewButton pauseInstanceId={pauseInstanceId} routeSegment={routeSegment} />
       ) : null}
     </>

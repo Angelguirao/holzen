@@ -1,8 +1,9 @@
-import { ExternalLink, ShieldCheck } from 'lucide-react';
+import { Clock, ExternalLink, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
+import { estimateReadTime } from '@/features/pause/public-ritual-frame';
+import { cn } from '@/lib/utils';
 import { CompanionError } from '../CompanionError';
-import { ReadTime } from './ReadTime';
 import { WhyThisCard } from './WhyThisCard';
 
 interface SignalData {
@@ -29,17 +30,9 @@ interface Props {
 }
 
 /**
- * Full-page Signal presentation.
+ * Full-page Signal presentation (Figma Lore full-view → product name Signal).
  *
- * Differs from the inline `SignalDisplay` in three ways:
- * 1. Favicon + publisher domain label sit above the source link rather than
- *    being a tiny mono-font line, so the source itself reads as a credibility
- *    cue rather than a footnote.
- * 2. A small "trusted source" badge renders when the signal's URL host matches
- *    a row in the curated `signal_sources` table. Falls back silently when the
- *    table or URL is unavailable.
- * 3. Adds `ReadTime` and (optional) `WhyThisCard` since Full View is a reading
- *    screen, not an interaction-dense card.
+ * Hierarchy: read time → title → source byline → body → source link row with favicon.
  */
 export function SignalFullView({
   signal,
@@ -57,8 +50,10 @@ export function SignalFullView({
 
   if (loading) {
     return (
-      <div className="space-y-3">
-        <Skeleton className="h-5 w-3/4" />
+      <div className="space-y-4">
+        <Skeleton className="mx-auto h-4 w-24" />
+        <Skeleton className="h-6 w-4/5 mx-auto" />
+        <Skeleton className="h-4 w-1/2 mx-auto" />
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-2/3" />
@@ -71,27 +66,44 @@ export function SignalFullView({
   }
 
   const bodyChars = signal.title.length + signal.body.length + signal.source.length;
+  const est = estimateReadTime(bodyChars);
+  const readLabel =
+    est.kind === 'glance'
+      ? t('companions.fullview.readTime.glance')
+      : est.kind === 'thirty'
+        ? t('companions.fullview.readTime.thirty')
+        : est.kind === 'ninety'
+          ? t('companions.fullview.readTime.ninety')
+          : t('companions.fullview.readTime.minutes', { n: est.minutes });
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center gap-2 flex-wrap">
-        <ReadTime chars={bodyChars} />
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        <div className="inline-flex items-center gap-1 text-sm text-muted-foreground" role="status">
+          <Clock className="h-4 w-4 shrink-0" aria-hidden />
+          <span>{readLabel}</span>
+        </div>
         <WhyThisCard
           companion="signal"
           mood={mood}
           marketDirection={marketDirection}
           preferredBias={preferredBias}
-          className="ml-auto"
+          className="ml-0"
         />
       </div>
 
-      <h2 className="text-base font-medium leading-snug text-foreground">{signal.title}</h2>
-      <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{signal.body}</p>
+      <div className="space-y-3 text-center">
+        <h2 className="text-base font-medium leading-snug text-foreground">{signal.title}</h2>
+        {signal.source ? (
+          <p className="text-sm font-medium leading-snug text-muted-foreground">{signal.source}</p>
+        ) : null}
+      </div>
 
-      <div className="pt-2 space-y-2 border-t border-border/20">
-        {host && (
-          <div className="flex items-center gap-2">
-            {/* `s2/favicons` is Google's public favicon service — no API key, caches aggressively, degrades to a default glyph on misses. */}
+      <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{signal.body}</p>
+
+      <div className="space-y-2 border-t border-border/20 pt-4">
+        {host ? (
+          <div className="flex items-center justify-center gap-2 flex-wrap">
             <img
               src={`https://www.google.com/s2/favicons?sz=32&domain=${encodeURIComponent(host)}`}
               alt=""
@@ -102,7 +114,7 @@ export function SignalFullView({
               aria-hidden
             />
             <span className="text-xs font-mono text-muted-foreground/70">{host}</span>
-            {isTrusted === true && (
+            {isTrusted === true ? (
               <span
                 className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-muted/30 px-1.5 py-[2px] text-[9px] font-mono text-muted-foreground"
                 role="status"
@@ -110,18 +122,22 @@ export function SignalFullView({
                 <ShieldCheck className="h-2.5 w-2.5" aria-hidden />
                 {t('companions.fullview.signal.trusted')}
               </span>
-            )}
+            ) : null}
           </div>
-        )}
-        <a
-          href={signal.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-nox-text-link/90 hover:text-nox-text-link transition-colors"
-        >
-          <ExternalLink className="h-3 w-3" />
-          {signal.source || t('companions.fullview.signal.readSource')}
-        </a>
+        ) : null}
+        <div className="flex justify-center">
+          <a
+            href={signal.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              'inline-flex items-center gap-1.5 text-xs font-medium text-nox-text-link/90 hover:text-nox-text-link transition-colors',
+            )}
+          >
+            <ExternalLink className="h-3 w-3" aria-hidden />
+            {signal.source || t('companions.fullview.signal.readSource')}
+          </a>
+        </div>
       </div>
     </div>
   );

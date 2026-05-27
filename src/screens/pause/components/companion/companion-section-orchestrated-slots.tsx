@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import type {
   CachedHistoricalInsightShape,
   CompanionData,
@@ -6,6 +7,7 @@ import type {
   RegenerateCompanionSlot,
 } from '@/features/pause/public-ritual-frame';
 import type { ZoomOutData } from '@/features/pause/public-ritual-frame';
+import { mergeHistoryBtcOverlay } from '@/features/pause/application/use-cases/ritual/frame/historical-insight-payload';
 import type {
   CompanionUiCompletionState,
   CompanionUiCompletionStep,
@@ -28,7 +30,10 @@ import { LearningInput } from '@/screens/pause/components/LearningInput';
 import { SignalDisplay } from '@/screens/pause/components/SignalDisplay';
 import { ZoomOutDisplay } from '@/screens/pause/components/ZoomOutDisplay';
 import { HistoricalInsightDisplay } from '@/screens/pause/components/HistoricalInsightDisplay';
-import { CompanionOrchestratedCard } from '@/screens/pause/components/companion/companion-orchestrated-card';
+import {
+  CompanionOrchestratedCard,
+  type CompanionOrchestratedCardProps,
+} from '@/screens/pause/components/companion/companion-orchestrated-card';
 import { COMPANION_SECTION_ICONS } from '@/screens/pause/components/companion/companion-section-icons';
 import type { CompanionSectionProFavoriteProps } from '@/features/pause/public-ritual-frame';
 
@@ -77,6 +82,13 @@ export type CompanionSectionOrchestratedSlotsProps = {
   cacheRelaxations: CompanionSlotRelaxations;
   regenerateCompanion: (slot: RegenerateCompanionSlot) => void;
   proFavorite: (favoriteKey: string) => CompanionSectionProFavoriteProps;
+  appearance?: CompanionOrchestratedCardProps['appearance'];
+  iconHelps?: {
+    signal?: string;
+    grounding?: string;
+    zoomOut?: string;
+    lookBack?: string;
+  };
 };
 
 export function CompanionSectionOrchestratedSlots({
@@ -114,9 +126,16 @@ export function CompanionSectionOrchestratedSlots({
   cacheRelaxations,
   regenerateCompanion,
   proFavorite,
+  appearance = 'default',
+  iconHelps,
 }: CompanionSectionOrchestratedSlotsProps) {
   "use memo";
   const { hasSignal, hasGrounding, hasZoomOut, hasHistory } = visibility;
+  const frameAppearance = appearance === 'frame';
+  const historyDisplay = useMemo(
+    () => mergeHistoryBtcOverlay(historyInsight, zoomOut),
+    [historyInsight, zoomOut],
+  );
 
   return (
     <>
@@ -138,9 +157,19 @@ export function CompanionSectionOrchestratedSlots({
           regenerateSlot="signal"
           onRegenerate={() => regenerateCompanion('signal')}
           routeSegment="signal"
+          appearance={appearance}
+          iconHelp={iconHelps?.signal}
+          showFullViewButton={!frameAppearance}
           {...proFavorite('signal')}
         >
-          <SignalDisplay signal={signal} loading={signalLoading} error={signalError} onRetry={retrySignal} />
+          <SignalDisplay
+            signal={signal}
+            loading={signalLoading}
+            error={signalError}
+            onRetry={retrySignal}
+            variant={frameAppearance ? 'frame' : 'default'}
+            pauseInstanceId={pauseInstanceId}
+          />
         </CompanionOrchestratedCard>
       ) : null}
 
@@ -210,7 +239,7 @@ export function CompanionSectionOrchestratedSlots({
           onFirstExpandComplete={() => markCompleted('history')}
           loading={historyLoading}
           pauseInstanceId={pauseInstanceId}
-          hasContent={Boolean(historyInsight)}
+          hasContent={Boolean(historyDisplay)}
           relaxationKey={cacheRelaxations.history}
           companionType="history_insight"
           cacheId={cacheIds.history}
@@ -220,7 +249,7 @@ export function CompanionSectionOrchestratedSlots({
           {...proFavorite('history_insight')}
         >
           <HistoricalInsightDisplay
-            data={historyInsight}
+            data={historyDisplay}
             loading={historyLoading}
             error={historyError}
             onRetry={retryHistory}
