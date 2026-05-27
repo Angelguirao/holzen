@@ -107,6 +107,94 @@ On **`/pause`**, leave flow still uses `PauseLeaveWithPendingSheet`. There is **
 
 ---
 
+## Manual QA checklist
+
+Use this when verifying the Home widget after changes to the resolver, projection hook, or pending-offer wiring. **Automated gate:** `npx vitest run src/features/pause/domain/home/home-pause-widget-mode.test.ts`.
+
+### Before you start
+
+| Prerequisite | Why |
+|--------------|-----|
+| Migration `20260527120000_pause_engaged_requires_reflection_step.sql` applied on target Supabase | Without it, `engaged` may flip before Reflect → wrong **C** vs **B** |
+| Signed-in user with **trial or Pro** (`getHomeSubscriptionGate` passes) | Lapsed/trial prompt replaces widget body |
+| `npm run dev` (port **8080**) against staging or local Supabase with edge/cron if testing pending | Pending rows come from `pause_create_or_reuse` / cron |
+| Home tab open (`/`); bottom nav **Home** | Pending UX is **Home-only** (no shell modal on other tabs) |
+
+**Inspect state (optional):** Supabase → `pause_instances` for your `user_id` (`state`, `created_at`); `pause_step_events` for open instance; `profiles.last_trigger_at`, `cooldown_hours`; pending row `state = 'pending'`.
+
+---
+
+### Mode matrix
+
+For each row: note **section title**, **body copy**, **primary CTA**, and **no blocking “Market context changed” modal**.
+
+| # | Target mode | How to get there | Expect on Home |
+|---|-------------|------------------|------------------|
+| 1 | **A** collapsed | No open pause; not in profile cooldown; collapse widget if expanded | Title **Your pause**; collapsed body empty |
+| 2 | **A′** expanded | Tap chevron on A | Status line + scheduling + **I need a pause** |
+| 3 | **B** | Open `active` pause; no step events *or* mid-ritual (Feel/Breathe logged) | **Pause with this**; template opening line pre-Reflect |
+| 4 | **C** | Deep pause: reach **Reflect** (`reflection_step` logged) → Postgres `engaged` | Title **Continue your pause**; **Continue** + **Discard** |
+| 5 | **C′** | **C** + cron queues new context (pending row) while still on Home | Two sections + **Pause with new context** + keep-current link |
+| 6 | **B + pending** | Open `active` (pre-Reflect) + pending row | Amber **New moment queued** banner; **Switch to new pause** / **Keep current pause**; main CTA still **Pause with this** |
+| 7 | **D** | Complete a pause; stay on profile cooldown; no open pause; has archive | **You paused**; **Pause again** + archive link |
+| 8 | **D′** | Same as D but `completedPauseCount = 0` | Rest copy without archive link |
+| 9 | **E** | ≥1 completed pause; profile cooldown active; **new** open `active` with **no** `pause_step_events` yet | **New pause available**; validation copy + **Pause with this** |
+| 10 | **E → B** | From **E**, open `/pause`, log Feel (or any step), return Home | Should drop to **B** (not **E**) |
+| 11 | **calm_waters** | Cron expires offer with `context_lost`; no open pause; within 24h window | Reassurance copy; optional Sonner toast once |
+| 12 | **loading** | Hard refresh Home while Holzen loading (no open pause yet) | “Opening your pause…” skeleton |
+| 13 | **Trial gate** | Lapsed / no entitlement user | Trial/reactivate CTA instead of ritual body |
+
+**Regression checks (E / pending fixes):**
+
+- First-ever cron pause (no completed archive) → **B**, not **E**, even during cooldown.
+- **Active + pending** → **B** with banner, never **E** without pending actions.
+- **Continue** appears only in **C** / **C′**, never for pre-Reflect `active`.
+
+---
+
+### Action flows
+
+| Action | Steps | Pass criteria |
+|--------|-------|---------------|
+| **Pause with this** | **B** or **E** → tap CTA | Navigates `/pause` with correct `pauseInstanceId` in location state |
+| **Continue** | **C** → tap | Same instance on `/pause`; session resumes |
+| **Discard** | **C** → **Discard** | Open pause cleared; widget → **A** or **D**; `pause_open_dismissed` (PostHog) with `surface: home_your_pause_widget` |
+| **Adopt pending** | **B** or **C′** → switch/adopt | Pending cleared; new instance active; `/pause` opens with **new** id; persisted tab session cleared; `pause_pending_adopted` |
+| **Decline pending** | Banner or **C′** → keep current | Pending row gone; current open pause unchanged; `pause_pending_declined` |
+| **I need a pause** | **A′** → manual trigger (cooldown clear) | Navigates `/pause` or silent open; no `/tools` route |
+| **Pending on other tabs** | Queue pending while on **Journey** | **No** global modal; return **Home** → banner or **C′** |
+
+---
+
+### `/pause` leave sheet (paired surface)
+
+1. Open `/pause` with open pause + pending row in DB.
+2. Tap header **Close** / leave.
+3. Expect **`PauseLeaveWithPendingSheet`** (not Home modal).
+4. Adopt/decline behavior matches Home (same RPCs + telemetry).
+
+---
+
+### Subscription & errors
+
+| Case | Expect |
+|------|--------|
+| Sub loading | Inline subscription skeleton in widget |
+| Market fetch fails but cached BTC shows | Market widget OK; pause widget not blocked by price-only error |
+| Persist / Holzen hard error, no open pause | Blocking error panel + retry |
+
+---
+
+### Automated tests (CI-friendly)
+
+```bash
+npx vitest run src/features/pause/domain/home/home-pause-widget-mode.test.ts
+npx vitest run src/features/pause/presentation/home/use-home-pause-actions.integration.test.tsx
+npm run check:posthog-events-allowlist   # pending + dismiss events documented
+```
+
+---
+
 ## Related
 
 - [pause-system.md](pause-system.md) — instance lifecycle, `engaged`, RPCs  
