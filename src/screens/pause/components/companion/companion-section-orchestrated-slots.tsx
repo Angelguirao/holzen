@@ -46,7 +46,6 @@ export type CompanionSectionOrchestratedSlotsProps = {
     hasZoomOut: boolean;
     hasHistory: boolean;
   };
-  companions: CompanionData;
   pauseInstanceId?: string | null;
   completion: CompanionUiCompletionState;
   markCompleted: (key: CompanionUiCompletionStep) => void | Promise<void>;
@@ -97,7 +96,6 @@ const FRAME_SLOT_ORDER: OrchestratedSlotKey[] = ['grounding', 'zoomOut', 'histor
 export function CompanionSectionOrchestratedSlots({
   labels,
   visibility,
-  companions,
   pauseInstanceId,
   completion,
   markCompleted,

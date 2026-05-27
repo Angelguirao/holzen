@@ -1,7 +1,9 @@
-/** Inline companion card payload (haiku + grounding stubs from pause instance). */
+/** Inline companion card payload (haiku from reflect; grounding uses lazy slot + artifacts). */
 export interface CompanionData {
   haiku: string | null;
+  /** Legacy session field from reflect fetch — not read by Frame companion strip. */
   groundingTitle: string | null;
+  /** Legacy session field from reflect fetch — not read by Frame companion strip. */
   groundingBody: string | null;
 }
 
