@@ -1,4 +1,3 @@
-import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
 import type { CachedHistoricalInsightShape } from '@/features/pause/domain/historical-insight';
 
 export interface CachedSignalShape {
@@ -31,7 +30,8 @@ export interface ParsedPauseArtifactCache {
   grounding?: CachedGroundingShape | null;
   history?: CachedHistoricalInsightShape | null;
   zoomOut?: CachedZoomOutShape | null;
-  intervention?: InterventionState | null;
+  /** Legacy featured headline (`pause_ai_artifacts` kind `intervention`) — not rendered in pause-first UI. */
+  intervention?: Record<string, unknown> | null;
 }
 
 type ArtifactRow = { kind: string; content: unknown };
@@ -60,7 +60,7 @@ export function parsePauseArtifactRows(rows: ArtifactRow[]): ParsedPauseArtifact
     } else if ((c.kind === 'zoom_out' || c.kind === 'zoom_out_deep_time') && d) {
       if (!result.zoomOut) result.zoomOut = d as CachedZoomOutShape;
     } else if (c.kind === 'intervention' && d) {
-      result.intervention = d as unknown as InterventionState;
+      result.intervention = d;
     }
   }
   return result;

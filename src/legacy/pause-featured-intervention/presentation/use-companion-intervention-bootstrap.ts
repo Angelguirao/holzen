@@ -1,12 +1,12 @@
 import { useEffect, useLayoutEffect, useRef, useState, useTransition } from 'react';
 import { toast as sonnerToast } from 'sonner';
-import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
+import type { InterventionState } from '@/legacy/pause-featured-intervention/domain/intervention-types';
+import type { CompanionSlotAutosaveParams } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
 import type {
-  CompanionSlotAutosaveParams,
   CompanionSlotCommitters,
   CompanionSlotRelaxations,
-} from './pause-companion-orchestrate-io';
-import { useCompanionOrchestrateSession } from './use-companion-orchestrate-session';
+} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
+import { useCompanionOrchestrateSession } from '@/features/pause/presentation/companion/use-companion-orchestrate-session';
 import { useCompanionInterventionFetch } from './use-companion-intervention-fetch';
 
 export interface UseCompanionInterventionBootstrapParams {
@@ -31,7 +31,6 @@ export function useCompanionInterventionBootstrap({
   mood,
   severityNumber,
   language,
-  autoSaveToLibrary,
   slotCommitters,
   fetchedSlotsRef,
   setCacheRelaxations,

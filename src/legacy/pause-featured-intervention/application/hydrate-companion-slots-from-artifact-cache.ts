@@ -1,4 +1,4 @@
-import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
+import type { InterventionState } from '@/legacy/pause-featured-intervention/domain/intervention-types';
 import { trackCompanionServed } from '@/features/pause/application/use-cases/ritual/frame/companion-generation-telemetry';
 import type { ParsedPauseArtifactCache } from '@/features/pause/application/use-cases/ritual/frame/artifact-cache-parse';
 import type { CompanionSlotCommitters } from './orchestrate-slot-apply';

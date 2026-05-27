@@ -6,7 +6,7 @@ import type {
   InterventionPayload,
   OrchestrateResponse,
 } from "./companion-orchestrate-types.ts";
-import type { InterventionSelection } from "./intervention-selector.ts";
+import type { InterventionSelection } from "../legacy/featured-intervention/intervention-selector.ts";
 import { ORCHESTRATOR_KEY_MAP } from "./companion-types.ts";
 
 const companionTypeMap = ORCHESTRATOR_KEY_MAP;

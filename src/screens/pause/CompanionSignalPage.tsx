@@ -10,7 +10,6 @@ import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback'
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
 import { SignalFullView } from '@/screens/pause/components/companion/SignalFullView';
 import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
-import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
 import { PageMeta } from '@/app/components/PageMeta';
 
 /**
@@ -40,7 +39,6 @@ export default function CompanionSignalPage() {
       cacheIds,
       cacheRelaxations,
       regenerateCompanion,
-      intervention,
     },
   } = useCompanionFullViewPage({
     routeInstanceId: rid,
@@ -82,8 +80,6 @@ export default function CompanionSignalPage() {
         noindex
       />
       <div className="space-y-6">
-        <InterventionCrossRefBadge companion="signal" intervention={intervention} />
-
         <SignalFullView
           signal={signal}
           loading={signalLoading}

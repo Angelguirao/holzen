@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildCompanionOrchestrateSessionFromRitual,
-  buildInterventionOrchestrateBody,
   buildLazyFetchOrchestrateBody,
   buildRegenerateOrchestrateBody,
   type CompanionOrchestrateSessionContext,
@@ -43,20 +42,6 @@ describe('buildCompanionOrchestrateSessionFromRitual', () => {
       mood: null,
       severity: 0,
       moodHistory: [],
-    });
-  });
-});
-
-describe('buildInterventionOrchestrateBody', () => {
-  it('requests intervention only with companions disabled', () => {
-    expect(buildInterventionOrchestrateBody(session)).toMatchObject({
-      holzenInvokeSource: 'browser_pause_intervention',
-      pauseInstanceId: 'pause-abc',
-      useIntervention: true,
-      enableSignal: false,
-      enableGrounding: false,
-      enableHistory: false,
-      enableZoomOut: false,
     });
   });
 });

@@ -3,7 +3,6 @@ import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import {
   applyCompanionOrchestrateRetryReset,
   EMPTY_COMPANION_SLOT_RELAXATIONS,
-  resetInterventionIdempotency,
   type CompanionSlotRelaxations,
 } from './pause-companion-orchestrate-io';
 
@@ -19,15 +18,10 @@ export type UseCompanionOrchestrateRetryParams = {
   setZoomOutError: (v: boolean) => void;
   setHistoryInsight: (v: null) => void;
   setHistoryError: (v: boolean) => void;
-  setIntervention: (v: null) => void;
-  setInterventionError: (v: boolean) => void;
-  clearInterventionFetchDedupe: () => void;
-  interventionSkippedRef: MutableRefObject<boolean>;
-  pendingRetryConfirmRef: MutableRefObject<string | null>;
   setCacheRelaxations: Dispatch<SetStateAction<CompanionSlotRelaxations>>;
 };
 
-/** Manual "retry orchestrate" — resets slots + intervention idempotency and bumps retry generation. */
+/** Manual "retry orchestrate" — clears slot UI and bumps retry generation. */
 export function useCompanionOrchestrateRetry({
   pauseInstanceId,
   setRetryCount,
@@ -40,24 +34,14 @@ export function useCompanionOrchestrateRetry({
   setZoomOutError,
   setHistoryInsight,
   setHistoryError,
-  setIntervention,
-  setInterventionError,
-  clearInterventionFetchDedupe,
-  interventionSkippedRef,
-  pendingRetryConfirmRef,
   setCacheRelaxations,
 }: UseCompanionOrchestrateRetryParams) {
   const retryOrchestrate = useCallback(() => {
     applyCompanionOrchestrateRetryReset(
       {
         pauseInstanceId: pauseInstanceId ?? null,
-        interventionSkipped: interventionSkippedRef.current,
       },
       {
-        resetInterventionIdempotency,
-        queuePendingRetryConfirm: (id) => {
-          pendingRetryConfirmRef.current = id;
-        },
         resetFetchedSlots: () => {
           fetchedSlotsRef.current = new Set();
         },
@@ -70,10 +54,7 @@ export function useCompanionOrchestrateRetry({
           setZoomOutError(false);
           setHistoryInsight(null);
           setHistoryError(false);
-          setIntervention(null);
-          setInterventionError(false);
         },
-        clearInterventionFetchDedupe,
         resetRelaxations: () => setCacheRelaxations(EMPTY_COMPANION_SLOT_RELAXATIONS),
       },
     );
@@ -90,11 +71,6 @@ export function useCompanionOrchestrateRetry({
     setZoomOutError,
     setHistoryInsight,
     setHistoryError,
-    setIntervention,
-    setInterventionError,
-    clearInterventionFetchDedupe,
-    interventionSkippedRef,
-    pendingRetryConfirmRef,
     setCacheRelaxations,
   ]);
 

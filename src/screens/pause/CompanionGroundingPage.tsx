@@ -9,7 +9,6 @@ import { GroundingFullView } from '@/screens/pause/components/companion/Groundin
 import { GroundingEnrichment } from '@/screens/pause/components/companion/GroundingEnrichment';
 import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
 import { RelatedBiasesThisMonth } from '@/screens/pause/components/companion/RelatedBiasesThisMonth';
-import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
 import { PageMeta } from '@/app/components/PageMeta';
 
 /** Full-screen Grounding chapter — mirrors History / Signal full-view routes. */
@@ -36,7 +35,6 @@ export default function CompanionGroundingPage() {
       cacheIds,
       cacheRelaxations,
       regenerateCompanion,
-      intervention,
     },
   } = useCompanionFullViewPage({
     routeInstanceId: rid,
@@ -81,8 +79,6 @@ export default function CompanionGroundingPage() {
         noindex
       />
       <div className="space-y-6">
-        <InterventionCrossRefBadge companion="grounding" intervention={intervention} />
-
         <GroundingFullView
           nudge={nudge}
           loading={nudgeLoading}

@@ -64,7 +64,6 @@ export function useCompanionFullViewPage({
   });
 
   const {
-    interventionLoading,
     fetchCompanion,
     signal,
     signalLoading,
@@ -82,7 +81,6 @@ export function useCompanionFullViewPage({
 
   useEffect(() => {
     if (!pauseInstanceId || !reflectionMessage) return;
-    if (interventionLoading) return;
     if (
       isCompanionFullViewSlotSettled(slot, {
         signal,
@@ -105,7 +103,6 @@ export function useCompanionFullViewPage({
   }, [
     pauseInstanceId,
     reflectionMessage,
-    interventionLoading,
     slot,
     signal,
     signalLoading,

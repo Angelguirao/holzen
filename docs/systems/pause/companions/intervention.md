@@ -18,7 +18,7 @@ This page is the **intervention-level** view. For the full **orchestrator** cont
 
 1. Client creates a `pause_instances` row (manual via `pause_create_or_reuse`) or `check-volatility` creates one (automatic via `pause_create_or_reuse_as`).
 2. **`use-companion-data`** calls **`companion-orchestrate`** with **`useIntervention: true`** and all **`enable*`** flags **false** (intervention-only request, `holzenInvokeSource: 'browser_pause_intervention'`).
-3. **`companion-orchestrate`** runs **`selectIntervention`** (`_shared/intervention-selector.ts`), which evaluates rules in priority order and returns a **selection** object (`mode`, `primary`, `secondary`, optional `mirrorData`).
+3. **`companion-orchestrate`** runs **`selectIntervention`** (`legacy/featured-intervention/intervention-selector.ts`), which evaluates rules in priority order and returns a **selection** object (`mode`, `primary`, `secondary`, optional `mirrorData`).
 4. The orchestrator assembles the **intervention payload** and persists it to **`pause_ai_artifacts`** (kind `intervention`).
 5. The Pause UI renders the result: mirror / trap / pattern / question, plus optional zoom-out secondary (via `CompanionSection` and related components).
 
@@ -93,7 +93,7 @@ flowchart LR
 | Aspect | Detail |
 |--------|--------|
 | **Trigger conditions** | `severity === "mild"` (<5% move) **and** total completed pause count for user **≥ 20**. |
-| **Data source** | **`generateQuestion`** (`_shared/generators/question.ts`) — dedicated AI path via Gemini. |
+| **Data source** | **`generateQuestion`** (`legacy/featured-intervention/question.ts`) — dedicated AI path via Gemini. |
 | **AI** | **Yes** — single reflective question, parallel with companion tasks. |
 | **Payload** | `intervention.mode === "question"`, `intervention.question` string. No `primary` / `secondary`. |
 | **UI** | Centered question copy + "Sit with this before deciding." No companion-shaped body. |
@@ -137,9 +137,10 @@ The intervention type does not change the session theme, and the session theme d
 
 | Area | Path |
 |------|------|
-| Intervention selector | `supabase/functions/_shared/intervention-selector.ts` |
-| Mirror builder | `supabase/functions/_shared/generators/mirror.ts` |
-| Question generator | `supabase/functions/_shared/generators/question.ts` |
+| Intervention selector | `supabase/functions/legacy/featured-intervention/intervention-selector.ts` |
+| Mirror builder | `supabase/functions/legacy/featured-intervention/mirror.ts` |
+| Question generator | `supabase/functions/legacy/featured-intervention/question.ts` |
+| Client stack (quarantined) | `src/legacy/pause-featured-intervention/` |
 | Session intent | `supabase/functions/_shared/session-intent.ts` |
 | Orchestrator | `supabase/functions/companion-orchestrate/index.ts` |
 | UI | `src/screens/pause/components/CompanionSection.tsx` (intervention block + cross-ref badges) |

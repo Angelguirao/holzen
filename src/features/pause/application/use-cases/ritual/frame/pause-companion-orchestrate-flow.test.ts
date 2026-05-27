@@ -13,8 +13,6 @@ import {
   setCompanionSlotLoading as setLoadingDirect,
 } from './companion-slot-ui-state';
 import { EMPTY_COMPANION_SLOT_RELAXATIONS as emptyRelaxationsDirect } from './orchestrate-slot-apply';
-import { resetInterventionIdempotency as resetIdempotencyDirect } from './intervention-idempotency';
-import { runCompanionInterventionBootstrap as runBootstrapDirect } from './run-companion-intervention-bootstrap';
 import { runCompanionSlotOrchestrate as runSlotOrchestrateDirect } from './run-companion-slot-orchestrate';
 import {
   applyCompanionOrchestrateRetryReset as applyRetryResetFromRetryFlow,
@@ -25,10 +23,6 @@ import {
 import {
   EMPTY_COMPANION_SLOT_RELAXATIONS as emptyRelaxationsFromSlotApplyFlow,
 } from './pause-companion-orchestrate-slot-apply-flow';
-import {
-  resetInterventionIdempotency as resetIdempotencyFromInterventionFlow,
-  runCompanionInterventionBootstrap as runBootstrapFromInterventionFlow,
-} from './pause-companion-intervention-orchestrate-flow';
 import {
   logCompanionSlotOrchestrateInvoke as logInvokeFromTelemetryFlow,
   trackCompanionGenerationInitiated as trackGenerationFromTelemetryFlow,
@@ -44,8 +38,6 @@ import {
   applyCompanionSlotOrchestrateOutcome,
   EMPTY_COMPANION_SLOT_RELAXATIONS,
   logCompanionSlotOrchestrateInvoke,
-  resetInterventionIdempotency,
-  runCompanionInterventionBootstrap,
   runCompanionSlotOrchestrate,
   setCompanionSlotError,
   setCompanionSlotLoading,
@@ -57,8 +49,6 @@ describe('pause-companion-orchestrate-flow', () => {
     expect(applyCompanionOrchestrateRetryReset).toBe(applyRetryResetFromRetryFlow);
     expect(applyCompanionSlotOrchestrateOutcome).toBe(applyOutcomeFromOutcomeFlow);
     expect(EMPTY_COMPANION_SLOT_RELAXATIONS).toBe(emptyRelaxationsFromSlotApplyFlow);
-    expect(resetInterventionIdempotency).toBe(resetIdempotencyFromInterventionFlow);
-    expect(runCompanionInterventionBootstrap).toBe(runBootstrapFromInterventionFlow);
     expect(logCompanionSlotOrchestrateInvoke).toBe(logInvokeFromTelemetryFlow);
     expect(trackCompanionGenerationInitiated).toBe(trackGenerationFromTelemetryFlow);
     expect(setCompanionSlotError).toBe(setErrorFromUiFlow);
@@ -66,12 +56,10 @@ describe('pause-companion-orchestrate-flow', () => {
     expect(runCompanionSlotOrchestrate).toBe(runSlotOrchestrateFromSlotFlow);
   });
 
-  it('re-exports orchestrate leaf modules for slot run, intervention, retry, outcome, telemetry, and UI state', () => {
+  it('re-exports orchestrate leaf modules for slot run, retry, outcome, telemetry, and UI state', () => {
     expect(typeof applyCompanionOrchestrateRetryReset).toBe('function');
     expect(typeof applyCompanionSlotOrchestrateOutcome).toBe('function');
     expect(typeof logCompanionSlotOrchestrateInvoke).toBe('function');
-    expect(typeof resetInterventionIdempotency).toBe('function');
-    expect(typeof runCompanionInterventionBootstrap).toBe('function');
     expect(typeof runCompanionSlotOrchestrate).toBe('function');
     expect(typeof setCompanionSlotError).toBe('function');
     expect(typeof setCompanionSlotLoading).toBe('function');
@@ -82,8 +70,6 @@ describe('pause-companion-orchestrate-flow', () => {
     expect(applyCompanionOrchestrateRetryReset).toBe(applyRetryResetDirect);
     expect(applyCompanionSlotOrchestrateOutcome).toBe(applyOutcomeDirect);
     expect(logCompanionSlotOrchestrateInvoke).toBe(logInvokeDirect);
-    expect(resetInterventionIdempotency).toBe(resetIdempotencyDirect);
-    expect(runCompanionInterventionBootstrap).toBe(runBootstrapDirect);
     expect(runCompanionSlotOrchestrate).toBe(runSlotOrchestrateDirect);
     expect(setCompanionSlotError).toBe(setErrorDirect);
     expect(setCompanionSlotLoading).toBe(setLoadingDirect);
@@ -96,12 +82,10 @@ describe('pause-companion-orchestrate-flow', () => {
    */
   it('sibling cluster: analytics-flow exports stay distinct from orchestrate-flow', () => {
     expect(runCompanionSlotOrchestrate).not.toBe(runLogCompanionFeedbackVote);
-    expect(runCompanionInterventionBootstrap).not.toBe(runLogCompanionFullviewOpened);
     expect(applyCompanionOrchestrateRetryReset).not.toBe(runLogCompanionFeedbackVote);
     expect(logCompanionSlotOrchestrateInvoke).not.toBe(runLogCompanionFullviewOpened);
     expect(trackCompanionGenerationInitiated).not.toBe(runLogCompanionFeedbackVote);
     expect(setCompanionSlotError).not.toBe(runLogCompanionFullviewOpened);
-    expect(resetInterventionIdempotency).not.toBe(runLogCompanionFeedbackVote);
     expect(EMPTY_COMPANION_SLOT_RELAXATIONS).not.toBe(runLogCompanionFullviewOpened);
     // Full cross-flow pins: `pause-companion-analytics-orchestrate-flow-sibling-parity.test.ts`.
   });
