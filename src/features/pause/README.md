@@ -1,6 +1,7 @@
 # Pause feature module
 
 **Product truth:** [docs/systems/pause-system.md](../../../docs/systems/pause-system.md)  
+**Reflect vs Frame (ritual intent):** [docs/systems/pause/ritual-reflect-vs-frame.md](../../../docs/systems/pause/ritual-reflect-vs-frame.md)  
 **Client target (canonical interior):** [docs/systems/pause-client-architecture.md](../../../docs/systems/pause-client-architecture.md) §3  
 **Repo map / waves:** [frontend-module-layout.md](../../../docs/fundamentals/frontend-module-layout.md) §10–11
 

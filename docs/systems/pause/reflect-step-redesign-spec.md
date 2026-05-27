@@ -4,13 +4,15 @@
 
 **Failure UX (May 2026):** When live `holzen-reflect` fails on the client, Reflect no longer swaps to the Home blocking error panel only. It shows an amber inline notice + **client fallback** structured copy (Feel recap, template inquiry, context strip) via `build-reflect-client-fallback.ts` / `resolve-pause-reflect-display-content.ts`.  
 **Owner:** Pause / ritual UX + `holzen-reflect` pipeline.  
-**Related:** [pause-system.md](../pause-system.md) §7.1 (deep ritual), [ai-powered-pause-system.md](ai-powered-pause-system.md) §3 (reflection generation), [companions/signal.md](companions/signal.md) (cited “why markets move” on Frame).
+**Related:** [ritual-reflect-vs-frame.md](ritual-reflect-vs-frame.md) (product intent — start here for “what belongs where”), [pause-system.md](../pause-system.md) §7.1 (deep ritual), [ai-powered-pause-system.md](ai-powered-pause-system.md) §3 (reflection generation), [companions/signal.md](companions/signal.md) (cited “why markets move” on Frame).
 
 ---
 
 ## 1. Why this document exists
 
-The deep ritual step is labeled **Reflect**, but shipped behavior is closer to **regulate**: one short AI paragraph that validates emotion and reduces urgency. That matches an early product bet (“slow the impulse before education”) but under-delivers on:
+> **Product framing:** [ritual-reflect-vs-frame.md](ritual-reflect-vs-frame.md) — canonical split between inward **Reflect** and optional outward **Frame**.
+
+The deep ritual step is labeled **Reflect**, but early shipped behavior was closer to **regulate**: one short AI paragraph that validates emotion and reduces urgency. That matches an early product bet (“slow the impulse before education”) but under-delivers on:
 
 - **What set me off?** (trigger, not only “BTC is down X%”)
 - **What story am I telling myself?** (cognitive framing, not only stoic reassurance)
