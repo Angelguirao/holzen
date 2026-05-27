@@ -53,7 +53,7 @@ export default function CompanionSignalPage() {
 
   if (loadError) {
     return (
-      <CompanionFocusLayout title={t('companions.signal')} onBack={handleBack}>
+      <CompanionFocusLayout title={t('companions.signalTitle')} onBack={handleBack}>
         <PageMeta
           title={t('companions.fullview.signal.meta')}
           description={t('companions.fullview.signal.meta')}
@@ -73,7 +73,7 @@ export default function CompanionSignalPage() {
   }
 
   return (
-    <CompanionFocusLayout title={t('companions.signal')} onBack={handleBack}>
+    <CompanionFocusLayout title={t('companions.signalTitle')} onBack={handleBack}>
       <PageMeta
         title={t('companions.fullview.signal.meta')}
         description={t('companions.fullview.signal.meta')}

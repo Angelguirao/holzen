@@ -49,7 +49,7 @@ export default function CompanionZoomOutPage() {
 
   if (loadError) {
     return (
-      <CompanionFocusLayout title={t('companions.zoomOut')} onBack={handleBack}>
+      <CompanionFocusLayout title={t('companions.zoomOutTitle')} onBack={handleBack}>
         <PageMeta
           title={t('companions.focusZoomOutMeta')}
           description={t('companions.focusZoomOutMeta')}
@@ -69,7 +69,7 @@ export default function CompanionZoomOutPage() {
   }
 
   return (
-    <CompanionFocusLayout title={t('companions.zoomOut')} onBack={handleBack}>
+    <CompanionFocusLayout title={t('companions.zoomOutTitle')} onBack={handleBack}>
       <PageMeta
         title={t('companions.focusZoomOutMeta')}
         description={t('companions.focusZoomOutMeta')}

@@ -54,7 +54,7 @@ export default function CompanionHistoryPage() {
 
   if (loadError) {
     return (
-      <CompanionFocusLayout title={t('companions.lookBack')} onBack={handleBack}>
+      <CompanionFocusLayout title={t('companions.lookBackTitle')} onBack={handleBack}>
         <PageMeta
           title={t('companions.focusHistoryMeta')}
           description={t('companions.focusHistoryMeta')}
@@ -74,7 +74,7 @@ export default function CompanionHistoryPage() {
   }
 
   return (
-    <CompanionFocusLayout title={t('companions.lookBack')} onBack={handleBack}>
+    <CompanionFocusLayout title={t('companions.lookBackTitle')} onBack={handleBack}>
       <PageMeta
         title={t('companions.focusHistoryMeta')}
         description={t('companions.focusHistoryMeta')}
