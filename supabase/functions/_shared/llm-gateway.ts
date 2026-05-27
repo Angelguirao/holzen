@@ -1,6 +1,7 @@
 /**
- * LLM gateway — task-aware model selection with provider cascade:
- *   Google Gemini direct → OpenRouter (failover).
+ * LLM gateway — task-aware model selection with provider cascade.
+ * Order: `LLM_PROVIDER_ORDER` (default `google,openrouter`), e.g. `openrouter,google` when Google billing is unavailable.
+ * Failover: retryable HTTP statuses on one provider try the next credential in the chain (includes 402 billing).
  */
 import { fetchInitWithIncomingTrace } from "./forward-trace-headers.ts";
 import type { LlmBudgetTier } from "./llm-budget.ts";
@@ -10,8 +11,10 @@ export { budgetTierFromSpendRatio, resolveLlmBudgetTier } from "./llm-budget.ts"
 
 export type LlmGatewayProvider = "google" | "openrouter";
 
-/** Active deploys use Google → OpenRouter only. */
+/** Active deploys use Google and/or OpenRouter only. */
 const ACTIVE_LLM_PROVIDERS: readonly LlmGatewayProvider[] = ["google", "openrouter"];
+
+const DEFAULT_LLM_PROVIDER_ORDER: readonly LlmGatewayProvider[] = ["google", "openrouter"];
 
 export type LlmTask =
   | "reflect"
@@ -82,6 +85,39 @@ export function resolveModelsForTask(
   return [...cascade];
 }
 
+/** Parse `LLM_PROVIDER_ORDER` (comma-separated `google` / `openrouter`). Exported for tests. */
+export function parseLlmProviderOrder(
+  raw: string | undefined | null,
+): LlmGatewayProvider[] {
+  if (!raw?.trim()) return [...DEFAULT_LLM_PROVIDER_ORDER];
+  const order: LlmGatewayProvider[] = [];
+  for (const part of raw.split(",")) {
+    const p = part.trim().toLowerCase();
+    if (p !== "google" && p !== "openrouter") continue;
+    const provider = p as LlmGatewayProvider;
+    if (!order.includes(provider)) order.push(provider);
+  }
+  return order.length > 0 ? order : [...DEFAULT_LLM_PROVIDER_ORDER];
+}
+
+function readLlmProviderOrderFromEnv(): LlmGatewayProvider[] {
+  // deno-lint-ignore no-explicit-any
+  const denoGlobal = (globalThis as any).Deno;
+  return parseLlmProviderOrder(denoGlobal?.env?.get?.("LLM_PROVIDER_ORDER"));
+}
+
+/**
+ * When the Google circuit breaker is open, skip curated fallback only if OpenRouter
+ * is configured — live generation can still run on the failover provider.
+ */
+export function shouldUseCuratedFallbackForGoogleDegradation(
+  googleDegraded: boolean,
+  chain: readonly LlmCredentials[],
+): boolean {
+  if (!googleDegraded) return false;
+  return !chain.some((c) => c.provider === "openrouter");
+}
+
 /** Ordered provider credentials — first is primary. */
 export function resolveLlmCredentialChain(
   allowedProviders?: ReadonlySet<LlmGatewayProvider>,
@@ -89,18 +125,25 @@ export function resolveLlmCredentialChain(
   const allow = (provider: LlmGatewayProvider) =>
     !allowedProviders || allowedProviders.has(provider);
 
-  const chain: LlmCredentials[] = [];
+  const byProvider = new Map<LlmGatewayProvider, LlmCredentials>();
 
   const googleKey =
     Deno.env.get("GOOGLE_AI_API_KEY")?.trim() ||
     Deno.env.get("GEMINI_API_KEY")?.trim();
-  if (allow("google") && googleKey) chain.push({ apiKey: googleKey, provider: "google" });
+  if (allow("google") && googleKey) {
+    byProvider.set("google", { apiKey: googleKey, provider: "google" });
+  }
 
   const openRouterKey = Deno.env.get("OPENROUTER_API_KEY")?.trim();
   if (allow("openrouter") && openRouterKey) {
-    chain.push({ apiKey: openRouterKey, provider: "openrouter" });
+    byProvider.set("openrouter", { apiKey: openRouterKey, provider: "openrouter" });
   }
 
+  const chain: LlmCredentials[] = [];
+  for (const provider of readLlmProviderOrderFromEnv()) {
+    const creds = byProvider.get(provider);
+    if (creds) chain.push(creds);
+  }
   return chain;
 }
 
@@ -142,7 +185,15 @@ function openRouterHeaders(apiKey: string): Record<string, string> {
 }
 
 function isRetryableLlmStatus(status: number): boolean {
-  return status === 408 || status === 429 || status === 502 || status === 503 || status === 504;
+  return (
+    status === 402 ||
+    status === 403 ||
+    status === 408 ||
+    status === 429 ||
+    status === 502 ||
+    status === 503 ||
+    status === 504
+  );
 }
 
 /**

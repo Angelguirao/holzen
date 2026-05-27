@@ -61,7 +61,8 @@ Copy staging values where appropriate; swap to **live** vendor keys where noted.
 | Secret | Notes |
 |--------|--------|
 | `GOOGLE_AI_API_KEY` | Primary Gemini |
-| `OPENROUTER_API_KEY` | Recommended failover |
+| `OPENROUTER_API_KEY` | Recommended; set `LLM_PROVIDER_ORDER=openrouter,google` if Google billing is blocked |
+| `LLM_PROVIDER_ORDER` | e.g. `openrouter,google` — provider try order for `llm-gateway` |
 | `PERPLEXITY_API_KEY` | Companions / library ingest |
 | `RESEND_API_KEY` | Production-only Resend API key |
 | `RESEND_WEBHOOK_SECRET` | Resend → prod `handle-email-suppression` |
