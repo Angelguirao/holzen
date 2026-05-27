@@ -11,6 +11,7 @@ export type PauseReflectCardProps = {
   reflectionMessage: string;
   reflectionContent: ReflectionContentV2 | null;
   currentFeel?: CurrentFeelForReflect;
+  severityAbsPct?: number;
   reflectionLoading: boolean;
   reflectionError: string | null;
   onReflectionRetry?: () => void;
@@ -27,6 +28,7 @@ export function PauseReflectCard({
   reflectionMessage,
   reflectionContent,
   currentFeel,
+  severityAbsPct,
   reflectionLoading,
   reflectionError,
   onReflectionRetry,
@@ -56,6 +58,7 @@ export function PauseReflectCard({
             reflectionMessage={reflectionMessage}
             reflectionContent={reflectionContent}
             currentFeel={currentFeel}
+            severityAbsPct={severityAbsPct}
             reflectionLoading={reflectionLoading}
             reflectionError={reflectionError}
             onReflectionRetry={onReflectionRetry}

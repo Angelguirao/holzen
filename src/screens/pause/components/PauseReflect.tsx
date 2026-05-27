@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { resolvePauseReflectDisplayContent } from '@/features/pause/domain/reflect/generation/resolve-pause-reflect-display-content';
 import {
   usePauseReflectionStepLog,
   type CurrentFeelForReflect,
@@ -15,6 +17,7 @@ interface Props {
   reflectionMessage: string;
   reflectionContent?: ReflectionContentV2 | null;
   currentFeel?: CurrentFeelForReflect;
+  severityAbsPct?: number;
   reflectionLoading?: boolean;
   reflectionError?: string | null;
   onReflectionRetry?: () => void;
@@ -33,6 +36,7 @@ export function PauseReflect({
   reflectionMessage,
   reflectionContent = null,
   currentFeel,
+  severityAbsPct = 0,
   reflectionLoading = false,
   reflectionError = null,
   onReflectionRetry,
@@ -45,6 +49,28 @@ export function PauseReflect({
 }: Props) {
   "use memo";
   const { t } = useTranslation();
+
+  const effectiveReflectionContent = useMemo(
+    () =>
+      resolvePauseReflectDisplayContent({
+        reflectionContent,
+        reflectionMessage,
+        reflectionError,
+        context,
+        severityAbsPct,
+        currentFeel,
+        t,
+      }),
+    [
+      reflectionContent,
+      reflectionMessage,
+      reflectionError,
+      context,
+      severityAbsPct,
+      currentFeel,
+      t,
+    ],
+  );
 
   usePauseReflectionStepLog({
     pauseInstanceId,
@@ -67,7 +93,7 @@ export function PauseReflect({
         </p>
         <p className={pauseStepLayout.screenSubtitle}>
           {t('pause.reflect.subtitle', {
-            defaultValue: 'Name what you feel, then one question.',
+            defaultValue: 'Take your time',
           })}
         </p>
       </div>
@@ -78,6 +104,7 @@ export function PauseReflect({
         reflectionMessage={reflectionMessage}
         reflectionContent={reflectionContent}
         currentFeel={currentFeel}
+        severityAbsPct={severityAbsPct}
         reflectionLoading={reflectionLoading}
         reflectionError={reflectionError}
         onReflectionRetry={onReflectionRetry}
@@ -91,7 +118,7 @@ export function PauseReflect({
         reflectionLoading={reflectionLoading}
         reflectionError={reflectionError}
         reflectionMessage={reflectionMessage}
-        reflectionContent={reflectionContent}
+        reflectionContent={effectiveReflectionContent}
         onContinue={onContinue}
         onBack={onBack}
       />

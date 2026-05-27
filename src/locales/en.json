@@ -1622,7 +1622,7 @@
     },
     "reflect": {
       "title": "Reflect",
-      "subtitle": "Name what you feel, then one question.",
+      "subtitle": "Take your time",
       "landLabel": "Land",
       "nameItTitle": "Name it",
       "feelRecap": "You said: {{mood}} ({{intensity}}/5)",
@@ -1631,6 +1631,8 @@
       "hypothesisLabel": "What might be underneath",
       "contextStripTitle": "Why might markets move?",
       "contextStripDisclaimer": "Common narratives, not financial advice.",
+      "fallbackLand": "This moment can feel loud. You do not need to decide anything right now — just notice what is here.",
+      "generationFailedNotice": "We could not refresh this reflection. Here is a starting point — you can still continue.",
       "cardAria": "Reflection",
       "addPostIt": "Add your post-it",
       "favoriteAria": "Favorite this reflection",

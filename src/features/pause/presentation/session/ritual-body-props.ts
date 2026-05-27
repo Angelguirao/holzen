@@ -70,6 +70,7 @@ export type PauseSessionDeepRitualBodyProps = {
   reflectionMessage: string;
   reflectionContent?: ReflectionContentV2 | null;
   currentFeel?: CurrentFeelForReflect;
+  severityAbsPct?: number;
   reflectionLoading?: boolean;
   reflectionError?: string | null;
   onReflectionRetry?: () => void;
