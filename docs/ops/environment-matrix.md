@@ -283,10 +283,10 @@ These exist in hosted Edge Functions without you creating matching secrets manua
 
 | Variable | Used for | Where obtained | Environment notes |
 |---|---|---|---|
-| `GOOGLE_AI_API_KEY` | Direct Gemini access (`llm-gateway` provider `google`) | Google AI Studio | Optional when using OpenRouter-only; omit if billing blocked. |
-| `GEMINI_API_KEY` | Alias accepted by `_shared/llm-gateway.ts` and helper scripts | Same Google AI key | Prefer `GOOGLE_AI_API_KEY` as the canonical name; use this only for compatibility. |
-| `OPENROUTER_API_KEY` | Gemini (and other models) via OpenRouter | OpenRouter dashboard | Recommended; required for OpenRouter-first deploys. |
-| `LLM_PROVIDER_ORDER` | Provider try order for `llm-gateway` | Manual, e.g. `openrouter,google` | Default `google,openrouter`. Set `openrouter,google` when Google billing is unavailable. |
+| `OPENROUTER_API_KEY` | All Gemini LLM calls via OpenRouter (`llm-gateway`) | OpenRouter dashboard | **Required** for active-surface AI (default is OpenRouter-only). |
+| `LLM_PROVIDER_ORDER` | Provider try order for `llm-gateway` | Manual | Default `openrouter`. Set `google,openrouter` only if you also use direct Gemini. |
+| `GOOGLE_AI_API_KEY` | Direct Gemini (`google` provider) | Google AI Studio | **Not used** unless listed in `LLM_PROVIDER_ORDER`. |
+| `GEMINI_API_KEY` | Alias for `GOOGLE_AI_API_KEY` | Same Google AI key | Same as above. |
 | `OPENROUTER_HTTP_REFERER` | OpenRouter attribution header | Manual value | Optional. |
 | `OPENROUTER_APP_TITLE` | OpenRouter attribution title | Manual value | Optional; defaults to `Holzen`. |
 | `PERPLEXITY_API_KEY` | Companion generation and feed ingest | Perplexity dashboard | Optional but recommended for the current AI stack. |

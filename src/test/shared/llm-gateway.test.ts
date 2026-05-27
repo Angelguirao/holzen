@@ -31,8 +31,8 @@ describe('llm-budget tier thresholds', () => {
 });
 
 describe('parseLlmProviderOrder', () => {
-  it('defaults to google then openrouter', () => {
-    expect(parseLlmProviderOrder(undefined)).toEqual(['google', 'openrouter']);
+  it('defaults to openrouter only', () => {
+    expect(parseLlmProviderOrder(undefined)).toEqual(['openrouter']);
   });
 
   it('honors openrouter-first order', () => {

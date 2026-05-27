@@ -45,7 +45,7 @@ flowchart TB
 | Integration | Shipped usage | Replacement |
 |-------------|---------------|-------------|
 | **Google OAuth** | Was `@lovable.dev/cloud-auth-js` | **Supabase Auth** `signInWithOAuth('google')` — configure Google OAuth in Supabase Dashboard |
-| **AI (reflection + companions)** | `LOVABLE_API_KEY` → Lovable gateway | **`OPENROUTER_API_KEY`** + **`LLM_PROVIDER_ORDER=openrouter,google`** when Google billing is blocked; otherwise **`GOOGLE_AI_API_KEY`** (optional failover **`OPENROUTER_API_KEY`**) via [`_shared/llm-gateway.ts`](../../supabase/functions/_shared/llm-gateway.ts) |
+| **AI (reflection + companions)** | `LOVABLE_API_KEY` → Lovable gateway | **`OPENROUTER_API_KEY`** (OpenRouter-only by default via [`_shared/llm-gateway.ts`](../../supabase/functions/_shared/llm-gateway.ts)); **`GOOGLE_AI_API_KEY`** only if you set **`LLM_PROVIDER_ORDER=google,openrouter`** |
 | **Transactional email** | `@lovable.dev/email-js` | **`RESEND_API_KEY`** via [`_shared/transactional-email.ts`](../../supabase/functions/_shared/transactional-email.ts) (Resend path) |
 | **Auth emails** | Lovable auth email webhook | **Supabase Auth Send Email Hook** → `auth-email-hook` (`SEND_EMAIL_HOOK_SECRET` + `RESEND_API_KEY`) |
 | **Bounce/suppression** | Lovable / Mailgun HMAC webhook | **Resend webhooks** → `handle-email-suppression` (`RESEND_WEBHOOK_SECRET`) |

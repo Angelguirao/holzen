@@ -75,7 +75,8 @@ npm run staging:secrets-set
 
 | Secret | Staging value |
 |--------|----------------|
-| `GOOGLE_AI_API_KEY` | Google AI Studio key (Gemini) |
+| `OPENROUTER_API_KEY` | OpenRouter (default LLM path; Gemini model ids) |
+| `GOOGLE_AI_API_KEY` | Optional — only if `LLM_PROVIDER_ORDER` includes `google` |
 | `OPENROUTER_API_KEY` | Optional Gemini failover |
 | `PERPLEXITY_API_KEY` | Perplexity API key |
 | `RESEND_API_KEY` | Staging-only Resend API key |
