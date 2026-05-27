@@ -26,4 +26,4 @@
 
 ## How to verify
 
-1. After a volatility trigger, open the pause notification **immediately**: reflection text + ritual should load; featured/companion areas show skeletons or content, not a silent empty state (`use-companion-data` loader priming + existing `InterventionSection` / `LearningInput` skeletons).
+1. After a volatility trigger, open the pause notification **immediately**: reflection text + ritual should load; companion hub shows skeletons or content on tap, not a silent empty state (`useCompanionOrchestration` loader priming + `CompanionSection` / `LearningInput` skeletons). Featured intervention (`InterventionSection`) is quarantined — not shipped.

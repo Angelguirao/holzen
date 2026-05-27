@@ -1,22 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
 import { applyCompanionInterventionInvokeOutcome } from './apply-companion-intervention-invoke-outcome';
 
-vi.mock('@/features/pause/application/use-cases/ritual/frame/companion-intervention-telemetry', () => ({
+vi.mock('./companion-intervention-telemetry', () => ({
   logCompanionInterventionInvokeFailed: vi.fn(),
   logCompanionInterventionInvokeOk: vi.fn(),
   logCompanionInterventionSignalHydrated: vi.fn(),
 }));
 
-vi.mock('./orchestrate-slot-apply', async (importOriginal) => {
-  const actual =
-    await importOriginal<
-      typeof import('./orchestrate-slot-apply')
-    >();
-  return {
-    ...actual,
-    hydrateOrchestrateSlotsFromInterventionResponse: vi.fn(() => null),
-  };
-});
+vi.mock('./intervention-slot-hydrate', () => ({
+  hydrateOrchestrateSlotsFromInterventionResponse: vi.fn(() => null),
+}));
 
 const pauseInstanceId = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
 

@@ -1,14 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import type {
-  CompanionOrchestrateSessionContext,
-  RunCompanionInterventionBootstrapPorts,
-} from './pause-companion-orchestrate-io';
+import type { CompanionOrchestrateSessionContext } from '@/features/pause/application/use-cases/ritual/frame/build-companion-orchestrate-body';
+import type { RunCompanionInterventionBootstrapPorts } from '@/legacy/pause-featured-intervention/application/run-companion-intervention-bootstrap';
 import { useCompanionInterventionFetch } from './use-companion-intervention-fetch';
 
 const {
   runCompanionInterventionBootstrapMock,
-  mockCompanionOrchestrator,
   invokeInterventionMock,
   loadOrchestrateSessionMock,
   sessionFixture,
@@ -26,22 +23,21 @@ const {
   return {
     sessionFixture,
     runCompanionInterventionBootstrapMock: vi.fn().mockResolvedValue({ status: 'cached' }),
-    mockCompanionOrchestrator: {
-      port: 'supabaseCompanionOrchestrator',
-      invokeIntervention: invokeInterventionMock,
-    },
     invokeInterventionMock,
     loadOrchestrateSessionMock: vi.fn().mockResolvedValue(sessionFixture),
   };
 });
 
-vi.mock('@/features/pause/domain/pause-featured-intervention', () => ({
+vi.mock('@/legacy/pause-featured-intervention/domain/pause-featured-intervention', () => ({
   PAUSE_FEATURED_INTERVENTION_ENABLED: true,
 }));
 
-vi.mock('./pause-companion-orchestrate-io', () => ({
+vi.mock('@/legacy/pause-featured-intervention/application/run-companion-intervention-bootstrap', () => ({
   runCompanionInterventionBootstrap: runCompanionInterventionBootstrapMock,
-  companionOrchestrator: mockCompanionOrchestrator,
+}));
+
+vi.mock('@/legacy/pause-featured-intervention/infrastructure/invoke-featured-intervention', () => ({
+  invokeFeaturedInterventionOrchestrate: invokeInterventionMock,
 }));
 
 vi.mock('@/features/pause/public-queries', () => ({
@@ -59,7 +55,9 @@ function baseParams() {
     retryCount: 0,
     interventionFetchKeyRef,
     interventionSkippedRef,
-    startInterventionTransition: (cb) => { void cb(); },
+    startInterventionTransition: (cb: () => void) => {
+      void cb();
+    },
     setInterventionError: noop,
     setIntervention: noop,
     loadOrchestrateSession: loadOrchestrateSessionMock,
@@ -92,7 +90,7 @@ describe('useCompanionInterventionFetch', () => {
     const ports = runCompanionInterventionBootstrapMock.mock.calls[0]?.[1] as
       | RunCompanionInterventionBootstrapPorts
       | undefined;
-    expect(ports?.invokeIntervention).toBeDefined();
+    expect(ports?.invokeIntervention).toBe(invokeInterventionMock);
     await ports?.invokeIntervention?.(sessionFixture);
     expect(invokeInterventionMock).toHaveBeenCalledWith(sessionFixture);
   });
