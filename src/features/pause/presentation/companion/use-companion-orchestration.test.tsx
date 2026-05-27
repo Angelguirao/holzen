@@ -88,6 +88,12 @@ const {
   };
 });
 
+vi.mock('./use-companion-artifact-hydrate', () => ({
+  useCompanionArtifactHydrate: vi.fn(() => ({
+    whenArtifactHydrateReady: () => Promise.resolve(),
+  })),
+}));
+
 vi.mock('./use-companion-slot-ui-state', () => ({
   useCompanionSlotUiState: useCompanionSlotUiStateMock,
 }));
@@ -156,6 +162,7 @@ describe('useCompanionOrchestration', () => {
       requirePro,
       startCheckout,
       fetchedSlotsRef: slotUiFixture.fetchedSlotsRef,
+      whenArtifactHydrateReady: expect.any(Function),
       setCacheIds: slotUiFixture.setCacheIds,
       setCacheRelaxations: slotUiFixture.setCacheRelaxations,
       slotCommitters: slotUiFixture.slotCommitters,
