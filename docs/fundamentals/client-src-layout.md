@@ -90,7 +90,7 @@ Traces one **shipped** vertical slice: user starts a manual pause from Home and 
 
 | Step | Layer | Code |
 |------|-------|------|
-| Tap “Need a moment” (or equivalent CTA) | Screen | `HomeScreen` → `HomePauseCardBody` via `useHomePauseCardProjection` |
+| Tap “Need a moment” (or equivalent CTA) | Screen | `HomeScreen` → `HomePauseWidgetBody` via `useHomePauseCardProjection` |
 | Orchestration | Screen hook | `useHomePauseActions.handleNeedAPause` |
 | Market + pause create | Screen hook → feature | `useHolzen.manualTrigger` → `generateMessage` |
 | RPC (authority) | Feature infra | `pauseCreateOrReuse` → Postgres `pause_create_or_reuse` |

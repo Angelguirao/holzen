@@ -13,7 +13,7 @@ Authoritative orchestration: [`src/screens/home/HomeScreen.tsx`](../../src/scree
 | Pull-to-refresh row | [`HomePullRefreshIndicator.tsx`](../../src/screens/home/components/HomePullRefreshIndicator.tsx) |
 | Customize link button | [`HomeCustomizeLinkButton.tsx`](../../src/screens/home/components/HomeCustomizeLinkButton.tsx) |
 | Zen mode (not MVP) | [`src/legacy/zen-mode/`](../../src/legacy/zen-mode/README.md) |
-| Pause widget body | [`HomePauseCardBody.tsx`](../../src/screens/home/components/HomePauseCardBody.tsx) |
+| Pause widget body | [`HomePauseWidgetBody.tsx`](../../src/screens/home/components/HomePauseWidgetBody.tsx) |
 | Pause error panel | [`HomePauseBlockingErrorPanel.tsx`](../../src/screens/home/components/HomePauseBlockingErrorPanel.tsx) |
 | Context meta lines | [`HomePauseContextMeta.tsx`](../../src/screens/home/components/HomePauseContextMeta.tsx) |
 | Expand chevrons | [`HomeExpandChevronButton.tsx`](../../src/screens/home/components/HomeExpandChevronButton.tsx) |
@@ -66,7 +66,7 @@ Zen and the inline pause card share this contract so reflection failures are not
 
 ## Your pause widget (Figma A–E + calm-waters)
 
-Home maps **`v_pause_full.state`** to Figma modes via [`resolveHomePauseWidgetMode`](../../src/features/pause/domain/home/home-pause-widget-mode.ts). **`active` → B** (Pause with this); **`engaged` → C / C′** (Continue + Discard). Full narrative: **[pause-engaged-and-home-widget.md](../systems/pause-engaged-and-home-widget.md)**.
+Home maps **`v_pause_full.state`** to Figma modes via [`resolveHomePauseWidgetMode`](../../src/features/pause/domain/home/home-pause-widget-mode.ts). **`active` → B** (Pause with this); **`engaged` → C / C′** (Continue + Discard). Projection narrative: **[home-pause-widget-projection.md](../systems/home-pause-widget-projection.md)**.
 
 | UI mode | When | Header / CTA |
 |--------|------|----------------|

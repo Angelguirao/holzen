@@ -8,12 +8,6 @@ export {
   type PauseArrivalToneAction,
 } from './domain/home/resolve-pause-arrival-tone-action';
 export {
-  buildHomePauseCardBodyProps,
-  type BuildHomePauseCardBodyPropsInput,
-  type HomePauseCardBodyPropsProjection,
-  type PauseContextHomePreview,
-} from './presentation/home/home-pause-card-body-props';
-export {
   pauseHomeErrorKind,
   pauseHomeErrorStrings,
   shouldShowHomePauseSectionSnooze,
@@ -60,7 +54,11 @@ export {
   useHomePauseActions,
   type PauseDismissAnalyticsSurface,
 } from './presentation/home/use-home-pause-actions';
-export { usePauseContextHomePreviews } from './presentation/home/use-pause-context-home-previews';
+export { useHomePendingPauseOfferActions } from './presentation/home/use-home-pending-pause-offer-actions';
+export {
+  usePauseContextHomePreviews,
+  type PauseContextHomePreview,
+} from './presentation/home/use-pause-context-home-previews';
 export { useOpenPauseHomePreview } from './presentation/reflect/generation/manual-open/use-open-pause-home-preview';
 export {
   useManualPauseTrigger,

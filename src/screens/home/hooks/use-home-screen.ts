@@ -10,6 +10,7 @@ import {
   useCompletedPauseCount,
   useDismissOutletPauseReady,
   useHomePauseActions,
+  useHomePendingPauseOfferActions,
   usePauseArrivalAudio,
 } from '@/features/pause/public-home';
 import { useMarketDisplayPreferences } from '@/features/market/public-hooks';
@@ -168,6 +169,8 @@ export function useHomeScreen() {
     dismissAnalyticsSurface: 'home_your_pause_widget',
   });
 
+  const pendingOfferActions = useHomePendingPauseOfferActions(navigate);
+
   const pauseProjection = useHomePauseCardProjection({
     subscriptionReady,
     hasAccess,
@@ -177,7 +180,6 @@ export function useHomeScreen() {
     trialLoading,
     hasOpenPause,
     openPauseState,
-    pauseContextHomePreview: { btc24h: null, marketSentiment: null },
     loading,
     error,
     btcData,
@@ -188,7 +190,9 @@ export function useHomeScreen() {
     manualCooldownRemaining,
     manualTrigger,
     onNavigatePauseWithThis: pauseActions.handleNavigatePauseWithThis,
-    onNavigatePauseFromPendingBanner: pauseActions.handleNavigatePauseWithThisFromPendingBanner,
+    onAdoptPendingOffer: pendingOfferActions.adoptPendingOffer,
+    onDeclinePendingOffer: pendingOfferActions.declinePendingOffer,
+    pendingOfferBusy: pendingOfferActions.pendingOfferBusy,
     onDismissOpenPause: pauseActions.handleDismiss,
     onNeedPause: pauseActions.handleNeedAPause,
     onStartCheckoutPro: pauseActions.startProCheckout,

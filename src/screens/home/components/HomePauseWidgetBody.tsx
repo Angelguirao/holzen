@@ -109,6 +109,12 @@ export function HomePauseWidgetBody(props: Props) {
           previewLine={props.previewLine}
           marketBlock={props.marketBlock}
           onPauseWithThis={props.onPauseWithThis}
+          showPendingQueuedBanner={props.showPendingQueuedBanner}
+          pendingPreviewLine={props.pendingPreviewLine}
+          pendingMarketBlock={props.pendingMarketBlock}
+          onPauseWithNewContext={props.onPauseWithNewContext}
+          onDeclinePendingOffer={props.onDeclinePendingOffer}
+          pendingOfferBusy={props.pendingOfferBusy}
           ctaLabelKey="home.pauseWidget.pauseWithThis"
         />
       );
@@ -133,6 +139,8 @@ export function HomePauseWidgetBody(props: Props) {
           onPauseWithThis={props.onPauseWithThis}
           onDismissOpenPause={props.onDismissOpenPause}
           onPauseWithNewContext={props.onPauseWithNewContext}
+          onDeclinePendingOffer={props.onDeclinePendingOffer}
+          pendingOfferBusy={props.pendingOfferBusy}
         />
       );
 

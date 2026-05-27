@@ -1,6 +1,6 @@
 -- Align Postgres `engaged` with product/Figma: deep ritual reaches `engaged` only after
 -- `reflection_step` (Reflect beat). Brief ritual never enters `engaged` — it completes
--- from `active` via `outcome_logged`. See docs/systems/pause-engaged-and-home-widget.md.
+-- from `active` via `outcome_logged`. See docs/systems/pause-system.md and home-pause-widget-projection.md.
 
 UPDATE public.pause_templates
    SET required_for_engaged = ARRAY['reflection_step']::text[]

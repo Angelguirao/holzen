@@ -10,7 +10,15 @@ import type { HomePauseWidgetBodyProjection } from '@/features/pause/presentatio
 
 type OpenBodyProps = Pick<
   HomePauseWidgetBodyProjection,
-  'previewLine' | 'marketBlock' | 'onPauseWithThis'
+  | 'previewLine'
+  | 'marketBlock'
+  | 'onPauseWithThis'
+  | 'showPendingQueuedBanner'
+  | 'pendingPreviewLine'
+  | 'pendingMarketBlock'
+  | 'onPauseWithNewContext'
+  | 'onDeclinePendingOffer'
+  | 'pendingOfferBusy'
 > & {
   ctaLabelKey: string;
   showSparkle?: boolean;
@@ -21,6 +29,12 @@ export function HomePauseOpenActiveBody({
   previewLine,
   marketBlock,
   onPauseWithThis,
+  showPendingQueuedBanner,
+  pendingPreviewLine,
+  pendingMarketBlock,
+  onPauseWithNewContext,
+  onDeclinePendingOffer,
+  pendingOfferBusy,
   ctaLabelKey,
   showSparkle = true,
 }: OpenBodyProps) {
@@ -29,6 +43,45 @@ export function HomePauseOpenActiveBody({
 
   return (
     <div className="space-y-4">
+      {showPendingQueuedBanner ? (
+        <div
+          className="rounded-lg border border-nox-accent-mustard/35 bg-nox-accent-mustard/10 px-3 py-2.5 text-xs leading-snug text-foreground/95"
+          role="status"
+        >
+          <p className="font-medium text-foreground">{t('home.pendingQueuedTitle')}</p>
+          <p className="mt-1 text-foreground/85">{t('home.pendingQueuedBody')}</p>
+          {pendingPreviewLine ? (
+            <div className="mt-2">
+              <HomePauseWidgetPreviewLine previewLine={pendingPreviewLine} />
+            </div>
+          ) : null}
+          {pendingMarketBlock ? (
+            <div className="mt-2">
+              <HomePauseWidgetMarketRow block={pendingMarketBlock} />
+            </div>
+          ) : null}
+          {onPauseWithNewContext ? (
+            <button
+              type="button"
+              disabled={pendingOfferBusy}
+              onClick={onPauseWithNewContext}
+              className="mt-2 w-full rounded-lg border border-nox-accent-mustard/45 bg-background/80 px-2 py-1.5 text-center text-xs font-medium text-foreground hover:bg-background disabled:opacity-60"
+            >
+              {t('home.pendingQueuedCta')}
+            </button>
+          ) : null}
+          {onDeclinePendingOffer ? (
+            <button
+              type="button"
+              disabled={pendingOfferBusy}
+              onClick={onDeclinePendingOffer}
+              className="mt-1 w-full py-1 text-center text-xs font-medium text-muted-foreground underline underline-offset-2 hover:text-foreground disabled:opacity-60"
+            >
+              {t('pause.pendingKeepCta', { defaultValue: 'Keep current pause' })}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       <HomePauseWidgetPreviewLine previewLine={previewLine} />
       <HomePauseWidgetMarketRow block={marketBlock} />
       <button
@@ -85,7 +138,11 @@ export function HomePauseEngagedBody({
 type PendingProps = EngagedProps &
   Pick<
     HomePauseWidgetBodyProjection,
-    'pendingPreviewLine' | 'pendingMarketBlock' | 'onPauseWithNewContext'
+    | 'pendingPreviewLine'
+    | 'pendingMarketBlock'
+    | 'onPauseWithNewContext'
+    | 'onDeclinePendingOffer'
+    | 'pendingOfferBusy'
   >;
 
 /** State C′ — dual layout. */
@@ -97,6 +154,8 @@ export function HomePauseEngagedPendingBody({
   onPauseWithThis,
   onDismissOpenPause,
   onPauseWithNewContext,
+  onDeclinePendingOffer,
+  pendingOfferBusy,
 }: PendingProps) {
   "use memo";
   const { t } = useTranslation();
@@ -132,9 +191,19 @@ export function HomePauseEngagedPendingBody({
       <p className={homeInWidget.kicker}>{t('home.pauseWidget.newContextSection')}</p>
       {pendingPreviewLine ? <HomePauseWidgetPreviewLine previewLine={pendingPreviewLine} /> : null}
       {pendingMarketBlock ? <HomePauseWidgetMarketRow block={pendingMarketBlock} /> : null}
-      <button type="button" onClick={onNewContext} className={homeInWidget.ctaSecondary}>
+      <button type="button" disabled={pendingOfferBusy} onClick={onNewContext} className={homeInWidget.ctaSecondary}>
         {t('home.pauseWidget.pauseWithNewContext')}
       </button>
+      {onDeclinePendingOffer ? (
+        <button
+          type="button"
+          disabled={pendingOfferBusy}
+          onClick={onDeclinePendingOffer}
+          className="w-full py-1 text-center text-sm font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground disabled:opacity-60"
+        >
+          {t('pause.pendingKeepCta', { defaultValue: 'Keep current pause' })}
+        </button>
+      ) : null}
     </div>
   );
 }

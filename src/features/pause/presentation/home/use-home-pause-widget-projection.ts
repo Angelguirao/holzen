@@ -41,6 +41,9 @@ export type HomePauseWidgetBodyProjection = {
   onReactivate: () => void;
   onPauseWithThis: () => void;
   onPauseWithNewContext?: () => void;
+  onDeclinePendingOffer?: () => void;
+  pendingOfferBusy?: boolean;
+  showPendingQueuedBanner: boolean;
   onDismissOpenPause: () => void;
   loading: boolean;
   error: string | null;
@@ -82,7 +85,9 @@ export type UseHomePauseWidgetProjectionParams = {
   manualCooldownRemaining: () => number;
   manualTrigger: (mood?: string) => Promise<ManualPauseTriggerResult>;
   onNavigatePauseWithThis: () => void;
-  onNavigatePauseFromPendingBanner: () => void;
+  onAdoptPendingOffer: () => void | Promise<boolean>;
+  onDeclinePendingOffer: () => void | Promise<boolean>;
+  pendingOfferBusy: boolean;
   onDismissOpenPause: () => void;
   onNeedPause: () => void;
   onStartCheckoutPro: () => void;
@@ -257,18 +262,8 @@ export function useHomePauseWidgetProjection(
   const pendingContextText =
     typeof pendingSnapshot?.context_text === 'string' ? pendingSnapshot.context_text : null;
 
-  const pendingMarketBlock =
-    widgetMode === 'C_prime' && pending
-      ? formatHomePauseMarketBlock({
-          contextText: pendingContextText,
-          btcData: params.btcData,
-          trackedAssetId: params.trackedAssetId,
-          instanceCreatedAt: pending.created_at ?? null,
-        })
-      : null;
-
   const pendingPreviewLine =
-    widgetMode === 'C_prime' && pending
+    pending && (widgetMode === 'C_prime' || widgetMode === 'B')
       ? resolveHomePauseWidgetPreviewLine({
           hasReflectionStep: false,
           reflectionMessage: pending.preview_message,
@@ -277,6 +272,18 @@ export function useHomePauseWidgetProjection(
           openPauseState: 'active',
         })
       : null;
+
+  const pendingMarketBlock =
+    pending && (widgetMode === 'C_prime' || widgetMode === 'B')
+      ? formatHomePauseMarketBlock({
+          contextText: pendingContextText,
+          btcData: params.btcData,
+          trackedAssetId: params.trackedAssetId,
+          instanceCreatedAt: pending.created_at ?? null,
+        })
+      : null;
+
+  const showPendingQueuedBanner = widgetMode === 'B' && Boolean(pending);
 
   const body: HomePauseWidgetBodyProjection = {
     widgetMode,
@@ -291,7 +298,10 @@ export function useHomePauseWidgetProjection(
     onStartTrial: params.onStartTrial,
     onReactivate: params.onReactivate,
     onPauseWithThis: params.onNavigatePauseWithThis,
-    onPauseWithNewContext: params.onNavigatePauseFromPendingBanner,
+    onPauseWithNewContext: () => void params.onAdoptPendingOffer(),
+    onDeclinePendingOffer: () => void params.onDeclinePendingOffer(),
+    pendingOfferBusy: params.pendingOfferBusy,
+    showPendingQueuedBanner,
     onDismissOpenPause: params.onDismissOpenPause,
     loading: params.loading,
     error: params.error,
