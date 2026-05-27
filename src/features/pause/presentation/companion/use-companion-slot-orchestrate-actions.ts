@@ -51,7 +51,7 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
     severityNumber,
     language,
     canAccessCompanion,
-    applyOptimisticDecrement,
+    applyOptimisticDecrement: _applyOptimisticDecrement,
     refreshSubscription,
     toast,
     requirePro,
@@ -95,10 +95,9 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
       if (!canAccessCompanion()) return;
 
       fetchedSlotsRef.current.add(slot);
-      applyOptimisticDecrement('companion');
       await runSlotOrchestrate(slot, 'lazy_fetch');
     },
-    [pauseInstanceId, canAccessCompanion, applyOptimisticDecrement, runSlotOrchestrate, fetchedSlotsRef],
+    [pauseInstanceId, canAccessCompanion, runSlotOrchestrate, fetchedSlotsRef],
   );
 
   const regenerateCompanion = useCallback(
