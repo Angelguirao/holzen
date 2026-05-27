@@ -1,4 +1,5 @@
-import { forwardRef, useCallback } from 'react';
+import { forwardRef, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useProGate } from '@/features/subscription/public-hooks';
 import { useCompanionSection, useCompanionSectionExpansion } from '@/features/pause/public-ritual-frame';
@@ -44,7 +45,22 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   ref,
 ) {
   "use memo";
+  const { t } = useTranslation();
   const { isPro } = useProGate();
+
+  const frameIconHelps = useMemo(
+    () =>
+      appearance === 'frame'
+        ? {
+            haiku: t('pause.frame.companions.haikuHelp'),
+            signal: t('pause.frame.companions.signalHelp'),
+            grounding: t('pause.frame.companions.groundingHelp'),
+            zoomOut: t('pause.frame.companions.zoomOutHelp'),
+            lookBack: t('pause.frame.companions.lookBackHelp'),
+          }
+        : undefined,
+    [appearance, t],
+  );
 
   const {
     labels,
@@ -140,6 +156,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           onFirstExpandComplete={() => markCompleted('haiku')}
           proFavorite={proFavorite('haiku')}
           appearance={appearance}
+          iconHelp={frameIconHelps?.haiku}
         />
       ) : null}
 
@@ -180,6 +197,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
         proFavorite={proFavorite}
         appearance={appearance}
         companionSlotOrder={companionSlotOrder}
+        iconHelps={frameIconHelps}
       />
     </div>
   );

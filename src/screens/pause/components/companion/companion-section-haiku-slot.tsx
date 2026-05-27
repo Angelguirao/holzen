@@ -16,6 +16,7 @@ export type CompanionSectionHaikuSlotProps = {
   onFirstExpandComplete: () => void;
   proFavorite: CompanionSectionProFavoriteProps;
   appearance?: CompanionCardAppearance;
+  iconHelp?: string;
 };
 
 export function CompanionSectionHaikuSlot({
@@ -27,6 +28,7 @@ export function CompanionSectionHaikuSlot({
   onFirstExpandComplete,
   proFavorite,
   appearance = 'default',
+  iconHelp,
 }: CompanionSectionHaikuSlotProps) {
   "use memo";
   return (
@@ -41,6 +43,7 @@ export function CompanionSectionHaikuSlot({
       }}
       completed={completed}
       appearance={appearance}
+      iconHelp={iconHelp}
       {...proFavorite}
     >
       <HaikuDisplay haiku={haiku} variant={appearance === 'frame' ? 'verse' : 'default'} />
