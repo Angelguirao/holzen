@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useCompanionArtifactHydrate } from './use-companion-artifact-hydrate';
 import { useCompanionOrchestrateRetry } from './use-companion-orchestrate-retry';
 import { useCompanionSlotOrchestrateActions } from './use-companion-slot-orchestrate-actions';
 import { useCompanionSlotUiState } from './use-companion-slot-ui-state';
@@ -40,6 +41,12 @@ export function useCompanionOrchestration({
   const [retryCount, setRetryCount] = useState(0);
 
   const slotUi = useCompanionSlotUiState(pauseInstanceId);
+
+  useCompanionArtifactHydrate({
+    pauseInstanceId,
+    fetchedSlotsRef: slotUi.fetchedSlotsRef,
+    slotCommitters: slotUi.slotCommitters,
+  });
 
   const orchestrateActions = useCompanionSlotOrchestrateActions({
     pauseInstanceId,

@@ -190,7 +190,7 @@ export function CompanionSectionOrchestratedSlots({
           onFirstExpandComplete={() => markCompleted('grounding')}
           loading={nudgeLoading}
           pauseInstanceId={pauseInstanceId}
-          hasContent={Boolean(nudge)}
+          hasContent={Boolean(nudge) || Boolean(companions.groundingTitle?.trim() || companions.groundingBody?.trim())}
           relaxationKey={cacheRelaxations.nudge}
           companionType="grounding"
           cacheId={cacheIds.nudge}
