@@ -42,8 +42,6 @@ describe('isPauseSessionWaitingForInstanceFetch', () => {
           reflection_message: 'm',
           context: null,
           haiku: null,
-          grounding_title: null,
-          grounding_body: null,
         },
       }),
     ).toBe(false);

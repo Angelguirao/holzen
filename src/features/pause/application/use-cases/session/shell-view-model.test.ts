@@ -10,8 +10,6 @@ const ready = (over: Partial<PauseSessionHydrationReady> = {}): PauseSessionHydr
   pauseInstanceId: 'pi-1',
   companions: {
     haiku: 'h',
-    groundingTitle: 'gt',
-    groundingBody: 'gb',
   },
   companionPrefs: { ...DEFAULT_PREFS, haiku: false },
   severity: 'moderate',

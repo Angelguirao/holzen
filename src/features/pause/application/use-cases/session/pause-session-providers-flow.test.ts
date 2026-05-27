@@ -22,7 +22,7 @@ describe('pause-session-providers-flow', () => {
       dismissMessage,
       message: null,
       context: null,
-      companions: { haiku: null, groundingTitle: null, groundingBody: null },
+      companions: { haiku: null },
       lastPauseInstanceId: null,
       companionPrefs: {
         breathing: true,

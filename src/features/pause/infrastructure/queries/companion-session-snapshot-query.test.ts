@@ -48,7 +48,7 @@ describe('loadPauseSessionSnapshot', () => {
       reflectionMessage: '',
       context: 'BTC moved',
       mood: 'anxious',
-      companions: { haiku: null, groundingTitle: null, groundingBody: null },
+      companions: { haiku: null },
     });
   });
 

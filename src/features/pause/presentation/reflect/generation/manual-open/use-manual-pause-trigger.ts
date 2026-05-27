@@ -87,7 +87,7 @@ export function useManualPauseTrigger({
         setMessage,
         setContext,
         setCompanionsEmpty: () =>
-          setCompanions({ haiku: null, groundingTitle: null, groundingBody: null }),
+          setCompanions({ haiku: null }),
         setNewPauseArrival,
         setLastTriggerAt,
         syncOpenPauseFromDb,

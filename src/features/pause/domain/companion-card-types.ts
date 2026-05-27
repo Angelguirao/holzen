@@ -1,10 +1,13 @@
-/** Inline companion card payload (haiku from reflect; grounding uses lazy slot + artifacts). */
+/** Inline companion payload on the pause session (haiku from reflect; other slots use artifacts + orchestrate). */
 export interface CompanionData {
   haiku: string | null;
-  /** Legacy session field from reflect fetch — not read by Frame companion strip. */
-  groundingTitle: string | null;
-  /** Legacy session field from reflect fetch — not read by Frame companion strip. */
-  groundingBody: string | null;
+}
+
+/** Strip removed session fields when loading legacy persisted / router payloads. */
+export function normalizeCompanionData(companions: unknown): CompanionData {
+  if (!companions || typeof companions !== 'object') return { haiku: null };
+  const haiku = (companions as { haiku?: unknown }).haiku;
+  return { haiku: haiku === null || typeof haiku === 'string' ? haiku : null };
 }
 
 export interface CompanionPrefs {

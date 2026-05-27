@@ -134,8 +134,6 @@ export async function generateReflectionAtReflectStep(
 
   const companions: CompanionData = {
     haiku: fnData?.haiku ?? null,
-    groundingTitle: fnData?.grounding_title ?? null,
-    groundingBody: fnData?.grounding_body ?? null,
   };
 
   await persistReflectionArtifacts({
@@ -145,8 +143,8 @@ export async function generateReflectionAtReflectStep(
     message,
     structured: content,
     haiku: companions.haiku,
-    groundingTitle: companions.groundingTitle,
-    groundingBody: companions.groundingBody,
+    groundingTitle: fnData?.grounding_title ?? null,
+    groundingBody: fnData?.grounding_body ?? null,
     groundingCitation: fnData?.grounding_citation ?? null,
     groundingUrl: fnData?.grounding_url ?? null,
   });

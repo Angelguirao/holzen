@@ -18,7 +18,7 @@ import {
 import { computePauseSessionHydration } from './pause-session-shell-flow';
 import { pickPauseHolzenProvidersSlice } from './pause-session-providers-flow';
 
-const companions = { haiku: null, groundingTitle: null, groundingBody: null } as const;
+const companions = { haiku: null } as const;
 const companionPrefs = {
   breathing: true,
   haiku: true,

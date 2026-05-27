@@ -15,7 +15,7 @@ describe('pickPauseHolzenProvidersSlice', () => {
         dismissMessage,
         message: 'Take a breath.',
         context: 'btc_move',
-        companions: { haiku: 'line', groundingTitle: null, groundingBody: null },
+        companions: { haiku: 'line' },
         lastPauseInstanceId: 'inst-1',
         companionPrefs: {
           breathing: true,
@@ -36,7 +36,7 @@ describe('pickPauseHolzenProvidersSlice', () => {
       dismissMessage,
       message: 'Take a breath.',
       context: 'btc_move',
-      companions: { haiku: 'line', groundingTitle: null, groundingBody: null },
+      companions: { haiku: 'line' },
       lastPauseInstanceId: 'inst-1',
       companionPrefs: {
         breathing: true,
@@ -61,7 +61,7 @@ describe('pickPauseHolzenProvidersSlice', () => {
       dismissMessage,
       message: 'Hi',
       context: null,
-      companions: { haiku: null, groundingTitle: null, groundingBody: null },
+      companions: { haiku: null },
       lastPauseInstanceId: null,
       severity: 'mild' as const,
       btcData: null,
