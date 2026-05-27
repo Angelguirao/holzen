@@ -259,43 +259,73 @@
   ],
   "reflection": [
     {
-      "message": "The number changed. You didn't. That distinction is worth sitting with.",
+      "land": "The number changed. You didn't.",
+      "hypothesis": "That distinction might be worth sitting with before the next alert pulls you forward.",
+      "inquiry": "What story is the chart telling your body right now?",
+      "message": "The number changed. You didn't. That distinction might be worth sitting with before the next alert pulls you forward. What story is the chart telling your body right now?",
       "haiku": "Digits on a screen\nshift like sand beneath the tide\nthe shore remains still"
     },
     {
-      "message": "Between the price alert and your next action, there is a space. That space is yours.",
+      "land": "Between the price alert and your next action, there is a space.",
+      "hypothesis": "That gap is often where agency lives — not in the tick, but in what you do with the breath before you move.",
+      "inquiry": "What would it cost you to stay in that space a little longer?",
+      "message": "Between the price alert and your next action, there is a space. That gap is often where agency lives — not in the tick, but in what you do with the breath before you move. What would it cost you to stay in that space a little longer?",
       "haiku": "A bell rings somewhere\nthe hand pauses, breath arrives\nchoice lives in the gap"
     },
     {
-      "message": "Every holder who came before you sat exactly where you're sitting now, feeling exactly what you feel.",
+      "land": "Every holder who came before you sat where you are sitting now.",
+      "hypothesis": "The feeling might not be new — only the timestamp on the screen.",
+      "inquiry": "What part of this moment feels oldest in you?",
+      "message": "Every holder who came before you sat where you are sitting now. The feeling might not be new — only the timestamp on the screen. What part of this moment feels oldest in you?",
       "haiku": "Footprints in the snow\nthousands walked this path before\nspring remembered them"
     },
     {
-      "message": "What would the version of you one year from now think about this moment?",
+      "land": "Moments like this often invite a longer view than the chart allows.",
+      "hypothesis": "Part of you might already be imagining a future self judging this pause.",
+      "inquiry": "What would the version of you one year from now notice about this moment?",
+      "message": "Moments like this often invite a longer view than the chart allows. Part of you might already be imagining a future self judging this pause. What would the version of you one year from now notice about this moment?",
       "haiku": "Tomorrow's calm self\nlooks back at today's sharp edge\nand finds it was round"
     },
     {
-      "message": "Volatility is not the enemy of conviction. It's the price of it.",
+      "land": "Volatility is not the enemy of conviction.",
+      "hypothesis": "It might simply be the price of caring about something that moves in public.",
+      "inquiry": "What are you trying to protect by holding on?",
+      "message": "Volatility is not the enemy of conviction. It might simply be the price of caring about something that moves in public. What are you trying to protect by holding on?",
       "haiku": "The mountain does not\napologize for its storms\nit simply endures"
     },
     {
-      "message": "Breathing does not wait for the chart to finish its story.",
+      "land": "Breathing does not wait for the chart to finish its story.",
+      "hypothesis": "Your body might already be ahead of the candle — steady before the narrative catches up.",
+      "inquiry": "What changes if you let the exhale lead?",
+      "message": "Breathing does not wait for the chart to finish its story. Your body might already be ahead of the candle — steady before the narrative catches up. What changes if you let the exhale lead?",
       "haiku": "The chart keeps moving\nYour exhale was always here\nBefore the pixels"
     },
     {
-      "message": "Stillness is allowed even when alerts stack like unread mail.",
+      "land": "Stillness is allowed even when alerts stack like unread mail.",
+      "hypothesis": "The inbox can feel louder than the move — urgency might be coming from habit, not from the market alone.",
+      "inquiry": "Which notification is actually asking for your attention?",
+      "message": "Stillness is allowed even when alerts stack like unread mail. The inbox can feel louder than the move — urgency might be coming from habit, not from the market alone. Which notification is actually asking for your attention?",
       "haiku": "Snow falls on signal\nthe masts forgot their long names\nQuiet white fields wait"
     },
     {
-      "message": "You can notice fear without handing it the keys to your hands.",
+      "land": "You can notice fear without handing it the keys to your hands.",
+      "hypothesis": "Fear often wants a decision before you have had a breath — naming it might loosen its grip.",
+      "inquiry": "What is fear asking you to do right now?",
+      "message": "You can notice fear without handing it the keys to your hands. Fear often wants a decision before you have had a breath — naming it might loosen its grip. What is fear asking you to do right now?",
       "haiku": "Fear knocks the same door\nseasons return with soft rain\nSoft breath holds the lock"
     },
     {
-      "message": "The body knows noon light whether markets agree with the sky.",
+      "land": "The body knows noon light whether markets agree with the sky.",
+      "hypothesis": "Grounding might live in sensation before it lives in any price.",
+      "inquiry": "What do you feel in your body that the chart cannot show?",
+      "message": "The body knows noon light whether markets agree with the sky. Grounding might live in sensation before it lives in any price. What do you feel in your body that the chart cannot show?",
       "haiku": "Sun warms your shoulders\nDistant rooms hum on softly\nNoon rests on your skin"
     },
     {
-      "message": "Curiosity toward the feeling beats verdicts about the number.",
+      "land": "Curiosity toward the feeling beats verdicts about the number.",
+      "hypothesis": "A label like good or bad might be smaller than what you are actually carrying.",
+      "inquiry": "What would you notice if you stayed curious for one more breath?",
+      "message": "Curiosity toward the feeling beats verdicts about the number. A label like good or bad might be smaller than what you are actually carrying. What would you notice if you stayed curious for one more breath?",
       "haiku": "Candle melts its wax\nevening rounds each jagged edge\nGlow holds the dark room"
     }
   ]

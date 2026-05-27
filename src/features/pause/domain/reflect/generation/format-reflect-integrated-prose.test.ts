@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { buildReflectClientFallback } from './build-reflect-client-fallback';
 import { reflectionContentV2 } from './reflection-content-v2';
 import {
   formatReflectIntegratedProse,
@@ -47,15 +48,14 @@ describe('formatReflectIntegratedProse', () => {
     );
   });
 
-  it('omits context strip for curated one-voice fallback', () => {
-    const content = reflectionContentV2({
-      land: 'Calm line.',
-      hypothesis: '',
-      inquiry: 'One question?',
-      contextStrip: 'Would be a third block.',
-      integratedMessage: 'Calm line. One question?',
+  it('omits context strip for client-style fallback (strip null, single paragraph)', () => {
+    const content = buildReflectClientFallback({
+      context: 'BTC is down 3%',
+      severityAbsPct: 3,
+      currentFeel: { mood: 'calm' },
     });
-    expect(formatReflectIntegratedProse(content)).toBe('Calm line. One question?');
+    expect(formatReflectIntegratedProse(content)).toBe(content.message);
+    expect(formatReflectIntegratedProse(content)).not.toContain('\n\n');
   });
 
   it('appends context strip after multi-paragraph live message', () => {

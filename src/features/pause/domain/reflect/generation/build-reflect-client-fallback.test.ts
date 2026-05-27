@@ -11,6 +11,7 @@ describe('buildReflectClientFallback', () => {
 
     expect(content.schemaVersion).toBe(2);
     expect(content.land.length).toBeGreaterThan(10);
+    expect(content.hypothesis.length).toBeGreaterThan(10);
     expect(content.inquiry).toContain('?');
     expect(content.contextStrip).toBeNull();
     expect(content.message).toContain(content.land);

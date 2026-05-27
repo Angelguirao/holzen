@@ -23,7 +23,14 @@ type SeedShape = {
   grounding: Array<{ title: string; body: string; citation: string; url: string }>;
   history: Array<Record<string, unknown>>;
   zoom_out: Array<{ title: string; body: string }>;
-  reflection: Array<{ message: string; haiku: string }>;
+  reflection: Array<{
+    message?: string;
+    land?: string;
+    hypothesis?: string;
+    inquiry?: string;
+    integratedMessage?: string;
+    haiku: string;
+  }>;
 };
 
 const S = seed as SeedShape;

@@ -7,25 +7,31 @@ import { resolvePauseReflectDisplayContent } from './resolve-pause-reflect-displ
 const t = ((_key: string, opts?: { defaultValue?: string }) => opts?.defaultValue ?? _key) as import('i18next').TFunction;
 
 describe('reflect fallback one voice', () => {
-  it('composeReflectFallbackOneVoice joins land and inquiry in one paragraph', () => {
+  it('composeReflectFallbackOneVoice weaves land, hypothesis, and inquiry', () => {
     const prose = composeReflectFallbackOneVoice(
-      'This moment can feel loud.',
+      'The move can feel personal.',
+      'Sometimes the story is older than the chart.',
       'What feels most at risk',
     );
-    expect(prose).toBe('This moment can feel loud. What feels most at risk?');
+    expect(prose).toContain('personal.');
+    expect(prose).toContain('older than the chart.');
+    expect(prose).toContain('most at risk?');
     expect(prose).not.toContain('\n\n');
   });
 
-  it('client fallback renders as a single editorial block (no context strip paragraph)', () => {
+  it('client fallback includes hypothesis and one editorial block', () => {
     const content = buildReflectClientFallback({
       context: 'BTC is down 8%',
       severityAbsPct: 8,
-      currentFeel: { mood: 'anxious' },
+      currentFeel: { mood: 'fearful', intensity: 4, tileLabel: 'Worried' },
     });
+
+    expect(content.hypothesis.length).toBeGreaterThan(10);
     expect(content.contextStrip).toBeNull();
     const prose = formatReflectIntegratedProse(content);
     expect(prose).not.toContain('\n\n');
     expect(prose).toContain('?');
+    expect(prose).toContain(content.hypothesis);
   });
 
   it('generation error prefers client fallback over stale structured content', () => {
@@ -46,6 +52,6 @@ describe('reflect fallback one voice', () => {
       t,
     });
     expect(display?.message).not.toContain('Stale land');
-    expect(display?.message).not.toContain('\n\n');
+    expect(display?.hypothesis.length).toBeGreaterThan(10);
   });
 });
