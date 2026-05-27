@@ -26,6 +26,7 @@ interface Props {
 }
 
 const TOTAL_STEPS = 3;
+const ONBOARDING_STEP_KEYS = ['asset', 'threshold', 'subscription'] as const;
 const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export function OnboardingFlow({
@@ -155,9 +156,9 @@ export function OnboardingFlow({
           transition={{ delay: 0.5 }}
         >
           <motion.div className="flex items-center gap-2">
-            {[...Array(TOTAL_STEPS)].map((_, i) => (
+            {ONBOARDING_STEP_KEYS.map((stepKey, i) => (
               <motion.div
-                key={`onboarding-step-${i}`}
+                key={stepKey}
                 className="h-px bg-foreground"
                 animate={{
                   width: i === step ? '1.5rem' : '0.75rem',

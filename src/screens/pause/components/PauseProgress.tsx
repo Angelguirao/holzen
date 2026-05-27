@@ -48,14 +48,13 @@ export function PauseProgress({
 
   if (variant === 'pill') {
     return (
-      <div className="flex w-max min-w-full items-center justify-start gap-1 sm:gap-1.5" role="list">
+      <ol className="flex w-max min-w-full list-none items-center justify-start gap-1 p-0 sm:gap-1.5">
         {PAUSE_DEEP_DISPLAY_STEPS.map((step, i) => {
           const isActive = i === currentIndex;
           const isPast = i < currentIndex;
           return (
-            <div
+            <li
               key={step}
-              role="listitem"
               className="flex min-w-[2.75rem] flex-col items-center gap-1.5 px-0.5 sm:min-w-0"
               aria-current={isActive ? 'step' : undefined}
             >
@@ -75,22 +74,21 @@ export function PauseProgress({
               >
                 {displayLabels[step]}
               </span>
-            </div>
+            </li>
           );
         })}
-      </div>
+      </ol>
     );
   }
 
   return (
-    <div className="flex w-full items-start justify-between gap-[11px]" role="list">
+    <ol className="flex w-full list-none items-start justify-between gap-[11px] p-0">
       {PAUSE_DEEP_DISPLAY_STEPS.map((step, i) => {
         const isActive = i === currentIndex;
         const isPast = i < currentIndex;
         return (
-          <div
+          <li
             key={step}
-            role="listitem"
             className="flex min-w-0 flex-1 flex-col items-center gap-2.5"
             aria-current={isActive ? 'step' : undefined}
           >
@@ -108,9 +106,9 @@ export function PauseProgress({
             >
               {displayLabels[step]}
             </span>
-          </div>
+          </li>
         );
       })}
-    </div>
+    </ol>
   );
 }

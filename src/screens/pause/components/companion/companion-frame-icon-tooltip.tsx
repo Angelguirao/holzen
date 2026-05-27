@@ -14,14 +14,18 @@ export function CompanionFrameIconTooltip({ content, children, className }: Comp
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span
-          tabIndex={0}
-          className={cn('inline-flex shrink-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background', className)}
+        <button
+          type="button"
+          className={cn(
+            'inline-flex shrink-0 rounded-md border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+            className,
+          )}
+          aria-label={content}
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => e.stopPropagation()}
         >
           {children}
-        </span>
+        </button>
       </TooltipTrigger>
       <TooltipContent side="top" className="max-w-[14rem] text-center text-xs leading-snug">
         {content}

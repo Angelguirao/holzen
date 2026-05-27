@@ -385,8 +385,8 @@ export default function Admin() {
             <div className={`rounded-xl border px-4 py-2.5 space-y-1 ${
               issues.length > 0 ? 'border-destructive/20 bg-destructive/5' : 'border-border/20 bg-card/10'
             }`}>
-              {[...issues.map(msg => ({ msg, level: 'issue' as const })), ...tips.map(msg => ({ msg, level: 'tip' as const }))].map(({ msg, level }, i) => (
-                <p key={i} className={`text-[10px] font-mono ${level === 'issue' ? 'text-destructive/70' : 'text-muted-foreground/50'}`}>
+              {[...issues.map(msg => ({ msg, level: 'issue' as const })), ...tips.map(msg => ({ msg, level: 'tip' as const }))].map(({ msg, level }) => (
+                <p key={`${level}-${msg}`} className={`text-[10px] font-mono ${level === 'issue' ? 'text-destructive/70' : 'text-muted-foreground/50'}`}>
                   {level === 'issue' ? '⚠' : '💡'} {msg}
                 </p>
               ))}
@@ -456,7 +456,9 @@ export default function Admin() {
                       labelStyle={{ fontSize: '10px', color: 'hsl(var(--muted-foreground) / 0.6)' }}
                     />
                     <Bar dataKey="total" radius={[4, 4, 0, 0]} maxBarSize={24}>
-                      {costChartData.map((_, i) => <Cell key={i} fill="hsl(var(--primary) / 0.3)" />)}
+                      {costChartData.map((entry) => (
+                        <Cell key={entry.day} fill="hsl(var(--primary) / 0.3)" />
+                      ))}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
@@ -530,7 +532,7 @@ export default function Admin() {
                 const pct = row.cache_hit_pct ?? 0;
                 const type = row.companion_type ?? 'unknown';
                 return (
-                  <div key={i} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2">
+                  <div key={type} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[10px] font-mono text-foreground/80">{label(type)}</span>
                       <span className="text-[10px] font-mono text-muted-foreground/60">{pct.toFixed(0)}% · {row.total_serves ?? 0} serves</span>
@@ -571,7 +573,10 @@ export default function Admin() {
                 const isAlert = failPct > 20;
                 const rateLimited = Number((row as { rate_limited?: number }).rate_limited ?? 0);
                 return (
-                  <div key={i} className={`rounded-lg border px-3 py-2 ${isAlert ? 'border-destructive/20 bg-destructive/5' : 'border-border/10 bg-card/5'}`}>
+                  <div
+                    key={`${row.companion_type ?? 'unknown'}-${row.model ?? 'default'}`}
+                    className={`rounded-lg border px-3 py-2 ${isAlert ? 'border-destructive/20 bg-destructive/5' : 'border-border/10 bg-card/5'}`}
+                  >
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0">
                         <span className="text-[10px] font-mono text-foreground/80">
@@ -664,7 +669,7 @@ export default function Admin() {
                 const pct = row.approval_pct ?? 0;
                 const total = (row.total_thumbs_up ?? 0) + (row.total_thumbs_down ?? 0);
                 return (
-                  <div key={i} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
+                  <div key={row.companion_type ?? `feedback-${i}`} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-mono text-foreground/80">{label(row.companion_type)}</span>
                       <div className="flex items-center gap-2">

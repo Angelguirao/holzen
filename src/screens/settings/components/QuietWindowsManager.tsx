@@ -156,8 +156,9 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
           {/* Day picker */}
           <div className="flex gap-1">
             {DAY_LABELS.map((label, i) => (
-              <button type="button"
-                key={i}
+              <button
+                type="button"
+                key={label}
                 onClick={() => toggleDay(w, i)}
                 className={`flex-1 text-[9px] font-mono py-1 rounded-md transition-colors ${
                   w.days.includes(i)

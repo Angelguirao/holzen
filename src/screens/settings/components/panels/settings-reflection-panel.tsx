@@ -84,14 +84,16 @@ export function SettingsReflectionPanel() {
             )}
           </p>
         </section>
-        <div
-          className="grid grid-cols-4 gap-2"
-          role="group"
-          aria-labelledby="settings-cooldown-label"
+        <fieldset
+          className="m-0 grid min-w-0 grid-cols-4 gap-2 border-0 p-0"
           aria-describedby="settings-cooldown-help-body"
         >
+          <legend id="settings-cooldown-label" className="sr-only">
+            {t('settings.cooldownLabel', { defaultValue: 'Cooldown between pauses' })}
+          </legend>
           {([1, 6, 12, 24] as const).map((h) => (
-            <button type="button"
+            <button
+              type="button"
               key={h}
               onClick={() => setCooldownHours(h)}
               className={`rounded-md border px-3 py-2 text-center transition-colors ${
@@ -103,7 +105,7 @@ export function SettingsReflectionPanel() {
               <p className="text-base font-sans">{h}h</p>
             </button>
           ))}
-        </div>
+        </fieldset>
       </div>
 
       <ProLock feature="tone">

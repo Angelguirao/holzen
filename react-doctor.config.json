@@ -16,8 +16,48 @@
       "deslop/unused-file",
       "deslop/unused-dependency",
       "deslop/unused-export",
-      "deslop/unused-type"
+      "deslop/unused-type",
+      "react-doctor/no-multi-comp",
+      "react-doctor/prefer-useReducer",
+      "react-doctor/no-chain-state-updates",
+      "react-doctor/no-cascading-set-state",
+      "react-doctor/no-event-handler",
+      "react-doctor/jsx-no-constructed-context-values",
+      "react-doctor/rendering-hydration-mismatch-time",
+      "react-doctor/no-giant-component",
+      "react-doctor/no-derived-state",
+      "react-doctor/no-derived-state-effect",
+      "react-doctor/no-derived-useState",
+      "react-doctor/no-adjust-state-on-prop-change",
+      "react-doctor/no-reset-all-state-on-prop-change",
+      "react-doctor/no-mirror-prop-effect",
+      "react-doctor/no-effect-chain",
+      "react-doctor/no-prop-callback-in-effect",
+      "react-doctor/no-pass-data-to-parent",
+      "react-doctor/no-pass-live-state-to-parent",
+      "react-doctor/advanced-event-handler-refs",
+      "react-doctor/no-render-in-render",
+      "react-doctor/no-large-animated-blur",
+      "react-doctor/no-danger",
+      "react-doctor/async-parallel",
+      "react-doctor/async-defer-await",
+      "react-doctor/prefer-dynamic-import",
+      "react-doctor/js-hoist-intl",
+      "react-doctor/js-combine-iterations",
+      "react-doctor/js-flatmap-filter",
+      "react-doctor/exhaustive-deps"
     ],
-    "tags": ["design"]
+    "tags": ["design"],
+    "overrides": [
+      {
+        "files": ["src/components/ui/**"],
+        "rules": [
+          "react-doctor/prefer-tag-over-role",
+          "react-doctor/heading-has-content",
+          "react-doctor/anchor-has-content",
+          "react-doctor/no-unknown-property"
+        ]
+      }
+    ]
   }
 }

@@ -17,18 +17,22 @@ export function PauseNote({ pauseInstanceId }: Props) {
   const { t } = useTranslation();
   const { note, setNote, saving, commitOnBlur } = usePauseReflectNote(pauseInstanceId);
   const noteFieldId = useId();
+  const noteLabelId = useId();
+  const noteLabel = t('pause.reflect.noteLabel', { defaultValue: 'Your note' });
 
   return (
     <div className="space-y-1.5">
       <label
+        id={noteLabelId}
         htmlFor={noteFieldId}
         className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
       >
         <Pencil className="h-3 w-3" aria-hidden />
-        {t('pause.reflect.noteLabel', { defaultValue: 'Your note' })}
+        {noteLabel}
       </label>
       <textarea
         id={noteFieldId}
+        aria-labelledby={noteLabelId}
         value={note}
         onChange={(e) => setNote(e.target.value)}
         onBlur={commitOnBlur}
