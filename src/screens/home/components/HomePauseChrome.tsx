@@ -324,7 +324,6 @@ export function AutoCooldownIndicator({
         title={t('home.nextScanIdleTitle', {
           defaultValue: 'When Holzen next checks market conditions against your settings (about every 15 minutes).',
         })}
-        role="status"
         aria-live="polite"
         aria-label={nextScanAria}
       >
@@ -349,7 +348,7 @@ export function AutoCooldownIndicator({
       'You are in the rest period that starts when a pause is created. It is not the same timer as the Need a moment button. This rest window ends at {{time}} ({{hours}} hours from that pause).',
   });
   return (
-    <div className="space-y-0.5 py-1 text-base font-sans" role="status" aria-live="polite" aria-label={cooldownAria}>
+    <div className="space-y-0.5 py-1 text-base font-sans" aria-live="polite" aria-label={cooldownAria}>
       <p className={cn(homeInWidget.metaFaint, 'uppercase tracking-wide')} aria-hidden="true">
         {t('home.autoCooldown.afterPauseKicker', { defaultValue: 'Rest window after your last pause' })}
       </p>

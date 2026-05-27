@@ -66,7 +66,7 @@ export default function CompanionSignalPage() {
 
   if (!loadError && (snapshotPending || !snapshot)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background" role="status" aria-busy="true">
+      <div className="min-h-screen flex items-center justify-center bg-background" aria-busy="true">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-border/50 border-t-nox-text-link/70" />
       </div>
     );
@@ -91,7 +91,7 @@ export default function CompanionSignalPage() {
         />
 
         {signal && cacheRelaxations.signal && (
-          <p className="text-[10px] text-muted-foreground/55 font-mono leading-snug" role="status">
+          <p className="text-[10px] text-muted-foreground/55 font-mono leading-snug">
             {t(`companions.cacheRelaxation.${cacheRelaxations.signal}`)}
           </p>
         )}

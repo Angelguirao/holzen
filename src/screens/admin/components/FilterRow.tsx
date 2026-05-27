@@ -8,7 +8,7 @@ export function FilterRow({ label: filterLabel, options, value, onChange }: {
     <div className="flex flex-wrap items-center gap-1.5">
       <span className="text-[9px] font-mono text-muted-foreground/50 mr-1">{filterLabel}:</span>
       {options.map(opt => (
-        <button
+        <button type="button"
           key={opt.value}
           onClick={() => onChange(opt.value)}
           className={`text-[9px] font-mono px-2 py-0.5 rounded-full transition-colors ${

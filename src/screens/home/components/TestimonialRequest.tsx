@@ -35,24 +35,18 @@ export function TestimonialRequest({ completedPauseCount }: Props) {
   const { user } = useAuth();
   const { firstName } = useProfile();
   const { t } = useTranslation();
-  const [visible, setVisible] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const visible = !dismissed && shouldShow(completedPauseCount);
   const [quote, setQuote] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [state, formAction, isPending] = useActionState(submitTestimonialAction, {});
-
-  useEffect(() => {
-    setVisible(shouldShow(completedPauseCount));
-  }, [completedPauseCount]);
-
-  useEffect(() => {
-    if (firstName) setDisplayName(firstName);
-  }, [firstName]);
+  const displayNameValue = displayName || firstName || '';
 
   useEffect(() => {
     if (state.success) {
       localStorage.setItem(SUBMITTED_KEY, 'true');
       toast.success(t('testimonial.thanks'));
-      setVisible(false);
+      setDismissed(true);
     } else if (state.error) {
       toast.error(t('testimonial.failed'));
     }
@@ -60,7 +54,7 @@ export function TestimonialRequest({ completedPauseCount }: Props) {
 
   const dismiss = () => {
     localStorage.setItem(DISMISS_KEY, new Date().toISOString());
-    setVisible(false);
+    setDismissed(true);
   };
 
   if (!user) return null;
@@ -79,7 +73,7 @@ export function TestimonialRequest({ completedPauseCount }: Props) {
               <MessageCircle className="h-4 w-4 text-nox-text-link shrink-0" />
               <p className="text-sm text-foreground font-medium">{t('testimonial.title')}</p>
             </div>
-            <button onClick={dismiss} className="text-muted-foreground hover:text-foreground transition-colors">
+            <button type="button" onClick={dismiss} className="text-muted-foreground hover:text-foreground transition-colors">
               <X className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -89,8 +83,9 @@ export function TestimonialRequest({ completedPauseCount }: Props) {
             <input
               type="text"
               name="displayName"
-              value={displayName}
+              value={displayNameValue}
               onChange={(e) => setDisplayName(e.target.value)}
+              aria-label={t('testimonial.nameLabel')}
               placeholder={t('testimonial.nameLabel')}
               className="w-full text-xs rounded-md border border-border bg-background px-3 py-2 text-foreground placeholder:text-muted-foreground/50"
               maxLength={50}
@@ -109,7 +104,7 @@ export function TestimonialRequest({ completedPauseCount }: Props) {
                 type="submit"
                 size="sm"
                 loading={isPending}
-                disabled={!quote.trim() || !displayName.trim()}
+                disabled={!quote.trim() || !displayNameValue.trim()}
                 className="text-xs font-mono gap-1.5"
               >
                 <Send className="h-3 w-3" />

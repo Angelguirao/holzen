@@ -91,7 +91,7 @@ export function SettingsReflectionPanel() {
           aria-describedby="settings-cooldown-help-body"
         >
           {([1, 6, 12, 24] as const).map((h) => (
-            <button
+            <button type="button"
               key={h}
               onClick={() => setCooldownHours(h)}
               className={`rounded-md border px-3 py-2 text-center transition-colors ${
@@ -112,7 +112,7 @@ export function SettingsReflectionPanel() {
           <p className="text-xs text-muted-foreground leading-relaxed">{t('settings.toneDesc')}</p>
           <div className="grid grid-cols-2 gap-2">
             {(['stoic', 'zen', 'poetic', 'blunt'] as const).map((value) => (
-              <button
+              <button type="button"
                 key={value}
                 onClick={() => setReflectionTone(value)}
                 className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
@@ -143,7 +143,7 @@ export function SettingsReflectionPanel() {
                 { value: 'koan', key: 'koan' },
               ] as const
             ).map((s) => (
-              <button
+              <button type="button"
                 key={s.value}
                 onClick={() => setReflectionStyle(s.value)}
                 className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
@@ -167,6 +167,7 @@ export function SettingsReflectionPanel() {
           <textarea
             value={customPrompt ?? ''}
             onChange={(e) => setCustomPrompt(e.target.value || null)}
+            aria-label={t('settings.customPromptPlaceholder')}
             placeholder={t('settings.customPromptPlaceholder')}
             maxLength={200}
             rows={3}

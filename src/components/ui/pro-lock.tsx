@@ -31,7 +31,7 @@ export function ProLock({ children, inline, feature, hideContent }: Props) {
 
   if (inline) {
     return (
-      <button
+      <button type="button"
         onClick={() => startCheckout()}
         disabled={checkoutLoading}
         className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
@@ -62,7 +62,7 @@ export function ProLock({ children, inline, feature, hideContent }: Props) {
         <p className="max-w-xs leading-relaxed text-muted-foreground text-center text-sm">
           {contextualDesc || fallbackDesc}
         </p>
-        <button
+        <button type="button"
           onClick={() => startCheckout()}
           disabled={checkoutLoading}
           className="group inline-flex items-center gap-1.5 font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline disabled:opacity-50 text-base font-sans"

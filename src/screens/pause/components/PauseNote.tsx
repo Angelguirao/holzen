@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pencil } from 'lucide-react';
 import { usePauseReflectNote } from '@/features/pause/public-ritual-reflect';
@@ -15,14 +16,19 @@ export function PauseNote({ pauseInstanceId }: Props) {
   "use memo";
   const { t } = useTranslation();
   const { note, setNote, saving, commitOnBlur } = usePauseReflectNote(pauseInstanceId);
+  const noteFieldId = useId();
 
   return (
     <div className="space-y-1.5">
-      <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+      <label
+        htmlFor={noteFieldId}
+        className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
+      >
         <Pencil className="h-3 w-3" aria-hidden />
         {t('pause.reflect.noteLabel', { defaultValue: 'Your note' })}
       </label>
       <textarea
+        id={noteFieldId}
         value={note}
         onChange={(e) => setNote(e.target.value)}
         onBlur={commitOnBlur}

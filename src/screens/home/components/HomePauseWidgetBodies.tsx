@@ -46,7 +46,6 @@ export function HomePauseOpenActiveBody({
       {showPendingQueuedBanner ? (
         <div
           className="rounded-lg border border-nox-accent-mustard/35 bg-nox-accent-mustard/10 px-3 py-2.5 text-xs leading-snug text-foreground/95"
-          role="status"
         >
           <p className="font-medium text-foreground">{t('home.pendingQueuedTitle')}</p>
           <p className="mt-1 text-foreground/85">{t('home.pendingQueuedBody')}</p>

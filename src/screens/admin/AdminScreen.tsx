@@ -319,7 +319,7 @@ export default function Admin() {
         <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground/80">System Monitor</h2>
         <div className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3">
           <p className="text-xs text-destructive/70">{error}</p>
-          <button onClick={refresh} className="mt-2 text-[10px] font-sans font-medium text-nox-text-link/70 hover:text-nox-text-link flex items-center gap-1">
+          <button type="button" onClick={refresh} className="mt-2 text-[10px] font-sans font-medium text-nox-text-link/70 hover:text-nox-text-link flex items-center gap-1">
             <RefreshCw className="h-3 w-3" /> Retry
           </button>
         </div>
@@ -352,7 +352,7 @@ export default function Admin() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground/80">System Monitor</h2>
-        <button onClick={refresh} className="flex items-center gap-1.5 text-[10px] font-sans font-medium text-muted-foreground/60 hover:text-nox-text-link transition-colors">
+        <button type="button" onClick={refresh} className="flex items-center gap-1.5 text-[10px] font-sans font-medium text-muted-foreground/60 hover:text-nox-text-link transition-colors">
           <RefreshCw className="h-3 w-3" />
           {lastUpdated && <span>{lastUpdated.toLocaleTimeString()}</span>}
         </button>
@@ -407,7 +407,7 @@ export default function Admin() {
           {/* Period Selector */}
           <div className="flex items-center gap-1.5">
             {PERIOD_OPTIONS.map(opt => (
-              <button key={opt.value} onClick={() => setPeriod(opt.value)}
+              <button type="button" key={opt.value} onClick={() => setPeriod(opt.value)}
                 className={`text-[9px] font-mono px-2 py-0.5 rounded-full transition-colors ${
                   period === opt.value ? 'bg-muted/60 text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground/80 hover:bg-muted/20'
                 }`}>

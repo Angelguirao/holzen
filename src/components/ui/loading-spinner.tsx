@@ -2,13 +2,12 @@ import { cn } from "@/lib/utils";
 
 export function LoadingSpinner({ className }: { className?: string }) {
   return (
-    <div
+    <output
       className={cn(
-        "h-5 w-5 animate-spin rounded-full border-2 border-muted border-t-foreground",
+        "block h-5 w-5 animate-spin rounded-full border-2 border-muted border-t-foreground",
         className,
       )}
       aria-label="Loading"
-      role="status"
     />
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSnooze } from '@/features/user/public-hooks';
+import { useSnoozeTimeLabel } from '@/screens/home/components/use-snooze-time-label';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Moon, Clock } from 'lucide-react';
@@ -26,6 +27,7 @@ export function SnoozeControl() {
   const { t } = useTranslation();
   const { snoozedUntil, isActive, snooze, cancelSnooze } = useSnooze();
   const [open, setOpen] = useState(false);
+  const activeTimeLabel = useSnoozeTimeLabel(snoozedUntil, isActive);
 
   const handleSnooze = async (hours: number) => {
     hapticFeedback('light');
@@ -55,11 +57,6 @@ export function SnoozeControl() {
   };
 
   if (isActive && snoozedUntil) {
-    const remaining = Math.max(0, snoozedUntil.getTime() - Date.now());
-    const hours = Math.floor(remaining / 3600000);
-    const minutes = Math.floor((remaining % 3600000) / 60000);
-    const timeLabel = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-
     return (
       <motion.div
         initial={{ opacity: 0, y: 4 }}
@@ -68,7 +65,7 @@ export function SnoozeControl() {
       >
         <Moon className="h-3 w-3 text-muted-foreground/50" />
         <p className={`${homeInWidget.meta} flex-1 text-muted-foreground/80`}>
-          {t('snooze.activeLabel', { time: timeLabel, defaultValue: `Snoozed · {{time}} left` })}
+          {t('snooze.activeLabel', { time: activeTimeLabel, defaultValue: `Snoozed · {{time}} left` })}
         </p>
         <button
           onClick={handleCancel}
@@ -130,6 +127,7 @@ export function SnoozeToolbarControl() {
   const { t } = useTranslation();
   const { snoozedUntil, isActive, snooze, cancelSnooze } = useSnooze();
   const [open, setOpen] = useState(false);
+  const activeTimeLabel = useSnoozeTimeLabel(snoozedUntil, isActive);
 
   const handleSnooze = async (hours: number) => {
     hapticFeedback('light');
@@ -158,16 +156,6 @@ export function SnoozeToolbarControl() {
     setOpen(false);
     toast(t('snooze.cancelled', { defaultValue: 'Snooze cancelled' }), { duration: 2000 });
   };
-
-  const activeTimeLabel =
-    isActive && snoozedUntil
-      ? (() => {
-          const remaining = Math.max(0, snoozedUntil.getTime() - Date.now());
-          const hours = Math.floor(remaining / 3600000);
-          const minutes = Math.floor((remaining % 3600000) / 60000);
-          return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-        })()
-      : '';
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

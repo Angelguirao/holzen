@@ -230,7 +230,7 @@ export function SourceManagement() {
                       </p>
                     )}
                   </div>
-                  <button
+                  <button type="button"
                     onClick={() => removeCatalogSource(source.id)}
                     className="text-muted-foreground/40 hover:text-destructive transition-colors shrink-0"
                     aria-label="Remove"
@@ -265,7 +265,7 @@ export function SourceManagement() {
                     onCheckedChange={() => toggleCustomSource(cs.id)}
                     className="shrink-0"
                   />
-                  <button
+                  <button type="button"
                     onClick={() => removeCustomSource(cs.id)}
                     className="text-muted-foreground/40 hover:text-destructive transition-colors shrink-0"
                     aria-label="Remove"
@@ -299,7 +299,7 @@ export function SourceManagement() {
                 ? ['blog', 'podcast', 'newsletter', 'analyst', 'youtube', 'dashboard']
                 : ['book', 'blog', 'podcast', 'newsletter', 'analyst']
               ).map((tp) => (
-                <button
+                <button type="button"
                   key={tp}
                   onClick={() => setCustomType(tp)}
                   className={`text-[10px] font-mono py-1 px-2 rounded border transition-colors ${
@@ -322,7 +322,7 @@ export function SourceManagement() {
             </div>
           </div>
         ) : (
-          <button
+          <button type="button"
             onClick={() => setAddingCustom(true)}
             className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
           >
@@ -346,7 +346,7 @@ export function SourceManagement() {
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-foreground truncate">{source.name}</p>
                   </div>
-                  <button
+                  <button type="button"
                     onClick={() => restoreCatalogSource(source.id)}
                     className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors shrink-0"
                   >

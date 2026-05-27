@@ -105,6 +105,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
               type="text"
               value={w.label}
               onChange={(e) => updateWindow(w.id, { label: e.target.value })}
+              aria-label={t('quietWindows.labelPlaceholder', { defaultValue: 'Label (e.g. Work hours)' })}
               placeholder={t('quietWindows.labelPlaceholder', { defaultValue: 'Label (e.g. Work hours)' })}
               className="flex-1 bg-transparent border-none outline-none text-xs font-mono text-foreground/80 placeholder:text-muted-foreground/30"
             />
@@ -113,7 +114,9 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
               onCheckedChange={(v) => updateWindow(w.id, { active: v })}
             />
             <button
+              type="button"
               onClick={() => deleteWindow(w.id)}
+              aria-label={t('quietWindows.deleteWindow', { defaultValue: 'Delete quiet window' })}
               className="p-1 text-muted-foreground/30 hover:text-destructive transition-colors"
             >
               <Trash2 className="h-3 w-3" />
@@ -127,6 +130,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
               <select
                 value={w.start_hour}
                 onChange={(e) => updateWindow(w.id, { start_hour: Number(e.target.value) })}
+                aria-label={t('common.from')}
                 className="w-full text-xs font-mono px-2 py-1.5 rounded-md border border-border/60 bg-background text-foreground"
               >
                 {Array.from({ length: 24 }, (_, i) => (
@@ -139,6 +143,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
               <select
                 value={w.end_hour}
                 onChange={(e) => updateWindow(w.id, { end_hour: Number(e.target.value) })}
+                aria-label={t('common.until')}
                 className="w-full text-xs font-mono px-2 py-1.5 rounded-md border border-border/60 bg-background text-foreground"
               >
                 {Array.from({ length: 24 }, (_, i) => (
@@ -151,7 +156,7 @@ export function QuietWindowsManager({ userId }: { userId?: string }) {
           {/* Day picker */}
           <div className="flex gap-1">
             {DAY_LABELS.map((label, i) => (
-              <button
+              <button type="button"
                 key={i}
                 onClick={() => toggleDay(w, i)}
                 className={`flex-1 text-[9px] font-mono py-1 rounded-md transition-colors ${

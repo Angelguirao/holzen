@@ -127,7 +127,7 @@ const LandingScreen = () => {
         >
           <h1 className="text-base font-mono tracking-[0.25em] uppercase" style={{ color: '#DBB366' }}>Holzen</h1>
           <div className="flex items-center gap-4">
-            <button
+            <button type="button"
               onClick={() => navigate('/auth')}
               className="transition-colors font-sans text-base text-nox-text-link hover:text-nox-text-link/80"
             >

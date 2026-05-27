@@ -47,7 +47,7 @@ export function CompanionCard({
 
   if (locked) {
     return (
-      <button
+      <button type="button"
         onClick={onUpgrade}
         className="flex w-full items-center gap-3 rounded-xl border border-border/10 bg-card/10 px-4 py-3.5 text-left text-muted-foreground/30 transition-all duration-300 hover:bg-card/20 hover:text-muted-foreground/50"
       >
@@ -136,7 +136,7 @@ export function CompanionCard({
           </span>
         ) : null}
         {onToggleFavorite ? (
-          <button
+          <button type="button"
             onClick={(e) => {
               e.stopPropagation();
               onToggleFavorite();

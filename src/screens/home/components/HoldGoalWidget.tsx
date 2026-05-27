@@ -269,14 +269,14 @@ export function HoldGoalWidget({
       <div className={goalEditorShell}>
         <div className="flex items-center justify-between">
           <p className={homeInWidget.kicker}>{t('holdGoal.setYourGoal')}</p>
-          <button onClick={() => { setSetting(false); setValidationError(null); setStartDate(new Date()); }} className="text-muted-foreground/40 hover:text-foreground">
+          <button type="button" onClick={() => { setSetting(false); setValidationError(null); setStartDate(new Date()); }} className="text-muted-foreground/40 hover:text-foreground">
             <X className="h-3 w-3" />
           </button>
         </div>
 
         <div className="flex rounded bg-muted/50 p-0.5">
           {(['time', 'forever'] as const).map((tp) => (
-            <button
+            <button type="button"
               key={tp}
               onClick={() => { setGoalType(tp); setInputValue(''); setValidationError(null); }}
               className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-semibold transition-colors ${
@@ -351,7 +351,7 @@ export function HoldGoalWidget({
             {goalType === 'time' && (
               <div className="flex rounded bg-muted/50 p-0.5">
                 {(['months', 'years'] as const).map((u) => (
-                  <button
+                  <button type="button"
                     key={u}
                     onClick={() => { setTimeUnit(u); setInputValue(''); setValidationError(null); }}
                     className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold capitalize transition-colors ${

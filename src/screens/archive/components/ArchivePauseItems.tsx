@@ -24,7 +24,7 @@ function groupByCalendarDay(items: PauseArchiveRow[], t: (k: string, o?: { defau
     arr.push(row);
     buckets.set(day, arr);
   });
-  const keys = [...buckets.keys()].sort((a, b) => b - a);
+  const keys = [...buckets.keys()].toSorted((a, b) => b - a);
   return keys.map((ts) => {
     const d = new Date(ts);
     const label = isToday(d) ? t('library.dateToday') : format(d, 'dd/MM/yy');
@@ -65,7 +65,7 @@ export function ArchivePauseItems({
     <div className="flex flex-col">
       <div>
         {loading && filtered.length === 0 && !listLoadFailed ? (
-          <div className="flex justify-center py-16" role="status" aria-busy="true" aria-label={t('common.loading')}>
+          <div className="flex justify-center py-16" aria-busy="true" aria-label={t('common.loading')}>
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground/40" />
           </div>
         ) : listLoadFailed && filtered.length === 0 ? (

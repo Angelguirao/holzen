@@ -45,21 +45,21 @@ function BtcOnThisDayRows({
       <div className="flex w-full gap-2.5">
         <div className="flex min-w-0 flex-1 flex-col gap-0 text-base italic leading-6 text-muted-foreground">
           {labels.map((label, i) => (
-            <p key={`y-${i}`} className={i === labels.length - 1 ? 'font-medium not-italic text-foreground' : ''}>
+            <p key={`y-${label}`} className={i === labels.length - 1 ? 'font-medium not-italic text-foreground' : ''}>
               {label}
             </p>
           ))}
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-0 text-base leading-6 text-foreground tabular-nums">
           {prices.map((price, i) => (
-            <p key={`p-${i}`} className={i === prices.length - 1 ? 'font-semibold' : ''}>
+            <p key={`p-${price}`} className={i === prices.length - 1 ? 'font-semibold' : ''}>
               {price}
             </p>
           ))}
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-0 text-base leading-6 text-muted-foreground tabular-nums">
-          {changes.map((change, i) => (
-            <p key={`c-${i}`}>{change}</p>
+          {changes.map((change) => (
+            <p key={`c-${change}`}>{change}</p>
           ))}
         </div>
       </div>

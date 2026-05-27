@@ -46,7 +46,7 @@ export function SettingsYouPanel() {
             (value) => {
               const selected = motivations.includes(value);
               return (
-                <button
+                <button type="button"
                   key={value}
                   onClick={() => {
                     const next = selected ? motivations.filter((v) => v !== value) : [...motivations, value];
@@ -75,6 +75,7 @@ export function SettingsYouPanel() {
         <textarea
           value={mantra ?? ''}
           onChange={(e) => setMantra(e.target.value || null)}
+          aria-label={t('settings.mantraPlaceholder')}
           placeholder={t('settings.mantraPlaceholder')}
           maxLength={200}
           rows={2}

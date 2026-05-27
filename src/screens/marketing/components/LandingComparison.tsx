@@ -109,7 +109,7 @@ function CardFlip({ reaction, reflection, prefersReduced, t }: VariantProps) {
     <div className="space-y-4">
       {/* Toggle tabs */}
       <div className="flex rounded-lg border border-border/50 overflow-hidden">
-        <button
+        <button type="button"
           onClick={() => setShowReflection(false)}
           className={`flex-1 py-2.5 text-[10px] font-mono tracking-[0.15em] uppercase transition-colors ${
             !showReflection
@@ -119,7 +119,7 @@ function CardFlip({ reaction, reflection, prefersReduced, t }: VariantProps) {
         >
           {t('landing.reaction.label')}
         </button>
-        <button
+        <button type="button"
           onClick={() => setShowReflection(true)}
           className={`flex-1 py-2.5 text-[10px] font-mono tracking-[0.15em] uppercase transition-colors ${
             showReflection

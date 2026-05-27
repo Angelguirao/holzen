@@ -24,7 +24,6 @@ function PageChunkFallback() {
   return (
     <div
       className="space-y-6"
-      role="status"
       aria-live="polite"
       aria-busy="true"
       aria-label="Loading"

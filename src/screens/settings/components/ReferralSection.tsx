@@ -52,7 +52,7 @@ export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?:
 
   return (
     <div className="space-y-3">
-      <button
+      <button type="button"
         onClick={() => setExpanded(!expanded)}
         className="text-xs font-sans font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80 hover:underline"
       >
@@ -65,7 +65,7 @@ export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?:
             {t('referral.shareDescription')}
           </p>
 
-          <button
+          <button type="button"
             onClick={copyLink}
             className="flex items-center gap-2 w-full rounded-md border border-border bg-muted/30 px-3 py-2 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
           >

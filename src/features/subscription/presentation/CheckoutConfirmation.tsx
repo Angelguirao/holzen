@@ -597,14 +597,16 @@ export function CheckoutConfirmation() {
       try {
         const events = await fetchCheckoutEvents();
         // Most recent paid session for this pack type, by created desc.
-        const match = events
-          .filter(
-            (e) =>
-              e.pack_type === mode &&
-              e.payment_status === 'paid' &&
-              (e.expected_credits > 0 || (e.granted_credits ?? 0) > 0),
-          )
-          .sort((a, b) => b.created - a.created)[0];
+        const paidForMode = events.filter(
+          (e) =>
+            e.pack_type === mode &&
+            e.payment_status === 'paid' &&
+            (e.expected_credits > 0 || (e.granted_credits ?? 0) > 0),
+        );
+        const match = paidForMode.reduce<(typeof paidForMode)[number] | undefined>(
+          (best, e) => (!best || e.created > best.created ? e : best),
+          undefined,
+        );
         if (match && !cancelled) {
           // Prefer the actual granted amount once the webhook applied it
           // (handles partial grants or future per-session pricing). Otherwise
@@ -1399,7 +1401,7 @@ function NotifyDispatchStatus({
 
   if (status === null) {
     return (
-      <div className={baseClass} role="status" aria-live="polite">
+      <div className={baseClass} aria-live="polite">
         <LoadingSpinner className="h-3 w-3 border-[1.5px]" />
         <span>Queuing email and push confirmation…</span>
       </div>
@@ -1408,7 +1410,7 @@ function NotifyDispatchStatus({
 
   if (status.skipped === 'opted_out') {
     return (
-      <div className={baseClass} role="status">
+      <div className={baseClass}>
         <BellOff className="h-3.5 w-3.5" aria-hidden />
         <span>Notifications are off — no email or push sent.</span>
       </div>
@@ -1419,7 +1421,6 @@ function NotifyDispatchStatus({
     return (
       <div
         className="mt-3 flex items-center gap-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground"
-        role="status"
       >
         <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
         <span>
@@ -1440,7 +1441,7 @@ function NotifyDispatchStatus({
       : 'Push skipped';
 
   return (
-    <div className={baseClass} role="status">
+    <div className={baseClass}>
       <span className="inline-flex items-center gap-1.5">
         <Mail className="h-3.5 w-3.5" aria-hidden />
         {emailLabel}
@@ -1489,7 +1490,6 @@ function RefreshStatusBanner({
     return (
       <div
         className="mt-3 flex flex-col gap-2 rounded-md border border-border bg-muted/20 px-3 py-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between"
-        role="status"
         aria-live="polite"
         aria-busy="true"
       >
@@ -1534,7 +1534,6 @@ function RefreshStatusBanner({
     return (
       <div
         className="mt-3 flex flex-col gap-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between"
-        role="status"
         aria-live="polite"
       >
         <span className="flex items-center gap-2">
