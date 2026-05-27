@@ -1,6 +1,10 @@
-import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
+import type { InterventionState } from '@/legacy/pause-featured-intervention/domain/intervention-types';
 import type { ParsedPauseArtifactCache } from '@/features/pause/application/use-cases/ritual/frame/artifact-cache-parse';
-import type { CompanionOrchestrateSessionContext } from './build-companion-orchestrate-body';
+import type { CompanionOrchestrateSessionContext } from '@/features/pause/application/use-cases/ritual/frame/build-companion-orchestrate-body';
+import type {
+  CompanionSlotCommitters,
+  CompanionSlotRelaxations,
+} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
 import { applyCompanionInterventionInvokeOutcome } from './apply-companion-intervention-invoke-outcome';
 import {
   logCompanionInterventionInvoke,
@@ -8,7 +12,6 @@ import {
 } from './companion-intervention-telemetry';
 import { hydrateCompanionSlotsFromArtifactCache } from './hydrate-companion-slots-from-artifact-cache';
 import { hasInvokedIntervention, runOnceIntervention } from './intervention-idempotency';
-import type { CompanionSlotCommitters, CompanionSlotRelaxations } from './orchestrate-slot-apply';
 
 export type RunCompanionInterventionBootstrapResult =
   | { status: 'cached' }
@@ -33,10 +36,7 @@ export type RunCompanionInterventionBootstrapInput = {
   setIntervention: (value: InterventionState) => void;
 };
 
-/**
- * Cache hydrate → idempotency gate → single intervention `companion-orchestrate` invoke.
- * Caller owns React loading/error flags.
- */
+/** Cache hydrate → idempotency gate → single intervention `companion-orchestrate` invoke. */
 export async function runCompanionInterventionBootstrap(
   input: RunCompanionInterventionBootstrapInput,
   ports: RunCompanionInterventionBootstrapPorts,

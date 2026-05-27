@@ -8,7 +8,6 @@ export interface CompanionOrchestrator {
   loadSignalSources?(): Promise<CompanionOrchestrateSourceWire[] | undefined>;
   loadGroundingSources?(): Promise<CompanionOrchestrateSourceWire[] | undefined>;
   invoke(body: Record<string, unknown>): Promise<{ data: unknown; error: unknown }>;
-  invokeIntervention(
-    session: CompanionOrchestrateSessionContext,
-  ): Promise<{ data: unknown; error: unknown }>;
 }
+
+export type { CompanionOrchestrateSessionContext, CompanionOrchestrateSourceWire };

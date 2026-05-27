@@ -1,16 +1,16 @@
-import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
+import type { InterventionState } from '@/legacy/pause-featured-intervention/domain/intervention-types';
+import { resolveCompanionOrchestrateInvokeFailure } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-invoke-error';
+import {
+  isFilledOrchestrateSlot,
+  type CompanionSlotCommitters,
+  type CompanionSlotRelaxations,
+} from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
 import {
   logCompanionInterventionInvokeFailed,
   logCompanionInterventionInvokeOk,
   logCompanionInterventionSignalHydrated,
-} from '@/features/pause/application/use-cases/ritual/frame/companion-intervention-telemetry';
-import { resolveCompanionOrchestrateInvokeFailure } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-invoke-error';
-import {
-  hydrateOrchestrateSlotsFromInterventionResponse,
-  isFilledOrchestrateSlot,
-  type CompanionSlotCommitters,
-  type CompanionSlotRelaxations,
-} from './orchestrate-slot-apply';
+} from './companion-intervention-telemetry';
+import { hydrateOrchestrateSlotsFromInterventionResponse } from './intervention-slot-hydrate';
 
 const INTERVENTION_UNAVAILABLE =
   'This AI feature is temporarily unavailable. Please try again in a minute.';
@@ -29,7 +29,6 @@ export type ApplyCompanionInterventionInvokeOutcomeResult =
   | { status: 'success' }
   | { status: 'error' };
 
-/** Applies intervention-only `companion-orchestrate` invoke result to UI state. */
 export async function applyCompanionInterventionInvokeOutcome({
   pauseInstanceId,
   data,

@@ -9,7 +9,6 @@ import { CompanionFocusLayout } from '@/screens/pause/components/companion/Compa
 import { ReadTime } from '@/screens/pause/components/companion/ReadTime';
 import { WhyThisCard } from '@/screens/pause/components/companion/WhyThisCard';
 import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
-import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
 import { PageMeta } from '@/app/components/PageMeta';
 
 export default function CompanionHistoryPage() {
@@ -35,7 +34,6 @@ export default function CompanionHistoryPage() {
       cacheIds,
       cacheRelaxations,
       regenerateCompanion,
-      intervention,
     },
   } = useCompanionFullViewPage({
     routeInstanceId: rid,
@@ -75,8 +73,6 @@ export default function CompanionHistoryPage() {
         noindex
       />
       <div className="space-y-6">
-        <InterventionCrossRefBadge companion="history" intervention={intervention} />
-
         {historyInsight && (
           <div className="flex items-center gap-2 flex-wrap">
             <ReadTime

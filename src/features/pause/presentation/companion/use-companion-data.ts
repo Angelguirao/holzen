@@ -6,12 +6,7 @@ import { useCompanionLibraryFavorites } from './use-companion-library-favorites'
 import { useCompanionOrchestration } from './use-companion-orchestration';
 import { useCompanionUiCompletion } from './use-companion-ui-completion';
 
-export type {
-  RegenerateCompanionSlot,
-  InterventionPrimary,
-  InterventionSecondary,
-  InterventionState,
-} from '@/features/pause/domain/companion-orchestrate';
+export type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
 
 export interface UseCompanionDataParams {
   companions: CompanionData;

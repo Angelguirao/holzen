@@ -10,19 +10,17 @@ vi.mock('@/features/pause/public-queries', () => ({
   invalidateCompanionUiCompletionQuery: vi.fn(),
 }));
 
-import * as orchestrateIo from './pause-companion-orchestrate-io';
 import {
   applyCompanionOrchestrateRetryReset,
   applyCompanionSlotOrchestrateOutcome,
   EMPTY_COMPANION_SLOT_RELAXATIONS,
   logCompanionSlotOrchestrateInvoke,
-  resetInterventionIdempotency,
-  runCompanionInterventionBootstrap,
   runCompanionSlotOrchestrate,
   setCompanionSlotError,
   setCompanionSlotLoading,
   trackCompanionGenerationInitiated,
 } from './pause-companion-orchestrate-io';
+import * as orchestrateIo from './pause-companion-orchestrate-io';
 import * as orchestrationIo from './pause-companion-orchestration-io';
 import {
   companionOrchestrator,
@@ -44,14 +42,12 @@ import {
 describe('pause-companion-orchestrate-io ↔ pause-companion-orchestration-io sibling parity', () => {
   it('orchestrate-io and orchestration-io are distinct presentation I/O surfaces', () => {
     expect(typeof runCompanionSlotOrchestrate).toBe('function');
-    expect(typeof runCompanionInterventionBootstrap).toBe('function');
     expect(typeof applyCompanionSlotOrchestrateOutcome).toBe('function');
     expect(typeof applyCompanionOrchestrateRetryReset).toBe('function');
     expect(typeof logCompanionSlotOrchestrateInvoke).toBe('function');
     expect(typeof trackCompanionGenerationInitiated).toBe('function');
     expect(typeof setCompanionSlotLoading).toBe('function');
     expect(typeof setCompanionSlotError).toBe('function');
-    expect(typeof resetInterventionIdempotency).toBe('function');
     expect(EMPTY_COMPANION_SLOT_RELAXATIONS).toMatchObject({ nudge: null, signal: null });
 
     expect(typeof pauseLoadCompanionOrchestrateSession).toBe('function');
@@ -68,24 +64,21 @@ describe('pause-companion-orchestrate-io ↔ pause-companion-orchestration-io si
     expect('nextExpandedWithLazyFetch' in orchestrateIo).toBe(false);
 
     expect('runCompanionSlotOrchestrate' in orchestrationIo).toBe(false);
-    expect('runCompanionInterventionBootstrap' in orchestrationIo).toBe(false);
     expect('applyCompanionSlotOrchestrateOutcome' in orchestrationIo).toBe(false);
     expect('EMPTY_COMPANION_SLOT_RELAXATIONS' in orchestrationIo).toBe(false);
   });
 
   it('orchestrate-io exports stay off session load, favorites, and expansion helpers', () => {
     expect(runCompanionSlotOrchestrate).not.toBe(pauseLoadCompanionOrchestrateSession);
-    expect(runCompanionInterventionBootstrap).not.toBe(loadCompanionOrchestrateSession);
     expect(applyCompanionSlotOrchestrateOutcome).not.toBe(pauseToggleCompanionLibraryFavorite);
     expect(logCompanionSlotOrchestrateInvoke).not.toBe(nextExpandedWithLazyFetch);
     expect(trackCompanionGenerationInitiated).not.toBe(pauseCompanionUiStepCompletion);
     expect(setCompanionSlotLoading).not.toBe(invalidateCompanionUiCompletionQuery);
-    expect(resetInterventionIdempotency).not.toBe(pauseLoadCompanionOrchestrateSession);
   });
 
   it('orchestration-io exports stay off slot orchestrate, intervention bootstrap, and retry UI', () => {
     expect(pauseLoadCompanionOrchestrateSession).not.toBe(runCompanionSlotOrchestrate);
-    expect(loadCompanionOrchestrateSession).not.toBe(runCompanionInterventionBootstrap);
+    expect(loadCompanionOrchestrateSession).not.toBe(runCompanionSlotOrchestrate);
     expect(pauseToggleCompanionLibraryFavorite).not.toBe(applyCompanionSlotOrchestrateOutcome);
     expect(nextExpandedWithLazyFetch).not.toBe(logCompanionSlotOrchestrateInvoke);
     expect(pauseCompanionUiStepCompletion).not.toBe(trackCompanionGenerationInitiated);

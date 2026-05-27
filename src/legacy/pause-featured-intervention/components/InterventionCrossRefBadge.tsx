@@ -1,6 +1,7 @@
 import { Pin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { InterventionState, RegenerateCompanionSlot } from '@/features/pause/public-ritual-frame';
+import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
+import type { InterventionState } from '@/legacy/pause-featured-intervention/domain/intervention-types';
 
 /**
  * Mapping from orchestrator slot → intervention types that, when featured,

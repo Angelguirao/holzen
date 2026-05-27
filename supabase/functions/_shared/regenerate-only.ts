@@ -11,7 +11,7 @@ import { generateGrounding } from "./generators/grounding.ts";
 import { generateHistory } from "./generators/history.ts";
 import { generateZoomOut } from "./generators/zoom-out.ts";
 import { determineSessionIntent } from "./session-intent.ts";
-import { bucketSeverity } from "./intervention-selector.ts";
+import { bucketSeverity } from "./market-context.ts";
 import { fetchGroundingSourcesForOrchestrate, fetchSignalSourcesForOrchestrate } from "./pause-cron-parity.ts";
 import { fetchRecentSignalCitationUrls, mergeRecentSignalUrls } from "./recent-signal-urls.ts";
 import { ORCHESTRATOR_KEY_MAP } from "./companion-types.ts";

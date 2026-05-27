@@ -11,10 +11,15 @@ import {
   tierLimits,
 } from "../_shared/subscription-entitlements.ts";
 import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "../_shared/ai-user-messages.ts";
-import { generateQuestion } from "../_shared/generators/question.ts";
 import { resolveLlmCredentialChain, resolveLlmBudgetTier } from "../_shared/llm-gateway.ts";
 import { determineSessionIntent } from "../_shared/session-intent.ts";
-import { selectIntervention, parseDirection, bucketSeverity, type InterventionSelection } from "../_shared/intervention-selector.ts";
+import {
+  selectIntervention,
+  parseDirection,
+  bucketSeverity,
+  type InterventionSelection,
+} from "../legacy/featured-intervention/intervention-selector.ts";
+import { generateQuestion } from "../legacy/featured-intervention/question.ts";
 import { fetchGroundingSourcesForOrchestrate } from "../_shared/pause-cron-parity.ts";
 import type { InterventionPayload } from "../_shared/companion-orchestrate-types.ts";
 import {

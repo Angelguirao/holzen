@@ -14,7 +14,8 @@
  */
 
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
-import { buildMirror, type MirrorResult } from "./generators/mirror.ts";
+import { buildMirror, type MirrorResult } from "./mirror.ts";
+export { parseDirection, bucketSeverity } from "../../_shared/market-context.ts";
 
 export type InterventionMode = "insight" | "question";
 export type PrimaryType = "mirror" | "pattern" | "trap";
@@ -39,28 +40,6 @@ export interface SelectInterventionParams {
   moodHistory?: Array<{ mood: string; outcome?: string | null }>;
   svcClient: SupabaseClient;
   log?: (msg: string, extra?: Record<string, unknown>) => void;
-}
-
-/**
- * Parse market direction from the context string as a convenience helper.
- * "BTC is down 7.2%..." → "down"
- */
-export function parseDirection(context?: string): "up" | "down" | "neutral" {
-  if (!context) return "neutral";
-  const lower = context.toLowerCase();
-  if (lower.includes("is down")) return "down";
-  if (lower.includes("is up")) return "up";
-  return "neutral";
-}
-
-/**
- * Convert a numeric severity (percent change) to a bucketed level.
- */
-export function bucketSeverity(pct: number): "mild" | "moderate" | "high" {
-  const abs = Math.abs(pct);
-  if (abs >= 10) return "high";
-  if (abs >= 5) return "moderate";
-  return "mild";
 }
 
 /**

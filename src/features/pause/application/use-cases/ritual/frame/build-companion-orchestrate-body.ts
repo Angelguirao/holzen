@@ -60,17 +60,6 @@ function slotEnableFlags(slot: RegenerateCompanionSlot) {
   };
 }
 
-export function buildInterventionOrchestrateBody(
-  session: CompanionOrchestrateSessionContext,
-): Record<string, unknown> {
-  return {
-    holzenInvokeSource: 'browser_pause_intervention',
-    ...session,
-    ...ALL_SLOTS_DISABLED,
-    useIntervention: true,
-  };
-}
-
 export function buildLazyFetchOrchestrateBody(
   session: CompanionOrchestrateSessionContext,
   slot: RegenerateCompanionSlot,

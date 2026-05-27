@@ -18,19 +18,17 @@ import {
   logCompanionFullviewOpened,
   logCompanionFullviewOpenedWithRepository,
 } from './pause-companion-analytics-io';
-import * as orchestrateIo from './pause-companion-orchestrate-io';
 import {
   applyCompanionOrchestrateRetryReset,
   applyCompanionSlotOrchestrateOutcome,
   EMPTY_COMPANION_SLOT_RELAXATIONS,
   logCompanionSlotOrchestrateInvoke,
-  resetInterventionIdempotency,
-  runCompanionInterventionBootstrap,
   runCompanionSlotOrchestrate,
   setCompanionSlotError,
   setCompanionSlotLoading,
   trackCompanionGenerationInitiated,
 } from './pause-companion-orchestrate-io';
+import * as orchestrateIo from './pause-companion-orchestrate-io';
 
 /**
  * Presentation sibling parity: analytics-io vs orchestrate-io (parity with
@@ -46,47 +44,40 @@ describe('pause-companion-analytics-io ↔ pause-companion-orchestrate-io siblin
     expect(typeof companionAnalyticsRepository).toBe('object');
 
     expect(typeof runCompanionSlotOrchestrate).toBe('function');
-    expect(typeof runCompanionInterventionBootstrap).toBe('function');
     expect(typeof applyCompanionSlotOrchestrateOutcome).toBe('function');
     expect(typeof applyCompanionOrchestrateRetryReset).toBe('function');
     expect(typeof logCompanionSlotOrchestrateInvoke).toBe('function');
     expect(typeof trackCompanionGenerationInitiated).toBe('function');
     expect(typeof setCompanionSlotLoading).toBe('function');
     expect(typeof setCompanionSlotError).toBe('function');
-    expect(typeof resetInterventionIdempotency).toBe('function');
     expect(EMPTY_COMPANION_SLOT_RELAXATIONS).toMatchObject({ nudge: null, signal: null });
 
     expect('logCompanionFeedbackVote' in analyticsIo).toBe(true);
     expect('logCompanionFullviewOpened' in analyticsIo).toBe(true);
     expect('runCompanionSlotOrchestrate' in analyticsIo).toBe(false);
-    expect('runCompanionInterventionBootstrap' in analyticsIo).toBe(false);
-
     expect('runCompanionSlotOrchestrate' in orchestrateIo).toBe(true);
-    expect('runCompanionInterventionBootstrap' in orchestrateIo).toBe(true);
     expect('logCompanionFeedbackVote' in orchestrateIo).toBe(false);
     expect('logCompanionFullviewOpened' in orchestrateIo).toBe(false);
   });
 
   it('analytics-io exports stay off slot orchestrate, intervention bootstrap, and retry UI', () => {
     expect(logCompanionFeedbackVote).not.toBe(runCompanionSlotOrchestrate);
-    expect(logCompanionFullviewOpened).not.toBe(runCompanionInterventionBootstrap);
+    expect(logCompanionFullviewOpened).not.toBe(runCompanionSlotOrchestrate);
     expect(logCompanionFeedbackVoteWithRepository).not.toBe(applyCompanionSlotOrchestrateOutcome);
     expect(logCompanionFullviewOpenedWithRepository).not.toBe(applyCompanionOrchestrateRetryReset);
     expect(logCompanionFeedbackVote).not.toBe(logCompanionSlotOrchestrateInvoke);
     expect(logCompanionFullviewOpened).not.toBe(trackCompanionGenerationInitiated);
     expect(logCompanionFeedbackVote).not.toBe(setCompanionSlotLoading);
     expect(logCompanionFullviewOpened).not.toBe(setCompanionSlotError);
-    expect(logCompanionFeedbackVote).not.toBe(resetInterventionIdempotency);
+    expect(logCompanionFeedbackVote).not.toBe(logCompanionSlotOrchestrateInvoke);
     expect(companionAnalyticsRepository).not.toBe(EMPTY_COMPANION_SLOT_RELAXATIONS);
   });
 
   it('orchestrate-io exports stay off analytics write helpers', () => {
     expect(runCompanionSlotOrchestrate).not.toBe(logCompanionFeedbackVote);
-    expect(runCompanionInterventionBootstrap).not.toBe(logCompanionFullviewOpened);
     expect(applyCompanionSlotOrchestrateOutcome).not.toBe(logCompanionFeedbackVoteWithRepository);
     expect(logCompanionSlotOrchestrateInvoke).not.toBe(logCompanionFullviewOpenedWithRepository);
     expect(trackCompanionGenerationInitiated).not.toBe(logCompanionFeedbackVote);
     expect(setCompanionSlotError).not.toBe(logCompanionFullviewOpened);
-    expect(resetInterventionIdempotency).not.toBe(companionAnalyticsRepository);
   });
 });

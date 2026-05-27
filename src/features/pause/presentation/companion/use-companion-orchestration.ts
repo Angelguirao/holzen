@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useCompanionInterventionBootstrap } from './use-companion-intervention-bootstrap';
 import { useCompanionOrchestrateRetry } from './use-companion-orchestrate-retry';
 import { useCompanionSlotOrchestrateActions } from './use-companion-slot-orchestrate-actions';
 import { useCompanionSlotUiState } from './use-companion-slot-ui-state';
@@ -23,9 +22,7 @@ export type UseCompanionOrchestrationParams = {
   startCheckout: () => void;
 };
 
-/**
- * Slot UI, intervention bootstrap, lazy-fetch/regenerate, and full orchestrate retry.
- */
+/** Slot UI, lazy-fetch/regenerate, and full orchestrate retry (featured intervention lives in legacy). */
 export function useCompanionOrchestration({
   pauseInstanceId,
   context,
@@ -43,20 +40,6 @@ export function useCompanionOrchestration({
   const [retryCount, setRetryCount] = useState(0);
 
   const slotUi = useCompanionSlotUiState(pauseInstanceId);
-
-  const interventionBootstrap = useCompanionInterventionBootstrap({
-    pauseInstanceId,
-    retryCount,
-    context,
-    reflectionMessage,
-    mood,
-    severityNumber,
-    language,
-    autoSaveToLibrary: slotUi.autoSaveToLibrary,
-    slotCommitters: slotUi.slotCommitters,
-    fetchedSlotsRef: slotUi.fetchedSlotsRef,
-    setCacheRelaxations: slotUi.setCacheRelaxations,
-  });
 
   const orchestrateActions = useCompanionSlotOrchestrateActions({
     pauseInstanceId,
@@ -91,11 +74,6 @@ export function useCompanionOrchestration({
     setZoomOutError: slotUi.setZoomOutError,
     setHistoryInsight: slotUi.setHistoryInsight,
     setHistoryError: slotUi.setHistoryError,
-    setIntervention: interventionBootstrap.setIntervention,
-    setInterventionError: interventionBootstrap.setInterventionError,
-    clearInterventionFetchDedupe: interventionBootstrap.clearInterventionFetchDedupe,
-    interventionSkippedRef: interventionBootstrap.interventionSkippedRef,
-    pendingRetryConfirmRef: interventionBootstrap.pendingRetryConfirmRef,
     setCacheRelaxations: slotUi.setCacheRelaxations,
   });
 
@@ -114,9 +92,6 @@ export function useCompanionOrchestration({
     historyInsight: slotUi.historyInsight,
     historyLoading: slotUi.historyLoading,
     historyError: slotUi.historyError,
-    intervention: interventionBootstrap.intervention,
-    interventionLoading: interventionBootstrap.interventionLoading,
-    interventionError: interventionBootstrap.interventionError,
     retryOrchestrate,
     fetchCompanion: orchestrateActions.fetchCompanion,
     regenerateCompanion: orchestrateActions.regenerateCompanion,

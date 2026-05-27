@@ -35,8 +35,6 @@ import { runToggleCompanionLibraryFavorite as toggleFavoriteDirect } from '@/fea
 import {
   applyCompanionSlotOrchestrateOutcome,
   logCompanionSlotOrchestrateInvoke,
-  resetInterventionIdempotency,
-  runCompanionInterventionBootstrap,
   runCompanionSlotOrchestrate,
   setCompanionSlotLoading,
   trackCompanionGenerationInitiated,
@@ -158,14 +156,14 @@ describe('pause-companion-orchestration-io parity (application)', () => {
    * Reciprocal inline pins ↔ `pause-companion-orchestrate-io-parity.test.ts` (application + presentation).
    * Persist/favorite leaf pins: orchestrate-io parity `sibling cluster: orchestration-io persist/favorite wrappers…`.
    */
-  it('sibling cluster: orchestrate-io slot/intervention exports stay distinct from orchestration-io', () => {
+  it('sibling cluster: orchestrate-io slot exports stay distinct from orchestration-io', () => {
     expect(pauseLoadCompanionOrchestrateSession).not.toBe(runCompanionSlotOrchestrate);
-    expect(pauseToggleCompanionLibraryFavorite).not.toBe(runCompanionInterventionBootstrap);
+    expect(pauseToggleCompanionLibraryFavorite).not.toBe(runCompanionSlotOrchestrate);
     expect(pauseCompanionUiStepCompletion).not.toBe(applyCompanionSlotOrchestrateOutcome);
     expect(loadCompanionOrchestrateSession).not.toBe(logCompanionSlotOrchestrateInvoke);
     expect(nextExpandedWithLazyFetch).not.toBe(trackCompanionGenerationInitiated);
     expect(pauseLoadCompanionOrchestrateSession).not.toBe(setCompanionSlotLoading);
-    expect(pauseToggleCompanionLibraryFavorite).not.toBe(resetInterventionIdempotency);
+    expect(pauseToggleCompanionLibraryFavorite).not.toBe(logCompanionSlotOrchestrateInvoke);
     expect(companionOrchestrator).not.toBe(runCompanionSlotOrchestrate);
   });
 });

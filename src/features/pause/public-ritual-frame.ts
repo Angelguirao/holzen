@@ -5,10 +5,7 @@
  */
 export type { CompanionData, CompanionPrefs } from './domain/companion-card-types';
 export type { CachedHistoricalInsightShape } from './domain/historical-insight';
-export type {
-  InterventionState,
-  RegenerateCompanionSlot,
-} from './domain/companion-orchestrate';
+export type { RegenerateCompanionSlot } from './domain/companion-orchestrate';
 export type { CompanionFeedbackVote } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
 export type {
   CompanionSlotCacheIds,
@@ -53,10 +50,6 @@ export {
   type UseCompanionOrchestrateSessionParams,
 } from './presentation/companion/use-companion-orchestrate-session';
 export {
-  useCompanionInterventionFetch,
-  type UseCompanionInterventionFetchParams,
-} from './presentation/companion/use-companion-intervention-fetch';
-export {
   useCompanionOrchestrateRetry,
   type UseCompanionOrchestrateRetryParams,
 } from './presentation/companion/use-companion-orchestrate-retry';
@@ -64,10 +57,6 @@ export {
   useCompanionSlotOrchestrateFailurePorts,
   type UseCompanionSlotOrchestrateFailurePortsParams,
 } from './presentation/companion/use-companion-slot-orchestrate-failure-ports';
-export {
-  useCompanionInterventionBootstrap,
-  type UseCompanionInterventionBootstrapParams,
-} from './presentation/companion/use-companion-intervention-bootstrap';
 export {
   useCompanionSlotRunOrchestrate,
   type UseCompanionSlotRunOrchestrateParams,
