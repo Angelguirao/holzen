@@ -26,9 +26,11 @@ export type ResolveHomePauseWidgetModeInput = {
   reflectionMessage: string | null;
   trackedAssetSymbol: string;
   hasPendingOffer: boolean;
-  /** Ms remaining on profile auto cooldown when no open pause (post-pause rest). */
+  /** Ms remaining on profile `last_trigger_at` auto cooldown (post-pause rest / E gate). */
   postPauseAutoCooldownRemainingMs: number;
   completedPauseCount: number;
+  /** Any `pause_step_events` on the open instance — mid-ritual stays B, not E. */
+  hasOpenPauseStepEvents: boolean;
   /** User expanded the widget manually (A′ / D expanded). */
   userExpanded: boolean;
 };
@@ -64,18 +66,27 @@ export function resolveHomePauseWidgetMode(
   }
 
   if (input.hasOpenPause) {
-    const inPostPauseCooldown = input.postPauseAutoCooldownRemainingMs > 0;
-
-    if (inPostPauseCooldown && input.openPauseState === 'active') {
-      return { mode: 'E', defaultCollapsed: false, hasReachedReflect };
-    }
-
     // Postgres `engaged` = deep ritual reached Reflect (`reflection_step`). Maps to Figma C.
     if (input.openPauseState === 'engaged') {
       if (input.hasPendingOffer) {
         return { mode: 'C_prime', defaultCollapsed: false, hasReachedReflect };
       }
       return { mode: 'C', defaultCollapsed: false, hasReachedReflect };
+    }
+
+    // Queued context while still `active` — inline banner on B (not E).
+    if (input.hasPendingOffer) {
+      return { mode: 'B', defaultCollapsed: false, hasReachedReflect };
+    }
+
+    const inPostPauseCooldown = input.postPauseAutoCooldownRemainingMs > 0;
+    const isPostRestNewActiveOffer =
+      inPostPauseCooldown &&
+      input.completedPauseCount > 0 &&
+      !input.hasOpenPauseStepEvents;
+
+    if (isPostRestNewActiveOffer) {
+      return { mode: 'E', defaultCollapsed: false, hasReachedReflect };
     }
 
     return { mode: 'B', defaultCollapsed: false, hasReachedReflect };

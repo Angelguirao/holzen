@@ -12,6 +12,7 @@ export type PauseHomeContextValue = {
   openPauseState: 'active' | 'engaged' | null;
   contextSnapshot: Record<string, unknown> | null;
   hasReflectionStep: boolean;
+  hasOpenPauseStepEvents: boolean;
   hasReachedReflect: boolean;
   isBriefRitual: boolean;
   openPauseCreatedAt: string | null;

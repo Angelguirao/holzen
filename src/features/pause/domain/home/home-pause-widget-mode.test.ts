@@ -95,6 +95,7 @@ const baseInput = {
   hasPendingOffer: false,
   postPauseAutoCooldownRemainingMs: 0,
   completedPauseCount: 0,
+  hasOpenPauseStepEvents: false,
   userExpanded: false,
 };
 
@@ -154,15 +155,51 @@ describe('resolveHomePauseWidgetMode', () => {
     expect(r.mode).toBe('C_prime');
   });
 
-  it('E when post-pause cooldown and new active offer', () => {
+  it('E when post-pause cooldown and new active offer (no ritual progress)', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'active',
       postPauseAutoCooldownRemainingMs: 60_000,
       completedPauseCount: 2,
+      hasOpenPauseStepEvents: false,
     });
     expect(r.mode).toBe('E');
+  });
+
+  it('B not E when first active pause during cooldown (no completed archive)', () => {
+    const r = resolveHomePauseWidgetMode({
+      ...baseInput,
+      hasOpenPause: true,
+      openPauseState: 'active',
+      postPauseAutoCooldownRemainingMs: 60_000,
+      completedPauseCount: 0,
+    });
+    expect(r.mode).toBe('B');
+  });
+
+  it('B not E when active mid-ritual (step events logged)', () => {
+    const r = resolveHomePauseWidgetMode({
+      ...baseInput,
+      hasOpenPause: true,
+      openPauseState: 'active',
+      postPauseAutoCooldownRemainingMs: 60_000,
+      completedPauseCount: 3,
+      hasOpenPauseStepEvents: true,
+    });
+    expect(r.mode).toBe('B');
+  });
+
+  it('B not E when active with pending queued (banner on B)', () => {
+    const r = resolveHomePauseWidgetMode({
+      ...baseInput,
+      hasOpenPause: true,
+      openPauseState: 'active',
+      postPauseAutoCooldownRemainingMs: 60_000,
+      completedPauseCount: 2,
+      hasPendingOffer: true,
+    });
+    expect(r.mode).toBe('B');
   });
 
   it('D collapsed when post-pause rest with archive', () => {

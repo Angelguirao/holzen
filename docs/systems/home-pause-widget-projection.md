@@ -45,7 +45,8 @@ Modes are **derived**, not stored. Primary inputs to `resolveHomePauseWidgetMode
 | `hasOpenPause` | `lastPauseInstanceId` from `v_pause_current` |
 | `openPauseState` | `active` \| `engaged` on open row |
 | `hasPendingOffer` | `usePendingPauseOffer()` — queued instance while user still has open pause |
-| `postPauseAutoCooldownRemainingMs` | Profile auto cooldown when no open pause (or in-widget cooldown when open) |
+| `postPauseAutoCooldownRemainingMs` | Profile `last_trigger_at` + `cooldown_hours` (not instance age) |
+| `hasOpenPauseStepEvents` | Any row in `pause_step_events` for open instance |
 | `completedPauseCount` | Archive depth for D vs D′ |
 | `showCalmWaters` | Recent `context_lost` instance within home window |
 | `userExpanded` | Session preference for collapsible A / D |
@@ -57,7 +58,8 @@ Modes are **derived**, not stored. Primary inputs to `resolveHomePauseWidgetMode
 | **C** | Open pause, `state = engaged` | **Continue** + **Discard** |
 | **C′** | Engaged + pending offer row | Dual layout: current pause vs new context (adopt / decline) |
 | **D** / **D′** | No open pause, auto cooldown active | Rest copy; D′ = no archive link |
-| **E** | Open `active` pause during post-pause cooldown window | New offer while prior ritual still open |
+| **E** | Open `active`, profile cooldown, `completedPauseCount > 0`, no step events yet | New offer after a prior completion (untouched instance) |
+| **B** + pending | Open `active` + pending row (wins over E) | Inline queued banner + adopt/decline |
 | **calm_waters** | No open pause, recent context_lost | Informational; optional scheduling |
 | **loading** / **blocking_error** | Holzen loading or hard market error | Skeleton or retry |
 
