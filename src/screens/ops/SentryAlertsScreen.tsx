@@ -199,8 +199,8 @@ export default function SentryAlertsScreen() {
             <div>
               <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Filters / scope</div>
               <ul className="space-y-1">
-                {rule.filters.map((f, i) => (
-                  <li key={i} className="flex justify-between gap-4">
+                {rule.filters.map((f) => (
+                  <li key={`${f.label}-${f.value}`} className="flex justify-between gap-4">
                     <span className="text-muted-foreground">{f.label}</span>
                     <code className="text-xs bg-muted px-1.5 py-0.5 rounded">{f.value}</code>
                   </li>

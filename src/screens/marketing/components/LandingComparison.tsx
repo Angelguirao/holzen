@@ -58,7 +58,7 @@ function SideBySide({ reaction, reflection, prefersReduced, t }: VariantProps) {
           {t('landing.reaction.label')}
         </p>
         {reaction.map((step, i) => (
-          <div key={i} className="relative flex gap-3 pb-6 last:pb-0">
+          <div key={step.title} className="relative flex gap-3 pb-6 last:pb-0">
             {i < reaction.length - 1 && (
               <div className="absolute left-[11px] top-[28px] bottom-0 w-px bg-destructive/15" />
             )}
@@ -81,7 +81,7 @@ function SideBySide({ reaction, reflection, prefersReduced, t }: VariantProps) {
           {t('landing.reflection.label')}
         </p>
         {reflection.map((step, i) => (
-          <div key={i} className="relative flex gap-3 pb-6 last:pb-0">
+          <div key={step.title} className="relative flex gap-3 pb-6 last:pb-0">
             {i < reflection.length - 1 && (
               <div className="absolute left-[11px] top-[28px] bottom-0 w-px bg-border/60" />
             )}
@@ -143,7 +143,7 @@ function CardFlip({ reaction, reflection, prefersReduced, t }: VariantProps) {
             className="space-y-0"
           >
             {steps.map((step, i) => (
-              <div key={i} className="relative flex gap-3 pb-5 last:pb-0">
+              <div key={step.title} className="relative flex gap-3 pb-5 last:pb-0">
                 {i < steps.length - 1 && (
                   <div className={`absolute left-[11px] top-[28px] bottom-0 w-px ${isCalm ? 'bg-border/60' : 'bg-destructive/15'}`} />
                 )}
@@ -184,8 +184,8 @@ function Stacked({ reaction, reflection, prefersReduced, t }: VariantProps) {
           {t('landing.reaction.label')}
         </p>
         <div className="space-y-2.5 opacity-50">
-          {reaction.map((step, i) => (
-            <div key={i} className="flex items-center gap-2.5">
+          {reaction.map((step) => (
+            <div key={step.title} className="flex items-center gap-2.5">
               <div className="flex-shrink-0 w-5 h-5 rounded-full border border-destructive/15 flex items-center justify-center text-destructive/30">
                 {step.icon}
               </div>
@@ -235,8 +235,8 @@ function Stacked({ reaction, reflection, prefersReduced, t }: VariantProps) {
           {t('landing.reflection.label')}
         </p>
         <div className="space-y-2.5">
-          {reflection.map((step, i) => (
-            <div key={i} className="flex items-center gap-2.5">
+          {reflection.map((step) => (
+            <div key={step.title} className="flex items-center gap-2.5">
               <div className="flex-shrink-0 w-5 h-5 rounded-full border border-border/70 bg-muted/30 flex items-center justify-center text-muted-foreground">
                 {step.icon}
               </div>

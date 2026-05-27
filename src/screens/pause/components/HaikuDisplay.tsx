@@ -26,14 +26,14 @@ export function HaikuDisplay({ haiku, variant = 'companion', className }: Props)
   const isVerse = variant === 'verse';
 
   return (
-    <div
+    <fieldset
       className={cn(
+        'm-0 min-w-0 border-0 p-0',
         isVerse ? 'space-y-2 border-t border-border/40 py-3 text-center' : 'space-y-1 py-3',
         className,
       )}
-      role="group"
-      aria-label="Haiku"
     >
+      <legend className="sr-only">Haiku</legend>
       {lines.map((line) => (
         <p
           key={line}
@@ -47,6 +47,6 @@ export function HaikuDisplay({ haiku, variant = 'companion', className }: Props)
           {line}
         </p>
       ))}
-    </div>
+    </fieldset>
   );
 }

@@ -15,16 +15,16 @@ export function PauseDoneDefaultStreakHero({ decision }: PauseDoneDefaultStreakH
     <>
       <div className="relative">
         <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: [0, 1.4, 1], opacity: 1 }}
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: [0.95, 1.4, 1], opacity: 1 }}
           transition={{ duration: 0.6, times: [0, 0.6, 1], ease: 'easeOut' }}
           className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-nox-text-highlight/12"
         >
           <Flame className="h-7 w-7 text-muted-foreground" />
         </motion.div>
-        {[...Array(6)].map((_, i) => (
+        {(['a', 'b', 'c', 'd', 'e', 'f'] as const).map((particleId, i) => (
           <motion.div
-            key={i}
+            key={particleId}
             className="absolute left-1/2 top-1/2 h-1 w-1 rounded-full bg-nox-text-highlight/35"
             initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
             animate={{

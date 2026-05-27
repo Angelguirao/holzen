@@ -105,8 +105,8 @@ export const Changelog = forwardRef<HTMLDivElement, ChangelogProps>(function Cha
                     <span className="text-[10px] font-mono text-muted-foreground">{entry.date}</span>
                   </div>
                   <ul className="space-y-1">
-                    {entry.changes.map((change, i) => (
-                      <li key={i} className="text-xs text-muted-foreground leading-relaxed">
+                    {entry.changes.map((change) => (
+                      <li key={`${entry.id}-${change}`} className="text-xs text-muted-foreground leading-relaxed">
                         · {change}
                       </li>
                     ))}

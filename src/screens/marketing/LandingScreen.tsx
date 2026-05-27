@@ -179,7 +179,7 @@ const LandingScreen = () => {
           onClick={() => document.getElementById('reflection-loop')?.scrollIntoView({ behavior: 'smooth' })}
           aria-label="Scroll to content"
         >
-          <ChevronDown className="h-4 w-4 animate-bounce text-muted-foreground" />
+          <ChevronDown className="h-4 w-4 text-muted-foreground motion-safe:animate-[chevron-nudge_2s_ease-in-out_infinite]" />
         </motion.button>
       </div>
 
