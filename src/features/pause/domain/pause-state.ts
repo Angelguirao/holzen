@@ -6,9 +6,8 @@
  * in TypeScript so:
  *
  *   1. The Pause UI can render an optimistic state *before* the RPC round
- *      trip resolves (e.g. gating Frame/Reflect until deep `engaged` — both
- *      `initial_emotion_logged` and `breath_completed` exist; in the shipped
- *      ritual, Feel always precedes first Breathe, but Postgres checks a set, not row order).
+ *      trip resolves (e.g. gating Home Continue until deep `engaged`, which
+ *      requires `reflection_step` in Postgres — see pause-engaged-and-home-widget.md).
  *   2. `src/lib/badges/compute.ts` and the Stats hooks can derive state
  *      from fixture data without round-tripping to a database.
  *   3. Unit tests pin the rules to a place humans can read (the SQL is
@@ -145,8 +144,9 @@ function payloadMarksBriefRitual(payload: Record<string, unknown> | undefined): 
 }
 
 /**
- * True when this instance counts as **brief** for engaged gates and `is_brief_ritual`
- * (Feel tagged `brief_ritual`, no `ritual_depth_upgraded` — mirrors `pause_instance_is_brief_ritual` in SQL).
+ * True when this instance counts as **brief** for ritual depth (`is_brief_ritual`
+ * on `v_pause_full`). Brief instances do not enter Postgres `engaged` under
+ * `volatility_v1` (they complete from `active` via `outcome_logged`).
  */
 export function pauseInstanceHasBriefRitualTag(
   stepEvents: readonly PauseStepEventRow[],
@@ -198,10 +198,9 @@ function allIn<T>(required: readonly T[], present: Set<T>): boolean {
  *      `template.action_window_ms` is set (matches Postgres).
  *   4. **`open_max_age` (engaged only):** **`engaged`** and `COALESCE(engaged_at, created_at)` + 12h ≤ `now`
  *      → `expired`. **`active`** is not time-expired by this rule (matches Postgres).
- *   5. **`volatility_v1`:** **`engaged`** uses a **set** of step types (order not evaluated):
- *      brief → `initial_emotion_logged` only; deep → `initial_emotion_logged` and
- *      `breath_completed` (Feel + first Breathe in normal UI). **`completed`** as soon as
- *      **`outcome_logged`** exists. Companion counts do **not** gate completion.
+ *   5. **`volatility_v1`:** **`engaged`** when **deep** and `reflection_step` exists
+ *      (Reflect reached). **Brief** never enters `engaged`; it completes from `active`
+ *      via `outcome_logged`. **`completed`** as soon as **`outcome_logged`** exists.
  *   6. **Other template slugs:** `required_for_engaged` / `required_for_completed` from
  *      the row, plus `countedCompanionCount` ≥ `required_companion_count` for completed.
  *   7. Otherwise: unchanged.
@@ -249,9 +248,7 @@ export function computePauseState(params: {
   const isVolatilityV1 = template.slug === 'volatility_v1';
 
   const engagedOk = isVolatilityV1
-    ? briefMode
-      ? allIn(['initial_emotion_logged'] as const, seenSteps)
-      : allIn(['initial_emotion_logged', 'breath_completed'] as const, seenSteps)
+    ? !briefMode && seenSteps.has('reflection_step')
     : allIn(template.required_for_engaged, seenSteps);
 
   const completedOk = isVolatilityV1

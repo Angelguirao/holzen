@@ -11,7 +11,6 @@ import { useHomePauseWidgetProjection } from '@/features/pause/presentation/home
 export type UseHomePauseCardProjectionParams = UsePauseCardProjectionParams & {
   hasReflectionStep: boolean;
   reflectionMessage: string | null;
-  isBriefRitual: boolean;
   contextSnapshot: Record<string, unknown> | null;
   openPauseCreatedAt: string | null;
   contextText: string | null;
@@ -35,7 +34,6 @@ export function useHomePauseCardProjection(params: UseHomePauseCardProjectionPar
     openPauseState: params.openPauseState,
     hasReflectionStep: params.hasReflectionStep,
     reflectionMessage: params.reflectionMessage,
-    isBriefRitual: params.isBriefRitual,
     contextSnapshot: params.contextSnapshot,
     openPauseCreatedAt: params.openPauseCreatedAt,
     contextText: params.contextText,
