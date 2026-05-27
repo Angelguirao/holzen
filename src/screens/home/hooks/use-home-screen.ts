@@ -157,7 +157,6 @@ export function useHomeScreen() {
     message,
     context,
     lastPauseInstanceId,
-    openPauseState,
     companions,
     companionPrefs,
     severity,

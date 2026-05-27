@@ -72,7 +72,6 @@ import {
 import * as pendingOfferIo from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   markPauseManualStartedHomeOnce,
-  trackHomePendingPauseBannerPauseOpened,
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
   trackPauseOpenDismissed,
@@ -178,7 +177,6 @@ describe('pause-home-reflect-io parity (application)', () => {
   });
 
   it('presentation home-reflect-io stays off home-reflect-telemetry-io exports', () => {
-    expect('trackHomePendingPauseBannerPauseOpened' in homeReflectIo).toBe(false);
     expect('trackPauseOpenDismissed' in homeReflectIo).toBe(false);
     expect('markPauseManualStartedHomeOnce' in homeReflectIo).toBe(false);
     expect('trackManualPauseInstanceCreated' in homeReflectIo).toBe(false);
@@ -202,7 +200,7 @@ describe('pause-home-reflect-io parity (application)', () => {
    */
   it('sibling cluster: home-reflect-telemetry-io exports stay distinct from home-reflect-io', () => {
     expect(openFromHomeIo).not.toBe(trackPauseOpenDismissed);
-    expect(dismissFromHomeIo).not.toBe(trackHomePendingPauseBannerPauseOpened);
+    expect(dismissFromHomeIo).not.toBe(trackPauseOpenDismissed);
     expect(pauseDismissOpenPauseHomePreview).not.toBe(markPauseManualStartedHomeOnce);
     expect(pauseHomeManualOpenPorts).not.toBe(trackManualPauseInstanceCreated);
     expect(buildMarketFromHomeIo).not.toBe(trackPauseManualCompleted);

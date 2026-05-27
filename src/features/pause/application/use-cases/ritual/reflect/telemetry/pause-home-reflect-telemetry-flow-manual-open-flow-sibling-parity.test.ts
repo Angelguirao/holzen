@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 
 import {
   markPauseManualStartedHomeOnce,
-  trackHomePendingPauseBannerPauseOpened,
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
   trackPauseOpenDismissed,
@@ -19,15 +18,9 @@ import {
 } from '../generation/manual-open/pause-reflect-generation-manual-open-flow';
 import * as manualOpenFlow from '../generation/manual-open/pause-reflect-generation-manual-open-flow';
 
-/**
- * Application sibling parity: Home manual-open telemetry-flow vs manual-open-flow CI anchors.
- * Complements `pause-home-reflect-telemetry-flow-reflect-telemetry-flow-sibling-parity.test.ts`
- * and `pause-reflect-generation-manual-open-flow-sibling-parity.test.ts`.
- */
 describe('pause-home-reflect-telemetry-flow ↔ pause-reflect-generation-manual-open-flow sibling parity', () => {
   it('home-reflect-telemetry-flow and manual-open-flow are distinct sibling CI anchors', () => {
     expect(typeof trackPauseOpenDismissed).toBe('function');
-    expect(typeof trackHomePendingPauseBannerPauseOpened).toBe('function');
     expect(typeof markPauseManualStartedHomeOnce).toBe('function');
     expect(typeof trackManualPauseInstanceCreated).toBe('function');
     expect(typeof trackPauseManualCompleted).toBe('function');
@@ -45,7 +38,6 @@ describe('pause-home-reflect-telemetry-flow ↔ pause-reflect-generation-manual-
     expect('buildManualPauseOpenParams' in homeReflectTelemetryFlow).toBe(false);
 
     expect('trackPauseOpenDismissed' in manualOpenFlow).toBe(false);
-    expect('trackHomePendingPauseBannerPauseOpened' in manualOpenFlow).toBe(false);
     expect('markPauseManualStartedHomeOnce' in manualOpenFlow).toBe(false);
     expect('trackManualPauseInstanceCreated' in manualOpenFlow).toBe(false);
     expect('trackPauseManualCompleted' in manualOpenFlow).toBe(false);
@@ -53,7 +45,6 @@ describe('pause-home-reflect-telemetry-flow ↔ pause-reflect-generation-manual-
 
   it('home manual-open telemetry exports stay off manual-open use cases and domain builders', () => {
     expect(trackPauseOpenDismissed).not.toBe(openManualPauseFromHome);
-    expect(trackHomePendingPauseBannerPauseOpened).not.toBe(dismissOpenPauseHome);
     expect(markPauseManualStartedHomeOnce).not.toBe(runOpenManualPauseSilentModeAfterCreate);
     expect(trackManualPauseInstanceCreated).not.toBe(runPersistSilentReflectionStub);
     expect(trackPauseManualCompleted).not.toBe(buildManualPauseMarketContext);
@@ -62,10 +53,10 @@ describe('pause-home-reflect-telemetry-flow ↔ pause-reflect-generation-manual-
 
   it('manual-open-flow exports stay off Home PostHog trackers', () => {
     expect(openManualPauseFromHome).not.toBe(trackPauseOpenDismissed);
-    expect(dismissOpenPauseHome).not.toBe(trackHomePendingPauseBannerPauseOpened);
-    expect(runOpenManualPauseSilentModeAfterCreate).not.toBe(markPauseManualStartedHomeOnce);
-    expect(runPersistSilentReflectionStub).not.toBe(trackManualPauseInstanceCreated);
-    expect(buildManualPauseOpenParams).not.toBe(trackPauseManualCompleted);
-    expect(buildManualPauseMarketContext).not.toBe(trackPauseOpenDismissed);
+    expect(dismissOpenPauseHome).not.toBe(markPauseManualStartedHomeOnce);
+    expect(runOpenManualPauseSilentModeAfterCreate).not.toBe(trackManualPauseInstanceCreated);
+    expect(runPersistSilentReflectionStub).not.toBe(trackPauseManualCompleted);
+    expect(buildManualPauseOpenParams).not.toBe(trackPauseOpenDismissed);
+    expect(buildManualPauseMarketContext).not.toBe(markPauseManualStartedHomeOnce);
   });
 });

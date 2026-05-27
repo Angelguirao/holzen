@@ -86,7 +86,9 @@ When cron/manual trigger queues a **pending** instance while the user still has 
 | `engaged` | **C′** — side-by-side current vs new context | Adopt / decline via `usePendingPauseOfferMutations` on Home |
 | `active` | **B** + inline queued banner | Same mutations; banner CTA adopts pending |
 
-On **`/pause`**, leave flow still uses `PauseLeaveWithPendingSheet`. There is **no** app-shell blocking dialog on Home or other routes.
+On **`/pause`**, leave flow still uses `PauseLeaveWithPendingSheet`. There is **no** app-shell blocking dialog.
+
+**Other shell routes (Archive, Journey, Settings):** pending UX is **Home-only** in the shipped pause-first shell. Users on other tabs discover the queued offer when they return Home or open `/pause` (leave sheet). No global modal.
 
 ---
 

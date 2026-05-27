@@ -136,8 +136,7 @@
       "toast": "Market settled — that pause offer closed."
     },
     "pendingQueuedTitle": "New moment queued",
-    "pendingQueuedBody": "The market moved again while this pause is open. On the pause screen you can switch to the fresh context or keep this one.",
-    "pendingQueuedCta": "Open pause screen",
+    "pendingQueuedBody": "The market moved again while this pause is open. Switch to the fresh context below or keep this one.",
     "pauseReadyBanner": "A pause is ready for you",
     "pauseReadyBannerHideAria": "Hide reminder — your pause stays open on Home",
     "pauseDismissCta": "Dismiss pause",
