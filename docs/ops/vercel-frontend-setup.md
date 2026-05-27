@@ -73,7 +73,6 @@ Project → Settings → Environment Variables:
 | `VITE_SENTRY_DSN` | prod DSN | optional | Frontend errors |
 | `VITE_POSTHOG_KEY` | prod key | staging key | Product analytics |
 | `VITE_POSTHOG_HOST` | `https://us.i.posthog.com` | same | |
-| `VITE_ADMIN_USER_IDS` | comma UUIDs | optional | `/admin` gate |
 
 **Build-only (Production):** add `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` if you want source maps uploaded during `npm run build` (Vite Sentry plugin no-ops without them).
 
@@ -100,7 +99,6 @@ In Vercel → **holzen** → Settings → Environment Variables, add each row to
 | `VITE_SITE_ORIGIN` | *(optional)* preview deployment URL | Omit to use `https://holzen.app` fallback from `vite.config.ts` |
 | `VITE_POSTHOG_KEY` | Same as prod or a staging PostHog project key | Optional for PR analytics |
 | `VITE_POSTHOG_HOST` | `https://eu.i.posthog.com` | Match prod if using one PostHog project |
-| `VITE_ADMIN_USER_IDS` | *(empty or comma UUIDs)* | Optional `/admin` gate on previews |
 | `VITE_SENTRY_DSN` | *(optional)* | Frontend errors on preview |
 
 **Production** (already set via CLI; re-sync with `node scripts/vercel-sync-env.mjs`):
@@ -113,7 +111,6 @@ In Vercel → **holzen** → Settings → Environment Variables, add each row to
 | `VITE_APP_VERSION` | `$VERCEL_GIT_COMMIT_SHA` |
 | `VITE_SITE_ORIGIN` | `https://holzen.app` |
 | `VITE_POSTHOG_KEY` / `VITE_POSTHOG_HOST` | From `.env.prod` / `.env.prod.local` |
-| `VITE_ADMIN_USER_IDS` | From `.env.prod` / `.env.prod.local` |
 
 ---
 

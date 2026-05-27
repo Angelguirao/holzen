@@ -73,7 +73,7 @@ This matches the “skills-first” stats organization documented in `docs/decis
 
 ### 1.5 Admin and internal tooling
 
-Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admin/edge-coverage`). Not in bottom nav; suitable for allowlisted operators (`VITE_ADMIN_USER_IDS` pattern per `AGENTS.md`).
+Under `/admin` and children (`/admin/smoke-test`, `/admin/sentry-alerts`, `/admin/edge-coverage`). Not in bottom nav; for operators with `profiles.is_admin = true`.
 
 ### 1.6 Cross-cutting behaviors
 

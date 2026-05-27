@@ -153,7 +153,7 @@ npm run dev:staging
 
 ### A. Secrets + prices (in-app)
 
-1. Sign in as admin (`VITE_ADMIN_USER_IDS`).
+1. Sign in as a user with `profiles.is_admin = true` (see [environment-matrix.md](environment-matrix.md)).
 2. Open **`/admin`** → **Stripe Price Check** (calls `admin-check-stripe-prices`).
 3. All three required prices should show **ok** with correct recurrence (Pro = recurring, flex = one_time).
 

@@ -43,7 +43,7 @@ Environment variables (see [.env.example](.env.example) and [docs/ops/environmen
   - **Prod-like from local Vite:** copy [.env.prod.example](.env.prod.example) to **`.env.prod.local`**, fill in URL + anon key, run **`npm run dev:prod`**.
   - **Local Docker only:** copy [.env.localstack.example](.env.localstack.example) to **`.env.localstack.local`**, set the anon key from `npm run supabase:status`, run **`npm run dev:local`**.
 
-The app reads **`VITE_SUPABASE_URL`** and **`VITE_SUPABASE_PUBLISHABLE_KEY`**. **`VITE_ADMIN_USER_IDS`** is optional (comma-separated auth user UUIDs); admin access may also be governed in the database (e.g. `is_admin` / `is_admin()`) depending on your setup.
+The app reads **`VITE_SUPABASE_URL`** and **`VITE_SUPABASE_PUBLISHABLE_KEY`**. **`/admin`** access is governed by **`profiles.is_admin`** in Supabase (set via SQL on the target project).
 
 Start the dev server (Vite is configured for **port 8080**):
 
