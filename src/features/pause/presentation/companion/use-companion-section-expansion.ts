@@ -14,9 +14,9 @@ export type UseCompanionSectionExpansionParams = {
   signal: unknown;
   signalLoading: boolean;
   signalError: unknown;
-  nudge: unknown;
-  nudgeLoading: boolean;
-  nudgeError: unknown;
+  grounding: unknown;
+  groundingLoading: boolean;
+  groundingError: unknown;
   zoomOut: unknown;
   zoomOutLoading: boolean;
   zoomOutError: unknown;
@@ -58,9 +58,9 @@ export function useCompanionSectionExpansion({
   signal,
   signalLoading,
   signalError,
-  nudge,
-  nudgeLoading,
-  nudgeError,
+  grounding,
+  groundingLoading,
+  groundingError,
   zoomOut,
   zoomOutLoading,
   zoomOutError,
@@ -121,11 +121,11 @@ export function useCompanionSectionExpansion({
     () =>
       toggleSlot('grounding', {
         slot: 'grounding',
-        data: nudge,
-        loading: nudgeLoading,
-        error: nudgeError,
+        data: grounding,
+        loading: groundingLoading,
+        error: groundingError,
       }),
-    [toggleSlot, nudge, nudgeLoading, nudgeError],
+    [toggleSlot, grounding, groundingLoading, groundingError],
   );
 
   const toggleZoomOut = useCallback(

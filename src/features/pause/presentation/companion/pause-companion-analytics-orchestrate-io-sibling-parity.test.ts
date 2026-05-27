@@ -50,7 +50,7 @@ describe('pause-companion-analytics-io ↔ pause-companion-orchestrate-io siblin
     expect(typeof trackCompanionGenerationInitiated).toBe('function');
     expect(typeof setCompanionSlotLoading).toBe('function');
     expect(typeof setCompanionSlotError).toBe('function');
-    expect(EMPTY_COMPANION_SLOT_RELAXATIONS).toMatchObject({ nudge: null, signal: null });
+    expect(EMPTY_COMPANION_SLOT_RELAXATIONS).toMatchObject({ grounding: null, signal: null });
 
     expect('logCompanionFeedbackVote' in analyticsIo).toBe(true);
     expect('logCompanionFullviewOpened' in analyticsIo).toBe(true);

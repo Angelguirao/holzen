@@ -130,7 +130,7 @@ Both call edges and write `pause_ai_artifacts`, but they are **different ritual 
 
 **Do not** split folders because “it is AI.” Split by **where the user is in the ritual**. Ports may still be separate interfaces (`ReflectGenerator`, `CompanionOrchestrator`) — that is adapter shape, not package politics.
 
-Companions stay **inside pause** ([holzen-application-architecture.md](../fundamentals/holzen-application-architecture.md) §8). Full-screen `/companion/*` routes are **pause presentation** for one slot on an instance.
+Companions stay **inside pause** ([holzen-application-architecture.md](../fundamentals/holzen-application-architecture.md) §8). Full-screen `/companion/*` routes are **pause presentation** for one slot on an instance. Product vs `ground_nudge` naming map: [pause/companions/frame-companions.md](pause/companions/frame-companions.md).
 
 ### 3.2 Presentation vs screens (Holzen rule)
 

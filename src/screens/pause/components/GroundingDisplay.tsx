@@ -17,7 +17,7 @@ export type GroundingNudgePayload = {
 export type GroundingDisplayVariant = 'default' | 'frame';
 
 export type GroundingDisplayProps = {
-  nudge: GroundingNudgePayload | null;
+  grounding: GroundingNudgePayload | null;
   loading: boolean;
   error: boolean;
   onRetry?: () => void;
@@ -34,9 +34,9 @@ function truncateExcerpt(body: string, maxChars = 220): string {
   return `${cut.trimEnd()}…`;
 }
 
-/** Grounding / bias nudge body — same data path as other lazy companion slots (`nudge` state). */
+/** Grounding companion body — same lazy-fetch path as Signal, Look Back, and Zoom Out. */
 export function GroundingDisplay({
-  nudge,
+  grounding,
   loading = false,
   error = false,
   onRetry,
@@ -65,20 +65,20 @@ export function GroundingDisplay({
     );
   }
 
-  if (!nudge) return null;
+  if (!grounding) return null;
 
   if (isFrame) {
-    const excerpt = truncateExcerpt(nudge.body);
+    const excerpt = truncateExcerpt(grounding.body);
     return (
       <div className="space-y-2 pt-2">
-        {nudge.title ? (
-          <p className="text-sm font-medium leading-snug tracking-wide text-foreground">{nudge.title}</p>
+        {grounding.title ? (
+          <p className="text-sm font-medium leading-snug tracking-wide text-foreground">{grounding.title}</p>
         ) : null}
         {excerpt ? (
           <p className="text-sm leading-relaxed tracking-wide text-foreground">{excerpt}</p>
         ) : null}
-        {nudge.citation ? (
-          <p className="text-sm font-medium leading-snug tracking-wide text-muted-foreground">{nudge.citation}</p>
+        {grounding.citation ? (
+          <p className="text-sm font-medium leading-snug tracking-wide text-muted-foreground">{grounding.citation}</p>
         ) : null}
         {pauseInstanceId ? (
           <CompanionOpenFullViewButton pauseInstanceId={pauseInstanceId} routeSegment="grounding" />
@@ -89,14 +89,14 @@ export function GroundingDisplay({
 
   return (
     <div className="space-y-1.5 py-3">
-      <p className="text-xs font-mono font-medium text-foreground/80">{nudge.title}</p>
-      <p className="text-xs text-muted-foreground leading-relaxed">{nudge.body}</p>
-      {nudge.citation ? (
+      <p className="text-xs font-mono font-medium text-foreground/80">{grounding.title}</p>
+      <p className="text-xs text-muted-foreground leading-relaxed">{grounding.body}</p>
+      {grounding.citation ? (
         <div className="flex items-center gap-1.5 pt-1">
-          <p className="text-[9px] font-mono text-muted-foreground/40">{nudge.citation}</p>
-          {nudge.url ? (
+          <p className="text-[9px] font-mono text-muted-foreground/40">{grounding.citation}</p>
+          {grounding.url ? (
             <a
-              href={nudge.url}
+              href={grounding.url}
               target="_blank"
               rel="noopener noreferrer"
               className="text-nox-text-link/60 hover:text-nox-text-link transition-colors"

@@ -39,9 +39,9 @@ export function isCompanionFullViewSlotSettled(
     signal: unknown;
     signalLoading: boolean;
     signalError: unknown;
-    nudge: unknown;
-    nudgeLoading: boolean;
-    nudgeError: unknown;
+    grounding: unknown;
+    groundingLoading: boolean;
+    groundingError: unknown;
     historyInsight: unknown;
     historyLoading: boolean;
     historyError: unknown;
@@ -54,7 +54,7 @@ export function isCompanionFullViewSlotSettled(
     case 'signal':
       return Boolean(fields.signal || fields.signalLoading || fields.signalError);
     case 'grounding':
-      return Boolean(fields.nudge || fields.nudgeLoading || fields.nudgeError);
+      return Boolean(fields.grounding || fields.groundingLoading || fields.groundingError);
     case 'history':
       return Boolean(fields.historyInsight || fields.historyLoading || fields.historyError);
     case 'zoomOut':

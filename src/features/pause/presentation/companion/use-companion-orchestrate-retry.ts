@@ -12,8 +12,8 @@ export type UseCompanionOrchestrateRetryParams = {
   fetchedSlotsRef: MutableRefObject<Set<string>>;
   setSignal: (v: null) => void;
   setSignalError: (v: boolean) => void;
-  setNudge: (v: null) => void;
-  setNudgeError: (v: boolean) => void;
+  setGrounding: (v: null) => void;
+  setGroundingError: (v: boolean) => void;
   setZoomOut: (v: null) => void;
   setZoomOutError: (v: boolean) => void;
   setHistoryInsight: (v: null) => void;
@@ -28,8 +28,8 @@ export function useCompanionOrchestrateRetry({
   fetchedSlotsRef,
   setSignal,
   setSignalError,
-  setNudge,
-  setNudgeError,
+  setGrounding,
+  setGroundingError,
   setZoomOut,
   setZoomOutError,
   setHistoryInsight,
@@ -48,8 +48,8 @@ export function useCompanionOrchestrateRetry({
         clearSlotContent: () => {
           setSignal(null);
           setSignalError(false);
-          setNudge(null);
-          setNudgeError(false);
+          setGrounding(null);
+          setGroundingError(false);
           setZoomOut(null);
           setZoomOutError(false);
           setHistoryInsight(null);
@@ -65,8 +65,8 @@ export function useCompanionOrchestrateRetry({
     fetchedSlotsRef,
     setSignal,
     setSignalError,
-    setNudge,
-    setNudgeError,
+    setGrounding,
+    setGroundingError,
     setZoomOut,
     setZoomOutError,
     setHistoryInsight,

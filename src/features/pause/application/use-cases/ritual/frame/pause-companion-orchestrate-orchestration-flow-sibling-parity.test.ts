@@ -29,7 +29,7 @@ describe('pause-companion-orchestrate-flow ↔ pause-companion-orchestration-flo
     expect(typeof setCompanionSlotError).toBe('function');
     expect(typeof setCompanionSlotLoading).toBe('function');
     expect(EMPTY_COMPANION_SLOT_RELAXATIONS).toMatchObject({
-      nudge: null,
+      grounding: null,
       signal: null,
     });
 
