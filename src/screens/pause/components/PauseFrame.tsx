@@ -128,6 +128,7 @@ export function PauseFrame({
             icon={<SignalIcon className="h-5 w-5 text-primary" aria-hidden />}
             label={t('pause.frame.signal', { defaultValue: 'Signal' })}
             href={companionFullViewHref(pauseInstanceId, 'signal')}
+            iconHelp={t('pause.frame.companions.signalHelp')}
           />
         ) : null}
 
@@ -136,6 +137,7 @@ export function PauseFrame({
             icon={<GroundingIcon className="h-5 w-5 text-primary" aria-hidden />}
             label={t('pause.frame.ground', { defaultValue: 'Ground yourself' })}
             href={companionFullViewHref(pauseInstanceId, 'grounding')}
+            iconHelp={t('pause.frame.companions.groundingHelp')}
           />
         ) : null}
 
@@ -144,6 +146,7 @@ export function PauseFrame({
             icon={<ZoomOutIcon className="h-5 w-5 text-primary" aria-hidden />}
             label={t('pause.frame.zoomOut', { defaultValue: 'Zoom out' })}
             href={companionFullViewHref(pauseInstanceId, 'zoom-out')}
+            iconHelp={t('pause.frame.companions.zoomOutHelp')}
           />
         ) : null}
 
@@ -152,6 +155,7 @@ export function PauseFrame({
             icon={<HistoryIcon className="h-5 w-5 text-primary" aria-hidden />}
             label={t('pause.frame.lookBack', { defaultValue: 'Look back' })}
             href={companionFullViewHref(pauseInstanceId, 'history')}
+            iconHelp={t('pause.frame.companions.lookBackHelp')}
           />
         ) : null}
       </div>

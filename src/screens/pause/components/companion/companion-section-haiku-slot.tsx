@@ -1,6 +1,9 @@
 import type { CompanionData } from '@/features/pause/public-ritual-frame';
 import { HaikuDisplay } from '@/screens/pause/components/HaikuDisplay';
-import { CompanionCard } from '@/screens/pause/components/companion/companion-card';
+import {
+  CompanionCard,
+  type CompanionCardAppearance,
+} from '@/screens/pause/components/companion/companion-card';
 import { COMPANION_SECTION_ICONS } from '@/screens/pause/components/companion/companion-section-icons';
 import type { CompanionSectionProFavoriteProps } from '@/features/pause/public-ritual-frame';
 
@@ -12,6 +15,7 @@ export type CompanionSectionHaikuSlotProps = {
   completed: boolean;
   onFirstExpandComplete: () => void;
   proFavorite: CompanionSectionProFavoriteProps;
+  appearance?: CompanionCardAppearance;
 };
 
 export function CompanionSectionHaikuSlot({
@@ -22,6 +26,7 @@ export function CompanionSectionHaikuSlot({
   completed,
   onFirstExpandComplete,
   proFavorite,
+  appearance = 'default',
 }: CompanionSectionHaikuSlotProps) {
   "use memo";
   return (
@@ -35,9 +40,10 @@ export function CompanionSectionHaikuSlot({
         if (!completed) onFirstExpandComplete();
       }}
       completed={completed}
+      appearance={appearance}
       {...proFavorite}
     >
-      <HaikuDisplay haiku={haiku} />
+      <HaikuDisplay haiku={haiku} variant={appearance === 'frame' ? 'verse' : 'default'} />
     </CompanionCard>
   );
 }
