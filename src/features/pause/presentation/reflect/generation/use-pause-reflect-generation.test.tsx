@@ -31,12 +31,26 @@ vi.mock('@/features/auth/public', () => ({
   useAuth: () => ({ user: { id: 'user-1' } }),
 }));
 
-const { profileFixture } = vi.hoisted(() => ({
-  profileFixture: { display_name: 'Test' },
-}));
+const { profileFixture, useProfileMock } = vi.hoisted(() => {
+  const profileFixture = {
+    reflectionTone: 'stoic',
+    reflectionStyle: 'standard',
+    customPrompt: null as string | null,
+    motivations: [] as string[],
+    mantra: null as string | null,
+    groundingActivities: [] as string[],
+    currency: 'USD',
+    language: 'en',
+    display_name: 'Test',
+  };
+  return {
+    profileFixture,
+    useProfileMock: vi.fn(() => profileFixture),
+  };
+});
 
 vi.mock('@/features/user/public-hooks', () => ({
-  useProfile: () => profileFixture,
+  useProfile: () => useProfileMock(),
 }));
 
 vi.mock('react-i18next', () => ({
@@ -169,10 +183,34 @@ describe('usePauseReflectGeneration', () => {
         pauseInstanceId: 'pause-1',
         userId: 'user-1',
         context: 'btc',
-        profile: profileFixture,
+        profile: expect.objectContaining({
+          reflectionTone: 'stoic',
+          reflectionStyle: 'standard',
+          currency: 'USD',
+          language: 'en',
+        }),
       }),
       mockReflectGenerator,
     );
+  });
+
+  it('does not restart holzen-reflect when useProfile returns a new object reference', async () => {
+    pauseReflectGenerationMock.mockResolvedValue({ status: 'generated', message: 'edge' });
+
+    const { rerender } = renderHook(() => usePauseReflectGeneration(baseParams()));
+
+    await waitFor(() => {
+      expect(pauseReflectGenerationMock.mock.calls.length).toBeGreaterThan(0);
+    });
+    const callsAfterMount = pauseReflectGenerationMock.mock.calls.length;
+
+    useProfileMock.mockImplementation(() => ({
+      ...profileFixture,
+      display_name: 'Re-render tick',
+    }));
+    rerender();
+
+    expect(pauseReflectGenerationMock.mock.calls.length).toBe(callsAfterMount);
   });
 
   it('reports missing-context error without calling holzen-reflect', async () => {
