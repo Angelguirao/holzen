@@ -2,10 +2,8 @@ import { ExternalLink } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { CompanionError } from './CompanionError';
-import { SignalReadFullStoryButton } from '@/screens/pause/components/companion/signal-read-full-story-button';
-import { SignalKeyIdeasBlock } from '@/screens/pause/components/companion/signal-key-ideas-block';
 import type { SignalPayload } from '@/features/pause/domain/signal-payload';
-import { normalizeSignalKeyIdeas } from '@/features/pause/domain/signal-payload';
+import { SignalFrameDisplay } from '@/screens/pause/components/signal-frame-display';
 
 export type { SignalPayload };
 
@@ -16,18 +14,8 @@ interface SignalDisplayProps {
   loading: boolean;
   error: boolean;
   onRetry?: () => void;
-  /** Frame accordion: title → byline → excerpt → purple full-story CTA. */
   variant?: SignalDisplayVariant;
   pauseInstanceId?: string | null;
-}
-
-function truncateExcerpt(body: string, maxChars = 220): string {
-  const trimmed = body.trim();
-  if (trimmed.length <= maxChars) return trimmed;
-  const slice = trimmed.slice(0, maxChars);
-  const lastSpace = slice.lastIndexOf(' ');
-  const cut = lastSpace > maxChars * 0.6 ? slice.slice(0, lastSpace) : slice;
-  return `${cut.trimEnd()}…`;
 }
 
 export function SignalDisplay({
@@ -43,12 +31,11 @@ export function SignalDisplay({
 
   if (loading) {
     return (
-      <div className={cn('space-y-2', isFrame && 'px-1 pt-4')}>
-        <Skeleton className={cn(isFrame ? 'h-4 w-4/5' : 'h-4 w-3/4')} />
-        {isFrame ? <Skeleton className="h-4 w-2/5" /> : null}
-        <Skeleton className="h-3 w-full" />
-        <Skeleton className="h-3 w-full" />
-        <Skeleton className="h-3 w-2/3" />
+      <div className={cn('space-y-2', isFrame && 'px-1')}>
+        <Skeleton className={cn(isFrame ? 'mt-4 h-4 w-full' : 'h-4 w-3/4')} />
+        <Skeleton className="h-4 w-2/3" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-5/6" />
       </div>
     );
   }
@@ -63,24 +50,8 @@ export function SignalDisplay({
 
   if (!signal) return null;
 
-  if (isFrame) {
-    const excerpt = truncateExcerpt(signal.body);
-    const keyIdeas = normalizeSignalKeyIdeas({ body: signal.body, keyIdeas: signal.keyIdeas });
-    return (
-      <div className="space-y-2 pt-2">
-        {signal.title ? (
-          <p className="text-sm font-medium leading-snug tracking-wide text-foreground">{signal.title}</p>
-        ) : null}
-        {signal.source ? (
-          <p className="text-sm font-medium leading-snug tracking-wide text-muted-foreground">{signal.source}</p>
-        ) : null}
-        {excerpt ? (
-          <p className="text-sm leading-relaxed tracking-wide text-foreground">{excerpt}</p>
-        ) : null}
-        <SignalKeyIdeasBlock keyIdeas={keyIdeas} variant="teaser" className="pt-1" />
-        {pauseInstanceId ? <SignalReadFullStoryButton pauseInstanceId={pauseInstanceId} /> : null}
-      </div>
-    );
+  if (isFrame && pauseInstanceId) {
+    return <SignalFrameDisplay signal={signal} pauseInstanceId={pauseInstanceId} />;
   }
 
   return (
