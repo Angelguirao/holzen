@@ -17,5 +17,5 @@ export function reflectGenerationUserErrorMessage(raw: string): string {
   if (lower.includes('rate') || lower.includes('limit') || lower.includes('429')) {
     return 'Too many requests — please wait a moment and try again.';
   }
-  return 'Reflection unavailable right now. Try again shortly.';
+  return 'We could not refresh this reflection. Here is a starting point — you can still continue.';
 }

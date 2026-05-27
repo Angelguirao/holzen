@@ -26,6 +26,17 @@ export function composeReflectionMessage(parts: {
   return [parts.land.trim(), parts.hypothesis.trim(), parts.inquiry.trim()].filter(Boolean).join('\n\n');
 }
 
+/** Curated / offline fallback: one paragraph (validation + question), not labeled blocks. */
+export function composeReflectFallbackOneVoice(land: string, inquiry: string): string {
+  const l = land.trim();
+  let q = inquiry.trim();
+  if (!q) return l;
+  if (!q.endsWith('?')) q = `${q}?`;
+  if (!l) return q;
+  const landEnd = /[.!?]$/.test(l) ? l : `${l}.`;
+  return `${landEnd} ${q}`;
+}
+
 export function reflectionContentV2(input: {
   land: string;
   hypothesis: string;

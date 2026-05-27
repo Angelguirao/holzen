@@ -161,6 +161,7 @@ export function usePauseReflectGeneration({
         if (content) setReflectionContent(content);
       } catch (e: unknown) {
         if (!shouldCommitReflectGeneration(validityTicket, validityRef.current)) return;
+        setReflectionContent(null);
         const raw = e instanceof Error ? e.message : String(e);
         setError(reflectGenerationUserErrorMessage(raw));
       }

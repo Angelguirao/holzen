@@ -34,6 +34,16 @@ export function inquiryFallbackForMood(mood: string | undefined, context: string
   return "What is this moment asking you to notice about yourself?";
 }
 
+function composeReflectFallbackOneVoice(land: string, inquiry: string): string {
+  const l = land.trim();
+  let q = inquiry.trim();
+  if (!q) return l;
+  if (!q.endsWith("?")) q = `${q}?`;
+  if (!l) return q;
+  const landEnd = /[.!?]$/.test(l) ? l : `${l}.`;
+  return `${landEnd} ${q}`;
+}
+
 export function mapReflectionFallbackToV2(
   fallback: { message: string; haiku?: string | null },
   opts: { context: string; severity: number; mood?: string },
@@ -41,7 +51,7 @@ export function mapReflectionFallbackToV2(
   const land = fallback.message.trim();
   const inquiry = inquiryFallbackForMood(opts.mood, opts.context);
   const contextStrip = buildReflectionContextStripC0(opts.context, opts.severity);
-  const message = [land, inquiry].filter(Boolean).join("\n\n");
+  const message = composeReflectFallbackOneVoice(land, inquiry);
   return {
     schemaVersion: 2,
     land,
