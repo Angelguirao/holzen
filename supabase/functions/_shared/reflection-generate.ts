@@ -16,7 +16,7 @@ import { buildReflectionContextStripC0 } from "./reflection-context-strip-c0.ts"
 import { inquiryFallbackForMood } from "./reflection-fallback-v2.ts";
 
 /** Bump when the system prompt, tone rules, or quality gate changes. */
-export const REFLECTION_PROMPT_VERSION = "v6";
+export const REFLECTION_PROMPT_VERSION = "v7";
 
 export interface CurrentFeelInput {
   mood: string;
@@ -135,12 +135,13 @@ const LANG_NAMES: Record<string, string> = {
   tr: "Turkish",
 };
 
-/** Injected into system prompt: model must return structured Reflect JSON (v6). */
+/** Injected into system prompt: model must return structured Reflect JSON (v7). */
 const REFLECTION_JSON_OUTPUT_INSTRUCTION =
   `You MUST respond with a JSON object only (no markdown). The object must contain exactly these keys:
 - "land": 1-2 sentences — emotional validation and lower urgency (no inquiry yet)
 - "hypothesis": 1 sentence — gentle guess about what might be underneath their feeling (weave mood/tile naturally; do NOT say "you said" or repeat the Feel step)
 - "inquiry": Exactly one open question — what set them off / what story they are telling (no "?!" stacking)
+- "message": 2-4 short paragraphs as ONE continuous reflection for the user to read — weave land, then hypothesis, then the inquiry question in a single voice (no headings, labels, or bullet lists). Must match the three fields above; inquiry must appear as the closing question.
 - "haiku": A haiku (3 lines separated by newlines, 5-7-5 syllables), or null if not appropriate`;
 
 const REFLECTION_NO_COMPANION_IN_MESSAGE = `
@@ -326,6 +327,22 @@ function composeV2Message(land: string, hypothesis: string, inquiry: string): st
   return [land, hypothesis, inquiry].filter((s) => s.trim().length > 0).join("\n\n");
 }
 
+/** Prefer model-integrated prose; fall back to stitching structured fields. */
+function resolveDisplayMessage(
+  raw: { message?: string },
+  land: string,
+  hypothesis: string,
+  inquiry: string,
+  log: ((msg: string) => void) | undefined,
+  logAttempt: ((e: Record<string, unknown>) => void) | undefined,
+): string {
+  const stitched = composeV2Message(land, hypothesis, inquiry);
+  const candidate = raw.message?.trim();
+  if (!candidate) return stitched;
+  const gated = gateReflectField(candidate, "message", 680, log, logAttempt);
+  return gated ?? stitched;
+}
+
 function applyQualityGateAndHaikuTrim(
   raw: {
     land?: string;
@@ -338,11 +355,14 @@ function applyQualityGateAndHaikuTrim(
   log: ((msg: string) => void) | undefined,
   logAttempt: ((e: Record<string, unknown>) => void) | undefined,
 ): UnifiedReflectionResult | null {
-  let land = (raw.land ?? raw.message ?? "").trim();
+  let land = (raw.land ?? "").trim();
   let hypothesis = (raw.hypothesis ?? "").trim();
   let inquiry = (raw.inquiry ?? "").trim();
 
-  if (!land && !inquiry) return null;
+  if (!land && !inquiry && !raw.message?.trim()) return null;
+  if (!land && raw.message?.trim()) {
+    land = raw.message.trim().split(/\n\n/)[0]?.trim() ?? raw.message.trim();
+  }
 
   if (!inquiry) {
     inquiry = inquiryFallbackForMood(opts.currentFeel?.mood, opts.context);
@@ -361,7 +381,7 @@ function applyQualityGateAndHaikuTrim(
   if (!gatedInquiry) return null;
   inquiry = gatedInquiry.endsWith("?") ? gatedInquiry : `${gatedInquiry}?`;
 
-  const message = composeV2Message(land, hypothesis, inquiry);
+  const message = resolveDisplayMessage(raw, land, hypothesis, inquiry, log, logAttempt);
   const contextStrip = buildReflectionContextStripC0(opts.context, opts.severity);
   const haiku = trimHaiku(raw.haiku, log);
 
