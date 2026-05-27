@@ -10,6 +10,10 @@ export type PauseHomeContextValue = {
   severity: 'mild' | 'moderate' | 'high';
   lastPauseInstanceId: string | null;
   openPauseState: 'active' | 'engaged' | null;
+  contextSnapshot: Record<string, unknown> | null;
+  hasReflectionStep: boolean;
+  hasReachedReflect: boolean;
+  openPauseCreatedAt: string | null;
   loading: boolean;
   error: string | null;
   newPauseArrival: boolean;

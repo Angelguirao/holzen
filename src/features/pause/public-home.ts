@@ -27,6 +27,19 @@ export {
   type UsePauseCardProjectionParams,
 } from './presentation/home/use-pause-card-projection';
 export {
+  useHomePauseWidgetProjection,
+  type HomePauseWidgetProjection,
+  type HomePauseWidgetBodyProjection,
+  type UseHomePauseWidgetProjectionParams,
+  HOME_PAUSE_WIDGET_EXPANDED_STORAGE_KEY,
+} from './presentation/home/use-home-pause-widget-projection';
+export {
+  resolveHomePauseWidgetMode,
+  homePauseWidgetSectionTitleKey,
+  type HomePauseWidgetMode,
+} from './domain/home/home-pause-widget-mode';
+export { hasReachedReflectForHome } from './domain/home/has-reached-reflect-for-home';
+export {
   useCompletedPauseCount,
   COMPLETED_PAUSE_COUNT_QUERY_KEY,
   fetchCompletedPauseCount,

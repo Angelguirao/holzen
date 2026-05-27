@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import type { User } from '@supabase/supabase-js';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import { DEFAULT_COMPANIONS } from '@/features/pause/domain/session-model';
@@ -12,6 +13,7 @@ import { usePauseInstancesRealtime } from '@/features/pause/presentation/realtim
  * Hydrates on login and resyncs on `pause_instances` realtime (cron / complete / dismiss).
  */
 export function useOpenPauseHomePreview(user: User | null) {
+  const queryClient = useQueryClient();
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
   const [companions, setCompanions] = useState<CompanionData>(DEFAULT_COMPANIONS);
@@ -19,6 +21,10 @@ export function useOpenPauseHomePreview(user: User | null) {
   /** From `v_pause_current.state` — `active` vs `engaged` for Home CTA copy. */
   const [openPauseState, setOpenPauseState] = useState<'active' | 'engaged' | null>(null);
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
+  const [contextSnapshot, setContextSnapshot] = useState<Record<string, unknown> | null>(null);
+  const [hasReflectionStep, setHasReflectionStep] = useState(false);
+  const [hasReachedReflect, setHasReachedReflect] = useState(false);
+  const [openPauseCreatedAt, setOpenPauseCreatedAt] = useState<string | null>(null);
 
   const clearOpenPausePreview = useCallback(() => {
     setLastPauseInstanceId(null);
@@ -27,6 +33,10 @@ export function useOpenPauseHomePreview(user: User | null) {
     setMessage(null);
     setContext(null);
     setCompanions(DEFAULT_COMPANIONS);
+    setContextSnapshot(null);
+    setHasReflectionStep(false);
+    setHasReachedReflect(false);
+    setOpenPauseCreatedAt(null);
     clearPausePersistedTabSession();
   }, []);
 
@@ -50,8 +60,12 @@ export function useOpenPauseHomePreview(user: User | null) {
       setLastPauseInstanceId(preview.pauseInstanceId);
       setOpenPauseState(preview.openPauseState);
       setLastTriggerAt(preview.createdAt);
+      setOpenPauseCreatedAt(preview.createdAt);
       setContext(preview.contextText);
+      setContextSnapshot(preview.contextSnapshot);
       setMessage(preview.reflectionMessage);
+      setHasReflectionStep(preview.hasReflectionStep);
+      setHasReachedReflect(preview.hasReachedReflect);
       setCompanions(preview.companions);
     },
     [user, clearOpenPausePreview],
@@ -67,6 +81,9 @@ export function useOpenPauseHomePreview(user: User | null) {
     user?.id,
     user ? `holzen-open-pause-${user.id}` : 'holzen-open-pause-none',
     () => {
+      if (user?.id) {
+        void queryClient.invalidateQueries({ queryKey: ['home-recent-context-lost', user.id] });
+      }
       void syncOpenPauseFromDb();
     },
   );
@@ -85,12 +102,20 @@ export function useOpenPauseHomePreview(user: User | null) {
     lastPauseInstanceId,
     openPauseState,
     lastTriggerAt,
+    contextSnapshot,
+    hasReflectionStep,
+    hasReachedReflect,
+    openPauseCreatedAt,
     setMessage,
     setContext,
     setCompanions,
     setLastPauseInstanceId,
     setOpenPauseState,
     setLastTriggerAt,
+    setContextSnapshot,
+    setHasReflectionStep,
+    setHasReachedReflect,
+    setOpenPauseCreatedAt,
     clearOpenPausePreview,
     dismissOpenPauseHome: dismissOpenPauseHomePreviewAction,
     syncOpenPauseFromDb,
