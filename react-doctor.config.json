@@ -4,6 +4,20 @@
     "files": [
       "src/legacy/**",
       "supabase/functions/legacy/**"
-    ]
+    ],
+    "rules": [
+      "react-doctor/react-compiler-no-manual-memoization",
+      "react-doctor/no-react19-deprecated-apis",
+      "react-doctor/only-export-components",
+      "react-doctor/use-lazy-motion",
+      "react-hooks-js/todo",
+      "react-hooks-js/set-state-in-effect",
+      "react-hooks-js/refs",
+      "deslop/unused-file",
+      "deslop/unused-dependency",
+      "deslop/unused-export",
+      "deslop/unused-type"
+    ],
+    "tags": ["design"]
   }
 }
