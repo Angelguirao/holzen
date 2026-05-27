@@ -3,6 +3,7 @@ import { ChevronDown, Heart, ImageIcon } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { hapticFeedback } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
+import { HaikuDisplay } from '@/screens/pause/components/HaikuDisplay';
 
 export type PauseFrameHaikuCardProps = {
   open: boolean;
@@ -77,9 +78,11 @@ export function PauseFrameHaikuCard({
             <p className="px-4 pb-4 text-sm leading-relaxed text-muted-foreground">
               {t('pause.frame.haikuLoading', { defaultValue: 'Loading…' })}
             </p>
-          ) : (
-            <p className="px-4 pb-4 text-sm leading-relaxed text-muted-foreground">{displayBody}</p>
-          )}
+          ) : displayBody.trim() ? (
+            <div className="px-4 pb-4">
+              <HaikuDisplay haiku={displayBody} variant="verse" className="border-t-0 py-2" />
+            </div>
+          ) : null}
         </CollapsibleContent>
       </div>
     </Collapsible>

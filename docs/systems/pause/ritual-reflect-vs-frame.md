@@ -68,7 +68,7 @@ The Reflect card shows:
 |---------|---------|
 | **Feel recap** (muted line) | “You said: …” from this pause’s Feel step — always visible when mood is known. |
 | **One letter** | Single `message` from `holzen-reflect` (v8 prompt) — land + hypothesis + inquiry woven in one voice; at most one line break before the closing question. |
-| **Haiku** (optional) | Small italic aside below the letter — not part of the reflection copy. |
+| **Haiku** (optional) | Three-line stack (`HaikuDisplay` `verse` variant) below the letter — centered, one line per row — not part of the reflection copy. |
 | **Market context** (collapsed) | Raw telemetry + optional narrative strip — **hidden by default**; not mixed into the letter. |
 | **Your note** (Pro, below card) | Post-it / tags — clearly separate from AI copy. |
 

@@ -11,6 +11,7 @@ import {
   trackPauseReflectBlockViewed,
   trackPauseReflectInquiryDisplayed,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import { HaikuDisplay } from '@/screens/pause/components/HaikuDisplay';
 import { PauseReflectInlineNotice } from '@/screens/pause/components/pause-reflect-inline-notice';
 import { PauseReflectMarketContext } from '@/screens/pause/components/pause-reflect-market-context';
 
@@ -120,12 +121,7 @@ export function PauseReflectMessageBody({
         </p>
       ) : null}
       {view === 'body' && artifactHaiku?.trim() ? (
-        <p
-          className="border-t border-border/40 pt-3 text-xs italic leading-relaxed text-muted-foreground/90"
-          aria-label={t('pause.reflect.haikuAside', { defaultValue: 'Haiku' })}
-        >
-          {artifactHaiku.trim()}
-        </p>
+        <HaikuDisplay haiku={artifactHaiku} variant="verse" />
       ) : null}
       {view === 'body' ? (
         <PauseReflectMarketContext
