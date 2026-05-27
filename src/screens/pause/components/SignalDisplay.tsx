@@ -3,14 +3,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { CompanionError } from './CompanionError';
 import { SignalReadFullStoryButton } from '@/screens/pause/components/companion/signal-read-full-story-button';
+import { SignalKeyIdeasBlock } from '@/screens/pause/components/companion/signal-key-ideas-block';
+import type { SignalPayload } from '@/features/pause/domain/signal-payload';
+import { normalizeSignalKeyIdeas } from '@/features/pause/domain/signal-payload';
 
-export type SignalPayload = {
-  title: string;
-  body: string;
-  source: string;
-  /** Canonical first-publication URL — prioritized over any mirror upstream. */
-  url: string;
-};
+export type { SignalPayload };
 
 export type SignalDisplayVariant = 'default' | 'frame';
 
@@ -68,6 +65,7 @@ export function SignalDisplay({
 
   if (isFrame) {
     const excerpt = truncateExcerpt(signal.body);
+    const keyIdeas = normalizeSignalKeyIdeas({ body: signal.body, keyIdeas: signal.keyIdeas });
     return (
       <div className="space-y-2 pt-2">
         {signal.title ? (
@@ -79,6 +77,7 @@ export function SignalDisplay({
         {excerpt ? (
           <p className="text-sm leading-relaxed tracking-wide text-foreground">{excerpt}</p>
         ) : null}
+        <SignalKeyIdeasBlock keyIdeas={keyIdeas} variant="teaser" className="pt-1" />
         {pauseInstanceId ? <SignalReadFullStoryButton pauseInstanceId={pauseInstanceId} /> : null}
       </div>
     );

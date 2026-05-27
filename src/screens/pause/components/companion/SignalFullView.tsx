@@ -5,14 +5,11 @@ import { estimateReadTime } from '@/features/pause/public-ritual-frame';
 import { cn } from '@/lib/utils';
 import { CompanionError } from '../CompanionError';
 import { WhyThisCard } from './WhyThisCard';
+import { SignalKeyIdeasBlock } from '@/screens/pause/components/companion/signal-key-ideas-block';
+import type { SignalPayload } from '@/features/pause/domain/signal-payload';
+import { normalizeSignalKeyIdeas } from '@/features/pause/domain/signal-payload';
 
-interface SignalData {
-  title: string;
-  body: string;
-  source: string;
-  /** Canonical first-publication URL. */
-  url: string;
-}
+type SignalData = SignalPayload;
 
 interface Props {
   signal: SignalData | null;
@@ -100,6 +97,12 @@ export function SignalFullView({
       </div>
 
       <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{signal.body}</p>
+
+      <SignalKeyIdeasBlock
+        keyIdeas={normalizeSignalKeyIdeas({ body: signal.body, keyIdeas: signal.keyIdeas })}
+        variant="full"
+        className="border-t border-border/20 pt-4"
+      />
 
       <div className="space-y-2 border-t border-border/20 pt-4">
         {host ? (

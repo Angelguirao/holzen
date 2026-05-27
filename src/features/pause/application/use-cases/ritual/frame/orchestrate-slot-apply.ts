@@ -14,6 +14,7 @@ import {
   toZoomOutDisplayData,
   zoomOutLibraryAutosaveFromDisplayData,
 } from '@/features/pause/application/use-cases/ritual/frame/zoom-out-payload';
+import { normalizeSignalPayload } from '@/features/pause/domain/signal-payload';
 
 /** Legacy hook name: companion slots no longer mirror rows into a bookmark table. */
 export type CompanionSlotAutosaveParams = {
@@ -103,7 +104,8 @@ function commitOrchestrateSlotData(
 ): void {
   switch (slot) {
     case 'signal': {
-      const d = data as { title: string; body: string; source: string; url: string };
+      const d = normalizeSignalPayload(data);
+      if (!d) break;
       c.setSignal(d);
       void c.autoSaveToLibrary({ title: d.title, body: d.body, sourceType: 'signal', sourceUrl: d.url });
       break;
