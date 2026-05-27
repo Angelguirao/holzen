@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { reflectionContentV2 } from './reflection-content-v2';
 import { isPauseReflectContinueDisabled } from './is-pause-reflect-continue-disabled';
 
 describe('isPauseReflectContinueDisabled', () => {
@@ -25,6 +26,20 @@ describe('isPauseReflectContinueDisabled', () => {
       isPauseReflectContinueDisabled({
         reflectionError: null,
         reflectionMessage: 'Breathe.',
+      }),
+    ).toBe(false);
+  });
+
+  it('allows continue when structured inquiry exists without legacy message', () => {
+    expect(
+      isPauseReflectContinueDisabled({
+        reflectionError: null,
+        reflectionMessage: '',
+        reflectionContent: reflectionContentV2({
+          land: '',
+          hypothesis: '',
+          inquiry: 'What feels most at risk?',
+        }),
       }),
     ).toBe(false);
   });

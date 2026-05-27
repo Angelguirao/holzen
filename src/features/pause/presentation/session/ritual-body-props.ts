@@ -2,6 +2,10 @@ import type { RefObject } from 'react';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { BriefPauseStep } from '@/features/pause/domain/ritual-types';
+import type {
+  CurrentFeelForReflect,
+  ReflectionContentV2,
+} from '../../domain/reflect/generation/reflection-content-v2';
 import type { FeelStepTile } from '../../domain/feel-step-tile';
 import type { MoodValue } from '../../domain/mood-value';
 import type { PauseSessionStepTransitionConfig } from './pause-session-step-transition-io';
@@ -64,6 +68,8 @@ export type PauseSessionDeepRitualBodyProps = {
   pauseInstanceId: string | null;
   context: string | null;
   reflectionMessage: string;
+  reflectionContent?: ReflectionContentV2 | null;
+  currentFeel?: CurrentFeelForReflect;
   reflectionLoading?: boolean;
   reflectionError?: string | null;
   onReflectionRetry?: () => void;

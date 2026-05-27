@@ -257,6 +257,8 @@ flowchart TB
 
 ## 3. Reflection generation (`_shared/reflection-generate.ts`)
 
+**Product spec:** structured Reflect beat (regulate + inquiry + light market narratives) — [reflect-step-redesign-spec.md](reflect-step-redesign-spec.md) (**Phase 1 shipped** May 2026, `REFLECTION_PROMPT_VERSION` **v6**).
+
 - **`generateUnifiedReflection(params)`** — Calls **`_shared/llm-gateway.ts`** (Google Gemini direct → OpenRouter failover) with **`GOOGLE_AI_API_KEY`**, trying models in order: **`google/gemini-3-flash-preview`**, then **`google/gemini-2.5-flash`** (JSON path uses per-attempt timeouts **12s** then **8s**).
 - **Output** — JSON object with `**message`** + `**haiku`** only (`response_format: json_object`), plus the shared quality gate. Companion payloads are finalized by `**companion-orchestrate**` into **`pause_ai_artifacts`** (not legacy `reflections` columns). `**holzen-reflect`** may still echo `**grounding_***` keys in JSON for API stability (often null from this path).
 - **Callers:** `holzen-reflect/index.ts` (auth, sanitization, analytics, curated fallback), invoked from the SPA after the deep ritual reaches the **Reflect** beat (the HTTP call may still complete while the user is on **Frame**, second **Breathe**, or **Decide**). **`check-volatility`** creates instances and sends notifications **without** calling this generator.

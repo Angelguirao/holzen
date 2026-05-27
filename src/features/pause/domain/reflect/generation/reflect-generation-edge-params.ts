@@ -1,3 +1,5 @@
+import type { CurrentFeelForReflect } from '@/features/pause/domain/reflect/generation/reflection-content-v2';
+
 /** Profile fields consumed by edge `holzen-reflect` during Reflect-step generation. */
 export type ReflectGenerationProfileInput = {
   reflectionTone: string;
@@ -23,8 +25,11 @@ export type ReflectGenerationEdgeInvokeInput = {
   groundingActivities?: string[];
   currency: string;
   language: string;
+  currentFeel?: CurrentFeelForReflect;
   signal?: AbortSignal;
 };
+
+export type { CurrentFeelForReflect };
 
 export function buildReflectGenerationEdgeInvokeInput(input: {
   pauseInstanceId: string;
@@ -32,6 +37,7 @@ export function buildReflectGenerationEdgeInvokeInput(input: {
   context: string;
   severityAbsPct: number;
   profile: ReflectGenerationProfileInput;
+  currentFeel?: CurrentFeelForReflect;
   signal?: AbortSignal;
 }): ReflectGenerationEdgeInvokeInput {
   const { profile } = input;
@@ -49,6 +55,7 @@ export function buildReflectGenerationEdgeInvokeInput(input: {
       profile.groundingActivities.length > 0 ? profile.groundingActivities : undefined,
     currency: profile.currency,
     language: profile.language,
+    currentFeel: input.currentFeel,
     signal: input.signal,
   };
 }

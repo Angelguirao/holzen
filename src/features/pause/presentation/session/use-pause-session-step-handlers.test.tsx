@@ -21,6 +21,7 @@ const {
   const mockBreathBundle = { goToStep: vi.fn() };
   const mockReflectBundle = {
     effectiveReflectionMessage: 'copy',
+    reflectionContent: null,
     reflectionLoading: false,
     reflectionError: null,
     retryReflection: vi.fn(),

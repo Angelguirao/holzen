@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { reflectionContentFromLegacyMessage } from '@/features/pause/domain/reflect/generation/reflection-content-v2';
 import { runReflectGeneration } from './run-reflect-generation';
 import type { ReflectGenerationProfileInput } from '@/features/pause/domain/reflect/generation/reflect-generation-edge-params';
 
@@ -25,6 +26,8 @@ const baseInput = {
 const emptyRecencyHints = { moodHistory: [], recentMessages: [], recentHaikus: [] };
 
 const noopReflectGeneratorExtras = {
+  fetchReflectionText: vi.fn().mockResolvedValue(null),
+  fetchReflectionContent: vi.fn().mockResolvedValue(null),
   fetchHaikuText: vi.fn(),
   fetchLatestReflectStep: vi.fn(),
   loadRecencyHints: vi.fn().mockResolvedValue(emptyRecencyHints),
@@ -33,47 +36,52 @@ const noopReflectGeneratorExtras = {
 
 describe('runReflectGeneration', () => {
   it('returns seed without calling generator', async () => {
-    const fetchReflectionText = vi.fn();
+    const fetchReflectionContent = vi.fn();
     const generateReflection = vi.fn();
 
     const result = await runReflectGeneration(
       { ...baseInput, initialReflectionMessage: '  seeded  ' },
-      { fetchReflectionText, generateReflection, ...noopReflectGeneratorExtras },
+      { fetchReflectionContent, generateReflection, ...noopReflectGeneratorExtras },
     );
 
-    expect(result).toEqual({ status: 'seed', message: 'seeded' });
-    expect(fetchReflectionText).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      status: 'seed',
+      message: 'seeded',
+      content: reflectionContentFromLegacyMessage('seeded'),
+    });
+    expect(fetchReflectionContent).not.toHaveBeenCalled();
     expect(generateReflection).not.toHaveBeenCalled();
   });
 
   it('returns cached artifact message', async () => {
+    const cached = reflectionContentFromLegacyMessage('from cache');
     const result = await runReflectGeneration(
       { ...baseInput, initialReflectionMessage: '' },
       {
-        fetchReflectionText: vi.fn().mockResolvedValue('from cache'),
-        generateReflection: vi.fn(),
         ...noopReflectGeneratorExtras,
+        fetchReflectionContent: vi.fn().mockResolvedValue(cached),
+        generateReflection: vi.fn(),
       },
     );
 
-    expect(result).toEqual({ status: 'cached', message: 'from cache' });
+    expect(result).toEqual({ status: 'cached', message: 'from cache', content: cached });
   });
 
   it('invokes holzen-reflect when cache empty', async () => {
     const loadRecencyHints = vi.fn().mockResolvedValue(emptyRecencyHints);
-    const generateReflection = vi.fn().mockResolvedValue({ message: 'fresh' });
+    const content = reflectionContentFromLegacyMessage('fresh');
+    const generateReflection = vi.fn().mockResolvedValue({ message: 'fresh', content });
 
     const result = await runReflectGeneration(
       { ...baseInput, initialReflectionMessage: '' },
       {
         ...noopReflectGeneratorExtras,
-        fetchReflectionText: vi.fn().mockResolvedValue(null),
         loadRecencyHints,
         generateReflection,
       },
     );
 
-    expect(result).toEqual({ status: 'generated', message: 'fresh' });
+    expect(result).toEqual({ status: 'generated', message: 'fresh', content });
     expect(loadRecencyHints).toHaveBeenCalledTimes(1);
     expect(generateReflection).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -92,7 +100,6 @@ describe('runReflectGeneration', () => {
     const result = await runReflectGeneration(
       { ...baseInput, initialReflectionMessage: '', signal: ac.signal },
       {
-        fetchReflectionText: vi.fn().mockResolvedValue(null),
         generateReflection: vi.fn().mockRejectedValue(new DOMException('aborted', 'AbortError')),
         ...noopReflectGeneratorExtras,
       },

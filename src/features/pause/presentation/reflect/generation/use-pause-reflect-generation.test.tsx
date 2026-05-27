@@ -1,5 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { reflectionContentFromLegacyMessage } from '@/features/pause/domain/reflect/generation/reflection-content-v2';
 import { usePauseReflectGeneration } from './use-pause-reflect-generation';
 import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-text';
 
@@ -84,6 +85,7 @@ beforeEach(() => {
   );
   usePauseArtifactReflectionTextMock.mockReturnValue({
     artifactReflectionText: null,
+    artifactReflectionContent: null,
     reflectionTextFetch: 'idle',
   });
 });
@@ -116,8 +118,10 @@ describe('usePauseReflectGeneration', () => {
   });
 
   it('hydrates reflectionMessage from artifact before holzen-reflect completes', async () => {
+    const persisted = reflectionContentFromLegacyMessage('persisted reflection');
     usePauseArtifactReflectionTextMock.mockReturnValue({
       artifactReflectionText: 'persisted reflection',
+      artifactReflectionContent: persisted,
       reflectionTextFetch: 'done',
     });
 
@@ -137,7 +141,11 @@ describe('usePauseReflectGeneration', () => {
   });
 
   it('keeps nav seed when initialReflectionMessage is non-empty', async () => {
-    pauseReflectGenerationMock.mockResolvedValue({ status: 'generated', message: 'edge' });
+    pauseReflectGenerationMock.mockResolvedValue({
+      status: 'generated',
+      message: 'edge',
+      content: reflectionContentFromLegacyMessage('edge'),
+    });
 
     usePauseArtifactReflectionTextMock.mockReturnValue({
       artifactReflectionText: 'artifact only',
@@ -155,12 +163,18 @@ describe('usePauseReflectGeneration', () => {
   });
 
   it('commits holzen-reflect result after artifact hydrate when edge completes', async () => {
+    const fromRow = reflectionContentFromLegacyMessage('from artifact row');
     usePauseArtifactReflectionTextMock.mockReturnValue({
       artifactReflectionText: 'from artifact row',
+      artifactReflectionContent: fromRow,
       reflectionTextFetch: 'done',
     });
 
-    let resolveEdge: (value: { status: 'generated'; message: string }) => void = () => {};
+    let resolveEdge: (value: {
+      status: 'generated';
+      message: string;
+      content: ReturnType<typeof reflectionContentFromLegacyMessage>;
+    }) => void = () => {};
     pauseReflectGenerationMock.mockImplementation(
       () =>
         new Promise((resolve) => {
@@ -174,7 +188,11 @@ describe('usePauseReflectGeneration', () => {
       expect(result.current.reflectionMessage).toBe('from artifact row');
     });
 
-    resolveEdge({ status: 'generated', message: 'edge copy' });
+    resolveEdge({
+      status: 'generated',
+      message: 'edge copy',
+      content: reflectionContentFromLegacyMessage('edge copy'),
+    });
     await waitFor(() => {
       expect(result.current.reflectionMessage).toBe('edge copy');
     });
@@ -195,7 +213,11 @@ describe('usePauseReflectGeneration', () => {
   });
 
   it('does not restart holzen-reflect when useProfile returns a new object reference', async () => {
-    pauseReflectGenerationMock.mockResolvedValue({ status: 'generated', message: 'edge' });
+    pauseReflectGenerationMock.mockResolvedValue({
+      status: 'generated',
+      message: 'edge',
+      content: reflectionContentFromLegacyMessage('edge'),
+    });
 
     const { rerender } = renderHook(() => usePauseReflectGeneration(baseParams()));
 

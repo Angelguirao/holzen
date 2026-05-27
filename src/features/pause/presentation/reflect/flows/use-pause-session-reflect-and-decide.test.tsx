@@ -23,6 +23,7 @@ const {
     lastReflectGenArgs.current = args;
     return {
       reflectionMessage: 'Generated reflection',
+      reflectionContent: null,
       loading: false,
       error: null,
       retry: vi.fn(),
@@ -69,6 +70,7 @@ function baseParams(
     setPauseImpactData: vi.fn(),
     setPhase: vi.fn(),
     selectedMood: 'calm' as const,
+    selectedBriefFace: null,
     selectedMoodAfter: null,
     breathingFirstCompleted: true,
     breathingSecondCompleted: false,

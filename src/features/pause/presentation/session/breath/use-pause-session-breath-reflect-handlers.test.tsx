@@ -29,6 +29,7 @@ const {
     lastReflectArgs.current = args;
     return {
       effectiveReflectionMessage: 'Effective copy',
+      reflectionContent: null,
       reflectionLoading: false,
       reflectionError: null,
       retryReflection: vi.fn(),

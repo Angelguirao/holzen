@@ -1,8 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import type { ReflectArtifactPersistInput } from '@/features/pause/domain/reflect/generation/reflect-artifact-persist';
+import { reflectionContentFromHolzenReflectResponse } from '@/features/pause/domain/reflect/generation/holzen-reflect-response';
+import type { ReflectionContentV2 } from '@/features/pause/domain/reflect/generation/reflection-content-v2';
 import { invokeHolzenReflect } from './holzen-reflect-edge';
 import type { ReflectRecencyHints } from '@/features/pause/domain/reflect/generation/reflect-recency-hints';
+import type { CurrentFeelForReflect } from '@/features/pause/domain/reflect/generation/reflect-generation-edge-params';
 
 /** @deprecated Prefer `ReflectArtifactPersistInput` from `domain/reflect/generation/reflect-artifact-persist.ts`. */
 export type PersistReflectionArtifactsParams = ReflectArtifactPersistInput;
@@ -14,12 +17,17 @@ export async function persistReflectionArtifacts(params: ReflectArtifactPersistI
     userId,
     context,
     message,
+    structured,
     haiku,
     groundingTitle,
     groundingBody,
     groundingCitation,
     groundingUrl,
   } = params;
+
+  const reflectionContent: Record<string, unknown> = structured
+    ? { ...structured, context }
+    : { message, context };
 
   const artifacts: Array<{
     pause_instance_id: string;
@@ -31,7 +39,7 @@ export async function persistReflectionArtifacts(params: ReflectArtifactPersistI
       pause_instance_id: pauseInstanceId,
       user_id: userId,
       kind: 'reflection_text',
-      content: { message, context },
+      content: reflectionContent,
     },
   ];
 
@@ -77,6 +85,7 @@ export type GenerateReflectionAtReflectParams = {
   groundingActivities?: string[];
   currency: string;
   language: string;
+  currentFeel?: CurrentFeelForReflect;
   recencyHints: ReflectRecencyHints;
   /** Cancels the edge invoke when the run is superseded, `pauseInstanceId` changes, reflect generation is disabled in `PauseSession`, or the effect cleans up. */
   signal?: AbortSignal;
@@ -84,6 +93,7 @@ export type GenerateReflectionAtReflectParams = {
 
 export type GenerateReflectionAtReflectResult = {
   message: string;
+  content: ReflectionContentV2;
   companions: CompanionData;
 };
 
@@ -95,6 +105,7 @@ export async function generateReflectionAtReflectStep(
 
   const { data: fnData, error: fnError } = await invokeHolzenReflect(
     {
+      pauseInstanceId: params.pauseInstanceId,
       context: params.context,
       tone: params.tone,
       customPrompt: params.customPrompt || undefined,
@@ -108,6 +119,7 @@ export async function generateReflectionAtReflectStep(
           : undefined,
       currency: params.currency,
       language: params.language,
+      ...(params.currentFeel ? { currentFeel: params.currentFeel } : {}),
       ...(moodHistory && moodHistory.length > 0 ? { moodHistory } : {}),
       ...(recentMessages && recentMessages.length > 0 ? { recentMessages } : {}),
       ...(recentHaikus && recentHaikus.length > 0 ? { recentHaikus } : {}),
@@ -116,8 +128,9 @@ export async function generateReflectionAtReflectStep(
   );
   if (fnError) throw fnError;
 
-  const message = fnData?.message?.trim();
-  if (!message) throw new Error('No pause message returned');
+  const content = reflectionContentFromHolzenReflectResponse(fnData);
+  const message = content?.message?.trim();
+  if (!message || !content) throw new Error('No pause message returned');
 
   const companions: CompanionData = {
     haiku: fnData?.haiku ?? null,
@@ -130,6 +143,7 @@ export async function generateReflectionAtReflectStep(
     userId: params.userId,
     context: params.context,
     message,
+    structured: content,
     haiku: companions.haiku,
     groundingTitle: companions.groundingTitle,
     groundingBody: companions.groundingBody,
@@ -137,5 +151,5 @@ export async function generateReflectionAtReflectStep(
     groundingUrl: fnData?.grounding_url ?? null,
   });
 
-  return { message, companions };
+  return { message, content, companions };
 }

@@ -54,6 +54,7 @@ function setup(overrides: Partial<Parameters<typeof buildPauseSessionScaffoldRit
     pauseInstanceId: 'p1',
     context: null,
     message: 'hello',
+    reflectionContent: null,
     isFavorite: false,
     toggleFavorite: vi.fn(),
     subscribed: false,
