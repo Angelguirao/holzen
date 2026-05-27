@@ -136,6 +136,45 @@ export async function getFlexCreditBalance(svcClient: SupabaseClient, userId: st
   return Number(data?.balance_credits) || 0;
 }
 
+/** Read-only quota check — same math as consume, without debiting allowance or credits. */
+export async function peekAllowanceOrCredits(
+  svcClient: SupabaseClient,
+  args: {
+    userId: string;
+    feature: MeteredFeature;
+    limit: number;
+    amount?: number;
+  },
+): Promise<{
+  allowed: boolean;
+  limit: number;
+  used: number;
+  remainingAllowance: number;
+  requestedUnits: number;
+  creditCost: number;
+  creditsBalance: number;
+}> {
+  const safeLimit = Math.max(0, Math.floor(args.limit));
+  const safeAmount = Math.max(1, Math.floor(args.amount ?? 1));
+  const creditCost = FEATURE_CREDIT_COST[args.feature] ?? 1;
+  const used = await getMonthlyFeatureUsage(svcClient, args.userId, args.feature);
+  const clamped = clampUsage(used, safeLimit);
+  const creditsBalance = await getFlexCreditBalance(svcClient, args.userId);
+  const remainingAllowance = clamped.remaining;
+  const useAllowance = Math.min(safeAmount, remainingAllowance);
+  const needUnits = Math.max(safeAmount - useAllowance, 0);
+  const needCredits = needUnits * creditCost;
+  return {
+    allowed: needCredits <= creditsBalance,
+    limit: safeLimit,
+    used: clamped.used,
+    remainingAllowance,
+    requestedUnits: safeAmount,
+    creditCost,
+    creditsBalance,
+  };
+}
+
 export async function consumeAllowanceOrCredits(
   svcClient: SupabaseClient,
   args: {

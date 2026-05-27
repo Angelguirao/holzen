@@ -109,13 +109,13 @@ spent — a row without logging still runs but cannot be capped per-user.
 
 | Layer | When charge happens | Refund on generation failure? |
 | --- | --- | --- |
-| **Edge `companion-orchestrate`** | `consumeAllowanceOrCredits` runs **before** rate limits and **before** Perplexity/Gemini generation (after artifact skip path). One RPC may debit **multiple units** when several premium slots run in one invoke (`signal` + `grounding` + `history` count toward `premiumCompanionUnits`). | **No** — there is no `refund` / reverse RPC in the repo today. Failed or empty generation after a successful debit still consumes allowance/credits. |
-| **Edge `regenerate-only`** | Same pattern: quota consumed before the targeted generator runs. | **No** |
-| **Client lazy fetch** | `useCompanionSlotOrchestrateActions` calls `applyOptimisticDecrement('companion')` **before** `runSlotOrchestrate` (UI may show lower balance immediately). | On failure, `refreshSubscription()` in `finally` reconciles from server; optimistic UI can be wrong until refresh. |
+| **Edge `companion-orchestrate`** | `peekAllowanceOrCredits` pre-checks affordability for requested premium slots; `consumeAllowanceOrCredits` runs **after** generation (or artifact cache hit) for **billable** slots only (`contentSatisfiesCompanion` per slot). Multi-slot invokes debit 0–3 units based on what actually rendered. Panic mode / rate limit / budget **after** peek → **no debit**. | **N/A** — empty or errored slots are not debited. |
+| **Edge `regenerate-only`** | Peek before generate; consume **one** unit only when persisted content satisfies the slot. | **N/A** — failed regenerate does not debit. |
+| **Client lazy fetch** | No optimistic companion decrement; `refreshSubscription()` in `finally` after orchestrate returns. | Balance matches server post-success billing. |
 
-**Implications for Frame (May 2026):** companions generate **on first card expand** only — users are not charged at Frame mount. Opening a card that triggers `companion-orchestrate` still debits **even if** the slot returns empty, errors, or panic-mode bypass after debit (panic check is after quota today).
+**Implications for Frame (May 2026):** companions generate **on first card expand** only — users are not charged at Frame mount. Failed expand (empty body, error) should not reduce monthly allowance or flex credits.
 
-**Follow-up if product requires pay-for-success:** move `consumeAllowanceOrCredits` to after successful artifact persist, or add a compensating credit RPC on known failure paths (coordinate with `credit_wallets` audit trail).
+**Implementation:** `supabase/functions/_shared/companion-orchestrate-billing.ts` + `peekAllowanceOrCredits` in `subscription-entitlements.ts`.
 
 ---
 
