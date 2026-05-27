@@ -76,7 +76,7 @@ export function SignalFullView({
   return (
     <div className="space-y-4">
       <div className="flex flex-col items-center gap-4">
-        <div className="inline-flex items-center justify-center gap-1 text-sm text-muted-foreground" role="status">
+        <div className="inline-flex items-center justify-center gap-1 text-sm text-muted-foreground">
           <Clock className="h-4 w-4 shrink-0" aria-hidden />
           <span>{readLabel}</span>
         </div>
@@ -124,7 +124,6 @@ export function SignalFullView({
               {isTrusted === true ? (
                 <span
                   className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-muted/30 px-1.5 py-[2px] text-[9px] font-mono text-muted-foreground"
-                  role="status"
                 >
                   <ShieldCheck className="h-2.5 w-2.5" aria-hidden />
                   {t('companions.fullview.signal.trusted')}

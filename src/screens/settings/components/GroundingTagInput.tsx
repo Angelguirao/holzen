@@ -54,6 +54,7 @@ export function GroundingTagInput({
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
+        aria-label={t('onboarding.groundingPlaceholder', { defaultValue: 'e.g. running, cooking, guitar...' })}
         placeholder={t('onboarding.groundingPlaceholder', { defaultValue: 'e.g. running, cooking, guitar...' })}
         className="w-full bg-transparent border-b border-border/40 focus:border-foreground/30 outline-none text-sm font-mono py-2 text-foreground placeholder:text-muted-foreground/30 transition-colors"
       />

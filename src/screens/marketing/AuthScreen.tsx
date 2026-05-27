@@ -39,7 +39,7 @@ const AuthScreen = () => {
         <div className="w-full max-w-sm space-y-6">
           <PageHeading title={t('common.holzen')} />
           <p className="text-sm">{t('auth.checkEmailConfirm')}</p>
-          <button onClick={() => setConfirmSent(false)} className="text-xs font-mono text-muted-foreground underline">{t('common.back')}</button>
+          <button type="button" onClick={() => setConfirmSent(false)} className="text-xs font-mono text-muted-foreground underline">{t('common.back')}</button>
         </div>
       </div>
     );
@@ -51,7 +51,7 @@ const AuthScreen = () => {
         <div className="w-full max-w-sm space-y-6">
           <PageHeading title={t('common.holzen')} />
           <p className="text-sm">{t('auth.checkEmailReset')}</p>
-          <button onClick={() => { setResetSent(false); setView('sign-in'); }} className="text-muted-foreground underline text-sm font-sans">{t('auth.backToSignIn')}</button>
+          <button type="button" onClick={() => { setResetSent(false); setView('sign-in'); }} className="text-muted-foreground underline text-sm font-sans">{t('auth.backToSignIn')}</button>
         </div>
       </div>
     );
@@ -83,7 +83,7 @@ const AuthScreen = () => {
             {error && <p className="text-xs text-destructive font-mono">{error}</p>}
             <LoadingButton type="submit" className="w-full text-base font-sans font-normal" loading={forgotPending}>{t('auth.sendResetLink')}</LoadingButton>
           </form>
-          <button onClick={() => setView('sign-in')} className="text-muted-foreground underline text-sm font-sans w-full text-center">{t('auth.backToSignIn')}</button>
+          <button type="button" onClick={() => setView('sign-in')} className="text-muted-foreground underline text-sm font-sans w-full text-center">{t('auth.backToSignIn')}</button>
         </div>
       </div>
     );
@@ -181,7 +181,7 @@ const AuthScreen = () => {
           </p>
         )}
 
-        <button onClick={toggleSignUpSignIn} className="underline w-full text-center text-base font-sans text-nox-text-link hover:text-nox-text-link/80">
+        <button type="button" onClick={toggleSignUpSignIn} className="underline w-full text-center text-base font-sans text-nox-text-link hover:text-nox-text-link/80">
           {view === 'sign-up' ? t('auth.alreadyHaveAccount') : t('auth.createAnAccount')}
         </button>
       </div>

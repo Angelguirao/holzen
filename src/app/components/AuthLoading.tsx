@@ -5,9 +5,8 @@ const AuthLoading = () => {
   const { t } = useTranslation();
   const message = t('auth.restoringSession');
   return (
-  <div
+  <output
     className="min-h-screen flex flex-col items-center justify-center p-6"
-    role="status"
     aria-live="polite"
     aria-busy="true"
   >
@@ -29,7 +28,7 @@ const AuthLoading = () => {
         <Skeleton className="h-4 w-full" />
       </div>
     </div>
-  </div>
+  </output>
   );
 };
 

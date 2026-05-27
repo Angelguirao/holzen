@@ -157,7 +157,7 @@ export function OnboardingFlow({
           <motion.div className="flex items-center gap-2">
             {[...Array(TOTAL_STEPS)].map((_, i) => (
               <motion.div
-                key={i}
+                key={`onboarding-step-${i}`}
                 className="h-px bg-foreground"
                 animate={{
                   width: i === step ? '1.5rem' : '0.75rem',

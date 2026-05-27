@@ -34,9 +34,9 @@ export function HaikuDisplay({ haiku, variant = 'companion', className }: Props)
       role="group"
       aria-label="Haiku"
     >
-      {lines.map((line, index) => (
+      {lines.map((line) => (
         <p
-          key={`${index}-${line.slice(0, 12)}`}
+          key={line}
           className={cn(
             'leading-relaxed',
             isVerse

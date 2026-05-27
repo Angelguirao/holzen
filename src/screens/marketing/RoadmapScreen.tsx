@@ -109,7 +109,7 @@ const RoadmapScreen = () => {
 
   const filtered = useMemo(() => {
     const base = activeCategory === 'all' ? items : items.filter((i) => i.category === activeCategory);
-    return [...base].sort((a, b) => b.vote_count - a.vote_count);
+    return base.toSorted((a, b) => b.vote_count - a.vote_count);
   }, [items, activeCategory]);
 
   return (
@@ -130,7 +130,7 @@ const RoadmapScreen = () => {
         {/* Category filter chips */}
         <div className="flex flex-wrap gap-1.5">
           {CATEGORIES.map((cat) => (
-            <button
+            <button type="button"
               key={cat}
               onClick={() => setActiveCategory(cat)}
               className={`px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider border transition-colors ${
@@ -162,7 +162,7 @@ const RoadmapScreen = () => {
                   key={item.id}
                   className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 flex gap-3 items-start"
                 >
-                  <button
+                  <button type="button"
                     onClick={() => void toggleVote(item.id)}
                     disabled={!user}
                     className={`shrink-0 flex flex-col items-center gap-0.5 pt-0.5 transition-colors ${

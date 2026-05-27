@@ -103,19 +103,19 @@ export class ErrorBoundary extends Component<Props, State> {
               Something went wrong. Take a breath, then try again.
             </p>
             <div className="space-y-2">
-              <button
+              <button type="button"
                 onClick={this.handleReset}
                 className="block mx-auto text-xs font-mono text-muted-foreground underline"
               >
                 Try again
               </button>
-              <button
+              <button type="button"
                 onClick={this.handleGoHome}
                 className="block mx-auto text-xs font-mono text-muted-foreground underline"
               >
                 Go home
               </button>
-              <button
+              <button type="button"
                 onClick={this.handleReport}
                 className="block mx-auto text-xs font-mono text-muted-foreground underline"
               >

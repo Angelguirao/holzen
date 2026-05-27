@@ -14,7 +14,6 @@ export function PauseReflectInlineNotice({ message, onTryAgain }: PauseReflectIn
   return (
     <div
       className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5"
-      role="status"
     >
       <div className="flex gap-2">
         <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden />

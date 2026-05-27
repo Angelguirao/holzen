@@ -66,7 +66,7 @@ export function SettingsExperiencePanel() {
               { code: 'TRY', label: 'TRY', desc: 'Turkish Lira (₺)' },
             ] as const
           ).map((c) => (
-            <button
+            <button type="button"
               key={c.code}
               onClick={() => setCurrency(c.code)}
               className={`rounded-md border px-3 py-2.5 text-left transition-colors ${

@@ -12,7 +12,7 @@ const TermsScreen = () => {
       <PageMeta title="Terms of Service — Holzen" description="Terms of service for Holzen, a self-awareness app for volatile asset holders." path="/terms" />
       <div className="flex-1 w-full max-w-lg px-6 py-16 space-y-10">
         <div className="space-y-4">
-          <button
+          <button type="button"
             onClick={() => navigate(-1)}
             className="text-xs font-mono tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors"
           >

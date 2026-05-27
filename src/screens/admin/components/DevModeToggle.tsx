@@ -53,7 +53,7 @@ export function DevModeToggle() {
   return (
     <div className="space-y-2">
       <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Dev Tools</p>
-      <button
+      <button type="button"
         onClick={toggle}
         className={`w-full rounded-xl border px-4 py-3 flex items-center gap-3 transition-all ${
           devMode

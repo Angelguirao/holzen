@@ -33,7 +33,9 @@ const CATEGORY_LABELS: Record<string, string> = {
   grounding: 'Grounding',
 };
 
-export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }: {
+const EMPTY_LIBRARY_ENTRIES: LibraryEntryRow[] = [];
+
+export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = EMPTY_LIBRARY_ENTRIES }: {
   sources: SignalSourceRow[];
   onRefresh: () => void;
   libraryEntries?: LibraryEntryRow[];
@@ -164,19 +166,32 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
       </div>
 
       {!adding ? (
-        <button onClick={() => setAdding(true)} className="text-[10px] font-sans font-medium text-nox-text-link/75 hover:text-nox-text-link transition-colors">
+        <button type="button" onClick={() => setAdding(true)} className="text-[10px] font-sans font-medium text-nox-text-link/75 hover:text-nox-text-link transition-colors">
           + Add source
         </button>
       ) : (
         <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 space-y-2">
-          <input value={newName} onChange={e => setNewName(e.target.value)}
+          <input
+            value={newName}
+            onChange={e => setNewName(e.target.value)}
+            aria-label="Source name"
             placeholder="Source name (e.g. Parker Lewis)"
-            className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40" />
-          <input value={newUrl} onChange={e => setNewUrl(e.target.value)}
+            className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40"
+          />
+          <input
+            value={newUrl}
+            onChange={e => setNewUrl(e.target.value)}
+            aria-label="Source URL"
             placeholder="URL (optional)"
-            className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40" />
+            className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40"
+          />
           <div className="flex gap-2">
-            <select value={newType} onChange={e => setNewType(e.target.value)} className="text-[10px] font-mono bg-transparent border border-border/30 rounded px-1.5 py-0.5">
+            <select
+              value={newType}
+              onChange={e => setNewType(e.target.value)}
+              aria-label="Source type"
+              className="text-[10px] font-mono bg-transparent border border-border/30 rounded px-1.5 py-0.5"
+            >
               <option value="blog">blog</option>
               <option value="rss">rss (feed URL)</option>
               <option value="site_map">site_map (discover URLs)</option>
@@ -191,17 +206,17 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
             </select>
           </div>
           <div className="flex gap-2">
-            <button onClick={addSource} disabled={saving || !newName.trim()} className="text-[10px] font-sans font-medium text-nox-text-link hover:text-nox-text-link/80 disabled:opacity-30">
+            <button type="button" onClick={addSource} disabled={saving || !newName.trim()} className="text-[10px] font-sans font-medium text-nox-text-link hover:text-nox-text-link/80 disabled:opacity-30">
               {saving ? 'Saving...' : 'Save'}
             </button>
-            <button onClick={() => setAdding(false)} className="text-[10px] font-mono text-muted-foreground/60 hover:text-muted-foreground">
+            <button type="button" onClick={() => setAdding(false)} className="text-[10px] font-mono text-muted-foreground/60 hover:text-muted-foreground">
               Cancel
             </button>
           </div>
         </div>
       )}
 
-      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full text-left">
+      <button type="button" onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full text-left">
         {open ? <ChevronDown className="h-3 w-3 text-muted-foreground/60" /> : <ChevronRight className="h-3 w-3 text-muted-foreground/60" />}
         <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
           Source Catalog <span className="text-muted-foreground/45">({sources.length})</span>

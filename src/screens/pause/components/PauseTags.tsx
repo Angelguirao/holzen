@@ -45,6 +45,7 @@ export function PauseTags({ pauseInstanceId }: Props) {
             }
           }}
           onBlur={addDraft}
+          aria-label={t('pause.reflect.tagsPlaceholder', { defaultValue: 'Add a tag…' })}
           placeholder={t('pause.reflect.tagsPlaceholder', { defaultValue: 'Add a tag…' })}
           className="flex-1 min-w-24 rounded-full border border-dashed border-border/50 bg-transparent px-2 py-0.5 text-[10px] font-mono focus:outline-none focus:ring-1 focus:ring-ring"
         />

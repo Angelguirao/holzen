@@ -138,7 +138,7 @@ export function AppConfigTools() {
           <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
             Spend today
           </p>
-          <button
+          <button type="button"
             onClick={() => void refresh()}
             className="flex items-center gap-1 text-[10px] font-sans font-medium text-muted-foreground/50 hover:text-nox-text-link"
           >
@@ -173,7 +173,7 @@ export function AppConfigTools() {
         <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
           Panic mode
         </p>
-        <button
+        <button type="button"
           onClick={() => {
             const next = !state.panic_mode;
             const optimistic = { ...state, panic_mode: next };
@@ -395,6 +395,7 @@ export function AppConfigTools() {
               <input
                 type="text"
                 value={state.ai_cost_alert_recipients.join(', ')}
+                aria-label="Recipient emails"
                 placeholder="ops@example.com, ceo@example.com"
                 onChange={(e) => {
                   const list = e.target.value
@@ -617,6 +618,7 @@ function NumberRow({
         value={raw}
         min={min}
         step={step}
+        aria-label={label}
         placeholder="—"
         onChange={(e) => {
           const v = e.target.value;

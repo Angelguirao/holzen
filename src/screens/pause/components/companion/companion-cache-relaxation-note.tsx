@@ -13,7 +13,6 @@ export function CompanionCacheRelaxationNote({ relaxationKey }: CompanionCacheRe
   return (
     <p
       className="mt-2 px-0.5 font-mono text-[10px] leading-snug text-muted-foreground/55"
-      role="status"
     >
       {t(`companions.cacheRelaxation.${relaxationKey}`)}
     </p>

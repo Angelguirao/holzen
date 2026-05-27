@@ -27,7 +27,7 @@ export function PauseReadyBanner({ visible, onDismiss }: Props) {
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className="fixed top-0 inset-x-0 z-50 flex items-center justify-between gap-2 bg-nox-background-accent/40 backdrop-blur-md border-b border-nox-border-default/60 px-4 py-2.5"
         >
-          <button
+          <button type="button"
             onClick={() => {
               onDismiss();
               navigate('/');
@@ -42,7 +42,7 @@ export function PauseReadyBanner({ visible, onDismiss }: Props) {
               {t('home.pauseReadyBanner', { defaultValue: 'A pause is ready for you' })}
             </span>
           </button>
-          <button
+          <button type="button"
             onClick={(e) => {
               e.stopPropagation();
               onDismiss();

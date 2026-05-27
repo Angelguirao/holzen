@@ -12,7 +12,7 @@ const PrivacyScreen = () => {
       <PageMeta title="Privacy Policy — Holzen" description="How Holzen handles your data. We collect only what's needed and you can export or delete everything anytime." path="/privacy" />
       <div className="flex-1 w-full max-w-lg px-6 py-16 space-y-10">
         <div className="space-y-4">
-          <button
+          <button type="button"
             onClick={() => navigate(-1)}
             className="text-xs font-mono tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors"
           >

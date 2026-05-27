@@ -127,7 +127,6 @@ function RouteChunkFallback() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-6 bg-background"
-      role="status"
       aria-live="polite"
       aria-busy="true"
       aria-label="Loading"

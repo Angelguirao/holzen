@@ -66,7 +66,7 @@ export function HomeWidget({
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-3">
         {/* Drag handle — large touch target */}
-        <button
+        <button type="button"
           {...listeners}
           className="touch-none cursor-grab active:cursor-grabbing p-1.5 -ml-1.5 rounded-md text-muted-foreground/40 hover:text-muted-foreground/70 hover:bg-muted/50 active:bg-muted transition-colors"
           aria-label={`Drag to reorder ${title}`}

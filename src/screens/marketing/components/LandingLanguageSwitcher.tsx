@@ -23,7 +23,7 @@ export function LandingLanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors">
+        <button type="button" className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors">
           <Globe className="h-3.5 w-3.5" />
           <span className="uppercase">{i18n.language}</span>
         </button>
