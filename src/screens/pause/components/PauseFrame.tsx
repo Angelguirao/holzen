@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
@@ -9,57 +9,45 @@ import {
   usePauseArtifactHaiku,
   usePauseArtifactReflectionText,
 } from '@/features/pause/public-ritual-reflect';
-import {
-  getCompanionSectionVisibility,
-  useCompanionData,
-  useCompanionSectionExpansion,
-  type CompanionData,
-  type CompanionPrefs,
-} from '@/features/pause/public-ritual-frame';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/public-ritual-frame';
+import type { PauseSeverity } from '@/features/pause/public-navigation';
 import { pauseStepLayout } from '@/features/pause/public-session';
 import { hapticFeedback } from '@/lib/haptics';
-import { COMPANION_SECTION_ICONS } from '@/screens/pause/components/companion/companion-section-icons';
-import { PauseFrameHaikuCard } from '@/screens/pause/components/pause-frame-haiku-card';
-import { PauseFrameSignalCard } from '@/screens/pause/components/pause-frame-signal-card';
-import { PauseFrameToolRow } from '@/screens/pause/components/pause-frame-tool-row';
+import { CompanionSection } from '@/screens/pause/components/CompanionSection';
 
 export interface PauseFrameProps {
   pauseInstanceId: string | null;
   reflectionMessage: string;
   companionPrefs: CompanionPrefs;
-  /** Used for visibility parity with inline `CompanionSection` orchestrated slots. */
   companions: CompanionData;
+  context?: string | null;
+  mood?: string | null;
+  severity?: PauseSeverity;
   isFavorite: boolean;
   onToggleFavorite: () => void;
   subscribed: boolean;
   onImDone: () => void;
 }
 
-function companionFullViewHref(
-  pauseInstanceId: string | null,
-  segment: 'signal' | 'grounding' | 'zoom-out' | 'history',
-): string {
-  if (!pauseInstanceId) return '/pause';
-  return `/companion/${segment}/${pauseInstanceId}`;
-}
-
 /**
- * Figma "Frame" hub: companion context + links to angles (ground, zoom out, history, signal).
- * Completing the hub logs shift server-side from the parent (skipped mirror mood).
+ * Figma "Frame" hub: inline accordion companion cards (lazy orchestrate on expand).
+ * Full-view routes remain optional inside an expanded card.
  */
 export function PauseFrame({
   pauseInstanceId,
   reflectionMessage,
   companionPrefs,
   companions,
-  isFavorite,
-  onToggleFavorite,
-  subscribed,
+  context,
+  mood,
+  severity = 'mild',
+  isFavorite: _isFavorite,
+  onToggleFavorite: _onToggleFavorite,
+  subscribed: _subscribed,
   onImDone,
 }: PauseFrameProps) {
   "use memo";
   const { t } = useTranslation();
-  const companionHaikuEnabled = companionPrefs.haiku;
   const sessionSeedEmpty = !reflectionMessage.trim();
   const { artifactReflectionText } = usePauseArtifactReflectionText({
     pauseInstanceId,
@@ -71,67 +59,22 @@ export function PauseFrame({
     artifactReflectionText,
   );
 
-  /** Match Reflect companion pattern: collapsed until the user opens the card. */
-  const [haikuOpen, setHaikuOpen] = useState(false);
   const { artifactHaiku, haikuFetch } = usePauseArtifactHaiku({
     pauseInstanceId,
-    companionHaikuEnabled,
+    companionHaikuEnabled: companionPrefs.haiku,
     trigger: 'whenEnabled',
-    fetchEnabled: haikuOpen,
+    fetchEnabled: companionPrefs.haiku && Boolean(pauseInstanceId),
   });
 
-  const { hasSignal, hasGrounding, hasZoomOut, hasHistory } = useMemo(
-    () => getCompanionSectionVisibility(companionPrefs, companions, pauseInstanceId),
-    [companionPrefs, companions, pauseInstanceId],
-  );
-
-  const {
-    signal,
-    signalLoading,
-    signalError,
-    retrySignal,
-    cacheIds,
-    cacheRelaxations,
-    regenerateCompanion,
-    canAccessCompanion,
-    fetchCompanion,
-    completion,
-    markCompleted,
-  } = useCompanionData({
-    companions,
-    prefs: companionPrefs,
-    pauseInstanceId,
-  });
-
-  const { expandedSignal, toggleSignal } = useCompanionSectionExpansion({
-    signal,
-    signalLoading,
-    signalError,
-    nudge: null,
-    nudgeLoading: false,
-    nudgeError: false,
-    zoomOut: null,
-    zoomOutLoading: false,
-    zoomOutError: false,
-    historyInsight: null,
-    historyLoading: false,
-    historyError: false,
-    fetchCompanion,
-    canAccessCompanion,
-    exclusiveExpand: true,
-  });
-
-  const GroundingIcon = COMPANION_SECTION_ICONS.grounding;
-  const ZoomOutIcon = COMPANION_SECTION_ICONS.zoomOut;
-  const HistoryIcon = COMPANION_SECTION_ICONS.history;
-
-  /** Haiku is optional and lazy-loaded — do not require nav reflection seed (matches Reflect artifact pattern). */
-  const showHaikuCard = companionHaikuEnabled && Boolean(pauseInstanceId);
-  const displayHaikuBody = resolveFrameHaikuDisplayBody({
-    artifactHaiku,
-    haikuFetch,
-    reflectionMessage: effectiveReflectionMessage,
-  });
+  const frameCompanions = useMemo((): CompanionData => {
+    const displayHaiku = resolveFrameHaikuDisplayBody({
+      artifactHaiku,
+      haikuFetch,
+      reflectionMessage: effectiveReflectionMessage,
+    }).trim();
+    if (!displayHaiku) return companions;
+    return { ...companions, haiku: companions.haiku ?? displayHaiku };
+  }, [artifactHaiku, companions, effectiveReflectionMessage, haikuFetch]);
 
   return (
     <motion.div
@@ -148,63 +91,20 @@ export function PauseFrame({
         </p>
       </div>
 
-      <div className="mt-6 w-full space-y-3">
-        {showHaikuCard ? (
-          <PauseFrameHaikuCard
-            open={haikuOpen}
-            onOpenChange={setHaikuOpen}
-            subscribed={subscribed}
-            isFavorite={isFavorite}
-            onToggleFavorite={onToggleFavorite}
-            haikuFetch={haikuFetch}
-            displayBody={displayHaikuBody}
-          />
-        ) : null}
-
-        {hasSignal ? (
-          <PauseFrameSignalCard
-            label={t('pause.frame.signal', { defaultValue: 'Signal' })}
-            expanded={expandedSignal}
-            onToggleExpand={toggleSignal}
-            completed={Boolean(completion.signal)}
-            onFirstExpandComplete={() => markCompleted('signal')}
-            pauseInstanceId={pauseInstanceId}
-            signal={signal}
-            signalLoading={signalLoading}
-            signalError={signalError}
-            retrySignal={retrySignal}
-            cacheId={cacheIds.signal}
-            relaxationKey={cacheRelaxations.signal}
-            regenerateCompanion={regenerateCompanion}
-          />
-        ) : null}
-
-        {hasGrounding ? (
-          <PauseFrameToolRow
-            icon={<GroundingIcon className="h-5 w-5 text-primary" aria-hidden />}
-            label={t('pause.frame.ground', { defaultValue: 'Ground yourself' })}
-            href={companionFullViewHref(pauseInstanceId, 'grounding')}
-            iconHelp={t('pause.frame.companions.groundingHelp')}
-          />
-        ) : null}
-
-        {hasZoomOut ? (
-          <PauseFrameToolRow
-            icon={<ZoomOutIcon className="h-5 w-5 text-primary" aria-hidden />}
-            label={t('pause.frame.zoomOut', { defaultValue: 'Zoom out' })}
-            href={companionFullViewHref(pauseInstanceId, 'zoom-out')}
-            iconHelp={t('pause.frame.companions.zoomOutHelp')}
-          />
-        ) : null}
-
-        {hasHistory ? (
-          <PauseFrameToolRow
-            icon={<HistoryIcon className="h-5 w-5 text-primary" aria-hidden />}
-            label={t('pause.frame.lookBack', { defaultValue: 'Look back' })}
-            href={companionFullViewHref(pauseInstanceId, 'history')}
-            iconHelp={t('pause.frame.companions.lookBackHelp')}
-          />
-        ) : null}
+      <div className="mt-6 w-full">
+        <CompanionSection
+          companions={frameCompanions}
+          prefs={companionPrefs}
+          severity={severity}
+          pauseInstanceId={pauseInstanceId}
+          context={context}
+          reflectionMessage={effectiveReflectionMessage}
+          mood={mood}
+          hideSectionLead
+          exclusiveExpand
+          appearance="frame"
+          companionSlotOrder="frame"
+        />
       </div>
 
       <div className="mt-10 flex w-full justify-center">

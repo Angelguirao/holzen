@@ -103,6 +103,22 @@ spent — a row without logging still runs but cannot be capped per-user.
 
 ---
 
+## 2.1 Premium companion metering — when users are charged
+
+**Product feature key:** `premium_companion` (included monthly allowance on Pro, then flex credits at **3 credits per unit** — see `FEATURE_CREDIT_COST` in `subscription-entitlements.ts`).
+
+| Layer | When charge happens | Refund on generation failure? |
+| --- | --- | --- |
+| **Edge `companion-orchestrate`** | `consumeAllowanceOrCredits` runs **before** rate limits and **before** Perplexity/Gemini generation (after artifact skip path). One RPC may debit **multiple units** when several premium slots run in one invoke (`signal` + `grounding` + `history` count toward `premiumCompanionUnits`). | **No** — there is no `refund` / reverse RPC in the repo today. Failed or empty generation after a successful debit still consumes allowance/credits. |
+| **Edge `regenerate-only`** | Same pattern: quota consumed before the targeted generator runs. | **No** |
+| **Client lazy fetch** | `useCompanionSlotOrchestrateActions` calls `applyOptimisticDecrement('companion')` **before** `runSlotOrchestrate` (UI may show lower balance immediately). | On failure, `refreshSubscription()` in `finally` reconciles from server; optimistic UI can be wrong until refresh. |
+
+**Implications for Frame (May 2026):** companions generate **on first card expand** only — users are not charged at Frame mount. Opening a card that triggers `companion-orchestrate` still debits **even if** the slot returns empty, errors, or panic-mode bypass after debit (panic check is after quota today).
+
+**Follow-up if product requires pay-for-success:** move `consumeAllowanceOrCredits` to after successful artifact persist, or add a compensating credit RPC on known failure paths (coordinate with `credit_wallets` audit trail).
+
+---
+
 ## 3. Per-invocation cost estimates
 
 Engineering estimates using midpoint token counts. Actuals vary with locale,

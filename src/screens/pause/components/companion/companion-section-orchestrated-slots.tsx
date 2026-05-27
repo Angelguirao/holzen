@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import type {
   CachedHistoricalInsightShape,
   CompanionData,
@@ -83,6 +83,8 @@ export type CompanionSectionOrchestratedSlotsProps = {
   regenerateCompanion: (slot: RegenerateCompanionSlot) => void;
   proFavorite: (favoriteKey: string) => CompanionSectionProFavoriteProps;
   appearance?: CompanionOrchestratedCardProps['appearance'];
+  /** Figma Frame: Grounding → Zoom out → Look back → Signal (default: Signal first). */
+  companionSlotOrder?: 'default' | 'frame';
   iconHelps?: {
     signal?: string;
     grounding?: string;
@@ -90,6 +92,11 @@ export type CompanionSectionOrchestratedSlotsProps = {
     lookBack?: string;
   };
 };
+
+type OrchestratedSlotKey = 'signal' | 'grounding' | 'zoomOut' | 'history';
+
+const DEFAULT_SLOT_ORDER: OrchestratedSlotKey[] = ['signal', 'grounding', 'zoomOut', 'history'];
+const FRAME_SLOT_ORDER: OrchestratedSlotKey[] = ['grounding', 'zoomOut', 'history', 'signal'];
 
 export function CompanionSectionOrchestratedSlots({
   labels,
@@ -127,19 +134,22 @@ export function CompanionSectionOrchestratedSlots({
   regenerateCompanion,
   proFavorite,
   appearance = 'default',
+  companionSlotOrder = 'default',
   iconHelps,
 }: CompanionSectionOrchestratedSlotsProps) {
   "use memo";
   const { hasSignal, hasGrounding, hasZoomOut, hasHistory } = visibility;
   const frameAppearance = appearance === 'frame';
+  const showFullViewButton = !frameAppearance;
   const historyDisplay = useMemo(
     () => mergeHistoryBtcOverlay(historyInsight, zoomOut),
     [historyInsight, zoomOut],
   );
 
-  return (
-    <>
-      {hasSignal ? (
+  const slotOrder = companionSlotOrder === 'frame' ? FRAME_SLOT_ORDER : DEFAULT_SLOT_ORDER;
+
+  const slots: Record<OrchestratedSlotKey, ReactNode> = {
+    signal: hasSignal ? (
         <CompanionOrchestratedCard
           id="signal"
           label={labels.signal}
@@ -159,7 +169,7 @@ export function CompanionSectionOrchestratedSlots({
           routeSegment="signal"
           appearance={appearance}
           iconHelp={iconHelps?.signal}
-          showFullViewButton={!frameAppearance}
+          showFullViewButton={showFullViewButton}
           {...proFavorite('signal')}
         >
           <SignalDisplay
@@ -171,9 +181,8 @@ export function CompanionSectionOrchestratedSlots({
             pauseInstanceId={pauseInstanceId}
           />
         </CompanionOrchestratedCard>
-      ) : null}
-
-      {hasGrounding ? (
+      ) : null,
+    grounding: hasGrounding ? (
         <CompanionOrchestratedCard
           id="grounding"
           label={labels.ground}
@@ -191,6 +200,9 @@ export function CompanionSectionOrchestratedSlots({
           regenerateSlot="grounding"
           onRegenerate={() => regenerateCompanion('grounding')}
           routeSegment="grounding"
+          appearance={appearance}
+          iconHelp={iconHelps?.grounding}
+          showFullViewButton
           {...proFavorite('grounding')}
         >
           <LearningInput
@@ -202,9 +214,8 @@ export function CompanionSectionOrchestratedSlots({
             onRetry={retryNudge}
           />
         </CompanionOrchestratedCard>
-      ) : null}
-
-      {hasZoomOut ? (
+      ) : null,
+    zoomOut: hasZoomOut ? (
         <CompanionOrchestratedCard
           id="zoomOut"
           label={labels.zoomOut}
@@ -222,13 +233,15 @@ export function CompanionSectionOrchestratedSlots({
           regenerateSlot="zoomOut"
           onRegenerate={() => regenerateCompanion('zoomOut')}
           routeSegment="zoom-out"
+          appearance={appearance}
+          iconHelp={iconHelps?.zoomOut}
+          showFullViewButton
           {...proFavorite('zoom_out')}
         >
           <ZoomOutDisplay data={zoomOut} loading={zoomOutLoading} error={zoomOutError} onRetry={retryZoomOut} />
         </CompanionOrchestratedCard>
-      ) : null}
-
-      {hasHistory ? (
+      ) : null,
+    history: hasHistory ? (
         <CompanionOrchestratedCard
           id="history"
           label={labels.lookBack}
@@ -246,6 +259,9 @@ export function CompanionSectionOrchestratedSlots({
           regenerateSlot="history"
           onRegenerate={() => regenerateCompanion('history')}
           routeSegment="history"
+          appearance={appearance}
+          iconHelp={iconHelps?.lookBack}
+          showFullViewButton
           {...proFavorite('history_insight')}
         >
           <HistoricalInsightDisplay
@@ -255,7 +271,14 @@ export function CompanionSectionOrchestratedSlots({
             onRetry={retryHistory}
           />
         </CompanionOrchestratedCard>
-      ) : null}
+      ) : null,
+  };
+
+  return (
+    <>
+      {slotOrder.map((key) => (
+        <div key={key}>{slots[key]}</div>
+      ))}
     </>
   );
 }

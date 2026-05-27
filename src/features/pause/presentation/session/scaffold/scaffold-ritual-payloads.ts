@@ -143,6 +143,7 @@ export function buildPauseSessionScaffoldRitualPayloads(
       isFavorite: p.isFavorite,
       onToggleFavorite: p.toggleFavorite,
       subscribed: p.subscribed,
+      mood: p.selectedMood,
       onFrameImDone: () => void p.handleFrameImDone(),
       onDecide: p.handleDecide,
       onRepeatDeepFirstBreathPattern: p.handleDeepFirstBreathRepeat,

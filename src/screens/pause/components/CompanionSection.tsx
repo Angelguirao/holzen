@@ -6,6 +6,8 @@ import type { CompanionData, CompanionPrefs } from '@/features/pause/public-ritu
 import { CompanionSectionHaikuSlot } from '@/screens/pause/components/companion/companion-section-haiku-slot';
 import { CompanionSectionOrchestratedSlots } from '@/screens/pause/components/companion/companion-section-orchestrated-slots';
 import { companionSectionProFavoriteProps } from '@/features/pause/public-ritual-frame';
+import type { CompanionCardAppearance } from '@/screens/pause/components/companion/companion-card';
+import type { CompanionSectionOrchestratedSlotsProps } from '@/screens/pause/components/companion/companion-section-orchestrated-slots';
 
 interface Props {
   companions: CompanionData;
@@ -18,10 +20,27 @@ interface Props {
   mood?: string | null;
   /** Overrides the small section label above companion cards (e.g. pause reflect step). */
   sectionLead?: string | null;
+  hideSectionLead?: boolean;
+  exclusiveExpand?: boolean;
+  appearance?: CompanionCardAppearance;
+  companionSlotOrder?: CompanionSectionOrchestratedSlotsProps['companionSlotOrder'];
 }
 
 export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection(
-  { companions, prefs, severity = 'mild', pauseInstanceId, context, reflectionMessage, mood, sectionLead },
+  {
+    companions,
+    prefs,
+    severity = 'mild',
+    pauseInstanceId,
+    context,
+    reflectionMessage,
+    mood,
+    sectionLead,
+    hideSectionLead = false,
+    exclusiveExpand = false,
+    appearance = 'default',
+    companionSlotOrder = 'default',
+  },
   ref,
 ) {
   "use memo";
@@ -92,6 +111,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     historyError,
     fetchCompanion,
     canAccessCompanion,
+    exclusiveExpand,
   });
 
   const proFavorite = useCallback(
@@ -103,10 +123,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   if (!showSection) return null;
 
   return (
-    <div ref={ref} className="space-y-2.5">
-      <p className="mb-2 px-1 text-center text-xs font-medium leading-snug text-muted-foreground">
-        {sectionLead ?? labels.pause}
-      </p>
+    <div ref={ref} className="space-y-3">
+      {hideSectionLead ? null : (
+        <p className="mb-2 px-1 text-center text-xs font-medium leading-snug text-muted-foreground">
+          {sectionLead ?? labels.pause}
+        </p>
+      )}
 
       {hasHaiku && companions.haiku ? (
         <CompanionSectionHaikuSlot
@@ -117,6 +139,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           completed={Boolean(completion.haiku)}
           onFirstExpandComplete={() => markCompleted('haiku')}
           proFavorite={proFavorite('haiku')}
+          appearance={appearance}
         />
       ) : null}
 
@@ -155,6 +178,8 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
         cacheRelaxations={cacheRelaxations}
         regenerateCompanion={regenerateCompanion}
         proFavorite={proFavorite}
+        appearance={appearance}
+        companionSlotOrder={companionSlotOrder}
       />
     </div>
   );

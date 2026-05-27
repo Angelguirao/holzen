@@ -49,6 +49,7 @@ export function PauseSessionDeepRitualBody({
   isFavorite,
   onToggleFavorite,
   subscribed,
+  mood,
   onFrameImDone,
   onDecide,
   onRepeatDeepFirstBreathPattern,
@@ -127,6 +128,9 @@ export function PauseSessionDeepRitualBody({
             reflectionMessage={reflectionMessage}
             companionPrefs={companionPrefs}
             companions={companions}
+            context={context}
+            mood={mood}
+            severity={severity}
             isFavorite={isFavorite}
             onToggleFavorite={() => {
               void onToggleFavorite();
