@@ -6,6 +6,8 @@ type LazyToggleArgs = {
   data: unknown;
   loading: boolean;
   error: unknown;
+  /** Reflect-step or other inline copy already on screen — expand only, no quota fetch. */
+  hasStoredContent?: boolean;
 };
 
 export type CompanionSectionExpandSlot = 'haiku' | 'signal' | 'grounding' | 'zoomOut' | 'history';
@@ -27,6 +29,9 @@ export type UseCompanionSectionExpansionParams = {
   canAccessCompanion: () => boolean;
   /** When true, opening one card collapses all others (Frame / Figma wireframe). */
   exclusiveExpand?: boolean;
+  /** Grounding copy from reflect artifacts (not lazy `nudge` state). */
+  groundingTitle?: string | null;
+  groundingBody?: string | null;
 };
 
 type ExpansionMap = Record<CompanionSectionExpandSlot, boolean>;
@@ -45,12 +50,17 @@ function openExclusive(slot: CompanionSectionExpandSlot): ExpansionMap {
 
 /** True when the user may expand (has payload, in-flight, error, or Pro access to fetch). */
 function canOpenLazySlot(args: LazyToggleArgs, canAccess: () => boolean): boolean {
-  if (args.data || args.loading || args.error) return true;
+  if (args.hasStoredContent || args.data || args.loading || args.error) return true;
   return canAccess();
 }
 
 function needsLazyFetch(args: LazyToggleArgs): boolean {
+  if (args.hasStoredContent) return false;
   return !args.data && !args.loading && !args.error;
+}
+
+function hasReflectGroundingContent(title?: string | null, body?: string | null): boolean {
+  return Boolean(title?.trim() || body?.trim());
 }
 
 /** Expand/collapse state for inline `CompanionSection` cards (lazy fetch on first open). */
@@ -70,7 +80,10 @@ export function useCompanionSectionExpansion({
   fetchCompanion,
   canAccessCompanion,
   exclusiveExpand = false,
+  groundingTitle = null,
+  groundingBody = null,
 }: UseCompanionSectionExpansionParams) {
+  const groundingStoredContent = hasReflectGroundingContent(groundingTitle, groundingBody);
   const [expansion, setExpansion] = useState<ExpansionMap>(CLOSED);
 
   const toggleSlot = useCallback(
@@ -124,8 +137,9 @@ export function useCompanionSectionExpansion({
         data: nudge,
         loading: nudgeLoading,
         error: nudgeError,
+        hasStoredContent: groundingStoredContent,
       }),
-    [toggleSlot, nudge, nudgeLoading, nudgeError],
+    [toggleSlot, nudge, nudgeLoading, nudgeError, groundingStoredContent],
   );
 
   const toggleZoomOut = useCallback(

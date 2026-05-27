@@ -96,6 +96,25 @@ describe('useCompanionSectionExpansion', () => {
     expect(result.current.expandedSignal).toBe(false);
   });
 
+  it('opens grounding with reflect copy without calling canAccessCompanion', () => {
+    const canAccessCompanion = vi.fn(() => false);
+    const fetchCompanion = vi.fn();
+    const { result } = renderHook(() =>
+      useCompanionSectionExpansion({
+        ...baseParams({ canAccessCompanion, fetchCompanion }),
+        groundingTitle: 'Already here',
+        groundingBody: 'From reflect',
+      }),
+    );
+
+    act(() => {
+      result.current.toggleGrounding();
+    });
+    expect(result.current.expandedLearning).toBe(true);
+    expect(canAccessCompanion).not.toHaveBeenCalled();
+    expect(fetchCompanion).not.toHaveBeenCalled();
+  });
+
   it('without exclusiveExpand multiple slots can stay open', () => {
     const { result } = renderHook(() =>
       useCompanionSectionExpansion({ ...baseParams(), exclusiveExpand: false }),
