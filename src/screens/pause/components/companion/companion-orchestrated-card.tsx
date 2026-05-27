@@ -66,8 +66,9 @@ export function CompanionOrchestratedCard({
       icon={icon}
       expanded={expanded}
       onToggle={() => {
+        const opening = !expanded;
         onToggleExpand();
-        if (!completed) onFirstExpandComplete?.();
+        if (opening && !completed) onFirstExpandComplete?.();
       }}
       completed={completed}
       loading={loading}
