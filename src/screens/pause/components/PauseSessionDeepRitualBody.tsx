@@ -42,6 +42,7 @@ export function PauseSessionDeepRitualBody({
   reflectionMessage,
   reflectionContent,
   currentFeel,
+  severityAbsPct,
   reflectionLoading,
   reflectionError,
   onReflectionRetry,
@@ -104,6 +105,7 @@ export function PauseSessionDeepRitualBody({
             reflectionMessage={reflectionMessage}
             reflectionContent={reflectionContent ?? null}
             currentFeel={currentFeel}
+            severityAbsPct={severityAbsPct}
             reflectionLoading={reflectionLoading}
             reflectionError={reflectionError}
             onReflectionRetry={onReflectionRetry}

@@ -139,6 +139,7 @@ export function buildPauseSessionScaffoldRitualPayloads(
       reflectionMessage: p.message,
       reflectionContent: p.reflectionContent,
       currentFeel: p.currentFeel,
+      severityAbsPct: p.severityAbsPct,
       isFavorite: p.isFavorite,
       onToggleFavorite: p.toggleFavorite,
       subscribed: p.subscribed,
