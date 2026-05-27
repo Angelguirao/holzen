@@ -69,6 +69,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run smoke:edge-logging` | Optional: HTTP smoke against deployed edges — verifies `x-cid` round-trip through `withRequestLogging` (see `supabase/functions/README.md`). |
 | `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **production** Supabase project ref (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Use `npm run gen:types:staging` when you intentionally want staging. |
 | `npm run design:lint` | Optional: validate root **[DESIGN.md](DESIGN.md)** ([`@google/design.md`](https://www.npmjs.com/package/@google/design.md)); uses `npx` (network on first run). |
+| `npm run doctor` | Optional: [React Doctor](https://react.doctor) health scan (`react-doctor` devDependency). Use `npm run doctor -- --verbose --diff` before/after React changes; skill `.cursor/skills/react-doctor/`. |
 | `npm run test:coverage` | Vitest with coverage reports only (no JUnit; use **`test:ci`** for the full CI gate). |
 | `npm run check:version-sync` | Ensures `package.json` **version** matches the latest **`changelog_entries`** row (REST); runs automatically as **`prebuild`** before **`npm run build`**. |
 | `npm run stamp:release` | Writes **`git rev-parse --short=12 HEAD`** into **`supabase/functions/_shared/release.ts`** (`EDGE_RELEASE`) for edge Sentry/BetterStack **`SENTRY_RELEASE`**. Idempotent. |

@@ -83,7 +83,8 @@
     "mcp:setup": "node scripts/setup-mcp.mjs",
     "mcp:sync-secrets": "node scripts/sync-mcp-secrets.mjs",
     "mcp:check": "node scripts/setup-mcp.mjs --check",
-    "design:lint": "npx --yes @google/design.md lint DESIGN.md"
+    "design:lint": "npx --yes @google/design.md lint DESIGN.md",
+    "doctor": "react-doctor"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -179,6 +180,7 @@
     "globals": "^15.15.0",
     "jsdom": "^20.0.3",
     "postcss": "^8.5.6",
+    "react-doctor": "^0.2.9",
     "supabase": "^2.84.4",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
