@@ -247,16 +247,6 @@ export {
   type OpenPauseHomePreview,
 } from './infrastructure/queries/open-pause-home-preview-query';
 export {
-  GROUNDING_ENRICHMENT_DISABLED_QUERY_KEY,
-  GROUNDING_ENRICHMENT_DISABLED_SEGMENT,
-  GROUNDING_ENRICHMENT_QUERY_PREFIX,
-  fetchGroundingEnrichment,
-  getGroundingEnrichmentQueryOptions,
-  groundingEnrichmentQueryKey,
-  type GroundingEnrichment,
-  type GroundingEnrichmentInput,
-} from './infrastructure/queries/grounding-enrichment-query';
-export {
   RELATED_BIASES_GROUND_NUDGE_DISABLED_USER_ID,
   RELATED_BIASES_GROUND_NUDGE_NONE_QUERY_KEY,
   RELATED_BIASES_GROUND_NUDGE_QUERY_PREFIX,

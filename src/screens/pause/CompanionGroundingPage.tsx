@@ -2,11 +2,10 @@ import { useParams, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useProfile } from '@/features/user/public-hooks';
-import { useCompanionFullViewPage, useGroundingEnrichment } from '@/features/pause/public-ritual-frame';
+import { useCompanionFullViewPage } from '@/features/pause/public-ritual-frame';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
 import { GroundingFullView } from '@/screens/pause/components/companion/GroundingFullView';
-import { GroundingEnrichment } from '@/screens/pause/components/companion/GroundingEnrichment';
 import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
 import { RelatedBiasesThisMonth } from '@/screens/pause/components/companion/RelatedBiasesThisMonth';
 import { PageMeta } from '@/app/components/PageMeta';
@@ -41,11 +40,6 @@ export default function CompanionGroundingPage() {
     slot: 'grounding',
     companionPrefs,
     severity,
-  });
-
-  const enrichmentQuery = useGroundingEnrichment({
-    citation: nudge?.citation ?? null,
-    url: nudge?.url ?? null,
   });
 
   if (missingRouteId) return <Navigate to="/" replace />;
@@ -85,15 +79,6 @@ export default function CompanionGroundingPage() {
           error={nudgeError}
           onRetry={retryNudge}
           mood={mood}
-          enrichmentSlot={
-            nudge?.citation ? (
-              <GroundingEnrichment
-                data={enrichmentQuery.data ?? null}
-                loading={enrichmentQuery.isLoading}
-                error={enrichmentQuery.isError}
-              />
-            ) : undefined
-          }
         />
 
         {nudge && cacheRelaxations.nudge && (

@@ -10,7 +10,6 @@ Source of truth: `supabase/config.toml` + [active-surface.md](../../docs/ops/act
 | `holzen-number` | `public/` | Anon `apikey` | Y |
 | `holzen-reflect` | `pause-pipeline/` | User JWT | Y |
 | `companion-orchestrate` | `pause-pipeline/` | User JWT | Y |
-| `grounding-enrich` | `pause-pipeline/` | User JWT | Y (companion Full View) |
 | `check-subscription` | `billing/` | User JWT | Y |
 | `ensure-trial-subscription` | `billing/` | User JWT | Y |
 | `retry-flex-credit` | `billing/` | User JWT | Y |

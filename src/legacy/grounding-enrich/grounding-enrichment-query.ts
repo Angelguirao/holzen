@@ -2,7 +2,7 @@ import {
   invokeGroundingEnrich,
   type GroundingEnrichment,
   type GroundingEnrichBody,
-} from '../edge/grounding-enrich-edge';
+} from './grounding-enrich-edge';
 
 export type { GroundingEnrichment };
 
@@ -45,10 +45,6 @@ export async function fetchGroundingEnrichment(
   return data ?? null;
 }
 
-/**
- * TanStack options for `grounding-enrich` (edge already applies a cross-user cache;
- * this layer dedupes within the session).
- */
 export function getGroundingEnrichmentQueryOptions(input: GroundingEnrichmentInput) {
   const citation = input.citation?.trim() ?? '';
   const enabled = citation.length > 0;

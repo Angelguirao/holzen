@@ -92,7 +92,7 @@ spent — a row without logging still runs but cannot be capped per-user.
 | `reflection-insights` *(legacy)*                  | cron / user                      | Gemini via `llm-gateway`                                   | ✓                          | Skip run / 503                             |
 | `weekly-digest` *(legacy cron)*                   | cron                             | Gemini `gemini-2.5-flash-lite`                             | ✓                          | Digest email sent **without** AI insight   |
 | `monthly-report` *(legacy cron)*                  | cron                             | Gemini `gemini-2.5-flash-lite`                             | ✓                          | Report email sent **without** AI paragraph |
-| `grounding-enrich`                                | user                             | Gemini `gemini-2.5-flash` (cache hits skip)                | (via `createLogger`)       | 503                                        |
+| `grounding-enrich` *(legacy — undeployed)*        | user                             | Gemini `gemini-2.5-flash` (cache hits skip)                | (via `createLogger`)       | 503                                        |
 | `admin-library-preview` *(legacy)*                | admin                            | Gemini `gemini-2.5-flash-lite`                             | ✓                          | 503                                        |
 | `pregenerate-companions`                          | cron                             | Fills `companion_cache` only; Perplexity + Gemini per step when below target | ✓                   | Skip run                                   |
 | `fetch-source-feeds` *(legacy cron)*              | cron                             | Gemini + optional Perplexity                               | ✓                          | Skip run                                   |
@@ -300,7 +300,7 @@ a threshold.
 | `suggest-grounding`      | ✓            | ✓              | ✓       | —                 | `suggest_grounding`     |
 | `suggest-ritual`         | ✓            | ✓              | ✓       | —                 | `suggest_ritual`        |
 | `generate-wallpaper`     | ✓            | ✓              | ✓       | —                 | `wallpaper`             |
-| `grounding-enrich`       | ✓            | ✓              | ✓       | —                 | `grounding_enrich`      |
+| `grounding-enrich` *(legacy)* | ✓       | ✓              | ✓       | —                 | `grounding_enrich`      |
 | `admin-library-preview`  | ✓            | ✓              | ✓       | —                 | `admin_library_preview` |
 | `night-reflection`       | ✓            | —              | ✓       | —                 | `night_reflection`      |
 | `weekly-digest`          | ✓            | —              | ✓       | —                 | `digest`                |

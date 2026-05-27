@@ -146,7 +146,7 @@ packages/pause/src/
         feel/
         breathe/
         reflect/          # holzen-reflect beat (not a top-level package)
-        frame/            # companion-orchestrate + grounding-enrich (not @holzen/companion)
+        frame/            # companion-orchestrate (not @holzen/companion)
         decide/
         done/
       archive/            # pause/echo list reads — not user collections (MVP)

@@ -75,8 +75,6 @@ vector_port = 55428
     verify_jwt = false
   [functions.companion-orchestrate]
     verify_jwt = false
-  [functions.grounding-enrich]
-    verify_jwt = false
   [functions.health]
     verify_jwt = false
 

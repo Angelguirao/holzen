@@ -34,7 +34,6 @@ const COVERAGE: Row[] = [
   { name: "customer-portal", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "delete-account", wrl: true, edgeError: true, logger: false, audit: true },
   { name: "ensure-trial-subscription", wrl: true, edgeError: false, logger: true, audit: false },
-  { name: "grounding-enrich", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "handle-email-suppression", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "handle-email-unsubscribe", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "health", wrl: true, edgeError: false, logger: false, audit: false },

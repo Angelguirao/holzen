@@ -51,6 +51,6 @@ Detail: [cicd-overview.md](./cicd-overview.md)
 
 - Baseline squash (`holzen_schema_baseline.sql`) — tail cutover used instead
 - `en.full.json` on disk — use tag `full-ia-pre-strip`
-- Undeploy `grounding-enrich` — **rejected**; stays shipped
+- Undeploy `grounding-enrich` — **done** (legacy handler + `src/legacy/grounding-enrich/`; full view = orchestrate/hydrate only)
 - Rename `reflection_text` → `opening_message` — **rejected**
 - `check:i18n-active-keys` in CI — optional debt (~118 keys)

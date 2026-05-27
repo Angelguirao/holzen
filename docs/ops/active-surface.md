@@ -23,7 +23,7 @@ Example: `WHERE created_at >= '2026-05-21T20:00:00.000Z'` on truncated tables is
 
 **Public:** `/roadmap` (voting), landing, auth, legal.
 
-**Full-screen (no bottom nav):** `/onboarding`, `/pause`, `/companion/*` (including `/companion/grounding/:pauseInstanceId` → `grounding-enrich`)
+**Full-screen (no bottom nav):** `/onboarding`, `/pause`, `/companion/*` (grounding full view reads orchestrate/hydrated nudge only — no `grounding-enrich`)
 
 **Dead IA (404 only):** `/tools`, `/tools/*`, `/library`, `/journey/stats`, `/journey/:tab`, …
 
@@ -78,14 +78,14 @@ Listed in `supabase/config.toml` `[functions.*]` and `src/screens/ops/EdgeCovera
 
 | Group | Functions |
 | --- | --- |
-| Pause | `holzen-reflect`, `companion-orchestrate`, `pregenerate-companions`, `grounding-enrich` |
+| Pause | `holzen-reflect`, `companion-orchestrate`, `pregenerate-companions` |
 | Volatility | `check-volatility`, `refresh-btc-prices`, `backfill-btc-prices`, `seed-btc-history` |
 | Billing | `check-subscription`, `create-checkout`, `ensure-trial-subscription`, `stripe-webhook`, `customer-portal`, `retry-flex-credit`, `list-checkout-events`, `notify-checkout-confirmation` |
 | Account / platform | `delete-account`, `health`, `send-feedback`, `register-push`, `record-referral`, `process-referral-pending`, `holzen-number` |
 | Email | `process-email-queue`, `send-transactional-email`, `preview-transactional-email`, `handle-email-unsubscribe`, `handle-email-suppression`, `auth-email-hook` |
 | Ops / admin | `ai-cost-alert`, `admin-check-stripe-prices` |
 
-**Undeployed / legacy:** `supabase/functions/legacy/full-shell/` (ingest, badges, night reflection, letters, digest, `fetch-source-feeds`, …). No `export-user-data` edge exists in this repo.
+**Undeployed / legacy:** `supabase/functions/legacy/full-shell/` (ingest, badges, night reflection, letters, digest, `fetch-source-feeds`, …) and `supabase/functions/legacy/grounding-enrich/` (citation enrichment — client in `src/legacy/grounding-enrich/`). No `export-user-data` edge exists in this repo.
 
 ## pg_cron (kept)
 
