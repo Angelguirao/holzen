@@ -24,6 +24,7 @@ export function useOpenPauseHomePreview(user: User | null) {
   const [contextSnapshot, setContextSnapshot] = useState<Record<string, unknown> | null>(null);
   const [hasReflectionStep, setHasReflectionStep] = useState(false);
   const [hasReachedReflect, setHasReachedReflect] = useState(false);
+  const [isBriefRitual, setIsBriefRitual] = useState(false);
   const [openPauseCreatedAt, setOpenPauseCreatedAt] = useState<string | null>(null);
 
   const clearOpenPausePreview = useCallback(() => {
@@ -36,6 +37,7 @@ export function useOpenPauseHomePreview(user: User | null) {
     setContextSnapshot(null);
     setHasReflectionStep(false);
     setHasReachedReflect(false);
+    setIsBriefRitual(false);
     setOpenPauseCreatedAt(null);
     clearPausePersistedTabSession();
   }, []);
@@ -66,6 +68,7 @@ export function useOpenPauseHomePreview(user: User | null) {
       setMessage(preview.reflectionMessage);
       setHasReflectionStep(preview.hasReflectionStep);
       setHasReachedReflect(preview.hasReachedReflect);
+      setIsBriefRitual(preview.isBriefRitual);
       setCompanions(preview.companions);
     },
     [user, clearOpenPausePreview],
@@ -105,6 +108,7 @@ export function useOpenPauseHomePreview(user: User | null) {
     contextSnapshot,
     hasReflectionStep,
     hasReachedReflect,
+    isBriefRitual,
     openPauseCreatedAt,
     setMessage,
     setContext,
@@ -115,6 +119,7 @@ export function useOpenPauseHomePreview(user: User | null) {
     setContextSnapshot,
     setHasReflectionStep,
     setHasReachedReflect,
+    setIsBriefRitual,
     setOpenPauseCreatedAt,
     clearOpenPausePreview,
     dismissOpenPauseHome: dismissOpenPauseHomePreviewAction,

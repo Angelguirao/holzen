@@ -14,6 +14,7 @@ export type OpenPauseHomePreview = {
   reflectionMessage: string | null;
   hasReflectionStep: boolean;
   hasReachedReflect: boolean;
+  isBriefRitual: boolean;
   companions: CompanionData;
 };
 
@@ -34,9 +35,10 @@ async function fetchHasReflectionStep(pauseInstanceId: string): Promise<boolean>
  */
 export async function fetchOpenPauseHomePreview(userId: string): Promise<OpenPauseHomePreview | null> {
   const { data, error } = await supabase
-    .from('v_pause_current' as never)
-    .select('id, created_at, context_snapshot, state')
+    .from('v_pause_full' as never)
+    .select('id, created_at, context_snapshot, state, is_brief_ritual')
     .eq('user_id', userId)
+    .in('state', ['active', 'engaged'])
     .maybeSingle();
 
   if (error || !data) return null;
@@ -46,6 +48,7 @@ export async function fetchOpenPauseHomePreview(userId: string): Promise<OpenPau
     created_at: string;
     context_snapshot: Record<string, unknown> | null;
     state?: string;
+    is_brief_ritual?: boolean | null;
   };
 
   const openPauseState =
@@ -90,6 +93,7 @@ export async function fetchOpenPauseHomePreview(userId: string): Promise<OpenPau
     reflectionMessage,
     hasReflectionStep,
     hasReachedReflect,
+    isBriefRitual: row.is_brief_ritual === true,
     companions: companionDataFromArtifacts(artifactRows),
   };
 }

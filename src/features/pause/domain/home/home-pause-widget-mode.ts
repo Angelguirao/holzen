@@ -1,3 +1,4 @@
+import { canShowHomePauseContinueCta } from '@/features/pause/domain/home/can-show-home-pause-continue-cta';
 import { hasReachedReflectForHome } from '@/features/pause/domain/home/has-reached-reflect-for-home';
 
 /** Figma-aligned Home “Your pause” widget modes (UI projection only). */
@@ -6,7 +7,6 @@ export type HomePauseWidgetMode =
   | 'blocking_error'
   | 'calm_waters'
   | 'B'
-  | 'B_prime'
   | 'C'
   | 'C_prime'
   | 'E'
@@ -26,6 +26,8 @@ export type ResolveHomePauseWidgetModeInput = {
   hasReflectionStep: boolean;
   reflectionMessage: string | null;
   trackedAssetSymbol: string;
+  /** From `v_pause_full.is_brief_ritual` — gates Continue to deep + Reflect only. */
+  isBriefRitual: boolean;
   hasPendingOffer: boolean;
   /** Ms remaining on profile auto cooldown when no open pause (post-pause rest). */
   postPauseAutoCooldownRemainingMs: number;
@@ -72,16 +74,17 @@ export function resolveHomePauseWidgetMode(
       return { mode: 'E', defaultCollapsed: false, hasReachedReflect };
     }
 
-    if (hasReachedReflect && input.hasPendingOffer) {
+    const showContinueCta = canShowHomePauseContinueCta({
+      hasReachedReflect,
+      isBriefRitual: input.isBriefRitual,
+    });
+
+    if (showContinueCta && input.hasPendingOffer) {
       return { mode: 'C_prime', defaultCollapsed: false, hasReachedReflect };
     }
 
-    if (hasReachedReflect) {
+    if (showContinueCta) {
       return { mode: 'C', defaultCollapsed: false, hasReachedReflect };
-    }
-
-    if (input.openPauseState === 'engaged') {
-      return { mode: 'B_prime', defaultCollapsed: false, hasReachedReflect };
     }
 
     return { mode: 'B', defaultCollapsed: false, hasReachedReflect };

@@ -13,6 +13,7 @@ export type PauseHomeContextValue = {
   contextSnapshot: Record<string, unknown> | null;
   hasReflectionStep: boolean;
   hasReachedReflect: boolean;
+  isBriefRitual: boolean;
   openPauseCreatedAt: string | null;
   loading: boolean;
   error: string | null;

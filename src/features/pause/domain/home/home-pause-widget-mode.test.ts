@@ -92,6 +92,7 @@ const baseInput = {
   hasReflectionStep: false,
   reflectionMessage: null as string | null,
   trackedAssetSymbol: 'BTC',
+  isBriefRitual: false,
   hasPendingOffer: false,
   postPauseAutoCooldownRemainingMs: 0,
   completedPauseCount: 0,
@@ -120,21 +121,35 @@ describe('resolveHomePauseWidgetMode', () => {
     expect(r.hasReachedReflect).toBe(false);
   });
 
-  it('B_prime for engaged pre-Reflect', () => {
+  it('B for engaged pre-Reflect (no Continue until deep + Reflect)', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'engaged',
     });
-    expect(r.mode).toBe('B_prime');
+    expect(r.mode).toBe('B');
     expect(r.hasReachedReflect).toBe(false);
   });
 
-  it('C for engaged after Reflect', () => {
+  it('B for brief ritual after Reflect (Continue is deep-only)', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'engaged',
+      isBriefRitual: true,
+      hasReflectionStep: true,
+      reflectionMessage: 'You can pause here.',
+    });
+    expect(r.mode).toBe('B');
+    expect(r.hasReachedReflect).toBe(true);
+  });
+
+  it('C for deep ritual after Reflect', () => {
+    const r = resolveHomePauseWidgetMode({
+      ...baseInput,
+      hasOpenPause: true,
+      openPauseState: 'engaged',
+      isBriefRitual: false,
       hasReflectionStep: true,
       reflectionMessage: 'You can pause here.',
     });
@@ -142,11 +157,12 @@ describe('resolveHomePauseWidgetMode', () => {
     expect(r.hasReachedReflect).toBe(true);
   });
 
-  it('C_prime when reached Reflect and pending queued', () => {
+  it('C_prime when deep, reached Reflect, and pending queued', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'engaged',
+      isBriefRitual: false,
       hasReflectionStep: true,
       reflectionMessage: 'Copy',
       hasPendingOffer: true,
