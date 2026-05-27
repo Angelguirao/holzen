@@ -8,6 +8,7 @@ export {
   type CurrentFeelForReflect,
   type ReflectionContentV2,
 } from './domain/reflect/generation/reflection-content-v2';
+export { formatReflectIntegratedProse } from './domain/reflect/generation/format-reflect-integrated-prose';
 export { resolveFrameHaikuDisplayBody } from './domain/reflect/generation/resolve-frame-haiku-display-body';
 export {
   resolvePauseReflectMessageView,
