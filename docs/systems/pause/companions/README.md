@@ -8,6 +8,12 @@
 
 Focused notes on the **intervention** and **individual companion types** — how they fit into the overall pause pipeline described in [ai-powered-pause-system.md](../ai-powered-pause-system.md).
 
+## Metering & cost
+
+| Doc | What |
+|-----|------|
+| [companion-metering.md](companion-metering.md) | **What counts** against Companions & guidance (orchestrate/regenerate only), pregenerate vs session cost, naming map |
+
 ## Cache warmer (background)
 
 | Doc | What |
