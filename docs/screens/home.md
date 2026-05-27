@@ -80,6 +80,8 @@ Home maps **`v_pause_full.state`** to Figma modes via [`resolveHomePauseWidgetMo
 
 Opening preview: deterministic i18n templates pre-Reflect (`home.pauseOpening.*`); post-Reflect uses `reflection_text`. Market block: compact BTC/F&G + Updated HH:mm from [`formatHomePauseMarketBlock`](../../src/features/pause/domain/home/format-home-pause-market-block.ts).
 
+**Manual QA:** [home-pause-widget-projection.md § Manual QA checklist](../systems/home-pause-widget-projection.md#manual-qa-checklist).
+
 ## Navigation to Pause
 
 From the pause card, “Pause with this” navigates to `/pause` with [`PauseSessionLocationState`](../../src/lib/router-location-state.ts): reflection text, context, instance id, companions, prefs, severity. See [phase-2 manual pause pipeline](../reviews/phase-2-manual-pause-pipeline.md) for the producer/consumer contract.
