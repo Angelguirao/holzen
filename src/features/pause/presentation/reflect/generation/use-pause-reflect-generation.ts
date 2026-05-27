@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
+import type { ReflectGenerationProfileInput } from '@/features/pause/domain/reflect/generation/reflect-generation-edge-params';
 import {
   messageFromReflectGenerationResult,
   pauseReflectGeneration,
@@ -27,6 +28,28 @@ export function usePauseReflectGeneration({
   const { t } = useTranslation();
   const { user } = useAuth();
   const profile = useProfile();
+  const profileForReflect = useMemo<ReflectGenerationProfileInput>(
+    () => ({
+      reflectionTone: profile.reflectionTone,
+      reflectionStyle: profile.reflectionStyle,
+      customPrompt: profile.customPrompt ?? '',
+      motivations: profile.motivations ?? [],
+      mantra: profile.mantra ?? '',
+      groundingActivities: profile.groundingActivities ?? [],
+      currency: profile.currency,
+      language: profile.language,
+    }),
+    [
+      profile.reflectionTone,
+      profile.reflectionStyle,
+      profile.customPrompt,
+      profile.motivations,
+      profile.mantra,
+      profile.groundingActivities,
+      profile.currency,
+      profile.language,
+    ],
+  );
 
   const [reflectionMessage, setReflectionMessage] = useState(initialReflectionMessage);
   const [isPending, startTransition] = useTransition();
@@ -35,6 +58,7 @@ export function usePauseReflectGeneration({
   const validityRef = useRef(0);
   /** Aborts the in-flight `holzen-reflect` when superseded, `pauseInstanceId` changes, `enabled` turns false, or the effect cleans up. */
   const reflectGenAbortRef = useRef<AbortController | null>(null);
+  const runGenerationRef = useRef<() => void>(() => {});
 
   const navSeedEmpty = !initialReflectionMessage.trim();
   const { artifactReflectionText } = usePauseArtifactReflectionText({
@@ -103,7 +127,7 @@ export function usePauseReflectGeneration({
             context: context!.trim(),
             initialReflectionMessage,
             severityAbsPct,
-            profile,
+            profile: profileForReflect,
             signal: ac.signal,
           },
           reflectGenerator,
@@ -117,7 +141,19 @@ export function usePauseReflectGeneration({
         setError(reflectGenerationUserErrorMessage(raw));
       }
     });
-  }, [t, enabled, pauseInstanceId, user, context, initialReflectionMessage, severityAbsPct, profile, startTransition]);
+  }, [
+    t,
+    enabled,
+    pauseInstanceId,
+    user,
+    context,
+    initialReflectionMessage,
+    severityAbsPct,
+    profileForReflect,
+    startTransition,
+  ]);
+
+  runGenerationRef.current = runGeneration;
 
   useEffect(() => {
     if (!enabled) {
@@ -126,13 +162,22 @@ export function usePauseReflectGeneration({
         reflectGenAbortRef.current?.abort();
       };
     }
-    runGeneration();
+    runGenerationRef.current();
     return () => {
       reflectGenAbortRef.current?.abort();
     };
-  }, [enabled, runGeneration]);
+  }, [
+    enabled,
+    pauseInstanceId,
+    context,
+    initialReflectionMessage,
+    user?.id,
+    severityAbsPct,
+    profileForReflect,
+  ]);
 
   const retry = useCallback(() => {
+    setError(null);
     validityRef.current += 1;
     runGeneration();
   }, [runGeneration]);
