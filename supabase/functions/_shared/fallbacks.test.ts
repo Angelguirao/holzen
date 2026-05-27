@@ -166,10 +166,13 @@ describe('REFLECTION_FALLBACKS', () => {
     expect(REFLECTION_FALLBACKS.length).toBeGreaterThanOrEqual(5);
   });
 
-  it('all entries have a message', () => {
+  it('all entries have v2 fields and integrated message', () => {
     for (const entry of REFLECTION_FALLBACKS) {
-      expect(entry.message).toBeTruthy();
-      expect(entry.message.length).toBeGreaterThan(10);
+      expect(entry.land?.length).toBeGreaterThan(10);
+      expect(entry.hypothesis?.length).toBeGreaterThan(10);
+      expect(entry.inquiry?.length).toBeGreaterThan(10);
+      expect(entry.message?.length).toBeGreaterThan(20);
+      expect(entry.message).toContain(entry.inquiry!.replace(/\?$/, ''));
     }
   });
 
@@ -188,8 +191,8 @@ describe('REFLECTION_FALLBACKS', () => {
     }
   });
 
-  it('all messages are unique', () => {
-    const messages = REFLECTION_FALLBACKS.map(e => e.message);
+  it('all integrated messages are unique', () => {
+    const messages = REFLECTION_FALLBACKS.map((e) => e.message);
     expect(new Set(messages).size).toBe(messages.length);
   });
 });

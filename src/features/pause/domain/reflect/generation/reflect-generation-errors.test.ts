@@ -22,6 +22,6 @@ describe('reflectGenerationUserErrorMessage', () => {
   });
 
   it('falls back to generic copy', () => {
-    expect(reflectGenerationUserErrorMessage('model timeout')).toContain('unavailable');
+    expect(reflectGenerationUserErrorMessage('model timeout')).toContain('starting point');
   });
 });

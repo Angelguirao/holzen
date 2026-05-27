@@ -277,6 +277,8 @@ Store structured reflect output only in `pause_ai_artifacts`. Phase 3 may add `r
 
 **Prompt:** `REFLECTION_PROMPT_VERSION` **v7** — structured `land` / `hypothesis` / `inquiry` for analytics plus required **`message`** (2–4 paragraphs, one voice). Quality gate prefers gated `message`; UI uses `message` when present (`formatReflectIntegratedProse`), else stitches fields.
 
+**Curated fallbacks (parity):** `reflect-fallback-templates.ts` + v2 rows in `fallback-seed.json` (land / hypothesis / inquiry / `message`). Client failure → mood/direction templates; edge pool → `mapReflectionFallbackToV2` (no double-question when seed line already asks one).
+
 ### 8.2 Optional `reflect-pregen` (phase 2)
 
 **Trigger:** Client after successful `initial_emotion_logged` on deep ritual (fire-and-forget).

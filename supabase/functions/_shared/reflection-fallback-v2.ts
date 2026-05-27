@@ -1,4 +1,10 @@
 import { buildReflectionContextStripC0 } from "./reflection-context-strip-c0.ts";
+import {
+  composeReflectFallbackOneVoice,
+  reflectCopyAlreadyAsksQuestion,
+  reflectHypothesisFallbackTemplate,
+  reflectInquiryFallbackTemplate,
+} from "./reflect-fallback-templates.ts";
 
 export type ReflectionV2Payload = {
   schemaVersion: 2;
@@ -10,52 +16,65 @@ export type ReflectionV2Payload = {
   haiku?: string | null;
 };
 
-const INQUIRY_BY_MOOD: Record<string, string> = {
-  fearful: "What are you afraid will happen if this continues?",
-  anxious: "What feels most at risk for you right now?",
-  fomo: "What are you afraid of missing if you act — or if you do not?",
-  excited: "What would you regret doing if this keeps running?",
-  greedy: "What story makes this moment feel like proof you were right?",
-  calm: "What would staying steady cost you emotionally right now?",
-  uncertain: "What part of this move feels hardest to sit with?",
-  detached: "What would change if you treated this as weather, not verdict?",
+/** @deprecated Use reflectInquiryFallbackTemplate from reflect-fallback-templates.ts */
+export function inquiryFallbackForMood(mood: string | undefined, context: string): string {
+  return reflectInquiryFallbackTemplate(mood ?? "", context);
+}
+
+export type ReflectionFallbackSeed = {
+  message?: string;
+  land?: string;
+  hypothesis?: string;
+  inquiry?: string;
+  /** Pre-composed display copy when seed authors provide it */
+  integratedMessage?: string;
+  haiku?: string | null;
 };
 
-export function inquiryFallbackForMood(mood: string | undefined, context: string): string {
-  const key = (mood ?? "").toLowerCase();
-  if (INQUIRY_BY_MOOD[key]) return INQUIRY_BY_MOOD[key];
-  const lower = context.toLowerCase();
-  if (lower.includes("is down")) {
-    return "What feels most true about why this drop is hitting you right now?";
-  }
-  if (lower.includes("is up")) {
-    return "What story are you telling yourself about why this rise matters?";
-  }
-  return "What is this moment asking you to notice about yourself?";
-}
-
-function composeReflectFallbackOneVoice(land: string, inquiry: string): string {
-  const l = land.trim();
-  let q = inquiry.trim();
-  if (!q) return l;
-  if (!q.endsWith("?")) q = `${q}?`;
-  if (!l) return q;
-  const landEnd = /[.!?]$/.test(l) ? l : `${l}.`;
-  return `${landEnd} ${q}`;
-}
-
 export function mapReflectionFallbackToV2(
-  fallback: { message: string; haiku?: string | null },
+  fallback: ReflectionFallbackSeed,
   opts: { context: string; severity: number; mood?: string },
 ): ReflectionV2Payload {
-  const land = fallback.message.trim();
-  const inquiry = inquiryFallbackForMood(opts.mood, opts.context);
+  const mood = opts.mood ?? "";
   const contextStrip = buildReflectionContextStripC0(opts.context, opts.severity);
-  const message = composeReflectFallbackOneVoice(land, inquiry);
+
+  const hasStructuredSeed = Boolean(
+    fallback.land?.trim() || fallback.integratedMessage?.trim() ||
+      (fallback.inquiry?.trim() && fallback.hypothesis?.trim()),
+  );
+
+  if (hasStructuredSeed) {
+    const land = (fallback.land ?? fallback.message ?? "").trim();
+    const hypothesis = (fallback.hypothesis ?? reflectHypothesisFallbackTemplate(mood, opts.context)).trim();
+    let inquiry = (fallback.inquiry ?? "").trim();
+    if (!inquiry && !reflectCopyAlreadyAsksQuestion(`${land} ${hypothesis}`)) {
+      inquiry = reflectInquiryFallbackTemplate(mood, opts.context);
+    }
+    const message = (fallback.integratedMessage ?? "").trim() ||
+      composeReflectFallbackOneVoice(land, hypothesis, inquiry);
+    return {
+      schemaVersion: 2,
+      land,
+      hypothesis,
+      inquiry,
+      contextStrip,
+      message,
+      haiku: fallback.haiku ?? null,
+    };
+  }
+
+  const land = (fallback.message ?? "").trim();
+  const hypothesis = reflectHypothesisFallbackTemplate(mood, opts.context);
+  let inquiry = reflectInquiryFallbackTemplate(mood, opts.context);
+  if (reflectCopyAlreadyAsksQuestion(land)) {
+    inquiry = "";
+  }
+  const message = composeReflectFallbackOneVoice(land, hypothesis, inquiry);
+
   return {
     schemaVersion: 2,
     land,
-    hypothesis: "",
+    hypothesis,
     inquiry,
     contextStrip,
     message,
