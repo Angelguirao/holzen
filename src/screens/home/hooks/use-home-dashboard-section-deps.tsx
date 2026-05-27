@@ -28,6 +28,7 @@ export function useHomeDashboardSectionDeps(args: {
   toggleMarketChartExpanded: () => void;
   pauseCardBody: ReactNode;
   pauseSectionHeaderRight: ReactNode | undefined;
+  pauseWidgetProjection: import('@/features/pause/presentation/home/use-home-pause-widget-projection').HomePauseWidgetProjection;
   subscribed: boolean;
   collapsed: Record<string, boolean>;
   toggleCollapsed: (id: string) => void;
@@ -55,6 +56,7 @@ export function useHomeDashboardSectionDeps(args: {
     toggleMarketChartExpanded,
     pauseCardBody,
     pauseSectionHeaderRight,
+    pauseWidgetProjection,
     subscribed,
     collapsed,
     toggleCollapsed,
@@ -84,6 +86,7 @@ export function useHomeDashboardSectionDeps(args: {
       toggleMarketChartExpanded,
       pauseCardBody,
       pauseSectionHeaderRight,
+      pauseWidgetProjection,
       subscribed,
       collapsed,
       toggleCollapsed,
@@ -109,6 +112,7 @@ export function useHomeDashboardSectionDeps(args: {
       toggleMarketChartExpanded,
       pauseCardBody,
       pauseSectionHeaderRight,
+      pauseWidgetProjection,
       subscribed,
       collapsed,
       toggleCollapsed,

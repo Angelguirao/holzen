@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
+import { fetchProfileLastTriggerAt } from '@/features/user/public-queries';
 import {
   useCompletedPauseCount,
   useDismissOutletPauseReady,
   useHomePauseActions,
   usePauseArrivalAudio,
-  usePauseContextHomePreviews,
 } from '@/features/pause/public-home';
 import { useMarketDisplayPreferences } from '@/features/market/public-hooks';
 import { getHomeSubscriptionGate } from '@/features/subscription/public';
@@ -59,6 +60,9 @@ export function useHomeScreen() {
     severity,
     lastPauseInstanceId,
     openPauseState,
+    contextSnapshot,
+    hasReflectionStep,
+    openPauseCreatedAt,
     loading,
     error,
     newPauseArrival,
@@ -106,7 +110,14 @@ export function useHomeScreen() {
   } = useMarketDisplayPreferences();
   const unitBasisModeSupported = trackedAssetId === 'bitcoin';
   const completedPauseCount = useCompletedPauseCount() ?? 0;
-  const pauseContextHomePreview = usePauseContextHomePreviews(context);
+
+  const profileLastTriggerQuery = useQuery({
+    queryKey: ['profile-last-trigger-at', user?.id],
+    queryFn: () => fetchProfileLastTriggerAt(user!.id),
+    enabled: Boolean(user?.id),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
 
   const [goalWhyHoldSummary, setGoalWhyHoldSummary] = useState<string | null>(null);
 
@@ -166,7 +177,7 @@ export function useHomeScreen() {
     trialLoading,
     hasOpenPause,
     openPauseState,
-    pauseContextHomePreview,
+    pauseContextHomePreview: { btc24h: null, marketSentiment: null },
     loading,
     error,
     btcData,
@@ -183,6 +194,15 @@ export function useHomeScreen() {
     onStartCheckoutPro: pauseActions.startProCheckout,
     onStartTrial: () => void ensureTrial(),
     onReactivate: () => void startReactivationCheckout(),
+    hasReflectionStep,
+    reflectionMessage: message,
+    contextSnapshot,
+    openPauseCreatedAt,
+    contextText: context,
+    completedPauseCount,
+    trackedAssetId,
+    newPauseArrival,
+    profileLastTriggerAt: profileLastTriggerQuery.data ?? null,
   });
 
   const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = useHomePullFullReload();
@@ -208,6 +228,7 @@ export function useHomeScreen() {
       toggleMarketChartExpanded,
       pauseCardBody: pauseProjection.pauseCardBody,
       pauseSectionHeaderRight: pauseProjection.pauseSectionHeaderRight,
+      pauseWidgetProjection: pauseProjection.pauseWidgetProjection,
       subscribed,
       collapsed,
       toggleCollapsed,

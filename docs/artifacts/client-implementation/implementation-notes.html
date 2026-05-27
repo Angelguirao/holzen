@@ -245,6 +245,34 @@
   <h3 class="initiative" id="initiative-general">General / cross-cutting</h3>
   <p class="empty-initiative">Feature epics, auth UX, settings flows, and other work that does not fit a named initiative — use initiative tag <code>general</code> and link the owner doc from the AGENTS change map.</p>
 
+  <h3 class="initiative" id="initiative-home-pause-widget">Home pause widget (Figma 4.1)</h3>
+
+  <article class="note" id="note-home-pause-widget-figma-2026-05">
+    <header>
+      <span class="initiative-tag">home-pause-widget</span>
+      <span>2026-05-27</span>
+      <span>Figma 469:14301 · pause-system §3</span>
+      <span class="status resolved">resolved</span>
+    </header>
+    <h3>Home widget A–E projection + opening preview</h3>
+    <dl>
+      <dt>Design decision</dt>
+      <dd>
+        Figma states are a client read-model (<code>resolveHomePauseWidgetMode</code>), not new Postgres states.
+        <strong>C / C′</strong> require <code>hasReachedReflectForHome</code> (reflection_step or non-stub reflection_text);
+        <strong>engaged</strong> pre-Reflect maps to <strong>B′</strong> (Continue, template preview).
+        Pre-Reflect empathy line uses deterministic i18n from <code>context_snapshot</code> — no holzen-reflect at cron/Home open.
+      </dd>
+      <dt>Calm-waters</dt>
+      <dd>
+        When cron expires <code>active|pending</code> with <code>context_lost</code>, show reassurance copy (not state B);
+        optional Sonner toast; query <code>fetchRecentContextLostPause</code> within 24h.
+      </dd>
+      <dt>Deviation</dt>
+      <dd>None from pause-system lifecycle; RPC and reflect write timing unchanged.</dd>
+    </dl>
+  </article>
+
   <!--
   ── Template: copy above the closing comment; newest first within initiative ──
   Update Contents → Running notes if adding a new anchor id.

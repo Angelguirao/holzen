@@ -5,6 +5,8 @@ import { cn } from '@/lib/utils';
 
 export interface HomeSectionCardProps {
   title: string;
+  /** Optional icon before title (e.g. moon on Your pause). */
+  titleLeading?: ReactNode;
   /** Optional summary on the header row (e.g. hold goal compact line); truncates on small widths. */
   headerSubtitle?: ReactNode;
   headerRight?: ReactNode;
@@ -22,6 +24,7 @@ export interface HomeSectionCardProps {
  */
 export function HomeSectionCard({
   title,
+  titleLeading,
   headerSubtitle,
   headerRight,
   children,
@@ -39,6 +42,7 @@ export function HomeSectionCard({
     <div className={cn('rounded-xl border border-border/40 bg-card/40', className)}>
       <div className="flex items-center gap-2 px-4 py-3">
         <div className="flex min-w-0 flex-1 items-center gap-2">
+          {titleLeading ? <span className="shrink-0">{titleLeading}</span> : null}
           <span className="shrink-0 text-xs font-normal uppercase tracking-wide text-secondary-foreground">{title}</span>
           {headerSubtitle ? (
             <span className="min-w-0 truncate text-xs font-medium tabular-nums text-muted-foreground">
