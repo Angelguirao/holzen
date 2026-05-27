@@ -14,13 +14,13 @@ import { pauseWindowShowsClockCountdown } from './pause-state';
 
 const NOW = new Date('2026-04-23T20:00:00.000Z');
 
-/** Mirrors production `volatility_v1` after migration `20260506200000_pause_volatility_v1_contract_and_transitions.sql`. */
+/** Mirrors production `volatility_v1` after `20260527120000_pause_engaged_requires_reflection_step.sql`. */
 const volatilityTemplate: PauseTemplateRow = {
   slug: 'volatility_v1',
   window_ms: 6 * 60 * 60 * 1000,
   action_window_ms: null,
   dismissal_suppression_ms: 6 * 60 * 60 * 1000,
-  required_for_engaged: ['initial_emotion_logged', 'breath_completed'],
+  required_for_engaged: ['reflection_step'],
   required_for_completed: ['outcome_logged'],
   allowed_companion_types: ['signal', 'ground_nudge', 'historical_insight', 'zoom_out', 'haiku'],
   required_companion_count: 0,
@@ -185,7 +185,23 @@ describe('computePauseState', () => {
     ).toBe('active');
   });
 
-  it('engages when breath + initial emotion are present (deep volatility_v1)', () => {
+  it('engages deep volatility_v1 when reflection_step is logged', () => {
+    expect(
+      computePauseState({
+        instance: makeInstance(),
+        template: volatilityTemplate,
+        stepEvents: [
+          makeStep({ step_type: 'initial_emotion_logged', payload: { mood: 'calm' } }),
+          makeStep({ step_type: 'breath_completed', payload: { breath_segment: 1 } }),
+          makeStep({ step_type: 'reflection_step', payload: {} }),
+        ],
+        companionEvents: [],
+        now: NOW,
+      }),
+    ).toBe('engaged');
+  });
+
+  it('stays active after Feel + Breathe until reflection_step (deep)', () => {
     expect(
       computePauseState({
         instance: makeInstance(),
@@ -197,10 +213,10 @@ describe('computePauseState', () => {
         companionEvents: [],
         now: NOW,
       }),
-    ).toBe('engaged');
+    ).toBe('active');
   });
 
-  it('brief volatility_v1 engages after initial_emotion only when brief_ritual is set', () => {
+  it('brief volatility_v1 never engages (stays active after Feel)', () => {
     expect(
       computePauseState({
         instance: makeInstance(),
@@ -210,29 +226,14 @@ describe('computePauseState', () => {
             step_type: 'initial_emotion_logged',
             payload: { mood: 'calm', intensity: 2, brief_ritual: true },
           }),
-        ],
-        companionEvents: [],
-        now: NOW,
-      }),
-    ).toBe('engaged');
-  });
-
-  it('brief upgraded to deep uses deep engaged gate (needs breath_completed)', () => {
-    expect(
-      computePauseState({
-        instance: makeInstance(),
-        template: volatilityTemplate,
-        stepEvents: [
-          makeStep({
-            step_type: 'initial_emotion_logged',
-            payload: { mood: 'calm', intensity: 2, brief_ritual: true },
-          }),
-          makeStep({ step_type: 'ritual_depth_upgraded', payload: { from: 'brief', to: 'deep' } }),
         ],
         companionEvents: [],
         now: NOW,
       }),
     ).toBe('active');
+  });
+
+  it('brief upgraded to deep stays active until reflection_step', () => {
     expect(
       computePauseState({
         instance: makeInstance(),
@@ -251,7 +252,7 @@ describe('computePauseState', () => {
         companionEvents: [],
         now: NOW,
       }),
-    ).toBe('engaged');
+    ).toBe('active');
   });
 
   it('deep volatility_v1 stays active with only initial_emotion (no breath yet)', () => {

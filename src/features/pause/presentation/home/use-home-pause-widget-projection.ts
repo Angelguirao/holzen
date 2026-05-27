@@ -69,7 +69,6 @@ export type UseHomePauseWidgetProjectionParams = {
   openPauseState: 'active' | 'engaged' | null;
   hasReflectionStep: boolean;
   reflectionMessage: string | null;
-  isBriefRitual: boolean;
   contextSnapshot: Record<string, unknown> | null;
   openPauseCreatedAt: string | null;
   contextText: string | null;
@@ -175,7 +174,6 @@ export function useHomePauseWidgetProjection(
         hasReflectionStep: params.hasReflectionStep,
         reflectionMessage: params.reflectionMessage,
         trackedAssetSymbol: assetSymbol,
-        isBriefRitual: params.isBriefRitual,
         hasPendingOffer: Boolean(pending),
         postPauseAutoCooldownRemainingMs,
         completedPauseCount: params.completedPauseCount ?? 0,
@@ -189,7 +187,6 @@ export function useHomePauseWidgetProjection(
       params.openPauseState,
       params.hasReflectionStep,
       params.reflectionMessage,
-      params.isBriefRitual,
       assetSymbol,
       pending,
       postPauseAutoCooldownRemainingMs,

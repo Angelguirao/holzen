@@ -1,4 +1,3 @@
-import { canShowHomePauseContinueCta } from '@/features/pause/domain/home/can-show-home-pause-continue-cta';
 import { hasReachedReflectForHome } from '@/features/pause/domain/home/has-reached-reflect-for-home';
 
 /** Figma-aligned Home “Your pause” widget modes (UI projection only). */
@@ -26,8 +25,6 @@ export type ResolveHomePauseWidgetModeInput = {
   hasReflectionStep: boolean;
   reflectionMessage: string | null;
   trackedAssetSymbol: string;
-  /** From `v_pause_full.is_brief_ritual` — gates Continue to deep + Reflect only. */
-  isBriefRitual: boolean;
   hasPendingOffer: boolean;
   /** Ms remaining on profile auto cooldown when no open pause (post-pause rest). */
   postPauseAutoCooldownRemainingMs: number;
@@ -68,22 +65,16 @@ export function resolveHomePauseWidgetMode(
 
   if (input.hasOpenPause) {
     const inPostPauseCooldown = input.postPauseAutoCooldownRemainingMs > 0;
-    const hasArchive = input.completedPauseCount > 0;
 
     if (inPostPauseCooldown && input.openPauseState === 'active' && !hasReachedReflect) {
       return { mode: 'E', defaultCollapsed: false, hasReachedReflect };
     }
 
-    const showContinueCta = canShowHomePauseContinueCta({
-      hasReachedReflect,
-      isBriefRitual: input.isBriefRitual,
-    });
-
-    if (showContinueCta && input.hasPendingOffer) {
-      return { mode: 'C_prime', defaultCollapsed: false, hasReachedReflect };
-    }
-
-    if (showContinueCta) {
+    // Postgres `engaged` = deep ritual reached Reflect (`reflection_step`). Maps to Figma C.
+    if (input.openPauseState === 'engaged') {
+      if (input.hasPendingOffer) {
+        return { mode: 'C_prime', defaultCollapsed: false, hasReachedReflect };
+      }
       return { mode: 'C', defaultCollapsed: false, hasReachedReflect };
     }
 
