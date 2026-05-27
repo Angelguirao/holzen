@@ -12,7 +12,11 @@ export function formatReflectIntegratedProse(content: ReflectionContentV2): stri
   const integrated = content.message.trim();
 
   if (integrated.length >= 20) {
-    return contextStrip ? `${integrated}\n\n${contextStrip}` : integrated;
+    const curatedOneVoice = !integrated.includes('\n\n') && !content.hypothesis.trim();
+    if (!contextStrip || curatedOneVoice) {
+      return integrated;
+    }
+    return `${integrated}\n\n${contextStrip}`;
   }
 
   const land = content.land.trim();
