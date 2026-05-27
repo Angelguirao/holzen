@@ -139,7 +139,7 @@ const LANG_NAMES: Record<string, string> = {
 const REFLECTION_JSON_OUTPUT_INSTRUCTION =
   `You MUST respond with a JSON object only (no markdown). The object must contain exactly these keys:
 - "land": 1-2 sentences — emotional validation and lower urgency (no inquiry yet)
-- "hypothesis": 1 sentence — gentle guess about what might be underneath their feeling (use their mood/tile when provided)
+- "hypothesis": 1 sentence — gentle guess about what might be underneath their feeling (weave mood/tile naturally; do NOT say "you said" or repeat the Feel step)
 - "inquiry": Exactly one open question — what set them off / what story they are telling (no "?!" stacking)
 - "haiku": A haiku (3 lines separated by newlines, 5-7-5 syllables), or null if not appropriate`;
 
