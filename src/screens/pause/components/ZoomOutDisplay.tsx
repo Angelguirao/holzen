@@ -42,7 +42,7 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
     navigate(companionHistoryPath(echoId), {
       state: { returnTo: location.pathname + location.search },
     });
-  }, [data?.echo?.id, subscribed, t, startCheckout, navigate, location.pathname, location.search]);
+  }, [data?.echo?.id, subscribed, t, startCheckout, navigate, location]);
 
   if (loading) {
     return (

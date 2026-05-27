@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { CalendarClock, RefreshCw, Settings as SettingsIcon, AlertTriangle, Receipt, FileCheck, Mail, BellRing, BellOff } from 'lucide-react';
 import {
   Dialog,
@@ -399,8 +399,11 @@ export function CheckoutConfirmation() {
   // QUIET_STATE_CHECKLIST audit effect below. Never read in production.
   const dialogContentRef = useRef<HTMLDivElement | null>(null);
 
+  const [searchParams] = useSearchParams();
+
   useEffect(() => {
-    const detected = detectMode(location.search);
+    const search = searchParams.toString();
+    const detected = detectMode(search ? `?${search}` : '');
     if (!detected) return;
     // If we already showed a confirmation for this mode within the window,
     // strip params silently and bail — handles refresh + back-navigation
@@ -422,7 +425,7 @@ export function CheckoutConfirmation() {
       activeGuardTsRef.current = null;
     }
     if (alreadyConfirmed) {
-      const params = new URLSearchParams(location.search);
+      const params = new URLSearchParams(search);
       params.delete('subscribed');
       params.delete('credits');
       params.delete('pack');
@@ -466,7 +469,7 @@ export function CheckoutConfirmation() {
       //   - past-tense, descriptive copy ("already shown", not "great job")
       //   - dedup keyed on the suppressed search string so back-and-forth
       //     navigation doesn't stack toasts.
-      const dedupeKey = `${detected}:${location.search}`;
+      const dedupeKey = `${detected}:${search ? `?${search}` : ''}`;
       if (suppressionAnnouncedRef.current !== dedupeKey) {
         suppressionAnnouncedRef.current = dedupeKey;
         toast.message('Checkout already confirmed — no new sync triggered.', {
@@ -484,7 +487,7 @@ export function CheckoutConfirmation() {
     // `Date.now()`, so re-read to capture the exact value.
     activeGuardTsRef.current = readConfirmedGuard()?.ts ?? Date.now();
     // Strip checkout query params; keep path + hash.
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(search);
     params.delete('subscribed');
     params.delete('credits');
     params.delete('pack');
@@ -503,7 +506,7 @@ export function CheckoutConfirmation() {
       void sub.refresh();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- checkout query + localStorage guard; listing sub/navigate would re-run and duplicate side effects
-  }, [location.search]);
+  }, [searchParams]);
 
   const open = mode !== null;
 
@@ -586,6 +589,7 @@ export function CheckoutConfirmation() {
     if (!mode || mode === 'subscription') return;
     let cancelled = false;
     let attempt = 0;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     const maxAttempts = 6; // ~ up to 30s with the backoff below
 
     const tick = async () => {
@@ -621,12 +625,13 @@ export function CheckoutConfirmation() {
       if (attempt < maxAttempts) {
         // Backoff: 1.5s, 3s, 5s, 8s, 12s, 18s
         const delays = [1500, 3000, 5000, 8000, 12000, 18000];
-        setTimeout(tick, delays[Math.min(attempt - 1, delays.length - 1)]);
+        timeoutId = setTimeout(tick, delays[Math.min(attempt - 1, delays.length - 1)]);
       }
     };
     void tick();
     return () => {
       cancelled = true;
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
     };
   }, [mode]);
 

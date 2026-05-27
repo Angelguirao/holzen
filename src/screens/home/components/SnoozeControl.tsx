@@ -85,6 +85,7 @@ export function SnoozeControl() {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
+          type="button"
           className="flex items-center gap-1.5 py-1 leading-snug font-sans font-medium text-nox-text-link hover:text-nox-text-link/80 text-base"
         >
           <Moon className="h-3.5 w-3.5" />
@@ -98,6 +99,7 @@ export function SnoozeControl() {
         {SNOOZE_OPTIONS.map(({ hours, labelKey }) => (
           <button
             key={hours}
+            type="button"
             onClick={() => handleSnooze(hours)}
             className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-muted/50"
           >
@@ -108,6 +110,7 @@ export function SnoozeControl() {
           </button>
         ))}
         <button
+          type="button"
           onClick={handleSnoozeUntilTomorrow}
           className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-muted/50"
         >

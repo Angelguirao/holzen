@@ -86,7 +86,7 @@ export default function SettingsHubScreen() {
     if (isSettingsSectionId(id)) {
       navigate(settingsSectionPath(id), { replace: true });
     }
-  }, [location.hash, navigate]);
+  }, [location, navigate]);
 
   return (
     <div className="space-y-6 pb-8">
