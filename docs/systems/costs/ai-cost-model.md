@@ -5,7 +5,7 @@ enforced, and how to respond when spend goes sideways. Supersedes the old
 pause-only estimates doc (which is now a focused case study — see link in §7).
 
 > **Scope.** Third-party AI API spend only: Perplexity (Sonar Pro, Sonar) and
-> **Google Gemini** (direct via `GOOGLE_AI_API_KEY`, optional OpenRouter failover).
+> **Google Gemini models via OpenRouter** (`OPENROUTER_API_KEY`; default in `llm-gateway.ts`). See [llm-openrouter.md](../../ops/llm-openrouter.md).
 > **Not** included: Vercel/hosting, Supabase plan fees, Stripe, Resend email,
 > VAPID, CoinGecko usage. Those bill on separate dashboards and don't scale with AI usage.
 
@@ -40,7 +40,7 @@ negotiated rate differs.
 
 ### 1.2 Google Gemini (direct + OpenRouter failover)
 
-Primary path: **`GOOGLE_AI_API_KEY`** → [Google Gemini OpenAI-compat API](https://ai.google.dev/gemini-api/docs/pricing). Optional failover: **`OPENROUTER_API_KEY`** → [OpenRouter](https://openrouter.ai/docs) (same model ids, used only on retryable errors).
+Primary path: **`OPENROUTER_API_KEY`** → [OpenRouter](https://openrouter.ai/docs/pricing) with model ids such as `google/gemini-2.5-flash`. Optional direct Google only when **`LLM_PROVIDER_ORDER`** includes `google`.
 
 Legacy Tier B edges under `supabase/functions/legacy/` use **`llm-gateway.ts`** (Google → OpenRouter) and **`transactional-email.ts`** (Resend). They no longer require `LOVABLE_API_KEY`.
 

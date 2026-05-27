@@ -51,7 +51,7 @@ Supabase Edge secrets are not exported automatically.
    - `LOG_DRAIN_URL`, `LOG_DRAIN_TOKEN`
    - `SLACK_WEBHOOK_URL`
    - `RESEND_API_KEY`, `SEND_EMAIL_HOOK_SECRET`
-   - `GOOGLE_AI_API_KEY`, `OPENROUTER_API_KEY` (optional failover)
+   - `OPENROUTER_API_KEY` (required for LLM); remove legacy `GOOGLE_AI_API_KEY` if unused
    - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
    - `PERPLEXITY_API_KEY`, `CRON_SECRET`
    - Vault: `holzen_cron_service_role` for pg_cron HTTP auth

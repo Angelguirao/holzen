@@ -77,7 +77,7 @@ See [staging-supabase-setup.md](staging-supabase-setup.md).
 
 **Secrets (staging minimum):**
 
-- `GOOGLE_AI_API_KEY` (Gemini)
+- `OPENROUTER_API_KEY` (see [llm-openrouter.md](llm-openrouter.md))
 - `PERPLEXITY_API_KEY`
 - `RESEND_API_KEY`
 - `STRIPE_*` (**test mode**)
@@ -149,7 +149,7 @@ Dashboard checklist (both projects):
 
 ```text
 Supabase → Edge Functions → Secrets → delete LOVABLE_API_KEY
-Verify: RESEND_API_KEY, SEND_EMAIL_HOOK_SECRET, RESEND_WEBHOOK_SECRET, GOOGLE_AI_API_KEY present
+Verify: RESEND_API_KEY, SEND_EMAIL_HOOK_SECRET, RESEND_WEBHOOK_SECRET, OPENROUTER_API_KEY present; remove unused `GOOGLE_AI_API_KEY` / `GEMINI_API_KEY` from Edge secrets
 ```
 
 ## Branch model (recommended)

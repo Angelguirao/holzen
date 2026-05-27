@@ -181,7 +181,7 @@ Leaving is not one switch—it is **four separable decisions**:
 
 ### 2. Edge functions and secrets
 
-**Current:** Secrets in **Supabase Dashboard → Edge Functions → Secrets** (per project). Deploy via CI / **`supabase functions deploy`**. Re-verify: `CRON_SECRET` vs `pg_cron` vault, Stripe webhook signing secret, `GOOGLE_AI_API_KEY`, `RESEND_API_KEY`, `LOG_DRAIN_*`, `SENTRY_*` ([deployment-sync-guide.md](deployment-sync-guide.md)).
+**Current:** Secrets in **Supabase Dashboard → Edge Functions → Secrets** (per project). Deploy via CI / **`supabase functions deploy`**. Re-verify: `CRON_SECRET` vs `pg_cron` vault, Stripe webhook signing secret, `OPENROUTER_API_KEY`, `RESEND_API_KEY`, `LOG_DRAIN_*`, `SENTRY_*` ([deployment-sync-guide.md](deployment-sync-guide.md)); remove unused `GOOGLE_AI_API_KEY` ([llm-openrouter.md](llm-openrouter.md)).
 
 ### 3. Frontend hosting
 
