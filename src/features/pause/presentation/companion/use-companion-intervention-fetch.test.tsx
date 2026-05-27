@@ -35,6 +35,10 @@ const {
   };
 });
 
+vi.mock('@/features/pause/domain/pause-featured-intervention', () => ({
+  PAUSE_FEATURED_INTERVENTION_ENABLED: true,
+}));
+
 vi.mock('./pause-companion-orchestrate-io', () => ({
   runCompanionInterventionBootstrap: runCompanionInterventionBootstrapMock,
   companionOrchestrator: mockCompanionOrchestrator,

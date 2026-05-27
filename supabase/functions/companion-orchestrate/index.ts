@@ -42,7 +42,7 @@ const corsHeaders = {
  * Single entry point for intervention selection and companion generation.
  *
  * Client invocation modes:
- * - Intervention-only: all enable* false, useIntervention true (mount)
+ * - Intervention-only (optional): all enable* false, useIntervention true — not used by pause-first SPA
  * - Single-slot lazy: one enable* true (card tap, holzenInvokeSource: browser_lazy_fetch)
  * - Regenerate: regenerateOnly param (explicit user action)
  *
@@ -166,7 +166,7 @@ serve(
       enableGrounding = false,
       enableHistory = false,
       enableZoomOut = false,
-      useIntervention = true,
+      useIntervention = false,
     } = body as Record<string, unknown>;
 
     const moodHistory = body.moodHistory as
