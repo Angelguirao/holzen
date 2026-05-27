@@ -245,7 +245,7 @@ SELECT cron.schedule(
 
 ## Follow-up Check (`check-followups`) — **removed (Pause V2)**
 
-> **Pause V2:** the `follow_ups` table, the `check-followups` edge function, and the `check-followups-hourly` pg_cron job were removed in [`20260423202000_pause_v2_destructive_cutover.sql`](../../supabase/migrations/20260423202000_pause_v2_destructive_cutover.sql). Mirror outcomes now come from **`pause_step_events`** / **`v_pause_full`** (see `buildMirror` in `_shared/generators/mirror.ts`). **Do not** re-schedule the SQL below.
+> **Pause V2:** the `follow_ups` table, the `check-followups` edge function, and the `check-followups-hourly` pg_cron job were removed in [`20260423202000_pause_v2_destructive_cutover.sql`](../../supabase/migrations/20260423202000_pause_v2_destructive_cutover.sql). Mirror outcomes now come from **`pause_step_events`** / **`v_pause_full`** (see `buildMirror` in `supabase/functions/legacy/featured-intervention/mirror.ts`). **Do not** re-schedule the SQL below.
 
 <details>
 <summary>Historical snippet (pre–V2 only)</summary>

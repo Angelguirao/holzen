@@ -2,11 +2,13 @@
 
 ## Context
 
-Automatic pauses from `check-volatility` create `pause_instances` on claim **without** pre-filling companion **`pause_ai_artifacts`**; expanded content arrives from **`companion-orchestrate`** once **`PauseSession`** runs (intervention-only orchestrate once **`pauseInstanceId`** is bound, slots on tap). Manual pauses may arrive with more merged `location.state` from the browser.
+Automatic pauses from `check-volatility` create `pause_instances` on claim **without** pre-filling companion **`pause_ai_artifacts`**; expanded content arrives from **`companion-orchestrate`** on **lazy slot** tap once **`PauseSession`** runs (shipped). Manual pauses may arrive with more merged `location.state` from the browser. Mount-time intervention orchestrate was removed from the shipped client (May 2026).
 
 ## What we shipped
 
-**Client loader priming** in `use-companion-data`: a `useLayoutEffect` keyed on `pauseInstanceId` sets `interventionLoading` and per-pref companion loaders (`signal`, `grounding` / nudge, `history`, `zoomOut`) to **true** before the browser paints when a pause is active. That removes the first-frame gap where hooks initialized `loading` to `false`, so `InterventionSection` and `CompanionSection` did not render skeletons and grounding could look **silently empty** on notification opens.
+> **Superseded (May 2026):** Featured intervention UI and mount-time orchestrate are quarantined (`src/legacy/pause-featured-intervention/`). Shipped Frame uses companion hub + lazy slots only.
+
+**Client loader priming** in `use-companion-data` (historical): a `useLayoutEffect` keyed on `pauseInstanceId` sets `interventionLoading` and per-pref companion loaders (`signal`, `grounding` / nudge, `history`, `zoomOut`) to **true** before the browser paints when a pause is active. That removes the first-frame gap where hooks initialized `loading` to `false`, so `InterventionSection` and `CompanionSection` did not render skeletons and grounding could look **silently empty** on notification opens.
 
 Existing UI already had skeletons for intervention (`InterventionSection`) and grounding (`LearningInput` when `nudgeLoading`); this change ensures those paths are active on the first painted frame for cron-driven opens.
 

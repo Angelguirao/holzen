@@ -41,9 +41,9 @@ Links use explicit HTML anchors before each numbered section so jumps behave con
 1. **Trigger** — User opens Pause (client) *or* the `check-volatility` cron decides a user crossed thresholds.
 2. **Reflection** — Short copy (+ optional haiku) anchored to market **context** (e.g. “BTC is down 5.2%…”).
 3. **Persist** — Create or reuse a `pause_instances` row via `pause_create_or_reuse` (manual) or `pause_create_or_reuse_as` (automatic). **`reflection_text`** (+ optional **`haiku`**) upserts happen at **Reflect** in the ritual: the browser invokes edge **`holzen-reflect`** for **both** manual- and cron-created instances (cron does **not** run the reflection LLM on claim). **`check-volatility`** updates **`profiles.last_context`** for delivery (banner / notification subtitle uses **`metadata.context`** from the instance snapshot; reflection body comes from **`pause_ai_artifacts`** after Reflect). **`useHolzenHomeContextState`** (via **`HolzenProvider`**) does **not** write profile fields (the pause row is the manual source of truth). **`profiles.last_trigger_at`** advances on the **automatic** claim path; **silent** manual mode still writes a stub **`reflection_text`** at trigger time (§2.3.B).
-4. **Intervention** — `companion-orchestrate` (intervention-only call, no companion slots) chooses an **intervention** (mirror / trap / pattern / question) and persists it. See **§7** for a per-type reference.
+4. **Featured intervention (quarantined)** — Optional headline via `companion-orchestrate` with `useIntervention: true` (mirror / trap / pattern / question). **Not shipped** in pause-first UI — code in `src/legacy/pause-featured-intervention/`; edge selector in `supabase/functions/legacy/featured-intervention/`. See **§7** (reference; UI was `InterventionSection`, removed).
 5. **Companion cards (lazy)** — When the user **taps/expands** a companion card, a **single-slot** `companion-orchestrate` call generates that companion on demand. Each generator tries **library → cache → live → curated** (phase ordering controlled by `COMPANION_PHASE_`* env vars in `_shared/phase-config.ts`).
-6. **Surface** — Client shows `InterventionSection` plus optional companion cards from user preferences.
+6. **Surface** — **`PauseFrame`** hub + companion deep-links (`CompanionSection`); no featured intervention headline in the shipped bundle.
 
 ### Diagram — end-to-end pipeline
 
@@ -55,7 +55,7 @@ flowchart TB
   R[Reflect step\nholzen-reflect]
   ART[(pause_ai_artifacts)]
   CO[companion-orchestrate]
-  UI[Pause UI\nInterventionSection + companions]
+  UI[Pause UI\nPauseFrame + companion cards]
   M --> DB
   C --> DB
   DB --> R
@@ -68,7 +68,7 @@ flowchart TB
 
 
 
-Reflection text and haiku land in `pause_ai_artifacts` from **`holzen-reflect`** after the invoke completes (entered at **Reflect**; **`PauseSession`** keeps **`use-pause-reflect-generation`** enabled through **Frame**, second **Breathe**, and **Decide** so HTTP can finish past the Reflect card — see [pause-system.md](../pause-system.md) §7.1, **Reflection + haiku (deep)**). The **intervention** is fetched first via **`companion-orchestrate`** (intervention-only) once **`pauseInstanceId`** is live in **`PauseSession`**, typically **before** that Reflect beat; individual **companion slots** are generated lazily when the user taps a card (or hydrated from existing `pause_ai_artifacts`). **Who calls the orchestrator:** the **`PauseSessionScreen`** client (**`useCompanionData`**) for **both** manual- and cron-created pauses. **`check-volatility`** does **not** invoke **`companion-orchestrate`** on automatic pause claim in Pause V2.
+Reflection text and haiku land in `pause_ai_artifacts` from **`holzen-reflect`** after the invoke completes (entered at **Reflect**; **`PauseSession`** keeps **`use-pause-reflect-generation`** enabled through **Frame**, second **Breathe**, and **Decide** so HTTP can finish past the Reflect card — see [pause-system.md](../pause-system.md) §7.1, **Reflection + haiku (deep)**). **Featured intervention** mount-time orchestrate is **off** in the shipped client (`PAUSE_FEATURED_INTERVENTION_ENABLED = false`); individual **companion slots** are generated lazily when the user taps a card (or hydrated from existing `pause_ai_artifacts`). **Who calls the orchestrator:** **`useCompanionOrchestration`** / **`useCompanionData`** on **`PauseSessionScreen`** for lazy slot fetch and regenerate — **both** manual- and cron-created pauses. **`check-volatility`** does **not** invoke **`companion-orchestrate`** on automatic pause claim in Pause V2.
 
 ---
 
@@ -156,7 +156,7 @@ Tone, reflection style, custom prompt, motivations, mantra, grounding activities
 Canonical source in Pause V2 is **`pause_step_events`**: pair **`initial_emotion_logged`** with **`outcome_logged`** per `pause_instance_id`, then sort newest-first (`**pause-cron-parity.ts**` → `**pauseRecencyInputs**` on the server; **`loadMoodHistoryForOrchestrate`** in the browser for **`companion-orchestrate`**). The **`generateUnifiedReflection`** prompt uses `moodHistory` when the **caller passes it**.
 
 - **Manual (reflect step):** **`use-pause-reflect-generation`** / **`generateReflectionAtReflectStep`** loads the same shapes as cron via **`loadReflectRecencyHints`** (`src/features/pause/infrastructure/queries/reflect/generation/load-reflect-recency-hints.ts`) and passes `moodHistory` / `recentMessages` / `recentHaikus` into **`holzen-reflect`** when present (parity with **`pauseRecencyInputs`** in **`check-volatility`**).  
-- **Manual (orchestrator):** **`useCompanionData`** loads `moodHistory` from **`pause_step_events`** (`**loadMoodHistoryForOrchestrate`**) and sends it to **`companion-orchestrate`** (intervention + lazy slots).  
+- **Manual (orchestrator):** **`useCompanionOrchestration`** / **`useCompanionData`** loads `moodHistory` from **`pause_step_events`** (`**loadMoodHistoryForOrchestrate`**) and sends it to **`companion-orchestrate`** on **lazy slot** tap/regenerate (shipped); legacy intervention-only call is quarantined.  
 - **Automatic (claim-time):** `**check-volatility`** calls `**pauseRecencyInputs**` to optionally set **`last_reported_mood`** in the **`context_snapshot`** when creating the pause row; the reflection LLM still runs only at **Reflect** in the client.
 
 **Nuance:** A mood picked **only after** the reflect-step returns is **not** in `moodHistory` for **that** `generateUnifiedReflection` call; it will show up on **later** runs once logged to **`pause_step_events`**. If the user already chose a mood **before** invoking generation, the **manual open** path can pass **`last_reported_mood`** inside **`pause_create_or_reuse`**’s **`context_snapshot`** for storage/analytics.
@@ -180,7 +180,7 @@ Up to **five** recent haikus and **five** recent reflect-step **messages** (from
 
 **G. Invoking `companion-orchestrate`**
 
-- **`PauseSession` (manual or cron-created instance):** **`useCompanionData`** sends the **user JWT**. Once **`pauseInstanceId`** is available (typically early in **`PauseSession`**, often **before** Reflect), it calls orchestrate with **`useIntervention: true`** and all **`enable*`** flags **false** (intervention-only). When the user taps a companion card, a second call with a single **`enable*`** flag fetches that slot (`holzenInvokeSource: 'browser_lazy_fetch'`). Regenerate uses **`regenerateOnly`** (`holzenInvokeSource: 'browser_regenerate'`).
+- **`PauseSession` (manual or cron-created instance):** **`useCompanionOrchestration`** sends the **user JWT**. **Shipped:** when the user taps a companion card, orchestrate runs with a single **`enable*`** flag (`holzenInvokeSource: 'browser_lazy_fetch'`). Regenerate uses **`regenerateOnly`** (`holzenInvokeSource: 'browser_regenerate'`). **Legacy:** intervention-only (`useIntervention: true`, all **`enable*`** false) — quarantined in `src/legacy/pause-featured-intervention/`.
 - **Pause V2 `check-volatility`:** does **not** invoke **`companion-orchestrate`** on automatic pause **claim**. Companion orchestration runs only from the browser once the user opens the pause.
 
 *Why:* manual and server-opened pauses share the **same** in-tab orchestrator contract under the user’s session; the cron worker only **creates** the pause row and **delivers** notifications.
@@ -269,12 +269,12 @@ flowchart TB
 
 ## 4. Client flow (Pause V2)
 
-This section is **client-centric** (Home open → ritual → companions): **`useHolzenHomeContextState`** and **`useCompanionData`** run **in the browser** (React); `**holzen-reflect`** and `**companion-orchestrate`** are **HTTP edge functions**; persistence uses **`pause_instances`** and **`pause_ai_artifacts`** via the **Supabase client** under **RLS** (no **`profiles.last_context`** update on the manual path — see §2.3.H). **Intervention** orchestration usually runs **once `pauseInstanceId` is live**, often **before** the deep **Reflect** step; **reflection** is triggered at **Reflect** and the reflect hook stays on through **Frame**, second **Breathe**, and **Decide** (see §2 and [pause-system.md](../pause-system.md) §7.1, **Reflection + haiku (deep)**). Canonical tables and transitions: [pause-system.md](../pause-system.md).
+This section is **client-centric** (Home open → ritual → companions): **`useHolzenHomeContextState`** and **`useCompanionOrchestration`** / **`useCompanionData`** run **in the browser** (React); `**holzen-reflect`** and `**companion-orchestrate`** are **HTTP edge functions**; persistence uses **`pause_instances`** and **`pause_ai_artifacts`** via the **Supabase client** under **RLS** (no **`profiles.last_context`** update on the manual path — see §2.3.H). **Featured intervention** mount orchestrate is **off** in the shipped client; **reflection** is triggered at **Reflect** and the reflect hook stays on through **Frame**, second **Breathe**, and **Decide** (see §2 and [pause-system.md](../pause-system.md) §7.1, **Reflection + haiku (deep)**). Canonical tables and transitions: [pause-system.md](../pause-system.md).
 
 1. **`use-holzen-home-context-state.ts`** (`src/features/pause/presentation/`; mounted in **`HolzenProvider.tsx`**) — Builds context, calls **`pauseCreateOrReuse`** (RPC via `public-rpc`). React tracks **`lastPauseInstanceId`**. The non-silent Home path does **not** invoke **`holzen-reflect`**.
 2. **`PauseSessionScreen`** + **`use-pause-reflect-generation.ts`** — Invoke **`holzen-reflect`** via **`generateReflectionAtReflectStep`** once the deep ritual reaches **Reflect**; the session keeps that hook **enabled** on **Frame**, second **Breathe**, and **Decide** too so in-flight generation can finish after the user leaves the Reflect card.
 3. **Pause UI** — **`useCompanionData`** receives **`pauseInstanceId`**, **`context`**, **`reflectionMessage`** (prop name = AI reflect-step text), **`mood`**, **`severityNumber`**, language.
-4. **`useCompanionData`** (once **`pauseInstanceId`** is live) — Hydrates companion payloads from **`pause_ai_artifacts`** where present; calls **`companion-orchestrate`** for intervention + cached reads using **`pauseInstanceId`** (typically **before** the deep **Reflect** step).
+4. **`useCompanionOrchestration`** (once **`pauseInstanceId`** is live) — Hydrates companion slot state from **`pause_ai_artifacts`** / cache where present; **lazy** `companion-orchestrate` per card tap (no mount-time intervention in shipped bundle).
 5. **`useCompanionData`** (on tap) — **`fetchCompanion(slot)`** calls **`companion-orchestrate`** with a single **`enable*`** flag (`holzenInvokeSource: 'browser_lazy_fetch'`). Results persist via **`writeCompanionData`** into **`pause_ai_artifacts`** (library → cache → live → curated ordering unchanged).
 
 <a id="toc-manual-pause-request-order"></a>
@@ -288,7 +288,7 @@ This section is **client-centric** (Home open → ritual → companions): **`use
 | 1 | Browser | `**fetchBtcData**` builds **context** (24h / optional 7d, Fear & Greed / on-chain enrichment). |
 | 2 | Browser + Postgres | **`pauseCreateOrReuse`** → open **`pause_instances`** row (no reflection AI yet). |
 | 3 | Pause UI — Reflect | Edge **`holzen-reflect`** → **`pause_ai_artifacts`** (`reflection_text`, optional `haiku` / `ground_nudge`). |
-| 4 | Pause UI | **`useCompanionData`** uses **`pauseInstanceId`**; intervention (often before Reflect) + lazy fetches call **`companion-orchestrate`**. |
+| 4 | Pause UI | **`useCompanionOrchestration`** uses **`pauseInstanceId`**; lazy slot fetches call **`companion-orchestrate`** when the user opens a companion (shipped). |
 
 **Silent mode:** `**holzen-reflect**` is not called; client still runs **`pauseCreateOrReuse`** and writes “BTC moved.” into **`pause_ai_artifacts`**.
 
@@ -302,8 +302,8 @@ This section is **client-centric** (Home open → ritual → companions): **`use
 
 - **Files:** `supabase/functions/companion-orchestrate/index.ts` (HTTP handler) and `**_shared/companion-orchestrate-*.ts`** (types, body parsing, logging, skip-cache, **parallel generator tasks**, **settled-result fold + background writes**).
 - **Role:** Auth → rate limit → daily budget → parse body → `**determineSessionIntent`** → `**selectIntervention`** (when `**useIntervention`** is true **and** `**pauseInstanceId`** is present) → `**Promise.all`** of `**generateQuestion`** (question mode only) **and** enabled generator tasks → assemble `**intervention`** + companion results → `companion_serves` inserts → `**writeCompanionData`** (upserts **`pause_ai_artifacts`** per slot; legacy `**reflection_companions**` / `**reflections**` storage was **dropped** in Pause V2).
-- **Invocation modes (client):** The SPA usually sends **narrow** requests: (1) intervention-only (all `enable*` false, `holzenInvokeSource: 'browser_pause_intervention'`), (2) single-slot lazy fetch (`holzenInvokeSource: 'browser_lazy_fetch'`), (3) regenerate (`regenerateOnly`). Some **server-side** HTTP invokes may set several `enable*` flags in **one** call (automation **outside** Pause V2 **`check-volatility`** claim — see repo callers). The **`pregenerate-companions`** edge function is **separate** — it does **not** call `companion-orchestrate`; it writes rows into `companion_cache` only (see [pregenerate.md](companions/pregenerate.md)).
-- **Typical JSON body:** `**pauseInstanceId**` (UUID of the row in **`pause_instances`**), `**context`**, `**reflectionMessage**` (AI reflect-step text), `**language**`, `**mood**`, numeric `**severity**` (absolute % move → `**bucketSeverity**` in `intervention-selector.ts`), `**moodHistory**`, `**signalSources**` / `**groundingSources**` (merged catalog URLs when Signal/Ground are on), recency arrays (`**recentNudgeTopics**`, `**recentGroundingSources**`, `**recentSignalSources**`, …), `**enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut**`, `**useIntervention**` (default true). If `**pauseInstanceId**` is missing or `**useIntervention: false**`, no intervention is selected (`**response.intervention**` omitted); generators still run per `**enable***`.
+- **Invocation modes (client):** The **shipped** SPA sends **narrow** requests: (1) single-slot lazy fetch (`holzenInvokeSource: 'browser_lazy_fetch'`), (2) regenerate (`regenerateOnly`). **Legacy / tests:** intervention-only (all `enable*` false, `holzenInvokeSource: 'browser_pause_intervention'`) when `useIntervention: true`. Some **server-side** HTTP invokes may set several `enable*` flags in **one** call (automation **outside** Pause V2 **`check-volatility`** claim — see repo callers). The **`pregenerate-companions`** edge function is **separate** — it does **not** call `companion-orchestrate`; it writes rows into `companion_cache` only (see [pregenerate.md](companions/pregenerate.md)).
+- **Typical JSON body:** `**pauseInstanceId**` (UUID of the row in **`pause_instances`**), `**context`**, `**reflectionMessage**` (AI reflect-step text), `**language**`, `**mood**`, numeric `**severity**` (absolute % move → `**bucketSeverity**` in `legacy/featured-intervention/intervention-selector.ts`), `**moodHistory**`, `**signalSources**` / `**groundingSources**` (merged catalog URLs when Signal/Ground are on), recency arrays (`**recentNudgeTopics**`, `**recentGroundingSources**`, `**recentSignalSources**`, …), `**enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut**`, `**useIntervention**` (default **false** in shipped client). If `**pauseInstanceId**` is missing or `**useIntervention: false**`, no intervention is selected (`**response.intervention**` omitted); generators still run per `**enable***`.
 
 ### Diagram — inside `companion-orchestrate`
 
@@ -332,9 +332,9 @@ flowchart TD
 
 ### 5.2 Intervention selection
 
-- **File:** `supabase/functions/_shared/intervention-selector.ts`
+- **File:** `supabase/functions/legacy/featured-intervention/intervention-selector.ts`
 - **Order (first match wins):**  
-  1. **Mirror** — qualifying past **completed** pause (`**buildMirror`** in `_shared/generators/mirror.ts`, reads **`v_pause_full`** for same-direction history ≥30 days old with an **outcome**).
+  1. **Mirror** — qualifying past **completed** pause (`**buildMirror`** in `legacy/featured-intervention/mirror.ts`, reads **`v_pause_full`** for same-direction history ≥30 days old with an **outcome**).
   2. **Trap** — mood **and** market direction aligned to a bias: e.g. fearful/anxious on a **down** move; FOMO/greed/excited on an **up** move; FOMO/greedy on a **down** move (capitulation framing). High severity can attach `**zoom_out`** as **secondary**.
   3. **Pattern** — **high** severity (no trap).
   4. **Question mode** — **mild** severity **and** `**countPastSessions` ≥ 20** (completed **`pause_instances`** for the user).
@@ -359,7 +359,7 @@ flowchart LR
 
 ### 5.3 Question mode
 
-- **File:** `supabase/functions/_shared/generators/question.ts`
+- **File:** `supabase/functions/legacy/featured-intervention/question.ts`
 - **Invocation:** When `selection.mode === "question"`, orchestrator awaits `**generateQuestion`** in parallel with generator tasks (`questionPromise`).
 
 ### 5.4 Session intent (theming)
@@ -405,10 +405,10 @@ For a full breakdown of **which intervention** maps to **which generator output*
 
 The pause step combines two ideas that are easy to conflate:
 
-1. **Featured intervention** — One **cognitive headline** at the top (`InterventionSection`): mirror, trap, pattern, question mode, plus an optional **secondary** zoom-out block.
-2. **Companion cards** — Collapsible **slots** below the divider (`CompanionSection`): Haiku, Ground, Signal, Zoom Out, Look Back (history). Four of these are filled by **companion-orchestrate** (one slot per lazy-load call, or **several slots in one** HTTP invoke when a **server** caller sets multiple **`enable*`** flags — **not** from **`check-volatility`** on automatic pause claim in Pause V2); the intervention is fetched in a **separate** initial orchestrate call; **Haiku** is produced by **`holzen-reflect`** / **`generateUnifiedReflection`** and stored in **`pause_ai_artifacts`** like other companion kinds.
+1. **Featured intervention (not shipped)** — Cognitive headline (`InterventionSection` — removed). Logic lives in **`legacy/featured-intervention/`** (edge + `src/legacy/pause-featured-intervention/`). Re-enable: [pause-featured-intervention README](../../../src/legacy/pause-featured-intervention/README.md).
+2. **Companion cards (shipped)** — **`PauseFrame`** / **`CompanionSection`**: Haiku, Ground, Signal, Zoom Out, Look Back (history). Filled by **lazy** `companion-orchestrate` (one slot per tap, or **several slots in one** HTTP invoke when a **server** caller sets multiple **`enable*`** flags — **not** from **`check-volatility`** on automatic pause claim in Pause V2). **Haiku** is produced by **`holzen-reflect`** / **`generateUnifiedReflection`** and stored in **`pause_ai_artifacts`** like other companion kinds.
 
-**Session intent** (§5.4) biases **all** orchestrated generators toward one emotional angle (Signal angle, Grounding bias, History mood, Zoom-out seed). Intervention **selection** (`intervention-selector.ts`) is separate: it only decides **what to feature** and **which generator outputs** are copied into the intervention payload.
+**Session intent** (§5.4) biases **all** orchestrated generators toward one emotional angle (Signal angle, Grounding bias, History mood, Zoom-out seed). Intervention **selection** (`legacy/featured-intervention/intervention-selector.ts`) is separate when `useIntervention: true`: it decides **what to feature** and **which generator outputs** are copied into the intervention payload.
 
 ### Diagram — intervention vs companion cards
 
@@ -494,7 +494,7 @@ flowchart TB
 | Aspect                | Detail                                                                                                                                                                                                  |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **When selected**     | `**severity === "mild"**` **and** count of **`pause_instances`** with **`state = 'completed'`** for the user **≥ 20** (`countPastSessions`).                                                                                                       |
-| **Payload**           | No `primary` / `trap` / `pattern` / `mirror`. `intervention.mode === "question"` and `**intervention.question**` string from `**generateQuestion**` (`_shared/generators/question.ts`, Gemini via `llm-gateway`). |
+| **Payload**           | No `primary` / `trap` / `pattern` / `mirror`. `intervention.mode === "question"` and `**intervention.question**` string from `**generateQuestion**` (`legacy/featured-intervention/question.ts`, Gemini via `llm-gateway`). |
 | **AI**                | **Yes** — dedicated question path, parallel with companion tasks.                                                                                                                                       |
 | **UI**                | Centered question copy + “Sit with this before deciding.” **No** companion-shaped body for the headline.                                                                                                |
 | **Companion overlap** | Other generators still run per `**enable***` flags (cost note: **§11.3**).                                                                                                                              |
@@ -596,7 +596,7 @@ flowchart TB
 | Piece                    | Role                                                                                                                                                                                       |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Breathing**            | `**CompanionPrefs.breathing**` exists for pause prefs; the **breathing ritual** is **not** rendered inside `CompanionSection` companion cards — it is a **separate flow** in the pause UI. |
-| **Intervention loading** | `useCompanionData` fetches the intervention eagerly once **`pauseInstanceId`** is available (`useIntervention: true`, all `enable*` false), typically early in **`PauseSessionScreen`** and often **before** Reflect; companion slots are fetched lazily on card tap.                             |
+| **Companion loading (shipped)** | `useCompanionOrchestration` hydrates from cache/artifacts; slots fetch lazily on card tap. **Legacy:** eager intervention (`useIntervention: true`) — `src/legacy/pause-featured-intervention/`.                             |
 
 
 ---
@@ -641,8 +641,8 @@ Reads that need hydrated pause + companion text use **`v_pause_full`** and/or **
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `HolzenProvider.tsx` / `use-holzen-home-context-state.ts` (`features/pause/presentation/`) | BTC context, manual cooldown, **`pauseCreateOrReuse`** (opens instance + snapshot); **silent** stub `reflection_text`; non-silent defers AI to Reflect (`public-hooks` / `public-rpc`)                                                                                       |
 | `use-pause-reflect-generation.ts` | Deep ritual: **`PauseSessionScreen`** enables the hook on **Reflect**, **Frame**, second **Breathe**, and **Decide**; cache read, then **`holzen-reflect`** via **`generateReflectionAtReflectStep`** → **`pause_ai_artifacts`**                                                                                         |
-| `use-companion-data.ts` (`useCompanionSection`, `useCompanionFullViewPage`, … via `public-hooks`) | Intervention-only orchestrate once **`pauseInstanceId`** is set (often before Reflect), lazy per-slot `fetchCompanion` on card tap, per-companion loading/errors, recency hints; companion payloads persist in **`pause_ai_artifacts`** only                         |
-| `InterventionSection.tsx`    | Renders mirror / trap / pattern / question + optional zoom-out secondary                                                                                                                                  |
+| `use-companion-data.ts` / `useCompanionOrchestration` (`useCompanionSection`, `useCompanionFullViewPage`, … via `public-hooks`) | Lazy per-slot `fetchCompanion` / `regenerateCompanion` on card tap; per-companion loading/errors, recency hints; payloads in **`pause_ai_artifacts`**. No mount-time intervention orchestrate in shipped bundle.                         |
+| `src/legacy/pause-featured-intervention/` + `InterventionSection` (removed) | **Quarantined** featured headline: mirror / trap / pattern / question + optional zoom-out secondary — not in active `src/` bundle                                                                                                                                  |
 | `CompanionSection.tsx`       | Container for companion cards and prefs; hides Zoom Out card when intervention already shows zoom-out secondary (§7.5). Each companion card has an **"Open full view"** button wired to the routes below. |
 | `features/pause/domain/companion-types.ts` (`public`) | Canonical type strings shared with tests; full intervention ↔ generator ↔ UI map in **§7**                                                                                                                |
 
@@ -665,7 +665,7 @@ Shared primitives reused across all four pages (in `src/screens/pause/components
 - `**ReadTime**` — chars/WPM-bucketed read-time indicator.
 - `**WhyThisCard**` — collapsible disclosure that explains the orchestrator's pick in terms of mood + market direction + session `preferredBias`. Renders nothing if none of the three are known.
 - `**HistoryThread**` — the last 5 cards of the same companion type for this user, deep-linking to their own Full Views.
-- `**InterventionCrossRefBadge**` — small "This was also today's headline" tag for `grounding`/`history`/`zoomOut` when their payload was also the featured intervention (see §7.2 / §7.3 / §7.5).
+- `**InterventionCrossRefBadge**` — **legacy only** (`src/legacy/pause-featured-intervention/`): "This was also today's headline" when featured intervention is re-enabled (see §7.2 / §7.3 / §7.5).
 - `**useStaggeredReveal**` — 8 s breathing-room delay before feedback CTAs appear. Honors `prefers-reduced-motion` (skips the delay for accessibility).
 
 The "Open full view" navigation is always free. Companion card bodies are already persisted on **`pause_ai_artifacts`** when generated; Full View adds reading affordances and feedback, not a separate bookmark table.
@@ -779,9 +779,12 @@ supabase/functions/
     ├── pause-context-suffix.ts     # single formatter: Fear & Greed + on-chain context suffix (client + cron)
     ├── pause-cron-parity.ts        # shared fetches + pause context enrichment for check-volatility (manual parity)
     ├── session-intent.ts
-    ├── intervention-selector.ts
+    ├── market-context.ts           # parseDirection, bucketSeverity (active)
     ├── companion-data.ts
-    ├── generators/{ signal, grounding, history, zoom-out, question, mirror }.ts
+    ├── generators/{ signal, grounding, history, zoom-out }.ts
+legacy/featured-intervention/
+    ├── intervention-selector.ts
+    ├── mirror.ts, question.ts
     ├── phase-config.ts              # library → cache → live phase toggles (COMPANION_PHASE_*)
     ├── quality.ts, sanitize.ts, cache.ts, content-library.ts, observe.ts, ratelimit.ts, fallbacks.ts
 

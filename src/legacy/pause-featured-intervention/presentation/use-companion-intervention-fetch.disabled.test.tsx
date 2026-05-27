@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import { PAUSE_FEATURED_INTERVENTION_ENABLED } from '@/features/pause/domain/pause-featured-intervention';
+import { PAUSE_FEATURED_INTERVENTION_ENABLED } from '@/legacy/pause-featured-intervention/domain/pause-featured-intervention';
 import { useCompanionInterventionFetch } from './use-companion-intervention-fetch';
 
 const { runBootstrap } = vi.hoisted(() => ({

@@ -30,8 +30,8 @@ Models tried (in order): `google/gemini-3-flash-preview`, then `google/gemini-2.
 
 ### 1.2 Companion step (Signal, Grounding, History, Zoom Out)
 
-- **Client:** `use-companion-data` invokes `companion-orchestrate` for **intervention-only** once **`pauseInstanceId`** is live (typically early in **`PauseSession`**, often **before** Reflect), then one slot per card tap when artifacts are missing.
-- **Automatic pause:** `check-volatility` does **not** call `companion-orchestrate`; intervention + companions use the **same** client paths as manual pauses after the user opens **`/pause`**.
+- **Client (shipped):** `useCompanionOrchestration` invokes `companion-orchestrate` **per companion card tap** when artifacts are missing (`holzenInvokeSource: browser_lazy_fetch`); regenerate uses `regenerateOnly`. **Legacy:** mount-time intervention-only orchestrate — `src/legacy/pause-featured-intervention/` (not in active bundle).
+- **Automatic pause:** `check-volatility` does **not** call `companion-orchestrate`; companions use the **same** lazy client paths as manual pauses after the user opens **`/pause`**.
 
 Generators (in `supabase/functions/_shared/generators/`):
 
