@@ -60,17 +60,19 @@ After breathing, the user should spend one beat on **their** experience:
 
 Reflect is **not** homework. One **Continue** exits the step; there is no requirement to open companions.
 
-### 4.2 Shipped UI shape (v2)
+### 4.2 Shipped UI shape (May 2026 — one letter)
 
-Reflect is structured as three blocks (see [reflect-step-redesign-spec.md](reflect-step-redesign-spec.md)):
+The Reflect card shows:
 
-| Block | Purpose |
-|-------|---------|
-| **Land** | Short validation + lower urgency (carries the old “regulate” job, kept brief). |
-| **Name it** | Feel recap from this pause + one hypothesis + **one prominent question**. |
-| **Context strip** (optional, collapsed) | Light, **non-cited** “when moves like this happen, people often…” — not a substitute for Signal. |
+| Surface | Purpose |
+|---------|---------|
+| **Feel recap** (muted line) | “You said: …” from this pause’s Feel step — always visible when mood is known. |
+| **One letter** | Single `message` from `holzen-reflect` (v8 prompt) — land + hypothesis + inquiry woven in one voice; at most one line break before the closing question. |
+| **Haiku** (optional) | Small italic aside below the letter — not part of the reflection copy. |
+| **Market context** (collapsed) | Raw telemetry + optional narrative strip — **hidden by default**; not mixed into the letter. |
+| **Your note** (Pro, below card) | Post-it / tags — clearly separate from AI copy. |
 
-Optional **haiku** is aesthetic, not informational.
+Structured `land` / `hypothesis` / `inquiry` remain in the artifact for analytics; the UI does not render them as separate blocks. See [reflect-step-redesign-spec.md](reflect-step-redesign-spec.md) for generation detail.
 
 ### 4.3 What Reflect must not become
 

@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
-import { formatReflectIntegratedProse } from '@/features/pause/domain/reflect/generation/format-reflect-integrated-prose';
+import { buildReflectFeelRecapLine } from '@/features/pause/domain/reflect/generation/build-reflect-feel-recap-line';
+import { formatReflectDisplayLetter } from '@/features/pause/domain/reflect/generation/format-reflect-display-letter';
 import { resolvePauseReflectDisplayContent } from '@/features/pause/domain/reflect/generation/resolve-pause-reflect-display-content';
 import type { CurrentFeelForReflect, ReflectionContentV2 } from '@/features/pause/domain/reflect/generation/reflection-content-v2';
 import { resolvePauseReflectMessageView } from '@/features/pause/public-ritual-reflect';
@@ -11,6 +12,7 @@ import {
   trackPauseReflectInquiryDisplayed,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import { PauseReflectInlineNotice } from '@/screens/pause/components/pause-reflect-inline-notice';
+import { PauseReflectMarketContext } from '@/screens/pause/components/pause-reflect-market-context';
 
 export type PauseReflectMessageBodyProps = {
   pauseInstanceId: string | null;
@@ -25,7 +27,7 @@ export type PauseReflectMessageBodyProps = {
   artifactHaiku: string | null | undefined;
 };
 
-/** Reflection card: market context line + single editorial block (v2 concepts integrated), optional haiku. */
+/** Reflect card: Feel recap + one letter + optional haiku aside + collapsed market context. */
 export function PauseReflectMessageBody({
   pauseInstanceId,
   context,
@@ -55,8 +57,13 @@ export function PauseReflectMessageBody({
     [reflectionContent, reflectionMessage, reflectionError, context, severityAbsPct, currentFeel, t],
   );
 
-  const integratedProse = useMemo(
-    () => (displayContent ? formatReflectIntegratedProse(displayContent) : ''),
+  const feelRecap = useMemo(
+    () => buildReflectFeelRecapLine(currentFeel, t),
+    [currentFeel, t],
+  );
+
+  const letter = useMemo(
+    () => (displayContent ? formatReflectDisplayLetter(displayContent) : ''),
     [displayContent],
   );
 
@@ -82,8 +89,10 @@ export function PauseReflectMessageBody({
     }
   }, [view, displayContent, pauseInstanceId, currentFeel?.mood, usedClientFallback]);
 
+  const contextStrip = displayContent?.contextStrip?.trim() || null;
+
   return (
-    <div className="min-w-0 flex-1 space-y-2">
+    <div className="min-w-0 flex-1 space-y-4">
       {reflectionError ? (
         <PauseReflectInlineNotice
           message={reflectionError}
@@ -102,16 +111,28 @@ export function PauseReflectMessageBody({
           <Skeleton className="h-4 w-5/6" />
         </div>
       ) : null}
-      {context?.trim() && view === 'body' ? (
-        <p className="text-xs font-mono uppercase tracking-wide text-muted-foreground">{context.trim()}</p>
+      {view === 'body' && feelRecap ? (
+        <p className="text-sm leading-relaxed text-muted-foreground">{feelRecap}</p>
       ) : null}
-      {view === 'body' && integratedProse ? (
+      {view === 'body' && letter ? (
         <p className="whitespace-pre-line font-editorial text-base leading-relaxed text-foreground sm:text-lg">
-          {integratedProse}
+          {letter}
         </p>
       ) : null}
-      {artifactHaiku?.trim() ? (
-        <p className="pt-1 text-sm italic leading-relaxed text-muted-foreground">{artifactHaiku.trim()}</p>
+      {view === 'body' && artifactHaiku?.trim() ? (
+        <p
+          className="border-t border-border/40 pt-3 text-xs italic leading-relaxed text-muted-foreground/90"
+          aria-label={t('pause.reflect.haikuAside', { defaultValue: 'Haiku' })}
+        >
+          {artifactHaiku.trim()}
+        </p>
+      ) : null}
+      {view === 'body' ? (
+        <PauseReflectMarketContext
+          pauseInstanceId={pauseInstanceId}
+          marketContext={context}
+          contextStrip={contextStrip}
+        />
       ) : null}
     </div>
   );
