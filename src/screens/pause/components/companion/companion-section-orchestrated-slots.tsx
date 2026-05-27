@@ -234,7 +234,7 @@ export function CompanionSectionOrchestratedSlots({
           routeSegment="zoom-out"
           appearance={appearance}
           iconHelp={iconHelps?.zoomOut}
-          showFullViewButton
+          showFullViewButton={showFullViewButton}
           {...proFavorite('zoom_out')}
         >
           <ZoomOutDisplay data={zoomOut} loading={zoomOutLoading} error={zoomOutError} onRetry={retryZoomOut} />
