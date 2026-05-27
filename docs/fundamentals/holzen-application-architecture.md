@@ -289,7 +289,7 @@ packages/pause/src/   # today: src/features/pause/
         feel/
         breathe/
         reflect/                # reflection_step + holzen-reflect generation
-        frame/                  # intervention, slot orchestrate, grounding-enrich
+        frame/                  # intervention, slot orchestrate
         decide/
         done/
       archive/                  # pauses/echoes reads (not user collections)

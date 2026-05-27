@@ -615,6 +615,7 @@
     "cooldownHelpBody": "Automatic pauses wait at least this long after the previous one.",
     "cooldownHelpTitle": "Cooldown help",
     "creditsDashboard": "Credits & allowances",
+    "companionCreditsMeteringHelp": "Companions & guidance counts when Holzen first generates or regenerates Signal, Grounding, Look Back, or Zoom Out for a pause. Opening cards or full views you already have does not use allowance. Haiku and reflection prose are separate.",
     "flexBalanceShort": "{{count}} flex credits",
     "flexPackMCta": "Buy Flex Pack M",
     "flexPackSCta": "Buy Flex Pack S",

@@ -113,7 +113,9 @@ spent — a row without logging still runs but cannot be capped per-user.
 | **Edge `regenerate-only`** | Peek before generate; consume **one** unit only when persisted content satisfies the slot. | **N/A** — failed regenerate does not debit. |
 | **Client lazy fetch** | No optimistic companion decrement; `refreshSubscription()` in `finally` after orchestrate returns. | Balance matches server post-success billing. |
 
-**Implications for Frame (May 2026):** companions generate **on first card expand** only — users are not charged at Frame mount. Failed expand (empty body, error) should not reduce monthly allowance or flex credits.
+**Implications for Frame (May 2026):** companions generate **on first card expand** only — users are not charged at Frame mount. Failed expand (empty body, error) should not reduce monthly allowance or flex credits. Re-opening full view or expanding an already-generated card is read-only. **`pregenerate-companions`** is not user-metered (shared `companion_cache`).
+
+**User-facing summary:** [companion-metering.md](../pause/companions/companion-metering.md).
 
 **Implementation:** `supabase/functions/_shared/companion-orchestrate-billing.ts` + `peekAllowanceOrCredits` in `subscription-entitlements.ts`.
 

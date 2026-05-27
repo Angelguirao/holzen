@@ -35,6 +35,9 @@ describe('pause-reflect-telemetry-flow ↔ pause-reflect-telemetry-io wrapper si
       'trackPauseReflectWallpaperTap',
     ]);
     expect(Object.keys(telemetryIo).sort()).toEqual([
+      'trackPauseReflectBlockViewed',
+      'trackPauseReflectContextStripExpanded',
+      'trackPauseReflectInquiryDisplayed',
       'trackPauseReflectPostItOpen',
       'trackPauseReflectShareTap',
       'trackPauseReflectWallpaperTap',

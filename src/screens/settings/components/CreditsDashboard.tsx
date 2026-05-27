@@ -157,6 +157,12 @@ export function CreditsDashboard() {
               })}
         </p>
       )}
+
+      {subscribed && (
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          {t('settings.companionCreditsMeteringHelp')}
+        </p>
+      )}
     </div>
   );
 }
