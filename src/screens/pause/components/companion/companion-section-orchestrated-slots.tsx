@@ -1,7 +1,6 @@
 import { useMemo, type ReactNode } from 'react';
 import type {
   CachedHistoricalInsightShape,
-  CompanionData,
   CompanionSlotCacheIds,
   CompanionSlotRelaxations,
   RegenerateCompanionSlot,
@@ -190,7 +189,7 @@ export function CompanionSectionOrchestratedSlots({
           onFirstExpandComplete={() => markCompleted('grounding')}
           loading={nudgeLoading}
           pauseInstanceId={pauseInstanceId}
-          hasContent={Boolean(nudge) || Boolean(companions.groundingTitle?.trim() || companions.groundingBody?.trim())}
+          hasContent={Boolean(nudge)}
           relaxationKey={cacheRelaxations.nudge}
           companionType="grounding"
           cacheId={cacheIds.nudge}
@@ -203,11 +202,9 @@ export function CompanionSectionOrchestratedSlots({
           {...proFavorite('grounding')}
         >
           <GroundingDisplay
-            title={companions.groundingTitle ?? ''}
-            body={companions.groundingBody ?? ''}
             nudge={nudge}
-            nudgeLoading={nudgeLoading}
-            nudgeError={nudgeError}
+            loading={nudgeLoading}
+            error={nudgeError}
             onRetry={retryNudge}
             variant={frameAppearance ? 'frame' : 'default'}
             pauseInstanceId={pauseInstanceId}
