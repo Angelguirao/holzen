@@ -246,11 +246,11 @@ const supabaseEdgeSpecs = {
   },
   GOOGLE_AI_API_KEY: {
     name: "GOOGLE_AI_API_KEY",
-    label: "Google AI / Gemini API key",
+    label: "Direct Google Gemini API key (legacy)",
     where: "Supabase Dashboard → {project} → Edge Functions → Secrets",
-    how: "Google AI Studio → API key. Secret name must be `GOOGLE_AI_API_KEY` (see `_shared/llm-gateway.ts`).",
-    tier: "required",
-    docs: "docs/systems/pause/ai-powered-pause-system.md",
+    how: "Only when `LLM_PROVIDER_ORDER` includes `google`. Default deploy is OpenRouter-only — remove this secret.",
+    tier: "optional",
+    docs: "docs/ops/llm-openrouter.md",
   },
   STRIPE_SECRET_KEY: {
     name: "STRIPE_SECRET_KEY",
@@ -342,11 +342,19 @@ const supabaseEdgeSpecs = {
   },
   OPENROUTER_API_KEY: {
     name: "OPENROUTER_API_KEY",
-    label: "OpenRouter failover API key",
+    label: "OpenRouter API key (primary LLM)",
     where: "Supabase Dashboard → {project} → Edge Functions → Secrets",
-    how: "Optional LLM failover when Gemini returns 429/5xx. OpenRouter dashboard → API key.",
+    how: "openrouter.ai/keys — required for default `LLM_PROVIDER_ORDER=openrouter`. Set `OPENROUTER_HTTP_REFERER` when you can.",
+    tier: "required",
+    docs: "docs/ops/llm-openrouter.md",
+  },
+  OPENROUTER_HTTP_REFERER: {
+    name: "OPENROUTER_HTTP_REFERER",
+    label: "OpenRouter HTTP-Referer attribution",
+    where: "Supabase Dashboard → {project} → Edge Functions → Secrets",
+    how: "Your app URL (e.g. https://holzen.app). Recommended for OpenRouter dashboards.",
     tier: "recommended",
-    docs: "docs/systems/costs/ai-cost-model.md",
+    docs: "docs/ops/llm-openrouter.md",
   },
   PERPLEXITY_API_KEY: {
     name: "PERPLEXITY_API_KEY",

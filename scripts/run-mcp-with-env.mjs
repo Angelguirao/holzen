@@ -32,12 +32,11 @@ function loadEnvFile(filePath) {
   }
 }
 
-/** aistudio-mcp-server reads GEMINI_API_KEY; Holzen edge reads GOOGLE_AI_API_KEY — same key. */
+/** Legacy mcp-secrets may still list GOOGLE_AI_API_KEY — map to GEMINI for aistudio MCP only. */
 function aliasGeminiKeys() {
-  const google = process.env.GOOGLE_AI_API_KEY?.trim();
+  const legacyGoogle = process.env.GOOGLE_AI_API_KEY?.trim();
   const gemini = process.env.GEMINI_API_KEY?.trim();
-  if (!gemini && google) process.env.GEMINI_API_KEY = google;
-  if (!google && gemini) process.env.GOOGLE_AI_API_KEY = gemini;
+  if (!gemini && legacyGoogle) process.env.GEMINI_API_KEY = legacyGoogle;
 }
 
 const argv = process.argv.slice(2);

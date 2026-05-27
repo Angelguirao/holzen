@@ -348,13 +348,13 @@ serve(
 
     if (shouldUseCuratedFallbackForGoogleDegradation(degraded.includes("google"), llmChain)) {
 
-      return serveFallback("reflection: gemini degraded, no openrouter — serving curated pool");
+      return serveFallback("reflection: gemini circuit open, no openrouter — serving curated pool");
 
     }
 
     if (degraded.includes("google") && llmChain.some((c) => c.provider === "openrouter")) {
 
-      log("reflection: google degraded, attempting live generation via openrouter");
+      log("reflection: gemini circuit open, attempting live generation via openrouter");
 
     }
 

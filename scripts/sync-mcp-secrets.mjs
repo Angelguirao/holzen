@@ -51,7 +51,6 @@ function loadSources() {
   }
   maps.push({
     GEMINI_API_KEY: process.env.GEMINI_API_KEY ?? "",
-    GOOGLE_AI_API_KEY: process.env.GOOGLE_AI_API_KEY ?? "",
     IONOS_API_KEY: process.env.IONOS_API_KEY ?? "",
     IONOS_MCP_PATH: process.env.IONOS_MCP_PATH ?? "",
   });
@@ -62,15 +61,13 @@ export function syncMcpSecrets({ write = true } = {}) {
   mkdirSync(cursorDir, { recursive: true });
   const maps = loadSources();
 
-  const gemini =
-    firstEnvValue(maps, ["GEMINI_API_KEY", "GOOGLE_AI_API_KEY"]) || "";
+  const gemini = firstEnvValue(maps, ["GEMINI_API_KEY"]) || "";
   const ionosKey = firstEnvValue(maps, ["IONOS_API_KEY"]) || "";
   const ionosPath =
     firstEnvValue(maps, ["IONOS_MCP_PATH"]) || detectIonosMcpPath();
 
   const merged = {
     GEMINI_API_KEY: gemini,
-    GOOGLE_AI_API_KEY: gemini,
     IONOS_API_KEY: ionosKey,
     IONOS_MCP_PATH: ionosPath.replace(/\\/g, "/"),
   };
@@ -97,11 +94,14 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   const result = syncMcpSecrets();
   console.log(`Wrote ${path.relative(repoRoot, result.secretsPath)}`);
   console.log(
-    `  GEMINI_API_KEY: ${result.hasGemini ? "ok" : "missing — create at https://aistudio.google.com/apikey"}`,
+    `  GEMINI_API_KEY: ${result.hasGemini ? "ok" : "optional — Cursor aistudio MCP only"}`,
   );
   console.log(`  IONOS_API_KEY: ${result.hasIonos ? "ok" : "missing"}`);
   console.log(
     `  IONOS_MCP_PATH: ${result.ionosPathExists ? "found" : "missing"} (${result.merged.IONOS_MCP_PATH})`,
   );
-  process.exit(result.hasGemini && result.hasIonos ? 0 : 1);
+  console.log(
+    "  Holzen edge LLM: OPENROUTER_API_KEY in supabase/.env.local (npm run edge:env:bootstrap)",
+  );
+  process.exit(result.hasIonos ? 0 : 1);
 }
