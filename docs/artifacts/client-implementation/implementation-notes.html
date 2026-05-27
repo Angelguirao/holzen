@@ -268,6 +268,11 @@
         When cron expires <code>active|pending</code> with <code>context_lost</code>, show reassurance copy (not state B);
         optional Sonner toast; query <code>fetchRecentContextLostPause</code> within 24h.
       </dd>
+      <dt>Mode E gate (2026-05-27 follow-up)</dt>
+      <dd>
+        <strong>E</strong> only when profile cooldown + <code>completedPauseCount &gt; 0</code> + open instance has no
+        <code>pause_step_events</code> yet; <strong>active + pending</strong> resolves to <strong>B</strong> (inline banner).
+      </dd>
       <dt>Deviation</dt>
       <dd>None from pause-system lifecycle; RPC and reflect write timing unchanged.</dd>
     </dl>

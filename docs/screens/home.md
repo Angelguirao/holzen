@@ -18,10 +18,10 @@ Authoritative orchestration: [`src/screens/home/HomeScreen.tsx`](../../src/scree
 | Context meta lines | [`HomePauseContextMeta.tsx`](../../src/screens/home/components/HomePauseContextMeta.tsx) |
 | Expand chevrons | [`HomeExpandChevronButton.tsx`](../../src/screens/home/components/HomeExpandChevronButton.tsx) |
 | Customize copy keys | [`home-customize-section-copy.ts`](../../src/lib/home-customize-section-copy.ts) |
-| Pause error surfacing | [`home-pause-widget-error.ts`](../../src/lib/home-pause-widget-error.ts) |
-| Subscription / Zen gate flags (pure) | [`home-subscription-gate.ts`](../../src/lib/home-subscription-gate.ts) |
+| Pause error surfacing | [`pause-home-widget-error.ts`](../../src/features/pause/domain/home/pause-home-widget-error.ts) |
+| Subscription / Zen gate flags (pure) | [`home-gate.ts`](../../src/features/subscription/application/home-gate.ts) (`getHomeSubscriptionGate` via [`public.ts`](../../src/features/subscription/public.ts)) |
 
-Hooks (`src/screens/home/hooks/use-home-*.ts` / `use-home-*.tsx`): checkout welcome toast, completed pause count, outlet `pauseReady`, document title, hero quote analytics, pause arrival chime + prefetch, market display preferences (price hide, BTC mode, chart expand), **visible section ids** (`useHomeVisibleSections`), **customize sheet wiring** (`useHomeCustomizeBridge`), **market + goal/why header chevrons** (`useHomeMarketGoalHeaders`), **pause navigation + checkout** (`useHomePauseActions`), **pause card projection** (`useHomePauseCardProjection`), **Today wiring** (`useHomeDashboardTodayWiring` composes `useHomeDashboardSectionDeps` + `useHomeDashboardSectionRenderers`; section deps default an optional compact `HolzenNumber` market footer when `marketFooter` is omitted), **dashboard layout props** (`useHomeDashboardLayoutProps` — stable object for `HomeDashboardLayout`), **pause context preview parsing** (`useHomePauseContextPreviews`), **pull full reload** (`useHomePullFullReload`). App shell outlet typing: [`home-app-layout-outlet.ts`](../../src/lib/home-app-layout-outlet.ts). Layout prop surface: exported **`HomeDashboardLayoutProps`** on [`HomeDashboardLayout.tsx`](../../src/screens/home/components/HomeDashboardLayout.tsx). Use **`HOME_WIDGET_DEFAULT_ORDER`** from optional-visibility for a stable `useWidgetLayout` default-order reference. Subscription booleans for Home come from **`getHomeSubscriptionGate`** in `home-subscription-gate.ts` (Vitest-covered).
+Hooks (`src/screens/home/hooks/use-home-*.ts` / `use-home-*.tsx`): checkout welcome toast, completed pause count, outlet `pauseReady`, document title, hero quote analytics, pause arrival chime + prefetch, market display preferences (price hide, BTC mode, chart expand), **visible section ids** (`useHomeVisibleSections`), **customize sheet wiring** (`useHomeCustomizeBridge`), **market + goal/why header chevrons** (`useHomeMarketGoalHeaders`), **pause card projection** (`useHomePauseCardProjection`), **Today wiring** (`useHomeDashboardTodayWiring` composes `useHomeDashboardSectionDeps` + `useHomeDashboardSectionRenderers`; section deps default an optional compact `HolzenNumber` market footer when `marketFooter` is omitted), **dashboard layout props** (`useHomeDashboardLayoutProps` — stable object for `HomeDashboardLayout`), **pull full reload** (`useHomePullFullReload`). Pause navigation, widget projection, and pending-offer actions live in [`public-home.ts`](../../src/features/pause/public-home.ts) (`useHomePauseActions`, `useHomePauseWidgetProjection`, `useHomePendingPauseOfferActions`, …). App shell outlet typing: [`home-app-layout-outlet.ts`](../../src/screens/home/lib/home-app-layout-outlet.ts). Layout prop surface: exported **`HomeDashboardLayoutProps`** on [`HomeDashboardLayout.tsx`](../../src/screens/home/components/HomeDashboardLayout.tsx). Use **`HOME_WIDGET_DEFAULT_ORDER`** from optional-visibility for a stable `useWidgetLayout` default-order reference. Subscription booleans for Home come from **`getHomeSubscriptionGate`** in `features/subscription/application/home-gate.ts` (Vitest-covered).
 
 ## Purpose
 
@@ -57,7 +57,7 @@ Shipped widgets render only **`goal-why`**, **`market`**, **`your-pause`** ([`re
 
 ## Pause widget error surfacing
 
-Logic lives in [`src/lib/home-pause-widget-error.ts`](../../src/lib/home-pause-widget-error.ts):
+Logic lives in [`src/features/pause/domain/home/pause-home-widget-error.ts`](../../src/features/pause/domain/home/pause-home-widget-error.ts):
 
 - **`shouldSurfacePauseWidgetError`** — Persist errors always block; without `btcData`, any error blocks; with cached prices, **price-only** CoinGecko / market copy is suppressed so the chart stays usable.
 - **`pauseHomeErrorKind`** — Maps `useHolzen` user-facing strings to `network` / `ai` / `generic` / `persist` so i18n titles match real failures (including “Could not reach Holzen” without substring `fetch`).
@@ -71,11 +71,11 @@ Home maps **`v_pause_full.state`** to Figma modes via [`resolveHomePauseWidgetMo
 | UI mode | When | Header / CTA |
 |--------|------|----------------|
 | **A** | Idle, no open pause | YOUR PAUSE (collapsed) / manual scheduling when expanded |
-| **B** | `state = active` | Template opening line + **Pause with this** |
-| **C** | `state = engaged` (deep + Reflect) | **Continue your pause** + Continue / Discard |
+| **B** | `state = active` (default: in-ritual, first offer, or + pending banner) | Template opening line + **Pause with this** |
+| **C** | `state = engaged` (deep + `reflection_step`) | **Continue your pause** + Continue / Discard |
 | **C′** | C + pending offer | Dual sections + **Pause with new context** |
-| **D / D′** | Post-pause auto cooldown | **You paused** + Pause again / archive link |
-| **E** | Cooldown + new active offer | **New pause available** + validation copy |
+| **D / D′** | No open pause, profile auto cooldown | **You paused** + Pause again / archive link |
+| **E** | `active` + profile cooldown + prior completion + no step events yet | **New pause available** + **Pause with this** |
 | **Calm** | Recent `context_lost` expiry | Reassurance + next scan (no B flash) |
 
 Opening preview: deterministic i18n templates pre-Reflect (`home.pauseOpening.*`); post-Reflect uses `reflection_text`. Market block: compact BTC/F&G + Updated HH:mm from [`formatHomePauseMarketBlock`](../../src/features/pause/domain/home/format-home-pause-market-block.ts).
