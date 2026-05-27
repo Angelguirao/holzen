@@ -24,7 +24,7 @@ Check the score did not regress. If it dropped, fix regressions before committin
 npm run doctor -- --verbose
 ```
 
-Fix issues by severity — errors first, then warnings. Treat findings as hypotheses; read the file before changing. Ignore bulk style rules and `src/legacy/**` unless the task explicitly includes legacy. See [active-surface.md](../../../docs/ops/active-surface.md).
+Fix issues by severity — errors first, then warnings. Treat findings as hypotheses; read the file before changing. Ignore bulk style rules and `src/legacy/**` unless the task explicitly includes legacy. See [active-surface.md](../../../docs/ops/active-surface.md) and root `react-doctor.config.json` (legacy paths, design tag, dead-code false positives, compiler pilot rules).
 
 ## /doctor — full local triage workflow
 
