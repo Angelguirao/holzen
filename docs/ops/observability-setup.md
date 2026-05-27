@@ -51,7 +51,7 @@ Click-paths and config for the Holzen observability stack. This is the setup sou
 | `LOG_DRAIN_URL` | BetterStack log ingest endpoint (`https://in.logs.betterstack.com`) |
 | `LOG_DRAIN_TOKEN` | BetterStack source token (not the API token) |
 | `SLACK_WEBHOOK_URL` | Slack Incoming Webhook URL for `#holzen-alerts` |
-| `GOOGLE_AI_API_KEY` | Primary LLM (Gemini direct) — see `_shared/llm-gateway.ts` |
+| `OPENROUTER_API_KEY` | Primary LLM (OpenRouter; Gemini model ids) — see `_shared/llm-gateway.ts` |
 | `OPENROUTER_API_KEY` | Optional LLM failover |
 | `RESEND_API_KEY` | Transactional email (required post platform-exit) |
 | `RESEND_WEBHOOK_SECRET` | Resend bounce/complaint webhook signing |

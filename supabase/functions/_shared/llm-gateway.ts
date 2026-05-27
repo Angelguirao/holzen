@@ -1,6 +1,6 @@
 /**
  * LLM gateway — task-aware model selection with provider cascade.
- * Order: `LLM_PROVIDER_ORDER` (default `google,openrouter`), e.g. `openrouter,google` when Google billing is unavailable.
+ * Order: `LLM_PROVIDER_ORDER` (default `openrouter` only). Set `google,openrouter` only if you use direct Gemini billing.
  * Failover: retryable HTTP statuses on one provider try the next credential in the chain (includes 402 billing).
  */
 import { fetchInitWithIncomingTrace } from "./forward-trace-headers.ts";
@@ -14,7 +14,7 @@ export type LlmGatewayProvider = "google" | "openrouter";
 /** Active deploys use Google and/or OpenRouter only. */
 const ACTIVE_LLM_PROVIDERS: readonly LlmGatewayProvider[] = ["google", "openrouter"];
 
-const DEFAULT_LLM_PROVIDER_ORDER: readonly LlmGatewayProvider[] = ["google", "openrouter"];
+const DEFAULT_LLM_PROVIDER_ORDER: readonly LlmGatewayProvider[] = ["openrouter"];
 
 export type LlmTask =
   | "reflect"
@@ -127,20 +127,28 @@ export function resolveLlmCredentialChain(
 
   const byProvider = new Map<LlmGatewayProvider, LlmCredentials>();
 
-  const googleKey =
-    Deno.env.get("GOOGLE_AI_API_KEY")?.trim() ||
-    Deno.env.get("GEMINI_API_KEY")?.trim();
-  if (allow("google") && googleKey) {
-    byProvider.set("google", { apiKey: googleKey, provider: "google" });
+  const order = readLlmProviderOrderFromEnv();
+  const wantsGoogle = order.includes("google");
+  const wantsOpenRouter = order.includes("openrouter");
+
+  if (wantsGoogle) {
+    const googleKey =
+      Deno.env.get("GOOGLE_AI_API_KEY")?.trim() ||
+      Deno.env.get("GEMINI_API_KEY")?.trim();
+    if (allow("google") && googleKey) {
+      byProvider.set("google", { apiKey: googleKey, provider: "google" });
+    }
   }
 
-  const openRouterKey = Deno.env.get("OPENROUTER_API_KEY")?.trim();
-  if (allow("openrouter") && openRouterKey) {
-    byProvider.set("openrouter", { apiKey: openRouterKey, provider: "openrouter" });
+  if (wantsOpenRouter) {
+    const openRouterKey = Deno.env.get("OPENROUTER_API_KEY")?.trim();
+    if (allow("openrouter") && openRouterKey) {
+      byProvider.set("openrouter", { apiKey: openRouterKey, provider: "openrouter" });
+    }
   }
 
   const chain: LlmCredentials[] = [];
-  for (const provider of readLlmProviderOrderFromEnv()) {
+  for (const provider of order) {
     const creds = byProvider.get(provider);
     if (creds) chain.push(creds);
   }
@@ -266,7 +274,7 @@ export async function llmChatCompletionsWithFallback(
   );
   if (chain.length === 0) {
     throw new Error(
-      "No LLM credentials configured (GOOGLE_AI_API_KEY and/or OPENROUTER_API_KEY)",
+      "No LLM credentials configured (OPENROUTER_API_KEY required for default openrouter-only order)",
     );
   }
 
