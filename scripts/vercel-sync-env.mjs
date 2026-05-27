@@ -69,7 +69,6 @@ add("VITE_SUPABASE_PROJECT_ID", "geqkxsnyqvhtascjghuu", "production");
 add("VITE_SUPABASE_PUBLISHABLE_KEY", prod.VITE_SUPABASE_PUBLISHABLE_KEY, "production");
 add("VITE_APP_VERSION", "$VERCEL_GIT_COMMIT_SHA", "production");
 add("VITE_SITE_ORIGIN", "https://holzen.app", "production");
-add("VITE_ADMIN_USER_IDS", prod.VITE_ADMIN_USER_IDS, "production");
 add("VITE_POSTHOG_KEY", prod.VITE_POSTHOG_KEY, "production");
 add("VITE_POSTHOG_HOST", prod.VITE_POSTHOG_HOST, "production");
 
@@ -79,7 +78,6 @@ function syncPreviewEnvironment(gitBranch) {
   add("VITE_SUPABASE_PROJECT_ID", "ksplyxxdvandkwzundql", "preview", gitBranch);
   add("VITE_SUPABASE_PUBLISHABLE_KEY", staging.VITE_SUPABASE_PUBLISHABLE_KEY, "preview", gitBranch);
   add("VITE_APP_VERSION", "$VERCEL_GIT_COMMIT_SHA", "preview", gitBranch);
-  add("VITE_ADMIN_USER_IDS", staging.VITE_ADMIN_USER_IDS ?? "", "preview", gitBranch);
   add("VITE_POSTHOG_KEY", prod.VITE_POSTHOG_KEY, "preview", gitBranch);
   add("VITE_POSTHOG_HOST", prod.VITE_POSTHOG_HOST, "preview", gitBranch);
 }

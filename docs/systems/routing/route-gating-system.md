@@ -97,7 +97,7 @@ Route gating is **UX and navigation policy** only. It does not replace:
 
 - Supabase **RLS** on tables
 - Edge function **authorization** checks
-- Admin or sensitive operations must still be enforced server-side (e.g. `VITE_ADMIN_USER_IDS` pattern on the client is not a security boundary by itself).
+- Admin or sensitive operations must still be enforced server-side (`profiles.is_admin`, RLS, edge auth). The client `/admin` gate is UX only.
 
 ## Files
 

@@ -217,7 +217,6 @@ These are public by design. They belong in local `.env*` files for local Vite, a
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Browser publishable/anon key | Local `.env*`, Vercel, GitHub preflight | Supabase → API → publishable / anon key | Never use the service role key here. |
 | `VITE_SITE_ORIGIN` | Canonical site origin for SEO / OG / links | Local `.env*`, Vercel Production | Product domain | Prod should be `https://holzen.app`; Preview can omit it. |
 | `VITE_APP_VERSION` | Release correlation across frontend, edges, Sentry, PostHog | Vercel, CI, optional local | `VERCEL_GIT_COMMIT_SHA` or current Git SHA | Must match edge `SENTRY_RELEASE` / `EDGE_RELEASE`. |
-| `VITE_ADMIN_USER_IDS` | Optional `/admin` allowlist in the client | Local `.env*`, Vercel | Supabase Auth user UUIDs | Comma-separated UUIDs; server-side admin logic may still apply independently. |
 | `VITE_SENTRY_DSN` | Frontend Sentry DSN | Vercel, optional local | Sentry → Project → Client Keys (DSN) | If unset, `src/config/public-env.ts` falls back to committed defaults. |
 | `VITE_POSTHOG_KEY` | Frontend PostHog project key | Vercel, optional local | PostHog → Project Settings → Project API Key | If unset, `src/config/public-env.ts` falls back to committed defaults. |
 | `VITE_POSTHOG_HOST` | PostHog ingest host | Vercel, optional local | PostHog region (`https://eu.i.posthog.com` or `https://us.i.posthog.com`) | Match your PostHog region. |
@@ -230,6 +229,16 @@ These are public by design. They belong in local `.env*` files for local Vite, a
 
 - `VITE_SENTRY_DSN`, `VITE_POSTHOG_KEY`, and `VITE_POSTHOG_HOST` fall back to committed values in `src/config/public-env.ts` when unset.
 - `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` do not have committed fallbacks. `vite.config.ts` and `scripts/check-version-sync.mjs` now fail fast when they are missing.
+
+### Admin access (`/admin`)
+
+There is **no** client env var for admin. Grant access in Supabase on the target project:
+
+```sql
+UPDATE profiles SET is_admin = true WHERE user_id = '<auth-user-uuid>';
+```
+
+`useIsAdmin` reads the same `profiles.is_admin` flag; RLS and admin edge handlers enforce it server-side.
 
 ## Developer and build-only toggles
 

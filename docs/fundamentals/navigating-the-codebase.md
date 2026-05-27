@@ -205,7 +205,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 ## 13. Admin (`src/screens/admin/AdminScreen.tsx`)
 
 - Route `/admin` is **protected by login** like any other `ProtectedRoute`.
-- **Authorization:** `useIsAdmin` reads `profiles.is_admin` when present; if the column/query fails, it falls back to **`VITE_ADMIN_USER_IDS`** (comma-separated user UUIDs).
+- **Authorization:** `useIsAdmin` reads `profiles.is_admin` (same flag enforced by RLS and admin edge handlers).
 - UI pulls stats and tools from `use-admin-stats` and components under `components/admin/`.
 
 ---
