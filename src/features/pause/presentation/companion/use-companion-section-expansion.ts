@@ -68,9 +68,9 @@ export function useCompanionSectionExpansion({
       error: unknown,
     ) =>
       () => {
+        if (exclusiveExpand) collapseExcept(expandKey);
         setExpanded((current) => {
           if (current) return false;
-          if (exclusiveExpand) collapseExcept(expandKey);
           return nextExpandedWithLazyFetch(false, {
             data,
             loading,
@@ -85,9 +85,9 @@ export function useCompanionSectionExpansion({
   );
 
   const toggleHaiku = useCallback(() => {
+    if (exclusiveExpand) collapseExcept('haiku');
     setExpandedHaiku((current) => {
       if (current) return false;
-      if (exclusiveExpand) collapseExcept('haiku');
       return true;
     });
   }, [collapseExcept, exclusiveExpand]);

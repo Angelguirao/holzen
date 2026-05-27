@@ -42,6 +42,23 @@ describe('useCompanionSectionExpansion', () => {
     expect(result.current.expandedLearning).toBe(true);
   });
 
+  it('exclusiveExpand collapses lazy slots when opening another', () => {
+    const { result } = renderHook(() =>
+      useCompanionSectionExpansion({ ...baseParams(), exclusiveExpand: true }),
+    );
+
+    act(() => {
+      result.current.toggleZoomOut();
+    });
+    expect(result.current.expandedZoomOut).toBe(true);
+
+    act(() => {
+      result.current.toggleHistory();
+    });
+    expect(result.current.expandedZoomOut).toBe(false);
+    expect(result.current.expandedHistory).toBe(true);
+  });
+
   it('without exclusiveExpand multiple slots can stay open', () => {
     const { result } = renderHook(() =>
       useCompanionSectionExpansion({ ...baseParams(), exclusiveExpand: false }),
