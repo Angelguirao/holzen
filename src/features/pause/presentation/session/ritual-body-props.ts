@@ -77,6 +77,7 @@ export type PauseSessionDeepRitualBodyProps = {
   isFavorite: boolean;
   onToggleFavorite: () => void | Promise<void>;
   subscribed: boolean;
+  mood?: MoodValue | null;
   onFrameImDone: () => void;
   onDecide: (decision: string) => void;
   onRepeatDeepFirstBreathPattern: () => void;

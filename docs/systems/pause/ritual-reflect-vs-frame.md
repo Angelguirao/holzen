@@ -98,7 +98,8 @@ Structured `land` / `hypothesis` / `inquiry` remain in the artifact for analytic
 Frame is a **hub**, not a second Reflect screen:
 
 - Subtitle intent: *“Want another angle? Your companions.”*
-- Rows link to full-view companions (`/companion/signal|grounding|history|zoom-out/:pauseInstanceId`).
+- **Inline accordion cards** (Figma wireframes): Haiku → Ground yourself → Zoom out → Look back → Signal. **Only one card open at a time**; expanding one collapses the others.
+- Premium slots **lazy-fetch** on first expand (`companion-orchestrate`). Long-form read stays optional via **Open full view** inside an expanded card (`/companion/*`), not as the primary Frame interaction.
 - **I’m done** logs `shift_emotion_logged` with `{ from_frame_hub: true }` and advances to second Breathe — no mirror mood required.
 
 The user has already had an internal beat on Reflect. Frame answers: **“Do I still want external perspective?”**
@@ -183,7 +184,7 @@ Use these to validate the split, not to merge steps:
 | Surface | Code |
 |---------|------|
 | Reflect step | `src/screens/pause/components/PauseReflect.tsx`, `pause-reflect-card.tsx` |
-| Frame hub | `src/screens/pause/components/PauseFrame.tsx` |
+| Frame hub | `src/screens/pause/components/PauseFrame.tsx` → `CompanionSection` (`exclusiveExpand`, `appearance="frame"`) |
 | Reflect generation | `holzen-reflect` edge; `use-pause-reflect-generation` |
 | Companion lazy fetch | `useCompanionOrchestration` → `companion-orchestrate` |
 | Legacy intervention | `src/legacy/pause-featured-intervention/` (not in active bundle) |
