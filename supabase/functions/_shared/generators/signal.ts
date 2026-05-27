@@ -42,9 +42,10 @@ import {
 import { preferNonYoutubeCitationsFirst } from "../recent-signal-urls.ts";
 import { getPhaseConfig } from "../phase-config.ts";
 import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
+import { normalizeSignalKeyIdeas } from "../signal-key-ideas.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
-export const PROMPT_VERSION = "v9";
+export const PROMPT_VERSION = "v10";
 
 /**
  * Optional Perplexity denylist entries (leading `-`, e.g. `-example.com`).
@@ -141,6 +142,7 @@ export interface SignalResult {
     source: string;
     url: string;
     quote?: string;
+    keyIdeas?: string[];
   } | null;
   /** `catalog` = `companion_catalog`; `cache` = `companion_cache` — distinct pools and invalidation. */
   source: "live" | "catalog" | "library" | "cache" | "curated" | "empty";
@@ -539,6 +541,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
 TONE: Profound, calm, grounding. Like a wise friend reminding you why you hold.
 TITLE: Evocative, poetic, 5-10 words. Should read like a book chapter title, not a headline.
 BODY: 2-3 sentences capturing the philosophical ESSENCE — not a summary. Distill the core idea.
+KEY IDEAS: 3-4 short bullet takeaways (each under 120 characters) a reader can scan in seconds — distinct angles, not copies of the body sentences.
 QUOTE (optional): If the search results contain a memorable direct quote from the thinker (1 sentence max), include it. Must be a REAL quote from the search results — do NOT fabricate. Leave empty if no direct quote is found.
 
 GOOD TITLES: "Proof of work is proof of sacrifice" / "Sound money teaches patience before wealth" / "Settlement is the antidote to narrative"
@@ -583,8 +586,13 @@ URL RULES (CRITICAL):
             source: { type: "string", description: "Thinker, writer, or publication name" },
             url: { type: "string", description: "Citation URL copied character-for-character" },
             quote: { type: "string", description: "Optional: a real direct quote from the thinker (1 sentence, from search results only)" },
+            keyIdeas: {
+              type: "array",
+              items: { type: "string" },
+              description: "3-4 short scannable takeaways (under 120 chars each)",
+            },
           },
-          required: ["title", "body", "source", "url"],
+          required: ["title", "body", "source", "url", "keyIdeas"],
           additionalProperties: false,
         },
       },
@@ -700,6 +708,8 @@ URL RULES (CRITICAL):
   if (signal.source !== originalSource) {
     log(`source corrected: "${originalSource}" → "${signal.source}"`);
   }
+
+  signal.keyIdeas = normalizeSignalKeyIdeas({ body: signal.body, keyIdeas: signal.keyIdeas });
 
   // ── Step 5: Cache write ──
   const qualityScore = 1;

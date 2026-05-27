@@ -123,6 +123,12 @@ Haiku may appear in a collapsible card on Frame (lazy-loaded). It mirrors Reflec
 
 The old **headline intervention** (mirror / trap / pattern / question at top of Frame) is **not shipped** in pause-first UI. Code lives in `src/legacy/pause-featured-intervention/` and `supabase/functions/legacy/featured-intervention/`. Frame today is **companion hub only** — do not conflate with that legacy surface when reading older docs or reviews.
 
+### 5.5 `companion-orchestrate` is active (not legacy)
+
+**`supabase/functions/companion-orchestrate`** is the **shipped** edge entry for lazy companion generation on Frame (listed in [active-surface.md](../../ops/active-surface.md)). What is legacy: **featured intervention** orchestration (`supabase/functions/legacy/featured-intervention/`) and the old headline UI — not the companion-orchestrate path the SPA calls via `invokeEdge`.
+
+**Signal (May 2026):** inline + full view include a **Key ideas** bullet list (`keyIdeas` on the artifact; prompt v10). Older cached signals without `keyIdeas` derive bullets from the body on the client.
+
 ---
 
 ## 6. Should anything move from Frame to Reflect?

@@ -6,6 +6,7 @@ export interface CachedSignalShape {
   body: string;
   source: string;
   url: string;
+  keyIdeas?: string[];
 }
 
 export interface CachedGroundingShape {
@@ -48,6 +49,7 @@ export function parsePauseArtifactRows(rows: ArtifactRow[]): ParsedPauseArtifact
         body: (d.body as string) ?? '',
         source: d.source as string,
         url: (d.url as string) ?? '',
+        ...(Array.isArray(d.keyIdeas) ? { keyIdeas: d.keyIdeas as string[] } : {}),
       };
     } else if (c.kind === 'ground_nudge' && d) {
       result.grounding = {

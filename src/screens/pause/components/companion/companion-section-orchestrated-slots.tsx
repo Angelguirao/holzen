@@ -13,12 +13,9 @@ import type {
   CompanionUiCompletionStep,
 } from '@/features/pause/public-queries';
 
-type CompanionSignalPayload = {
-  title: string;
-  body: string;
-  source: string;
-  url: string;
-} | null;
+import type { SignalPayload } from '@/features/pause/domain/signal-payload';
+
+type CompanionSignalPayload = SignalPayload | null;
 
 type CompanionNudgePayload = {
   title: string;
