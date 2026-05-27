@@ -22,7 +22,7 @@ Use this table when you're unsure which runtime actually reads a variable.
 | Variable type | Local frontend | Local Edge Functions | Hosted frontend | Hosted Edge Functions |
 |---|---|---|---|---|
 | `VITE_*` browser/build vars | Local `.env*` files such as `.env.localstack.local`, `.env.staging.local`, `.env.prod.local`, or `.env` | Not used | Vercel environment variables | Not used |
-| Server-side secrets such as `STRIPE_SECRET_KEY`, `RESEND_API_KEY`, `GOOGLE_AI_API_KEY` | Never | `supabase/.env.local`, `supabase/.env`, or OS env while running `npm run supabase:functions:serve` | Never | Supabase Dashboard → Edge Functions → Secrets |
+| Server-side secrets such as `STRIPE_SECRET_KEY`, `RESEND_API_KEY`, `OPENROUTER_API_KEY` | Never | `supabase/.env.local`, `supabase/.env`, or OS env while running `npm run supabase:functions:serve` | Never | Supabase Dashboard → Edge Functions → Secrets |
 
 Quick rule:
 
@@ -281,12 +281,12 @@ These exist in hosted Edge Functions without you creating matching secrets manua
 
 ### AI and companion secrets
 
+**Model routing (OpenRouter):** [llm-openrouter.md](llm-openrouter.md) — which `google/gemini-*` ids each task uses, budget tiers, and secrets to delete.
+
 | Variable | Used for | Where obtained | Environment notes |
 |---|---|---|---|
 | `OPENROUTER_API_KEY` | All Gemini LLM calls via OpenRouter (`llm-gateway`) | OpenRouter dashboard | **Required** for active-surface AI (default is OpenRouter-only). |
 | `LLM_PROVIDER_ORDER` | Provider try order for `llm-gateway` | Manual | Default `openrouter`. Set `google,openrouter` only if you also use direct Gemini. |
-| `GOOGLE_AI_API_KEY` | Direct Gemini (`google` provider) | Google AI Studio | **Not used** unless listed in `LLM_PROVIDER_ORDER`. |
-| `GEMINI_API_KEY` | Alias for `GOOGLE_AI_API_KEY` | Same Google AI key | Same as above. |
 | `OPENROUTER_HTTP_REFERER` | OpenRouter attribution header | Manual value | Optional. |
 | `OPENROUTER_APP_TITLE` | OpenRouter attribution title | Manual value | Optional; defaults to `Holzen`. |
 | `PERPLEXITY_API_KEY` | Companion generation and feed ingest | Perplexity dashboard | Optional but recommended for the current AI stack. |

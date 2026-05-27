@@ -192,7 +192,7 @@ npm run prod:secrets-set
 |--------|---------|
 | `RESEND_API_KEY` | Auth + transactional email |
 | `SEND_EMAIL_HOOK_SECRET` | Supabase Auth Send Email Hook |
-| `GOOGLE_AI_API_KEY` | Gemini / pause AI |
+| `OPENROUTER_API_KEY` | Gemini via OpenRouter / pause AI |
 | `STRIPE_SECRET_KEY` | Subscriptions (test on staging, live on prod) |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signature |
 | `STRIPE_PRICE_ID_PRO` | Pro subscription price |

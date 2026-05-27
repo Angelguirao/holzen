@@ -62,7 +62,7 @@ Holzen’s `observe.ts` uses the same order of magnitude: `sonar-pro` → `[3, 1
 
 ### 2.2 Gemini (direct + OpenRouter via `llm-gateway`)
 
-Holzen calls Gemini through **`GOOGLE_AI_API_KEY`** (primary) with optional **`OPENROUTER_API_KEY`** failover. Billing is per the [Google AI](https://ai.google.dev/pricing) and [OpenRouter](https://openrouter.ai/docs/pricing) dashboards — no Lovable gateway markup.
+Holzen calls Gemini-family models through **`OPENROUTER_API_KEY`** by default ([llm-openrouter.md](../../ops/llm-openrouter.md)). Billing is on the [OpenRouter](https://openrouter.ai/docs/pricing) dashboard (model ids like `google/gemini-2.5-flash`).
 
 Holzen maps Gemini-style models in `observe.ts` at **current GA rates** (re-verified 2026-04-19):
 

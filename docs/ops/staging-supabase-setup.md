@@ -67,7 +67,7 @@ Supabase Dashboard → Project Settings → Edge Functions → Secrets, **or** f
 
 ```sh
 cp .env.staging.secrets.example .env.staging.secrets
-# fill RESEND_*, STRIPE_* (test), GOOGLE_AI_API_KEY, observability keys
+# fill RESEND_*, STRIPE_* (test), OPENROUTER_API_KEY, observability keys
 npm run staging:secrets-set
 ```
 
@@ -75,8 +75,7 @@ npm run staging:secrets-set
 
 | Secret | Staging value |
 |--------|----------------|
-| `OPENROUTER_API_KEY` | OpenRouter (default LLM path; Gemini model ids) |
-| `GOOGLE_AI_API_KEY` | Optional — only if `LLM_PROVIDER_ORDER` includes `google` |
+| `OPENROUTER_API_KEY` | **Required** — all Gemini LLM via OpenRouter ([llm-openrouter.md](llm-openrouter.md)) |
 | `OPENROUTER_API_KEY` | Optional Gemini failover |
 | `PERPLEXITY_API_KEY` | Perplexity API key |
 | `RESEND_API_KEY` | Staging-only Resend API key |

@@ -60,9 +60,8 @@ Copy staging values where appropriate; swap to **live** vendor keys where noted.
 
 | Secret | Notes |
 |--------|--------|
-| `GOOGLE_AI_API_KEY` | Optional — only if `LLM_PROVIDER_ORDER` includes `google` |
-| `OPENROUTER_API_KEY` | **Required** — all Gemini LLM traffic |
-| `LLM_PROVIDER_ORDER` | `openrouter` (default; omit or set explicitly) |
+| `OPENROUTER_API_KEY` | **Required** — all Gemini LLM traffic ([llm-openrouter.md](llm-openrouter.md)) |
+| `OPENROUTER_HTTP_REFERER` / `OPENROUTER_APP_TITLE` | Recommended attribution headers |
 | `PERPLEXITY_API_KEY` | Companions / library ingest |
 | `RESEND_API_KEY` | Production-only Resend API key |
 | `RESEND_WEBHOOK_SECRET` | Resend → prod `handle-email-suppression` |
