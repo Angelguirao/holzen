@@ -8,7 +8,7 @@ describe('buildHomePauseSessionLocationState', () => {
         message: ' Breathe ',
         context: 'btc_move',
         pauseInstanceId: 'inst-1',
-        companions: { haiku: 'line', groundingTitle: null, groundingBody: null },
+        companions: { haiku: 'line' },
         companionPrefs: {
           breathing: true,
           haiku: true,
@@ -23,7 +23,7 @@ describe('buildHomePauseSessionLocationState', () => {
       reflectionMessage: ' Breathe ',
       context: 'btc_move',
       pauseInstanceId: 'inst-1',
-      companions: { haiku: 'line', groundingTitle: null, groundingBody: null },
+      companions: { haiku: 'line' },
       companionPrefs: {
         breathing: true,
         haiku: true,
@@ -42,7 +42,7 @@ describe('buildHomePauseSessionLocationState', () => {
         message: null,
         context: null,
         pauseInstanceId: undefined,
-        companions: { haiku: null, groundingTitle: null, groundingBody: null },
+        companions: { haiku: null },
         companionPrefs: {
           breathing: false,
           haiku: false,

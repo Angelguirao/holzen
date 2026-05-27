@@ -38,8 +38,6 @@ export function buildFetchedPauseInstanceFromFetch(
     reflection_message: msg,
     context: ctx,
     haiku: companionData.haiku,
-    grounding_title: companionData.groundingTitle,
-    grounding_body: companionData.groundingBody,
     db_state: inst.state ?? null,
     engaged_at: inst.engaged_at ?? null,
   };

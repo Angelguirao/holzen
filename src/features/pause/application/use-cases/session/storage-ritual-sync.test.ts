@@ -6,7 +6,7 @@ const baseSaved = (over: Partial<PersistedSession> = {}): PersistedSession => ({
   message: 'm',
   context: null,
   pauseInstanceId: 'pi-1',
-  companions: { haiku: null, groundingTitle: null, groundingBody: null },
+  companions: { haiku: null },
   companionPrefs: { breathing: true, haiku: true, grounding: true, signal: true, zoomOut: true, history: true },
   severity: 'mild',
   moodDone: false,
