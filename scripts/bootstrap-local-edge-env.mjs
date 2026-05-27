@@ -87,17 +87,6 @@ function mergeValues(existing, flags, stripePriceIds) {
   const repoEnv = readOptionalDotenv(repoEnvPath);
   const repoEnvLocal = readOptionalDotenv(repoEnvLocalPath);
   const sharedSupabaseEnv = readOptionalDotenv(sharedSupabaseEnvPath);
-  const googleKey =
-    firstNonEmpty(
-      existing.GOOGLE_AI_API_KEY,
-      sharedSupabaseEnv.GOOGLE_AI_API_KEY,
-      repoEnvLocal.GOOGLE_AI_API_KEY,
-      repoEnv.GOOGLE_AI_API_KEY,
-      mcpSecrets.GOOGLE_AI_API_KEY,
-      mcpSecrets.GEMINI_API_KEY,
-      process.env.GOOGLE_AI_API_KEY,
-      process.env.GEMINI_API_KEY,
-    );
   const resendKey = firstNonEmpty(
     existing.RESEND_API_KEY,
     sharedSupabaseEnv.RESEND_API_KEY,
@@ -164,7 +153,6 @@ function mergeValues(existing, flags, stripePriceIds) {
       repoEnv.RESEND_WEBHOOK_SECRET,
       process.env.RESEND_WEBHOOK_SECRET,
     ),
-    GOOGLE_AI_API_KEY: googleKey,
     OPENROUTER_API_KEY: openRouterKey,
     OPENROUTER_HTTP_REFERER: firstNonEmpty(
       existing.OPENROUTER_HTTP_REFERER,
@@ -334,8 +322,7 @@ function renderEnv(values) {
     "RESEND_API_KEY=" + values.RESEND_API_KEY,
     "RESEND_WEBHOOK_SECRET=" + values.RESEND_WEBHOOK_SECRET,
     "",
-    "# --- AI providers ---",
-    "GOOGLE_AI_API_KEY=" + values.GOOGLE_AI_API_KEY,
+    "# --- AI providers (OpenRouter only — docs/ops/llm-openrouter.md) ---",
     "OPENROUTER_API_KEY=" + values.OPENROUTER_API_KEY,
     "OPENROUTER_HTTP_REFERER=" + values.OPENROUTER_HTTP_REFERER,
     "OPENROUTER_APP_TITLE=" + values.OPENROUTER_APP_TITLE,
@@ -380,14 +367,14 @@ function summarize(values) {
   );
   const hasEmailSending = Boolean(values.RESEND_API_KEY);
   const hasEmailWebhook = Boolean(values.RESEND_WEBHOOK_SECRET);
-  const hasAi = Boolean(values.GOOGLE_AI_API_KEY || values.OPENROUTER_API_KEY);
+  const hasAi = Boolean(values.OPENROUTER_API_KEY);
   const hasPerplexity = Boolean(values.PERPLEXITY_API_KEY);
 
   console.log("Local edge env bootstrapped:");
   console.log(`- Stripe local billing: ${hasStripe ? "ready" : "incomplete"}`);
   console.log(`- Email sending: ${hasEmailSending ? "ready" : "incomplete"}`);
   console.log(`- Email suppression webhook: ${hasEmailWebhook ? "ready" : "optional / missing"}`);
-  console.log(`- Gemini/OpenRouter flows: ${hasAi ? "ready" : "incomplete"}`);
+  console.log(`- OpenRouter LLM flows: ${hasAi ? "ready" : "incomplete"}`);
   console.log(`- Perplexity-backed companion/feed flows: ${hasPerplexity ? "ready" : "incomplete"}`);
 
   const missing = [];
@@ -397,8 +384,8 @@ function summarize(values) {
   if (!values.STRIPE_PRICE_ID_FLEX_PACK_S) missing.push("STRIPE_PRICE_ID_FLEX_PACK_S");
   if (!values.STRIPE_PRICE_ID_FLEX_PACK_M) missing.push("STRIPE_PRICE_ID_FLEX_PACK_M");
   if (!values.RESEND_API_KEY) missing.push("RESEND_API_KEY");
-  if (!values.GOOGLE_AI_API_KEY && !values.OPENROUTER_API_KEY) {
-    missing.push("GOOGLE_AI_API_KEY or OPENROUTER_API_KEY");
+  if (!values.OPENROUTER_API_KEY) {
+    missing.push("OPENROUTER_API_KEY");
   }
   if (!values.PERPLEXITY_API_KEY) missing.push("PERPLEXITY_API_KEY");
 
