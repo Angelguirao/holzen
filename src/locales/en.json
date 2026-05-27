@@ -869,10 +869,24 @@
     "echoMoreEntries_other": "{{count}} more entries from that pause",
     "echoEmptyTitle": "Echo",
     "echoEmptyBody": "You haven’t left notes on past pauses yet. Add one next time — only your own words show up here, never a new AI take.",
+    "zoomOutEmptyLead": "Perspective takes time to build.",
+    "zoomOutEmptyBody": "The more you pause and add notes, the richer your zoom-out view becomes. Deep-time perspective and your own words from past pauses will appear here over time.",
+    "lookBackContent": {
+      "btcOnThisDay": "BTC on this day",
+      "partialData": "partial",
+      "yearsAgo_one": "{{count}}y ago",
+      "yearsAgo_other": "{{count}}y ago",
+      "now": "Now",
+      "btcInsightLabel": "Bitcoin · {{period}}",
+      "btcInsightFallback": "Bitcoin",
+      "mirrorMoment": "Parallel",
+      "mirrorMomentWithAsset": "{{assetClass}} parallel"
+    },
     "echoHolzenAsked": "Holzen asked",
     "echoYourNote": "Your note",
     "echoYourReplay": "Your replay",
     "openFullView": "Open full view",
+    "readFullStory": "Read the full story",
     "focusZoomOutMeta": "Zoom Out — Holzen",
     "focusHistoryMeta": "Look back — Holzen",
     "focusLoadError": "We could not load this pause. It may have been removed or you may need to sign in again.",
@@ -988,9 +1002,9 @@
       "grounding": "Ground Yourself",
       "groundingDesc": "Behavioral finance research in context",
       "zoomOut": "Zoom Out",
-      "zoomOutDesc": "BTC prices 1–5 years ago, your past pauses & deep-time perspective",
+      "zoomOutDesc": "Deep-time perspective and your own words from past pauses",
       "history": "Historical Echo",
-      "historyDesc": "Financial history parallels & cross-asset analogies via research"
+      "historyDesc": "BTC on this day, historical parallels, and cross-asset analogies"
     },
     "whatYouGet": "What's included",
     "features": {
@@ -1617,13 +1631,31 @@
       "zoomOut": "Zoom out",
       "lookBack": "Look back",
       "signal": "Signal",
+      "readFullStory": "Read the full story",
+      "toggleSignalAria": "Expand or collapse Signal",
+      "companionSeen": "Seen",
       "imDone": "I'm done",
       "haikuLoading": "Loading…",
+      "lookBackContent": {
+        "btcOnThisDay": "BTC on this day",
+        "partialData": "partial",
+        "yearsAgo_one": "{{count}}y ago",
+        "yearsAgo_other": "{{count}}y ago",
+        "now": "Now",
+        "btcInsightLabel": "Bitcoin · {{period}}",
+        "btcInsightFallback": "Bitcoin history",
+        "mirrorMoment": "A moment that mirrors today",
+        "mirrorMomentWithAsset": "{{assetClass}} parallel"
+      },
+      "zoomOutContent": {
+        "emptyTitle": "Perspective takes time to build.",
+        "emptyBody": "The more you pause and add notes, the richer your zoom-out view becomes. Deep-time perspective and your own words from past pauses will appear here over time."
+      },
       "companions": {
         "haikuHelp": "A short poem that distills your reflection.",
         "groundingHelp": "A quick breath or body reset when anxiety spikes.",
-        "zoomOutHelp": "A wider market or time perspective on what you feel.",
-        "lookBackHelp": "A pattern drawn from your past pauses.",
+        "zoomOutHelp": "Deep-time perspective and a waypoint from your past pauses.",
+        "lookBackHelp": "BTC on this day, a historical mirror, and a cross-asset analogy.",
         "signalHelp": "Curated external context tied to what you shared."
       }
     },

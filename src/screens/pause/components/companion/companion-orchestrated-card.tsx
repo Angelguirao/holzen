@@ -28,6 +28,8 @@ export type CompanionOrchestratedCardProps = {
   onRegenerate: () => void;
   routeSegment: CompanionFullViewRouteSegment;
   appearance?: CompanionCardAppearance;
+  iconHelp?: string;
+  showFullViewButton?: boolean;
   children: React.ReactNode;
 };
 
@@ -52,6 +54,8 @@ export function CompanionOrchestratedCard({
   onRegenerate,
   routeSegment,
   appearance = 'default',
+  iconHelp,
+  showFullViewButton = true,
   children,
 }: CompanionOrchestratedCardProps) {
   "use memo";
@@ -70,6 +74,7 @@ export function CompanionOrchestratedCard({
       isFavorite={isFavorite}
       onToggleFavorite={onToggleFavorite}
       appearance={appearance}
+      iconHelp={iconHelp}
     >
       <CompanionOrchestratedSlotChrome
         pauseInstanceId={pauseInstanceId}
@@ -82,6 +87,7 @@ export function CompanionOrchestratedCard({
         onRegenerate={onRegenerate}
         regenerating={loading}
         routeSegment={routeSegment}
+        showFullViewButton={showFullViewButton}
       >
         {children}
       </CompanionOrchestratedSlotChrome>
