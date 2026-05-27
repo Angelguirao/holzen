@@ -7,12 +7,13 @@
  */
 
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
-import { createAttemptLogger } from "../observe.ts";
+import { createAttemptLogger } from "../../_shared/observe.ts";
 import {
   llmChatCompletionsWithFallback,
   llmLogProvider,
   resolveModelsForTask,
-} from "../llm-gateway.ts";
+  type LlmCredentials,
+} from "../../_shared/llm-gateway.ts";
 
 /** Bump when the system prompt or style rules change. */
 export const PROMPT_VERSION = "v1";
