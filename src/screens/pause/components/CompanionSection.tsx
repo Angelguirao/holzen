@@ -128,8 +128,6 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     fetchCompanion,
     canAccessCompanion,
     exclusiveExpand,
-    groundingTitle: companions.groundingTitle,
-    groundingBody: companions.groundingBody,
   });
 
   const proFavorite = useCallback(
@@ -165,7 +163,6 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       <CompanionSectionOrchestratedSlots
         labels={labels}
         visibility={{ hasSignal, hasGrounding, hasZoomOut, hasHistory }}
-        companions={companions}
         pauseInstanceId={pauseInstanceId}
         completion={completion}
         markCompleted={markCompleted}
