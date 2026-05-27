@@ -10,7 +10,7 @@ import {
   type CompanionSlotRelaxations,
 } from './pause-companion-orchestrate-io';
 
-interface NudgeData {
+interface GroundingData {
   title: string;
   body: string;
   citation: string;
@@ -27,12 +27,12 @@ interface SignalData {
 /** Per-slot companion card UI state (loading / error / payload) for a single pause instance. */
 export function useCompanionSlotUiState(pauseInstanceId?: string | null) {
   const [signalPending, startSignalTransition] = useTransition();
-  const [nudgePending, startNudgeTransition] = useTransition();
+  const [groundingPending, startGroundingTransition] = useTransition();
   const [zoomOutPending, startZoomOutTransition] = useTransition();
   const [historyPending, startHistoryTransition] = useTransition();
 
   const [cacheIds, setCacheIds] = useState<CompanionSlotCacheIds>({
-    nudge: null,
+    grounding: null,
     signal: null,
     zoomOut: null,
     history: null,
@@ -41,8 +41,8 @@ export function useCompanionSlotUiState(pauseInstanceId?: string | null) {
     EMPTY_COMPANION_SLOT_RELAXATIONS,
   );
 
-  const [nudge, setNudge] = useState<NudgeData | null>(null);
-  const [nudgeError, setNudgeError] = useState(false);
+  const [grounding, setGrounding] = useState<GroundingData | null>(null);
+  const [groundingError, setGroundingError] = useState(false);
 
   const [signal, setSignal] = useState<SignalData | null>(null);
   const [signalError, setSignalError] = useState(false);
@@ -63,17 +63,17 @@ export function useCompanionSlotUiState(pauseInstanceId?: string | null) {
   const companionSlotTransitionStarters = useMemo<CompanionSlotTransitionStarters>(
     () => ({
       signal: startSignalTransition,
-      grounding: startNudgeTransition,
+      grounding: startGroundingTransition,
       history: startHistoryTransition,
       zoomOut: startZoomOutTransition,
     }),
-    [startSignalTransition, startNudgeTransition, startHistoryTransition, startZoomOutTransition],
+    [startSignalTransition, startGroundingTransition, startHistoryTransition, startZoomOutTransition],
   );
 
   const companionSlotErrorSetters = useMemo(
     () => ({
       setSignalError,
-      setNudgeError,
+      setGroundingError,
       setHistoryError,
       setZoomOutError,
     }),
@@ -83,7 +83,7 @@ export function useCompanionSlotUiState(pauseInstanceId?: string | null) {
   const slotCommitters = useMemo<CompanionSlotCommitters>(
     () => ({
       setSignal,
-      setNudge,
+      setGrounding,
       setHistoryInsight,
       setZoomOut,
       autoSaveToLibrary,
@@ -94,13 +94,13 @@ export function useCompanionSlotUiState(pauseInstanceId?: string | null) {
   useLayoutEffect(() => {
     setSignal(null);
     setSignalError(false);
-    setNudge(null);
-    setNudgeError(false);
+    setGrounding(null);
+    setGroundingError(false);
     setZoomOut(null);
     setZoomOutError(false);
     setHistoryInsight(null);
     setHistoryError(false);
-    setCacheIds({ nudge: null, signal: null, zoomOut: null, history: null });
+    setCacheIds({ grounding: null, signal: null, zoomOut: null, history: null });
     setCacheRelaxations(EMPTY_COMPANION_SLOT_RELAXATIONS);
     fetchedSlotsRef.current = new Set();
   }, [pauseInstanceId]);
@@ -110,9 +110,9 @@ export function useCompanionSlotUiState(pauseInstanceId?: string | null) {
     setCacheIds,
     cacheRelaxations,
     setCacheRelaxations,
-    nudge,
-    nudgeLoading: nudgePending,
-    nudgeError,
+    grounding,
+    groundingLoading: groundingPending,
+    groundingError,
     signal,
     signalLoading: signalPending,
     signalError,
@@ -122,8 +122,8 @@ export function useCompanionSlotUiState(pauseInstanceId?: string | null) {
     historyInsight,
     historyLoading: historyPending,
     historyError,
-    setNudge,
-    setNudgeError,
+    setGrounding,
+    setGroundingError,
     setSignal,
     setSignalError,
     setZoomOut,

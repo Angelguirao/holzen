@@ -39,7 +39,7 @@ describe('pause-companion-orchestrate-io ↔ pause-companion-frame-ui-io sibling
     expect(typeof trackCompanionGenerationInitiated).toBe('function');
     expect(typeof setCompanionSlotLoading).toBe('function');
     expect(typeof setCompanionSlotError).toBe('function');
-    expect(EMPTY_COMPANION_SLOT_RELAXATIONS).toMatchObject({ nudge: null, signal: null });
+    expect(EMPTY_COMPANION_SLOT_RELAXATIONS).toMatchObject({ grounding: null, signal: null });
 
     expect(typeof getCompanionSectionVisibility).toBe('function');
     expect(typeof isCompanionSectionVisible).toBe('function');

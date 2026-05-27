@@ -70,10 +70,10 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     toggleCompanionFavorite,
     completion,
     markCompleted,
-    nudge,
-    nudgeLoading,
-    nudgeError,
-    retryNudge,
+    grounding,
+    groundingLoading,
+    groundingError,
+    retryGrounding,
     signal,
     signalLoading,
     signalError,
@@ -116,9 +116,9 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     signal,
     signalLoading,
     signalError,
-    nudge,
-    nudgeLoading,
-    nudgeError,
+    grounding,
+    groundingLoading,
+    groundingError,
     zoomOut,
     zoomOutLoading,
     zoomOutError,
@@ -178,10 +178,10 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
         signalLoading={signalLoading}
         signalError={signalError}
         retrySignal={retrySignal}
-        nudge={nudge}
-        nudgeLoading={nudgeLoading}
-        nudgeError={nudgeError}
-        retryNudge={retryNudge}
+        grounding={grounding}
+        groundingLoading={groundingLoading}
+        groundingError={groundingError}
+        retryGrounding={retryGrounding}
         zoomOut={zoomOut}
         zoomOutLoading={zoomOutLoading}
         zoomOutError={zoomOutError}

@@ -57,7 +57,7 @@ describe('pause-companion-orchestrate-io', () => {
   it('re-exports frame orchestration helpers for companion presentation hooks', () => {
     expect(typeof runCompanionSlotOrchestrate).toBe('function');
     expect(EMPTY_COMPANION_SLOT_RELAXATIONS).toMatchObject({
-      nudge: null,
+      grounding: null,
       signal: null,
     });
   });

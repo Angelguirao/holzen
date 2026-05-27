@@ -66,7 +66,7 @@ function baseParams() {
     setCacheRelaxations: noop,
     slotCommitters: {
       setSignal: noop,
-      setNudge: noop,
+      setGrounding: noop,
       setHistoryInsight: noop,
       setZoomOut: noop,
       autoSaveToLibrary: noop,
@@ -79,7 +79,7 @@ function baseParams() {
     },
     companionSlotErrorSetters: {
       setSignalError: noop,
-      setNudgeError: noop,
+      setGroundingError: noop,
       setHistoryError: noop,
       setZoomOutError: noop,
     },

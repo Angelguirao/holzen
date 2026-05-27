@@ -24,7 +24,7 @@ export function hydrateCompanionSlotsFromArtifactCache(
   input: HydrateCompanionSlotsFromArtifactCacheInput,
 ): HydrateCompanionSlotsFromArtifactCacheResult {
   const { cached, fetchedSlots, committers, setIntervention } = input;
-  const { setSignal, setNudge, setHistoryInsight, setZoomOut, autoSaveToLibrary } = committers;
+  const { setSignal, setGrounding, setHistoryInsight, setZoomOut, autoSaveToLibrary } = committers;
 
   if (cached.signal) {
     setSignal(cached.signal);
@@ -38,7 +38,7 @@ export function hydrateCompanionSlotsFromArtifactCache(
     });
   }
   if (cached.grounding) {
-    setNudge(cached.grounding);
+    setGrounding(cached.grounding);
     fetchedSlots.add('grounding');
     trackCompanionServed('grounding', 'cache');
     void autoSaveToLibrary({

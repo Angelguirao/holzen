@@ -27,10 +27,10 @@ export default function CompanionGroundingPage() {
     revealed,
     handleBack,
     companion: {
-      nudge,
-      nudgeLoading,
-      nudgeError,
-      retryNudge,
+      grounding,
+      groundingLoading,
+      groundingError,
+      retryGrounding,
       cacheIds,
       cacheRelaxations,
       regenerateCompanion,
@@ -74,35 +74,35 @@ export default function CompanionGroundingPage() {
       />
       <div className="space-y-6">
         <GroundingFullView
-          nudge={nudge}
-          loading={nudgeLoading}
-          error={nudgeError}
-          onRetry={retryNudge}
+          grounding={grounding}
+          loading={groundingLoading}
+          error={groundingError}
+          onRetry={retryGrounding}
           mood={mood}
         />
 
-        {nudge && cacheRelaxations.nudge && (
+        {grounding && cacheRelaxations.grounding && (
           <p className="text-[10px] text-muted-foreground/55 font-mono leading-snug" role="status">
-            {t(`companions.cacheRelaxation.${cacheRelaxations.nudge}`)}
+            {t(`companions.cacheRelaxation.${cacheRelaxations.grounding}`)}
           </p>
         )}
 
-        {nudge && revealed && (
+        {grounding && revealed && (
           <div className="space-y-4 border-t border-border/20 pt-5 animate-in fade-in duration-500">
             <CompanionFeedback
               pauseInstanceId={pauseInstanceId}
               companionType="grounding"
-              cacheId={cacheIds.nudge}
+              cacheId={cacheIds.grounding}
               regenerateSlot="grounding"
               onRegenerate={() => regenerateCompanion('grounding')}
-              regenerating={nudgeLoading}
+              regenerating={groundingLoading}
             />
           </div>
         )}
 
         <RelatedBiasesThisMonth
           currentPauseInstanceId={pauseInstanceId}
-          currentTitle={nudge?.title ?? null}
+          currentTitle={grounding?.title ?? null}
         />
 
         <HistoryThread companion="grounding" currentPauseInstanceId={pauseInstanceId} />

@@ -14,11 +14,11 @@ const {
 } = vi.hoisted(() => {
   const fetchedSlotsRef = { current: new Set<string>() };
   const slotUiFixture = {
-    cacheIds: { nudge: null, signal: null, zoomOut: null, history: null },
-    cacheRelaxations: { nudge: false, signal: false, zoomOut: false, history: false },
+    cacheIds: { grounding: null, signal: null, zoomOut: null, history: null },
+    cacheRelaxations: { grounding: false, signal: false, zoomOut: false, history: false },
     slotCommitters: {
       setSignal: vi.fn(),
-      setNudge: vi.fn(),
+      setGrounding: vi.fn(),
       setHistoryInsight: vi.fn(),
       setZoomOut: vi.fn(),
       autoSaveToLibrary: vi.fn(),
@@ -28,9 +28,9 @@ const {
     setCacheIds: vi.fn(),
     companionSlotTransitionStarters: {},
     companionSlotErrorSetters: {},
-    nudge: null,
-    nudgeLoading: false,
-    nudgeError: false,
+    grounding: null,
+    groundingLoading: false,
+    groundingError: false,
     signal: null,
     signalLoading: false,
     signalError: false,
@@ -42,8 +42,8 @@ const {
     historyError: false,
     setSignal: vi.fn(),
     setSignalError: vi.fn(),
-    setNudge: vi.fn(),
-    setNudgeError: vi.fn(),
+    setGrounding: vi.fn(),
+    setGroundingError: vi.fn(),
     setZoomOut: vi.fn(),
     setZoomOutError: vi.fn(),
     setHistoryInsight: vi.fn(),
@@ -52,7 +52,7 @@ const {
   const orchestrateActionsFixture = {
     fetchCompanion: vi.fn(),
     regenerateCompanion: vi.fn(),
-    retryNudge: vi.fn(),
+    retryGrounding: vi.fn(),
     retrySignal: vi.fn(),
     retryZoomOut: vi.fn(),
     retryHistory: vi.fn(),

@@ -34,7 +34,7 @@ export interface UseCompanionSlotOrchestrateActionsParams {
   companionSlotTransitionStarters: CompanionSlotTransitionStarters;
   companionSlotErrorSetters: {
     setSignalError: (v: boolean) => void;
-    setNudgeError: (v: boolean) => void;
+    setGroundingError: (v: boolean) => void;
     setHistoryError: (v: boolean) => void;
     setZoomOutError: (v: boolean) => void;
   };
@@ -126,7 +126,7 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
     [fetchCompanion, fetchedSlotsRef],
   );
 
-  const retryNudge = useCallback(() => retrySlot('grounding'), [retrySlot]);
+  const retryGrounding = useCallback(() => retrySlot('grounding'), [retrySlot]);
   const retrySignal = useCallback(() => retrySlot('signal'), [retrySlot]);
   const retryZoomOut = useCallback(() => retrySlot('zoomOut'), [retrySlot]);
   const retryHistory = useCallback(() => retrySlot('history'), [retrySlot]);
@@ -134,7 +134,7 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
   return {
     fetchCompanion,
     regenerateCompanion,
-    retryNudge,
+    retryGrounding,
     retrySignal,
     retryZoomOut,
     retryHistory,

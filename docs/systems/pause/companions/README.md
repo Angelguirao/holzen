@@ -26,6 +26,12 @@ Focused notes on the **intervention** and **individual companion types** — how
 |-----|------|
 | [intervention.md](intervention.md) | **Intervention** — selection order (mirror / trap / pattern / question), severity bucketing, session intent vs selection |
 
+## Frame companions (architecture map)
+
+| Doc | What |
+|-----|------|
+| [frame-companions.md](frame-companions.md) | **Frame companions** — product vs backend names, client orchestrate slots, Reflect vs Frame journeys |
+
 ## Companion cards
 
 | Doc | Companion |

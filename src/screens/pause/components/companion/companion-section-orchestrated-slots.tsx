@@ -16,7 +16,7 @@ import type { SignalPayload } from '@/features/pause/domain/signal-payload';
 
 type CompanionSignalPayload = SignalPayload | null;
 
-type CompanionNudgePayload = {
+type CompanionGroundingPayload = {
   title: string;
   body: string;
   citation: string;
@@ -61,10 +61,10 @@ export type CompanionSectionOrchestratedSlotsProps = {
   signalLoading: boolean;
   signalError: boolean;
   retrySignal: () => void;
-  nudge: CompanionNudgePayload;
-  nudgeLoading: boolean;
-  nudgeError: boolean;
-  retryNudge: () => void;
+  grounding: CompanionGroundingPayload;
+  groundingLoading: boolean;
+  groundingError: boolean;
+  retryGrounding: () => void;
   zoomOut: ZoomOutData | null;
   zoomOutLoading: boolean;
   zoomOutError: boolean;
@@ -111,10 +111,10 @@ export function CompanionSectionOrchestratedSlots({
   signalLoading,
   signalError,
   retrySignal,
-  nudge,
-  nudgeLoading,
-  nudgeError,
-  retryNudge,
+  grounding,
+  groundingLoading,
+  groundingError,
+  retryGrounding,
   zoomOut,
   zoomOutLoading,
   zoomOutError,
@@ -185,12 +185,12 @@ export function CompanionSectionOrchestratedSlots({
           onToggleExpand={toggleGrounding}
           completed={Boolean(completion.grounding)}
           onFirstExpandComplete={() => markCompleted('grounding')}
-          loading={nudgeLoading}
+          loading={groundingLoading}
           pauseInstanceId={pauseInstanceId}
-          hasContent={Boolean(nudge)}
-          relaxationKey={cacheRelaxations.nudge}
+          hasContent={Boolean(grounding)}
+          relaxationKey={cacheRelaxations.grounding}
           companionType="grounding"
-          cacheId={cacheIds.nudge}
+          cacheId={cacheIds.grounding}
           regenerateSlot="grounding"
           onRegenerate={() => regenerateCompanion('grounding')}
           routeSegment="grounding"
@@ -200,10 +200,10 @@ export function CompanionSectionOrchestratedSlots({
           {...proFavorite('grounding')}
         >
           <GroundingDisplay
-            nudge={nudge}
-            loading={nudgeLoading}
-            error={nudgeError}
-            onRetry={retryNudge}
+            grounding={grounding}
+            loading={groundingLoading}
+            error={groundingError}
+            onRetry={retryGrounding}
             variant={frameAppearance ? 'frame' : 'default'}
             pauseInstanceId={pauseInstanceId}
           />
