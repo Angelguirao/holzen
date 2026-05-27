@@ -1,0 +1,9 @@
+{
+  "$schema": "https://www.react.doctor/schema.json",
+  "ignore": {
+    "files": [
+      "src/legacy/**",
+      "supabase/functions/legacy/**"
+    ]
+  }
+}
