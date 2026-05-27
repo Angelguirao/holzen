@@ -179,6 +179,7 @@ export {
   type UseHolzenManualTriggerOrchestrationParams,
   useHomePauseActions,
   type PauseDismissAnalyticsSurface,
+  useHomePendingPauseOfferActions,
   usePauseContextHomePreviews,
   useHolzenHomeContextState,
 } from './public-home';
@@ -187,13 +188,10 @@ export {
   PAUSE_CRON_QUARTER_INTERVAL_MS,
 } from './public-scheduling';
 export {
-  buildHomePauseCardBodyProps,
   pauseHomeErrorKind,
   pauseHomeErrorStrings,
   shouldShowHomePauseSectionSnooze,
   shouldSurfacePauseWidgetError,
-  type BuildHomePauseCardBodyPropsInput,
-  type HomePauseCardBodyPropsProjection,
   type PauseContextHomePreview,
   type PauseHomeErrorKind,
 } from './public-home';

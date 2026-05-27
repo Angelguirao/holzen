@@ -14,7 +14,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 |----------------|------------------------|-----------------------------------------------------|
 | App boot, routing, auth wiring, Vercel vs local | [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) | [docs/systems/routing/route-gating-system.md](docs/systems/routing/route-gating-system.md) if gates change |
 | Nav, IA, primary routes, bottom nav | [docs/ops/active-surface.md](docs/ops/active-surface.md) + `src/App.tsx` / `src/lib/app-routes.ts` | [docs/design/information-architecture.md](docs/design/information-architecture.md) (§1–§3 full-IA reference; §4.5–§4.6 pause-first); [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md) if `navigation.*` or product surface names in analytics change |
-| Pause lifecycle, instances, events, artifacts, stats hooks | [docs/systems/pause-system.md](docs/systems/pause-system.md) | **`engaged` + Home widget:** [pause-engaged-and-home-widget.md](docs/systems/pause-engaged-and-home-widget.md); RPCs/migrations listed under **Where to change what → Pause**; client layout [pause-client-architecture.md](docs/systems/pause-client-architecture.md); keep `invokeEdge` / `x-cid` intact |
+| Pause lifecycle, instances, events, artifacts, stats hooks | [docs/systems/pause-system.md](docs/systems/pause-system.md) | **Home widget projection:** [home-pause-widget-projection.md](docs/systems/home-pause-widget-projection.md); RPCs/migrations listed under **Where to change what → Pause**; client layout [pause-client-architecture.md](docs/systems/pause-client-architecture.md); keep `invokeEdge` / `x-cid` intact |
 | Pause AI, companions, edge orchestration, cron | [docs/systems/pause/ai-powered-pause-system.md](docs/systems/pause/ai-powered-pause-system.md) | [docs/systems/costs/ai-cost-model.md](docs/systems/costs/ai-cost-model.md) when limits/flags/cost paths change |
 | Profile stats UI and skills-first model | [docs/systems/stats-system.md](docs/systems/stats-system.md) | **Not shipped** in pause-first UI — reference `src/legacy/full-shell/`; active journey uses overview in `screens/journey/` |
 | Badges (families, definitions, sync) | [docs/systems/badges-system.md](docs/systems/badges-system.md) | **Not shipped** — `BadgesPanelV2` in `src/legacy/full-shell/` only |
@@ -119,7 +119,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 
 - Full environment inventory and per-environment behavior: [docs/ops/environment-matrix.md](docs/ops/environment-matrix.md).
 - **Required for a custom project:** `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (see `.env.example` and `src/integrations/supabase/client.ts`).
-- **Optional:** `VITE_ADMIN_USER_IDS` — comma-separated auth user UUIDs allowed to use `/admin`.
+- **Admin `/admin` routes:** grant via `profiles.is_admin = true` in Supabase (see `docs/ops/environment-matrix.md`).
 - `vite.config.ts` uses `loadEnv`; `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` are required for Vite dev/build, and `scripts/check-version-sync.mjs` also needs explicit Supabase env (`VITE_*` or `SUPABASE_*`) during `npm run build`.
 
 Never commit `.env` or service role keys.

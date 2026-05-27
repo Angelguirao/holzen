@@ -7,7 +7,7 @@
  *
  *   1. The Pause UI can render an optimistic state *before* the RPC round
  *      trip resolves (e.g. gating Home Continue until deep `engaged`, which
- *      requires `reflection_step` in Postgres — see pause-engaged-and-home-widget.md).
+ *      requires `reflection_step` in Postgres — see pause-system.md).
  *   2. `src/lib/badges/compute.ts` and the Stats hooks can derive state
  *      from fixture data without round-tripping to a database.
  *   3. Unit tests pin the rules to a place humans can read (the SQL is
