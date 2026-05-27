@@ -25,7 +25,6 @@ const ALLOWED = new Set([
   'handle-email-unsubscribe',
   'admin-check-stripe-prices',
   'process-referral-pending',
-  'grounding-enrich',
 ]);
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

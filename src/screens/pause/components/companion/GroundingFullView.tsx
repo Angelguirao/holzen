@@ -20,22 +20,13 @@ interface Props {
   mood?: string | null;
   marketDirection?: 'up' | 'down' | 'neutral' | null;
   preferredBias?: string | null;
-  /**
-   * Placeholder slot for PR 2's `grounding-enrich` edge function output
-   * (abstract + researcher bios + citation count). Accepts a ReactNode so the
-   * page can own the fetching and render what it likes. Rendered *after* the
-   * body + citation link so the primary content stays front-and-center.
-   */
-  enrichmentSlot?: React.ReactNode;
 }
 
 /**
  * Full-page Grounding (research nudge) presentation.
  *
  * Differs from the inline `LearningInput` in that the citation is promoted
- * from a tiny icon-link footnote into a proper "Read the paper" CTA, and the
- * page leaves room for a rich enrichment block (abstract, researchers, citation
- * count) that the inline card can't host.
+ * from a tiny icon-link footnote into a proper "Read the paper" CTA.
  */
 export function GroundingFullView({
   nudge,
@@ -45,7 +36,6 @@ export function GroundingFullView({
   mood,
   marketDirection,
   preferredBias,
-  enrichmentSlot,
 }: Props) {
   "use memo";
   const { t } = useTranslation();
@@ -101,11 +91,6 @@ export function GroundingFullView({
           )}
         </div>
       )}
-
-      {/* PR 2 enrichment — abstract preview, researcher bios, citation count.
-          Placeholder in PR 1; wired in PR 2 via <GroundingEnrichment /> rendered
-          by CompanionGroundingPage. Hides gracefully when nothing is available. */}
-      {enrichmentSlot}
     </div>
   );
 }

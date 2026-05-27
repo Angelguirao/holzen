@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { GroundingEnrichment as EnrichmentData } from '@/features/pause/public-ritual-frame';
+import type { GroundingEnrichment as EnrichmentData } from './grounding-enrichment-query';
 
 interface Props {
   data: EnrichmentData | null | undefined;
@@ -8,13 +8,7 @@ interface Props {
   error: boolean;
 }
 
-/**
- * Renders the enrichment block (abstract preview + researcher bios + citation
- * count) below the Grounding body on the Full View. Deliberately silent on
- * missing data: if all three upstream providers failed for this citation we
- * render nothing rather than a sad "couldn't enrich" banner — the body + DOI
- * link above already deliver the core experience.
- */
+/** @deprecated Undeployed with grounding-enrich edge — kept for recovery. */
 export function GroundingEnrichment({ data, loading, error }: Props) {
   "use memo";
   const { t } = useTranslation();

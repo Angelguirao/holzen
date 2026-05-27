@@ -26,7 +26,7 @@ Organize client code by **product concern** (ritual beat, session, trigger, arch
 flowchart TB
   subgraph server["Authority"]
     RPC["pause_* RPCs"]
-    EDGE["holzen-reflect · companion-orchestrate · grounding-enrich"]
+    EDGE["holzen-reflect · companion-orchestrate"]
     PG["pause_instances · step_events · ai_artifacts"]
   end
 
@@ -126,7 +126,7 @@ Both call edges and write `pause_ai_artifacts`, but they are **different ritual 
 | Module | Ritual beat | Edge | Hook surface |
 |--------|-------------|------|--------------|
 | `ritual/reflect/` | **Reflect** | `holzen-reflect` | `usePauseReflectGeneration` |
-| `ritual/frame/` | **Frame** (+ `/companion/*` full views) | `companion-orchestrate`, `grounding-enrich` | `useCompanionData` |
+| `ritual/frame/` | **Frame** (+ `/companion/*` full views) | `companion-orchestrate` | `useCompanionData` |
 
 **Do not** split folders because “it is AI.” Split by **where the user is in the ritual**. Ports may still be separate interfaces (`ReflectGenerator`, `CompanionOrchestrator`) — that is adapter shape, not package politics.
 

@@ -82,10 +82,6 @@ export {
   useCompanionSectionExpansion,
   type UseCompanionSectionExpansionParams,
 } from './presentation/companion/use-companion-section-expansion';
-export {
-  useGroundingEnrichment,
-  type GroundingEnrichment,
-} from './presentation/companion/use-grounding-enrichment';
 export { usePauseSessionCompanionSnapshot } from './presentation/companion/use-pause-session-companion-snapshot';
 export {
   useFullviewTelemetry,

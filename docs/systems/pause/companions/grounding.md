@@ -134,11 +134,8 @@ When `selectIntervention` picks **trap** as the primary intervention:
 | UI | `src/screens/pause/components/CompanionSection.tsx` (Ground card via `LearningInput`) |
 | Full View page | `src/screens/pause/CompanionGroundingPage.tsx` (route `/companion/grounding/:pauseInstanceId`) |
 | Full View presentation | `src/screens/pause/components/companion/GroundingFullView.tsx` |
-| Enrichment edge fn | `supabase/functions/grounding-enrich/index.ts` |
-| Enrichment helpers | `supabase/functions/_shared/grounding-enrichment-util.ts` |
-| Enrichment client hook | `src/features/pause/presentation/companion/use-grounding-enrichment.ts` (`public-hooks`) |
-| Enrichment presentation | `src/screens/pause/components/companion/GroundingEnrichment.tsx` |
-| Enrichment cache table | `grounding_enrichment_cache` (migration `20260418140000_grounding_enrichment_cache.sql`) |
+| Legacy enrichment (undeployed) | `supabase/functions/legacy/grounding-enrich/`, `src/legacy/grounding-enrich/` |
+| Enrichment cache table | `grounding_enrichment_cache` (kept; writes were via legacy edge only) |
 | Related biases rail | `src/screens/pause/components/companion/RelatedBiasesThisMonth.tsx` (+ `related-biases-util.ts`) |
 | Full View telemetry hook | `src/features/pause/presentation/companion/use-fullview-telemetry.ts` (`public-hooks`; event `companion_fullview_opened`) |
 
@@ -149,7 +146,7 @@ When `selectIntervention` picks **trap** as the primary intervention:
 The inline Ground card in `CompanionSection` has an **"Open full view"** button that routes to **`/companion/grounding/:pauseInstanceId`** (lazy-loaded in `src/App.tsx`). The Full View keeps the generated body verbatim and surrounds it with affordances that don't fit in the inline card:
 
 - **Promoted citation CTA** — the tiny `ExternalLink` footnote in `LearningInput` becomes a proper **"Read the paper →"** link sitting directly under the citation text.
-- **Enrichment slot** — the `GroundingFullView` accepts an `enrichmentSlot` ReactNode where `CompanionGroundingPage` renders abstract preview + 1–2 sentence researcher bios + Semantic Scholar citation count from the `grounding-enrich` edge function (see §10). Missing fields hide silently — we never show a "couldn't enrich" banner.
+- **No second AI call** — full view shows orchestrate/hydrated title, body, citation, and external link only (parity with Signal). Legacy citation enrichment lived in §10 and is undeployed.
 - **Read-time indicator** + **"Why this card now?"** disclosure with mood / market direction / session-intent transparency (explains why *this* bias was picked today).
 - **Cross-reference badge** — when the session's primary intervention was a `trap` that used this same Ground payload, a subtle **"This was also today's headline"** badge sits above the card so the repetition is acknowledged rather than confusing.
 - **Breathing-room pacing** (8 s) before feedback + save CTAs fade in.
@@ -161,9 +158,11 @@ The "Open full view" navigation is free; only the **Save this moment** action is
 
 ---
 
-## 10. Citation enrichment (`grounding-enrich` edge function)
+## 10. Citation enrichment (legacy — undeployed)
 
-The Full View's enrichment block is served by a dedicated edge function, `grounding-enrich` (JWT verified, authenticated users only). It exists for three reasons:
+> **Pause-first (May 2026):** `grounding-enrich` was moved to `supabase/functions/legacy/grounding-enrich/` and removed from `config.toml`. The active client no longer invokes it. Recovery: `src/legacy/grounding-enrich/README.md`.
+
+The former Full View enrichment block was served by a dedicated edge function, `grounding-enrich` (JWT verified, authenticated users only). It existed for three reasons:
 
 1. **Cross-user cache.** Every user who sees the same citation shares the same enriched row — keyed by `sha256(normalizeCitation(citation))` — so we pay each upstream API once per paper, not once per user. TTL: **60 days** on the happy path, **1 day** when all three providers failed (so outages self-heal).
 2. **Graceful fan-out.** The function calls Crossref, Semantic Scholar, and Gemini **in parallel**. Each helper returns `null` on failure so one bad provider can't tank the whole response. The final payload fields are *all nullable*; the UI renders only what arrived.
@@ -198,7 +197,7 @@ citation + url (+ optional DOI)
 
 ### Client wiring
 
-`useGroundingEnrichment({ citation, url })` is a TanStack Query hook that memoizes the edge-function call per `(citation, doi, url)` tuple. Result is passed to `<GroundingEnrichment data loading error />` which renders nothing until data arrives and nothing at all if every field is null/empty (i.e. the page looks exactly like pre-enrichment, only richer when the data exists).
+When deployed, `useGroundingEnrichment({ citation, url })` (now under `src/legacy/grounding-enrich/`) memoized the edge call per `(citation, doi, url)` and rendered via `<GroundingEnrichment />`, hiding silently when all fields were empty.
 
 ### Storage
 
