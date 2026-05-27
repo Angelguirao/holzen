@@ -2,16 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useHomePauseActions } from './use-home-pause-actions';
 
-const { trackPauseOpenDismissedMock, trackHomePendingPauseBannerPauseOpenedMock } = vi.hoisted(
-  () => ({
-    trackPauseOpenDismissedMock: vi.fn(),
-    trackHomePendingPauseBannerPauseOpenedMock: vi.fn(),
-  }),
-);
+const { trackPauseOpenDismissedMock } = vi.hoisted(() => ({
+  trackPauseOpenDismissedMock: vi.fn(),
+}));
 
 vi.mock('@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io', () => ({
   trackPauseOpenDismissed: trackPauseOpenDismissedMock,
-  trackHomePendingPauseBannerPauseOpened: trackHomePendingPauseBannerPauseOpenedMock,
 }));
 
 const navigate = vi.fn();
@@ -35,7 +31,6 @@ describe('F2 — Home → start pause', () => {
         message: null,
         context: null,
         lastPauseInstanceId: null,
-        openPauseState: null,
         companions: {} as never,
         companionPrefs: {} as never,
         severity: 'mild',

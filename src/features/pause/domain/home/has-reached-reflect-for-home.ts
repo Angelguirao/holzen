@@ -6,7 +6,7 @@ export type HasReachedReflectForHomeInput = {
   trackedAssetSymbol: string;
 };
 
-/** Figma “reached Reflect” — Postgres `engaged` is necessary but not sufficient. */
+/** Preview copy after Reflect — uses `reflection_step` and non-stub `reflection_text`. */
 export function hasReachedReflectForHome(input: HasReachedReflectForHomeInput): boolean {
   if (input.hasReflectionStep) return true;
   const msg = input.reflectionMessage?.trim() ?? '';

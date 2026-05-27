@@ -132,6 +132,16 @@ describe('resolveHomePauseWidgetMode', () => {
     expect(r.hasReachedReflect).toBe(true);
   });
 
+  it('stays B when active and pending queued (not C_prime)', () => {
+    const r = resolveHomePauseWidgetMode({
+      ...baseInput,
+      hasOpenPause: true,
+      openPauseState: 'active',
+      hasPendingOffer: true,
+    });
+    expect(r.mode).toBe('B');
+  });
+
   it('C_prime when engaged and pending queued', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,

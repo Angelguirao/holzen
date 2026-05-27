@@ -75,7 +75,7 @@ function useTabChunkPrefetch() {
  * **Orchestration (intentional):** this file mounts cross-context chrome that must
  * survive tab switches — not domain logic owned by a single screen.
  * - `useShellProfile` — profile load errors + i18n (via `useProfile`, not Home’s `useHolzen`)
- * - `ShellPauseChrome` — pending offer modal + pause-ready banner (`useHolzen` isolated there)
+ * - `ShellPauseChrome` — pause-ready banner off Home (pending offer inline on Home widget)
  * - `CheckoutConfirmation` / `PaywallSubscribedTracker` — subscription return UX on any tab
  * - `NotificationBell` — inbox header (`features/notifications`)
  *

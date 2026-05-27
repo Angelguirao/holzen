@@ -122,7 +122,6 @@ import {
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   markPauseManualStartedHomeOnce,
-  trackHomePendingPauseBannerPauseOpened,
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
   trackPauseOpenDismissed,
@@ -372,7 +371,7 @@ describe('pause-reflect-telemetry-io parity', () => {
    */
   it('sibling cluster: Home manual-open telemetry-io exports stay distinct from session reflect telemetry-io', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(trackPauseOpenDismissed);
-    expect(trackPauseReflectShareTap).not.toBe(trackHomePendingPauseBannerPauseOpened);
+    expect(trackPauseReflectShareTap).not.toBe(trackPauseOpenDismissed);
     expect(trackPauseReflectWallpaperTap).not.toBe(markPauseManualStartedHomeOnce);
     expect(trackPostItFromTelemetryIo).not.toBe(trackManualPauseInstanceCreated);
     expect(trackShareTapFromTelemetryIo).not.toBe(trackPauseManualCompleted);

@@ -9,7 +9,6 @@ import {
   shouldNavigateAfterManualTrigger,
 } from '@/features/pause/public-navigation';
 import {
-  trackHomePendingPauseBannerPauseOpened,
   trackPauseOpenDismissed,
   type PauseDismissAnalyticsSurface,
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io';
@@ -21,8 +20,6 @@ export function useHomePauseActions(args: {
   message: string | null;
   context: string | null;
   lastPauseInstanceId: string | null;
-  /** Current open pause row state from `v_pause_current` (for analytics on pending-banner CTA). */
-  openPauseState: 'active' | 'engaged' | null;
   companions: CompanionData;
   companionPrefs: CompanionPrefs;
   severity: BtcMoveSeverity;
@@ -38,7 +35,6 @@ export function useHomePauseActions(args: {
     message,
     context,
     lastPauseInstanceId,
-    openPauseState,
     companions,
     companionPrefs,
     severity,
@@ -111,12 +107,6 @@ export function useHomePauseActions(args: {
     navigate('/pause', { state: navState });
   }, [message, context, lastPauseInstanceId, companions, companionPrefs, severity, navigate]);
 
-  const handleNavigatePauseWithThisFromPendingBanner = useCallback(() => {
-    if (!canNavigateToPauseSession(message, lastPauseInstanceId)) return;
-    trackHomePendingPauseBannerPauseOpened(lastPauseInstanceId, openPauseState);
-    handleNavigatePauseWithThis();
-  }, [message, lastPauseInstanceId, openPauseState, handleNavigatePauseWithThis]);
-
   const startProCheckout = useCallback(() => {
     startCheckout('pro');
   }, [startCheckout]);
@@ -125,7 +115,6 @@ export function useHomePauseActions(args: {
     handleNeedAPause,
     handleDismiss,
     handleNavigatePauseWithThis,
-    handleNavigatePauseWithThisFromPendingBanner,
     startProCheckout,
   };
 }

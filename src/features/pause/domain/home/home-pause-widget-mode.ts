@@ -66,7 +66,7 @@ export function resolveHomePauseWidgetMode(
   if (input.hasOpenPause) {
     const inPostPauseCooldown = input.postPauseAutoCooldownRemainingMs > 0;
 
-    if (inPostPauseCooldown && input.openPauseState === 'active' && !hasReachedReflect) {
+    if (inPostPauseCooldown && input.openPauseState === 'active') {
       return { mode: 'E', defaultCollapsed: false, hasReachedReflect };
     }
 

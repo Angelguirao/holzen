@@ -114,7 +114,6 @@ import {
 } from '@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow';
 import {
   markPauseManualStartedHomeOnce,
-  trackHomePendingPauseBannerPauseOpened,
   trackManualPauseInstanceCreated,
   trackPauseManualCompleted,
   trackPauseOpenDismissed,
@@ -358,7 +357,7 @@ describe('pause-reflect-telemetry-io parity (application)', () => {
    */
   it('sibling cluster: Home manual-open telemetry-io exports stay distinct from session reflect telemetry-io', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(trackPauseOpenDismissed);
-    expect(trackPauseReflectShareTap).not.toBe(trackHomePendingPauseBannerPauseOpened);
+    expect(trackPauseReflectShareTap).not.toBe(trackPauseOpenDismissed);
     expect(trackPauseReflectWallpaperTap).not.toBe(markPauseManualStartedHomeOnce);
     expect(trackPostItFromTelemetryIo).not.toBe(trackManualPauseInstanceCreated);
     expect(trackShareTapFromTelemetryIo).not.toBe(trackPauseManualCompleted);

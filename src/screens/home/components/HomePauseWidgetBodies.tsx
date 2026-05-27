@@ -67,7 +67,7 @@ export function HomePauseOpenActiveBody({
               onClick={onPauseWithNewContext}
               className="mt-2 w-full rounded-lg border border-nox-accent-mustard/45 bg-background/80 px-2 py-1.5 text-center text-xs font-medium text-foreground hover:bg-background disabled:opacity-60"
             >
-              {t('home.pendingQueuedCta')}
+              {t('pause.pendingAdoptCta', { defaultValue: 'Switch to new pause' })}
             </button>
           ) : null}
           {onDeclinePendingOffer ? (
