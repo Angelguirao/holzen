@@ -2,40 +2,41 @@ import { describe, expect, it } from 'vitest';
 import { buildReflectClientFallback } from './build-reflect-client-fallback';
 import { reflectionContentV2 } from './reflection-content-v2';
 import {
+  formatReflectDisplayLetter,
   formatReflectIntegratedProse,
   stitchReflectFieldsForDisplay,
 } from './format-reflect-integrated-prose';
 
-describe('formatReflectIntegratedProse', () => {
+describe('formatReflectDisplayLetter', () => {
   it('prefers integrated message over stitched fields', () => {
     const content = reflectionContentV2({
       land: 'Land only.',
       hypothesis: 'Hypothesis only.',
       inquiry: 'Stitch question',
-      contextStrip: null,
+      contextStrip: 'Strip hidden from letter.',
       integratedMessage:
-        'The move feels personal, not just statistical. What story are you telling yourself about this dip?',
+        'That flicker of fear you named can feel heavier when doubt spreads. What story are you telling yourself about this dip?',
     });
-    const prose = formatReflectIntegratedProse(content);
-    expect(prose).toContain('feels personal');
+    const prose = formatReflectDisplayLetter(content);
+    expect(prose).toContain('flicker of fear');
     expect(prose).not.toContain('Land only.');
-    expect(prose).not.toContain('Hypothesis only.');
+    expect(prose).not.toContain('Strip hidden');
   });
 
-  it('stitches fields when message is empty', () => {
+  it('one-voice stitch when message is empty', () => {
     const content = reflectionContentV2({
       land: 'The move is sharp.',
       hypothesis: 'This might feel personal.',
       inquiry: 'What story are you telling yourself?',
       contextStrip: 'Some traders watch flows.',
     });
-    const prose = formatReflectIntegratedProse(content);
-    expect(prose).toBe(
-      `${stitchReflectFieldsForDisplay(content)}\n\nSome traders watch flows.`,
-    );
+    const prose = formatReflectDisplayLetter(content);
+    expect(prose).not.toContain('\n\n');
+    expect(prose).not.toContain('Some traders watch flows.');
+    expect(prose).toContain('?');
   });
 
-  it('appends context strip after live integrated message with hypothesis', () => {
+  it('does not append context strip to live integrated message', () => {
     const content = reflectionContentV2({
       land: 'a',
       hypothesis: 'Underneath might be fear.',
@@ -43,31 +44,53 @@ describe('formatReflectIntegratedProse', () => {
       contextStrip: 'Market context line.',
       integratedMessage: 'Live voice with multiple ideas woven together.',
     });
-    expect(formatReflectIntegratedProse(content)).toBe(
-      'Live voice with multiple ideas woven together.\n\nMarket context line.',
-    );
+    expect(formatReflectDisplayLetter(content)).toBe('Live voice with multiple ideas woven together.');
   });
 
-  it('omits context strip for client-style fallback (strip null, single paragraph)', () => {
+  it('client fallback is one paragraph without context strip', () => {
     const content = buildReflectClientFallback({
       context: 'BTC is down 3%',
       severityAbsPct: 3,
       currentFeel: { mood: 'calm' },
     });
-    expect(formatReflectIntegratedProse(content)).toBe(content.message);
-    expect(formatReflectIntegratedProse(content)).not.toContain('\n\n');
+    expect(formatReflectDisplayLetter(content)).toBe(content.message);
+    expect(formatReflectDisplayLetter(content)).not.toContain('\n\n');
   });
 
-  it('appends context strip after multi-paragraph live message', () => {
+  it('normalizes triple-paragraph LLM output before final question', () => {
     const content = reflectionContentV2({
       land: 'a',
-      hypothesis: 'Underneath.',
-      inquiry: 'b?',
-      contextStrip: 'Market context line.',
-      integratedMessage: 'Para one.\n\nPara two with a question at the end?',
+      hypothesis: 'b',
+      inquiry: 'c?',
+      contextStrip: null,
+      integratedMessage: 'Para one.\n\nPara two.\n\nWhat story are you telling yourself?',
     });
-    expect(formatReflectIntegratedProse(content)).toBe(
-      'Para one.\n\nPara two with a question at the end?\n\nMarket context line.',
+    expect(formatReflectDisplayLetter(content)).toBe(
+      'Para one. Para two.\n\nWhat story are you telling yourself?',
     );
+  });
+});
+
+describe('formatReflectIntegratedProse alias', () => {
+  it('matches formatReflectDisplayLetter', () => {
+    const content = reflectionContentV2({
+      land: 'x',
+      hypothesis: 'y',
+      inquiry: 'z?',
+      integratedMessage: 'Same output.',
+    });
+    expect(formatReflectIntegratedProse(content)).toBe(formatReflectDisplayLetter(content));
+  });
+});
+
+describe('stitchReflectFieldsForDisplay', () => {
+  it('keeps legacy paragraph stitch for internal tests', () => {
+    const content = reflectionContentV2({
+      land: 'The move is sharp.',
+      hypothesis: 'This might feel personal.',
+      inquiry: 'What story are you telling yourself?',
+      contextStrip: null,
+    });
+    expect(stitchReflectFieldsForDisplay(content)).toContain('\n\n');
   });
 });

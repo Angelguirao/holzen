@@ -1,6 +1,6 @@
 # Reflect step redesign — product & technical spec (draft)
 
-**Status:** Phase 1 implemented (May 2026). Phase 2+ (pregen, user answers) not implemented.
+**Status:** Phase 1 implemented (May 2026). **UI one-letter pass** (May 2026): Feel recap + single `message` + collapsed market context + haiku aside. Phase 2+ (pregen, user answers) not implemented. Prompt **`REFLECTION_PROMPT_VERSION` v8**.
 
 **Failure UX (May 2026):** When live `holzen-reflect` fails on the client, Reflect no longer swaps to the Home blocking error panel only. It shows an amber inline notice + **client fallback** structured copy (Feel recap, template inquiry, context strip) via `build-reflect-client-fallback.ts` / `resolve-pause-reflect-display-content.ts`.  
 **Owner:** Pause / ritual UX + `holzen-reflect` pipeline.  

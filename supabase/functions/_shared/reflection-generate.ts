@@ -16,7 +16,7 @@ import { buildReflectionContextStripC0 } from "./reflection-context-strip-c0.ts"
 import { inquiryFallbackForMood } from "./reflection-fallback-v2.ts";
 
 /** Bump when the system prompt, tone rules, or quality gate changes. */
-export const REFLECTION_PROMPT_VERSION = "v7";
+export const REFLECTION_PROMPT_VERSION = "v8";
 
 export interface CurrentFeelInput {
   mood: string;
@@ -135,13 +135,13 @@ const LANG_NAMES: Record<string, string> = {
   tr: "Turkish",
 };
 
-/** Injected into system prompt: model must return structured Reflect JSON (v7). */
+/** Injected into system prompt: model must return structured Reflect JSON (v8). */
 const REFLECTION_JSON_OUTPUT_INSTRUCTION =
   `You MUST respond with a JSON object only (no markdown). The object must contain exactly these keys:
 - "land": 1-2 sentences — emotional validation and lower urgency (no inquiry yet)
-- "hypothesis": 1 sentence — gentle guess about what might be underneath their feeling (weave mood/tile naturally; do NOT say "you said" or repeat the Feel step)
+- "hypothesis": 1 sentence — gentle guess about what might be underneath their feeling (weave mood/tile naturally; do NOT say "you said" or repeat the Feel step verbatim)
 - "inquiry": Exactly one open question — what set them off / what story they are telling (no "?!" stacking)
-- "message": 2-4 short paragraphs as ONE continuous reflection for the user to read — weave land, then hypothesis, then the inquiry question in a single voice (no headings, labels, or bullet lists). Must match the three fields above; inquiry must appear as the closing question.
+- "message": ONE letter in a single voice — 3 to 5 sentences total. Open with a brief, natural acknowledgment of their current Feel mood (the UI also shows Feel separately). Weave land, hypothesis, and inquiry into flowing prose. Use at most ONE blank line immediately before the closing question. Do NOT include market telemetry (exact %, prices, mempool, hashrate, block height, or Fear & Greed index name/score). No headings, labels, or bullet lists. Must match land/hypothesis/inquiry; inquiry must be the closing question.
 - "haiku": A haiku (3 lines separated by newlines, 5-7-5 syllables), or null if not appropriate`;
 
 const REFLECTION_NO_COMPANION_IN_MESSAGE = `
@@ -402,7 +402,10 @@ function applyQualityGateAndHaikuTrim(
 
 function buildCurrentFeelBlock(currentFeel?: CurrentFeelInput): string {
   if (!currentFeel?.mood) return "";
-  const lines = [`CURRENT FEEL (this pause — personalize land, hypothesis, and inquiry):`];
+  const lines = [
+    `CURRENT FEEL (this pause — personalize land, hypothesis, inquiry, and especially the opening of "message"):`,
+    `The "message" field must open with a brief acknowledgment of this mood in natural language (e.g. "That weight of fear you named…") — do NOT copy "You said" verbatim; the UI shows Feel separately.`,
+  ];
   const intensity =
     typeof currentFeel.intensity === "number" ? ` (${currentFeel.intensity}/5)` : "";
   lines.push(`- Mood: ${currentFeel.mood}${intensity}`);
@@ -479,6 +482,7 @@ Reflection rules:
 - Land: emotional validation first; reduce urgency; no inquiry in land.
 - Hypothesis: optional tone; never blame; use "might", "often", "sometimes".
 - Inquiry: one question only; no multi-part lectures.
+- "message": one letter only — no telemetry dump; at most one line break before the final question.
 - Preserve agency: never say "you should". Never tell the user what to do.
 - No reassurance, excitement, trading advice, lists, or disclaimers.
 - No exclamation marks, emojis, motivational language, reward language.
