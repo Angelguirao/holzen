@@ -260,7 +260,7 @@ export function CompanionSectionOrchestratedSlots({
           routeSegment="history"
           appearance={appearance}
           iconHelp={iconHelps?.lookBack}
-          showFullViewButton
+          showFullViewButton={showFullViewButton}
           {...proFavorite('history_insight')}
         >
           <HistoricalInsightDisplay
@@ -268,6 +268,7 @@ export function CompanionSectionOrchestratedSlots({
             loading={historyLoading}
             error={historyError}
             onRetry={retryHistory}
+            variant={frameAppearance ? 'frame' : 'default'}
           />
         </CompanionOrchestratedCard>
       ) : null,

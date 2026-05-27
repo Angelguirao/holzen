@@ -3,28 +3,40 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { History, ArrowRight } from 'lucide-react';
 import { useProfile } from '@/features/user/public-hooks';
 import { formatBtcPrice } from '@/features/market/public';
+import { cn } from '@/lib/utils';
 export type { CachedHistoricalInsightShape } from '@/features/pause/public-ritual-frame';
 import type { CachedHistoricalInsightShape } from '@/features/pause/public-ritual-frame';
 import { CompanionError } from './CompanionError';
 import { BtcOnThisDayBlock } from '@/screens/pause/components/btc-on-this-day-block';
+import { LookBackFrameDisplay } from '@/screens/pause/components/look-back-frame-display';
+
+export type HistoricalInsightDisplayVariant = 'default' | 'frame';
 
 interface Props {
   data: CachedHistoricalInsightShape | null;
   loading: boolean;
   error: boolean;
   onRetry?: () => void;
+  variant?: HistoricalInsightDisplayVariant;
 }
 
-export function HistoricalInsightDisplay({ data, loading, error, onRetry }: Props) {
+export function HistoricalInsightDisplay({
+  data,
+  loading,
+  error,
+  onRetry,
+  variant = 'default',
+}: Props) {
   "use memo";
   const { t } = useTranslation();
   const { currency } = useProfile();
   const fmtPrice = (n: number) => formatBtcPrice(n, currency);
+  const isFrame = variant === 'frame';
 
   if (loading) {
     return (
-      <div className="space-y-3">
-        <Skeleton className="h-3 w-3/4" />
+      <div className={cn('space-y-3', isFrame && 'px-1 pt-4')}>
+        <Skeleton className={cn(isFrame ? 'h-4 w-full' : 'h-3 w-3/4')} />
         <Skeleton className="h-3 w-full" />
         <Skeleton className="h-3 w-4/5" />
         <Skeleton className="h-3 w-2/3" />
@@ -33,9 +45,17 @@ export function HistoricalInsightDisplay({ data, loading, error, onRetry }: Prop
   }
 
   if (error) {
-    return <CompanionError companionType="history" onRetry={onRetry} />;
+    return (
+      <div className={cn(isFrame && 'px-1 pt-2')}>
+        <CompanionError companionType="history" onRetry={onRetry} />
+      </div>
+    );
   }
   if (!data) return null;
+
+  if (isFrame) {
+    return <LookBackFrameDisplay data={data} formatPrice={fmtPrice} />;
+  }
 
   const hasBtcPrices =
     typeof data.currentPrice === 'number' && (data.onThisDay?.length ?? 0) > 0;
@@ -66,8 +86,8 @@ export function HistoricalInsightDisplay({ data, loading, error, onRetry }: Prop
             </p>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
-          {data.btcInsight ?? t('companions.lookBackBtcInsightFallback')}
-        </p>
+            {data.btcInsight ?? t('companions.lookBackBtcInsightFallback')}
+          </p>
         </div>
       ) : null}
 
