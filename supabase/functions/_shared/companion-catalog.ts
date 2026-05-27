@@ -7,6 +7,7 @@
 
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { COMPANION_SERVE_FRESHNESS_DAYS } from "./companion-serve-freshness.ts";
+import { normalizeSignalKeyIdeas } from "./signal-key-ideas.ts";
 
 export interface CatalogEntry {
   id: string;
@@ -283,12 +284,15 @@ export function essayToSignal(entry: CatalogEntry): {
   source: string;
   url: string;
   quote?: string;
+  keyIdeas?: string[];
 } {
+  const body = entry.summary;
   return {
     title: entry.title,
-    body: entry.summary,
+    body,
     source: entry.author || "Unknown",
     url: entry.original_url || entry.url || "",
+    keyIdeas: normalizeSignalKeyIdeas({ body, keyIdeas: undefined }),
     ...(entry.key_quote ? { quote: entry.key_quote } : {}),
   };
 }
