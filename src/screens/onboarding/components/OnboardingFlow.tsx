@@ -41,7 +41,7 @@ export function OnboardingFlow({
   const prefersReduced = useReducedMotion();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
-  const [trackedAssetId, setTrackedAssetId] = useState(
+  const [trackedAssetId, setTrackedAssetId] = useState(() =>
     normalizeTrackedAssetId(initialTrackedAssetId || 'bitcoin'),
   );
   const [threshold, setThreshold] = useState(initialThreshold || 5);

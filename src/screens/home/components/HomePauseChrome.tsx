@@ -125,7 +125,7 @@ export function NeedAMomentButton({
   className?: string;
 }) {
   "use memo";
-  const [remaining, setRemaining] = useState(cooldownRemaining());
+  const [remaining, setRemaining] = useState(() => cooldownRemaining());
 
   useEffect(() => {
     // Only tick while a cooldown is actually counting down. When idle
