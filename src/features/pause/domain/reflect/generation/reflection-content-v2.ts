@@ -31,18 +31,22 @@ export function reflectionContentV2(input: {
   hypothesis: string;
   inquiry: string;
   contextStrip?: string | null;
+  /** LLM-integrated prose for display; structured fields kept for analytics. */
+  integratedMessage?: string | null;
 }): ReflectionContentV2 {
   const land = input.land.trim();
   const hypothesis = input.hypothesis.trim();
   const inquiry = input.inquiry.trim();
   const contextStrip = input.contextStrip?.trim() || null;
+  const stitched = composeReflectionMessage({ land, hypothesis, inquiry });
+  const integrated = input.integratedMessage?.trim();
   return {
     schemaVersion: REFLECTION_CONTENT_SCHEMA_VERSION,
     land,
     hypothesis,
     inquiry,
     contextStrip,
-    message: composeReflectionMessage({ land, hypothesis, inquiry }),
+    message: integrated && integrated.length >= 20 ? integrated : stitched,
   };
 }
 
@@ -64,18 +68,17 @@ export function reflectionContentFromArtifactContent(content: unknown): Reflecti
     const land = typeof c.land === 'string' ? c.land.trim() : '';
     const hypothesis = typeof c.hypothesis === 'string' ? c.hypothesis.trim() : '';
     const inquiry = typeof c.inquiry === 'string' ? c.inquiry.trim() : '';
-    const message =
-      typeof c.message === 'string' && c.message.trim()
-        ? c.message.trim()
-        : composeReflectionMessage({ land, hypothesis, inquiry });
-    if (!message && !land && !inquiry) return null;
+    const stitched = composeReflectionMessage({ land, hypothesis, inquiry });
+    const storedMessage =
+      typeof c.message === 'string' && c.message.trim() ? c.message.trim() : stitched;
+    if (!storedMessage && !land && !inquiry) return null;
     return {
       schemaVersion: REFLECTION_CONTENT_SCHEMA_VERSION,
       land,
       hypothesis,
       inquiry,
       contextStrip: typeof c.contextStrip === 'string' ? c.contextStrip.trim() || null : null,
-      message,
+      message: storedMessage,
     };
   }
   if (typeof c.message === 'string' && c.message.trim()) {

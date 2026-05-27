@@ -1,32 +1,49 @@
 import { describe, expect, it } from 'vitest';
 import { reflectionContentV2 } from './reflection-content-v2';
-import { formatReflectIntegratedProse } from './format-reflect-integrated-prose';
+import {
+  formatReflectIntegratedProse,
+  stitchReflectFieldsForDisplay,
+} from './format-reflect-integrated-prose';
 
 describe('formatReflectIntegratedProse', () => {
-  it('orders land, hypothesis, inquiry, and context strip without labels', () => {
+  it('prefers integrated message over stitched fields', () => {
     const content = reflectionContentV2({
-      land: 'The move is sharp.',
-      hypothesis: 'This might feel personal, not just statistical.',
-      inquiry: 'What story are you telling yourself',
-      contextStrip: 'Some traders watch flows; others notice their breath.',
+      land: 'Land only.',
+      hypothesis: 'Hypothesis only.',
+      inquiry: 'Stitch question',
+      contextStrip: null,
+      integratedMessage:
+        'The move feels personal, not just statistical. What story are you telling yourself about this dip?',
     });
     const prose = formatReflectIntegratedProse(content);
-    expect(prose).toContain('The move is sharp.');
-    expect(prose).toContain('This might feel personal');
-    expect(prose).toContain('What story are you telling yourself?');
-    expect(prose).toContain('Some traders watch flows');
-    expect(prose).not.toContain('Name it');
-    expect(prose).not.toContain('You said:');
+    expect(prose).toContain('feels personal');
+    expect(prose).not.toContain('Land only.');
+    expect(prose).not.toContain('Hypothesis only.');
   });
 
-  it('falls back to message when structured fields are empty', () => {
+  it('stitches fields when message is empty', () => {
     const content = reflectionContentV2({
-      land: '',
-      hypothesis: '',
-      inquiry: '',
-      contextStrip: null,
+      land: 'The move is sharp.',
+      hypothesis: 'This might feel personal.',
+      inquiry: 'What story are you telling yourself',
+      contextStrip: 'Some traders watch flows.',
     });
-    const withMessage = { ...content, message: 'Legacy single paragraph.' };
-    expect(formatReflectIntegratedProse(withMessage)).toBe('Legacy single paragraph.');
+    const prose = formatReflectIntegratedProse(content);
+    expect(prose).toBe(
+      `${stitchReflectFieldsForDisplay(content)}\n\nSome traders watch flows.`,
+    );
+  });
+
+  it('appends context strip after integrated message', () => {
+    const content = reflectionContentV2({
+      land: 'a',
+      hypothesis: '',
+      inquiry: 'b',
+      contextStrip: 'Market context line.',
+      integratedMessage: 'One voice paragraph with a question at the end?',
+    });
+    expect(formatReflectIntegratedProse(content)).toBe(
+      'One voice paragraph with a question at the end?\n\nMarket context line.',
+    );
   });
 });

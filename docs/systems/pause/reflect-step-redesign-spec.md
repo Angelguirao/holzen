@@ -1,6 +1,8 @@
 # Reflect step redesign — product & technical spec (draft)
 
-**Status:** Phase 1 implemented (May 2026). Phase 2+ (pregen, user answers) not implemented.  
+**Status:** Phase 1 implemented (May 2026). Phase 2+ (pregen, user answers) not implemented.
+
+**Failure UX (May 2026):** When live `holzen-reflect` fails on the client, Reflect no longer swaps to the Home blocking error panel only. It shows an amber inline notice + **client fallback** structured copy (Feel recap, template inquiry, context strip) via `build-reflect-client-fallback.ts` / `resolve-pause-reflect-display-content.ts`.  
 **Owner:** Pause / ritual UX + `holzen-reflect` pipeline.  
 **Related:** [pause-system.md](../pause-system.md) §7.1 (deep ritual), [ai-powered-pause-system.md](ai-powered-pause-system.md) §3 (reflection generation), [companions/signal.md](companions/signal.md) (cited “why markets move” on Frame).
 
@@ -106,7 +108,7 @@ Three **UI blocks** in one scrollable step. User still taps **Continue** once to
 ```text
 ┌─────────────────────────────────────────┐
 │ Reflect                                   │
-│ Name what you feel, then one question.    │  ← new subtitle
+│ Take your time                            │
 ├─────────────────────────────────────────┤
 │ [A] LAND (1–2 sentences)                  │
 │     Validation + lower urgency            │
@@ -273,7 +275,7 @@ Store structured reflect output only in `pause_ai_artifacts`. Phase 3 may add `r
 
 **Errors:** On 429/5xx with fallbacks enabled → 200 with curated pool mapped into v2 fields (not raw `{ "error": … }` for Reflect).
 
-**Prompt:** Bump to `REFLECTION_PROMPT_VERSION` v6 — separate instructions per field; keep global bans (no prices, no advice, no companion-style education in land/inquiry).
+**Prompt:** `REFLECTION_PROMPT_VERSION` **v7** — structured `land` / `hypothesis` / `inquiry` for analytics plus required **`message`** (2–4 paragraphs, one voice). Quality gate prefers gated `message`; UI uses `message` when present (`formatReflectIntegratedProse`), else stitches fields.
 
 ### 8.2 Optional `reflect-pregen` (phase 2)
 
@@ -355,7 +357,7 @@ Keep existing reflection events; extend properties with `schema_version`.
 
 New keys (examples):
 
-- `pause.reflect.subtitle` → “Name what you feel, then one question.”
+- `pause.reflect.subtitle` → “Take your time” (reverted from “Name what you feel, then one question.” — Feel step already covers naming; product decision Q1)
 - `pause.reflect.feelRecap` → “You said: {{mood}} ({{intensity}}/5)”
 - `pause.reflect.hypothesisLabel` → “What might be underneath”
 - `pause.reflect.contextStripTitle` → “Why might markets move?”

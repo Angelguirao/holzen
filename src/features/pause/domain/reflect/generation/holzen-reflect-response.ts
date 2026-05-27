@@ -20,16 +20,18 @@ export function reflectionContentFromHolzenReflectResponse(
 ): ReflectionContentV2 | null {
   if (!data) return null;
   if (data.schemaVersion === 2) {
-    const land = (data.land ?? data.message ?? '').trim();
+    const land = (data.land ?? '').trim();
     const hypothesis = (data.hypothesis ?? '').trim();
     const inquiry = (data.inquiry ?? '').trim();
     const contextStrip = (data.contextStrip ?? '').trim() || null;
-    if (!land && !inquiry && !data.message?.trim()) return null;
+    const integratedMessage = data.message?.trim();
+    if (!land && !inquiry && !integratedMessage) return null;
     return reflectionContentV2({
-      land: land || (data.message ?? '').trim(),
+      land: land || integratedMessage?.split(/\n\n/)[0]?.trim() || '',
       hypothesis,
       inquiry,
       contextStrip,
+      integratedMessage,
     });
   }
   const message = data.message?.trim();
