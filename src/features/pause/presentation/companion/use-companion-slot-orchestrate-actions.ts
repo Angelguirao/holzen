@@ -27,6 +27,7 @@ export interface UseCompanionSlotOrchestrateActionsParams {
   requirePro: (feature: 'companions') => boolean;
   startCheckout: () => void;
   fetchedSlotsRef: React.MutableRefObject<Set<string>>;
+  whenArtifactHydrateReady: () => Promise<void>;
   setCacheIds: React.Dispatch<React.SetStateAction<CompanionSlotCacheIds>>;
   setCacheRelaxations: React.Dispatch<React.SetStateAction<CompanionSlotRelaxations>>;
   slotCommitters: CompanionSlotCommitters;
@@ -57,6 +58,7 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
     requirePro,
     startCheckout,
     fetchedSlotsRef,
+    whenArtifactHydrateReady,
     setCacheIds,
     setCacheRelaxations,
     slotCommitters,
@@ -91,13 +93,20 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
   const fetchCompanion = useCallback(
     async (slot: RegenerateCompanionSlot) => {
       if (!pauseInstanceId) return;
+      await whenArtifactHydrateReady();
       if (fetchedSlotsRef.current.has(slot)) return;
       if (!canAccessCompanion()) return;
 
       fetchedSlotsRef.current.add(slot);
       await runSlotOrchestrate(slot, 'lazy_fetch');
     },
-    [pauseInstanceId, canAccessCompanion, runSlotOrchestrate, fetchedSlotsRef],
+    [
+      pauseInstanceId,
+      whenArtifactHydrateReady,
+      canAccessCompanion,
+      runSlotOrchestrate,
+      fetchedSlotsRef,
+    ],
   );
 
   const regenerateCompanion = useCallback(

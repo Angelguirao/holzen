@@ -42,7 +42,7 @@ export function useCompanionOrchestration({
 
   const slotUi = useCompanionSlotUiState(pauseInstanceId);
 
-  useCompanionArtifactHydrate({
+  const { whenArtifactHydrateReady } = useCompanionArtifactHydrate({
     pauseInstanceId,
     fetchedSlotsRef: slotUi.fetchedSlotsRef,
     slotCommitters: slotUi.slotCommitters,
@@ -62,6 +62,7 @@ export function useCompanionOrchestration({
     requirePro,
     startCheckout,
     fetchedSlotsRef: slotUi.fetchedSlotsRef,
+    whenArtifactHydrateReady,
     setCacheIds: slotUi.setCacheIds,
     setCacheRelaxations: slotUi.setCacheRelaxations,
     slotCommitters: slotUi.slotCommitters,
@@ -106,5 +107,6 @@ export function useCompanionOrchestration({
     retrySignal: orchestrateActions.retrySignal,
     retryZoomOut: orchestrateActions.retryZoomOut,
     retryHistory: orchestrateActions.retryHistory,
+    whenArtifactHydrateReady,
   };
 }

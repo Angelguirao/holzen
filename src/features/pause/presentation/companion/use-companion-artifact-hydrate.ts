@@ -1,4 +1,4 @@
-import { useEffect, type MutableRefObject } from 'react';
+import { useCallback, useEffect, useRef, type MutableRefObject } from 'react';
 import { hydrateCompanionSlotsFromArtifactCache } from '@/features/pause/application/use-cases/ritual/frame/hydrate-companion-slots-from-artifact-cache';
 import { fetchParsedPauseArtifactCache } from '@/features/pause/public-queries';
 import type { CompanionSlotCommitters } from './pause-companion-orchestrate-io';
@@ -9,18 +9,27 @@ export type UseCompanionArtifactHydrateParams = {
   slotCommitters: CompanionSlotCommitters;
 };
 
-/** Load persisted `pause_ai_artifacts` into slot UI so expand does not re-bill lazy fetch. */
+/**
+ * Load persisted `pause_ai_artifacts` into slot UI before lazy-fetch / quota checks.
+ * Exposes `whenArtifactHydrateReady` so full-view routes and `fetchCompanion` wait
+ * for hydrate instead of treating an empty in-memory slot as "needs generation".
+ */
 export function useCompanionArtifactHydrate({
   pauseInstanceId,
   fetchedSlotsRef,
   slotCommitters,
 }: UseCompanionArtifactHydrateParams) {
+  const hydrateReadyRef = useRef<Promise<void>>(Promise.resolve());
+
   useEffect(() => {
     const id = pauseInstanceId;
-    if (!id) return;
+    if (!id) {
+      hydrateReadyRef.current = Promise.resolve();
+      return;
+    }
 
     let cancelled = false;
-    void (async () => {
+    hydrateReadyRef.current = (async () => {
       try {
         const cached = await fetchParsedPauseArtifactCache(id);
         if (cancelled) return;
@@ -30,7 +39,7 @@ export function useCompanionArtifactHydrate({
           committers: slotCommitters,
         });
       } catch {
-        // Expand path may still lazy-fetch; avoid blocking the strip on read errors.
+        // Lazy-fetch may still run; do not block the strip on read errors.
       }
     })();
 
@@ -38,4 +47,11 @@ export function useCompanionArtifactHydrate({
       cancelled = true;
     };
   }, [pauseInstanceId, fetchedSlotsRef, slotCommitters]);
+
+  const whenArtifactHydrateReady = useCallback(
+    () => hydrateReadyRef.current,
+    [],
+  );
+
+  return { whenArtifactHydrateReady };
 }

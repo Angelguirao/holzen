@@ -65,6 +65,7 @@ export function useCompanionFullViewPage({
 
   const {
     fetchCompanion,
+    whenArtifactHydrateReady,
     signal,
     signalLoading,
     signalError,
@@ -81,25 +82,35 @@ export function useCompanionFullViewPage({
 
   useEffect(() => {
     if (!pauseInstanceId || !reflectionMessage) return;
-    if (
-      isCompanionFullViewSlotSettled(slot, {
-        signal,
-        signalLoading,
-        signalError,
-        nudge,
-        nudgeLoading,
-        nudgeError,
-        historyInsight,
-        historyLoading,
-        historyError,
-        zoomOut,
-        zoomOutLoading,
-        zoomOutError,
-      })
-    ) {
-      return;
-    }
-    void fetchCompanion(slot);
+
+    let cancelled = false;
+    void (async () => {
+      await whenArtifactHydrateReady();
+      if (cancelled) return;
+      if (
+        isCompanionFullViewSlotSettled(slot, {
+          signal,
+          signalLoading,
+          signalError,
+          nudge,
+          nudgeLoading,
+          nudgeError,
+          historyInsight,
+          historyLoading,
+          historyError,
+          zoomOut,
+          zoomOutLoading,
+          zoomOutError,
+        })
+      ) {
+        return;
+      }
+      await fetchCompanion(slot);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [
     pauseInstanceId,
     reflectionMessage,
@@ -117,6 +128,7 @@ export function useCompanionFullViewPage({
     zoomOutLoading,
     zoomOutError,
     fetchCompanion,
+    whenArtifactHydrateReady,
   ]);
 
   const revealed = useStaggeredReveal(COMPANION_FULL_VIEW_BREATHING_ROOM_MS);
