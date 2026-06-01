@@ -1,7 +1,7 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HomeHeroQuote } from '@/screens/home/components/HomeHeroQuote';
+import { HomeGreetingRow } from '@/screens/home/components/HomeGreetingRow';
 import { HomeCustomizeSheet } from '@/screens/home/components/HomeCustomizeSheet';
 import { HomePullRefreshIndicator } from '@/screens/home/components/HomePullRefreshIndicator';
 import { HomeCustomizeLinkButton } from '@/screens/home/components/HomeCustomizeLinkButton';
@@ -59,7 +59,7 @@ export const HomeDashboardLayout = memo(function HomeDashboardLayout({
 
   return (
     <div {...pullHandlers} className="space-y-6">
-      <HomeHeroQuote userId={userId} firstName={firstName} />
+      <HomeGreetingRow firstName={firstName} onOpenCustomize={onOpenCustomize} />
 
       <InstallHolzenCard />
 
@@ -73,25 +73,13 @@ export const HomeDashboardLayout = memo(function HomeDashboardLayout({
         ) : null}
         {goalWhyBlock ? <div key="goal-why">{goalWhyBlock}</div> : null}
         {todaySectionIds.length > 0 ? (
-          <section aria-labelledby="home-today-heading" className="space-y-3">
-            <div className="flex items-center justify-between gap-3">
-              <h2 id="home-today-heading" className="text-base font-medium text-foreground">
-                {t('home.today')}
-              </h2>
-              <HomeCustomizeLinkButton
-                label={t('home.customize')}
-                onClick={onOpenCustomize}
-                variant="shrink"
-              />
-            </div>
-            <div className="space-y-4">
-              {todaySectionIds.map((sectionId) => {
-                const node = renderSection(sectionId);
-                if (node == null) return null;
-                return <div key={sectionId}>{node}</div>;
-              })}
-            </div>
-          </section>
+          <div className="space-y-4">
+            {todaySectionIds.map((sectionId) => {
+              const node = renderSection(sectionId);
+              if (node == null) return null;
+              return <div key={sectionId}>{node}</div>;
+            })}
+          </div>
         ) : null}
       </div>
 

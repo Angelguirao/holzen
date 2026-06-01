@@ -97,7 +97,6 @@
   },
   "home": {
     "title": "Home",
-    "greeting": "Welcome back, {{name}}",
     "noActiveReflection": "No active pause.",
     "pauseEmpty": {
       "statusLine": "No active pause right now. Try the next step below between checks — or request a manual pause anytime."
@@ -157,6 +156,16 @@
     "whenBtcMoves": "When Bitcoin moves, we'll help you pause before you act.",
     "today": "Today",
     "customize": "Customize",
+    "greeting": {
+      "hello": "Hello",
+      "helloName": "Hello, {{name}}"
+    },
+    "practiceStats": {
+      "presence": "Presence",
+      "presenceFootnote": "From your practice",
+      "pauses": "Pauses",
+      "pausesFootnote": "Pauses held"
+    },
     "customizeSheet": {
       "title": "Customize your Home",
       "description": "Shape what you see first and how it is ordered—so Home meets you where you are and supports the mindset you want to carry into the rest of the app.",
@@ -177,8 +186,8 @@
           "desc": "Brings your pause practice into view on Home—so regulation and boundaries stay within reach when intensity rises."
         },
         "journeyPulse": {
-          "title": "Journey pulse",
-          "desc": "A light snapshot of how your practice is moving—so you sense continuity and direction without wading through every detail."
+          "title": "Practice stats",
+          "desc": "Presence (lifetime practice XP) and how many pauses you have completed."
         },
         "quickCapture": {
           "title": "Quick capture",
@@ -191,8 +200,10 @@
       }
     },
     "goalWhy": {
-      "expandHoldDetails": "Show hold goal details and motivations",
-      "collapseHoldDetails": "Hide hold goal details and motivations"
+      "expandHoldDetails": "Show hold goal details",
+      "collapseHoldDetails": "Hide hold goal details",
+      "editMantra": "Edit personal mantra",
+      "mantraPlaceholder": "Add a personal mantra in Settings to anchor your pauses."
     },
     "statTiles": {
       "holzenScore": "Holzen score",

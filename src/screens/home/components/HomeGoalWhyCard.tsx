@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
@@ -6,65 +6,44 @@ import { HoldGoalWidget } from '@/screens/home/components/HoldGoalWidget';
 import { useProfile } from '@/features/user/public-hooks';
 import { useAuth } from '@/features/auth/public';
 import { getProfileRowQueryOptions } from '@/features/user/public-queries';
-import {
-  computeHoldGoalCompactHeadline,
-  type HoldGoalHeadlineGoal,
-} from '@/features/user/public';
 import { cn } from '@/lib/utils';
 
-type HoldGoalRow = HoldGoalHeadlineGoal;
-
 /**
- * Home “why + hold” card: header row gets a **compact hold summary** (Figma); body shows
- * motivations always; chevron reveals full hold goal wireframe.
+ * Home anchor card body (Wireframes 546:8945): mantra quote, motivations, optional hold-goal expand.
  */
 export function HomeGoalWhyCard({
   currentPrice,
   detailsExpanded,
-  onHoldGoalSummaryChange,
 }: {
   currentPrice?: number;
   detailsExpanded: boolean;
-  onHoldGoalSummaryChange?: (summary: string | null) => void;
 }) {
   "use memo";
   const { t } = useTranslation();
-  const { motivations } = useProfile();
+  const { motivations, mantra } = useProfile();
   const { user } = useAuth();
   const userId = user?.id;
   const prefersReduced = useReducedMotion();
 
-  const { data: profileRow, status: profileQueryStatus } = useQuery(getProfileRowQueryOptions(userId));
-
-  const holdLoading = Boolean(userId && profileQueryStatus !== 'success' && profileQueryStatus !== 'error');
-
-  const holdGoal = useMemo((): HoldGoalRow | null => {
-    if (!userId || profileQueryStatus !== 'success' || !profileRow?.hold_goal_type) return null;
-    return {
-      type: profileRow.hold_goal_type as HoldGoalRow['type'],
-      start: profileRow.hold_goal_start,
-      targetMonths: profileRow.hold_goal_target_months,
-      targetPrice: profileRow.hold_goal_target_price,
-      currency: profileRow.hold_goal_currency || 'USD',
-    };
-  }, [userId, profileQueryStatus, profileRow]);
+  useQuery(getProfileRowQueryOptions(userId));
 
   const motivationLine = useMemo(
     () => motivations.map((m) => t(`settings.motivations.${m}`, m)).join(' \u00B7 '),
     [motivations, t],
   );
 
-  useEffect(() => {
-    if (holdLoading) {
-      onHoldGoalSummaryChange?.(null);
-      return;
-    }
-    const summary = computeHoldGoalCompactHeadline(holdGoal, { currentPrice, t });
-    onHoldGoalSummaryChange?.(summary);
-  }, [holdGoal, holdLoading, currentPrice, t, onHoldGoalSummaryChange]);
+  const mantraLine = mantra?.trim() ?? '';
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
+      <p className="text-sm font-medium leading-snug text-foreground">
+        {mantraLine
+          ? `"${mantraLine}"`
+          : t('home.goalWhy.mantraPlaceholder', {
+              defaultValue: 'Add a personal mantra in Settings to anchor your pauses.',
+            })}
+      </p>
+
       {motivationLine ? (
         <p className="text-xs font-medium italic tracking-wide text-muted-foreground">{motivationLine}</p>
       ) : null}
@@ -79,7 +58,7 @@ export function HomeGoalWhyCard({
             transition={{ duration: 0.22, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className={cn(motivationLine && 'border-t border-border/30 pt-4')}>
+            <div className={cn((motivationLine || mantraLine) && 'border-t border-border/30 pt-4')}>
               <HoldGoalWidget
                 currentPrice={currentPrice}
                 variant="wireframe"

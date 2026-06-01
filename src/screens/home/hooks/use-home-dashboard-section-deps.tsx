@@ -8,8 +8,6 @@ import type { BtcPriceData, TrackedAssetId } from '@/features/market/public';
 /** Memoized bundle passed into {@link renderHomeDashboardSection}. */
 export function useHomeDashboardSectionDeps(args: {
   t: TFunction;
-  goalWhyHoldSummary: string | null;
-  setGoalWhyHoldSummary: (v: string | null) => void;
   goalWhyHeaderRight: ReactNode;
   goalWhyExpanded: boolean;
   error: string | null;
@@ -32,13 +30,14 @@ export function useHomeDashboardSectionDeps(args: {
   subscribed: boolean;
   collapsed: Record<string, boolean>;
   toggleCollapsed: (id: string) => void;
+  presenceXp: number | null;
+  completedPauseCount: number | null;
+  practiceStatsLoading: boolean;
 }): HomeDashboardSectionDeps {
   const defaultMarketFooter = useMemo(() => <HolzenNumber variant="compact" />, []);
 
   const {
     t,
-    goalWhyHoldSummary,
-    setGoalWhyHoldSummary,
     goalWhyHeaderRight,
     goalWhyExpanded,
     error,
@@ -60,6 +59,9 @@ export function useHomeDashboardSectionDeps(args: {
     subscribed,
     collapsed,
     toggleCollapsed,
+    presenceXp,
+    completedPauseCount,
+    practiceStatsLoading,
   } = args;
 
   const marketFooter = marketFooterProp ?? defaultMarketFooter;
@@ -67,8 +69,6 @@ export function useHomeDashboardSectionDeps(args: {
   return useMemo(
     () => ({
       t,
-      goalWhyHoldSummary,
-      setGoalWhyHoldSummary,
       goalWhyHeaderRight,
       goalWhyExpanded,
       error,
@@ -90,11 +90,12 @@ export function useHomeDashboardSectionDeps(args: {
       subscribed,
       collapsed,
       toggleCollapsed,
+      presenceXp,
+      completedPauseCount,
+      practiceStatsLoading,
     }),
     [
       t,
-      goalWhyHoldSummary,
-      setGoalWhyHoldSummary,
       goalWhyHeaderRight,
       goalWhyExpanded,
       error,
@@ -116,6 +117,9 @@ export function useHomeDashboardSectionDeps(args: {
       subscribed,
       collapsed,
       toggleCollapsed,
+      presenceXp,
+      completedPauseCount,
+      practiceStatsLoading,
     ],
   );
 }
