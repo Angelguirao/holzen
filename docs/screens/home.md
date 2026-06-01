@@ -57,6 +57,18 @@ Home is the signed-in landing surface after onboarding: hero quote, optional ins
 
 Shipped widgets render **`goal-why`**, **`market`**, **`your-pause`**, and (when enabled in Customize) **`journey-pulse`** → [`HomePracticeStatTiles`](../../src/screens/home/components/HomePracticeStatTiles.tsx) ([`render-home-dashboard-section.tsx`](../../src/screens/home/components/render-home-dashboard-section.tsx)). Legacy ids **`quick-capture`** and **`night`** may still appear in persisted layout order / Customize storage ([`home-section-visibility-constants.ts`](../../src/screens/home/lib/home-section-visibility-constants.ts)) but **`renderHomeDashboardSection` returns `null`** for them — no UI.
 
+## Goal-why anchor card (Your whys)
+
+Wireframe: [546:8945](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=546-8945). Rendered **above** the draggable widget stack via `goalWhyBlock` in [`HomeDashboardLayout`](../../src/screens/home/components/HomeDashboardLayout.tsx) (not a `HomeSectionCard` — no expand chevron).
+
+| Surface | Content |
+|---------|---------|
+| **Home** | [`HomeGoalWhyCard`](../../src/screens/home/components/HomeGoalWhyCard.tsx) — quoted `profiles.mantra` + motivation chips as a dot-separated line; pencil → Settings → You |
+| **Settings → You** | Full editors for motivations grid + mantra textarea |
+| **Hold goal / commitment** | **Not on active Home** — [`src/legacy/hold-goal/`](../../src/legacy/hold-goal/README.md) (investment-strategy scope) |
+
+Future depth (rational thesis, versioned whys): [backlog/home-why-thesis-evolution.md](../backlog/home-why-thesis-evolution.md).
+
 ## Practice stats row (Presence + Pauses)
 
 Wireframe structure: two equal tiles after **Your pause** — **Presence** (lifetime practice XP) and **Pauses** (completed pause count).

@@ -174,8 +174,8 @@
       "resetLink": "Reset to defaults",
       "sections": {
         "goalWhy": {
-          "title": "Why you stay",
-          "desc": "The thread of why you stay and what you are holding for—so Home can anchor you in meaning before the next impulse arrives."
+          "title": "Your whys",
+          "desc": "Your mantra and what matters to you — a quick anchor before the next impulse."
         },
         "market": {
           "title": "Market",
@@ -200,10 +200,10 @@
       }
     },
     "goalWhy": {
-      "expandHoldDetails": "Show hold goal details",
-      "collapseHoldDetails": "Hide hold goal details",
+      "editWhys": "Edit mantra and motivations",
       "editMantra": "Edit personal mantra",
-      "mantraPlaceholder": "Add a personal mantra in Settings to anchor your pauses."
+      "mantraPlaceholder": "Add a personal mantra in Settings to anchor your pauses.",
+      "motivationsPlaceholder": "Choose what matters in Settings → You."
     },
     "statTiles": {
       "holzenScore": "Holzen score",
@@ -249,7 +249,7 @@
     "widget": {
       "market": "Market",
       "goal": "Goal",
-      "whyHoldTitle": "Your anchor",
+      "whyHoldTitle": "Your whys",
       "yourPause": "Your pause",
       "continueYourPause": "Continue your pause",
       "youPaused": "You paused",
@@ -393,7 +393,7 @@
       "editGroundingInSettings": "Edit grounding activities in Settings",
       "openGround": "Open Ground",
       "mantraEmptyTitle": "Set a breathing mantra",
-      "mantraEmptyBody": "A short optional line can anchor you during breathwork. It is not shown on Home.",
+      "mantraEmptyBody": "A short optional line can anchor you during breathwork and on Home.",
       "mantraEmptyCta": "Open Settings → You",
       "tile": {
         "grounding": "Grounding",
@@ -491,7 +491,7 @@
       "monero": "Monero (XMR)"
     },
     "myWhy": "My Why",
-    "myWhyDesc": "Why do you hold? Select what resonates. This anchors your pause experience and companion tone.",
+    "myWhyDesc": "What matters to you? Select what resonates. This shapes your Home anchor and companion tone.",
     "motivations": {
       "freedom": "Financial freedom",
       "freedomDesc": "Building independence",
@@ -511,7 +511,7 @@
       "curiosityDesc": "Learning about money"
     },
     "personalMantra": "Personal mantra",
-    "mantraDesc": "Optional. Your own words — shown during pauses and woven into AI pause copy.",
+    "mantraDesc": "Optional. Your own words — shown on Home and during pauses, woven into AI pause copy.",
     "mantraPlaceholder": "e.g. I hold because time is on my side…",
     "btcMode": "1 BTC = 1 BTC",
     "btcModeDesc": "Strip away fiat noise. No prices, no percentages, no red or green. Just Bitcoin.",

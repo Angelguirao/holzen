@@ -11,23 +11,21 @@ Presence is a **client-side projection** — nothing is stored in Postgres. The 
 
 | Component | Value |
 |-----------|--------|
-| **Base** | **2** XP — every completed pause |
-| **Bonus** | Up to **+3** XP from ritual depth (capped per pause) |
-
-Bonus signals (same events as the Done screen, **weaker weights** than `buildPauseScoreImpacts` copy hints):
+| **Base** | **5** XP — every completed pause |
+| **Bonus** | Sum of ritual-depth signals (same **`points`** weights as `buildPauseScoreImpacts` on Done) |
 
 | Signal | Bonus |
 |--------|-------|
-| Breathing completed | +1 |
-| Mood shifted toward composure (when no breathing bonus) | +1 |
-| Perspective tools used | +1 per tool, max +2 |
-| Reflection note or tags | +1 |
-| Brief ritual: decision recorded | +1 |
-| Brief ritual: entry mood named (when no regulation bonus yet) | +1 |
+| Breathing completed | +4 |
+| Mood shifted toward composure (when no breathing bonus) | +5 |
+| Perspective tools used | +2 per tool, max +6 |
+| Reflection note or tags | +3 |
+| Brief ritual: decision recorded | +2 |
+| Brief ritual: entry mood named (when no regulation bonus yet) | +2 |
 
-Raw bonus is **`min(sum(signals), 3)`**. Typical range per pause: **2–5** XP.
+Typical range per pause: **5–18+** XP depending on ritual depth (no artificial per-pause cap).
 
-**Constants (source of truth):** `PAUSE_PRACTICE_BASE_XP`, `PAUSE_PRACTICE_MAX_BONUS_XP` in `src/features/pause/domain/home/compute-pause-practice-xp.ts`.
+**Constants (source of truth):** `PAUSE_PRACTICE_BASE_XP` in `src/features/pause/domain/home/compute-pause-practice-xp.ts`; bonus weights in `sum-pause-score-impact-points.ts`.
 
 ---
 
@@ -60,7 +58,7 @@ flowchart LR
 
 | Change | File(s) |
 |--------|---------|
-| Base / cap / formula | `compute-pause-practice-xp.ts`, `sum-pause-score-impact-points.ts` + tests |
+| Base / bonus weights | `compute-pause-practice-xp.ts`, `sum-pause-score-impact-points.ts` + tests |
 | Fetch / cache | `home-practice-stats-query.ts`, `use-home-practice-stats.ts` |
 | Tile layout / copy | `HomePracticeStatTiles.tsx`, `src/locales/en.json` |
 | Section id / Customize | `journey-pulse` in `home-section-visibility-constants.ts`, `render-home-dashboard-section.tsx` |
@@ -69,5 +67,5 @@ flowchart LR
 
 ## Related
 
-- Done-screen qualitative impacts (not summed for Presence): `buildPauseScoreImpacts` in `score-impacts.ts`
+- Done-screen qualitative impacts (same event sources; copy only on Done): `buildPauseScoreImpacts` in `score-impacts.ts`
 - Legacy Holzen Score (not shipped on Home): `src/legacy/full-shell/` · [stats-system.md](stats-system.md)

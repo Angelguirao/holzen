@@ -1,5 +1,4 @@
 import { Input } from '@/components/ui/input';
-import { HoldGoalWidget } from '@/screens/home/components/HoldGoalWidget';
 import { GroundingTagInput } from '@/screens/settings/components/GroundingTagInput';
 import { useSettingsState } from '@/screens/settings/hooks/use-settings-state';
 
@@ -30,12 +29,6 @@ export function SettingsYouPanel() {
           maxLength={30}
           className="text-xs font-mono"
         />
-      </div>
-
-      <div className="space-y-3">
-        <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.holdGoalTitle')}</p>
-        <p className="leading-relaxed text-foreground text-sm">{t('settings.holdGoalDesc')}</p>
-        <HoldGoalWidget />
       </div>
 
       <div className="space-y-3">

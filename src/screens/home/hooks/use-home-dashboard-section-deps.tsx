@@ -8,8 +8,6 @@ import type { BtcPriceData, TrackedAssetId } from '@/features/market/public';
 /** Memoized bundle passed into {@link renderHomeDashboardSection}. */
 export function useHomeDashboardSectionDeps(args: {
   t: TFunction;
-  goalWhyHeaderRight: ReactNode;
-  goalWhyExpanded: boolean;
   error: string | null;
   marketHeaderRight: ReactNode;
   /** Defaults to a compact {@link HolzenNumber} when omitted. */
@@ -38,8 +36,6 @@ export function useHomeDashboardSectionDeps(args: {
 
   const {
     t,
-    goalWhyHeaderRight,
-    goalWhyExpanded,
     error,
     marketHeaderRight,
     marketFooter: marketFooterProp,
@@ -69,8 +65,6 @@ export function useHomeDashboardSectionDeps(args: {
   return useMemo(
     () => ({
       t,
-      goalWhyHeaderRight,
-      goalWhyExpanded,
       error,
       marketHeaderRight,
       marketFooter,
@@ -96,8 +90,6 @@ export function useHomeDashboardSectionDeps(args: {
     }),
     [
       t,
-      goalWhyHeaderRight,
-      goalWhyExpanded,
       error,
       marketHeaderRight,
       marketFooter,

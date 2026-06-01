@@ -3,11 +3,10 @@ import {
   computePausePracticeXpForInstance,
   computePresenceXpFromCompletedPauses,
   PAUSE_PRACTICE_BASE_XP,
-  PAUSE_PRACTICE_MAX_BONUS_XP,
 } from './compute-pause-practice-xp';
 
 describe('computePresenceXpFromCompletedPauses', () => {
-  it('sums base XP plus capped ritual bonuses per completed pause', () => {
+  it('sums base XP plus Done-aligned ritual bonuses per completed pause', () => {
     const instances = [{ id: 'a', context: null }, { id: 'b', context: null }];
     const events = new Map([
       [
@@ -30,14 +29,13 @@ describe('computePresenceXpFromCompletedPauses', () => {
 
     const xp = computePresenceXpFromCompletedPauses(instances, events, companions);
 
-    // a: base 2 + min(breath 1 + tools 2, cap 3) = 5
-    // b: base 2 + min(brief decision 1 + entry mood 1, cap 3) = 4
-    expect(xp).toBe(9);
-    expect(PAUSE_PRACTICE_BASE_XP).toBe(2);
-    expect(PAUSE_PRACTICE_MAX_BONUS_XP).toBe(3);
+    // a: base 5 + breath 4 + tools 4 = 13 (mood bonus skipped when breathing counts)
+    // b: base 5 + brief decision 2 + brief entry mood 2 = 9
+    expect(xp).toBe(22);
+    expect(PAUSE_PRACTICE_BASE_XP).toBe(5);
   });
 
-  it('caps a rich ritual at base + max bonus', () => {
+  it('rewards a rich deep ritual without an artificial cap', () => {
     const xp = computePausePracticeXpForInstance(
       [
         { step_type: 'breath_completed', payload: {} },
@@ -47,7 +45,8 @@ describe('computePresenceXpFromCompletedPauses', () => {
       null,
       3,
     );
-    expect(xp).toBe(PAUSE_PRACTICE_BASE_XP + PAUSE_PRACTICE_MAX_BONUS_XP);
+    // base 5 + breath 4 + note/tags 3 + tools 6 = 18
+    expect(xp).toBe(18);
   });
 
   it('returns zero when there are no completed pauses', () => {
