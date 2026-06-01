@@ -12,8 +12,11 @@ export type UseHomePauseCardProjectionParams = UseHomePauseWidgetProjectionParam
 
 /** Screen conductor: pause widget projection + Home route components (snooze + body). */
 export function useHomePauseCardProjection(params: UseHomePauseCardProjectionParams) {
-  const { subscriptionReady, hasAccess, ...widgetParams } = params;
-  const { showSnoozeToolbar } = usePauseCardProjection({ subscriptionReady, hasAccess });
+  const { subscriptionReady, ...widgetParams } = params;
+  const { showSnoozeToolbar } = usePauseCardProjection({
+    subscriptionReady,
+    hasAccess: widgetParams.hasAccess,
+  });
 
   const widgetProjection = useHomePauseWidgetProjection(widgetParams);
 
