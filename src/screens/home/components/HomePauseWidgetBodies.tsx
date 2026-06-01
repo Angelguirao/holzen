@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
-import { AutoCooldownIndicator, NeedAMomentButton } from '@/screens/home/components/HomePauseChrome';
+import { AutoCooldownIndicator, formatMsAsMS } from '@/screens/home/components/HomePauseChrome';
 import { HomePauseWidgetPreviewLine } from '@/screens/home/components/HomePauseWidgetPreviewLine';
 import { HomePauseWidgetMarketRow } from '@/screens/home/components/HomePauseWidgetMarketRow';
 import type { HomePauseWidgetBodyProjection } from '@/features/pause/presentation/home/use-home-pause-widget-projection';
@@ -323,41 +325,59 @@ export function HomePauseCalmWatersBody({
   );
 }
 
-/** State A′ — manual idle expanded (scheduling + Need a moment). */
+/** State A — idle, no open pause (structure: Figma 546:8975; tokens: Nox). */
 export function HomePauseIdleExpandedBody(
   props: Pick<
     HomePauseWidgetBodyProjection,
-    | 'showPauseScheduling'
-    | 'autoCooldownRemaining'
-    | 'cooldownHours'
-    | 'nextCronCheckIn'
-    | 'onNeedPause'
-    | 'manualCooldownRemaining'
-    | 'loading'
+    'onNeedPause' | 'manualCooldownRemaining' | 'loading'
   >,
 ) {
   "use memo";
   const { t } = useTranslation();
+  const [remaining, setRemaining] = useState(() => props.manualCooldownRemaining());
+
+  useEffect(() => {
+    if (remaining <= 0) return;
+    const interval = setInterval(() => {
+      const next = props.manualCooldownRemaining();
+      setRemaining(next);
+      if (next <= 0) clearInterval(interval);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [props.manualCooldownRemaining, remaining]);
+
+  const inCooldown = remaining > 0;
+  const ctaLabel = inCooldown
+    ? remaining >= 60_000
+      ? t('home.manualReflectionIn', { minutes: Math.ceil(remaining / 60_000) })
+      : t('home.manualReflectionInSoon', { time: formatMsAsMS(remaining) })
+    : t('home.pauseIdle.letsPauseCta', { defaultValue: "Let's pause" });
 
   return (
-    <div className="space-y-4">
-      <p className={`${homeInWidget.bodyMuted} leading-relaxed`}>{t('home.pauseEmpty.statusLine')}</p>
-      {props.showPauseScheduling ? (
-        <div className="rounded-lg border border-border/40 bg-muted/10 px-3 py-2.5">
-          <AutoCooldownIndicator
-            cooldownRemaining={props.autoCooldownRemaining}
-            cooldownHours={props.cooldownHours}
-            nextCronCheckIn={props.nextCronCheckIn}
-          />
-        </div>
-      ) : null}
-      <div className="border-t border-border/40 pt-3">
-        <NeedAMomentButton
-          onTrigger={props.onNeedPause}
-          cooldownRemaining={props.manualCooldownRemaining}
-          loading={props.loading}
-        />
-      </div>
+    <div className="flex flex-col gap-4">
+      <p className={cn(homeInWidget.body, 'leading-relaxed')}>
+        <span className="text-foreground">
+          {t('home.pauseIdle.withinRangeLead', {
+            defaultValue: 'The market is within your range.',
+          })}
+        </span>{' '}
+        <span className="text-muted-foreground">
+          {t('home.pauseIdle.withinRangeTail', {
+            defaultValue: 'This is the moment to pause without urgency.',
+          })}
+        </span>
+      </p>
+      <LoadingButton
+        type="button"
+        variant="default"
+        onClick={props.onNeedPause}
+        loading={props.loading}
+        loadingText={t('home.generatingReflection')}
+        disabled={inCooldown}
+        className={cn(homeInWidget.ctaNoxPrimary, 'h-10 border-0 shadow-none')}
+      >
+        {ctaLabel}
+      </LoadingButton>
     </div>
   );
 }

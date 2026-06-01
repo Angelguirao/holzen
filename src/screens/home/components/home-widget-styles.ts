@@ -35,6 +35,9 @@ export const homeInWidget = {
   /** Top-right dismiss on reflection / grounding previews */
   dismissAbs:
     'absolute -top-1 -right-1 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/30 transition-colors hover:bg-muted/50 hover:text-muted-foreground/60',
+  /** Nox primary pill — inverse surface (`DESIGN.md` button-primary); full-width widget CTAs. */
+  ctaNoxPrimary:
+    'flex w-full items-center justify-center rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90',
   /** Primary full-width action (Pause with this, Ground when subscribed) */
   ctaPrimary:
     'flex w-full items-center justify-center gap-2 rounded-xl border border-nox-border-default/60 bg-nox-background-accent/30 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-nox-background-accent/45',

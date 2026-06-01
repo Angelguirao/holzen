@@ -165,19 +165,15 @@ export function HomePauseWidgetBody(props: Props) {
       );
 
     case 'A_expanded':
+    case 'A_collapsed':
       return (
         <HomePauseIdleExpandedBody
-          showPauseScheduling={props.showPauseScheduling}
-          autoCooldownRemaining={props.autoCooldownRemaining}
-          cooldownHours={props.cooldownHours}
-          nextCronCheckIn={props.nextCronCheckIn}
           onNeedPause={props.onNeedPause}
           manualCooldownRemaining={props.manualCooldownRemaining}
           loading={props.loading}
         />
       );
 
-    case 'A_collapsed':
     default:
       return null;
   }

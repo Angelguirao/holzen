@@ -70,7 +70,7 @@ Home maps **`v_pause_full.state`** to Figma modes via [`resolveHomePauseWidgetMo
 
 | UI mode | When | Header / CTA |
 |--------|------|----------------|
-| **A** | Idle, no open pause | YOUR PAUSE (collapsed) / manual scheduling when expanded |
+| **A** | Idle, no open pause | YOUR PAUSE + moon; two-tone copy + Nox primary **Let's pause** (Wireframes 546:8975 structure) |
 | **B** | `state = active` (default: in-ritual, first offer, or + pending banner) | Template opening line + **Pause with this** |
 | **C** | `state = engaged` (deep + `reflection_step`) | **Continue your pause** + Continue / Discard |
 | **C′** | C + pending offer | Dual sections + **Pause with new context** |

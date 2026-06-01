@@ -6,7 +6,7 @@ import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
 
 /** Format ms as m:ss for short countdowns (e.g. next cron tick, manual cooldown under one minute). */
-function formatMsAsMS(ms: number): string {
+export function formatMsAsMS(ms: number): string {
   const totalSec = Math.max(0, Math.floor(ms / 1000));
   const m = Math.floor(totalSec / 60);
   const s = totalSec % 60;

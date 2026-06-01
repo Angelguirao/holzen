@@ -160,7 +160,7 @@ export function useHomePauseWidgetProjection(
 
   const assetSymbol = trackedAssetSymbol(params.trackedAssetId);
 
-  const [userExpanded, setUserExpanded] = useState<boolean>(() => readExpandedPreference() ?? false);
+  const [userExpanded, setUserExpanded] = useState<boolean>(() => readExpandedPreference() ?? true);
 
   const { mode: widgetMode } = useMemo(
     () =>
@@ -210,12 +210,15 @@ export function useHomePauseWidgetProjection(
     }
   }, [widgetMode, params.newPauseArrival]);
 
+  const isIdleMode = widgetMode === 'A_collapsed' || widgetMode === 'A_expanded';
   const collapsible =
-    homePauseWidgetModeIsCollapsible(widgetMode) || widgetMode === 'calm_waters';
+    !isIdleMode && (homePauseWidgetModeIsCollapsible(widgetMode) || widgetMode === 'calm_waters');
   const collapsed =
     widgetMode === 'calm_waters'
       ? !userExpanded
-      : homePauseWidgetModeIsCollapsed(widgetMode);
+      : isIdleMode
+        ? false
+        : homePauseWidgetModeIsCollapsed(widgetMode);
 
   const onToggleCollapse = useCallback(() => {
     setUserExpanded((prev) => {
