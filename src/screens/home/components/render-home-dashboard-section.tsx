@@ -8,11 +8,9 @@ import { HomePracticeStatTiles } from '@/screens/home/components/HomePracticeSta
 import type { HomePauseWidgetProjection } from '@/features/pause/presentation/home/use-home-pause-widget-projection';
 import type { BtcPriceData, TrackedAssetId } from '@/features/market/public';
 
-/** Everything needed to render one Home “Today” / goal-why section by id. */
+/** Everything needed to render one Home dashboard section by id. */
 export interface HomeDashboardSectionDeps {
   t: TFunction;
-  goalWhyHeaderRight: ReactNode;
-  goalWhyExpanded: boolean;
   error: string | null;
   marketHeaderRight: ReactNode;
   marketFooter: ReactNode;
@@ -40,16 +38,7 @@ export interface HomeDashboardSectionDeps {
 export function renderHomeDashboardSection(sectionId: string, d: HomeDashboardSectionDeps): ReactNode {
   switch (sectionId) {
     case 'goal-why':
-      return (
-        <HomeSectionCard
-          className="rounded-lg"
-          title={d.t('home.widget.whyHoldTitle')}
-          hideTitle
-          headerRight={d.goalWhyHeaderRight}
-        >
-          <HomeGoalWhyCard currentPrice={d.btcData?.currentPrice} detailsExpanded={d.goalWhyExpanded} />
-        </HomeSectionCard>
-      );
+      return <HomeGoalWhyCard />;
 
     case 'market':
       return (

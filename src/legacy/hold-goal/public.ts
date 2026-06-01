@@ -1,0 +1,1 @@
+export { HoldGoalWidget } from './HoldGoalWidget';

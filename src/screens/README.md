@@ -49,7 +49,7 @@ Co-locate Vitest beside the file under test. **Pause:** ritual conductors live i
 |---------|------------|
 | Pause ritual UI | `screens/pause/components/` |
 | Pause rules / RPC | `features/pause/` |
-| Home dashboard UI + hooks | `screens/home/components/` (`HoldGoalWidget`, `InstallHolzenCard`, `ThresholdFrequencyEstimator`), `hooks/` |
+| Home dashboard UI + hooks | `screens/home/components/` (`HomeGoalWhyCard`, `HomePracticeStatTiles`, `InstallHolzenCard`, `ThresholdFrequencyEstimator`), `hooks/` |
 | First-run onboarding UI | `screens/onboarding/components/` |
 | Settings prefs UI | `screens/settings/components/` (`ThresholdSetting`, `QuietWindowsManager`, …) |
 | Route wiring | `App.tsx` → `screens/<route>/*Screen.tsx` |

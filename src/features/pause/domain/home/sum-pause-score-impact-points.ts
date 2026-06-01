@@ -12,36 +12,37 @@ const COMPOSURE: Record<string, number> = {
 };
 
 /**
- * Small ritual-signal bonus for Home Presence XP (weaker than Done-screen copy weights).
+ * Ritual signal bonus weights for Home Presence XP — aligned with
+ * {@link buildPauseScoreImpacts} `points` (Done screen uses the same events for copy only).
  * See docs/systems/home-practice-presence-xp.md.
  */
-export function sumPausePracticeBonusPoints(
+export function sumPauseScoreImpactPoints(
   data: PauseImpactData,
   variant: 'default' | 'brief',
 ): number {
   let total = 0;
 
   if (data.breathingCompleted) {
-    total += 1;
+    total += 4;
   } else if (data.mood && data.moodAfter && COMPOSURE[data.moodAfter] > COMPOSURE[data.mood]) {
-    total += 1;
+    total += 5;
   }
 
   if (data.engagedTools > 0) {
-    total += Math.min(2, data.engagedTools);
+    total += Math.min(6, 2 * data.engagedTools);
   }
 
   if (data.wroteNote || data.usedTags) {
-    total += 1;
+    total += 3;
   }
 
   if (variant === 'brief' && data.decision) {
-    total += 1;
+    total += 2;
     const hasRegulation =
       data.breathingCompleted ||
       (data.mood && data.moodAfter && COMPOSURE[data.moodAfter] > COMPOSURE[data.mood]);
     if (data.mood && !hasRegulation) {
-      total += 1;
+      total += 2;
     }
   }
 

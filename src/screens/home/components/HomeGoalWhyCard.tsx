@@ -1,31 +1,19 @@
 import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { HoldGoalWidget } from '@/screens/home/components/HoldGoalWidget';
+import { Pencil } from 'lucide-react';
 import { useProfile } from '@/features/user/public-hooks';
-import { useAuth } from '@/features/auth/public';
-import { getProfileRowQueryOptions } from '@/features/user/public-queries';
+import { settingsSectionPath } from '@/lib/app-routes';
+import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
 
 /**
- * Home anchor card body (Wireframes 546:8945): mantra quote, motivations, optional hold-goal expand.
+ * Home “Your whys” card (Wireframes 546:8945): mantra + motivations only — no hold goal / commitment.
  */
-export function HomeGoalWhyCard({
-  currentPrice,
-  detailsExpanded,
-}: {
-  currentPrice?: number;
-  detailsExpanded: boolean;
-}) {
+export function HomeGoalWhyCard() {
   "use memo";
   const { t } = useTranslation();
   const { motivations, mantra } = useProfile();
-  const { user } = useAuth();
-  const userId = user?.id;
-  const prefersReduced = useReducedMotion();
-
-  useQuery(getProfileRowQueryOptions(userId));
 
   const motivationLine = useMemo(
     () => motivations.map((m) => t(`settings.motivations.${m}`, m)).join(' \u00B7 '),
@@ -35,39 +23,31 @@ export function HomeGoalWhyCard({
   const mantraLine = mantra?.trim() ?? '';
 
   return (
-    <div className="space-y-3">
-      <p className="text-sm font-medium leading-snug text-foreground">
-        {mantraLine
-          ? `"${mantraLine}"`
-          : t('home.goalWhy.mantraPlaceholder', {
-              defaultValue: 'Add a personal mantra in Settings to anchor your pauses.',
-            })}
-      </p>
+    <div className={cn('rounded-lg border border-border/40 bg-card/40 p-4')}>
+      <div className="flex items-start justify-between gap-3">
+        <p className="min-w-0 flex-1 text-sm font-medium leading-snug text-foreground">
+          {mantraLine
+            ? `"${mantraLine}"`
+            : t('home.goalWhy.mantraPlaceholder', {
+                defaultValue: 'Add a personal mantra in Settings to anchor your pauses.',
+              })}
+        </p>
+        <Link
+          to={settingsSectionPath('you')}
+          className={homeInWidget.iconBtn}
+          aria-label={t('home.goalWhy.editWhys')}
+        >
+          <Pencil className="h-4 w-4 shrink-0" aria-hidden />
+        </Link>
+      </div>
 
       {motivationLine ? (
-        <p className="text-xs font-medium italic tracking-wide text-muted-foreground">{motivationLine}</p>
-      ) : null}
-
-      <AnimatePresence initial={false}>
-        {detailsExpanded ? (
-          <motion.div
-            key="goal-why-hold"
-            initial={prefersReduced ? false : { height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={prefersReduced ? undefined : { height: 0, opacity: 0 }}
-            transition={{ duration: 0.22, ease: 'easeInOut' }}
-            className="overflow-hidden"
-          >
-            <div className={cn((motivationLine || mantraLine) && 'border-t border-border/30 pt-4')}>
-              <HoldGoalWidget
-                currentPrice={currentPrice}
-                variant="wireframe"
-                wireframeDetailsExpanded
-              />
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+        <p className="pt-2 text-xs font-medium italic tracking-wide text-muted-foreground">{motivationLine}</p>
+      ) : (
+        <p className="pt-2 text-xs text-muted-foreground">
+          {t('home.goalWhy.motivationsPlaceholder')}
+        </p>
+      )}
     </div>
   );
 }

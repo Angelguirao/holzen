@@ -144,7 +144,7 @@ export function useHomeScreen() {
     subscribed,
   });
 
-  const { goalWhyExpanded, goalWhyHeaderRight, marketHeaderRight } = useHomeMarketGoalHeaders({
+  const { marketHeaderRight } = useHomeMarketGoalHeaders({
     t,
     marketChartExpanded,
     marketChartExpandBlocked,
@@ -212,8 +212,6 @@ export function useHomeScreen() {
   const { renderSection, goalWhyBlock } = useHomeDashboardTodayWiring(
     {
       t,
-      goalWhyHeaderRight,
-      goalWhyExpanded,
       error,
       marketHeaderRight,
       btcData,

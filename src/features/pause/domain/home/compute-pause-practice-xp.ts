@@ -3,13 +3,10 @@ import {
   resolveHomePracticeRitualVariant,
   type HomePracticeStepEventRow,
 } from './build-pause-impact-from-step-events';
-import { sumPausePracticeBonusPoints } from './sum-pause-score-impact-points';
+import { sumPauseScoreImpactPoints } from './sum-pause-score-impact-points';
 
 /** Every `state = completed` pause earns at least this much Presence XP. */
-export const PAUSE_PRACTICE_BASE_XP = 2;
-
-/** Cap on ritual-depth bonus per pause (keeps Home Presence growth modest). */
-export const PAUSE_PRACTICE_MAX_BONUS_XP = 3;
+export const PAUSE_PRACTICE_BASE_XP = 5;
 
 export type HomePracticePauseInstanceRow = {
   id: string;
@@ -23,11 +20,7 @@ export function computePausePracticeXpForInstance(
 ): number {
   const impact = buildPauseImpactFromStepEvents(events, context, engagedTools);
   const variant = resolveHomePracticeRitualVariant(events);
-  const bonus = Math.min(
-    sumPausePracticeBonusPoints(impact, variant),
-    PAUSE_PRACTICE_MAX_BONUS_XP,
-  );
-  return PAUSE_PRACTICE_BASE_XP + bonus;
+  return PAUSE_PRACTICE_BASE_XP + sumPauseScoreImpactPoints(impact, variant);
 }
 
 export function computePresenceXpFromCompletedPauses(
