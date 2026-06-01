@@ -89,12 +89,12 @@ export function renderHomeDashboardSection(sectionId: string, d: HomeDashboardSe
                     ? 'New pause available'
                     : 'Your pause',
           })}
-          titleLeading={
-            d.pauseWidgetProjection.showMoonIcon ? (
-              <Moon className="h-3.5 w-3.5 text-muted-foreground/70" aria-hidden />
-            ) : undefined
+          headerRight={
+            d.pauseSectionHeaderRight ??
+            (d.pauseWidgetProjection.showMoonIcon ? (
+              <Moon className="h-5 w-5 shrink-0 text-muted-foreground/70" aria-hidden />
+            ) : undefined)
           }
-          headerRight={d.pauseSectionHeaderRight}
           collapsible={d.pauseWidgetProjection.collapsible}
           collapsed={d.pauseWidgetProjection.collapsed}
           onToggleCollapse={d.pauseWidgetProjection.onToggleCollapse}
