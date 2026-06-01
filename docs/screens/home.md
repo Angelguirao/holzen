@@ -1,6 +1,6 @@
 # Home (`/`)
 
-**Pause-first shipped scope (2026-05):** widgets are **goal-why**, **market**, and **your-pause** only (no journey-pulse, quick-capture, night reflection, or stats). Trial/lapsed gating via `getHomeSubscriptionGate` + `useSubscription` entitlement. Manifest: [active-surface.md](../ops/active-surface.md).
+**Pause-first shipped scope (2026-05):** widgets are **goal-why**, **market**, **your-pause**, and optional **practice stats** (Presence + Pauses row). Trial/lapsed gating via `getHomeSubscriptionGate` + `useSubscription` entitlement. Manifest: [active-surface.md](../ops/active-surface.md).
 
 Authoritative orchestration: [`src/screens/home/HomeScreen.tsx`](../../src/screens/home/HomeScreen.tsx).
 
@@ -14,6 +14,8 @@ Authoritative orchestration: [`src/screens/home/HomeScreen.tsx`](../../src/scree
 | Customize link button | [`HomeCustomizeLinkButton.tsx`](../../src/screens/home/components/HomeCustomizeLinkButton.tsx) |
 | Zen mode (not MVP) | [`src/legacy/zen-mode/`](../../src/legacy/zen-mode/README.md) |
 | Pause widget body | [`HomePauseWidgetBody.tsx`](../../src/screens/home/components/HomePauseWidgetBody.tsx) |
+| Practice stat tiles (Presence + Pauses) | [`HomePracticeStatTiles.tsx`](../../src/screens/home/components/HomePracticeStatTiles.tsx) |
+| Greeting row | [`HomeGreetingRow.tsx`](../../src/screens/home/components/HomeGreetingRow.tsx) |
 | Pause error panel | [`HomePauseBlockingErrorPanel.tsx`](../../src/screens/home/components/HomePauseBlockingErrorPanel.tsx) |
 | Context meta lines | [`HomePauseContextMeta.tsx`](../../src/screens/home/components/HomePauseContextMeta.tsx) |
 | Expand chevrons | [`HomeExpandChevronButton.tsx`](../../src/screens/home/components/HomeExpandChevronButton.tsx) |
@@ -47,13 +49,24 @@ Home is the signed-in landing surface after onboarding: hero quote, optional ins
 
 1. **Loading** — `!profileLoaded` → `AuthLoading`.
 2. **Onboarding** — `!hasOnboarded` → `Onboarding`.
-3. **Hold dashboard** — Hero quote, pull-to-refresh (full reload), “Today” sections driven by `visibleOrderedSectionIds` (pause-first: **goal-why**, **market**, **your-pause** only), customize sheet (widget order/visibility only), testimonial prompt.
+3. **Hold dashboard** — Greeting row (`Hello, {name}` + Customize), pull-to-refresh, widget stack (**goal-why**, **market**, **your-pause**, optional **Presence / Pauses** stats), customize sheet, testimonial prompt.
 
 **Zen mode** (minimal reflection Home, `holzen_zen_mode`) is **not MVP** — see [`src/legacy/zen-mode/`](../../src/legacy/zen-mode/README.md).
 
 ## Layout section ids (pause-first)
 
-Shipped widgets render only **`goal-why`**, **`market`**, **`your-pause`** ([`render-home-dashboard-section.tsx`](../../src/screens/home/components/render-home-dashboard-section.tsx)). Legacy ids **`journey-pulse`**, **`quick-capture`**, and **`night`** may still appear in persisted layout order / Customize storage ([`home-section-visibility-constants.ts`](../../src/screens/home/lib/home-section-visibility-constants.ts)) but **`renderHomeDashboardSection` returns `null`** for them — no UI. Phase C hygiene may remove dead ids from constants and storage migrations.
+Shipped widgets render **`goal-why`**, **`market`**, **`your-pause`**, and (when enabled in Customize) **`journey-pulse`** → [`HomePracticeStatTiles`](../../src/screens/home/components/HomePracticeStatTiles.tsx) ([`render-home-dashboard-section.tsx`](../../src/screens/home/components/render-home-dashboard-section.tsx)). Legacy ids **`quick-capture`** and **`night`** may still appear in persisted layout order / Customize storage ([`home-section-visibility-constants.ts`](../../src/screens/home/lib/home-section-visibility-constants.ts)) but **`renderHomeDashboardSection` returns `null`** for them — no UI.
+
+## Practice stats row (Presence + Pauses)
+
+Wireframe structure: two equal tiles after **Your pause** — **Presence** (lifetime practice XP) and **Pauses** (completed pause count).
+
+| Tile | Source | Hook / query |
+|------|--------|----------------|
+| **Pauses** | Exact count, `pause_instances.state = completed` | [`useHomePracticeStats`](../../src/features/pause/presentation/home/use-home-practice-stats.ts) |
+| **Presence** | Client sum per [home-practice-presence-xp.md](../systems/home-practice-presence-xp.md) | Same query bundle |
+
+Customize id remains **`journey-pulse`** (historical); default visibility **on**.
 
 ## Pause widget error surfacing
 

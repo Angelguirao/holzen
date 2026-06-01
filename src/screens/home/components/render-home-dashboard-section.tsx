@@ -4,14 +4,13 @@ import { Moon } from 'lucide-react';
 import { BtcStatus } from '@/screens/home/components/BtcStatus';
 import { HomeGoalWhyCard } from '@/screens/home/components/HomeGoalWhyCard';
 import { HomeSectionCard } from '@/screens/home/components/HomeSectionCard';
+import { HomePracticeStatTiles } from '@/screens/home/components/HomePracticeStatTiles';
 import type { HomePauseWidgetProjection } from '@/features/pause/presentation/home/use-home-pause-widget-projection';
 import type { BtcPriceData, TrackedAssetId } from '@/features/market/public';
 
 /** Everything needed to render one Home “Today” / goal-why section by id. */
 export interface HomeDashboardSectionDeps {
   t: TFunction;
-  goalWhyHoldSummary: string | null;
-  setGoalWhyHoldSummary: (v: string | null) => void;
   goalWhyHeaderRight: ReactNode;
   goalWhyExpanded: boolean;
   error: string | null;
@@ -33,6 +32,9 @@ export interface HomeDashboardSectionDeps {
   subscribed: boolean;
   collapsed: Record<string, boolean>;
   toggleCollapsed: (id: string) => void;
+  presenceXp: number | null;
+  completedPauseCount: number | null;
+  practiceStatsLoading: boolean;
 }
 
 export function renderHomeDashboardSection(sectionId: string, d: HomeDashboardSectionDeps): ReactNode {
@@ -42,14 +44,10 @@ export function renderHomeDashboardSection(sectionId: string, d: HomeDashboardSe
         <HomeSectionCard
           className="rounded-lg"
           title={d.t('home.widget.whyHoldTitle')}
-          headerSubtitle={d.goalWhyHoldSummary ?? undefined}
+          hideTitle
           headerRight={d.goalWhyHeaderRight}
         >
-          <HomeGoalWhyCard
-            currentPrice={d.btcData?.currentPrice}
-            detailsExpanded={d.goalWhyExpanded}
-            onHoldGoalSummaryChange={d.setGoalWhyHoldSummary}
-          />
+          <HomeGoalWhyCard currentPrice={d.btcData?.currentPrice} detailsExpanded={d.goalWhyExpanded} />
         </HomeSectionCard>
       );
 
@@ -103,9 +101,17 @@ export function renderHomeDashboardSection(sectionId: string, d: HomeDashboardSe
         </HomeSectionCard>
       );
 
+    case 'journey-pulse':
+      return (
+        <HomePracticeStatTiles
+          presenceXp={d.presenceXp}
+          completedPauseCount={d.completedPauseCount}
+          isLoading={d.practiceStatsLoading}
+        />
+      );
+
     case 'quick-capture':
     case 'night':
-    case 'journey-pulse':
       return null;
 
     default:

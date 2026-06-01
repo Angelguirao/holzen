@@ -14,7 +14,7 @@ export type HomeSectionIdWithoutVisibilityToggle =
 /**
  * Default Home section order (Hold mode + Customize). `goal-why` is pinned first; the rest
  * reorder in Customize (DnD). `normalizeHomeSectionOrder` merges defaults and keeps tail order.
- * `journey-pulse` is the Holzen score / In motion row (`HomeStatTiles`).
+ * `journey-pulse` is the Presence + Pauses stat row (`HomePracticeStatTiles`).
  */
 export const ALL_HOME_SECTION_IDS = [
   'goal-why',
@@ -32,7 +32,7 @@ export type AllHomeSectionId = (typeof ALL_HOME_SECTION_IDS)[number];
  */
 export const HOME_WIDGET_DEFAULT_ORDER: string[] = [...ALL_HOME_SECTION_IDS];
 
-/** Layout + visibility id for the Holzen score + In motion row (`HomeStatTiles`). */
+/** Layout + visibility id for the Presence + Pauses stat row (`HomePracticeStatTiles`). */
 export const JOURNEY_STAT_TILES_VISIBILITY_ID = 'journey-pulse' as const;
 
 export function isHomeSectionAlwaysVisibleInLayout(id: string): boolean {

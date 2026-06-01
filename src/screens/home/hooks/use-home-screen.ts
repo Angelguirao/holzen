@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -11,6 +10,7 @@ import {
   useDismissOutletPauseReady,
   useHomePauseActions,
   useHomePendingPauseOfferActions,
+  useHomePracticeStats,
   usePauseArrivalAudio,
 } from '@/features/pause/public-home';
 import { useMarketDisplayPreferences } from '@/features/market/public-hooks';
@@ -24,7 +24,6 @@ import { useHomeCustomizeBridge } from '@/screens/home/hooks/use-home-customize-
 import { useHomeDashboardLayoutProps } from '@/screens/home/hooks/use-home-dashboard-layout-props';
 import { useHomeDashboardTodayWiring } from '@/screens/home/hooks/use-home-dashboard-today-wiring';
 import { useHomeDocumentTitle } from '@/screens/home/hooks/use-home-document-title';
-import { useHomeHeroQuoteViewed } from '@/screens/home/hooks/use-home-hero-quote-viewed';
 import { useHomeMarketGoalHeaders } from '@/screens/home/hooks/use-home-market-goal-headers';
 import { useHomeOptionalVisibility } from '@/screens/home/hooks/use-home-optional-visibility';
 import { useHomePauseCardProjection } from '@/screens/home/hooks/use-home-pause-card-projection';
@@ -98,7 +97,6 @@ export function useHomeScreen() {
   const pauseReady = outletCtx?.pauseReady ?? false;
   const dismissPauseReady = outletCtx?.dismissPauseReady;
   useDismissOutletPauseReady(pauseReady, hasOpenPause, dismissPauseReady);
-  useHomeHeroQuoteViewed(profileLoaded, user?.id);
   usePauseArrivalAudio(newPauseArrival, lastPauseInstanceId, clearNewPauseArrival);
 
   const {
@@ -112,6 +110,7 @@ export function useHomeScreen() {
   } = useMarketDisplayPreferences();
   const unitBasisModeSupported = trackedAssetId === 'bitcoin';
   const completedPauseCount = useCompletedPauseCount() ?? 0;
+  const { stats: practiceStats, isLoading: practiceStatsLoading } = useHomePracticeStats();
 
   const profileLastTriggerQuery = useQuery({
     queryKey: ['profile-last-trigger-at', user?.id],
@@ -120,8 +119,6 @@ export function useHomeScreen() {
     staleTime: 60_000,
     refetchOnWindowFocus: false,
   });
-
-  const [goalWhyHoldSummary, setGoalWhyHoldSummary] = useState<string | null>(null);
 
   const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(
     HOME_WIDGET_DEFAULT_ORDER,
@@ -215,8 +212,6 @@ export function useHomeScreen() {
   const { renderSection, goalWhyBlock } = useHomeDashboardTodayWiring(
     {
       t,
-      goalWhyHoldSummary,
-      setGoalWhyHoldSummary,
       goalWhyHeaderRight,
       goalWhyExpanded,
       error,
@@ -237,6 +232,9 @@ export function useHomeScreen() {
       subscribed,
       collapsed,
       toggleCollapsed,
+      presenceXp: practiceStats?.presenceXp ?? null,
+      completedPauseCount: practiceStats?.completedPauseCount ?? null,
+      practiceStatsLoading,
     },
     visibleOrderedSectionIds,
   );

@@ -90,7 +90,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 ## Screens (in-app surfaces)
 
-- `screens/home.md` — **`/`** dashboard: modes (zen vs full), widgets, subscription/checkout interplay, pause error surfacing, analytics touchpoints.
+- `screens/home.md` — **`/`** dashboard: greeting + widget stack (goal-why, market, your-pause, Presence/Pauses stats), subscription/checkout interplay, pause error surfacing, analytics touchpoints. **Presence XP formula:** [systems/home-practice-presence-xp.md](systems/home-practice-presence-xp.md).
 - `screens/pause.md` — **`/pause`** full-screen volatility ritual: gate, depth picker, brief vs deep scaffold, `@/features/pause/public-rpc` wiring, exit navigation, analytics notes.
 
 ## Reports (snapshots)

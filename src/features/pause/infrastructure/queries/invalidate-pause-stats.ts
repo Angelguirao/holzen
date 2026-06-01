@@ -1,6 +1,7 @@
 import { pauseArchiveListQueryPrefix } from '@/features/pause/infrastructure/queries/archive/archive-query-keys';
 import { journeyPauseInstancesQueryKey } from './journey-pause-instances-query-key';
 import { COMPLETED_PAUSE_COUNT_QUERY_KEY } from './completed-pause-count-query-key';
+import { HOME_PRACTICE_STATS_QUERY_KEY } from './home-practice-stats-query-key';
 import { currentPauseQueryKey } from './current-pause-query-key';
 import { pendingPauseOfferQueryKey } from '@/features/pause/infrastructure/queries/reflect/pending-offer/pending-pause-offer-query-key';
 import { getHolzenQueryClient } from '../holzen-query-client-ref';
@@ -16,6 +17,7 @@ export function invalidatePauseStatsDataForUser(userId: string | null | undefine
   if (!qc) return;
   void qc.invalidateQueries({ queryKey: journeyPauseInstancesQueryKey(userId) });
   void qc.invalidateQueries({ queryKey: COMPLETED_PAUSE_COUNT_QUERY_KEY(userId) });
+  void qc.invalidateQueries({ queryKey: HOME_PRACTICE_STATS_QUERY_KEY(userId) });
   void qc.invalidateQueries({ queryKey: archivePausesTabHasRowsQueryPrefix(userId) });
   void qc.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(userId) });
   void qc.invalidateQueries({ queryKey: pendingPauseOfferQueryKey(userId) });

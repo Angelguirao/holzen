@@ -5,6 +5,8 @@ import { cn } from '@/lib/utils';
 
 export interface HomeSectionCardProps {
   title: string;
+  /** When true, title is visually hidden but available to screen readers. */
+  hideTitle?: boolean;
   /** Optional icon before title (e.g. moon on Your pause). */
   titleLeading?: ReactNode;
   /** Optional summary on the header row (e.g. hold goal compact line); truncates on small widths. */
@@ -24,6 +26,7 @@ export interface HomeSectionCardProps {
  */
 export function HomeSectionCard({
   title,
+  hideTitle = false,
   titleLeading,
   headerSubtitle,
   headerRight,
@@ -43,7 +46,14 @@ export function HomeSectionCard({
       <div className="flex items-center gap-2 px-4 py-3">
         <div className="flex min-w-0 flex-1 items-center gap-2">
           {titleLeading ? <span className="shrink-0">{titleLeading}</span> : null}
-          <span className="shrink-0 text-xs font-normal uppercase tracking-wide text-secondary-foreground">{title}</span>
+          <span
+            className={cn(
+              'shrink-0 text-xs font-normal uppercase tracking-wide text-secondary-foreground',
+              hideTitle && 'sr-only',
+            )}
+          >
+            {title}
+          </span>
           {headerSubtitle ? (
             <span className="min-w-0 truncate text-xs font-medium tabular-nums text-muted-foreground">
               {headerSubtitle}

@@ -39,6 +39,12 @@ export {
   fetchCompletedPauseCount,
   getCompletedPauseCountQueryOptions,
 } from './presentation/home/use-completed-pause-count';
+export { useHomePracticeStats, type HomePracticeStats } from './presentation/home/use-home-practice-stats';
+export {
+  fetchHomePracticeStats,
+  getHomePracticeStatsQueryOptions,
+  HOME_PRACTICE_STATS_QUERY_KEY,
+} from './infrastructure/queries/home-practice-stats-query';
 export { useDismissOutletPauseReady } from './presentation/home/use-dismiss-outlet-pause-ready';
 export {
   usePendingPauseOffer,
