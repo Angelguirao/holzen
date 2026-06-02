@@ -1,26 +1,36 @@
 import {
-  buildPauseImpactFromStepEvents,
-  resolveHomePracticeRitualVariant,
-  type HomePracticeStepEventRow,
-} from './build-pause-impact-from-step-events';
-import { sumPauseScoreImpactPoints } from './sum-pause-score-impact-points';
+  computePracticeXpBreakdown,
+  sumPracticeXpBreakdown,
+} from '@/features/pause/domain/practice/compute-practice-xp-breakdown';
+import {
+  PRACTICE_XP_BRIEF_BASE,
+  PRACTICE_XP_DEEP_BASE,
+} from '@/features/pause/domain/practice/practice-xp-constants';
+import type { HomePracticeStepEventRow } from './build-pause-impact-from-step-events';
 
-/** Every `state = completed` pause earns at least this much Presence XP. */
-export const PAUSE_PRACTICE_BASE_XP = 5;
+/** @deprecated Use {@link PRACTICE_XP_BRIEF_BASE} / {@link PRACTICE_XP_DEEP_BASE}. */
+export const PAUSE_PRACTICE_BASE_XP = PRACTICE_XP_BRIEF_BASE;
 
 export type HomePracticePauseInstanceRow = {
   id: string;
   context: string | null;
+  metadata?: unknown;
 };
 
 export function computePausePracticeXpForInstance(
   events: readonly HomePracticeStepEventRow[],
-  context: string | null,
+  _context: string | null,
   engagedTools: number,
+  instanceId = 'local',
+  instanceMetadata?: unknown,
 ): number {
-  const impact = buildPauseImpactFromStepEvents(events, context, engagedTools);
-  const variant = resolveHomePracticeRitualVariant(events);
-  return PAUSE_PRACTICE_BASE_XP + sumPauseScoreImpactPoints(impact, variant);
+  const breakdown = computePracticeXpBreakdown({
+    instanceId,
+    events,
+    engagedTools,
+    instanceMetadata,
+  });
+  return sumPracticeXpBreakdown(breakdown);
 }
 
 export function computePresenceXpFromCompletedPauses(
@@ -33,8 +43,16 @@ export function computePresenceXpFromCompletedPauses(
   for (const instance of instances) {
     const events = eventsByInstanceId.get(instance.id) ?? [];
     const engagedTools = companionCompleteCounts.get(instance.id) ?? 0;
-    total += computePausePracticeXpForInstance(events, instance.context, engagedTools);
+    total += computePausePracticeXpForInstance(
+      events,
+      instance.context,
+      engagedTools,
+      instance.id,
+      instance.metadata,
+    );
   }
 
   return total;
 }
+
+export { PRACTICE_XP_DEEP_BASE };

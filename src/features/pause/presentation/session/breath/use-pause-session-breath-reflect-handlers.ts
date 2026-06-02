@@ -76,6 +76,8 @@ export function usePauseSessionBreathReflectHandlers(
     pauseInstanceId,
     t,
     lastShiftLogKeyRef: mood.lastShiftLogKeyRef,
+    frameShiftMood: selectedMoodAfter,
+    frameShiftIntensity: shiftIntensity,
     setFrameDone,
     setMoodAfterDone,
     goToStep: breath.goToStep,

@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
-import { pauseReflectTagUpdate } from './pause-reflect-steps-io';
 import {
   getLatestPauseReflectTagsQueryOptions,
   PAUSE_REFLECT_STEP_TAGS,
   pauseArchiveListQueryPrefix,
   pauseReflectStepLatestQueryKey,
 } from '@/features/pause/public-queries';
+import { runPauseReflectTagUpdateDefault } from './run-pause-reflect-tag-update';
 
-/** Reflect post-it tags: hydrate from latest step event, commit via `pause_log_step`. */
+/** Legacy Reflect post-it tags — not used in pause-first active UI. */
 export function usePauseReflectTags(pauseInstanceId: string) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -26,7 +26,7 @@ export function usePauseReflectTags(pauseInstanceId: string) {
     async (next: string[]) => {
       setTags(next);
       try {
-        const outcome = await pauseReflectTagUpdate({
+        const outcome = await runPauseReflectTagUpdateDefault({
           pauseInstanceId,
           tags: next,
         });

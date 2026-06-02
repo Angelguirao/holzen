@@ -29,10 +29,8 @@ export function usePauseSessionBreathStepHandlers(input: {
 }): {
   handleContinueAfterFirstBreath: () => Promise<void>;
   handleContinueAfterSecondBreath: () => Promise<void>;
-  handleSkipFirstBreath: () => Promise<void>;
   handleSkipSecondBreath: () => Promise<void>;
   handleBriefBreathContinue: () => Promise<void>;
-  handleBriefSkipBreath: () => Promise<void>;
   handleBriefIntegrateComplete: () => void;
 } {
   const {
@@ -68,14 +66,6 @@ export function usePauseSessionBreathStepHandlers(input: {
     goToStep(DEEP_PAUSE_STEP_AFTER_SECOND_BREATH);
   }, [ensureBreathSegment2Logged, goToStep]);
 
-  const handleSkipFirstBreath = useCallback(async () => {
-    setBreathingFirstCompleted(false);
-    const ok = await logBreathSegment1Skipped();
-    if (!ok) return;
-    setBreathingFirstCompleted(true);
-    goToStep(DEEP_PAUSE_STEP_AFTER_FIRST_BREATH);
-  }, [logBreathSegment1Skipped, goToStep, setBreathingFirstCompleted]);
-
   const handleSkipSecondBreath = useCallback(async () => {
     setBreathingSecondCompleted(false);
     const ok = await logBreathSegment2Skipped();
@@ -91,14 +81,6 @@ export function usePauseSessionBreathStepHandlers(input: {
     setBriefStep(BRIEF_PAUSE_STEP_AFTER_BREATH);
   }, [ensureBreathSegment1Logged, setBreathingFirstCompleted, setBriefStep]);
 
-  const handleBriefSkipBreath = useCallback(async () => {
-    setBreathingFirstCompleted(false);
-    const ok = await logBreathSegment1Skipped(BRIEF_FIRST_BREATH_SEGMENT_LOG);
-    if (!ok) return;
-    setBreathingFirstCompleted(true);
-    setBriefStep(BRIEF_PAUSE_STEP_AFTER_BREATH);
-  }, [logBreathSegment1Skipped, setBreathingFirstCompleted, setBriefStep]);
-
   const handleBriefIntegrateComplete = useCallback(() => {
     const claim = claimBriefIntegrateAdvance(integrateAdvanceRef.current);
     if (!claim.canAdvance) return;
@@ -110,10 +92,8 @@ export function usePauseSessionBreathStepHandlers(input: {
   return {
     handleContinueAfterFirstBreath,
     handleContinueAfterSecondBreath,
-    handleSkipFirstBreath,
     handleSkipSecondBreath,
     handleBriefBreathContinue,
-    handleBriefSkipBreath,
     handleBriefIntegrateComplete,
   };
 }

@@ -1,6 +1,6 @@
 # Stats System
 
-> **Pause-first shipped (2026-06):** **Practice Presence XP** (lifetime total, per-pause awards, Journey breakdown) — see [**Pause-first MVP — Practice Presence XP**](#pause-first-mvp--practice-presence-xp) below. Surfaces: Home `journey-pulse` glimpse, Journey overview, Done qualitative impacts (same signal weights).
+> **Pause-first shipped (2026-06):** **Practice Presence XP** (lifetime total, per-pause awards, Journey breakdown) — see [**Pause-first MVP — Practice Presence XP**](#pause-first-mvp--practice-presence-xp) below. Surfaces: Home `journey-pulse` glimpse, Journey overview; Done uses qualitative impacts only (not the XP ledger).
 >
 > **Not shipped in pause-first:** Holzen Score ring, five skills, Profile → Stats tab, badges alignment scoring — reference `src/legacy/full-shell/` or tag `full-ia-pre-strip`. Manifest: [active-surface.md](../ops/active-surface.md).
 
@@ -20,31 +20,33 @@ Holzen’s **shipped** numeric practice model is **Presence XP**: reward complet
 | `get_practice_summary(user_id)` | Read model: totals, brief/deep split, `xp_by_signal` |
 | `pause_compute_practice_xp_breakdown` / `pause_finalize_practice_xp` | Compute + sync (SQL) |
 
-Migrations: `20260601120000_pause_practice_xp_persistence.sql`, `20260602120000_practice_summary_xp_by_signal.sql`.
+Migrations: `20260601120000_pause_practice_xp_persistence.sql`, `20260602120000_practice_summary_xp_by_signal.sql`, `20260603120000_pause_practice_xp_v2_ritual_completion.sql`.
 
 **When XP is written:** After `pause_step_events` / qualifying `pause_companion_events` inserts → `pause_evaluate_transitions` → `pause_finalize_practice_xp` when `state = completed` (including late `post_pause_emotion_logged`).
 
-**Client parity reference (must match SQL when weights change):** `src/features/pause/domain/home/compute-pause-practice-xp.ts`, `sum-pause-score-impact-points.ts` (Vitest).
+**Completion contract (`volatility_v1`):** `outcome_logged` is accepted only when ritual beats are met (`pause_volatility_v1_ritual_beats_met`). Postgres `completed` requires both outcome and beats. Brief: Feel + unskipped Breathe + Decide. Deep: Feel + Breathe₁ + Reflect + Frame (`shift_emotion_logged`) + Breathe₂ + Decide (second breath may be skipped in UI but must log segment 2).
 
-### Formula per completed pause
+**Client parity reference (must match SQL when weights change):** `src/features/pause/domain/practice/compute-practice-xp-breakdown.ts`, `practice-xp-constants.ts` (Vitest). Done-screen `buildPauseScoreImpacts` remains qualitative copy only.
 
-| Component | Value |
-|-----------|--------|
-| **Base** | **5** XP — every completed pause |
-| **Bonuses** | Same ritual signals as Done screen (`buildPauseScoreImpacts` copy only on Done; numeric weights below) |
+### Formula per completed pause (v2)
 
-| Signal | Bonus XP |
-|--------|----------|
-| Breathing completed | +4 |
-| Mood toward composure (only if breathing did not already award) | +5 |
-| Perspective tools (`complete`, `counts_for_pause`) | +2 each, max +6 |
-| Reflection note or tags | +3 |
-| Brief ritual: decision (`outcome_logged`) | +2 |
-| Brief ritual: naming entry mood (when no regulation bonus yet) | +2 |
+| Depth | Base XP | Bonuses |
+|-------|---------|---------|
+| **Brief** | **10** — full brief path only | **None** |
+| **Deep** | **18** — full deep path only | Optional only (stack) |
 
-Typical range per pause: **5–18+**. No per-pause cap.
+| Deep bonus | XP | Detection |
+|------------|-----|-----------|
+| Reflect favorite | +2 | `favorite_toggled` with `is_favorite: true` |
+| Reflect note | +3 | `note_updated` with non-empty `text` |
+| Companion completes | +2 each, max +6 | `pause_companion_events` `complete` + `counts_for_pause` |
+| Frame slot favorites | +2 each, max +4 | `pause_instances.metadata.companion_slot_favorites` |
+| Second breath completed | +4 | `breath_completed` segment 2, not `skipped` |
+| Frame mood check-in | +3 | `shift_emotion_logged` with `mood`, not `from_frame_hub` only |
 
-**`xp_by_signal` keys** (lifetime sums on Journey): `base`, `breath`, `mood_regulation`, `tools`, `reflection`, `brief_decision`, `brief_entry_mood`.
+Typical range: brief **10**; deep **18–36** when all optional practice is done. Tags do not award XP (legacy only).
+
+**`xp_by_signal` keys** (lifetime sums on Journey): `base_brief`, `base_deep`, `favorite`, `note`, `companions`, `companion_favorites`, `breath_second`, `shift_mood`.
 
 ### UI surfaces (pause-first)
 

@@ -267,7 +267,7 @@ describe('computePauseState', () => {
     ).toBe('active');
   });
 
-  it('completes volatility_v1 when only outcome_logged exists (from active)', () => {
+  it('stays active when only outcome_logged exists without ritual beats', () => {
     expect(
       computePauseState({
         instance: makeInstance(),
@@ -276,10 +276,10 @@ describe('computePauseState', () => {
         companionEvents: [],
         now: NOW,
       }),
-    ).toBe('completed');
+    ).toBe('active');
   });
 
-  it('completes volatility_v1 when only outcome_logged exists (from engaged)', () => {
+  it('stays engaged when only outcome_logged exists without ritual beats', () => {
     expect(
       computePauseState({
         instance: makeInstance({ state: 'engaged' }),
@@ -288,7 +288,7 @@ describe('computePauseState', () => {
         companionEvents: [],
         now: NOW,
       }),
-    ).toBe('completed');
+    ).toBe('engaged');
   });
 
   it('still completes volatility_v1 when full deep ritual steps exist without companions', () => {
@@ -297,10 +297,12 @@ describe('computePauseState', () => {
         instance: makeInstance({ state: 'engaged' }),
         template: volatilityTemplate,
         stepEvents: [
-          makeStep({ step_type: 'breath_completed' }),
-          makeStep({ step_type: 'initial_emotion_logged' }),
-          makeStep({ step_type: 'shift_emotion_logged' }),
-          makeStep({ step_type: 'outcome_logged' }),
+          makeStep({ step_type: 'initial_emotion_logged', payload: { mood: 'calm' } }),
+          makeStep({ step_type: 'breath_completed', payload: { breath_segment: 1 } }),
+          makeStep({ step_type: 'reflection_step', payload: {} }),
+          makeStep({ step_type: 'shift_emotion_logged', payload: { from_frame_hub: true } }),
+          makeStep({ step_type: 'breath_completed', payload: { breath_segment: 2 } }),
+          makeStep({ step_type: 'outcome_logged', payload: { outcome: 'held' } }),
         ],
         companionEvents: [
           makeCompanion({ counts_for_pause: false, non_counting_reason: 'outside_window' }),

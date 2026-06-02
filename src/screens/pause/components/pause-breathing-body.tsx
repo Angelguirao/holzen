@@ -27,7 +27,7 @@ export type PauseBreathingBodyProps = {
   totalCycles: number;
   timedDisplay: PauseBreathingTimedDisplay;
   onStart: () => void;
-  onSkipBreath: () => void | Promise<void>;
+  onSkipBreath?: () => void | Promise<void>;
   onContinueAfterBreath: () => void;
   onAdvanceFailed: () => void;
   onRepeatDeepFirstBreathPattern?: () => void;

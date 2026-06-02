@@ -220,7 +220,6 @@ export {
   usePauseReflectFrameFocusAmbience,
   usePauseReflectNote,
   usePauseReflectionStepLog,
-  usePauseReflectTags,
   usePauseReflectUiTelemetry,
   usePauseSessionReflectAndDecide,
   type UsePauseSessionReflectAndDecideParams,

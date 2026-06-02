@@ -28,7 +28,6 @@ export type PauseSessionBriefRitualBodyProps = {
   onTimedBreathingChange: (active: boolean) => void;
   onBriefBreathPatternComplete: () => void;
   onContinueAfterBriefBreath: () => void;
-  onSkipBriefBreath: () => void;
   ritualSoundMuted: boolean;
   briefIntegrateDone: boolean;
   onBriefIntegrateComplete: () => void;
@@ -59,7 +58,7 @@ export type PauseSessionDeepRitualBodyProps = {
   onSecondBreathPatternComplete: () => void;
   onContinueAfterFirstBreath: () => void;
   onContinueAfterSecondBreath: () => void;
-  onSkipFirstBreath: () => void;
+  /** Deep second Breathe intro only — optional skip to Decide (XP bonus when not skipped). */
   onSkipSecondBreath: () => void;
   ritualSoundMuted: boolean;
   prefersReducedMotion: boolean;
@@ -78,6 +77,8 @@ export type PauseSessionDeepRitualBodyProps = {
   onToggleFavorite: () => void | Promise<void>;
   subscribed: boolean;
   mood?: MoodValue | null;
+  selectedShiftMood: MoodValue | null;
+  onSelectShiftMood: (mood: MoodValue) => void;
   onFrameImDone: () => void;
   onDecide: (decision: string) => void;
   onRepeatDeepFirstBreathPattern: () => void;

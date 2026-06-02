@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { Tag, X } from 'lucide-react';
-import { usePauseReflectTags } from '@/features/pause/public-ritual-reflect';
+import { usePauseReflectTags } from './use-pause-reflect-tags';
 
 interface Props {
   pauseInstanceId: string;
 }
 
+/** Legacy Reflect post-it tags — not rendered in pause-first active routes. */
 export function PauseTags({ pauseInstanceId }: Props) {
   "use memo";
   const { t } = useTranslation();

@@ -38,8 +38,8 @@ interface Props {
   feelTile?: FeelStepTile | null;
   /** After full breath cycles: deep shows an interstitial then continues; brief auto-invokes (Integrate). */
   onContinueAfterBreath: () => void;
-  /** Intro or mid-pattern skip: leave breath without logging completion. */
-  onSkipBreath: () => void | Promise<void>;
+  /** Deep second Breathe intro only — skip logs `breath_completed` with `skipped: true`. */
+  onSkipBreath?: () => void | Promise<void>;
   completed?: boolean;
   /** Fires when timed cycles finish — parent may mark session “past pattern” for header chrome (no DB log yet). */
   onPatternComplete?: () => void;

@@ -42,7 +42,6 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   setBreathingFirstCompleted: (done: boolean) => void;
   setBreathingSecondCompleted: (done: boolean) => void;
   handleBriefBreathContinue: () => void | Promise<unknown>;
-  handleBriefSkipBreath: PauseSessionBriefRitualBodyProps['onSkipBriefBreath'];
   soundMuted: boolean;
   prefersReducedMotion: boolean;
   briefIntegrateDone: boolean;
@@ -53,7 +52,6 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   goToStep: PauseSessionDeepRitualBodyProps['goToStep'];
   handleContinueAfterFirstBreath: () => void | Promise<unknown>;
   handleContinueAfterSecondBreath: () => void | Promise<unknown>;
-  handleSkipFirstBreath: PauseSessionDeepRitualBodyProps['onSkipFirstBreath'];
   handleSkipSecondBreath: PauseSessionDeepRitualBodyProps['onSkipSecondBreath'];
   companions: CompanionData;
   companionPrefs: CompanionPrefs;
@@ -65,6 +63,8 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   isFavorite: boolean;
   toggleFavorite: PauseSessionDeepRitualBodyProps['onToggleFavorite'];
   subscribed: boolean;
+  selectedMoodAfter: MoodValue | null;
+  setSelectedMoodAfter: (mood: MoodValue) => void;
   handleFrameImDone: () => void | Promise<unknown>;
   handleDeepFirstBreathRepeat: PauseSessionDeepRitualBodyProps['onRepeatDeepFirstBreathPattern'];
   handleDeepSecondBreathRepeat: PauseSessionDeepRitualBodyProps['onRepeatDeepSecondBreathPattern'];
@@ -99,7 +99,6 @@ export function buildPauseSessionScaffoldRitualPayloads(
       /** Brief: first segment “completed” is set after `breath_completed` RPC in `handleBriefBreathContinue`. */
       onBriefBreathPatternComplete: () => {},
       onContinueAfterBriefBreath: () => void p.handleBriefBreathContinue(),
-      onSkipBriefBreath: p.handleBriefSkipBreath,
       ritualSoundMuted: p.soundMuted,
       briefIntegrateDone: p.briefIntegrateDone,
       onBriefIntegrateComplete: p.handleBriefIntegrateComplete,
@@ -128,7 +127,6 @@ export function buildPauseSessionScaffoldRitualPayloads(
       onSecondBreathPatternComplete: () => p.setBreathingSecondCompleted(true),
       onContinueAfterFirstBreath: () => void p.handleContinueAfterFirstBreath(),
       onContinueAfterSecondBreath: () => void p.handleContinueAfterSecondBreath(),
-      onSkipFirstBreath: p.handleSkipFirstBreath,
       onSkipSecondBreath: p.handleSkipSecondBreath,
       ritualSoundMuted: p.soundMuted,
       prefersReducedMotion: p.prefersReducedMotion,
@@ -144,6 +142,8 @@ export function buildPauseSessionScaffoldRitualPayloads(
       onToggleFavorite: p.toggleFavorite,
       subscribed: p.subscribed,
       mood: p.selectedMood,
+      selectedShiftMood: p.selectedMoodAfter,
+      onSelectShiftMood: p.setSelectedMoodAfter,
       onFrameImDone: () => void p.handleFrameImDone(),
       onDecide: p.handleDecide,
       onRepeatDeepFirstBreathPattern: p.handleDeepFirstBreathRepeat,

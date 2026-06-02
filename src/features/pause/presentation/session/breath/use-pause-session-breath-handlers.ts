@@ -71,10 +71,8 @@ export function usePauseSessionBreathHandlers(params: UsePauseSessionBreathHandl
   const {
     handleContinueAfterFirstBreath,
     handleContinueAfterSecondBreath,
-    handleSkipFirstBreath,
     handleSkipSecondBreath,
     handleBriefBreathContinue,
-    handleBriefSkipBreath,
     handleBriefIntegrateComplete,
   } = usePauseSessionBreathStepHandlers({
     goToStep: navigation.goToStep,
@@ -122,10 +120,8 @@ export function usePauseSessionBreathHandlers(params: UsePauseSessionBreathHandl
     showPauseHeaderBack: navigation.showPauseHeaderBack,
     handleContinueAfterFirstBreath,
     handleContinueAfterSecondBreath,
-    handleSkipFirstBreath,
     handleSkipSecondBreath,
     handleBriefBreathContinue,
-    handleBriefSkipBreath,
     handleBriefIntegrateComplete,
     handleBriefSwitchToDeepPause,
   };
