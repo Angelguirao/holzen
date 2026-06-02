@@ -1,20 +1,32 @@
 # Home Presence XP (practice stats)
 
-> **Canonical formula** for the Home **Presence** stat tile (left column of the `journey-pulse` row).  
-> **Screen:** [screens/home.md](../screens/home.md) · **UI:** `HomePracticeStatTiles` · **Query:** `fetchHomePracticeStats`
+> **Canonical formula** for Presence XP. **Authority:** Postgres (`pause_compute_practice_xp_awarded`, `pause_finalize_practice_xp`). **Client parity reference:** `compute-pause-practice-xp.ts` (Vitest) — must stay aligned when weights change.
 
-Presence is a **client-side projection** — nothing is stored in Postgres. The **Pauses** tile uses the exact `pause_instances.state = 'completed'` count.
-
-**Long term:** Home shows a **glimpse** only; Journey owns breakdowns (XP by signal/variant, pause mix). See [journey-practice-stats-evolution.md](../backlog/journey-practice-stats-evolution.md).
+**Screen:** [screens/home.md](../screens/home.md) · **Home glimpse:** `HomePracticeStatTiles` · **Journey drill-down:** `/journey` · **Read API:** `get_practice_summary` RPC
 
 ---
 
-## Per completed pause
+## Storage (Postgres)
+
+| Column / object | Role |
+|-----------------|------|
+| `pause_instances.practice_xp_awarded` | XP for that completed pause (recomputed idempotently) |
+| `profiles.practice_presence_xp_total` | Lifetime sum |
+| `profiles.completed_pause_count` | Completed instance count |
+| `get_practice_summary(user_id)` | Home + Journey read model (+ brief/deep split) |
+
+**When XP is written:** After each `pause_step_events` / qualifying `pause_companion_events` insert, `pause_evaluate_transitions` runs, then `pause_finalize_practice_xp` if the instance is `completed` (includes post-`outcome_logged` `post_pause_emotion_logged`).
+
+Migration: `20260601120000_pause_practice_xp_persistence.sql`.
+
+---
+
+## Per completed pause (formula)
 
 | Component | Value |
 |-----------|--------|
-| **Base** | **5** XP — every completed pause |
-| **Bonus** | Sum of ritual-depth signals (same **`points`** weights as `buildPauseScoreImpacts` on Done) |
+| **Base** | **5** XP |
+| **Bonus** | Ritual-depth signals (same weights as Done / `sumPauseScoreImpactPoints`) |
 
 | Signal | Bonus |
 |--------|-------|
@@ -25,49 +37,20 @@ Presence is a **client-side projection** — nothing is stored in Postgres. The 
 | Brief ritual: decision recorded | +2 |
 | Brief ritual: entry mood named (when no regulation bonus yet) | +2 |
 
-Typical range per pause: **5–18+** XP depending on ritual depth (no artificial per-pause cap).
-
-**Constants (source of truth):** `PAUSE_PRACTICE_BASE_XP` in `src/features/pause/domain/home/compute-pause-practice-xp.ts`; bonus weights in `sum-pause-score-impact-points.ts`.
+Typical range: **5–18+** XP per pause.
 
 ---
 
-## Data path
+## Client
 
-```mermaid
-flowchart LR
-  PI[pause_instances completed]
-  SE[pause_step_events]
-  CE[pause_companion_events complete]
-  DOM[computePresenceXpFromCompletedPauses]
-  Q[fetchHomePracticeStats]
-  UI[HomePracticeStatTiles]
-
-  PI --> Q
-  SE --> Q
-  CE --> Q
-  Q --> DOM
-  DOM --> UI
-```
-
-1. `fetchHomePracticeStats` loads up to **200** most recent completed instances (for step/companion joins).
-2. **`completedPauseCount`** uses an exact `count` on all completed rows (not limited to 200).
-3. **`presenceXp`** sums XP only over the fetched instance batch (performance guard).
-4. Invalidates via `invalidatePauseStatsDataForUser` when a pause reaches `completed`.
-
----
-
-## Where to change what
-
-| Change | File(s) |
-|--------|---------|
-| Base / bonus weights | `compute-pause-practice-xp.ts`, `sum-pause-score-impact-points.ts` + tests |
-| Fetch / cache | `home-practice-stats-query.ts`, `use-home-practice-stats.ts` |
-| Tile layout / copy | `HomePracticeStatTiles.tsx`, `src/locales/en.json` |
-| Section id / Customize | `journey-pulse` in `home-section-visibility-constants.ts`, `render-home-dashboard-section.tsx` |
+- **Query:** `PRACTICE_SUMMARY_QUERY_KEY` → `get_practice_summary` (TanStack Query).
+- **Home:** `useHomePracticeStats` selects `presenceXp` + `completedPauseCount`.
+- **Journey:** `usePracticeSummary` — Presence, completed total, brief/deep mix.
+- **Invalidate:** `invalidatePauseStatsDataForUser` after pause completes.
 
 ---
 
 ## Related
 
-- Done-screen qualitative impacts (same event sources; copy only on Done): `buildPauseScoreImpacts` in `score-impacts.ts`
-- Legacy Holzen Score (not shipped on Home): `src/legacy/full-shell/` · [stats-system.md](stats-system.md)
+- [journey-practice-stats-evolution.md](../backlog/journey-practice-stats-evolution.md) — future XP-by-signal UI on Journey
+- [stats-system.md](stats-system.md) — legacy Holzen Score (not pause-first)

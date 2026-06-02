@@ -1,7 +1,8 @@
 # Journey practice stats — Home glimpse vs canonical overview
 
-**Status:** Backlog (2026-06).  
-**Shipped today:** Home `journey-pulse` row ([`HomePracticeStatTiles`](../../src/screens/home/components/HomePracticeStatTiles.tsx)) shows **Presence** (sum XP) + **Pauses** (completed count). Journey [`JourneyOverviewScreen`](../../src/screens/journey/JourneyOverviewScreen.tsx) shows **streak** + **completed count** + Archive CTA — overlapping but not yet the drill-down.
+**Status:** Shipped (2026-06) — Postgres roll-ups + `get_practice_summary`; Journey shows Presence, completed, brief/deep mix. Home tiles link to `/journey`.
+
+**Shipped today:** migration `20260601120000_pause_practice_xp_persistence.sql`, `get_practice_summary`, `usePracticeSummary`, Journey overview practice section.
 
 **Formula (Presence):** [home-practice-presence-xp.md](../systems/home-practice-presence-xp.md) — client projection from `pause_instances` + `pause_step_events` + companion completes.
 
@@ -100,9 +101,9 @@ Deferring **derived** roll-ups in the SPA is a **cost / churn** choice, not a pr
 
 ## Suggested build order
 
-1. Shared `PracticeStatsSummary` type + query in `features/pause/` (refactor `fetchHomePracticeStats` upward).
-2. Journey UI: variant split + XP-by-signal section (read-only).
-3. Home: tappable tiles → Journey; align copy (“completed pauses” not investment “held”).
+1. ~~Shared `PracticeStatsSummary` + `get_practice_summary`~~ **Done (2026-06).**
+2. Journey UI: variant split on overview **Done**; XP-by-signal section (read-only) — **next**.
+3. ~~Home: tappable tiles → Journey~~ **Done.**
 4. Optional: period comparison card (port patterns from legacy `PeriodComparisonCard` in `full-shell`, not the whole Stats stack).
 
 ---
