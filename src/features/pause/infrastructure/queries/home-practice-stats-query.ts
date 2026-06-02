@@ -4,6 +4,7 @@ import {
   type PracticeSummary,
 } from '@/features/pause/domain/practice/practice-summary';
 import {
+  fetchHomePracticeStats,
   fetchPracticeSummary,
   getPracticeSummaryQueryOptions,
   PRACTICE_SUMMARY_QUERY_KEY,
