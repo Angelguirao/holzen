@@ -68,12 +68,19 @@
           true
         );
 
+        const RECOVERY_ATTEMPTS_KEY = "holzen-boot-recovery-attempts";
+
         function buildFreshUrl() {
-          const nextParams = new URLSearchParams(window.location.search);
-          nextParams.delete("reset-app-cache");
-          nextParams.set("cache-bust", String(Date.now()));
-          const nextSearch = nextParams.toString();
-          return `${window.location.origin}/${nextSearch ? `?${nextSearch}` : ""}${window.location.hash}`;
+          const next = new URL(window.location.href);
+          next.searchParams.delete("reset-app-cache");
+          next.searchParams.set("cache-bust", String(Date.now()));
+          return next.toString();
+        }
+
+        function navigateToResetAppCache() {
+          const next = new URL(window.location.href);
+          next.searchParams.set("reset-app-cache", "1");
+          window.location.replace(next.toString());
         }
 
         async function resetAppCache() {
@@ -86,8 +93,26 @@
               const cacheKeys = await caches.keys();
               await Promise.all(cacheKeys.map((key) => caches.delete(key)));
             }
+            try {
+              await fetch(window.location.href, { cache: "reload" });
+            } catch {
+              /* offline — still reload below */
+            }
+            let recoveryAttempts = null;
+            try {
+              recoveryAttempts = sessionStorage.getItem(RECOVERY_ATTEMPTS_KEY);
+            } catch {
+              /* ignore */
+            }
             localStorage.clear();
-            sessionStorage.clear();
+            try {
+              sessionStorage.clear();
+              if (recoveryAttempts != null) {
+                sessionStorage.setItem(RECOVERY_ATTEMPTS_KEY, recoveryAttempts);
+              }
+            } catch {
+              /* ignore */
+            }
           } catch (error) {
             console.warn("[boot-recovery] cache reset failed", error);
           }
@@ -100,12 +125,67 @@
           return;
         }
 
-        window.setTimeout(() => {
+        let recoveryTimeoutId = 0;
+
+        function cancelBootRecoveryUi() {
+          if (recoveryTimeoutId) {
+            window.clearTimeout(recoveryTimeoutId);
+            recoveryTimeoutId = 0;
+          }
+        }
+
+        const rootEl = document.getElementById("root");
+        if (rootEl) {
+          const observer = new MutationObserver(() => {
+            if (rootEl.children.length > 0) {
+              cancelBootRecoveryUi();
+              try {
+                sessionStorage.removeItem(RECOVERY_ATTEMPTS_KEY);
+              } catch {
+                /* ignore */
+              }
+            }
+          });
+          observer.observe(rootEl, { childList: true });
+        }
+
+        const moduleEntry = document.querySelector('script[type="module"][src]');
+        moduleEntry?.addEventListener("load", cancelBootRecoveryUi);
+
+        recoveryTimeoutId = window.setTimeout(() => {
+          recoveryTimeoutId = 0;
           const root = document.getElementById("root");
           if (!root || root.children.length > 0) return;
 
+          let attempts = 0;
+          try {
+            attempts = Number(sessionStorage.getItem(RECOVERY_ATTEMPTS_KEY) || "0");
+          } catch {
+            /* ignore */
+          }
+          attempts += 1;
+          try {
+            sessionStorage.setItem(RECOVERY_ATTEMPTS_KEY, String(attempts));
+          } catch {
+            /* ignore */
+          }
+
           const detail = bootScriptError
             ? `<p style="margin:0 0 14px;opacity:0.72;font-size:12px;word-break:break-word;">${bootScriptError}</p>`
+            : "";
+
+          const host = window.location.hostname;
+          const onLegacyPreview =
+            host.endsWith(".lovable.app") || host === "holzen.lovable.app";
+          const productionOrigin = "https://holzen.app";
+          const escalated = attempts >= 2;
+
+          const legacyHint = onLegacyPreview
+            ? `<p style="margin:0 0 14px;opacity:0.72;font-size:13px;">You may be on an old preview host. Open <a href="${productionOrigin}" style="color:#DBB366;">holzen.app</a> instead.</p>`
+            : "";
+
+          const escalatedHelp = escalated
+            ? `<p style="margin:0 0 14px;opacity:0.72;font-size:13px;text-align:left;">Still stuck? Try a <strong>private/incognito</strong> window, uninstall the Holzen home-screen app if you added one from an old build, or clear this site in browser settings (Application → Clear site data).</p>`
             : "";
 
           root.innerHTML = `
@@ -113,18 +193,22 @@
               <section style="max-width:460px;text-align:center;line-height:1.5;">
                 <h1 style="font-size:22px;margin:0 0 12px;">Holzen needs a quick refresh</h1>
                 <p style="margin:0 0 18px;opacity:0.82;">Your browser likely has an old cached app version. Resetting local app cache will fix this.</p>
+                ${legacyHint}
+                ${escalatedHelp}
                 ${detail}
-                <button id="reset-app-cache-btn" style="border:0;border-radius:999px;padding:12px 18px;background:#DBB366;color:#151719;font-weight:600;cursor:pointer;">Reset app cache</button>
+                <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+                  <button id="reset-app-cache-btn" type="button" style="border:0;border-radius:999px;padding:12px 18px;background:#DBB366;color:#151719;font-weight:600;cursor:pointer;">Reset app cache</button>
+                  <button id="hard-reload-btn" type="button" style="border:1px solid rgba(245,242,236,0.35);border-radius:999px;padding:10px 16px;background:transparent;color:#f5f2ec;font-size:14px;cursor:pointer;">Reload page</button>
+                </div>
               </section>
             </main>
           `;
 
-          const button = document.getElementById("reset-app-cache-btn");
-          button?.addEventListener("click", async () => {
-            button.setAttribute("disabled", "true");
-            button.textContent = "Resetting...";
-            await resetAppCache();
-            window.location.replace(buildFreshUrl());
+          document.getElementById("reset-app-cache-btn")?.addEventListener("click", () => {
+            navigateToResetAppCache();
+          });
+          document.getElementById("hard-reload-btn")?.addEventListener("click", () => {
+            window.location.reload();
           });
         }, 8000);
       })();

@@ -57,9 +57,9 @@ Sets Tailwind’s `dark:` variant before CSS/JS load so the first paint matches 
 
 1. **`#root`** — an empty mount div in `index.html` until React renders.
 2. **Inline boot-recovery script** (runs before the bundle):
-   - `?reset-app-cache=1` — unregisters service workers, clears Cache Storage and `localStorage` / `sessionStorage`, then reloads with `cache-bust`.
-   - Listens for failed `<script>` loads.
-   - After **8 seconds**, if `#root` is still empty, shows a “Reset app cache” UI (stale SW / chunk mismatch).
+   - `?reset-app-cache=1` — unregisters service workers, clears Cache Storage and `localStorage` (preserves boot-recovery attempt counter in `sessionStorage`), fetches HTML with `cache: reload`, then reloads with `cache-bust`.
+   - Listens for failed `<script>` loads; cancels the fallback timer when the module entry loads or `#root` gains children.
+   - After **8 seconds**, if `#root` is still empty, shows “Reset app cache” + “Reload page”; repeated failures show manual steps; `*.lovable.app` hosts get a link to `https://holzen.app`.
 3. **`<script type="module" src="/src/main.tsx">`** — Vite entry; becomes the app bundle in `dist/`.
 
 ### `src/main.tsx` — application entry
