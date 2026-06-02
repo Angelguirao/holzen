@@ -33,14 +33,25 @@ Holzen’s local API gateway uses port **55421** (not the default `54321`). Conf
 
 ### 2. Supabase local secrets
 
-Copy [supabase/.env.example](../../supabase/.env.example) → `supabase/.env.local` and set:
+In **`supabase/.env.local`** (already gitignored), set:
 
 ```env
 SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID="<web-client-id>.apps.googleusercontent.com"
 SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET="<client-secret>"
 ```
 
+**Where to copy from**
+
+1. **Client ID** — [Supabase staging → Google provider](https://supabase.com/dashboard/project/ksplyxxdvandkwzundql/auth/providers?provider=Google) (same Web client as prod if you reused it), or **Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs**.
+2. **Client secret** — Only in **Google Cloud** (Supabase does not show it again after save). Use **+ CREATE CREDENTIALS → OAuth client ID → Web application**, or open the existing Holzen Web client → copy secret / reset if lost.
+
 The CLI loads `supabase/.env.local` when you run `npm run supabase:start`.
+
+Verify without printing secrets:
+
+```sh
+npm run check:local-google-oauth
+```
 
 ### 3. Start stack and app
 
