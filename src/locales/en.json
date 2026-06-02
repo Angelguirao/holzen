@@ -345,7 +345,20 @@
       "archiveCta": "Open your pause library",
       "presence": {
         "label": "Presence",
-        "footnote": "Lifetime practice XP"
+        "footnote": "Lifetime practice XP",
+        "breakdownTitle": "Where your XP came from",
+        "breakdownDesc": "Lifetime bonus XP by ritual signal (every completed pause includes base XP).",
+        "breakdownAria": "Presence XP by signal",
+        "signalXp": "{{xp}} XP",
+        "signals": {
+          "base": "Completed pauses (base)",
+          "breath": "Breathing ritual",
+          "mood_regulation": "Mood toward composure",
+          "tools": "Perspective tools",
+          "reflection": "Reflection note or tags",
+          "brief_decision": "Brief ritual — decision",
+          "brief_entry_mood": "Brief ritual — naming mood"
+        }
       },
       "completed": {
         "label": "Completed pauses",

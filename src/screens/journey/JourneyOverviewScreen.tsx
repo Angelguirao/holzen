@@ -2,9 +2,11 @@ import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { JourneyStreakCard } from '@/screens/journey/components/JourneyStreakCard';
+import { JourneyPracticeXpBreakdown } from '@/screens/journey/components/JourneyPracticeXpBreakdown';
 import { Button } from '@/components/ui/button';
 import { useJourneyPauseInstances } from '@/features/pause/public-hooks';
 import { usePracticeSummary } from '@/features/pause/presentation/practice/use-practice-summary';
+import { EMPTY_PRACTICE_XP_BY_SIGNAL } from '@/features/pause/domain/practice/practice-xp-by-signal';
 import { trackJourneyOverviewViewed } from '@/features/pause/public-hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -81,6 +83,11 @@ export default function JourneyOverview() {
             </p>
           ) : null}
         </div>
+        <JourneyPracticeXpBreakdown
+          xpBySignal={practiceSummary?.xpBySignal ?? EMPTY_PRACTICE_XP_BY_SIGNAL}
+          presenceXpTotal={presenceXp}
+          isLoading={practiceLoading}
+        />
       </section>
 
       <Button asChild variant="outline" className="w-full">
