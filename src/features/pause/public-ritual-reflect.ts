@@ -38,7 +38,6 @@ export { useReflectionShareHandlers } from './presentation/reflect/share/use-ref
 export type { UseReflectionShareHandlersParams } from './presentation/reflect/share/reflection-share-handler-types';
 export { usePauseReflectionStepLog } from './presentation/reflect/steps/use-pause-reflection-step-log';
 export { usePauseReflectUiTelemetry } from './presentation/reflect/telemetry/use-pause-reflect-ui-telemetry';
-export { usePauseReflectTags } from './presentation/reflect/steps/use-pause-reflect-tags';
 export { usePauseReflectNote } from './presentation/reflect/steps/use-pause-reflect-note';
 export { usePauseReflectFrameFocusAmbience } from './presentation/reflect/ambience/use-pause-reflect-frame-focus-ambience';
 export { usePauseFavoriteToggle } from './presentation/reflect/steps/use-pause-favorite-toggle';

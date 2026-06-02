@@ -167,6 +167,71 @@ export function pauseInstanceHasBriefRitualTag(
   return briefFeel && !upgraded;
 }
 
+function ritualPayloadSkipped(payload: Record<string, unknown> | undefined): boolean {
+  if (!payload) return false;
+  const v = payload.skipped;
+  if (v === true) return true;
+  if (typeof v === 'string') {
+    const s = v.trim().toLowerCase();
+    return s === 'true' || s === 't' || s === '1';
+  }
+  return false;
+}
+
+function ritualBreathSegment(payload: Record<string, unknown> | undefined): number {
+  const raw = payload?.breath_segment;
+  if (typeof raw === 'number' && raw >= 1 && raw <= 2) return raw;
+  if (typeof raw === 'string' && raw !== '') {
+    const n = Number(raw);
+    if (Number.isFinite(n) && n >= 1 && n <= 2) return n;
+  }
+  return 1;
+}
+
+function hasRitualBreathSegment(
+  events: readonly PauseStepEventRow[],
+  instanceId: string,
+  segment: 1 | 2,
+): boolean {
+  for (const e of events) {
+    if (e.pause_instance_id !== instanceId) continue;
+    if (e.step_type !== 'breath_completed') continue;
+    if (ritualBreathSegment(e.payload) === segment) return true;
+  }
+  return false;
+}
+
+/** Mirrors `pause_volatility_v1_ritual_beats_met` (Postgres). */
+export function volatilityV1RitualBeatsMet(
+  stepEvents: readonly PauseStepEventRow[],
+  instanceId: string,
+): boolean {
+  const hasFeel = stepEvents.some(
+    (e) => e.pause_instance_id === instanceId && e.step_type === 'initial_emotion_logged',
+  );
+  if (!hasFeel) return false;
+
+  if (pauseInstanceHasBriefRitualTag(stepEvents, instanceId)) {
+    return stepEvents.some(
+      (e) =>
+        e.pause_instance_id === instanceId &&
+        e.step_type === 'breath_completed' &&
+        !ritualPayloadSkipped(e.payload),
+    );
+  }
+
+  return (
+    hasRitualBreathSegment(stepEvents, instanceId, 1) &&
+    stepEvents.some(
+      (e) => e.pause_instance_id === instanceId && e.step_type === 'reflection_step',
+    ) &&
+    stepEvents.some(
+      (e) => e.pause_instance_id === instanceId && e.step_type === 'shift_emotion_logged',
+    ) &&
+    hasRitualBreathSegment(stepEvents, instanceId, 2)
+  );
+}
+
 /** Count of `complete` companion events for this instance where `counts_for_pause=true`. */
 export function countedCompanionCount(
   events: readonly PauseCompanionEventRow[],
@@ -199,8 +264,8 @@ function allIn<T>(required: readonly T[], present: Set<T>): boolean {
  *   4. **`open_max_age` (engaged only):** **`engaged`** and `COALESCE(engaged_at, created_at)` + 12h ≤ `now`
  *      → `expired`. **`active`** is not time-expired by this rule (matches Postgres).
  *   5. **`volatility_v1`:** **`engaged`** when **deep** and `reflection_step` exists
- *      (Reflect reached). **Brief** never enters `engaged`; it completes from `active`
- *      via `outcome_logged`. **`completed`** as soon as **`outcome_logged`** exists.
+ *      (Reflect reached). **Brief** never enters `engaged`. **`completed`** when
+ *      **`outcome_logged`** exists and ritual beats are met (see `volatilityV1RitualBeatsMet`).
  *   6. **Other template slugs:** `required_for_engaged` / `required_for_completed` from
  *      the row, plus `countedCompanionCount` ≥ `required_companion_count` for completed.
  *   7. Otherwise: unchanged.
@@ -252,7 +317,8 @@ export function computePauseState(params: {
     : allIn(template.required_for_engaged, seenSteps);
 
   const completedOk = isVolatilityV1
-    ? seenSteps.has('outcome_logged')
+    ? seenSteps.has('outcome_logged') &&
+      volatilityV1RitualBeatsMet(stepEvents, instance.id)
     : allIn(template.required_for_completed, seenSteps) &&
       counted >= template.required_companion_count;
 

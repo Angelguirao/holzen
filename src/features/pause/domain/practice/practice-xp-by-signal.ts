@@ -1,12 +1,13 @@
 /** Keys returned by `get_practice_summary.xp_by_signal` (Postgres). */
 export const PRACTICE_XP_SIGNAL_KEYS = [
-  'base',
-  'breath',
-  'mood_regulation',
-  'tools',
-  'reflection',
-  'brief_decision',
-  'brief_entry_mood',
+  'base_brief',
+  'base_deep',
+  'favorite',
+  'note',
+  'companions',
+  'companion_favorites',
+  'breath_second',
+  'shift_mood',
 ] as const;
 
 export type PracticeXpSignalKey = (typeof PRACTICE_XP_SIGNAL_KEYS)[number];
@@ -14,13 +15,14 @@ export type PracticeXpSignalKey = (typeof PRACTICE_XP_SIGNAL_KEYS)[number];
 export type PracticeXpBySignal = Record<PracticeXpSignalKey, number>;
 
 export const EMPTY_PRACTICE_XP_BY_SIGNAL: PracticeXpBySignal = {
-  base: 0,
-  breath: 0,
-  mood_regulation: 0,
-  tools: 0,
-  reflection: 0,
-  brief_decision: 0,
-  brief_entry_mood: 0,
+  base_brief: 0,
+  base_deep: 0,
+  favorite: 0,
+  note: 0,
+  companions: 0,
+  companion_favorites: 0,
+  breath_second: 0,
+  shift_mood: 0,
 };
 
 export function mapPracticeXpBySignalRpc(raw: unknown): PracticeXpBySignal {

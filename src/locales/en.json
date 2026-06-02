@@ -347,17 +347,18 @@
         "label": "Presence",
         "footnote": "Lifetime practice XP",
         "breakdownTitle": "Where your XP came from",
-        "breakdownDesc": "Lifetime bonus XP by ritual signal (every completed pause includes base XP).",
+        "breakdownDesc": "Lifetime XP by signal — brief and deep base, plus deep optional practice.",
         "breakdownAria": "Presence XP by signal",
         "signalXp": "{{xp}} XP",
         "signals": {
-          "base": "Completed pauses (base)",
-          "breath": "Breathing ritual",
-          "mood_regulation": "Mood toward composure",
-          "tools": "Perspective tools",
-          "reflection": "Reflection note or tags",
-          "brief_decision": "Brief ritual — decision",
-          "brief_entry_mood": "Brief ritual — naming mood"
+          "base_brief": "Brief ritual completed",
+          "base_deep": "Deep ritual completed",
+          "favorite": "Reflect favorite",
+          "note": "Reflect note",
+          "companions": "Companion completes",
+          "companion_favorites": "Frame companion favorites",
+          "breath_second": "Second breath completed",
+          "shift_mood": "Frame mood check-in"
         }
       },
       "completed": {
@@ -1707,6 +1708,8 @@
       "toggleSignalAria": "Expand or collapse Signal",
       "companionSeen": "Seen",
       "imDone": "I'm done",
+      "shiftMoodTitle": "How are you feeling now?",
+      "shiftMoodHint": "Optional — tap a mood if something shifted after companions.",
       "haikuLoading": "Loading…",
       "lookBackContent": {
         "marketLead": "The market has been here before.",

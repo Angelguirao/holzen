@@ -6,19 +6,20 @@ import {
 } from './practice-xp-by-signal';
 
 describe('mapPracticeXpBySignalRpc', () => {
-  it('maps snake_case keys from RPC', () => {
+  it('maps v2 signal keys from RPC', () => {
     const signals = mapPracticeXpBySignalRpc({
-      base: 50,
-      breath: 40,
-      mood_regulation: 10,
-      tools: 12,
-      reflection: 9,
-      brief_decision: 4,
-      brief_entry_mood: 2,
+      base_brief: 50,
+      base_deep: 120,
+      favorite: 10,
+      note: 9,
+      companions: 12,
+      companion_favorites: 4,
+      breath_second: 8,
+      shift_mood: 6,
     });
-    expect(signals.base).toBe(50);
-    expect(signals.breath).toBe(40);
-    expect(sumPracticeXpBySignal(signals)).toBe(127);
+    expect(signals.base_brief).toBe(50);
+    expect(signals.base_deep).toBe(120);
+    expect(sumPracticeXpBySignal(signals)).toBe(219);
   });
 });
 
@@ -26,17 +27,18 @@ describe('buildPracticeXpSignalRows', () => {
   it('omits zero signals and sorts by xp', () => {
     const rows = buildPracticeXpSignalRows(
       {
-        base: 10,
-        breath: 8,
-        mood_regulation: 0,
-        tools: 4,
-        reflection: 0,
-        brief_decision: 0,
-        brief_entry_mood: 0,
+        base_brief: 0,
+        base_deep: 18,
+        favorite: 2,
+        note: 0,
+        companions: 4,
+        companion_favorites: 0,
+        breath_second: 0,
+        shift_mood: 3,
       },
-      22,
+      27,
     );
-    expect(rows.map((r) => r.key)).toEqual(['base', 'breath', 'tools']);
-    expect(rows[0].sharePercent).toBe(Math.round((10 / 22) * 100));
+    expect(rows.map((r) => r.key)).toEqual(['base_deep', 'companions', 'shift_mood', 'favorite']);
+    expect(rows[0].sharePercent).toBe(Math.round((18 / 27) * 100));
   });
 });

@@ -31,7 +31,6 @@ export function PauseSessionDeepRitualBody({
   onSecondBreathPatternComplete,
   onContinueAfterFirstBreath,
   onContinueAfterSecondBreath,
-  onSkipFirstBreath,
   onSkipSecondBreath,
   ritualSoundMuted,
   prefersReducedMotion,
@@ -50,6 +49,8 @@ export function PauseSessionDeepRitualBody({
   onToggleFavorite,
   subscribed,
   mood,
+  selectedShiftMood,
+  onSelectShiftMood,
   onFrameImDone,
   onDecide,
   onRepeatDeepFirstBreathPattern,
@@ -91,7 +92,6 @@ export function PauseSessionDeepRitualBody({
             onTimedBreathingChange={onTimedBreathingChange}
             onPatternComplete={onFirstBreathPatternComplete}
             onContinueAfterBreath={onContinueAfterFirstBreath}
-            onSkipBreath={onSkipFirstBreath}
             ritualSoundMuted={ritualSoundMuted}
             onRepeatDeepFirstBreathPattern={onRepeatDeepFirstBreathPattern}
           />
@@ -136,6 +136,8 @@ export function PauseSessionDeepRitualBody({
               void onToggleFavorite();
             }}
             subscribed={subscribed}
+            selectedShiftMood={selectedShiftMood}
+            onSelectShiftMood={onSelectShiftMood}
             onImDone={onFrameImDone}
           />
         </motion.div>

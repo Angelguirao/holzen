@@ -14,6 +14,10 @@ import type { PauseSeverity } from '@/features/pause/public-navigation';
 import { pauseStepLayout } from '@/features/pause/public-session';
 import { hapticFeedback } from '@/lib/haptics';
 import { CompanionSection } from '@/screens/pause/components/CompanionSection';
+import {
+  PauseFrameShiftMood,
+  type PauseFrameShiftMoodProps,
+} from '@/screens/pause/components/PauseFrameShiftMood';
 
 export interface PauseFrameProps {
   pauseInstanceId: string | null;
@@ -26,6 +30,8 @@ export interface PauseFrameProps {
   isFavorite: boolean;
   onToggleFavorite: () => void;
   subscribed: boolean;
+  selectedShiftMood: PauseFrameShiftMoodProps['selectedShiftMood'];
+  onSelectShiftMood: PauseFrameShiftMoodProps['onSelectShiftMood'];
   onImDone: () => void;
 }
 
@@ -44,6 +50,8 @@ export function PauseFrame({
   isFavorite: _isFavorite,
   onToggleFavorite: _onToggleFavorite,
   subscribed: _subscribed,
+  selectedShiftMood,
+  onSelectShiftMood,
   onImDone,
 }: PauseFrameProps) {
   "use memo";
@@ -106,6 +114,11 @@ export function PauseFrame({
           companionSlotOrder="frame"
         />
       </div>
+
+      <PauseFrameShiftMood
+        selectedShiftMood={selectedShiftMood}
+        onSelectShiftMood={onSelectShiftMood}
+      />
 
       <div className="mt-10 flex w-full justify-center">
         <Button

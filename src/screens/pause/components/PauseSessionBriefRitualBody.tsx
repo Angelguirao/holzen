@@ -29,7 +29,6 @@ export function PauseSessionBriefRitualBody({
   onTimedBreathingChange,
   onBriefBreathPatternComplete,
   onContinueAfterBriefBreath,
-  onSkipBriefBreath,
   ritualSoundMuted,
   briefIntegrateDone,
   onBriefIntegrateComplete,
@@ -68,7 +67,6 @@ export function PauseSessionBriefRitualBody({
             onTimedBreathingChange={onTimedBreathingChange}
             onPatternComplete={onBriefBreathPatternComplete}
             onContinueAfterBreath={onContinueAfterBriefBreath}
-            onSkipBreath={onSkipBriefBreath}
             ritualSoundMuted={ritualSoundMuted}
             feelTile={selectedBriefFace}
           />

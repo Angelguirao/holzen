@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { CirclePlus } from 'lucide-react';
 import { PauseNote } from '@/screens/pause/components/PauseNote';
-import { PauseTags } from '@/screens/pause/components/PauseTags';
 import { usePauseReflectUiTelemetry } from '@/features/pause/public-ritual-reflect';
 import { Button } from '@/components/ui/button';
 import { hapticFeedback } from '@/lib/haptics';
@@ -12,7 +11,7 @@ export type PauseReflectPostItSectionProps = {
   pauseInstanceId: string;
 };
 
-/** Pro reflect: optional post-it note and tags (expandable). */
+/** Pro reflect: optional post-it note (expandable). Tags are legacy-only. */
 export function PauseReflectPostItSection({ pauseInstanceId }: PauseReflectPostItSectionProps) {
   "use memo";
   const { t } = useTranslation();
@@ -45,7 +44,6 @@ export function PauseReflectPostItSection({ pauseInstanceId }: PauseReflectPostI
           transition={{ duration: 0.25 }}
         >
           <PauseNote pauseInstanceId={pauseInstanceId} />
-          <PauseTags pauseInstanceId={pauseInstanceId} />
         </motion.div>
       ) : null}
     </div>

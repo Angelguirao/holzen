@@ -12,7 +12,8 @@ export type PauseBreathIntroProps = {
   ritualVariant: 'brief' | 'deep';
   prefersReducedMotion: boolean;
   onStart: () => void;
-  onSkipBreath: () => void | Promise<void>;
+  /** Deep second segment only — omit on brief and deep first breathe. */
+  onSkipBreath?: () => void | Promise<void>;
 };
 
 /** Pre-start breath ritual intro (first/second segment copy, mantra, start/skip CTAs). */
@@ -94,7 +95,7 @@ export function PauseBreathIntro({
             <Play className="h-4 w-4 shrink-0 fill-current" aria-hidden />
           </Button>
         </motion.div>
-        {ritualVariant === 'deep' && breathSegment === 'second' ? (
+        {ritualVariant === 'deep' && breathSegment === 'second' && onSkipBreath ? (
           <Button
             type="button"
             variant="ghost"

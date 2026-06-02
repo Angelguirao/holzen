@@ -170,6 +170,8 @@ describe('usePauseSessionBreathReflectHandlers', () => {
     expect(lastShiftFrameArgs.current).toMatchObject({
       pauseInstanceId: 'pause-inst-1',
       lastShiftLogKeyRef: mood.lastShiftLogKeyRef,
+      frameShiftMood: null,
+      frameShiftIntensity: 4,
       goToStep: goToStepMock,
     });
     expect(lastShiftFrameArgs.current?.setFrameDone).toBe(ritual.setFrameDone);
