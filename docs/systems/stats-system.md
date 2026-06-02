@@ -1,25 +1,81 @@
 # Stats System
 
-> **Not in shipped pause-first scope (2026-05).** Reference implementation: git tag `full-ia-pre-strip` or `src/legacy/full-shell/`. Shipped surface: [active-surface.md](../ops/active-surface.md).
-
-> **Status (legacy full shell only — tag `full-ia-pre-strip` / `src/legacy/full-shell/`):** the "Recommended target model (skills-first)" at the bottom of
-> this doc is **shipped there**. Journey → **Stats** (`Profile > Stats`) renders
-> [`StatsContentV2`](../../src/legacy/full-shell/src/components/stats/StatsContentV2.tsx) with all
-> 13 deep-dive / Journey / Advanced cards, reading exclusively from
-> `v_pause_full` + `pause_step_events` + `pause_companion_events`.
-> **Holzen + skill values are computed client-side on read** — see **Pause V2 — data flow and where scores are computed** below. Pause lifecycle narrative: [`pause-system.md`](pause-system.md).
+> **Pause-first shipped (2026-06):** **Practice Presence XP** (lifetime total, per-pause awards, Journey breakdown) — see [**Pause-first MVP — Practice Presence XP**](#pause-first-mvp--practice-presence-xp) below. Surfaces: Home `journey-pulse` glimpse, Journey overview, Done qualitative impacts (same signal weights).
 >
-> The "Current App Order" section below is retained as historical context —
-> it describes the legacy layout that ran on `reflections` and was removed
-> in the Pause V2 cutover.
+> **Not shipped in pause-first:** Holzen Score ring, five skills, Profile → Stats tab, badges alignment scoring — reference `src/legacy/full-shell/` or tag `full-ia-pre-strip`. Manifest: [active-surface.md](../ops/active-surface.md).
 
-## Pause V2 — data flow and where scores are computed (authoritative)
+---
+
+## Pause-first MVP — Practice Presence XP
+
+Holzen’s **shipped** numeric practice model is **Presence XP**: reward completed pause rituals, not portfolio or hold-strategy performance. This replaces the legacy Holzen Score / skills stack for active routes.
+
+### Authority (Postgres)
+
+| Column / RPC | Role |
+|--------------|------|
+| `pause_instances.practice_xp_awarded` | XP for that completed pause (recomputed idempotently) |
+| `profiles.practice_presence_xp_total` | Lifetime Presence sum |
+| `profiles.completed_pause_count` | Completed instance count |
+| `get_practice_summary(user_id)` | Read model: totals, brief/deep split, `xp_by_signal` |
+| `pause_compute_practice_xp_breakdown` / `pause_finalize_practice_xp` | Compute + sync (SQL) |
+
+Migrations: `20260601120000_pause_practice_xp_persistence.sql`, `20260602120000_practice_summary_xp_by_signal.sql`.
+
+**When XP is written:** After `pause_step_events` / qualifying `pause_companion_events` inserts → `pause_evaluate_transitions` → `pause_finalize_practice_xp` when `state = completed` (including late `post_pause_emotion_logged`).
+
+**Client parity reference (must match SQL when weights change):** `src/features/pause/domain/home/compute-pause-practice-xp.ts`, `sum-pause-score-impact-points.ts` (Vitest).
+
+### Formula per completed pause
+
+| Component | Value |
+|-----------|--------|
+| **Base** | **5** XP — every completed pause |
+| **Bonuses** | Same ritual signals as Done screen (`buildPauseScoreImpacts` copy only on Done; numeric weights below) |
+
+| Signal | Bonus XP |
+|--------|----------|
+| Breathing completed | +4 |
+| Mood toward composure (only if breathing did not already award) | +5 |
+| Perspective tools (`complete`, `counts_for_pause`) | +2 each, max +6 |
+| Reflection note or tags | +3 |
+| Brief ritual: decision (`outcome_logged`) | +2 |
+| Brief ritual: naming entry mood (when no regulation bonus yet) | +2 |
+
+Typical range per pause: **5–18+**. No per-pause cap.
+
+**`xp_by_signal` keys** (lifetime sums on Journey): `base`, `breath`, `mood_regulation`, `tools`, `reflection`, `brief_decision`, `brief_entry_mood`.
+
+### UI surfaces (pause-first)
+
+| Surface | What |
+|---------|------|
+| **Home** (`journey-pulse`) | Presence total + completed count — glimpse; links to Journey ([screens/home.md](../screens/home.md)) |
+| **Journey** (`/journey`) | Presence, completed, brief/deep mix, XP-by-signal bars (`JourneyPracticeXpBreakdown`) |
+| **Pause Done** | Qualitative `ScoreImpact` rows — not lifetime totals |
+
+**Query:** `PRACTICE_SUMMARY_QUERY_KEY` → `get_practice_summary`. Invalidate: `invalidatePauseStatsDataForUser` after completion.
+
+**Explicit non-goals (stay legacy / Tier B):** Holzen Score, hold-goal alignment %, badge progress tiles on Home.
+
+---
+
+## Legacy full shell — Holzen Score & Profile Stats (not shipped)
+
+> Reference: git tag `full-ia-pre-strip` / `src/legacy/full-shell/`. Journey → **Stats** (`Profile > Stats`) rendered
+> [`StatsContentV2`](../../src/legacy/full-shell/src/components/stats/StatsContentV2.tsx) with 13 deep-dive cards from
+> `v_pause_full` + step/companion events. **Holzen Score and five skills** were computed **client-side on read** via [`computePauseScore`](../../src/lib/stats/pause-score.ts).
+> Pause lifecycle: [`pause-system.md`](pause-system.md).
+
+The sections below document **legacy** metrics and layout (pre–pause-first strip). They are **not** the active product model.
+
+## Pause V2 — legacy read path (Holzen Score; not pause-first)
 
 ### Source of truth (Postgres)
 
-Pause lifecycle and ritual signals live in **`pause_instances`**, **`pause_step_events`**, **`pause_companion_events`**, and the read-model view **`v_pause_full`** (extended as migrations add columns). There is **no** trigger or materialized column that writes Holzen Score or per-skill numbers at `completed` time.
+Pause lifecycle and ritual signals live in **`pause_instances`**, **`pause_step_events`**, **`pause_companion_events`**, and **`v_pause_full`**. Legacy Holzen Score was **not** stored at `completed` time.
 
-### Read path and client-side aggregation
+### Read path and client-side aggregation (legacy only)
 
 - **Legacy full shell only:** [`usePauseStatsData`](../../src/legacy/full-shell/src/hooks/use-pause-stats-data.ts) loads one **TanStack Query** bundle per user: `v_pause_full` (bounded) + `pause_step_events` + `pause_companion_events` via [`fetchPauseStatsData`](../../src/legacy/full-shell/src/lib/pause-stats-data-query.ts). Journey → Stats and badges reused this cache in full IA — **not** pause-first Home/Journey overview.
 - **Holzen Score and the five skill values** are computed **in the browser on read** by [`computePauseScore`](../../src/lib/stats/pause-score.ts) from that bundle (e.g. [`SkillOverviewCard`](../../src/legacy/full-shell/src/components/stats/SkillOverviewCard.tsx), [`HomeStatTiles`](../../src/legacy/full-shell/src/components/home/HomeStatTiles.tsx) in legacy).

@@ -4,7 +4,7 @@
 
 **Shipped today:** migration `20260601120000_pause_practice_xp_persistence.sql`, `get_practice_summary`, `usePracticeSummary`, Journey overview practice section.
 
-**Formula (Presence):** [home-practice-presence-xp.md](../systems/home-practice-presence-xp.md) — client projection from `pause_instances` + `pause_step_events` + companion completes.
+**Formula (Presence):** [stats-system.md](../systems/stats-system.md) § Pause-first MVP — Postgres `get_practice_summary`.
 
 ---
 
@@ -111,5 +111,5 @@ Deferring **derived** roll-ups in the SPA is a **cost / churn** choice, not a pr
 ## Related
 
 - [screens/home.md](../screens/home.md) — `journey-pulse` section
-- [home-practice-presence-xp.md](../systems/home-practice-presence-xp.md)
+- [stats-system.md](../systems/stats-system.md) — Pause-first Presence XP
 - [active-surface.md](../ops/active-surface.md) — Journey overview shipped; `/journey/stats` dead

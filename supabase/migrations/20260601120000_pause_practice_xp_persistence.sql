@@ -1,6 +1,6 @@
 -- Practice Presence XP: persist per completed pause + profile roll-ups.
 -- Formula must match src/features/pause/domain/home/compute-pause-practice-xp.ts
--- and sum-pause-score-impact-points.ts (see docs/systems/home-practice-presence-xp.md).
+-- and sum-pause-score-impact-points.ts (see docs/systems/stats-system.md § Pause-first MVP).
 
 ALTER TABLE public.pause_instances
   ADD COLUMN IF NOT EXISTS practice_xp_awarded integer;
