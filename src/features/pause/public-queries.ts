@@ -8,6 +8,13 @@ export {
   fetchCompletedPauseCount,
   getCompletedPauseCountQueryOptions,
 } from './infrastructure/queries/completed-pause-count-query';
+export type { PracticeSummary } from './domain/practice/practice-summary';
+export {
+  fetchPracticeSummary,
+  fetchHomePracticeStats,
+  getPracticeSummaryQueryOptions,
+  PRACTICE_SUMMARY_QUERY_KEY,
+} from './infrastructure/queries/practice-summary-query';
 export {
   fetchPauseInstancesForJourney,
   getJourneyPauseInstancesQueryOptions,

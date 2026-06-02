@@ -162,9 +162,9 @@
     },
     "practiceStats": {
       "presence": "Presence",
-      "presenceFootnote": "From your practice",
+      "presenceFootnote": "Lifetime XP · see Journey",
       "pauses": "Pauses",
-      "pausesFootnote": "Pauses held"
+      "pausesFootnote": "Completed · see Journey",
     },
     "customizeSheet": {
       "title": "Customize your Home",
@@ -343,8 +343,13 @@
       "title": "Journey",
       "subtitle": "Your pause rhythm at a glance.",
       "archiveCta": "Open your pause library",
+      "presence": {
+        "label": "Presence",
+        "footnote": "Lifetime practice XP"
+      },
       "completed": {
-        "label": "Completed pauses"
+        "label": "Completed pauses",
+        "mix": "{{deep}} deep · {{brief}} brief"
       },
       "streak": {
         "title": "Streak",
