@@ -43,10 +43,12 @@ Typical range: **5–18+** XP per pause.
 
 ## Client
 
-- **Query:** `PRACTICE_SUMMARY_QUERY_KEY` → `get_practice_summary` (TanStack Query).
-- **Home:** `useHomePracticeStats` selects `presenceXp` + `completedPauseCount`.
-- **Journey:** `usePracticeSummary` — Presence, completed total, brief/deep mix.
+- **Query:** `PRACTICE_SUMMARY_QUERY_KEY` → `get_practice_summary` (includes `xp_by_signal`).
+- **Home:** `useHomePracticeStats` selects `presenceXp` + `completedPauseCount` (ignores breakdown).
+- **Journey:** `usePracticeSummary` + `JourneyPracticeXpBreakdown` — Presence, completed, brief/deep, XP-by-signal bars.
 - **Invalidate:** `invalidatePauseStatsDataForUser` after pause completes.
+
+**`xp_by_signal` keys:** `base`, `breath`, `mood_regulation`, `tools`, `reflection`, `brief_decision`, `brief_entry_mood` — aggregated in SQL (`20260602120000_practice_summary_xp_by_signal.sql`).
 
 ---
 

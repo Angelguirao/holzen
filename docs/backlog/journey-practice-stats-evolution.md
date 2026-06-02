@@ -102,7 +102,7 @@ Deferring **derived** roll-ups in the SPA is a **cost / churn** choice, not a pr
 ## Suggested build order
 
 1. ~~Shared `PracticeStatsSummary` + `get_practice_summary`~~ **Done (2026-06).**
-2. Journey UI: variant split on overview **Done**; XP-by-signal section (read-only) — **next**.
+2. ~~Journey UI: variant split on overview~~ **Done**; ~~XP-by-signal section~~ **Done (2026-06)** — `JourneyPracticeXpBreakdown`.
 3. ~~Home: tappable tiles → Journey~~ **Done.**
 4. Optional: period comparison card (port patterns from legacy `PeriodComparisonCard` in `full-shell`, not the whole Stats stack).
 
