@@ -61,9 +61,40 @@ Home keeps **one** number (total completed). Journey shows **composition** + str
 3. **TanStack Query** — single query key family e.g. `practiceStats(userId)` consumed by `useHomePracticeStats` and `useJourneyPracticeOverview`; Home uses `select` for glimpse fields.
 4. **Rename when ready** — Customize id `journey-pulse` is historical; optional rename to `practice-glimpse` in a migration PR with storage key note.
 5. **Deep links** — Home tiles should navigate to `/journey` (hash or section ref when Journey sections exist); footnote copy: “See breakdown in Journey”.
-6. **Server later** — RPC only when a **second consumer** needs the same roll-up (email, leaderboard, anti-tamper); until then client aggregation from bounded instance fetch is acceptable (document cap like Presence doc §200).
+6. **Postgres when it earns its keep** — see [§ When to add Postgres](#when-to-add-postgres) below (not “never DB”).
 
 **Explicit non-goals:** Holzen Score ring, hold-goal alignment %, badge progress on Home — legacy [`stats-system.md`](../systems/stats-system.md) / `full-shell`.
+
+---
+
+## When to add Postgres
+
+Deferring **derived** roll-ups in the SPA is a **cost / churn** choice, not a product rule. New Postgres is appropriate when at least one of these is true:
+
+| Trigger | Why DB helps |
+|---------|----------------|
+| **Lifetime totals must be exact** | Client sum over “last 200 instances” is wrong for power users; counter or per-pause snapshot fixes it |
+| **Second consumer** | Email digest, cron, admin, future API, Pro leaderboard — needs same numbers without shipping TS to the server |
+| **Formula stabilizes** | XP weights stop changing every sprint — safe to persist or to backfill |
+| **Performance** | Journey loads full event history on every tab open — aggregation in SQL/RPC is cheaper |
+| **Gates or entitlements** | If Presence XP ever unlocks features, store authoritative totals (RLS + RPC), not client math |
+
+**What should be Postgres (user-authored, not derived):**
+
+| Data | Table | Notes |
+|------|--------|--------|
+| **Thesis / whys text** | `profiles.pause_thesis` (or JSON) | Same pattern as `mantra`, `motivations[]` |
+| **Thesis snippets from pause** | `pause_thesis_snippets` or instance metadata | Optional; ritual → identity |
+
+**Recommended shape for derived practice stats (when triggers fire):**
+
+1. **`pause_instances.practice_xp_awarded`** — set when `state → completed` inside the same RPC path that completes the pause (one formula; port TS or compute in trusted RPC).
+2. **`profiles.practice_presence_xp_total`** + **`profiles.completed_pause_count`** — denormalized counters updated in that transaction (or reconcile job).
+3. **Optional RPC** `get_practice_summary(p_user_id)` — brief/deep counts and XP-by-signal for Journey without re-fetching all step events on the client.
+
+**Anti-patterns:** duplicate XP math in SQL vs TS without shared tests; materialized views that lag until refresh; storing legacy Holzen Score on `profiles` for pause-first.
+
+**Interim (now):** client projection is fine for MVP glimpse + Journey v1 while breakdown UX and XP weights still move ([stats-system.md](../systems/stats-system.md) § “Why client-side today”).
 
 ---
 

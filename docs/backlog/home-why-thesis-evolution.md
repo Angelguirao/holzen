@@ -53,10 +53,12 @@ Evolve whys toward a **durable personal thesis** — meaning and regulation, not
 
 ## Engineering notes
 
-1. **Schema:** `profiles.pause_thesis` (text) or JSON `{ body, updated_at, snippets[] }` — RLS same as mantra.
-2. **Domain:** `features/user/` for profile field; `features/pause/application/` for “suggest thesis snippet from ritual” use case (no UI in infrastructure).
-3. **Events:** any new capture → [event-taxonomy.md](../ops/event-taxonomy.md) (`pause.thesis_snippet_saved` etc.).
-4. **Home:** keep anchor card **read-only** + link to Settings/Journey; no expand-to-edit on Home long term.
+1. **Schema — user-authored (use Postgres):** `profiles.pause_thesis` (text) or JSON `{ body, updated_at }` — RLS same as `mantra`; edited in Settings, read on Home/Journey.
+2. **Schema — ritual captures (optional Postgres):** `pause_thesis_snippets` or `pause_instances.metadata` entry when user saves a post-Reflect line — ties activation layer to identity.
+3. **Schema — derived stats:** defer to [journey-practice-stats-evolution.md § When to add Postgres](journey-practice-stats-evolution.md#when-to-add-postgres); not required for first thesis UX.
+4. **Domain:** `features/user/` for profile fields; `features/pause/application/` for “suggest thesis snippet from ritual” use case (no UI in infrastructure).
+5. **Events:** any new capture → [event-taxonomy.md](../ops/event-taxonomy.md) (`pause.thesis_snippet_saved` etc.).
+6. **Home:** keep anchor card **read-only** + link to Settings/Journey; no expand-to-edit on Home long term.
 
 ---
 
