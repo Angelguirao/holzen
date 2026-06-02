@@ -76,7 +76,7 @@ Wireframe structure: two equal tiles after **Your pause** — **Presence** (life
 | Tile | Source | Hook / query |
 |------|--------|----------------|
 | **Pauses** | Exact count, `pause_instances.state = completed` | [`useHomePracticeStats`](../../src/features/pause/presentation/home/use-home-practice-stats.ts) |
-| **Presence** | Client sum per [home-practice-presence-xp.md](../systems/home-practice-presence-xp.md) | Same query bundle |
+| **Presence** | `get_practice_summary` / profile roll-ups ([stats-system.md](../systems/stats-system.md) § Pause-first MVP) | [`useHomePracticeStats`](../../src/features/pause/presentation/home/use-home-practice-stats.ts) |
 
 Customize id remains **`journey-pulse`** (historical); default visibility **on**. Tiles are a **glimpse** — full breakdowns belong on Journey ([journey-practice-stats-evolution.md](../backlog/journey-practice-stats-evolution.md)).
 

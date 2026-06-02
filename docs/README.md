@@ -90,7 +90,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 ## Screens (in-app surfaces)
 
-- `screens/home.md` — **`/`** dashboard: greeting + widget stack (goal-why, market, your-pause, Presence/Pauses stats), subscription/checkout interplay, pause error surfacing, analytics touchpoints. **Presence XP formula:** [systems/home-practice-presence-xp.md](systems/home-practice-presence-xp.md).
+- `screens/home.md` — **`/`** dashboard: greeting + widget stack (goal-why, market, your-pause, Presence/Pauses stats), subscription/checkout interplay, pause error surfacing, analytics touchpoints. **Presence XP:** [systems/stats-system.md](systems/stats-system.md) § Pause-first MVP.
 - `screens/pause.md` — **`/pause`** full-screen volatility ritual: gate, depth picker, brief vs deep scaffold, `@/features/pause/public-rpc` wiring, exit navigation, analytics notes.
 
 ## Reports (snapshots)
@@ -147,7 +147,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 - `systems/pause/companions/` — deep dives per companion type (see [companions/signal.md](systems/pause/companions/signal.md) for Signal).
 - `systems/pause/past-reflections.md` — shared "user words" read model behind Zoom Out's Echo and Daily Practice Replay (notes + replay entries, never AI text).
 - `systems/content-library-fetch-source-feeds.md` — **`fetch-source-feeds`** pipeline: RSS/Map discovery → scrape → Gemini → `content_library`; admin setup and **JSON** log grep tokens (`fn`, **`fetch_feeds_*`** **`msg`**).
-- `systems/stats-system.md` — **legacy full-shell only** (not pause-first): Profile → Stats / skills-first model reference in UI order (`src/legacy/full-shell/`).
+- `systems/stats-system.md` — **pause-first:** Practice Presence XP (Postgres + formula + Home/Journey surfaces). **Legacy:** Holzen Score / Profile → Stats (`src/legacy/full-shell/`).
 - `systems/badges-system.md` — **legacy full-shell only** (not pause-first): Profile → Badges reference in UI order (`src/legacy/full-shell/`).
 
 ## Postmortems
