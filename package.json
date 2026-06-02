@@ -40,6 +40,7 @@
     "check:posthog-events-allowlist": "node scripts/check-posthog-events-allowlist.mjs",
     "check:feature-flags-doc": "node scripts/check-feature-flags-doc.mjs",
     "check:env-docs": "node scripts/check-env-docs.mjs",
+    "check:local-google-oauth": "node scripts/check-local-google-oauth-env.mjs",
     "smoke:edge-logging": "node scripts/smoke-edge-logging.mjs",
     "check:version-sync": "node scripts/check-version-sync.mjs",
     "check:view-migrations": "node scripts/lint-view-migrations.mjs",
