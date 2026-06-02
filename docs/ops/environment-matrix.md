@@ -95,6 +95,7 @@ avoid Windows excluded-port conflicts that frequently affect the upstream
 5. If you need local Edge Functions too, copy `supabase/.env.example` to `supabase/.env` or `supabase/.env.local`
 6. Fill only the secrets needed for the flows you are testing locally, then start functions: `npm run supabase:functions:serve` (this repo passes `--env-file supabase/.env.local`)
 7. Start the app: `npm run dev:local`
+8. Optional Google OAuth on Docker: [local-google-oauth.md](local-google-oauth.md) (Option B)
 
 Notes:
 

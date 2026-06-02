@@ -155,6 +155,8 @@ The local API gateway exposes `http://127.0.0.1:55421/functions/v1`, but your fu
 
 **Edge function secrets:** Start from `supabase/.env.example`, then copy it to `supabase/.env` (shared local defaults) or `supabase/.env.local` (personal overrides). The CLI reads `supabase/.env.local`, then `supabase/.env`, then OS env. Add only the secrets needed for the flows you are testing locally: Stripe test keys, Resend/auth-email values, AI provider keys, VAPID keys, or observability overrides.
 
+**Google sign-in locally:** Either use **`npm run dev:staging`** with staging dashboard redirect URLs for `localhost:8080`, or enable Google on Docker Supabase via `SUPABASE_AUTH_EXTERNAL_GOOGLE_*` in `supabase/.env.local` — full steps in [docs/ops/local-google-oauth.md](docs/ops/local-google-oauth.md).
+
 **Bootstrap helper:** `npm run supabase:env:local` fills `supabase/.env.local` with reusable local defaults, generated local-only hook secrets, Stripe test-mode values from your Stripe CLI login, and Gemini aliases from `.cursor/mcp-secrets.env` when present. Pass `-- --stripe-webhook-secret <whsec_...>` after `stripe listen ...` to wire local webhook verification too.
 
 **Local cron auth:** If you want cron-driven local Edge functions like `check-volatility`, `pregenerate-companions`, and `refresh-btc-prices` to run against your local function server, set `CRON_SECRET` in `supabase/.env.local` or `supabase/.env`, then run `npm run supabase:cron:local` (or restart `npm run supabase:start`). Without `CRON_SECRET`, those shipped HTTP cron jobs stay disabled locally on purpose.
