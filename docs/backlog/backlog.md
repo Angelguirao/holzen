@@ -172,7 +172,8 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Product / UX | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | **Done (2026-04).** Logs + pause UI copy — see ticket |
 | Product / UX | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | **Done (2026-04).** Form **`name`** / **`id`** / **`autocomplete`** — see ticket |
 | Product / UX | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **Done (2026-04).** Home **`/`** axe fixes — see ticket |
-| Product / UX | [home-why-thesis-evolution.md](home-why-thesis-evolution.md) | **Home:** evolve mantra + motivation chips toward rational thesis / versioned whys (hold goal stays legacy) |
+| Product / UX | [home-why-thesis-evolution.md](home-why-thesis-evolution.md) | **Home / Pause / Journey:** thesis depth — activation in ritual, identity in Settings, history on Journey |
+| Product / UX | [journey-practice-stats-evolution.md](journey-practice-stats-evolution.md) | **Home glimpse → Journey drill-down:** Presence XP slices, pause counts by variant/signal |
 | Product / UX | [companion-tts-pro.md](companion-tts-pro.md) | **Companions:** Pro TTS (`SpeechSynthesis` → ElevenLabs if needed) |
 | Product / UX | [companion-share-as-image-pro.md](companion-share-as-image-pro.md) | **Companions:** Pro share-as-image (`html-to-image` + design) |
 | Product / UX | [companion-high-contrast-reading-mode.md](companion-high-contrast-reading-mode.md) | **Companions:** High-contrast reading (theme tokens) |

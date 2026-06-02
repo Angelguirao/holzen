@@ -78,7 +78,7 @@ Wireframe structure: two equal tiles after **Your pause** — **Presence** (life
 | **Pauses** | Exact count, `pause_instances.state = completed` | [`useHomePracticeStats`](../../src/features/pause/presentation/home/use-home-practice-stats.ts) |
 | **Presence** | Client sum per [home-practice-presence-xp.md](../systems/home-practice-presence-xp.md) | Same query bundle |
 
-Customize id remains **`journey-pulse`** (historical); default visibility **on**.
+Customize id remains **`journey-pulse`** (historical); default visibility **on**. Tiles are a **glimpse** — full breakdowns belong on Journey ([journey-practice-stats-evolution.md](../backlog/journey-practice-stats-evolution.md)).
 
 ## Pause widget error surfacing
 

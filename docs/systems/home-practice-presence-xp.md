@@ -3,7 +3,9 @@
 > **Canonical formula** for the Home **Presence** stat tile (left column of the `journey-pulse` row).  
 > **Screen:** [screens/home.md](../screens/home.md) · **UI:** `HomePracticeStatTiles` · **Query:** `fetchHomePracticeStats`
 
-Presence is a **client-side projection** — nothing is stored in Postgres. The **Pauses** tile uses the exact `pause_instances.state = 'completed'` count; **Presence** sums XP from completed ritual signals.
+Presence is a **client-side projection** — nothing is stored in Postgres. The **Pauses** tile uses the exact `pause_instances.state = 'completed'` count.
+
+**Long term:** Home shows a **glimpse** only; Journey owns breakdowns (XP by signal/variant, pause mix). See [journey-practice-stats-evolution.md](../backlog/journey-practice-stats-evolution.md).
 
 ---
 
