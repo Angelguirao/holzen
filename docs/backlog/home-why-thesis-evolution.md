@@ -1,44 +1,66 @@
-# Home “Your whys” — thesis & depth (backlog)
+# Personal thesis & “whys” — where depth lives
 
 **Status:** Backlog (2026-06).  
-**Context:** Pause-first Home anchor card ([Wireframes 546:8945](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=546-8945)) shows **mantra + motivations only**. Hold goal / commitment UI moved to [`src/legacy/hold-goal/`](../../src/legacy/hold-goal/README.md) (investment-strategy semantics).
+**Context:** Pause-first Home anchor ([Wireframes 546:8945](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=546-8945)) = **mantra + motivations** (display). Hold goal / commitment → [`src/legacy/hold-goal/`](../../src/legacy/hold-goal/README.md).
 
-**Shipped today:** `profiles.mantra`, `profiles.motivations[]`, `HomeGoalWhyCard`, Settings → You editors.
-
----
-
-## Product direction (future)
-
-Evolve “whys” from static chips + a one-line mantra toward a **durable personal thesis** — still about *meaning and regulation*, not portfolio targets or hold-duration strategy.
-
-| Idea | Sketch | Notes |
-|------|--------|--------|
-| **Rational thesis** | 2–4 sentence user-authored “why I pause / why this matters” block on Home | Replaces or sits above mantra; editable in Settings; optional AI draft from motivations |
-| **Structured whys** | Ranked motivations + optional free-text “what this means to me” per chip | Keeps chip UX; adds depth without investment jargon |
-| **Thesis versioning** | Append-only history (“how my why evolved”) | Journey/Archive surface; privacy-sensitive |
-| **Pause-linked echoes** | After Reflect, suggest one sentence that connects ritual to thesis | Opt-in; uses `reflection_text` + thesis, not market advice |
-| **Regulation framing** | Copy and IA emphasize *response over reaction*, not *hold vs sell* | Aligns with pause-first stance in [active-surface.md](../ops/active-surface.md) |
+**Practice stats glimpse (separate track):** [journey-practice-stats-evolution.md](journey-practice-stats-evolution.md).
 
 ---
 
-## Explicit non-goals (stay in legacy / Tier B)
+## Should thesis-building belong in the pause flow?
 
-- Hold goal types, target months, price bands (`hold_goal_*` columns)
-- Alignment / decision scoring tied to hold strategy ([stats-system.md](../systems/stats-system.md) legacy)
-- “Set your commitment” onboarding flows tied to BTC targets
+**Yes — partially.** Thesis is not only Settings text; it becomes real when tied to **completed rituals**. But the **pause flow should activate and refine**, not replace, a stable identity layer.
+
+| Layer | Surface | Responsibility |
+|-------|---------|----------------|
+| **Identity (stable)** | Settings → You; **read** on Home anchor | Mantra, motivation chips, future `pause_thesis` field — edited deliberately, low frequency |
+| **Activation (episodic)** | `/pause` — especially **Reflect → Done** | Connect *this* moment to whys: optional one-liner, “does this still fit?” micro-prompt, never block completion |
+| **Reflection (aggregate)** | **Journey** | How practice and stated whys evolved over weeks; version history if we ship it |
+| **Corpus** | **Archive** | Per-pause artifacts (`reflection_text`), not thesis editing |
+
+**Recommended pause touchpoints (in order of leverage):**
+
+1. **Post-Reflect (engaged path)** — After user has language for the moment, optional: “Add one line to your thesis?” or “Save as echo” — **opt-in**, skippable, no gate on Continue.
+2. **Done / ScoreImpact** — Qualitative copy can reference motivations/thesis (“You named what matters”) without new inputs.
+3. **Brief ritual Done** — Lighter: confirm chip selections still resonate (yes/no), not long-form writing.
+4. **Not in:** market trigger, breath timer, or first “Let’s pause” — too early; breaks regulation flow.
+
+**Do not** turn `/pause` into onboarding for a 4-paragraph essay. Heavy authoring stays **Settings** or a dedicated **Journey → Your whys** subsection; pause flow only offers **frictionless captures** that append to thesis history.
 
 ---
 
-## Engineering notes when picking this up
+## Product direction (future content)
 
-1. **Schema:** likely new `profiles` JSON or text column (`why_thesis` / `pause_thesis`) — migration + RLS same as mantra.
-2. **Home:** extend `HomeGoalWhyCard` or sibling component; keep section id `goal-why` unless storage migration.
-3. **i18n / Customize:** rename labels from “anchor” / “why you stay” to “Your whys” consistently.
-4. **AI:** any draft helper must go through existing reflect/orchestrate privacy patterns — no new edge without manifest updates.
+Evolve whys toward a **durable personal thesis** — meaning and regulation, not portfolio strategy.
+
+| Idea | Primary surface | Notes |
+|------|-----------------|-------|
+| **Rational thesis** | Settings + Journey read; **snippet** on Home | 2–4 sentences; Home shows first line or quote |
+| **Structured whys** | Settings | Chips + per-chip “what this means to me” |
+| **Thesis versioning** | Journey | Append-only timeline; privacy-sensitive |
+| **Pause-linked echoes** | Post-Reflect opt-in | One sentence from `reflection_text` + thesis; AI draft via existing orchestrate privacy |
+| **Regulation framing** | Copy everywhere | Response over reaction; no hold-duration advice |
+
+---
+
+## Explicit non-goals
+
+- Hold goal types, price targets, alignment scoring ([stats-system.md](../systems/stats-system.md) legacy)
+- Mandatory thesis step before `pause_completed`
+- Investment “commitment” flows on Home
+
+---
+
+## Engineering notes
+
+1. **Schema:** `profiles.pause_thesis` (text) or JSON `{ body, updated_at, snippets[] }` — RLS same as mantra.
+2. **Domain:** `features/user/` for profile field; `features/pause/application/` for “suggest thesis snippet from ritual” use case (no UI in infrastructure).
+3. **Events:** any new capture → [event-taxonomy.md](../ops/event-taxonomy.md) (`pause.thesis_snippet_saved` etc.).
+4. **Home:** keep anchor card **read-only** + link to Settings/Journey; no expand-to-edit on Home long term.
 
 ---
 
 ## Related
 
-- [screens/home.md](../screens/home.md) — anchor card wiring
-- [home-practice-presence-xp.md](../systems/home-practice-presence-xp.md) — Presence tile (separate from whys)
+- [screens/home.md](../screens/home.md) — goal-why anchor
+- [journey-practice-stats-evolution.md](journey-practice-stats-evolution.md) — Presence/Pauses drill-down
