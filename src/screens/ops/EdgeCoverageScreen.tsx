@@ -38,6 +38,8 @@ const COVERAGE: Row[] = [
   { name: "handle-email-unsubscribe", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "health", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "holzen-number", wrl: true, edgeError: false, logger: false, audit: false },
+  { name: "home-bootstrap", wrl: true, edgeError: false, logger: false, audit: false },
+  { name: "market-quote", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "holzen-reflect", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "list-checkout-events", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "notify-checkout-confirmation", wrl: false, edgeError: false, logger: false, audit: false },

@@ -60,7 +60,7 @@ export function getPendingPauseOfferQueryOptions(userId: string | undefined) {
     queryFn: () => fetchPendingPauseOffer(userId!),
     enabled: Boolean(userId),
     staleTime: 30_000,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
     retry: false,
   } as const;
 }
