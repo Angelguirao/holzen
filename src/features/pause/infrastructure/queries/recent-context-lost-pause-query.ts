@@ -19,7 +19,7 @@ export async function fetchRecentContextLostPause(
 
   const { data, error } = await supabase
     .from('pause_instances' as never)
-    .select('id, terminal_at, updated_at, created_at')
+    .select('id, terminal_at, created_at')
     .eq('user_id', userId)
     .eq('state', 'expired')
     .eq('expired_reason', 'context_lost')
