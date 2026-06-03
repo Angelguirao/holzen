@@ -166,9 +166,9 @@
     },
     "practiceStats": {
       "presence": "Presence",
-      "presenceFootnote": "Lifetime XP · see Journey",
-      "pauses": "Pauses",
-      "pausesFootnote": "Completed · see Journey"
+      "presenceFootnote": "Lifetime XP",
+      "pauses": "Completed",
+      "pausesFootnote": "All time"
     },
     "customizeSheet": {
       "title": "Customize your Home",
@@ -186,8 +186,8 @@
           "desc": "Optional wider-world context on the same screen when you want it—so you can stay oriented without leaving your flow."
         },
         "yourPause": {
-          "title": "Your pause",
-          "desc": "Brings your pause practice into view on Home—so regulation and boundaries stay within reach when intensity rises."
+          "title": "Pause",
+          "desc": "Brings pause practice into view on Home—so regulation and boundaries stay within reach when intensity rises."
         },
         "journeyPulse": {
           "title": "Practice stats",
@@ -217,7 +217,10 @@
     "market": {
       "expandDetails": "Show chart and 24h details",
       "collapseDetails": "Hide chart and 24h details",
-      "chartExpandDisabled": "Chart and 24h details need a visible fiat price (not BTC-only or hidden price)."
+      "chartExpandDisabled": "Chart and 24h details need a visible fiat price (not BTC-only or hidden price).",
+      "withinYourRange": "Within your range",
+      "beyondYourRange": "Beyond your range",
+      "beyondRangeCumulative": "7-day move beyond your range"
     },
     "heroQuote": {
       "lineWithName": "{{name}}, {{line}}",
@@ -254,8 +257,8 @@
       "market": "Market",
       "goal": "Goal",
       "whyHoldTitle": "Your whys",
-      "yourPause": "Your pause",
-      "continueYourPause": "Continue your pause",
+      "yourPause": "Pause",
+      "continueYourPause": "Continue pause",
       "youPaused": "You paused",
       "newPauseAvailable": "New pause available",
       "reflection": "Pause",

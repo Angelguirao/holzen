@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
-import { HolzenNumber } from '@/screens/home/components/HolzenNumber';
+import { HomeMarketWidgetFooter } from '@/screens/home/components/HomeMarketWidgetFooter';
 import type { HomeDashboardSectionDeps } from '@/screens/home/components/render-home-dashboard-section';
 import type { BtcPriceData, TrackedAssetId } from '@/features/market/public';
 
@@ -10,9 +10,12 @@ export function useHomeDashboardSectionDeps(args: {
   t: TFunction;
   error: string | null;
   marketHeaderRight: ReactNode;
-  /** Defaults to a compact {@link HolzenNumber} when omitted. */
+  /** Defaults to {@link HomeMarketWidgetFooter} when omitted. */
   marketFooter?: ReactNode;
   btcData: BtcPriceData | null;
+  threshold: number;
+  thresholdDown: number;
+  cumulativeThreshold: number;
   priceHidden: boolean;
   togglePriceHidden: () => void;
   currency: string;
@@ -32,14 +35,15 @@ export function useHomeDashboardSectionDeps(args: {
   completedPauseCount: number | null;
   practiceStatsLoading: boolean;
 }): HomeDashboardSectionDeps {
-  const defaultMarketFooter = useMemo(() => <HolzenNumber variant="compact" />, []);
-
   const {
     t,
     error,
     marketHeaderRight,
     marketFooter: marketFooterProp,
     btcData,
+    threshold,
+    thresholdDown,
+    cumulativeThreshold,
     priceHidden,
     togglePriceHidden,
     currency,
@@ -60,7 +64,16 @@ export function useHomeDashboardSectionDeps(args: {
     practiceStatsLoading,
   } = args;
 
-  const marketFooter = marketFooterProp ?? defaultMarketFooter;
+  const marketFooter =
+    marketFooterProp ??
+    (btcData && !error ? (
+      <HomeMarketWidgetFooter
+        btcData={btcData}
+        threshold={threshold}
+        thresholdDown={thresholdDown}
+        cumulativeThreshold={cumulativeThreshold}
+      />
+    ) : null);
 
   return useMemo(
     () => ({
