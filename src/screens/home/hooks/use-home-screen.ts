@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useAuth } from '@/features/auth/public';
-import { useProfile } from '@/features/user/public-hooks';
+import { useHolzenCommunityStatsRealtime, useProfile } from '@/features/user/public-hooks';
 import {
   useCompletedPauseCount,
   useDismissOutletPauseReady,
@@ -92,6 +92,8 @@ export function useHomeScreen() {
     coinIdRaw: trackedAssetId,
     currency,
   });
+
+  useHolzenCommunityStatsRealtime(Boolean(user?.id));
 
   const hasOpenPause = Boolean(lastPauseInstanceId);
 
