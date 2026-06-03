@@ -69,6 +69,10 @@ skip_nonce_check = true
     verify_jwt = false
   [functions.holzen-number]
     verify_jwt = false
+  [functions.home-bootstrap]
+    verify_jwt = false
+  [functions.market-quote]
+    verify_jwt = false
   [functions.holzen-reflect]
     verify_jwt = false
   [functions.register-push]

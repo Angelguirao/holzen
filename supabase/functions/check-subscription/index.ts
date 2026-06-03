@@ -9,6 +9,7 @@ import {
   startOfUtcMonthDate,
   tierFromStripePriceId,
   tierLimits,
+  type SubscriptionTier,
 } from "../_shared/subscription-entitlements.ts";
 import {
   entitlementFromHolzenStatus,
@@ -22,6 +23,28 @@ const corsHeaders = {
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const SUBSCRIBED_STATUSES = new Set(["active", "trialing"]);
+
+type SupabaseServiceClient = ReturnType<typeof createClient>;
+
+async function loadCompanionUsagePayload(
+  serviceClient: SupabaseServiceClient,
+  userId: string,
+  tier: SubscriptionTier,
+) {
+  const limits = tierLimits(tier);
+  const monthStart = startOfUtcMonthDate();
+  const [companionsUsed, flexCreditsBalance] = await Promise.all([
+    getMonthlyFeatureUsage(serviceClient, userId, "premium_companion", monthStart),
+    getFlexCreditBalance(serviceClient, userId),
+  ]);
+  const companions = clampUsage(companionsUsed, limits.premium_companion);
+  return {
+    monthly_companion_limit: limits.premium_companion,
+    monthly_companion_used: companions.used,
+    monthly_companion_remaining: companions.remaining,
+    flex_credits_balance: flexCreditsBalance,
+  };
+}
 
 serve(
   withRequestLogging("check-subscription", async ({ req, log }) => {
@@ -77,33 +100,14 @@ serve(
 
     // Lifetime access — always return immediately
     if (profile?.lifetime_access) {
-      const limits = tierLimits("lifetime");
-      const monthStart = startOfUtcMonthDate();
-      const [companionsUsed, wallpapersUsed, insightsUsed, flexCreditsBalance] = await Promise.all([
-        getMonthlyFeatureUsage(serviceClient, userId, "premium_companion", monthStart),
-        getMonthlyFeatureUsage(serviceClient, userId, "wallpaper", monthStart),
-        getMonthlyFeatureUsage(serviceClient, userId, "reflection_insights", monthStart),
-        getFlexCreditBalance(serviceClient, userId),
-      ]);
-      const companions = clampUsage(companionsUsed, limits.premium_companion);
-      const wallpapers = clampUsage(wallpapersUsed, limits.wallpaper);
-      const insights = clampUsage(insightsUsed, limits.reflection_insights);
+      const usage = await loadCompanionUsagePayload(serviceClient, userId, "lifetime");
       return new Response(JSON.stringify({
         subscribed: true,
         lifetime: true,
         tier: "lifetime",
         entitlement: "active",
         subscription_end: null,
-        monthly_companion_limit: limits.premium_companion,
-        monthly_companion_used: companions.used,
-        monthly_companion_remaining: companions.remaining,
-        monthly_wallpaper_limit: limits.wallpaper,
-        monthly_wallpaper_used: wallpapers.used,
-        monthly_wallpaper_remaining: wallpapers.remaining,
-        monthly_insights_limit: limits.reflection_insights,
-        monthly_insights_used: insights.used,
-        monthly_insights_remaining: insights.remaining,
-        flex_credits_balance: flexCreditsBalance,
+        ...usage,
         subscription_billing_interval: null,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -112,10 +116,65 @@ serve(
 
     // Check if cache is still fresh (unless force=true in body)
     let force = false;
+    let usageOnly = false;
     try {
       const body = await req.json();
       force = body?.force === true;
+      usageOnly = body?.usage_only === true;
     } catch { /* no body is fine */ }
+
+    const buildProfileProjection = async (opts: {
+      subscribed: boolean;
+      tier: "free" | "pro" | "lifetime";
+      subscriptionStatus: string;
+      subscriptionEnd: string | null;
+      subscriptionBillingInterval: string | null;
+      trialStart: string | null;
+      trialEnd: string | null;
+      cached: boolean;
+      stripePriceId?: string | null;
+    }) => {
+      const usage = await loadCompanionUsagePayload(serviceClient, userId, opts.tier);
+      const entitlement = entitlementFromHolzenStatus(opts.subscribed, opts.subscriptionStatus);
+      return {
+        subscribed: opts.subscribed,
+        lifetime: opts.tier === "lifetime",
+        tier: opts.tier,
+        entitlement,
+        subscription_end: opts.subscriptionEnd,
+        cached: opts.cached,
+        stripe_price_id: opts.stripePriceId ?? null,
+        subscription_status: opts.subscriptionStatus,
+        trial_start: opts.trialStart,
+        trial_end: opts.trialEnd,
+        ...usage,
+        subscription_billing_interval: opts.subscriptionBillingInterval,
+      };
+    };
+
+    if (usageOnly && profile) {
+      const cachedSubscribed = profile.lifetime_access === true ||
+        SUBSCRIBED_STATUSES.has(profile.subscription_status ?? "");
+      const cachedStatus = profile.subscription_status ?? "free";
+      const tier: "free" | "pro" | "lifetime" = profile.lifetime_access
+        ? "lifetime"
+        : cachedSubscribed
+        ? ((profile.subscription_tier as "pro" | "free") ?? "pro")
+        : "free";
+      const payload = await buildProfileProjection({
+        subscribed: cachedSubscribed || profile.lifetime_access === true,
+        tier,
+        subscriptionStatus: cachedStatus,
+        subscriptionEnd: profile.subscription_end ?? null,
+        subscriptionBillingInterval: null,
+        trialStart: null,
+        trialEnd: null,
+        cached: true,
+      });
+      return new Response(JSON.stringify(payload), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     if (!force && profile?.subscription_checked_at) {
       const checkedAt = new Date(profile.subscription_checked_at).getTime();
@@ -126,17 +185,7 @@ serve(
         const cachedStatus = profile.subscription_status ?? "free";
         const tier: "free" | "pro" | "lifetime" = cachedSubscribed ? "pro" : "free";
         const cachedEntitlement = entitlementFromHolzenStatus(cachedSubscribed, cachedStatus);
-        const limits = tierLimits(tier);
-        const monthStart = startOfUtcMonthDate();
-        const [companionsUsed, wallpapersUsed, insightsUsed, flexCreditsBalance] = await Promise.all([
-          getMonthlyFeatureUsage(serviceClient, userId, "premium_companion", monthStart),
-          getMonthlyFeatureUsage(serviceClient, userId, "wallpaper", monthStart),
-          getMonthlyFeatureUsage(serviceClient, userId, "reflection_insights", monthStart),
-          getFlexCreditBalance(serviceClient, userId),
-        ]);
-        const companions = clampUsage(companionsUsed, limits.premium_companion);
-        const wallpapers = clampUsage(wallpapersUsed, limits.wallpaper);
-        const insights = clampUsage(insightsUsed, limits.reflection_insights);
+        const usage = await loadCompanionUsagePayload(serviceClient, userId, tier);
         return new Response(JSON.stringify({
           subscribed: cachedSubscribed,
           lifetime: false,
@@ -145,16 +194,7 @@ serve(
           subscription_end: profile.subscription_end,
           cached: true,
           subscription_status: cachedStatus,
-          monthly_companion_limit: limits.premium_companion,
-          monthly_companion_used: companions.used,
-          monthly_companion_remaining: companions.remaining,
-          monthly_wallpaper_limit: limits.wallpaper,
-          monthly_wallpaper_used: wallpapers.used,
-          monthly_wallpaper_remaining: wallpapers.remaining,
-          monthly_insights_limit: limits.reflection_insights,
-          monthly_insights_used: insights.used,
-          monthly_insights_remaining: insights.remaining,
-          flex_credits_balance: flexCreditsBalance,
+          ...usage,
           subscription_billing_interval: null,
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -258,18 +298,7 @@ serve(
       })
       .eq("user_id", userId);
 
-    const limits = tierLimits(subscriptionTier);
-    const monthStart = startOfUtcMonthDate();
-    const [companionsUsed, wallpapersUsed, insightsUsed, flexCreditsBalance] = await Promise.all([
-      getMonthlyFeatureUsage(serviceClient, userId, "premium_companion", monthStart),
-      getMonthlyFeatureUsage(serviceClient, userId, "wallpaper", monthStart),
-      getMonthlyFeatureUsage(serviceClient, userId, "reflection_insights", monthStart),
-      getFlexCreditBalance(serviceClient, userId),
-    ]);
-    const companions = clampUsage(companionsUsed, limits.premium_companion);
-    const wallpapers = clampUsage(wallpapersUsed, limits.wallpaper);
-    const insights = clampUsage(insightsUsed, limits.reflection_insights);
-
+    const usage = await loadCompanionUsagePayload(serviceClient, userId, subscriptionTier);
     const entitlement = entitlementFromHolzenStatus(hasActive, subscriptionStatus);
 
     return new Response(JSON.stringify({
@@ -283,16 +312,7 @@ serve(
       subscription_status: subscriptionStatus,
       trial_start: trialStart,
       trial_end: trialEnd,
-      monthly_companion_limit: limits.premium_companion,
-      monthly_companion_used: companions.used,
-      monthly_companion_remaining: companions.remaining,
-      monthly_wallpaper_limit: limits.wallpaper,
-      monthly_wallpaper_used: wallpapers.used,
-      monthly_wallpaper_remaining: wallpapers.remaining,
-      monthly_insights_limit: limits.reflection_insights,
-      monthly_insights_used: insights.used,
-      monthly_insights_remaining: insights.remaining,
-      flex_credits_balance: flexCreditsBalance,
+      ...usage,
       subscription_billing_interval: subscriptionBillingInterval,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

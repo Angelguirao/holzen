@@ -12,13 +12,14 @@ async function fetchBreatheAmbientBtcUsd(): Promise<BtcPriceData | null> {
   }
 }
 
+/** Not mounted on pause-first routes; kept for legacy breathe tooling exports. */
 export function getBreatheAmbientBtcQueryOptions(enabled: boolean) {
   return {
     queryKey: BREATHE_AMBIENT_BTC_QUERY_KEY,
     queryFn: fetchBreatheAmbientBtcUsd,
     enabled,
-    refetchInterval: 30_000,
-    staleTime: 0,
+    staleTime: 5 * 60_000,
+    refetchInterval: false,
     refetchOnWindowFocus: false,
     retry: false,
   };

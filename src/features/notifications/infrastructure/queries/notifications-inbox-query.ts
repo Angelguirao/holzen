@@ -30,6 +30,7 @@ export async function fetchNotificationsInboxRows(userId: string): Promise<Notif
     .from('notifications')
     .select('id, type, metadata, action_path, action_state, created_at, dismissed_at')
     .eq('user_id', userId)
+    .eq('type', 'pause')
     .is('dismissed_at', null)
     .order('created_at', { ascending: false })
     .limit(20);
@@ -47,7 +48,7 @@ export function getNotificationsInboxMappedListQueryOptions<T>(params: {
     queryFn,
     enabled: Boolean(userId),
     staleTime: 30_000,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
     retry: false,
     placeholderData: keepPreviousData,
   } as const;

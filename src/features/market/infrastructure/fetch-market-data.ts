@@ -7,6 +7,8 @@ import {
   normalizeTrackedAssetId,
   type TrackedAssetId,
 } from '@/features/market/domain/tracked-assets';
+import { invokeMarketQuote } from '@/features/market/infrastructure/edge/market-quote-edge';
+import { mapMarketQuotePayload } from '@/features/market/infrastructure/edge/map-market-quote-payload';
 
 function marketCacheKey(coinId: string): string {
   return `holzen_market_cache_${coinId}`;
@@ -137,6 +139,22 @@ function dedupeMarketFetch(inflightKey: string, run: () => Promise<BtcPriceData>
   return p;
 }
 
+async function tryFetchMarketFromEdge(
+  coinId: TrackedAssetId,
+  currency: string,
+  mode: 'lite' | 'full',
+): Promise<BtcPriceData | null> {
+  try {
+    const { data, error } = await invokeMarketQuote({ coinId, currency, mode });
+    if (error || !data) return null;
+    const mapped = mapMarketQuotePayload(data);
+    cacheMarketData(coinId, mapped);
+    return mapped;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Home market strip: 24h quote + Fear & Greed only (2 external calls).
  * Full enrichment (7d cumulative, on-chain) runs on manual pause trigger.
@@ -145,6 +163,9 @@ async function fetchMarketDataLiteUncached(
   coinId: TrackedAssetId,
   currency: string,
 ): Promise<BtcPriceData> {
+  const fromEdge = await tryFetchMarketFromEdge(coinId, currency, 'lite');
+  if (fromEdge) return fromEdge;
+
   const cur = currency.toLowerCase();
   const id = encodeURIComponent(coinId);
 
@@ -174,6 +195,9 @@ async function fetchMarketDataLiteUncached(
 }
 
 async function fetchMarketDataUncached(coinId: TrackedAssetId, currency: string): Promise<BtcPriceData> {
+  const fromEdge = await tryFetchMarketFromEdge(coinId, currency, 'full');
+  if (fromEdge) return fromEdge;
+
   const cur = currency.toLowerCase();
   const id = encodeURIComponent(coinId);
 

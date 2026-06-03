@@ -10,6 +10,11 @@ import type {
   SubscriptionSnapshot,
 } from '@/features/subscription/domain/subscription-snapshot';
 
+export type FetchSubscriptionSnapshotOptions = {
+  force?: boolean;
+  usageOnly?: boolean;
+};
+
 export const SUB_CACHE_KEY = 'holzen_sub_cache';
 
 export const SUBSCRIPTION_QUERY_PREFIX = ['subscription'] as const;
@@ -37,9 +42,9 @@ export function writeSubCache(c: SubCache) {
 
 export async function fetchSubscriptionSnapshot(
   _userId: string,
-  force: boolean,
+  options: FetchSubscriptionSnapshotOptions = {},
 ): Promise<SubscriptionSnapshot> {
-  const { data, error } = await invokeCheckSubscription(force);
+  const { data, error } = await invokeCheckSubscription(options);
   if (error) throw error;
   const apiFlexCreditsBalance = Number(data?.flex_credits_balance) || 0;
 
@@ -48,12 +53,6 @@ export async function fetchSubscriptionSnapshot(
     const companionLimit = Number(data.monthly_companion_limit) || 0;
     const companionUsed = Number(data.monthly_companion_used) || 0;
     const companionRemaining = Math.max(0, Number(data.monthly_companion_remaining) || 0);
-    const wallpaperLimit = Number(data.monthly_wallpaper_limit) || 0;
-    const wallpaperUsed = Number(data.monthly_wallpaper_used) || 0;
-    const wallpaperRemaining = Math.max(0, Number(data.monthly_wallpaper_remaining) || 0);
-    const insightsLimit = Number(data.monthly_insights_limit) || 0;
-    const insightsUsed = Number(data.monthly_insights_used) || 0;
-    const insightsRemaining = Math.max(0, Number(data.monthly_insights_remaining) || 0);
     const flexCreditsBalance = Number(data.flex_credits_balance) || 0;
     const subscriptionStatus = (data.subscription_status as string) ?? null;
     const subscriptionEnd = (data.subscription_end as string) ?? null;
@@ -70,12 +69,6 @@ export async function fetchSubscriptionSnapshot(
       companionLimit,
       companionUsed,
       companionRemaining,
-      wallpaperLimit,
-      wallpaperUsed,
-      wallpaperRemaining,
-      insightsLimit,
-      insightsUsed,
-      insightsRemaining,
       flexCreditsBalance,
       ts: Date.now(),
     });
@@ -87,12 +80,6 @@ export async function fetchSubscriptionSnapshot(
       companionLimit,
       companionUsed,
       companionRemaining,
-      wallpaperLimit,
-      wallpaperUsed,
-      wallpaperRemaining,
-      insightsLimit,
-      insightsUsed,
-      insightsRemaining,
       flexCreditsBalance,
       subscriptionStatus,
       subscriptionEnd,
@@ -102,8 +89,8 @@ export async function fetchSubscriptionSnapshot(
     };
   }
 
-  const subscriptionStatus = (data.subscription_status as string) ?? null;
-  const subscriptionEnd = (data.subscription_end as string) ?? null;
+  const subscriptionStatus = (data?.subscription_status as string) ?? null;
+  const subscriptionEnd = (data?.subscription_end as string) ?? null;
 
   writeSubCache({
     subscribed: false,
@@ -113,12 +100,6 @@ export async function fetchSubscriptionSnapshot(
     companionLimit: 0,
     companionUsed: 0,
     companionRemaining: 0,
-    wallpaperLimit: 0,
-    wallpaperUsed: 0,
-    wallpaperRemaining: 0,
-    insightsLimit: 0,
-    insightsUsed: 0,
-    insightsRemaining: 0,
     flexCreditsBalance: apiFlexCreditsBalance,
     ts: Date.now(),
   });
@@ -130,12 +111,6 @@ export async function fetchSubscriptionSnapshot(
     companionLimit: 0,
     companionUsed: 0,
     companionRemaining: 0,
-    wallpaperLimit: 0,
-    wallpaperUsed: 0,
-    wallpaperRemaining: 0,
-    insightsLimit: 0,
-    insightsUsed: 0,
-    insightsRemaining: 0,
     flexCreditsBalance: apiFlexCreditsBalance,
     subscriptionStatus,
     subscriptionEnd,

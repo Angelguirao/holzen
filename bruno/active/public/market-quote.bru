@@ -1,0 +1,26 @@
+meta {
+  name: market-quote
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/market-quote
+  body: json
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  Authorization: Bearer {{SUPABASE_ACCESS_TOKEN}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "coinId": "bitcoin",
+    "currency": "USD",
+    "mode": "lite"
+  }
+}

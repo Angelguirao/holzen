@@ -43,7 +43,7 @@ export function getCurrentPauseQueryOptions(userId: string | undefined) {
     queryFn: () => fetchCurrentPause(userId!),
     enabled: Boolean(userId),
     staleTime: 30_000,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
     retry: false,
   } as const;
 }

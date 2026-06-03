@@ -8,6 +8,8 @@ Source of truth: `supabase/config.toml` + [active-surface.md](../../docs/ops/act
 | --- | --- | --- | --- |
 | `health` | `platform/` | Anon `apikey` | Y |
 | `holzen-number` | `public/` | Anon `apikey` | Y |
+| `home-bootstrap` | `public/` | User JWT | Y |
+| `market-quote` | `public/` | User JWT | Y |
 | `holzen-reflect` | `pause-pipeline/` | User JWT | Y |
 | `companion-orchestrate` | `pause-pipeline/` | User JWT | Y |
 | `check-subscription` | `billing/` | User JWT | Y |

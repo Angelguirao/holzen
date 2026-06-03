@@ -3,10 +3,20 @@ import type { CheckoutEvent } from '@/features/subscription/domain/checkout-even
 
 export type CheckSubscriptionResponse = Record<string, unknown>;
 
+export type CheckSubscriptionInvokeOptions = {
+  /** Reconcile with Stripe (settings refresh, checkout return). */
+  force?: boolean;
+  /** Live usage/credits from Postgres only — skip Stripe. */
+  usageOnly?: boolean;
+};
+
 /** Entitlement snapshot for signed-in user (`check-subscription` edge). */
-export function invokeCheckSubscription(force?: boolean) {
+export function invokeCheckSubscription(options?: CheckSubscriptionInvokeOptions) {
+  const body: Record<string, boolean> = {};
+  if (options?.force) body.force = true;
+  if (options?.usageOnly) body.usage_only = true;
   return invokeEdge<CheckSubscriptionResponse>('check-subscription', {
-    body: force ? { force: true } : undefined,
+    body: Object.keys(body).length > 0 ? body : undefined,
   });
 }
 
