@@ -18,6 +18,8 @@ export interface PauseSessionLocationState {
   companions?: CompanionData;
   companionPrefs?: CompanionPrefs;
   severity?: PauseSeverity;
+  /** Home manual “Let’s pause” — land on depth picker, not a restored ritual step. */
+  startAtDepthPicker?: boolean;
 }
 
 export interface PauseSessionNavParsed {
@@ -27,6 +29,7 @@ export interface PauseSessionNavParsed {
   companions: CompanionData | undefined;
   companionPrefs: CompanionPrefs | undefined;
   severity: PauseSeverity | undefined;
+  startAtDepthPicker: boolean;
 }
 
 /** Router state passed from notification actions (pause deep links use `action_state`). */
@@ -60,6 +63,7 @@ export function parsePauseSessionLocationState(state: unknown): PauseSessionNavP
     companions: undefined,
     companionPrefs: undefined,
     severity: undefined,
+    startAtDepthPicker: false,
   };
   if (!state || typeof state !== 'object') return empty;
   const o = state as Record<string, unknown>;
@@ -77,6 +81,8 @@ export function parsePauseSessionLocationState(state: unknown): PauseSessionNavP
       ? (sev as PauseSeverity)
       : undefined;
 
+  const startAtDepthPicker = o.startAtDepthPicker === true;
+
   return {
     pauseInstanceId,
     reflectionMessage,
@@ -84,5 +90,6 @@ export function parsePauseSessionLocationState(state: unknown): PauseSessionNavP
     companions,
     companionPrefs,
     severity,
+    startAtDepthPicker,
   };
 }

@@ -54,7 +54,8 @@ Modes are **derived**, not stored. Primary inputs to `resolveHomePauseWidgetMode
 | Mode | Typical condition | Primary CTA / body |
 |------|-------------------|-------------------|
 | **A** | Idle, no open pause | YOUR PAUSE + moon (header); two-tone reassurance + Nox primary **Let's pause** pill; not collapsible (structure per Wireframes 546:8975) |
-| **B** | Open pause, `state = active` | **Pause with this** → `/pause` |
+| **B** | Open pause, `state = active`, no step events yet | **Pause with this** → `/pause` (new-offer / auto opening copy) |
+| **B_in_progress** | Open pause, `state = active`, `hasOpenPauseStepEvents` | **Continue** + **Discard** (Figma 555-18858 — within-range lead + “still here”) |
 | **C** | Open pause, `state = engaged` | **Continue** + **Discard** |
 | **C′** | Engaged + pending offer row | Dual layout: current pause vs new context (adopt / decline) |
 | **D** / **D′** | No open pause, auto cooldown active | Rest copy; D′ = no archive link |

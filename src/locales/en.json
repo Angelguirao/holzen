@@ -106,6 +106,9 @@
       "withinRangeTail": "This is the moment to pause without urgency.",
       "letsPauseCta": "Let's pause"
     },
+    "pauseInProgress": {
+      "stillHere": "The pause you started is still here."
+    },
     "generatingReflection": "Preparing your pause…",
     "pauseCtaActive": "Start this pause",
     "pauseCtaEngaged": "Continue this pause",

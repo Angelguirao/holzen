@@ -33,7 +33,9 @@ export function usePauseSessionShellRitual(
     t,
   });
 
-  const ritual = usePauseSessionRitualState(shell.restored);
+  const ritual = usePauseSessionRitualState(shell.restored, {
+    startAtDepthPicker: shell.nav.startAtDepthPicker,
+  });
 
   usePauseSessionTerminalEntryRedirect({
     pauseInstanceId: shell.pauseInstanceIdForTerminal,

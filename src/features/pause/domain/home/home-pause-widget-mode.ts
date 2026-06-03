@@ -6,6 +6,7 @@ export type HomePauseWidgetMode =
   | 'blocking_error'
   | 'calm_waters'
   | 'B'
+  | 'B_in_progress'
   | 'C'
   | 'C_prime'
   | 'E'
@@ -53,7 +54,7 @@ export function resolveHomePauseWidgetMode(
       })
     : false;
 
-  if (input.loading && !input.hasOpenPause) {
+  if (input.loading) {
     return { mode: 'loading', defaultCollapsed: false, hasReachedReflect };
   }
 
@@ -77,6 +78,10 @@ export function resolveHomePauseWidgetMode(
     // Queued context while still `active` — inline banner on B (not E).
     if (input.hasPendingOffer) {
       return { mode: 'B', defaultCollapsed: false, hasReachedReflect };
+    }
+
+    if (input.hasOpenPauseStepEvents) {
+      return { mode: 'B_in_progress', defaultCollapsed: false, hasReachedReflect };
     }
 
     const inPostPauseCooldown = input.postPauseAutoCooldownRemainingMs > 0;
@@ -119,6 +124,7 @@ export function resolveHomePauseWidgetMode(
 /** Section title i18n keys per mode. */
 export function homePauseWidgetSectionTitleKey(mode: HomePauseWidgetMode): string {
   switch (mode) {
+    case 'B_in_progress':
     case 'C':
     case 'C_prime':
       return 'home.widget.continueYourPause';

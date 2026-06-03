@@ -22,7 +22,11 @@ import { usePauseSessionEntryPresentationEffects } from './use-pause-session-ent
  * In-session ritual UI state for `/pause` (step, mood, breath progress, depth picker).
  * Initialized from `loadSession` / shell `restored` snapshot; persisted via `usePauseSessionPersistToStorage`.
  */
-export function usePauseSessionRitualState(restored: PersistedSession | null) {
+export function usePauseSessionRitualState(
+  restored: PersistedSession | null,
+  options?: { startAtDepthPicker?: boolean },
+) {
+  const startAtDepthPicker = options?.startAtDepthPicker === true;
   const restoredStep = mapPersistedStep(restored?.step);
 
   const [step, setStep] = useState<PauseStep>(restoredStep);
@@ -52,7 +56,9 @@ export function usePauseSessionRitualState(restored: PersistedSession | null) {
   const [curtainLifted, setCurtainLifted] = useState(false);
   const [pauseImpactData, setPauseImpactData] = useState<PauseImpactData | null>(null);
 
-  const [ritualEntry, setRitualEntry] = useState<RitualDepth | 'picker'>(() => initialRitualEntry(restored));
+  const [ritualEntry, setRitualEntry] = useState<RitualDepth | 'picker'>(() =>
+    startAtDepthPicker ? 'picker' : initialRitualEntry(restored),
+  );
   const [briefStep, setBriefStep] = useState<BriefPauseStep>(() => initialBriefPauseStepFromRestored(restored));
   const [briefIntegrateDone, setBriefIntegrateDone] = useState(() =>
     initialBriefIntegrateDoneFromRestored(restored),
