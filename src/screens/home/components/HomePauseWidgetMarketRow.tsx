@@ -26,17 +26,18 @@ export function HomePauseWidgetMarketRow({ block }: Props) {
   if (!block.moveLine && !block.sentimentLine && !updated) return null;
 
   return (
-    <div className={homeInWidget.meta}>
+    <div className="text-sm leading-5 tracking-wide text-foreground">
       {block.moveLine || block.sentimentLine ? (
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <p>
           {block.moveLine ? (
-            <span className="font-medium tabular-nums text-foreground/90">{block.moveLine}</span>
+            <span className="tabular-nums">{block.moveLine}</span>
           ) : null}
+          {block.moveLine && block.sentimentLine ? '    ' : null}
           {block.sentimentLine ? <span>{block.sentimentLine}</span> : null}
-        </div>
+        </p>
       ) : null}
       {updated ? (
-        <p className={`${homeInWidget.metaFaint} mt-1`}>
+        <p className={`${homeInWidget.metaFaint} leading-5`}>
           {t('home.pauseWidget.updatedAt', { time: updated, defaultValue: 'Updated {{time}}' })}
         </p>
       ) : null}

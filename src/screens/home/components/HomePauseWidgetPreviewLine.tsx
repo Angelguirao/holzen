@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
-import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import type { HomePauseWidgetPreviewLine } from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
 
 type Props = {
@@ -25,9 +24,9 @@ export function HomePauseWidgetPreviewLine({ previewLine }: Props) {
 
   if (previewLine.kind === 'template') {
     return (
-      <p className={`${homeInWidget.bodyMuted} leading-relaxed`}>{t(previewLine.i18nKey)}</p>
+      <p className="text-sm leading-5 tracking-wide text-muted-foreground">{t(previewLine.i18nKey)}</p>
     );
   }
 
-  return <p className={`${homeInWidget.bodyLead} leading-relaxed`}>{previewLine.text}</p>;
+  return <p className="text-sm leading-5 tracking-wide font-medium text-foreground">{previewLine.text}</p>;
 }

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { LoadingButton } from '@/components/ui/loading-button';
@@ -8,6 +7,15 @@ import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { AutoCooldownIndicator, formatMsAsMS } from '@/screens/home/components/HomePauseChrome';
 import { HomePauseWidgetPreviewLine } from '@/screens/home/components/HomePauseWidgetPreviewLine';
 import { HomePauseWidgetMarketRow } from '@/screens/home/components/HomePauseWidgetMarketRow';
+import {
+  homePauseWidgetBodyStack,
+  HomePauseWidgetDiscardLink,
+  HomePauseWidgetNoxCta,
+  HomePauseWidgetOpeningStack,
+  HomePauseWidgetTwoToneLead,
+} from '@/screens/home/components/HomePauseWidgetShared';
+import type { HomePauseWidgetPreviewLine } from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
+import type { HomePauseMarketBlock } from '@/features/pause/domain/home/format-home-pause-market-block';
 import type { HomePauseWidgetBodyProjection } from '@/features/pause/presentation/home/use-home-pause-widget-projection';
 
 type OpenBodyProps = Pick<
@@ -23,10 +31,33 @@ type OpenBodyProps = Pick<
   | 'pendingOfferBusy'
 > & {
   ctaLabelKey: string;
-  showSparkle?: boolean;
 };
 
-/** State B — new pause offer. */
+function HomePauseWidgetOpeningAndMarket({
+  previewLine,
+  marketBlock,
+}: {
+  previewLine: HomePauseWidgetPreviewLine | null;
+  marketBlock: HomePauseMarketBlock;
+}) {
+  const hasMarket =
+    Boolean(marketBlock.moveLine || marketBlock.sentimentLine || marketBlock.updatedAtIso);
+  const hasPreview = previewLine != null && previewLine.kind !== 'none';
+
+  if (!hasPreview && !hasMarket) return null;
+
+  return (
+    <HomePauseWidgetOpeningStack>
+      {hasPreview ? <HomePauseWidgetPreviewLine previewLine={previewLine} /> : null}
+      {hasPreview && hasMarket ? <p className="leading-5" aria-hidden="true">
+        {'\u200b'}
+      </p> : null}
+      {hasMarket ? <HomePauseWidgetMarketRow block={marketBlock} /> : null}
+    </HomePauseWidgetOpeningStack>
+  );
+}
+
+/** State B — new pause offer (Figma 559:26757). */
 export function HomePauseOpenActiveBody({
   previewLine,
   marketBlock,
@@ -38,13 +69,12 @@ export function HomePauseOpenActiveBody({
   onDeclinePendingOffer,
   pendingOfferBusy,
   ctaLabelKey,
-  showSparkle = true,
 }: OpenBodyProps) {
   "use memo";
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-4">
+    <div className={homePauseWidgetBodyStack}>
       {showPendingQueuedBanner ? (
         <div
           className="rounded-lg border border-nox-accent-mustard/35 bg-nox-accent-mustard/10 px-3 py-2.5 text-xs leading-snug text-foreground/95"
@@ -83,18 +113,8 @@ export function HomePauseOpenActiveBody({
           ) : null}
         </div>
       ) : null}
-      <HomePauseWidgetPreviewLine previewLine={previewLine} />
-      <HomePauseWidgetMarketRow block={marketBlock} />
-      <button
-        type="button"
-        onClick={onPauseWithThis}
-        className={cn(homeInWidget.ctaPrimary, 'bg-foreground text-background hover:bg-foreground/90')}
-      >
-        {showSparkle ? (
-          <Sparkles className="h-4 w-4 shrink-0 text-background" aria-hidden />
-        ) : null}
-        {t(ctaLabelKey)}
-      </button>
+      <HomePauseWidgetOpeningAndMarket previewLine={previewLine} marketBlock={marketBlock} />
+      <HomePauseWidgetNoxCta label={t(ctaLabelKey)} onClick={onPauseWithThis} />
     </div>
   );
 }
@@ -106,47 +126,31 @@ type EngagedProps = Pick<
 
 type InProgressProps = Pick<
   HomePauseWidgetBodyProjection,
-  'marketBlock' | 'onPauseWithThis' | 'onDismissOpenPause'
+  'onPauseWithThis' | 'onDismissOpenPause'
 >;
 
-/** State B_in_progress — open `active` pause with ritual progress (Figma continue layout). */
-export function HomePauseInProgressBody({
-  marketBlock,
-  onPauseWithThis,
-  onDismissOpenPause,
-}: InProgressProps) {
+/** State B_in_progress — open `active` pause with ritual progress (Figma 555:18858). */
+export function HomePauseInProgressBody({ onPauseWithThis, onDismissOpenPause }: InProgressProps) {
   "use memo";
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-4">
-      <p className={cn(homeInWidget.body, 'leading-relaxed')}>
-        <span className="text-foreground">
-          {t('home.pauseIdle.withinRangeLead', {
-            defaultValue: 'The market is within your range.',
-          })}
-        </span>{' '}
-        <span className="text-muted-foreground">
-          {t('home.pauseInProgress.stillHere', {
-            defaultValue: 'The pause you started is still here.',
-          })}
-        </span>
-      </p>
-      <HomePauseWidgetMarketRow block={marketBlock} />
-      <button
-        type="button"
-        onClick={onPauseWithThis}
-        className={cn(homeInWidget.ctaPrimary, 'bg-foreground text-background hover:bg-foreground/90')}
-      >
-        {t('home.pauseWidget.continue')}
-      </button>
-      <button
-        type="button"
-        onClick={onDismissOpenPause}
-        className="w-full py-1 text-center text-sm font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
-      >
-        {t('home.pauseWidget.discard')}
-      </button>
+    <div className={homePauseWidgetBodyStack}>
+      <HomePauseWidgetTwoToneLead
+        lead={t('home.pauseIdle.withinRangeLead', {
+          defaultValue: 'The market is within your range.',
+        })}
+        tail={t('home.pauseInProgress.stillHere', {
+          defaultValue: 'The pause you started is still here.',
+        })}
+      />
+      <div className="flex flex-col gap-6 pb-2">
+        <HomePauseWidgetNoxCta label={t('home.pauseWidget.continue')} onClick={onPauseWithThis} />
+        <HomePauseWidgetDiscardLink
+          label={t('home.pauseWidget.discard')}
+          onClick={onDismissOpenPause}
+        />
+      </div>
     </div>
   );
 }
@@ -162,23 +166,15 @@ export function HomePauseEngagedBody({
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-4">
-      <HomePauseWidgetPreviewLine previewLine={previewLine} />
-      <HomePauseWidgetMarketRow block={marketBlock} />
-      <button
-        type="button"
-        onClick={onPauseWithThis}
-        className={cn(homeInWidget.ctaPrimary, 'bg-foreground text-background hover:bg-foreground/90')}
-      >
-        {t('home.pauseWidget.continue')}
-      </button>
-      <button
-        type="button"
-        onClick={onDismissOpenPause}
-        className="w-full py-1 text-center text-sm font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
-      >
-        {t('home.pauseWidget.discard')}
-      </button>
+    <div className={homePauseWidgetBodyStack}>
+      <HomePauseWidgetOpeningAndMarket previewLine={previewLine} marketBlock={marketBlock} />
+      <div className="flex flex-col gap-6 pb-2">
+        <HomePauseWidgetNoxCta label={t('home.pauseWidget.continue')} onClick={onPauseWithThis} />
+        <HomePauseWidgetDiscardLink
+          label={t('home.pauseWidget.discard')}
+          onClick={onDismissOpenPause}
+        />
+      </div>
     </div>
   );
 }
@@ -210,24 +206,16 @@ export function HomePauseEngagedPendingBody({
   const onNewContext = onPauseWithNewContext ?? onPauseWithThis;
 
   return (
-    <div className="space-y-4">
+    <div className={homePauseWidgetBodyStack}>
       <p className={homeInWidget.kicker}>{t('home.pauseWidget.currentPauseSection')}</p>
-      <HomePauseWidgetPreviewLine previewLine={previewLine} />
-      <HomePauseWidgetMarketRow block={marketBlock} />
-      <button
-        type="button"
-        onClick={onPauseWithThis}
-        className={cn(homeInWidget.ctaPrimary, 'bg-foreground text-background hover:bg-foreground/90')}
-      >
-        {t('home.pauseWidget.continue')}
-      </button>
-      <button
-        type="button"
-        onClick={onDismissOpenPause}
-        className="w-full py-1 text-center text-sm font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
-      >
-        {t('home.pauseWidget.discard')}
-      </button>
+      <HomePauseWidgetOpeningAndMarket previewLine={previewLine} marketBlock={marketBlock} />
+      <div className="flex flex-col gap-6 pb-2">
+        <HomePauseWidgetNoxCta label={t('home.pauseWidget.continue')} onClick={onPauseWithThis} />
+        <HomePauseWidgetDiscardLink
+          label={t('home.pauseWidget.discard')}
+          onClick={onDismissOpenPause}
+        />
+      </div>
 
       <div className="relative py-2 text-center">
         <span className="relative z-10 bg-card/40 px-3 text-xs uppercase tracking-wide text-muted-foreground">
@@ -237,20 +225,28 @@ export function HomePauseEngagedPendingBody({
       </div>
 
       <p className={homeInWidget.kicker}>{t('home.pauseWidget.newContextSection')}</p>
-      {pendingPreviewLine ? <HomePauseWidgetPreviewLine previewLine={pendingPreviewLine} /> : null}
-      {pendingMarketBlock ? <HomePauseWidgetMarketRow block={pendingMarketBlock} /> : null}
-      <button type="button" disabled={pendingOfferBusy} onClick={onNewContext} className={homeInWidget.ctaSecondary}>
+      {pendingMarketBlock ? (
+        <HomePauseWidgetOpeningAndMarket
+          previewLine={pendingPreviewLine}
+          marketBlock={pendingMarketBlock}
+        />
+      ) : pendingPreviewLine ? (
+        <HomePauseWidgetPreviewLine previewLine={pendingPreviewLine} />
+      ) : null}
+      <button
+        type="button"
+        disabled={pendingOfferBusy}
+        onClick={onNewContext}
+        className={homeInWidget.ctaSecondary}
+      >
         {t('home.pauseWidget.pauseWithNewContext')}
       </button>
       {onDeclinePendingOffer ? (
-        <button
-          type="button"
-          disabled={pendingOfferBusy}
+        <HomePauseWidgetDiscardLink
+          label={t('pause.pendingKeepCta', { defaultValue: 'Keep current pause' })}
           onClick={onDeclinePendingOffer}
-          className="w-full py-1 text-center text-sm font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground disabled:opacity-60"
-        >
-          {t('pause.pendingKeepCta', { defaultValue: 'Keep current pause' })}
-        </button>
+          disabled={pendingOfferBusy}
+        />
       ) : null}
     </div>
   );
@@ -296,20 +292,16 @@ export function HomePausePostPauseBody({
         : 'home.pausePostPause.restBody';
 
   return (
-    <div className="space-y-4">
-      <p className={`${homeInWidget.bodyMuted} leading-relaxed`}>{t(bodyKey)}</p>
+    <div className={homePauseWidgetBodyStack}>
+      <p className="text-sm leading-5 tracking-wide text-muted-foreground">{t(bodyKey)}</p>
 
       {isE ? (
         <>
-          <HomePauseWidgetPreviewLine previewLine={previewLine} />
-          <HomePauseWidgetMarketRow block={marketBlock} />
-          <button
-            type="button"
+          <HomePauseWidgetOpeningAndMarket previewLine={previewLine} marketBlock={marketBlock} />
+          <HomePauseWidgetNoxCta
+            label={t('home.pauseWidget.pauseWithThis')}
             onClick={onPauseWithThis}
-            className={cn(homeInWidget.ctaPrimary, 'bg-foreground text-background hover:bg-foreground/90')}
-          >
-            {t('home.pauseWidget.pauseWithThis')}
-          </button>
+          />
         </>
       ) : (
         <>
@@ -355,8 +347,8 @@ export function HomePauseCalmWatersBody({
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-4">
-      <p className={`${homeInWidget.bodyMuted} leading-relaxed`}>
+    <div className={homePauseWidgetBodyStack}>
+      <p className="text-sm leading-5 tracking-wide text-muted-foreground">
         {t('home.pauseCalmWaters.body')}
       </p>
       {showPauseScheduling ? (
@@ -401,19 +393,15 @@ export function HomePauseIdleExpandedBody(
     : t('home.pauseIdle.letsPauseCta', { defaultValue: "Let's pause" });
 
   return (
-    <div className="flex flex-col gap-4">
-      <p className={cn(homeInWidget.body, 'leading-relaxed')}>
-        <span className="text-foreground">
-          {t('home.pauseIdle.withinRangeLead', {
-            defaultValue: 'The market is within your range.',
-          })}
-        </span>{' '}
-        <span className="text-muted-foreground">
-          {t('home.pauseIdle.withinRangeTail', {
-            defaultValue: 'This is the moment to pause without urgency.',
-          })}
-        </span>
-      </p>
+    <div className={homePauseWidgetBodyStack}>
+      <HomePauseWidgetTwoToneLead
+        lead={t('home.pauseIdle.withinRangeLead', {
+          defaultValue: 'The market is within your range.',
+        })}
+        tail={t('home.pauseIdle.withinRangeTail', {
+          defaultValue: 'This is the moment to pause without urgency.',
+        })}
+      />
       <LoadingButton
         type="button"
         variant="default"
