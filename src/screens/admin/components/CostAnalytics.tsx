@@ -38,7 +38,7 @@ import {
 } from '@/screens/admin/public-queries';
 import { ProviderHealthCard } from '@/screens/admin/components/ProviderHealthCard';
 
-/** All AI features we expect to see logging in `generation_attempts`. */
+/** Pause-first AI features we expect to see logging in `generation_attempts`. */
 const EXPECTED_FEATURES = [
   'reflection',
   'signal',
@@ -46,17 +46,8 @@ const EXPECTED_FEATURES = [
   'history',
   'zoom_out',
   'intervention',
-  'journal_prompt',
-  'suggest_grounding',
-  'suggest_ritual',
-  'wallpaper',
-  'night_reflection',
-  'reflection_insights',
-  'digest',
-  'reports',
   'admin_library_preview',
   'pregenerate',
-  'fetch_source_feeds',
 ] as const;
 
 interface FeatureStat {

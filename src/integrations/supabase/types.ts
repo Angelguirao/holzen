@@ -1225,7 +1225,7 @@ export type Database = {
           first_name: string | null
           grounding_activities: string[] | null
           has_onboarded: boolean
-          hold_goal_currency: string | null
+          display_currency: string | null
           id: string
           is_admin: boolean | null
           language: string
@@ -1268,7 +1268,7 @@ export type Database = {
           first_name?: string | null
           grounding_activities?: string[] | null
           has_onboarded?: boolean
-          hold_goal_currency?: string | null
+          display_currency?: string | null
           id?: string
           is_admin?: boolean | null
           language?: string
@@ -1311,7 +1311,7 @@ export type Database = {
           first_name?: string | null
           grounding_activities?: string[] | null
           has_onboarded?: boolean
-          hold_goal_currency?: string | null
+          display_currency?: string | null
           id?: string
           is_admin?: boolean | null
           language?: string

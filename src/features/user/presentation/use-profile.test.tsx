@@ -81,7 +81,7 @@ function buildProfileRow(overrides: Partial<ProfileRow> = {}): ProfileRow {
     first_name: 'Ada',
     motivations: [],
     mantra: null,
-    hold_goal_currency: 'USD',
+    display_currency: 'USD',
     tracked_asset_id: 'bitcoin',
     language: 'en',
     grounding_activities: [],

@@ -20,10 +20,13 @@ export async function fetchProfileLastTriggerAt(userId: string): Promise<string 
   return data?.last_trigger_at ?? null;
 }
 
-export type ProfilesHoldGoalUpdate = Pick<
+export type ProfilesDisplayCurrencyUpdate = Pick<
   Database['public']['Tables']['profiles']['Update'],
-  'hold_goal_currency'
+  'display_currency'
 >;
+
+/** @deprecated Use `ProfilesDisplayCurrencyUpdate` */
+export type ProfilesHoldGoalUpdate = ProfilesDisplayCurrencyUpdate;
 
 export async function updateProfileSnoozedUntil(
   userId: string,

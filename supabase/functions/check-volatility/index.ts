@@ -64,8 +64,8 @@ async function fetchWithRetry(
   throw new Error("Failed to fetch market data after retries");
 }
 
-/** CoinGecko quote currency — matches `use-holzen` / `fetchBtcData(currency)` (`profiles.hold_goal_currency`). */
-function normalizeHoldGoalCurrency(raw: unknown): string {
+/** CoinGecko quote currency — matches market fetch (`profiles.display_currency`). */
+function normalizeDisplayCurrency(raw: unknown): string {
   if (typeof raw === "string" && raw.trim().length >= 3) return raw.trim().toLowerCase();
   return "usd";
 }
@@ -83,7 +83,7 @@ interface VolatilityProfile {
   threshold?: number | null;
   threshold_down?: number | null;
   cumulative_threshold?: number | null;
-  hold_goal_currency?: string | null;
+  display_currency?: string | null;
   email_notifications?: boolean | null;
   last_trigger_at?: string | null;
   cooldown_hours?: number | null;
@@ -192,7 +192,7 @@ serve(
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select(
-        "user_id, threshold, threshold_down, cumulative_threshold, hold_goal_currency, tracked_asset_id, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
+        "user_id, threshold, threshold_down, cumulative_threshold, display_currency, tracked_asset_id, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
       );
 
     if (profilesError) throw profilesError;
@@ -211,7 +211,7 @@ serve(
     const assetToCurrencies = new Map<string, Set<string>>();
     for (const p of profileRows) {
       const aid = normalizeTrackedAssetId(p.tracked_asset_id);
-      const c = normalizeHoldGoalCurrency(p.hold_goal_currency);
+      const c = normalizeDisplayCurrency(p.display_currency);
       if (!assetToCurrencies.has(aid)) assetToCurrencies.set(aid, new Set());
       assetToCurrencies.get(aid)!.add(c);
     }
@@ -266,7 +266,7 @@ serve(
 
     function metricsForProfile(p: VolatilityProfile, fallback: AssetVolatilityMetrics): AssetVolatilityMetrics {
       const aid = normalizeTrackedAssetId(p.tracked_asset_id);
-      const c = normalizeHoldGoalCurrency(p.hold_goal_currency);
+      const c = normalizeDisplayCurrency(p.display_currency);
       return metricsByAssetCur.get(aid)?.get(c) ??
         metricsByAssetCur.get(aid)?.get("usd") ??
         metricsByAssetCur.get("bitcoin")?.get(c) ??

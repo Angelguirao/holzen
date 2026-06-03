@@ -7,21 +7,7 @@ import {
 /** Matches `screens/admin/lib/admin-query-namespace` — keep in sync if the prefix changes. */
 const ADMIN_QUERY_PREFIX = ['admin'] as const;
 
-export const FEATURE_KEYS = [
-  'wallpaper',
-  'letters',
-  'nudges',
-  'digest',
-  'reports',
-  'night_reflection',
-  'reflection_insights',
-  'suggest_ritual',
-  'suggest_grounding',
-  'journal_prompt',
-  'pregenerate',
-  'fetch_source_feeds',
-  'admin_library_preview',
-] as const;
+export const FEATURE_KEYS = ['pregenerate'] as const;
 
 export type FeatureKey = (typeof FEATURE_KEYS)[number];
 
