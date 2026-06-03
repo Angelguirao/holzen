@@ -27,6 +27,7 @@
     "check:i18n-active-keys": "node scripts/check-i18n-active-keys.mjs",
     "check:invoke-edge-allowlist": "node scripts/check-invoke-edge-allowlist.mjs",
     "check:no-idle-query-polling": "node scripts/check-no-idle-query-polling.mjs",
+    "check:invalidation-first-queries": "node scripts/check-no-idle-query-polling.mjs",
     "check:bundle-shipped": "node scripts/check-bundle-shipped.mjs",
     "check:bruno-active-manifest": "node scripts/check-bruno-active-manifest.mjs",
     "check:feature-imports": "node scripts/check-feature-imports.mjs",
