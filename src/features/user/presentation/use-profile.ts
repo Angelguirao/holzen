@@ -317,6 +317,8 @@ export function useProfile() {
   }, [user, invalidateProfileQuery]);
 
   return {
+    /** From cached `profiles.last_trigger_at` — automatic pause cooldown anchor. */
+    lastTriggerAt: profileRow?.last_trigger_at ?? null,
     threshold,
     setThreshold,
     thresholdDown,

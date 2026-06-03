@@ -4,6 +4,7 @@ import type { User } from '@supabase/supabase-js';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import { DEFAULT_COMPANIONS } from '@/features/pause/domain/session-model';
 import { fetchOpenPauseHomePreview } from '@/features/pause/public-queries';
+import { PROFILE_QUERY_KEY } from '@/features/user/public-queries';
 import { pauseDismissOpenPauseHomePreview } from './pause-home-reflect-io';
 import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import { usePauseInstancesRealtime } from '@/features/pause/presentation/realtime/use-pause-instances-realtime';
@@ -89,6 +90,7 @@ export function useOpenPauseHomePreview(user: User | null) {
     () => {
       if (user?.id) {
         void queryClient.invalidateQueries({ queryKey: ['home-recent-context-lost', user.id] });
+        void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(user.id) });
       }
       void syncOpenPauseFromDb();
     },

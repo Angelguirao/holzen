@@ -1,10 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
-import { fetchProfileLastTriggerAt } from '@/features/user/public-queries';
 import {
   useCompletedPauseCount,
   useDismissOutletPauseReady,
@@ -82,6 +80,7 @@ export function useHomeScreen() {
     currency,
     trackedAssetId,
     profileLoaded,
+    lastTriggerAt: profileLastTriggerAt,
   } = useProfile();
 
   const hasOpenPause = Boolean(lastPauseInstanceId);
@@ -111,14 +110,6 @@ export function useHomeScreen() {
   const unitBasisModeSupported = trackedAssetId === 'bitcoin';
   const completedPauseCount = useCompletedPauseCount() ?? 0;
   const { stats: practiceStats, isLoading: practiceStatsLoading } = useHomePracticeStats();
-
-  const profileLastTriggerQuery = useQuery({
-    queryKey: ['profile-last-trigger-at', user?.id],
-    queryFn: () => fetchProfileLastTriggerAt(user!.id),
-    enabled: Boolean(user?.id),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-  });
 
   const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(
     HOME_WIDGET_DEFAULT_ORDER,
@@ -204,7 +195,7 @@ export function useHomeScreen() {
     completedPauseCount,
     trackedAssetId,
     newPauseArrival,
-    profileLastTriggerAt: profileLastTriggerQuery.data ?? null,
+    profileLastTriggerAt,
   });
 
   const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = useHomePullFullReload();
