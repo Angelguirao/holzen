@@ -62,7 +62,7 @@ flowchart TB
 |-------|----------|--------------|
 | **Market context** | BTC price, volatility, drawdowns, Fear & Greed | [Market fetch](../../src/features/market/infrastructure/fetch-market-data.ts), cron **`check-volatility`**, pause context snapshots |
 | **Behavioral signals** | Refresh loops, revisit frequency, time-on-chart, night checking | **Partial** — pause step events, profile triggers; **not** cross-site browser telemetry yet |
-| **Decision engine** | Threshold rules, intervention selection, cooldowns | **Partial** — [intervention companion](../systems/pause/companions/intervention.md), severity/fingerprint in pause domain; room to extract shared “engine” package |
+| **Decision engine** | Threshold rules, intervention selection, cooldowns | **Partial** — [intervention companion](../systems/pause/companions/intervention.md), severity/fingerprint in pause domain; automatic triggers use **24h/7d % moves** ([ADR](../decisions/2026-06-03-percent-volatility-triggers.md), not absolute price levels) |
 | **Outputs** | Calming overlays, cooldown copy, breathing, thesis reminders | **Strong in SPA** — `/pause` ritual; **missing on third-party sites** until extension ships |
 
 The **first milestone** is not overlays, AI, or platform partnerships. It is:
