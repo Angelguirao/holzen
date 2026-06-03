@@ -52,7 +52,7 @@ Holzen thesis #4 — *boundaries are enforced* — is implemented largely throug
 |------------|-------------------------|-----------------|
 | Ship pause-first only | `check:active-surface`, `check:bundle-shipped`, `check:no-phase-labels` | [active-surface.md](../ops/active-surface.md) |
 | Modular monolith / layer direction | `check:architecture-alignment` (includes `check:feature-imports`, `check:no-screens-in-features`), `check:no-root-components` | [.cursor/rules/architecture-migration.mdc](../../.cursor/rules/architecture-migration.mdc) discovery `rg` |
-| Server owns truth | Vitest; RLS/migration review | [client-server-architecture-holzen.md](client-server-architecture-holzen.md), flow review |
+| Server owns truth | Vitest; RLS/migration review; `check:no-idle-query-polling` | [client-server-architecture-holzen.md](client-server-architecture-holzen.md), flow review |
 | Edge deploy + observe | `check:edge-logging`, config.toml coverage, `check:edge-coverage-manifest`, `check:edge` | [edge-logging-conventions.md](../ops/edge-logging-conventions.md) |
 | Controlled client → edge surface | `check:invoke-edge-allowlist` | `invokeEdge` + `x-cid` on new call sites |
 | Analytics taxonomy | `check:posthog-events-allowlist` | [event-taxonomy.md](../ops/event-taxonomy.md) in same PR |
@@ -94,6 +94,7 @@ Scripts live under `scripts/`. See script headers for exact rules and allowlists
 | `check:no-app-imports-in-features` | Via architecture-alignment | No `@/app/*` imports under `src/features/**` |
 | `check:no-profile-spread-in-pause-home` | Via architecture-alignment | `useHolzenHomeContextState` must not `...profile` — use `useProfile` at call sites |
 | `check:no-root-components` | Yes | No new `src/components/*.tsx` outside allowlist |
+| `check:no-idle-query-polling` | Yes | No timed `refetchInterval` in active `src/` (invalidation-first TanStack Query) |
 
 ### 4.3 Edge platform
 

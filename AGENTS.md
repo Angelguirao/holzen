@@ -48,7 +48,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run build` | Production build (**`prebuild`** → **`npm run check:version-sync`**) |
 | `npm run preview` | Serve built output locally |
 | `npm run test` | Vitest (jsdom), single run |
-| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, `check:active-surface`, `check:react19-leverage`, `check:no-phase-labels`, `check:invoke-edge-allowlist`, `check:bruno-active-manifest`, `check:env-docs`, Vitest with coverage + JUnit |
+| `npm run test:ci` | CI gate: `check:edge-logging`, `check:edge-coverage-manifest`, `check:active-surface`, `check:react19-leverage`, `check:no-phase-labels`, `check:invoke-edge-allowlist`, `check:no-idle-query-polling`, `check:bruno-active-manifest`, `check:env-docs`, Vitest with coverage + JUnit |
 | `npm run check:no-phase-labels` | Plan §5.0 — fail on `mvp` / `pre-mvp` tokens in active `src/`, ops, Bruno, CI scripts (allowlisted migration filename + branch) |
 | `npm run check:bundle-shipped` | After **`build`**: no `BadgesPanelV2` / `ToolsHub` in `dist/assets` (pause-first strip guard; in the **CI build step** and **`check:prepush`**) |
 | `npm run check:bruno-active-manifest` | Every `[functions.*]` in `config.toml` is listed in `bruno/active/functions-catalog.md` (in **`test:ci`**) |
@@ -65,6 +65,7 @@ Use this table to pick the **canonical narrative** for the slice you are touchin
 | `npm run check:edge-coverage-manifest` | Ensures `src/screens/ops/EdgeCoverageScreen.tsx` `COVERAGE` lists every `supabase/config.toml` `[functions.*]` name (and no extras). Run when adding/removing edge functions. |
 | `npm run check:no-root-components` | No new `src/components/*.tsx` outside `ui/` + allowlist (in **`test:ci`**) |
 | `npm run check:architecture-alignment` | Features layout, no screens-in-features (in **`test:ci`**) |
+| `npm run check:no-idle-query-polling` | Active `src/` TanStack Query options must not use timed `refetchInterval` (invalidation-first; admin ops allowlisted) (in **`test:ci`** / **`check:prepush`**) |
 | `npm run check:prepush` | Full scripted preflight (`scripts/pre-push-check.sh`). **Requires `bash`** (Git Bash / WSL on Windows). |
 | `npm run smoke:edge-logging` | Optional: HTTP smoke against deployed edges — verifies `x-cid` round-trip through `withRequestLogging` (see `supabase/functions/README.md`). |
 | `npm run gen:types` | Regenerate `src/integrations/supabase/types.ts` from the **production** Supabase project ref (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Use `npm run gen:types:staging` when you intentionally want staging. |
