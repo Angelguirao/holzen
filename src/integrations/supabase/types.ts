@@ -191,110 +191,6 @@ export type Database = {
         }
         Relationships: []
       }
-      collection_items: {
-        Row: {
-          added_at: string
-          collection_id: string
-          id: string
-          pause_instance_id: string
-          position: number
-        }
-        Insert: {
-          added_at?: string
-          collection_id: string
-          id?: string
-          pause_instance_id: string
-          position?: number
-        }
-        Update: {
-          added_at?: string
-          collection_id?: string
-          id?: string
-          pause_instance_id?: string
-          position?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "collection_items_collection_id_fkey"
-            columns: ["collection_id"]
-            isOneToOne: false
-            referencedRelation: "collections"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "pause_instances"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_archive_echoes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_archive_pauses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_completed"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_current"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collection_items_pause_instance_id_fkey"
-            columns: ["pause_instance_id"]
-            isOneToOne: false
-            referencedRelation: "v_pause_full"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      collections: {
-        Row: {
-          color: string | null
-          created_at: string
-          description: string | null
-          icon: string | null
-          id: string
-          name: string
-          user_id: string
-        }
-        Insert: {
-          color?: string | null
-          created_at?: string
-          description?: string | null
-          icon?: string | null
-          id?: string
-          name: string
-          user_id: string
-        }
-        Update: {
-          color?: string | null
-          created_at?: string
-          description?: string | null
-          icon?: string | null
-          id?: string
-          name?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       companion_cache: {
         Row: {
           automated_score: number | null
@@ -837,48 +733,6 @@ export type Database = {
         }
         Relationships: []
       }
-      grounding_enrichment_cache: {
-        Row: {
-          abstract: string | null
-          citation_count: number | null
-          citation_hash: string
-          created_at: string
-          doi: string | null
-          expires_at: string
-          id: string
-          last_validated_at: string | null
-          researchers: Json
-          source_provenance: Json
-          url: string | null
-        }
-        Insert: {
-          abstract?: string | null
-          citation_count?: number | null
-          citation_hash: string
-          created_at?: string
-          doi?: string | null
-          expires_at?: string
-          id?: string
-          last_validated_at?: string | null
-          researchers?: Json
-          source_provenance?: Json
-          url?: string | null
-        }
-        Update: {
-          abstract?: string | null
-          citation_count?: number | null
-          citation_hash?: string
-          created_at?: string
-          doi?: string | null
-          expires_at?: string
-          id?: string
-          last_validated_at?: string | null
-          researchers?: Json
-          source_provenance?: Json
-          url?: string | null
-        }
-        Relationships: []
-      }
       monthly_feature_usage: {
         Row: {
           created_at: string
@@ -1372,10 +1226,6 @@ export type Database = {
           grounding_activities: string[] | null
           has_onboarded: boolean
           hold_goal_currency: string | null
-          hold_goal_start: string | null
-          hold_goal_target_months: number | null
-          hold_goal_target_price: number | null
-          hold_goal_type: string | null
           id: string
           is_admin: boolean | null
           language: string
@@ -1384,6 +1234,7 @@ export type Database = {
           lifetime_access: boolean
           mantra: string | null
           motivations: string[] | null
+          pause_thesis: string | null
           quiet_hours_end: number | null
           quiet_hours_start: number | null
           referral_code: string
@@ -1418,10 +1269,6 @@ export type Database = {
           grounding_activities?: string[] | null
           has_onboarded?: boolean
           hold_goal_currency?: string | null
-          hold_goal_start?: string | null
-          hold_goal_target_months?: number | null
-          hold_goal_target_price?: number | null
-          hold_goal_type?: string | null
           id?: string
           is_admin?: boolean | null
           language?: string
@@ -1430,6 +1277,7 @@ export type Database = {
           lifetime_access?: boolean
           mantra?: string | null
           motivations?: string[] | null
+          pause_thesis?: string | null
           quiet_hours_end?: number | null
           quiet_hours_start?: number | null
           referral_code?: string
@@ -1464,10 +1312,6 @@ export type Database = {
           grounding_activities?: string[] | null
           has_onboarded?: boolean
           hold_goal_currency?: string | null
-          hold_goal_start?: string | null
-          hold_goal_target_months?: number | null
-          hold_goal_target_price?: number | null
-          hold_goal_type?: string | null
           id?: string
           is_admin?: boolean | null
           language?: string
@@ -1476,6 +1320,7 @@ export type Database = {
           lifetime_access?: boolean
           mantra?: string | null
           motivations?: string[] | null
+          pause_thesis?: string | null
           quiet_hours_end?: number | null
           quiet_hours_start?: number | null
           referral_code?: string
@@ -2905,10 +2750,6 @@ export type Database = {
           p_user_id: string
         }
         Returns: undefined
-      }
-      owns_collection: {
-        Args: { _collection_id: string; _user_id: string }
-        Returns: boolean
       }
       pause_adopt_pending_offer: { Args: never; Returns: Json }
       pause_create_or_reuse: {
