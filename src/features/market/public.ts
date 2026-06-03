@@ -40,6 +40,7 @@ export { formatBtcPrice } from './application/format-market-price';
 export {
   fetchBtcData,
   fetchMarketData,
+  fetchMarketDataLite,
 } from './infrastructure/fetch-market-data';
 export {
   BREATHE_AMBIENT_BTC_QUERY_KEY,

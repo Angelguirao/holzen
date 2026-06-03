@@ -6,15 +6,14 @@ import {
   pendingPauseOfferQueryKey,
   type PendingPauseOfferRow,
 } from '@/features/pause/public-queries';
-import { usePauseInstancesRealtime } from '@/features/pause/presentation/realtime/use-pause-instances-realtime';
 
 export type { PendingPauseOfferRow };
 export { pendingPauseOfferQueryKey };
 
 /**
  * The single `state = 'pending'` pause row for the user (if any), plus a
- * short reflection preview when artifacts exist. Subscribes to
- * `pause_instances` so cron-created offers surface without refresh.
+ * short reflection preview when artifacts exist. Resyncs via the shared
+ * `pause_instances` Realtime handler in `useOpenPauseHomePreview`.
  */
 export function usePendingPauseOffer() {
   const { user } = useAuth();
@@ -27,14 +26,6 @@ export function usePendingPauseOffer() {
     if (!userId) return Promise.resolve();
     return queryClient.invalidateQueries({ queryKey: pendingPauseOfferQueryKey(userId) });
   }, [queryClient, userId]);
-
-  usePauseInstancesRealtime(
-    userId,
-    userId ? `pause-pending-offer-${userId}` : 'pause-pending-offer-none',
-    () => {
-      void bump();
-    },
-  );
 
   return {
     pending: query.data ?? null,

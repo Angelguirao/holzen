@@ -105,7 +105,7 @@ export function useCompanionSlotRunOrchestrate({
             }
             setCompanionSlotError(slot, companionSlotErrorSetters, true);
           } finally {
-            if (mode === 'lazy_fetch') {
+            if (mode === 'lazy_fetch' || mode === 'regenerate') {
               void refreshSubscription();
             }
             resolve();

@@ -88,7 +88,6 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
       currency,
       cooldownHours,
       lastTriggerAt,
-      btcData: btcQuery.data,
       queryClient,
       generateMessage,
       setError,
