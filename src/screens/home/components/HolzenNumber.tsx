@@ -15,7 +15,7 @@ export function HolzenNumber({ variant = 'default' }: { variant?: 'default' | 'c
   const { data, isPending } = useQuery(getHolzenNumberQueryOptions());
 
   if (isPending || !data) return null;
-  if (data.users_paused_today === 0 && data.percent === 0) return null;
+  if (data.users_pausing_now === 0 && data.percent === 0) return null;
 
   const motionProps = prefersReduced
     ? {}
@@ -30,7 +30,7 @@ export function HolzenNumber({ variant = 'default' }: { variant?: 'default' | 'c
       <motion.div className="flex items-center text-muted-foreground py-1" {...motionProps}>
         <p className={homeInWidget.meta}>
           <span className="font-semibold tabular-nums text-foreground">{data.percent}%</span>{' '}
-          {t('holzenNumber.pausedToday', { defaultValue: 'paused today' })}
+          {t('holzenNumber.pausingNow', { defaultValue: 'pausing now' })}
         </p>
       </motion.div>
     );
@@ -44,9 +44,9 @@ export function HolzenNumber({ variant = 'default' }: { variant?: 'default' | 'c
       </div>
       <p className="text-lg font-semibold tabular-nums tracking-tight text-foreground">{data.percent}%</p>
       <p className={homeInWidget.meta}>
-        {t('holzenNumber.pausedTodayDetail', {
-          count: data.users_paused_today,
-          defaultValue: '{{count}} people paused today',
+        {t('holzenNumber.pausingNowDetail', {
+          count: data.users_pausing_now,
+          defaultValue: '{{count}} people pausing now',
         })}
       </p>
     </motion.div>

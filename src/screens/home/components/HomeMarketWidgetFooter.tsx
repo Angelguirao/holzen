@@ -58,18 +58,18 @@ function RangeStatusLine({ status }: { status: MarketVolatilityRangeStatus }) {
   );
 }
 
-function CommunityPausedTodayLine() {
+function CommunityPausingNowLine() {
   "use memo";
   const { t } = useTranslation();
   const { data, isPending } = useQuery(getHolzenNumberQueryOptions());
 
   if (isPending || !data) return null;
-  if (data.users_paused_today === 0 && data.percent === 0) return null;
+  if (data.users_pausing_now === 0 && data.percent === 0) return null;
 
   return (
     <p className={cn(homeInWidget.meta, 'min-w-0 flex-1 text-right leading-4 tracking-wide')}>
       <span className="font-medium tabular-nums text-foreground">{data.percent}%</span>{' '}
-      {t('holzenNumber.pausedToday', { defaultValue: 'paused today' })}
+      {t('holzenNumber.pausingNow', { defaultValue: 'pausing now' })}
     </p>
   );
 }
@@ -95,7 +95,7 @@ export function HomeMarketWidgetFooter({ btcData, threshold, thresholdDown, cumu
   return (
     <div className="flex gap-1 pt-0.5">
         {rangeStatus ? <RangeStatusLine status={rangeStatus} /> : <span className="flex-1" />}
-        <CommunityPausedTodayLine />
+        <CommunityPausingNowLine />
     </div>
   );
 }
