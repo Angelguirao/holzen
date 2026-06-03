@@ -299,7 +299,7 @@ export function HomePausePostPauseBody({
         <>
           <HomePauseWidgetOpeningAndMarket previewLine={previewLine} marketBlock={marketBlock} />
           <HomePauseWidgetNoxCta
-            label={t('home.pauseWidget.pauseWithThis')}
+            label={t('home.pauseIdle.letsPauseCta', { defaultValue: "Let's pause" })}
             onClick={onPauseWithThis}
           />
         </>

@@ -124,7 +124,7 @@ export function HomePauseWidgetBody(props: Props) {
           onPauseWithNewContext={props.onPauseWithNewContext}
           onDeclinePendingOffer={props.onDeclinePendingOffer}
           pendingOfferBusy={props.pendingOfferBusy}
-          ctaLabelKey="home.pauseWidget.pauseWithThis"
+          ctaLabelKey="home.pauseIdle.letsPauseCta"
         />
       );
 
