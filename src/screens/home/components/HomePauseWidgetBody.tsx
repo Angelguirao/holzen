@@ -107,7 +107,6 @@ export function HomePauseWidgetBody(props: Props) {
     case 'B_in_progress':
       return (
         <HomePauseInProgressBody
-          marketBlock={props.marketBlock}
           onPauseWithThis={props.onPauseWithThis}
           onDismissOpenPause={props.onDismissOpenPause}
         />

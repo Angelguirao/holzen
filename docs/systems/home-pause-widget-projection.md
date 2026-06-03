@@ -54,9 +54,9 @@ Modes are **derived**, not stored. Primary inputs to `resolveHomePauseWidgetMode
 | Mode | Typical condition | Primary CTA / body |
 |------|-------------------|-------------------|
 | **A** | Idle, no open pause | YOUR PAUSE + moon (header); two-tone reassurance + Nox primary **Let's pause** pill; not collapsible (structure per Wireframes 546:8975) |
-| **B** | Open pause, `state = active`, no step events yet | **Pause with this** → `/pause` (new-offer / auto opening copy) |
-| **B_in_progress** | Open pause, `state = active`, `hasOpenPauseStepEvents` | **Continue** + **Discard** (Figma 555-18858 — within-range lead + “still here”) |
-| **C** | Open pause, `state = engaged` | **Continue** + **Discard** |
+| **B** | Open `active`, no step events yet | Figma **559:26757** — opening line + inline market + Nox **Pause with this** |
+| **B_in_progress** | Open `active`, `hasOpenPauseStepEvents` | Figma **555:18858** — two-tone status (no market row); Nox **Continue** + primary **Discard** |
+| **C** | Open pause, `state = engaged` | Same CTA stack as **B_in_progress**; opening/reflection + inline market when present |
 | **C′** | Engaged + pending offer row | Dual layout: current pause vs new context (adopt / decline) |
 | **D** / **D′** | No open pause, auto cooldown active | Rest copy; D′ = no archive link |
 | **E** | Open `active`, profile cooldown, `completedPauseCount > 0`, no step events yet | New offer after a prior completion (untouched instance) |
@@ -101,7 +101,7 @@ On **`/pause`**, leave flow still uses `PauseLeaveWithPendingSheet`. There is **
 |--------|---------|
 | New mode or gate | `home-pause-widget-mode.ts` + tests in `home-pause-widget-mode.test.ts` |
 | New data for mode | `fetchOpenPauseHomePreview`, `use-home-pause-widget-projection.ts` |
-| Body layout / CTAs | `HomePauseWidgetBodies.tsx`, `HomePauseWidgetBody.tsx` |
+| Body layout / CTAs | `HomePauseWidgetBodies.tsx`, `HomePauseWidgetShared.tsx`, `HomePauseWidgetBody.tsx` |
 | Navigate / dismiss / adopt | `use-home-pause-actions.ts`, `use-home-pending-pause-offer-actions.ts` |
 | i18n | `src/locales/en.json` keys under `home.pauseWidget.*` |
 | Product analytics | [event-taxonomy.md](../ops/event-taxonomy.md) — Home widget surfaces for pending adopt/decline |
@@ -133,8 +133,9 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 |---|-------------|------------------|------------------|
 | 1 | **A** collapsed | No open pause; not in profile cooldown; collapse widget if expanded | Title **Your pause**; collapsed body empty |
 | 2 | **A′** expanded | Tap chevron on A | Status line + scheduling + **I need a pause** |
-| 3 | **B** | Open `active` pause; no step events *or* mid-ritual (Feel/Breathe logged) | **Pause with this**; template opening line pre-Reflect |
-| 4 | **C** | Deep pause: reach **Reflect** (`reflection_step` logged) → Postgres `engaged` | Title **Continue your pause**; **Continue** + **Discard** |
+| 3 | **B** | Open `active`; no `pause_step_events` yet | **Your pause**; empathy + inline BTC/F&G + Nox **Pause with this** |
+| 3b | **B_in_progress** | Open `active`; log Feel (or any step) | **Continue your pause**; two-tone status only; Nox **Continue** + primary **Discard** |
+| 4 | **C** | Reach Reflect → `engaged` | Same title/CTAs as 3b; reflection or opening + inline market when present |
 | 5 | **C′** | **C** + cron queues new context (pending row) while still on Home | Two sections + **Pause with new context** + keep-current link |
 | 6 | **B + pending** | Open `active` (pre-Reflect) + pending row | Amber **New moment queued** banner; **Switch to new pause** / **Keep current pause**; main CTA still **Pause with this** |
 | 7 | **D** | Complete a pause; stay on profile cooldown; no open pause; has archive | **You paused**; **Pause again** + archive link |
@@ -149,7 +150,7 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 
 - First-ever cron pause (no completed archive) → **B**, not **E**, even during cooldown.
 - **Active + pending** → **B** with banner, never **E** without pending actions.
-- **Continue** appears only in **C** / **C′**, never for pre-Reflect `active`.
+- **Continue** appears in **B_in_progress**, **C**, and **C′** — not on untouched **B** (use **Pause with this**).
 
 ---
 
