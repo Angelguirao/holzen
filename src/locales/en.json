@@ -826,6 +826,9 @@
   },
   "holzenNumber": {
     "title": "The Holzen Number",
+    "pausingNow": "pausing now",
+    "pausingNowDetail": "{{count}} person pausing now",
+    "pausingNowDetail_other": "{{count}} people pausing now",
     "heldSteadyToday": "held steady today",
     "reflectionsRecorded": "of users held steady today · {{count}} pause recorded",
     "reflectionsRecorded_other": "of users held steady today · {{count}} pauses recorded"

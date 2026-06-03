@@ -80,6 +80,10 @@ Wireframe structure: two equal tiles after **Your pause** — **Presence** (life
 
 Customize id remains **`journey-pulse`** (historical); default visibility **on**. Tiles are a **glimpse** — full breakdowns belong on Journey ([journey-practice-stats-evolution.md](../backlog/journey-practice-stats-evolution.md)).
 
+## Market widget footer (Figma 559:26565)
+
+[`HomeMarketWidgetFooter`](../../src/screens/home/components/HomeMarketWidgetFooter.tsx) sits under the BTC price: **within / beyond your range** (left) and **% pausing now** (right). The community stat counts distinct users with `pause_instances.state` in **`active` | `engaged`** (in-ritual, not pending offers), as % of onboarded profiles. Data: `get_holzen_number()` → `holzen_community_stats` (`id = live`), warmed by `home-bootstrap`, invalidated on own pause lifecycle + **`holzen_community_stats` Realtime** (no polling).
+
 ## Pause widget error surfacing
 
 Logic lives in [`src/features/pause/domain/home/pause-home-widget-error.ts`](../../src/features/pause/domain/home/pause-home-widget-error.ts):

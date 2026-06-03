@@ -4,8 +4,8 @@ import { subscribeHolzenCommunityStats } from '@/features/user/infrastructure/re
 import { HOLZEN_NUMBER_QUERY_KEY } from '@/features/user/infrastructure/queries/holzen-number-query';
 
 /**
- * Invalidate the public “paused today” aggregate when Postgres refreshes
- * `holzen_community_stats` (any user's pause activity). Home-only wiring.
+ * Invalidate the public “pausing now” aggregate when Postgres refreshes
+ * `holzen_community_stats` (any user's in-ritual pause). Home-only wiring.
  */
 export function useHolzenCommunityStatsRealtime(enabled: boolean) {
   const queryClient = useQueryClient();
