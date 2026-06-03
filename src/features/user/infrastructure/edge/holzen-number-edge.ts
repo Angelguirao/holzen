@@ -1,8 +1,9 @@
 import { invokeEdge } from '@/lib/invoke-edge';
 
+/** Public aggregate from `get_holzen_number()` (community pause activity). */
 export type HolzenNumberData = {
-  total: number;
-  held_steady: number;
+  users_paused_today: number;
+  /** % of onboarded profiles with a non-pending pause created today (UTC). */
   percent: number;
   calculated_at: string;
 };

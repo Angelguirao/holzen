@@ -18,6 +18,11 @@ export {
   effectiveCumulativeThreshold,
   isCumulativeMoveTriggered,
 } from './domain/volatility-thresholds';
+export {
+  resolveMarketVolatilityRangeStatus,
+  type MarketVolatilityRangeStatus,
+  type MarketVolatilityRangeInput,
+} from './domain/market-volatility-range-status';
 export { parsePauseContextForHomePreview } from './application/pause-context-home-preview';
 export {
   severityFromBtcChangePercent,

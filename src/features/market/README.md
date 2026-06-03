@@ -14,6 +14,7 @@ features/market/
     market-quote.ts           # BtcPriceData, currencies
     btc-move-severity.ts      # severity from % move
     volatility-thresholds.ts  # cumulative trigger thresholds (shared with edge)
+    market-volatility-range-status.ts  # within / beyond band UI projection (Home Market footer)
     tracked-assets.ts
     coingecko-market-chart-point.ts
   application/
