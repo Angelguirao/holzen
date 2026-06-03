@@ -91,13 +91,13 @@ export function useSubscription() {
     queryKey: userId != null ? subscriptionQueryKey(userId) : (['subscription', null] as const),
     enabled: !!userId,
     // Invalidation-first: credit spend paths call `refresh()` (usage_only).
-    // No idle polling or focus refetch — entitlements change on user action,
-    // checkout return, or reconnect.
+    // No idle polling, focus refetch, or reconnect refetch — entitlements change
+    // on user action, checkout return, or explicit refresh().
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     refetchInterval: false,
     refetchOnWindowFocus: false,
-    refetchOnReconnect: true,
+    refetchOnReconnect: false,
     retry: 1,
     queryFn: async () => {
       const mode = subscriptionNextFetchMode;

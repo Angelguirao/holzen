@@ -94,7 +94,7 @@ Scripts live under `scripts/`. See script headers for exact rules and allowlists
 | `check:no-app-imports-in-features` | Via architecture-alignment | No `@/app/*` imports under `src/features/**` |
 | `check:no-profile-spread-in-pause-home` | Via architecture-alignment | `useHolzenHomeContextState` must not `...profile` — use `useProfile` at call sites |
 | `check:no-root-components` | Yes | No new `src/components/*.tsx` outside allowlist |
-| `check:no-idle-query-polling` | Yes | No timed `refetchInterval` in active `src/` (invalidation-first TanStack Query) |
+| `check:no-idle-query-polling` | Yes | Active `src/` TanStack Query: no timed `refetchInterval`, `refetchOnWindowFocus: true`, `refetchOnReconnect: true`, or focus-driven `invalidateQueries` (admin ops allowlisted) |
 
 ### 4.3 Edge platform
 
