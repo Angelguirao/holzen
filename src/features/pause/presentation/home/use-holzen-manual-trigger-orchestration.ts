@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } 
 import type { QueryClient } from '@tanstack/react-query';
 import type { User } from '@supabase/supabase-js';
 import type { BtcPriceData } from '@/features/market/public';
-import { getHolzenMarketDisplayQueryOptions } from '@/features/market/public';
+import { fetchMarketData, getHolzenMarketDisplayQueryOptions } from '@/features/market/public';
 import { isHolzenDevMode } from '@/features/market/public';
 import {
   buildManualTriggerCooldownStorageKey,
@@ -26,14 +26,13 @@ export type UseHolzenManualTriggerOrchestrationParams = {
   currency: string;
   cooldownHours: number;
   lastTriggerAt: string | null;
-  btcData: BtcPriceData | undefined;
   queryClient: QueryClient;
   generateMessage: (data: BtcPriceData, mood?: string) => Promise<ManualPauseTriggerResult>;
   setError: Dispatch<SetStateAction<string | null>>;
 };
 
 /**
- * Home manual-trigger gate: localStorage cooldown, market fetch fallback, then `generateMessage`.
+ * Home manual-trigger gate: localStorage cooldown, full market fetch, then `generateMessage`.
  * Used by `useHolzen` in screens (HolzenProvider stays on Home route tree).
  */
 export function useHolzenManualTriggerOrchestration({
@@ -42,7 +41,6 @@ export function useHolzenManualTriggerOrchestration({
   currency,
   cooldownHours,
   lastTriggerAt,
-  btcData,
   queryClient,
   generateMessage,
   setError,
@@ -98,12 +96,9 @@ export function useHolzenManualTriggerOrchestration({
           currency,
           enabled: true,
         });
-        const data =
-          btcData ??
-          (await queryClient.fetchQuery({
-            queryKey: marketOpts.queryKey,
-            queryFn: marketOpts.queryFn,
-          }));
+        // Manual pause needs full market context (7d cumulative, on-chain enrichment).
+        const data = await fetchMarketData(profileTrackedAssetId, currency);
+        queryClient.setQueryData(marketOpts.queryKey, data);
         const result = await generateMessage(data, mood);
         if (result.opened) {
           const now = Date.now();
@@ -117,7 +112,6 @@ export function useHolzenManualTriggerOrchestration({
       }
     },
     [
-      btcData,
       generateMessage,
       manualCooldownRemaining,
       currency,

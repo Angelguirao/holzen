@@ -89,13 +89,12 @@ export function useSubscription() {
   const query = useQuery({
     queryKey: userId != null ? subscriptionQueryKey(userId) : (['subscription', null] as const),
     enabled: !!userId,
-    // Tightened from 5min → 30s so credit changes (regenerate, wallpaper,
-    // insights) reconcile within the same interaction window even if a
-    // call site forgets to invalidate. Optimistic decrement still gives
-    // an instant UI; this is the safety net.
-    staleTime: 30 * 1000,
+    // Invalidation-first: credit spend paths call `refresh()`; window focus
+    // also invalidates (below). No idle polling — entitlements change on user
+    // action, checkout return, or reconnect, not on a timer.
+    staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
-    refetchInterval: userId ? 60 * 1000 : false,
+    refetchInterval: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
     retry: 1,

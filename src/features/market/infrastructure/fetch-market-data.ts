@@ -98,7 +98,80 @@ function getCachedMarketData(coinId: string): CachedMarketData | null {
   }
 }
 
+function readCachedMarketQuote(
+  coinId: TrackedAssetId,
+  currency: string,
+): BtcPriceData | null {
+  const cached = getCachedMarketData(coinId);
+  if (cached?.data?.currency?.toUpperCase() === currency.toUpperCase()) {
+    console.warn('Using cached market data from', new Date(cached.timestamp).toISOString());
+    return { ...cached.data, _stale: true } as BtcPriceData;
+  }
+  return null;
+}
+
+function parse24hQuoteFromChart(
+  prices1d: [number, number][],
+): Pick<BtcPriceData, 'currentPrice' | 'price24hAgo' | 'changePercent' | 'direction'> {
+  if (!prices1d || prices1d.length < 2) throw new Error('Insufficient price data');
+  const price24hAgo = prices1d[0][1];
+  const currentPrice = prices1d[prices1d.length - 1][1];
+  const changePercent = ((currentPrice - price24hAgo) / price24hAgo) * 100;
+  return {
+    currentPrice,
+    price24hAgo,
+    changePercent,
+    direction: changePercent >= 0 ? 'up' : 'down',
+  };
+}
+
 const marketFetchInflight = new Map<string, Promise<BtcPriceData>>();
+
+function dedupeMarketFetch(inflightKey: string, run: () => Promise<BtcPriceData>): Promise<BtcPriceData> {
+  const existing = marketFetchInflight.get(inflightKey);
+  if (existing) return existing;
+  const p = run().finally(() => {
+    marketFetchInflight.delete(inflightKey);
+  });
+  marketFetchInflight.set(inflightKey, p);
+  return p;
+}
+
+/**
+ * Home market strip: 24h quote + Fear & Greed only (2 external calls).
+ * Full enrichment (7d cumulative, on-chain) runs on manual pause trigger.
+ */
+async function fetchMarketDataLiteUncached(
+  coinId: TrackedAssetId,
+  currency: string,
+): Promise<BtcPriceData> {
+  const cur = currency.toLowerCase();
+  const id = encodeURIComponent(coinId);
+
+  try {
+    const [res1d, fearGreed] = await Promise.all([
+      fetchWithRetry(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=1`),
+      fetchFearGreed(),
+    ]);
+
+    const data1d = await res1d.json();
+    const quote = parse24hQuoteFromChart(data1d.prices as [number, number][]);
+
+    const result: BtcPriceData = {
+      coinId,
+      ...quote,
+      fearGreed,
+      currency: currency.toUpperCase(),
+    };
+
+    cacheMarketData(coinId, result);
+    return result;
+  } catch (e) {
+    const cached = readCachedMarketQuote(coinId, currency);
+    if (cached) return cached;
+    throw e;
+  }
+}
 
 async function fetchMarketDataUncached(coinId: TrackedAssetId, currency: string): Promise<BtcPriceData> {
   const cur = currency.toLowerCase();
@@ -114,12 +187,7 @@ async function fetchMarketDataUncached(coinId: TrackedAssetId, currency: string)
     ]);
 
     const data1d = await res1d.json();
-    const prices1d: [number, number][] = data1d.prices;
-    if (!prices1d || prices1d.length < 2) throw new Error('Insufficient price data');
-
-    const price24hAgo = prices1d[0][1];
-    const currentPrice = prices1d[prices1d.length - 1][1];
-    const changePercent = ((currentPrice - price24hAgo) / price24hAgo) * 100;
+    const quote = parse24hQuoteFromChart(data1d.prices as [number, number][]);
 
     let cumulativeChangePercent: number | undefined;
     let cumulativeDirection: 'up' | 'down' | undefined;
@@ -129,7 +197,7 @@ async function fetchMarketDataUncached(coinId: TrackedAssetId, currency: string)
       const prices7d: [number, number][] = data7d.prices;
       if (prices7d && prices7d.length >= 2) {
         const price7dAgo = prices7d[0][1];
-        cumulativeChangePercent = ((currentPrice - price7dAgo) / price7dAgo) * 100;
+        cumulativeChangePercent = ((quote.currentPrice - price7dAgo) / price7dAgo) * 100;
         cumulativeDirection = cumulativeChangePercent >= 0 ? 'up' : 'down';
       }
     } catch {
@@ -138,10 +206,7 @@ async function fetchMarketDataUncached(coinId: TrackedAssetId, currency: string)
 
     const result: BtcPriceData = {
       coinId,
-      currentPrice,
-      price24hAgo,
-      changePercent,
-      direction: changePercent >= 0 ? 'up' : 'down',
+      ...quote,
       cumulativeChangePercent,
       cumulativeDirection,
       fearGreed,
@@ -152,28 +217,29 @@ async function fetchMarketDataUncached(coinId: TrackedAssetId, currency: string)
     cacheMarketData(coinId, result);
     return result;
   } catch (e) {
-    const cached = getCachedMarketData(coinId);
-    if (cached?.data?.currency?.toUpperCase() === currency.toUpperCase()) {
-      console.warn('Using cached market data from', new Date(cached.timestamp).toISOString());
-      return { ...cached.data, _stale: true } as BtcPriceData;
-    }
+    const cached = readCachedMarketQuote(coinId, currency);
+    if (cached) return cached;
     throw e;
   }
 }
 
+export async function fetchMarketDataLite(
+  coinIdRaw: string | null | undefined,
+  currency: string = 'USD',
+): Promise<BtcPriceData> {
+  const coinId = normalizeTrackedAssetId(coinIdRaw);
+  const inflightKey = `${coinId}|${currency.toUpperCase()}|lite`;
+  return dedupeMarketFetch(inflightKey, () => fetchMarketDataLiteUncached(coinId, currency));
+}
+
+/** Full quote for manual pause context (7d cumulative + optional on-chain). */
 export async function fetchMarketData(
   coinIdRaw: string | null | undefined,
   currency: string = 'USD',
 ): Promise<BtcPriceData> {
   const coinId = normalizeTrackedAssetId(coinIdRaw);
-  const inflightKey = `${coinId}|${currency.toUpperCase()}`;
-  const existing = marketFetchInflight.get(inflightKey);
-  if (existing) return existing;
-  const p = fetchMarketDataUncached(coinId, currency).finally(() => {
-    marketFetchInflight.delete(inflightKey);
-  });
-  marketFetchInflight.set(inflightKey, p);
-  return p;
+  const inflightKey = `${coinId}|${currency.toUpperCase()}|full`;
+  return dedupeMarketFetch(inflightKey, () => fetchMarketDataUncached(coinId, currency));
 }
 
 /** @deprecated Prefer fetchMarketData(trackedAssetId, currency) */

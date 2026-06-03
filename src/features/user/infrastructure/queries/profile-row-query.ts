@@ -63,7 +63,7 @@ export function getProfileRowQueryOptions(userId: string | undefined) {
     queryKey: PROFILE_QUERY_KEY(userId ?? PROFILE_QUERY_SIGNED_OUT_KEY),
     queryFn: () => fetchProfileRowForUser(userId!),
     enabled: Boolean(userId),
-    staleTime: 0,
+    staleTime: 60_000,
     refetchOnWindowFocus: false,
     retry: false,
   } as const;
