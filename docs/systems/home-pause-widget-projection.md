@@ -54,7 +54,7 @@ Modes are **derived**, not stored. Primary inputs to `resolveHomePauseWidgetMode
 | Mode | Typical condition | Primary CTA / body |
 |------|-------------------|-------------------|
 | **A** | Idle, no open pause | YOUR PAUSE + moon (header); two-tone reassurance + Nox primary **Let's pause** pill; not collapsible (structure per Wireframes 546:8975) |
-| **B** | Open `active`, no step events yet | Figma **559:26757** — opening line + inline market + Nox **Pause with this** |
+| **B** | Open `active`, no step events yet | Figma **559:26757** — opening line + inline market + Nox **Let's pause** |
 | **B_in_progress** | Open `active`, `hasOpenPauseStepEvents` | Figma **555:18858** — two-tone status (no market row); Nox **Continue** + primary **Discard** |
 | **C** | Open pause, `state = engaged` | Same CTA stack as **B_in_progress**; opening/reflection + inline market when present |
 | **C′** | Engaged + pending offer row | Dual layout: current pause vs new context (adopt / decline) |
@@ -133,14 +133,14 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 |---|-------------|------------------|------------------|
 | 1 | **A** collapsed | No open pause; not in profile cooldown; collapse widget if expanded | Title **Your pause**; collapsed body empty |
 | 2 | **A′** expanded | Tap chevron on A | Status line + scheduling + **I need a pause** |
-| 3 | **B** | Open `active`; no `pause_step_events` yet | **Your pause**; empathy + inline BTC/F&G + Nox **Pause with this** |
+| 3 | **B** | Open `active`; no `pause_step_events` yet | **Your pause**; empathy + inline BTC/F&G + Nox **Let's pause** |
 | 3b | **B_in_progress** | Open `active`; log Feel (or any step) | **Continue your pause**; two-tone status only; Nox **Continue** + primary **Discard** |
 | 4 | **C** | Reach Reflect → `engaged` | Same title/CTAs as 3b; reflection or opening + inline market when present |
 | 5 | **C′** | **C** + cron queues new context (pending row) while still on Home | Two sections + **Pause with new context** + keep-current link |
-| 6 | **B + pending** | Open `active` (pre-Reflect) + pending row | Amber **New moment queued** banner; **Switch to new pause** / **Keep current pause**; main CTA still **Pause with this** |
+| 6 | **B + pending** | Open `active` (pre-Reflect) + pending row | Amber **New moment queued** banner; **Switch to new pause** / **Keep current pause**; main CTA still **Let's pause** |
 | 7 | **D** | Complete a pause; stay on profile cooldown; no open pause; has archive | **You paused**; **Pause again** + archive link |
 | 8 | **D′** | Same as D but `completedPauseCount = 0` | Rest copy without archive link |
-| 9 | **E** | ≥1 completed pause; profile cooldown active; **new** open `active` with **no** `pause_step_events` yet | **New pause available**; validation copy + **Pause with this** |
+| 9 | **E** | ≥1 completed pause; profile cooldown active; **new** open `active` with **no** `pause_step_events` yet | **New pause available**; validation copy + **Let's pause** |
 | 10 | **E → B** | From **E**, open `/pause`, log Feel (or any step), return Home | Should drop to **B** (not **E**) |
 | 11 | **calm_waters** | Cron expires offer with `context_lost`; no open pause; within 24h window | Reassurance copy; optional Sonner toast once |
 | 12 | **loading** | Hard refresh Home while Holzen loading (no open pause yet) | “Opening your pause…” skeleton |
@@ -150,7 +150,7 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 
 - First-ever cron pause (no completed archive) → **B**, not **E**, even during cooldown.
 - **Active + pending** → **B** with banner, never **E** without pending actions.
-- **Continue** appears in **B_in_progress**, **C**, and **C′** — not on untouched **B** (use **Pause with this**).
+- **Continue** appears in **B_in_progress**, **C**, and **C′** — not on untouched **B** (use **Let's pause**).
 
 ---
 
@@ -158,7 +158,7 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 
 | Action | Steps | Pass criteria |
 |--------|-------|---------------|
-| **Pause with this** | **B** or **E** → tap CTA | Navigates `/pause` with correct `pauseInstanceId` in location state |
+| **Let's pause** | **B** or **E** → tap CTA | Navigates `/pause` with correct `pauseInstanceId` in location state |
 | **Continue** | **C** → tap | Same instance on `/pause`; session resumes |
 | **Discard** | **C** → **Discard** | Open pause cleared; widget → **A** or **D**; `pause_open_dismissed` (PostHog) with `surface: home_your_pause_widget` |
 | **Adopt pending** | **B** or **C′** → switch/adopt | Pending cleared; new instance active; `/pause` opens with **new** id; persisted tab session cleared; `pause_pending_adopted` |

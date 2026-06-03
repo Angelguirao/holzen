@@ -91,16 +91,16 @@ Zen and the inline pause card share this contract so reflection failures are not
 
 ## Your pause widget (Figma A–E + calm-waters)
 
-Home maps **`v_pause_full.state`** to Figma modes via [`resolveHomePauseWidgetMode`](../../src/features/pause/domain/home/home-pause-widget-mode.ts). **`active` → B** (Pause with this); **`engaged` → C / C′** (Continue + Discard). Projection narrative: **[home-pause-widget-projection.md](../systems/home-pause-widget-projection.md)**.
+Home maps **`v_pause_full.state`** to Figma modes via [`resolveHomePauseWidgetMode`](../../src/features/pause/domain/home/home-pause-widget-mode.ts). **`active` → B** (Let's pause); **`engaged` → C / C′** (Continue + Discard). Projection narrative: **[home-pause-widget-projection.md](../systems/home-pause-widget-projection.md)**.
 
 | UI mode | When | Header / CTA |
 |--------|------|----------------|
 | **A** | Idle, no open pause | YOUR PAUSE + moon; two-tone copy + Nox primary **Let's pause** (Wireframes 546:8975 structure) |
-| **B** | `state = active` (default: in-ritual, first offer, or + pending banner) | Template opening line + **Pause with this** |
+| **B** | `state = active` (default: in-ritual, first offer, or + pending banner) | Template opening line + **Let's pause** |
 | **C** | `state = engaged` (deep + `reflection_step`) | **Continue your pause** + Continue / Discard |
 | **C′** | C + pending offer | Dual sections + **Pause with new context** |
 | **D / D′** | No open pause, profile auto cooldown | **You paused** + Pause again / archive link |
-| **E** | `active` + profile cooldown + prior completion + no step events yet | **New pause available** + **Pause with this** |
+| **E** | `active` + profile cooldown + prior completion + no step events yet | **New pause available** + **Let's pause** |
 | **Calm** | Recent `context_lost` expiry | Reassurance + next scan (no B flash) |
 
 Opening preview: deterministic i18n templates pre-Reflect (`home.pauseOpening.*`); post-Reflect uses `reflection_text`. Market block: compact BTC/F&G + Updated HH:mm from [`formatHomePauseMarketBlock`](../../src/features/pause/domain/home/format-home-pause-market-block.ts).
