@@ -10,6 +10,8 @@ Related: `docs/systems/auth/auth-and-referral-system.md` (session + `AuthProvide
 
 - `useAuth()` returns `{ user, loading }` from `AuthProvider` (`@/features/auth/public`).
 - Route wrappers read **only** those two values. They do not call Supabase directly.
+- `AuthProvider` validates `INITIAL_SESSION` and `TOKEN_REFRESHED` with `getUser()`; stale JWTs (e.g. after account deletion or a wiped local DB) are signed out before protected routes render.
+- `useProfile` signs out when the profile query detects an orphan session (`ProfileSessionInvalidError`: missing `auth.users` / unrecoverable `profiles` row). Until profile loads successfully, `hasOnboarded` defaults to **false** (no row → not treated as onboarded).
 
 ## Components
 
@@ -86,7 +88,7 @@ flowchart TD
 
 ## Invariants
 
-1. **No protected content while `loading`**: children of `ProtectedRoute` never mount until `loading` is false and `user` is set.
+1. **No protected content while `loading`**: children of `ProtectedRoute` never mount until `loading` is false and `user` is set (and that `user` was validated server-side on session restore).
 2. **First-run users are gated**: signed-in users with `has_onboarded = false` are redirected to `/onboarding` before protected app surfaces mount.
 3. **Deterministic redirects**: unauthenticated users hitting protected URLs always go to `/welcome`; authenticated users hitting public-only URLs go to `/`; onboarded users hitting `/onboarding` go to `/`.
 4. **No redirect loop** between `/welcome`, `/onboarding`, and `/` for normal flows: `/welcome` is public-only, `/onboarding` is protected + first-run only, and `/` is protected + onboarded-only.

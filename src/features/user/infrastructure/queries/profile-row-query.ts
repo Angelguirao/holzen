@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { ProfileSessionInvalidError } from '@/features/user/domain/profile-session-invalid-error';
 import { holzenLog } from '@/lib/holzen-console';
 import {
   PROFILE_QUERY_KEY,
@@ -42,6 +43,10 @@ export async function fetchProfileRowForUser(userId: string): Promise<ProfileRow
   if (!data) {
     holzenLog.profile('no row — inserting profiles');
     const { error: insErr } = await supabase.from('profiles').insert({ user_id: userId });
+    if (insErr?.code === '23503') {
+      holzenLog.profile('insert blocked — auth.users missing for user_id');
+      throw new ProfileSessionInvalidError(insErr.message);
+    }
     if (insErr && !String(insErr.message).includes('duplicate') && insErr.code !== '23505') {
       console.error('[useProfile] profiles insert failed:', insErr.message);
     }
@@ -52,6 +57,10 @@ export async function fetchProfileRowForUser(userId: string): Promise<ProfileRow
       .maybeSingle();
     data = again.data as ProfileRow | null;
     if (again.error) console.error('[useProfile] profiles re-select failed:', again.error.message);
+    if (!data) {
+      holzenLog.profile('no profile row after insert attempt — treating session as invalid');
+      throw new ProfileSessionInvalidError();
+    }
   }
 
   return data;

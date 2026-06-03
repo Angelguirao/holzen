@@ -71,6 +71,7 @@
     "showLess": "Show less"
   },
   "auth": {
+    "sessionInvalid": "Your sign-in is no longer valid on the server. Please sign in again.",
     "restoringSession": "Restoring your session…",
     "signInToContinue": "Sign in to continue",
     "createAnAccount": "Create an account",

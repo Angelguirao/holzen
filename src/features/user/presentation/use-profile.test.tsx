@@ -2,11 +2,14 @@ import type { ReactNode } from 'react';
 import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { ProfileSessionInvalidError } from '@/features/user/domain/profile-session-invalid-error';
 import type { ProfileRow } from '@/features/user/domain/user-profile-row';
 import { useProfile } from './use-profile';
 
-const { mockProfileRowRef, updateProfileFieldsMock } = vi.hoisted(() => ({
+const { mockProfileRowRef, mockProfileQueryErrorRef, updateProfileFieldsMock } = vi.hoisted(() => ({
   mockProfileRowRef: { current: null as ProfileRow | null },
+  mockProfileQueryErrorRef: { current: null as Error | null },
   updateProfileFieldsMock: vi.fn().mockResolvedValue({ error: null }),
 }));
 
@@ -14,6 +17,10 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
+}));
+
+const { signOutAuthMock } = vi.hoisted(() => ({
+  signOutAuthMock: vi.fn().mockResolvedValue({ error: null }),
 }));
 
 vi.mock('sonner', () => ({
@@ -26,6 +33,7 @@ vi.mock('@/features/auth/public', () => ({
   useAuth: () => ({
     user: { id: 'user-1' },
   }),
+  signOutAuth: signOutAuthMock,
 }));
 
 vi.mock('../public-queries', () => {
@@ -37,7 +45,10 @@ vi.mock('../public-queries', () => {
     getProfileRowQueryOptions: (userId: string | undefined) => ({
       queryKey: PROFILE_QUERY_KEY(userId ?? 'signed-out'),
       enabled: Boolean(userId),
-      queryFn: async () => mockProfileRowRef.current,
+      queryFn: async () => {
+        if (mockProfileQueryErrorRef.current) throw mockProfileQueryErrorRef.current;
+        return mockProfileRowRef.current;
+      },
       retry: false,
     }),
     fetchProfileLastTriggerAt: vi.fn(),
@@ -98,6 +109,9 @@ function createWrapper() {
 
 describe('useProfile', () => {
   beforeEach(() => {
+    signOutAuthMock.mockClear();
+    vi.mocked(toast.error).mockClear();
+    mockProfileQueryErrorRef.current = null;
     mockProfileRowRef.current = buildProfileRow({ has_onboarded: false });
     updateProfileFieldsMock.mockClear().mockImplementation(async (_userId: string, fields: { has_onboarded?: boolean }) => {
       if (fields.has_onboarded === true) {
@@ -131,6 +145,21 @@ describe('useProfile', () => {
       hasOnboarded: false,
     });
     expect(result.current.hasOnboarded).toBe(false);
+  });
+
+  it('signs out when profile load reports an invalid server session', async () => {
+    mockProfileQueryErrorRef.current = new ProfileSessionInvalidError();
+    mockProfileRowRef.current = null;
+
+    const { result } = renderHook(() => useProfile(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => {
+      expect(signOutAuthMock).toHaveBeenCalled();
+    });
+    expect(toast.error).toHaveBeenCalledWith('auth.sessionInvalid');
+    expect(result.current.profileLoaded).toBe(false);
   });
 
   it('optimistically flips onboarding complete in the shared query cache', async () => {
