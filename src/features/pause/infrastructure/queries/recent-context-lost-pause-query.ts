@@ -34,11 +34,10 @@ export async function fetchRecentContextLostPause(
   const row = data as {
     id: string;
     terminal_at: string | null;
-    updated_at: string | null;
     created_at: string;
   };
 
-  const expiredAt = row.terminal_at ?? row.updated_at ?? row.created_at;
+  const expiredAt = row.terminal_at ?? row.created_at;
   return { expiredAt, pauseInstanceId: row.id };
 }
 
