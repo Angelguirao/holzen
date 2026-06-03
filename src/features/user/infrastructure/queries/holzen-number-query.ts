@@ -21,12 +21,15 @@ export async function fetchHolzenNumber(): Promise<HolzenNumberData | null> {
   }
 }
 
-/** Daily aggregate — fetch once per SPA session; pull-to-refresh reloads the page. */
+/**
+ * Public daily aggregate (`get_holzen_number` via edge). No polling — warm on Home
+ * bootstrap, refetch when invalidated (pause lifecycle / realtime), or cold mount.
+ */
 export function getHolzenNumberQueryOptions() {
   return {
     queryKey: HOLZEN_NUMBER_QUERY_KEY,
     queryFn: fetchHolzenNumber,
-    staleTime: Number.POSITIVE_INFINITY,
+    staleTime: 5 * 60_000,
     refetchInterval: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
