@@ -21,12 +21,16 @@ export async function fetchHolzenNumber(): Promise<HolzenNumberData | null> {
   }
 }
 
+/** Daily aggregate — no need for minute-level polling on Home. */
+const HOLZEN_NUMBER_STALE_MS = 4 * 60_000;
+const HOLZEN_NUMBER_REFETCH_MS = 5 * 60_000;
+
 export function getHolzenNumberQueryOptions() {
   return {
     queryKey: HOLZEN_NUMBER_QUERY_KEY,
     queryFn: fetchHolzenNumber,
-    refetchInterval: 60_000,
-    staleTime: 30_000,
+    refetchInterval: HOLZEN_NUMBER_REFETCH_MS,
+    staleTime: HOLZEN_NUMBER_STALE_MS,
     refetchOnWindowFocus: false,
     retry: false,
   } as const;
