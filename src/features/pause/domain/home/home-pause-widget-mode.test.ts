@@ -178,7 +178,7 @@ describe('resolveHomePauseWidgetMode', () => {
     expect(r.mode).toBe('B');
   });
 
-  it('B not E when active mid-ritual (step events logged)', () => {
+  it('B_in_progress when active mid-ritual (step events logged)', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,
       hasOpenPause: true,
@@ -187,7 +187,7 @@ describe('resolveHomePauseWidgetMode', () => {
       completedPauseCount: 3,
       hasOpenPauseStepEvents: true,
     });
-    expect(r.mode).toBe('B');
+    expect(r.mode).toBe('B_in_progress');
   });
 
   it('B not E when active with pending queued (banner on B)', () => {

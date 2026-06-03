@@ -2,12 +2,13 @@ import type { RitualDepth } from '@/features/pause/domain/ritual-types';
 
 export type PauseSessionPhase = 'session' | 'done';
 
-/** Depth picker: session phase, user still on ritual picker, and coalesced shell has a message to anchor the ritual. */
+/** Depth picker: session phase and user has not chosen brief/deep yet. */
 export function isPauseSessionDepthPickerActive(input: {
   phase: PauseSessionPhase;
   ritualEntry: RitualDepth | 'picker';
-  hasShellMessage: boolean;
+  /** @deprecated No longer gates the picker; kept for call-site parity tests. */
+  hasShellMessage?: boolean;
 }): boolean {
-  const { phase, ritualEntry, hasShellMessage } = input;
-  return phase === 'session' && ritualEntry === 'picker' && hasShellMessage;
+  const { phase, ritualEntry } = input;
+  return phase === 'session' && ritualEntry === 'picker';
 }

@@ -104,6 +104,53 @@ type EngagedProps = Pick<
   'previewLine' | 'marketBlock' | 'onPauseWithThis' | 'onDismissOpenPause'
 >;
 
+type InProgressProps = Pick<
+  HomePauseWidgetBodyProjection,
+  'marketBlock' | 'onPauseWithThis' | 'onDismissOpenPause'
+>;
+
+/** State B_in_progress — open `active` pause with ritual progress (Figma continue layout). */
+export function HomePauseInProgressBody({
+  marketBlock,
+  onPauseWithThis,
+  onDismissOpenPause,
+}: InProgressProps) {
+  "use memo";
+  const { t } = useTranslation();
+
+  return (
+    <div className="space-y-4">
+      <p className={cn(homeInWidget.body, 'leading-relaxed')}>
+        <span className="text-foreground">
+          {t('home.pauseIdle.withinRangeLead', {
+            defaultValue: 'The market is within your range.',
+          })}
+        </span>{' '}
+        <span className="text-muted-foreground">
+          {t('home.pauseInProgress.stillHere', {
+            defaultValue: 'The pause you started is still here.',
+          })}
+        </span>
+      </p>
+      <HomePauseWidgetMarketRow block={marketBlock} />
+      <button
+        type="button"
+        onClick={onPauseWithThis}
+        className={cn(homeInWidget.ctaPrimary, 'bg-foreground text-background hover:bg-foreground/90')}
+      >
+        {t('home.pauseWidget.continue')}
+      </button>
+      <button
+        type="button"
+        onClick={onDismissOpenPause}
+        className="w-full py-1 text-center text-sm font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
+      >
+        {t('home.pauseWidget.discard')}
+      </button>
+    </div>
+  );
+}
+
 /** State C — reached Reflect. */
 export function HomePauseEngagedBody({
   previewLine,

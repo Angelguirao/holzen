@@ -200,7 +200,7 @@ export function useHomePauseWidgetProjection(
     const prev = prevModeRef.current;
     prevModeRef.current = widgetMode;
 
-    const autoExpandModes: HomePauseWidgetMode[] = ['B', 'C', 'C_prime', 'E'];
+    const autoExpandModes: HomePauseWidgetMode[] = ['B', 'B_in_progress', 'C', 'C_prime', 'E'];
     const enteredAutoExpand =
       prev !== null && autoExpandModes.includes(widgetMode) && !autoExpandModes.includes(prev);
 

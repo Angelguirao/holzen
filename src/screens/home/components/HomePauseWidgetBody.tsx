@@ -11,6 +11,7 @@ import {
   HomePauseEngagedBody,
   HomePauseEngagedPendingBody,
   HomePauseIdleExpandedBody,
+  HomePauseInProgressBody,
   HomePauseOpenActiveBody,
   HomePausePostPauseBody,
 } from '@/screens/home/components/HomePauseWidgetBodies';
@@ -100,6 +101,15 @@ export function HomePauseWidgetBody(props: Props) {
           autoCooldownRemaining={props.autoCooldownRemaining}
           cooldownHours={props.cooldownHours}
           nextCronCheckIn={props.nextCronCheckIn}
+        />
+      );
+
+    case 'B_in_progress':
+      return (
+        <HomePauseInProgressBody
+          marketBlock={props.marketBlock}
+          onPauseWithThis={props.onPauseWithThis}
+          onDismissOpenPause={props.onDismissOpenPause}
         />
       );
 

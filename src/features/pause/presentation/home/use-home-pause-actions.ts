@@ -56,12 +56,13 @@ export function useHomePauseActions(args: {
     const result = await manualTrigger();
     if (!shouldNavigateAfterManualTrigger(result)) return;
     const navState = buildHomePauseSessionLocationState({
-      message,
+      message: null,
       context: result.context ?? context,
       pauseInstanceId: result.instanceId ?? undefined,
       companions,
       companionPrefs,
       severity,
+      startAtDepthPicker: true,
     });
     holzenLog.home('Navigate to /pause after Need a moment', {
       pauseInstanceId: result.instanceId,
