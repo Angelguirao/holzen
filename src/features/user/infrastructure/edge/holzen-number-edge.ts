@@ -3,8 +3,11 @@ import { invokeEdge } from '@/lib/invoke-edge';
 /** Public aggregate from `get_holzen_number()` (community pause activity). */
 export type HolzenNumberData = {
   users_pausing_now: number;
-  /** % of onboarded profiles with pause_instances.state in active | engaged. */
-  percent: number;
+  /** % of onboarded profiles in active | engaged pause right now. */
+  percent_pausing_now: number;
+  users_paused_today: number;
+  /** % of onboarded profiles with a non-pending pause started today (UTC). */
+  percent_paused_today: number;
   calculated_at: string;
 };
 

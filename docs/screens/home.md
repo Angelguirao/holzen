@@ -82,7 +82,7 @@ Customize id remains **`journey-pulse`** (historical); default visibility **on**
 
 ## Market widget footer (Figma 559:26565)
 
-[`HomeMarketWidgetFooter`](../../src/screens/home/components/HomeMarketWidgetFooter.tsx) sits under the BTC price: **within / beyond your range** (left) and **% pausing now** (right). The community stat counts distinct users with `pause_instances.state` in **`active` | `engaged`** (in-ritual, not pending offers), as % of onboarded profiles. Data: `get_holzen_number()` → `holzen_community_stats` (`id = live`), warmed by `home-bootstrap`, invalidated on own pause lifecycle + **`holzen_community_stats` Realtime** (no polling).
+[`HomeMarketWidgetFooter`](../../src/screens/home/components/HomeMarketWidgetFooter.tsx) sits under the BTC price: **within / beyond your range** (left) and community stats stacked on the **right** — **% pausing now** (live: `active` | `engaged`) above **% paused today** (UTC day, non-pending starts). Each line hides at 0. Data: `get_holzen_number()` → `holzen_community_stats` (`id = live`), warmed by `home-bootstrap`, invalidated on own pause lifecycle + **`holzen_community_stats` Realtime** (no polling).
 
 ## Pause widget error surfacing
 

@@ -829,6 +829,9 @@
     "pausingNow": "pausing now",
     "pausingNowDetail": "{{count}} person pausing now",
     "pausingNowDetail_other": "{{count}} people pausing now",
+    "pausedToday": "paused today",
+    "pausedTodayDetail": "{{count}} person paused today",
+    "pausedTodayDetail_other": "{{count}} people paused today",
     "heldSteadyToday": "held steady today",
     "reflectionsRecorded": "of users held steady today · {{count}} pause recorded",
     "reflectionsRecorded_other": "of users held steady today · {{count}} pauses recorded"

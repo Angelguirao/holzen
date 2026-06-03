@@ -1,13 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
-import { getHolzenNumberQueryOptions } from '@/features/user/public-queries';
 import {
   resolveMarketVolatilityRangeStatus,
   type MarketVolatilityRangeStatus,
 } from '@/features/market/domain/market-volatility-range-status';
 import type { BtcPriceData } from '@/features/market/public';
-import { homeInWidget } from '@/screens/home/components/home-widget-styles';
-import { cn } from '@/lib/utils';
+import { HomeMarketCommunityStats } from '@/screens/home/components/home-market-community-stats';
 
 type Props = {
   btcData: BtcPriceData | null;
@@ -58,23 +55,7 @@ function RangeStatusLine({ status }: { status: MarketVolatilityRangeStatus }) {
   );
 }
 
-function CommunityPausingNowLine() {
-  "use memo";
-  const { t } = useTranslation();
-  const { data, isPending } = useQuery(getHolzenNumberQueryOptions());
-
-  if (isPending || !data) return null;
-  if (data.users_pausing_now === 0 && data.percent === 0) return null;
-
-  return (
-    <p className={cn(homeInWidget.meta, 'min-w-0 flex-1 text-right leading-4 tracking-wide')}>
-      <span className="font-medium tabular-nums text-foreground">{data.percent}%</span>{' '}
-      {t('holzenNumber.pausingNow', { defaultValue: 'pausing now' })}
-    </p>
-  );
-}
-
-/** Figma 559:26565 — threshold band + community pause stat under Market price. */
+/** Figma 559:26565 — range (left) + community stats stacked (right) under Market price. */
 export function HomeMarketWidgetFooter({ btcData, threshold, thresholdDown, cumulativeThreshold }: Props) {
   "use memo";
 
@@ -93,9 +74,9 @@ export function HomeMarketWidgetFooter({ btcData, threshold, thresholdDown, cumu
   if (!rangeStatus && !btcData) return null;
 
   return (
-    <div className="flex gap-1 pt-0.5">
-        {rangeStatus ? <RangeStatusLine status={rangeStatus} /> : <span className="flex-1" />}
-        <CommunityPausingNowLine />
+    <div className="flex items-start gap-1 pt-0.5">
+      {rangeStatus ? <RangeStatusLine status={rangeStatus} /> : <span className="flex-1" />}
+      <HomeMarketCommunityStats />
     </div>
   );
 }
