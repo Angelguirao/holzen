@@ -112,19 +112,8 @@ serve(
     // Pause V2 tables (pause_instances / pause_step_events /
     // pause_companion_events / pause_ai_artifacts) already cascade from
     // auth.users(id); explicit deletes here keep the order obvious.
-    await serviceClient
-      .from("collection_items")
-      .delete()
-      .in(
-        "collection_id",
-        (
-          await serviceClient.from("collections").select("id").eq("user_id", userId)
-        ).data?.map((c: { id: string }) => c.id) ?? []
-      );
-
     await Promise.all([
       serviceClient.from("user_signal_preferences").delete().eq("user_id", userId),
-      serviceClient.from("collections").delete().eq("user_id", userId),
       serviceClient.from("feedback").delete().eq("user_id", userId),
       serviceClient.from("analytics_events").delete().eq("user_id", userId),
       serviceClient.from("testimonials").delete().eq("user_id", userId),

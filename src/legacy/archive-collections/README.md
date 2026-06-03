@@ -2,6 +2,8 @@
 
 User-defined **Collections** tab and `collections` / `collection_items` client code — **not shipped** in pause-first MVP.
 
+**Postgres:** `collections` / `collection_items` **dropped** in `20260604120000_pause_first_zombie_schema_cleanup.sql`. Re-enabling requires restoring those tables from migration history before wiring UI back.
+
 Moved from active `src/features/pause/` and `src/screens/archive/` per [docs/systems/pause-client-architecture.md](../../../docs/systems/pause-client-architecture.md) §7.
 
 ## Still in active MVP

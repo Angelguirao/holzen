@@ -34,7 +34,6 @@ export type FeatureFlagKey =
   | "journal_prompt"
   | "pregenerate"
   | "fetch_source_feeds"
-  | "grounding_enrich"
   | "admin_library_preview";
 
 /**

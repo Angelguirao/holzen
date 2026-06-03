@@ -36,7 +36,7 @@ Example: `WHERE created_at >= '2026-05-21T20:00:00.000Z'` on truncated tables is
 | **`companion_catalog`** | Yes | Curated companion pool — **not** user collections |
 | **`useCompanionLibraryFavorites`** | Yes | Slot hearts on `pause_instances.metadata` — misleading “library” name |
 
-**DB:** `collections` / `collection_items` tables remain (account deletion, RLS); only the **client UI** was quarantined.
+**DB:** `collections` / `collection_items` **dropped** in `20260604120000_pause_first_zombie_schema_cleanup.sql`. Recovery requires restoring tables from git history before that migration.
 
 ## Home — Zen mode (legacy)
 
@@ -104,12 +104,22 @@ Listed in `supabase/config.toml` `[functions.*]` and `src/screens/ops/EdgeCovera
 
 ## Postgres — Tier C (shipped)
 
-`pause_*`, `collections` / `collection_items` *(DB tables may remain; **client Collections UI not in shipped scope** — see Archive section above)*, trimmed `profiles`, `notifications`, `roadmap_items` / `roadmap_votes`, **`companion_catalog`** (curated companion pool; renamed from `content_library`), `companion_cache`, `companion_serves`, `companion_fallbacks`, `generation_attempts`, `signal_sources`, `user_signal_preferences`, `signal_source_suggestions`, `quiet_windows`, **`grounding_enrichment_cache`** (companion grounding enrichment), Stripe/credits, `btc_price_cache`, email infra, `audit_log`, `app_config`.
+`pause_*`, trimmed `profiles`, `notifications`, `roadmap_items` / `roadmap_votes`, **`companion_catalog`** (curated companion pool; renamed from `content_library`), `companion_cache`, `companion_serves`, `companion_fallbacks`, `generation_attempts`, `signal_sources`, `user_signal_preferences`, `signal_source_suggestions`, `quiet_windows`, Stripe/credits, `btc_price_cache`, email infra, `audit_log`, `app_config`.
+
+## Postgres — Tier D dropped (zombie schema cleanup)
+
+Migration `20260604120000_pause_first_zombie_schema_cleanup.sql`:
+
+| Dropped | Was | Recovery |
+| --- | --- | --- |
+| `grounding_enrichment_cache` | Cross-user cache for undeployed `grounding-enrich` edge | Restore table + edge from `src/legacy/grounding-enrich/README.md` |
+| `collections` / `collection_items` | User Archive collections (UI in `src/legacy/archive-collections/`) | Restore tables from pre-cleanup migration history |
+| `profiles.hold_goal_type` … `hold_goal_target_price` | Home hold-goal widget (not shipped) | **`hold_goal_currency` kept** — Settings display currency (legacy name) |
 
 ## Schema notes
 
 - Reflect-step artifact kind: **`reflection_text`** (`v_pause_full.reflection_text`) — **not** renamed to `opening_message`.
-- `profiles` columns removed: `ai_insights_enabled`, `night_reflection_hour`, `digest_frequency`, `ritual_template`, `notify_badges`, `streak_freeze_dates`, `companion_breathing` (`20260522130000_drop_companion_breathing.sql`).
+- `profiles` columns removed: `ai_insights_enabled`, `night_reflection_hour`, `digest_frequency`, `ritual_template`, `notify_badges`, `streak_freeze_dates`, `companion_breathing` (`20260522130000_drop_companion_breathing.sql`); hold-goal goal fields (`hold_goal_type`, `hold_goal_start`, `hold_goal_target_*`) in `20260604120000_pause_first_zombie_schema_cleanup.sql` — **`hold_goal_currency` remains** (display currency).
 - Companions: **catalog → cache → live → curated** (`companion_catalog` table; `COMPANION_PHASE_CATALOG` default on). Code: `_shared/companion-catalog.ts`, `_shared/phase-config.ts`.
 
 ## PostHog (shipped)

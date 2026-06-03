@@ -20,7 +20,6 @@ export const FEATURE_KEYS = [
   'journal_prompt',
   'pregenerate',
   'fetch_source_feeds',
-  'grounding_enrich',
   'admin_library_preview',
 ] as const;
 

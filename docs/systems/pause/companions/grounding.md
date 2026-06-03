@@ -135,7 +135,7 @@ When `selectIntervention` picks **trap** as the primary intervention:
 | Full View page | `src/screens/pause/CompanionGroundingPage.tsx` (route `/companion/grounding/:pauseInstanceId`) |
 | Full View presentation | `src/screens/pause/components/companion/GroundingFullView.tsx` |
 | Legacy enrichment (undeployed) | `supabase/functions/legacy/grounding-enrich/`, `src/legacy/grounding-enrich/` |
-| Enrichment cache table | `grounding_enrichment_cache` (kept; writes were via legacy edge only) |
+| Enrichment cache table | **Dropped** (`20260604120000_pause_first_zombie_schema_cleanup.sql`) — restore with edge per legacy README |
 | Related biases rail | `src/screens/pause/components/companion/RelatedBiasesThisMonth.tsx` (+ `related-biases-util.ts`) |
 | Full View telemetry hook | `src/features/pause/presentation/companion/use-fullview-telemetry.ts` (`public-hooks`; event `companion_fullview_opened`) |
 
@@ -201,10 +201,7 @@ When deployed, `useGroundingEnrichment({ citation, url })` (now under `src/legac
 
 ### Storage
 
-Table `grounding_enrichment_cache` (migration `20260418140000_grounding_enrichment_cache.sql`):
-- PK: `id`; unique key for upsert: `citation_hash`.
-- Columns: `doi`, `url`, `abstract`, `researchers jsonb` (`[{name, bio}]`), `citation_count`, `source_provenance jsonb`, `last_validated_at`, `expires_at`.
-- RLS: `authenticated` role can `SELECT` (content is public metadata); writes are service-role only via the edge function.
+Table `grounding_enrichment_cache` was removed in `20260604120000_pause_first_zombie_schema_cleanup.sql`. To recover citation enrichment, recreate the table from `20260418140000_grounding_enrichment_cache.sql` and redeploy the edge (see `src/legacy/grounding-enrich/README.md`).
 
 ### Telemetry
 
