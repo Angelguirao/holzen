@@ -109,7 +109,7 @@ Opening preview: deterministic i18n templates pre-Reflect (`home.pauseOpening.*`
 
 ## Navigation to Pause
 
-From the pause card, “Pause with this” navigates to `/pause` with [`PauseSessionLocationState`](../../src/lib/router-location-state.ts): reflection text, context, instance id, companions, prefs, severity. See [phase-2 manual pause pipeline](../reviews/phase-2-manual-pause-pipeline.md) for the producer/consumer contract.
+From the pause card, **Let's pause** (modes **B** / **E**) navigates to `/pause` with [`PauseSessionLocationState`](../../src/lib/router-location-state.ts): reflection text, context, instance id, companions, prefs, severity. See [phase-2 manual pause pipeline](../reviews/phase-2-manual-pause-pipeline.md) for the producer/consumer contract.
 
 ## Analytics
 
