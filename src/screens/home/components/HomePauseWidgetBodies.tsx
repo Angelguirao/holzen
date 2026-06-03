@@ -14,7 +14,7 @@ import {
   HomePauseWidgetOpeningStack,
   HomePauseWidgetTwoToneLead,
 } from '@/screens/home/components/HomePauseWidgetShared';
-import type { HomePauseWidgetPreviewLine } from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
+import type { HomePauseWidgetPreviewLine as HomePauseWidgetPreviewLineModel } from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
 import type { HomePauseMarketBlock } from '@/features/pause/domain/home/format-home-pause-market-block';
 import type { HomePauseWidgetBodyProjection } from '@/features/pause/presentation/home/use-home-pause-widget-projection';
 
@@ -37,7 +37,7 @@ function HomePauseWidgetOpeningAndMarket({
   previewLine,
   marketBlock,
 }: {
-  previewLine: HomePauseWidgetPreviewLine | null;
+  previewLine: HomePauseWidgetPreviewLineModel | null;
   marketBlock: HomePauseMarketBlock;
 }) {
   const hasMarket =
