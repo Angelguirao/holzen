@@ -78,3 +78,28 @@ Well-aligned relative to other contexts — see [src/features/market/README.md](
 ## 7. Related
 
 - Pause home orchestration: `useHolzenHomeContextState` in pause presentation (composes market + pause)
+
+---
+
+## 8. Automatic pause trigger signal (server)
+
+**Authority:** `check-volatility` edge + `profiles` threshold columns. Client displays context and frequency estimates; it does **not** decide eligibility.
+
+### Shipped contract
+
+| Signal | Window | Profile fields | Breach rule |
+|--------|--------|----------------|-------------|
+| Daily move | Rolling 24h | `threshold` (up), `threshold_down` (down) | Signed % change vs direction-specific threshold |
+| Cumulative move | Rolling 7d | `cumulative_threshold` (default 15; `0` = off) | `abs(change_7d) ≥ threshold` |
+
+Metrics come from CoinGecko `market_chart` in the cron worker (`fetchAssetVolatilityForCurrency`). Shared pure helpers: `supabase/functions/_shared/volatility-thresholds.ts` and `src/features/market/domain/volatility-thresholds.ts` (keep in sync).
+
+Gating after breach: cooldown (`claim_trigger_slot`), quiet hours / `quiet_windows`, snooze, email/push prefs — see [notifications-delivery.md](notifications-delivery.md) and [phase-3-server-cron-triggers.md](../reviews/phase-3-server-cron-triggers.md).
+
+### Why percent, not absolute price levels
+
+Automatic offers target **volatility-driven checking**, not trading alerts at fixed spot prices. **Percentage deviation** stays meaningful as BTC spot drifts; absolute "$X" levels go stale and match a different product job.
+
+**Decision record:** [2026-06-03-percent-volatility-triggers.md](../decisions/2026-06-03-percent-volatility-triggers.md).
+
+**Future (optional):** personal anchor thresholds (entry, round numbers) layered **on top of** % logic — [volatility-anchor-thresholds.md](../backlog/volatility-anchor-thresholds.md).

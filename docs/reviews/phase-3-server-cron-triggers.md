@@ -21,7 +21,7 @@ If this path drifts from Phase 2 or from **`check-volatility`** / **`PauseSessio
 
 ## What to understand first (priority)
 
-1. **Eligibility gates**: who gets an automatic pause (thresholds, quiet hours/snooze, cooldown) and how `last_trigger_at` is claimed to avoid double-fires.
+1. **Eligibility gates**: who gets an automatic pause (thresholds, quiet hours/snooze, cooldown) and how `last_trigger_at` is claimed to avoid double-fires. **Signal shape:** 24h / 7d **% moves** (not absolute price levels) — [2026-06-03-percent-volatility-triggers.md](../decisions/2026-06-03-percent-volatility-triggers.md).
 2. **Order of writes (V2):** pause instance + profile fields + `notifications` row on claim — **no** server-side `generateUnifiedReflection` and **no** `companion-orchestrate` from this worker; the UI may open `/pause` before the user has run **Reflect** / lazy companion fetches.
 3. **Parity with manual pause**: cron builds BTC context similarly to `use-holzen` (shared helpers in `_shared/`), but **reflection LLM** work is **deferred** to the client at **Reflect** (`holzen-reflect`), not inline `generateUnifiedReflection` inside `check-volatility` on claim.
 4. **Notification entry**: `NotificationBell` deep-links to `/pause` with `{ pauseInstanceId }` only — same boundary Phase 2 called out; hydration must come from profile/hooks/DB.

@@ -191,6 +191,8 @@ Companion `**counts_for_pause**` is **not** read for completion on `**volatility
 
 **Code (keep in sync):** `**src/features/pause/domain/pause-fingerprint.ts**` (browser + Vitest) and `**supabase/functions/_shared/pause.ts**` (cron + service RPC). `**check-volatility**` and Home manual open both call the same helpers before `**pause_create_or_reuse**`.
 
+**Trigger signal (why % not price levels):** eligibility uses **24h / 7d percentage moves** vs user thresholds — not fixed above/below spot prices. Rationale and alternatives: [2026-06-03-percent-volatility-triggers.md](../decisions/2026-06-03-percent-volatility-triggers.md). Optional future anchors: [volatility-anchor-thresholds.md](../backlog/volatility-anchor-thresholds.md).
+
 ---
 
 ## 6. Pause step payloads
