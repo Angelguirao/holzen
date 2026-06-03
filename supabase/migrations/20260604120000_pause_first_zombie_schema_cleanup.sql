@@ -67,11 +67,7 @@ BEGIN
     email_notifications = COALESCE((safe_updates->>'email_notifications')::boolean, email_notifications),
     has_onboarded = COALESCE((safe_updates->>'has_onboarded')::boolean, has_onboarded),
     companion_haiku = COALESCE((safe_updates->>'companion_haiku')::boolean, companion_haiku),
-    companion_grounding = COALESCE(
-      (safe_updates->>'companion_grounding')::boolean,
-      (safe_updates->>'companion_learning')::boolean,
-      companion_grounding
-    ),
+    companion_grounding = COALESCE((safe_updates->>'companion_grounding')::boolean, companion_grounding),
     companion_signal = COALESCE((safe_updates->>'companion_signal')::boolean, companion_signal),
     companion_zoom_out = COALESCE((safe_updates->>'companion_zoom_out')::boolean, companion_zoom_out),
     companion_history = COALESCE((safe_updates->>'companion_history')::boolean, companion_history),

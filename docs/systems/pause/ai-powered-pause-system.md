@@ -125,7 +125,7 @@ If two rows in the reference table below look “duplicated,” check whether th
 
 **C. Building the BTC context string**
 
-- **Manual:** **`fetchBtcData`** in **`src/features/market/infrastructure/fetch-market-data.ts`** (user’s **`hold_goal_currency`**, CoinGecko-style data, Fear & Greed, optional mempool.space). Runs in the **browser** next to the session.
+- **Manual:** **`fetchBtcData`** in **`src/features/market/infrastructure/fetch-market-data.ts`** (user’s **`display_currency`**, CoinGecko-style data, Fear & Greed, optional mempool.space). Runs in the **browser** next to the session.
 - **Automatic:** For each **distinct** quote currency among loaded profiles, `**check-volatility`** fetches CoinGecko `**market_chart`** (1d + 7d), maps each user to **their** currency’s series, then appends **one** Fear & Greed snapshot and **one** on-chain snapshot **per cron run** for everyone processed in that batch.
 
 *Why:* the **sentence** is shared (§2.2); the **fetch strategy** differs because the cron must scale to **many users** and respect **API limits**—fetching F&G and mempool data **per user** would be slow and expensive. Eligibility still uses **each user’s** quote currency, not “USD only for the world.”

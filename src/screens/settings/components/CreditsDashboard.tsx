@@ -5,10 +5,7 @@ import { useCallback, useTransition } from 'react';
 import { LoadingButton } from '@/components/ui/loading-button';
 
 /**
- * Compact credits dashboard: shows current Flex credit balance, monthly allowance
- * usage per feature, and the next reset time. Monthly allowances roll over at the
- * start of each UTC month (matches `consume_monthly_feature_quota` SQL function),
- * so we surface that as the "next eligible usage time" when a bucket is depleted.
+ * Compact credits dashboard: Flex credit balance + monthly companion allowance.
  */
 export function CreditsDashboard() {
   const { t } = useTranslation();
@@ -20,12 +17,6 @@ export function CreditsDashboard() {
     companionLimit,
     companionUsed,
     companionRemaining,
-    wallpaperLimit,
-    wallpaperUsed,
-    wallpaperRemaining,
-    insightsLimit,
-    insightsUsed,
-    insightsRemaining,
     monthlyUsed,
     monthlyRemaining,
     manualRetry,
@@ -46,7 +37,6 @@ export function CreditsDashboard() {
     );
   }
 
-  // Next monthly reset = first day of next UTC month
   const now = new Date();
   const nextReset = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
   const nextResetLabel = nextReset.toLocaleDateString(undefined, {
@@ -62,18 +52,6 @@ export function CreditsDashboard() {
           used: companionUsed,
           limit: companionLimit,
           remaining: companionRemaining,
-        },
-        {
-          label: t('settings.allowanceWallpapers', { defaultValue: 'Wallpapers' }),
-          used: wallpaperUsed,
-          limit: wallpaperLimit,
-          remaining: wallpaperRemaining,
-        },
-        {
-          label: t('settings.allowanceInsights', { defaultValue: 'Insights' }),
-          used: insightsUsed,
-          limit: insightsLimit,
-          remaining: insightsRemaining,
         },
       ]
     : [

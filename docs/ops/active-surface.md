@@ -114,12 +114,23 @@ Migration `20260604120000_pause_first_zombie_schema_cleanup.sql`:
 | --- | --- | --- |
 | `grounding_enrichment_cache` | Cross-user cache for undeployed `grounding-enrich` edge | Restore table + edge from `src/legacy/grounding-enrich/README.md` |
 | `collections` / `collection_items` | User Archive collections (UI in `src/legacy/archive-collections/`) | Restore tables from pre-cleanup migration history |
-| `profiles.hold_goal_type` … `hold_goal_target_price` | Home hold-goal widget (not shipped) | **`hold_goal_currency` kept** — Settings display currency (legacy name) |
+| `profiles.hold_goal_type` … `hold_goal_target_price` | Home hold-goal widget (not shipped) | Renamed to **`display_currency`** in Tier E — Settings + market quotes |
+
+## Postgres — Tier E (schema hygiene)
+
+Migration `20260605120000_pause_first_schema_hygiene.sql`:
+
+| Change | Notes |
+| --- | --- |
+| `profiles.hold_goal_currency` → **`display_currency`** | Settings display currency + CoinGecko `vs_currency`; `update_profile_safe` accepts legacy JSON key |
+| `notifications.type` CHECK | **`pause` only** — legacy badge/letter/insight types removed at cutover |
+| `app_config.feature_flags` | **`pregenerate` only** (shipped AI kill-switch) |
+| Dead `app_config` heartbeat keys | `heartbeat.fetch_source_feeds`, `heartbeat.night_reflection`, `heartbeat.check_followups` deleted |
 
 ## Schema notes
 
 - Reflect-step artifact kind: **`reflection_text`** (`v_pause_full.reflection_text`) — **not** renamed to `opening_message`.
-- `profiles` columns removed: `ai_insights_enabled`, `night_reflection_hour`, `digest_frequency`, `ritual_template`, `notify_badges`, `streak_freeze_dates`, `companion_breathing` (`20260522130000_drop_companion_breathing.sql`); hold-goal goal fields (`hold_goal_type`, `hold_goal_start`, `hold_goal_target_*`) in `20260604120000_pause_first_zombie_schema_cleanup.sql` — **`hold_goal_currency` remains** (display currency).
+- `profiles` columns removed: `ai_insights_enabled`, `night_reflection_hour`, `digest_frequency`, `ritual_template`, `notify_badges`, `streak_freeze_dates`, `companion_breathing` (`20260522130000_drop_companion_breathing.sql`); hold-goal goal fields (`hold_goal_type`, `hold_goal_start`, `hold_goal_target_*`) in `20260604120000_pause_first_zombie_schema_cleanup.sql`. **`display_currency`** (renamed from `hold_goal_currency` in `20260605120000_pause_first_schema_hygiene.sql`) — Settings + market quotes.
 - Companions: **catalog → cache → live → curated** (`companion_catalog` table; `COMPANION_PHASE_CATALOG` default on). Code: `_shared/companion-catalog.ts`, `_shared/phase-config.ts`.
 
 ## PostHog (shipped)

@@ -158,7 +158,7 @@ export function useProfile() {
       setFirstNameState(row.first_name ?? null);
       setMotivationsState(row.motivations ?? []);
       setMantraState(row.mantra ?? null);
-      setCurrencyCommitted(row.hold_goal_currency ?? 'USD');
+      setCurrencyCommitted(row.display_currency ?? 'USD');
       setTrackedAssetIdCommitted(normalizeTrackedAssetId(row.tracked_asset_id));
       setLanguageCommitted(row.language ?? 'en');
       setGroundingActivitiesState(row.grounding_activities ?? []);
@@ -420,7 +420,7 @@ export function useProfile() {
       const previous = currencyCommitted;
       addOptimisticCurrency(val);
       if (!user) return;
-      const { error } = await updateProfileFields(user.id, { hold_goal_currency: val });
+      const { error } = await updateProfileFields(user.id, { display_currency: val });
       if (!error) {
         setCurrencyCommitted(val);
         invalidateProfileQuery();
