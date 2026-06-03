@@ -22,9 +22,10 @@ export async function fetchHolzenNumber(): Promise<HolzenNumberData | null> {
 }
 
 /**
- * Public live aggregate (`get_holzen_number` via edge / `holzen_community_stats` cache).
+ * Public community aggregates (`get_holzen_number` via edge / `holzen_community_stats` cache):
+ * pausing now (active|engaged) + paused today (UTC).
  * No polling — warm on Home bootstrap; refetch when invalidated (own pause, or
- * `holzen_community_stats` Realtime when anyone enters or leaves an in-ritual pause).
+ * `holzen_community_stats` Realtime when pause activity changes).
  */
 export function getHolzenNumberQueryOptions() {
   return {
