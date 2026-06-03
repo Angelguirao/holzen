@@ -13,35 +13,39 @@ interface HomePracticeStatTilesProps {
 function StatTile({
   label,
   value,
-  footnote,
+  unit,
   isLoading,
   to,
 }: {
   label: string;
   value: number | null;
-  footnote: string;
+  unit: string;
   isLoading: boolean;
   to: string;
 }) {
   return (
     <Link
       to={to}
-      className="flex min-h-[108px] flex-col rounded-lg border border-border/40 bg-card/40 p-4 transition-colors hover:border-border/60 hover:bg-card/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="flex min-h-[96px] flex-col rounded-lg border border-border/40 bg-card/40 p-4 transition-colors hover:border-border/60 hover:bg-card/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <p className={cn(homeInWidget.kicker, 'text-[10px] tracking-widest')}>{label}</p>
-      {isLoading ? (
-        <Skeleton className="mt-3 h-12 w-16" />
-      ) : (
-        <p className="mt-2 text-[3rem] font-normal tabular-nums leading-none tracking-tight text-foreground">
-          {value ?? 0}
-        </p>
-      )}
-      <p className="mt-auto text-xs leading-snug text-muted-foreground">{footnote}</p>
+      <div className="mt-2 flex flex-1 items-end">
+        {isLoading ? (
+          <Skeleton className="h-12 w-20" />
+        ) : (
+          <div className="flex items-end gap-1.5">
+            <span className="text-[3rem] font-normal tabular-nums leading-none tracking-tight text-foreground">
+              {value ?? 0}
+            </span>
+            <span className="mb-1.5 text-xs font-normal leading-none text-muted-foreground">{unit}</span>
+          </div>
+        )}
+      </div>
     </Link>
   );
 }
 
-/** Presence + Pauses glimpse (Wireframes 546:8986) — taps through to Journey drill-down. */
+/** Presence + completed-count glimpse — entire tile links to Journey. */
 export function HomePracticeStatTiles({
   presenceXp,
   completedPauseCount,
@@ -56,17 +60,17 @@ export function HomePracticeStatTiles({
         to="/journey"
         label={t('home.practiceStats.presence', { defaultValue: 'Presence' })}
         value={presenceXp}
-        footnote={t('home.practiceStats.presenceFootnote', {
-          defaultValue: 'Lifetime XP · see Journey',
+        unit={t('home.practiceStats.presenceUnit', {
+          defaultValue: 'XP',
         })}
         isLoading={isLoading}
       />
       <StatTile
         to="/journey"
-        label={t('home.practiceStats.pauses', { defaultValue: 'Pauses' })}
+        label={t('home.practiceStats.pauses', { defaultValue: 'Completed' })}
         value={completedPauseCount}
-        footnote={t('home.practiceStats.pausesFootnote', {
-          defaultValue: 'Completed · see Journey',
+        unit={t('home.practiceStats.pausesUnit', {
+          defaultValue: 'Pauses',
         })}
         isLoading={isLoading}
       />
