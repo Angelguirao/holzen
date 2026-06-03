@@ -1,9 +1,9 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import type { User } from '@supabase/supabase-js';
+import type { AuthChangeEvent, User } from '@supabase/supabase-js';
 import { holzenLog } from '@/lib/holzen-console';
 import type { AuthSessionState } from '@/features/auth/public';
 import {
-  getAuthSession,
+  getAuthUser,
   handleAuthFunnelEvents,
   identifyAuthenticatedUser,
   signOutAuth,
@@ -18,6 +18,26 @@ const AuthContext = createContext<AuthSessionState>({
   signOut: async () => {},
 });
 
+async function resolveSessionUser(
+  event: AuthChangeEvent,
+  sessionUser: User | null,
+): Promise<User | null> {
+  if (!sessionUser) return null;
+  if (event !== 'INITIAL_SESSION' && event !== 'TOKEN_REFRESHED') {
+    return sessionUser;
+  }
+  const validated = await getAuthUser();
+  if (!validated) {
+    holzenLog.auth('stale session — signing out', {
+      event,
+      userIdPrefix: sessionUser.id.slice(0, 8),
+    });
+    await signOutAuth();
+    return null;
+  }
+  return validated;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,26 +49,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         hasSession: !!session,
         userIdPrefix: session?.user?.id?.slice(0, 8) ?? null,
       });
-      setUser(session?.user ?? null);
+
+      const nextUser = await resolveSessionUser(event, session?.user ?? null);
+      setUser(nextUser);
       setLoading(false);
 
-      syncAuthObservability(event, session?.user?.id);
-      handleAuthFunnelEvents(event, session?.user);
+      syncAuthObservability(event, nextUser?.id);
+      handleAuthFunnelEvents(event, nextUser ?? undefined);
 
-      if (event === 'SIGNED_IN' && session?.user) {
-        runSignedInSideEffects(session.user);
+      if (nextUser && event === 'INITIAL_SESSION') {
+        identifyAuthenticatedUser(nextUser.id);
       }
-    });
-
-    void getAuthSession().then((session) => {
-      holzenLog.auth('getSession (initial)', {
-        hasSession: !!session,
-        userIdPrefix: session?.user?.id?.slice(0, 8) ?? null,
-      });
-      setUser(session?.user ?? null);
-      setLoading(false);
-      if (session?.user) {
-        identifyAuthenticatedUser(session.user.id);
+      if (event === 'SIGNED_IN' && nextUser) {
+        runSignedInSideEffects(nextUser);
       }
     });
 

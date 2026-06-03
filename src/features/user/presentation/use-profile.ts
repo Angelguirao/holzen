@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback, useOptimistic } from 'react';
+import { useState, useEffect, useCallback, useOptimistic, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@/features/auth/public';
+import { signOutAuth, useAuth } from '@/features/auth/public';
+import { isProfileSessionInvalidError } from '@/features/user/domain/profile-session-invalid-error';
 import { holzenLog } from '@/lib/holzen-console';
 import type { CompanionPrefs } from '@/features/pause/public-hooks';
 import { normalizeTrackedAssetId } from '@/features/market/public';
@@ -95,14 +96,23 @@ export function useProfile() {
     companionPrefsCommitted,
     (_current, next: CompanionPrefs) => next,
   );
-  const [hasOnboardedState, setHasOnboarded] = useState(true);
+  const [hasOnboardedState, setHasOnboarded] = useState(false);
+  const sessionInvalidHandledRef = useRef(false);
+
+  useEffect(() => {
+    sessionInvalidHandledRef.current = false;
+  }, [userId]);
 
   const retryProfileLoad = useCallback(() => {
     void refetchProfile();
   }, [refetchProfile]);
 
+  const profileSessionInvalid =
+    profileQueryStatus === 'error' && isProfileSessionInvalidError(profileQueryError);
   const profileLoaded = Boolean(
-    userId && (profileQueryStatus === 'success' || profileQueryStatus === 'error'),
+    userId &&
+      !profileSessionInvalid &&
+      (profileQueryStatus === 'success' || profileQueryStatus === 'error'),
   );
   const hasOnboarded = profileRow?.has_onboarded ?? hasOnboardedState;
   const profileLoadError = userId
@@ -112,6 +122,17 @@ export function useProfile() {
         ? String(profileQueryError)
         : null
     : null;
+
+  useEffect(() => {
+    if (!userId || !profileSessionInvalid || sessionInvalidHandledRef.current) return;
+    sessionInvalidHandledRef.current = true;
+    holzenLog.profile('invalid server session — signing out');
+    toast.error(t('auth.sessionInvalid'));
+    void (async () => {
+      await signOutAuth();
+      queryClient.removeQueries({ queryKey: PROFILE_QUERY_KEY(userId) });
+    })();
+  }, [userId, profileSessionInvalid, t, queryClient]);
 
   useEffect(() => {
     if (!userId) {
