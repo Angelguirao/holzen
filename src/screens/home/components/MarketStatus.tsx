@@ -118,13 +118,6 @@ export function MarketStatus({
   }
 
   if (unitBasisMode) {
-    const unitBasisToolbar = (
-      <div className="flex shrink-0 items-center justify-end gap-1">
-        {exitBtcToolbarBtn}
-        {eyeToggleBtn}
-      </div>
-    );
-
     return (
       <div className="space-y-3">
         <div className="flex flex-col gap-2">
@@ -132,17 +125,15 @@ export function MarketStatus({
             {t('marketStatus.priceIsNoise')}
           </p>
           <div className="flex items-center justify-between gap-2">
-            {hidden ? (
-              <p className={homeInWidget.priceHidden}>••••••</p>
-            ) : (
-              <p className="text-[22px] font-bold leading-7 tabular-nums tracking-[0.088px] text-foreground">
-                {t('marketStatus.unitBasisIdentity', {
-                  symbol: quoteSym,
-                  defaultValue: `1 ${quoteSym} = 1 ${quoteSym}`,
-                })}
-              </p>
-            )}
-            {unitBasisToolbar}
+            <p className="text-[22px] font-bold leading-7 tabular-nums tracking-[0.088px] text-foreground">
+              {t('marketStatus.unitBasisIdentity', {
+                symbol: quoteSym,
+                defaultValue: `1 ${quoteSym} = 1 ${quoteSym}`,
+              })}
+            </p>
+            {exitBtcToolbarBtn ? (
+              <div className="flex shrink-0 items-center justify-end gap-1">{exitBtcToolbarBtn}</div>
+            ) : null}
           </div>
         </div>
       </div>
