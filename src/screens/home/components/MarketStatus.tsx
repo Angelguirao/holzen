@@ -141,6 +141,7 @@ export function MarketStatus({
               )}
             </div>
             <div className="flex shrink-0 items-center justify-end gap-1">
+              {eyeToggleBtn}
               {exitBtcToolbarBtn}
             </div>
           </div>
@@ -166,7 +167,9 @@ export function MarketStatus({
             : 'text-nox-accent-green'
     : '';
 
-  const showChartBlock = !hidden && chartExpanded;
+  /** 24h + sentiment stay visible when collapsed; chart expand only toggles the 7-day block (Figma §3). */
+  const showPriceDetails = !hidden;
+  const showChart = !hidden && chartExpanded;
   const chartChevronToggle =
     chartChevronInPriceRow && onToggleChartExpanded ? (
       <button
@@ -221,20 +224,21 @@ export function MarketStatus({
           </div>
           {priceRowToolbar}
         </div>
-        {showChartBlock ? (
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <p className={homeInWidget.subPrice}>
-              {dir}{pct}% {t('marketStatus.in24h')}
-            </p>
-            {data.fearGreed && (
-              <p className={`text-xs font-medium tabular-nums ${fearGreedColor}`}>
-                {data.fearGreed.value} · {data.fearGreed.label}
-              </p>
-            )}
-          </div>
+        {showPriceDetails ? (
+          <p className={homeInWidget.subPrice}>
+            {dir}{pct}% {t('marketStatus.in24h')}
+            {data.fearGreed ? (
+              <>
+                {' · '}
+                <span className={`font-medium tabular-nums ${fearGreedColor}`}>
+                  {data.fearGreed.value} {data.fearGreed.label}
+                </span>
+              </>
+            ) : null}
+          </p>
         ) : null}
       </div>
-      {showChartBlock ? (
+      {showChart ? (
         <div>
           <MarketChartLazyGate hidden={hidden} currency={cur} coinId={data?.coinId ?? coinIdProp ?? 'bitcoin'} />
         </div>

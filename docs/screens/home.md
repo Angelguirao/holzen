@@ -82,7 +82,7 @@ Customize id remains **`journey-pulse`** (historical); default visibility **on**
 
 ## Market widget footer (Figma 559:26565)
 
-[`HomeMarketWidgetFooter`](../../src/screens/home/components/HomeMarketWidgetFooter.tsx) sits under the BTC price: **within / beyond your range** (left) and community stats stacked on the **right** — **% pausing now** (live: `active` | `engaged`) above **% paused today** (UTC day, non-pending starts). Each line hides at 0. Data: `get_holzen_number()` → `holzen_community_stats` (`id = live`), warmed on Home mount via parallel `holzen-number` + `market-quote` prefetch (`useHomePrefetch`), invalidated on own pause lifecycle + **`holzen_community_stats` Realtime** (no polling).
+[`HomeMarketWidgetFooter`](../../src/screens/home/components/HomeMarketWidgetFooter.tsx) sits under the BTC price: **within / beyond your range** (left) and community stats stacked on the **right** — **% of users pausing now** (live: `active` | `engaged`) above **% of users paused today** (UTC day, non-pending starts). While the user is mid-pause (step events or `engaged`), the footer shows a single **% are pausing now, too** line (Figma 3.4.4.2). Each line hides at 0. Data: `get_holzen_number()` → `holzen_community_stats` (`id = live`), warmed on Home mount via parallel `holzen-number` + `market-quote` prefetch (`useHomePrefetch`), invalidated on own pause lifecycle + **`holzen_community_stats` Realtime** (no polling).
 
 ## Pause widget error surfacing
 
