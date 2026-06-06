@@ -13,6 +13,8 @@ export type BuildHomePauseSessionLocationStateInput = {
   severity: PauseSeverity;
   /** Manual “Let’s pause” from idle — skip restored ritual and open depth picker only. */
   startAtDepthPicker?: boolean;
+  /** Navigate before `manualTrigger` finishes — depth picker shows while instance is created. */
+  openingManualPause?: boolean;
 };
 
 /** Router state for Home → `/pause` (open pause card or post manual trigger). */
@@ -27,5 +29,6 @@ export function buildHomePauseSessionLocationState(
     companionPrefs: input.companionPrefs,
     severity: input.severity,
     ...(input.startAtDepthPicker ? { startAtDepthPicker: true } : {}),
+    ...(input.openingManualPause ? { openingManualPause: true } : {}),
   };
 }

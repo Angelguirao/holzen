@@ -61,6 +61,31 @@ describe('buildHomePauseSessionLocationState', () => {
     });
   });
 
+  it('sets openingManualPause for optimistic idle navigation', () => {
+    expect(
+      buildHomePauseSessionLocationState({
+        message: null,
+        context: 'btc_move',
+        pauseInstanceId: undefined,
+        companions: { haiku: null },
+        companionPrefs: {
+          breathing: false,
+          haiku: false,
+          grounding: false,
+          signal: false,
+          zoomOut: false,
+          history: false,
+        },
+        severity: 'mild',
+        startAtDepthPicker: true,
+        openingManualPause: true,
+      }),
+    ).toMatchObject({
+      openingManualPause: true,
+      startAtDepthPicker: true,
+    });
+  });
+
   it('coerces null message to empty reflectionMessage', () => {
     expect(
       buildHomePauseSessionLocationState({

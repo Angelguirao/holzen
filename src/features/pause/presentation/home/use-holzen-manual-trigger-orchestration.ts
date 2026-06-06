@@ -14,11 +14,11 @@ import {
   readManualTriggerCooldownAtMs,
   writeManualTriggerCooldownAtMs,
 } from '@/features/pause/public-trigger';
+import type { ManualPauseTriggerOptions } from '@/features/pause/domain/manual-pause-trigger-options';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
 } from '@/features/pause/domain/manual-pause-trigger-result';
-import { holzenLog } from '@/lib/holzen-console';
 
 export type UseHolzenManualTriggerOrchestrationParams = {
   user: User | null;
@@ -27,7 +27,11 @@ export type UseHolzenManualTriggerOrchestrationParams = {
   cooldownHours: number;
   lastTriggerAt: string | null;
   queryClient: QueryClient;
-  generateMessage: (data: MarketQuote, mood?: string) => Promise<ManualPauseTriggerResult>;
+  generateMessage: (
+    data: MarketQuote,
+    mood?: string,
+    options?: ManualPauseTriggerOptions,
+  ) => Promise<ManualPauseTriggerResult>;
   setError: Dispatch<SetStateAction<string | null>>;
 };
 
@@ -80,7 +84,10 @@ export function useHolzenManualTriggerOrchestration({
   );
 
   const manualTrigger = useCallback(
-    async (mood?: string): Promise<ManualPauseTriggerResult> => {
+    async (
+      mood?: string,
+      options?: ManualPauseTriggerOptions,
+    ): Promise<ManualPauseTriggerResult> => {
       const remaining = manualCooldownRemaining();
       if (isManualTriggerBlockedByCooldown(remaining)) {
         holzenLog.manual('manualTrigger: blocked by cooldown', {
@@ -99,7 +106,7 @@ export function useHolzenManualTriggerOrchestration({
         // Manual pause needs full market context (on-chain enrichment when BTC).
         const data = await fetchMarketData(profileTrackedAssetId, currency);
         queryClient.setQueryData(marketOpts.queryKey, data);
-        const result = await generateMessage(data, mood);
+        const result = await generateMessage(data, mood, options);
         if (result.opened) {
           const now = Date.now();
           setLastManualAt(now);

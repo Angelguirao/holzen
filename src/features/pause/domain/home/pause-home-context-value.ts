@@ -1,7 +1,7 @@
 import type { MarketQuote } from '@/features/market/public';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
+import type { ManualPauseTriggerOptions } from '@/features/pause/domain/manual-pause-trigger-options';
 import type { ManualPauseTriggerResult } from '@/features/pause/domain/manual-pause-trigger-result';
-/** Pause + market orchestration shared across Home shell and `/pause` (not full user profile). */
 export type PauseHomeContextValue = {
   marketData: MarketQuote | null;
   /** @deprecated Use marketData — kept for legacy `@/legacy` callers via `useHolzen()`. */
@@ -23,7 +23,10 @@ export type PauseHomeContextValue = {
   newPauseArrival: boolean;
   clearNewPauseArrival: () => void;
   dismissMessage: () => void | Promise<void>;
-  manualTrigger: (mood?: string) => Promise<ManualPauseTriggerResult>;
+  manualTrigger: (
+    mood?: string,
+    options?: ManualPauseTriggerOptions,
+  ) => Promise<ManualPauseTriggerResult>;
   manualCooldownRemaining: number;
   autoCooldownRemaining: number;
   nextCronCheckIn: () => number;

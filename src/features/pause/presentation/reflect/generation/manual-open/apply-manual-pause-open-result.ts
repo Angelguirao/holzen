@@ -34,6 +34,7 @@ export type ApplyManualPauseOpenResultInput = {
   assetId: string;
   severityBand: string;
   startedAtMs: number;
+  skipHomePreview?: boolean;
 };
 
 /** Maps `openManualPauseFromHome` outcome to Home preview state + analytics. */
@@ -41,7 +42,7 @@ export async function applyManualPauseOpenResult(
   input: ApplyManualPauseOpenResultInput,
   ports: ManualPauseHomePreviewPorts,
 ): Promise<ManualPauseTriggerResult> {
-  const { result, ctx, silentMsg, assetId, severityBand, startedAtMs } = input;
+  const { result, ctx, silentMsg, assetId, severityBand, startedAtMs, skipHomePreview } = input;
   const trackCreated = ports.trackInstanceCreated ?? trackManualPauseInstanceCreated;
   const trackCompleted = ports.trackManualCompleted ?? trackPauseManualCompleted;
 
@@ -70,7 +71,9 @@ export async function applyManualPauseOpenResult(
     ports.setMessage(result.silentStubPersisted ? silentMsg : null);
     ports.setContext(ctx);
     ports.setCompanionsEmpty();
-    ports.setNewPauseArrival(true);
+    if (!skipHomePreview) {
+      ports.setNewPauseArrival(true);
+    }
     ports.setLastTriggerAt(new Date().toISOString());
     trackCompleted({
       durationS: Math.round((Date.now() - startedAtMs) / 1000),
