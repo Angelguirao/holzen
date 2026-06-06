@@ -174,6 +174,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Product / UX | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | **Done (2026-04).** Form **`name`** / **`id`** / **`autocomplete`** — see ticket |
 | Product / UX | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **Done (2026-04).** Home **`/`** axe fixes — see ticket |
 | Product / UX | [home-why-thesis-evolution.md](home-why-thesis-evolution.md) | **Home / Pause / Journey:** thesis depth — activation in ritual, identity in Settings, history on Journey |
+| Product / UX | [home-market-logical-surface.md](home-market-logical-surface.md) | **Home market widget:** behavioral tiers (status vs monitoring), perspective controls, duplication with Your pause |
 | Product / UX | [journey-practice-stats-evolution.md](journey-practice-stats-evolution.md) | **Home glimpse → Journey drill-down:** Presence XP slices, pause counts by variant/signal |
 | Product / UX | [volatility-anchor-thresholds.md](volatility-anchor-thresholds.md) | **Market / pause:** optional anchor thresholds (entry, levels) layered on % triggers |
 | Product / UX | [companion-tts-pro.md](companion-tts-pro.md) | **Companions:** Pro TTS (`SpeechSynthesis` → ElevenLabs if needed) |
