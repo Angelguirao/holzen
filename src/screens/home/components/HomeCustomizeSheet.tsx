@@ -4,7 +4,6 @@ import { GripVertical } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
 import {
   DndContext,
@@ -25,6 +24,14 @@ import {
 } from '@/screens/home/lib/home-section-visibility-constants';
 import { GOAL_WHY_SECTION_ID, normalizeHomeSectionOrder } from '@/screens/home/lib/home-section-order-normalize';
 
+/** Wireframes 251:13802 — inset cards, 16px titles, 14px descriptions. */
+const customizeCardClass =
+  'rounded-lg border-2 border-border/60 bg-muted/30 p-4';
+
+const customizeTitleClass = 'text-base font-medium leading-6 text-foreground';
+
+const customizeDescClass = 'text-sm font-normal leading-5 text-muted-foreground';
+
 export interface HomeCustomizeSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -35,8 +42,6 @@ export interface HomeCustomizeSheetProps {
   sectionTitle: (id: string) => string;
   sectionDescription: (id: string) => string;
   onResetAll: () => void;
-  /** When true, Night reflection toggle is disabled (e.g. not Pro). */
-  nightToggleDisabled?: boolean;
   /** Bump after reset-to-defaults so @dnd-kit remounts and matches parent `order`. */
   dndRemountKey?: number;
 }
@@ -57,19 +62,13 @@ function CustomizePinnedRow({
 }) {
   "use memo";
   return (
-    <div
-      className={cn(
-        'flex items-start gap-2 rounded-xl border border-border/50 bg-muted/20 px-3 py-3',
-      )}
-    >
-      <div className="h-9 w-10 shrink-0" aria-hidden />
-      <div className="min-w-0 flex-1 space-y-0.5">
-        <Label htmlFor={`home-section-${id}`} className="text-sm font-medium leading-snug text-foreground">
+    <div className={customizeCardClass}>
+      <div className="min-w-0 space-y-1">
+        <Label htmlFor={`home-section-${id}`} className={customizeTitleClass}>
           {title}
         </Label>
-        <p className={cn(homeInWidget.metaFaint, 'leading-snug')}>{description}</p>
+        <p className={customizeDescClass}>{description}</p>
       </div>
-      <div className="h-6 w-10 shrink-0" aria-hidden />
     </div>
   );
 }
@@ -80,7 +79,6 @@ function CustomizeSortableRow({
   description,
   checked,
   onCheckedChange,
-  switchDisabled,
   showSwitch,
   disableSortable,
 }: {
@@ -89,7 +87,6 @@ function CustomizeSortableRow({
   description: string;
   checked: boolean;
   onCheckedChange: (v: boolean) => void;
-  switchDisabled?: boolean;
   showSwitch: boolean;
   /** When true, `useSortable` is disabled (no transform from DnD). */
   disableSortable: boolean;
@@ -111,41 +108,35 @@ function CustomizeSortableRow({
       ref={setNodeRef}
       style={style}
       {...(disableSortable ? attributes : {})}
-      className={cn(
-        'flex items-start gap-2 rounded-xl border border-border/50 bg-muted/20 px-3 py-3',
-        isDragging && 'shadow-md',
-      )}
+      className={cn(customizeCardClass, 'flex items-start gap-1', isDragging && 'shadow-md')}
     >
       {disableSortable ? (
-        <div className="h-9 w-10 shrink-0" aria-hidden />
+        <div className="h-6 w-6 shrink-0" aria-hidden />
       ) : (
         <button
           type="button"
-          className="touch-none cursor-grab shrink-0 rounded-md p-1.5 text-muted-foreground/50 hover:bg-muted/60 hover:text-muted-foreground active:cursor-grabbing"
+          className="touch-none shrink-0 cursor-grab rounded-md text-muted-foreground/70 hover:text-muted-foreground active:cursor-grabbing"
           aria-label={`Drag to reorder ${title}`}
           {...attributes}
           {...listeners}
         >
-          <GripVertical className="h-4 w-4" aria-hidden />
+          <GripVertical className="h-6 w-6" aria-hidden />
         </button>
       )}
-      <div className="min-w-0 flex-1 space-y-0.5">
-        <Label htmlFor={`home-section-${id}`} className="text-sm font-medium leading-snug text-foreground">
+      <div className={cn('min-w-0 flex-1 space-y-1', showSwitch && 'pr-2')}>
+        <Label htmlFor={`home-section-${id}`} className={customizeTitleClass}>
           {title}
         </Label>
-        <p className={cn(homeInWidget.metaFaint, 'leading-snug')}>{description}</p>
+        <p className={customizeDescClass}>{description}</p>
       </div>
       {showSwitch ? (
         <Switch
           id={`home-section-${id}`}
           checked={!!checked}
-          disabled={switchDisabled}
           onCheckedChange={onCheckedChange}
           className="shrink-0"
         />
-      ) : (
-        <div className="h-6 w-10 shrink-0" aria-hidden />
-      )}
+      ) : null}
     </div>
   );
 }
@@ -160,7 +151,6 @@ export function HomeCustomizeSheet({
   sectionTitle,
   sectionDescription,
   onResetAll,
-  nightToggleDisabled,
   dndRemountKey = 0,
 }: HomeCustomizeSheetProps) {
   "use memo";
@@ -194,26 +184,27 @@ export function HomeCustomizeSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="max-h-[88vh] overflow-y-auto rounded-t-2xl pb-8 pt-6">
-        <SheetHeader className="space-y-2 px-1 pr-10 text-center sm:text-center">
-          <SheetTitle className="text-base font-semibold sm:text-lg">
+      <SheetContent side="bottom" className="max-h-[88vh] overflow-y-auto rounded-t-[2.5rem] px-8 pb-8 pt-10">
+        <SheetHeader className="space-y-0 px-0 text-center sm:text-center">
+          <SheetTitle className="text-sm font-medium leading-5 text-foreground">
             {t('home.customizeSheet.title')}
           </SheetTitle>
-          <SheetDescription className="text-balance">
-            {t('home.customizeSheet.description')}
-          </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-6 space-y-6">
-          <section className="space-y-3" aria-labelledby="home-customize-widgets">
+        <SheetDescription className="mt-6 text-left text-base font-medium leading-6 text-foreground">
+          {t('home.customizeSheet.description')}
+        </SheetDescription>
+
+        <div className="mt-6 space-y-4">
+          <section className="space-y-4" aria-labelledby="home-customize-widgets">
             <div className="flex items-center justify-between gap-3">
-              <h3 id="home-customize-widgets" className={cn(homeInWidget.kickerAccent, 'text-xs')}>
+              <h3 id="home-customize-widgets" className="text-base font-medium leading-6 text-foreground">
                 {t('home.customizeSheet.widgetsHeading')}
               </h3>
               <button
                 type="button"
                 onClick={onResetAll}
-                className="shrink-0 text-xs font-medium text-foreground underline underline-offset-4 decoration-foreground/40 hover:decoration-foreground"
+                className="shrink-0 text-sm font-medium text-nox-text-link transition-colors hover:text-nox-text-link/80"
               >
                 {t('home.customizeSheet.resetLink')}
               </button>
@@ -226,7 +217,7 @@ export function HomeCustomizeSheet({
               onDragEnd={handleDragEnd}
               modifiers={[restrictToVerticalAxis]}
             >
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-4">
                 <CustomizePinnedRow
                   key={GOAL_WHY_SECTION_ID}
                   id={GOAL_WHY_SECTION_ID}
@@ -234,7 +225,7 @@ export function HomeCustomizeSheet({
                   description={sectionDescription(GOAL_WHY_SECTION_ID)}
                 />
                 <SortableContext items={tailOrder} strategy={verticalListSortingStrategy}>
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-4">
                     {tailOrder.map((id) => {
                       const noVisibilityToggle = isHomeSectionAlwaysVisibleInLayout(id);
                       return (
@@ -245,7 +236,6 @@ export function HomeCustomizeSheet({
                           description={sectionDescription(id)}
                           checked={!!visible[id]}
                           onCheckedChange={(v) => onSetVisible(id, v)}
-                          switchDisabled={id === 'night' && nightToggleDisabled}
                           showSwitch={!noVisibilityToggle}
                           disableSortable={false}
                         />

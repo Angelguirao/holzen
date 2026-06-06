@@ -20,9 +20,9 @@ describe('home-screen-telemetry', () => {
   });
 
   it('tracks optional widget toggle', () => {
-    trackHomeOptionalWidgetToggled('night', true);
+    trackHomeOptionalWidgetToggled('journey-pulse', true);
     expect(trackEvent).toHaveBeenCalledWith('home.optional_widget_toggled', {
-      widget_id: 'night',
+      widget_id: 'journey-pulse',
       visible: true,
     });
   });

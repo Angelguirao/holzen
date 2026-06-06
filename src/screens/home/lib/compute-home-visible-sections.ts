@@ -6,14 +6,11 @@ import {
 export function computeVisibleOrderedSectionIds(args: {
   order: string[];
   sectionVisible: Record<string, boolean>;
-  subscribed: boolean;
-  hasNightReflection: boolean;
 }): string[] {
-  const { order, sectionVisible, subscribed, hasNightReflection } = args;
+  const { order, sectionVisible } = args;
   return order.filter((id) => {
     if (isHomeSectionAlwaysVisibleInLayout(id)) return true;
     if (!sectionVisible[id]) return false;
-    if (id === 'night' && (!subscribed || !hasNightReflection)) return false;
     return true;
   });
 }
