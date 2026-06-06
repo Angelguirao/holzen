@@ -32,7 +32,7 @@ Home market is **context supply + perspective controls** for the behavioral engi
 
 | Element | Why |
 |---------|-----|
-| **Within / beyond your range** (+ 7d cumulative when applicable) | Connects user settings to “is this my moment?” — best single status line |
+| **Within / beyond your range** (24h directional thresholds) | Connects user settings to “is this my moment?” — best single status line |
 | **Hide fiat price** | Behavioral output; masks pair + price as `••••` / `••••••` |
 | **Unit-basis mode** (`1 BTC = 1 BTC`) | Bitcoin-only perspective mode; hide control **disabled** (visible, not actionable) |
 | **Toolbar affordances** | Icons stay visible; disable when incoherent (BTC enter while hidden; hide while unit-basis) |
@@ -60,7 +60,7 @@ Treat Home market as a **monitoring + perspective panel**, not a **market data w
 
 ```text
 Collapsed (default)
-├── Status: within | ▼/▲ beyond range (incl. 7d cumulative label when relevant)
+├── Status: within | ▼/▲ beyond range (daily thresholds)
 ├── Perspective row: fiat price OR unit-basis identity OR masked dots
 ├── Toolbar: BTC mode | hide (disabled states per mode)
 └── Footer: range (left) + community stats (right, gated)
@@ -105,7 +105,8 @@ Absolute price anchors as **optional future layer** stay in [volatility-anchor-t
 ## Implementation notes (when picking slices)
 
 - **Display prefs:** `useMarketDisplayPreferences` — hide, unit-basis, chart expand; expand blocked in unit-basis + hidden fiat.
-- **Footer projection:** `resolveMarketVolatilityRangeStatus` mirrors server thresholds; keep in sync with `_shared/volatility-thresholds.ts`.
+- **Footer projection:** `resolveMarketVolatilityRangeStatus` mirrors daily server thresholds; keep in sync with `_shared/volatility-thresholds.ts`.
+- **7-day cumulative (legacy):** stripped from active pause-first (Jun 2026). Archived in `src/legacy/cumulative-threshold/`; DB column `profiles.cumulative_threshold` retained for compatibility.
 - **Pause duplication:** `formatHomePauseMarketBlock` + `HomePauseWidgetMarketRow` — pause card is the canonical “hot moment” copy surface.
 - **Figma vs logic:** Collapsed Market has **no** 24h/F&G ([251:17255](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=251-17255)); unit-basis layout ([533:36421](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=533-36421)). Align code when changing behavior; update this doc when **product** intent diverges from Figma.
 

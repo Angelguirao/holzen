@@ -13,7 +13,6 @@ export type BuildManualPauseOpenParamsInput = {
   silentMode: boolean;
   mood?: string;
   data: MarketQuote;
-  cumulativeThreshold: number;
   profileTrackedAssetId: string;
 };
 
@@ -22,7 +21,6 @@ export function buildManualPauseOpenParams(
 ): OpenManualPauseFromHomeParams & ManualPauseMarketContext {
   const { assetId, ctx, severityBand, onChainBand, silentMsg } = buildManualPauseMarketContext(
     input.data,
-    input.cumulativeThreshold,
     input.profileTrackedAssetId,
   );
 
@@ -37,7 +35,7 @@ export function buildManualPauseOpenParams(
     silentMessage: silentMsg,
     mood: input.mood,
     changePercent: input.data.changePercent,
-    cumulativeChangePercent: input.data.cumulativeChangePercent ?? null,
+    cumulativeChangePercent: null,
     trackedAssetId: assetId,
     fearGreedLabel: input.data.fearGreed?.label ?? null,
     onChainBand,

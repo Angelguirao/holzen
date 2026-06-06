@@ -13,11 +13,7 @@ export {
   buildPauseContextFromBtc,
   buildPauseContextFromMarket,
 } from './application/pause-context-from-market';
-export {
-  DEFAULT_CUMULATIVE_THRESHOLD,
-  effectiveCumulativeThreshold,
-  isCumulativeMoveTriggered,
-} from './domain/volatility-thresholds';
+export { isVolatilityThresholdBreached } from './domain/volatility-thresholds';
 export {
   resolveMarketVolatilityRangeStatus,
   type MarketVolatilityRangeStatus,

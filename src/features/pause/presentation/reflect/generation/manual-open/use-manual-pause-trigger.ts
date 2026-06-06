@@ -23,7 +23,6 @@ import { holzenLog } from '@/lib/holzen-console';
 export interface UseManualPauseTriggerParams {
   user: User | null;
   silentMode: boolean;
-  cumulativeThreshold: number;
   trackedAssetId: string;
   syncOpenPauseFromDb: () => Promise<void>;
   setError: Dispatch<SetStateAction<string | null>>;
@@ -42,7 +41,6 @@ export interface UseManualPauseTriggerParams {
 export function useManualPauseTrigger({
   user,
   silentMode,
-  cumulativeThreshold,
   trackedAssetId: profileTrackedAssetId,
   syncOpenPauseFromDb,
   setError,
@@ -74,7 +72,6 @@ export function useManualPauseTrigger({
         silentMode,
         mood,
         data,
-        cumulativeThreshold,
         profileTrackedAssetId,
       });
       const { assetId, ctx, silentMsg, ...openParams } = built;
@@ -131,7 +128,6 @@ export function useManualPauseTrigger({
     [
       user,
       silentMode,
-      cumulativeThreshold,
       profileTrackedAssetId,
       syncOpenPauseFromDb,
       setError,

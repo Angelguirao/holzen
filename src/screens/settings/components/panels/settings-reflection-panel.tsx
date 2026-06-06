@@ -18,8 +18,6 @@ export function SettingsReflectionPanel() {
     setThreshold,
     thresholdDown,
     setThresholdDown,
-    cumulativeThreshold,
-    setCumulativeThreshold,
     cooldownHours,
     setCooldownHours,
     reflectionTone,
@@ -59,8 +57,6 @@ export function SettingsReflectionPanel() {
         onSetUp={setThreshold}
         thresholdDown={thresholdDown}
         onSetDown={setThresholdDown}
-        cumulativeThreshold={cumulativeThreshold}
-        onSetCumulative={setCumulativeThreshold}
         cooldownHours={cooldownHours}
         trackedAssetId={trackedAssetId}
       />

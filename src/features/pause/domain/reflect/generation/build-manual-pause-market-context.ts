@@ -19,12 +19,11 @@ export type ManualPauseMarketContext = {
 /** Market snapshot → pause context string, severity band, and silent reflection stub copy. */
 export function buildManualPauseMarketContext(
   data: MarketQuote,
-  cumulativeThreshold: number,
   profileTrackedAssetId: string,
 ): ManualPauseMarketContext {
   const assetId = normalizeTrackedAssetId(profileTrackedAssetId);
   const assetSym = trackedAssetSymbol(assetId);
-  const ctx = buildPauseContextFromMarket(data, cumulativeThreshold, assetSym);
+  const ctx = buildPauseContextFromMarket(data, assetSym);
   const severityBand = severityFromMarketChangePercent(data.changePercent) ?? 'mild';
   const onChainBand =
     isBitcoinTrackedAsset(assetId) && data.onChain

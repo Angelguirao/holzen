@@ -91,9 +91,10 @@ Well-aligned relative to other contexts — see [src/features/market/README.md](
 | Signal | Window | Profile fields | Breach rule |
 |--------|--------|----------------|-------------|
 | Daily move | Rolling 24h | `threshold` (up), `threshold_down` (down) | Signed % change vs direction-specific threshold |
-| Cumulative move | Rolling 7d | `cumulative_threshold` (default 15; `0` = off) | `abs(change_7d) ≥ threshold` |
 
-Metrics come from CoinGecko `market_chart` in the cron worker (`fetchAssetVolatilityForCurrency`). Shared pure helpers: `supabase/functions/_shared/volatility-thresholds.ts` and `src/features/market/domain/volatility-thresholds.ts` (keep in sync).
+**Legacy (not active):** rolling 7d cumulative auto-pause (`cumulative_threshold`) — archived in `src/legacy/cumulative-threshold/` and `supabase/functions/_shared/legacy/volatility-thresholds-cumulative-legacy.ts` (Jun 2026 strip).
+
+Metrics come from CoinGecko `market_chart?days=1` in the cron worker (`fetchAssetVolatilityForCurrency`). Shared pure helpers: `supabase/functions/_shared/volatility-thresholds.ts` and `src/features/market/domain/volatility-thresholds.ts` (keep in sync).
 
 Gating after breach: cooldown (`claim_trigger_slot`), quiet hours / `quiet_windows`, snooze, email/push prefs — see [notifications-delivery.md](notifications-delivery.md) and [phase-3-server-cron-triggers.md](../reviews/phase-3-server-cron-triggers.md).
 

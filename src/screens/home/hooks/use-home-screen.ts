@@ -83,7 +83,6 @@ export function useHomeScreen() {
     trackedAssetId,
     threshold,
     thresholdDown,
-    cumulativeThreshold,
     profileLoaded,
     lastTriggerAt: profileLastTriggerAt,
   } = useProfile();
@@ -221,7 +220,6 @@ export function useHomeScreen() {
       marketData,
       threshold,
       thresholdDown,
-      cumulativeThreshold,
       marketCommunityPauseInProgress,
       priceHidden,
       togglePriceHidden,

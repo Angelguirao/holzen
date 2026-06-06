@@ -12,7 +12,6 @@ import {
   pauseRecencyInputs,
 } from "../_shared/pause-cron-parity.ts";
 import {
-  isCumulativeMoveTriggered,
   isVolatilityThresholdBreached,
 } from "../_shared/volatility-thresholds.ts";
 import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
@@ -73,8 +72,6 @@ function normalizeDisplayCurrency(raw: unknown): string {
 type AssetVolatilityMetrics = {
   changePercent: number;
   direction: string;
-  cumulativeChangePercent: number;
-  cumulativeDirection: string;
 };
 
 /** Row shape from the `profiles` select in this handler. */
@@ -82,7 +79,6 @@ interface VolatilityProfile {
   user_id: string;
   threshold?: number | null;
   threshold_down?: number | null;
-  cumulative_threshold?: number | null;
   display_currency?: string | null;
   email_notifications?: boolean | null;
   last_trigger_at?: string | null;
@@ -114,18 +110,11 @@ async function fetchAssetVolatilityForCurrency(
 ): Promise<AssetVolatilityMetrics> {
   const cur = vsCurrency.toLowerCase();
   const id = encodeURIComponent(coinId);
-  const [res1d, res7d] = await Promise.all([
-    fetchWithRetry(
-      incoming,
-      `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=1`,
-      log,
-    ),
-    fetchWithRetry(
-      incoming,
-      `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=7`,
-      log,
-    ),
-  ]);
+  const res1d = await fetchWithRetry(
+    incoming,
+    `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=1`,
+    log,
+  );
 
   const data1d = await res1d.json();
   const prices1d: [number, number][] = data1d.prices;
@@ -135,19 +124,9 @@ async function fetchAssetVolatilityForCurrency(
   const currentPrice = prices1d[prices1d.length - 1][1];
   const changePercent = ((currentPrice - price24hAgo) / price24hAgo) * 100;
 
-  const data7d = await res7d.json();
-  const prices7d: [number, number][] = data7d.prices;
-  let cumulativeChangePercent = 0;
-  if (prices7d && prices7d.length >= 2) {
-    const price7dAgo = prices7d[0][1];
-    cumulativeChangePercent = ((currentPrice - price7dAgo) / price7dAgo) * 100;
-  }
-
   return {
     changePercent,
     direction: changePercent >= 0 ? "up" : "down",
-    cumulativeChangePercent,
-    cumulativeDirection: cumulativeChangePercent >= 0 ? "up" : "down",
   };
 }
 
@@ -192,7 +171,7 @@ serve(
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select(
-        "user_id, threshold, threshold_down, cumulative_threshold, display_currency, tracked_asset_id, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
+        "user_id, threshold, threshold_down, display_currency, tracked_asset_id, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
       );
 
     if (profilesError) throw profilesError;
@@ -277,7 +256,6 @@ serve(
       holzen_event: "check_volatility_cron",
       phase: "market_sample_loaded",
       change24h_pct: Number(usdPeek.changePercent.toFixed(2)),
-      change7d_pct: Number(usdPeek.cumulativeChangePercent.toFixed(2)),
       asset_currency_pairs: pairRows.filter((r) => r.m).length,
     });
 
@@ -466,11 +444,6 @@ serve(
       const assetId = normalizeTrackedAssetId(profile.tracked_asset_id);
       const sym = trackedAssetSymbol(assetId);
       let ctx = `${sym} is ${dir} ${pct}% in the last 24 hours.`;
-      if (isCumulativeMoveTriggered(userM.cumulativeChangePercent, profile.cumulative_threshold)) {
-        const cumDir = userM.cumulativeDirection === "down" ? "down" : "up";
-        const absCum = Math.abs(userM.cumulativeChangePercent);
-        ctx += ` Over 7 days, it's ${cumDir} ${absCum.toFixed(1)}%.`;
-      }
       const onChainForUser = isBitcoinTrackedAsset(assetId) ? onChainSnapshot : null;
       ctx = enrichAutomaticPauseContext(ctx, fearGreedSnapshot, onChainForUser);
 
@@ -492,7 +465,7 @@ serve(
         directionBucket,
         severityBand,
         dailyBucketPct,
-        cumulativeBucketPct: bucketChangePercent(userM.cumulativeChangePercent),
+        cumulativeBucketPct: 0,
         trackedAssetId: assetId,
         fearGreedBand: fearGreedSnapshot?.label ?? null,
         onChainBand: onChainForUser
@@ -510,7 +483,7 @@ serve(
           p_source: "cron_volatility",
           p_context_snapshot: {
             change_24h_pct: userM.changePercent,
-            change_7d_pct: userM.cumulativeChangePercent,
+            change_7d_pct: null,
             direction: userM.direction,
             severity: severityBand,
             context_text: ctx,
@@ -523,12 +496,6 @@ serve(
             triggered: [
               Math.abs(userM.changePercent) >= (profile.threshold ?? 5)
                 ? "daily"
-                : null,
-              isCumulativeMoveTriggered(
-                userM.cumulativeChangePercent,
-                profile.cumulative_threshold,
-              )
-                ? "cumulative"
                 : null,
             ].filter(Boolean),
           },

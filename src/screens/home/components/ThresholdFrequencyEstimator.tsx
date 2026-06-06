@@ -7,7 +7,6 @@ import { getThresholdVolatilityEstimatorQueryOptions } from '@/features/user/pub
 interface Props {
   thresholdUp: number;
   thresholdDown?: number;
-  cumulativeThreshold?: number;
   cooldownHours?: number;
   className?: string;
   /** CoinGecko coin id for historical volatility fetch. */
@@ -57,21 +56,16 @@ function computeStatsDaily(
 }
 
 /**
- * Simulates the real trigger logic used in the app:
- * - 24h directional threshold (up/down)
- * - 7d cumulative threshold (absolute move, up or down)
- * - cooldown gating
+ * Simulates daily trigger logic with cooldown gating (matches active cron/UI).
  */
 function computeStatsSimulated(
   hourlyPrices: [number, number][],
   thresholdUp: number,
   thresholdDown: number,
-  cumulativeThreshold: number,
   cooldownHours: number,
   avgDailyMove: number,
 ): VolatilityStats {
   const msPerDay = 24 * 60 * 60 * 1000;
-  const msPer7Days = 7 * msPerDay;
   const cooldownMs = cooldownHours * 60 * 60 * 1000;
 
   const now = hourlyPrices[hourlyPrices.length - 1][0];
@@ -87,7 +81,6 @@ function computeStatsSimulated(
     const [ts, priceNow] = hourlyPrices[i];
 
     const has24hHistory = ts - hourlyPrices[0][0] >= msPerDay;
-    const has7dHistory = ts - hourlyPrices[0][0] >= msPer7Days;
 
     let dailyTriggered = false;
     if (has24hHistory) {
@@ -100,19 +93,9 @@ function computeStatsSimulated(
         : Math.abs(change24h) >= thresholdDown;
     }
 
-    let cumulativeTriggered = false;
-    if (cumulativeThreshold > 0 && has7dHistory) {
-      const idx7d = findIndexAtOrBeforeTimestamp(hourlyPrices, ts - msPer7Days, i - 1);
-      const price7dAgo = hourlyPrices[idx7d][1];
-      const change7d = ((priceNow - price7dAgo) / price7dAgo) * 100;
-      cumulativeTriggered = Math.abs(change7d) >= cumulativeThreshold;
-    }
-
-    if (dailyTriggered || cumulativeTriggered) {
-      // Count raw signals (no cooldown filter)
+    if (dailyTriggered) {
       if (ts >= t30) rawSignals30d++;
 
-      // Count deduplicated pauses (with cooldown)
       if (ts - lastTriggerTime >= cooldownMs) {
         if (ts >= t90) triggers90++;
         if (ts >= t30) triggers30++;
@@ -127,7 +110,6 @@ function computeStatsSimulated(
 export function ThresholdFrequencyEstimator({
   thresholdUp,
   thresholdDown,
-  cumulativeThreshold = 0,
   cooldownHours,
   className,
   coinId = 'bitcoin',
@@ -151,17 +133,14 @@ export function ThresholdFrequencyEstimator({
         cachedData.hourlyPrices,
         thresholdUp,
         effectiveDown,
-        cumulativeThreshold,
         cooldownHours ?? 24,
         avgDailyMove,
       );
     }
     return computeStatsDaily(cachedData.dailyChanges, thresholdUp, effectiveDown);
-  }, [cachedData, thresholdUp, effectiveDown, cumulativeThreshold, cooldownHours]);
+  }, [cachedData, thresholdUp, effectiveDown, cooldownHours]);
 
   if (!stats) return null;
-
-  const monthlyEstimate = Math.round((stats.crossings90d / 90) * 30);
 
   return (
     <div className={className}>

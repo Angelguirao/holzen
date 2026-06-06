@@ -47,11 +47,9 @@ describe('pause-home-reflect-io', () => {
         direction: 'up',
         currency: 'USD',
         changePercent: 2,
-        cumulativeChangePercent: 3,
         fearGreed: { value: 25, label: 'Fear' },
         onChain: null,
       },
-      5,
       'bitcoin',
     );
     expect(market.assetId).toBe('bitcoin');
@@ -75,11 +73,9 @@ describe('pause-home-reflect-io', () => {
         direction: 'up',
         currency: 'USD',
         changePercent: 1,
-        cumulativeChangePercent: 2,
         fearGreed: null,
         onChain: null,
       },
-      cumulativeThreshold: 5,
       profileTrackedAssetId: 'bitcoin',
     });
     expect(params.userId).toBe('u1');
