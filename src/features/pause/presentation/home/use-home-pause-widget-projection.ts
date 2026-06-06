@@ -24,6 +24,10 @@ import {
 } from '@/features/pause/infrastructure/queries/recent-context-lost-pause-query';
 import { usePendingPauseOffer } from '@/features/pause/presentation/reflect/pending-offer/use-pending-pause-offer';
 import { useCalmWatersToast } from '@/features/pause/presentation/home/use-calm-waters-toast';
+import {
+  markHomePauseWidgetFirstVisitHandled,
+  shouldExpandHomePauseWidgetFirstVisit,
+} from '@/features/pause/infrastructure/home-pause-widget-first-visit-storage';
 
 export const HOME_PAUSE_WIDGET_EXPANDED_STORAGE_KEY = 'holzen_home_pause_widget_expanded_v1';
 
@@ -157,6 +161,14 @@ export function useHomePauseWidgetProjection(
     () => params.manualCooldownRemaining(),
     [params.manualCooldownRemaining, cooldownNowMs],
   );
+
+  useEffect(() => {
+    if (!userId || params.hasOpenPause || params.loading) return;
+    if (manualCooldownRemainingMs > 0) return;
+    if (!shouldExpandHomePauseWidgetFirstVisit(userId)) return;
+    setUserExpanded(true);
+    markHomePauseWidgetFirstVisitHandled(userId);
+  }, [userId, params.hasOpenPause, params.loading, manualCooldownRemainingMs]);
 
   const { mode: widgetMode } = useMemo(
     () =>
