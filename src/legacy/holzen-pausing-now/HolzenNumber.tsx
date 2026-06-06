@@ -2,22 +2,28 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { motion, useReducedMotion } from 'framer-motion';
 import { getHolzenNumberQueryOptions } from '@/features/user/public-queries';
-import { hasVisibleHomeMarketCommunityStats } from '@/screens/home/components/home-market-community-stats';
+import type { HolzenNumberData } from '@/features/user/infrastructure/edge/holzen-number-edge';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
+import { hasPausingNowStat } from '@/legacy/holzen-pausing-now/has-pausing-now-stat';
 
-/**
- * Legacy full-width community stat (default variant). Home Market uses
- * {@link HomeMarketWidgetFooter} compact lines instead.
- */
+function hasVisibleLegacyHolzenNumber(data: HolzenNumberData): boolean {
+  return (
+    hasPausingNowStat(data) ||
+    data.users_paused_today > 0 ||
+    data.percent_paused_today > 0
+  );
+}
+
+/** Legacy full-width / compact community stat (includes live “pausing now”). Not shipped on pause-first Home. */
 export function HolzenNumber({ variant = 'default' }: { variant?: 'default' | 'compact' }) {
   "use memo";
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const { data, isPending } = useQuery(getHolzenNumberQueryOptions());
 
-  if (isPending || !data || !hasVisibleHomeMarketCommunityStats(data)) return null;
+  if (isPending || !data || !hasVisibleLegacyHolzenNumber(data)) return null;
 
-  const showNow = data.users_pausing_now > 0 || data.percent_pausing_now > 0;
+  const showNow = hasPausingNowStat(data);
   const showToday = data.users_paused_today > 0 || data.percent_paused_today > 0;
 
   const motionProps = prefersReduced

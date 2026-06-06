@@ -15,8 +15,6 @@ export function useHomeDashboardSectionDeps(args: {
   marketData: MarketQuote | null;
   threshold: number;
   thresholdDown: number;
-  /** Mid-ritual open pause — community stat copy switches to Figma 3.4.4.2. */
-  marketCommunityPauseInProgress?: boolean;
   priceHidden: boolean;
   togglePriceHidden: () => void;
   currency: string;
@@ -44,7 +42,6 @@ export function useHomeDashboardSectionDeps(args: {
     marketData,
     threshold,
     thresholdDown,
-    marketCommunityPauseInProgress = false,
     priceHidden,
     togglePriceHidden,
     currency,
@@ -72,7 +69,6 @@ export function useHomeDashboardSectionDeps(args: {
         marketData={marketData}
         threshold={threshold}
         thresholdDown={thresholdDown}
-        pauseInProgress={marketCommunityPauseInProgress}
       />
     ) : null);
 

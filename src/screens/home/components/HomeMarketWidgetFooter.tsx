@@ -10,8 +10,6 @@ type Props = {
   marketData: MarketQuote | null;
   threshold: number;
   thresholdDown: number;
-  /** Figma 3.4.4.2 — single “% are pausing now, too” line while user mid-pause. */
-  pauseInProgress?: boolean;
 };
 
 function RangeStatusLine({ status }: { status: MarketVolatilityRangeStatus }) {
@@ -45,13 +43,8 @@ function RangeStatusLine({ status }: { status: MarketVolatilityRangeStatus }) {
   );
 }
 
-/** Figma 559:26565 — range (left) + community stats stacked (right) under Market price. */
-export function HomeMarketWidgetFooter({
-  marketData,
-  threshold,
-  thresholdDown,
-  pauseInProgress = false,
-}: Props) {
+/** Figma 559:26565 — range (left) + paused-today stat (right) under Market price. */
+export function HomeMarketWidgetFooter({ marketData, threshold, thresholdDown }: Props) {
   "use memo";
 
   const rangeStatus =
@@ -70,7 +63,7 @@ export function HomeMarketWidgetFooter({
   return (
     <div className="flex items-start gap-1 pt-0.5">
       {rangeStatus ? <RangeStatusLine status={rangeStatus} /> : <span className="flex-1" />}
-      <HomeMarketCommunityStats pauseInProgress={pauseInProgress} />
+      <HomeMarketCommunityStats />
     </div>
   );
 }

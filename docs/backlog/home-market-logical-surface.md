@@ -40,7 +40,7 @@ Home market is **context supply + perspective controls** for the behavioral engi
 | **Trigger truth** | Postgres + `check-volatility` cron | Client **reflects** thresholds; does not authorize fires alone |
 | **Intervention** | **Your pause** widget + `/pause` | Empathy copy, move/sentiment, CTA when user should act |
 | **Perspective** | User prefs (hide fiat, unit-basis mode) | Reduce arousal without leaving Home |
-| **Social norm** | `holzen_community_stats` | “Others paused / pausing” when moment is hot — not ambient noise |
+| **Social norm** | `holzen_community_stats` | “% paused today” when gated hot — live “pausing now” archived under `@/legacy/holzen-pausing-now/` |
 
 Long term, treat Home market as a **perspective-first posture panel** (range + lens + optional anchor price), **not** a market-data widget.
 
