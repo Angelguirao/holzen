@@ -27,6 +27,7 @@ import {
   CONTEXT_LOST_HOME_WINDOW_MS,
 } from '@/features/pause/infrastructure/queries/recent-context-lost-pause-query';
 import { usePendingPauseOffer } from '@/features/pause/presentation/reflect/pending-offer/use-pending-pause-offer';
+import { useCalmWatersToast } from '@/features/pause/presentation/home/use-calm-waters-toast';
 
 export const HOME_PAUSE_WIDGET_EXPANDED_STORAGE_KEY = 'holzen_home_pause_widget_expanded_v1';
 
@@ -65,8 +66,6 @@ export type HomePauseWidgetBodyProjection = {
   pendingPreviewLine: HomePauseWidgetPreviewLine | null;
   pendingMarketBlock: ReturnType<typeof formatHomePauseMarketBlock> | null;
   calmWatersExpiredAt: string | null;
-  /** One-shot Sonner when a cron offer expired with `context_lost` (mode stays A / D). */
-  showCalmWatersToast: boolean;
 };
 
 export type UseHomePauseWidgetProjectionParams = {
@@ -137,6 +136,12 @@ export function useHomePauseWidgetProjection(
       calmQuery.data &&
       Date.now() - new Date(calmQuery.data.expiredAt).getTime() < CONTEXT_LOST_HOME_WINDOW_MS,
   );
+
+  useCalmWatersToast({
+    userId,
+    showCalmWaters,
+    pauseInstanceId: calmQuery.data?.pauseInstanceId ?? null,
+  });
 
   const blockingError = Boolean(
     params.error && shouldSurfacePauseWidgetError(params.error, params.marketData),
@@ -324,7 +329,6 @@ export function useHomePauseWidgetProjection(
     pendingPreviewLine,
     pendingMarketBlock,
     calmWatersExpiredAt: calmQuery.data?.expiredAt ?? null,
-    showCalmWatersToast: showCalmWaters,
   };
 
   return {
