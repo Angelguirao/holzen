@@ -139,7 +139,7 @@ Migration `20260605120000_pause_first_schema_hygiene.sql`:
 | --- | --- |
 | `app.route_not_found` | NotFound |
 | `journey.overview_viewed` | Journey overview |
-| `onboarding.completed` | 3-step onboarding completed + trial ensure |
+| `onboarding.completed` | 4-step onboarding completed (Why first) + trial ensure |
 | `trial.started` | New Stripe trial (`source: ensure_trial`) |
 | `trial.expired` | Entitlement → `lapsed` |
 

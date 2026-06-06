@@ -63,7 +63,7 @@ Wireframe: [546:8945](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wirefr
 
 | Surface | Content |
 |---------|---------|
-| **Home** | [`HomeGoalWhyCard`](../../src/screens/home/components/HomeGoalWhyCard.tsx) — quoted `profiles.mantra` + motivation chips as a dot-separated line; pencil → Settings → You |
+| **Home** | [`HomeGoalWhyCard`](../../src/screens/home/components/HomeGoalWhyCard.tsx) — quoted `profiles.mantra` (optional) + motivation line; **Add your anchor** when empty; pencil opens in-place edit sheet |
 | **Settings → You** | Full editors for motivations grid + mantra textarea |
 | **Hold goal / commitment** | **Not on active Home** — [`src/legacy/hold-goal/`](../../src/legacy/hold-goal/README.md) (investment-strategy scope) |
 

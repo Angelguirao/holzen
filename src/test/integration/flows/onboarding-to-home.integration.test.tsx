@@ -26,14 +26,17 @@ describe('F1 — Sign up → onboard → trial', () => {
     ensureTrial.mockClear();
   });
 
-  it('runs the 3-step flow and calls ensureTrial after saving the draft', async () => {
+  it('runs the 4-step flow and calls ensureTrial after saving the draft', async () => {
+    const onSaveMotivations = vi.fn().mockResolvedValue(undefined);
     const onSaveDraft = vi.fn().mockResolvedValue(undefined);
     const onComplete = vi.fn().mockResolvedValue(undefined);
     render(
       <QueryClientProvider client={new QueryClient()}>
         <OnboardingFlow
+          initialMotivations={[]}
           initialTrackedAssetId="bitcoin"
           initialThreshold={5}
+          onSaveMotivations={onSaveMotivations}
           onSaveDraft={onSaveDraft}
           onStartTrial={ensureTrial}
           onComplete={onComplete}
@@ -42,13 +45,20 @@ describe('F1 — Sign up → onboard → trial', () => {
       </QueryClientProvider>,
     );
 
-    expect(screen.getByText('1/3')).toBeInTheDocument();
+    expect(screen.getByText('1/4')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Financial freedom/i }));
     fireEvent.click(screen.getByRole('button', { name: /continue/i }));
 
-    expect(await screen.findByText('2/3')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(onSaveMotivations).toHaveBeenCalledWith(['freedom']);
+    });
+    expect(await screen.findByText('2/4')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /continue/i }));
 
-    expect(await screen.findByText('3/3')).toBeInTheDocument();
+    expect(await screen.findByText('3/4')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /continue/i }));
+
+    expect(await screen.findByText('4/4')).toBeInTheDocument();
     const trialBtn = await screen.findByRole('button', { name: /free trial/i });
     fireEvent.click(trialBtn);
 

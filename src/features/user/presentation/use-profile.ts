@@ -399,7 +399,12 @@ export function useProfile() {
       setMotivationsState(val);
       if (!user) return;
       const { error } = await updateProfileFields(user.id, { motivations: val });
-      if (!error) invalidateProfileQuery();
+      if (error) {
+        holzenLog.profile('motivations update failed', { error: error.message });
+        toast.error(t('common.profileWriteFailed'));
+        throw error;
+      }
+      invalidateProfileQuery();
     },
     groundingActivities,
     setGroundingActivities: async (val: string[]) => {
@@ -413,7 +418,12 @@ export function useProfile() {
       setMantraState(val);
       if (!user) return;
       const { error } = await updateProfileFields(user.id, { mantra: val });
-      if (!error) invalidateProfileQuery();
+      if (error) {
+        holzenLog.profile('mantra update failed', { error: error.message });
+        toast.error(t('common.profileWriteFailed'));
+        throw error;
+      }
+      invalidateProfileQuery();
     },
     currency,
     setCurrency: async (val: string) => {
