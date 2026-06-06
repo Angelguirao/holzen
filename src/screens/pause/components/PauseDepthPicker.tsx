@@ -1,16 +1,17 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import type { MarketQuote } from '@/features/market/public';
 import { PauseDepthPickerDepthCards } from '@/screens/pause/components/pause-depth-picker-depth-cards';
 import { PauseDepthPickerFooterLinks } from '@/screens/pause/components/pause-depth-picker-footer-links';
 import { PauseDepthPickerHeader } from '@/screens/pause/components/pause-depth-picker-header';
+import { PauseDepthPickerMarketContext } from '@/screens/pause/components/pause-depth-picker-market-context';
 
 interface Props {
-  contextLine: string | null;
+  marketData: MarketQuote | null;
+  trackedAssetId: string;
   onBrief: () => void;
   onDeep: () => void;
   onAboutPauses: () => void;
-  /** Opens the help sheet on the “Step science” tab (brief vs deep choice screen only). */
-  onOpenStepScience: () => void;
   onClose: () => void;
   /** When true, deep pause is visually gated; `onDeep` still runs so callers can show paywall / checkout. */
   deepPauseLocked?: boolean;
@@ -18,12 +19,13 @@ interface Props {
   choicesDisabled?: boolean;
 }
 
+/** Full-screen depth choice — Figma Wireframes 589:19155. */
 export function PauseDepthPicker({
-  contextLine,
+  marketData,
+  trackedAssetId,
   onBrief,
   onDeep,
   onAboutPauses,
-  onOpenStepScience,
   onClose,
   deepPauseLocked = false,
   choicesDisabled = false,
@@ -40,14 +42,11 @@ export function PauseDepthPicker({
     >
       <PauseDepthPickerHeader onAboutPauses={onAboutPauses} onClose={onClose} />
 
-      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col px-5 pb-12 pt-[35px] sm:px-8">
+      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col px-5 pb-12 pt-10 sm:px-8">
         <div className="flex flex-col gap-8">
-          <div className="text-center">
-            <h1 className="text-[22px] font-normal leading-[28px] tracking-[0.01em] text-foreground">
-              <span className="block">{t('pause.depthPicker.headline1', { defaultValue: 'You paused' })}</span>
-              <span className="block">{t('pause.depthPicker.headline2', { defaultValue: "That's the hardest part." })}</span>
-            </h1>
-          </div>
+          <h1 className="text-center text-[22px] font-normal leading-7 tracking-[0.004em] text-foreground">
+            {t('pause.depthPicker.headline', { defaultValue: 'How long do you have?' })}
+          </h1>
 
           <PauseDepthPickerDepthCards
             onBrief={onBrief}
@@ -56,14 +55,9 @@ export function PauseDepthPicker({
             choicesDisabled={choicesDisabled}
           />
 
-          {contextLine ? (
-            <p className="text-center text-base font-normal leading-6 text-muted-foreground">{contextLine}</p>
-          ) : null}
+          <PauseDepthPickerMarketContext marketData={marketData} trackedAssetId={trackedAssetId} />
 
-          <PauseDepthPickerFooterLinks
-            onAboutPauses={onAboutPauses}
-            onOpenStepScience={onOpenStepScience}
-          />
+          <PauseDepthPickerFooterLinks onAboutPauses={onAboutPauses} />
         </div>
       </div>
     </motion.div>

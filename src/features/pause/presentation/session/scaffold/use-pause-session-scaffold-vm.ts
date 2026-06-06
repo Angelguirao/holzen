@@ -88,7 +88,8 @@ export function usePauseSessionScaffoldVm(
 
   return {
     sessionOnPicker: scaffold.sessionOnPicker,
-    depthContextLine: scaffold.depthContextLine,
+    depthPickerMarketData: marketData,
+    depthPickerTrackedAssetId: trackedAssetId,
     depthPickerOnBrief: mood.depthPickerOnBrief,
     handleDepthPickerDeep: mood.handleDepthPickerDeep,
     scaffoldRitualDerived: scaffold.scaffoldRitualDerived,

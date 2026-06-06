@@ -30,13 +30,13 @@ export function PauseDepthPickerDepthCards({
           choicesDisabled && 'pointer-events-none opacity-60',
         )}
       >
-        <span className="text-base font-medium text-muted-foreground">
+        <span className="text-base font-medium leading-6 tracking-[0.01em] text-muted-foreground">
           {t('pause.depthPicker.brief.label', { defaultValue: 'Brief pause' })}
         </span>
-        <span className="text-sm font-normal text-muted-foreground">
+        <span className="text-sm font-normal leading-5 tracking-[0.008em] text-muted-foreground">
           {t('pause.depthPicker.brief.duration', { defaultValue: '~ 2 min' })}
         </span>
-        <span className="text-sm leading-5 text-foreground">
+        <span className="text-sm leading-5 tracking-[0.008em] text-foreground">
           {t('pause.depthPicker.brief.desc', { defaultValue: 'Steady yourself, then decide.' })}
         </span>
       </button>
@@ -58,7 +58,7 @@ export function PauseDepthPickerDepthCards({
         }
       >
         <span className="flex w-full items-center justify-center gap-2">
-          <span className="text-base font-medium text-muted-foreground">
+          <span className="text-base font-medium leading-6 tracking-[0.01em] text-muted-foreground">
             {t('pause.depthPicker.deep.label', { defaultValue: 'Deep pause' })}
           </span>
           {deepPauseLocked ? (
@@ -67,10 +67,10 @@ export function PauseDepthPickerDepthCards({
             </span>
           ) : null}
         </span>
-        <span className="text-sm font-normal text-muted-foreground">
+        <span className="text-sm font-normal leading-5 tracking-[0.008em] text-muted-foreground">
           {t('pause.depthPicker.deep.duration', { defaultValue: '~ 7 min' })}
         </span>
-        <span className="text-sm leading-5 text-foreground">
+        <span className="text-sm leading-5 tracking-[0.008em] text-foreground">
           {t('pause.depthPicker.deep.desc', {
             defaultValue: 'Sit with it. Reflect. Decide from your center.',
           })}
