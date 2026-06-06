@@ -100,6 +100,7 @@ export function usePauseSessionTerminalEntryRedirect(input: {
         t('pause.terminalEntryRedirect', {
           defaultValue: 'This pause already ended — opening your archive.',
         }),
+        { id: `pause:terminal-entry:${pauseInstanceId}` },
       );
     }
     navigate('/archive?seg=pauses', { replace: true });

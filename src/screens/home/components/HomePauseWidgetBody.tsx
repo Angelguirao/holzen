@@ -1,7 +1,5 @@
-import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SubscriptionSkeleton } from '@/screens/home/components/SubscriptionSkeleton';
 import { LoadingButton } from '@/components/ui/loading-button';
@@ -24,17 +22,6 @@ type Props = HomePauseWidgetBodyProjection;
 export function HomePauseWidgetBody(props: Props) {
   "use memo";
   const { t } = useTranslation();
-  const calmToastShown = useRef(false);
-
-  useEffect(() => {
-    if (props.widgetMode !== 'calm_waters' && !props.showCalmWatersToast) {
-      calmToastShown.current = false;
-      return;
-    }
-    if (calmToastShown.current) return;
-    calmToastShown.current = true;
-    toast.message(t('home.pauseCalmWaters.toast'), { duration: 5000 });
-  }, [props.widgetMode, props.showCalmWatersToast, t]);
 
   const blockingError =
     props.error && shouldSurfacePauseWidgetError(props.error, props.marketData) ? props.error : null;
