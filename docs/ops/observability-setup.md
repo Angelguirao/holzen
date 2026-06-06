@@ -216,7 +216,7 @@ Mirror of the **Part A** table in [pg-cron-heartbeat-wiring.md](../backlog/pg-cr
 | `process-email-queue` | `*/1 * * * *` | 1 min | 5 min | `heartbeat.process_email_queue` |
 | `process-referral-pending` | `*/5 * * * *` | 5 min | 2 min | `heartbeat.process_referral_pending` |
 | `refresh-market-prices` | `*/15 * * * *` | 15 min | 5 min | `heartbeat.refresh_market_prices` |
-| `check-volatility` | `*/15 * * * *` | 15 min | 5 min | `heartbeat.check_volatility` |
+| `check-volatility` | `0 * * * *` | 1 hr | 10 min | `heartbeat.check_volatility` |
 | `night-reflection` | `0 * * * *` | 1 hr | 10 min | `heartbeat.night_reflection` |
 | `pregenerate-companions` | `0 */6 * * *` | 6 hr | 30 min | `heartbeat.pregenerate_companions` |
 | `fetch-source-feeds` | `0 6,18 * * *` | 12 hr | 30 min | `heartbeat.fetch_source_feeds` |

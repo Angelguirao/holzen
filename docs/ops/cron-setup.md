@@ -203,10 +203,10 @@ SELECT cron.alter_job('pregenerate-companions', active := false);
 Checks BTC price and triggers pause sessions for eligible users.
 
 ```sql
--- Run every 15 minutes (Authorization injected at runtime — see [Cron HTTP auth](#cron-http-auth))
+-- Run every hour (Authorization injected at runtime — see [Cron HTTP auth](#cron-http-auth))
 SELECT cron.schedule(
   'check-volatility',
-  '*/15 * * * *',
+  '0 * * * *',
   $$
   SELECT net.http_post(
     url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/check-volatility',

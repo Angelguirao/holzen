@@ -158,23 +158,23 @@ If **Signal** hits **3** Perplexity requests (retries) and **Grounding** hits **
 
 ---
 
-## 6. “Pro user”, sensitive thresholds, cron every 15 minutes
+## 6. “Pro user”, sensitive thresholds, hourly volatility cron
 
 ### 6.1 What the product actually limits
 
-- **`check-volatility`** is often scheduled **every 15 minutes** (see [cron-setup.md](../../ops/cron-setup.md)), but that only **evaluates** users; it does **not** mean one new pause per user every 15 minutes.
-- **Automatic** pauses require thresholds **and** passing **`last_trigger_at` + `cooldown_hours`** (default **6 hours** in `check-volatility` when `last_trigger_at` is set). So in the worst **sustained** volatile market, expect on the order of **~4 automatic full generations per user per day**, not 96.
+- **`check-volatility`** runs **hourly** (see [cron-setup.md](../../ops/cron-setup.md)); each tick only **evaluates** users — it does **not** mean one new pause per user every hour.
+- **Automatic** pauses require thresholds **and** passing quiet hours, snooze, and “one open cron offer” rules (profile **`cooldown_hours`** no longer gates cron offers as of 2026-06). In sustained volatile markets, cost is bounded mainly by how often conditions actually align — not by scan cadence alone.
 - **Manual** pauses: each full flow does **reflection** (`pause_ai_call`) + **orchestrate**. `companion-orchestrate` uses `checkRateLimit` (**30** allowlisted AI events per **60** minutes per user). That caps **combined** frequency with other features that emit the same events (see `ratelimit.ts` allowlist).
 
 So “unlimited pauses” in product terms still has a **practical ceiling** from rate limits and from how often a user actually completes sessions.
 
 ### 6.2 Scenario: thresholds at 1% (up/down) and 3% cumulative
 
-With **1%** daily and **3%** cumulative, users enter the eligible pool **often** while the market moves. **Cooldown** remains the main brake on **automatic** repeat cost.
+With **1%** daily and **3%** cumulative, users enter the eligible pool **often** while the market moves. **One open cron offer** and dismiss/fingerprint rules remain the main brakes on **automatic** repeat cost.
 
 **Worst-case automatic (illustrative):**
 
-- 4 full sessions/day × **~$0.21** API ≈ **~$0.85/day** ≈ **~$25/month** API per user **if** every automatic run is all-live and all companions stay on.
+- Several full sessions/day × **~$0.21** API ≈ **~$0.85/day** ≈ **~$25/month** API per user **if** every automatic run is all-live and all companions stay on.
 
 **Worst-case manual (illustrative, rate-limit bound):**
 
@@ -182,9 +182,9 @@ With **1%** daily and **3%** cumulative, users enter the eligible pool **often**
 
 Use these as **stress bounds**, not typical behavior.
 
-### 6.3 Manual repeat taps vs BTC refresh
+### 6.3 Manual repeat taps vs market refresh
 
-The **15-minute** cadence in ops docs is the **volatility cron** schedule and aligns with how often **eligibility** is re-checked. It is **not** the same as the **Home** client cooldown between successful manual “Need a moment” runs (**1 hour** in production; see `src/features/market/application/manual-cooldown.ts`). **BTC spot prices** for Zoom Out are maintained on a separate schedule (`refresh-btc-prices`; comments in `zoom-out.ts` refer to ~15 minute freshness).
+The **hourly** cadence in ops docs is the **volatility cron** schedule and aligns with how often **eligibility** is re-checked. It is **not** the same as the **Home** client cooldown between successful manual “Need a moment” runs (**1 hour** in production; see `src/features/market/application/manual-cooldown.ts`). **BTC spot prices** for Zoom Out are maintained on a separate schedule (`refresh-market-prices`; see `zoom-out.md` for ~15 minute freshness).
 
 ---
 

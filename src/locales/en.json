@@ -248,12 +248,12 @@
     "nextAutoCheck": "Next auto-check · {{time}}",
     "cooldownHeadline": "{{hours}}h cooldown · {{time}} left",
     "nextScanLine": "Next scan · {{scan}}",
-    "nextScanIdleTitle": "When Holzen next checks market conditions against your settings (about every 15 minutes).",
+    "nextScanIdleTitle": "When Holzen next checks market conditions against your settings (about every hour).",
     "autoCooldown": {
       "afterPauseKicker": "Rest window after your last pause",
       "serverChecksKicker": "Holzen is watching the market for you",
       "cooldownAria": "You are in the rest period that starts when a pause is created. It is not the same timer as the Need a moment button. This rest window ends at {{time}} ({{hours}} hours from that pause).",
-      "nextScanAria": "Holzen reviews conditions on a quarter-hour rhythm. The next routine check is around {{time}}. A new automatic pause only happens when your settings and the market align — this is only the schedule.",
+      "nextScanAria": "Holzen reviews conditions about once an hour. The next routine check is around {{time}}. A new automatic pause only happens when your settings and the market align — this is only the schedule.",
       "cooldownReadyAt": "{{hours}}h rest · until {{time}}",
       "nextScanAtClock": "Next routine check · {{time}}"
     },

@@ -52,7 +52,7 @@ function createStableClockFormatter(): (ms: number) => string {
 
 type CooldownSnapshot = { remaining: number; readyAt: number; nextScanAt: number };
 
-const SNAPSHOT_STORAGE_KEY = 'holzen_home_cooldown_snapshot_v1';
+const SNAPSHOT_STORAGE_KEY = 'holzen_home_cooldown_snapshot_v2';
 
 /**
  * Hydrate the snapshot from localStorage. Returns null when nothing valid is
@@ -84,21 +84,20 @@ function writePersistedSnapshot(snap: CooldownSnapshot): void {
   } catch { void 0; }
 }
 
-/** Keep in sync with `PAUSE_CRON_QUARTER_INTERVAL_MS` (`public-scheduling` / scheduling use case). */
-const CRON_INTERVAL_MS = 15 * 60_000;
+/** Keep in sync with `PAUSE_CRON_CHECK_VOLATILITY_INTERVAL_MS` (`public-scheduling`). */
+const CRON_INTERVAL_MS = 60 * 60_000;
 
 /**
  * Compute the wall-clock instant of the first cron check that can actually
- * act on this user. The cron itself fires every 15 minutes regardless of
- * cooldown, but ticks that land while the user is still cooling down are
- * effectively no-ops for them — so the next *meaningful* scan is the first
- * quarter-hour boundary at or after cooldown ends.
+ * act on this user. `check-volatility` runs hourly; ticks while manual
+ * cooldown is active are no-ops for starting another voluntary pause — so the
+ * next meaningful scan is the first hour boundary at or after cooldown ends.
  */
 function computeNextScanAt(now: number, cooldownMsRemaining: number, msUntilNextCron: number): number {
   // While idle, the next cron tick is the next meaningful scan.
   if (cooldownMsRemaining <= 0) return now + msUntilNextCron;
   // While cooling down, anchor to the cron grid: round the cooldown-end
-  // moment up to the next quarter-hour boundary.
+  // moment up to the next hour boundary.
   const cooldownEndsAt = now + cooldownMsRemaining;
   const nextCronAt = now + msUntilNextCron;
   if (nextCronAt >= cooldownEndsAt) return nextCronAt;
@@ -321,13 +320,13 @@ export function AutoCooldownIndicator({
     const nextScanAria = t('home.autoCooldown.nextScanAria', {
       time: nextScanClock,
       defaultValue:
-        'Holzen reviews conditions on a quarter-hour rhythm. The next review is around {{time}}. A new automatic pause only happens when your settings and the market align — this is only the schedule.',
+        'Holzen reviews conditions about once an hour. The next review is around {{time}}. A new automatic pause only happens when your settings and the market align — this is only the schedule.',
     });
     return (
       <div
         className="space-y-0.5 py-0.5 font-sans"
         title={t('home.nextScanIdleTitle', {
-          defaultValue: 'When Holzen next checks market conditions against your settings (about every 15 minutes).',
+          defaultValue: 'When Holzen next checks market conditions against your settings (about every hour).',
         })}
         aria-live="polite"
         aria-label={nextScanAria}
