@@ -1,6 +1,6 @@
 /**
  * Server-side market quote fetch + short TTL cache (CoinGecko + Fear & Greed).
- * Used by `market-quote` and `home-bootstrap` edges — keeps browser off public APIs.
+ * Used by `market-quote` edge — keeps browser off public APIs.
  */
 import { fetchInitWithIncomingTrace } from "./forward-trace-headers.ts";
 import { coingeckoHeaders } from "./coingecko.ts";

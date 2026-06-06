@@ -27,7 +27,7 @@ import { useHomeOptionalVisibility } from '@/screens/home/hooks/use-home-optiona
 import { useHomePauseCardProjection } from '@/screens/home/hooks/use-home-pause-card-projection';
 import { useHomePullFullReload } from '@/screens/home/hooks/use-home-pull-full-reload';
 import { useHomeVisibleSections } from '@/screens/home/hooks/use-home-visible-sections';
-import { useHomeBootstrapPrefetch } from '@/screens/home/hooks/use-home-bootstrap-prefetch';
+import { useHomePrefetch } from '@/screens/home/hooks/use-home-prefetch';
 
 /**
  * Home route conductor — composes Holzen outlet, subscription gate, pause card, and dashboard layout.
@@ -87,7 +87,7 @@ export function useHomeScreen() {
     lastTriggerAt: profileLastTriggerAt,
   } = useProfile();
 
-  useHomeBootstrapPrefetch({
+  useHomePrefetch({
     userId: user?.id,
     coinIdRaw: trackedAssetId,
     currency,

@@ -24,7 +24,7 @@ export async function fetchHolzenNumber(): Promise<HolzenNumberData | null> {
 /**
  * Public community aggregates (`get_holzen_number` via edge / `holzen_community_stats` cache):
  * pausing now (active|engaged) + paused today (UTC).
- * No polling — warm on Home bootstrap; refetch when invalidated (own pause, or
+ * No polling — warm on Home prefetch (`useHomePrefetch`); refetch when invalidated (own pause, or
  * `holzen_community_stats` Realtime when pause activity changes).
  */
 export function getHolzenNumberQueryOptions() {
