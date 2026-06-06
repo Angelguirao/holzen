@@ -71,4 +71,21 @@ describe('resolveHomeMarketDisplayQuote', () => {
       }),
     ).toBeNull();
   });
+
+  it('coerces string snapshot pct and skips invalid prices', () => {
+    const quote = sampleQuote(0.2, { currentPrice: Number.NaN, price24hAgo: 99_000 });
+    const result = resolveHomeMarketDisplayQuote({
+      marketData: quote,
+      openPauseSource: 'cron_volatility',
+      openPauseState: 'active',
+      openPauseContextSnapshot: {
+        change_24h_pct: '-0.39',
+        direction: 'down',
+      },
+    });
+
+    expect(result?.changePercent).toBe(-0.39);
+    expect(result?.price24hAgo).toBe(99_000);
+    expect(result?._stale).toBeUndefined();
+  });
 });

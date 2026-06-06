@@ -165,8 +165,12 @@ export function MarketStatus({
 
   const cur = data.currency || currency;
   const dir = data.direction === 'down' ? '−' : '+';
-  const pct = Math.abs(data.changePercent).toFixed(1);
-  const price = formatMarketPrice(data.currentPrice, cur);
+  const pct = Number.isFinite(data.changePercent)
+    ? Math.abs(data.changePercent).toFixed(1)
+    : '—';
+  const price = Number.isFinite(data.currentPrice)
+    ? formatMarketPrice(data.currentPrice, cur)
+    : '—';
 
   const fearGreedColor = data.fearGreed
     ? data.fearGreed.value <= 25
