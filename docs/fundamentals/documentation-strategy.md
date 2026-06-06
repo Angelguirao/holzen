@@ -17,6 +17,7 @@ When behavior or contracts change, update **one** primary doc (or code comment o
 | A decision that is costly to reverse | `docs/decisions/` (short ADR; see [decisions/README.md](../decisions/README.md)) |
 | Why something broke and how we hardened it | `docs/postmortems/` |
 | Planned work, experiments, “nice to have” | `docs/backlog/` (not normative for current behavior) |
+| Product strategy, moats, defensibility, roadmap philosophy | [fundamentals/strategy-and-defensibility.md](strategy-and-defensibility.md) | Surface execution: [behavioral-platform-strategy.md](behavioral-platform-strategy.md) |
 | Running implementation log (decisions, deviations, tradeoffs, open questions) | [fundamentals/implementation-notes-workflow.md](implementation-notes-workflow.md) | [artifacts/client-implementation/implementation-notes.html](../artifacts/client-implementation/implementation-notes.html) |
 | Commands and “where to edit” for agents and quick lookup | [AGENTS.md](../../AGENTS.md) |
 | Environment variables, secret storage, naming, and env differences | [ops/environment-matrix.md](../ops/environment-matrix.md) |
