@@ -32,7 +32,6 @@ export interface UseManualPauseTriggerParams {
   setCompanions: Dispatch<SetStateAction<CompanionData>>;
   setNewPauseArrival: Dispatch<SetStateAction<boolean>>;
   setLastPauseInstanceId: Dispatch<SetStateAction<string | null>>;
-  setLastTriggerAt: Dispatch<SetStateAction<string | null>>;
 }
 
 /**
@@ -50,7 +49,6 @@ export function useManualPauseTrigger({
   setCompanions,
   setNewPauseArrival,
   setLastPauseInstanceId,
-  setLastTriggerAt,
 }: UseManualPauseTriggerParams) {
   const [isPending, startTransition] = useTransition();
 
@@ -91,7 +89,6 @@ export function useManualPauseTrigger({
         setCompanionsEmpty: () =>
           setCompanions({ haiku: null }),
         setNewPauseArrival,
-        setLastTriggerAt,
         syncOpenPauseFromDb,
         trackInstanceCreated: trackManualPauseInstanceCreated,
         trackManualCompleted: trackPauseManualCompleted,
@@ -149,7 +146,6 @@ export function useManualPauseTrigger({
       setCompanions,
       setNewPauseArrival,
       setLastPauseInstanceId,
-      setLastTriggerAt,
       startTransition,
     ],
   );

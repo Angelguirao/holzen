@@ -20,7 +20,6 @@ export type ManualPauseHomePreviewPorts = {
   setContext: (context: string | null) => void;
   setCompanionsEmpty: () => void;
   setNewPauseArrival: (value: boolean) => void;
-  setLastTriggerAt: (iso: string) => void;
   syncOpenPauseFromDb: () => Promise<void>;
   /** PostHog — wired from `public-rpc` in Home presentation; defaults for unit tests. */
   trackInstanceCreated?: (payload: TrackManualPauseInstanceCreatedPayload) => void;
@@ -74,7 +73,6 @@ export async function applyManualPauseOpenResult(
     if (!skipHomePreview) {
       ports.setNewPauseArrival(true);
     }
-    ports.setLastTriggerAt(new Date().toISOString());
     trackCompleted({
       durationS: Math.round((Date.now() - startedAtMs) / 1000),
       hadBitcoinContext: assetId === 'bitcoin',

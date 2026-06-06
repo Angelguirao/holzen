@@ -1,16 +1,13 @@
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import {
-  computeAutoCooldownReadyAtMs,
+  computeIdleCooldownReadyAtMs,
 } from '@/features/pause/domain/reflect/generation/compute-pause-trigger-cooldowns';
 import {
   AutoCooldownIndicator,
   formatHomePauseReadyAtClock,
-  formatMsAsMS,
 } from '@/screens/home/components/HomePauseChrome';
 import { HomePauseWidgetPreviewLine } from '@/screens/home/components/HomePauseWidgetPreviewLine';
 import { HomePauseWidgetMarketRow } from '@/screens/home/components/HomePauseWidgetMarketRow';
@@ -262,29 +259,26 @@ export function HomePauseEngagedPendingBody({
 type PostPauseProps = Pick<
   HomePauseWidgetBodyProjection,
   | 'widgetMode'
-  | 'onPauseAgain'
-  | 'completedPauseCount'
   | 'onPauseWithThis'
   | 'previewLine'
   | 'marketBlock'
   | 'profileLastTriggerAt'
+  | 'manualCooldownRemainingMs'
   | 'cooldownHours'
 >;
 
 /** States D / D′ / E — post-pause rest and new-offer variants. */
 export function HomePausePostPauseBody({
   widgetMode,
-  onPauseAgain,
-  completedPauseCount,
   onPauseWithThis,
   previewLine,
   marketBlock,
   profileLastTriggerAt,
+  manualCooldownRemainingMs,
   cooldownHours,
 }: PostPauseProps) {
   "use memo";
   const { t } = useTranslation();
-  const hasArchive = completedPauseCount > 0;
   const isE = widgetMode === 'E';
   const isD =
     widgetMode === 'D_collapsed' ||
@@ -308,7 +302,11 @@ export function HomePausePostPauseBody({
   }
 
   if (isD) {
-    const readyAtMs = computeAutoCooldownReadyAtMs(profileLastTriggerAt, cooldownHours);
+    const readyAtMs = computeIdleCooldownReadyAtMs({
+      profileLastTriggerAt,
+      cooldownHours,
+      manualCooldownRemainingMs,
+    });
     const readyAtClock =
       readyAtMs != null && readyAtMs > Date.now()
         ? formatHomePauseReadyAtClock(readyAtMs)
@@ -319,27 +317,11 @@ export function HomePausePostPauseBody({
     return (
       <div className={homePauseWidgetBodyStack}>
         <p className="text-sm leading-5 tracking-wide text-foreground">
-          {hasArchive
-            ? t('home.pausePostPause.cooldownArchiveBody', {
-                time: readyAtClock,
-                defaultValue:
-                  'If the urge returns, another pause is available at {{time}}. Until then, your past words are here.',
-              })
-            : t('home.pausePostPause.cooldownNoArchiveBody', {
-                time: readyAtClock,
-                defaultValue:
-                  'If the urge returns, another pause is available at {{time}}. Until then, rest is part of the practice.',
-              })}
+          {t('home.pausePostPause.availableAt', {
+            time: readyAtClock,
+            defaultValue: 'Another pause is available at {{time}}',
+          })}
         </p>
-        {hasArchive ? (
-          <Link to="/library?tab=pauses" className={homeInWidget.ctaNoxPrimary}>
-            {t('home.pausePostPause.revisitArchive')}
-          </Link>
-        ) : (
-          <button type="button" onClick={onPauseAgain} className={homeInWidget.ctaNoxPrimary}>
-            {t('home.pauseWidget.pauseAgain')}
-          </button>
-        )}
       </div>
     );
   }
@@ -382,31 +364,10 @@ export function HomePauseCalmWatersBody({
 
 /** State A — idle, no open pause (structure: Figma 546:8975; tokens: Nox). */
 export function HomePauseIdleExpandedBody(
-  props: Pick<
-    HomePauseWidgetBodyProjection,
-    'onNeedPause' | 'manualCooldownRemaining' | 'loading'
-  >,
+  props: Pick<HomePauseWidgetBodyProjection, 'onNeedPause' | 'loading'>,
 ) {
   "use memo";
   const { t } = useTranslation();
-  const [remaining, setRemaining] = useState(() => props.manualCooldownRemaining());
-
-  useEffect(() => {
-    if (remaining <= 0) return;
-    const interval = setInterval(() => {
-      const next = props.manualCooldownRemaining();
-      setRemaining(next);
-      if (next <= 0) clearInterval(interval);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [props.manualCooldownRemaining, remaining]);
-
-  const inCooldown = remaining > 0;
-  const ctaLabel = inCooldown
-    ? remaining >= 60_000
-      ? t('home.manualReflectionIn', { minutes: Math.ceil(remaining / 60_000) })
-      : t('home.manualReflectionInSoon', { time: formatMsAsMS(remaining) })
-    : t('home.pauseIdle.letsPauseCta', { defaultValue: "Let's pause" });
 
   return (
     <div className={homePauseWidgetBodyStack}>
@@ -424,10 +385,9 @@ export function HomePauseIdleExpandedBody(
         onClick={props.onNeedPause}
         loading={props.loading}
         loadingText={t('home.generatingReflection')}
-        disabled={inCooldown}
         className={cn(homeInWidget.ctaNoxPrimary, 'h-10 border-0 shadow-none')}
       >
-        {ctaLabel}
+        {t('home.pauseIdle.letsPauseCta', { defaultValue: "Let's pause" })}
       </LoadingButton>
     </div>
   );

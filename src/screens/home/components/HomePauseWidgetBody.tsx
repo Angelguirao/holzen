@@ -153,25 +153,22 @@ export function HomePauseWidgetBody(props: Props) {
       return (
         <HomePausePostPauseBody
           widgetMode={props.widgetMode}
-          onPauseAgain={props.onPauseAgain}
-          completedPauseCount={props.completedPauseCount}
           onPauseWithThis={props.onPauseWithThis}
           previewLine={props.previewLine}
           marketBlock={props.marketBlock}
           profileLastTriggerAt={props.profileLastTriggerAt}
+          manualCooldownRemainingMs={props.manualCooldownRemainingMs}
           cooldownHours={props.cooldownHours}
         />
       );
 
     case 'A_expanded':
-    case 'A_collapsed':
       return (
-        <HomePauseIdleExpandedBody
-          onNeedPause={props.onNeedPause}
-          manualCooldownRemaining={props.manualCooldownRemaining}
-          loading={props.loading}
-        />
+        <HomePauseIdleExpandedBody onNeedPause={props.onNeedPause} loading={props.loading} />
       );
+
+    case 'A_collapsed':
+      return null;
 
     default:
       return null;

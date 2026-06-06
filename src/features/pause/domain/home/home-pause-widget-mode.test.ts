@@ -95,6 +95,7 @@ const baseInput = {
   trackedAssetSymbol: 'BTC',
   hasPendingOffer: false,
   postPauseAutoCooldownRemainingMs: 0,
+  manualCooldownRemainingMs: 0,
   completedPauseCount: 0,
   hasOpenPauseStepEvents: false,
   userExpanded: false,
@@ -228,6 +229,15 @@ describe('resolveHomePauseWidgetMode', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,
       postPauseAutoCooldownRemainingMs: 60_000,
+      completedPauseCount: 0,
+    });
+    expect(r.mode).toBe('D_prime_collapsed');
+  });
+
+  it('D_prime when manual cooldown only (no profile auto cooldown)', () => {
+    const r = resolveHomePauseWidgetMode({
+      ...baseInput,
+      manualCooldownRemainingMs: 45_000,
       completedPauseCount: 0,
     });
     expect(r.mode).toBe('D_prime_collapsed');
