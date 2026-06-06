@@ -8,7 +8,7 @@ export type PauseDepthPickerMarketLines = {
   sentimentLine: string | null;
 };
 
-/** Figma 589:19155 — compact move + fear/greed row for depth picker footer. */
+/** Figma 589:19181 — compact move + fear/greed row for depth picker. */
 export function formatPauseDepthPickerMarketLines(
   marketData: MarketQuote | null,
   trackedAssetId: string | null,
