@@ -15,6 +15,7 @@ import {
   normalizeTitleKey,
 } from "../_shared/content-dedup.ts";
 import type { PregenerateCacheTopupKey } from "../_shared/pregenerate-cache-topup-config.ts";
+import { normalizeHistoricalInsightContent, resolveMarketInsight } from "../_shared/historical-insight-wire.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -482,7 +483,7 @@ serve(
           const aiRes = await geminiChat({
               model: "google/gemini-2.5-flash",
               messages: [
-                { role: "system", content: `You are a financial historian. Extract ONE historical parallel from the search results. The title should be evocative (e.g., "When gold crashed 26% in 2013"). btcInsight: 2-3 sentences about what happened with specific dates and numbers. analogy: 1-2 sentences connecting it to Bitcoin holding. Include assetClass, period, source name.` },
+                { role: "system", content: `You are a financial historian. Extract ONE historical parallel from the search results. The title should be evocative (e.g., "When gold crashed 26% in 2013"). marketInsight: 2-3 sentences about what happened with specific dates and numbers. analogy: 1-2 sentences connecting it to Bitcoin holding. Include assetClass, period, source name.` },
                 { role: "user", content: `Search results:\n${searchContent}\n\nCitations:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}` },
               ],
               response_format: { type: "json_object" },
@@ -503,20 +504,21 @@ serve(
             });
               const raw = aiData.choices?.[0]?.message?.content;
               if (raw) {
-                const insight = JSON.parse(raw);
-                if (insight.title && insight.btcInsight) {
+                const insight = normalizeHistoricalInsightContent(JSON.parse(raw) as Record<string, unknown>);
+                const marketInsight = resolveMarketInsight(insight);
+                if (insight.title && marketInsight) {
                   // Pin URL to first citation if available
                   if (!insight.url && citations.length > 0) insight.url = citations[0];
 
                   if (await isCompanionCacheDuplicate(svcClient, "historical_insight", insight.title, {
                     url: insight.url,
-                    bodySnippet: insight.btcInsight,
+                    bodySnippet: marketInsight,
                   })) {
                     results.push(`history: SKIPPED duplicate "${insight.title}"`);
                   } else {
                     let qualityScore = 1;
                     if (insight.url && await isUrlReachable(insight.url)) qualityScore = 2;
-                    const histFp = await contentSnippetFingerprint(insight.btcInsight || "");
+                    const histFp = await contentSnippetFingerprint(marketInsight);
                     await svcClient.from("companion_cache").insert({
                       companion_type: "historical_insight",
                       language: "en",

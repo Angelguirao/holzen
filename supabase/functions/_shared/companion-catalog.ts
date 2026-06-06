@@ -313,7 +313,7 @@ export function paperToGrounding(entry: CatalogEntry): {
 
 export function eventToHistory(entry: CatalogEntry): {
   title: string;
-  btcInsight: string;
+  marketInsight: string;
   analogy: string;
   assetClass: string;
   period: string;
@@ -323,7 +323,7 @@ export function eventToHistory(entry: CatalogEntry): {
 } {
   return {
     title: entry.title,
-    btcInsight: entry.summary,
+    marketInsight: entry.summary,
     analogy: entry.analogy || "",
     assetClass: entry.asset_class || "",
     period: entry.event_date || "",

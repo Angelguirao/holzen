@@ -78,7 +78,7 @@ For **equities**, expect a new `AssetQuoteProvider` value, a `ports/market-data`
 
 ---
 
-## 5. Naming debt (client complete; server deferred)
+## 5. Naming debt (client + edge Tier 1 complete)
 
 **Active `src/` — prefer canonical names; aliases kept for `@/legacy` only:**
 
@@ -93,9 +93,11 @@ For **equities**, expect a new `AssetQuoteProvider` value, a `ports/market-data`
 | `buildPauseContextFromMarket` | `buildPauseContextFromBtc` |
 | `getCoingeckoSpotPriceUsd*` | `getCoingeckoBtcUsd*` |
 | `BREATHE_AMBIENT_MARKET_QUERY_KEY` | `BREATHE_AMBIENT_BTC_QUERY_KEY` |
-| `marketInsight` / `resolveHistoricalMarketInsight()` | `btcInsight` on wire/cache shapes |
+| `marketInsight` / `resolveHistoricalMarketInsight()` | `btcInsight` dual-read on client + edge until DB backfill |
 
-**Do not rename without migration:** `holzen_btc_mode` localStorage, `btcData` on `useHolzen()`, edge/cache `btcInsight`, `btc_price_cache`, edge function names (`backfill-btc-prices`, etc.).
+**Edge Tier 1 (Jun 2026):** `_shared/market-on-this-day-*`, `market-price-warm.ts`, `historical-insight-wire.ts`; generators/fallbacks emit `marketInsight`; migration `20260607130000_historical_insight_market_insight_key.sql` rekeys stored fallbacks/cache rows.
+
+**Still deferred (Tier 2 — ops-heavy):** `btc_price_cache` table rename, edge function folder names (`refresh-btc-prices`, etc.), cron heartbeat keys, `holzen_btc_mode` localStorage, `btcData` on `useHolzen()`.
 
 ---
 

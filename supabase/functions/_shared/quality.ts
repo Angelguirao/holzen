@@ -67,7 +67,7 @@ export function containsCryptoLanguage(text: string): boolean {
   return BANNED_CRYPTO_TERMS.some(term => lower.includes(term));
 }
 
-// ── Per-companion-type quality gate configurations ──
+import { resolveMarketInsight } from "./historical-insight-wire.ts";
 
 interface QualityConfig {
   minBodyLength: number;
@@ -109,8 +109,8 @@ const QUALITY_CONFIGS: Record<string, QualityConfig> = {
     maxBodyLength: 800,
     minTitleWords: 3,
     maxTitleWords: 15,
-    bodyField: "btcInsight",
-    requiredFields: ["title", "btcInsight"],
+    bodyField: "marketInsight",
+    requiredFields: ["title", "marketInsight"],
     noMarketData: false,
   },
   zoom_out_deep_time: {
@@ -151,7 +151,9 @@ export function qualityGate(
 
   // Required fields check
   for (const field of config.requiredFields) {
-    const fv = content[field];
+    const fv = field === "marketInsight" && companionType === "historical_insight"
+      ? resolveMarketInsight(content)
+      : content[field];
     if (typeof fv !== "string" || fv.trim().length < 2) {
       return { pass: false, reason: `missing_${field}` };
     }
@@ -165,7 +167,9 @@ export function qualityGate(
   if (titleWords > config.maxTitleWords) return { pass: false, reason: "title_too_many_words" };
 
   // Body validation
-  const body = strField(content, config.bodyField).trim();
+  const body = companionType === "historical_insight"
+    ? resolveMarketInsight(content)
+    : strField(content, config.bodyField).trim();
   if (body.length < config.minBodyLength) return { pass: false, reason: "body_too_short" };
   if (body.length > config.maxBodyLength) return { pass: false, reason: "body_too_long" };
 
@@ -256,7 +260,7 @@ function checkSpecificity(companionType: string, content: Record<string, unknown
       break;
     }
     case "historical_insight": {
-      const insight = strField(content, "btcInsight");
+      const insight = resolveMarketInsight(content);
       const hasYearWord = /\b(19|20)\d{2}\b/.test(insight);
       const hasMonthName =
         /\b(January|February|March|April|May|June|July|August|September|October|November|December)\b/i.test(
