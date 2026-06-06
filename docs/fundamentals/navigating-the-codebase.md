@@ -182,7 +182,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 | `journal-prompt` | **Legacy full IA** — `src/legacy/full-shell/src/components/practice/GuidedJournal.tsx` |
 | `send-feedback` | `FeedbackForm.tsx`, `OfflineBanner.tsx` |
 | `generate-wallpaper` | **Legacy full IA** — `src/legacy/full-shell/src/components/ReflectionWallpaper.tsx` |
-| `holzen-number` | `screens/home/components/HolzenNumber.tsx` → `@/features/user/public-queries` / `public-rpc` |
+| `holzen-number` | `HomeMarketCommunityStats` / `HomeMarketWidgetFooter` → `@/features/user/public-queries` (legacy full widget: `@/legacy/holzen-pausing-now/HolzenNumber.tsx`) |
 | `reflection-insights` | **Legacy full IA** — `src/legacy/full-shell/src/components/AIInsightsPanel.tsx` (route **404** pause-first) |
 | `check-subscription`, `create-checkout`, `customer-portal` | `@/features/subscription/public-hooks` |
 | `register-push` | `@/features/notifications/public-hooks` (`usePushNotifications`) |

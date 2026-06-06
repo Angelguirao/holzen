@@ -5,10 +5,6 @@ import type { HolzenNumberData } from '@/features/user/infrastructure/edge/holze
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
 
-function hasPausingNowStat(data: HolzenNumberData): boolean {
-  return data.users_pausing_now > 0 || data.percent_pausing_now > 0;
-}
-
 function hasPausedTodayStat(data: HolzenNumberData): boolean {
   return data.users_paused_today > 0 || data.percent_paused_today > 0;
 }
@@ -27,49 +23,25 @@ function CommunityStatLine({
   );
 }
 
-/** Right column: live + today community pause stats (Figma Market footer). */
-export function HomeMarketCommunityStats({ pauseInProgress = false }: { pauseInProgress?: boolean }) {
+/** Right column: “% of users paused today” (Figma Market footer). */
+export function HomeMarketCommunityStats() {
   "use memo";
   const { t } = useTranslation();
   const { data, isPending } = useQuery(getHolzenNumberQueryOptions());
 
-  if (isPending || !data) return null;
-
-  const showNow = hasPausingNowStat(data);
-  const showToday = hasPausedTodayStat(data);
-
-  if (pauseInProgress && showNow) {
-    return (
-      <div className="flex min-w-0 flex-1 flex-col items-end gap-0.5">
-        <CommunityStatLine
-          percent={data.percent_pausing_now}
-          label={t('holzenNumber.pausingNowToo', { defaultValue: 'are pausing now, too' })}
-        />
-      </div>
-    );
-  }
-
-  if (!showNow && !showToday) return null;
+  if (isPending || !data || !hasPausedTodayStat(data)) return null;
 
   return (
     <div className="flex min-w-0 flex-1 flex-col items-end gap-0.5">
-      {showNow ? (
-        <CommunityStatLine
-          percent={data.percent_pausing_now}
-          label={t('holzenNumber.pausingNow', { defaultValue: 'of users pausing now' })}
-        />
-      ) : null}
-      {showToday ? (
-        <CommunityStatLine
-          percent={data.percent_paused_today}
-          label={t('holzenNumber.pausedToday', { defaultValue: 'of users paused today' })}
-        />
-      ) : null}
+      <CommunityStatLine
+        percent={data.percent_paused_today}
+        label={t('holzenNumber.pausedToday', { defaultValue: 'of users paused today' })}
+      />
     </div>
   );
 }
 
 export function hasVisibleHomeMarketCommunityStats(data: HolzenNumberData | null | undefined): boolean {
   if (!data) return false;
-  return hasPausingNowStat(data) || hasPausedTodayStat(data);
+  return hasPausedTodayStat(data);
 }
