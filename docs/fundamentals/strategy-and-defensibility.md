@@ -8,7 +8,7 @@ This document is the **parent strategy layer**. Surface-specific execution (exte
 
 | Doc | Owns |
 |-----|------|
-| **This file** | Why code is not the moat; defensibility tiers; investment priorities; decision filters |
+| **This file** | Why code is not the moat; defensibility tiers; metrics (§3.1); competitive frame (§8); GTM (§9); decision filters |
 | [behavioral-platform-strategy.md](behavioral-platform-strategy.md) | Behavioral engine thesis, web → extension → mobile, wedge, north-star metrics |
 | [active-surface.md](../ops/active-surface.md) | What ships today |
 | [pricing-strategy.md](../systems/costs/pricing-strategy.md) | Packaging and sustainability |
@@ -154,7 +154,7 @@ Cheap AI makes **average** content infinite; it makes **trusted, cited, Bitcoin-
 ### 4.7 Distribution is part of defensibility
 
 Referral plumbing exists; **trust in a community** is not automatic. Strategy without GTM is a science project.  
-Prefer depth in Bitcoin-holder channels over generic wellness SEO.
+See **§9 GTM and community** for channels and what to avoid.
 
 ---
 
@@ -206,7 +206,59 @@ As of pause-first shipped scope:
 
 ---
 
-## 8. Related reading
+## 8. Competitive landscape — who we are not
+
+Holzen does not win by being “mindfulness + crypto” in one app store listing. Clones will ship that in weeks. We win by **occupying a position others cannot hold without breaking their business model**.
+
+| Category | Examples (illustrative) | Their default | Holzen’s contrast |
+|----------|-------------------------|---------------|-------------------|
+| **Generic wellness** | Calm, Headspace, Insight Timer | Daily habit, sleep, generic stress | **Event-triggered** — meets you when *your* asset moves, not Tuesday meditation |
+| **Trading & exchange apps** | Exchange mobile apps, perps UIs, price widgets | Maximize volume, time-on-chart, trade CTAs | **Anti-impulse** — no buy/sell judgment; reduce arousal, not tickets |
+| **Portfolio & alert tools** | Trackers, alert bots, “whale” feeds | More data, faster alerts, more checking | **Behavior layer** — same volatility, different outcome (pause before act) |
+| **Affiliate / signal / “alpha”** | Paid groups, shill CT, tip bots | Hype, urgency, directional calls | **Neutrality** — cognitive reappraisal + citations, not calls |
+| **Generic AI crypto coach** | ChatGPT wrappers, “AI advisor” apps | Open-ended advice, engagement chat | **Ritual + server invariants** — structured pause, append-only history, quality-gated corpus |
+| **Copycat Holzen** | Future “BTC pause” clones | Same screens, cheaper sub, louder AI | **Timing tuning, corpus depth, user history, reputation** — see §3 Tier A |
+
+**Positioning sentence (internal):** Holzen is the **trusted interrupt** for long-horizon holders when volatility spikes — not a therapist, not a broker, not a ticker.
+
+When marketing or partnerships blur these lines (e.g. trade referrals, “buy the dip” copy), treat it as a **Tier A regression** — see §5 decision filters.
+
+---
+
+## 9. GTM and community
+
+Distribution compounds defensibility when **the right people hear about you at the right moment** (a red week), not when you out-spend generic wellness ads.
+
+### 9.1 Who we optimize for first
+
+**Long-horizon Bitcoin holders** who already feel the checking loop — especially desktop-heavy researchers, multi-tab market watchers, and CT-adjacent investors who distrust preachy wellness. Early adopters may not match “average mobile crypto user”; that is acceptable while the **extension wedge** is unproven ([behavioral-platform-strategy.md §4](behavioral-platform-strategy.md)).
+
+### 9.2 Channels that fit (depth over breadth)
+
+| Channel | Why it fits | Holzen assets |
+|---------|-------------|---------------|
+| **Bitcoin-native media** | Trust transfers; audience already feels volatility pain | `/about`, `/blog`, behavioral-finance framing in [public/llms.txt](../../public/llms.txt) |
+| **Newsletters & podcasts** | Long-form holders; credibility > virality | Founder story, research citations (see locale About/FAQ) |
+| **Vol-week organic** | Product is *for* drawdowns — usage and word-of-mouth spike together | Cron-triggered pauses, push/email when configured |
+| **Referral** | Holder-to-holder trust | `holzen_ref` → `record-referral` ([auth-and-referral-system.md](../systems/auth/auth-and-referral-system.md)) |
+| **Public roadmap** | Community input without over-promising | `/roadmap` (shipped stub; votes on `roadmap_items`) |
+
+### 9.3 What we deprioritize (for now)
+
+- **Generic wellness SEO** — wrong intent, wrong trust bar, easy for clones to outrank with AI content farms.
+- **Paid social at scale** — expensive; hard to convey neutrality in a feed card; measure LTV only after vol-week retention (§3.1).
+- **Exchange partnerships** — structural conflict with neutrality (volume incentives).
+- **“Financial advisor” positioning** — regulatory and trust risk; contradicts product stance.
+
+### 9.4 Community as moat (honest)
+
+Community is **Tier A only when earned**: users recommend Holzen *during* a stressful week because it helped once. Metrics: referral signups, organic mentions in vol weeks, qualitative feedback themes (“kept me from…” — without turning into trade advice marketing).
+
+**Operating rule:** every GTM experiment should link to a **§3.1 metric** within one volatility cycle, or it is brand-only (fine, but not counted as defensibility progress).
+
+---
+
+## 10. Related reading
 
 - [behavioral-platform-strategy.md](behavioral-platform-strategy.md) — **execution**: extension wedge, engine layers, phased evolution
 - [decisions/2026-05-16-pause-first-shipped-scope.md](../decisions/2026-05-16-pause-first-shipped-scope.md) — focus decision
@@ -217,8 +269,8 @@ When strategy shifts materially, update **this file** and adjust [behavioral-pla
 
 ---
 
-## 9. Review cadence
+## 11. Review cadence
 
-- **Quarterly** (or after a major volatility week): re-read §3 tiers, **§3.1 metrics**, and §7 maturity; adjust roadmap emphasis.
+- **Quarterly** (or after a major volatility week): re-read §3 tiers, **§3.1 metrics**, §7 maturity, and **§8–§9** positioning/GTM; adjust roadmap emphasis.
 - **When adding a new primary surface** (extension, mobile): add an ADR under [decisions/](../decisions/) and link back here.
 - **When claiming a moat in marketing**: verify it maps to Tier A and is true today, not aspirational.
