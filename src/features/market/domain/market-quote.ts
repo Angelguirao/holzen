@@ -31,7 +31,7 @@ export interface MarketQuote {
 }
 
 /** @deprecated Prefer MarketQuote — incremental rename from BTC-only naming. */
-export type MarketQuote = MarketQuote;
+export type BtcPriceData = MarketQuote;
 
 export const SUPPORTED_CURRENCIES = [
   { code: 'USD', symbol: '$', label: 'US Dollar' },
