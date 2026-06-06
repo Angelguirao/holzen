@@ -25,7 +25,7 @@ function mapOnChain(raw: Record<string, unknown> | undefined): OnChainData | und
   return Object.keys(onChain).length > 0 ? onChain : undefined;
 }
 
-/** Map `market-quote` / `home-bootstrap` edge JSON into client `BtcPriceData`. */
+/** Map `market-quote` edge JSON into client `BtcPriceData`. */
 export function mapMarketQuotePayload(payload: MarketQuoteEdgePayload): BtcPriceData {
   return {
     coinId: normalizeTrackedAssetId(payload.coinId),

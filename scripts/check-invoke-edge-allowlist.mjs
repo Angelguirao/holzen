@@ -16,7 +16,6 @@ const ALLOWED = new Set([
   'list-checkout-events',
   'notify-checkout-confirmation',
   'holzen-number',
-  'home-bootstrap',
   'market-quote',
   'health',
   'register-push',
