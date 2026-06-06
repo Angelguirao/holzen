@@ -9,7 +9,7 @@ BEGIN
   WHERE jobname IN (
     'check-volatility',
     'pregenerate-companions',
-    'refresh-btc-prices'
+    'refresh-market-prices'
   );
 EXCEPTION
   WHEN undefined_table OR invalid_schema_name THEN

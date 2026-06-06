@@ -11,7 +11,7 @@ BEGIN
   WHERE jobname IN (
     'check-volatility',
     'pregenerate-companions',
-    'refresh-btc-prices'
+    'refresh-market-prices'
   );
 
   PERFORM cron.schedule(
@@ -49,19 +49,19 @@ BEGIN
   );
 
   PERFORM cron.schedule(
-    'refresh-btc-prices',
+    'refresh-market-prices',
     '*/15 * * * *',
     $cmd$
     SELECT net.http_post(
       url := (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'holzen_project_url' LIMIT 1)
-        || '/functions/v1/refresh-btc-prices',
+        || '/functions/v1/refresh-market-prices',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
         'Authorization', 'Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'CRON_SECRET' LIMIT 1)
       ),
       body := '{}'::jsonb
     );
-    SELECT public.emit_heartbeat('refresh_btc_prices');
+    SELECT public.emit_heartbeat('refresh_market_prices');
     $cmd$
   );
 EXCEPTION

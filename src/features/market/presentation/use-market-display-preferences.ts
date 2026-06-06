@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { readUnitBasisModeFromStorage, writeUnitBasisModeToStorage } from '@/features/market/domain/unit-basis-mode-storage';
 import { trackHomeMarketChartExpandToggled } from './market-display-io';
 
 function readIsTrue(key: string): boolean {
@@ -9,14 +10,12 @@ function readIsTrue(key: string): boolean {
   }
 }
 
-const UNIT_BASIS_MODE_STORAGE_KEY = 'holzen_btc_mode';
-
 /**
  * Price visibility, unit-basis display mode (1 BTC = 1 BTC), and market chart expand state for Home.
  */
 export function useMarketDisplayPreferences() {
   const [priceHidden, setPriceHidden] = useState(() => readIsTrue('holzen_hide_price'));
-  const [unitBasisMode, setUnitBasisMode] = useState(() => readIsTrue(UNIT_BASIS_MODE_STORAGE_KEY));
+  const [unitBasisMode, setUnitBasisMode] = useState(() => readUnitBasisModeFromStorage());
   const [marketChartExpanded, setMarketChartExpanded] = useState(false);
   const marketChartExpandBlocked = unitBasisMode || priceHidden;
 
@@ -41,11 +40,7 @@ export function useMarketDisplayPreferences() {
   const toggleUnitBasisMode = useCallback(() => {
     setUnitBasisMode((prev) => {
       const next = !prev;
-      try {
-        localStorage.setItem(UNIT_BASIS_MODE_STORAGE_KEY, String(next));
-      } catch {
-        /* ignore */
-      }
+      writeUnitBasisModeToStorage(next);
       return next;
     });
   }, []);

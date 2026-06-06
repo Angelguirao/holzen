@@ -382,10 +382,10 @@ The pause UI invokes **`companion-orchestrate`** (via **`useCompanionData`**); *
 | Signal    | `_shared/generators/signal.ts`    | Library (essays) → Cache → Live (Perplexity + Gemini)               | curated     |
 | Grounding | `_shared/generators/grounding.ts` | Library (papers, **disabled**) → Cache → Live (Perplexity + Gemini) | curated     |
 | History   | `_shared/generators/history.ts`   | Library (events) → Cache → Live (Perplexity + Gemini)               | curated     |
-| Zoom out  | `_shared/generators/zoom-out.ts`  | Cache → Live (`btc_price_cache` + echo + deep-time AI)              | curated     |
+| Zoom out  | `_shared/generators/zoom-out.ts`  | Cache → Live (`market_price_cache` + echo + deep-time AI)              | curated     |
 
 
-**Zoom out dependency:** Cron `**refresh-btc-prices`** must keep `btc_price_cache` fresh ([cron-setup.md](../../ops/cron-setup.md)).
+**Zoom out dependency:** Cron `**refresh-market-prices`** must keep `market_price_cache` fresh ([cron-setup.md](../../ops/cron-setup.md)).
 
 **Phase ordering (pause-first shipped):** Generators use **catalog → cache → live → curated**. `_shared/phase-config.ts` reads `COMPANION_PHASE_CATALOG`, `COMPANION_PHASE_CACHE`, `COMPANION_PHASE_LIVE` (all default on). Curated rows live in **`companion_catalog`** (renamed from `content_library` in `20260521200000_holzen_mvp_launch_cutover.sql`). Warm pool: **`pregenerate-companions`** cron → `companion_cache`. When `DISABLE_COMPANION_FALLBACKS` is set, only live runs (testing).
 
@@ -568,7 +568,7 @@ flowchart TB
 | Aspect               | Detail                                                                                                                                                                                                                                                                                                                                                    |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Orchestrator key** | `**zoomOut**` → artifact kind **`zoom_out_deep_time`** (`ORCHESTRATOR_KEY_MAP`); `**companion_serves**` records the serve.                                                                                                                                                                                                                                    |
-| **Generator**        | `_shared/generators/zoom-out.ts`; `**zoomOutAngle**` from session intent; depends on `**btc_price_cache**` (cron).                                                                                                                                                                                                                                        |
+| **Generator**        | `_shared/generators/zoom-out.ts`; `**zoomOutAngle**` from session intent; depends on `**market_price_cache**` (cron).                                                                                                                                                                                                                                        |
 | **Profile pref**     | `**companion_zoom_out**`.                                                                                                                                                                                                                                                                                                                                 |
 | **Pause V2 storage** | **`pause_ai_artifacts`** (`**zoom_out_deep_time`**); client hydration via **`useCompanionData`** + orchestrate responses / artifact reads. |
 | **UI**               | `**ZoomOutDisplay**`; feedback uses `**zoom_out**` → cache type `**zoom_out_deep_time**`. Card hidden when intervention already shows `**secondary.type === 'zoom_out'**` (§7.5).                                                                                                                                                                         |
@@ -684,7 +684,7 @@ Exact SQL lives in **[cron-setup.md](../../ops/cron-setup.md)**. Typical schedul
 | Job                      | Role for pause system                                            |
 | ------------------------ | ---------------------------------------------------------------- |
 | `check-volatility`       | Eligibility + **`pause_create_or_reuse_as`** + profile / notifications delivery; **no** reflection LLM and **no** **`companion-orchestrate`** on claim (Pause V2) |
-| `refresh-btc-prices`     | Feeds zoom-out generator                                         |
+| `refresh-market-prices`     | Feeds zoom-out generator                                         |
 | `pregenerate-companions` | `companion_cache` lifecycle + need-based pool warming (does **not** call `companion-orchestrate`; see [pregenerate.md](companions/pregenerate.md)) |
 | `fetch-source-feeds`     | Fills `content_library` for fallbacks                            |
 | `night-reflection`       | Separate end-of-day message path                                 |
@@ -764,7 +764,7 @@ supabase/functions/
 ├── holzen-reflect/index.ts
 ├── companion-orchestrate/index.ts
 ├── check-volatility/index.ts
-├── refresh-btc-prices/index.ts
+├── refresh-market-prices/index.ts
 ├── pregenerate-companions/index.ts
 ├── fetch-source-feeds/index.ts
 ├── night-reflection/index.ts

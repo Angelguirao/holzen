@@ -1,11 +1,11 @@
 meta {
-  name: backfill-btc-prices
+  name: backfill-market-prices
   type: http
   seq: 11
 }
 
 post {
-  url: {{VITE_SUPABASE_URL}}/functions/v1/backfill-btc-prices
+  url: {{VITE_SUPABASE_URL}}/functions/v1/backfill-market-prices
   body: json
   auth: none
 }

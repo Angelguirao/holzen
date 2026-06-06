@@ -12,7 +12,7 @@ const localProjectUrl = "http://api.supabase.internal:8000";
 const rescheduleSqlPath = join(root, "scripts", "sql", "reschedule-local-active-crons.sql");
 const disableSqlPath = join(root, "scripts", "sql", "disable-local-active-crons.sql");
 const inspectCronSql =
-  "SELECT jobid, jobname, schedule, active FROM cron.job WHERE jobname IN ('check-volatility','pregenerate-companions','refresh-btc-prices') ORDER BY jobname;";
+  "SELECT jobid, jobname, schedule, active FROM cron.job WHERE jobname IN ('check-volatility','pregenerate-companions','refresh-market-prices') ORDER BY jobname;";
 
 function runSupabaseQuery(label, args) {
   console.log(`\n▶ ${label}`);

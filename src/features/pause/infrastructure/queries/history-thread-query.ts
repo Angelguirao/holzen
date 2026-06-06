@@ -16,7 +16,7 @@ export interface HistoryThreadRow {
   id: string;
   pause_instance_id: string;
   created_at: string | null;
-  content: { title?: string; body?: string; btcInsight?: string } | null;
+  content: { title?: string; body?: string; marketInsight?: string; btcInsight?: string } | null;
 }
 
 export const HISTORY_THREAD_QUERY_PREFIX = ['history-thread'] as const;

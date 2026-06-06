@@ -3,6 +3,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { marketOnThisDayYearOffsets } from "../_shared/market-on-this-day-config.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import { MARKET_PRICE_CACHE_TABLE } from "../_shared/market-price-cache-table.ts";
 import { warmMissingMarketPrices } from "../_shared/market-price-warm.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
@@ -13,13 +14,13 @@ const corsHeaders = {
 };
 
 /**
- * Background BTC price refresh.
+ * Background market price refresh (bitcoin today).
  *
  * Scheduled via cron every ~15 minutes (see docs/ops/cron-setup.md). Fetches:
  * 1. Current BTC price (USD)
  * 2. Historical prices for "on this day" (1–N calendar years ago; see btc-on-this-day-config)
  *
- * Stores everything in btc_price_cache. The zoom-out companion reads ONLY from this
+ * Stores everything in market_price_cache. The zoom-out companion reads ONLY from this
  * cache during sessions (no CoinGecko at user time).
  *
  * **Freshness contract (product):** Historical rows for each anniversary date (1y..Ny ago) are
@@ -43,20 +44,20 @@ const corsHeaders = {
  */
 
 serve(
-  withRequestLogging("refresh-btc-prices", async ({ req, log }) => {
+  withRequestLogging("refresh-market-prices", async ({ req, log }) => {
   const t0 = Date.now();
 
   try {
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      log.warn("refresh_btc_phase", {
-        holzen_event: "refresh_btc_cron",
+      log.warn("refresh_market_phase", {
+        holzen_event: "refresh_market_cron",
         phase: "service_auth_rejected",
       });
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
-    log("refresh_btc_phase", {
-      holzen_event: "refresh_btc_cron",
+    log("refresh_market_phase", {
+      holzen_event: "refresh_market_cron",
       phase: "service_auth_ok",
     });
 
@@ -82,14 +83,14 @@ serve(
         const price = data?.bitcoin?.usd;
         if (price) {
           const today = new Date().toISOString().slice(0, 10);
-          const { error: upErr } = await supabase.from("btc_price_cache").upsert({
+          const { error: upErr } = await supabase.from(MARKET_PRICE_CACHE_TABLE).upsert({
             date: today,
             price: Math.round(price),
             fetched_at: new Date().toISOString(),
           });
           if (upErr) {
-            log.error("refresh_btc_current", {
-              holzen_event: "refresh_btc_cron",
+            log.error("refresh_market_current", {
+              holzen_event: "refresh_market_cron",
               phase: "current_upsert_failed",
               ...unknownErrorForLog(upErr),
             });
@@ -98,15 +99,15 @@ serve(
             results.push(`current: $${Math.round(price)}`);
           }
         } else {
-          log.warn("refresh_btc_current", {
-            holzen_event: "refresh_btc_cron",
+          log.warn("refresh_market_current", {
+            holzen_event: "refresh_market_cron",
             phase: "current_missing_bitcoin_usd",
           });
           results.push("current: no price in JSON");
         }
       } else if (res.status === 429) {
-        log.warn("refresh_btc_current", {
-          holzen_event: "refresh_btc_cron",
+        log.warn("refresh_market_current", {
+          holzen_event: "refresh_market_cron",
           phase: "coingecko_rate_limited_current",
         });
         coingeckoInterCallMs = 12000; // reduce immediate second 429 on market_chart/range
@@ -121,14 +122,14 @@ serve(
             const price = data?.USD?.last;
             if (price) {
               const today = new Date().toISOString().slice(0, 10);
-              const { error: upErr } = await supabase.from("btc_price_cache").upsert({
+              const { error: upErr } = await supabase.from(MARKET_PRICE_CACHE_TABLE).upsert({
                 date: today,
                 price: Math.round(price),
                 fetched_at: new Date().toISOString(),
               });
               if (upErr) {
-                log.error("refresh_btc_current", {
-                  holzen_event: "refresh_btc_cron",
+                log.error("refresh_market_current", {
+                  holzen_event: "refresh_market_cron",
                   phase: "current_backup_upsert_failed",
                   ...unknownErrorForLog(upErr),
                 });
@@ -142,16 +143,16 @@ serve(
           }
         } catch { /* backup also failed */ }
       } else {
-        log.warn("refresh_btc_current", {
-          holzen_event: "refresh_btc_cron",
+        log.warn("refresh_market_current", {
+          holzen_event: "refresh_market_cron",
           phase: "coingecko_non_ok",
           http_status: res.status,
         });
         results.push(`current: HTTP ${res.status}`);
       }
     } catch (e) {
-      log.error("refresh_btc_current", {
-        holzen_event: "refresh_btc_cron",
+      log.error("refresh_market_current", {
+        holzen_event: "refresh_market_cron",
         phase: "current_fetch_error",
         ...unknownErrorForLog(e),
       });
@@ -182,7 +183,7 @@ serve(
     // right place for intraday updates — this list only covers 1y..Ny ago.
     const dateKeys = yearTargets.map((t) => t.dateKey);
     const { data: cached } = await supabase
-      .from("btc_price_cache")
+      .from(MARKET_PRICE_CACHE_TABLE)
       .select("date")
       .in("date", dateKeys);
     const cachedRows = (cached ?? []) as { date: string }[];
@@ -206,8 +207,8 @@ serve(
         } else if (warm.skippedRecent === missingTargets.length) {
           results.push(`historical: all ${missingTargets.length} fetched <15min ago (skipped)`);
         } else {
-          log.warn("refresh_btc_historical", {
-            holzen_event: "refresh_btc_cron",
+          log.warn("refresh_market_historical", {
+            holzen_event: "refresh_market_cron",
             phase: "historical_no_dates_resolved",
             missing: missingTargets.length,
             rate_limited: warm.rateLimited,
@@ -220,8 +221,8 @@ serve(
           );
         }
       } catch (e) {
-        log.error("refresh_btc_historical", {
-          holzen_event: "refresh_btc_cron",
+        log.error("refresh_market_historical", {
+          holzen_event: "refresh_market_cron",
           phase: "historical_warm_failed",
           ...unknownErrorForLog(e),
         });
@@ -232,8 +233,8 @@ serve(
     }
 
     const summary = results.length > 0 ? results.join("; ").slice(0, 500) : "no steps recorded";
-    log("refresh_btc_complete", {
-      holzen_event: "refresh_btc_cron",
+    log("refresh_market_complete", {
+      holzen_event: "refresh_market_cron",
       phase: "run_complete",
       ms: Date.now() - t0,
       summary,
@@ -242,8 +243,8 @@ serve(
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    log.error("refresh_btc_uncaught", {
-      holzen_event: "refresh_btc_cron",
+    log.error("refresh_market_uncaught", {
+      holzen_event: "refresh_market_cron",
       phase: "uncaught",
       ...unknownErrorForLog(e),
     });

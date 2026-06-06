@@ -149,7 +149,7 @@ export type Database = {
         }
         Relationships: []
       }
-      btc_price_cache: {
+      market_price_cache: {
         Row: {
           date: string
           fetched_at: string

@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { MARKET_ON_THIS_DAY_YEARS_BACK, marketOnThisDayYearOffsets } from "./market-on-this-day-config.ts";
+import { MARKET_PRICE_CACHE_TABLE } from "./market-price-cache-table.ts";
 import { warmMissingMarketPrices } from "./market-price-warm.ts";
 import { errorMessageFromUnknown, getEdgeRuntime } from "./edge-runtime.ts";
 
@@ -19,7 +20,7 @@ interface PriceCacheRow {
 type PriceLog = (msg: string, extra?: Record<string, unknown>) => void;
 
 /**
- * Read anniversary prices from `btc_price_cache` (kept warm by refresh-btc-prices cron).
+ * Read anniversary prices from `market_price_cache` (kept warm by refresh-market-prices cron).
  * Used by Look Back; Zoom Out no longer surfaces price rows in the client.
  */
 export async function fetchMarketOnThisDayPrices(
@@ -41,7 +42,7 @@ export async function fetchMarketOnThisDayPrices(
   const allDateKeys = [todayKey, ...yearTargets.map((t) => t.dateKey)];
 
   const { data: cached } = await svcClient
-    .from("btc_price_cache")
+    .from(MARKET_PRICE_CACHE_TABLE)
     .select("date, price")
     .in("date", allDateKeys);
 

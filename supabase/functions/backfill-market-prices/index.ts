@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
 import { coingeckoHeaders, fetchCoinGeckoHistoryPrice } from "../_shared/coingecko.ts";
+import { MARKET_PRICE_CACHE_TABLE } from "../_shared/market-price-cache-table.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 
@@ -70,8 +71,8 @@ function closestPriceForTarget(
 }
 
 /**
- * Manual / ops: backfill `btc_price_cache` for a UTC date range using CoinGecko
- * `market_chart/range` (same nearest-sample idea as `refresh-btc-prices`).
+ * Manual / ops: backfill `market_price_cache` for a UTC date range using CoinGecko
+ * `market_chart/range` (same nearest-sample idea as `refresh-market-prices`).
  *
  * **Auth:** service role JWT or `CRON_SECRET` (same as other cron workers).
  *
@@ -86,7 +87,7 @@ function closestPriceForTarget(
  *   `PER_DATE_MAX_CALLS` per invocation). Use **`per_date`** when `onlyMissing`
  *   + a wide range leaves only a few gap dates (e.g. the 10 zoom-out anniversary
  *   dates spanning a decade) — the endpoint swap avoids the demo-tier empty-
- *   array problem that made `refresh-btc-prices` fail silently.
+ *   array problem that made `refresh-market-prices` fail silently.
  * - `chunkDays` (optional, default 45): CoinGecko window size per HTTP call. Ignored in `per_date` mode.
  * - `maxChunks` (optional, default 10, max 25): CoinGecko **calls** per invocation; if more
  *   days remain, response includes **`resumeFrom`** — POST again with **`from: resumeFrom`**
@@ -97,7 +98,7 @@ function closestPriceForTarget(
  */
 
 serve(
-  withRequestLogging("backfill-btc-prices", async ({ req, log }) => {
+  withRequestLogging("backfill-market-prices", async ({ req, log }) => {
   const t0 = Date.now();
 
   try {
@@ -191,7 +192,7 @@ serve(
 
     if (onlyMissing) {
       const { data: existing, error: selErr } = await supabase
-        .from("btc_price_cache")
+        .from(MARKET_PRICE_CACHE_TABLE)
         .select("date")
         .gte("date", fromRaw)
         .lte("date", toRaw);
@@ -263,7 +264,7 @@ serve(
       }
 
       if (!dryRun && inserts.length > 0) {
-        const { error: upErr } = await supabase.from("btc_price_cache").upsert(inserts);
+        const { error: upErr } = await supabase.from(MARKET_PRICE_CACHE_TABLE).upsert(inserts);
         if (upErr) {
           log.error("backfill_btc_upsert", {
             holzen_event: "backfill_btc_cron",
@@ -378,7 +379,7 @@ serve(
       }
 
       if (!dryRun && inserts.length > 0) {
-        const { error: upErr } = await supabase.from("btc_price_cache").upsert(inserts);
+        const { error: upErr } = await supabase.from(MARKET_PRICE_CACHE_TABLE).upsert(inserts);
         if (upErr) {
           log.error("backfill_btc_upsert", {
             holzen_event: "backfill_btc_cron",

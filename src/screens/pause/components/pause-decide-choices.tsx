@@ -51,7 +51,7 @@ export function PauseDecideChoices({ introLine, onHold, onBought, onSold }: Paus
           <OutcomeIcon outcome="held" size={18} className="text-primary-foreground" />
         </div>
         <span className="text-sm font-semibold tracking-wide">
-          {t('pause.brief.decide.holdPrimary', { defaultValue: 'Hold' })}
+          {t('pause.brief.decide.holdPrimary', { defaultValue: 'No change' })}
         </span>
       </Button>
       <div className="flex w-full max-w-[280px] gap-3">
@@ -62,7 +62,7 @@ export function PauseDecideChoices({ introLine, onHold, onBought, onSold }: Paus
           className="flex flex-1 items-center justify-center gap-2 rounded-full border-primary/40 bg-primary/5 py-3 text-xs font-semibold text-foreground hover:bg-primary/10"
         >
           <OutcomeIcon outcome="bought" size={14} className="text-muted-foreground" />
-          {t('ritual.decide.buy', { defaultValue: 'I bought' })}
+          {t('ritual.decide.buy', { defaultValue: 'Bought' })}
         </Button>
         <Button
           type="button"
@@ -71,7 +71,7 @@ export function PauseDecideChoices({ introLine, onHold, onBought, onSold }: Paus
           className="flex flex-1 items-center justify-center gap-2 rounded-full border-primary/40 bg-primary/5 py-3 text-xs font-semibold text-foreground hover:bg-primary/10"
         >
           <OutcomeIcon outcome="sold" size={14} className="text-muted-foreground" />
-          {t('ritual.decide.sell', { defaultValue: 'I sold' })}
+          {t('ritual.decide.sell', { defaultValue: 'Sold' })}
         </Button>
       </div>
     </motion.div>

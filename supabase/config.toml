@@ -85,11 +85,11 @@ skip_nonce_check = true
     verify_jwt = false
   [functions.pregenerate-companions]
     verify_jwt = false
-  [functions.refresh-btc-prices]
+  [functions.refresh-market-prices]
     verify_jwt = false
-  [functions.backfill-btc-prices]
+  [functions.backfill-market-prices]
     verify_jwt = false
-  [functions.seed-btc-history]
+  [functions.seed-market-history]
     verify_jwt = false
   [functions.ai-cost-alert]
     verify_jwt = false

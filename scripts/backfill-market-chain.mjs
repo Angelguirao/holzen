@@ -1,5 +1,5 @@
 /**
- * Chain `backfill-btc-prices` until `completed: true` (long spans, e.g. 10 years).
+ * Chain `backfill-market-prices` until `completed: true` (long spans, e.g. 10 years).
  *
  * Env (same as Bruno service-cron):
  *   SUPABASE_URL or VITE_SUPABASE_URL — project URL (no trailing slash)
@@ -7,7 +7,7 @@
  *   VITE_SUPABASE_PUBLISHABLE_KEY or SUPABASE_ANON_KEY — `apikey` header
  *
  * Usage:
- *   node scripts/backfill-btc-chain.mjs 2016-04-14 2026-04-14
+ *   node scripts/backfill-market-chain.mjs 2016-04-14 2026-04-14
  *
  * Pauses 3s between invocations to reduce CoinGecko 429 risk.
  */
@@ -24,11 +24,11 @@ if (!base || !bearer || !anon) {
   process.exit(1);
 }
 if (!from || !to) {
-  console.error("Usage: node scripts/backfill-btc-chain.mjs <from YYYY-MM-DD> <to YYYY-MM-DD>");
+  console.error("Usage: node scripts/backfill-market-chain.mjs <from YYYY-MM-DD> <to YYYY-MM-DD>");
   process.exit(1);
 }
 
-const url = `${base}/functions/v1/backfill-btc-prices`;
+const url = `${base}/functions/v1/backfill-market-prices`;
 const maxIterations = 500;
 let iteration = 0;
 

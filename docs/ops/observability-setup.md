@@ -104,7 +104,7 @@ Edge CORS (`supabase/functions/_shared/cors.ts`) allow-lists those headers; `wit
 
 `fetchInitWithIncomingTrace(incomingRequest, init)` merges the same headers into a plain `fetch` **`RequestInit`** for outbound third-party calls (for example **`llm-gateway`** Gemini/OpenRouter requests or price APIs) without overwriting keys already set in `init.headers`.
 
-BTC cache workers (`refresh-btc-prices`, `backfill-btc-prices`, `seed-btc-history`) and shared helpers such as **`fetchCoinGeckoHistoryPrice`** / **`warmMissingBtcPrices`** accept the incoming edge `Request` where applicable so CoinGecko, backup tickers, and CryptoCompare calls stay in the same trace when headers are present.
+Market cache workers (`refresh-market-prices`, `backfill-market-prices`, `seed-market-history`) and shared helpers such as **`fetchCoinGeckoHistoryPrice`** / **`warmMissingMarketPrices`** accept the incoming edge `Request` where applicable so CoinGecko, backup tickers, and CryptoCompare calls stay in the same trace when headers are present.
 
 **`callPerplexityChat(..., incoming?)`** forwards the same headers to Perplexity. **`companion-orchestrate`** passes the edge `Request` into signal, grounding, history, zoom-out, and **question-mode** `generateQuestion` (including regenerate-only) so live search and **`llm-gateway`** calls stay correlated with the client trace. **`generateUnifiedReflection`** accepts the same for **`holzen-reflect`** (browser Reflect step). Companion **structuring** steps (signal, grounding, history) forward the same headers on Gemini API calls via **`llm-gateway`**. **`fetchFeedXmlIfApplicable`** / **`firecrawlMapArticleUrls`** accept an optional incoming request for **`fetch-source-feeds`** *(legacy Tier B)* outbound RSS and Firecrawl Map calls.
 
@@ -170,7 +170,7 @@ Each targets source `holzen-edges`:
 | fail-open rate-limit | `msg contains "limit_check_fail_open"` | Slack, warning |
 | Orchestrate invoke error | `msg contains "orchestrate_invoke_error"` | Slack, warning |
 | Error spike | `level = "error"` count > 10 per 5 min | Slack, paging |
-| Heartbeat miss: refresh-btc-prices | See §6 below | Slack, paging |
+| Heartbeat miss: refresh-market-prices | See §6 below | Slack, paging |
 | Heartbeat miss: pregenerate-companions | See §6 | Slack, paging |
 | Heartbeat miss: check-volatility | See §6 | Slack, paging |
 | Heartbeat miss: night-reflection | See §6 | Slack, paging |
@@ -214,7 +214,7 @@ Mirror of the **Part A** table in [pg-cron-heartbeat-wiring.md](../backlog/pg-cr
 |---|---|---|---|---|
 | `process-email-queue` | `*/1 * * * *` | 1 min | 5 min | `heartbeat.process_email_queue` |
 | `process-referral-pending` | `*/5 * * * *` | 5 min | 2 min | `heartbeat.process_referral_pending` |
-| `refresh-btc-prices` | `*/15 * * * *` | 15 min | 5 min | `heartbeat.refresh_btc_prices` |
+| `refresh-market-prices` | `*/15 * * * *` | 15 min | 5 min | `heartbeat.refresh_market_prices` |
 | `check-volatility` | `*/15 * * * *` | 15 min | 5 min | `heartbeat.check_volatility` |
 | `night-reflection` | `0 * * * *` | 1 hr | 10 min | `heartbeat.night_reflection` |
 | `pregenerate-companions` | `0 */6 * * *` | 6 hr | 30 min | `heartbeat.pregenerate_companions` |
