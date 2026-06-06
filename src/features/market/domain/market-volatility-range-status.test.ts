@@ -1,5 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { resolveMarketVolatilityRangeStatus } from '@/features/market/domain/market-volatility-range-status';
+import {
+  resolveHomeMarketRangeStatus,
+  resolveMarketVolatilityRangeStatus,
+} from '@/features/market/domain/market-volatility-range-status';
+import type { MarketQuote } from '@/features/market/domain/market-quote';
+
+const sampleQuote = (changePercent: number): MarketQuote => ({
+  coinId: 'bitcoin',
+  currentPrice: 100,
+  price24hAgo: 100,
+  changePercent,
+  direction: changePercent >= 0 ? 'up' : 'down',
+  currency: 'USD',
+});
 
 describe('resolveMarketVolatilityRangeStatus', () => {
   const profile = { threshold: 5, threshold_down: 5 };
@@ -29,5 +42,48 @@ describe('resolveMarketVolatilityRangeStatus', () => {
         direction: 'up',
       }),
     ).toEqual({ kind: 'beyond', axis: 'daily_up' });
+  });
+});
+
+describe('resolveHomeMarketRangeStatus', () => {
+  it('uses live quote when no open cron pause', () => {
+    expect(
+      resolveHomeMarketRangeStatus({
+        marketData: sampleQuote(3),
+        threshold: 5,
+        thresholdDown: 5,
+        openPauseSource: null,
+        openPauseState: null,
+      }),
+    ).toEqual({ kind: 'within' });
+  });
+
+  it('shows beyond when open cron pause exists even if live quote is stale-within', () => {
+    expect(
+      resolveHomeMarketRangeStatus({
+        marketData: sampleQuote(0.4),
+        threshold: 5,
+        thresholdDown: 5,
+        openPauseSource: 'cron_volatility',
+        openPauseState: 'active',
+        openPauseContextSnapshot: {
+          change_24h_pct: 0.7,
+          direction: 'up',
+        },
+      }),
+    ).toEqual({ kind: 'beyond', axis: 'daily_up' });
+  });
+
+  it('does not force beyond for manual open pauses', () => {
+    expect(
+      resolveHomeMarketRangeStatus({
+        marketData: sampleQuote(2),
+        threshold: 5,
+        thresholdDown: 5,
+        openPauseSource: 'manual',
+        openPauseState: 'active',
+        openPauseContextSnapshot: { change_24h_pct: 2, direction: 'up' },
+      }),
+    ).toEqual({ kind: 'within' });
   });
 });

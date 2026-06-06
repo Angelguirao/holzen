@@ -15,6 +15,9 @@ export function useHomeDashboardSectionDeps(args: {
   marketData: MarketQuote | null;
   threshold: number;
   thresholdDown: number;
+  openPauseSource?: string | null;
+  openPauseState?: 'active' | 'engaged' | null;
+  openPauseContextSnapshot?: Record<string, unknown> | null;
   priceHidden: boolean;
   togglePriceHidden: () => void;
   currency: string;
@@ -42,6 +45,9 @@ export function useHomeDashboardSectionDeps(args: {
     marketData,
     threshold,
     thresholdDown,
+    openPauseSource,
+    openPauseState,
+    openPauseContextSnapshot,
     priceHidden,
     togglePriceHidden,
     currency,
@@ -69,6 +75,9 @@ export function useHomeDashboardSectionDeps(args: {
         marketData={marketData}
         threshold={threshold}
         thresholdDown={thresholdDown}
+        openPauseSource={openPauseSource}
+        openPauseState={openPauseState}
+        openPauseContextSnapshot={openPauseContextSnapshot}
       />
     ) : null);
 

@@ -9,6 +9,7 @@ export type OpenPauseHomePreview = {
   pauseInstanceId: string;
   createdAt: string;
   openPauseState: 'active' | 'engaged';
+  openPauseSource: string | null;
   contextText: string | null;
   contextSnapshot: Record<string, unknown> | null;
   reflectionMessage: string | null;
@@ -44,7 +45,7 @@ async function fetchPauseStepEventCount(
 export async function fetchOpenPauseHomePreview(userId: string): Promise<OpenPauseHomePreview | null> {
   const { data, error } = await supabase
     .from('v_pause_full' as never)
-    .select('id, created_at, context_snapshot, state, is_brief_ritual')
+    .select('id, created_at, context_snapshot, state, is_brief_ritual, source')
     .eq('user_id', userId)
     .in('state', ['active', 'engaged'])
     .maybeSingle();
@@ -57,6 +58,7 @@ export async function fetchOpenPauseHomePreview(userId: string): Promise<OpenPau
     context_snapshot: Record<string, unknown> | null;
     state?: string;
     is_brief_ritual?: boolean | null;
+    source?: string | null;
   };
 
   const openPauseState =
@@ -100,6 +102,7 @@ export async function fetchOpenPauseHomePreview(userId: string): Promise<OpenPau
     pauseInstanceId: row.id,
     createdAt: row.created_at,
     openPauseState,
+    openPauseSource: row.source ?? null,
     contextText,
     contextSnapshot,
     reflectionMessage,

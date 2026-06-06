@@ -16,8 +16,10 @@ export {
 export { isVolatilityThresholdBreached } from './domain/volatility-thresholds';
 export {
   resolveMarketVolatilityRangeStatus,
+  resolveHomeMarketRangeStatus,
   type MarketVolatilityRangeStatus,
   type MarketVolatilityRangeInput,
+  type HomeMarketRangeStatusInput,
 } from './domain/market-volatility-range-status';
 export { parsePauseContextForHomePreview } from './application/pause-context-home-preview';
 export {

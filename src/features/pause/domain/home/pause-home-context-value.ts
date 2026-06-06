@@ -12,6 +12,7 @@ export type PauseHomeContextValue = {
   severity: 'mild' | 'moderate' | 'high';
   lastPauseInstanceId: string | null;
   openPauseState: 'active' | 'engaged' | null;
+  openPauseSource: string | null;
   contextSnapshot: Record<string, unknown> | null;
   hasReflectionStep: boolean;
   hasOpenPauseStepEvents: boolean;
