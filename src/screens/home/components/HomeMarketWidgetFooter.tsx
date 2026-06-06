@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import {
-  resolveMarketVolatilityRangeStatus,
+  resolveHomeMarketRangeStatus,
   type MarketVolatilityRangeStatus,
 } from '@/features/market/domain/market-volatility-range-status';
 import type { MarketQuote } from '@/features/market/public';
@@ -10,6 +10,9 @@ type Props = {
   marketData: MarketQuote | null;
   threshold: number;
   thresholdDown: number;
+  openPauseSource?: string | null;
+  openPauseState?: 'active' | 'engaged' | null;
+  openPauseContextSnapshot?: Record<string, unknown> | null;
 };
 
 function RangeStatusLine({ status }: { status: MarketVolatilityRangeStatus }) {
@@ -44,19 +47,24 @@ function RangeStatusLine({ status }: { status: MarketVolatilityRangeStatus }) {
 }
 
 /** Figma 559:26565 — range (left) + paused-today stat (right) under Market price. */
-export function HomeMarketWidgetFooter({ marketData, threshold, thresholdDown }: Props) {
+export function HomeMarketWidgetFooter({
+  marketData,
+  threshold,
+  thresholdDown,
+  openPauseSource,
+  openPauseState,
+  openPauseContextSnapshot,
+}: Props) {
   "use memo";
 
-  const rangeStatus =
-    marketData != null
-      ? resolveMarketVolatilityRangeStatus(
-          { threshold, threshold_down: thresholdDown },
-          {
-            changePercent: marketData.changePercent,
-            direction: marketData.direction,
-          },
-        )
-      : null;
+  const rangeStatus = resolveHomeMarketRangeStatus({
+    marketData,
+    threshold,
+    thresholdDown,
+    openPauseSource,
+    openPauseState,
+    openPauseContextSnapshot,
+  });
 
   if (!rangeStatus && !marketData) return null;
 

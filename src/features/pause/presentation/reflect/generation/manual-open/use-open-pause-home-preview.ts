@@ -5,6 +5,7 @@ import type { CompanionData } from '@/features/pause/domain/companion-card-types
 import { DEFAULT_COMPANIONS } from '@/features/pause/domain/session-model';
 import { fetchOpenPauseHomePreview } from '@/features/pause/public-queries';
 import { pendingPauseOfferQueryKey } from '@/features/pause/infrastructure/queries/reflect/pending-offer/pending-pause-offer-query-key';
+import { HOLZEN_MARKET_DISPLAY_QUERY_PREFIX } from '@/features/market/application/queries/holzen-market-display-keys';
 import { HOLZEN_NUMBER_QUERY_KEY, PROFILE_QUERY_KEY } from '@/features/user/public-queries';
 import { pauseDismissOpenPauseHomePreview } from './pause-home-reflect-io';
 import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
@@ -33,6 +34,7 @@ export function useOpenPauseHomePreview(
   const [lastPauseInstanceId, setLastPauseInstanceId] = useState<string | null>(null);
   /** From `v_pause_current.state` — `active` vs `engaged` for Home CTA copy. */
   const [openPauseState, setOpenPauseState] = useState<'active' | 'engaged' | null>(null);
+  const [openPauseSource, setOpenPauseSource] = useState<string | null>(null);
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
   const [contextSnapshot, setContextSnapshot] = useState<Record<string, unknown> | null>(null);
   const [hasReflectionStep, setHasReflectionStep] = useState(false);
@@ -44,6 +46,7 @@ export function useOpenPauseHomePreview(
   const clearOpenPausePreview = useCallback(() => {
     setLastPauseInstanceId(null);
     setOpenPauseState(null);
+    setOpenPauseSource(null);
     setLastTriggerAt(null);
     setMessage(null);
     setContext(null);
@@ -89,6 +92,7 @@ export function useOpenPauseHomePreview(
 
       setLastPauseInstanceId(preview.pauseInstanceId);
       setOpenPauseState(preview.openPauseState);
+      setOpenPauseSource(preview.openPauseSource);
       setLastTriggerAt(preview.createdAt);
       setOpenPauseCreatedAt(preview.createdAt);
       setContext(preview.contextText);
@@ -119,6 +123,7 @@ export function useOpenPauseHomePreview(
         void queryClient.invalidateQueries({ queryKey: ['home-recent-context-lost', user.id] });
         void queryClient.invalidateQueries({ queryKey: pendingPauseOfferQueryKey(user.id) });
         void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(user.id) });
+        void queryClient.invalidateQueries({ queryKey: HOLZEN_MARKET_DISPLAY_QUERY_PREFIX });
       }
       void syncOpenPauseFromDb().then((instanceChanged) => {
         if (instanceChanged) {
@@ -141,6 +146,7 @@ export function useOpenPauseHomePreview(
     companions,
     lastPauseInstanceId,
     openPauseState,
+    openPauseSource,
     lastTriggerAt,
     contextSnapshot,
     hasReflectionStep,
@@ -153,6 +159,7 @@ export function useOpenPauseHomePreview(
     setCompanions,
     setLastPauseInstanceId,
     setOpenPauseState,
+    setOpenPauseSource,
     setLastTriggerAt,
     setContextSnapshot,
     setHasReflectionStep,

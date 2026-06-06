@@ -1,3 +1,4 @@
+import type { MarketQuote } from '@/features/market/domain/market-quote';
 import type { VolatilityThresholdProfile } from '@/features/market/domain/volatility-thresholds';
 
 export type MarketVolatilityRangeStatus =
@@ -8,6 +9,26 @@ export type MarketVolatilityRangeInput = {
   changePercent: number;
   direction: 'up' | 'down';
 };
+
+export type HomeMarketRangeStatusInput = {
+  marketData: MarketQuote | null;
+  threshold: number;
+  thresholdDown: number;
+  openPauseSource?: string | null;
+  openPauseState?: 'active' | 'engaged' | null;
+  openPauseContextSnapshot?: Record<string, unknown> | null;
+};
+
+function cronPauseBeyondAxis(
+  contextSnapshot: Record<string, unknown> | null | undefined,
+): 'daily_up' | 'daily_down' {
+  if (contextSnapshot?.direction === 'down') return 'daily_down';
+  const snapPct = contextSnapshot?.change_24h_pct;
+  if (typeof snapPct === 'number' && Number.isFinite(snapPct) && snapPct < 0) {
+    return 'daily_down';
+  }
+  return 'daily_up';
+}
 
 /**
  * UI projection: is the current quote inside the user's daily pause auto-trigger bands?
@@ -29,4 +50,44 @@ export function resolveMarketVolatilityRangeStatus(
     kind: 'beyond',
     axis: data.direction === 'down' ? 'daily_down' : 'daily_up',
   };
+}
+
+/**
+ * Home Market footer: live quote vs thresholds, aligned with an open cron pause when present.
+ * Cron offers only open on server-side breach — show beyond while that pause is open even if
+ * the cached live quote has not refetched yet.
+ */
+export function resolveHomeMarketRangeStatus(
+  input: HomeMarketRangeStatusInput,
+): MarketVolatilityRangeStatus | null {
+  const profile = { threshold: input.threshold, threshold_down: input.thresholdDown };
+
+  const liveStatus =
+    input.marketData != null
+      ? resolveMarketVolatilityRangeStatus(profile, {
+          changePercent: input.marketData.changePercent,
+          direction: input.marketData.direction,
+        })
+      : null;
+
+  const openCronPause =
+    input.openPauseSource === 'cron_volatility' &&
+    (input.openPauseState === 'active' || input.openPauseState === 'engaged');
+
+  if (!openCronPause) {
+    return liveStatus;
+  }
+
+  const snapPct = input.openPauseContextSnapshot?.change_24h_pct;
+  if (typeof snapPct === 'number' && Number.isFinite(snapPct)) {
+    const snapStatus = resolveMarketVolatilityRangeStatus(profile, {
+      changePercent: snapPct,
+      direction: snapPct >= 0 ? 'up' : 'down',
+    });
+    if (snapStatus.kind === 'beyond') {
+      return snapStatus;
+    }
+  }
+
+  return { kind: 'beyond', axis: cronPauseBeyondAxis(input.openPauseContextSnapshot) };
 }
