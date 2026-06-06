@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { errorMessage } from "../_shared/error-message.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 
 const corsHeaders = {
@@ -20,7 +21,7 @@ Deno.serve(withRequestLogging("holzen-number", async ({ req }) => {
       headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=60" },
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }), {
+    return new Response(JSON.stringify({ error: errorMessage(err) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
