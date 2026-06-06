@@ -21,9 +21,9 @@ Future classes (more cryptos, equities, commodities) should extend a **catalog +
 | `src/features/market/domain/tracked-assets.ts` | `TrackedAssetDefinition` (`id`, `symbol`, `kind`, `provider`); `TRACKED_ASSETS = [bitcoin]`; `isBitcoinTrackedAsset()` |
 | `supabase/functions/_shared/tracked-assets.ts` | Same allowlist |
 | Migration `20260606140000_tracked_asset_bitcoin_only.sql` | Coerce non-bitcoin rows → `bitcoin`; `update_profile_safe` accepts `bitcoin` only |
-| `MarketQuote` type alias | `BtcPriceData` retained as deprecated alias for incremental rename |
 | Settings | Asset picker hidden when catalog length is 1 (read-only label) |
-| i18n | Removed ETH/SOL/XMR settings labels |
+| i18n | Removed ETH/SOL/XMR settings labels; active UI uses `marketStatus.*`, `settings.unitBasisMode*`, `pause.frame.lookBackContent.market*` |
+| Client naming | `MarketQuote`, `marketData`, `MarketStatus`/`MarketChart`, `marketInsight` dual-read, breathe-ambient market query; deprecated aliases retained for `@/legacy` |
 
 ---
 
@@ -39,17 +39,17 @@ Future classes (more cryptos, equities, commodities) should extend a **catalog +
 | **Fetch pipeline** | `fetchMarketData(coinId, currency)` already parameterized by CoinGecko id |
 | **Volatility cron** | `check-volatility` uses profile asset + shared threshold helpers |
 | **Pause context builders** | `buildPauseContextFromMarket`, manual reflect context take normalized asset id |
+| **Look Back client parse** | `marketInsight` canonical; dual-reads legacy `btcInsight` from cache/edge JSON |
 
 ### Bitcoin-specific (gate on `isBitcoinTrackedAsset()`)
 
 | Feature | Location (representative) |
 |---------|---------------------------|
 | On-chain block (mempool, fees) | `fetch-market-data.ts`, `OnChainData` |
-| Home “BTC unit” display mode | `use-market-display-preferences.ts`, market widget |
+| Home “1 BTC = 1 BTC” unit display mode | `use-market-display-preferences.ts`, `holzen_btc_mode` localStorage |
 | Zoom-out anniversary companion copy | edge `companion-orchestrate` / zoom-out tasks |
-| `BtcMoveSeverity`, `formatBtcPrice`, `fetchBtcData` naming | market feature — rename to `Market*` incrementally |
-| `btc_price_cache` table name | server cache keyed by asset today; rename optional later |
 | Fear & Greed index | crypto-wide today; may stay crypto-only or become optional per kind |
+| User-visible “BTC on this day” copy | Product-accurate for pause-first; not genericized intentionally |
 
 ### Not prepared (explicit deferrals)
 
@@ -60,6 +60,8 @@ Future classes (more cryptos, equities, commodities) should extend a **catalog +
 | **Asset kind in DB** | Kind lives in client/edge catalog only — add `tracked_assets` reference table if catalog grows |
 | **Trading hours / market calendars** | Volatility cron assumes 24/7 crypto charts |
 | **Regulatory copy per asset class** | Product/legal not scoped |
+| **`btc_price_cache` table name** | Server cache keyed by asset today; rename with multi-asset migration |
+| **Edge serialized keys** | `btcInsight` in orchestrate prompts, `fallback-seed.json`, artifact rows — dual-write when adding assets |
 
 ---
 
@@ -70,23 +72,30 @@ Future classes (more cryptos, equities, commodities) should extend a **catalog +
 3. Gate BTC-only UI with `isBitcoinTrackedAsset(trackedAssetId)` — do not branch on string literals scattered in screens.
 4. Add i18n `settings.trackedAssets.{id}` and onboarding copy if user-selectable.
 5. PostHog: keep `tracked_asset_id` property on relevant events (already sanitized string).
+6. Edge: dual-write `marketInsight` + keep reading `btcInsight` until cache backfill or TTL clears legacy rows.
 
 For **equities**, expect a new `AssetQuoteProvider` value, a `ports/market-data` adapter, and likely a **reference table** instead of a growing CASE in SQL.
 
 ---
 
-## 5. Naming debt (incremental, not blocking)
+## 5. Naming debt (client complete; server deferred)
 
-Prefer new code:
+**Active `src/` — prefer canonical names; aliases kept for `@/legacy` only:**
 
-- `MarketQuote` over `BtcPriceData` (alias retained)
-- `fetchMarketData` over `fetchBtcData` (alias retained)
-- `formatMarketPrice` over `formatBtcPrice` (alias retained)
-- `MarketMoveSeverity` / `severityFromMarketChangePercent` over `BtcMoveSeverity` / `severityFromBtcChangePercent` (aliases retained)
-- `marketData` over `btcData` on pause home context (`btcData` alias kept for `@/legacy` only)
-- `MarketStatus` / `MarketChart` over `BtcStatus` / `BtcChart` (deprecated component aliases on new files)
+| Canonical | Deprecated alias (keep) |
+|-----------|-------------------------|
+| `MarketQuote` | `BtcPriceData` |
+| `fetchMarketData` | `fetchBtcData` |
+| `formatMarketPrice` | `formatBtcPrice` |
+| `MarketMoveSeverity` / `severityFromMarketChangePercent` | `BtcMoveSeverity` / `severityFromBtcChangePercent` |
+| `marketData` | `btcData` on pause home context |
+| `MarketStatus` / `MarketChart` | `BtcStatus` / `BtcChart` |
+| `buildPauseContextFromMarket` | `buildPauseContextFromBtc` |
+| `getCoingeckoSpotPriceUsd*` | `getCoingeckoBtcUsd*` |
+| `BREATHE_AMBIENT_MARKET_QUERY_KEY` | `BREATHE_AMBIENT_BTC_QUERY_KEY` |
+| `marketInsight` / `resolveHistoricalMarketInsight()` | `btcInsight` on wire/cache shapes |
 
-Remaining optional: `btcInsight` / companion cache JSON keys (serialized), `btc-on-this-day` i18n strings, `BREATHE_AMBIENT_BTC_QUERY_KEY`, `btc_price_cache` table name, `holzen_btc_mode` localStorage key (product still BTC unit display).
+**Do not rename without migration:** `holzen_btc_mode` localStorage, `btcData` on `useHolzen()`, edge/cache `btcInsight`, `btc_price_cache`, edge function names (`backfill-btc-prices`, etc.).
 
 ---
 
