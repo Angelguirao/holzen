@@ -823,6 +823,7 @@
     "hide": "Hide",
     "showPrice": "Show price",
     "hidePrice": "Hide price",
+    "hidePriceDisabledInUnitBasis": "Hide price is not available in 1 BTC = 1 BTC mode",
     "priceIsNoise": "Price is noise. Value is constant.",
     "in24h": "in 24h"
   },
