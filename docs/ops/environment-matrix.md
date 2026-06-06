@@ -105,6 +105,42 @@ Notes:
 - Prefer `supabase/.env` for shared local defaults and `supabase/.env.local` for personal overrides.
 - After editing `CRON_SECRET`, re-run `npm run supabase:cron:local` (or restart `npm run supabase:start`) to refresh the local cron wiring.
 
+**Troubleshooting — Docker container name already in use**
+
+If `npm run supabase:start` fails with something like:
+
+```text
+Conflict. The container name "/supabase_vector_holzen" is already in use by container "…"
+```
+
+Docker still has a **stopped** Supabase container from a prior run (crash, `Ctrl+C` during start, Docker Desktop restart, or an interrupted `supabase stop`). The CLI tries to create a fresh container with the same fixed name (`supabase_<service>_<project_id>`; this repo’s `project_id` is `holzen` in `supabase/config.toml`).
+
+Fix (try in order):
+
+1. **Graceful stop** — from repo root:
+   ```sh
+   npm run supabase:stop
+   npm run supabase:start
+   ```
+2. **Remove the stale container** — replace the name with the one in your error message:
+   ```sh
+   docker rm -f supabase_vector_holzen
+   npm run supabase:start
+   ```
+3. **Remove all local Supabase containers for this project** (when several services conflict):
+   ```powershell
+   # PowerShell (Windows)
+   docker ps -a --filter "name=supabase_" --format "{{.Names}}" | ForEach-Object { docker rm -f $_ }
+   ```
+   ```sh
+   # Git Bash / macOS / Linux
+   docker ps -a --filter "name=supabase_" -q | xargs -r docker rm -f
+   ```
+   Then `npm run supabase:start` again.
+4. **Still stuck** — quit Docker Desktop, start it again, repeat step 2 or 3. Check `npm run env:doctor` for link + Docker status.
+
+This does **not** delete migration files; it only removes Docker containers. Use `npm run supabase:reset` when you intentionally want a fresh local DB volume.
+
 ### Local: app against staging
 
 1. Copy `.env.staging.example` to `.env.staging.local`
