@@ -90,6 +90,7 @@ export function usePauseSessionScaffoldVm(
     sessionOnPicker: scaffold.sessionOnPicker,
     depthPickerMarketData: marketData,
     depthPickerTrackedAssetId: trackedAssetId,
+    depthPickerContextText: shell.context,
     depthPickerOnBrief: mood.depthPickerOnBrief,
     handleDepthPickerDeep: mood.handleDepthPickerDeep,
     scaffoldRitualDerived: scaffold.scaffoldRitualDerived,

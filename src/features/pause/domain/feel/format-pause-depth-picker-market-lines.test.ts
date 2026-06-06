@@ -36,4 +36,14 @@ describe('formatPauseDepthPickerMarketLines', () => {
       )?.arrow,
     ).toBe('▼');
   });
+
+  it('prefers sentiment from pause context when live quote lacks fear/greed', () => {
+    expect(
+      formatPauseDepthPickerMarketLines(
+        sampleQuote({ fearGreed: undefined }),
+        'bitcoin',
+        'BTC is up 1.1% in the last 24 hours. Market sentiment: Fear (32/100).',
+      )?.sentimentLine,
+    ).toBe('Fear · 32');
+  });
 });

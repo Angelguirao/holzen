@@ -9,6 +9,7 @@ import { PauseDepthPickerMarketContext } from '@/screens/pause/components/pause-
 interface Props {
   marketData: MarketQuote | null;
   trackedAssetId: string;
+  contextText?: string | null;
   onBrief: () => void;
   onDeep: () => void;
   onAboutPauses: () => void;
@@ -23,6 +24,7 @@ interface Props {
 export function PauseDepthPicker({
   marketData,
   trackedAssetId,
+  contextText = null,
   onBrief,
   onDeep,
   onAboutPauses,
@@ -55,7 +57,11 @@ export function PauseDepthPicker({
             choicesDisabled={choicesDisabled}
           />
 
-          <PauseDepthPickerMarketContext marketData={marketData} trackedAssetId={trackedAssetId} />
+          <PauseDepthPickerMarketContext
+            marketData={marketData}
+            trackedAssetId={trackedAssetId}
+            contextText={contextText}
+          />
 
           <PauseDepthPickerFooterLinks onAboutPauses={onAboutPauses} />
         </div>

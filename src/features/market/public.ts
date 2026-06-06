@@ -21,6 +21,10 @@ export {
 } from './domain/market-volatility-range-status';
 export { parsePauseContextForHomePreview } from './application/pause-context-home-preview';
 export {
+  formatCompactMarketSentimentFromContextText,
+  formatCompactMarketSentimentFromFearGreed,
+} from './application/format-compact-market-sentiment-line';
+export {
   severityFromMarketChangePercent,
   type MarketMoveSeverity,
 } from './domain/market-move-severity';
@@ -67,6 +71,7 @@ export {
   getHolzenMarketDisplayQueryOptions,
   holzenMarketDisplayQueryKey,
 } from './infrastructure/queries/holzen-market-display-query';
+export { getFearGreedDisplayQueryOptions } from './infrastructure/queries/fear-greed-display-query';
 export {
   getCoingeckoSpotPriceUsdQueryOptions,
   prefetchCoingeckoSpotPriceUsd,
