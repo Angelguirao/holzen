@@ -61,6 +61,7 @@ export type HomePauseWidgetBodyProjection = {
   onPauseAgain: () => void;
   completedPauseCount: number;
   profileLastTriggerAt: string | null;
+  manualCooldownRemainingMs: number;
   pendingPreviewLine: HomePauseWidgetPreviewLine | null;
   pendingMarketBlock: ReturnType<typeof formatHomePauseMarketBlock> | null;
   calmWatersExpiredAt: string | null;
@@ -147,10 +148,14 @@ export function useHomePauseWidgetProjection(
   const [cooldownNowMs, setCooldownNowMs] = useState(() => Date.now());
 
   useEffect(() => {
-    if (!params.profileLastTriggerAt || params.cooldownHours <= 0) return;
     const id = window.setInterval(() => setCooldownNowMs(Date.now()), 1000);
     return () => window.clearInterval(id);
-  }, [params.profileLastTriggerAt, params.cooldownHours]);
+  }, []);
+
+  const manualCooldownRemainingMs = useMemo(
+    () => params.manualCooldownRemaining(),
+    [params.manualCooldownRemaining, cooldownNowMs],
+  );
 
   const postPauseAutoCooldownRemainingMs = computeAutoCooldownRemainingMs(
     params.profileLastTriggerAt,
@@ -171,6 +176,7 @@ export function useHomePauseWidgetProjection(
         trackedAssetSymbol: assetSymbol,
         hasPendingOffer: Boolean(pending),
         postPauseAutoCooldownRemainingMs,
+        manualCooldownRemainingMs,
         completedPauseCount: params.completedPauseCount ?? 0,
         hasOpenPauseStepEvents: params.hasOpenPauseStepEvents,
         userExpanded,
@@ -186,6 +192,7 @@ export function useHomePauseWidgetProjection(
       assetSymbol,
       pending,
       postPauseAutoCooldownRemainingMs,
+      manualCooldownRemainingMs,
       params.completedPauseCount,
       params.hasOpenPauseStepEvents,
       userExpanded,
@@ -313,6 +320,7 @@ export function useHomePauseWidgetProjection(
     onPauseAgain: params.onNeedPause,
     completedPauseCount: params.completedPauseCount ?? 0,
     profileLastTriggerAt: params.profileLastTriggerAt,
+    manualCooldownRemainingMs,
     pendingPreviewLine,
     pendingMarketBlock,
     calmWatersExpiredAt: calmQuery.data?.expiredAt ?? null,

@@ -35,7 +35,6 @@ export function useOpenPauseHomePreview(
   /** From `v_pause_current.state` — `active` vs `engaged` for Home CTA copy. */
   const [openPauseState, setOpenPauseState] = useState<'active' | 'engaged' | null>(null);
   const [openPauseSource, setOpenPauseSource] = useState<string | null>(null);
-  const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
   const [contextSnapshot, setContextSnapshot] = useState<Record<string, unknown> | null>(null);
   const [hasReflectionStep, setHasReflectionStep] = useState(false);
   const [hasOpenPauseStepEvents, setHasOpenPauseStepEvents] = useState(false);
@@ -47,7 +46,6 @@ export function useOpenPauseHomePreview(
     setLastPauseInstanceId(null);
     setOpenPauseState(null);
     setOpenPauseSource(null);
-    setLastTriggerAt(null);
     setMessage(null);
     setContext(null);
     setCompanions(DEFAULT_COMPANIONS);
@@ -93,7 +91,6 @@ export function useOpenPauseHomePreview(
       setLastPauseInstanceId(preview.pauseInstanceId);
       setOpenPauseState(preview.openPauseState);
       setOpenPauseSource(preview.openPauseSource);
-      setLastTriggerAt(preview.createdAt);
       setOpenPauseCreatedAt(preview.createdAt);
       setContext(preview.contextText);
       setContextSnapshot(preview.contextSnapshot);
@@ -147,7 +144,6 @@ export function useOpenPauseHomePreview(
     lastPauseInstanceId,
     openPauseState,
     openPauseSource,
-    lastTriggerAt,
     contextSnapshot,
     hasReflectionStep,
     hasOpenPauseStepEvents,
@@ -160,7 +156,6 @@ export function useOpenPauseHomePreview(
     setLastPauseInstanceId,
     setOpenPauseState,
     setOpenPauseSource,
-    setLastTriggerAt,
     setContextSnapshot,
     setHasReflectionStep,
     setHasReachedReflect,

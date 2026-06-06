@@ -29,6 +29,7 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
     trackedAssetId: profileTrackedAssetId,
     cooldownHours,
     profileLoaded,
+    lastTriggerAt: profileLastTriggerAt,
   } = profile;
 
   const marketQuery = useQuery(
@@ -50,7 +51,6 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
     lastPauseInstanceId,
     openPauseState,
     openPauseSource,
-    lastTriggerAt,
     contextSnapshot,
     hasReflectionStep,
     hasOpenPauseStepEvents,
@@ -62,7 +62,6 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
     setCompanions,
     setLastPauseInstanceId,
     setOpenPauseState,
-    setLastTriggerAt,
     dismissOpenPauseHome: dismissMessage,
     syncOpenPauseFromDb,
   } = useOpenPauseHomePreview(user, {
@@ -80,7 +79,6 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
     setCompanions,
     setNewPauseArrival,
     setLastPauseInstanceId,
-    setLastTriggerAt,
   });
 
   const { manualTrigger, manualCooldownRemaining, autoCooldownRemaining } =
@@ -89,7 +87,7 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
       profileTrackedAssetId,
       currency,
       cooldownHours,
-      lastTriggerAt,
+      lastTriggerAt: profileLastTriggerAt,
       queryClient,
       generateMessage,
       setError,

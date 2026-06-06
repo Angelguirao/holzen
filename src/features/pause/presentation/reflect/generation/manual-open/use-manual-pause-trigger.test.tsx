@@ -94,7 +94,6 @@ describe('useManualPauseTrigger', () => {
         setCompanions: noopSet,
         setNewPauseArrival: noopSet,
         setLastPauseInstanceId: noopSet,
-        setLastTriggerAt: noopSet,
       }),
     );
 

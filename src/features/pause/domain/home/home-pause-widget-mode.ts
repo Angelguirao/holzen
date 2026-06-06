@@ -29,6 +29,8 @@ export type ResolveHomePauseWidgetModeInput = {
   hasPendingOffer: boolean;
   /** Ms remaining on profile `last_trigger_at` auto cooldown (post-pause rest / E gate). */
   postPauseAutoCooldownRemainingMs: number;
+  /** Ms remaining on Home manual “Let’s pause” local cooldown. */
+  manualCooldownRemainingMs: number;
   completedPauseCount: number;
   /** Any `pause_step_events` on the open instance — mid-ritual stays B, not E. */
   hasOpenPauseStepEvents: boolean;
@@ -93,8 +95,9 @@ export function resolveHomePauseWidgetMode(
     return { mode: 'B', defaultCollapsed: false, hasReachedReflect };
   }
 
-  const inPostPauseRest = input.postPauseAutoCooldownRemainingMs > 0;
-  if (inPostPauseRest) {
+  const inIdleCooldown =
+    input.postPauseAutoCooldownRemainingMs > 0 || input.manualCooldownRemainingMs > 0;
+  if (inIdleCooldown) {
     const hasArchive = input.completedPauseCount > 0;
     if (!hasArchive) {
       return {
