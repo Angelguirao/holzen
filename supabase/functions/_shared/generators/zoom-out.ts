@@ -34,7 +34,7 @@ import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { getPhaseConfig } from "../phase-config.ts";
 import { fetchPastReflectionWithWords, type PastReflectionWithWords } from "../past-reflections.ts";
 import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
-import { normalizeTrackedAssetId } from "../tracked-assets.ts";
+import { normalizeTrackedAssetId, isBitcoinTrackedAsset } from "../tracked-assets.ts";
 import {
   type LlmBudgetTier,
   llmChatCompletionsWithFallback,
@@ -407,7 +407,7 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
   const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, forceLive, skipLive, budgetTier = "normal", log, incomingRequest } =
     params;
   const tracked = normalizeTrackedAssetId(params.trackedAssetId);
-  if (tracked !== "bitcoin") {
+  if (!isBitcoinTrackedAsset(tracked)) {
     log(`zoomOut: tracked asset ${tracked} — BTC anniversary pipeline skipped`);
     if (companionFallbacksDisabled()) {
       return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };

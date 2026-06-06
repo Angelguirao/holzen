@@ -502,7 +502,7 @@
     "holdGoalTitle": "Your commitment",
     "holdGoalDesc": "Optional time-bound or open-ended commitment anchor. This is not portfolio tracking — it supports your pause ritual.",
     "trackedAssetTitle": "Tracked asset",
-    "trackedAssetDesc": "Volatility checks, Home market data, and pause context follow this asset. Legacy Bitcoin calendar badges apply only when Bitcoin is selected.",
+    "trackedAssetDesc": "Volatility checks, Home market data, and pause context follow Bitcoin. Thresholds below apply to BTC price moves.",
     "trackedAssets": {
       "bitcoin": "Bitcoin (BTC)"
     },

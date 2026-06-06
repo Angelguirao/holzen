@@ -33,12 +33,12 @@ export function SettingsReflectionPanel() {
   } = useSettingsState();
   return (
     <>
-      <div className="space-y-3">
-        <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">
-          {t('settings.trackedAssetTitle')}
-        </p>
-        <p className="leading-relaxed text-foreground text-sm">{t('settings.trackedAssetDesc')}</p>
-        {TRACKED_ASSETS.length > 1 ? (
+      {TRACKED_ASSETS.length > 1 ? (
+        <div className="space-y-3">
+          <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">
+            {t('settings.trackedAssetTitle')}
+          </p>
+          <p className="leading-relaxed text-foreground text-sm">{t('settings.trackedAssetDesc')}</p>
           <Select value={trackedAssetId} onValueChange={(v) => void setTrackedAssetId(v)}>
             <SelectTrigger className="max-w-md font-mono text-xs" aria-label={t('settings.trackedAssetTitle')}>
               <SelectValue />
@@ -51,12 +51,8 @@ export function SettingsReflectionPanel() {
               ))}
             </SelectContent>
           </Select>
-        ) : (
-          <p className="max-w-md font-mono text-xs text-foreground">
-            {t(`settings.trackedAssets.${TRACKED_ASSETS[0].id}`)}
-          </p>
-        )}
-      </div>
+        </div>
+      ) : null}
 
       <ThresholdSetting
         thresholdUp={threshold}

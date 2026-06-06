@@ -1,6 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { isBitcoinTrackedAsset } from '@/features/market/public';
 import {
   CHECKOUT_SUPPRESSION_WINDOW_DEFAULT_MINUTES,
   CHECKOUT_SUPPRESSION_WINDOW_MIN_MINUTES,
@@ -28,7 +29,7 @@ export function SettingsExperiencePanel() {
   } = useSettingsState();
   return (
     <>
-      {trackedAssetId === 'bitcoin' ? (
+      {isBitcoinTrackedAsset(trackedAssetId) ? (
         <div className="space-y-3">
           <p className="uppercase tracking-wider text-base font-sans font-semibold text-[#dbb266]">{t('settings.btcMode')}</p>
           <p className="leading-relaxed text-foreground text-sm">{t('settings.btcModeDesc')}</p>
@@ -49,7 +50,7 @@ export function SettingsExperiencePanel() {
       ) : null}
 
       <div
-        className={`space-y-3 transition-opacity ${trackedAssetId === 'bitcoin' && btcMode ? 'opacity-30 pointer-events-none' : ''}`}
+        className={`space-y-3 transition-opacity ${isBitcoinTrackedAsset(trackedAssetId) && btcMode ? 'opacity-30 pointer-events-none' : ''}`}
       >
         <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.displayCurrency')}</p>
         <p className="leading-relaxed text-foreground text-sm">{t('settings.displayCurrencyDesc')}</p>

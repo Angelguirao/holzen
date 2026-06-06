@@ -28,7 +28,7 @@ import {
   bucketChangePercent,
   computeContextFingerprint,
 } from "../_shared/pause.ts";
-import { normalizeTrackedAssetId, trackedAssetSymbol } from "../_shared/tracked-assets.ts";
+import { normalizeTrackedAssetId, isBitcoinTrackedAsset, trackedAssetSymbol } from "../_shared/tracked-assets.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -471,7 +471,7 @@ serve(
         const absCum = Math.abs(userM.cumulativeChangePercent);
         ctx += ` Over 7 days, it's ${cumDir} ${absCum.toFixed(1)}%.`;
       }
-      const onChainForUser = assetId === "bitcoin" ? onChainSnapshot : null;
+      const onChainForUser = isBitcoinTrackedAsset(assetId) ? onChainSnapshot : null;
       ctx = enrichAutomaticPauseContext(ctx, fearGreedSnapshot, onChainForUser);
 
       const { moodHistory } = await pauseRecencyInputs(supabase, profile.user_id);

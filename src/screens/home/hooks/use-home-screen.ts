@@ -11,6 +11,7 @@ import {
   useHomePracticeStats,
   usePauseArrivalAudio,
 } from '@/features/pause/public-home';
+import { isBitcoinTrackedAsset } from '@/features/market/public';
 import { useMarketDisplayPreferences } from '@/features/market/public-hooks';
 import { getHomeSubscriptionGate } from '@/features/subscription/public';
 import { useSubscription } from '@/features/subscription/public-hooks';
@@ -119,7 +120,7 @@ export function useHomeScreen() {
     toggleBtcMode,
     toggleMarketChartExpanded,
   } = useMarketDisplayPreferences();
-  const unitBasisModeSupported = trackedAssetId === 'bitcoin';
+  const unitBasisModeSupported = isBitcoinTrackedAsset(trackedAssetId);
   const completedPauseCount = useCompletedPauseCount() ?? 0;
   const { stats: practiceStats, isLoading: practiceStatsLoading } = useHomePracticeStats();
 

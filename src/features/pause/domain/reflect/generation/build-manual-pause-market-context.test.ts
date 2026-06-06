@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
 import { buildManualPauseMarketContext } from './build-manual-pause-market-context';
 
-const baseMarket: BtcPriceData = {
+const baseMarket: MarketQuote = {
   coinId: 'bitcoin',
   currentPrice: 100000,
   price24hAgo: 106000,
