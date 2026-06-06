@@ -425,10 +425,10 @@ CONNECTION TO THE MOMENT:
 - Example: "Recognizing this pattern is the first step to not acting on it."
 - This sentence should feel like a gentle mirror, not advice
 
-BITCOIN ONLY:
-- Frame everything in terms of Bitcoin holders, not "crypto investors"
+BITCOIN CONTEXT:
+- Frame for investors who track Bitcoin volatility — not generic "crypto investors"
 - Say "Bitcoin" not "crypto" or "cryptocurrency"
-- The user holds Bitcoin specifically — this is not about altcoins or "the crypto market"
+- Do not recommend buying, selling, or holding — offer perspective and emotional regulation only
 
 BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shift, revolutionary, unprecedented, navigate the, in the world of, it's worth noting, at the end of the day, moving forward, leverage, synergy, ecosystem, disruptive, next-gen, cutting-edge`,
       },

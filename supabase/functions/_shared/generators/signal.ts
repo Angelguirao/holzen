@@ -383,7 +383,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
   const searchQuery = trimmedSearchAngle
     ? `${trimmedSearchAngle}${sourceHint}${recentExclusion}${urlExclusion}${facetSuffix}`
     : context
-    ? `Cognitive reappraisal for a Bitcoin holder when ${context}.${directionHint} Find one high-quality essay or article (sound money, PoW, time preference, holding, settlement, or monetary ethics) from a respected publication or author — not a personal blog.${sourceHint}${recentExclusion}${urlExclusion}${facetSuffix}`
+    ? `Cognitive reappraisal for an investor during Bitcoin volatility when ${context}.${directionHint} Find one high-quality essay or article on patience, uncertainty, time preference, or sound decision-making under volatility — from a respected publication or author, not a personal blog.${sourceHint}${recentExclusion}${urlExclusion}${facetSuffix}`
     : `Find one high-quality Bitcoin essay for cognitive reappraisal: sound money, proof-of-work, time preference, holding, or monetary ethics — from a reputable publication or writer; diversify author and domain.${sourceHint}${recentExclusion}${urlExclusion}${facetSuffix}`;
 
   const perplexitySystem = buildSignalPerplexitySystem(recentExclusion, topicExclusion);

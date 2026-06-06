@@ -7,14 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { motion, useReducedMotion, useInView } from 'framer-motion';
 import {
-  ArrowRight, Twitter, Instagram, Wind, Feather, BookOpen, TrendingDown, Brain,
-  BarChart3, Target, Heart, Mail, Globe, Shield, Award,
-  Zap, Moon, ChevronDown, Timer, Eye, Sparkles, Compass,
-  Smartphone, Anchor, ExternalLink, UserCircle,
+  Twitter, Instagram, Wind, Feather, BookOpen, TrendingDown, Brain,
+  BarChart3, Target, Globe, Shield, Archive,
+  Zap, ChevronDown, Timer, Sparkles, Compass,
+  Smartphone, Anchor, ExternalLink,
 } from 'lucide-react';
 import { PageMeta } from '@/app/components/PageMeta';
-import { LandingTestimonials } from '@/screens/marketing/components/LandingTestimonials';
-import { LandingLanguageSwitcher } from '@/screens/marketing/components/LandingLanguageSwitcher';
 import { PRICING } from '@/features/subscription/public';
 import { prefetchCoingeckoSpotPriceUsd } from '@/features/market/public';
 import { prefetchBlogPublishedFirstPage } from '@/features/user/public-queries';
@@ -67,28 +65,23 @@ const LandingScreen = () => {
     { icon: <Timer className="h-4 w-4" />, label: t('landing.companions.history'), desc: t('landing.companions.historyDesc') },
   ];
 
-  /** What's included on the landing page — trimmed for clarity; product still includes more (see app). */
+  /** Pause-first shipped scope only — see docs/ops/active-surface.md */
   const FEATURES = [
     { icon: <Wind />, label: t('landing.features.pause'), desc: t('landing.features.pauseDesc') },
     { icon: <Sparkles />, label: t('landing.features.companions'), desc: t('landing.features.companionsDesc') },
     { icon: <TrendingDown />, label: t('landing.features.detection'), desc: t('landing.features.detectionDesc') },
     { icon: <Brain />, label: t('landing.features.mood'), desc: t('landing.features.moodDesc') },
     { icon: <Anchor />, label: t('landing.features.grounding'), desc: t('landing.features.groundingDesc') },
-    { icon: <BarChart3 />, label: t('landing.features.insights'), desc: t('landing.features.insightsDesc') },
-    { icon: <Eye />, label: t('landing.features.holdGoals'), desc: t('landing.features.holdGoalsDesc') },
-    { icon: <UserCircle />, label: t('landing.features.profileStats'), desc: t('landing.features.profileStatsDesc') },
-    { icon: <Award />, label: t('landing.features.badges'), desc: t('landing.features.badgesDesc') },
-    { icon: <Heart />, label: t('landing.features.library'), desc: t('landing.features.libraryDesc') },
-    { icon: <Mail />, label: t('landing.features.letters'), desc: t('landing.features.lettersDesc') },
-    { icon: <Target />, label: t('landing.features.practice'), desc: t('landing.features.practiceDesc') },
+    { icon: <Archive />, label: t('landing.features.archive'), desc: t('landing.features.archiveDesc') },
+    { icon: <BarChart3 />, label: t('landing.features.journey'), desc: t('landing.features.journeyDesc') },
     { icon: <Feather />, label: t('landing.features.mantra'), desc: t('landing.features.mantraDesc') },
-    { icon: <Moon />, label: t('landing.features.mindfulSpaces'), desc: t('landing.features.mindfulSpacesDesc') },
     { icon: <Smartphone />, label: t('landing.features.pwa'), desc: t('landing.features.pwaDesc') },
     { icon: <Shield />, label: t('landing.features.privacy'), desc: t('landing.features.privacyDesc') },
   ];
 
   const FAQ = [
     { key: 'who', q: t('landing.faq.whoQuestion'), a: t('landing.faq.whoAnswer') },
+    { key: 'advice', q: t('landing.faq.adviceQuestion'), a: t('landing.faq.adviceAnswer') },
     { key: 'breathe', q: t('landing.faq.breatheQuestion'), a: t('landing.faq.breatheAnswer') },
     { key: 'meditation', q: t('landing.faq.meditationQuestion'), a: t('landing.faq.meditationAnswer') },
     { key: 'value', q: t('landing.faq.valueQuestion', { price: PRICING.monthlyPrice.toFixed(2) }), a: t('landing.faq.valueAnswer', { trialDays: PRICING.trialDays }) },
@@ -102,7 +95,7 @@ const LandingScreen = () => {
     <div className="min-h-screen bg-[#0F172A] text-foreground">
       <PageMeta
         title="Holzen — When Bitcoin moves, pause before you do"
-        description="Holzen watches Bitcoin volatility and sends AI pause prompts to help you slow down before acting on impulse. Mood tracking, journaling, and behavioral insights."
+        description="Volatility-triggered pause practice for investors. Holzen watches Bitcoin moves and guides you through a science-backed ritual — not advice, just space to choose deliberately."
         path="/welcome"
         jsonLd={{
           '@context': 'https://schema.org',
@@ -236,7 +229,7 @@ const LandingScreen = () => {
       </div>
 
       {/* ─── SIX-STEP SCIENCE ─── */}
-      <div className="bg-muted/30">
+      <div id="science" className="bg-muted/30">
         <div className="max-w-lg mx-auto px-6 py-16">
           <Section>
             <SectionLabel>{t('landing.scienceStepsTitle')}</SectionLabel>
@@ -419,6 +412,8 @@ const LandingScreen = () => {
             >
               {t('landing.blog')}
             </Link>
+            <span className="text-muted-foreground/20">·</span>
+            <Link to="/roadmap" className="hover:text-foreground transition-colors">{t('landing.roadmap')}</Link>
             <span className="text-muted-foreground/20">·</span>
             <Link to="/terms" className="hover:text-foreground transition-colors">{t('landing.terms')}</Link>
             <span className="text-muted-foreground/20">·</span>

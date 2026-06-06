@@ -42,7 +42,7 @@ const ReserveScreen = () => {
     <div className="min-h-screen flex items-start justify-center px-6 py-16">
       <PageMeta
         title="BTC Reserve Strategy — Holzen"
-        description="Holzen holds Bitcoin as a long-term reserve asset. Our treasury strategy, philosophy, and live metrics — transparent by design."
+        description="Holzen's company Bitcoin treasury — founders' conviction, reported transparently. Separate from the product; not investment advice for users."
         path="/reserve"
       />
       <div className="w-full max-w-sm space-y-14">

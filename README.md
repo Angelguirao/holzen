@@ -1,6 +1,6 @@
 # Holzen
 
-Holzen is a React + TypeScript single-page app focused on **Bitcoin-aware mindfulness**: pause rituals when markets move, AI companions, archive, and subscription billing via Supabase edge functions.
+Holzen is a React + TypeScript single-page app focused on **volatility-triggered pause practice for investors**: science-backed rituals when markets move (starting with Bitcoin), AI companions, archive, and subscription billing via Supabase edge functions.
 
 ## Pause-first shipped product
 
