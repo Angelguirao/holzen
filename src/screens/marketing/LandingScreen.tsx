@@ -10,7 +10,7 @@ import {
   Twitter, Instagram, Wind, Feather, BookOpen, TrendingDown, Brain,
   BarChart3, Target, Globe, Shield, Archive,
   Zap, ChevronDown, Timer, Sparkles, Compass,
-  Smartphone, Anchor, ExternalLink,
+  Smartphone, Anchor, ExternalLink, Heart,
 } from 'lucide-react';
 import { PageMeta } from '@/app/components/PageMeta';
 import { PRICING } from '@/features/subscription/public';
