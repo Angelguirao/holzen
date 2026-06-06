@@ -17,7 +17,16 @@ export function computeAutoCooldownRemainingMs(
   nowMs: number = Date.now(),
 ): number {
   if (!lastTriggerAt) return 0;
-  const cooldownMs = cooldownHours * 60 * 60 * 1000;
-  const elapsed = nowMs - new Date(lastTriggerAt).getTime();
-  return Math.max(0, cooldownMs - elapsed);
+  const readyAtMs = computeAutoCooldownReadyAtMs(lastTriggerAt, cooldownHours);
+  if (readyAtMs == null) return 0;
+  return Math.max(0, readyAtMs - nowMs);
+}
+
+/** Wall-clock moment when profile auto cooldown ends (for Home D copy). */
+export function computeAutoCooldownReadyAtMs(
+  lastTriggerAt: string | null,
+  cooldownHours: number,
+): number | null {
+  if (!lastTriggerAt) return null;
+  return new Date(lastTriggerAt).getTime() + cooldownHours * 60 * 60 * 1000;
 }

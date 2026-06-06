@@ -124,11 +124,6 @@ export function homePauseWidgetSectionTitleKey(mode: HomePauseWidgetMode): strin
     case 'C':
     case 'C_prime':
       return 'home.widget.continueYourPause';
-    case 'D_collapsed':
-    case 'D_expanded':
-    case 'D_prime_collapsed':
-    case 'D_prime_expanded':
-      return 'home.widget.youPaused';
     case 'E':
       return 'home.widget.newPauseAvailable';
     default:
