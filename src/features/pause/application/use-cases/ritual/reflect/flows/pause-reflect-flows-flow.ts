@@ -34,17 +34,13 @@ export {
   resolvePauseSessionReflectAndDecidePreflight,
   type PauseSessionReflectAndDecideViewInput,
 } from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow';
-export {
-  formatReinforcementQuoteFromSession,
-  resolvePauseDecideOutcomeFlow,
-} from '@/features/pause/domain/decide/pause-decide-outcome-flow';
+export { resolvePauseDecideOutcomeFlow } from '@/features/pause/domain/decide/pause-decide-outcome-flow';
 export type { PauseImpactData } from '../../decide/impact-data';
 export { runPauseOutcomeLog } from '../../decide/run-pause-outcome-log';
 export {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
 } from '../../decide/outcome-toast';
-export { getSessionQuote } from '../../decide/wisdom-quotes';
 export {
   buildPauseScoreImpacts,
   parseScoreImpactVolatilityPct,

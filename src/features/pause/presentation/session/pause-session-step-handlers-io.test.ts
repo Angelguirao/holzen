@@ -2,12 +2,12 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
-  reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' },
+  reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' }
 }));
 
 import {
   buildPauseSessionStepRitualBundle,
-  buildPauseSessionStepShellBundle,
+  buildPauseSessionStepShellBundle
 } from './pause-session-step-handlers-io';
 import {
   buildPauseSessionStepTransitionConfig,
@@ -15,15 +15,15 @@ import {
   PAUSE_SESSION_STEP_TRANSITION_DURATION_REDUCED_S,
   PAUSE_SESSION_STEP_TRANSITION_DURATION_S,
   PAUSE_SESSION_STEP_TRANSITION_EASE,
-  pauseStepSwipeDirection,
+  pauseStepSwipeDirection
 } from './pause-session-step-transition-io';
 import {
   buildPauseSessionPersistSnapshot,
-  computePauseStorageRitualSyncPatch,
+  computePauseStorageRitualSyncPatch
 } from './scaffold/pause-session-scaffold-io';
 import {
   buildPauseSessionStepRitualBundle as buildRitualFromLeaf,
-  buildPauseSessionStepShellBundle as buildShellFromLeaf,
+  buildPauseSessionStepShellBundle as buildShellFromLeaf
 } from '@/features/pause/application/use-cases/session/step-bundles';
 import {
   pauseReflectFavoriteToggle,
@@ -35,21 +35,20 @@ import {
   pauseReflectTagUpdateWithRepository,
   pauseReflectionStepLogOnceWithRepository,
   shouldLogPauseReflectionStep,
-  shouldShowFavoriteProHint,
+  shouldShowFavoriteProHint
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   reflectPauseRepository,
   resolvePauseSessionReflectAndDecideAfterGeneration,
-  resolvePauseSessionReflectAndDecidePreflight,
+  resolvePauseSessionReflectAndDecidePreflight
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 
 import {
   buildPauseSessionStepRitualBundle as buildRitualFromHandlersFlow,
-  buildPauseSessionStepShellBundle as buildShellFromHandlersFlow,
+  buildPauseSessionStepShellBundle as buildShellFromHandlersFlow
 } from '@/features/pause/application/use-cases/session/pause-session-step-handlers-flow';
 
 describe('pause-session-step-handlers-io', () => {
@@ -127,7 +126,6 @@ describe('pause-session-step-handlers-io', () => {
     expect(buildPauseSessionStepShellBundle).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(buildPauseSessionStepRitualBundle).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
     expect(buildPauseSessionStepShellBundle).not.toBe(buildPauseScoreImpacts);
-    expect(buildPauseSessionStepRitualBundle).not.toBe(formatReinforcementQuoteFromSession);
     expect(buildPauseSessionStepShellBundle).not.toBe(reflectPauseRepository);
     // Full cross-I/O pins: `pause-session-step-handlers-flows-io-sibling-parity.test.ts`.
   });

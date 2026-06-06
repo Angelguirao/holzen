@@ -39,7 +39,6 @@ const { profileFixture, useProfileMock } = vi.hoisted(() => {
     customPrompt: null as string | null,
     motivations: [] as string[],
     mantra: null as string | null,
-    groundingActivities: [] as string[],
     currency: 'USD',
     language: 'en',
     display_name: 'Test',

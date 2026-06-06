@@ -10,7 +10,7 @@ import {
   Twitter, Instagram, Wind, Feather, BookOpen, TrendingDown, Brain,
   BarChart3, Target, Globe, Shield, Archive,
   Zap, ChevronDown, Timer, Sparkles, Compass,
-  Smartphone, Anchor, ExternalLink, Heart,
+  Smartphone, ExternalLink, Heart,
 } from 'lucide-react';
 import { PageMeta } from '@/app/components/PageMeta';
 import { PRICING } from '@/features/subscription/public';
@@ -71,7 +71,6 @@ const LandingScreen = () => {
     { icon: <Sparkles />, label: t('landing.features.companions'), desc: t('landing.features.companionsDesc') },
     { icon: <TrendingDown />, label: t('landing.features.detection'), desc: t('landing.features.detectionDesc') },
     { icon: <Brain />, label: t('landing.features.mood'), desc: t('landing.features.moodDesc') },
-    { icon: <Anchor />, label: t('landing.features.grounding'), desc: t('landing.features.groundingDesc') },
     { icon: <Archive />, label: t('landing.features.archive'), desc: t('landing.features.archiveDesc') },
     { icon: <BarChart3 />, label: t('landing.features.journey'), desc: t('landing.features.journeyDesc') },
     { icon: <Feather />, label: t('landing.features.mantra'), desc: t('landing.features.mantraDesc') },
@@ -222,7 +221,14 @@ const LandingScreen = () => {
               {t('landing.scienceDesc')}
             </p>
             <p className="text-[10px] text-muted-foreground/50 leading-relaxed">
-              <a href="https://doi.org/10.1111/0022-1082.00226" target="_blank" rel="noopener noreferrer" className="underline hover:text-muted-foreground transition-colors">Barber, B. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth." <em>The Journal of Finance</em>, 55(2).</a>
+              <a
+                href={t('landing.scienceCitationUrl')}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-muted-foreground transition-colors"
+              >
+                {t('landing.scienceCitationLabel')}
+              </a>
             </p>
           </div>
         </Section>

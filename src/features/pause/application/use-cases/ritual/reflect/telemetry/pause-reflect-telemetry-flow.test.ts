@@ -3,32 +3,31 @@ import { describe, expect, it } from 'vitest';
 import {
   trackPauseReflectPostItOpen as trackPostItDirect,
   trackPauseReflectShareTap as trackShareTapDirect,
-  trackPauseReflectWallpaperTap as trackWallpaperDirect,
+  trackPauseReflectWallpaperTap as trackWallpaperDirect
 } from './pause-reflect-session-ui-telemetry';
 
 import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
-  trackPauseSessionAbandoned,
+  trackPauseSessionAbandoned
 } from '../pending-offer/pause-pending-offer-telemetry-flow';
 import {
   trackPauseReflectPostItOpen as trackPostItFromShareFlow,
   trackPauseReflectShareTap as trackShareTapFromShareFlow,
-  trackPauseReflectWallpaperTap as trackWallpaperFromShareFlow,
+  trackPauseReflectWallpaperTap as trackWallpaperFromShareFlow
 } from '../share/pause-reflect-share-flow';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
+  trackPauseReflectWallpaperTap
 } from './pause-reflect-telemetry-flow';
 import {
   buildReflectionShareText as buildShareTextFromShareFlow,
-  runReflectionShareImage as runShareImageFromShareFlow,
+  runReflectionShareImage as runShareImageFromShareFlow
 } from '../share/pause-reflect-share-flow';
 import {
-  formatReinforcementQuoteFromSession as formatQuoteFromFlowsFlow,
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
-  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
+  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow
 } from '../flows/pause-reflect-flows-flow';
 import {
   runPauseFavoriteToggle as runFavoriteFromStepsFlow,
@@ -36,11 +35,11 @@ import {
   runPauseReflectTagUpdate as runTagFromStepsFlow,
   runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
   shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
-  shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
+  shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow
 } from '../steps/pause-reflect-steps-flow';
 import {
   openManualPauseFromHome as openManualFromGenerationFlow,
-  runReflectGeneration as runReflectGenerationFromGenerationFlow,
+  runReflectGeneration as runReflectGenerationFromGenerationFlow
 } from '../generation/pause-reflect-generation-flow';
 
 describe('pause-reflect-telemetry-flow', () => {

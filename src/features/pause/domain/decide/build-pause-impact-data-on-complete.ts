@@ -14,7 +14,6 @@ export type BuildPauseImpactDataOnCompleteInput = {
   breathingSecondCompleted: boolean;
   feelIntensity: number | null;
   shiftIntensity: number | null;
-  reinforcementQuote: string;
   reflectionMessage: string;
   haiku: string | null;
 };
@@ -35,7 +34,6 @@ export function buildPauseImpactDataOnComplete(p: BuildPauseImpactDataOnComplete
     usedTags: false,
     feelIntensity: p.feelIntensity,
     shiftIntensity: p.shiftIntensity,
-    reinforcementQuote: p.reinforcementQuote,
     reflectionMessage: p.reflectionMessage.trim() || null,
     haiku: p.haiku?.trim() ? p.haiku.trim() : null,
   };

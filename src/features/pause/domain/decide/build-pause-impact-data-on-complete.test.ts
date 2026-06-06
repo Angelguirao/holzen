@@ -8,7 +8,6 @@ const base = () => ({
   selectedMoodAfter: 'fomo' as const,
   feelIntensity: 3,
   shiftIntensity: 4,
-  reinforcementQuote: '"Hi" — Author',
   reflectionMessage: 'Reflection body',
   haiku: 'one\ntwo\nthree' as string | null,
 });
@@ -54,7 +53,7 @@ describe('buildPauseImpactDataOnComplete', () => {
     ).toBe(false);
   });
 
-  it('passes through static done fields and quote', () => {
+  it('passes through static done fields', () => {
     const d = buildPauseImpactDataOnComplete({
       ...base(),
       ritualEntry: 'brief',
@@ -66,7 +65,6 @@ describe('buildPauseImpactDataOnComplete', () => {
     expect(d.engagedTools).toBe(0);
     expect(d.wroteNote).toBe(false);
     expect(d.usedTags).toBe(false);
-    expect(d.reinforcementQuote).toBe('"Hi" — Author');
     expect(d.reflectionMessage).toBe('Reflection body');
     expect(d.haiku).toBe('one\ntwo\nthree');
   });

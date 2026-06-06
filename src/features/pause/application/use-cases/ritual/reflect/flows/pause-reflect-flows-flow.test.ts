@@ -1,63 +1,59 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {},
+  supabase: {}
 }));
 
 import {
-  formatReinforcementQuoteFromSession,
-  resolvePauseDecideOutcomeFlow,
+  resolvePauseDecideOutcomeFlow
 } from '@/features/pause/domain/decide/pause-decide-outcome-flow';
 import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
-  resolvePauseSessionReflectAndDecidePreflight,
+  resolvePauseSessionReflectAndDecidePreflight
 } from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow';
 
 import {
-  formatReinforcementQuoteFromSession as formatQuoteFromOutcomeViewFlow,
-  resolvePauseDecideOutcomeFlow as resolveOutcomeFlowFromOutcomeViewFlow,
+  resolvePauseDecideOutcomeFlow as resolveOutcomeFlowFromOutcomeViewFlow
 } from '../../decide/pause-decide-outcome-view-flow';
 import { runPauseOutcomeLog as runOutcomeLogFromOutcomeLogFlow } from '../../decide/pause-decide-outcome-log-flow';
 import {
   showPauseOutcomeNotCompletedToast as showNotCompletedFromOutcomeToastFlow,
-  showPauseOutcomeSaveFailedToast as showSaveFailedFromOutcomeToastFlow,
+  showPauseOutcomeSaveFailedToast as showSaveFailedFromOutcomeToastFlow
 } from '../../decide/pause-decide-outcome-toast-flow';
 import {
   buildPauseScoreImpacts as buildImpactsFromScoreImpactsFlow,
   parseScoreImpactVolatilityPct as parseVolatilityFromScoreImpactsFlow,
   resolveScoreImpactDisplayImpacts as resolveDisplayImpactsFromScoreImpactsFlow,
   resolveScoreImpactViewMode as resolveViewModeFromScoreImpactsFlow,
-  scoreImpactMotionDelaySec as motionDelayFromScoreImpactsFlow,
+  scoreImpactMotionDelaySec as motionDelayFromScoreImpactsFlow
 } from '../../decide/pause-decide-score-impacts-flow';
-import { getSessionQuote as getQuoteFromWisdomQuotesFlow } from '../../decide/pause-decide-wisdom-quotes-flow';
 import {
   showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeSaveFailedToast
 } from '../../decide/outcome-toast';
 import { runPauseOutcomeLog } from '../../decide/run-pause-outcome-log';
 import {
   buildPauseScoreImpacts,
-  parseScoreImpactVolatilityPct,
+  parseScoreImpactVolatilityPct
 } from '../../decide/score-impacts';
 import {
   resolveScoreImpactDisplayImpacts,
   resolveScoreImpactViewMode,
-  scoreImpactMotionDelaySec,
+  scoreImpactMotionDelaySec
 } from '../../decide/score-impact-presentation';
-import { getSessionQuote } from '../../decide/wisdom-quotes';
 
 import {
   buildPauseSessionStepRitualBundle,
-  buildPauseSessionStepShellBundle,
+  buildPauseSessionStepShellBundle
 } from '@/features/pause/application/use-cases/session/pause-session-step-handlers-flow';
 import {
   resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromAndDecideViewFlow,
-  resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromAndDecideViewFlow,
+  resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromAndDecideViewFlow
 } from './pause-reflect-and-decide-view-flow';
 import { runReflectGeneration } from '../generation/pause-reflect-generation-flow';
 import {
   startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience
 } from '../ambience/pause-reflect-ambience-flow';
 import {
   runPauseFavoriteToggle as runFavoriteFromStepsFlow,
@@ -65,39 +61,37 @@ import {
   runPauseReflectTagUpdate as runTagFromStepsFlow,
   runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
   shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
-  shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
+  shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow
 } from '../steps/pause-reflect-steps-flow';
 import {
   trackPauseReflectPostItOpen as trackPostItFromTelemetryFlow,
   trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
-  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
+  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow
 } from '../telemetry/pause-reflect-telemetry-flow';
 import {
   buildFeelTilesMoodLogOptions as buildFeelTilesFromMoodFlow,
   runInitialEmotionSelect as runEmotionSelectFromMoodFlow,
-  runInitialEmotionSkip as runEmotionSkipFromMoodFlow,
+  runInitialEmotionSkip as runEmotionSkipFromMoodFlow
 } from '../../feel/pause-feel-flow';
 import {
   buildReflectionShareText as buildShareTextFromShareFlow,
   runReflectionShareImage as runShareImageFromShareFlow,
-  trackPauseReflectShareTap as trackShareTapFromShareFlow,
+  trackPauseReflectShareTap as trackShareTapFromShareFlow
 } from '../share/pause-reflect-share-flow';
 import {
   getPendingPauseOfferDisplay as getDisplayFromPendingOfferFlow,
   runAdoptPendingPauseOffer as runAdoptFromPendingOfferFlow,
   runDeclinePendingPauseOffer as runDeclineFromPendingOfferFlow,
   trackPausePendingAdopted as trackAdoptedFromPendingOfferFlow,
-  trackPausePendingDeclined as trackDeclinedFromPendingOfferFlow,
+  trackPausePendingDeclined as trackDeclinedFromPendingOfferFlow
 } from '../pending-offer/pause-reflect-pending-offer-flow';
 
 import {
   pauseReflectOutcomeLog,
-  pauseReflectOutcomeLogWithRepository,
+  pauseReflectOutcomeLogWithRepository
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   buildPauseScoreImpacts as buildImpactsFromFlow,
-  formatReinforcementQuoteFromSession as formatQuoteFromFlow,
-  getSessionQuote as getQuoteFromFlow,
   parseScoreImpactVolatilityPct as parseVolatilityFromFlow,
   resolvePauseDecideOutcomeFlow as resolveOutcomeFlowFromFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromFlow,
@@ -107,7 +101,7 @@ import {
   runPauseOutcomeLog as runOutcomeLogFromFlow,
   scoreImpactMotionDelaySec as motionDelayFromFlow,
   showPauseOutcomeNotCompletedToast as showNotCompletedFromFlow,
-  showPauseOutcomeSaveFailedToast as showSaveFailedFromFlow,
+  showPauseOutcomeSaveFailedToast as showSaveFailedFromFlow
 } from './pause-reflect-flows-flow';
 
 describe('pause-reflect-flows-flow', () => {
@@ -128,9 +122,7 @@ describe('pause-reflect-flows-flow', () => {
 
     expect(resolvePreflightFromFlow).toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(resolveAfterGenFromFlow).toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
-    expect(formatQuoteFromFlow).toBe(formatReinforcementQuoteFromSession);
     expect(resolveOutcomeFlowFromFlow).toBe(resolvePauseDecideOutcomeFlow);
-    expect(getQuoteFromFlow).toBe(getSessionQuote);
     expect(runOutcomeLogFromFlow).toBe(runPauseOutcomeLog);
     expect(showNotCompletedFromFlow).toBe(showPauseOutcomeNotCompletedToast);
     expect(showSaveFailedFromFlow).toBe(showPauseOutcomeSaveFailedToast);

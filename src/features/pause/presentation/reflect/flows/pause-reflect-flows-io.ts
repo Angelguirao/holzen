@@ -55,10 +55,7 @@ import {
   type ScoreImpactVariant,
   type ScoreImpactViewMode,
 } from '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation';
-import {
-  formatReinforcementQuoteFromSession,
-  resolvePauseDecideOutcomeFlow,
-} from '@/features/pause/domain/decide/pause-decide-outcome-flow';
+import { resolvePauseDecideOutcomeFlow } from '@/features/pause/domain/decide/pause-decide-outcome-flow';
 import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
@@ -69,7 +66,6 @@ import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
 } from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
-import { getSessionQuote } from '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
@@ -78,8 +74,6 @@ export const reflectPauseRepository = supabasePauseRepository;
 
 export {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   parseScoreImpactVolatilityPct,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,

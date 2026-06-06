@@ -12,33 +12,33 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'supabasePauseRepository' },
-  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
+  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' }
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/feel/run-initial-emotion-log', () => ({
   runInitialEmotionSelect: vi.fn(() => Promise.resolve({ status: 'local_only' as const, ui: {} })),
-  runInitialEmotionSkip: vi.fn(() => Promise.resolve({ status: 'local_only' as const, ui: {} })),
+  runInitialEmotionSkip: vi.fn(() => Promise.resolve({ status: 'local_only' as const, ui: {} }))
 }));
 
 import {
   applyBriefDepthPickerRitualEntry as applyBriefDirect,
-  applyDeepDepthPickerRitualEntry as applyDeepDirect,
+  applyDeepDepthPickerRitualEntry as applyDeepDirect
 } from '@/features/pause/domain/feel/apply-depth-picker-ritual-entry';
 import { buildFeelTilesMoodLogOptions as buildFeelTilesDirect } from '@/features/pause/domain/feel/build-feel-tiles-mood-log-options';
 import {
   initialEmotionResetUi as resetUiDirect,
-  initialEmotionSelectRollbackUi as rollbackUiDirect,
+  initialEmotionSelectRollbackUi as rollbackUiDirect
 } from '@/features/pause/domain/feel/initial-emotion-presentation';
 import { isPauseSessionDepthPickerActive as isDepthPickerActiveDirect } from '@/features/pause/domain/feel/pause-depth-picker-active';
 import {
   resolvePauseSessionChromeCloseAction as resolveChromeCloseDirect,
-  runPauseSessionChromeCloseAction as runChromeCloseDirect,
+  runPauseSessionChromeCloseAction as runChromeCloseDirect
 } from '@/features/pause/domain/feel/pause-session-chrome-close';
 import { runDeepPausePickerEntryIfPro as runDeepPickerDirect } from '@/features/pause/domain/feel/run-deep-pause-picker-entry-if-pro';
 import { resolvePauseDepthContextLineParams as resolveDepthLineDirect } from '@/features/pause/domain/feel/resolve-pause-depth-context-line-params';
 import {
   runInitialEmotionSelect,
-  runInitialEmotionSkip,
+  runInitialEmotionSkip
 } from '@/features/pause/application/use-cases/ritual/feel/run-initial-emotion-log';
 import {
   applyBriefDepthPickerRitualEntry,
@@ -52,7 +52,7 @@ import {
   runDeepPausePickerEntryIfPro,
   runInitialEmotionSelect as runInitialEmotionSelectFromFlow,
   runInitialEmotionSkip as runInitialEmotionSkipFromFlow,
-  runPauseSessionChromeCloseAction,
+  runPauseSessionChromeCloseAction
 } from '@/features/pause/application/use-cases/ritual/feel/pause-feel-flow';
 import {
   applyBriefDepthPickerRitualEntry as applyBriefFromMoodIo,
@@ -69,14 +69,14 @@ import {
   resolvePauseDepthContextLineParams as resolveDepthLineFromMoodIo,
   resolvePauseSessionChromeCloseAction as resolveChromeCloseFromMoodIo,
   runDeepPausePickerEntryIfPro as runDeepPickerFromMoodIo,
-  runPauseSessionChromeCloseAction as runChromeCloseFromMoodIo,
+  runPauseSessionChromeCloseAction as runChromeCloseFromMoodIo
 } from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   messageFromReflectGenerationResult,
   pauseReflectGeneration,
   reflectGenerationPrerequisite,
   reflectGenerator,
-  runReflectGeneration,
+  runReflectGeneration
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   pauseReflectFavoriteToggle,
@@ -85,26 +85,25 @@ import {
   pauseReflectionStepLogOnce,
   pauseReflectFavoriteToggleWithRepository,
   pauseReflectNoteUpdateWithRepository,
-  pauseReflectionStepLogOnceWithRepository,
+  pauseReflectionStepLogOnceWithRepository
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
-  formatReinforcementQuoteFromSession,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
-  resolvePauseSessionReflectAndDecidePreflight,
+  resolvePauseSessionReflectAndDecidePreflight
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
   pauseAdoptPendingOfferWithRepository,
   pauseDeclinePendingOffer,
-  pauseDeclinePendingOfferWithRepository,
+  pauseDeclinePendingOfferWithRepository
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
-  resolveShiftFrameHubDonePresentation,
+  resolveShiftFrameHubDonePresentation
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import * as hubIo from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import * as moodIo from '@/features/pause/presentation/feel/pause-feel-io';
@@ -112,15 +111,15 @@ import * as shareIo from '@/features/pause/presentation/reflect/share/pause-refl
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
+  trackPauseReflectWallpaperTap
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
   buildReflectionShareText,
-  pauseReflectionShareImage,
+  pauseReflectionShareImage
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
@@ -183,7 +182,7 @@ describe('pause-feel-io parity (application)', () => {
     const input = {
       pauseInstanceId: 'inst-mood-app',
       mood: 'calm' as const,
-      lastFeelLogKey: null,
+      lastFeelLogKey: null
     };
 
     await pauseInitialEmotionSelect(input);
@@ -204,7 +203,7 @@ describe('pause-feel-io parity (application)', () => {
     const input = {
       pauseInstanceId: 'inst-mood-app-custom',
       mood: 'excited' as const,
-      lastFeelLogKey: 'key-1',
+      lastFeelLogKey: 'key-1'
     };
 
     await pauseInitialEmotionSelectWithRepository(
@@ -307,7 +306,6 @@ describe('pause-feel-io parity (application)', () => {
     expect(pauseInitialEmotionSelect).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(pauseInitialEmotionSkip).not.toBe(pauseReflectOutcomeLog);
     expect(pauseInitialEmotionSelectWithRepository).not.toBe(pauseReflectOutcomeLogWithRepository);
-    expect(buildFeelTilesMoodLogOptions).not.toBe(formatReinforcementQuoteFromSession);
     expect(pauseInitialEmotionSkip).not.toBe(pauseReflectOutcomeLogWithRepository);
     // Reciprocal inline pins: `pause-reflect-flows-io-parity.test.ts`.
   });

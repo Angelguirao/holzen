@@ -2,16 +2,15 @@ import { describe, expect, it } from 'vitest';
 
 import {
   startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience
 } from '../ambience/pause-reflect-ambience-flow';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   runPauseOutcomeLog,
-  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeNotCompletedToast
 } from './pause-reflect-flows-flow';
 import * as ambienceFlow from '../ambience/pause-reflect-ambience-flow';
 import * as flowsFlow from './pause-reflect-flows-flow';
@@ -23,7 +22,6 @@ describe('pause-reflect-flows-flow ↔ pause-reflect-ambience-flow sibling parit
   it('flows-flow and ambience-flow are distinct sibling CI anchors', () => {
     expect(typeof resolvePauseSessionReflectAndDecidePreflight).toBe('function');
     expect(typeof resolvePauseSessionReflectAndDecideAfterGeneration).toBe('function');
-    expect(typeof formatReinforcementQuoteFromSession).toBe('function');
     expect(typeof resolvePauseDecideOutcomeFlow).toBe('function');
     expect(typeof runPauseOutcomeLog).toBe('function');
     expect(typeof showPauseOutcomeNotCompletedToast).toBe('function');
@@ -36,7 +34,6 @@ describe('pause-reflect-flows-flow ↔ pause-reflect-ambience-flow sibling parit
     expect('stopPauseReflectFrameFocusAmbience' in flowsFlow).toBe(false);
     expect('resolvePauseSessionReflectAndDecidePreflight' in ambienceFlow).toBe(false);
     expect('resolvePauseSessionReflectAndDecideAfterGeneration' in ambienceFlow).toBe(false);
-    expect('formatReinforcementQuoteFromSession' in ambienceFlow).toBe(false);
     expect('runPauseOutcomeLog' in ambienceFlow).toBe(false);
     expect('buildPauseScoreImpacts' in ambienceFlow).toBe(false);
   });
@@ -45,7 +42,6 @@ describe('pause-reflect-flows-flow ↔ pause-reflect-ambience-flow sibling parit
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(runPauseOutcomeLog).not.toBe(startPauseReflectFrameFocusAmbience);
-    expect(formatReinforcementQuoteFromSession).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(buildPauseScoreImpacts).not.toBe(stopPauseReflectFrameFocusAmbience);
   });
@@ -54,7 +50,6 @@ describe('pause-reflect-flows-flow ↔ pause-reflect-ambience-flow sibling parit
     expect(startPauseReflectFrameFocusAmbience).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(stopPauseReflectFrameFocusAmbience).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
     expect(startPauseReflectFrameFocusAmbience).not.toBe(runPauseOutcomeLog);
-    expect(stopPauseReflectFrameFocusAmbience).not.toBe(formatReinforcementQuoteFromSession);
     expect(startPauseReflectFrameFocusAmbience).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(stopPauseReflectFrameFocusAmbience).not.toBe(buildPauseScoreImpacts);
   });

@@ -1,14 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: { port: 'reflectPauseRepository' },
+  supabasePauseRepository: { port: 'reflectPauseRepository' }
 }));
 
 import * as flowsIo from './pause-reflect-flows-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   reflectPauseRepository as flowsReflectPauseRepository,
@@ -16,7 +14,7 @@ import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeSaveFailedToast
 } from './pause-reflect-flows-io';
 import * as pendingOfferIo from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
@@ -25,7 +23,7 @@ import {
   pauseAdoptPendingOfferWithRepository,
   pauseDeclinePendingOffer,
   pauseDeclinePendingOfferWithRepository,
-  reflectPauseRepository as pendingOfferReflectPauseRepository,
+  reflectPauseRepository as pendingOfferReflectPauseRepository
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 
 /**
@@ -40,9 +38,7 @@ describe('pause-reflect-flows-io ↔ pause-reflect-pending-offer-io sibling pari
   it('flows-io and pending-offer-io are distinct presentation I/O surfaces', () => {
     expect(typeof resolvePauseSessionReflectAndDecidePreflight).toBe('function');
     expect(typeof resolvePauseSessionReflectAndDecideAfterGeneration).toBe('function');
-    expect(typeof formatReinforcementQuoteFromSession).toBe('function');
     expect(typeof resolvePauseDecideOutcomeFlow).toBe('function');
-    expect(typeof getSessionQuote).toBe('function');
     expect(typeof buildPauseScoreImpacts).toBe('function');
     expect(typeof pauseReflectOutcomeLog).toBe('function');
     expect(typeof pauseReflectOutcomeLogWithRepository).toBe('function');
@@ -73,7 +69,6 @@ describe('pause-reflect-flows-io ↔ pause-reflect-pending-offer-io sibling pari
     expect(pauseReflectOutcomeLog).not.toBe(getPendingPauseOfferDisplay);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseAdoptPendingOfferWithRepository);
     expect(buildPauseScoreImpacts).not.toBe(pauseDeclinePendingOffer);
-    expect(formatReinforcementQuoteFromSession).not.toBe(pauseAdoptPendingOffer);
     expect(showPauseOutcomeSaveFailedToast).not.toBe(pauseDeclinePendingOfferWithRepository);
   });
 
@@ -84,6 +79,5 @@ describe('pause-reflect-flows-io ↔ pause-reflect-pending-offer-io sibling pari
     expect(pauseAdoptPendingOfferWithRepository).not.toBe(pauseReflectOutcomeLogWithRepository);
     expect(pauseDeclinePendingOffer).not.toBe(buildPauseScoreImpacts);
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(resolvePauseDecideOutcomeFlow);
-    expect(getPendingPauseOfferDisplay).not.toBe(getSessionQuote);
   });
 });

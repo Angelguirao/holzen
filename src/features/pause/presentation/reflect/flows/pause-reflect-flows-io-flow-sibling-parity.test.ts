@@ -1,17 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {},
+  supabase: {}
 }));
 
 vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: { port: 'reflectPauseRepository' },
+  supabasePauseRepository: { port: 'reflectPauseRepository' }
 }));
 
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   parseScoreImpactVolatilityPct,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
@@ -21,13 +19,11 @@ import {
   runPauseOutcomeLog,
   scoreImpactMotionDelaySec,
   showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeSaveFailedToast
 } from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
 import * as flowsFlow from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
 import {
   buildPauseScoreImpacts as buildImpactsFromFlowsIo,
-  formatReinforcementQuoteFromSession as formatQuoteFromFlowsIo,
-  getSessionQuote as getQuoteFromFlowsIo,
   parseScoreImpactVolatilityPct as parseVolatilityFromFlowsIo,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
@@ -39,7 +35,7 @@ import {
   resolveScoreImpactViewMode as resolveViewModeFromFlowsIo,
   scoreImpactMotionDelaySec as motionDelayFromFlowsIo,
   showPauseOutcomeNotCompletedToast as showNotCompletedFromFlowsIo,
-  showPauseOutcomeSaveFailedToast as showSaveFailedFromFlowsIo,
+  showPauseOutcomeSaveFailedToast as showSaveFailedFromFlowsIo
 } from './pause-reflect-flows-io';
 import * as flowsIo from './pause-reflect-flows-io';
 
@@ -70,9 +66,7 @@ describe('pause-reflect-flows-io ↔ pause-reflect-flows-flow sibling parity (pr
   it('presentation flows-io reflect+decide bindings match flows CI umbrella', () => {
     expect(resolvePreflightFromFlowsIo).toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(resolveAfterGenFromFlowsIo).toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
-    expect(formatQuoteFromFlowsIo).toBe(formatReinforcementQuoteFromSession);
     expect(resolveOutcomeFromFlowsIo).toBe(resolvePauseDecideOutcomeFlow);
-    expect(getQuoteFromFlowsIo).toBe(getSessionQuote);
     expect(buildImpactsFromFlowsIo).toBe(buildPauseScoreImpacts);
     expect(parseVolatilityFromFlowsIo).toBe(parseScoreImpactVolatilityPct);
     expect(resolveDisplayImpactsFromFlowsIo).toBe(resolveScoreImpactDisplayImpacts);

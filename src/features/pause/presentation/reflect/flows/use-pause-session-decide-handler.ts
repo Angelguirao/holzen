@@ -2,8 +2,6 @@ import { useCallback } from 'react';
 import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/features/auth/public';
 import {
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
   resolvePauseDecideOutcomeFlow,
   showPauseOutcomeNotCompletedToast,
@@ -67,7 +65,6 @@ export function usePauseSessionDecideHandler(
             reflectionMessage,
             haiku,
           },
-          reinforcementQuote: formatReinforcementQuoteFromSession(getSessionQuote()),
         });
 
         if (flow.kind === 'abort_sync_failed') {

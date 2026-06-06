@@ -49,8 +49,6 @@ export function useSettingsModel() {
     trackedAssetId,
     setTrackedAssetId,
     language: _language,
-    groundingActivities,
-    setGroundingActivities,
     profileLoaded,
   } = useProfile();
   void _language;
@@ -111,7 +109,6 @@ export function useSettingsModel() {
         mantra,
         currency,
         trackedAssetId,
-        groundingActivities,
         companionPrefs,
       }),
     [
@@ -131,7 +128,6 @@ export function useSettingsModel() {
       mantra,
       currency,
       trackedAssetId,
-      groundingActivities,
       companionPrefs,
     ],
   );
@@ -174,8 +170,6 @@ export function useSettingsModel() {
     setCurrency,
     trackedAssetId,
     setTrackedAssetId,
-    groundingActivities,
-    setGroundingActivities,
     profileLoaded,
     subscribed,
     subLoading,

@@ -82,7 +82,6 @@ export type GenerateReflectionAtReflectParams = {
   customPrompt?: string;
   motivations?: string[];
   mantra?: string;
-  groundingActivities?: string[];
   currency: string;
   language: string;
   currentFeel?: CurrentFeelForReflect;
@@ -113,10 +112,6 @@ export async function generateReflectionAtReflectStep(
       severity: params.severity,
       motivations: params.motivations && params.motivations.length > 0 ? params.motivations : undefined,
       mantra: params.mantra || undefined,
-      groundingActivities:
-        params.groundingActivities && params.groundingActivities.length > 0
-          ? params.groundingActivities
-          : undefined,
       currency: params.currency,
       language: params.language,
       ...(params.currentFeel ? { currentFeel: params.currentFeel } : {}),

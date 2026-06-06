@@ -7,7 +7,6 @@ export type ReflectGenerationProfileInput = {
   customPrompt: string;
   motivations: string[];
   mantra: string;
-  groundingActivities: string[];
   currency: string;
   language: string;
 };
@@ -22,7 +21,6 @@ export type ReflectGenerationEdgeInvokeInput = {
   customPrompt?: string;
   motivations?: string[];
   mantra?: string;
-  groundingActivities?: string[];
   currency: string;
   language: string;
   currentFeel?: CurrentFeelForReflect;
@@ -51,8 +49,6 @@ export function buildReflectGenerationEdgeInvokeInput(input: {
     customPrompt: profile.customPrompt || undefined,
     motivations: profile.motivations.length > 0 ? profile.motivations : undefined,
     mantra: profile.mantra || undefined,
-    groundingActivities:
-      profile.groundingActivities.length > 0 ? profile.groundingActivities : undefined,
     currency: profile.currency,
     language: profile.language,
     currentFeel: input.currentFeel,

@@ -1,7 +1,6 @@
 import { Input } from '@/components/ui/input';
 import { ANCHOR_MANTRA_MAX_LENGTH } from '@/features/user/domain/profile-motivations';
 import { MotivationPickerGrid } from '@/features/user/presentation/MotivationPickerGrid';
-import { GroundingTagInput } from '@/screens/settings/components/GroundingTagInput';
 import { useSettingsState } from '@/screens/settings/hooks/use-settings-state';
 
 export function SettingsYouPanel() {
@@ -13,8 +12,6 @@ export function SettingsYouPanel() {
     setMotivations,
     mantra,
     setMantra,
-    groundingActivities,
-    setGroundingActivities,
   } = useSettingsState();
   return (
     <>
@@ -59,8 +56,6 @@ export function SettingsYouPanel() {
           {(mantra?.length ?? 0)}/{ANCHOR_MANTRA_MAX_LENGTH}
         </p>
       </div>
-
-      <GroundingTagInput activities={groundingActivities} onChange={setGroundingActivities} />
     </>
   );
 }

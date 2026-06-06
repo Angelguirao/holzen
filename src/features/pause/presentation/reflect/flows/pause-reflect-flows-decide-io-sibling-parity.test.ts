@@ -1,19 +1,17 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: { port: 'reflectPauseRepository' },
+  supabasePauseRepository: { port: 'reflectPauseRepository' }
 }));
 
 import {
   initialDecisionFromRestored,
-  initialPhaseFromRestored,
+  initialPhaseFromRestored
 } from '@/features/pause/application/use-cases/session/pause-session-decide-flow';
 import * as decideIo from '@/features/pause/presentation/session/pause-session-decide-io';
 import * as flowsIo from './pause-reflect-flows-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   reflectPauseRepository,
@@ -21,7 +19,7 @@ import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeSaveFailedToast
 } from './pause-reflect-flows-io';
 
 /**
@@ -36,9 +34,7 @@ describe('pause-reflect-flows-io ↔ pause-session-decide-io sibling parity', ()
   it('flows-io and session decide-io are distinct presentation I/O surfaces', () => {
     expect(typeof resolvePauseSessionReflectAndDecidePreflight).toBe('function');
     expect(typeof resolvePauseSessionReflectAndDecideAfterGeneration).toBe('function');
-    expect(typeof formatReinforcementQuoteFromSession).toBe('function');
     expect(typeof resolvePauseDecideOutcomeFlow).toBe('function');
-    expect(typeof getSessionQuote).toBe('function');
     expect(typeof buildPauseScoreImpacts).toBe('function');
     expect(typeof pauseReflectOutcomeLog).toBe('function');
     expect(typeof pauseReflectOutcomeLogWithRepository).toBe('function');
@@ -64,10 +60,8 @@ describe('pause-reflect-flows-io ↔ pause-session-decide-io sibling parity', ()
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(initialPhaseFromRestored);
     expect(pauseReflectOutcomeLog).not.toBe(initialDecisionFromRestored);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(initialPhaseFromRestored);
-    expect(formatReinforcementQuoteFromSession).not.toBe(initialDecisionFromRestored);
     expect(buildPauseScoreImpacts).not.toBe(initialPhaseFromRestored);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(initialPhaseFromRestored);
-    expect(getSessionQuote).not.toBe(initialDecisionFromRestored);
     expect(showPauseOutcomeNotCompletedToast).not.toBe(initialPhaseFromRestored);
     expect(showPauseOutcomeSaveFailedToast).not.toBe(initialDecisionFromRestored);
   });
@@ -77,9 +71,7 @@ describe('pause-reflect-flows-io ↔ pause-session-decide-io sibling parity', ()
     expect(initialPhaseFromRestored).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
     expect(initialDecisionFromRestored).not.toBe(pauseReflectOutcomeLog);
     expect(initialPhaseFromRestored).not.toBe(pauseReflectOutcomeLogWithRepository);
-    expect(initialDecisionFromRestored).not.toBe(formatReinforcementQuoteFromSession);
     expect(initialPhaseFromRestored).not.toBe(showPauseOutcomeNotCompletedToast);
-    expect(initialDecisionFromRestored).not.toBe(getSessionQuote);
     expect(initialPhaseFromRestored).not.toBe(buildPauseScoreImpacts);
     expect(initialDecisionFromRestored).not.toBe(reflectPauseRepository);
   });

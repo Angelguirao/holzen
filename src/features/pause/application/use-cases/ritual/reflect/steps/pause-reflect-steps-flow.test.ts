@@ -5,17 +5,17 @@ import { shouldShowFavoriteProHint } from '@/features/pause/domain/reflect/steps
 
 import {
   runPauseFavoriteToggle as runFavoriteFromFavoriteFlow,
-  shouldShowFavoriteProHint as shouldShowFavoriteFromFavoriteFlow,
+  shouldShowFavoriteProHint as shouldShowFavoriteFromFavoriteFlow
 } from './pause-favorite-toggle-flow';
 import {
-  runPauseReflectNoteUpdate as runNoteFromNoteFlow,
+  runPauseReflectNoteUpdate as runNoteFromNoteFlow
 } from './pause-reflect-note-flow';
 import {
-  runPauseReflectTagUpdate as runTagFromTagFlow,
+  runPauseReflectTagUpdate as runTagFromTagFlow
 } from './pause-reflect-tag-flow';
 import {
   runPauseReflectionStepLogOnce as runReflectionStepFromLogFlow,
-  shouldLogPauseReflectionStep as shouldLogFromLogFlow,
+  shouldLogPauseReflectionStep as shouldLogFromLogFlow
 } from './pause-reflection-step-log-flow';
 import {
   runPauseFavoriteToggle,
@@ -23,7 +23,7 @@ import {
   runPauseReflectTagUpdate,
   runPauseReflectionStepLogOnce,
   shouldLogPauseReflectionStep as shouldLogFromFlow,
-  shouldShowFavoriteProHint as shouldShowFavoriteFromFlow,
+  shouldShowFavoriteProHint as shouldShowFavoriteFromFlow
 } from './pause-reflect-steps-flow';
 import { runPauseFavoriteToggle as runFavoriteDirect } from './run-pause-favorite-toggle';
 import { runPauseReflectNoteUpdate as runNoteDirect } from './run-pause-reflect-note-update';
@@ -35,22 +35,20 @@ import {
   openManualPauseFromHome as openManualFromGenerationFlow,
   reflectGenerationPrerequisite as prerequisiteFromGenerationFlow,
   runReflectGeneration as runReflectGenerationFromGenerationFlow,
-  shouldCommitReflectGeneration as shouldCommitFromGenerationFlow,
+  shouldCommitReflectGeneration as shouldCommitFromGenerationFlow
 } from '../generation/pause-reflect-generation-flow';
 import {
   buildPauseScoreImpacts as buildImpactsFromFlowsFlow,
-  formatReinforcementQuoteFromSession as formatQuoteFromFlowsFlow,
-  getSessionQuote as getQuoteFromFlowsFlow,
   resolvePauseDecideOutcomeFlow as resolveOutcomeFromFlowsFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromFlowsFlow,
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
   runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
-  showPauseOutcomeNotCompletedToast as showNotCompletedFromFlowsFlow,
+  showPauseOutcomeNotCompletedToast as showNotCompletedFromFlowsFlow
 } from '../flows/pause-reflect-flows-flow';
 import {
   buildShiftEmotionFrameHubLogBundle as buildHubLogBundleFromHubFlow,
   resolveShiftFrameHubDonePresentation as resolveHubPresentationFromHubFlow,
-  runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
+  runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow
 } from '../hub/pause-reflect-hub-flow';
 import {
   getPendingPauseOfferDisplay as getDisplayFromPendingOfferFlow,
@@ -58,25 +56,25 @@ import {
   runDeclinePendingPauseOffer as runDeclineFromPendingOfferFlow,
   trackPausePendingAdopted as trackAdoptedFromPendingOfferFlow,
   trackPausePendingDeclined as trackDeclinedFromPendingOfferFlow,
-  trackPauseSessionAbandoned as trackAbandonedFromPendingOfferFlow,
+  trackPauseSessionAbandoned as trackAbandonedFromPendingOfferFlow
 } from '../pending-offer/pause-reflect-pending-offer-flow';
 import {
   buildReflectionShareText as buildShareTextFromShareFlow,
   runReflectionShareImage as runShareImageFromShareFlow,
-  trackPauseReflectShareTap as trackShareTapFromShareFlow,
+  trackPauseReflectShareTap as trackShareTapFromShareFlow
 } from '../share/pause-reflect-share-flow';
 import {
   trackPauseReflectPostItOpen as trackPostItFromTelemetryFlow,
   trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
-  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
+  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow
 } from '../telemetry/pause-reflect-telemetry-flow';
 import {
   startPauseReflectFrameFocusAmbience as startAmbienceFromAmbienceFlow,
-  stopPauseReflectFrameFocusAmbience as stopAmbienceFromAmbienceFlow,
+  stopPauseReflectFrameFocusAmbience as stopAmbienceFromAmbienceFlow
 } from '../ambience/pause-reflect-ambience-flow';
 import {
   buildPauseSessionStepRitualBundle as buildRitualBundleFromHandlersFlow,
-  buildPauseSessionStepShellBundle as buildShellBundleFromHandlersFlow,
+  buildPauseSessionStepShellBundle as buildShellBundleFromHandlersFlow
 } from '@/features/pause/application/use-cases/session/pause-session-step-handlers-flow';
 
 describe('pause-reflect-steps-flow', () => {
