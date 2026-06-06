@@ -42,14 +42,21 @@ export function MarketStatus({
   const quoteSym = trackedAssetSymbol(data?.coinId ?? coinIdProp ?? 'bitcoin');
 
   const fiatLabelCurrency = (data?.currency ?? currency).toUpperCase();
+  const iconBtnDisabled = 'pointer-events-none opacity-30';
 
-  /** Fiat row only — hidden price + “1 BTC” mode would be incoherent. */
+  /** Fiat row — disabled while price is hidden (icons stay visible). */
   const enterBtcToolbarBtn =
-    onToggleUnitBasisMode && !unitBasisMode && !hidden ? (
+    onToggleUnitBasisMode && !unitBasisMode ? (
       <button
         type="button"
         onClick={onToggleUnitBasisMode}
-        className={cn(homeInWidget.iconBtn, 'text-muted-foreground/40 hover:text-foreground')}
+        disabled={hidden}
+        aria-disabled={hidden}
+        className={cn(
+          homeInWidget.iconBtn,
+          'text-muted-foreground/40 hover:text-foreground',
+          hidden && iconBtnDisabled,
+        )}
         aria-label={t('marketStatus.enterUnitBasisMode')}
         title={t('marketStatus.enterUnitBasisMode')}
       >
@@ -75,10 +82,25 @@ export function MarketStatus({
     <button
       type="button"
       onClick={toggle}
-      className={homeInWidget.iconBtn}
-      aria-label={hidden ? t('marketStatus.showPrice') : t('marketStatus.hidePrice')}
+      disabled={unitBasisMode}
+      aria-disabled={unitBasisMode}
+      className={cn(homeInWidget.iconBtn, unitBasisMode && iconBtnDisabled)}
+      aria-label={
+        unitBasisMode
+          ? t('marketStatus.hidePriceDisabledInUnitBasis')
+          : hidden
+            ? t('marketStatus.showPrice')
+            : t('marketStatus.hidePrice')
+      }
+      title={
+        unitBasisMode
+          ? t('marketStatus.hidePriceDisabledInUnitBasis')
+          : hidden
+            ? t('marketStatus.showPrice')
+            : t('marketStatus.hidePrice')
+      }
     >
-      {hidden ? (
+      {hidden && !unitBasisMode ? (
         <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
       ) : (
         <Eye className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
@@ -131,9 +153,10 @@ export function MarketStatus({
                 defaultValue: `1 ${quoteSym} = 1 ${quoteSym}`,
               })}
             </p>
-            {exitBtcToolbarBtn ? (
-              <div className="flex shrink-0 items-center justify-end gap-1">{exitBtcToolbarBtn}</div>
-            ) : null}
+            <div className="flex shrink-0 items-center justify-end gap-1">
+              {exitBtcToolbarBtn}
+              {eyeToggleBtn}
+            </div>
           </div>
         </div>
       </div>
@@ -190,23 +213,26 @@ export function MarketStatus({
     <div className="space-y-3">
       <div className="space-y-1">
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
-          <p className={homeInWidget.kicker}>
-            {quoteSym} / {cur}
-          </p>
-          {data._stale && (
-            <span className={`flex items-center gap-1 ${homeInWidget.metaFaint}`} title="Using cached data — live APIs unavailable">
-              <Clock className="h-2.5 w-2.5" />
-              cached
-            </span>
+          {hidden ? (
+            <p className={homeInWidget.subPriceHidden}>••••</p>
+          ) : (
+            <>
+              <p className={homeInWidget.kicker}>
+                {quoteSym} / {cur}
+              </p>
+              {data._stale && (
+                <span className={`flex items-center gap-1 ${homeInWidget.metaFaint}`} title="Using cached data — live APIs unavailable">
+                  <Clock className="h-2.5 w-2.5" />
+                  cached
+                </span>
+              )}
+            </>
           )}
         </div>
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0 flex-1">
             {hidden ? (
-              <>
-                <p className={homeInWidget.priceHidden}>••••••</p>
-                <p className={homeInWidget.subPriceHidden}>••••</p>
-              </>
+              <p className={homeInWidget.priceHidden}>••••••</p>
             ) : (
               <p className={homeInWidget.price}>{price}</p>
             )}
