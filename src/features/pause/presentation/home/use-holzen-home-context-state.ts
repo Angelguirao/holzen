@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getHolzenMarketDisplayQueryOptions,
   mapHolzenMarketDisplayError,
+  resolveHomeMarketDisplayQuote,
   severityFromMarketChangePercent,
 } from '@/features/market/public';
 import { useAuth } from '@/features/auth/public';
@@ -95,7 +96,16 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
 
   const nextCronCheckIn = useCallback(() => millisecondsUntilNextVolatilityCheck(), []);
 
-  const marketData = marketQuery.data ?? null;
+  const marketData = useMemo(
+    () =>
+      resolveHomeMarketDisplayQuote({
+        marketData: marketQuery.data ?? null,
+        openPauseSource,
+        openPauseState,
+        openPauseContextSnapshot: contextSnapshot,
+      }),
+    [marketQuery.data, openPauseSource, openPauseState, contextSnapshot],
+  );
 
   const severity = severityFromMarketChangePercent(marketData?.changePercent);
 
