@@ -78,6 +78,7 @@ Well-aligned relative to other contexts — see [src/features/market/README.md](
 ## 7. Related
 
 - Pause home orchestration: `useHolzenHomeContextState` in pause presentation (composes market + pause)
+- **Home market product logic (tiers, non-goals, experiments):** [home-market-logical-surface.md](../backlog/home-market-logical-surface.md)
 
 ---
 
