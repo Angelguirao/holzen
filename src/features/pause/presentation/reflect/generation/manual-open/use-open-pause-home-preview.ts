@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { User } from '@supabase/supabase-js';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
@@ -10,12 +10,23 @@ import { pauseDismissOpenPauseHomePreview } from './pause-home-reflect-io';
 import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import { usePauseInstancesRealtime } from '@/features/pause/presentation/realtime/use-pause-instances-realtime';
 
+export type UseOpenPauseHomePreviewOptions = {
+  /** Fires after a debounced realtime resync when the open pause row id changed (cron / replace). */
+  onOpenPauseInstanceChanged?: () => void;
+};
+
 /**
  * Home open-pause preview from `v_pause_current` + reflection/companion artifacts.
  * Hydrates on login and resyncs on `pause_instances` realtime (cron / complete / dismiss).
  */
-export function useOpenPauseHomePreview(user: User | null) {
+export function useOpenPauseHomePreview(
+  user: User | null,
+  options: UseOpenPauseHomePreviewOptions = {},
+) {
+  const { onOpenPauseInstanceChanged } = options;
   const queryClient = useQueryClient();
+  const lastSyncedInstanceIdRef = useRef<string | null>(null);
+  const initialSyncDoneRef = useRef(false);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
   const [companions, setCompanions] = useState<CompanionData>(DEFAULT_COMPANIONS);
@@ -48,20 +59,33 @@ export function useOpenPauseHomePreview(user: User | null) {
 
   /** Re-read v_pause_current + artifacts so Home matches Library after completes / dismissals. */
   const syncOpenPauseFromDb = useCallback(
-    async (signal?: AbortSignal) => {
+    async (signal?: AbortSignal): Promise<boolean> => {
       const dead = () => signal?.aborted ?? false;
       if (!user) {
         clearOpenPausePreview();
-        return;
+        lastSyncedInstanceIdRef.current = null;
+        initialSyncDoneRef.current = false;
+        return false;
       }
       const preview = await fetchOpenPauseHomePreview(user.id);
 
-      if (dead()) return;
+      if (dead()) return false;
+
+      const previousId = lastSyncedInstanceIdRef.current;
+      const afterInitialSync = initialSyncDoneRef.current;
 
       if (!preview) {
+        const hadOpenPause = previousId !== null;
         clearOpenPausePreview();
-        return;
+        lastSyncedInstanceIdRef.current = null;
+        initialSyncDoneRef.current = true;
+        return afterInitialSync && hadOpenPause;
       }
+
+      const instanceChanged =
+        afterInitialSync && preview.pauseInstanceId !== previousId;
+      lastSyncedInstanceIdRef.current = preview.pauseInstanceId;
+      initialSyncDoneRef.current = true;
 
       setLastPauseInstanceId(preview.pauseInstanceId);
       setOpenPauseState(preview.openPauseState);
@@ -75,6 +99,7 @@ export function useOpenPauseHomePreview(user: User | null) {
       setHasReachedReflect(preview.hasReachedReflect);
       setIsBriefRitual(preview.isBriefRitual);
       setCompanions(preview.companions);
+      return instanceChanged;
     },
     [user, clearOpenPausePreview],
   );
@@ -95,7 +120,11 @@ export function useOpenPauseHomePreview(user: User | null) {
         void queryClient.invalidateQueries({ queryKey: pendingPauseOfferQueryKey(user.id) });
         void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(user.id) });
       }
-      void syncOpenPauseFromDb();
+      void syncOpenPauseFromDb().then((instanceChanged) => {
+        if (instanceChanged) {
+          onOpenPauseInstanceChanged?.();
+        }
+      });
     },
   );
 
