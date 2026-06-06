@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { MarketQuote } from '@/features/market/public';
 import { PauseAboutPausesBody } from '@/screens/pause/components/PauseAboutPausesBody';
 import { PauseDepthPicker } from '@/screens/pause/components/PauseDepthPicker';
 import { PauseScienceScrollBody } from '@/screens/pause/components/PauseScienceSheet';
@@ -8,7 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 /** Depth choice on `/pause` before a ritual starts; About + Step science live here only. */
 export function PauseSessionDepthPickerStack(props: {
-  contextLine: string | null;
+  marketData: MarketQuote | null;
+  trackedAssetId: string;
   onBrief: () => void;
   onDeep: () => void;
   /** Free users: deep card shows a Pro / trial hint; `onDeep` should still run (e.g. paywall). */
@@ -19,7 +21,15 @@ export function PauseSessionDepthPickerStack(props: {
 }) {
   "use memo";
   const { t } = useTranslation();
-  const { contextLine, onBrief, onDeep, deepPauseLocked = false, choicesDisabled = false, onClose } = props;
+  const {
+    marketData,
+    trackedAssetId,
+    onBrief,
+    onDeep,
+    deepPauseLocked = false,
+    choicesDisabled = false,
+    onClose,
+  } = props;
 
   const [helpOpen, setHelpOpen] = useState(false);
   const [helpTab, setHelpTab] = useState<'about' | 'steps'>('about');
@@ -29,21 +39,16 @@ export function PauseSessionDepthPickerStack(props: {
     setHelpOpen(true);
   };
 
-  const openStepScience = () => {
-    setHelpTab('steps');
-    setHelpOpen(true);
-  };
-
   return (
     <>
       <PauseDepthPicker
-        contextLine={contextLine}
+        marketData={marketData}
+        trackedAssetId={trackedAssetId}
         onBrief={onBrief}
         onDeep={onDeep}
         deepPauseLocked={deepPauseLocked}
         choicesDisabled={choicesDisabled}
         onAboutPauses={openAbout}
-        onOpenStepScience={openStepScience}
         onClose={onClose}
       />
       <Sheet open={helpOpen} onOpenChange={setHelpOpen}>

@@ -1566,6 +1566,7 @@
     "depthPicker": {
       "contextMoved": "{{sym}} moved {{pct}}% in the last 24 hours.",
       "kicker": "What do you need?",
+      "headline": "How long do you have?",
       "headline1": "You paused",
       "headline2": "That's the hardest part.",
       "brief": {
