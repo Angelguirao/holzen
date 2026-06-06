@@ -151,7 +151,7 @@ const AboutScreen = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              {t('about.btcReserve')}
+              {t('about.reserveLabel')}
             </p>
             <p className="text-sm text-foreground leading-relaxed">
               {t('about.reserveBody1')}
