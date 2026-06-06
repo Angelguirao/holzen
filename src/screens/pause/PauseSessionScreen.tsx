@@ -46,6 +46,7 @@ export default function PauseSessionScreen() {
               onBrief={vm.depthPickerOnBrief}
               onDeep={vm.handleDepthPickerDeep}
               deepPauseLocked={!vm.subscribed}
+              choicesDisabled={vm.openingManualPausePending}
               onClose={vm.requestExitPauseBeforeDone}
             />
           }

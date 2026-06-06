@@ -13,11 +13,13 @@ export function PauseSessionDepthPickerStack(props: {
   onDeep: () => void;
   /** Free users: deep card shows a Pro / trial hint; `onDeep` should still run (e.g. paywall). */
   deepPauseLocked?: boolean;
+  /** Manual open from Home idle — instance still creating. */
+  choicesDisabled?: boolean;
   onClose: () => void;
 }) {
   "use memo";
   const { t } = useTranslation();
-  const { contextLine, onBrief, onDeep, deepPauseLocked = false, onClose } = props;
+  const { contextLine, onBrief, onDeep, deepPauseLocked = false, choicesDisabled = false, onClose } = props;
 
   const [helpOpen, setHelpOpen] = useState(false);
   const [helpTab, setHelpTab] = useState<'about' | 'steps'>('about');
@@ -39,6 +41,7 @@ export function PauseSessionDepthPickerStack(props: {
         onBrief={onBrief}
         onDeep={onDeep}
         deepPauseLocked={deepPauseLocked}
+        choicesDisabled={choicesDisabled}
         onAboutPauses={openAbout}
         onOpenStepScience={openStepScience}
         onClose={onClose}

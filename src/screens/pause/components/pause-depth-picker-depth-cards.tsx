@@ -6,12 +6,14 @@ type PauseDepthPickerDepthCardsProps = {
   onBrief: () => void;
   onDeep: () => void;
   deepPauseLocked?: boolean;
+  choicesDisabled?: boolean;
 };
 
 export function PauseDepthPickerDepthCards({
   onBrief,
   onDeep,
   deepPauseLocked = false,
+  choicesDisabled = false,
 }: PauseDepthPickerDepthCardsProps) {
   "use memo";
   const { t } = useTranslation();
@@ -21,7 +23,12 @@ export function PauseDepthPickerDepthCards({
       <button
         type="button"
         onClick={onBrief}
-        className={cn(PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS, 'bg-muted/25 hover:bg-muted/40')}
+        disabled={choicesDisabled}
+        className={cn(
+          PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS,
+          'bg-muted/25 hover:bg-muted/40',
+          choicesDisabled && 'pointer-events-none opacity-60',
+        )}
       >
         <span className="text-base font-medium text-muted-foreground">
           {t('pause.depthPicker.brief.label', { defaultValue: 'Brief pause' })}
@@ -37,10 +44,12 @@ export function PauseDepthPickerDepthCards({
       <button
         type="button"
         onClick={onDeep}
+        disabled={choicesDisabled}
         className={cn(
           PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS,
           'bg-muted/50 hover:bg-muted/65',
           deepPauseLocked && 'opacity-80 ring-1 ring-border/60',
+          choicesDisabled && 'pointer-events-none opacity-60',
         )}
         aria-label={
           deepPauseLocked

@@ -14,6 +14,8 @@ interface Props {
   onClose: () => void;
   /** When true, deep pause is visually gated; `onDeep` still runs so callers can show paywall / checkout. */
   deepPauseLocked?: boolean;
+  /** Brief/deep cards disabled while manual open from Home is still creating the instance. */
+  choicesDisabled?: boolean;
 }
 
 export function PauseDepthPicker({
@@ -24,6 +26,7 @@ export function PauseDepthPicker({
   onOpenStepScience,
   onClose,
   deepPauseLocked = false,
+  choicesDisabled = false,
 }: Props) {
   "use memo";
   const { t } = useTranslation();
@@ -50,6 +53,7 @@ export function PauseDepthPicker({
             onBrief={onBrief}
             onDeep={onDeep}
             deepPauseLocked={deepPauseLocked}
+            choicesDisabled={choicesDisabled}
           />
 
           {contextLine ? (

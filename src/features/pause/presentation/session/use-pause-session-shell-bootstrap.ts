@@ -83,13 +83,18 @@ export function usePauseSessionShellBootstrap({
   });
 
   const hasCoalescedShellSession =
-    Boolean(pauseInstanceIdForTerminal) || message.length > 0;
+    Boolean(pauseInstanceIdForTerminal) || message.length > 0 || nav.openingManualPause;
 
-  const waitingForFetch = isPauseSessionWaitingForInstanceFetch({
-    hydrationStatus: hydration.status,
-    fetchFailed,
-    fetchedInstance,
-  });
+  const openingManualPausePending =
+    nav.openingManualPause && !pauseInstanceIdForTerminal;
+
+  const waitingForFetch =
+    !nav.startAtDepthPicker &&
+    isPauseSessionWaitingForInstanceFetch({
+      hydrationStatus: hydration.status,
+      fetchFailed,
+      fetchedInstance,
+    });
 
   return {
     nav,
@@ -115,6 +120,7 @@ export function usePauseSessionShellBootstrap({
     handleDeclinePendingFromLeaveSheet,
     handlePendingAdoptFromLeaveSheet,
     hasCoalescedShellSession,
+    openingManualPausePending,
     waitingForFetch,
   };
 }

@@ -1,6 +1,7 @@
 import { useCallback, useTransition, type Dispatch, type SetStateAction } from 'react';
 import type { User } from '@supabase/supabase-js';
 import type { MarketQuote } from '@/features/market/public';
+import type { ManualPauseTriggerOptions } from '@/features/pause/domain/manual-pause-trigger-options';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
@@ -54,7 +55,11 @@ export function useManualPauseTrigger({
   const [isPending, startTransition] = useTransition();
 
   const generateMessage = useCallback(
-    async (data: MarketQuote, mood?: string): Promise<ManualPauseTriggerResult> => {
+    async (
+      data: MarketQuote,
+      mood?: string,
+      options?: ManualPauseTriggerOptions,
+    ): Promise<ManualPauseTriggerResult> => {
       if (!user) {
         holzenLog.manual('generateMessage: skipped (no user)');
         return MANUAL_PAUSE_TRIGGER_IDLE;
@@ -94,7 +99,15 @@ export function useManualPauseTrigger({
 
       const applyOpenResult = (result: Parameters<typeof applyManualPauseOpenResult>[0]['result']) =>
         applyManualPauseOpenResult(
-          { result, ctx, silentMsg, assetId, severityBand, startedAtMs: t0 },
+          {
+            result,
+            ctx,
+            silentMsg,
+            assetId,
+            severityBand,
+            startedAtMs: t0,
+            skipHomePreview: options?.skipHomePreview,
+          },
           previewPorts,
         );
 

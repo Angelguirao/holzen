@@ -27,6 +27,7 @@ export function usePauseSessionRitualSurface(
     handlePendingAdoptFromLeaveSheet: shell.handlePendingAdoptFromLeaveSheet,
     handleDeclinePendingFromLeaveSheet: shell.handleDeclinePendingFromLeaveSheet,
     hasCoalescedShellSession: shell.hasCoalescedShellSession,
+    openingManualPausePending: shell.openingManualPausePending,
     phase: ritual.phase,
     waitingForFetch: shell.waitingForFetch,
     fetchFailed: shell.fetchFailed,
