@@ -5,6 +5,9 @@ import { cn } from '@/lib/utils';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import {
+  computeAutoCooldownReadyAtMs,
+} from '@/features/pause/domain/reflect/generation/compute-pause-trigger-cooldowns';
+import {
   AutoCooldownIndicator,
   formatHomePauseReadyAtClock,
   formatMsAsMS,
@@ -260,22 +263,24 @@ type PostPauseProps = Pick<
   HomePauseWidgetBodyProjection,
   | 'widgetMode'
   | 'onPauseAgain'
-  | 'autoCooldownRemaining'
   | 'completedPauseCount'
   | 'onPauseWithThis'
   | 'previewLine'
   | 'marketBlock'
+  | 'profileLastTriggerAt'
+  | 'cooldownHours'
 >;
 
 /** States D / D′ / E — post-pause rest and new-offer variants. */
 export function HomePausePostPauseBody({
   widgetMode,
   onPauseAgain,
-  autoCooldownRemaining,
   completedPauseCount,
   onPauseWithThis,
   previewLine,
   marketBlock,
+  profileLastTriggerAt,
+  cooldownHours,
 }: PostPauseProps) {
   "use memo";
   const { t } = useTranslation();
@@ -286,19 +291,6 @@ export function HomePausePostPauseBody({
     widgetMode === 'D_expanded' ||
     widgetMode === 'D_prime_collapsed' ||
     widgetMode === 'D_prime_expanded';
-
-  const [remainingMs, setRemainingMs] = useState(() => autoCooldownRemaining());
-
-  useEffect(() => {
-    if (!isD) return;
-    setRemainingMs(autoCooldownRemaining());
-    const interval = setInterval(() => {
-      const next = autoCooldownRemaining();
-      setRemainingMs(next);
-      if (next <= 0) clearInterval(interval);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [autoCooldownRemaining, isD]);
 
   if (isE) {
     return (
@@ -316,8 +308,13 @@ export function HomePausePostPauseBody({
   }
 
   if (isD) {
+    const readyAtMs = computeAutoCooldownReadyAtMs(profileLastTriggerAt, cooldownHours);
     const readyAtClock =
-      remainingMs > 0 ? formatHomePauseReadyAtClock(Date.now() + remainingMs) : '—';
+      readyAtMs != null && readyAtMs > Date.now()
+        ? formatHomePauseReadyAtClock(readyAtMs)
+        : null;
+
+    if (!readyAtClock) return null;
 
     return (
       <div className={homePauseWidgetBodyStack}>

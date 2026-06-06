@@ -154,11 +154,12 @@ export function HomePauseWidgetBody(props: Props) {
         <HomePausePostPauseBody
           widgetMode={props.widgetMode}
           onPauseAgain={props.onPauseAgain}
-          autoCooldownRemaining={props.autoCooldownRemaining}
           completedPauseCount={props.completedPauseCount}
           onPauseWithThis={props.onPauseWithThis}
           previewLine={props.previewLine}
           marketBlock={props.marketBlock}
+          profileLastTriggerAt={props.profileLastTriggerAt}
+          cooldownHours={props.cooldownHours}
         />
       );
 

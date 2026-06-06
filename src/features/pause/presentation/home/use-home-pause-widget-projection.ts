@@ -17,7 +17,10 @@ import {
   resolveHomePauseWidgetPreviewLine,
   type HomePauseWidgetPreviewLine,
 } from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
-import { computeAutoCooldownRemainingMs } from '@/features/pause/domain/reflect/generation/compute-pause-trigger-cooldowns';
+import {
+  computeAutoCooldownReadyAtMs,
+  computeAutoCooldownRemainingMs,
+} from '@/features/pause/domain/reflect/generation/compute-pause-trigger-cooldowns';
 import { shouldSurfacePauseWidgetError } from '@/features/pause/domain/home/pause-home-widget-error';
 import {
   fetchRecentContextLostPause,
@@ -57,6 +60,7 @@ export type HomePauseWidgetBodyProjection = {
   onNeedPause: () => void;
   onPauseAgain: () => void;
   completedPauseCount: number;
+  profileLastTriggerAt: string | null;
   pendingPreviewLine: HomePauseWidgetPreviewLine | null;
   pendingMarketBlock: ReturnType<typeof formatHomePauseMarketBlock> | null;
   calmWatersExpiredAt: string | null;
@@ -102,24 +106,6 @@ export type UseHomePauseWidgetProjectionParams = {
   hasOpenPauseStepEvents: boolean;
 };
 
-function readExpandedPreference(): boolean | null {
-  try {
-    const v = sessionStorage.getItem(HOME_PAUSE_WIDGET_EXPANDED_STORAGE_KEY);
-    if (v === null) return null;
-    return v === 'true';
-  } catch {
-    return null;
-  }
-}
-
-function writeExpandedPreference(expanded: boolean): void {
-  try {
-    sessionStorage.setItem(HOME_PAUSE_WIDGET_EXPANDED_STORAGE_KEY, expanded ? 'true' : 'false');
-  } catch {
-    /* ignore */
-  }
-}
-
 export type HomePauseWidgetProjection = {
   sectionTitleKey: string;
   showMoonIcon: boolean;
@@ -145,11 +131,6 @@ export function useHomePauseWidgetProjection(
     refetchOnWindowFocus: false,
   });
 
-  const postPauseAutoCooldownRemainingMs = useMemo(
-    () => computeAutoCooldownRemainingMs(params.profileLastTriggerAt, params.cooldownHours),
-    [params.profileLastTriggerAt, params.cooldownHours],
-  );
-
   const showCalmWaters = Boolean(
     !params.hasOpenPause &&
       calmQuery.data &&
@@ -162,7 +143,20 @@ export function useHomePauseWidgetProjection(
 
   const assetSymbol = trackedAssetSymbol(params.trackedAssetId);
 
-  const [userExpanded, setUserExpanded] = useState<boolean>(() => readExpandedPreference() ?? false);
+  const [userExpanded, setUserExpanded] = useState(false);
+  const [cooldownNowMs, setCooldownNowMs] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (!params.profileLastTriggerAt || params.cooldownHours <= 0) return;
+    const id = window.setInterval(() => setCooldownNowMs(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, [params.profileLastTriggerAt, params.cooldownHours]);
+
+  const postPauseAutoCooldownRemainingMs = computeAutoCooldownRemainingMs(
+    params.profileLastTriggerAt,
+    params.cooldownHours,
+    cooldownNowMs,
+  );
 
   const { mode: widgetMode } = useMemo(
     () =>
@@ -202,13 +196,25 @@ export function useHomePauseWidgetProjection(
     const prev = prevModeRef.current;
     prevModeRef.current = widgetMode;
 
+    const restModes: HomePauseWidgetMode[] = [
+      'A_collapsed',
+      'A_expanded',
+      'D_collapsed',
+      'D_expanded',
+      'D_prime_collapsed',
+      'D_prime_expanded',
+    ];
+    const activeModes: HomePauseWidgetMode[] = ['B', 'B_in_progress', 'C', 'C_prime', 'E'];
+    if (prev && activeModes.includes(prev) && restModes.includes(widgetMode)) {
+      setUserExpanded(false);
+    }
+
     const autoExpandModes: HomePauseWidgetMode[] = ['B', 'B_in_progress', 'C', 'C_prime', 'E'];
     const enteredAutoExpand =
       prev !== null && autoExpandModes.includes(widgetMode) && !autoExpandModes.includes(prev);
 
     if (params.newPauseArrival || enteredAutoExpand) {
       setUserExpanded(true);
-      writeExpandedPreference(true);
     }
   }, [widgetMode, params.newPauseArrival]);
 
@@ -216,11 +222,7 @@ export function useHomePauseWidgetProjection(
   const collapsed = homePauseWidgetModeIsCollapsed(widgetMode);
 
   const onToggleCollapse = useCallback(() => {
-    setUserExpanded((prev) => {
-      const next = !prev;
-      writeExpandedPreference(next);
-      return next;
-    });
+    setUserExpanded((prev) => !prev);
   }, []);
 
   const marketBlock = useMemo(
@@ -310,6 +312,7 @@ export function useHomePauseWidgetProjection(
     onNeedPause: params.onNeedPause,
     onPauseAgain: params.onNeedPause,
     completedPauseCount: params.completedPauseCount ?? 0,
+    profileLastTriggerAt: params.profileLastTriggerAt,
     pendingPreviewLine,
     pendingMarketBlock,
     calmWatersExpiredAt: calmQuery.data?.expiredAt ?? null,

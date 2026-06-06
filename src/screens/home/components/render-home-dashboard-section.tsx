@@ -70,9 +70,7 @@ export function renderHomeDashboardSection(sectionId: string, d: HomeDashboardSe
             defaultValue:
               d.pauseWidgetProjection.sectionTitleKey === 'home.widget.continueYourPause'
                 ? 'Continue pause'
-                : d.pauseWidgetProjection.sectionTitleKey === 'home.widget.youPaused'
-                  ? 'You paused'
-                  : d.pauseWidgetProjection.sectionTitleKey === 'home.widget.newPauseAvailable'
+                : d.pauseWidgetProjection.sectionTitleKey === 'home.widget.newPauseAvailable'
                     ? 'New pause available'
                     : 'Your pause',
           })}

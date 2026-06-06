@@ -5,6 +5,7 @@ import { hasReachedReflectForHome } from '@/features/pause/domain/home/has-reach
 import { buildHomePauseOpeningPreviewKey } from '@/features/pause/domain/home/build-home-pause-opening-preview-key';
 import {
   homePauseWidgetModeIsCollapsed,
+  homePauseWidgetSectionTitleKey,
   resolveHomePauseWidgetMode,
 } from '@/features/pause/domain/home/home-pause-widget-mode';
 
@@ -217,6 +218,10 @@ describe('resolveHomePauseWidgetMode', () => {
       completedPauseCount: 3,
     });
     expect(r.mode).toBe('D_collapsed');
+  });
+
+  it('section title stays Your pause for D rest modes', () => {
+    expect(homePauseWidgetSectionTitleKey('D_collapsed')).toBe('home.widget.yourPause');
   });
 
   it('D_prime when post-pause rest without archive', () => {
