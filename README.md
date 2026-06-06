@@ -158,6 +158,8 @@ The local API gateway exposes `http://127.0.0.1:55421/functions/v1`, but your fu
 
 **Local cron auth:** If you want cron-driven local Edge functions like `check-volatility`, `pregenerate-companions`, and `refresh-market-prices` to run against your local function server, set `CRON_SECRET` in `supabase/.env.local` or `supabase/.env`, then run `npm run supabase:cron:local` (or restart `npm run supabase:start`). Without `CRON_SECRET`, those shipped HTTP cron jobs stay disabled locally on purpose.
 
+**Docker “container name already in use”:** Run `npm run supabase:stop`, then `docker rm -f supabase_vector_holzen` (or the name from the error), then `npm run supabase:start` again. Full steps: [docs/ops/environment-matrix.md](docs/ops/environment-matrix.md) (Local Docker troubleshooting).
+
 **Vendor-backed flows:** Billing, transactional email, AI calls, and some ops paths still depend on third-party credentials even when the function code is running locally. For Stripe webhooks, you can forward events into the local stack with:
 
 ```sh
