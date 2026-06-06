@@ -6,6 +6,7 @@ import { DEFAULT_COMPANIONS } from '@/features/pause/domain/session-model';
 import { fetchOpenPauseHomePreview } from '@/features/pause/public-queries';
 import { pendingPauseOfferQueryKey } from '@/features/pause/infrastructure/queries/reflect/pending-offer/pending-pause-offer-query-key';
 import { HOLZEN_MARKET_DISPLAY_QUERY_PREFIX } from '@/features/market/application/queries/holzen-market-display-keys';
+import { notificationsInboxQueryKey } from '@/features/notifications/infrastructure/queries/notifications-inbox-query';
 import { HOLZEN_NUMBER_QUERY_KEY, PROFILE_QUERY_KEY } from '@/features/user/public-queries';
 import { pauseDismissOpenPauseHomePreview } from './pause-home-reflect-io';
 import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
@@ -121,6 +122,7 @@ export function useOpenPauseHomePreview(
         void queryClient.invalidateQueries({ queryKey: pendingPauseOfferQueryKey(user.id) });
         void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(user.id) });
         void queryClient.invalidateQueries({ queryKey: HOLZEN_MARKET_DISPLAY_QUERY_PREFIX });
+        void queryClient.invalidateQueries({ queryKey: notificationsInboxQueryKey(user.id) });
       }
       void syncOpenPauseFromDb().then((instanceChanged) => {
         if (instanceChanged) {
