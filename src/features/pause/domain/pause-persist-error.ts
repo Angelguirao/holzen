@@ -1,6 +1,6 @@
 /**
  * Fragment included in `error` when persisting a pause (e.g. `pause_ai_artifacts` upsert)
- * fails after a successful generate — Home uses this to show the banner even when `btcData` exists.
+ * fails after a successful generate — Home uses this to show the banner even when `marketData` exists.
  */
 export const PAUSE_PERSIST_ERROR_MARKER = 'Could not save your pause';
 /** @deprecated Prefer PAUSE_PERSIST_ERROR_MARKER; still matched for backwards compatibility */

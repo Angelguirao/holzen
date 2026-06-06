@@ -62,7 +62,7 @@ function baseParams(
     pauseInstanceId: 'pause-inst-1',
     context: 'btc_dip',
     message: 'Seed message',
-    btcData: { changePercent: -4.2 } as import('@/features/market/public').BtcPriceData,
+    marketData: { changePercent: -4.2 } as import('@/features/market/public').MarketQuote,
     companionsHaiku: 'line one',
     dismissMessage: vi.fn(),
     refreshSubscription: vi.fn(),

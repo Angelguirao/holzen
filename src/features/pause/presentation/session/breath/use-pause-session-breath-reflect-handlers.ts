@@ -20,7 +20,7 @@ export function usePauseSessionBreathReflectHandlers(
   },
   mood: PauseSessionBreathReflectMoodSlice,
 ) {
-  const { t, dismissMessage, btcData, subscribed, subLoading, requirePro, refreshSubscription } = p;
+  const { t, dismissMessage, marketData, subscribed, subLoading, requirePro, refreshSubscription } = p;
   const { restored, message, context, pauseInstanceId, companions } = shell;
   const {
     step,
@@ -90,7 +90,7 @@ export function usePauseSessionBreathReflectHandlers(
     pauseInstanceId,
     context,
     message,
-    btcData,
+    marketData,
     companionsHaiku: companions.haiku ?? null,
     dismissMessage,
     refreshSubscription,

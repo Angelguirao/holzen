@@ -1,9 +1,9 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const BtcChartLazy = lazy(async () => {
-  const m = await import('@/screens/home/components/BtcChart');
-  return { default: m.BtcChart };
+const MarketChartLazy = lazy(async () => {
+  const m = await import('@/screens/home/components/MarketChart');
+  return { default: m.MarketChart };
 });
 
 function ChartSkeleton() {
@@ -25,7 +25,7 @@ interface Props {
 /**
  * Defers Recharts + CoinGecko chart fetch until near viewport — cuts main-thread layout work on cold Home paint.
  */
-export function BtcChartLazyGate({ hidden = false, currency = 'USD', coinId = 'bitcoin' }: Props) {
+export function MarketChartLazyGate({ hidden = false, currency = 'USD', coinId = 'bitcoin' }: Props) {
   "use memo";
   const containerRef = useRef<HTMLDivElement>(null);
   const [mountChart, setMountChart] = useState(false);
@@ -62,9 +62,12 @@ export function BtcChartLazyGate({ hidden = false, currency = 'USD', coinId = 'b
         <ChartSkeleton />
       ) : (
         <Suspense fallback={<ChartSkeleton />}>
-          <BtcChartLazy hidden={false} currency={currency} coinId={coinId} />
+          <MarketChartLazy hidden={false} currency={currency} coinId={coinId} />
         </Suspense>
       )}
     </div>
   );
 }
+
+/** @deprecated Use MarketChartLazyGate */
+export const BtcChartLazyGate = MarketChartLazyGate;

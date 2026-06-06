@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
 import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
@@ -15,7 +15,7 @@ export type UsePauseSessionReflectAndDecideParams = {
   pauseInstanceId: string | null;
   context: string | null;
   message: string;
-  btcData: BtcPriceData | null;
+  marketData: MarketQuote | null;
   companionsHaiku: string | null;
   dismissMessage: () => void | Promise<void>;
   refreshSubscription: () => void | Promise<void>;

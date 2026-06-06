@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getHolzenMarketDisplayQueryOptions,
   mapHolzenMarketDisplayError,
-  severityFromBtcChangePercent,
+  severityFromMarketChangePercent,
 } from '@/features/market/public';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
@@ -31,7 +31,7 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
     profileLoaded,
   } = profile;
 
-  const btcQuery = useQuery(
+  const marketQuery = useQuery(
     getHolzenMarketDisplayQueryOptions({
       coinIdRaw: profileTrackedAssetId,
       currency,
@@ -95,22 +95,23 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
 
   const nextCronCheckIn = useCallback(() => millisecondsUntilNextQuarterHour(), []);
 
-  const btcData = btcQuery.data ?? null;
+  const marketData = marketQuery.data ?? null;
 
-  const severity = severityFromBtcChangePercent(btcData?.changePercent);
+  const severity = severityFromMarketChangePercent(marketData?.changePercent);
 
   const marketFetchError = useMemo(
     () =>
       mapHolzenMarketDisplayError({
         profileLoaded,
-        isError: btcQuery.isError,
-        error: btcQuery.error,
+        isError: marketQuery.isError,
+        error: marketQuery.error,
       }),
-    [profileLoaded, btcQuery.isError, btcQuery.error],
+    [profileLoaded, marketQuery.isError, marketQuery.error],
   );
 
   return {
-    btcData,
+    marketData,
+    btcData: marketData,
     message,
     context,
     companions,

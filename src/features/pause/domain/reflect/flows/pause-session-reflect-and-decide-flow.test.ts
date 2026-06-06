@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
 import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
@@ -7,12 +7,12 @@ import {
 
 describe('pause-session-reflect-and-decide-flow', () => {
   it('preflight enables holzen-reflect on deep reflect step', () => {
-    const btcData = { changePercent: -2.5 } as BtcPriceData;
+    const marketData = { changePercent: -2.5 } as MarketQuote;
     const view = resolvePauseSessionReflectAndDecidePreflight({
       ritualEntry: 'deep',
       step: 'reflect',
       seedMessage: 'Seed',
-      btcData,
+      marketData,
     });
     expect(view.reflectGenEnabled).toBe(true);
     expect(view.severityAbsPct).toBe(2.5);
@@ -25,7 +25,7 @@ describe('pause-session-reflect-and-decide-flow', () => {
       step: 'reflect',
       seedMessage: 'Seed',
       generatedReflectionMessage: '  Generated  ',
-      btcData: null,
+      marketData: null,
     });
     expect(view.effectiveReflectionMessage).toBe('Generated');
   });
@@ -35,7 +35,7 @@ describe('pause-session-reflect-and-decide-flow', () => {
       ritualEntry: 'brief',
       step: 'reflect',
       seedMessage: 'Only seed',
-      btcData: null,
+      marketData: null,
     });
     expect(view.reflectGenEnabled).toBe(false);
     expect(view.effectiveReflectionMessage).toBe('Only seed');

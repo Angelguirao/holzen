@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { TFunction } from 'i18next';
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
 import { isPauseSessionDepthPickerActive } from '@/features/pause/presentation/feel/pause-feel-io';
 import type { FetchedPauseInstance } from '@/features/pause/domain/session-model';
 import type { RitualDepth } from '@/features/pause/domain/ritual-types';
@@ -14,7 +14,7 @@ export type UsePauseSessionScaffoldPresentationParams = Omit<
   'prefersReducedMotion' | 'stepTransition'
 > & {
   t: TFunction;
-  btcData: BtcPriceData | null;
+  marketData: MarketQuote | null;
   trackedAssetId: string;
   ritualEntry: RitualDepth | 'picker';
   phase: 'session' | 'done';
@@ -35,7 +35,7 @@ export type UsePauseSessionScaffoldPresentationParams = Omit<
 export function usePauseSessionScaffoldPresentation(params: UsePauseSessionScaffoldPresentationParams) {
   const {
     t,
-    btcData,
+    marketData,
     trackedAssetId,
     ritualEntry,
     phase,
@@ -50,7 +50,7 @@ export function usePauseSessionScaffoldPresentation(params: UsePauseSessionScaff
 
   const { depthContextLine } = usePauseSessionDepthAndBriefCopy({
     t,
-    btcData,
+    marketData,
     trackedAssetId,
     ritualEntry,
   });

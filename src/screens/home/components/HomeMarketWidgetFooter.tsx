@@ -3,11 +3,11 @@ import {
   resolveMarketVolatilityRangeStatus,
   type MarketVolatilityRangeStatus,
 } from '@/features/market/domain/market-volatility-range-status';
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
 import { HomeMarketCommunityStats } from '@/screens/home/components/home-market-community-stats';
 
 type Props = {
-  btcData: BtcPriceData | null;
+  marketData: MarketQuote | null;
   threshold: number;
   thresholdDown: number;
   cumulativeThreshold: number;
@@ -56,22 +56,22 @@ function RangeStatusLine({ status }: { status: MarketVolatilityRangeStatus }) {
 }
 
 /** Figma 559:26565 — range (left) + community stats stacked (right) under Market price. */
-export function HomeMarketWidgetFooter({ btcData, threshold, thresholdDown, cumulativeThreshold }: Props) {
+export function HomeMarketWidgetFooter({ marketData, threshold, thresholdDown, cumulativeThreshold }: Props) {
   "use memo";
 
   const rangeStatus =
-    btcData != null
+    marketData != null
       ? resolveMarketVolatilityRangeStatus(
           { threshold, threshold_down: thresholdDown, cumulative_threshold: cumulativeThreshold },
           {
-            changePercent: btcData.changePercent,
-            direction: btcData.direction,
-            cumulativeChangePercent: btcData.cumulativeChangePercent,
+            changePercent: marketData.changePercent,
+            direction: marketData.direction,
+            cumulativeChangePercent: marketData.cumulativeChangePercent,
           },
         )
       : null;
 
-  if (!rangeStatus && !btcData) return null;
+  if (!rangeStatus && !marketData) return null;
 
   return (
     <div className="flex items-start gap-1 pt-0.5">

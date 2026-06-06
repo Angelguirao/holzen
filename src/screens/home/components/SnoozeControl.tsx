@@ -121,7 +121,7 @@ export function SnoozeControl() {
   );
 }
 
-/** Icon + popover for Home section headers (matches Market/BtcStatus hit targets). */
+/** Icon + popover for Home section headers (matches Market/MarketStatus hit targets). */
 export function SnoozeToolbarControl() {
   "use memo";
   const { t } = useTranslation();

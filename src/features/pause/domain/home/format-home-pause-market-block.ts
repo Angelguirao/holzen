@@ -1,4 +1,4 @@
-import type { BtcPriceData } from '@/features/market/domain/market-quote';
+import type { MarketQuote } from '@/features/market/domain/market-quote';
 import { parsePauseContextForHomePreview } from '@/features/market/application/pause-context-home-preview';
 import { trackedAssetSymbol } from '@/features/market/domain/tracked-assets';
 
@@ -28,13 +28,13 @@ function compactSentimentFromContext(marketSentiment: string | null): string | n
   return `${match[1].trim()} · ${match[2]}`;
 }
 
-function compactMoveFromLiveBtc(data: BtcPriceData, assetSymbol: string): string {
+function compactMoveFromLiveQuote(data: MarketQuote, assetSymbol: string): string {
   const arrow = data.direction === 'down' ? '↓' : '↑';
   const pct = Math.abs(data.changePercent).toFixed(1);
   return `${assetSymbol} ${arrow} ${pct}% · 24h`;
 }
 
-function compactSentimentFromLiveBtc(data: BtcPriceData): string | null {
+function compactSentimentFromLiveQuote(data: MarketQuote): string | null {
   const fg = data.fearGreed;
   if (!fg?.label || typeof fg.value !== 'number') return null;
   return `${fg.label} · ${fg.value}`;
@@ -43,7 +43,7 @@ function compactSentimentFromLiveBtc(data: BtcPriceData): string | null {
 /** Formats the compact BTC/F&G block for Home pause widget states B/C. */
 export function formatHomePauseMarketBlock(input: {
   contextText: string | null;
-  btcData: BtcPriceData | null;
+  marketData: MarketQuote | null;
   trackedAssetId: string;
   instanceCreatedAt: string | null;
 }): HomePauseMarketBlock {
@@ -52,11 +52,11 @@ export function formatHomePauseMarketBlock(input: {
 
   const moveLine =
     compactMoveFromContext(parsed.btc24h, assetSymbol) ??
-    (input.btcData ? compactMoveFromLiveBtc(input.btcData, assetSymbol) : null);
+    (input.marketData ? compactMoveFromLiveQuote(input.marketData, assetSymbol) : null);
 
   const sentimentLine =
     compactSentimentFromContext(parsed.marketSentiment) ??
-    (input.btcData ? compactSentimentFromLiveBtc(input.btcData) : null);
+    (input.marketData ? compactSentimentFromLiveQuote(input.marketData) : null);
 
   return {
     moveLine,

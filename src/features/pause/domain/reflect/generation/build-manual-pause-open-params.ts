@@ -1,4 +1,4 @@
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
 import {
   buildManualPauseMarketContext,
   type ManualPauseMarketContext,
@@ -12,7 +12,7 @@ export type BuildManualPauseOpenParamsInput = {
   userId: string;
   silentMode: boolean;
   mood?: string;
-  data: BtcPriceData;
+  data: MarketQuote;
   cumulativeThreshold: number;
   profileTrackedAssetId: string;
 };

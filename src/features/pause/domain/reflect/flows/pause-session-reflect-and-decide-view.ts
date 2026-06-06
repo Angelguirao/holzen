@@ -1,4 +1,4 @@
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
 import { isPauseReflectGenerationEnabled } from '@/features/pause/domain/reflect/generation/reflect-generation-enabled';
 import { resolveEffectiveReflectionMessage } from '@/features/pause/domain/reflect/generation/resolve-effective-reflection-message';
 import { resolveReflectGenerationSeverityAbsPct } from '@/features/pause/domain/reflect/generation/reflect-generation-severity-abs-pct';
@@ -12,13 +12,13 @@ export type PauseSessionReflectAndDecideViewInput = {
   seedMessage: string;
   /** Latest generated copy from `usePauseReflectGeneration`. */
   generatedReflectionMessage: string;
-  btcData: BtcPriceData | null;
+  marketData: MarketQuote | null;
 };
 
 /** Pure Reflect + Decide step inputs for the session conductor (generation gate, severity, effective copy). */
 export function buildPauseSessionReflectAndDecideView(input: PauseSessionReflectAndDecideViewInput) {
   const reflectGenEnabled = isPauseReflectGenerationEnabled(input.ritualEntry, input.step);
-  const severityAbsPct = resolveReflectGenerationSeverityAbsPct(input.btcData?.changePercent);
+  const severityAbsPct = resolveReflectGenerationSeverityAbsPct(input.marketData?.changePercent);
   const effectiveReflectionMessage = resolveEffectiveReflectionMessage(
     input.generatedReflectionMessage,
     input.seedMessage,

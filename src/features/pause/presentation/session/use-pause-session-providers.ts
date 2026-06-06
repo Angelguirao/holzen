@@ -44,7 +44,7 @@ export function usePauseSessionProvidersFromHolzenSlice(
     severity,
     profileLoaded,
     resyncOpenPauseFromDb,
-    btcData,
+    marketData,
     trackedAssetId,
   } = holzen;
 
@@ -86,7 +86,7 @@ export function usePauseSessionProvidersFromHolzenSlice(
     dismissMessage,
     profileLoaded,
     resyncOpenPauseFromDb,
-    btcData,
+    marketData,
     trackedAssetId,
     subscribed,
     subLoading,

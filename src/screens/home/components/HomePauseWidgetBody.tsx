@@ -38,7 +38,7 @@ export function HomePauseWidgetBody(props: Props) {
   }, [props.widgetMode, t]);
 
   const blockingError =
-    props.error && shouldSurfacePauseWidgetError(props.error, props.btcData) ? props.error : null;
+    props.error && shouldSurfacePauseWidgetError(props.error, props.marketData) ? props.error : null;
 
   if (!props.subLoading && !props.hasAccess) {
     return (

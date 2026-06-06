@@ -6,7 +6,7 @@ export const HOLZEN_MARKET_DISPLAY_COINGECKO_ERROR =
 export const HOLZEN_MARKET_DISPLAY_RETRY_ERROR =
   'Could not check market data. Will retry automatically.';
 
-/** Whether `error` is a mapped Holzen market display failure (price-only on Home when `btcData` is cached). */
+/** Whether `error` is a mapped Holzen market display failure (price-only on Home when `marketData` is cached). */
 export function isHolzenMarketDisplayUserError(error: string): boolean {
   return error === HOLZEN_MARKET_DISPLAY_COINGECKO_ERROR || error === HOLZEN_MARKET_DISPLAY_RETRY_ERROR;
 }

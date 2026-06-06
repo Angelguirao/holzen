@@ -20,7 +20,7 @@ export function usePauseSessionReflectAndDecide({
   pauseInstanceId,
   context,
   message,
-  btcData,
+  marketData,
   companionsHaiku,
   dismissMessage,
   refreshSubscription,
@@ -40,7 +40,7 @@ export function usePauseSessionReflectAndDecide({
     ritualEntry,
     step,
     seedMessage: message,
-    btcData,
+    marketData,
   });
 
   const currentFeel = useMemo(
@@ -77,7 +77,7 @@ export function usePauseSessionReflectAndDecide({
     step,
     seedMessage: message,
     generatedReflectionMessage,
-    btcData,
+    marketData,
   });
 
   const { handleDecide } = usePauseSessionDecideHandler({

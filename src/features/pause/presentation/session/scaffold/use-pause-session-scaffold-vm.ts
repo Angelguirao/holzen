@@ -12,13 +12,13 @@ export function usePauseSessionScaffoldVm(
   step: PauseSessionStepHandlersResult,
   chrome: PauseSessionScaffoldVmChromeSlots,
 ) {
-  const { mantra, btcData, trackedAssetId, prefersReducedMotion, breathSecondLabelVariant, t } = p;
+  const { mantra, marketData, trackedAssetId, prefersReducedMotion, breathSecondLabelVariant, t } = p;
   const { shell, ritual, mood, breath, reflect, toggleFavorite, handleFrameImDone, subscribed } =
     step;
 
   const scaffold = usePauseSessionScaffoldPresentation({
     t,
-    btcData,
+    marketData,
     trackedAssetId,
     ritualEntry: ritual.ritualEntry,
     phase: ritual.phase,
@@ -80,7 +80,7 @@ export function usePauseSessionScaffoldVm(
     handleFrameImDone,
     handleDeepFirstBreathRepeat: breath.handleDeepFirstBreathRepeat,
     handleDeepSecondBreathRepeat: breath.handleDeepSecondBreathRepeat,
-    severityAbsPct: Math.abs(btcData?.changePercent ?? 0),
+    severityAbsPct: Math.abs(marketData?.changePercent ?? 0),
     reflectionLoading: reflect.reflectionLoading,
     reflectionError: reflect.reflectionError,
     onReflectionRetry: reflect.retryReflection,

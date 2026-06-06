@@ -1,4 +1,4 @@
-import { normalizeTrackedAssetId, type BtcPriceData } from '@/features/market/public';
+import { normalizeTrackedAssetId, type MarketQuote } from '@/features/market/public';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import type { PauseHomeContextValue } from '@/features/pause/domain/home/pause-home-context-value';
 import type { PauseSeverity } from './location-state';
@@ -15,7 +15,7 @@ export type PauseHolzenProvidersSlice = {
   severity: PauseSeverity;
   profileLoaded: boolean;
   resyncOpenPauseFromDb: () => void | Promise<void>;
-  btcData: BtcPriceData | null;
+  marketData: MarketQuote | null;
   trackedAssetId: string;
 };
 
@@ -31,7 +31,7 @@ export type PickPauseHolzenProvidersSliceSource = {
   severity: PauseHolzenProvidersSlice['severity'];
   profileLoaded: PauseHolzenProvidersSlice['profileLoaded'];
   resyncOpenPauseFromDb: PauseHolzenProvidersSlice['resyncOpenPauseFromDb'];
-  btcData: PauseHolzenProvidersSlice['btcData'];
+  marketData: PauseHolzenProvidersSlice['marketData'];
   trackedAssetId: PauseHolzenProvidersSlice['trackedAssetId'];
 };
 
@@ -71,7 +71,7 @@ export function pickPauseHolzenProvidersSlice(
     severity: source.severity,
     profileLoaded: source.profileLoaded,
     resyncOpenPauseFromDb: source.resyncOpenPauseFromDb,
-    btcData: source.btcData,
+    marketData: source.marketData,
     trackedAssetId: source.trackedAssetId,
   };
 }

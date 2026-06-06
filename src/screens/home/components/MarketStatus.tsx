@@ -1,13 +1,13 @@
 import { Eye, EyeOff, WifiOff, Bitcoin, CircleDollarSign, Clock, ChevronDown } from 'lucide-react';
-import { BtcChartLazyGate } from '@/screens/home/components/BtcChartLazyGate';
+import { MarketChartLazyGate } from '@/screens/home/components/MarketChartLazyGate';
 import { Skeleton } from '@/components/ui/skeleton';
-import { formatBtcPrice, trackedAssetSymbol, type BtcPriceData } from '@/features/market/public';
+import { formatMarketPrice, trackedAssetSymbol, type MarketQuote } from '@/features/market/public';
 import { useTranslation } from 'react-i18next';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
 
 interface Props {
-  data: BtcPriceData | null;
+  data: MarketQuote | null;
   error: string | null;
   hidden: boolean;
   onToggleHidden: () => void;
@@ -23,7 +23,7 @@ interface Props {
   coinId?: string;
 }
 
-export function BtcStatus({
+export function MarketStatus({
   data,
   error,
   hidden,
@@ -152,7 +152,7 @@ export function BtcStatus({
   const cur = data.currency || currency;
   const dir = data.direction === 'down' ? '−' : '+';
   const pct = Math.abs(data.changePercent).toFixed(1);
-  const price = formatBtcPrice(data.currentPrice, cur);
+  const price = formatMarketPrice(data.currentPrice, cur);
 
   const fearGreedColor = data.fearGreed
     ? data.fearGreed.value <= 25
@@ -236,9 +236,12 @@ export function BtcStatus({
       </div>
       {showChartBlock ? (
         <div>
-          <BtcChartLazyGate hidden={hidden} currency={cur} coinId={data?.coinId ?? coinIdProp ?? 'bitcoin'} />
+          <MarketChartLazyGate hidden={hidden} currency={cur} coinId={data?.coinId ?? coinIdProp ?? 'bitcoin'} />
         </div>
       ) : null}
     </div>
   );
 }
+
+/** @deprecated Use MarketStatus */
+export const BtcStatus = MarketStatus;

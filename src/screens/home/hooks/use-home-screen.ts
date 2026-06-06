@@ -53,7 +53,7 @@ export function useHomeScreen() {
   useHomeDocumentTitle(true);
 
   const {
-    btcData,
+    marketData,
     message,
     context,
     companions,
@@ -181,7 +181,7 @@ export function useHomeScreen() {
     openPauseState,
     loading,
     error,
-    btcData,
+    marketData,
     showPauseScheduling,
     autoCooldownRemaining,
     cooldownHours,
@@ -216,7 +216,7 @@ export function useHomeScreen() {
       t,
       error,
       marketHeaderRight,
-      btcData,
+      marketData,
       threshold,
       thresholdDown,
       cumulativeThreshold,

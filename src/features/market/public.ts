@@ -25,6 +25,10 @@ export {
 } from './domain/market-volatility-range-status';
 export { parsePauseContextForHomePreview } from './application/pause-context-home-preview';
 export {
+  severityFromMarketChangePercent,
+  type MarketMoveSeverity,
+} from './domain/market-move-severity';
+export {
   severityFromBtcChangePercent,
   type BtcMoveSeverity,
 } from './domain/btc-move-severity';

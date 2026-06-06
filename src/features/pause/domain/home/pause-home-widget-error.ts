@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import { isHolzenMarketDisplayUserError, type BtcPriceData } from '@/features/market/public';
+import { isHolzenMarketDisplayUserError, type MarketQuote } from '@/features/market/public';
 import { isPausePersistError } from '@/features/pause/domain/pause-persist-error';
 
 /** Buckets for Home pause widget + zen error copy (aligned with `useHolzen` setError strings). */
@@ -58,7 +58,7 @@ export function pauseHomeErrorStrings(
 
 /**
  * Market fetch failures from `useHolzen` / `fetchBtcDisplay` — user still has cached
- * `btcData` we can show in the market widget, so the pause strip should not steal focus.
+ * `marketData` we can show in the market widget, so the pause strip should not steal focus.
  */
 export function isLikelyPriceOnlyMarketError(error: string): boolean {
   return isHolzenMarketDisplayUserError(error);
@@ -71,11 +71,11 @@ export function isLikelyPriceOnlyMarketError(error: string): boolean {
  */
 export function shouldSurfacePauseWidgetError(
   error: string | null,
-  btcData: BtcPriceData | null,
+  marketData: MarketQuote | null,
 ): boolean {
   if (!error) return false;
   if (isPausePersistError(error)) return true;
-  if (!btcData) return true;
+  if (!marketData) return true;
   return !isLikelyPriceOnlyMarketError(error);
 }
 
