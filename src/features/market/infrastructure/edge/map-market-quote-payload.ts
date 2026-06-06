@@ -1,4 +1,4 @@
-import type { BtcPriceData, OnChainData } from '@/features/market/domain/market-quote';
+import type { MarketQuote, OnChainData } from '@/features/market/domain/market-quote';
 import { normalizeTrackedAssetId } from '@/features/market/domain/tracked-assets';
 
 export type MarketQuoteEdgePayload = {
@@ -25,8 +25,8 @@ function mapOnChain(raw: Record<string, unknown> | undefined): OnChainData | und
   return Object.keys(onChain).length > 0 ? onChain : undefined;
 }
 
-/** Map `market-quote` edge JSON into client `BtcPriceData`. */
-export function mapMarketQuotePayload(payload: MarketQuoteEdgePayload): BtcPriceData {
+/** Map `market-quote` edge JSON into client `MarketQuote`. */
+export function mapMarketQuotePayload(payload: MarketQuoteEdgePayload): MarketQuote {
   return {
     coinId: normalizeTrackedAssetId(payload.coinId),
     currentPrice: payload.currentPrice,

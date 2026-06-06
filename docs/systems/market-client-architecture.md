@@ -112,6 +112,6 @@ Automatic offers target **volatility-driven checking**, not trading alerts at fi
 
 **Model:** `TrackedAssetDefinition` (`id`, `symbol`, `kind`, `provider`) + `profiles.tracked_asset_id` as provider-native string. **Quote type:** prefer `MarketQuote`; `BtcPriceData` is a deprecated alias.
 
-**BTC-only product features** should use `isBitcoinTrackedAsset()` (on-chain, unit display mode, zoom-out anniversary).
+**BTC-only product features** should use `isBitcoinTrackedAsset()` (on-chain, unit display mode, zoom-out anniversary). Active call sites use the helper in client fetch, pause context, Settings, Home, and edge `check-volatility` / `market-quote` / zoom-out.
 
 **Full 360° gap analysis and rollout steps:** [tracked-asset-class-evolution.md](../backlog/tracked-asset-class-evolution.md).

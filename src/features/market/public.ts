@@ -49,7 +49,7 @@ export type {
   SupportedCurrency,
 } from './domain/market-quote';
 export { SUPPORTED_CURRENCIES } from './domain/market-quote';
-export { formatBtcPrice } from './application/format-market-price';
+export { formatBtcPrice, formatMarketPrice } from './application/format-market-price';
 export {
   fetchBtcData,
   fetchMarketData,

@@ -4,6 +4,7 @@
  */
 import { fetchInitWithIncomingTrace } from "./forward-trace-headers.ts";
 import { coingeckoHeaders } from "./coingecko.ts";
+import { isBitcoinTrackedAsset } from "./tracked-assets.ts";
 
 export type MarketQuoteMode = "lite" | "full";
 
@@ -136,7 +137,7 @@ export async function fetchMarketQuoteCached(
   let onChain: Record<string, unknown> | undefined;
 
   if (mode === "full") {
-    if (coinId === "bitcoin") {
+    if (isBitcoinTrackedAsset(coinId)) {
       onChain = await fetchOnChainData(incoming);
     }
     try {

@@ -1,9 +1,10 @@
 import type {
-  BtcPriceData,
   FearGreedData,
+  MarketQuote,
   OnChainData,
 } from '@/features/market/domain/market-quote';
 import {
+  isBitcoinTrackedAsset,
   normalizeTrackedAssetId,
   type TrackedAssetId,
 } from '@/features/market/domain/tracked-assets';
@@ -78,11 +79,11 @@ async function fetchOnChainData(): Promise<OnChainData | undefined> {
 }
 
 interface CachedMarketData {
-  data: BtcPriceData;
+  data: MarketQuote;
   timestamp: number;
 }
 
-function cacheMarketData(coinId: string, data: BtcPriceData): void {
+function cacheMarketData(coinId: string, data: MarketQuote): void {
   try {
     localStorage.setItem(marketCacheKey(coinId), JSON.stringify({ data, timestamp: Date.now() }));
   } catch {
@@ -103,18 +104,18 @@ function getCachedMarketData(coinId: string): CachedMarketData | null {
 function readCachedMarketQuote(
   coinId: TrackedAssetId,
   currency: string,
-): BtcPriceData | null {
+): MarketQuote | null {
   const cached = getCachedMarketData(coinId);
   if (cached?.data?.currency?.toUpperCase() === currency.toUpperCase()) {
     console.warn('Using cached market data from', new Date(cached.timestamp).toISOString());
-    return { ...cached.data, _stale: true } as BtcPriceData;
+    return { ...cached.data, _stale: true } as MarketQuote;
   }
   return null;
 }
 
 function parse24hQuoteFromChart(
   prices1d: [number, number][],
-): Pick<BtcPriceData, 'currentPrice' | 'price24hAgo' | 'changePercent' | 'direction'> {
+): Pick<MarketQuote, 'currentPrice' | 'price24hAgo' | 'changePercent' | 'direction'> {
   if (!prices1d || prices1d.length < 2) throw new Error('Insufficient price data');
   const price24hAgo = prices1d[0][1];
   const currentPrice = prices1d[prices1d.length - 1][1];
@@ -127,9 +128,9 @@ function parse24hQuoteFromChart(
   };
 }
 
-const marketFetchInflight = new Map<string, Promise<BtcPriceData>>();
+const marketFetchInflight = new Map<string, Promise<MarketQuote>>();
 
-function dedupeMarketFetch(inflightKey: string, run: () => Promise<BtcPriceData>): Promise<BtcPriceData> {
+function dedupeMarketFetch(inflightKey: string, run: () => Promise<MarketQuote>): Promise<MarketQuote> {
   const existing = marketFetchInflight.get(inflightKey);
   if (existing) return existing;
   const p = run().finally(() => {
@@ -143,7 +144,7 @@ async function tryFetchMarketFromEdge(
   coinId: TrackedAssetId,
   currency: string,
   mode: 'lite' | 'full',
-): Promise<BtcPriceData | null> {
+): Promise<MarketQuote | null> {
   try {
     const { data, error } = await invokeMarketQuote({ coinId, currency, mode });
     if (error || !data) return null;
@@ -162,7 +163,7 @@ async function tryFetchMarketFromEdge(
 async function fetchMarketDataLiteUncached(
   coinId: TrackedAssetId,
   currency: string,
-): Promise<BtcPriceData> {
+): Promise<MarketQuote> {
   const fromEdge = await tryFetchMarketFromEdge(coinId, currency, 'lite');
   if (fromEdge) return fromEdge;
 
@@ -178,7 +179,7 @@ async function fetchMarketDataLiteUncached(
     const data1d = await res1d.json();
     const quote = parse24hQuoteFromChart(data1d.prices as [number, number][]);
 
-    const result: BtcPriceData = {
+    const result: MarketQuote = {
       coinId,
       ...quote,
       fearGreed,
@@ -194,7 +195,7 @@ async function fetchMarketDataLiteUncached(
   }
 }
 
-async function fetchMarketDataUncached(coinId: TrackedAssetId, currency: string): Promise<BtcPriceData> {
+async function fetchMarketDataUncached(coinId: TrackedAssetId, currency: string): Promise<MarketQuote> {
   const fromEdge = await tryFetchMarketFromEdge(coinId, currency, 'full');
   if (fromEdge) return fromEdge;
 
@@ -202,7 +203,7 @@ async function fetchMarketDataUncached(coinId: TrackedAssetId, currency: string)
   const id = encodeURIComponent(coinId);
 
   try {
-    const includeOnChain = coinId === 'bitcoin';
+    const includeOnChain = isBitcoinTrackedAsset(coinId);
     const [res1d, res7d, fearGreed, onChain] = await Promise.all([
       fetchWithRetry(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=1`),
       fetchWithRetry(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=7`),
@@ -228,7 +229,7 @@ async function fetchMarketDataUncached(coinId: TrackedAssetId, currency: string)
       // 7-day data is optional
     }
 
-    const result: BtcPriceData = {
+    const result: MarketQuote = {
       coinId,
       ...quote,
       cumulativeChangePercent,
@@ -250,7 +251,7 @@ async function fetchMarketDataUncached(coinId: TrackedAssetId, currency: string)
 export async function fetchMarketDataLite(
   coinIdRaw: string | null | undefined,
   currency: string = 'USD',
-): Promise<BtcPriceData> {
+): Promise<MarketQuote> {
   const coinId = normalizeTrackedAssetId(coinIdRaw);
   const inflightKey = `${coinId}|${currency.toUpperCase()}|lite`;
   return dedupeMarketFetch(inflightKey, () => fetchMarketDataLiteUncached(coinId, currency));
@@ -260,13 +261,13 @@ export async function fetchMarketDataLite(
 export async function fetchMarketData(
   coinIdRaw: string | null | undefined,
   currency: string = 'USD',
-): Promise<BtcPriceData> {
+): Promise<MarketQuote> {
   const coinId = normalizeTrackedAssetId(coinIdRaw);
   const inflightKey = `${coinId}|${currency.toUpperCase()}|full`;
   return dedupeMarketFetch(inflightKey, () => fetchMarketDataUncached(coinId, currency));
 }
 
 /** @deprecated Prefer fetchMarketData(trackedAssetId, currency) */
-export async function fetchBtcData(currency: string = 'USD'): Promise<BtcPriceData> {
+export async function fetchBtcData(currency: string = 'USD'): Promise<MarketQuote> {
   return fetchMarketData('bitcoin', currency);
 }
