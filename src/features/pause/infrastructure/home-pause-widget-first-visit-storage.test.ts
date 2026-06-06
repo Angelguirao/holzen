@@ -20,7 +20,7 @@ describe('homePauseWidgetFirstVisitStorage', () => {
     );
   });
 
-  it('allows first-visit expand once per user', () => {
+  it('allows idle onboarding auto-expand until consumed', () => {
     expect(shouldExpandHomePauseWidgetFirstVisit('user-1')).toBe(true);
     markHomePauseWidgetFirstVisitHandled('user-1');
     expect(shouldExpandHomePauseWidgetFirstVisit('user-1')).toBe(false);

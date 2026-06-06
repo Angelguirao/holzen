@@ -13,6 +13,7 @@ import {
   trackPauseOpenDismissed,
   type PauseDismissAnalyticsSurface,
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io';
+import { markHomePauseWidgetFirstVisitHandled } from '@/features/pause/infrastructure/home-pause-widget-first-visit-storage';
 import { holzenLog } from '@/lib/holzen-console';
 
 export type { PauseDismissAnalyticsSurface };
@@ -34,6 +35,7 @@ export function useHomePauseActions(args: {
   startCheckout: (target?: 'pro' | 'flex_pack_s' | 'flex_pack_m') => Promise<void>;
   /** PostHog `pause_open_dismissed.surface` — Zen reflection Done vs dashboard Your pause widget. */
   dismissAnalyticsSurface: PauseDismissAnalyticsSurface;
+  userId?: string;
 }) {
   const {
     message,
@@ -48,6 +50,7 @@ export function useHomePauseActions(args: {
     manualCooldownRemaining,
     startCheckout,
     dismissAnalyticsSurface,
+    userId,
   } = args;
 
   const handleNeedAPause = useCallback(async () => {
@@ -55,6 +58,10 @@ export function useHomePauseActions(args: {
     if (remaining > 0) {
       holzenLog.home('Need a moment: ignored (cooldown)', { remainingMs: remaining });
       return;
+    }
+
+    if (userId) {
+      markHomePauseWidgetFirstVisitHandled(userId);
     }
 
     holzenLog.home('Navigate to /pause immediately (Let\'s pause from idle)');
@@ -93,6 +100,7 @@ export function useHomePauseActions(args: {
     });
   }, [
     manualCooldownRemaining,
+    userId,
     manualTrigger,
     context,
     companions,

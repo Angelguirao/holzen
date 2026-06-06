@@ -167,8 +167,13 @@ export function useHomePauseWidgetProjection(
     if (manualCooldownRemainingMs > 0) return;
     if (!shouldExpandHomePauseWidgetFirstVisit(userId)) return;
     setUserExpanded(true);
-    markHomePauseWidgetFirstVisitHandled(userId);
   }, [userId, params.hasOpenPause, params.loading, manualCooldownRemainingMs]);
+
+  useEffect(() => {
+    if (!userId || !params.hasOpenPause) return;
+    if (!shouldExpandHomePauseWidgetFirstVisit(userId)) return;
+    markHomePauseWidgetFirstVisitHandled(userId);
+  }, [userId, params.hasOpenPause]);
 
   const { mode: widgetMode } = useMemo(
     () =>
