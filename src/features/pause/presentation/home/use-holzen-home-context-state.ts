@@ -3,9 +3,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getHolzenMarketDisplayQueryOptions,
   mapHolzenMarketDisplayError,
-  resolveHomeMarketDisplayQuote,
   severityFromMarketChangePercent,
 } from '@/features/market/public';
+import { resolveHomeMarketDisplayQuote } from '@/features/market/domain/home-market-display-quote';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
 import { millisecondsUntilNextVolatilityCheck } from '@/features/pause/public-scheduling';
@@ -96,16 +96,20 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
 
   const nextCronCheckIn = useCallback(() => millisecondsUntilNextVolatilityCheck(), []);
 
-  const marketData = useMemo(
-    () =>
-      resolveHomeMarketDisplayQuote({
-        marketData: marketQuery.data ?? null,
+  const marketData = useMemo(() => {
+    const live = marketQuery.data ?? null;
+    try {
+      return resolveHomeMarketDisplayQuote({
+        marketData: live,
         openPauseSource,
         openPauseState,
         openPauseContextSnapshot: contextSnapshot,
-      }),
-    [marketQuery.data, openPauseSource, openPauseState, contextSnapshot],
-  );
+      });
+    } catch (err) {
+      console.error('[useHolzenHomeContextState] market display projection failed', err);
+      return live;
+    }
+  }, [marketQuery.data, openPauseSource, openPauseState, contextSnapshot]);
 
   const severity = severityFromMarketChangePercent(marketData?.changePercent);
 
