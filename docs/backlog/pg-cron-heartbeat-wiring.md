@@ -33,7 +33,7 @@ BetterStack → **Uptime** product (not Logs) → **Heartbeats** → **Create he
 |---|---|---|---|---|
 | `holzen-cron-process-email-queue` | 1 min | 5 min | Smallest cadence; allow up to 5 missed slots before paging — single-slot misses are noise from pgmq lock contention. | `heartbeat.process_email_queue` |
 | `holzen-cron-process-referral-pending` | 5 min | 2 min | Floor grace; job is idempotent + retries internally, so one missed run is tolerable, two is not. | `heartbeat.process_referral_pending` |
-| `holzen-cron-refresh-btc-prices` | 15 min | 5 min | CoinGecko 429s + retry add up to ~3 min; 5 min absorbs that without false-positive while still catching a fully dead worker on the next slot. | `heartbeat.refresh_btc_prices` |
+| `holzen-cron-refresh-market-prices` | 15 min | 5 min | CoinGecko 429s + retry add up to ~3 min; 5 min absorbs that without false-positive while still catching a fully dead worker on the next slot. | `heartbeat.refresh_market_prices` |
 | `holzen-cron-check-volatility` | 15 min | 5 min | Same cadence as price refresh; grace matches so they alert in lockstep when pg_cron itself is down. | `heartbeat.check_volatility` |
 | `holzen-cron-night-reflection` | 1 hr | 10 min | Fans out per-user AI generation; p95 runtime ~3-5 min, grace covers slow batches without paging. | `heartbeat.night_reflection` |
 | `holzen-cron-pregenerate-companions` | 6 hr | 30 min | Long-running batch (Lovable AI); 30 min absolute grace, not proportional — anything later is a real stall. | `heartbeat.pregenerate_companions` |
@@ -52,7 +52,7 @@ Then: BetterStack Uptime → **Integrations → Slack** → same `#holzen-alerts
 Supabase dashboard → **SQL Editor** → new query → fill in the 7 UUIDs and run:
 
 ```sql
-UPDATE public.app_config SET value = to_jsonb('<uuid-refresh-btc-prices>'::text)       WHERE key = 'heartbeat.refresh_btc_prices';
+UPDATE public.app_config SET value = to_jsonb('<uuid-refresh-market-prices>'::text)   WHERE key = 'heartbeat.refresh_market_prices';
 UPDATE public.app_config SET value = to_jsonb('<uuid-fetch-source-feeds>'::text)       WHERE key = 'heartbeat.fetch_source_feeds';
 UPDATE public.app_config SET value = to_jsonb('<uuid-pregenerate-companions>'::text)   WHERE key = 'heartbeat.pregenerate_companions';
 UPDATE public.app_config SET value = to_jsonb('<uuid-check-volatility>'::text)         WHERE key = 'heartbeat.check_volatility';
@@ -80,23 +80,25 @@ Template (repeat per job):
 
 ```sql
 -- 1. Inspect the current command so you don't lose anything.
-SELECT jobname, schedule, command FROM cron.job WHERE jobname = 'refresh-btc-prices';
+SELECT jobname, schedule, command FROM cron.job WHERE jobname = 'refresh-market-prices';
 
 -- 2. Unschedule.
-SELECT cron.unschedule('refresh-btc-prices');
+SELECT cron.unschedule('refresh-market-prices');
 
 -- 3. Re-schedule with heartbeat appended. Paste the original command body verbatim
 --    into the $$ ... $$ block before the PERFORM line.
 SELECT cron.schedule(
-  'refresh-btc-prices',
+  'refresh-market-prices',
   '*/15 * * * *',
   $$
     -- <<< existing command body — usually a SELECT net.http_post(...) call >>>
 
-    PERFORM public.emit_job_heartbeat('refresh_btc_prices');
+    PERFORM public.emit_job_heartbeat('refresh_market_prices');
   $$
 );
 ```
+
+**Jun 2026 market naming:** migration [`20260607140000_market_price_cache_table.sql`](../../supabase/migrations/20260607140000_market_price_cache_table.sql) already unschedules `refresh-btc-prices`, schedules `refresh-market-prices`, copies `heartbeat.refresh_btc_prices` → `heartbeat.refresh_market_prices`, and appends `emit_job_heartbeat('refresh_market_prices')`. Fresh installs only need Part A (BetterStack monitor name) + verify Part B UUID is non-empty. Legacy job name `refresh-btc-prices` should no longer appear in `cron.job`.
 
 Do this for all 8 jobs. `emit_job_heartbeat` is a safe no-op while `app_config.heartbeat.<job>` is still empty, so the order of Part B vs Part C does not matter.
 

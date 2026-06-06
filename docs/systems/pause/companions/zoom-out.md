@@ -50,13 +50,13 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/zoom
 
 **Note:** Zoom Out does **not** have a library phase — there is no `content_library` type for deep-time content. The phase order is **cache → live → curated** (not the library → cache → live → curated pattern used by Signal, Grounding, and History).
 
-**Step 1: Price data** — Fetches BTC prices from **`btc_price_cache`** table (kept fresh by the `refresh-btc-prices` cron every ~15 minutes). Builds "on this day" comparisons for **1–10 calendar years** ago (UTC; see `_shared/btc-on-this-day-config.ts`). **No blocking CoinGecko calls at generation time** — the session reads cache only.
+**Step 1: Price data** — Fetches BTC prices from **`market_price_cache`** table (kept fresh by the `refresh-market-prices` cron every ~15 minutes). Builds "on this day" comparisons for **1–10 calendar years** ago (UTC; see `_shared/market-on-this-day-config.ts`). **No blocking CoinGecko calls at generation time** — the session reads cache only.
 
-**Background warm-on-read (2026-04-18):** If the cache read returns fewer than 10/10 historical rows, the generator fires a non-blocking `EdgeRuntime.waitUntil(warmMissingBtcPrices(…))` for the missing dates before returning. The current session still returns whatever it has (so the user isn't delayed), and the next session gets the full timeline. The helper lives in `_shared/btc-price-warm.ts` and is shared with `refresh-btc-prices`; it dedupes via a 15-minute freshness check, so multiple concurrent sessions with the same gap don't hammer CoinGecko. Observable via the `btc warm-on-read: attempted=… upserted=… …` orchestrate log line.
+**Background warm-on-read (2026-04-18):** If the cache read returns fewer than 10/10 historical rows, the generator fires a non-blocking `EdgeRuntime.waitUntil(warmMissingMarketPrices(…))` for the missing dates before returning. The current session still returns whatever it has (so the user isn't delayed), and the next session gets the full timeline. The helper lives in `_shared/market-price-warm.ts` and is shared with `refresh-market-prices`; it dedupes via a 15-minute freshness check, so multiple concurrent sessions with the same gap don't hammer CoinGecko. Observable via the `btc warm-on-read: attempted=… upserted=… …` orchestrate log line.
 
-**Gotcha (fixed 2026-04-18):** `refresh-btc-prices` previously fetched all 10 anniversary dates in a single `/market_chart/range` request. On CoinGecko's demo / free tier that endpoint silently returns an empty `prices[]` for anything older than ~365 days, so the cron logged `historical: 0 matched` and left `btc_price_cache` with only the current-day row — zoom-out logs showed `historical=0/10`. The fix is to use `/coins/bitcoin/history?date=DD-MM-YYYY` (one call per missing anniversary) which works on free tier for any year. The shared `warmMissingBtcPrices` helper now parallelises these with bounded concurrency (**5 concurrent**, **1.2s between batches**) — 10 anniversaries finish in ~2-3s instead of the previous ~10s sequential loop, while staying well under the demo tier's ~30 req/min quota. `backfill-btc-prices` still has a `"mode": "per_date"` branch using the same endpoint for sparse gap-filling (ops-triggered, not self-healing).
+**Gotcha (fixed 2026-04-18):** `refresh-market-prices` previously fetched all 10 anniversary dates in a single `/market_chart/range` request. On CoinGecko's demo / free tier that endpoint silently returns an empty `prices[]` for anything older than ~365 days, so the cron logged `historical: 0 matched` and left `market_price_cache` with only the current-day row — zoom-out logs showed `historical=0/10`. The fix is to use `/coins/bitcoin/history?date=DD-MM-YYYY` (one call per missing anniversary) which works on free tier for any year. The shared `warmMissingMarketPrices` helper now parallelises these with bounded concurrency (**5 concurrent**, **1.2s between batches**) — 10 anniversaries finish in ~2-3s instead of the previous ~10s sequential loop, while staying well under the demo tier's ~30 req/min quota. `backfill-market-prices` still has a `"mode": "per_date"` branch using the same endpoint for sparse gap-filling (ops-triggered, not self-healing).
 
-**Gotcha (2026-04-19):** Since mid-2026 CoinGecko's demo tier also returns 401 for `/coins/bitcoin/history` on dates >365 days back — not just `/market_chart/range` — so the 2y–10y anniversaries **cannot be resolved via CoinGecko on the free plan** regardless of endpoint. Two follow-on changes pinned the behaviour: (a) **`refresh-btc-prices` now skips historical rows that already exist in `btc_price_cache`** (closing prices for past dates are immutable), so the cron stops burning quota re-fetching rows it can't change anyway and logs stay clean; (b) a new ops function **`seed-btc-history`** populates the table once from **CryptoCompare**'s free `histoday` endpoint (no auth, no year cap). Run `seed-btc-history` once after deployment / DB restore to fill 2014→today; after that the cron only needs to fill the 1y anniversary as it rolls forward each day. See [docs/ops/cron-setup.md](../../../ops/cron-setup.md#bulk-historical-seed-seed-btc-history).
+**Gotcha (2026-04-19):** Since mid-2026 CoinGecko's demo tier also returns 401 for `/coins/bitcoin/history` on dates >365 days back — not just `/market_chart/range` — so the 2y–10y anniversaries **cannot be resolved via CoinGecko on the free plan** regardless of endpoint. Two follow-on changes pinned the behaviour: (a) **`refresh-market-prices` now skips historical rows that already exist in `market_price_cache`** (closing prices for past dates are immutable), so the cron stops burning quota re-fetching rows it can't change anyway and logs stay clean; (b) a new ops function **`seed-market-history`** populates the table once from **CryptoCompare**'s free `histoday` endpoint (no auth, no year cap). Run `seed-market-history` once after deployment / DB restore to fill 2014→today; after that the cron only needs to fill the 1y anniversary as it rolls forward each day. See [docs/ops/cron-setup.md](../../../ops/cron-setup.md#bulk-historical-seed-seed-market-history).
 
 **Step 2: Echo pause (strict user-words-only — 2026-04-18)** — Fetches a past pause from the same user ≥3 days old **that has at least one user-authored entry** (latest note text from `pause_step_events` where `step_type='note_updated'`). Never surfaces the AI prompt as the headline. Selection is biased by current market direction (`is up` / `is down` in `context`) with full-pool fallback when no direction-matching row exists. Shared read model with Daily Practice Replay — see [past-reflections.md](../past-reflections.md). When the user has zero past pauses with words yet, `echo` is `null` and `ZoomOutDisplay` renders a truthful empty state ("You haven't left notes on past pauses yet…"). The AI prompt that started the echoed pause is still available to the UI as `echo.aiPrompt` — shown as context ("Holzen asked…") in Replay's thread view, never as the main quote.
 
@@ -125,7 +125,7 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 | **`pause_ai_artifacts`** | Full composite JSON as kind `zoom_out_deep_time` | Canonical normalized store. |
 | **`companion_serves`** | Source, latency, fingerprint | Analytics and monitoring. |
 | **`companion_cache`** | Cached deep-time payload (prices are always fresh, not cached) | Pool for future serves. |
-| **`btc_price_cache`** | Historical BTC prices | Fed by `refresh-btc-prices` cron; read at generation time. |
+| **`market_price_cache`** | Historical BTC prices | Fed by `refresh-market-prices` cron; read at generation time. |
 
 ---
 
@@ -133,7 +133,7 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 
 | Dependency | Why | What breaks without it |
 |------------|-----|------------------------|
-| **`refresh-btc-prices` cron** | Keeps `btc_price_cache` fresh | "On this day" prices are stale or missing; `currentPrice` may be null |
+| **`refresh-market-prices` cron** | Keeps `market_price_cache` fresh | "On this day" prices are stale or missing; `currentPrice` may be null |
 | **`llm-gateway` (Gemini)** | Deep-time narrative generation | Falls through to curated fallback (prices + echo still work) |
 
 ---
@@ -149,10 +149,10 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 | Session intent | `supabase/functions/_shared/session-intent.ts` |
 | Quality gate | `supabase/functions/_shared/quality.ts` |
 | Phase config | `supabase/functions/_shared/phase-config.ts` |
-| “On this day” depth | `supabase/functions/_shared/btc-on-this-day-config.ts` — years back (default **10**) |
-| BTC price cron | `supabase/functions/refresh-btc-prices/index.ts` |
-| BTC cache fill helper | `supabase/functions/_shared/btc-price-warm.ts` — shared by cron + zoom-out warm-on-read (bounded parallelism, 15-min dedupe) |
-| BTC cache backfill (ops) | `supabase/functions/backfill-btc-prices/index.ts` — manual range fill; chain **`resumeFrom`** or `scripts/backfill-btc-chain.mjs` for multi-year gaps |
+| “On this day” depth | `supabase/functions/_shared/market-on-this-day-config.ts` — years back (default **10**) |
+| BTC price cron | `supabase/functions/refresh-market-prices/index.ts` |
+| BTC cache fill helper | `supabase/functions/_shared/market-price-warm.ts` — shared by cron + zoom-out warm-on-read (bounded parallelism, 15-min dedupe) |
+| BTC cache backfill (ops) | `supabase/functions/backfill-market-prices/index.ts` — manual range fill; chain **`resumeFrom`** or `scripts/backfill-market-chain.mjs` for multi-year gaps |
 | Client invoke | `src/features/pause/presentation/use-companion-data.ts` (export: `public-hooks`) |
 | Full-screen view | `src/screens/pause/CompanionZoomOutPage.tsx` — route `/companion/zoom-out/:pauseInstanceId` |
 | UI | `src/screens/pause/components/CompanionSection.tsx` (`ZoomOutDisplay`) |
@@ -164,6 +164,6 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 - [AI-powered pause system](../ai-powered-pause-system.md) — full pause architecture (§7.9 Zoom Out reference, §7.5 secondary zoom-out)
 - [past-reflections.md](../past-reflections.md) — shared "user words" read model behind Zoom Out's Echo and Daily Practice Replay
 - [intervention.md](intervention.md) — Intervention types (zoom-out as secondary)
-- [cron-setup.md](../../../ops/cron-setup.md) — `refresh-btc-prices` schedule; manual **`backfill-btc-prices`** for gaps
+- [cron-setup.md](../../../ops/cron-setup.md) — `refresh-market-prices` schedule; manual **`backfill-market-prices`** for gaps
 - [navigating-the-codebase.md](../../../fundamentals/navigating-the-codebase.md) — edge functions and hooks map
 - [pricing-strategy.md](../../costs/pricing-strategy.md#311-why-zoom-out-is-excluded-from-credit-metering-v1) — why `zoom-out` is intentionally not metered in v1
