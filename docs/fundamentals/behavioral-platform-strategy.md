@@ -6,8 +6,11 @@
 
 This document synthesizes external product/architecture guidance into **Holzen-specific** decisions. It does **not** replace runtime contracts in [systems/pause-system.md](../systems/pause-system.md), shipped scope in [ops/active-surface.md](../ops/active-surface.md), or application structure in [holzen-application-architecture.md](holzen-application-architecture.md).
 
+**Parent doc:** generic moat framing and investment priorities in the cheap-AI-code era → [strategy-and-defensibility.md](strategy-and-defensibility.md).
+
 | Doc | Owns |
 |-----|------|
+| [strategy-and-defensibility.md](strategy-and-defensibility.md) | Why code is not the moat; defensibility tiers; roadmap decision filters |
 | **This file** | Product thesis, surface strategy (web → extension → mobile), behavioral-engine layers, metrics philosophy, phased roadmap |
 | [pause-system.md](../systems/pause-system.md) | Pause V2 data model, RPCs, invariants |
 | [pause/ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) | AI + edge pipelines for pause and companions |

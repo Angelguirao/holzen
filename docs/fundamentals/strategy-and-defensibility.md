@@ -1,0 +1,201 @@
+# Strategy and defensibility
+
+**Status:** accepted direction (June 2026)  
+**Audience:** founders, product, engineering, and anyone prioritizing roadmap work  
+**Scope:** Generic strategic frame for Holzen in an era where **implementation is cheap** and **copying is fast**. How to think about moats, what to invest in, and what to stop treating as differentiation.
+
+This document is the **parent strategy layer**. Surface-specific execution (extension wedge, behavioral engine layers, phased roadmap) lives in [behavioral-platform-strategy.md](behavioral-platform-strategy.md). Runtime contracts and shipped scope stay in [systems/](../systems/) and [ops/active-surface.md](../ops/active-surface.md).
+
+| Doc | Owns |
+|-----|------|
+| **This file** | Why code is not the moat; defensibility tiers; investment priorities; decision filters |
+| [behavioral-platform-strategy.md](behavioral-platform-strategy.md) | Behavioral engine thesis, web → extension → mobile, wedge, north-star metrics |
+| [active-surface.md](../ops/active-surface.md) | What ships today |
+| [pricing-strategy.md](../systems/costs/pricing-strategy.md) | Packaging and sustainability |
+| [pause-system.md](../systems/pause-system.md) | Authoritative pause data model |
+
+---
+
+## 1. The new baseline
+
+**Code is no longer scarce.** A competent team — or a single builder with agents — can reproduce:
+
+- A React + Supabase + Stripe subscription app
+- Breathing exercises, dark UI, push notifications
+- “AI reflection when the market moves” with commodity models
+- Generic wellness copy and habit streaks
+
+**Copying the repo is not the threat.** The threat is **copying the category** faster than you compound anything users cannot rebuild in a weekend.
+
+Holzen’s strategy therefore assumes:
+
+1. **Features are inventory, not moats** — ship them to learn and retain, not to “own” a screen.
+2. **Defensibility is earned over time** — mostly from trust, data, context, and operational learning — not from the first MVP.
+3. **Speed of learning beats speed of shipping** — more surfaces and AI wrappers without measurement just increase surface area for clones.
+
+---
+
+## 2. What “defensibility” means here
+
+Defensibility is **why a user stays**, **why they trust you at the worst moment**, and **why a clone feels worse even when it looks the same**.
+
+It is **not**:
+
+- Having more tabs, badges, or integrations than competitors
+- Using a particular framework or cloud vendor
+- “We use AI” as a headline
+- Patents on obvious UX (usually weak in consumer software)
+
+It **is** (when it works):
+
+| Kind | Plain language | Compounds how? |
+|------|----------------|----------------|
+| **Contextual timing** | You show up when volatility actually hits *this* user, with sane gates | Cron + thresholds + quiet hours + delivery tuned over cycles |
+| **Trust stance** | You do not tell them to buy, sell, or hold; you help them notice impulse | Brand and product rules competitors with affiliate or trading incentives cannot copy cleanly |
+| **Personal history** | Their archive of pauses, moods, and choices through drawdowns | Switching cost grows with each completed ritual |
+| **Curated corpus** | Bitcoin-grounded reappraisal with citations and quality bars | Editorial + cache + dedup + `companion_catalog` / `signal_sources` — not raw LLM output |
+| **Behavioral measurement** | You know whether interventions actually calm checking or improve outcomes | PostHog + Postgres step events + extension telemetry (future) — clones guess; you iterate |
+| **Community & distribution** | Trusted voices send holders to you when charts go red | GTM moat; not in git, but real |
+| **Operational excellence** | Fewer bad pauses, fewer duplicate signals, faster incident response | Observability, cost ceilings, quality gates — invisible to users until competitors feel “janky” |
+
+None of these appear fully on day one. **Pause-first shipped scope** ([ADR](../decisions/2026-05-16-pause-first-shipped-scope.md)) was correct: prove one loop before re-expanding IA that copycats can also generate.
+
+---
+
+## 3. Defensibility tiers (honest ranking)
+
+Use this when debating roadmap items.
+
+### Tier A — Invest deliberately (hard to copy well)
+
+1. **Moment of intervention** — automatic pause offers, pending-offer logic, calm-market expiry, notification timing ([pause-system.md](../systems/pause-system.md), `check-volatility`).
+2. **Neutrality contract** — product stance in [active-surface.md](../ops/active-surface.md): reward completed rituals; do not judge strategy.
+3. **Append-only behavioral record** — `pause_step_events`, Archive, Journey streak as a volatility diary.
+4. **Corpus + quality pipeline** — companion phases, quality gates, dedup, trusted sources ([signal.md](../systems/pause/companions/signal.md), [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md)).
+5. **Cross-surface behavioral engine** (future) — shared rules in one package, multiple delivery surfaces ([behavioral-platform-strategy.md §2–4](behavioral-platform-strategy.md)).
+
+### Tier B — Useful, but cloneable (optimize for learning, not pride)
+
+- Ritual UI and Nox design — important for trust and conversion; **not** a long-term moat alone.
+- Individual companion generators — commodity models + prompts; moat is **corpus + selection + dedup**, not the generator file.
+- Subscription packaging — necessary; easily undercut ([pricing-strategy.md](../systems/costs/pricing-strategy.md)).
+
+### Tier C — Avoid as “strategy” (legacy or distraction)
+
+- Feature breadth (Tools hub, badges, full stats IA) — preserved in git for recovery, **not** shipped as differentiation ([active-surface.md](../ops/active-surface.md)).
+- “More AI” without outcome metrics — burns COGS; clones will match model quality.
+- Platform rewrite (NestJS, Redis, mobile-first) before one intervention proves value — see [behavioral-platform-strategy.md §10](behavioral-platform-strategy.md).
+
+---
+
+## 4. Working toward defensibility (operating principles)
+
+These are **how we work**, not slogans.
+
+### 4.1 Own the moment, not the feature list
+
+Every major initiative should answer: **Does this improve the right interrupt at the right time?**  
+If it only adds screens, defer it.
+
+### 4.2 Make switching costly in the right way
+
+Users should stay because **their history and trust deepen**, not because of dark patterns.  
+Archive, Journey, and future extension-linked sessions should reinforce: “Holzen remembers my cycles.”
+
+### 4.3 Treat copy as inevitable; compound what copy misses
+
+Assume a clone ships “BTC pause + breathing + GPT” in weeks. They will still lack:
+
+- Your tuned thresholds and expiry semantics
+- Months of `companion_cache` and catalog curation
+- Your users’ pause timelines
+- Your reputation among Bitcoin holders who hate preachy wellness
+
+**Invest in the lagging items**, not in hiding code.
+
+### 4.4 Measure behavioral outcomes, not engagement
+
+Align with [behavioral-platform-strategy.md §6](behavioral-platform-strategy.md): checking frequency, intervention completion, retention in vol weeks — **not** raw DAU tricks.  
+Engagement-maximizing metrics invite clones and misaligned product.
+
+### 4.5 Server-side authority for anything that matters
+
+Clones can copy React; they cannot copy **your Postgres invariants** without rebuilding migrations, RLS, and RPC semantics.  
+Keep lifecycle truth in [pause-system.md](../systems/pause-system.md) — not only in the client.
+
+### 4.6 Editorial taste is engineering work
+
+Curating `signal_sources`, `companion_catalog`, prompt versions, and quality gates is **product R&D**. Schedule it like features.  
+Cheap AI makes **average** content infinite; it makes **trusted, cited, Bitcoin-native** content more valuable.
+
+### 4.7 Distribution is part of defensibility
+
+Referral plumbing exists; **trust in a community** is not automatic. Strategy without GTM is a science project.  
+Prefer depth in Bitcoin-holder channels over generic wellness SEO.
+
+---
+
+## 5. Decision filters (use in roadmap / PR review)
+
+Before shipping or expanding scope, score the change (gut check is fine):
+
+| Question | If “no” → |
+|----------|-----------|
+| Does this strengthen **Tier A** (timing, trust, history, corpus, measurement)? | Likely backlog or polish only |
+| Will we **measure** whether it helped within one volatility cycle? | Do not ship silently |
+| Could a clone replicate it in **< 4 weeks** without our data? | OK for hygiene; **not** a strategy win |
+| Does it increase **COGS** without a metering or quality story? | Read [ai-cost-model.md](../systems/costs/ai-cost-model.md) first |
+| Does it contradict **neutrality** (trade advice, alignment scoring as judgment)? | Reject or redesign |
+
+**Pause-first rule of thumb:** one vertical slice that improves the pause loop beats three new routes.
+
+---
+
+## 6. Cheap AI code era — what changes for us
+
+| Old assumption | New assumption |
+|----------------|----------------|
+| More features → more moat | More **proven behavior change** → more moat |
+| AI is the product | AI is **infrastructure**; timing, copy, corpus, and trust are the product |
+| Hide the secret sauce in code | Sauce is **data, ops, and brand**; code is open to imitation |
+| Win on mobile reach first | Win on **observable intervention** first (SPA today; extension per platform strategy) |
+| Build full platform early | Build **one wedge**; platform narrative is Phase 4 *if* metrics support it |
+
+**Implication for engineering:** fitness functions, observability, and migration discipline ([architectural-fitness-functions.md](architectural-fitness-functions.md)) are defensibility enablers — they let a small team **out-learn** clones, not out-code them.
+
+---
+
+## 7. Current state (honest)
+
+As of pause-first shipped scope:
+
+| Asset | Maturity |
+|-------|----------|
+| Ritual + automatic triggers | **Shipped** — core loop exists |
+| Trust stance | **Shipped** — documented in active-surface |
+| Personal history | **Early** — Archive + Journey; grows with retention |
+| Curated corpus | **Building** — pipeline strong; corpus depth is ongoing |
+| Behavioral measurement | **Partial** — Postgres step trail strong; PostHog sparse by design; extension telemetry **not started** |
+| Cross-surface engine | **Planned** — [behavioral-platform-strategy.md](behavioral-platform-strategy.md) |
+| Brand / distribution | **Pre-scale** — product-led; community moat not yet proven |
+
+**We are defensible in design and architecture, not yet in market proof.** That is expected pre–full cycle.
+
+---
+
+## 8. Related reading
+
+- [behavioral-platform-strategy.md](behavioral-platform-strategy.md) — **execution**: extension wedge, engine layers, phased evolution
+- [decisions/2026-05-16-pause-first-shipped-scope.md](../decisions/2026-05-16-pause-first-shipped-scope.md) — focus decision
+- [stats-system.md](../systems/stats-system.md) — skills-first behavioral taxonomy (legacy full shell; north star for measurement language)
+- [public/llms.txt](../../public/llms.txt) — external one-line positioning
+
+When strategy shifts materially, update **this file** and adjust [behavioral-platform-strategy.md](behavioral-platform-strategy.md) only if surface or wedge choices change — keep one narrative, two layers.
+
+---
+
+## 9. Review cadence
+
+- **Quarterly** (or after a major volatility week): re-read §3 tiers and §7 maturity; adjust roadmap emphasis.
+- **When adding a new primary surface** (extension, mobile): add an ADR under [decisions/](../decisions/) and link back here.
+- **When claiming a moat in marketing**: verify it maps to Tier A and is true today, not aspirational.
