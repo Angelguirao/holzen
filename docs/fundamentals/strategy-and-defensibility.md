@@ -86,6 +86,29 @@ Use this when debating roadmap items.
 - “More AI” without outcome metrics — burns COGS; clones will match model quality.
 - Platform rewrite (NestJS, Redis, mobile-first) before one intervention proves value — see [behavioral-platform-strategy.md §10](behavioral-platform-strategy.md).
 
+### 3.1 Tier A → how we measure it
+
+Use this in roadmap reviews, PostHog funnels, and SQL dashboards. **Postgres is canonical for step-level truth**; PostHog is for **journey and retention** ([event-taxonomy.md](../ops/event-taxonomy.md), [pause-system.md §4.1](../systems/pause-system.md)).
+
+| Tier A asset | What “good” looks like | Primary signals (today) | Where to query |
+|--------------|------------------------|-------------------------|----------------|
+| **1. Moment of intervention** | Cron offers fire when context warrants; users adopt (not ignore) pending offers; calm-market expiry avoids stale nudges | `pause_instance_created` with `source: cron_volatility`; `pause_pending_adopted` / `pause_pending_declined`; funnel cron-created → `pause_engaged` → `pause_completed` | **PostHog:** events above. **Postgres:** `pause_instances` (`source`, `state`, `expired_reason`, `context_snapshot`); `profiles.last_trigger_at`, threshold fields. **Ops:** `check-volatility` edge logs + pg_cron heartbeats ([cron-setup.md](../ops/cron-setup.md)) |
+| **2. Neutrality contract** | Product never nudges buy/sell/hold; Decide records choice without retrospective judgment on Archive | No shipped “alignment score” or trade advice surfaces ([active-surface.md](../ops/active-surface.md)); `pause_outcome_retrospective` **removed** (May 2026) | **Qualitative:** feedback / support themes. **Postgres:** `outcome_logged` payloads exist for completed rituals — use for *user’s* history, not leaderboard scoring. **Guard:** PR review + §5 decision filters |
+| **3. Personal history** | Users accumulate completed pauses; Archive/Journey reflect cycles; switching would feel costly | Rising `completed_pause_count` and `streak_days` on `journey.overview_viewed`; `pause_completed` per user over time; Archive revisit (`navigation.primary_tab_opened` → `archive`) | **PostHog:** `journey.overview_viewed`, `pause_completed`, `navigation.*`. **Postgres:** `pause_instances` where `state = completed`; `pause_step_events`; `v_pause_archive_*` |
+| **4. Corpus + quality** | Companions feel grounded, cited, non-repetitive; cache/catalog carry load; live path is fallback not default | `companion.served` by `source` (`catalog`, `cache`, `live`, `curated`); low `quality_gate_reject` rate per slot in edge logs; `companion_serves` / `generation_attempts` mix | **PostHog:** `companion.served`, `generation.initiated`. **Postgres:** `companion_serves`, `companion_cache`, `generation_attempts`. **Ops:** BetterStack `companion_slot_resolved`, `cache_strict_miss` ([pause-signal-companion-logging-e2e.md](../ops/pause-signal-companion-logging-e2e.md)) |
+| **5. Cross-surface engine** (future) | Same rules on SPA + extension; one schema; comparable outcomes per surface | *Not instrumented yet* — reserve `surface: extension` in taxonomy when Plasmo ships ([behavioral-platform-strategy.md §4.2](behavioral-platform-strategy.md)) | **Future PostHog:** extension intervention + checking-rate events. **Future Postgres:** link extension session id → `pause_instance_id` when user deep-links to `/pause` |
+
+**North-star composites** (from [behavioral-platform-strategy.md §6](behavioral-platform-strategy.md)) — define cohorts explicitly:
+
+| Composite | Definition sketch | Status |
+|-----------|-------------------|--------|
+| **Vol-week retention** | Users active (any `pause_*` or `auth.signed_in`) in calendar weeks where BTC daily move exceeds user threshold | PostHog cohort + market data join (manual or warehouse) |
+| **Intervention completion rate** | `pause_completed` / (`pause_instance_created` where user opened ritual) for cron + manual | PostHog funnel; cross-check SQL on `pause_instances` |
+| **Engaged → completed** | `pause_completed` / `pause_engaged` (deep path; brief excluded from engaged — use Postgres `is_brief_ritual` for mix) | PostHog + `v_pause_full` for brief/deep splits ([event-taxonomy.md](../ops/event-taxonomy.md) brief note) |
+| **Checking frequency** (extension) | Pre/post intervention refresh count on allowlisted domains | **Not started** — Tier A proof for Phase 1 extension |
+
+When adding metrics for a new Tier A initiative, update **this table** and [event-taxonomy.md](../ops/event-taxonomy.md) in the same PR.
+
 ---
 
 ## 4. Working toward defensibility (operating principles)
@@ -196,6 +219,6 @@ When strategy shifts materially, update **this file** and adjust [behavioral-pla
 
 ## 9. Review cadence
 
-- **Quarterly** (or after a major volatility week): re-read §3 tiers and §7 maturity; adjust roadmap emphasis.
+- **Quarterly** (or after a major volatility week): re-read §3 tiers, **§3.1 metrics**, and §7 maturity; adjust roadmap emphasis.
 - **When adding a new primary surface** (extension, mobile): add an ADR under [decisions/](../decisions/) and link back here.
 - **When claiming a moat in marketing**: verify it maps to Tier A and is true today, not aspirational.
