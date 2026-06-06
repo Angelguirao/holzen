@@ -59,7 +59,7 @@ export const HomeDashboardLayout = memo(function HomeDashboardLayout({
 
   return (
     <div {...pullHandlers} className="space-y-6">
-      <HomeGreetingRow firstName={firstName} onOpenCustomize={onOpenCustomize} />
+      <HomeGreetingRow userId={userId} firstName={firstName} onOpenCustomize={onOpenCustomize} />
 
       <InstallHolzenCard />
 
