@@ -525,10 +525,10 @@
       "generationalDesc": "Beyond your lifetime",
       "discipline": "Learning discipline",
       "disciplineDesc": "Mastering patience",
-      "conviction": "Philosophical conviction",
-      "convictionDesc": "Belief in what's worth holding",
-      "sovereignty": "Self-sovereignty",
-      "sovereigntyDesc": "Financial autonomy on your terms",
+      "conviction": "Long-term conviction",
+      "convictionDesc": "Belief in what you're building toward",
+      "sovereignty": "Financial autonomy",
+      "sovereigntyDesc": "Independence on your terms",
       "inflation": "Inflation hedge",
       "inflationDesc": "Protecting what you earn",
       "curiosity": "Curiosity",
@@ -833,9 +833,9 @@
     "pausedToday": "paused today",
     "pausedTodayDetail": "{{count}} person paused today",
     "pausedTodayDetail_other": "{{count}} people paused today",
-    "heldSteadyToday": "held steady today",
-    "reflectionsRecorded": "of users held steady today · {{count}} pause recorded",
-    "reflectionsRecorded_other": "of users held steady today · {{count}} pauses recorded"
+    "heldSteadyToday": "chose deliberately today",
+    "reflectionsRecorded": "of users chose deliberately today · {{count}} pause recorded",
+    "reflectionsRecorded_other": "of users chose deliberately today · {{count}} pauses recorded"
   },
   "ritual": {
     "selectTemplate": "Choose your ritual",
@@ -854,13 +854,13 @@
       "reflect": "Reflect",
       "reflectDesc": "Sit with a reflection message and notice what arises",
       "review": "Self-review",
-      "reviewDesc": "Look at your personal stats — hold rate, mood patterns",
+      "reviewDesc": "Look at your personal stats — steadiness rate, mood patterns",
       "journal": "Journal",
       "journalDesc": "Free-form writing to process thoughts before deciding",
       "physical": "Physical action",
       "physicalDesc": "Movement or physical activity to release tension",
       "decide": "Decide",
-      "decideDesc": "Make your final choice: hold, buy, sell, or do nothing"
+      "decideDesc": "Record what you chose — for your awareness only, not our recommendation"
     },
     "categories": {
       "mindfulness": "Mindfulness",
@@ -899,7 +899,7 @@
     "review": {
       "last30Days": "Your last 30 days",
       "reflections": "Pauses",
-      "holdRate": "Hold rate",
+      "holdRate": "Steadiness rate",
       "dominantMood": "Dominant mood",
       "lastMarket": "Last market",
       "acknowledged": "I see my patterns"
@@ -1080,7 +1080,7 @@
       "zoomOut": "Zoom Out",
       "zoomOutDesc": "Deep-time perspective and your own words from past pauses",
       "history": "Look Back",
-      "historyDesc": "BTC on this day, historical parallels, and cross-asset analogies"
+      "historyDesc": "Bitcoin on this day, historical parallels, and cross-asset perspective"
     },
     "whatYouGet": "What's included",
     "features": {
@@ -1122,23 +1122,25 @@
     "questions": "Common questions",
     "faq": {
       "whoQuestion": "Who is Holzen for?",
-      "whoAnswer": "Anyone who holds Bitcoin and has ever felt the urge to sell during a crash or buy during a surge. Holzen is for holders who want to understand their emotional patterns — not traders looking for signals.",
+      "whoAnswer": "Anyone who invests and has felt the pull to act when markets move — whether that's selling during a drop, buying during a surge, or endlessly checking the chart. Holzen is for people who want to understand their emotional patterns and choose deliberately. It is not a signals or trading tool.",
+      "adviceQuestion": "Does Holzen tell me to buy, sell, or hold?",
+      "adviceAnswer": "No. Holzen doesn't know your goals, timeline, or portfolio. It interrupts impulse and helps you notice what you're feeling so you decide — consciously. Outcomes you log during a pause are for your own awareness, not our recommendation.",
       "breatheQuestion": "I don't need an app to tell me to breathe.",
       "breatheAnswer": "You're right — you don't. But Holzen doesn't just remind you to breathe. It intercepts you at the exact moment volatility hits, sequences you through a science-backed protocol (feel → regulate → reappraise → frame → regulate again → decide), and tracks your patterns over time. Willpower alone doesn't build a practice. Timing and structure do.",
       "meditationQuestion": "Isn't this just another meditation app?",
       "meditationAnswer": "Meditation apps are general-purpose. Holzen is triggered by real market events — it meets you in the moment you're most likely to act on impulse. It combines breathing, AI reflections, behavioral science, curated intelligence, and long-term pattern tracking into one practice. Calm doesn't know when Bitcoin just dropped 8%.",
       "valueQuestion": "${{price}}/month for something I might rarely use?",
-      "valueAnswer": "The moments you use Holzen are the moments that matter most — when a single impulsive decision can cost thousands. One avoided panic sell or FOMO buy pays for years of the subscription.\n\nHow often you pause is not \"once in a blue moon\" by design: when markets are choppy or your thresholds are sensitive, alerts can add up to many times a month. In settings, Holzen estimates how often you would have paused on recent price action so you can tune how often you want to be interrupted instead of guessing. You can also request a pause anytime from Home without waiting for an alert, with a short cooldown so the habit stays intentional.\n\nYour {{trialDays}}-day trial includes full Pro access. After it ends, reactivate from Settings to keep engaging with new pauses.",
+      "valueAnswer": "The moments you use Holzen are the moments that matter most — when a single impulsive decision can cost you clarity, sleep, or capital. One pause taken at the right time is worth far more than the subscription.\n\nHow often you pause is not \"once in a blue moon\" by design: when markets are choppy or your thresholds are sensitive, alerts can add up to many times a month. In settings, Holzen estimates how often you would have paused on recent price action so you can tune how often you want to be interrupted instead of guessing. You can also request a pause anytime from Home without waiting for an alert, with a short cooldown so the habit stays intentional.\n\nYour {{trialDays}}-day trial includes full Pro access. After it ends, reactivate from Settings to keep engaging with new pauses.",
       "fairUseQuestion": "What does \"unlimited\" actually mean?",
       "fairUseAnswer": "Pro includes unlimited pauses and AI companions for personal use — there's no per-month cap you can hit. To keep the service healthy for everyone, we apply light technical limits (a short cooldown between pauses and a per-hour ceiling) that real users never notice in practice. These only come into play for clearly abusive patterns like scripted traffic or repeated automated runs.",
       "worksQuestion": "Does this actually change behavior?",
       "worksAnswer": "Each step follows peer-reviewed research: affect labeling (Lieberman), vagal breathing (Porges), cognitive reappraisal (Gross), metacognition (Flavell), a second regulation pass, and deliberate decision-making (Kahneman). Over time, your stats reveal patterns you can't see in the moment — and that awareness itself shifts behavior.",
-      "rationalQuestion": "I'm a long-term holder — I don't panic.",
-      "rationalAnswer": "That's what most holders believe until a -20% day. Research shows even experienced investors overestimate their emotional resilience. Holzen isn't just for panic — it catches subtle patterns like over-checking, quiet anxiety, or euphoric overconfidence that erode conviction without you noticing.",
+      "rationalQuestion": "I'm a steady investor — I don't panic.",
+      "rationalAnswer": "That's what most investors believe until a sharp move. Research shows even experienced people overestimate their emotional resilience. Holzen isn't just for panic — it catches subtle patterns like over-checking, quiet anxiety, or euphoric overconfidence that erode deliberate choice without you noticing.",
       "dataQuestion": "What happens to my emotional data?",
       "dataAnswer": "We store only what's needed: your email, thresholds, pauses, and mood entries. You can export everything as JSON or CSV anytime, or delete your account entirely with one tap. See our"
     },
-    "footer": "Holzen is not a trading tool. It won't tell you what to do. It exists to help you understand yourself — one volatile moment at a time.",
+    "footer": "Holzen is not a trading tool or financial advisor. We don't tell you what to buy, sell, or hold. We help you understand yourself — one volatile moment at a time.",
     "contact": "Contact",
     "about": "About",
     "btcReserve": "BTC Reserve",
@@ -1175,21 +1177,21 @@
     "pauseResearchDecide": "Decide",
     "pauseResearchDecideDesc": "With regulation and reappraisal behind you, Kahneman's System 2 (2011) is online. You can act from intention rather than impulse.",
     "readFullScience": "See the full research on our landing page →",
-    "whyBitcoin": "Why Bitcoin",
-    "bitcoinBody1": "Holding Bitcoin is especially hard — and we think that's exactly why it's worth doing.",
-    "bitcoinBody2": "Bitcoin behaves like a volatile tech stock in the short term, but we believe it is something fundamentally different: the best savings technology ever invented. A decentralised, scarce, programmable monetary network with no counterparty risk.",
-    "bitcoinBody3": "We believe Bitcoin represents the most asymmetric bet in the history of financial markets. But capturing that asymmetry requires one thing above all else: the ability to hold through volatility.",
-    "bitcoinBody4": "Holzen exists to help people hold — with awareness. We don't tell you what to do. We help you pause long enough to notice your impulse, name it, and choose deliberately.",
+    "whyBitcoin": "Why we start with Bitcoin",
+    "bitcoinBody1": "Holzen launches with Bitcoin because it moves sharply, trades around the clock, and tends to stir strong emotions — an honest place to practice pausing before you act.",
+    "bitcoinBody2": "That doesn't mean we take a view on whether you should own Bitcoin, how much, or for how long. Your strategy is yours. We watch price moves so we can meet you in volatile moments, not to judge them.",
+    "bitcoinBody3": "Bitcoin is emotionally demanding in a way many assets are not: big swings, always-on markets, and a culture that celebrates conviction. That makes it a strong first trigger — not a claim that everyone should hold.",
+    "bitcoinBody4": "Holzen exists to help you hold yourself — with awareness. We don't tell you what to do with your portfolio. We help you pause long enough to notice your impulse, name it, and choose deliberately.",
     "ourPhilosophy": "Our philosophy",
     "philosophyBody1": "Holzen is a micropreneur project — small by design.",
     "philosophyBody2": "We don't have investors, a growth team, or a roadmap optimised for scale. We have a focused product, a clear price, and users who value what we build.",
     "philosophyBody3": "We believe the best software is often built by small teams who care deeply about the problem they're solving. No engagement metrics, no dark patterns, no pressure to grow at all costs.",
     "btcReserve": "BTC Reserve",
-    "reserveBody1": "We hold what we help others hold.",
-    "reserveBody2": "Holzen maintains a Bitcoin reserve as a long-term store of value — not as speculation, but as a statement of conviction.",
+    "reserveBody1": "Separately from the product, Holzen maintains a company Bitcoin reserve. See our reserve strategy for the founders' conviction — it's not guidance for your portfolio.",
+    "reserveBody2": "Holzen maintains a Bitcoin reserve as a long-term store of value — not as speculation, but as a statement of founders' conviction.",
     "readReserveStrategy": "Read our full reserve strategy →",
     "aboutUs": "About us",
-    "aboutUsBody1": "Holzen is built by a husband-and-wife team. We're Bitcoin holders ourselves, and we built this tool because we needed it.",
+    "aboutUsBody1": "Holzen is built by a husband-and-wife team. We built it because investing under volatility is hard — and we wanted a practice for the moments impulse speaks loudest.",
     "aboutUsBody2": "We hope Holzen can do the same for you.",
     "home": "Home",
     "terms": "Terms",
@@ -1201,7 +1203,7 @@
     "loadFailed": "We couldn't load posts. Check your connection and try again.",
     "loadMoreFailed": "Couldn't load more posts. Try again in a moment.",
     "nothingYet": "Nothing here yet.",
-    "nothingDesc": "We're working on our first posts about behavioral finance, Bitcoin conviction, and the art of doing nothing. Check back soon.",
+    "nothingDesc": "We're working on our first posts about investor psychology, behavioral finance, and the art of pausing. Check back soon.",
     "home": "Home",
     "about": "About",
     "terms": "Terms",
@@ -1212,11 +1214,11 @@
   },
   "reserve": {
     "title": "BTC Reserve Strategy",
-    "subtitle": "We hold what we help others hold.",
+    "subtitle": "Our company treasury — separate from the product",
     "whyWeHold": "Why we hold",
-    "whyWeHoldBody1": "A product that helps people hold Bitcoin should itself hold Bitcoin. Anything else would be a contradiction.",
-    "whyWeHoldBody2": "Holzen maintains a Bitcoin reserve — not as a financial strategy, but as a statement of conviction. We believe Bitcoin is the best savings technology ever created.",
-    "whyWeHoldBody3": "Our reserve is denominated in Bitcoin, not dollars. We don't measure success by fiat returns. We measure it by the discipline of not selling.",
+    "whyWeHoldBody1": "Holzen maintains a Bitcoin reserve as founders' conviction in what we build — not as a prescription for users.",
+    "whyWeHoldBody2": "The product helps anyone pause before acting, whatever they choose afterward. This page is about our company treasury only.",
+    "whyWeHoldBody3": "Our reserve is denominated in Bitcoin. We report it transparently when it starts — it is not investment advice for you.",
     "ourStrategy": "Our strategy",
     "strategyBody": "We allocate a significant portion of company treasury to Bitcoin. We acquire through dollar-cost averaging and opportunistic buys during periods of elevated fear. We do not trade. We do not hedge. We do not lend.",
     "strategyBullet1": "Self-custody only — no third-party risk",
@@ -1232,15 +1234,15 @@
     "reserveNotStarted": "Our reserve hasn't started yet. When it does, the numbers will appear here — transparent from the first sat.",
     "standingOnConviction": "Standing on conviction",
     "convictionBody1": "Our approach is inspired by companies like MicroStrategy, who demonstrated that a corporate Bitcoin reserve isn't speculative — it's a statement about the future of money.",
-    "convictionBody2": "Every sat in our treasury represents the same conviction we ask our users to practice. We don't just build tools for holders — we are holders.",
-    "closingQuote": "The practice is the same whether you hold 0.001 BTC or 10,000. Sit with the volatility. Notice the impulse. Choose deliberately.",
+    "convictionBody2": "Every sat in our treasury reflects our personal conviction as founders — not a strategy we ask users to follow.",
+    "closingQuote": "The practice is the same for every investor: sit with volatility, notice the impulse, choose deliberately.",
     "closingAttribution": "— Holzen"
   },
   "sources": {
     "title": "Sources",
     "signalTab": "Signal",
     "groundingTab": "Grounding",
-    "signalDescription": "Sources for Signal — Bitcoin sovereignty, sound money, time preference.",
+    "signalDescription": "Sources for Signal — patience, uncertainty, time preference, and decision-making under volatility.",
     "groundingDescription": "Sources for Ground Yourself — behavioral finance, psychology, decision science.",
     "activeCount": "{{active}} of {{total}} active",
     "types": {
@@ -1583,7 +1585,7 @@
       "sections": {
         "holzen": {
           "title": "Holzen, in one breath",
-          "body": "Holzen is a structured pause for Bitcoin holders: you name what you feel, slow your body with breath, then decide from a steadier state. It is not price advice — it is a regulation ritual so impulses have less room to steer."
+          "body": "Holzen is a structured pause for investors: you name what you feel, slow your body with breath, then choose from a steadier state. It is not price advice — it is a regulation ritual so impulses have less room to steer. We start with Bitcoin volatility as the trigger."
         },
         "challenge": {
           "title": "The challenge you are in",
@@ -1599,7 +1601,7 @@
         },
         "sixSteps": {
           "title": "The deep pause (six beats)",
-          "body": "The header shows six beats: Feel, Breathe, Reflect, Frame, a second Breathe, then Decide. After that second breath, one short settle screen appears before you record whether you held steady, sold, or bought — it uses the same sixth segment as Decide, not a separate labeled step. Each beat maps to skills psychologists study: interoception, autonomic settling, perspective-taking, metacognition, re-centering, and values-aligned action."
+          "body": "The header shows six beats: Feel, Breathe, Reflect, Frame, a second Breathe, then Decide. After that second breath, one short settle screen appears before you log what you chose — for your awareness only. Each beat maps to skills psychologists study: interoception, autonomic settling, perspective-taking, metacognition, re-centering, and values-aligned action."
         },
         "ritual": {
           "title": "Not a remedy — a ritual",
@@ -2165,9 +2167,9 @@
     "companionBreakdown": "Companion breakdown",
     "comparedToBaseline": "Compared to {{percent}}% baseline (no companions)",
     "basedOnDecisions": "Based on {{count}} decisions with recorded outcomes",
-    "pauseHigher": "When you pause before acting, your hold rate is {{delta}}pp higher.",
-    "pauseSame": "Your hold rate is the same whether you pause or not — keep reflecting.",
-    "pauseSimilar": "Interesting — your hold rate is similar regardless of pausing. The practice may be helping in ways beyond outcomes.",
+    "pauseHigher": "When you pause before acting, your steadiness rate is {{delta}}pp higher.",
+    "pauseSame": "Your steadiness rate is the same whether you pause or not — keep reflecting.",
+    "pauseSimilar": "Interesting — your steadiness rate is similar regardless of pausing. The practice may be helping in ways beyond outcomes.",
     "keepReflecting": "Keep reflecting to see how pausing affects your decisions.",
     "held": "{{percent}}% held",
     "companionLabels": {
@@ -2244,7 +2246,7 @@
     "thisWeek": "This week",
     "lastWeek": "Last week",
     "reflections": "Pauses",
-    "holdRate": "Hold rate",
+    "holdRate": "Steadiness rate",
     "composure": "Composure",
     "companionUse": "Companion use",
     "noDataPrevious": "No data for {{period}} — comparisons will appear next {{next}}.",
@@ -2281,8 +2283,8 @@
     "composed": "Composed",
     "mixed": "Mixed",
     "reactive": "Reactive",
-    "holdRate": "Hold Rate",
-    "holdRateDescription": "% of weeks where you held or did nothing after pausing"
+    "holdRate": "Steadiness rate",
+    "holdRateDescription": "% of weeks where you stayed steady or chose to wait after pausing"
   },
   "volatilityTimeline": {
     "title": "Volatility Timeline",
@@ -2303,12 +2305,12 @@
     "avgDuration": "Avg Duration",
     "mostUsed": "Most Used",
     "decisionBreakdown": "Decision breakdown",
-    "bestTemplateInsight": "Your {{template}} ritual has the highest hold rate at {{rate}}%",
+    "bestTemplateInsight": "Your {{template}} ritual has the highest steadiness rate at {{rate}}%",
     "avgSuffix": "avg {{seconds}}s",
     "templateEffectiveness": "Template effectiveness",
     "stepEffectiveness": "Step-type effectiveness",
     "topStepLabel": "Most effective step",
-    "stepInsight": "Rituals with {{step}} have a {{rateWith}}% hold rate vs {{rateWithout}}% without",
+    "stepInsight": "Rituals with {{step}} have a {{rateWith}}% steadiness rate vs {{rateWithout}}% without",
     "withStep": "With",
     "withoutStep": "Without",
     "held": "held",
@@ -2337,8 +2339,8 @@
     "then": "Then",
     "now": "Now",
     "insightCalmer": "You were calmer this time facing similar conditions.",
-    "insightHeldSteady": "You held steady this time — last time you acted on impulse.",
-    "insightConsistent": "Consistent composure — you held steady both times.",
+    "insightHeldSteady": "You stayed steady this time — last time you acted on impulse.",
+    "insightConsistent": "Consistent composure — you stayed steady both times.",
     "insightSimilar": "Similar emotional response — your patterns are consistent."
   },
   "moodCharts": {

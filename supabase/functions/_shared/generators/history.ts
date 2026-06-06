@@ -355,7 +355,7 @@ ACCURACY RULES (CRITICAL):
 BITCOIN ONLY:
 - The analogy must connect back to Bitcoin specifically, not "crypto" in general
 - Say "Bitcoin" not "crypto", "cryptocurrency", or "digital assets"
-- The user is a Bitcoin holder — not a "crypto investor"
+- The user tracks Bitcoin and is practicing emotional self-regulation — not seeking trading or allocation advice
 
 BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? `\n\nUSER MOOD: The user is feeling "${mood}". Subtly calibrate the historical parallel to resonate with this emotional state.` : ""}${titleExclusion}`,
       },

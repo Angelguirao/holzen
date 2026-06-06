@@ -4,7 +4,7 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 
 ## What this project is
 
-**Holzen** is a React + TypeScript SPA for Bitcoin-aware mindfulness: breathing/grounding flows, journaling, a library, and AI-style companions backed by **Supabase** (Postgres, auth, Row Level Security, Edge Functions). **Stripe** is used for subscriptions via edge functions.
+**Holzen** is a React + TypeScript SPA for volatility-triggered investor pause practice: breathing/grounding flows, journaling, a library, and AI-style companions backed by **Supabase** (Postgres, auth, Row Level Security, Edge Functions). **Stripe** is used for subscriptions via edge functions.
 
 ## Change map (read this before non-trivial edits)
 
