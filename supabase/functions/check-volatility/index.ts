@@ -318,7 +318,9 @@ serve(
       return false;
     }
 
-    // Filter: must exceed threshold, not in quiet hours/snooze, and no open cron offer yet.
+    // Filter: must exceed threshold, not in quiet hours/snooze. Skip net-new offers when
+    // a pending cron offer exists; still re-check users with open active|engaged cron pauses
+    // so context_snapshot can refresh within the same fingerprint band.
     function isSnoozed(p: VolatilityProfile): boolean {
       const snoozedUntil = p.snoozed_until;
       if (!snoozedUntil) return false;
@@ -330,30 +332,48 @@ serve(
       return isVolatilityThresholdBreached(p, metrics);
     }
 
-    const profileByUserId = new Map(profileRows.map((p) => [p.user_id, p]));
-    const { data: openCronPauseRows, error: openCronPauseErr } = await supabase
-      .from("pause_instances")
-      .select("user_id")
-      .eq("source", "cron_volatility")
-      .in("state", ["active", "pending"]);
-    if (openCronPauseErr) throw openCronPauseErr;
-
-    const openCronUserIds = new Set(
-      (openCronPauseRows ?? []).map((row) => row.user_id as string),
-    );
-
-    const eligible = profileRows.filter((p) => {
+    function passesVolatilityGates(p: VolatilityProfile): boolean {
       if (!profileVolatilityBreached(p)) return false;
       if (isInQuietHours(p)) return false;
       if (isSnoozed(p)) return false;
-      if (openCronUserIds.has(p.user_id)) return false;
       return true;
-    });
+    }
+
+    const profileByUserId = new Map(profileRows.map((p) => [p.user_id, p]));
+    const { data: openCronPauseRows, error: openCronPauseErr } = await supabase
+      .from("pause_instances")
+      .select("user_id, state")
+      .eq("source", "cron_volatility")
+      .in("state", ["active", "pending", "engaged"]);
+    if (openCronPauseErr) throw openCronPauseErr;
+
+    const openCronActiveEngagedUserIds = new Set(
+      (openCronPauseRows ?? [])
+        .filter((row) => row.state === "active" || row.state === "engaged")
+        .map((row) => row.user_id as string),
+    );
+    const openCronPendingUserIds = new Set(
+      (openCronPauseRows ?? [])
+        .filter((row) => row.state === "pending")
+        .map((row) => row.user_id as string),
+    );
+
+    const eligible = profileRows.filter(
+      (p) =>
+        passesVolatilityGates(p) &&
+        !openCronActiveEngagedUserIds.has(p.user_id) &&
+        !openCronPendingUserIds.has(p.user_id),
+    );
+    const contextRefresh = profileRows.filter(
+      (p) => passesVolatilityGates(p) && openCronActiveEngagedUserIds.has(p.user_id),
+    );
+    const toProcess = [...eligible, ...contextRefresh];
 
     log("check_volatility_phase", {
       holzen_event: "check_volatility_cron",
       phase: "eligible_users",
       eligible: eligible.length,
+      context_refresh: contextRefresh.length,
       total_profiles: profileRows.length,
     });
 
@@ -408,8 +428,8 @@ serve(
 
     const vapidReady = await initWebPushVapidFromEnv(log);
 
-    // Process all eligible users in parallel
-    const results = await Promise.all(eligible.map(async (profile) => {
+    // Process eligible users and open-pause context refresh in parallel
+    const results = await Promise.all(toProcess.map(async (profile) => {
       // Stamp last_trigger_at for audit; pause_create_or_reuse_as handles open-offer idempotency.
       const { data: claimed, error: claimError } = await supabase.rpc(
         "claim_trigger_slot",
@@ -508,6 +528,7 @@ serve(
       const wasCreated: boolean = createRes?.created === true;
       const reusedReason: string | null = createRes?.reused_reason ?? null;
       const pendingOffer: boolean = createRes?.pending_offer === true;
+      const contextRefreshed: boolean = createRes?.context_refreshed === true;
 
       if (!pauseInstanceId) {
         // Recent-dismissal match: user already walked away from this
@@ -522,8 +543,29 @@ serve(
       }
 
       if (!wasCreated) {
-        // Fingerprint match with an already-open pause: reuse, don't
-        // re-dispatch a push.
+        if (contextRefreshed) {
+          const { error: refreshProfileErr } = await supabase
+            .from("profiles")
+            .update({ last_context: ctx })
+            .eq("user_id", profile.user_id);
+          if (refreshProfileErr) {
+            log.error("check_volatility_profile", {
+              holzen_event: "check_volatility_cron",
+              phase: "context_refresh_profile_failed",
+              ...unknownErrorForLog(refreshProfileErr),
+            });
+            return false;
+          }
+          log("check_volatility_context_refresh", {
+            holzen_event: "check_volatility_cron",
+            phase: "open_pause_context_refreshed",
+            user_id_prefix: String(profile.user_id).slice(0, 8),
+            instance_id_prefix: String(pauseInstanceId).slice(0, 8),
+          });
+          return "refreshed";
+        }
+
+        // Fingerprint match without refresh flag, or other reuse: no push.
         log("check_volatility_skip", {
           holzen_event: "check_volatility_cron",
           phase: "open_pause_covers_context",
@@ -576,19 +618,22 @@ serve(
         holzenEvent: "check_volatility_cron",
       });
 
-      return true;
+      return "triggered";
     }));
 
-    const triggered = results.filter(Boolean).length;
+    const triggered = results.filter((r) => r === "triggered").length;
+    const contextRefreshed = results.filter((r) => r === "refreshed").length;
     log("check_volatility_complete", {
       holzen_event: "check_volatility_cron",
       phase: "run_complete",
       triggered,
+      context_refreshed: contextRefreshed,
     });
 
     return new Response(
       JSON.stringify({
         triggered,
+        contextRefreshed,
         contextLostExpired,
         btcChangeUsd: usdPeek.changePercent,
         marketPairsLoaded: pairRows.filter((r) => r.m).length,

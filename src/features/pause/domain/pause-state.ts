@@ -407,6 +407,8 @@ export function shouldCountCompanion(params: {
 export type CronFireDecision =
   | { action: 'create' }
   | { action: 'reject'; reason: 'fingerprint_match' | 'recent_dismissal' }
+  /** Same fingerprint band while a pause is open — refresh snapshot, do not create. */
+  | { action: 'refresh_context'; openInstanceId: string }
   /** User has touched the open pause; new regime is a `pending` row until adopt/decline. */
   | { action: 'pending_offer'; openInstanceId: string }
   /**
@@ -430,7 +432,7 @@ export function decideCronFire(params: {
 
   if (openInstance) {
     if (openInstance.context_fingerprint === newFingerprint) {
-      return { action: 'reject', reason: 'fingerprint_match' };
+      return { action: 'refresh_context', openInstanceId: openInstance.id };
     }
     const touched =
       openInstance.state === 'engaged' || params.openPauseTouched === true;
