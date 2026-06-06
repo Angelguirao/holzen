@@ -21,6 +21,10 @@ export {
   type MarketVolatilityRangeInput,
   type HomeMarketRangeStatusInput,
 } from './domain/market-volatility-range-status';
+export {
+  resolveHomeMarketDisplayQuote,
+  type HomeMarketDisplayQuoteInput,
+} from './domain/home-market-display-quote';
 export { parsePauseContextForHomePreview } from './application/pause-context-home-preview';
 export {
   formatCompactMarketSentimentFromContextText,
