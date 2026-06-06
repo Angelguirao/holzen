@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
 import { resolvePauseDepthContextLineParams } from './resolve-pause-depth-context-line-params';
 
-const sampleBtc = (changePercent: number): BtcPriceData => ({
+const sampleBtc = (changePercent: number): MarketQuote => ({
   coinId: 'bitcoin',
   currentPrice: 100,
   price24hAgo: 100,
@@ -12,7 +12,7 @@ const sampleBtc = (changePercent: number): BtcPriceData => ({
 });
 
 describe('resolvePauseDepthContextLineParams', () => {
-  it('returns null when btcData is missing', () => {
+  it('returns null when marketData is missing', () => {
     expect(resolvePauseDepthContextLineParams(null, 'btc')).toBeNull();
   });
 

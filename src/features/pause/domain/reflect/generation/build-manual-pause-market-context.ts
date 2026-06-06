@@ -3,7 +3,7 @@ import {
   buildPauseContextFromMarket,
   isBitcoinTrackedAsset,
   normalizeTrackedAssetId,
-  severityFromBtcChangePercent,
+  severityFromMarketChangePercent,
   trackedAssetSymbol,
 } from '@/features/market/public';
 import { buildSilentReflectionStubMessage } from '@/features/pause/domain/reflect/generation/build-silent-reflection-stub-message';
@@ -25,7 +25,7 @@ export function buildManualPauseMarketContext(
   const assetId = normalizeTrackedAssetId(profileTrackedAssetId);
   const assetSym = trackedAssetSymbol(assetId);
   const ctx = buildPauseContextFromMarket(data, cumulativeThreshold, assetSym);
-  const severityBand = severityFromBtcChangePercent(data.changePercent) ?? 'mild';
+  const severityBand = severityFromMarketChangePercent(data.changePercent) ?? 'mild';
   const onChainBand =
     isBitcoinTrackedAsset(assetId) && data.onChain
       ? ([data.onChain.mempoolSize, data.onChain.fastestFee, data.onChain.medianFee].filter(

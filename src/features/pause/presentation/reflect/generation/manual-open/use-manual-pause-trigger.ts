@@ -1,6 +1,6 @@
 import { useCallback, useTransition, type Dispatch, type SetStateAction } from 'react';
 import type { User } from '@supabase/supabase-js';
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
@@ -56,7 +56,7 @@ export function useManualPauseTrigger({
   const [isPending, startTransition] = useTransition();
 
   const generateMessage = useCallback(
-    async (data: BtcPriceData, mood?: string): Promise<ManualPauseTriggerResult> => {
+    async (data: MarketQuote, mood?: string): Promise<ManualPauseTriggerResult> => {
       if (!user) {
         holzenLog.manual('generateMessage: skipped (no user)');
         return MANUAL_PAUSE_TRIGGER_IDLE;

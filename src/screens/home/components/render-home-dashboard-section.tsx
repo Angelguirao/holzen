@@ -1,12 +1,12 @@
 import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
 import { Moon } from 'lucide-react';
-import { BtcStatus } from '@/screens/home/components/BtcStatus';
+import { MarketStatus } from '@/screens/home/components/MarketStatus';
 import { HomeGoalWhyCard } from '@/screens/home/components/HomeGoalWhyCard';
 import { HomeSectionCard } from '@/screens/home/components/HomeSectionCard';
 import { HomePracticeStatTiles } from '@/screens/home/components/HomePracticeStatTiles';
 import type { HomePauseWidgetProjection } from '@/features/pause/presentation/home/use-home-pause-widget-projection';
-import type { BtcPriceData, TrackedAssetId } from '@/features/market/public';
+import type { MarketQuote, TrackedAssetId } from '@/features/market/public';
 
 /** Everything needed to render one Home dashboard section by id. */
 export interface HomeDashboardSectionDeps {
@@ -14,7 +14,7 @@ export interface HomeDashboardSectionDeps {
   error: string | null;
   marketHeaderRight: ReactNode;
   marketFooter: ReactNode;
-  btcData: BtcPriceData | null;
+  marketData: MarketQuote | null;
   priceHidden: boolean;
   togglePriceHidden: () => void;
   currency: string;
@@ -47,8 +47,8 @@ export function renderHomeDashboardSection(sectionId: string, d: HomeDashboardSe
           headerRight={d.error ? undefined : d.marketHeaderRight}
           footer={d.marketFooter}
         >
-          <BtcStatus
-            data={d.btcData}
+          <MarketStatus
+            data={d.marketData}
             error={d.error}
             hidden={d.priceHidden}
             onToggleHidden={d.togglePriceHidden}

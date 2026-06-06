@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import { HomeMarketWidgetFooter } from '@/screens/home/components/HomeMarketWidgetFooter';
 import type { HomeDashboardSectionDeps } from '@/screens/home/components/render-home-dashboard-section';
-import type { BtcPriceData, TrackedAssetId } from '@/features/market/public';
+import type { MarketQuote, TrackedAssetId } from '@/features/market/public';
 
 /** Memoized bundle passed into {@link renderHomeDashboardSection}. */
 export function useHomeDashboardSectionDeps(args: {
@@ -12,7 +12,7 @@ export function useHomeDashboardSectionDeps(args: {
   marketHeaderRight: ReactNode;
   /** Defaults to {@link HomeMarketWidgetFooter} when omitted. */
   marketFooter?: ReactNode;
-  btcData: BtcPriceData | null;
+  marketData: MarketQuote | null;
   threshold: number;
   thresholdDown: number;
   cumulativeThreshold: number;
@@ -40,7 +40,7 @@ export function useHomeDashboardSectionDeps(args: {
     error,
     marketHeaderRight,
     marketFooter: marketFooterProp,
-    btcData,
+    marketData,
     threshold,
     thresholdDown,
     cumulativeThreshold,
@@ -66,9 +66,9 @@ export function useHomeDashboardSectionDeps(args: {
 
   const marketFooter =
     marketFooterProp ??
-    (btcData && !error ? (
+    (marketData && !error ? (
       <HomeMarketWidgetFooter
-        btcData={btcData}
+        marketData={marketData}
         threshold={threshold}
         thresholdDown={thresholdDown}
         cumulativeThreshold={cumulativeThreshold}
@@ -81,7 +81,7 @@ export function useHomeDashboardSectionDeps(args: {
       error,
       marketHeaderRight,
       marketFooter,
-      btcData,
+      marketData,
       priceHidden,
       togglePriceHidden,
       currency,
@@ -106,7 +106,7 @@ export function useHomeDashboardSectionDeps(args: {
       error,
       marketHeaderRight,
       marketFooter,
-      btcData,
+      marketData,
       priceHidden,
       togglePriceHidden,
       currency,

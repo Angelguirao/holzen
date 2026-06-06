@@ -1,10 +1,10 @@
-import type { BtcPriceData } from '@/features/market/domain/market-quote';
+import type { MarketQuote } from '@/features/market/domain/market-quote';
 import { isCumulativeMoveTriggered } from '@/features/market/domain/volatility-thresholds';
 import { enrichPauseContextWithMarketData } from '@holzen-pause-context';
 
 /** 24h + optional 7d cumulative line, then Fear & Greed / on-chain enrichment (matches manual pause copy). */
 export function buildPauseContextFromMarket(
-  data: BtcPriceData,
+  data: MarketQuote,
   cumulativeThreshold: number,
   assetSymbol: string,
 ): string {
@@ -19,6 +19,6 @@ export function buildPauseContextFromMarket(
 }
 
 /** @deprecated Use buildPauseContextFromMarket — kept for callers that assume BTC copy only. */
-export function buildPauseContextFromBtc(data: BtcPriceData, cumulativeThreshold: number): string {
+export function buildPauseContextFromBtc(data: MarketQuote, cumulativeThreshold: number): string {
   return buildPauseContextFromMarket(data, cumulativeThreshold, 'BTC');
 }

@@ -109,7 +109,7 @@ describe('pause-reflect-flows-io', () => {
       seedMessage: 'seed',
       ritualEntry: 'deep',
       step: 'reflect',
-      btcData: null,
+      marketData: null,
     });
     expect(view.reflectGenEnabled).toBe(true);
     expect(view.effectiveReflectionMessage).toBe('seed');

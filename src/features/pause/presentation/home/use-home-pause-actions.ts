@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import type { NavigateFunction } from 'react-router-dom';
-import type { BtcMoveSeverity } from '@/features/market/public';
+import type { MarketMoveSeverity } from '@/features/market/public';
 import type { ManualPauseTriggerResult } from '@/features/pause/domain/manual-pause-trigger-result';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import {
@@ -22,7 +22,7 @@ export function useHomePauseActions(args: {
   lastPauseInstanceId: string | null;
   companions: CompanionData;
   companionPrefs: CompanionPrefs;
-  severity: BtcMoveSeverity;
+  severity: MarketMoveSeverity;
   navigate: NavigateFunction;
   dismissMessage: () => void;
   manualTrigger: (mood?: string) => Promise<ManualPauseTriggerResult>;

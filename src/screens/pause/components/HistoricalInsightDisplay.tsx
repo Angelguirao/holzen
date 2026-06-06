@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { History, ArrowRight } from 'lucide-react';
 import { useProfile } from '@/features/user/public-hooks';
-import { formatBtcPrice } from '@/features/market/public';
+import { formatMarketPrice } from '@/features/market/public';
 import { cn } from '@/lib/utils';
 export type { CachedHistoricalInsightShape } from '@/features/pause/public-ritual-frame';
 import type { CachedHistoricalInsightShape } from '@/features/pause/public-ritual-frame';
@@ -30,7 +30,7 @@ export function HistoricalInsightDisplay({
   "use memo";
   const { t } = useTranslation();
   const { currency } = useProfile();
-  const fmtPrice = (n: number) => formatBtcPrice(n, currency);
+  const fmtPrice = (n: number) => formatMarketPrice(n, currency);
   const isFrame = variant === 'frame';
 
   if (loading) {

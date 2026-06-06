@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 import {
   HOLZEN_MARKET_DISPLAY_COINGECKO_ERROR,
   HOLZEN_MARKET_DISPLAY_RETRY_ERROR,
-  type BtcPriceData,
+  type MarketQuote,
 } from '@/features/market/public';
 import { PAUSE_PERSIST_ERROR_MARKER } from '@/features/pause/domain/pause-persist-error';
 import {
@@ -16,7 +16,7 @@ import {
 
 const echoT: TFunction = ((key: string) => key) as TFunction;
 
-const sampleBtc: BtcPriceData = {
+const sampleBtc: MarketQuote = {
   coinId: 'bitcoin',
   currentPrice: 100_000,
   price24hAgo: 99_000,
@@ -85,21 +85,21 @@ describe('pauseHomeErrorKind', () => {
 });
 
 describe('shouldSurfacePauseWidgetError', () => {
-  it('surfaces persist errors even with cached btcData', () => {
+  it('surfaces persist errors even with cached marketData', () => {
     expect(shouldSurfacePauseWidgetError(`${PAUSE_PERSIST_ERROR_MARKER}. Try again.`, sampleBtc)).toBe(
       true,
     );
   });
 
-  it('hides price-only errors when btcData exists', () => {
+  it('hides price-only errors when marketData exists', () => {
     expect(shouldSurfacePauseWidgetError(HOLZEN_MARKET_DISPLAY_COINGECKO_ERROR, sampleBtc)).toBe(false);
   });
 
-  it('shows price errors when there is no cached btcData', () => {
+  it('shows price errors when there is no cached marketData', () => {
     expect(shouldSurfacePauseWidgetError(HOLZEN_MARKET_DISPLAY_COINGECKO_ERROR, null)).toBe(true);
   });
 
-  it('shows AI / connectivity errors even with cached btcData', () => {
+  it('shows AI / connectivity errors even with cached marketData', () => {
     expect(shouldSurfacePauseWidgetError('Could not reach Holzen. Check your connection.', sampleBtc)).toBe(
       true,
     );

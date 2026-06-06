@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TrendingDown, TrendingUp } from 'lucide-react';
-import { formatBtcPrice } from '@/features/market/public';
+import { formatMarketPrice } from '@/features/market/public';
 import {
   getCoingeckoMarketChartQueryOptions,
   type CoingeckoMarketChartPoint,
@@ -17,7 +17,7 @@ interface Props {
   coinId?: string;
 }
 
-export function BtcChart({ hidden = false, currency = 'USD', coinId = 'bitcoin' }: Props) {
+export function MarketChart({ hidden = false, currency = 'USD', coinId = 'bitcoin' }: Props) {
   "use memo";
   const [retryNonce, setRetryNonce] = useState(0);
 
@@ -56,7 +56,7 @@ export function BtcChart({ hidden = false, currency = 'USD', coinId = 'bitcoin' 
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
-  const formatPrice = (p: number) => formatBtcPrice(p, currency);
+  const formatPrice = (p: number) => formatMarketPrice(p, currency);
 
   return (
     <div className="space-y-2">
@@ -75,7 +75,7 @@ export function BtcChart({ hidden = false, currency = 'USD', coinId = 'bitcoin' 
         <ResponsiveContainer width="100%" height={100} debounce={50}>
           <AreaChart data={data} margin={{ top: 4, right: 0, left: 0, bottom: 0 }} className="font-sans">
             <defs>
-              <linearGradient id="btcGradient" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="marketChartGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="hsl(var(--foreground))" stopOpacity={0.12} />
                 <stop offset="100%" stopColor="hsl(var(--foreground))" stopOpacity={0.01} />
               </linearGradient>
@@ -107,7 +107,7 @@ export function BtcChart({ hidden = false, currency = 'USD', coinId = 'bitcoin' 
               dataKey="price"
               stroke="hsl(var(--foreground))"
               strokeWidth={1.5}
-              fill="url(#btcGradient)"
+              fill="url(#marketChartGradient)"
               dot={false}
               isAnimationActive={false}
               activeDot={{ r: 2.5, fill: 'hsl(var(--foreground))' }}
@@ -118,3 +118,6 @@ export function BtcChart({ hidden = false, currency = 'USD', coinId = 'bitcoin' 
     </div>
   );
 }
+
+/** @deprecated Use MarketChart */
+export const BtcChart = MarketChart;

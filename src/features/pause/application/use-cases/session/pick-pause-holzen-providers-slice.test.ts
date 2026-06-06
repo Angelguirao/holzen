@@ -28,7 +28,7 @@ describe('pickPauseHolzenProvidersSlice', () => {
         severity: 'moderate',
         profileLoaded: true,
         resyncOpenPauseFromDb,
-        btcData: null,
+        marketData: null,
         trackedAssetId: 'bitcoin',
       }),
     ).toEqual({
@@ -49,7 +49,7 @@ describe('pickPauseHolzenProvidersSlice', () => {
       severity: 'moderate',
       profileLoaded: true,
       resyncOpenPauseFromDb,
-      btcData: null,
+      marketData: null,
       trackedAssetId: 'bitcoin',
     });
   });
@@ -64,7 +64,7 @@ describe('pickPauseHolzenProvidersSlice', () => {
       companions: { haiku: null },
       lastPauseInstanceId: null,
       severity: 'mild' as const,
-      btcData: null,
+      marketData: null,
       resyncOpenPauseFromDb,
     };
     const picked = pickPauseHolzenProvidersSlice(

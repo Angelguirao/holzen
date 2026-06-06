@@ -79,11 +79,14 @@ For **equities**, expect a new `AssetQuoteProvider` value, a `ports/market-data`
 
 Prefer new code:
 
-- `MarketQuote` over `BtcPriceData`
-- `fetchMarketData` over `fetchBtcData` (alias already exists)
-- `MarketMoveSeverity` over `BtcMoveSeverity` when touching those files
+- `MarketQuote` over `BtcPriceData` (alias retained)
+- `fetchMarketData` over `fetchBtcData` (alias retained)
+- `formatMarketPrice` over `formatBtcPrice` (alias retained)
+- `MarketMoveSeverity` / `severityFromMarketChangePercent` over `BtcMoveSeverity` / `severityFromBtcChangePercent` (aliases retained)
+- `marketData` over `btcData` on pause home context (`btcData` alias kept for `@/legacy` only)
+- `MarketStatus` / `MarketChart` over `BtcStatus` / `BtcChart` (deprecated component aliases on new files)
 
-Do **not** mass-rename in a single PR — use aliases and touch call sites when editing related behavior.
+Remaining optional: `btcMode` (product-specific unit display), `btc-on-this-day` pause ritual block, `btc_price_cache` table name.
 
 ---
 

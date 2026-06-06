@@ -71,7 +71,7 @@ function baseProviders() {
   return {
     t,
     dismissMessage: vi.fn(),
-    btcData: { changePercent: -3.1 } as import('@/features/market/public').BtcPriceData,
+    marketData: { changePercent: -3.1 } as import('@/features/market/public').MarketQuote,
     subscribed: true,
     subLoading: false,
     requirePro: vi.fn(),

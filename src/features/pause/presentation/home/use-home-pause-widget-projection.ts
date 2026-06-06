@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
 import { trackedAssetSymbol } from '@/features/market/domain/tracked-assets';
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
 import type { Entitlement } from '@/features/subscription/public';
 import type { ManualPauseTriggerResult } from '@/features/pause/domain/manual-pause-trigger-result';
 import { formatHomePauseMarketBlock } from '@/features/pause/domain/home/format-home-pause-market-block';
@@ -47,7 +47,7 @@ export type HomePauseWidgetBodyProjection = {
   onDismissOpenPause: () => void;
   loading: boolean;
   error: string | null;
-  btcData: BtcPriceData | null;
+  marketData: MarketQuote | null;
   onReflectionRetry: (mood?: string) => Promise<ManualPauseTriggerResult>;
   showPauseScheduling: boolean;
   autoCooldownRemaining: () => number;
@@ -77,7 +77,7 @@ export type UseHomePauseWidgetProjectionParams = {
   contextText: string | null;
   loading: boolean;
   error: string | null;
-  btcData: BtcPriceData | null;
+  marketData: MarketQuote | null;
   showPauseScheduling: boolean;
   autoCooldownRemaining: () => number;
   cooldownHours: number;
@@ -155,7 +155,7 @@ export function useHomePauseWidgetProjection(
   );
 
   const blockingError = Boolean(
-    params.error && shouldSurfacePauseWidgetError(params.error, params.btcData),
+    params.error && shouldSurfacePauseWidgetError(params.error, params.marketData),
   );
 
   const assetSymbol = trackedAssetSymbol(params.trackedAssetId);
@@ -232,11 +232,11 @@ export function useHomePauseWidgetProjection(
     () =>
       formatHomePauseMarketBlock({
         contextText: params.contextText,
-        btcData: params.btcData,
+        marketData: params.marketData,
         trackedAssetId: params.trackedAssetId,
         instanceCreatedAt: params.openPauseCreatedAt,
       }),
-    [params.contextText, params.btcData, params.trackedAssetId, params.openPauseCreatedAt],
+    [params.contextText, params.marketData, params.trackedAssetId, params.openPauseCreatedAt],
   );
 
   const previewLine = useMemo(
@@ -276,7 +276,7 @@ export function useHomePauseWidgetProjection(
     pending && (widgetMode === 'C_prime' || widgetMode === 'B' || widgetMode === 'E')
       ? formatHomePauseMarketBlock({
           contextText: pendingContextText,
-          btcData: params.btcData,
+          marketData: params.marketData,
           trackedAssetId: params.trackedAssetId,
           instanceCreatedAt: pending.created_at ?? null,
         })
@@ -305,7 +305,7 @@ export function useHomePauseWidgetProjection(
     onDismissOpenPause: params.onDismissOpenPause,
     loading: params.loading,
     error: params.error,
-    btcData: params.btcData,
+    marketData: params.marketData,
     onReflectionRetry: params.manualTrigger,
     showPauseScheduling: params.showPauseScheduling,
     autoCooldownRemaining: params.autoCooldownRemaining,

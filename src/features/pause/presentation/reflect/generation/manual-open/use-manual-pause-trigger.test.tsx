@@ -104,7 +104,7 @@ describe('useManualPauseTrigger', () => {
 
     await act(async () => {
       await result.current.generateMessage(
-        { changePercent: -2.5 } as import('@/features/market/public').BtcPriceData,
+        { changePercent: -2.5 } as import('@/features/market/public').MarketQuote,
       );
     });
 

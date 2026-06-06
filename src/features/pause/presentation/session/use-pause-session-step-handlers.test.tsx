@@ -90,7 +90,7 @@ function baseProviders() {
     subscribed: true,
     requirePro: vi.fn().mockReturnValue(true),
     dismissMessage: vi.fn(),
-    btcData: { changePercent: -2 } as import('@/features/market/public').BtcPriceData,
+    marketData: { changePercent: -2 } as import('@/features/market/public').MarketQuote,
     subLoading: false,
     refreshSubscription: vi.fn(),
   };

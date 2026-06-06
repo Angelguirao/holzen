@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 import type { QueryClient } from '@tanstack/react-query';
 import type { User } from '@supabase/supabase-js';
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
 import { fetchMarketData, getHolzenMarketDisplayQueryOptions } from '@/features/market/public';
 import { isHolzenDevMode } from '@/features/market/public';
 import {
@@ -27,7 +27,7 @@ export type UseHolzenManualTriggerOrchestrationParams = {
   cooldownHours: number;
   lastTriggerAt: string | null;
   queryClient: QueryClient;
-  generateMessage: (data: BtcPriceData, mood?: string) => Promise<ManualPauseTriggerResult>;
+  generateMessage: (data: MarketQuote, mood?: string) => Promise<ManualPauseTriggerResult>;
   setError: Dispatch<SetStateAction<string | null>>;
 };
 

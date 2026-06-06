@@ -35,7 +35,7 @@ describe('pause-session-providers-flow', () => {
       severity: 'mild',
       profileLoaded: false,
       resyncOpenPauseFromDb,
-      btcData: null,
+      marketData: null,
       trackedAssetId: 'bitcoin',
     };
 
