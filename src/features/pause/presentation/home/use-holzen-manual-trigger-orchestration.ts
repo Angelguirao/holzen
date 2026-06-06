@@ -6,7 +6,6 @@ import { fetchMarketData, getHolzenMarketDisplayQueryOptions } from '@/features/
 import { isHolzenDevMode } from '@/features/market/public';
 import {
   buildManualTriggerCooldownStorageKey,
-  computeAutoCooldownRemainingMs,
   computeManualCooldownRemainingMs,
   isManualTriggerBlockedByCooldown,
   mapManualTriggerStartError,
@@ -78,10 +77,7 @@ export function useHolzenManualTriggerOrchestration({
     [lastManualAt],
   );
 
-  const autoCooldownRemaining = useCallback(
-    () => computeAutoCooldownRemainingMs(lastTriggerAt, cooldownHours),
-    [lastTriggerAt, cooldownHours],
-  );
+  const autoCooldownRemaining = useCallback(() => 0, []);
 
   const manualTrigger = useCallback(
     async (

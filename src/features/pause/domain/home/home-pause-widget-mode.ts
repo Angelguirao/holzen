@@ -27,8 +27,6 @@ export type ResolveHomePauseWidgetModeInput = {
   reflectionMessage: string | null;
   trackedAssetSymbol: string;
   hasPendingOffer: boolean;
-  /** Ms remaining on profile `last_trigger_at` auto cooldown (post-pause rest / E gate). */
-  postPauseAutoCooldownRemainingMs: number;
   /** Ms remaining on Home manual “Let’s pause” local cooldown. */
   manualCooldownRemainingMs: number;
   completedPauseCount: number;
@@ -82,22 +80,17 @@ export function resolveHomePauseWidgetMode(
       return { mode: 'B_in_progress', defaultCollapsed: false, hasReachedReflect };
     }
 
-    const inPostPauseCooldown = input.postPauseAutoCooldownRemainingMs > 0;
-    const isPostRestNewActiveOffer =
-      inPostPauseCooldown &&
-      input.completedPauseCount > 0 &&
-      !input.hasOpenPauseStepEvents;
+    const isReturningUserNewActiveOffer =
+      input.completedPauseCount > 0 && !input.hasOpenPauseStepEvents;
 
-    if (isPostRestNewActiveOffer) {
+    if (isReturningUserNewActiveOffer) {
       return { mode: 'E', defaultCollapsed: false, hasReachedReflect };
     }
 
     return { mode: 'B', defaultCollapsed: false, hasReachedReflect };
   }
 
-  const inIdleCooldown =
-    input.postPauseAutoCooldownRemainingMs > 0 || input.manualCooldownRemainingMs > 0;
-  if (inIdleCooldown) {
+  if (input.manualCooldownRemainingMs > 0) {
     const hasArchive = input.completedPauseCount > 0;
     if (!hasArchive) {
       return {

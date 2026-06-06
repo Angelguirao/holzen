@@ -31,24 +31,11 @@ export function computeAutoCooldownReadyAtMs(
   return new Date(lastTriggerAt).getTime() + cooldownHours * 60 * 60 * 1000;
 }
 
-/** Latest moment the user can start another Home manual pause (auto + manual gates). */
-export function computeIdleCooldownReadyAtMs(input: {
-  profileLastTriggerAt: string | null;
-  cooldownHours: number;
-  manualCooldownRemainingMs: number;
-  nowMs?: number;
-}): number | null {
-  const nowMs = input.nowMs ?? Date.now();
-  const autoReadyAtMs = computeAutoCooldownReadyAtMs(
-    input.profileLastTriggerAt,
-    input.cooldownHours,
-  );
-  const manualReadyAtMs =
-    input.manualCooldownRemainingMs > 0 ? nowMs + input.manualCooldownRemainingMs : null;
-
-  const candidates = [autoReadyAtMs, manualReadyAtMs].filter(
-    (readyAtMs): readyAtMs is number => readyAtMs != null && readyAtMs > nowMs,
-  );
-  if (candidates.length === 0) return null;
-  return Math.max(...candidates);
+/** Wall-clock moment when the manual “Let’s pause” cooldown ends. */
+export function computeManualCooldownReadyAtMs(
+  manualCooldownRemainingMs: number,
+  nowMs: number = Date.now(),
+): number | null {
+  if (manualCooldownRemainingMs <= 0) return null;
+  return nowMs + manualCooldownRemainingMs;
 }
