@@ -818,6 +818,7 @@
     "checkConnection": "Check your connection and try again",
     "exitUnitBasisMode": "Back to {{currency}} price view",
     "enterUnitBasisMode": "Enter 1 BTC = 1 BTC mode",
+    "unitBasisIdentity": "1 {{symbol}} = 1 {{symbol}}",
     "show": "Show",
     "hide": "Hide",
     "showPrice": "Show price",
