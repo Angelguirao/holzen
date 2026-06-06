@@ -1,24 +1,24 @@
 import { TrendingDown, TrendingUp, CloudOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { BtcOnThisDayEntry } from '@/features/pause/domain/btc-on-this-day';
+import type { MarketOnThisDayEntry } from '@/features/pause/domain/market-on-this-day';
 
-export type BtcOnThisDayBlockProps = {
+export type MarketOnThisDayBlockProps = {
   currentPrice: number;
-  onThisDay: BtcOnThisDayEntry[];
+  onThisDay: MarketOnThisDayEntry[];
   partial?: boolean;
   formatPrice: (n: number) => string;
   /** Frame wireframe: centered header + three columnar stacks inside the gray panel. */
   variant?: 'default' | 'frame';
 };
 
-function BtcOnThisDayRows({
+function MarketOnThisDayRows({
   currentPrice,
   onThisDay,
   formatPrice,
   frame,
 }: {
   currentPrice: number;
-  onThisDay: BtcOnThisDayEntry[];
+  onThisDay: MarketOnThisDayEntry[];
   formatPrice: (n: number) => string;
   frame: boolean;
 }) {
@@ -100,14 +100,14 @@ function BtcOnThisDayRows({
   );
 }
 
-/** BTC anniversary price rows for Look Back (wireframe: "BTC on this day"). */
-export function BtcOnThisDayBlock({
+/** Tracked-asset anniversary price rows for Look Back. */
+export function MarketOnThisDayBlock({
   currentPrice,
   onThisDay,
   partial,
   formatPrice,
   variant = 'default',
-}: BtcOnThisDayBlockProps) {
+}: MarketOnThisDayBlockProps) {
   "use memo";
   const { t } = useTranslation();
   if (!currentPrice || onThisDay.length === 0) return null;
@@ -140,7 +140,7 @@ export function BtcOnThisDayBlock({
           {t('pause.frame.lookBackContent.partialData')}
         </p>
       ) : null}
-      <BtcOnThisDayRows
+      <MarketOnThisDayRows
         currentPrice={currentPrice}
         onThisDay={onThisDay}
         formatPrice={formatPrice}
@@ -149,3 +149,6 @@ export function BtcOnThisDayBlock({
     </div>
   );
 }
+
+/** @deprecated Use MarketOnThisDayBlock */
+export const BtcOnThisDayBlock = MarketOnThisDayBlock;

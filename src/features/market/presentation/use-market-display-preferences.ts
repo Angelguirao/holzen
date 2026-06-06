@@ -9,20 +9,22 @@ function readIsTrue(key: string): boolean {
   }
 }
 
+const UNIT_BASIS_MODE_STORAGE_KEY = 'holzen_btc_mode';
+
 /**
- * Price visibility, BTC unit mode, and market chart expand state for the Home market widget.
+ * Price visibility, unit-basis display mode (1 BTC = 1 BTC), and market chart expand state for Home.
  */
 export function useMarketDisplayPreferences() {
   const [priceHidden, setPriceHidden] = useState(() => readIsTrue('holzen_hide_price'));
-  const [btcMode, setBtcMode] = useState(() => readIsTrue('holzen_btc_mode'));
+  const [unitBasisMode, setUnitBasisMode] = useState(() => readIsTrue(UNIT_BASIS_MODE_STORAGE_KEY));
   const [marketChartExpanded, setMarketChartExpanded] = useState(false);
-  const marketChartExpandBlocked = btcMode || priceHidden;
+  const marketChartExpandBlocked = unitBasisMode || priceHidden;
 
   useEffect(() => {
-    if (btcMode || priceHidden) {
+    if (unitBasisMode || priceHidden) {
       setMarketChartExpanded(false);
     }
-  }, [btcMode, priceHidden]);
+  }, [unitBasisMode, priceHidden]);
 
   const togglePriceHidden = useCallback(() => {
     setPriceHidden((prev) => {
@@ -36,11 +38,11 @@ export function useMarketDisplayPreferences() {
     });
   }, []);
 
-  const toggleBtcMode = useCallback(() => {
-    setBtcMode((prev) => {
+  const toggleUnitBasisMode = useCallback(() => {
+    setUnitBasisMode((prev) => {
       const next = !prev;
       try {
-        localStorage.setItem('holzen_btc_mode', String(next));
+        localStorage.setItem(UNIT_BASIS_MODE_STORAGE_KEY, String(next));
       } catch {
         /* ignore */
       }
@@ -58,11 +60,15 @@ export function useMarketDisplayPreferences() {
 
   return {
     priceHidden,
-    btcMode,
+    unitBasisMode,
     marketChartExpanded,
     marketChartExpandBlocked,
     togglePriceHidden,
-    toggleBtcMode,
+    toggleUnitBasisMode,
     toggleMarketChartExpanded,
+    /** @deprecated Use unitBasisMode */
+    btcMode: unitBasisMode,
+    /** @deprecated Use toggleUnitBasisMode */
+    toggleBtcMode: toggleUnitBasisMode,
   };
 }

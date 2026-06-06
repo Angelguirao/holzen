@@ -57,7 +57,7 @@ export function pauseHomeErrorStrings(
 }
 
 /**
- * Market fetch failures from `useHolzen` / `fetchBtcDisplay` — user still has cached
+ * Market fetch failures from Holzen market display — user still has cached
  * `marketData` we can show in the market widget, so the pause strip should not steal focus.
  */
 export function isLikelyPriceOnlyMarketError(error: string): boolean {

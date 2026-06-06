@@ -1,7 +1,7 @@
 import { BookOpen, GitCompare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { CachedHistoricalInsightShape } from '@/features/pause/public-ritual-frame';
-import { BtcOnThisDayBlock } from '@/screens/pause/components/btc-on-this-day-block';
+import { MarketOnThisDayBlock } from '@/screens/pause/components/market-on-this-day-block';
 
 export type LookBackFrameDisplayProps = {
   data: CachedHistoricalInsightShape;
@@ -30,7 +30,7 @@ export function LookBackFrameDisplay({ data, formatPrice }: LookBackFrameDisplay
 
       {hasBtcPrices && data.currentPrice ? (
         <div className="space-y-4 rounded-lg bg-muted p-2">
-          <BtcOnThisDayBlock
+          <MarketOnThisDayBlock
             variant="frame"
             currentPrice={data.currentPrice}
             onThisDay={data.onThisDay ?? []}

@@ -64,7 +64,7 @@ export function useManualPauseTrigger({
       markPauseManualStartedHomeOnce();
       const t0 = Date.now();
       holzenLog.manual('generateMessage: start', {
-        btcChangePct: data.changePercent,
+        marketChangePct: data.changePercent,
         silentMode,
         mood: mood ?? '(none)',
       });

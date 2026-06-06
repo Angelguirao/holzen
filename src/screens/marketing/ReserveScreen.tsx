@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { PageHeading } from '@/components/ui/page-heading';
 import { StateCard } from '@/components/ui/state-card';
-import { getCoingeckoBtcUsdQueryOptions } from '@/features/market/public';
+import { getCoingeckoSpotPriceUsdQueryOptions } from '@/features/market/public';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -28,11 +28,11 @@ const ReserveScreen = () => {
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
-  const { data: btcPrice } = useQuery(getCoingeckoBtcUsdQueryOptions());
+  const { data: spotPriceUsd } = useQuery(getCoingeckoSpotPriceUsdQueryOptions());
 
-  const currentValue = btcPrice ? TREASURY.totalBtc * btcPrice : null;
-  const unrealisedPnl = btcPrice
-    ? ((btcPrice - TREASURY.averageCost) / TREASURY.averageCost) * 100
+  const currentValue = spotPriceUsd ? TREASURY.totalBtc * spotPriceUsd : null;
+  const unrealisedPnl = spotPriceUsd
+    ? ((spotPriceUsd - TREASURY.averageCost) / TREASURY.averageCost) * 100
     : null;
 
   const formatUsd = (n: number) =>

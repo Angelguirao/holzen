@@ -16,7 +16,7 @@ import { PageMeta } from '@/app/components/PageMeta';
 import { LandingTestimonials } from '@/screens/marketing/components/LandingTestimonials';
 import { LandingLanguageSwitcher } from '@/screens/marketing/components/LandingLanguageSwitcher';
 import { PRICING } from '@/features/subscription/public';
-import { prefetchCoingeckoBtcUsd } from '@/features/market/public';
+import { prefetchCoingeckoSpotPriceUsd } from '@/features/market/public';
 import { prefetchBlogPublishedFirstPage } from '@/features/user/public-queries';
 
 function Section({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
@@ -405,8 +405,8 @@ const LandingScreen = () => {
             <Link
               to="/reserve"
               className="hover:text-foreground transition-colors"
-              onMouseEnter={() => void prefetchCoingeckoBtcUsd(queryClient)}
-              onFocus={() => void prefetchCoingeckoBtcUsd(queryClient)}
+              onMouseEnter={() => void prefetchCoingeckoSpotPriceUsd(queryClient)}
+              onFocus={() => void prefetchCoingeckoSpotPriceUsd(queryClient)}
             >
               {t('landing.btcReserve')}
             </Link>
