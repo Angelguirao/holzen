@@ -1219,7 +1219,6 @@ export type Database = {
           companion_zoom_out: boolean
           cooldown_hours: number
           created_at: string
-          cumulative_threshold: number
           custom_prompt: string | null
           email_notifications: boolean
           first_name: string | null
@@ -1262,7 +1261,6 @@ export type Database = {
           companion_zoom_out?: boolean
           cooldown_hours?: number
           created_at?: string
-          cumulative_threshold?: number
           custom_prompt?: string | null
           email_notifications?: boolean
           first_name?: string | null
@@ -1305,7 +1303,6 @@ export type Database = {
           companion_zoom_out?: boolean
           cooldown_hours?: number
           created_at?: string
-          cumulative_threshold?: number
           custom_prompt?: string | null
           email_notifications?: boolean
           first_name?: string | null

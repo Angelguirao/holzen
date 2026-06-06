@@ -465,7 +465,6 @@ serve(
         directionBucket,
         severityBand,
         dailyBucketPct,
-        cumulativeBucketPct: 0,
         trackedAssetId: assetId,
         fearGreedBand: fearGreedSnapshot?.label ?? null,
         onChainBand: onChainForUser
@@ -483,7 +482,6 @@ serve(
           p_source: "cron_volatility",
           p_context_snapshot: {
             change_24h_pct: userM.changePercent,
-            change_7d_pct: null,
             direction: userM.direction,
             severity: severityBand,
             context_text: ctx,

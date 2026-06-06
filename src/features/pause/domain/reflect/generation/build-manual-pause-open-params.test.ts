@@ -9,7 +9,6 @@ const baseMarket: MarketQuote = {
   direction: 'down',
   currency: 'USD',
   changePercent: -6,
-  cumulativeChangePercent: -8,
   fearGreed: { value: 25, label: 'Fear' },
   onChain: {
     mempoolSize: 100,

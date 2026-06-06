@@ -14,8 +14,6 @@ export type MarketQuotePayload = {
   price24hAgo: number;
   changePercent: number;
   direction: "up" | "down";
-  cumulativeChangePercent?: number;
-  cumulativeDirection?: "up" | "down";
   fearGreed?: { value: number; label: string };
   onChain?: Record<string, unknown>;
   currency: string;

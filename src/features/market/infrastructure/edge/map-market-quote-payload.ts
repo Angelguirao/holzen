@@ -7,8 +7,6 @@ export type MarketQuoteEdgePayload = {
   price24hAgo: number;
   changePercent: number;
   direction: 'up' | 'down';
-  cumulativeChangePercent?: number;
-  cumulativeDirection?: 'up' | 'down';
   fearGreed?: { value: number; label: string };
   onChain?: Record<string, unknown>;
   currency: string;
@@ -33,8 +31,6 @@ export function mapMarketQuotePayload(payload: MarketQuoteEdgePayload): MarketQu
     price24hAgo: payload.price24hAgo,
     changePercent: payload.changePercent,
     direction: payload.direction,
-    cumulativeChangePercent: payload.cumulativeChangePercent,
-    cumulativeDirection: payload.cumulativeDirection,
     fearGreed: payload.fearGreed,
     onChain: mapOnChain(payload.onChain),
     currency: payload.currency.toUpperCase(),

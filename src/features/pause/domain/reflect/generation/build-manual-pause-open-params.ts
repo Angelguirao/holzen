@@ -35,7 +35,6 @@ export function buildManualPauseOpenParams(
     silentMessage: silentMsg,
     mood: input.mood,
     changePercent: input.data.changePercent,
-    cumulativeChangePercent: null,
     trackedAssetId: assetId,
     fearGreedLabel: input.data.fearGreed?.label ?? null,
     onChainBand,

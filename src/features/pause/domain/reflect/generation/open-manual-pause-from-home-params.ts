@@ -6,7 +6,6 @@ export type OpenManualPauseFromHomeParams = {
   silentMessage: string;
   mood?: string | null;
   changePercent: number;
-  cumulativeChangePercent: number | null;
   trackedAssetId: string;
   severityBand: string;
   fearGreedLabel: string | null;
