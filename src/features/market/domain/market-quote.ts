@@ -21,8 +21,6 @@ export interface MarketQuote {
   price24hAgo: number;
   changePercent: number;
   direction: 'up' | 'down';
-  cumulativeChangePercent?: number;
-  cumulativeDirection?: 'up' | 'down';
   fearGreed?: FearGreedData;
   onChain?: OnChainData;
   currency: string;

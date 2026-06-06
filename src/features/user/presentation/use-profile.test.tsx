@@ -61,7 +61,6 @@ function buildProfileRow(overrides: Partial<ProfileRow> = {}): ProfileRow {
     user_id: 'user-1',
     threshold: 5,
     threshold_down: 5,
-    cumulative_threshold: 15,
     last_context: null,
     email_notifications: true,
     has_onboarded: false,

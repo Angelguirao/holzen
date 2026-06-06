@@ -5,7 +5,6 @@ const INTEGRATION_PROFILE_ROW = {
   user_id: INTEGRATION_USER_ID,
   threshold: 5,
   threshold_down: 5,
-  cumulative_threshold: 15,
   last_context: null,
   email_notifications: true,
   has_onboarded: true,

@@ -13,4 +13,6 @@ This folder preserves the former **7-day cumulative** helpers and tests for refe
 
 Edge mirror: `supabase/functions/_shared/legacy/volatility-thresholds-cumulative-legacy.ts`.
 
-DB column `profiles.cumulative_threshold` remains for data compatibility; active UI no longer reads or writes it.
+**Schema (Jun 2026):** `profiles.cumulative_threshold` dropped in migration `20260608120000_drop_profiles_cumulative_threshold.sql`. Historical `pause_instances.context_snapshot.change_7d_pct` may still exist on old rows.
+
+**Fingerprints:** `computeContextFingerprint` no longer includes a cumulative bucket (`cb` removed); daily-only regime keys only.

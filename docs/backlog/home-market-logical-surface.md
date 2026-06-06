@@ -106,7 +106,7 @@ Absolute price anchors as **optional future layer** stay in [volatility-anchor-t
 
 - **Display prefs:** `useMarketDisplayPreferences` — hide, unit-basis, chart expand; expand blocked in unit-basis + hidden fiat.
 - **Footer projection:** `resolveMarketVolatilityRangeStatus` mirrors daily server thresholds; keep in sync with `_shared/volatility-thresholds.ts`.
-- **7-day cumulative (legacy):** stripped from active pause-first (Jun 2026). Archived in `src/legacy/cumulative-threshold/`; DB column `profiles.cumulative_threshold` retained for compatibility.
+- **7-day cumulative (legacy):** stripped from active pause-first (Jun 2026). Archived in `src/legacy/cumulative-threshold/`; DB column dropped; fingerprints daily-only.
 - **Pause duplication:** `formatHomePauseMarketBlock` + `HomePauseWidgetMarketRow` — pause card is the canonical “hot moment” copy surface.
 - **Figma vs logic:** Collapsed Market has **no** 24h/F&G ([251:17255](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=251-17255)); unit-basis layout ([533:36421](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=533-36421)). Align code when changing behavior; update this doc when **product** intent diverges from Figma.
 

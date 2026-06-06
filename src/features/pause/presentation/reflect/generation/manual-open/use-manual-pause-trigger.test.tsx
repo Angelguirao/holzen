@@ -59,7 +59,6 @@ vi.mock('@/features/pause/presentation/reflect/generation/manual-open/pause-home
     silentMsg: 'silent',
     contextText: 'ctx',
     silentMessage: 'silent',
-    cumulativeChangePercent: null,
     fearGreedLabel: null,
     onChainBand: null,
   }),

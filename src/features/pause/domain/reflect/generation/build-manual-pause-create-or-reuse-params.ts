@@ -16,7 +16,6 @@ export async function buildManualPauseCreateOrReuseParams(
     directionBucket,
     severityBand: params.severityBand,
     dailyBucketPct: bucketChangePercent(params.changePercent),
-    cumulativeBucketPct: bucketChangePercent(params.cumulativeChangePercent ?? 0),
     trackedAssetId: params.trackedAssetId,
     fearGreedBand: params.fearGreedLabel,
     onChainBand: params.onChainBand,
@@ -27,7 +26,6 @@ export async function buildManualPauseCreateOrReuseParams(
     source: 'manual',
     contextSnapshot: {
       change_24h_pct: params.changePercent,
-      change_7d_pct: params.cumulativeChangePercent ?? null,
       direction: directionBucket,
       severity: params.severityBand,
       context_text: params.contextText,

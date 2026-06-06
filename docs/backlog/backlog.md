@@ -30,7 +30,7 @@ Rule of thumb used here:
 
 | When | Ticket | Notes |
 |------|--------|-------|
-| 2026-06 | 7-day cumulative auto-pause strip | Active surface daily-only; archived in `src/legacy/cumulative-threshold/` + edge legacy helper. Settings slider removed; `profiles.cumulative_threshold` column kept. |
+| 2026-06 | 7-day cumulative residue cleanup | Dropped `profiles.cumulative_threshold`; removed 7d fields from `MarketQuote`, pause snapshots, and fingerprint hash (`cb`). |
 | 2026-04 | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | `mobile-web-app-capable` in `index.html`. |
 | 2026-04 | [cache-async-error-handling.md](cache-async-error-handling.md) | `.catch` + structured log on cache side-effect Supabase calls. |
 | 2026-04 | [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | Revert optimistic UI + `isPausePersistError` on Home when pause instance creation fails after generate. |

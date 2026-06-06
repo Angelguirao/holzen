@@ -92,7 +92,7 @@ Well-aligned relative to other contexts — see [src/features/market/README.md](
 |--------|--------|----------------|-------------|
 | Daily move | Rolling 24h | `threshold` (up), `threshold_down` (down) | Signed % change vs direction-specific threshold |
 
-**Legacy (not active):** rolling 7d cumulative auto-pause (`cumulative_threshold`) — archived in `src/legacy/cumulative-threshold/` and `supabase/functions/_shared/legacy/volatility-thresholds-cumulative-legacy.ts` (Jun 2026 strip).
+**Legacy (not active):** rolling 7d cumulative auto-pause — archived in `src/legacy/cumulative-threshold/` and `supabase/functions/_shared/legacy/volatility-thresholds-cumulative-legacy.ts`. Column `profiles.cumulative_threshold` dropped Jun 2026. Context fingerprints no longer hash a cumulative bucket (`cb` removed from `computeContextFingerprint`).
 
 Metrics come from CoinGecko `market_chart?days=1` in the cron worker (`fetchAssetVolatilityForCurrency`). Shared pure helpers: `supabase/functions/_shared/volatility-thresholds.ts` and `src/features/market/domain/volatility-thresholds.ts` (keep in sync).
 

@@ -22,7 +22,6 @@ const baseParams = {
   contextText: 'ctx',
   silentMessage: 'BTC moved.',
   changePercent: 3,
-  cumulativeChangePercent: 4,
   trackedAssetId: 'bitcoin',
   severityBand: 'mild',
   fearGreedLabel: 'fear',
@@ -44,7 +43,6 @@ describe('buildManualPauseCreateOrReuseParams', () => {
       directionBucket: 'up',
       severityBand: 'mild',
       dailyBucketPct: 3,
-      cumulativeBucketPct: 4,
       trackedAssetId: 'bitcoin',
       fearGreedBand: 'fear',
       onChainBand: 'low',
@@ -54,7 +52,6 @@ describe('buildManualPauseCreateOrReuseParams', () => {
       source: 'manual',
       contextSnapshot: {
         change_24h_pct: 3,
-        change_7d_pct: 4,
         direction: 'up',
         severity: 'mild',
         context_text: 'ctx',
@@ -70,7 +67,6 @@ describe('buildManualPauseCreateOrReuseParams', () => {
     const result = await buildManualPauseCreateOrReuseParams({
       ...baseParams,
       changePercent: -2,
-      cumulativeChangePercent: null,
       mood: 'calm',
     });
 
@@ -79,6 +75,5 @@ describe('buildManualPauseCreateOrReuseParams', () => {
     );
     expect(result.contextSnapshot.direction).toBe('down');
     expect(result.contextSnapshot.last_reported_mood).toBe('calm');
-    expect(result.contextSnapshot.change_7d_pct).toBeNull();
   });
 });
