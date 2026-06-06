@@ -401,7 +401,7 @@ const LandingScreen = () => {
               onMouseEnter={() => void prefetchCoingeckoSpotPriceUsd(queryClient)}
               onFocus={() => void prefetchCoingeckoSpotPriceUsd(queryClient)}
             >
-              {t('landing.btcReserve')}
+              {t('landing.reserveLabel')}
             </Link>
             <span className="text-muted-foreground/20">·</span>
             <Link
