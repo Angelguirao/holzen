@@ -62,10 +62,6 @@ export function resolveHomePauseWidgetMode(
     return { mode: 'blocking_error', defaultCollapsed: false, hasReachedReflect };
   }
 
-  if (input.showCalmWaters && !input.hasOpenPause) {
-    return { mode: 'calm_waters', defaultCollapsed: true, hasReachedReflect };
-  }
-
   if (input.hasOpenPause) {
     // Postgres `engaged` = deep ritual reached Reflect (`reflection_step`). Maps to Figma C.
     if (input.openPauseState === 'engaged') {

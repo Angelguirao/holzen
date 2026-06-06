@@ -60,6 +60,8 @@ export type HomePauseWidgetBodyProjection = {
   pendingPreviewLine: HomePauseWidgetPreviewLine | null;
   pendingMarketBlock: ReturnType<typeof formatHomePauseMarketBlock> | null;
   calmWatersExpiredAt: string | null;
+  /** One-shot Sonner when a cron offer expired with `context_lost` (mode stays A / D). */
+  showCalmWatersToast: boolean;
 };
 
 export type UseHomePauseWidgetProjectionParams = {
@@ -160,7 +162,7 @@ export function useHomePauseWidgetProjection(
 
   const assetSymbol = trackedAssetSymbol(params.trackedAssetId);
 
-  const [userExpanded, setUserExpanded] = useState<boolean>(() => readExpandedPreference() ?? true);
+  const [userExpanded, setUserExpanded] = useState<boolean>(() => readExpandedPreference() ?? false);
 
   const { mode: widgetMode } = useMemo(
     () =>
@@ -210,15 +212,8 @@ export function useHomePauseWidgetProjection(
     }
   }, [widgetMode, params.newPauseArrival]);
 
-  const isIdleMode = widgetMode === 'A_collapsed' || widgetMode === 'A_expanded';
-  const collapsible =
-    !isIdleMode && (homePauseWidgetModeIsCollapsible(widgetMode) || widgetMode === 'calm_waters');
-  const collapsed =
-    widgetMode === 'calm_waters'
-      ? !userExpanded
-      : isIdleMode
-        ? false
-        : homePauseWidgetModeIsCollapsed(widgetMode);
+  const collapsible = homePauseWidgetModeIsCollapsible(widgetMode);
+  const collapsed = homePauseWidgetModeIsCollapsed(widgetMode);
 
   const onToggleCollapse = useCallback(() => {
     setUserExpanded((prev) => {
@@ -318,6 +313,7 @@ export function useHomePauseWidgetProjection(
     pendingPreviewLine,
     pendingMarketBlock,
     calmWatersExpiredAt: calmQuery.data?.expiredAt ?? null,
+    showCalmWatersToast: showCalmWaters,
   };
 
   return {

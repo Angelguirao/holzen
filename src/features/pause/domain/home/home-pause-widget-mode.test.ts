@@ -100,10 +100,18 @@ const baseInput = {
 };
 
 describe('resolveHomePauseWidgetMode', () => {
-  it('A collapsed when idle', () => {
+  it('A collapsed when idle (including after context_lost)', () => {
     const r = resolveHomePauseWidgetMode(baseInput);
     expect(r.mode).toBe('A_collapsed');
     expect(homePauseWidgetModeIsCollapsed(r.mode)).toBe(true);
+  });
+
+  it('A collapsed when context_lost settled — not calm_waters body', () => {
+    const r = resolveHomePauseWidgetMode({
+      ...baseInput,
+      showCalmWaters: true,
+    });
+    expect(r.mode).toBe('A_collapsed');
   });
 
   it('A expanded when user expanded', () => {
@@ -218,14 +226,6 @@ describe('resolveHomePauseWidgetMode', () => {
       completedPauseCount: 0,
     });
     expect(r.mode).toBe('D_prime_collapsed');
-  });
-
-  it('calm_waters when flagged and no open pause', () => {
-    const r = resolveHomePauseWidgetMode({
-      ...baseInput,
-      showCalmWaters: true,
-    });
-    expect(r.mode).toBe('calm_waters');
   });
 
   it('loading when opening pause', () => {
