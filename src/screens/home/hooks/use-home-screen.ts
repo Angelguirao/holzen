@@ -166,6 +166,7 @@ export function useHomeScreen() {
     manualCooldownRemaining,
     startCheckout,
     dismissAnalyticsSurface: 'home_your_pause_widget',
+    userId: user?.id,
   });
 
   const pendingOfferActions = useHomePendingPauseOfferActions(navigate);

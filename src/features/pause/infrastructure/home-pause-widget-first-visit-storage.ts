@@ -4,7 +4,10 @@ export function homePauseWidgetFirstVisitStorageKey(userId: string): string {
   return `${HOME_PAUSE_WIDGET_FIRST_VISIT_KEY_PREFIX}_${userId}`;
 }
 
-/** False after the first Home idle visit auto-expand has been consumed for this user. */
+/**
+ * False after the user taps idle **Let's pause**, or an open pause exists first
+ * (Holzen offer — the first-visit A expanded onboarding is forfeited).
+ */
 export function shouldExpandHomePauseWidgetFirstVisit(userId: string | undefined): boolean {
   if (!userId) return false;
   try {
