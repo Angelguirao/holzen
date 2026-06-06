@@ -103,3 +103,15 @@ Automatic offers target **volatility-driven checking**, not trading alerts at fi
 **Decision record:** [2026-06-03-percent-volatility-triggers.md](../decisions/2026-06-03-percent-volatility-triggers.md).
 
 **Future (optional):** personal anchor thresholds (entry, round numbers) layered **on top of** % logic — [volatility-anchor-thresholds.md](../backlog/volatility-anchor-thresholds.md).
+
+---
+
+## 9. Tracked asset catalog (multi-class prep)
+
+**Shipped:** bitcoin only in `TRACKED_ASSETS` — see `src/features/market/domain/tracked-assets.ts`.
+
+**Model:** `TrackedAssetDefinition` (`id`, `symbol`, `kind`, `provider`) + `profiles.tracked_asset_id` as provider-native string. **Quote type:** prefer `MarketQuote`; `BtcPriceData` is a deprecated alias.
+
+**BTC-only product features** should use `isBitcoinTrackedAsset()` (on-chain, unit display mode, zoom-out anniversary).
+
+**Full 360° gap analysis and rollout steps:** [tracked-asset-class-evolution.md](../backlog/tracked-asset-class-evolution.md).

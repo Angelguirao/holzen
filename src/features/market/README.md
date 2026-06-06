@@ -11,11 +11,11 @@ Home orchestration mounts via `app/components/HolzenProvider` (`useHolzenHomeCon
 ```text
 features/market/
   domain/
-    market-quote.ts           # BtcPriceData, currencies
+    market-quote.ts           # MarketQuote (+ BtcPriceData alias), currencies
     btc-move-severity.ts      # severity from % move
     volatility-thresholds.ts  # cumulative trigger thresholds (shared with edge)
     market-volatility-range-status.ts  # within / beyond band UI projection (Home Market footer)
-    tracked-assets.ts
+    tracked-assets.ts         # TrackedAssetDefinition catalog; pause-first ships bitcoin only
     coingecko-market-chart-point.ts
   application/
     pause-context-from-market.ts

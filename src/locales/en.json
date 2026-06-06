@@ -504,10 +504,7 @@
     "trackedAssetTitle": "Tracked asset",
     "trackedAssetDesc": "Volatility checks, Home market data, and pause context follow this asset. Legacy Bitcoin calendar badges apply only when Bitcoin is selected.",
     "trackedAssets": {
-      "bitcoin": "Bitcoin (BTC)",
-      "ethereum": "Ethereum (ETH)",
-      "solana": "Solana (SOL)",
-      "monero": "Monero (XMR)"
+      "bitcoin": "Bitcoin (BTC)"
     },
     "myWhy": "My Why",
     "myWhyDesc": "What matters to you? Select what resonates. This shapes your Home anchor and companion tone.",

@@ -9,8 +9,6 @@ interface Props {
   stagger: (delay: number) => object;
 }
 
-const ONBOARDING_TRACKED_ASSETS = TRACKED_ASSETS.filter((asset) => asset.id === 'bitcoin');
-
 export function OnboardingAssetStep({ trackedAssetId, onSelect, stagger }: Props) {
   "use memo";
   const { t } = useTranslation();
@@ -37,7 +35,7 @@ export function OnboardingAssetStep({ trackedAssetId, onSelect, stagger }: Props
       </motion.div>
 
       <motion.div className="space-y-3" {...stagger(0.25)}>
-        {ONBOARDING_TRACKED_ASSETS.map((asset) => {
+        {TRACKED_ASSETS.map((asset) => {
           const isSelected = trackedAssetId === asset.id;
           return (
             <button

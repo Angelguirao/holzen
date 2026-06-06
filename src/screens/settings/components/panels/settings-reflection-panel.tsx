@@ -38,18 +38,24 @@ export function SettingsReflectionPanel() {
           {t('settings.trackedAssetTitle')}
         </p>
         <p className="leading-relaxed text-foreground text-sm">{t('settings.trackedAssetDesc')}</p>
-        <Select value={trackedAssetId} onValueChange={(v) => void setTrackedAssetId(v)}>
-          <SelectTrigger className="max-w-md font-mono text-xs" aria-label={t('settings.trackedAssetTitle')}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {TRACKED_ASSETS.map((a) => (
-              <SelectItem key={a.id} value={a.id} className="font-mono text-xs">
-                {t(`settings.trackedAssets.${a.id}`)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {TRACKED_ASSETS.length > 1 ? (
+          <Select value={trackedAssetId} onValueChange={(v) => void setTrackedAssetId(v)}>
+            <SelectTrigger className="max-w-md font-mono text-xs" aria-label={t('settings.trackedAssetTitle')}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {TRACKED_ASSETS.map((a) => (
+                <SelectItem key={a.id} value={a.id} className="font-mono text-xs">
+                  {t(`settings.trackedAssets.${a.id}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <p className="max-w-md font-mono text-xs text-foreground">
+            {t(`settings.trackedAssets.${TRACKED_ASSETS[0].id}`)}
+          </p>
+        )}
       </div>
 
       <ThresholdSetting
