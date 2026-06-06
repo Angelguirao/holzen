@@ -41,6 +41,7 @@ What we chose (one or two short paragraphs).
 
 | Date | Title | File |
 |------|--------|------|
+| 2026-05-26 | Browser extension via Plasmo (behavioral wedge) | [2026-05-26-browser-extension-plasmo.md](2026-05-26-browser-extension-plasmo.md) |
 | 2026-05-23 | Render boundaries now; defer React Compiler and React 19 | [2026-05-23-render-boundaries-defer-react-compiler-19.md](2026-05-23-render-boundaries-defer-react-compiler-19.md) |
 | 2026-05-17 | Modular monolith + hexagonal client (pre-launch) | [2026-05-17-modular-monolith-hexagonal-client.md](2026-05-17-modular-monolith-hexagonal-client.md) |
 | 2026-05-16 | Pause-first shipped scope | [2026-05-16-pause-first-shipped-scope.md](2026-05-16-pause-first-shipped-scope.md) |

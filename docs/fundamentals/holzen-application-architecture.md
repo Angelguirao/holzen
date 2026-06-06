@@ -50,6 +50,7 @@ These constraints are **inputs** to architecture, not afterthoughts.
 | **Supabase as platform** | Auth, PostgREST, RPCs, storage, and Deno edge are **infrastructure**; Holzen policy sits **above** them in SQL and application steps. |
 | **AI and third-party APIs** | Secrets and orchestration stay in **edge**; the SPA invokes named operations via `invokeEdge` with **`x-cid`**. |
 | **Single web app today** | One primary deployable (`apps/web` or equivalent); design so **packages** can be shared if a second client appears. |
+| **Behavioral surfaces (planned)** | Browser extension (Plasmo) for cross-site signals + overlays; mobile companion later — see [behavioral-platform-strategy.md](behavioral-platform-strategy.md) and ADR [2026-05-26-browser-extension-plasmo.md](../decisions/2026-05-26-browser-extension-plasmo.md). |
 | **Pre-launch window** | Prefer **one correct structural baseline** over years of incremental folder drift. |
 
 ---
@@ -490,5 +491,7 @@ When **behavior** of pause changes, update **`pause-system.md`**. When **why we 
 3. **Tabs are screens** in `apps/web`; they **compose** pause, subscription, market, and user — they are not packages.  
 4. **Use cases** name intentions; **ports/adapters** isolate IO; **contracts** align wire formats.  
 5. **Pre-launch** is the window to match **structure to the product model** — not to preserve accidental layout.
+
+**Platform evolution:** [behavioral-platform-strategy.md](behavioral-platform-strategy.md) (engine layers, extension wedge, metrics). **Extension ADR:** [2026-05-26-browser-extension-plasmo.md](../decisions/2026-05-26-browser-extension-plasmo.md).
 
 **One-line mandate:** *One pause context on the client, authoritative ritual on Supabase, screens that compose, React that presents.*

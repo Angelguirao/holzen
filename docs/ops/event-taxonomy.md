@@ -186,6 +186,21 @@ Web Vitals are also forwarded to Sentry metrics. PostHog copy supports cohort/fu
 
 `npm run check:posthog-events-allowlist` — every `trackEvent('…')` in active `src/` (excluding `src/legacy/` and `src/test/`) must appear in the **Active events** section above. Runs in **`test:ci`** and `scripts/pre-push-check.sh`.
 
+**Planned events** (below) are **not** enforced by the allowlist until code emits them.
+
+## Planned events (browser extension — not wired)
+
+Draft names for [browser-extension-behavioral-mvp.md](../backlog/browser-extension-behavioral-mvp.md). Move rows to **Active events** in the same PR as `trackEvent` call sites. Use super-property `surface: 'extension'`.
+
+| Event | When | Properties (draft) |
+|-------|------|---------------------|
+| `extension.market_domain_detected` | Content script matches allowlisted market domain | `{ domain: string }` |
+| `extension.check_burst_detected` | Refreshes/revisits exceed threshold in window | `{ domain: string, count: number, window_minutes: number }` |
+| `extension.intervention_shown` | Overlay displayed | `{ intervention_type: string, domain: string }` |
+| `extension.intervention_completed` | User finished cooldown/breathing | `{ intervention_type: string }` |
+| `extension.intervention_dismissed` | User closed without completing | `{ intervention_type: string }` |
+| `extension.pause_deep_link_opened` | User opened full pause on web | `{ source: 'overlay' \| 'popup' }` |
+
 ## Server-side events
 
 None. Edge functions emit to `analytics_events` (Postgres) and BetterStack logs — not PostHog. If we later need server-side events in PostHog (e.g. Stripe webhook events), add a dedicated `posthog-capture` pattern via HTTP and document it here.

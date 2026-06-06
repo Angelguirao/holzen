@@ -32,6 +32,18 @@ Do **not** move the SPA to `apps/web` without passing the extraction gate in [AD
 | **Screen / route** | `src/screens/<route>/` (now) → `apps/web/src/screens/` | Home, Archive, Journey, Settings, PauseSession, Companion* |
 | **Not a package** | — | `home`, `archive`, `journey`, `settings`, `companion` (companions are **inside** `pause`) |
 
+### 0.2 Browser extension (planned — not shipped)
+
+**ADR:** [2026-05-26-browser-extension-plasmo.md](../decisions/2026-05-26-browser-extension-plasmo.md) · **Strategy:** [behavioral-platform-strategy.md](behavioral-platform-strategy.md) · **Backlog:** [browser-extension-behavioral-mvp.md](../backlog/browser-extension-behavioral-mvp.md)
+
+| | **Now** | **Target** |
+|---|---------|------------|
+| **Location** | — | `apps/extension/` (Plasmo) |
+| **Shared code** | Pause/market logic in `src/features/` | `packages/behavioral-engine` + Nox tokens from shared CSS/Tailwind config |
+| **CI** | — | Extension build job; no `@/legacy` imports |
+
+The extension is a **second client**, not a feature folder under `src/features/`. It deep-links to the SPA for full `/pause` rituals.
+
 ---
 
 ## 1. Target monorepo tree (north star — gated on §0)
@@ -49,8 +61,15 @@ holzen/
       index.html
       vite.config.ts
       vitest.config.ts
+    extension/                  # Plasmo — behavioral overlays on market sites (planned)
+      src/
+        contents/               # content scripts per allowlisted domain
+        popup/                  # optional: status, sign-in CTA
+        overlay/                # shared intervention UI (Nox-aligned)
+      package.json
 
   packages/
+    behavioral-engine/          # shared intervention rules + thresholds (when SPA + extension share logic)
     contracts/
       src/
         edge/                   # holzen-reflect, companion-orchestrate, …

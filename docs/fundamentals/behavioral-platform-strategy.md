@@ -283,6 +283,8 @@ Extracting the engine into a package is a **refactor after** two surfaces (SPA +
 - [client-server-architecture-holzen.md](client-server-architecture-holzen.md) — truth vs projection
 - [c4-holzen.md](../architecture/c4-holzen.md) — system context (add extension container when it exists)
 - [implementation-notes-workflow.md](implementation-notes-workflow.md) — log ambiguous extension↔SPA decisions in implementation notes
+- [2026-05-26-browser-extension-plasmo.md](../decisions/2026-05-26-browser-extension-plasmo.md) — accepted Plasmo ADR
+- [browser-extension-behavioral-mvp.md](../backlog/browser-extension-behavioral-mvp.md) — phased implementation ticket
 - [backlog/e2e-browser-automation.md](../backlog/e2e-browser-automation.md) — full SPA journeys; extension will need Playwright + extension harness later
 
 ---
@@ -301,4 +303,4 @@ Extracting the engine into a package is a **refactor after** two surfaces (SPA +
 | First wedge | Volatility + compulsive checking | Concrete, measurable, browser-observable |
 | v0 intervention complexity | Rules + UX, not AI | Fast learning cycles |
 
-When extension work starts, add a short ADR (e.g. `decisions/YYYY-MM-DD-browser-extension-plasmo.md`) for Plasmo-specific wiring and update the C4 container diagram.
+**Implementation artifacts:** ADR [2026-05-26-browser-extension-plasmo.md](../decisions/2026-05-26-browser-extension-plasmo.md) · backlog [browser-extension-behavioral-mvp.md](../backlog/browser-extension-behavioral-mvp.md) · C4 [Level 2b](../architecture/c4-holzen.md#level-2b--planned-container-browser-extension) (planned container). Update the main C4 diagram when `apps/extension` ships.

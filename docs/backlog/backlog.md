@@ -110,6 +110,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | Lower | [companion-share-as-image-pro.md](companion-share-as-image-pro.md) | **Companions:** Pro **share as image** — **`html-to-image`** client-side; design pass — see ticket. |
 | Lower | [companion-high-contrast-reading-mode.md](companion-high-contrast-reading-mode.md) | **Companions:** **High-contrast reading** — theme token swap for Full View / cards — see ticket. |
 | Lower | [companion-print-friendly-css.md](companion-print-friendly-css.md) | **Companions:** **`@media print`** for reading surfaces — see ticket. |
+| **High (strategic wedge)** | [browser-extension-behavioral-mvp.md](browser-extension-behavioral-mvp.md) | **Open.** Plasmo extension: market-site check bursts → calming overlay → `/pause` deep link; validate compulsive-checking reduction — see [behavioral-platform-strategy.md](../fundamentals/behavioral-platform-strategy.md). |
 
 ### Ops & security (cron workers, secrets, docs alignment)
 
@@ -145,6 +146,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
 | Defer | [spa-framework-evaluation.md](spa-framework-evaluation.md) | Vite SPA vs full-stack React framework (SSR/SSG/RSC); when to reconsider. |
+| Planned | [browser-extension-behavioral-mvp.md](browser-extension-behavioral-mvp.md) | Plasmo extension for volatility/checking wedge — ADR accepted; no code yet — see [behavioral-platform-strategy.md](../fundamentals/behavioral-platform-strategy.md). |
 
 ---
 
@@ -187,6 +189,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Frontend | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **Done (2026-04).** Vite **`transformIndexHtml`** — see ticket |
 | Frontend | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | **Done (2026-04).** **`BtcChartLazyGate`** — see ticket |
 | Strategic | [spa-framework-evaluation.md](spa-framework-evaluation.md) | SPA vs framework evaluation |
+| Strategic | [browser-extension-behavioral-mvp.md](browser-extension-behavioral-mvp.md) | **Open.** Plasmo extension MVP — behavioral wedge |
 
 ---
 
@@ -194,10 +197,10 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 
 | Theme | Backlog files |
 |--------|----------------|
-| **Platform, architecture & tooling** | [e2e-browser-automation.md](e2e-browser-automation.md), [spa-framework-evaluation.md](spa-framework-evaluation.md), ~~[hosting-production-compression.md](hosting-production-compression.md)~~ **done** |
+| **Platform, architecture & tooling** | [e2e-browser-automation.md](e2e-browser-automation.md), [browser-extension-behavioral-mvp.md](browser-extension-behavioral-mvp.md), [spa-framework-evaluation.md](spa-framework-evaluation.md), ~~[hosting-production-compression.md](hosting-production-compression.md)~~ **done** |
 | **Frontend structure & conventions** | ~~[typed-navigation-state.md](typed-navigation-state.md)~~ **done**, ~~[route-level-code-splitting.md](route-level-code-splitting.md)~~ **done**, [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), ~~[data-fetching-conventions.md](data-fetching-conventions.md)~~ **done**, [home-fetch-deduplication.md](home-fetch-deduplication.md), ~~[resource-hints-preconnect.md](resource-hints-preconnect.md)~~ **done**, ~~[home-recharts-layout-cost.md](home-recharts-layout-cost.md)~~ **done** |
 | **Auth & routing** | ~~[auth-referral.md](auth-referral.md)~~ **done 2026-04**; ~~[route-gating.md](route-gating.md)~~ **done 2026-04** |
-| **Product / UX** | ~~[automatic-pause-notification-timing.md](automatic-pause-notification-timing.md)~~ **done**, ~~[cron-pause-featured-parity.md](cron-pause-featured-parity.md)~~ **done**, ~~[route-gating.md](route-gating.md)~~ **done**, ~~[cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md)~~ **done 2026-04**, ~~[form-field-name-id-a11y.md](form-field-name-id-a11y.md)~~ **done**, ~~[lighthouse-a11y-home.md](lighthouse-a11y-home.md)~~ **done** |
+| **Product / UX** | ~~[automatic-pause-notification-timing.md](automatic-pause-notification-timing.md)~~ **done**, ~~[cron-pause-featured-parity.md](cron-pause-featured-parity.md)~~ **done**, ~~[route-gating.md](route-gating.md)~~ **done**, ~~[cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md)~~ **done 2026-04**, ~~[form-field-name-id-a11y.md](form-field-name-id-a11y.md)~~ **done**, ~~[lighthouse-a11y-home.md](lighthouse-a11y-home.md)~~ **done**, [browser-extension-behavioral-mvp.md](browser-extension-behavioral-mvp.md) |
 | **Companions (reading / sharing)** | [companion-tts-pro.md](companion-tts-pro.md), [companion-share-as-image-pro.md](companion-share-as-image-pro.md), [companion-high-contrast-reading-mode.md](companion-high-contrast-reading-mode.md), [companion-print-friendly-css.md](companion-print-friendly-css.md) |
 | **Pause pipeline & client–server boundaries** | ~~[orchestrate-client-cron.md](orchestrate-client-cron.md)~~ **done**, ~~[automatic-pause-notification-timing.md](automatic-pause-notification-timing.md)~~ **done**, ~~[cron-pause-featured-parity.md](cron-pause-featured-parity.md)~~ **done** |
 | **Cost & duplicate work (client + server)** | ~~[orchestrate-client-cron.md](orchestrate-client-cron.md)~~ **done**, ~~[cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md)~~ **done**, [home-fetch-deduplication.md](home-fetch-deduplication.md) |
@@ -214,6 +217,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [auth-referral.md](auth-referral.md) | **Done (2026-04).** Queue + cron worker — see ticket |
 | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md) | **Done (2026-04).** Fire-and-forget policy — see ticket |
 | [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | **Done (2026-04).** **`cron-setup`** + **`refresh-btc-prices`** contract — see ticket |
+| [browser-extension-behavioral-mvp.md](browser-extension-behavioral-mvp.md) | **Open.** Plasmo extension — check bursts, overlays, pause deep link — see ticket |
 | [cache-async-error-handling.md](cache-async-error-handling.md) | **Done (2026-04).** `.catch` on fire-and-forget cache helpers — see ticket. |
 | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md) | **Done (2026-04).** **`fetch-source-feeds`** + **`pregenerate-companions`** — see ticket |
 | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | **Done (2026-04).** `holzen_event: cache_serve` + UI + DB column — see ticket |
@@ -297,3 +301,4 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 37. **Edge functions → `withRequestLogging` migration** — [edge-functions-request-logging-migration.md](edge-functions-request-logging-migration.md) *(4/39 wrapped; ~35 remaining)*
 38. **PostHog UI-level privacy hardening** — [posthog-ui-privacy-hardening.md](posthog-ui-privacy-hardening.md) *(code-side already locked down; UI toggles + Authorized URLs remaining)*
 39. **Sentry Allowed Domains** — [sentry-allowed-domains.md](sentry-allowed-domains.md) *(1-minute UI change; scopes public DSN to Holzen origins)*
+40. **Browser extension behavioral MVP** — [browser-extension-behavioral-mvp.md](browser-extension-behavioral-mvp.md) *(Plasmo; ADR [2026-05-26](../decisions/2026-05-26-browser-extension-plasmo.md); strategy [behavioral-platform](../fundamentals/behavioral-platform-strategy.md))*

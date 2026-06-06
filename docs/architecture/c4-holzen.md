@@ -1,6 +1,6 @@
 # Holzen — C4 architecture
 
-**Last updated:** 2026-04-02
+**Last updated:** 2026-05-26
 
 [C4](https://c4model.com/) describes software with hierarchical diagrams. This repo maintains **System Context** and **Container** views. Deeper levels (components, code) stay in feature docs and source layout.
 
@@ -83,9 +83,46 @@ UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 
 ---
 
+## Level 2b — Planned container (browser extension)
+
+**Not shipped.** Documented so C4 stays aligned with [behavioral-platform-strategy.md](../fundamentals/behavioral-platform-strategy.md) and ADR [2026-05-26-browser-extension-plasmo.md](../decisions/2026-05-26-browser-extension-plasmo.md). Merge into the main container diagram when `apps/extension` exists.
+
+```mermaid
+C4Container
+title Planned — browser extension container
+
+Person(user, "Holzen user", "Checks markets on third-party sites.")
+
+System_Boundary(holzen, "Holzen") {
+    Container(spa, "Web application", "React, Vite", "Pause ritual, auth, subscription — shipped.")
+    Container(ext, "Browser extension", "Plasmo, React, TS", "Content scripts, overlays, check-burst telemetry on allowlisted market domains.")
+    Container(edge, "Edge functions", "Deno", "Unchanged — reflection, companions, Stripe, cron.")
+}
+
+System_Ext(market_sites, "Market websites", "CoinMarketCap, TradingView, exchanges — not owned by Holzen.")
+System_Ext(supabase, "Supabase", "Auth, Postgres, hosts edge.")
+
+Rel(user, spa, "Full pause ritual", "HTTPS")
+Rel(user, market_sites, "Price checking", "HTTPS")
+Rel(ext, market_sites, "Observes + injects overlay", "Content scripts")
+Rel(user, ext, "Installs", "Web store")
+Rel(ext, supabase, "Session, optional telemetry/events", "HTTPS")
+Rel(ext, spa, "Deep link to /pause", "HTTPS")
+Rel(spa, supabase, "RLS, invoke edge", "HTTPS")
+Rel(edge, supabase, "Service role, secrets", "HTTPS")
+```
+
+**Notes**
+
+- Extension **does not** replace the SPA container; it adds **cross-origin behavioral signals** and lightweight interventions.
+- Prefer **PostHog** for extension funnel events (`surface: extension`); Postgres only if server-side aggregation is required (see backlog ticket).
+
+---
+
 ## Related documentation
 
 - [navigating-the-codebase.md](../fundamentals/navigating-the-codebase.md) — repo map and boot flow  
+- [behavioral-platform-strategy.md](../fundamentals/behavioral-platform-strategy.md) — planned browser extension container (§Level 2b in c4-holzen.md)
 - [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) — pause and companion pipeline  
 - [AGENTS.md](../../AGENTS.md) — paths and conventions for automation  
 - [cron-setup.md](../ops/cron-setup.md) — scheduled jobs calling edge functions  

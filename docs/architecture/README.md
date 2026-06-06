@@ -3,6 +3,7 @@
 This folder holds **C4-style** views of Holzen: **System Context** and **Container** diagrams (external systems and deployables). They complement:
 
 - [client-src-layout.md](../fundamentals/client-src-layout.md) — **inside the SPA**: `app` / `screens` / `components` / `features` folders
+- [behavioral-platform-strategy.md](../fundamentals/behavioral-platform-strategy.md) — product direction; extension as next surface (C4 §Level 2b when shipped)
 - [navigating-the-codebase.md](../fundamentals/navigating-the-codebase.md) — boot and runtime tour
 - [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) — pause AI pipeline
 
