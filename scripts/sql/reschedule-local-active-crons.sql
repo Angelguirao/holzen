@@ -16,7 +16,7 @@ BEGIN
 
   PERFORM cron.schedule(
     'check-volatility',
-    '*/15 * * * *',
+    '0 * * * *',
     $cmd$
     SELECT net.http_post(
       url := (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'holzen_project_url' LIMIT 1)

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { AutoCooldownIndicator } from '@/screens/home/components/HomePauseChrome';
 
-const SNAPSHOT_STORAGE_KEY = 'holzen_home_cooldown_snapshot_v1';
+const SNAPSHOT_STORAGE_KEY = 'holzen_home_cooldown_snapshot_v2';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -52,12 +52,12 @@ describe('HomePauseChrome scheduling helpers', () => {
     );
 
     // nextCronAt is +1m, cooldown ends at +1m30s, so the next actionable
-    // check is the following 15-minute slot (+16m from now).
+    // check is the following hourly slot (+61m from now).
     const row = JSON.parse(localStorage.getItem(SNAPSHOT_STORAGE_KEY) || 'null');
     expect(row).toMatchObject({
       remaining: 90_000,
       readyAt: now + 90_000,
-      nextScanAt: now + 960_000,
+      nextScanAt: now + 3_660_000,
     });
   });
 

@@ -184,8 +184,8 @@ export {
   useHolzenHomeContextState,
 } from './public-home';
 export {
-  millisecondsUntilNextQuarterHour,
-  PAUSE_CRON_QUARTER_INTERVAL_MS,
+  millisecondsUntilNextVolatilityCheck,
+  PAUSE_CRON_CHECK_VOLATILITY_INTERVAL_MS,
 } from './public-scheduling';
 export {
   pauseHomeErrorKind,

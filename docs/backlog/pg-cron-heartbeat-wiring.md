@@ -34,7 +34,7 @@ BetterStack → **Uptime** product (not Logs) → **Heartbeats** → **Create he
 | `holzen-cron-process-email-queue` | 1 min | 5 min | Smallest cadence; allow up to 5 missed slots before paging — single-slot misses are noise from pgmq lock contention. | `heartbeat.process_email_queue` |
 | `holzen-cron-process-referral-pending` | 5 min | 2 min | Floor grace; job is idempotent + retries internally, so one missed run is tolerable, two is not. | `heartbeat.process_referral_pending` |
 | `holzen-cron-refresh-market-prices` | 15 min | 5 min | CoinGecko 429s + retry add up to ~3 min; 5 min absorbs that without false-positive while still catching a fully dead worker on the next slot. | `heartbeat.refresh_market_prices` |
-| `holzen-cron-check-volatility` | 15 min | 5 min | Same cadence as price refresh; grace matches so they alert in lockstep when pg_cron itself is down. | `heartbeat.check_volatility` |
+| `holzen-cron-check-volatility` | 1 hr | 10 min | Hourly eligibility scan; p95 runtime is well under one slot — grace follows the hourly rule. | `heartbeat.check_volatility` |
 | `holzen-cron-night-reflection` | 1 hr | 10 min | Fans out per-user AI generation; p95 runtime ~3-5 min, grace covers slow batches without paging. | `heartbeat.night_reflection` |
 | `holzen-cron-pregenerate-companions` | 6 hr | 30 min | Long-running batch (Lovable AI); 30 min absolute grace, not proportional — anything later is a real stall. | `heartbeat.pregenerate_companions` |
 | `holzen-cron-fetch-source-feeds` | 12 hr | 30 min | External RSS/Firecrawl fetches with internal per-source throttling; runtime variance is bounded, so absolute grace is appropriate. | `heartbeat.fetch_source_feeds` |

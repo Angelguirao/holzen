@@ -7,7 +7,7 @@ import {
 } from '@/features/market/public';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
-import { millisecondsUntilNextQuarterHour } from '@/features/pause/public-scheduling';
+import { millisecondsUntilNextVolatilityCheck } from '@/features/pause/public-scheduling';
 import { useOpenPauseHomePreview } from '@/features/pause/presentation/reflect/generation/manual-open/use-open-pause-home-preview';
 import { useHolzenManualTriggerOrchestration } from './use-holzen-manual-trigger-orchestration';
 import { useManualPauseTrigger } from '@/features/pause/presentation/reflect/generation/manual-open/use-manual-pause-trigger';
@@ -93,7 +93,7 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
       setError,
     });
 
-  const nextCronCheckIn = useCallback(() => millisecondsUntilNextQuarterHour(), []);
+  const nextCronCheckIn = useCallback(() => millisecondsUntilNextVolatilityCheck(), []);
 
   const marketData = marketQuery.data ?? null;
 
