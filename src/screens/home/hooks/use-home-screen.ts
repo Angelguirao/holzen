@@ -97,6 +97,8 @@ export function useHomeScreen() {
   useHolzenCommunityStatsRealtime(Boolean(user?.id));
 
   const hasOpenPause = Boolean(lastPauseInstanceId);
+  const marketCommunityPauseInProgress =
+    hasOpenPause && (hasOpenPauseStepEvents || openPauseState === 'engaged');
 
   const { subscriptionReady, hasAccess, showPauseScheduling } = getHomeSubscriptionGate({
     subLoading,
@@ -220,6 +222,7 @@ export function useHomeScreen() {
       threshold,
       thresholdDown,
       cumulativeThreshold,
+      marketCommunityPauseInProgress,
       priceHidden,
       togglePriceHidden,
       currency,

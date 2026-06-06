@@ -827,10 +827,11 @@
   },
   "holzenNumber": {
     "title": "The Holzen Number",
-    "pausingNow": "pausing now",
+    "pausingNow": "of users pausing now",
+    "pausingNowToo": "are pausing now, too",
     "pausingNowDetail": "{{count}} person pausing now",
     "pausingNowDetail_other": "{{count}} people pausing now",
-    "pausedToday": "paused today",
+    "pausedToday": "of users paused today",
     "pausedTodayDetail": "{{count}} person paused today",
     "pausedTodayDetail_other": "{{count}} people paused today",
     "heldSteadyToday": "chose deliberately today",

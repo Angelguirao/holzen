@@ -17,7 +17,7 @@ function compactMoveFromContext(btc24h: string | null, assetSymbol: string): str
     new RegExp(`${assetSymbol} is (up|down) ([\\d.]+)% in the last 24 hours\\.`, 'i'),
   );
   if (!match) return btc24h;
-  const arrow = match[1].toLowerCase() === 'down' ? '↓' : '↑';
+  const arrow = match[1].toLowerCase() === 'down' ? '▼' : '▲';
   return `${assetSymbol} ${arrow} ${match[2]}% · 24h`;
 }
 
@@ -29,7 +29,7 @@ function compactSentimentFromContext(marketSentiment: string | null): string | n
 }
 
 function compactMoveFromLiveQuote(data: MarketQuote, assetSymbol: string): string {
-  const arrow = data.direction === 'down' ? '↓' : '↑';
+  const arrow = data.direction === 'down' ? '▼' : '▲';
   const pct = Math.abs(data.changePercent).toFixed(1);
   return `${assetSymbol} ${arrow} ${pct}% · 24h`;
 }

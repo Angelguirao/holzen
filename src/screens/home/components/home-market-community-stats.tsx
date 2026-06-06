@@ -28,7 +28,7 @@ function CommunityStatLine({
 }
 
 /** Right column: live + today community pause stats (Figma Market footer). */
-export function HomeMarketCommunityStats() {
+export function HomeMarketCommunityStats({ pauseInProgress = false }: { pauseInProgress?: boolean }) {
   "use memo";
   const { t } = useTranslation();
   const { data, isPending } = useQuery(getHolzenNumberQueryOptions());
@@ -37,6 +37,18 @@ export function HomeMarketCommunityStats() {
 
   const showNow = hasPausingNowStat(data);
   const showToday = hasPausedTodayStat(data);
+
+  if (pauseInProgress && showNow) {
+    return (
+      <div className="flex min-w-0 flex-1 flex-col items-end gap-0.5">
+        <CommunityStatLine
+          percent={data.percent_pausing_now}
+          label={t('holzenNumber.pausingNowToo', { defaultValue: 'are pausing now, too' })}
+        />
+      </div>
+    );
+  }
+
   if (!showNow && !showToday) return null;
 
   return (
@@ -44,13 +56,13 @@ export function HomeMarketCommunityStats() {
       {showNow ? (
         <CommunityStatLine
           percent={data.percent_pausing_now}
-          label={t('holzenNumber.pausingNow', { defaultValue: 'pausing now' })}
+          label={t('holzenNumber.pausingNow', { defaultValue: 'of users pausing now' })}
         />
       ) : null}
       {showToday ? (
         <CommunityStatLine
           percent={data.percent_paused_today}
-          label={t('holzenNumber.pausedToday', { defaultValue: 'paused today' })}
+          label={t('holzenNumber.pausedToday', { defaultValue: 'of users paused today' })}
         />
       ) : null}
     </div>
