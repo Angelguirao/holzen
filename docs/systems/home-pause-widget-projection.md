@@ -53,7 +53,7 @@ Modes are **derived**, not stored. Primary inputs to `resolveHomePauseWidgetMode
 
 | Mode | Typical condition | Primary CTA / body |
 |------|-------------------|-------------------|
-| **A** collapsed / expanded | No open pause; not in profile cooldown; default collapsed (Figma [578:30689](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-30689)) | Title **Your pause** + moon; chevron expands to [555:16772](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=555-16772) — within-range copy + **Let's pause** |
+| **A** collapsed / expanded | No open pause; not in manual cooldown; **collapsed by default** — **first Home idle visit** auto-expands once (Figma [555:16772](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=555-16772) exception) | Title **Your pause** + moon; chevron expands to within-range copy + **Let's pause** |
 | **B** | Open `active`, no step events yet | Figma **559:26757** — opening line + inline market + Nox **Let's pause** |
 | **B_in_progress** | Open `active`, `hasOpenPauseStepEvents` | Figma **555:18858** — two-tone status (no market row); Nox **Continue** + primary **Discard** |
 | **C** | Open pause, `state = engaged` | Same CTA stack as **B_in_progress**; opening/reflection + inline market when present |
@@ -131,8 +131,8 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 
 | # | Target mode | How to get there | Expect on Home |
 |---|-------------|------------------|------------------|
-| 1 | **A** collapsed | No open pause; not in profile cooldown | Title **Your pause** + moon; collapsed header only (Figma 578:30689) |
-| 2 | **A** expanded | Tap chevron on A | Within-range copy + Nox **Let's pause** (Figma 555:16772) |
+| 1 | **A** collapsed | No open pause; not in manual cooldown; **return visit** | Title **Your pause** + moon; collapsed header only (Figma 578:30689) |
+| 2 | **A** expanded | First Home idle visit **or** tap chevron on A | Within-range copy + Nox **Let's pause** (Figma 555:16772) |
 | 3 | **B** | Open `active`; no `pause_step_events` yet | **Your pause**; empathy + inline BTC/F&G + Nox **Let's pause** |
 | 3b | **B_in_progress** | Open `active`; log Feel (or any step) | **Continue your pause**; two-tone status only; Nox **Continue** + primary **Discard** |
 | 4 | **C** | Reach Reflect → `engaged` | Same title/CTAs as 3b; reflection or opening + inline market when present |
