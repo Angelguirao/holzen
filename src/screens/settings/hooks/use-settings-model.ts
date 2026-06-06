@@ -19,8 +19,6 @@ export function useSettingsModel() {
     setThreshold,
     thresholdDown,
     setThresholdDown,
-    cumulativeThreshold,
-    setCumulativeThreshold,
     emailNotifications,
     setEmailNotifications,
     companionPrefs,
@@ -95,7 +93,6 @@ export function useSettingsModel() {
       JSON.stringify({
         threshold,
         thresholdDown,
-        cumulativeThreshold,
         emailNotifications,
         reflectionTone,
         reflectionStyle,
@@ -114,7 +111,6 @@ export function useSettingsModel() {
     [
       threshold,
       thresholdDown,
-      cumulativeThreshold,
       emailNotifications,
       reflectionTone,
       reflectionStyle,
@@ -141,8 +137,6 @@ export function useSettingsModel() {
     setThreshold,
     thresholdDown,
     setThresholdDown,
-    cumulativeThreshold,
-    setCumulativeThreshold,
     emailNotifications,
     setEmailNotifications,
     companionPrefs,

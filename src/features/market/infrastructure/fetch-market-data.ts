@@ -158,7 +158,7 @@ async function tryFetchMarketFromEdge(
 
 /**
  * Home market strip: 24h quote + Fear & Greed only (2 external calls).
- * Full enrichment (7d cumulative, on-chain) runs on manual pause trigger.
+ * Full enrichment (on-chain) runs on manual pause trigger.
  */
 async function fetchMarketDataLiteUncached(
   coinId: TrackedAssetId,
@@ -204,9 +204,8 @@ async function fetchMarketDataUncached(coinId: TrackedAssetId, currency: string)
 
   try {
     const includeOnChain = isBitcoinTrackedAsset(coinId);
-    const [res1d, res7d, fearGreed, onChain] = await Promise.all([
+    const [res1d, fearGreed, onChain] = await Promise.all([
       fetchWithRetry(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=1`),
-      fetchWithRetry(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=7`),
       fetchFearGreed(),
       includeOnChain ? fetchOnChainData() : Promise.resolve(undefined),
     ]);
@@ -214,26 +213,9 @@ async function fetchMarketDataUncached(coinId: TrackedAssetId, currency: string)
     const data1d = await res1d.json();
     const quote = parse24hQuoteFromChart(data1d.prices as [number, number][]);
 
-    let cumulativeChangePercent: number | undefined;
-    let cumulativeDirection: 'up' | 'down' | undefined;
-
-    try {
-      const data7d = await res7d.json();
-      const prices7d: [number, number][] = data7d.prices;
-      if (prices7d && prices7d.length >= 2) {
-        const price7dAgo = prices7d[0][1];
-        cumulativeChangePercent = ((quote.currentPrice - price7dAgo) / price7dAgo) * 100;
-        cumulativeDirection = cumulativeChangePercent >= 0 ? 'up' : 'down';
-      }
-    } catch {
-      // 7-day data is optional
-    }
-
     const result: MarketQuote = {
       coinId,
       ...quote,
-      cumulativeChangePercent,
-      cumulativeDirection,
       fearGreed,
       onChain,
       currency: currency.toUpperCase(),
@@ -257,7 +239,7 @@ export async function fetchMarketDataLite(
   return dedupeMarketFetch(inflightKey, () => fetchMarketDataLiteUncached(coinId, currency));
 }
 
-/** Full quote for manual pause context (7d cumulative + optional on-chain). */
+/** Full quote for manual pause context (optional on-chain enrichment). */
 export async function fetchMarketData(
   coinIdRaw: string | null | undefined,
   currency: string = 'USD',

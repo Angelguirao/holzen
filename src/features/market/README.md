@@ -14,7 +14,7 @@ features/market/
     market-quote.ts           # MarketQuote (+ deprecated BtcPriceData alias), currencies
     market-move-severity.ts   # MarketMoveSeverity from % move
     btc-move-severity.ts      # deprecated re-exports
-    volatility-thresholds.ts  # cumulative trigger thresholds (shared with edge)
+    volatility-thresholds.ts  # daily trigger thresholds (shared with edge)
     market-volatility-range-status.ts  # within / beyond band UI projection (Home Market footer)
     tracked-assets.ts         # TrackedAssetDefinition catalog; pause-first ships bitcoin only
     coingecko-market-chart-point.ts

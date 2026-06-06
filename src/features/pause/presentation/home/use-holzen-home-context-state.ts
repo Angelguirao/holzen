@@ -69,7 +69,6 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
   const { generateMessage, loading } = useManualPauseTrigger({
     user,
     silentMode,
-    cumulativeThreshold: profile.cumulativeThreshold,
     trackedAssetId: profile.trackedAssetId,
     syncOpenPauseFromDb,
     setError,

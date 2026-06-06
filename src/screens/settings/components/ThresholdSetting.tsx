@@ -10,32 +10,27 @@ interface Props {
   onSetUp: (val: number) => void;
   thresholdDown: number;
   onSetDown: (val: number) => void;
-  cumulativeThreshold: number;
-  onSetCumulative: (val: number) => void;
   cooldownHours?: number;
   /** CoinGecko coin id for volatility frequency estimates. */
   trackedAssetId?: string;
 }
 
 export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function ThresholdSetting(
-  { thresholdUp, onSetUp, thresholdDown, onSetDown, cumulativeThreshold, onSetCumulative, cooldownHours, trackedAssetId = 'bitcoin' },
+  { thresholdUp, onSetUp, thresholdDown, onSetDown, cooldownHours, trackedAssetId = 'bitcoin' },
   ref
 ) {
   const { t } = useTranslation();
   const [upVal, setUpVal] = useState(thresholdUp);
   const [downVal, setDownVal] = useState(thresholdDown);
-  const [cumVal, setCumVal] = useState(cumulativeThreshold);
 
   useEffect(() => { setUpVal(thresholdUp); }, [thresholdUp]);
   useEffect(() => { setDownVal(thresholdDown); }, [thresholdDown]);
-  useEffect(() => { setCumVal(cumulativeThreshold); }, [cumulativeThreshold]);
 
   return (
     <div ref={ref} className="space-y-8">
       <ThresholdFrequencyEstimator
         thresholdUp={upVal}
         thresholdDown={downVal}
-        cumulativeThreshold={cumVal}
         cooldownHours={cooldownHours}
         coinId={trackedAssetId}
       />
@@ -107,40 +102,6 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
           </Button>
           {downVal !== thresholdDown && (
             <Button size="sm" onClick={() => onSetDown(downVal)} className="font-mono text-xs">
-              {t('threshold.confirm')}
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Cumulative threshold */}
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <p className="text-base font-sans text-secondary-foreground">{t('threshold.cumulative')}</p>
-          <p className="text-3xl font-mono tracking-tight">{cumVal.toFixed(1)}%</p>
-          <p className="text-base font-sans text-muted-foreground">{t('threshold.rolling7day')}</p>
-        </div>
-
-        <Slider
-          value={[cumVal]}
-          onValueChange={([v]) => setCumVal(v)}
-          min={3}
-          max={40}
-          step={1}
-          className="w-full"
-        />
-
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => { setCumVal(15); onSetCumulative(15); }}
-            className="font-mono text-xs"
-          >
-            {t('common.reset')}
-          </Button>
-          {cumVal !== cumulativeThreshold && (
-            <Button size="sm" onClick={() => onSetCumulative(cumVal)} className="font-mono text-xs">
               {t('threshold.confirm')}
             </Button>
           )}

@@ -46,14 +46,12 @@ vi.mock('@/features/pause/presentation/reflect/generation/manual-open/pause-home
     silentMode: boolean;
     mood?: string;
     data: { changePercent: number };
-    cumulativeThreshold: number;
     profileTrackedAssetId: string;
   }) => ({
     userId: input.userId,
     silentMode: input.silentMode,
     mood: input.mood,
     changePercent: input.data.changePercent,
-    cumulativeThreshold: input.cumulativeThreshold,
     trackedAssetId: input.profileTrackedAssetId,
     assetId: input.profileTrackedAssetId,
     ctx: 'ctx',
@@ -89,7 +87,6 @@ describe('useManualPauseTrigger', () => {
       useManualPauseTrigger({
         user,
         silentMode: true,
-        cumulativeThreshold: 5,
         trackedAssetId: 'bitcoin',
         syncOpenPauseFromDb: vi.fn().mockResolvedValue(undefined),
         setError: noopSet,

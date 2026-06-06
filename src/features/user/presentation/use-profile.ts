@@ -40,7 +40,6 @@ export function useProfile() {
 
   const [threshold, setThresholdState] = useState(5);
   const [thresholdDown, setThresholdDownState] = useState(5);
-  const [cumulativeThreshold, setCumulativeThresholdState] = useState(15);
   const [emailNotificationsCommitted, setEmailNotificationsCommitted] = useState(true);
   const [emailNotifications, addOptimisticEmailNotifications] = useOptimistic(
     emailNotificationsCommitted,
@@ -145,7 +144,6 @@ export function useProfile() {
       const row = data;
       setThresholdState(row.threshold);
       setThresholdDownState(row.threshold_down ?? row.threshold);
-      setCumulativeThresholdState(row.cumulative_threshold ?? 15);
       setEmailNotificationsCommitted(row.email_notifications ?? true);
       setReflectionToneCommitted(row.reflection_tone ?? 'stoic');
       setCooldownHoursState(row.cooldown_hours ?? 6);
@@ -190,13 +188,6 @@ export function useProfile() {
     setThresholdDownState(val);
     if (!user) return;
     const { error } = await updateProfileFields(user.id, { threshold_down: val });
-    if (!error) invalidateProfileQuery();
-  }, [user, invalidateProfileQuery]);
-
-  const setCumulativeThreshold = useCallback(async (val: number) => {
-    setCumulativeThresholdState(val);
-    if (!user) return;
-    const { error } = await updateProfileFields(user.id, { cumulative_threshold: val });
     if (!error) invalidateProfileQuery();
   }, [user, invalidateProfileQuery]);
 
@@ -342,8 +333,6 @@ export function useProfile() {
     setThreshold,
     thresholdDown,
     setThresholdDown,
-    cumulativeThreshold,
-    setCumulativeThreshold,
     emailNotifications,
     setEmailNotifications,
     reflectionTone,

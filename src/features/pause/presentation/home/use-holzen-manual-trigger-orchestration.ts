@@ -96,7 +96,7 @@ export function useHolzenManualTriggerOrchestration({
           currency,
           enabled: true,
         });
-        // Manual pause needs full market context (7d cumulative, on-chain enrichment).
+        // Manual pause needs full market context (on-chain enrichment when BTC).
         const data = await fetchMarketData(profileTrackedAssetId, currency);
         queryClient.setQueryData(marketOpts.queryKey, data);
         const result = await generateMessage(data, mood);

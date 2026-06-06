@@ -25,7 +25,6 @@ describe('buildManualPauseOpenParams', () => {
       silentMode: false,
       mood: 'anxious',
       data: baseMarket,
-      cumulativeThreshold: 5,
       profileTrackedAssetId: 'bitcoin',
     });
     expect(params.userId).toBe('user-1');

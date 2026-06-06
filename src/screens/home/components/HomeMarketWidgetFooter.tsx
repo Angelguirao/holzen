@@ -10,7 +10,6 @@ type Props = {
   marketData: MarketQuote | null;
   threshold: number;
   thresholdDown: number;
-  cumulativeThreshold: number;
   /** Figma 3.4.4.2 — single “% are pausing now, too” line while user mid-pause. */
   pauseInProgress?: boolean;
 };
@@ -32,27 +31,16 @@ function RangeStatusLine({ status }: { status: MarketVolatilityRangeStatus }) {
       <span className="text-nox-accent-green" aria-hidden>
         ▲
       </span>
-    ) : status.axis === 'daily_down' ? (
+    ) : (
       <span className="text-[#dbb266]" aria-hidden>
         ▼
       </span>
-    ) : (
-      <span className="text-muted-foreground" aria-hidden>
-        ◆
-      </span>
     );
-
-  const label =
-    status.axis === 'cumulative'
-      ? t('home.market.beyondRangeCumulative', {
-          defaultValue: '7-day move beyond your range',
-        })
-      : t('home.market.beyondYourRange', { defaultValue: 'Beyond your range' });
 
   return (
     <p className="min-w-0 flex-1 text-xs font-medium leading-4 tracking-wide text-foreground">
       {arrow}{' '}
-      <span>{label}</span>
+      <span>{t('home.market.beyondYourRange', { defaultValue: 'Beyond your range' })}</span>
     </p>
   );
 }
@@ -62,7 +50,6 @@ export function HomeMarketWidgetFooter({
   marketData,
   threshold,
   thresholdDown,
-  cumulativeThreshold,
   pauseInProgress = false,
 }: Props) {
   "use memo";
@@ -70,11 +57,10 @@ export function HomeMarketWidgetFooter({
   const rangeStatus =
     marketData != null
       ? resolveMarketVolatilityRangeStatus(
-          { threshold, threshold_down: thresholdDown, cumulative_threshold: cumulativeThreshold },
+          { threshold, threshold_down: thresholdDown },
           {
             changePercent: marketData.changePercent,
             direction: marketData.direction,
-            cumulativeChangePercent: marketData.cumulativeChangePercent,
           },
         )
       : null;

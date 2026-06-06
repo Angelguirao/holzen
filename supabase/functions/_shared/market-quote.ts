@@ -132,36 +132,14 @@ export async function fetchMarketQuoteCached(
   const data1d = await res1d.json();
   const quote = parse24h(data1d.prices as [number, number][]);
 
-  let cumulativeChangePercent: number | undefined;
-  let cumulativeDirection: "up" | "down" | undefined;
   let onChain: Record<string, unknown> | undefined;
-
-  if (mode === "full") {
-    if (isBitcoinTrackedAsset(coinId)) {
-      onChain = await fetchOnChainData(incoming);
-    }
-    try {
-      const res7d = await fetchWithRetry(
-        incoming,
-        `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=7`,
-      );
-      const data7d = await res7d.json();
-      const prices7d: [number, number][] = data7d.prices;
-      if (prices7d && prices7d.length >= 2) {
-        const price7dAgo = prices7d[0][1];
-        cumulativeChangePercent = ((quote.currentPrice - price7dAgo) / price7dAgo) * 100;
-        cumulativeDirection = cumulativeChangePercent >= 0 ? "up" : "down";
-      }
-    } catch {
-      /* optional */
-    }
+  if (mode === "full" && isBitcoinTrackedAsset(coinId)) {
+    onChain = await fetchOnChainData(incoming);
   }
 
   const payload: MarketQuotePayload = {
     coinId,
     ...quote,
-    cumulativeChangePercent,
-    cumulativeDirection,
     fearGreed,
     onChain,
     currency,
