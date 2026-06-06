@@ -1,4 +1,6 @@
-/** Home manual “Need a moment” cooldown timestamp in localStorage (ms since epoch). */
+/** Home manual “Need a moment” cooldown timestamp in localStorage (ms since epoch).
+ *  Key: `holzen_last_manual_at_${userId}` — see `buildManualTriggerCooldownStorageKey`.
+ *  Only stamped when a manual open succeeds; cron/automatic pauses do not reset it. */
 
 export function readManualTriggerCooldownAtMs(key: string): number | null {
   try {

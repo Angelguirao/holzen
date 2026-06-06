@@ -27,7 +27,7 @@ export type ResolveHomePauseWidgetModeInput = {
   reflectionMessage: string | null;
   trackedAssetSymbol: string;
   hasPendingOffer: boolean;
-  /** Ms remaining on Home manual “Let’s pause” local cooldown. */
+  /** Ms remaining on Home manual “Let’s pause” local cooldown (localStorage; not profile `cooldown_hours`). */
   manualCooldownRemainingMs: number;
   completedPauseCount: number;
   /** Any `pause_step_events` on the open instance — mid-ritual stays B, not E. */

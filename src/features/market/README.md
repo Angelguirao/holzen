@@ -22,7 +22,7 @@ features/market/
     pause-context-from-market.ts
     pause-context-home-preview.ts
     format-market-price.ts
-    manual-cooldown.ts
+    manual-cooldown.ts          # 1h manual “Let’s pause” gate (localStorage timestamp; see pause public-trigger)
     market-display-telemetry.ts   # Home market widget PostHog (chart expand)
     queries/                  # TanStack query keys only
   infrastructure/

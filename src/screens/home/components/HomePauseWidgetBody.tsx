@@ -144,6 +144,7 @@ export function HomePauseWidgetBody(props: Props) {
           previewLine={props.previewLine}
           marketBlock={props.marketBlock}
           manualCooldownRemainingMs={props.manualCooldownRemainingMs}
+          completedPauseCount={props.completedPauseCount}
         />
       );
 
