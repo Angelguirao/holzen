@@ -5,6 +5,11 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
 
+/** Locale-stable HH:mm for Home pause cooldown copy (Figma D). */
+export function formatHomePauseReadyAtClock(ms: number): string {
+  return createStableClockFormatter()(ms);
+}
+
 /** Format ms as m:ss for short countdowns (e.g. next cron tick, manual cooldown under one minute). */
 export function formatMsAsMS(ms: number): string {
   const totalSec = Math.max(0, Math.floor(ms / 1000));

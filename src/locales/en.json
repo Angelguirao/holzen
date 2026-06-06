@@ -136,6 +136,8 @@
     "pausePostPause": {
       "restBody": "You completed a pause recently. Rest is part of the practice — when you are ready, you can pause again.",
       "noArchiveBody": "You completed a pause. Your archive will collect these moments over time — for now, rest or start another pause when you need it.",
+      "cooldownArchiveBody": "If the urge returns, another pause is available at {{time}}. Until then, your past words are here.",
+      "cooldownNoArchiveBody": "If the urge returns, another pause is available at {{time}}. Until then, rest is part of the practice.",
       "newOfferBody": "You paused recently, and the market moved again. You can honor what you already did and still meet this new moment.",
       "revisitArchive": "Revisit your archive"
     },

@@ -7,7 +7,6 @@ import { SubscriptionSkeleton } from '@/screens/home/components/SubscriptionSkel
 import { LoadingButton } from '@/components/ui/loading-button';
 import { HomePauseBlockingErrorPanel } from '@/screens/home/components/HomePauseBlockingErrorPanel';
 import {
-  HomePauseCalmWatersBody,
   HomePauseEngagedBody,
   HomePauseEngagedPendingBody,
   HomePauseIdleExpandedBody,
@@ -28,14 +27,14 @@ export function HomePauseWidgetBody(props: Props) {
   const calmToastShown = useRef(false);
 
   useEffect(() => {
-    if (props.widgetMode !== 'calm_waters') {
+    if (props.widgetMode !== 'calm_waters' && !props.showCalmWatersToast) {
       calmToastShown.current = false;
       return;
     }
     if (calmToastShown.current) return;
     calmToastShown.current = true;
     toast.message(t('home.pauseCalmWaters.toast'), { duration: 5000 });
-  }, [props.widgetMode, t]);
+  }, [props.widgetMode, props.showCalmWatersToast, t]);
 
   const blockingError =
     props.error && shouldSurfacePauseWidgetError(props.error, props.marketData) ? props.error : null;
@@ -95,14 +94,7 @@ export function HomePauseWidgetBody(props: Props) {
       ) : null;
 
     case 'calm_waters':
-      return (
-        <HomePauseCalmWatersBody
-          showPauseScheduling={props.showPauseScheduling}
-          autoCooldownRemaining={props.autoCooldownRemaining}
-          cooldownHours={props.cooldownHours}
-          nextCronCheckIn={props.nextCronCheckIn}
-        />
-      );
+      return null;
 
     case 'B_in_progress':
       return (
@@ -162,10 +154,7 @@ export function HomePauseWidgetBody(props: Props) {
         <HomePausePostPauseBody
           widgetMode={props.widgetMode}
           onPauseAgain={props.onPauseAgain}
-          showPauseScheduling={props.showPauseScheduling}
           autoCooldownRemaining={props.autoCooldownRemaining}
-          cooldownHours={props.cooldownHours}
-          nextCronCheckIn={props.nextCronCheckIn}
           completedPauseCount={props.completedPauseCount}
           onPauseWithThis={props.onPauseWithThis}
           previewLine={props.previewLine}

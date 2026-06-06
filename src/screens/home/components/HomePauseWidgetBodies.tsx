@@ -4,7 +4,11 @@ import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
-import { AutoCooldownIndicator, formatMsAsMS } from '@/screens/home/components/HomePauseChrome';
+import {
+  AutoCooldownIndicator,
+  formatHomePauseReadyAtClock,
+  formatMsAsMS,
+} from '@/screens/home/components/HomePauseChrome';
 import { HomePauseWidgetPreviewLine } from '@/screens/home/components/HomePauseWidgetPreviewLine';
 import { HomePauseWidgetMarketRow } from '@/screens/home/components/HomePauseWidgetMarketRow';
 import {
@@ -256,10 +260,7 @@ type PostPauseProps = Pick<
   HomePauseWidgetBodyProjection,
   | 'widgetMode'
   | 'onPauseAgain'
-  | 'showPauseScheduling'
   | 'autoCooldownRemaining'
-  | 'cooldownHours'
-  | 'nextCronCheckIn'
   | 'completedPauseCount'
   | 'onPauseWithThis'
   | 'previewLine'
@@ -270,10 +271,7 @@ type PostPauseProps = Pick<
 export function HomePausePostPauseBody({
   widgetMode,
   onPauseAgain,
-  showPauseScheduling,
   autoCooldownRemaining,
-  cooldownHours,
-  nextCronCheckIn,
   completedPauseCount,
   onPauseWithThis,
   previewLine,
@@ -283,52 +281,73 @@ export function HomePausePostPauseBody({
   const { t } = useTranslation();
   const hasArchive = completedPauseCount > 0;
   const isE = widgetMode === 'E';
+  const isD =
+    widgetMode === 'D_collapsed' ||
+    widgetMode === 'D_expanded' ||
+    widgetMode === 'D_prime_collapsed' ||
+    widgetMode === 'D_prime_expanded';
 
-  const bodyKey =
-    widgetMode === 'D_prime_collapsed' || widgetMode === 'D_prime_expanded'
-      ? 'home.pausePostPause.noArchiveBody'
-      : isE
-        ? 'home.pausePostPause.newOfferBody'
-        : 'home.pausePostPause.restBody';
+  const [remainingMs, setRemainingMs] = useState(() => autoCooldownRemaining());
 
-  return (
-    <div className={homePauseWidgetBodyStack}>
-      <p className="text-sm leading-5 tracking-wide text-muted-foreground">{t(bodyKey)}</p>
+  useEffect(() => {
+    if (!isD) return;
+    setRemainingMs(autoCooldownRemaining());
+    const interval = setInterval(() => {
+      const next = autoCooldownRemaining();
+      setRemainingMs(next);
+      if (next <= 0) clearInterval(interval);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [autoCooldownRemaining, isD]);
 
-      {isE ? (
-        <>
-          <HomePauseWidgetOpeningAndMarket previewLine={previewLine} marketBlock={marketBlock} />
-          <HomePauseWidgetNoxCta
-            label={t('home.pauseIdle.letsPauseCta', { defaultValue: "Let's pause" })}
-            onClick={onPauseWithThis}
-          />
-        </>
-      ) : (
-        <>
-          {showPauseScheduling ? (
-            <div className="rounded-lg border border-border/40 bg-muted/10 px-3 py-2.5">
-              <AutoCooldownIndicator
-                cooldownRemaining={autoCooldownRemaining}
-                cooldownHours={cooldownHours}
-                nextCronCheckIn={nextCronCheckIn}
-              />
-            </div>
-          ) : null}
-          <button type="button" onClick={onPauseAgain} className={homeInWidget.ctaPrimary}>
+  if (isE) {
+    return (
+      <div className={homePauseWidgetBodyStack}>
+        <p className="text-sm leading-5 tracking-wide text-muted-foreground">
+          {t('home.pausePostPause.newOfferBody')}
+        </p>
+        <HomePauseWidgetOpeningAndMarket previewLine={previewLine} marketBlock={marketBlock} />
+        <HomePauseWidgetNoxCta
+          label={t('home.pauseIdle.letsPauseCta', { defaultValue: "Let's pause" })}
+          onClick={onPauseWithThis}
+        />
+      </div>
+    );
+  }
+
+  if (isD) {
+    const readyAtClock =
+      remainingMs > 0 ? formatHomePauseReadyAtClock(Date.now() + remainingMs) : '—';
+
+    return (
+      <div className={homePauseWidgetBodyStack}>
+        <p className="text-sm leading-5 tracking-wide text-foreground">
+          {hasArchive
+            ? t('home.pausePostPause.cooldownArchiveBody', {
+                time: readyAtClock,
+                defaultValue:
+                  'If the urge returns, another pause is available at {{time}}. Until then, your past words are here.',
+              })
+            : t('home.pausePostPause.cooldownNoArchiveBody', {
+                time: readyAtClock,
+                defaultValue:
+                  'If the urge returns, another pause is available at {{time}}. Until then, rest is part of the practice.',
+              })}
+        </p>
+        {hasArchive ? (
+          <Link to="/library?tab=pauses" className={homeInWidget.ctaNoxPrimary}>
+            {t('home.pausePostPause.revisitArchive')}
+          </Link>
+        ) : (
+          <button type="button" onClick={onPauseAgain} className={homeInWidget.ctaNoxPrimary}>
             {t('home.pauseWidget.pauseAgain')}
           </button>
-          {hasArchive ? (
-            <Link
-              to="/library?tab=pauses"
-              className="block w-full py-1 text-center text-sm font-medium text-muted-foreground underline underline-offset-2 hover:text-foreground"
-            >
-              {t('home.pausePostPause.revisitArchive')}
-            </Link>
-          ) : null}
-        </>
-      )}
-    </div>
-  );
+        )}
+      </div>
+    );
+  }
+
+  return null;
 }
 
 type CalmProps = Pick<
