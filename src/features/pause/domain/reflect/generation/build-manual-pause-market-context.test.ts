@@ -28,13 +28,13 @@ describe('buildManualPauseMarketContext', () => {
     expect(ctx.ctx).toContain('BTC');
   });
 
-  it('omits onChain band for non-bitcoin assets', () => {
+  it('normalizes legacy profile asset ids to bitcoin', () => {
     const ctx = buildManualPauseMarketContext(
       { ...baseMarket, changePercent: 1 },
       5,
       'ethereum',
     );
-    expect(ctx.assetId).toBe('ethereum');
-    expect(ctx.onChainBand).toBeNull();
+    expect(ctx.assetId).toBe('bitcoin');
+    expect(ctx.onChainBand).toBe('100:20:15');
   });
 });

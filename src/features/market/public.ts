@@ -29,14 +29,22 @@ export {
   type BtcMoveSeverity,
 } from './domain/btc-move-severity';
 export {
+  BITCOIN_TRACKED_ASSET,
   TRACKED_ASSETS,
+  isBitcoinTrackedAsset,
+  isTrackedAssetId,
   normalizeTrackedAssetId,
+  trackedAssetDefinition,
   trackedAssetSymbol,
+  type AssetQuoteProvider,
+  type TrackedAssetDefinition,
   type TrackedAssetId,
+  type TrackedAssetKind,
 } from './domain/tracked-assets';
 export type {
   BtcPriceData,
   FearGreedData,
+  MarketQuote,
   OnChainData,
   SupportedCurrency,
 } from './domain/market-quote';

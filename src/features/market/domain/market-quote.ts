@@ -14,8 +14,8 @@ export interface OnChainData {
 }
 
 /** Market quote for a single tracked asset in the user's display currency. */
-export interface BtcPriceData {
-  /** CoinGecko coin id (e.g. bitcoin, ethereum). */
+export interface MarketQuote {
+  /** Provider-native asset id (CoinGecko coin id today). */
   coinId: TrackedAssetId;
   currentPrice: number;
   price24hAgo: number;
@@ -29,6 +29,9 @@ export interface BtcPriceData {
   /** True when data comes from localStorage cache due to API failure */
   _stale?: boolean;
 }
+
+/** @deprecated Prefer MarketQuote — incremental rename from BTC-only naming. */
+export type BtcPriceData = MarketQuote;
 
 export const SUPPORTED_CURRENCIES = [
   { code: 'USD', symbol: '$', label: 'US Dollar' },
