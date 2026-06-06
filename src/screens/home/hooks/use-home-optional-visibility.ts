@@ -10,11 +10,12 @@ export {
   HOME_WIDGET_DEFAULT_ORDER,
   HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE,
   JOURNEY_STAT_TILES_VISIBILITY_ID,
-  OPTIONAL_HOME_WIDGET_IDS,
+  LEGACY_HOME_SECTION_IDS,
   isHomeSectionAlwaysVisibleInLayout,
+  isLegacyHomeSectionId,
   type AllHomeSectionId,
   type HomeSectionIdWithoutVisibilityToggle,
-  type OptionalHomeWidgetId,
+  type LegacyHomeSectionId,
 } from '@/screens/home/lib/home-section-visibility-constants';
 
 export function useHomeOptionalVisibility() {

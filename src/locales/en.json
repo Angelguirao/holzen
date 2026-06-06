@@ -173,34 +173,26 @@
     },
     "customizeSheet": {
       "title": "Customize your Home",
-      "description": "Shape what you see first and how it is ordered—so Home meets you where you are and supports the mindset you want to carry into the rest of the app.",
+      "description": "Choose what you see on Home. Toggle widgets on or off. Drag to reorder.",
       "resetLayout": "Reset layout & widgets",
       "widgetsHeading": "Widgets",
       "resetLink": "Reset to defaults",
       "sections": {
         "goalWhy": {
-          "title": "Your whys",
-          "desc": "Your mantra and what matters to you — a quick anchor before the next impulse."
+          "title": "Anchor",
+          "desc": "Your mantra or a line from the past, with your Why."
         },
         "market": {
           "title": "Market",
-          "desc": "Optional wider-world context on the same screen when you want it—so you can stay oriented without leaving your flow."
+          "desc": "BTC price, 24h change, and market sentiment."
         },
         "yourPause": {
-          "title": "Pause",
-          "desc": "Brings pause practice into view on Home—so regulation and boundaries stay within reach when intensity rises."
+          "title": "Your pause",
+          "desc": "Your active pause, when the market moves or when you ask for one."
         },
         "journeyPulse": {
-          "title": "Practice stats",
-          "desc": "Presence (lifetime practice XP) and how many pauses you have completed."
-        },
-        "quickCapture": {
-          "title": "Quick capture",
-          "desc": "Space to register what shows up in the moment—so meaning you notice here is less likely to evaporate when you move on."
-        },
-        "night": {
-          "title": "Evening reflection",
-          "desc": "A gentle close to the day—room to notice how things landed and leave today with a little more clarity before what comes next."
+          "title": "Practice",
+          "desc": "Your presence and pauses."
         }
       }
     },
@@ -258,7 +250,7 @@
       "market": "Market",
       "goal": "Goal",
       "whyHoldTitle": "Your whys",
-      "yourPause": "Pause",
+      "yourPause": "Your pause",
       "continueYourPause": "Continue pause",
       "youPaused": "You paused",
       "newPauseAvailable": "New pause available",

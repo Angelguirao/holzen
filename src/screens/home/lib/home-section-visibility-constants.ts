@@ -3,8 +3,9 @@
  * Shared by home-order normalization, copy helpers, and optional visibility hook.
  */
 
-export const OPTIONAL_HOME_WIDGET_IDS = ['quick-capture', 'night'] as const;
-export type OptionalHomeWidgetId = (typeof OPTIONAL_HOME_WIDGET_IDS)[number];
+/** Persisted ids from pre–pause-first Home; stripped on read — no UI or Customize rows. */
+export const LEGACY_HOME_SECTION_IDS = ['quick-capture', 'night'] as const;
+export type LegacyHomeSectionId = (typeof LEGACY_HOME_SECTION_IDS)[number];
 
 /** Shown on Home whenever present in layout order; Customize sheet has no on/off row (wireframe). */
 export const HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE = ['market', 'your-pause', 'goal-why'] as const;
@@ -18,11 +19,9 @@ export type HomeSectionIdWithoutVisibilityToggle =
  */
 export const ALL_HOME_SECTION_IDS = [
   'goal-why',
-  'night',
   'market',
   'your-pause',
   'journey-pulse',
-  'quick-capture',
 ] as const;
 export type AllHomeSectionId = (typeof ALL_HOME_SECTION_IDS)[number];
 
@@ -37,4 +36,8 @@ export const JOURNEY_STAT_TILES_VISIBILITY_ID = 'journey-pulse' as const;
 
 export function isHomeSectionAlwaysVisibleInLayout(id: string): boolean {
   return (HOME_SECTION_IDS_WITHOUT_VISIBILITY_TOGGLE as readonly string[]).includes(id);
+}
+
+export function isLegacyHomeSectionId(id: string): boolean {
+  return (LEGACY_HOME_SECTION_IDS as readonly string[]).includes(id);
 }

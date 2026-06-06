@@ -1,16 +1,11 @@
-import {
-  JOURNEY_STAT_TILES_VISIBILITY_ID,
-  OPTIONAL_HOME_WIDGET_IDS,
-} from '@/screens/home/lib/home-section-visibility-constants';
+import { JOURNEY_STAT_TILES_VISIBILITY_ID } from '@/screens/home/lib/home-section-visibility-constants';
 
 export const HOME_OPTIONAL_VISIBILITY_STORAGE_KEY = 'holzen_home_optional_visible';
 
-const VISIBILITY_KEYS = [...OPTIONAL_HOME_WIDGET_IDS, JOURNEY_STAT_TILES_VISIBILITY_ID] as const;
+const VISIBILITY_KEYS = [JOURNEY_STAT_TILES_VISIBILITY_ID] as const;
 
 export const defaultHomeOptionalVisibility: Record<string, boolean> = {
   [JOURNEY_STAT_TILES_VISIBILITY_ID]: true,
-  'quick-capture': false,
-  night: false,
 };
 
 /** Load optional Home widget visibility from localStorage (falls back to defaults). */

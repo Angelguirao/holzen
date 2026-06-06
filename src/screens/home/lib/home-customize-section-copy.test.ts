@@ -7,6 +7,7 @@ const echoT: TFunction = ((key: string) => key) as TFunction;
 
 describe('getHomeCustomizeSectionTitle', () => {
   it('returns i18n keys for known sections', () => {
+    expect(getHomeCustomizeSectionTitle(echoT, 'goal-why')).toBe('home.customizeSheet.sections.goalWhy.title');
     expect(getHomeCustomizeSectionTitle(echoT, 'market')).toBe('home.customizeSheet.sections.market.title');
     expect(getHomeCustomizeSectionTitle(echoT, JOURNEY_STAT_TILES_VISIBILITY_ID)).toBe(
       'home.customizeSheet.sections.journeyPulse.title',

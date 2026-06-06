@@ -132,8 +132,6 @@ export function useHomeScreen() {
   const { visibleOrderedSectionIds, todaySectionIds } = useHomeVisibleSections({
     order,
     sectionVisible,
-    subscribed,
-    hasNightReflection: false,
   });
 
   const { customizeSheet, onOpenCustomize } = useHomeCustomizeBridge({
@@ -144,7 +142,6 @@ export function useHomeScreen() {
     setVisible,
     resetLayout,
     resetSectionVisibility,
-    subscribed,
   });
 
   const { marketHeaderRight } = useHomeMarketGoalHeaders({

@@ -17,7 +17,6 @@ export interface HomeDashboardLayoutCustomizeProps {
   sectionTitle: (id: string) => string;
   sectionDescription: (id: string) => string;
   onResetAll: () => void;
-  nightToggleDisabled: boolean;
   dndRemountKey: number;
 }
 
@@ -93,7 +92,6 @@ export const HomeDashboardLayout = memo(function HomeDashboardLayout({
         sectionTitle={customize.sectionTitle}
         sectionDescription={customize.sectionDescription}
         onResetAll={customize.onResetAll}
-        nightToggleDisabled={customize.nightToggleDisabled}
         dndRemountKey={customize.dndRemountKey}
       />
 

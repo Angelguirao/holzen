@@ -18,18 +18,8 @@ export function useHomeCustomizeBridge(args: {
   setVisible: (id: string, value: boolean) => void;
   resetLayout: () => void;
   resetSectionVisibility: () => void;
-  subscribed: boolean;
 }) {
-  const {
-    t,
-    order,
-    reorder,
-    sectionVisible,
-    setVisible,
-    resetLayout,
-    resetSectionVisibility,
-    subscribed,
-  } = args;
+  const { t, order, reorder, sectionVisible, setVisible, resetLayout, resetSectionVisibility } = args;
 
   const [open, setOpen] = useState(false);
   const [dndRemountKey, setDndRemountKey] = useState(0);
@@ -72,7 +62,6 @@ export function useHomeCustomizeBridge(args: {
       sectionTitle,
       sectionDescription,
       onResetAll,
-      nightToggleDisabled: !subscribed,
       dndRemountKey,
     }),
     [
@@ -85,7 +74,6 @@ export function useHomeCustomizeBridge(args: {
       sectionTitle,
       sectionDescription,
       onResetAll,
-      subscribed,
       dndRemountKey,
     ],
   );
