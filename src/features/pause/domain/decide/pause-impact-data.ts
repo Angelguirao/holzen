@@ -10,7 +10,6 @@ export type PauseImpactData = {
   usedTags: boolean;
   feelIntensity?: number | null;
   shiftIntensity?: number | null;
-  reinforcementQuote?: string | null;
   reflectionMessage?: string | null;
   haiku?: string | null;
 };

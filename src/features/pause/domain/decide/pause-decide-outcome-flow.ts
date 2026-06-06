@@ -4,7 +4,6 @@ import {
   type PauseImpactData,
 } from '@/features/pause/domain/decide/build-pause-impact-data-on-complete';
 import type { RunPauseOutcomeLogResult } from '@/features/pause/domain/decide/pause-outcome-log-result';
-import type { WisdomQuote } from '@/features/pause/domain/decide/session-wisdom-quotes';
 
 export type PauseDecideOutcomeFlow =
   | { kind: 'abort_sync_failed' }
@@ -16,16 +15,11 @@ export type PauseDecideOutcomeFlow =
       pauseImpactData: PauseImpactData;
     };
 
-export function formatReinforcementQuoteFromSession(quote: WisdomQuote): string {
-  return `"${quote.text}" — ${quote.author}`;
-}
-
 /** Maps `runPauseOutcomeLog` result + ritual snapshot into presentation actions (no React). */
 export function resolvePauseDecideOutcomeFlow(params: {
   outcome: RunPauseOutcomeLogResult;
   decision: string;
-  ritualSnapshot: Omit<BuildPauseImpactDataOnCompleteInput, 'decision' | 'reinforcementQuote'>;
-  reinforcementQuote: string;
+  ritualSnapshot: Omit<BuildPauseImpactDataOnCompleteInput, 'decision'>;
 }): PauseDecideOutcomeFlow {
   if (params.outcome.status === 'sync_failed') {
     return { kind: 'abort_sync_failed' };
@@ -40,7 +34,6 @@ export function resolvePauseDecideOutcomeFlow(params: {
     pauseImpactData: buildPauseImpactDataOnComplete({
       ...params.ritualSnapshot,
       decision: params.decision,
-      reinforcementQuote: params.reinforcementQuote,
     }),
   };
 }

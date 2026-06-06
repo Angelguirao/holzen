@@ -13,13 +13,13 @@ vi.mock(
     >();
     return {
       ...actual,
-      runPauseOutcomeLog: runPauseOutcomeLogMock,
+      runPauseOutcomeLog: runPauseOutcomeLogMock
     };
   },
 );
 
 vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: { port: 'reflectPauseRepository' },
+  supabasePauseRepository: { port: 'reflectPauseRepository' }
 }));
 
 vi.mock(
@@ -27,7 +27,7 @@ vi.mock(
   () => ({
     trackPauseReflectPostItOpen: trackPauseReflectPostItOpenMock,
     trackPauseReflectShareTap: trackPauseReflectShareTapMock,
-    trackPauseReflectWallpaperTap: trackPauseReflectWallpaperTapMock,
+    trackPauseReflectWallpaperTap: trackPauseReflectWallpaperTapMock
   }),
 );
 
@@ -36,29 +36,29 @@ import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
 import {
   startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
   pauseShiftEmotionFrameHubDone,
-  pauseShiftEmotionFrameHubDoneWithRepository,
+  pauseShiftEmotionFrameHubDoneWithRepository
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
   buildFeelTilesMoodLogOptions,
   pauseInitialEmotionSelect,
-  pauseInitialEmotionSkip,
+  pauseInitialEmotionSkip
 } from '@/features/pause/presentation/feel/pause-feel-io';
 import { pauseReflectionShareImage } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
+  trackPauseReflectWallpaperTap
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
   pauseAdoptPendingOfferWithRepository,
   pauseDeclinePendingOffer,
-  pauseDeclinePendingOfferWithRepository,
+  pauseDeclinePendingOfferWithRepository
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   pauseReflectFavoriteToggle,
@@ -66,23 +66,21 @@ import {
   pauseReflectTagUpdate,
   pauseReflectionStepLogOnce,
   shouldLogPauseReflectionStep,
-  shouldShowFavoriteProHint,
+  shouldShowFavoriteProHint
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   buildPauseSessionStepRitualBundle,
-  buildPauseSessionStepShellBundle,
+  buildPauseSessionStepShellBundle
 } from '@/features/pause/presentation/session/pause-session-step-handlers-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   reflectPauseRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
-  type PauseImpactData,
+  type PauseImpactData
 } from './pause-reflect-flows-io';
 
 describe('pause-reflect-flows-io', () => {
@@ -99,7 +97,7 @@ describe('pause-reflect-flows-io', () => {
       context: null,
       engagedTools: 0,
       wroteNote: false,
-      usedTags: false,
+      usedTags: false
     };
     expect(sample.decision).toBe('hold');
   });
@@ -109,7 +107,7 @@ describe('pause-reflect-flows-io', () => {
       seedMessage: 'seed',
       ritualEntry: 'deep',
       step: 'reflect',
-      marketData: null,
+      marketData: null
     });
     expect(view.reflectGenEnabled).toBe(true);
     expect(view.effectiveReflectionMessage).toBe('seed');
@@ -125,7 +123,7 @@ describe('pause-reflect-flows-io', () => {
         context: null,
         engagedTools: 0,
         wroteNote: false,
-        usedTags: false,
+        usedTags: false
       },
       ((key: string) => key) as unknown as import('i18next').TFunction,
       'brief',
@@ -134,8 +132,6 @@ describe('pause-reflect-flows-io', () => {
   });
 
   it('re-exports decide flow helpers from domain/decide leaf modules', () => {
-    const quote = getSessionQuote();
-    expect(formatReinforcementQuoteFromSession(quote)).toContain(quote.author);
     expect(
       resolvePauseDecideOutcomeFlow({
         outcome: { status: 'sync_failed' },
@@ -150,9 +146,8 @@ describe('pause-reflect-flows-io', () => {
           feelIntensity: null,
           shiftIntensity: null,
           reflectionMessage: '',
-          haiku: null,
+          haiku: null
         },
-        reinforcementQuote: 'quote',
       }).kind,
     ).toBe('abort_sync_failed');
   });
@@ -165,7 +160,6 @@ describe('pause-reflect-flows-io', () => {
     expect(pauseReflectOutcomeLog).not.toBe(runPauseOutcomeLogDirect);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(runPauseOutcomeLogDirect);
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseReflectOutcomeLog);
-    expect(formatReinforcementQuoteFromSession).not.toBe(pauseReflectOutcomeLogWithRepository);
     expect(reflectPauseRepository).not.toBe(runPauseOutcomeLogDirect);
   });
 
@@ -185,13 +179,13 @@ describe('pause-reflect-flows-io', () => {
 
     const result = await pauseReflectOutcomeLog({
       pauseInstanceId: 'pi-1',
-      decision: 'hold',
+      decision: 'hold'
     });
 
     expect(result).toEqual({ status: 'completed' });
     expect(runPauseOutcomeLogMock).toHaveBeenCalledWith(reflectPauseRepository, {
       pauseInstanceId: 'pi-1',
-      decision: 'hold',
+      decision: 'hold'
     });
   });
 
@@ -201,12 +195,12 @@ describe('pause-reflect-flows-io', () => {
 
     await pauseReflectOutcomeLogWithRepository(repository, {
       pauseInstanceId: null,
-      decision: 'hold',
+      decision: 'hold'
     });
 
     expect(runPauseOutcomeLogMock).toHaveBeenCalledWith(repository, {
       pauseInstanceId: null,
-      decision: 'hold',
+      decision: 'hold'
     });
   });
 
@@ -214,7 +208,6 @@ describe('pause-reflect-flows-io', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(trackPauseReflectPostItOpen);
     expect(pauseReflectOutcomeLog).not.toBe(trackPauseReflectShareTap);
     expect(buildPauseScoreImpacts).not.toBe(trackPauseReflectWallpaperTap);
-    expect(getSessionQuote).not.toBe(trackPauseReflectPostItOpen);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(trackPauseReflectShareTap);
   });
 
@@ -222,7 +215,6 @@ describe('pause-reflect-flows-io', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(pauseReflectOutcomeLog).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(buildPauseScoreImpacts).not.toBe(startPauseReflectFrameFocusAmbience);
-    expect(formatReinforcementQuoteFromSession).not.toBe(stopPauseReflectFrameFocusAmbience);
   });
 
   it('sibling cluster: hub-io exports stay distinct from flows-io', () => {
@@ -262,8 +254,6 @@ describe('pause-reflect-flows-io', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(getPendingPauseOfferDisplay);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseAdoptPendingOfferWithRepository);
     expect(buildPauseScoreImpacts).not.toBe(pauseDeclinePendingOffer);
-    expect(formatReinforcementQuoteFromSession).not.toBe(pauseDeclinePendingOfferWithRepository);
-    expect(getSessionQuote).not.toBe(pauseAdoptPendingOffer);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(getPendingPauseOfferDisplay);
     // Reciprocal inline pins: `pause-reflect-pending-offer-io.test.ts`.
   });
@@ -278,8 +268,6 @@ describe('pause-reflect-flows-io', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseReflectTagUpdate);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseReflectionStepLogOnce);
     expect(buildPauseScoreImpacts).not.toBe(pauseReflectFavoriteToggle);
-    expect(formatReinforcementQuoteFromSession).not.toBe(pauseReflectNoteUpdate);
-    expect(getSessionQuote).not.toBe(pauseReflectTagUpdate);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(pauseReflectionStepLogOnce);
     expect(reflectPauseRepository).not.toBe(shouldShowFavoriteProHint);
     expect(pauseReflectOutcomeLog).not.toBe(shouldLogPauseReflectionStep);
@@ -297,7 +285,6 @@ describe('pause-reflect-flows-io', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(buildPauseSessionStepShellBundle);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(buildPauseSessionStepRitualBundle);
     expect(buildPauseScoreImpacts).not.toBe(buildPauseSessionStepShellBundle);
-    expect(formatReinforcementQuoteFromSession).not.toBe(buildPauseSessionStepRitualBundle);
     expect(reflectPauseRepository).not.toBe(buildPauseSessionStepShellBundle);
     // Full cross-I/O pins: `pause-session-step-handlers-flows-io-sibling-parity.test.ts`.
   });

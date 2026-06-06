@@ -68,7 +68,6 @@ export function useProfile() {
   const [firstName, setFirstNameState] = useState<string | null>(null);
   const [motivations, setMotivationsState] = useState<string[]>([]);
   const [mantra, setMantraState] = useState<string | null>(null);
-  const [groundingActivities, setGroundingActivitiesState] = useState<string[]>([]);
   const [currencyCommitted, setCurrencyCommitted] = useState<string>('USD');
   const [currency, addOptimisticCurrency] = useOptimistic(
     currencyCommitted,
@@ -161,7 +160,6 @@ export function useProfile() {
       setCurrencyCommitted(row.display_currency ?? 'USD');
       setTrackedAssetIdCommitted(normalizeTrackedAssetId(row.tracked_asset_id));
       setLanguageCommitted(row.language ?? 'en');
-      setGroundingActivitiesState(row.grounding_activities ?? []);
       setHasOnboarded(row.has_onboarded ?? false);
       setCompanionPrefsCommitted({
         breathing: true,
@@ -405,13 +403,6 @@ export function useProfile() {
         throw error;
       }
       invalidateProfileQuery();
-    },
-    groundingActivities,
-    setGroundingActivities: async (val: string[]) => {
-      setGroundingActivitiesState(val);
-      if (!user) return;
-      const { error } = await updateProfileFields(user.id, { grounding_activities: val });
-      if (!error) invalidateProfileQuery();
     },
     mantra,
     setMantra: async (val: string | null) => {

@@ -11,31 +11,29 @@ import {
   pauseReflectTagUpdateWithRepository,
   pauseReflectionStepLogOnceWithRepository,
   shouldLogPauseReflectionStep,
-  shouldShowFavoriteProHint,
+  shouldShowFavoriteProHint
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
-  resolvePauseSessionReflectAndDecidePreflight,
+  resolvePauseSessionReflectAndDecidePreflight
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
   trackPausePendingAdopted,
   trackPausePendingDeclined,
-  trackPauseSessionAbandoned,
+  trackPauseSessionAbandoned
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
+  trackPauseReflectWallpaperTap
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   getPendingPauseOfferDisplay,
@@ -44,7 +42,7 @@ import {
   pauseDeclinePendingOffer,
   pauseDeclinePendingOfferWithRepository,
   reflectPauseRepository,
-  type PendingPauseOfferDisplay,
+  type PendingPauseOfferDisplay
 } from './pause-reflect-pending-offer-io';
 
 const runAdoptPendingPauseOfferMock = vi.hoisted(() => vi.fn());
@@ -53,33 +51,33 @@ const getPendingPauseOfferDisplayMock = vi.hoisted(() =>
   vi.fn(() => ({
     contextText: 'mock-context',
     previewMessage: 'mock-preview',
-    showPreviewLine: true,
+    showPreviewLine: true
   })),
 );
 
 vi.mock(
   '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer',
   () => ({
-    runAdoptPendingPauseOffer: runAdoptPendingPauseOfferMock,
+    runAdoptPendingPauseOffer: runAdoptPendingPauseOfferMock
   }),
 );
 
 vi.mock(
   '@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer',
   () => ({
-    runDeclinePendingPauseOffer: runDeclinePendingPauseOfferMock,
+    runDeclinePendingPauseOffer: runDeclinePendingPauseOfferMock
   }),
 );
 
 vi.mock(
   '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display',
   () => ({
-    getPendingPauseOfferDisplay: getPendingPauseOfferDisplayMock,
+    getPendingPauseOfferDisplay: getPendingPauseOfferDisplayMock
   }),
 );
 
 vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: { kind: 'supabase' },
+  supabasePauseRepository: { kind: 'supabase' }
 }));
 
 describe('pause-reflect-pending-offer-io', () => {
@@ -126,7 +124,7 @@ describe('pause-reflect-pending-offer-io', () => {
   it('re-exports getPendingPauseOfferDisplay from pending-pause-offer-display leaf module', () => {
     const display: PendingPauseOfferDisplay = getPendingPauseOfferDisplay({
       context_snapshot: { context_text: 'btc' },
-      preview_message: 'Take a breath',
+      preview_message: 'Take a breath'
     });
     expect(getPendingPauseOfferDisplayMock).toHaveBeenCalled();
     expect(display.contextText).toBe('mock-context');
@@ -187,8 +185,6 @@ describe('pause-reflect-pending-offer-io', () => {
     expect(getPendingPauseOfferDisplay).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(pauseAdoptPendingOfferWithRepository).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
     expect(pauseDeclinePendingOffer).not.toBe(buildPauseScoreImpacts);
-    expect(pauseDeclinePendingOfferWithRepository).not.toBe(formatReinforcementQuoteFromSession);
-    expect(getPendingPauseOfferDisplay).not.toBe(getSessionQuote);
     expect(pauseAdoptPendingOffer).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(pauseDeclinePendingOffer).not.toBe(pauseReflectOutcomeLog);
     // Reciprocal inline pins: `pause-reflect-flows-io.test.ts`.

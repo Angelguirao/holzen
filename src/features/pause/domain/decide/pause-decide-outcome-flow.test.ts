@@ -1,11 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { BuildPauseImpactDataOnCompleteInput } from './build-pause-impact-data-on-complete';
-import {
-  formatReinforcementQuoteFromSession,
-  resolvePauseDecideOutcomeFlow,
-} from './pause-decide-outcome-flow';
+import { resolvePauseDecideOutcomeFlow } from './pause-decide-outcome-flow';
 
-const ritualSnapshot: Omit<BuildPauseImpactDataOnCompleteInput, 'decision' | 'reinforcementQuote'> = {
+const ritualSnapshot: Omit<BuildPauseImpactDataOnCompleteInput, 'decision'> = {
   context: 'BTC',
   selectedMood: 'calm',
   selectedMoodAfter: 'calm',
@@ -19,19 +16,12 @@ const ritualSnapshot: Omit<BuildPauseImpactDataOnCompleteInput, 'decision' | 're
 };
 
 describe('pause-decide-outcome-flow', () => {
-  it('formats reinforcement quote for impact shell', () => {
-    expect(formatReinforcementQuoteFromSession({ text: 'Wait', author: 'Buffett' })).toBe(
-      '"Wait" — Buffett',
-    );
-  });
-
   it('aborts on sync failure or not completed', () => {
     expect(
       resolvePauseDecideOutcomeFlow({
         outcome: { status: 'sync_failed' },
         decision: 'hold',
         ritualSnapshot,
-        reinforcementQuote: '"Q" — A',
       }),
     ).toEqual({ kind: 'abort_sync_failed' });
 
@@ -40,7 +30,6 @@ describe('pause-decide-outcome-flow', () => {
         outcome: { status: 'not_completed', outcomeState: 'pending' },
         decision: 'hold',
         ritualSnapshot,
-        reinforcementQuote: '"Q" — A',
       }),
     ).toEqual({
       kind: 'abort_not_completed',
@@ -54,7 +43,6 @@ describe('pause-decide-outcome-flow', () => {
       outcome: { status: 'completed' },
       decision: 'hold',
       ritualSnapshot,
-      reinforcementQuote: '"Q" — A',
     });
     expect(completed).toMatchObject({
       kind: 'advance',
@@ -67,7 +55,6 @@ describe('pause-decide-outcome-flow', () => {
       outcome: { status: 'no_instance' },
       decision: 'hold',
       ritualSnapshot,
-      reinforcementQuote: '"Q" — A',
     });
     expect(noInstance).toMatchObject({
       kind: 'advance',

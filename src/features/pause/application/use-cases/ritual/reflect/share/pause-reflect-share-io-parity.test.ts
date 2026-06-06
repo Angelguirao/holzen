@@ -18,22 +18,22 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {},
+  supabase: {}
 }));
 
 vi.mock(
   '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image',
   () => ({
-    runReflectionShareImage: vi.fn(() => Promise.resolve('downloaded' as const)),
+    runReflectionShareImage: vi.fn(() => Promise.resolve('downloaded' as const))
   }),
 );
 
 import {
-  deliverReflectionShareImage as deliverReflectionShareImageDirect,
+  deliverReflectionShareImage as deliverReflectionShareImageDirect
 } from '@/features/pause/application/use-cases/ritual/reflect/share/deliver-reflection-share-image';
 import {
   deliverReflectionShareImage,
-  runReflectionShareImage as runReflectionShareImageFromOrchestration,
+  runReflectionShareImage as runReflectionShareImageFromOrchestration
 } from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow';
 import { runReflectionShareImage as runReflectionShareImageDirect } from '@/features/pause/application/use-cases/ritual/reflect/share/run-reflection-share-image';
 import {
@@ -44,7 +44,7 @@ import {
   runReflectionShareImage,
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
+  trackPauseReflectWallpaperTap
 } from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow';
 import * as shareFlow from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-flow';
 import * as orchestrationFlow from '@/features/pause/application/use-cases/ritual/reflect/share/pause-reflect-share-orchestration-flow';
@@ -55,21 +55,20 @@ import {
   reflectGenerator,
   resolveReflectGenerationPrefetch,
   runReflectGeneration,
-  shouldCommitReflectGeneration,
+  shouldCommitReflectGeneration
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
-  resolvePauseSessionReflectAndDecidePreflight,
+  resolvePauseSessionReflectAndDecidePreflight
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   trackPauseReflectPostItOpen as trackPostItFromTelemetryIo,
   trackPauseReflectShareTap as trackShareTapFromTelemetryIo,
-  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryIo,
+  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryIo
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   getPendingPauseOfferDisplay,
@@ -77,24 +76,24 @@ import {
   pauseAdoptPendingOfferWithRepository,
   pauseDeclinePendingOffer,
   pauseDeclinePendingOfferWithRepository,
-  reflectPauseRepository,
+  reflectPauseRepository
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
-  resolveShiftFrameHubDonePresentation,
+  resolveShiftFrameHubDonePresentation
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
   buildFeelTilesMoodLogOptions,
   pauseInitialEmotionSelect,
   pauseInitialEmotionSkip,
   pauseInitialEmotionSelectWithRepository,
-  pauseInitialEmotionSkipWithRepository,
+  pauseInitialEmotionSkipWithRepository
 } from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   pauseReflectFavoriteToggle,
@@ -106,21 +105,21 @@ import {
   pauseReflectTagUpdateWithRepository,
   pauseReflectionStepLogOnceWithRepository,
   shouldLogPauseReflectionStep,
-  shouldShowFavoriteProHint,
+  shouldShowFavoriteProHint
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   dismissOpenPauseHome,
   openManualPauseFromHome,
   pauseDismissOpenPauseHomePreview,
   pauseDismissOpenPauseHomePreviewWithRepository,
-  pauseHomeManualOpenPorts,
+  pauseHomeManualOpenPorts
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 import {
   buildReflectionShareTelegramUrl as buildTelegramFromShareIo,
   buildReflectionShareText as buildTextFromShareIo,
   buildReflectionShareTweetUrl as buildTweetFromShareIo,
   buildReflectionShareWhatsAppUrl as buildWhatsAppFromShareIo,
-  pauseReflectionShareImage,
+  pauseReflectionShareImage
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import * as shareIo from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import * as hubIo from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
@@ -201,7 +200,6 @@ describe('pause-reflect-share-io parity (application)', () => {
   it('sibling cluster: flows-io exports stay distinct from share-io wrappers', () => {
     expect(pauseReflectionShareImage).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(buildTextFromShareIo).not.toBe(pauseReflectOutcomeLog);
-    expect(buildTelegramFromShareIo).not.toBe(formatReinforcementQuoteFromSession);
     expect(buildTweetFromShareIo).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(buildWhatsAppFromShareIo).not.toBe(buildPauseScoreImpacts);
     expect(pauseReflectionShareImage).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);

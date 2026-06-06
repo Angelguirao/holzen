@@ -1,14 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: { port: 'reflectPauseRepository' },
+  supabasePauseRepository: { port: 'reflectPauseRepository' }
 }));
 
 import * as flowsIo from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   reflectPauseRepository as flowsReflectPauseRepository,
@@ -16,7 +14,7 @@ import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeSaveFailedToast
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import * as hubIo from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
@@ -24,7 +22,7 @@ import {
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
   reflectPauseRepository as hubReflectPauseRepository,
-  resolveShiftFrameHubDonePresentation,
+  resolveShiftFrameHubDonePresentation
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 
 /**
@@ -37,9 +35,7 @@ describe('pause-reflect-flows-io ↔ pause-reflect-hub-io sibling parity (applic
   it('flows-io and hub-io are distinct presentation I/O surfaces', () => {
     expect(typeof resolvePauseSessionReflectAndDecidePreflight).toBe('function');
     expect(typeof resolvePauseSessionReflectAndDecideAfterGeneration).toBe('function');
-    expect(typeof formatReinforcementQuoteFromSession).toBe('function');
     expect(typeof resolvePauseDecideOutcomeFlow).toBe('function');
-    expect(typeof getSessionQuote).toBe('function');
     expect(typeof buildPauseScoreImpacts).toBe('function');
     expect(typeof pauseReflectOutcomeLog).toBe('function');
     expect(typeof pauseReflectOutcomeLogWithRepository).toBe('function');
@@ -68,7 +64,6 @@ describe('pause-reflect-flows-io ↔ pause-reflect-hub-io sibling parity (applic
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseShiftEmotionFrameHubDone);
     expect(pauseReflectOutcomeLog).not.toBe(pauseShiftEmotionFrameHubDoneWithRepository);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseShiftEmotionFrameHubDone);
-    expect(formatReinforcementQuoteFromSession).not.toBe(buildShiftEmotionFrameHubLogBundle);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(resolveShiftFrameHubDonePresentation);
     expect(buildPauseScoreImpacts).not.toBe(buildShiftEmotionFrameHubLogBundle);
     expect(showPauseOutcomeSaveFailedToast).not.toBe(pauseShiftEmotionFrameHubDone);
@@ -78,10 +73,8 @@ describe('pause-reflect-flows-io ↔ pause-reflect-hub-io sibling parity (applic
     expect(pauseShiftEmotionFrameHubDone).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseReflectOutcomeLog);
     expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseReflectOutcomeLogWithRepository);
-    expect(buildShiftEmotionFrameHubLogBundle).not.toBe(formatReinforcementQuoteFromSession);
     expect(resolveShiftFrameHubDonePresentation).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(pauseShiftEmotionFrameHubDone).not.toBe(showPauseOutcomeNotCompletedToast);
-    expect(buildShiftEmotionFrameHubLogBundle).not.toBe(getSessionQuote);
     expect(hubReflectPauseRepository).toBe(flowsReflectPauseRepository);
     expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseReflectOutcomeLog);
   });

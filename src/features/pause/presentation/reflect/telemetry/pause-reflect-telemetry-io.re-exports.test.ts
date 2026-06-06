@@ -2,25 +2,24 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
-  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
+  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' }
 }));
 
 import {
   trackPauseReflectPostItOpen as trackPostItDirect,
   trackPauseReflectShareTap as trackShareTapDirect,
-  trackPauseReflectWallpaperTap as trackWallpaperDirect,
+  trackPauseReflectWallpaperTap as trackWallpaperDirect
 } from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-session-ui-telemetry';
 import {
   trackPauseReflectPostItOpen as trackPostItFromTelemetryFlow,
   trackPauseReflectShareTap as trackShareTapFromTelemetryFlow,
-  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow,
+  trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryFlow
 } from '@/features/pause/application/use-cases/ritual/reflect/telemetry/pause-reflect-telemetry-flow';
 
 import {
   buildPauseScoreImpacts,
-  getSessionQuote,
   pauseReflectOutcomeLog,
-  resolvePauseSessionReflectAndDecidePreflight,
+  resolvePauseSessionReflectAndDecidePreflight
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   messageFromReflectGenerationResult,
@@ -29,12 +28,12 @@ import {
   reflectGenerator,
   resolveReflectGenerationPrefetch,
   runReflectGeneration,
-  shouldCommitReflectGeneration,
+  shouldCommitReflectGeneration
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
+  trackPauseReflectWallpaperTap
 } from './pause-reflect-telemetry-io';
 
 describe('pause-reflect-telemetry-io re-exports', () => {
@@ -58,7 +57,6 @@ describe('pause-reflect-telemetry-io re-exports', () => {
     expect(trackPauseReflectPostItOpen).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(trackPauseReflectShareTap).not.toBe(pauseReflectOutcomeLog);
     expect(trackPauseReflectWallpaperTap).not.toBe(buildPauseScoreImpacts);
-    expect(trackPauseReflectPostItOpen).not.toBe(getSessionQuote);
   });
 
   /**

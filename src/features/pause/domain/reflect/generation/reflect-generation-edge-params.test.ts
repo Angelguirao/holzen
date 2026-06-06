@@ -10,7 +10,6 @@ const profile: ReflectGenerationProfileInput = {
   customPrompt: '',
   motivations: [],
   mantra: '',
-  groundingActivities: [],
   currency: 'USD',
   language: 'en',
 };
@@ -41,7 +40,6 @@ describe('buildReflectGenerationEdgeInvokeInput', () => {
     expect(result.customPrompt).toBeUndefined();
     expect(result.motivations).toBeUndefined();
     expect(result.mantra).toBeUndefined();
-    expect(result.groundingActivities).toBeUndefined();
   });
 
   it('includes optional profile fields when non-empty', () => {
@@ -55,7 +53,6 @@ describe('buildReflectGenerationEdgeInvokeInput', () => {
         customPrompt: 'focus on breath',
         motivations: ['calm'],
         mantra: 'breathe',
-        groundingActivities: ['walk'],
       },
     });
 
@@ -63,7 +60,6 @@ describe('buildReflectGenerationEdgeInvokeInput', () => {
       customPrompt: 'focus on breath',
       motivations: ['calm'],
       mantra: 'breathe',
-      groundingActivities: ['walk'],
     });
   });
 });

@@ -3,23 +3,23 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'supabasePauseRepository' },
   supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
-  reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' },
+  reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' }
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle', () => ({
-  runPauseFavoriteToggle: vi.fn(() => Promise.resolve({ status: 'success' as const, newValue: true })),
+  runPauseFavoriteToggle: vi.fn(() => Promise.resolve({ status: 'success' as const, newValue: true }))
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update', () => ({
-  runPauseReflectNoteUpdate: vi.fn(() => Promise.resolve({ status: 'success' as const })),
+  runPauseReflectNoteUpdate: vi.fn(() => Promise.resolve({ status: 'success' as const }))
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-tag-update', () => ({
-  runPauseReflectTagUpdate: vi.fn(() => Promise.resolve({ status: 'success' as const })),
+  runPauseReflectTagUpdate: vi.fn(() => Promise.resolve({ status: 'success' as const }))
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflection-step-log', () => ({
-  runPauseReflectionStepLogOnce: vi.fn(() => Promise.resolve({ status: 'logged' as const })),
+  runPauseReflectionStepLogOnce: vi.fn(() => Promise.resolve({ status: 'logged' as const }))
 }));
 
 /**
@@ -59,7 +59,7 @@ import {
   runPauseReflectTagUpdate,
   runPauseReflectionStepLogOnce,
   shouldLogPauseReflectionStep,
-  shouldShowFavoriteProHint,
+  shouldShowFavoriteProHint
 } from '@/features/pause/application/use-cases/ritual/reflect/steps/pause-reflect-steps-flow';
 import { runPauseFavoriteToggle as runFavoriteToggleDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-favorite-toggle';
 import { runPauseReflectNoteUpdate as runNoteUpdateDirect } from '@/features/pause/application/use-cases/ritual/reflect/steps/run-pause-reflect-note-update';
@@ -76,47 +76,45 @@ import {
   pauseReflectionStepLogOnceWithRepository,
   reflectPauseRepository,
   shouldLogPauseReflectionStep as shouldLogFromStepsIo,
-  shouldShowFavoriteProHint as shouldShowFromStepsIo,
+  shouldShowFavoriteProHint as shouldShowFromStepsIo
 } from './pause-reflect-steps-io';
 import {
   startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
   buildFeelTilesMoodLogOptions,
   pauseInitialEmotionSelect,
   pauseInitialEmotionSkip,
   pauseInitialEmotionSelectWithRepository,
-  pauseInitialEmotionSkipWithRepository,
+  pauseInitialEmotionSkipWithRepository
 } from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
-  resolveShiftFrameHubDonePresentation,
+  resolveShiftFrameHubDonePresentation
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
-  resolvePauseSessionReflectAndDecidePreflight,
+  resolvePauseSessionReflectAndDecidePreflight
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
+  trackPauseReflectWallpaperTap
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   reflectionStepSessionStorage,
-  supabasePauseRepository,
+  supabasePauseRepository
 } from '@/features/pause/public-rpc';
 import {
   buildPauseSessionStepRitualBundle,
-  buildPauseSessionStepShellBundle,
+  buildPauseSessionStepShellBundle
 } from '@/features/pause/presentation/session/pause-session-step-handlers-io';
 import {
   messageFromReflectGenerationResult,
@@ -125,14 +123,14 @@ import {
   reflectGenerator,
   resolveReflectGenerationPrefetch,
   runReflectGeneration,
-  shouldCommitReflectGeneration,
+  shouldCommitReflectGeneration
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
   pauseAdoptPendingOfferWithRepository,
   pauseDeclinePendingOffer,
-  pauseDeclinePendingOfferWithRepository,
+  pauseDeclinePendingOfferWithRepository
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 
 /** Presentation-layer steps I/O parity (colocated beside `pause-reflect-steps-io.ts`). */
@@ -260,7 +258,7 @@ describe('pause-reflect-steps-io parity', () => {
     const customStorage = {
       canRead: () => true,
       isLogged: () => false,
-      markLogged: vi.fn(),
+      markLogged: vi.fn()
     };
     const input = { pauseInstanceId: 'inst-reflection-step-custom' };
 
@@ -271,7 +269,7 @@ describe('pause-reflect-steps-io parity', () => {
     );
 
     expect(runReflectionStepLogDirect).toHaveBeenCalledWith(customRepository, input, {
-      storage: customStorage,
+      storage: customStorage
     });
   });
 
@@ -376,9 +374,7 @@ describe('pause-reflect-steps-io parity', () => {
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectOutcomeLogWithRepository);
     expect(pauseReflectTagUpdate).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(pauseReflectionStepLogOnce).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
-    expect(shouldShowFromStepsIo).not.toBe(formatReinforcementQuoteFromSession);
     expect(shouldLogFromStepsIo).not.toBe(resolvePauseDecideOutcomeFlow);
-    expect(pauseReflectFavoriteToggle).not.toBe(getSessionQuote);
     expect(pauseReflectNoteUpdate).not.toBe(buildPauseScoreImpacts);
     expect(pauseReflectTagUpdate).not.toBe(pauseReflectOutcomeLog);
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectTagUpdate);

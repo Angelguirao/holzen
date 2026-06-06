@@ -2,17 +2,17 @@ import { describe, expect, it } from 'vitest';
 
 import {
   applyBriefDepthPickerRitualEntry,
-  applyDeepDepthPickerRitualEntry,
+  applyDeepDepthPickerRitualEntry
 } from '@/features/pause/domain/feel/apply-depth-picker-ritual-entry';
 import { buildFeelTilesMoodLogOptions } from '@/features/pause/domain/feel/build-feel-tiles-mood-log-options';
 import {
   initialEmotionResetUi,
-  initialEmotionSelectRollbackUi,
+  initialEmotionSelectRollbackUi
 } from '@/features/pause/domain/feel/initial-emotion-presentation';
 import { isPauseSessionDepthPickerActive } from '@/features/pause/domain/feel/pause-depth-picker-active';
 import {
   resolvePauseSessionChromeCloseAction,
-  runPauseSessionChromeCloseAction,
+  runPauseSessionChromeCloseAction
 } from '@/features/pause/domain/feel/pause-session-chrome-close';
 import { resolvePauseDepthContextLineParams } from '@/features/pause/domain/feel/resolve-pause-depth-context-line-params';
 import { runDeepPausePickerEntryIfPro } from '@/features/pause/domain/feel/run-deep-pause-picker-entry-if-pro';
@@ -29,57 +29,56 @@ import {
   runDeepPausePickerEntryIfPro as runDeepPickerFromFlow,
   runInitialEmotionSelect,
   runInitialEmotionSkip,
-  runPauseSessionChromeCloseAction as runChromeCloseFromFlow,
+  runPauseSessionChromeCloseAction as runChromeCloseFromFlow
 } from './pause-feel-flow';
 import {
   runInitialEmotionSelect as runSelectDirect,
-  runInitialEmotionSkip as runSkipDirect,
+  runInitialEmotionSkip as runSkipDirect
 } from './run-initial-emotion-log';
 import {
   runInitialEmotionSelect as runSelectFromLogFlow,
-  runInitialEmotionSkip as runSkipFromLogFlow,
+  runInitialEmotionSkip as runSkipFromLogFlow
 } from './pause-initial-emotion-log-flow';
 import {
   initialEmotionResetUi as resetUiFromPresentationFlow,
-  initialEmotionSelectRollbackUi as rollbackUiFromPresentationFlow,
+  initialEmotionSelectRollbackUi as rollbackUiFromPresentationFlow
 } from './pause-initial-emotion-presentation-flow';
 import { buildFeelTilesMoodLogOptions as buildFeelTilesFromFeelTilesFlow } from './pause-feel-tiles-flow';
 import {
   applyBriefDepthPickerRitualEntry as applyBriefFromDepthFlow,
   applyDeepDepthPickerRitualEntry as applyDeepFromDepthFlow,
   isPauseSessionDepthPickerActive as isDepthPickerActiveFromDepthFlow,
-  resolvePauseDepthContextLineParams as resolveDepthContextFromDepthFlow,
+  resolvePauseDepthContextLineParams as resolveDepthContextFromDepthFlow
 } from './pause-depth-picker-feel-flow';
 import {
   resolvePauseSessionChromeCloseAction as resolveChromeCloseFromChromeFlow,
   runDeepPausePickerEntryIfPro as runDeepPickerFromChromeFlow,
-  runPauseSessionChromeCloseAction as runChromeCloseFromChromeFlow,
+  runPauseSessionChromeCloseAction as runChromeCloseFromChromeFlow
 } from './pause-session-mood-chrome-flow';
 import {
   buildShiftEmotionFrameHubLogBundle as buildHubLogBundleFromHubFlow,
   resolveShiftFrameHubDonePresentation as resolveHubPresentationFromHubFlow,
-  runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
+  runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow
 } from '../reflect/hub/pause-reflect-hub-flow';
 import {
-  formatReinforcementQuoteFromSession as formatQuoteFromFlowsFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromFlowsFlow,
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
-  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
+  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow
 } from '../reflect/flows/pause-reflect-flows-flow';
 import {
   dismissOpenPauseHome as dismissFromGenerationFlow,
   openManualPauseFromHome as openManualFromGenerationFlow,
   reflectGenerationPrerequisite as prerequisiteFromGenerationFlow,
-  runReflectGeneration as runReflectGenerationFromGenerationFlow,
+  runReflectGeneration as runReflectGenerationFromGenerationFlow
 } from '../reflect/generation/pause-reflect-generation-flow';
 import {
   getPendingPauseOfferDisplay as getDisplayFromPendingOfferFlow,
   runAdoptPendingPauseOffer as runAdoptFromPendingOfferFlow,
-  runDeclinePendingPauseOffer as runDeclineFromPendingOfferFlow,
+  runDeclinePendingPauseOffer as runDeclineFromPendingOfferFlow
 } from '../reflect/pending-offer/pause-reflect-pending-offer-flow';
 import {
   startPauseReflectFrameFocusAmbience as startAmbienceFromAmbienceFlow,
-  stopPauseReflectFrameFocusAmbience as stopAmbienceFromAmbienceFlow,
+  stopPauseReflectFrameFocusAmbience as stopAmbienceFromAmbienceFlow
 } from '../reflect/ambience/pause-reflect-ambience-flow';
 
 describe('pause-feel-flow', () => {

@@ -23,6 +23,8 @@ legacy/
   README.md          ← this file
   full-shell/        ← pre-MVP IA (tools, stats, journey tabs, badges, …)
   locales/           ← full i18n bundles (Step 4)
+  pause-wisdom-quotes/   ← session investor quotes + Done reinforcement card
+  personal-grounding/    ← profile grounding_activities tag editor (Settings → You)
 ```
 
 Canonical shipped manifest: [`docs/ops/active-surface.md`](../docs/ops/active-surface.md).

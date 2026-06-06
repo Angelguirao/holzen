@@ -3,18 +3,18 @@ import { describe, expect, it } from 'vitest';
 import { getPendingPauseOfferDisplay } from './pending-pause-offer-display';
 import {
   trackPausePendingAdopted,
-  trackPausePendingDeclined,
+  trackPausePendingDeclined
 } from './pending-pause-offer-telemetry';
 import { trackPauseSessionAbandoned } from './pause-session-abandoned-telemetry';
 import { getPendingPauseOfferDisplay as getDisplayFromDisplayFlow } from './pause-pending-offer-display-flow';
 import {
   runAdoptPendingPauseOffer as runAdoptFromRpcSubcluster,
-  runDeclinePendingPauseOffer as runDeclineFromRpcSubcluster,
+  runDeclinePendingPauseOffer as runDeclineFromRpcSubcluster
 } from './pause-reflect-pending-offer-rpc-flow';
 import {
   trackPausePendingAdopted as trackAdoptedFromTelemetryFlow,
   trackPausePendingDeclined as trackDeclinedFromTelemetryFlow,
-  trackPauseSessionAbandoned as trackAbandonedFromTelemetryFlow,
+  trackPauseSessionAbandoned as trackAbandonedFromTelemetryFlow
 } from './pause-pending-offer-telemetry-flow';
 import {
   getPendingPauseOfferDisplay as getDisplayFromFlow,
@@ -22,7 +22,7 @@ import {
   runDeclinePendingPauseOffer,
   trackPausePendingAdopted as trackAdoptedFromFlow,
   trackPausePendingDeclined as trackDeclinedFromFlow,
-  trackPauseSessionAbandoned as trackAbandonedFromFlow,
+  trackPauseSessionAbandoned as trackAbandonedFromFlow
 } from './pause-reflect-pending-offer-flow';
 import { runAdoptPendingPauseOffer as runAdoptDirect } from './run-adopt-pending-pause-offer';
 import { runDeclinePendingPauseOffer as runDeclineDirect } from './run-decline-pending-pause-offer';
@@ -32,36 +32,34 @@ import {
   runPauseReflectTagUpdate as runTagFromStepsFlow,
   runPauseReflectionStepLogOnce as runReflectionStepFromStepsFlow,
   shouldLogPauseReflectionStep as shouldLogFromStepsFlow,
-  shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow,
+  shouldShowFavoriteProHint as shouldShowFavoriteFromStepsFlow
 } from '../steps/pause-reflect-steps-flow';
 import {
   buildReflectionShareText as buildShareTextFromShareFlow,
   runReflectionShareImage as runShareImageFromShareFlow,
-  trackPauseReflectPostItOpen as trackPostItFromShareFlow,
+  trackPauseReflectPostItOpen as trackPostItFromShareFlow
 } from '../share/pause-reflect-share-flow';
 import {
   dismissOpenPauseHome as dismissFromGenerationFlow,
   openManualPauseFromHome as openManualFromGenerationFlow,
   resolveReflectGenerationPrefetch as resolvePrefetchFromGenerationFlow,
-  runReflectGeneration as runReflectGenerationFromGenerationFlow,
+  runReflectGeneration as runReflectGenerationFromGenerationFlow
 } from '../generation/pause-reflect-generation-flow';
 import {
   buildPauseScoreImpacts as buildImpactsFromFlowsFlow,
-  formatReinforcementQuoteFromSession as formatQuoteFromFlowsFlow,
-  getSessionQuote as getQuoteFromFlowsFlow,
   resolvePauseDecideOutcomeFlow as resolveOutcomeFromFlowsFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromFlowsFlow,
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
-  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
+  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow
 } from '../flows/pause-reflect-flows-flow';
 import {
   buildShiftEmotionFrameHubLogBundle as buildLogBundleFromHubFlow,
   resolveShiftFrameHubDonePresentation as resolvePresentationFromHubFlow,
-  runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow,
+  runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow
 } from '../hub/pause-reflect-hub-flow';
 import {
   startPauseReflectFrameFocusAmbience as startAmbienceFromAmbienceFlow,
-  stopPauseReflectFrameFocusAmbience as stopAmbienceFromAmbienceFlow,
+  stopPauseReflectFrameFocusAmbience as stopAmbienceFromAmbienceFlow
 } from '../ambience/pause-reflect-ambience-flow';
 
 describe('pause-reflect-pending-offer-flow', () => {

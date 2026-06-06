@@ -4,7 +4,7 @@ const runReflectionShareImageMock = vi.hoisted(() => vi.fn());
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
-  supabaseReflectGenerator: { port: 'reflectGenerator' },
+  supabaseReflectGenerator: { port: 'reflectGenerator' }
 }));
 
 vi.mock(
@@ -15,7 +15,7 @@ vi.mock(
     >();
     return {
       ...actual,
-      runReflectionShareImage: runReflectionShareImageMock,
+      runReflectionShareImage: runReflectionShareImageMock
     };
   },
 );
@@ -25,27 +25,26 @@ import {
   pauseInitialEmotionSkip,
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
-  buildFeelTilesMoodLogOptions,
+  buildFeelTilesMoodLogOptions
 } from '@/features/pause/presentation/feel/pause-feel-io';
 import {
   startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import { pauseReflectGeneration } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
-  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeNotCompletedToast
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
-  resolveShiftFrameHubDonePresentation,
+  resolveShiftFrameHubDonePresentation
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
   pauseReflectFavoriteToggle,
@@ -58,19 +57,19 @@ import {
   pauseReflectionStepLogOnceWithRepository,
   reflectPauseRepository,
   shouldLogPauseReflectionStep,
-  shouldShowFavoriteProHint,
+  shouldShowFavoriteProHint
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
+  trackPauseReflectWallpaperTap
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   buildReflectionShareTelegramUrl,
   buildReflectionShareText,
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
-  pauseReflectionShareImage,
+  pauseReflectionShareImage
 } from './pause-reflect-share-io';
 
 describe('pause-reflect-share-io', () => {
@@ -106,7 +105,6 @@ describe('pause-reflect-share-io', () => {
     expect(pauseReflectionShareImage).not.toBe(pauseReflectOutcomeLog);
     expect(buildReflectionShareText).not.toBe(pauseReflectOutcomeLogWithRepository);
     expect(buildReflectionShareTelegramUrl).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
-    expect(buildReflectionShareTweetUrl).not.toBe(formatReinforcementQuoteFromSession);
     expect(buildReflectionShareWhatsAppUrl).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(pauseReflectionShareImage).not.toBe(buildPauseScoreImpacts);
     expect(buildReflectionShareText).not.toBe(showPauseOutcomeNotCompletedToast);

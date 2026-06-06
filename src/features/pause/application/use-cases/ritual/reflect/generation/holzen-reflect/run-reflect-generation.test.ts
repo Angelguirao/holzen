@@ -9,7 +9,6 @@ const profile: ReflectGenerationProfileInput = {
   customPrompt: '',
   motivations: [],
   mantra: '',
-  groundingActivities: [],
   currency: 'USD',
   language: 'en',
 };

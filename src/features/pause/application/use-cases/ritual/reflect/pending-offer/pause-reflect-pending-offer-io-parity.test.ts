@@ -9,15 +9,15 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'supabasePauseRepository' },
-  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
+  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' }
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-adopt-pending-pause-offer', () => ({
-  runAdoptPendingPauseOffer: vi.fn(() => Promise.resolve({ status: 'ok' as const, instanceId: 'inst-adopted' })),
+  runAdoptPendingPauseOffer: vi.fn(() => Promise.resolve({ status: 'ok' as const, instanceId: 'inst-adopted' }))
 }));
 
 vi.mock('@/features/pause/application/use-cases/ritual/reflect/pending-offer/run-decline-pending-pause-offer', () => ({
-  runDeclinePendingPauseOffer: vi.fn(() => Promise.resolve({ status: 'ok' as const })),
+  runDeclinePendingPauseOffer: vi.fn(() => Promise.resolve({ status: 'ok' as const }))
 }));
 
 import { getPendingPauseOfferDisplay as getDisplayDirect } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pending-pause-offer-display';
@@ -27,42 +27,40 @@ import { getPendingPauseOfferDisplay as getDisplayFromDisplayFlow } from '@/feat
 import {
   getPendingPauseOfferDisplay,
   runAdoptPendingPauseOffer,
-  runDeclinePendingPauseOffer,
+  runDeclinePendingPauseOffer
 } from '@/features/pause/application/use-cases/ritual/reflect/pending-offer/pause-reflect-pending-offer-flow';
 import {
   startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeSaveFailedToast
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   pauseReflectGeneration,
   reflectGenerator,
-  runReflectGeneration,
+  runReflectGeneration
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import * as generationIo from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   buildShiftEmotionFrameHubLogBundle,
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
-  resolveShiftFrameHubDonePresentation,
+  resolveShiftFrameHubDonePresentation
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
   buildFeelTilesMoodLogOptions,
   pauseInitialEmotionSelect,
   pauseInitialEmotionSkip,
   pauseInitialEmotionSelectWithRepository,
-  pauseInitialEmotionSkipWithRepository,
+  pauseInitialEmotionSkipWithRepository
 } from '@/features/pause/presentation/feel/pause-feel-io';
 import * as pendingOfferIo from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
@@ -71,14 +69,14 @@ import {
   pauseAdoptPendingOfferWithRepository,
   pauseDeclinePendingOffer,
   pauseDeclinePendingOfferWithRepository,
-  reflectPauseRepository,
+  reflectPauseRepository
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   buildReflectionShareTelegramUrl,
   buildReflectionShareText,
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
-  pauseReflectionShareImage,
+  pauseReflectionShareImage
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   pauseReflectFavoriteToggle,
@@ -90,25 +88,25 @@ import {
   pauseReflectTagUpdateWithRepository,
   pauseReflectionStepLogOnceWithRepository,
   shouldLogPauseReflectionStep,
-  shouldShowFavoriteProHint,
+  shouldShowFavoriteProHint
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import * as pendingOfferTelemetryIo from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 import {
   trackPausePendingAdopted as trackAdoptedFromTelemetryIo,
   trackPausePendingDeclined as trackDeclinedFromTelemetryIo,
-  trackPauseSessionAbandoned as trackAbandonedFromTelemetryIo,
+  trackPauseSessionAbandoned as trackAbandonedFromTelemetryIo
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-pending-offer-telemetry-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
+  trackPauseReflectWallpaperTap
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   dismissOpenPauseHome,
   openManualPauseFromHome,
   pauseDismissOpenPauseHomePreview,
   pauseDismissOpenPauseHomePreviewWithRepository,
-  pauseHomeManualOpenPorts,
+  pauseHomeManualOpenPorts
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-io';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
 
@@ -224,8 +222,6 @@ describe('pause-reflect-pending-offer-io parity (application)', () => {
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
     expect(pauseDeclinePendingOffer).not.toBe(buildPauseScoreImpacts);
     expect(pauseDeclinePendingOfferWithRepository).not.toBe(resolvePauseDecideOutcomeFlow);
-    expect(getPendingPauseOfferDisplay).not.toBe(formatReinforcementQuoteFromSession);
-    expect(getPendingPauseOfferDisplay).not.toBe(getSessionQuote);
     expect(pauseAdoptPendingOffer).not.toBe(pauseReflectOutcomeLog);
     expect(pauseDeclinePendingOffer).not.toBe(showPauseOutcomeNotCompletedToast);
     expect(pauseAdoptPendingOfferWithRepository).not.toBe(showPauseOutcomeSaveFailedToast);

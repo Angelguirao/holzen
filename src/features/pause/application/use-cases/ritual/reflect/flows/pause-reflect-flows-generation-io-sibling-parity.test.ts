@@ -2,20 +2,19 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
-  supabaseReflectGenerator: { port: 'reflectGenerator' },
+  supabaseReflectGenerator: { port: 'reflectGenerator' }
 }));
 
 import * as flowsIo from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   reflectPauseRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
-  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeNotCompletedToast
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import * as generationIo from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
@@ -25,7 +24,7 @@ import {
   reflectGenerator,
   resolveReflectGenerationPrefetch,
   runReflectGeneration,
-  shouldCommitReflectGeneration,
+  shouldCommitReflectGeneration
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 
 /**
@@ -40,7 +39,6 @@ describe('pause-reflect-flows-io ↔ pause-reflect-generation-io sibling parity 
   it('flows-io and generation-io are distinct presentation I/O surfaces', () => {
     expect(typeof resolvePauseSessionReflectAndDecidePreflight).toBe('function');
     expect(typeof resolvePauseSessionReflectAndDecideAfterGeneration).toBe('function');
-    expect(typeof formatReinforcementQuoteFromSession).toBe('function');
     expect(typeof resolvePauseDecideOutcomeFlow).toBe('function');
     expect(typeof pauseReflectOutcomeLog).toBe('function');
     expect(typeof buildPauseScoreImpacts).toBe('function');
@@ -60,14 +58,12 @@ describe('pause-reflect-flows-io ↔ pause-reflect-generation-io sibling parity 
     expect('resolvePauseSessionReflectAndDecidePreflight' in generationIo).toBe(false);
     expect('pauseReflectOutcomeLog' in generationIo).toBe(false);
     expect('buildPauseScoreImpacts' in generationIo).toBe(false);
-    expect('formatReinforcementQuoteFromSession' in generationIo).toBe(false);
   });
 
   it('reflect+decide flows I/O keeps preflight and outcome helpers off holzen-reflect generation', () => {
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(runReflectGeneration);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(pauseReflectGeneration);
     expect(pauseReflectOutcomeLog).not.toBe(runReflectGeneration);
-    expect(formatReinforcementQuoteFromSession).not.toBe(reflectGenerationPrerequisite);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(resolveReflectGenerationPrefetch);
     expect(buildPauseScoreImpacts).not.toBe(shouldCommitReflectGeneration);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(pauseReflectGeneration);
@@ -79,7 +75,6 @@ describe('pause-reflect-flows-io ↔ pause-reflect-generation-io sibling parity 
     expect(runReflectGeneration).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(pauseReflectGeneration).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
     expect(reflectGenerationPrerequisite).not.toBe(pauseReflectOutcomeLog);
-    expect(resolveReflectGenerationPrefetch).not.toBe(formatReinforcementQuoteFromSession);
     expect(shouldCommitReflectGeneration).not.toBe(buildPauseScoreImpacts);
     expect(messageFromReflectGenerationResult).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(reflectGenerator).not.toBe(reflectPauseRepository);
