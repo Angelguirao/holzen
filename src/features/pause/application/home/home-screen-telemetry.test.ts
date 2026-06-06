@@ -49,13 +49,13 @@ describe('home-screen-telemetry', () => {
 
   it('tracks onboarding completed', () => {
     trackOnboardingCompleted({
-      stepsCompleted: 3,
+      stepsCompleted: 4,
       trackedAssetId: 'bitcoin',
       thresholdUp: 5,
       thresholdDown: 5,
     });
     expect(trackEvent).toHaveBeenCalledWith('onboarding.completed', {
-      steps_completed: 3,
+      steps_completed: 4,
       tracked_asset_id: 'bitcoin',
       threshold_up: 5,
       threshold_down: 5,

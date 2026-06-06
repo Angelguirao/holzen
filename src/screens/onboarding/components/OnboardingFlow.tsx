@@ -4,10 +4,12 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   normalizeTrackedAssetId,
 } from '@/features/market/public';
+import { hasMinimumMotivations } from '@/features/user/domain/profile-motivations';
 import { trackOnboardingCompleted } from '@/features/pause/public-home';
 import { OnboardingAssetStep } from '@/screens/onboarding/components/OnboardingAssetStep';
 import { OnboardingSubscriptionStep } from '@/screens/onboarding/components/OnboardingSubscriptionStep';
 import { OnboardingThresholdStep } from '@/screens/onboarding/components/OnboardingThresholdStep';
+import { OnboardingWhyStep } from '@/screens/onboarding/components/OnboardingWhyStep';
 
 interface OnboardingDraft {
   trackedAssetId: string;
@@ -17,21 +19,25 @@ interface OnboardingDraft {
 }
 
 interface Props {
+  initialMotivations: string[];
   initialTrackedAssetId: string;
   initialThreshold: number;
+  onSaveMotivations: (motivations: string[]) => Promise<void>;
   onSaveDraft: (draft: OnboardingDraft) => Promise<void>;
   onStartTrial: () => Promise<void>;
   onComplete: () => Promise<void>;
   trialLoading: boolean;
 }
 
-const TOTAL_STEPS = 3;
-const ONBOARDING_STEP_KEYS = ['asset', 'threshold', 'subscription'] as const;
+const TOTAL_STEPS = 4;
+const ONBOARDING_STEP_KEYS = ['why', 'asset', 'threshold', 'subscription'] as const;
 const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export function OnboardingFlow({
+  initialMotivations,
   initialTrackedAssetId,
   initialThreshold,
+  onSaveMotivations,
   onSaveDraft,
   onStartTrial,
   onComplete,
@@ -42,11 +48,14 @@ export function OnboardingFlow({
   const prefersReduced = useReducedMotion();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
+  const [motivations, setMotivations] = useState<string[]>(() => [...initialMotivations]);
+  const [showWhyError, setShowWhyError] = useState(false);
   const [trackedAssetId, setTrackedAssetId] = useState(() =>
     normalizeTrackedAssetId(initialTrackedAssetId || 'bitcoin'),
   );
   const [threshold, setThreshold] = useState(initialThreshold || 5);
   const [isStartingTrial, startTrialFlow] = useTransition();
+  const [isSavingWhy, startWhySave] = useTransition();
 
   const goTo = useCallback((next: number) => {
     setDirection(next > step ? 1 : -1);
@@ -62,6 +71,25 @@ export function OnboardingFlow({
     }),
     [trackedAssetId, threshold],
   );
+
+  const handleContinue = useCallback(() => {
+    if (step === 0) {
+      if (!hasMinimumMotivations(motivations)) {
+        setShowWhyError(true);
+        return;
+      }
+      startWhySave(async () => {
+        try {
+          await onSaveMotivations(motivations);
+          goTo(step + 1);
+        } catch {
+          // Profile write errors surface their own toast copy.
+        }
+      });
+      return;
+    }
+    goTo(step + 1);
+  }, [goTo, motivations, onSaveMotivations, step, startWhySave]);
 
   const handleStartTrial = useCallback(() => {
     startTrialFlow(async () => {
@@ -105,6 +133,8 @@ export function OnboardingFlow({
           transition: { delay, duration: 0.4, ease },
         };
 
+  const continueDisabled = step === 0 && isSavingWhy;
+
   return (
     <motion.div className="fixed inset-0 z-[60] flex items-center justify-center bg-background p-6">
       <div className="w-full max-w-sm">
@@ -120,6 +150,18 @@ export function OnboardingFlow({
               transition={transition}
             >
               {step === 0 ? (
+                <OnboardingWhyStep
+                  motivations={motivations}
+                  onChange={(next) => {
+                    setMotivations(next);
+                    if (hasMinimumMotivations(next)) setShowWhyError(false);
+                  }}
+                  showMinimumError={showWhyError}
+                  stagger={stagger}
+                />
+              ) : null}
+
+              {step === 1 ? (
                 <OnboardingAssetStep
                   trackedAssetId={trackedAssetId}
                   onSelect={setTrackedAssetId}
@@ -127,7 +169,7 @@ export function OnboardingFlow({
                 />
               ) : null}
 
-              {step === 1 ? (
+              {step === 2 ? (
                 <OnboardingThresholdStep
                   trackedAssetId={trackedAssetId}
                   threshold={threshold}
@@ -136,10 +178,11 @@ export function OnboardingFlow({
                 />
               ) : null}
 
-              {step === 2 ? (
+              {step === 3 ? (
                 <OnboardingSubscriptionStep
                   trackedAssetId={trackedAssetId}
                   threshold={threshold}
+                  motivations={motivations}
                   onStartTrial={handleStartTrial}
                   trialLoading={trialLoading || isStartingTrial}
                   stagger={stagger}
@@ -186,8 +229,9 @@ export function OnboardingFlow({
             {step < TOTAL_STEPS - 1 ? (
               <button
                 type="button"
-                onClick={() => goTo(step + 1)}
-                className="text-[10px] font-mono text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+                disabled={continueDisabled}
+                onClick={handleContinue}
+                className="text-[10px] font-mono text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground disabled:opacity-40"
               >
                 {t('common.continue')}
               </button>

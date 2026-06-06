@@ -1,4 +1,6 @@
 import { Input } from '@/components/ui/input';
+import { ANCHOR_MANTRA_MAX_LENGTH } from '@/features/user/domain/profile-motivations';
+import { MotivationPickerGrid } from '@/features/user/presentation/MotivationPickerGrid';
 import { GroundingTagInput } from '@/screens/settings/components/GroundingTagInput';
 import { useSettingsState } from '@/screens/settings/hooks/use-settings-state';
 
@@ -34,32 +36,11 @@ export function SettingsYouPanel() {
       <div className="space-y-3">
         <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.myWhy')}</p>
         <p className="leading-relaxed text-foreground text-sm">{t('settings.myWhyDesc')}</p>
-        <div className="grid grid-cols-2 gap-2">
-          {(['freedom', 'family', 'generational', 'discipline', 'conviction', 'sovereignty', 'inflation', 'curiosity'] as const).map(
-            (value) => {
-              const selected = motivations.includes(value);
-              return (
-                <button type="button"
-                  key={value}
-                  onClick={() => {
-                    const next = selected ? motivations.filter((v) => v !== value) : [...motivations, value];
-                    setMotivations(next);
-                  }}
-                  className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
-                    selected
-                      ? 'border-ring bg-muted/40 text-foreground'
-                      : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <p className="font-medium text-sm font-sans text-secondary-foreground">{t(`settings.motivations.${value}`)}</p>
-                  <p className="text-muted-foreground mt-0.5 text-sm font-sans font-normal">
-                    {t(`settings.motivations.${value}Desc`)}
-                  </p>
-                </button>
-              );
-            },
-          )}
-        </div>
+        <MotivationPickerGrid
+          selected={motivations}
+          onChange={setMotivations}
+          lockLastSelected
+        />
       </div>
 
       <div className="space-y-3">
@@ -67,14 +48,16 @@ export function SettingsYouPanel() {
         <p className="leading-relaxed text-foreground text-sm">{t('settings.mantraDesc')}</p>
         <textarea
           value={mantra ?? ''}
-          onChange={(e) => setMantra(e.target.value || null)}
+          onChange={(e) => setMantra(e.target.value.slice(0, ANCHOR_MANTRA_MAX_LENGTH) || null)}
           aria-label={t('settings.mantraPlaceholder')}
           placeholder={t('settings.mantraPlaceholder')}
-          maxLength={200}
+          maxLength={ANCHOR_MANTRA_MAX_LENGTH}
           rows={2}
           className="w-full text-xs font-mono px-3 py-2 rounded-md border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-ring transition-colors resize-none"
         />
-        <p className="text-[10px] font-mono text-muted-foreground/50 text-right">{(mantra?.length ?? 0)}/200</p>
+        <p className="text-[10px] font-mono text-muted-foreground/50 text-right">
+          {(mantra?.length ?? 0)}/{ANCHOR_MANTRA_MAX_LENGTH}
+        </p>
       </div>
 
       <GroundingTagInput activities={groundingActivities} onChange={setGroundingActivities} />
