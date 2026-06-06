@@ -99,9 +99,18 @@ export async function invokeEdge<T = unknown, B = unknown>(
         let message = res.statusText || `Edge function error (${res.status})`;
         if (contentType.includes("application/json")) {
           try {
-            const errBody = (await res.json()) as { error?: string; message?: string };
+            const errBody = (await res.json()) as {
+              error?: string | { message?: string; code?: string };
+              message?: string;
+            };
             if (typeof errBody.error === "string") message = errBody.error;
-            else if (typeof errBody.message === "string") message = errBody.message;
+            else if (
+              errBody.error &&
+              typeof errBody.error === "object" &&
+              typeof errBody.error.message === "string"
+            ) {
+              message = errBody.error.message;
+            } else if (typeof errBody.message === "string") message = errBody.message;
           } catch {
             /* keep statusText */
           }

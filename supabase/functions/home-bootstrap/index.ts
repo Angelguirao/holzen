@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { errorMessage } from "../_shared/error-message.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { fetchMarketQuoteCached } from "../_shared/market-quote.ts";
 
@@ -54,12 +55,15 @@ Deno.serve(
     }
 
     try {
-      const [holzenNumberResult, market] = await Promise.all([
-        serviceClient.rpc("get_holzen_number"),
-        fetchMarketQuoteCached(coinId, currency, "lite", req),
-      ]);
-
+      const holzenNumberResult = await serviceClient.rpc("get_holzen_number");
       if (holzenNumberResult.error) throw holzenNumberResult.error;
+
+      let market: Awaited<ReturnType<typeof fetchMarketQuoteCached>> | null = null;
+      try {
+        market = await fetchMarketQuoteCached(coinId, currency, "lite", req);
+      } catch (marketErr) {
+        console.warn("home-bootstrap: market quote unavailable", errorMessage(marketErr));
+      }
 
       return new Response(
         JSON.stringify({
@@ -76,7 +80,7 @@ Deno.serve(
       );
     } catch (err) {
       return new Response(
-        JSON.stringify({ error: err instanceof Error ? err.message : String(err) }),
+        JSON.stringify({ error: errorMessage(err) }),
         {
           status: 502,
           headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -4,7 +4,8 @@ import type { MarketQuoteEdgePayload } from './map-market-quote-payload';
 
 export type HomeBootstrapResponse = {
   holzenNumber: HolzenNumberData;
-  market: MarketQuoteEdgePayload;
+  /** Null when CoinGecko / upstream market fetch fails; holzenNumber still returned. */
+  market: MarketQuoteEdgePayload | null;
 };
 
 /** Single round-trip for Home hero stats + market strip (`home-bootstrap` edge). */
