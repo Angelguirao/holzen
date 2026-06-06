@@ -199,11 +199,12 @@ Short version:
    ```sql
    UPDATE public.app_config
       SET value = to_jsonb('<uuid-from-betterstack>'::text)
-    WHERE key  = 'heartbeat.refresh_btc_prices';
+    WHERE key  = 'heartbeat.refresh_market_prices';
    ```
+   Migration `20260607140000_market_price_cache_table.sql` copies any existing UUID from `heartbeat.refresh_btc_prices` into `heartbeat.refresh_market_prices`. After cutover, create/rename the BetterStack heartbeat to `holzen-cron-refresh-market-prices` (legacy `holzen-cron-refresh-btc-prices` can be retired once the new monitor is green).
 3. In each cron schedule body, after the real work:
    ```sql
-   PERFORM public.emit_job_heartbeat('refresh_btc_prices');
+   PERFORM public.emit_job_heartbeat('refresh_market_prices');
    ```
 
 #### Heartbeat windows (canonical)

@@ -99,9 +99,11 @@ For **equities**, expect a new `AssetQuoteProvider` value, a `ports/market-data`
 
 **Edge Tier 2 (Jun 2026):** `market_price_cache` table (migration `20260607140000_market_price_cache_table.sql`); edge folders `refresh-market-prices`, `backfill-market-prices`, `seed-market-history`; cron job `refresh-market-prices` + `heartbeat.refresh_market_prices`; `_shared/market-price-cache-table.ts`.
 
-**Still deferred:** `btcData` on `useHolzen()` / legacy pause home context (alias only); product copy strings that stay BTC-accurate for bitcoin-only (`unitBasisMode`, Look Back labels); BetterStack monitor rename from `holzen-cron-refresh-btc-prices` (wire new UUID to `heartbeat.refresh_market_prices` in ops).
+**Still deferred:** `btcData` on `useHolzen()` / legacy pause home context (alias only); product copy strings that stay BTC-accurate for bitcoin-only (`unitBasisMode`, Look Back labels). **Ops (manual):** rename BetterStack heartbeat `holzen-cron-refresh-btc-prices` → `holzen-cron-refresh-market-prices` after migration `20260607140000` (UUID copied to `heartbeat.refresh_market_prices` automatically).
 
-**Tier 3 (Jun 2026):** `unit-basis-mode-storage` dual-read + Vitest; marketing i18n keys `landing.reserveLabel` / `about.reserveLabel` (replacing `btcReserve`; visible copy unchanged).
+**Tier 3 (Jun 2026):** `unit-basis-mode-storage` dual-read + Vitest; marketing i18n keys `landing.reserveLabel` / `about.reserveLabel`.
+
+**Tier 3b (Jun 2026):** Ops runbooks aligned — `observability-setup.md`, `incident-response.md`, `pg-cron-heartbeat-wiring.md`, `btc-price-cache-freshness.md`.
 
 ---
 
