@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 export function PauseSessionDepthPickerStack(props: {
   marketData: MarketQuote | null;
   trackedAssetId: string;
+  contextText?: string | null;
   onBrief: () => void;
   onDeep: () => void;
   /** Free users: deep card shows a Pro / trial hint; `onDeep` should still run (e.g. paywall). */
@@ -24,6 +25,7 @@ export function PauseSessionDepthPickerStack(props: {
   const {
     marketData,
     trackedAssetId,
+    contextText = null,
     onBrief,
     onDeep,
     deepPauseLocked = false,
@@ -44,6 +46,7 @@ export function PauseSessionDepthPickerStack(props: {
       <PauseDepthPicker
         marketData={marketData}
         trackedAssetId={trackedAssetId}
+        contextText={contextText}
         onBrief={onBrief}
         onDeep={onDeep}
         deepPauseLocked={deepPauseLocked}

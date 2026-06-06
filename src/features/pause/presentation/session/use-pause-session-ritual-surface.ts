@@ -35,6 +35,7 @@ export function usePauseSessionRitualSurface(
     sessionOnPicker: scaffoldVm.sessionOnPicker,
     depthPickerMarketData: scaffoldVm.depthPickerMarketData,
     depthPickerTrackedAssetId: scaffoldVm.depthPickerTrackedAssetId,
+    depthPickerContextText: scaffoldVm.depthPickerContextText,
     depthPickerOnBrief: scaffoldVm.depthPickerOnBrief,
     handleDepthPickerDeep: scaffoldVm.handleDepthPickerDeep,
     subscribed: step.subscribed,

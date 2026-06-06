@@ -2,7 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import {
+  getFearGreedDisplayQueryOptions,
   getHolzenMarketDisplayQueryOptions,
+  parsePauseContextForHomePreview,
+  formatCompactMarketSentimentFromContextText,
   type MarketQuote,
 } from '@/features/market/public';
 import { useProfile } from '@/features/user/public-hooks';
@@ -11,10 +14,16 @@ import { formatPauseDepthPickerMarketLines } from '@/features/pause/domain/feel/
 type Props = {
   marketData: MarketQuote | null;
   trackedAssetId: string;
+  /** Pause instance context — sentiment fallback after manual trigger. */
+  contextText?: string | null;
 };
 
 /** Market move + “Within your range” block (Figma Wireframes 589:19181). */
-export function PauseDepthPickerMarketContext({ marketData, trackedAssetId }: Props) {
+export function PauseDepthPickerMarketContext({
+  marketData,
+  trackedAssetId,
+  contextText = null,
+}: Props) {
   "use memo";
   const { t } = useTranslation();
   const { currency, profileLoaded } = useProfile();
@@ -28,7 +37,24 @@ export function PauseDepthPickerMarketContext({ marketData, trackedAssetId }: Pr
   );
 
   const resolvedMarket = marketData ?? marketQuery.data ?? null;
-  const lines = formatPauseDepthPickerMarketLines(resolvedMarket, trackedAssetId);
+  const contextSentiment = formatCompactMarketSentimentFromContextText(
+    parsePauseContextForHomePreview(contextText ?? null).marketSentiment,
+  );
+  const needsFearGreed =
+    profileLoaded && resolvedMarket != null && !resolvedMarket.fearGreed && !contextSentiment;
+
+  const fearGreedQuery = useQuery(getFearGreedDisplayQueryOptions(needsFearGreed));
+
+  const marketWithSentiment =
+    resolvedMarket && fearGreedQuery.data && !resolvedMarket.fearGreed
+      ? { ...resolvedMarket, fearGreed: fearGreedQuery.data }
+      : resolvedMarket;
+
+  const lines = formatPauseDepthPickerMarketLines(
+    marketWithSentiment,
+    trackedAssetId,
+    contextText,
+  );
 
   return (
     <div className="flex flex-col gap-2">

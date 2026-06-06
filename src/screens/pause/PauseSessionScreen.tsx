@@ -44,6 +44,7 @@ export default function PauseSessionScreen() {
             <PauseSessionDepthPickerStack
               marketData={vm.depthPickerMarketData}
               trackedAssetId={vm.depthPickerTrackedAssetId}
+              contextText={vm.depthPickerContextText}
               onBrief={vm.depthPickerOnBrief}
               onDeep={vm.handleDepthPickerDeep}
               deepPauseLocked={!vm.subscribed}

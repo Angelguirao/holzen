@@ -1,5 +1,9 @@
 import type { MarketQuote } from '@/features/market/domain/market-quote';
 import { parsePauseContextForHomePreview } from '@/features/market/application/pause-context-home-preview';
+import {
+  formatCompactMarketSentimentFromContextText,
+  formatCompactMarketSentimentFromFearGreed,
+} from '@/features/market/application/format-compact-market-sentiment-line';
 import { trackedAssetSymbol } from '@/features/market/domain/tracked-assets';
 
 export type HomePauseMarketBlock = {
@@ -22,10 +26,7 @@ function compactMoveFromContext(btc24h: string | null, assetSymbol: string): str
 }
 
 function compactSentimentFromContext(marketSentiment: string | null): string | null {
-  if (!marketSentiment) return null;
-  const match = marketSentiment.match(/Market sentiment:\s*(.+?)\s*\((\d{1,3})\/100\)\./i);
-  if (!match) return marketSentiment.trim();
-  return `${match[1].trim()} · ${match[2]}`;
+  return formatCompactMarketSentimentFromContextText(marketSentiment);
 }
 
 function compactMoveFromLiveQuote(data: MarketQuote, assetSymbol: string): string {
@@ -35,9 +36,7 @@ function compactMoveFromLiveQuote(data: MarketQuote, assetSymbol: string): strin
 }
 
 function compactSentimentFromLiveQuote(data: MarketQuote): string | null {
-  const fg = data.fearGreed;
-  if (!fg?.label || typeof fg.value !== 'number') return null;
-  return `${fg.label} · ${fg.value}`;
+  return formatCompactMarketSentimentFromFearGreed(data.fearGreed);
 }
 
 /** Formats the compact BTC/F&G block for Home pause widget states B/C. */

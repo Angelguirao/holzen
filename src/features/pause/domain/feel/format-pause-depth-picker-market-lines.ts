@@ -1,4 +1,9 @@
 import { trackedAssetSymbol, type MarketQuote } from '@/features/market/public';
+import { parsePauseContextForHomePreview } from '@/features/market/application/pause-context-home-preview';
+import {
+  formatCompactMarketSentimentFromContextText,
+  formatCompactMarketSentimentFromFearGreed,
+} from '@/features/market/application/format-compact-market-sentiment-line';
 
 export type PauseDepthPickerMarketLines = {
   sym: string;
@@ -8,19 +13,29 @@ export type PauseDepthPickerMarketLines = {
   sentimentLine: string | null;
 };
 
+function resolveSentimentLine(
+  marketData: MarketQuote | null,
+  contextText: string | null | undefined,
+): string | null {
+  const parsed = parsePauseContextForHomePreview(contextText ?? null);
+  return (
+    formatCompactMarketSentimentFromContextText(parsed.marketSentiment) ??
+    (marketData ? formatCompactMarketSentimentFromFearGreed(marketData.fearGreed) : null)
+  );
+}
+
 /** Figma 589:19181 — compact move + fear/greed row for depth picker. */
 export function formatPauseDepthPickerMarketLines(
   marketData: MarketQuote | null,
   trackedAssetId: string | null,
+  contextText?: string | null,
 ): PauseDepthPickerMarketLines | null {
   if (!marketData || !trackedAssetId) return null;
-  const fg = marketData.fearGreed;
   return {
     sym: trackedAssetSymbol(trackedAssetId),
     arrow: marketData.direction === 'down' ? '▼' : '▲',
     direction: marketData.direction,
     pct: Math.abs(marketData.changePercent).toFixed(1),
-    sentimentLine:
-      fg?.label && typeof fg.value === 'number' ? `${fg.label} · ${fg.value}` : null,
+    sentimentLine: resolveSentimentLine(marketData, contextText),
   };
 }
