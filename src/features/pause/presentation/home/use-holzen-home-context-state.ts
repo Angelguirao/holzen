@@ -39,6 +39,10 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
     }),
   );
 
+  const [error, setError] = useState<string | null>(null);
+  /** True briefly after a new pause message is shown — Home uses it for one-shot chime. */
+  const [newPauseArrival, setNewPauseArrival] = useState(false);
+
   const {
     message,
     context,
@@ -60,11 +64,9 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
     setLastTriggerAt,
     dismissOpenPauseHome: dismissMessage,
     syncOpenPauseFromDb,
-  } = useOpenPauseHomePreview(user);
-
-  const [error, setError] = useState<string | null>(null);
-  /** True briefly after a new pause message is shown — Home uses it for one-shot chime. */
-  const [newPauseArrival, setNewPauseArrival] = useState(false);
+  } = useOpenPauseHomePreview(user, {
+    onOpenPauseInstanceChanged: () => setNewPauseArrival(true),
+  });
 
   const { generateMessage, loading } = useManualPauseTrigger({
     user,
