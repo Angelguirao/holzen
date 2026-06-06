@@ -1,5 +1,12 @@
-import { useState, useCallback, type ReactNode } from 'react';
-import { mergeOrderWithDefaults, normalizeHomeSectionOrder } from '@/screens/home/lib/home-section-order-normalize';
+import { useState, useCallback, useEffect, type ReactNode } from 'react';
+import { normalizeHomeSectionOrder } from '@/screens/home/lib/home-section-order-normalize';
+import {
+  clearHomeLayoutCollapsed,
+  loadHomeLayoutCollapsed,
+  loadHomeLayoutOrder,
+  saveHomeLayoutCollapsed,
+  saveHomeLayoutOrder,
+} from '@/screens/home/lib/home-layout-storage';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { GripVertical, ChevronDown } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
@@ -119,72 +126,43 @@ export function HomeWidget({
 }
 
 // Hook to manage Home section order (core + optional) and per-widget collapse.
-const ORDER_KEY = 'holzen_home_section_order_v1';
-const LEGACY_ORDER_KEY = 'holzen_widget_order';
-const COLLAPSED_KEY = 'holzen_home_section_collapsed_v1';
-const LEGACY_COLLAPSED_KEY = 'holzen_widget_collapsed';
+export function useWidgetLayout(defaultOrder: string[], userId: string | undefined) {
+  const [order, setOrder] = useState<string[]>(() => loadHomeLayoutOrder(userId, defaultOrder));
 
-function loadOrder(defaultOrder: string[]): string[] {
-  try {
-    const raw = localStorage.getItem(ORDER_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as string[];
-      return normalizeHomeSectionOrder(mergeOrderWithDefaults(parsed, defaultOrder), defaultOrder);
-    }
-    const legacy = localStorage.getItem(LEGACY_ORDER_KEY);
-    if (legacy) {
-      const parsed = JSON.parse(legacy) as string[];
-      return normalizeHomeSectionOrder(mergeOrderWithDefaults(parsed, defaultOrder), defaultOrder);
-    }
-  } catch {
-    void 0;
-  }
-  return normalizeHomeSectionOrder([...defaultOrder], defaultOrder);
-}
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => loadHomeLayoutCollapsed(userId));
 
-function loadCollapsed(): Record<string, boolean> {
-  try {
-    const raw = localStorage.getItem(COLLAPSED_KEY);
-    if (raw) return JSON.parse(raw) as Record<string, boolean>;
-    const legacy = localStorage.getItem(LEGACY_COLLAPSED_KEY);
-    if (legacy) return JSON.parse(legacy) as Record<string, boolean>;
-  } catch {
-    void 0;
-  }
-  return {};
-}
-
-export function useWidgetLayout(defaultOrder: string[]) {
-  const [order, setOrder] = useState<string[]>(() => loadOrder(defaultOrder));
-
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(loadCollapsed);
+  useEffect(() => {
+    setOrder(loadHomeLayoutOrder(userId, defaultOrder));
+    setCollapsed(loadHomeLayoutCollapsed(userId));
+  }, [userId, defaultOrder]);
 
   const reorder = useCallback(
     (newOrder: string[]) => {
       const normalized = normalizeHomeSectionOrder(newOrder, defaultOrder);
       setOrder(normalized);
-      localStorage.setItem(ORDER_KEY, JSON.stringify(normalized));
+      saveHomeLayoutOrder(userId, normalized);
     },
-    [defaultOrder],
+    [defaultOrder, userId],
   );
 
-  const toggleCollapsed = useCallback((id: string) => {
-    setCollapsed((prev) => {
-      const next = { ...prev, [id]: !prev[id] };
-      localStorage.setItem(COLLAPSED_KEY, JSON.stringify(next));
-      return next;
-    });
-  }, []);
+  const toggleCollapsed = useCallback(
+    (id: string) => {
+      setCollapsed((prev) => {
+        const next = { ...prev, [id]: !prev[id] };
+        saveHomeLayoutCollapsed(userId, next);
+        return next;
+      });
+    },
+    [userId],
+  );
 
   const resetLayout = useCallback(() => {
     // Use `reorder` so defaults are persisted like drag updates; otherwise only `setOrder`
     // runs and dnd-kit can keep a stale visual order until the sheet remounts.
     reorder(normalizeHomeSectionOrder([...defaultOrder], defaultOrder));
     setCollapsed({});
-    localStorage.removeItem(COLLAPSED_KEY);
-    localStorage.removeItem(LEGACY_ORDER_KEY);
-    localStorage.removeItem(LEGACY_COLLAPSED_KEY);
-  }, [defaultOrder, reorder]);
+    clearHomeLayoutCollapsed(userId);
+  }, [defaultOrder, reorder, userId]);
 
   return { order, collapsed, reorder, toggleCollapsed, resetLayout };
 }

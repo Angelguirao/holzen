@@ -125,9 +125,10 @@ export function useHomeScreen() {
 
   const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(
     HOME_WIDGET_DEFAULT_ORDER,
+    user?.id,
   );
   const { visible: sectionVisible, setVisible, resetVisibility: resetSectionVisibility } =
-    useHomeOptionalVisibility();
+    useHomeOptionalVisibility(user?.id);
 
   const { visibleOrderedSectionIds, todaySectionIds } = useHomeVisibleSections({
     order,
