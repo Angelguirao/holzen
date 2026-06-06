@@ -27,10 +27,18 @@ export function toHistoricalInsightDisplayData(raw: unknown): CachedHistoricalIn
   const currentPrice = typeof o.currentPrice === 'number' ? o.currentPrice : null;
   const partial = typeof o.partial === 'boolean' ? o.partial : undefined;
 
+  const marketInsight =
+    typeof o.marketInsight === 'string'
+      ? o.marketInsight
+      : typeof o.btcInsight === 'string'
+        ? o.btcInsight
+        : undefined;
+
   return {
     title: typeof o.title === 'string' ? o.title : undefined,
     period: typeof o.period === 'string' ? o.period : undefined,
-    btcInsight: typeof o.btcInsight === 'string' ? o.btcInsight : undefined,
+    marketInsight,
+    btcInsight: marketInsight,
     assetClass: typeof o.assetClass === 'string' ? o.assetClass : undefined,
     analogy: typeof o.analogy === 'string' ? o.analogy : undefined,
     onThisDay,
@@ -43,7 +51,7 @@ export function toHistoricalInsightDisplayData(raw: unknown): CachedHistoricalIn
  * Legacy sessions may still have BTC rows on zoom-out artifacts. Prefer history payload,
  * then fall back to zoom-out price rows when Look Back lacks them.
  */
-export function mergeHistoryBtcOverlay(
+export function mergeHistoryMarketOverlay(
   history: CachedHistoricalInsightShape | null,
   zoomOut: ZoomOutData | null,
 ): CachedHistoricalInsightShape | null {
@@ -63,3 +71,6 @@ export function mergeHistoryBtcOverlay(
     partial: zoomOut.partial,
   };
 }
+
+/** @deprecated Use mergeHistoryMarketOverlay */
+export const mergeHistoryBtcOverlay = mergeHistoryMarketOverlay;

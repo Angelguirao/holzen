@@ -1,3 +1,2 @@
-/** TanStack key for legacy `/breathe` ambient strip (bitcoin · USD). */
-
-export const BREATHE_AMBIENT_BTC_QUERY_KEY = ['ambient', 'breathe', 'btc-usd'] as const;
+/** @deprecated Use BREATHE_AMBIENT_MARKET_QUERY_KEY from breathe-ambient-market-keys. */
+export { BREATHE_AMBIENT_MARKET_QUERY_KEY as BREATHE_AMBIENT_BTC_QUERY_KEY } from './breathe-ambient-market-keys';

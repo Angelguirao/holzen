@@ -50,8 +50,8 @@ export function MarketStatus({
         type="button"
         onClick={onToggleUnitBasisMode}
         className={cn(homeInWidget.iconBtn, 'text-muted-foreground/40 hover:text-foreground')}
-        aria-label={t('btcStatus.enterBtcMode')}
-        title={t('btcStatus.enterBtcMode')}
+        aria-label={t('marketStatus.enterUnitBasisMode')}
+        title={t('marketStatus.enterUnitBasisMode')}
       >
         <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
       </button>
@@ -64,8 +64,8 @@ export function MarketStatus({
         type="button"
         onClick={onToggleUnitBasisMode}
         className={cn(homeInWidget.iconBtn, 'text-foreground/50 hover:text-foreground')}
-        aria-label={t('btcStatus.exitBtcMode', { currency: fiatLabelCurrency })}
-        title={t('btcStatus.exitBtcMode', { currency: fiatLabelCurrency })}
+        aria-label={t('marketStatus.exitUnitBasisMode', { currency: fiatLabelCurrency })}
+        title={t('marketStatus.exitUnitBasisMode', { currency: fiatLabelCurrency })}
       >
         <CircleDollarSign className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
       </button>
@@ -76,7 +76,7 @@ export function MarketStatus({
       type="button"
       onClick={toggle}
       className={homeInWidget.iconBtn}
-      aria-label={hidden ? t('btcStatus.showPrice') : t('btcStatus.hidePrice')}
+      aria-label={hidden ? t('marketStatus.showPrice') : t('marketStatus.hidePrice')}
     >
       {hidden ? (
         <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
@@ -91,9 +91,9 @@ export function MarketStatus({
       <div className="space-y-2">
         <div className="flex items-center gap-2 text-muted-foreground">
           <WifiOff className="h-3.5 w-3.5 shrink-0" />
-          <p className={homeInWidget.meta}>{t('btcStatus.unableToFetch')}</p>
+          <p className={homeInWidget.meta}>{t('marketStatus.unableToFetch')}</p>
         </div>
-        <p className={homeInWidget.metaFaint}>{t('btcStatus.checkConnection')}</p>
+        <p className={homeInWidget.metaFaint}>{t('marketStatus.checkConnection')}</p>
       </div>
     );
   }
@@ -136,7 +136,7 @@ export function MarketStatus({
                   <p className={`${homeInWidget.price} text-foreground/90`}>
                     1 {quoteSym} = 1 {quoteSym}
                   </p>
-                  <p className="leading-snug text-sm text-[#dbb266]">{t('btcStatus.priceIsNoise')}</p>
+                  <p className="leading-snug text-sm text-[#dbb266]">{t('marketStatus.priceIsNoise')}</p>
                 </>
               )}
             </div>
@@ -224,7 +224,7 @@ export function MarketStatus({
         {showChartBlock ? (
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <p className={homeInWidget.subPrice}>
-              {dir}{pct}% {t('btcStatus.in24h')}
+              {dir}{pct}% {t('marketStatus.in24h')}
             </p>
             {data.fearGreed && (
               <p className={`text-xs font-medium tabular-nums ${fearGreedColor}`}>

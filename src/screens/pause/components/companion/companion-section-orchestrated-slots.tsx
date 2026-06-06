@@ -6,7 +6,7 @@ import type {
   RegenerateCompanionSlot,
 } from '@/features/pause/public-ritual-frame';
 import type { ZoomOutData } from '@/features/pause/public-ritual-frame';
-import { mergeHistoryBtcOverlay } from '@/features/pause/application/use-cases/ritual/frame/historical-insight-payload';
+import { mergeHistoryMarketOverlay } from '@/features/pause/application/use-cases/ritual/frame/historical-insight-payload';
 import type {
   CompanionUiCompletionState,
   CompanionUiCompletionStep,
@@ -136,7 +136,7 @@ export function CompanionSectionOrchestratedSlots({
   const frameAppearance = appearance === 'frame';
   const showFullViewButton = !frameAppearance;
   const historyDisplay = useMemo(
-    () => mergeHistoryBtcOverlay(historyInsight, zoomOut),
+    () => mergeHistoryMarketOverlay(historyInsight, zoomOut),
     [historyInsight, zoomOut],
   );
 

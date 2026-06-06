@@ -31,8 +31,8 @@ export function SettingsExperiencePanel() {
     <>
       {isBitcoinTrackedAsset(trackedAssetId) ? (
         <div className="space-y-3">
-          <p className="uppercase tracking-wider text-base font-sans font-semibold text-[#dbb266]">{t('settings.btcMode')}</p>
-          <p className="leading-relaxed text-foreground text-sm">{t('settings.btcModeDesc')}</p>
+          <p className="uppercase tracking-wider text-base font-sans font-semibold text-[#dbb266]">{t('settings.unitBasisMode')}</p>
+          <p className="leading-relaxed text-foreground text-sm">{t('settings.unitBasisModeDesc')}</p>
           <div className="flex items-center justify-between">
             <Label htmlFor="btc-mode" className="cursor-pointer text-base font-sans text-secondary-foreground">
               {t('settings.enableConvictionMode')}

@@ -529,6 +529,8 @@
     "personalMantra": "Personal mantra",
     "mantraDesc": "Optional. Your own words — shown on Home and during pauses, woven into AI pause copy.",
     "mantraPlaceholder": "e.g. I hold because time is on my side…",
+    "unitBasisMode": "1 BTC = 1 BTC",
+    "unitBasisModeDesc": "Strip away fiat noise. No prices, no percentages, no red or green. Just Bitcoin.",
     "btcMode": "1 BTC = 1 BTC",
     "btcModeDesc": "Strip away fiat noise. No prices, no percentages, no red or green. Just Bitcoin.",
     "enableConvictionMode": "Enable conviction mode",
@@ -801,6 +803,18 @@
     "sold": "Sold",
     "bought": "Bought",
     "nothing": "Nothing"
+  },
+  "marketStatus": {
+    "unableToFetch": "Unable to fetch price data",
+    "checkConnection": "Check your connection and try again",
+    "exitUnitBasisMode": "Back to {{currency}} price view",
+    "enterUnitBasisMode": "Enter 1 BTC = 1 BTC mode",
+    "show": "Show",
+    "hide": "Hide",
+    "showPrice": "Show price",
+    "hidePrice": "Hide price",
+    "priceIsNoise": "Price is noise. Value is constant.",
+    "in24h": "in 24h"
   },
   "btcStatus": {
     "unableToFetch": "Unable to fetch price data",
@@ -1716,6 +1730,10 @@
       "haikuLoading": "Loading…",
       "lookBackContent": {
         "marketLead": "The market has been here before.",
+        "marketOnThisDay": "BTC on this day",
+        "marketOnThisDayHeading": "BTC ON THIS DAY",
+        "marketInsightLabel": "Bitcoin · {{period}}",
+        "marketInsightFallback": "Bitcoin history",
         "btcOnThisDay": "BTC on this day",
         "btcOnThisDayHeading": "BTC ON THIS DAY",
         "tableClosing": "Today is one moment in a longer story.",
