@@ -161,7 +161,8 @@
     "today": "Today",
     "customize": "Customize",
     "greeting": {
-      "hello": "Hello",
+      "welcome": "Welcome",
+      "helloAgain": "Hello, again",
       "helloName": "Hello, {{name}}"
     },
     "practiceStats": {
