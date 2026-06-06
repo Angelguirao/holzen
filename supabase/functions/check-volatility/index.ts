@@ -318,8 +318,7 @@ serve(
       return false;
     }
 
-    // Filter: must exceed at least one threshold AND not in cooldown AND not in quiet hours
-    // Helper: check if user has an active snooze
+    // Filter: must exceed threshold, not in quiet hours/snooze, and no open cron offer yet.
     function isSnoozed(p: VolatilityProfile): boolean {
       const snoozedUntil = p.snoozed_until;
       if (!snoozedUntil) return false;
@@ -331,13 +330,24 @@ serve(
       return isVolatilityThresholdBreached(p, metrics);
     }
 
+    const profileByUserId = new Map(profileRows.map((p) => [p.user_id, p]));
+    const { data: openCronPauseRows, error: openCronPauseErr } = await supabase
+      .from("pause_instances")
+      .select("user_id")
+      .eq("source", "cron_volatility")
+      .in("state", ["active", "pending"]);
+    if (openCronPauseErr) throw openCronPauseErr;
+
+    const openCronUserIds = new Set(
+      (openCronPauseRows ?? []).map((row) => row.user_id as string),
+    );
+
     const eligible = profileRows.filter((p) => {
       if (!profileVolatilityBreached(p)) return false;
       if (isInQuietHours(p)) return false;
       if (isSnoozed(p)) return false;
-      if (!p.last_trigger_at) return true;
-      const cooldownMs = (p.cooldown_hours ?? 6) * 60 * 60 * 1000;
-      return new Date(p.last_trigger_at).getTime() < Date.now() - cooldownMs;
+      if (openCronUserIds.has(p.user_id)) return false;
+      return true;
     });
 
     log("check_volatility_phase", {
@@ -346,14 +356,6 @@ serve(
       eligible: eligible.length,
       total_profiles: profileRows.length,
     });
-
-    const profileByUserId = new Map(profileRows.map((p) => [p.user_id, p]));
-    const { data: openCronPauseRows, error: openCronPauseErr } = await supabase
-      .from("pause_instances")
-      .select("user_id")
-      .eq("source", "cron_volatility")
-      .in("state", ["active", "pending"]);
-    if (openCronPauseErr) throw openCronPauseErr;
 
     const calmSweepUserIds = [
       ...new Set(
@@ -408,16 +410,10 @@ serve(
 
     // Process all eligible users in parallel
     const results = await Promise.all(eligible.map(async (profile) => {
-      // Server-side idempotency: a single atomic UPDATE acts as the per-user
-      // cooldown lock. `claim_trigger_slot` returns true only for the first
-      // cron tick whose write actually flips `last_trigger_at` for this user
-      // within the cooldown window — every concurrent or duplicated tick
-      // (pg_cron retry, manual invoke, overlapping schedule) is rejected
-      // before any LLM call is made.
-      const cooldownHours = profile.cooldown_hours ?? 6;
+      // Stamp last_trigger_at for audit; pause_create_or_reuse_as handles open-offer idempotency.
       const { data: claimed, error: claimError } = await supabase.rpc(
         "claim_trigger_slot",
-        { _user_id: profile.user_id, _cooldown_hours: cooldownHours },
+        { _user_id: profile.user_id, _cooldown_hours: profile.cooldown_hours ?? 6 },
       );
       if (claimError) {
         log.error("check_volatility_claim", {
@@ -430,9 +426,8 @@ serve(
       if (claimed !== true) {
         log("check_volatility_skip", {
           holzen_event: "check_volatility_cron",
-          phase: "cooldown_slot_already_claimed",
+          phase: "claim_trigger_slot_no_profile",
           user_id_prefix: String(profile.user_id).slice(0, 8),
-          cooldown_hours: cooldownHours,
         });
         return false;
       }

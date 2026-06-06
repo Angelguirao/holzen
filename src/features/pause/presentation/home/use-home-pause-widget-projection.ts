@@ -17,10 +17,6 @@ import {
   resolveHomePauseWidgetPreviewLine,
   type HomePauseWidgetPreviewLine,
 } from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
-import {
-  computeAutoCooldownReadyAtMs,
-  computeAutoCooldownRemainingMs,
-} from '@/features/pause/domain/reflect/generation/compute-pause-trigger-cooldowns';
 import { shouldSurfacePauseWidgetError } from '@/features/pause/domain/home/pause-home-widget-error';
 import {
   fetchRecentContextLostPause,
@@ -162,12 +158,6 @@ export function useHomePauseWidgetProjection(
     [params.manualCooldownRemaining, cooldownNowMs],
   );
 
-  const postPauseAutoCooldownRemainingMs = computeAutoCooldownRemainingMs(
-    params.profileLastTriggerAt,
-    params.cooldownHours,
-    cooldownNowMs,
-  );
-
   const { mode: widgetMode } = useMemo(
     () =>
       resolveHomePauseWidgetMode({
@@ -180,7 +170,6 @@ export function useHomePauseWidgetProjection(
         reflectionMessage: params.reflectionMessage,
         trackedAssetSymbol: assetSymbol,
         hasPendingOffer: Boolean(pending),
-        postPauseAutoCooldownRemainingMs,
         manualCooldownRemainingMs,
         completedPauseCount: params.completedPauseCount ?? 0,
         hasOpenPauseStepEvents: params.hasOpenPauseStepEvents,
@@ -196,7 +185,6 @@ export function useHomePauseWidgetProjection(
       params.reflectionMessage,
       assetSymbol,
       pending,
-      postPauseAutoCooldownRemainingMs,
       manualCooldownRemainingMs,
       params.completedPauseCount,
       params.hasOpenPauseStepEvents,

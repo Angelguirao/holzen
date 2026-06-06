@@ -94,7 +94,6 @@ const baseInput = {
   reflectionMessage: null as string | null,
   trackedAssetSymbol: 'BTC',
   hasPendingOffer: false,
-  postPauseAutoCooldownRemainingMs: 0,
   manualCooldownRemainingMs: 0,
   completedPauseCount: 0,
   hasOpenPauseStepEvents: false,
@@ -165,24 +164,22 @@ describe('resolveHomePauseWidgetMode', () => {
     expect(r.mode).toBe('C_prime');
   });
 
-  it('E when post-pause cooldown and new active offer (no ritual progress)', () => {
+  it('E when returning user has new active offer (no ritual progress)', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'active',
-      postPauseAutoCooldownRemainingMs: 60_000,
       completedPauseCount: 2,
       hasOpenPauseStepEvents: false,
     });
     expect(r.mode).toBe('E');
   });
 
-  it('B not E when first active pause during cooldown (no completed archive)', () => {
+  it('B not E when first active pause (no completed archive)', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'active',
-      postPauseAutoCooldownRemainingMs: 60_000,
       completedPauseCount: 0,
     });
     expect(r.mode).toBe('B');
@@ -193,7 +190,6 @@ describe('resolveHomePauseWidgetMode', () => {
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'active',
-      postPauseAutoCooldownRemainingMs: 60_000,
       completedPauseCount: 3,
       hasOpenPauseStepEvents: true,
     });
@@ -205,17 +201,16 @@ describe('resolveHomePauseWidgetMode', () => {
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'active',
-      postPauseAutoCooldownRemainingMs: 60_000,
       completedPauseCount: 2,
       hasPendingOffer: true,
     });
     expect(r.mode).toBe('B');
   });
 
-  it('D collapsed when post-pause rest with archive', () => {
+  it('D collapsed when manual cooldown with archive', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,
-      postPauseAutoCooldownRemainingMs: 60_000,
+      manualCooldownRemainingMs: 60_000,
       completedPauseCount: 3,
     });
     expect(r.mode).toBe('D_collapsed');
@@ -225,19 +220,10 @@ describe('resolveHomePauseWidgetMode', () => {
     expect(homePauseWidgetSectionTitleKey('D_collapsed')).toBe('home.widget.yourPause');
   });
 
-  it('D_prime when post-pause rest without archive', () => {
+  it('D_prime when manual cooldown without archive', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,
-      postPauseAutoCooldownRemainingMs: 60_000,
-      completedPauseCount: 0,
-    });
-    expect(r.mode).toBe('D_prime_collapsed');
-  });
-
-  it('D_prime when manual cooldown only (no profile auto cooldown)', () => {
-    const r = resolveHomePauseWidgetMode({
-      ...baseInput,
-      manualCooldownRemainingMs: 45_000,
+      manualCooldownRemainingMs: 60_000,
       completedPauseCount: 0,
     });
     expect(r.mode).toBe('D_prime_collapsed');

@@ -143,9 +143,7 @@ export function HomePauseWidgetBody(props: Props) {
           onPauseWithThis={props.onPauseWithThis}
           previewLine={props.previewLine}
           marketBlock={props.marketBlock}
-          profileLastTriggerAt={props.profileLastTriggerAt}
           manualCooldownRemainingMs={props.manualCooldownRemainingMs}
-          cooldownHours={props.cooldownHours}
         />
       );
 

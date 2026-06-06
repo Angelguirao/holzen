@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import {
-  computeIdleCooldownReadyAtMs,
+  computeManualCooldownReadyAtMs,
 } from '@/features/pause/domain/reflect/generation/compute-pause-trigger-cooldowns';
 import {
   AutoCooldownIndicator,
@@ -262,20 +262,16 @@ type PostPauseProps = Pick<
   | 'onPauseWithThis'
   | 'previewLine'
   | 'marketBlock'
-  | 'profileLastTriggerAt'
   | 'manualCooldownRemainingMs'
-  | 'cooldownHours'
 >;
 
-/** States D / D′ / E — post-pause rest and new-offer variants. */
+/** States D / D′ / E — manual cooldown rest and new-offer variants. */
 export function HomePausePostPauseBody({
   widgetMode,
   onPauseWithThis,
   previewLine,
   marketBlock,
-  profileLastTriggerAt,
   manualCooldownRemainingMs,
-  cooldownHours,
 }: PostPauseProps) {
   "use memo";
   const { t } = useTranslation();
@@ -302,11 +298,7 @@ export function HomePausePostPauseBody({
   }
 
   if (isD) {
-    const readyAtMs = computeIdleCooldownReadyAtMs({
-      profileLastTriggerAt,
-      cooldownHours,
-      manualCooldownRemainingMs,
-    });
+    const readyAtMs = computeManualCooldownReadyAtMs(manualCooldownRemainingMs);
     const readyAtClock =
       readyAtMs != null && readyAtMs > Date.now()
         ? formatHomePauseReadyAtClock(readyAtMs)
@@ -317,9 +309,10 @@ export function HomePausePostPauseBody({
     return (
       <div className={homePauseWidgetBodyStack}>
         <p className="text-sm leading-5 tracking-wide text-foreground">
-          {t('home.pausePostPause.availableAt', {
+          {t('home.pausePostPause.manualCooldownBody', {
             time: readyAtClock,
-            defaultValue: 'Another pause is available at {{time}}',
+            defaultValue:
+              'You can start another pause at {{time}}. If the market moves meaningfully before then, Holzen can still offer one.',
           })}
         </p>
       </div>
