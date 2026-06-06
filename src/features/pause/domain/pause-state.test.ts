@@ -559,14 +559,14 @@ describe('decideCronFire', () => {
     ).toEqual({ action: 'create' });
   });
 
-  it('rejects with fingerprint_match when open pause has same fingerprint', () => {
+  it('refreshes context when open pause has same fingerprint', () => {
     expect(
       decideCronFire({
         openInstance: makeInstance({ context_fingerprint: 'fp-A' }),
         recentTerminalMatch: null,
         newFingerprint: 'fp-A',
       }),
-    ).toEqual({ action: 'reject', reason: 'fingerprint_match' });
+    ).toEqual({ action: 'refresh_context', openInstanceId: 'p1' });
   });
 
   it('queues pending_offer when open pause has different fingerprint', () => {

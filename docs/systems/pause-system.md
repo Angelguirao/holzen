@@ -181,7 +181,7 @@ Companion `**counts_for_pause**` is **not** read for completion on `**volatility
 
 ### 5.2 Context fingerprint (market regime)
 
-`**context_fingerprint**` is a stable hash of regime-relevant market context so `**pause_create_or_reuse**` can reuse an open pause or queue a `**pending**` offer only when the regime actually changed.
+`**context_fingerprint**` is a stable hash of regime-relevant market context so `**pause_create_or_reuse**` can reuse an open pause or queue a `**pending**` offer only when the regime actually changed. When the fingerprint is **unchanged**, cron still **refreshes** `**context_snapshot**` / `**context_rule_result**` on the open `**active|engaged**` row (exact `%`, mood, Fear & Greed, on-chain fields) without creating a new pause or re-pushing.
 
 | Input | Rule |
 | ----- | ---- |
