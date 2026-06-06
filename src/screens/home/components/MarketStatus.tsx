@@ -167,9 +167,8 @@ export function MarketStatus({
             : 'text-nox-accent-green'
     : '';
 
-  /** 24h + sentiment stay visible when collapsed; chart expand only toggles the 7-day block (Figma §3). */
-  const showPriceDetails = !hidden;
-  const showChart = !hidden && chartExpanded;
+  /** Collapsed: pair + price + footer only (Figma 251:17255). Expand reveals 24h/F&G + 7-day chart. */
+  const showExpandedDetails = !hidden && chartExpanded;
   const chartChevronToggle =
     chartChevronInPriceRow && onToggleChartExpanded ? (
       <button
@@ -224,7 +223,7 @@ export function MarketStatus({
           </div>
           {priceRowToolbar}
         </div>
-        {showPriceDetails ? (
+        {showExpandedDetails ? (
           <p className={homeInWidget.subPrice}>
             {dir}{pct}% {t('marketStatus.in24h')}
             {data.fearGreed ? (
@@ -238,7 +237,7 @@ export function MarketStatus({
           </p>
         ) : null}
       </div>
-      {showChart ? (
+      {showExpandedDetails ? (
         <div>
           <MarketChartLazyGate hidden={hidden} currency={cur} coinId={data?.coinId ?? coinIdProp ?? 'bitcoin'} />
         </div>
