@@ -325,7 +325,7 @@ export function HomePausePostPauseBody({
         </p>
         {isDWithArchive && completedPauseCount > 0 ? (
           <Link
-            to="/journey"
+            to="/archive"
             className={cn(
               homeInWidget.ctaNoxPrimary,
               'inline-flex h-10 w-full items-center justify-center border-0 shadow-none no-underline',
