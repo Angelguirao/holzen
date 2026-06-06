@@ -48,7 +48,7 @@ Example: `WHERE created_at >= '2026-05-21T20:00:00.000Z'` on truncated tables is
 
 ## Product stance (pause-first)
 
-Holzen **pauses** and rewards **completed rituals** (Journey streak + count). It does **not** judge hold/buy/sell strategy, portfolio targets, or retrospective trade-label hygiene. In-ritual **Decide** records what the user chose when finishing `/pause`; Archive is read-only for expired rows without a decision.
+Holzen **pauses** and rewards **completed rituals** (Journey streak + count). It does **not** judge hold/buy/sell strategy, portfolio targets, or retrospective trade-label hygiene. In-ritual **Decide** records what the user chose when finishing `/pause`; Archive is read-only for expired rows without a decision. This neutrality stance is **Tier A defensibility** — see [strategy-and-defensibility.md](../fundamentals/strategy-and-defensibility.md) §3.
 
 **Not shipped:** Home bulk hold, Archive retrospective “Log decision”, hold-goal **price targets** (legacy DB rows show a migration nudge only). Full stats / alignment scoring: `src/legacy/full-shell/`.
 
