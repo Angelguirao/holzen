@@ -1,9 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
-import { btcOnThisDayYearOffsets } from "../_shared/btc-on-this-day-config.ts";
+import { marketOnThisDayYearOffsets } from "../_shared/market-on-this-day-config.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
-import { warmMissingBtcPrices } from "../_shared/btc-price-warm.ts";
+import { warmMissingMarketPrices } from "../_shared/market-price-warm.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 
@@ -165,7 +165,7 @@ serve(
     const month = today.getUTCMonth();
     const day = today.getUTCDate();
 
-    const yearTargets = btcOnThisDayYearOffsets().map((y) => {
+    const yearTargets = marketOnThisDayYearOffsets().map((y) => {
       const d = new Date(Date.UTC(currentYear - y, month, day));
       return { yearsAgo: y, dateKey: d.toISOString().slice(0, 10), ts: Math.floor(d.getTime() / 1000) };
     });
@@ -191,7 +191,7 @@ serve(
 
     if (missingTargets.length > 0) {
       try {
-        const warm = await warmMissingBtcPrices(
+        const warm = await warmMissingMarketPrices(
           supabase,
           missingTargets.map((t) => t.dateKey),
           { incoming: req },

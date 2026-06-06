@@ -103,7 +103,7 @@ describe('HISTORY_FALLBACKS', () => {
   it('all entries have required fields', () => {
     for (const entry of HISTORY_FALLBACKS) {
       expect(entry.title).toBeTruthy();
-      expect(entry.btcInsight).toBeTruthy();
+      expect(entry.marketInsight).toBeTruthy();
       expect(entry.analogy).toBeTruthy();
       expect(entry.assetClass).toBeTruthy();
       expect(entry.period).toBeTruthy();

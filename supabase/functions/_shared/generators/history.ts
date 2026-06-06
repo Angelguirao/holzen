@@ -40,14 +40,15 @@ import {
 import { getPhaseConfig } from "../phase-config.ts";
 import { type CompanionCacheTitleRow } from "../companion-cache-dedup.ts";
 import { type HistoricalEra, pickEra } from "../history-util.ts";
-import { fetchBtcOnThisDayPrices } from "../btc-on-this-day-prices.ts";
+import { fetchMarketOnThisDayPrices } from "../market-on-this-day-prices.ts";
+import { normalizeHistoricalInsightContent, resolveMarketInsight } from "../historical-insight-wire.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
 export const PROMPT_VERSION = "v3";
 
 export type HistoryInsightData = {
   title: string;
-  btcInsight: string;
+  marketInsight: string;
   analogy: string;
   assetClass: string;
   period: string;
@@ -178,14 +179,14 @@ async function serveFallback(
   return serveCurated(svcClient);
 }
 
-async function enrichHistoryWithBtcPrices(
+async function enrichHistoryWithMarketPrices(
   svcClient: SupabaseClient,
   context: string | undefined,
   log: GenerateHistoryParams["log"],
   result: HistoryResult,
 ): Promise<HistoryResult> {
   if (!result.data) return result;
-  const prices = await fetchBtcOnThisDayPrices(svcClient, context, log);
+  const prices = await fetchMarketOnThisDayPrices(svcClient, context, log);
   return {
     ...result,
     data: {
@@ -339,7 +340,7 @@ async function generateHistoryCore(params: GenerateHistoryParams): Promise<Histo
 
 Return a JSON object with these keys:
 - "title": Short evocative title specific to the event (NOT generic like "Market Volatility")
-- "btcInsight": 2-3 sentences about the specific event with real dates/numbers
+- "marketInsight": 2-3 sentences about the specific event with real dates/numbers
 - "analogy": 1-2 sentences drawing a parallel from another asset class
 - "assetClass": The other asset class (e.g. "Gold", "Tech stocks")
 - "period": Historical period (e.g. "January 2015")
@@ -399,10 +400,10 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
       const usage = data.usage;
       const raw = data.choices?.[0]?.message?.content || "";
       try {
-        insight = JSON.parse(raw) as HistoryLiveData;
+        insight = normalizeHistoricalInsightContent(JSON.parse(raw) as Record<string, unknown>);
       } catch {
         const m = raw.match(/\{[\s\S]*\}/);
-        if (m) insight = JSON.parse(m[0]) as HistoryLiveData;
+        if (m) insight = normalizeHistoricalInsightContent(JSON.parse(m[0]) as Record<string, unknown>);
         else {
           logAttempt({ companion_type: "historical_insight", provider: logProvider, model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
           if (model !== models[models.length - 1]) continue; else break;
@@ -445,7 +446,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
 
   // ── Step 5: Cache write ──
   const qualityScore = 1;
-  if (insight.title && insight.btcInsight && qg.pass) {
+  if (insight.title && resolveMarketInsight(insight) && qg.pass) {
     try {
       const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "historical_insight").eq("language", "en").limit(30);
       const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
@@ -510,5 +511,5 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
 
 export async function generateHistory(params: GenerateHistoryParams): Promise<HistoryResult> {
   const result = await generateHistoryCore(params);
-  return enrichHistoryWithBtcPrices(params.svcClient, params.context, params.log, result);
+  return enrichHistoryWithMarketPrices(params.svcClient, params.context, params.log, result);
 }

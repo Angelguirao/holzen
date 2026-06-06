@@ -39,7 +39,7 @@ const POOL_ORDER: FallbackPoolType[] = ['signal', 'grounding', 'history', 'zoom_
 const POOL_HELP: Record<FallbackPoolType, string> = {
   signal: 'Last resort when Library + cache miss (Signal card). Fields: title, body, source, url.',
   grounding: 'Grounding nudge. Fields: title, body, citation, url.',
-  history: 'Historical echo. Fields: title, btcInsight, analogy, assetClass, period, source?, url?.',
+  history: 'Historical echo. Fields: title, marketInsight, analogy, assetClass, period, source?, url?.',
   zoom_out: 'Deep-time zoom. Fields: title, body.',
   reflection: 'holzen-reflect when AI unavailable. Fields: message, haiku.',
 };
@@ -152,7 +152,7 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
     const templates: Record<FallbackPoolType, Record<string, unknown>> = {
       signal: { title: '', body: '', source: '', url: '' },
       grounding: { title: '', body: '', citation: '', url: '' },
-      history: { title: '', btcInsight: '', analogy: '', assetClass: '', period: '', source: '', url: '' },
+      history: { title: '', marketInsight: '', analogy: '', assetClass: '', period: '', source: '', url: '' },
       zoom_out: { title: '', body: '' },
       reflection: { message: '', haiku: '' },
     };
