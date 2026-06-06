@@ -1,4 +1,4 @@
-import { Eye, EyeOff, WifiOff, Bitcoin, CircleDollarSign, Clock, ChevronDown } from 'lucide-react';
+import { Eye, EyeOff, WifiOff, Bitcoin, Coins, Clock, ChevronDown } from 'lucide-react';
 import { MarketChartLazyGate } from '@/screens/home/components/MarketChartLazyGate';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatMarketPrice, trackedAssetSymbol, type MarketQuote } from '@/features/market/public';
@@ -57,7 +57,7 @@ export function MarketStatus({
       </button>
     ) : null;
 
-  /** BTC / BTC row — always offer a way back to fiat quote. */
+  /** Unit-basis row — coin icon exits back to fiat (Figma 533:36421). */
   const exitBtcToolbarBtn =
     onToggleUnitBasisMode && unitBasisMode ? (
       <button
@@ -67,7 +67,7 @@ export function MarketStatus({
         aria-label={t('marketStatus.exitUnitBasisMode', { currency: fiatLabelCurrency })}
         title={t('marketStatus.exitUnitBasisMode', { currency: fiatLabelCurrency })}
       >
-        <CircleDollarSign className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
+        <Coins className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
       </button>
     ) : null;
 
@@ -118,32 +118,31 @@ export function MarketStatus({
   }
 
   if (unitBasisMode) {
+    const unitBasisToolbar = (
+      <div className="flex shrink-0 items-center justify-end gap-1">
+        {exitBtcToolbarBtn}
+        {eyeToggleBtn}
+      </div>
+    );
+
     return (
       <div className="space-y-3">
-        <div className="space-y-1">
-          <p className={homeInWidget.kicker}>
-            {quoteSym} / {quoteSym}
+        <div className="flex flex-col gap-2">
+          <p className="text-base font-medium leading-6 tracking-[0.16px] text-foreground">
+            {t('marketStatus.priceIsNoise')}
           </p>
           <div className="flex items-center justify-between gap-2">
-            <div className="min-w-0 flex-1 space-y-1">
-              {hidden ? (
-                <>
-                  <p className={homeInWidget.priceHidden}>••••••</p>
-                  <p className={homeInWidget.subPriceHidden}>••••</p>
-                </>
-              ) : (
-                <>
-                  <p className={`${homeInWidget.price} text-foreground/90`}>
-                    1 {quoteSym} = 1 {quoteSym}
-                  </p>
-                  <p className="leading-snug text-sm text-[#dbb266]">{t('marketStatus.priceIsNoise')}</p>
-                </>
-              )}
-            </div>
-            <div className="flex shrink-0 items-center justify-end gap-1">
-              {eyeToggleBtn}
-              {exitBtcToolbarBtn}
-            </div>
+            {hidden ? (
+              <p className={homeInWidget.priceHidden}>••••••</p>
+            ) : (
+              <p className="text-[22px] font-bold leading-7 tabular-nums tracking-[0.088px] text-foreground">
+                {t('marketStatus.unitBasisIdentity', {
+                  symbol: quoteSym,
+                  defaultValue: `1 ${quoteSym} = 1 ${quoteSym}`,
+                })}
+              </p>
+            )}
+            {unitBasisToolbar}
           </div>
         </div>
       </div>
