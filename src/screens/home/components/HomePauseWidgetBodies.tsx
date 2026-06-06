@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
@@ -263,6 +264,7 @@ type PostPauseProps = Pick<
   | 'previewLine'
   | 'marketBlock'
   | 'manualCooldownRemainingMs'
+  | 'completedPauseCount'
 >;
 
 /** States D / D′ / E — manual cooldown rest and new-offer variants. */
@@ -272,15 +274,16 @@ export function HomePausePostPauseBody({
   previewLine,
   marketBlock,
   manualCooldownRemainingMs,
+  completedPauseCount,
 }: PostPauseProps) {
   "use memo";
   const { t } = useTranslation();
   const isE = widgetMode === 'E';
-  const isD =
-    widgetMode === 'D_collapsed' ||
-    widgetMode === 'D_expanded' ||
-    widgetMode === 'D_prime_collapsed' ||
-    widgetMode === 'D_prime_expanded';
+  const isDWithArchive =
+    widgetMode === 'D_collapsed' || widgetMode === 'D_expanded';
+  const isDPrime =
+    widgetMode === 'D_prime_collapsed' || widgetMode === 'D_prime_expanded';
+  const isD = isDWithArchive || isDPrime;
 
   if (isE) {
     return (
@@ -306,15 +309,31 @@ export function HomePausePostPauseBody({
 
     if (!readyAtClock) return null;
 
+    const bodyKey = isDWithArchive && completedPauseCount > 0
+      ? 'home.pausePostPause.cooldownArchiveBody'
+      : 'home.pausePostPause.cooldownNoArchiveBody';
+
     return (
       <div className={homePauseWidgetBodyStack}>
         <p className="text-sm leading-5 tracking-wide text-foreground">
-          {t('home.pausePostPause.manualCooldownBody', {
+          {t(bodyKey, {
             time: readyAtClock,
-            defaultValue:
-              'You can start another pause at {{time}}. If the market moves meaningfully before then, Holzen can still offer one.',
+            defaultValue: isDWithArchive && completedPauseCount > 0
+              ? 'You can start another pause yourself at {{time}}. If the market moves before then, Holzen can still offer one here. Until then, your past words are in your archive.'
+              : 'You can start another pause yourself at {{time}}. If the market moves before then, Holzen can still offer one here.',
           })}
         </p>
+        {isDWithArchive && completedPauseCount > 0 ? (
+          <Link
+            to="/journey"
+            className={cn(
+              homeInWidget.ctaNoxPrimary,
+              'inline-flex h-10 w-full items-center justify-center border-0 shadow-none no-underline',
+            )}
+          >
+            {t('home.pausePostPause.revisitArchive', { defaultValue: 'Revisit your archive' })}
+          </Link>
+        ) : null}
       </div>
     );
   }
