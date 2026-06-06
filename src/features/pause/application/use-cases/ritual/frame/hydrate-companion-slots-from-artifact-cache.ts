@@ -1,6 +1,7 @@
 import { trackCompanionServed } from '@/features/pause/application/use-cases/ritual/frame/companion-generation-telemetry';
 import type { ParsedPauseArtifactCache } from '@/features/pause/application/use-cases/ritual/frame/artifact-cache-parse';
 import type { CompanionSlotCommitters } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
+import { resolveHistoricalMarketInsight } from '@/features/pause/domain/historical-insight';
 import {
   toZoomOutDisplayData,
   zoomOutLibraryAutosaveFromDisplayData,
@@ -54,7 +55,7 @@ export function hydrateCompanionSlotsFromArtifactCache(
     trackCompanionServed('history', 'cache');
     void autoSaveToLibrary({
       title: cached.history.title,
-      body: cached.history.btcInsight,
+      body: resolveHistoricalMarketInsight(cached.history),
       sourceType: 'history_insight',
     });
   }

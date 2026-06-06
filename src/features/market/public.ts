@@ -60,6 +60,10 @@ export {
   fetchMarketDataLite,
 } from './infrastructure/fetch-market-data';
 export {
+  BREATHE_AMBIENT_MARKET_QUERY_KEY,
+  getBreatheAmbientMarketQueryOptions,
+} from './infrastructure/queries/breathe-ambient-market-query';
+export {
   BREATHE_AMBIENT_BTC_QUERY_KEY,
   getBreatheAmbientBtcQueryOptions,
 } from './infrastructure/queries/breathe-ambient-btc-query';

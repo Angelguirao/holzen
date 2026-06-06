@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
-import { mergeHistoryBtcOverlay } from '@/features/pause/application/use-cases/ritual/frame/historical-insight-payload';
+import { mergeHistoryMarketOverlay } from '@/features/pause/application/use-cases/ritual/frame/historical-insight-payload';
+import { resolveHistoricalMarketInsight } from '@/features/pause/domain/historical-insight';
 import { useTranslation } from 'react-i18next';
 import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useProfile } from '@/features/user/public-hooks';
@@ -46,7 +47,7 @@ export default function CompanionHistoryPage() {
   });
 
   const historyDisplay = useMemo(
-    () => mergeHistoryBtcOverlay(historyInsight, zoomOut),
+    () => mergeHistoryMarketOverlay(historyInsight, zoomOut),
     [historyInsight, zoomOut],
   );
 
@@ -86,7 +87,7 @@ export default function CompanionHistoryPage() {
             <ReadTime
               chars={
                 (historyDisplay.title?.length ?? 0) +
-                (historyDisplay.btcInsight?.length ?? 0) +
+                (resolveHistoricalMarketInsight(historyDisplay)?.length ?? 0) +
                 (historyDisplay.analogy?.length ?? 0)
               }
             />

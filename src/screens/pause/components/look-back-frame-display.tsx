@@ -1,5 +1,6 @@
 import { BookOpen, GitCompare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { resolveHistoricalMarketInsight } from '@/features/pause/domain/historical-insight';
 import type { CachedHistoricalInsightShape } from '@/features/pause/public-ritual-frame';
 import { MarketOnThisDayBlock } from '@/screens/pause/components/market-on-this-day-block';
 
@@ -15,12 +16,13 @@ export function LookBackFrameDisplay({ data, formatPrice }: LookBackFrameDisplay
   "use memo";
   const { t } = useTranslation();
 
+  const marketInsight = resolveHistoricalMarketInsight(data);
   const hasBtcPrices =
     typeof data.currentPrice === 'number' && (data.onThisDay?.length ?? 0) > 0;
-  const hasMirror = Boolean(data.title || data.btcInsight || data.analogy);
+  const hasMirror = Boolean(data.title || marketInsight || data.analogy);
   const periodLabel = data.period
-    ? t('pause.frame.lookBackContent.btcInsightLabel', { period: data.period })
-    : t('pause.frame.lookBackContent.btcInsightFallback');
+    ? t('pause.frame.lookBackContent.marketInsightLabel', { period: data.period })
+    : t('pause.frame.lookBackContent.marketInsightFallback');
 
   return (
     <div className="space-y-4 px-1 pt-4">
@@ -49,7 +51,7 @@ export function LookBackFrameDisplay({ data, formatPrice }: LookBackFrameDisplay
             {t('pause.frame.lookBackContent.mirrorHeading')}
           </p>
 
-          {data.title || data.btcInsight ? (
+          {data.title || marketInsight ? (
             <div className="space-y-2 pb-2">
               {data.title ? (
                 <div className="flex items-start gap-2.5 pt-2">
@@ -65,15 +67,15 @@ export function LookBackFrameDisplay({ data, formatPrice }: LookBackFrameDisplay
                   </p>
                 </div>
               ) : null}
-              {data.btcInsight ? (
-                <p className="text-sm leading-5 tracking-wide text-foreground">{data.btcInsight}</p>
+              {marketInsight ? (
+                <p className="text-sm leading-5 tracking-wide text-foreground">{marketInsight}</p>
               ) : null}
             </div>
           ) : null}
 
           {data.analogy ? (
             <>
-              {data.title || data.btcInsight ? (
+              {data.title || marketInsight ? (
                 <div className="border-t border-dashed border-border/50" aria-hidden />
               ) : null}
               <div className="space-y-2 pt-2">

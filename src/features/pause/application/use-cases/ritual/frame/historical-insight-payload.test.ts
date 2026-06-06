@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
   mergeHistoryBtcOverlay,
+  mergeHistoryMarketOverlay,
   toHistoricalInsightDisplayData,
 } from './historical-insight-payload';
 import { toZoomOutDisplayData } from './zoom-out-payload';
 
 describe('historical-insight-payload', () => {
-  it('toHistoricalInsightDisplayData parses BTC overlay fields', () => {
+  it('toHistoricalInsightDisplayData parses market overlay fields from btcInsight', () => {
     expect(
       toHistoricalInsightDisplayData({
         title: 'T',
@@ -17,6 +18,7 @@ describe('historical-insight-payload', () => {
       }),
     ).toMatchObject({
       title: 'T',
+      marketInsight: 'body',
       btcInsight: 'body',
       currentPrice: 100_000,
       partial: true,
@@ -24,7 +26,19 @@ describe('historical-insight-payload', () => {
     });
   });
 
-  it('mergeHistoryBtcOverlay keeps history prices when present', () => {
+  it('toHistoricalInsightDisplayData prefers marketInsight over btcInsight', () => {
+    expect(
+      toHistoricalInsightDisplayData({
+        marketInsight: 'canonical',
+        btcInsight: 'legacy',
+      }),
+    ).toMatchObject({
+      marketInsight: 'canonical',
+      btcInsight: 'canonical',
+    });
+  });
+
+  it('mergeHistoryMarketOverlay keeps history prices when present', () => {
     const history = toHistoricalInsightDisplayData({
       title: 'H',
       onThisDay: [{ yearsAgo: 2, price: 20_000, date: '2022-05-01' }],
@@ -34,10 +48,10 @@ describe('historical-insight-payload', () => {
       onThisDay: [{ yearsAgo: 1, price: 40_000, date: '2024-05-01' }],
       currentPrice: 100_000,
     });
-    expect(mergeHistoryBtcOverlay(history, zoomOut)?.currentPrice).toBe(90_000);
+    expect(mergeHistoryMarketOverlay(history, zoomOut)?.currentPrice).toBe(90_000);
   });
 
-  it('mergeHistoryBtcOverlay falls back to zoom-out BTC rows for legacy sessions', () => {
+  it('mergeHistoryMarketOverlay falls back to zoom-out rows for legacy sessions', () => {
     const history = toHistoricalInsightDisplayData({
       title: 'H',
       btcInsight: 'insight',
@@ -49,12 +63,16 @@ describe('historical-insight-payload', () => {
       currentPrice: 100_000,
       partial: true,
     });
-    expect(mergeHistoryBtcOverlay(history, zoomOut)).toMatchObject({
+    expect(mergeHistoryMarketOverlay(history, zoomOut)).toMatchObject({
       title: 'H',
-      btcInsight: 'insight',
+      marketInsight: 'insight',
       currentPrice: 100_000,
       partial: true,
       onThisDay: [{ yearsAgo: 3, price: 10_000, date: '2021-05-01' }],
     });
+  });
+
+  it('mergeHistoryBtcOverlay remains a deprecated alias', () => {
+    expect(mergeHistoryBtcOverlay).toBe(mergeHistoryMarketOverlay);
   });
 });

@@ -6,6 +6,7 @@ import { formatMarketPrice } from '@/features/market/public';
 import { cn } from '@/lib/utils';
 export type { CachedHistoricalInsightShape } from '@/features/pause/public-ritual-frame';
 import type { CachedHistoricalInsightShape } from '@/features/pause/public-ritual-frame';
+import { resolveHistoricalMarketInsight } from '@/features/pause/domain/historical-insight';
 import { CompanionError } from './CompanionError';
 import { MarketOnThisDayBlock } from '@/screens/pause/components/market-on-this-day-block';
 import { LookBackFrameDisplay } from '@/screens/pause/components/look-back-frame-display';
@@ -60,6 +61,8 @@ export function HistoricalInsightDisplay({
   const hasBtcPrices =
     typeof data.currentPrice === 'number' && (data.onThisDay?.length ?? 0) > 0;
 
+  const marketInsight = resolveHistoricalMarketInsight(data);
+
   return (
     <div className="space-y-4">
       {data.title ? (
@@ -75,18 +78,18 @@ export function HistoricalInsightDisplay({
         />
       ) : null}
 
-      {data.btcInsight ? (
+      {marketInsight ? (
         <div className="space-y-1">
           <div className="flex items-center gap-1.5">
             <History className="h-3 w-3 text-muted-foreground/50 shrink-0" />
             <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
               {data.period
-                ? t('pause.frame.lookBackContent.btcInsightLabel', { period: data.period })
-                : t('pause.frame.lookBackContent.btcInsightFallback')}
+                ? t('pause.frame.lookBackContent.marketInsightLabel', { period: data.period })
+                : t('pause.frame.lookBackContent.marketInsightFallback')}
             </p>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            {data.btcInsight ?? t('companions.lookBackBtcInsightFallback')}
+            {marketInsight}
           </p>
         </div>
       ) : null}

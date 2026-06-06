@@ -125,8 +125,8 @@ export function MarketOnThisDayBlock({
           }
         >
           {frame
-            ? t('pause.frame.lookBackContent.btcOnThisDayHeading')
-            : t('pause.frame.lookBackContent.btcOnThisDay')}
+            ? t('pause.frame.lookBackContent.marketOnThisDayHeading')
+            : t('pause.frame.lookBackContent.marketOnThisDay')}
         </p>
         {!frame && partial ? (
           <span className="flex items-center gap-1 text-[8px] font-mono text-muted-foreground/35">
