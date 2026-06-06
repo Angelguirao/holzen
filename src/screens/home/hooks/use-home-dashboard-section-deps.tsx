@@ -21,8 +21,8 @@ export function useHomeDashboardSectionDeps(args: {
   currency: string;
   trackedAssetId: TrackedAssetId;
   unitBasisModeSupported: boolean;
-  btcMode: boolean;
-  toggleBtcMode: () => void;
+  unitBasisMode: boolean;
+  toggleUnitBasisMode: () => void;
   marketChartExpanded: boolean;
   toggleMarketChartExpanded: () => void;
   pauseCardBody: ReactNode;
@@ -49,8 +49,8 @@ export function useHomeDashboardSectionDeps(args: {
     currency,
     trackedAssetId,
     unitBasisModeSupported,
-    btcMode,
-    toggleBtcMode,
+    unitBasisMode,
+    toggleUnitBasisMode,
     marketChartExpanded,
     toggleMarketChartExpanded,
     pauseCardBody,
@@ -87,8 +87,8 @@ export function useHomeDashboardSectionDeps(args: {
       currency,
       trackedAssetId,
       unitBasisModeSupported,
-      btcMode,
-      toggleBtcMode,
+      unitBasisMode,
+      toggleUnitBasisMode,
       marketChartExpanded,
       toggleMarketChartExpanded,
       pauseCardBody,
@@ -112,8 +112,8 @@ export function useHomeDashboardSectionDeps(args: {
       currency,
       trackedAssetId,
       unitBasisModeSupported,
-      btcMode,
-      toggleBtcMode,
+      unitBasisMode,
+      toggleUnitBasisMode,
       marketChartExpanded,
       toggleMarketChartExpanded,
       pauseCardBody,

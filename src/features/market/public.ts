@@ -68,6 +68,10 @@ export {
   holzenMarketDisplayQueryKey,
 } from './infrastructure/queries/holzen-market-display-query';
 export {
+  getCoingeckoSpotPriceUsdQueryOptions,
+  prefetchCoingeckoSpotPriceUsd,
+} from './infrastructure/queries/coingecko-spot-price-query';
+export {
   getCoingeckoBtcUsdQueryOptions,
   prefetchCoingeckoBtcUsd,
 } from './infrastructure/queries/coingecko-btc-usd-query';

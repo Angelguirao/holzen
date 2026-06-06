@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 export type { CachedHistoricalInsightShape } from '@/features/pause/public-ritual-frame';
 import type { CachedHistoricalInsightShape } from '@/features/pause/public-ritual-frame';
 import { CompanionError } from './CompanionError';
-import { BtcOnThisDayBlock } from '@/screens/pause/components/btc-on-this-day-block';
+import { MarketOnThisDayBlock } from '@/screens/pause/components/market-on-this-day-block';
 import { LookBackFrameDisplay } from '@/screens/pause/components/look-back-frame-display';
 
 export type HistoricalInsightDisplayVariant = 'default' | 'frame';
@@ -67,7 +67,7 @@ export function HistoricalInsightDisplay({
       ) : null}
 
       {hasBtcPrices && data.currentPrice ? (
-        <BtcOnThisDayBlock
+        <MarketOnThisDayBlock
           currentPrice={data.currentPrice}
           onThisDay={data.onThisDay ?? []}
           partial={data.partial}

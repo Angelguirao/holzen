@@ -1,10 +1,10 @@
 import type { CachedHistoricalInsightShape } from '@/features/pause/domain/historical-insight';
-import type { BtcOnThisDayEntry } from '@/features/pause/domain/btc-on-this-day';
+import type { MarketOnThisDayEntry } from '@/features/pause/domain/market-on-this-day';
 import type { ZoomOutData } from '@/features/pause/domain/zoom-out-display';
 
-function parseOnThisDay(raw: unknown): BtcOnThisDayEntry[] {
+function parseOnThisDay(raw: unknown): MarketOnThisDayEntry[] {
   if (!Array.isArray(raw)) return [];
-  const out: BtcOnThisDayEntry[] = [];
+  const out: MarketOnThisDayEntry[] = [];
   for (const row of raw) {
     if (!row || typeof row !== 'object') continue;
     const r = row as Record<string, unknown>;

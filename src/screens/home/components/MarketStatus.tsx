@@ -12,8 +12,8 @@ interface Props {
   hidden: boolean;
   onToggleHidden: () => void;
   currency?: string;
-  btcMode?: boolean;
-  onToggleBtcMode?: () => void;
+  unitBasisMode?: boolean;
+  onToggleUnitBasisMode?: () => void;
   /** When set, headline price row includes a chevron to show/hide chart + 24h detail below the price. */
   chartExpanded?: boolean;
   onToggleChartExpanded?: () => void;
@@ -30,8 +30,8 @@ export function MarketStatus({
   onToggleHidden,
   currency = 'USD',
   coinId: coinIdProp,
-  btcMode = false,
-  onToggleBtcMode,
+  unitBasisMode = false,
+  onToggleUnitBasisMode,
   chartExpanded = true,
   onToggleChartExpanded,
   chartChevronInPriceRow = true,
@@ -45,10 +45,10 @@ export function MarketStatus({
 
   /** Fiat row only — hidden price + “1 BTC” mode would be incoherent. */
   const enterBtcToolbarBtn =
-    onToggleBtcMode && !btcMode && !hidden ? (
+    onToggleUnitBasisMode && !unitBasisMode && !hidden ? (
       <button
         type="button"
-        onClick={onToggleBtcMode}
+        onClick={onToggleUnitBasisMode}
         className={cn(homeInWidget.iconBtn, 'text-muted-foreground/40 hover:text-foreground')}
         aria-label={t('btcStatus.enterBtcMode')}
         title={t('btcStatus.enterBtcMode')}
@@ -59,10 +59,10 @@ export function MarketStatus({
 
   /** BTC / BTC row — always offer a way back to fiat quote. */
   const exitBtcToolbarBtn =
-    onToggleBtcMode && btcMode ? (
+    onToggleUnitBasisMode && unitBasisMode ? (
       <button
         type="button"
-        onClick={onToggleBtcMode}
+        onClick={onToggleUnitBasisMode}
         className={cn(homeInWidget.iconBtn, 'text-foreground/50 hover:text-foreground')}
         aria-label={t('btcStatus.exitBtcMode', { currency: fiatLabelCurrency })}
         title={t('btcStatus.exitBtcMode', { currency: fiatLabelCurrency })}
@@ -117,7 +117,7 @@ export function MarketStatus({
     );
   }
 
-  if (btcMode) {
+  if (unitBasisMode) {
     return (
       <div className="space-y-3">
         <div className="space-y-1">

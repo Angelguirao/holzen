@@ -113,11 +113,11 @@ export function useHomeScreen() {
 
   const {
     priceHidden,
-    btcMode,
+    unitBasisMode,
     marketChartExpanded,
     marketChartExpandBlocked,
     togglePriceHidden,
-    toggleBtcMode,
+    toggleUnitBasisMode,
     toggleMarketChartExpanded,
   } = useMarketDisplayPreferences();
   const unitBasisModeSupported = isBitcoinTrackedAsset(trackedAssetId);
@@ -225,8 +225,8 @@ export function useHomeScreen() {
       currency,
       trackedAssetId,
       unitBasisModeSupported,
-      btcMode,
-      toggleBtcMode,
+      unitBasisMode,
+      toggleUnitBasisMode,
       marketChartExpanded,
       toggleMarketChartExpanded,
       pauseCardBody: pauseProjection.pauseCardBody,

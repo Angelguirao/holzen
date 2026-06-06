@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Twitter } from 'lucide-react';
-import { prefetchCoingeckoBtcUsd } from '@/features/market/public';
+import { prefetchCoingeckoSpotPriceUsd } from '@/features/market/public';
 import { prefetchBlogPublishedFirstPage } from '@/features/user/public-queries';
 
 export function PublicFooter() {
@@ -38,8 +38,8 @@ export function PublicFooter() {
           <Link
             to="/reserve"
             className="hover:text-foreground transition-colors"
-            onMouseEnter={() => void prefetchCoingeckoBtcUsd(queryClient)}
-            onFocus={() => void prefetchCoingeckoBtcUsd(queryClient)}
+            onMouseEnter={() => void prefetchCoingeckoSpotPriceUsd(queryClient)}
+            onFocus={() => void prefetchCoingeckoSpotPriceUsd(queryClient)}
           >
             {t('landing.btcReserve')}
           </Link>

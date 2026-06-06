@@ -86,7 +86,7 @@ Prefer new code:
 - `marketData` over `btcData` on pause home context (`btcData` alias kept for `@/legacy` only)
 - `MarketStatus` / `MarketChart` over `BtcStatus` / `BtcChart` (deprecated component aliases on new files)
 
-Remaining optional: `btcMode` (product-specific unit display), `btc-on-this-day` pause ritual block, `btc_price_cache` table name.
+Remaining optional: `btcInsight` / companion cache JSON keys (serialized), `btc-on-this-day` i18n strings, `BREATHE_AMBIENT_BTC_QUERY_KEY`, `btc_price_cache` table name, `holzen_btc_mode` localStorage key (product still BTC unit display).
 
 ---
 

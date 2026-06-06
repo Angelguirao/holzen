@@ -20,8 +20,8 @@ export interface HomeDashboardSectionDeps {
   currency: string;
   trackedAssetId: TrackedAssetId;
   unitBasisModeSupported: boolean;
-  btcMode: boolean;
-  toggleBtcMode: () => void;
+  unitBasisMode: boolean;
+  toggleUnitBasisMode: () => void;
   marketChartExpanded: boolean;
   toggleMarketChartExpanded: () => void;
   pauseCardBody: ReactNode;
@@ -54,8 +54,8 @@ export function renderHomeDashboardSection(sectionId: string, d: HomeDashboardSe
             onToggleHidden={d.togglePriceHidden}
             currency={d.currency}
             coinId={d.trackedAssetId}
-            btcMode={d.unitBasisModeSupported && d.btcMode}
-            onToggleBtcMode={d.unitBasisModeSupported ? d.toggleBtcMode : undefined}
+            unitBasisMode={d.unitBasisModeSupported && d.unitBasisMode}
+            onToggleUnitBasisMode={d.unitBasisModeSupported ? d.toggleUnitBasisMode : undefined}
             chartExpanded={d.marketChartExpanded}
             onToggleChartExpanded={d.toggleMarketChartExpanded}
             chartChevronInPriceRow={false}

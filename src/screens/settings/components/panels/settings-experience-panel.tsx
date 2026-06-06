@@ -12,8 +12,8 @@ import { useSettingsState } from '@/screens/settings/hooks/use-settings-state';
 export function SettingsExperiencePanel() {
   const {
     t,
-    btcMode,
-    setBtcMode,
+    unitBasisMode,
+    setUnitBasisMode,
     trackedAssetId,
     currency,
     setCurrency,
@@ -39,9 +39,9 @@ export function SettingsExperiencePanel() {
             </Label>
             <Switch
               id="btc-mode"
-              checked={btcMode}
+              checked={unitBasisMode}
               onCheckedChange={(val) => {
-                setBtcMode(val);
+                setUnitBasisMode(val);
                 localStorage.setItem('holzen_btc_mode', String(val));
               }}
             />
@@ -50,7 +50,7 @@ export function SettingsExperiencePanel() {
       ) : null}
 
       <div
-        className={`space-y-3 transition-opacity ${isBitcoinTrackedAsset(trackedAssetId) && btcMode ? 'opacity-30 pointer-events-none' : ''}`}
+        className={`space-y-3 transition-opacity ${isBitcoinTrackedAsset(trackedAssetId) && unitBasisMode ? 'opacity-30 pointer-events-none' : ''}`}
       >
         <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.displayCurrency')}</p>
         <p className="leading-relaxed text-foreground text-sm">{t('settings.displayCurrencyDesc')}</p>
