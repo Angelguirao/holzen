@@ -1,7 +1,7 @@
 /**
  * Reusable zoom-out generation pipeline.
  *
- * Owns: CoinGecko price fetching (with btc_price_cache DB caching)
+ * Owns: CoinGecko price fetching (with market_price_cache DB caching)
  *       → echo reflection fetch → AI deep-time generation (with model fallback)
  *       → quality gate → cache write → cache fallback → curated fallback
  *       → response assembly.

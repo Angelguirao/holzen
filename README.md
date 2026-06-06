@@ -156,7 +156,7 @@ The local API gateway exposes `http://127.0.0.1:55421/functions/v1`, but your fu
 
 **Bootstrap helper:** `npm run supabase:env:local` fills `supabase/.env.local` with reusable local defaults, generated local-only hook secrets, Stripe test-mode values from your Stripe CLI login, and Gemini aliases from `.cursor/mcp-secrets.env` when present. Pass `-- --stripe-webhook-secret <whsec_...>` after `stripe listen ...` to wire local webhook verification too.
 
-**Local cron auth:** If you want cron-driven local Edge functions like `check-volatility`, `pregenerate-companions`, and `refresh-btc-prices` to run against your local function server, set `CRON_SECRET` in `supabase/.env.local` or `supabase/.env`, then run `npm run supabase:cron:local` (or restart `npm run supabase:start`). Without `CRON_SECRET`, those shipped HTTP cron jobs stay disabled locally on purpose.
+**Local cron auth:** If you want cron-driven local Edge functions like `check-volatility`, `pregenerate-companions`, and `refresh-market-prices` to run against your local function server, set `CRON_SECRET` in `supabase/.env.local` or `supabase/.env`, then run `npm run supabase:cron:local` (or restart `npm run supabase:start`). Without `CRON_SECRET`, those shipped HTTP cron jobs stay disabled locally on purpose.
 
 **Vendor-backed flows:** Billing, transactional email, AI calls, and some ops paths still depend on third-party credentials even when the function code is running locally. For Stripe webhooks, you can forward events into the local stack with:
 

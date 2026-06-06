@@ -4,12 +4,12 @@
  * Or: structurizr-cli export -workspace workspace.dsl -format plantuml
  */
 
-workspace "Holzen" "Bitcoin-aware mindfulness — system and container views" {
+workspace "Holzen" "Volatility-triggered investor pause practice — system and container views" {
 
     model {
-        user = person "Holzen user" "Uses mindfulness, pause, library, and companions in the browser."
+        user = person "Holzen user" "Uses pause rituals, archive, journey, and companions in the browser."
 
-        holzen = softwareSystem "Holzen" "Bitcoin-aware mindfulness: SPA plus serverless APIs and data." {
+        holzen = softwareSystem "Holzen" "Volatility-triggered investor pause practice: SPA plus serverless APIs and data." {
             spa = container "Web application" "UI, routing, auth session, TanStack Query, PWA." "React, TypeScript, Vite"
             edge = container "Edge functions" "HTTP APIs: reflection, companions, Stripe, notifications, cron webhooks." "Deno, TypeScript"
         }

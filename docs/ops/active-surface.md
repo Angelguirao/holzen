@@ -79,7 +79,7 @@ Listed in `supabase/config.toml` `[functions.*]` and `src/screens/ops/EdgeCovera
 | Group | Functions |
 | --- | --- |
 | Pause | `holzen-reflect`, `companion-orchestrate`, `pregenerate-companions` |
-| Volatility | `check-volatility`, `refresh-btc-prices`, `backfill-btc-prices`, `seed-btc-history` |
+| Volatility | `check-volatility`, `refresh-market-prices`, `backfill-market-prices`, `seed-market-history` |
 | Billing | `check-subscription`, `create-checkout`, `ensure-trial-subscription`, `stripe-webhook`, `customer-portal`, `retry-flex-credit`, `list-checkout-events`, `notify-checkout-confirmation` |
 | Account / platform | `delete-account`, `health`, `send-feedback`, `register-push`, `record-referral`, `process-referral-pending`, `holzen-number` |
 | Email | `process-email-queue`, `send-transactional-email`, `preview-transactional-email`, `handle-email-unsubscribe`, `handle-email-suppression`, `auth-email-hook` |
@@ -92,7 +92,7 @@ Listed in `supabase/config.toml` `[functions.*]` and `src/screens/ops/EdgeCovera
 | Job | Purpose |
 | --- | --- |
 | `check-volatility` | Pause offers from thresholds |
-| `refresh-btc-prices` | Market data |
+| `refresh-market-prices` | Market data |
 | `pregenerate-companions` | Warm `companion_cache` |
 | `process-email-queue` | Transactional email (pause-related templates) |
 
@@ -104,7 +104,7 @@ Listed in `supabase/config.toml` `[functions.*]` and `src/screens/ops/EdgeCovera
 
 ## Postgres — Tier C (shipped)
 
-`pause_*`, trimmed `profiles`, `notifications`, `roadmap_items` / `roadmap_votes`, **`companion_catalog`** (curated companion pool; renamed from `content_library`), `companion_cache`, `companion_serves`, `companion_fallbacks`, `generation_attempts`, `signal_sources`, `user_signal_preferences`, `signal_source_suggestions`, `quiet_windows`, Stripe/credits, `btc_price_cache`, email infra, `audit_log`, `app_config`.
+`pause_*`, trimmed `profiles`, `notifications`, `roadmap_items` / `roadmap_votes`, **`companion_catalog`** (curated companion pool; renamed from `content_library`), `companion_cache`, `companion_serves`, `companion_fallbacks`, `generation_attempts`, `signal_sources`, `user_signal_preferences`, `signal_source_suggestions`, `quiet_windows`, Stripe/credits, `market_price_cache`, email infra, `audit_log`, `app_config`.
 
 ## Postgres — Tier D dropped (zombie schema cleanup)
 

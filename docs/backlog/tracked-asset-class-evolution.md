@@ -46,7 +46,7 @@ Future classes (more cryptos, equities, commodities) should extend a **catalog +
 | Feature | Location (representative) |
 |---------|---------------------------|
 | On-chain block (mempool, fees) | `fetch-market-data.ts`, `OnChainData` |
-| Home “1 BTC = 1 BTC” unit display mode | `use-market-display-preferences.ts`, `holzen_btc_mode` localStorage |
+| Home “1 BTC = 1 BTC” unit display mode | `use-market-display-preferences.ts`, `holzen_unit_basis_mode` localStorage (dual-reads legacy `holzen_btc_mode`) |
 | Zoom-out anniversary companion copy | edge `companion-orchestrate` / zoom-out tasks |
 | Fear & Greed index | crypto-wide today; may stay crypto-only or become optional per kind |
 | User-visible “BTC on this day” copy | Product-accurate for pause-first; not genericized intentionally |
@@ -60,8 +60,7 @@ Future classes (more cryptos, equities, commodities) should extend a **catalog +
 | **Asset kind in DB** | Kind lives in client/edge catalog only — add `tracked_assets` reference table if catalog grows |
 | **Trading hours / market calendars** | Volatility cron assumes 24/7 crypto charts |
 | **Regulatory copy per asset class** | Product/legal not scoped |
-| **`btc_price_cache` table name** | Server cache keyed by asset today; rename with multi-asset migration |
-| **Edge serialized keys** | `btcInsight` in orchestrate prompts, `fallback-seed.json`, artifact rows — dual-write when adding assets |
+| **Edge serialized keys** | Legacy `btcInsight` dual-read on client + edge until TTL clears; new writes use `marketInsight` only |
 
 ---
 
@@ -78,7 +77,7 @@ For **equities**, expect a new `AssetQuoteProvider` value, a `ports/market-data`
 
 ---
 
-## 5. Naming debt (client + edge Tier 1 complete)
+## 5. Naming debt (client + edge Tier 1–2 complete)
 
 **Active `src/` — prefer canonical names; aliases kept for `@/legacy` only:**
 
@@ -94,10 +93,13 @@ For **equities**, expect a new `AssetQuoteProvider` value, a `ports/market-data`
 | `getCoingeckoSpotPriceUsd*` | `getCoingeckoBtcUsd*` |
 | `BREATHE_AMBIENT_MARKET_QUERY_KEY` | `BREATHE_AMBIENT_BTC_QUERY_KEY` |
 | `marketInsight` / `resolveHistoricalMarketInsight()` | `btcInsight` dual-read on client + edge until DB backfill |
+| `holzen_unit_basis_mode` | `holzen_btc_mode` localStorage dual-read |
 
 **Edge Tier 1 (Jun 2026):** `_shared/market-on-this-day-*`, `market-price-warm.ts`, `historical-insight-wire.ts`; generators/fallbacks emit `marketInsight`; migration `20260607130000_historical_insight_market_insight_key.sql` rekeys stored fallbacks/cache rows.
 
-**Still deferred (Tier 2 — ops-heavy):** `btc_price_cache` table rename, edge function folder names (`refresh-btc-prices`, etc.), cron heartbeat keys, `holzen_btc_mode` localStorage, `btcData` on `useHolzen()`.
+**Edge Tier 2 (Jun 2026):** `market_price_cache` table (migration `20260607140000_market_price_cache_table.sql`); edge folders `refresh-market-prices`, `backfill-market-prices`, `seed-market-history`; cron job `refresh-market-prices` + `heartbeat.refresh_market_prices`; `_shared/market-price-cache-table.ts`.
+
+**Still deferred:** `btcData` on `useHolzen()` / legacy pause home context; product copy (“BTC on this day”, marketing `btcReserve`); BetterStack monitor rename from `holzen-cron-refresh-btc-prices` (wire new UUID to `heartbeat.refresh_market_prices` in ops).
 
 ---
 

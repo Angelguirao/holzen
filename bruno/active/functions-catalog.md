@@ -28,11 +28,11 @@ Source of truth: `supabase/config.toml` + [active-surface.md](../../docs/ops/act
 | `handle-email-unsubscribe` | `email/` | Public token | n |
 | `process-email-queue` | `email/` | Service-role JWT only | ops |
 | `check-volatility` | `service-cron/` | `SERVICE_CRON_BEARER` | staging |
-| `refresh-btc-prices` | `service-cron/` | `SERVICE_CRON_BEARER` | staging |
+| `refresh-market-prices` | `service-cron/` | `SERVICE_CRON_BEARER` | staging |
 | `pregenerate-companions` | `service-cron/` | `SERVICE_CRON_BEARER` | staging |
 | `process-referral-pending` | `service-cron/` | `SERVICE_CRON_BEARER` | staging |
-| `backfill-btc-prices` | `service-cron/` | `SERVICE_CRON_BEARER` | ops |
-| `seed-btc-history` | `service-cron/` | `SERVICE_CRON_BEARER` | ops |
+| `backfill-market-prices` | `service-cron/` | `SERVICE_CRON_BEARER` | ops |
+| `seed-market-history` | `service-cron/` | `SERVICE_CRON_BEARER` | ops |
 | `ai-cost-alert` | `service-cron/` | `SERVICE_CRON_BEARER` | ops |
 | `auth-email-hook` | `auth-hook/` | Signed webhook / preview key | optional |
 | `stripe-webhook` | — | Stripe signature | not Bruno |

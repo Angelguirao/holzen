@@ -2,7 +2,7 @@
  * Shared "fill missing tracked-asset prices" helper.
  *
  * Used by two callers:
- * 1. `refresh-btc-prices` cron — fills the 10 "on this day" anniversary dates on
+ * 1. `refresh-market-prices` cron — fills the 10 "on this day" anniversary dates on
  *    a schedule (every ~15 min).
  * 2. Look Back background warm-on-read — when a session reads the cache and
  *    finds gaps, fires `EdgeRuntime.waitUntil(warmMissingMarketPrices(…))` so the
@@ -10,6 +10,7 @@
  */
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { fetchCoinGeckoHistoryPrice } from "./coingecko.ts";
+import { MARKET_PRICE_CACHE_TABLE } from "./market-price-cache-table.ts";
 
 const DEFAULT_CONCURRENCY = 5;
 const BATCH_GAP_MS = 1200;
@@ -25,7 +26,7 @@ export interface WarmResult {
 }
 
 /**
- * Fill `btc_price_cache` for the given UTC `YYYY-MM-DD` date keys.
+ * Fill `market_price_cache` for the given UTC `YYYY-MM-DD` date keys.
  *
  * Caller is responsible for choosing the date keys (e.g. today + 1..10 year
  * anniversaries for zoom-out). Returns counts for operator logging.
@@ -45,7 +46,7 @@ export async function warmMissingMarketPrices(
   let toFetch = unique;
   try {
     const { data: existing } = await svcClient
-      .from("btc_price_cache")
+      .from(MARKET_PRICE_CACHE_TABLE)
       .select("date, fetched_at")
       .in("date", unique);
     type FreshRow = { date?: string | null; fetched_at?: string | null };
@@ -88,9 +89,9 @@ export async function warmMissingMarketPrices(
   }
 
   if (inserts.length > 0) {
-    const { error } = await svcClient.from("btc_price_cache").upsert(inserts);
+    const { error } = await svcClient.from(MARKET_PRICE_CACHE_TABLE).upsert(inserts);
     if (error) {
-      throw new Error(`btc_price_cache upsert failed: ${error.message ?? String(error)}`);
+      throw new Error(`${MARKET_PRICE_CACHE_TABLE} upsert failed: ${error.message ?? String(error)}`);
     }
   }
 

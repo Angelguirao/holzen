@@ -16,9 +16,9 @@ Who uses Holzen, and which external systems it depends on.
 C4Context
 title System context — Holzen
 
-Person(user, "Holzen user", "Uses mindfulness, pause, library, and companions in the browser.")
+Person(user, "Holzen user", "Uses pause rituals, archive, journey, and companions in the browser.")
 
-System(holzen, "Holzen", "Bitcoin-aware mindfulness: SPA plus serverless APIs and data.")
+System(holzen, "Holzen", "Volatility-triggered investor pause practice: SPA plus serverless APIs and data.")
 
 System_Ext(supabase, "Supabase", "Postgres, Row Level Security, Auth, Edge Function runtime, storage.")
 System_Ext(stripe, "Stripe", "Checkout, subscriptions, customer portal; webhooks to Holzen.")

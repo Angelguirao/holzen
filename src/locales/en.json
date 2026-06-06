@@ -476,9 +476,9 @@
   },
   "settings": {
     "hubIntro": "Pick a category to change how Holzen fits you — same layout as Tools for consistency.",
-    "hubDescYou": "Name, hold goal, motivations, optional mantra for breathing pauses, and how Home greets you.",
+    "hubDescYou": "Name, motivations, optional mantra for breathing pauses, and how Home greets you.",
     "hubDescReflection": "Cooldown, tone, style, custom prompt, and silent mode for pauses.",
-    "hubDescExperience": "Conviction mode, currency, language, haptics, zen mode, and sounds.",
+    "hubDescExperience": "Display mode, currency, language, haptics, zen mode, and sounds.",
     "hubDescCompanions": "Which companion cards appear with your pause.",
     "hubDescNotifications": "Email, push, digest cadence, and quiet hours.",
     "hubDescSubscription": "Pro status, billing, and referrals.",
@@ -539,7 +539,7 @@
     "mantraPlaceholder": "e.g. I invest for the long run…",
     "unitBasisMode": "1 BTC = 1 BTC",
     "unitBasisModeDesc": "Strip away fiat noise. No prices, no percentages, no red or green. Just Bitcoin.",
-    "enableConvictionMode": "Enable conviction mode",
+    "enableConvictionMode": "Use 1 BTC = 1 BTC mode",
     "displayCurrency": "Display currency",
     "displayCurrencyDesc": "Choose how BTC prices are displayed throughout the app.",
     "reflectionLanguage": "Language",
@@ -764,7 +764,7 @@
     },
     "commitmentKicker": "Your commitment",
     "commitmentTitle": "Your commitment",
-    "commitmentIntro": "Set the commitment you are holding for. You can refine it anytime in Settings → You. Optional breathing mantra is also there after you have used pauses.",
+    "commitmentIntro": "Optional: add a personal commitment anchor anytime in Settings → You.",
     "commitmentFooterHint": "Skip if you prefer — you can set this later under Settings → You.",
     "commitmentHoldLabel": "Commitment (optional)",
     "ready": {
@@ -912,11 +912,11 @@
       "iveReflected": "I've reflected"
     },
     "decide": {
-      "prompt": "What will you do?",
-      "hold": "Hold",
-      "sell": "Sell",
-      "buy": "Buy",
-      "nothing": "Nothing"
+      "prompt": "What did you choose?",
+      "hold": "No change",
+      "sell": "Sold",
+      "buy": "Bought",
+      "nothing": "Wait"
     }
   },
   "companions": {
@@ -1514,26 +1514,26 @@
       },
       "decideStepDurationHint": "< 15 sec",
       "decide": {
-        "holdPrimary": "Hold"
+        "holdPrimary": "No change"
       },
       "done": {
         "completedSaved": "Completed and saved",
         "journeyShort": "This pause is now part of your Journey.",
         "journeyLead": "This pause is saved to your Journey.",
-        "journeyPersonalHeldWithMood": "You named {{mood}}, then chose to hold.",
-        "journeyPersonalHeld": "You chose to hold after pausing.",
+        "journeyPersonalHeldWithMood": "You named {{mood}}, then chose no change.",
+        "journeyPersonalHeld": "You chose no change after pausing.",
         "journeyPersonalSoldWithMood": "You named {{mood}}, then chose to sell.",
         "journeyPersonalSold": "You chose to sell after pausing.",
         "journeyPersonalBoughtWithMood": "You named {{mood}}, then chose to buy.",
         "journeyPersonalBought": "You chose to buy after pausing.",
         "personalityKicker": "Each completed pause adds to your rhythm — Holzen celebrates the pause, not the trade.",
-        "personalityKickerHeld": "You paused and chose to hold. That conscious moment is what counts.",
+        "personalityKickerHeld": "You paused and chose no change. That conscious moment is what counts.",
         "personalityKickerSold": "You paused and chose to sell. That conscious moment is what counts.",
         "personalityKickerBought": "You paused and chose to buy. That conscious moment is what counts.",
         "contributionWhenNoSnapshot": "Your pause is saved to Journey.",
         "contributionTitle": "What you practiced",
         "contributionFallback": "This pause is now part of your Journey.",
-        "impactHeldCalm": "You chose to hold after pausing.",
+        "impactHeldCalm": "You chose no change after pausing.",
         "impactBought": "You recorded what you chose after pausing.",
         "impactSold": "You recorded what you chose after pausing.",
         "impactDecisionRecorded": "You recorded what you chose after pausing — that is the practice.",
@@ -1550,9 +1550,9 @@
         "moodPickerTitle": "Choose emotion",
         "saveToJourney": "Save to journey",
         "saveToJourneySaving": "Saving…",
-        "outcomeHeld": "You chose to Hold",
-        "outcomeSold": "You chose to Sell",
-        "outcomeBought": "You chose to Buy",
+        "outcomeHeld": "No change",
+        "outcomeSold": "Sold",
+        "outcomeBought": "Bought",
         "outcomeFallback": "Nice work"
       },
       "breathIntroKicker": "Breathe",
@@ -1808,7 +1808,7 @@
   "testimonial": {
     "title": "Enjoying Holzen?",
     "subtitle": "Share a short quote about your experience — it may appear on our landing page.",
-    "placeholder": "e.g. \"Holzen helped me stop panic-selling during dips.\"",
+    "placeholder": "e.g. \"Holzen helped me pause before acting when the market moved.\"",
     "submit": "Submit",
     "thanks": "Thank you! Your testimonial is under review.",
     "nameLabel": "Display name",
@@ -2123,10 +2123,10 @@
   "volatility": {
     "title": "Volatility Tolerance",
     "grades": {
-      "ironHands": "Iron hands",
+      "ironHands": "Unshakable",
       "steady": "Steady",
       "shaky": "Shaky",
-      "paperHands": "Paper hands"
+      "paperHands": "Reactive"
     },
     "descriptions": {
       "high": "You stay remarkably composed during drops — even heavy ones.",
@@ -2195,7 +2195,7 @@
     "basedOnSkills": "Based on your last 30 pauses. Measures composure skills, not feelings."
   },
   "ritualFlow": {
-    "rememberWhy": "Remember why you hold",
+    "rememberWhy": "Remember your why",
     "ritualComplete": "Ritual complete",
     "decision": "Decision",
     "return": "Return",
@@ -2228,10 +2228,10 @@
   "cooldownBanner": {
     "youDecidedTo": "You decided to <strong>{{decision}}</strong> — sit with it.",
     "decisions": {
-      "held": "hold",
+      "held": "make no change",
       "sold": "sell",
       "bought": "buy",
-      "nothing": "do nothing"
+      "nothing": "wait"
     }
   },
   "onboardingSample": {
@@ -2456,10 +2456,10 @@
     "pauseWithThis": "Pause with this",
     "decision": "Decision",
     "decisions": {
-      "held": "hold",
+      "held": "make no change",
       "sold": "sell",
       "bought": "buy",
-      "nothing": "do nothing"
+      "nothing": "wait"
     },
     "viewHistory": "View history",
     "aiInsightsReady": "AI insights ready",
@@ -2688,10 +2688,10 @@
   "bulkHold": {
     "kicker": "Waiting for you",
     "title": "{{count}} pauses while you were away",
-    "subtitle": "Mark all as Hold with one tap, or open Review to see dates. Your Archive has full detail on each pause.",
-    "teaserHint": "Tap to hold all, review dates, or open your Archive.",
+    "subtitle": "Mark all as no change with one tap, or open Review to see dates. Your Archive has full detail on each pause.",
+    "teaserHint": "Tap to log no change on all, review dates, or open your Archive.",
     "openSheet": "Manage",
-    "holdAll": "Hold all",
+    "holdAll": "No change on all",
     "review": "Review",
     "back": "Back",
     "openArchive": "Open Archive",
@@ -2699,27 +2699,27 @@
     "reviewScreenTitle": "Your pauses",
     "reviewLead": "Look back at each moment.\nWhat did you do?",
     "sectionToday": "Today",
-    "outcomeHeld": "I held",
-    "outcomeBought": "I bought",
-    "outcomeSold": "I sold",
+    "outcomeHeld": "No change",
+    "outcomeBought": "Bought",
+    "outcomeSold": "Sold",
     "outcomeGroupAria": "What did you do for this pause?",
     "reviewNoContext": "No reflection line was saved for this pause.",
     "openArchiveFullDetail": "Open Archive for full detail",
-    "heldAllPill": "Held all",
-    "heldRest": "Held rest",
+    "heldAllPill": "All no change",
+    "heldRest": "Rest no change",
     "applyFailed": "Could not save outcomes. Check your connection and try again.",
     "applyPartialFailed": "{{count}} pause(s) could not be saved. Fix your connection or try again.",
     "reviewTitle": "Pauses to review",
     "reviewSub": "These expired without an outcome. Open your Archive for full detail on each pause.",
-    "successHeadline": "Held through your stack",
-    "successSub": "Your outcomes are logged. Echoes capture what surfaced during each pause.",
+    "successHeadline": "Logged your choices",
+    "successSub": "Your outcomes are saved. Echoes capture what surfaced during each pause.",
     "successChosen": "You chose deliberately",
-    "successHeldLine": "Held through {{count}} pauses",
-    "successConviction": "+{{count}} conviction",
+    "successHeldLine": "No change on {{count}} pauses",
+    "successConviction": "+{{count}} pauses logged",
     "echoesCardTitle": "Echoes",
     "echoesCardBody": "Revisit reflections and artifacts from these pauses in Echoes.",
     "viewEchoes": "View Echoes",
-    "allMarkedHold": "{{count}} pauses marked as Hold"
+    "allMarkedHold": "{{count}} pauses marked as no change"
   },
   "snooze": {
     "toolbarAria": "Snooze automatic pauses",

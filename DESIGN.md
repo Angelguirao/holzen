@@ -1,8 +1,8 @@
 ---
 version: alpha
 name: Holzen (Nox)
-description: >-
-  Bitcoin-aware mindfulness SPA. Visual system follows Google Stitch Nox;
+  description: >-
+  Volatility-triggered pause practice for investors. Visual system follows Google Stitch Nox;
   runtime tokens live in src/index.css and tailwind.config.ts.
 colors:
   background-primary: "#151E30"

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
+import { MARKET_PRICE_CACHE_TABLE } from "../_shared/market-price-cache-table.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { fetchInitWithIncomingTrace } from "../_shared/forward-trace-headers.ts";
 
@@ -10,19 +11,19 @@ const corsHeaders = {
 };
 
 /**
- * Bulk-seed `btc_price_cache` with daily closing BTC-USD prices from
+ * Bulk-seed `market_price_cache` with daily closing BTC-USD prices from
  * **CryptoCompare**'s free `histoday` endpoint.
  *
- * **Why a separate function from `backfill-btc-prices`?** Since mid-2024
+ * **Why a separate function from `backfill-market-prices`?** Since mid-2024
  * CoinGecko's demo tier serves historical `/coins/bitcoin/history` only for
  * the last ~365 days and returns 401 for older dates. That made Zoom Out's
  * 10-year anniversary strip impossible to fill on the free tier via
- * `refresh-btc-prices` or `backfill-btc-prices`. CryptoCompare's free
+ * `refresh-market-prices` or `backfill-market-prices`. CryptoCompare's free
  * `histoday` endpoint has no such restriction — it serves daily OHLC back to
  * BTC's earliest listing with no auth required and a generous quota (~100k
  * calls/month free). Used **once** after initial deployment (or after a DB
  * restore) to populate historical daily rows; afterwards the cron
- * `refresh-btc-prices` keeps today's row current and the immutable historical
+ * `refresh-market-prices` keeps today's row current and the immutable historical
  * rows are never re-fetched.
  *
  * **Auth:** service-role JWT or `CRON_SECRET` (same as other cron workers).
@@ -116,7 +117,7 @@ async function fetchCryptoCompareHistoDay(
 }
 
 serve(
-  withRequestLogging("seed-btc-history", async ({ req, log }) => {
+  withRequestLogging("seed-market-history", async ({ req, log }) => {
   const t0 = Date.now();
 
   try {
@@ -196,7 +197,7 @@ serve(
     let existingDates = new Set<string>();
     if (onlyMissing) {
       const { data: existing, error: selErr } = await supabase
-        .from("btc_price_cache")
+        .from(MARKET_PRICE_CACHE_TABLE)
         .select("date")
         .gte("date", fromRaw)
         .lte("date", toRaw);
@@ -295,7 +296,7 @@ serve(
       const CHUNK = 500;
       for (let i = 0; i < finalInserts.length; i += CHUNK) {
         const chunk = finalInserts.slice(i, i + CHUNK);
-        const { error: upErr } = await supabase.from("btc_price_cache").upsert(chunk);
+        const { error: upErr } = await supabase.from(MARKET_PRICE_CACHE_TABLE).upsert(chunk);
         if (upErr) {
           log.error("seed_btc_history_upsert", {
             holzen_event: "seed_btc_history_cron",

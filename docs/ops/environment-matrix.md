@@ -101,7 +101,7 @@ Notes:
 
 - `npm run supabase:start` exposes the local Edge Functions URL, but your handlers are only served once `npm run supabase:functions:serve` is running too.
 - `npm run supabase:env:local` can prefill `supabase/.env.local` from local sources: Stripe test key + price IDs from the Stripe CLI login, generated local-only hook secrets, and Gemini aliases from `.cursor/mcp-secrets.env`.
-- `npm run supabase:start` also neutralizes shipped local HTTP crons: with `CRON_SECRET` configured in `supabase/.env.local`, `supabase/.env`, or OS env, it rewires `check-volatility`, `pregenerate-companions`, and `refresh-btc-prices` to the local gateway; otherwise it disables those jobs locally so they do not keep calling stale remote URLs.
+- `npm run supabase:start` also neutralizes shipped local HTTP crons: with `CRON_SECRET` configured in `supabase/.env.local`, `supabase/.env`, or OS env, it rewires `check-volatility`, `pregenerate-companions`, and `refresh-market-prices` to the local gateway; otherwise it disables those jobs locally so they do not keep calling stale remote URLs.
 - Prefer `supabase/.env` for shared local defaults and `supabase/.env.local` for personal overrides.
 - After editing `CRON_SECRET`, re-run `npm run supabase:cron:local` (or restart `npm run supabase:start`) to refresh the local cron wiring.
 
@@ -356,7 +356,7 @@ These exist in hosted Edge Functions without you creating matching secrets manua
 | `FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE` | Max inserted articles per source | Launch/backfill tuning; optional. |
 | `FETCH_FEEDS_ARTICLE_DELAY_MS` | Delay between article attempts | Lower values speed backfills but can increase provider pressure. |
 | `FETCH_FEEDS_LOG_ORIGINAL_INFER` | Toggle original-resolution logging | Optional debug/tuning flag. |
-| `CRYPTOCOMPARE_API_KEY` | Optional CryptoCompare key for long-range BTC history seeding | Used by `seed-btc-history`; optional header when calling CryptoCompare. |
+| `CRYPTOCOMPARE_API_KEY` | Optional CryptoCompare key for long-range BTC history seeding | Used by `seed-market-history`; optional header when calling CryptoCompare. |
 
 ### Legacy or non-active-surface secrets
 

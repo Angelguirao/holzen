@@ -16,11 +16,11 @@ Set **`SERVICE_CRON_BEARER`** in `environments/local.bru`, `staging.bru`, or `pr
 | File | Function |
 | --- | --- |
 | `check-volatility.bru` | `check-volatility` |
-| `refresh-btc-prices.bru` | `refresh-btc-prices` |
+| `refresh-market-prices.bru` | `refresh-market-prices` |
 | `pregenerate-companions.bru` | `pregenerate-companions` |
 | `process-referral-pending.bru` | `process-referral-pending` |
-| `backfill-btc-prices.bru` | `backfill-btc-prices` (ops; chain `resumeFrom`) |
-| `seed-btc-history.bru` | `seed-btc-history` (ops bulk seed) |
+| `backfill-market-prices.bru` | `backfill-market-prices` (ops; chain `resumeFrom`) |
+| `seed-market-history.bru` | `seed-market-history` (ops bulk seed) |
 | `ai-cost-alert.bru` | `ai-cost-alert` (ops daily-cost alert smoke) |
 
 Do not run destructive or high-cost jobs against production without intent.
