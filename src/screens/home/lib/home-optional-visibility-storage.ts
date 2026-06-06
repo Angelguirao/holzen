@@ -1,25 +1,10 @@
 import { JOURNEY_STAT_TILES_VISIBILITY_ID } from '@/screens/home/lib/home-section-visibility-constants';
 
-export const HOME_OPTIONAL_VISIBILITY_STORAGE_KEY = 'holzen_home_optional_visible';
+export {
+  defaultHomeOptionalVisibility,
+  loadHomeOptionalVisibility,
+  saveHomeOptionalVisibility,
+  clearHomeOptionalVisibility,
+} from '@/screens/home/lib/home-layout-storage';
 
-const VISIBILITY_KEYS = [JOURNEY_STAT_TILES_VISIBILITY_ID] as const;
-
-export const defaultHomeOptionalVisibility: Record<string, boolean> = {
-  [JOURNEY_STAT_TILES_VISIBILITY_ID]: true,
-};
-
-/** Load optional Home widget visibility from localStorage (falls back to defaults). */
-export function loadHomeOptionalVisibility(): Record<string, boolean> {
-  try {
-    const raw = localStorage.getItem(HOME_OPTIONAL_VISIBILITY_STORAGE_KEY);
-    if (!raw) return { ...defaultHomeOptionalVisibility };
-    const parsed = JSON.parse(raw) as Record<string, boolean>;
-    const next = { ...defaultHomeOptionalVisibility };
-    for (const id of VISIBILITY_KEYS) {
-      if (typeof parsed[id] === 'boolean') next[id] = parsed[id];
-    }
-    return next;
-  } catch {
-    return { ...defaultHomeOptionalVisibility };
-  }
-}
+export { JOURNEY_STAT_TILES_VISIBILITY_ID };
