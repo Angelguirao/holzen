@@ -320,7 +320,7 @@ serve(
 
     // Filter: must exceed threshold, not in quiet hours/snooze. Skip net-new offers when
     // a pending cron offer exists; still re-check users with open active|engaged cron pauses
-    // so context_snapshot can refresh within the same fingerprint band.
+    // or a lone pending offer so context_snapshot can refresh within the same fingerprint band.
     function isSnoozed(p: VolatilityProfile): boolean {
       const snoozedUntil = p.snoozed_until;
       if (!snoozedUntil) return false;
@@ -358,6 +358,13 @@ serve(
         .map((row) => row.user_id as string),
     );
 
+    const openCronPendingOnlyUserIds = new Set(
+      (openCronPauseRows ?? [])
+        .filter((row) => row.state === "pending")
+        .map((row) => row.user_id as string)
+        .filter((userId) => !openCronActiveEngagedUserIds.has(userId)),
+    );
+
     const eligible = profileRows.filter(
       (p) =>
         passesVolatilityGates(p) &&
@@ -365,7 +372,10 @@ serve(
         !openCronPendingUserIds.has(p.user_id),
     );
     const contextRefresh = profileRows.filter(
-      (p) => passesVolatilityGates(p) && openCronActiveEngagedUserIds.has(p.user_id),
+      (p) =>
+        passesVolatilityGates(p) &&
+        (openCronActiveEngagedUserIds.has(p.user_id) ||
+          openCronPendingOnlyUserIds.has(p.user_id)),
     );
     const toProcess = [...eligible, ...contextRefresh];
 
@@ -544,21 +554,25 @@ serve(
 
       if (!wasCreated) {
         if (contextRefreshed) {
-          const { error: refreshProfileErr } = await supabase
-            .from("profiles")
-            .update({ last_context: ctx })
-            .eq("user_id", profile.user_id);
-          if (refreshProfileErr) {
-            log.error("check_volatility_profile", {
-              holzen_event: "check_volatility_cron",
-              phase: "context_refresh_profile_failed",
-              ...unknownErrorForLog(refreshProfileErr),
-            });
-            return false;
+          if (!pendingOffer) {
+            const { error: refreshProfileErr } = await supabase
+              .from("profiles")
+              .update({ last_context: ctx })
+              .eq("user_id", profile.user_id);
+            if (refreshProfileErr) {
+              log.error("check_volatility_profile", {
+                holzen_event: "check_volatility_cron",
+                phase: "context_refresh_profile_failed",
+                ...unknownErrorForLog(refreshProfileErr),
+              });
+              return false;
+            }
           }
           log("check_volatility_context_refresh", {
             holzen_event: "check_volatility_cron",
-            phase: "open_pause_context_refreshed",
+            phase: pendingOffer
+              ? "pending_offer_context_refreshed"
+              : "open_pause_context_refreshed",
             user_id_prefix: String(profile.user_id).slice(0, 8),
             instance_id_prefix: String(pauseInstanceId).slice(0, 8),
           });
