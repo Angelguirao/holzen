@@ -52,6 +52,7 @@ export function useOpenPauseHomePreview(
   const [hasReachedReflect, setHasReachedReflect] = useState(false);
   const [isBriefRitual, setIsBriefRitual] = useState(false);
   const [openPauseCreatedAt, setOpenPauseCreatedAt] = useState<string | null>(null);
+  const [openPauseEngagedAt, setOpenPauseEngagedAt] = useState<string | null>(null);
 
   const clearOpenPausePreview = useCallback(() => {
     setLastPauseInstanceId(null);
@@ -66,6 +67,7 @@ export function useOpenPauseHomePreview(
     setHasReachedReflect(false);
     setIsBriefRitual(false);
     setOpenPauseCreatedAt(null);
+    setOpenPauseEngagedAt(null);
     clearPausePersistedTabSession();
   }, []);
 
@@ -103,6 +105,7 @@ export function useOpenPauseHomePreview(
       setOpenPauseState(preview.openPauseState);
       setOpenPauseSource(preview.openPauseSource);
       setOpenPauseCreatedAt(preview.createdAt);
+      setOpenPauseEngagedAt(preview.engagedAt);
       setContext(preview.contextText);
       setContextSnapshot(preview.contextSnapshot);
       setMessage(preview.reflectionMessage);
@@ -163,6 +166,7 @@ export function useOpenPauseHomePreview(
       hasReachedReflect,
       isBriefRitual,
       openPauseCreatedAt,
+      openPauseEngagedAt,
     });
   }, [
     message,
@@ -177,6 +181,7 @@ export function useOpenPauseHomePreview(
     hasReachedReflect,
     isBriefRitual,
     openPauseCreatedAt,
+    openPauseEngagedAt,
   ]);
 
   const restorePreviewSnapshot = useCallback((snapshot: OpenPauseHomePreviewSnapshot) => {
@@ -193,6 +198,7 @@ export function useOpenPauseHomePreview(
       setHasReachedReflect(preview.hasReachedReflect);
       setIsBriefRitual(preview.isBriefRitual);
       setOpenPauseCreatedAt(preview.openPauseCreatedAt);
+      setOpenPauseEngagedAt(preview.openPauseEngagedAt);
       lastSyncedInstanceIdRef.current = preview.lastPauseInstanceId;
     });
   }, []);
@@ -210,6 +216,7 @@ export function useOpenPauseHomePreview(
     setHasReachedReflect(preview.hasReachedReflect);
     setIsBriefRitual(preview.isBriefRitual);
     setOpenPauseCreatedAt(preview.openPauseCreatedAt);
+    setOpenPauseEngagedAt(preview.openPauseEngagedAt);
     lastSyncedInstanceIdRef.current = preview.lastPauseInstanceId;
     clearPausePersistedTabSession();
   }, []);
@@ -236,6 +243,7 @@ export function useOpenPauseHomePreview(
     hasReachedReflect,
     isBriefRitual,
     openPauseCreatedAt,
+    openPauseEngagedAt,
     setMessage,
     setContext,
     setCompanions,

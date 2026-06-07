@@ -5,7 +5,6 @@ export type HomePauseWidgetMode =
   | 'loading'
   | 'blocking_error'
   | 'B'
-  | 'B_in_progress'
   | 'C'
   | 'C_prime'
   | 'D_collapsed'
@@ -27,7 +26,7 @@ export type ResolveHomePauseWidgetModeInput = {
   /** Ms remaining on Home manual “Let’s pause” local cooldown (localStorage; not profile `cooldown_hours`). */
   manualCooldownRemainingMs: number;
   completedPauseCount: number;
-  /** Any `pause_step_events` on the open instance — mid-ritual → B_in_progress. */
+  /** Reserved — ritual progress does not change Home mode; only `engaged` unlocks Continue. */
   hasOpenPauseStepEvents: boolean;
   /** User expanded the widget manually (A′ / D expanded). */
   userExpanded: boolean;
@@ -68,16 +67,9 @@ export function resolveHomePauseWidgetMode(
       return { mode: 'C', defaultCollapsed: false, hasReachedReflect };
     }
 
-    // Queued context while still `active` — inline banner on B.
-    if (input.hasPendingOffer) {
-      return { mode: 'B', defaultCollapsed: false, hasReachedReflect };
-    }
+    // Pre-Reflect `active` (with or without step events) → B + Let's pause. Pending UX waits for `engaged`.
 
-    if (input.hasOpenPauseStepEvents) {
-      return { mode: 'B_in_progress', defaultCollapsed: false, hasReachedReflect };
-    }
-
-    // Figma 559:26757 — any open `active` pre-ritual (manual, cron, returning user).
+    // Figma 559:26757 — open `active` until Reflect (`engaged`).
     return { mode: 'B', defaultCollapsed: false, hasReachedReflect };
   }
 
@@ -107,7 +99,6 @@ export function resolveHomePauseWidgetMode(
 /** Section title i18n keys per mode. */
 export function homePauseWidgetSectionTitleKey(mode: HomePauseWidgetMode): string {
   switch (mode) {
-    case 'B_in_progress':
     case 'C':
     case 'C_prime':
       return 'home.widget.continueYourPause';
@@ -115,7 +106,7 @@ export function homePauseWidgetSectionTitleKey(mode: HomePauseWidgetMode): strin
     case 'D_expanded':
     case 'D_prime_collapsed':
     case 'D_prime_expanded':
-      return 'home.widget.youPaused';
+      return 'home.widget.yourPause';
     default:
       return 'home.widget.yourPause';
   }

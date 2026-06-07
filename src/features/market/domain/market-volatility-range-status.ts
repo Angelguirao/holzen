@@ -78,6 +78,11 @@ export function resolveHomeMarketRangeStatus(
     return liveStatus;
   }
 
+  // Engaged + live within band: calm waters (Figma 578:27830) — market footer matches live quote.
+  if (input.openPauseState === 'engaged' && liveStatus?.kind === 'within') {
+    return liveStatus;
+  }
+
   const snapPct = input.openPauseContextSnapshot?.change_24h_pct;
   if (typeof snapPct === 'number' && Number.isFinite(snapPct)) {
     const snapStatus = resolveMarketVolatilityRangeStatus(profile, {

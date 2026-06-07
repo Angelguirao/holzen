@@ -94,6 +94,8 @@ export function HomePauseWidgetBody(props: Props) {
         <HomePauseEngagedBody
           onPauseWithThis={props.onPauseWithThis}
           onDismissOpenPause={props.onDismissOpenPause}
+          engagedPauseMarketSettled={props.engagedPauseMarketSettled}
+          openPauseEngagedAt={props.openPauseEngagedAt}
         />
       );
 
@@ -125,7 +127,11 @@ export function HomePauseWidgetBody(props: Props) {
 
     case 'A_expanded':
       return (
-        <HomePauseIdleExpandedBody onNeedPause={props.onNeedPause} loading={props.loading} />
+        <HomePauseIdleExpandedBody
+          onNeedPause={props.onNeedPause}
+          loading={props.loading}
+          postManualCooldownIdle={props.postManualCooldownIdle}
+        />
       );
 
     case 'A_collapsed':

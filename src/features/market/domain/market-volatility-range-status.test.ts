@@ -74,6 +74,22 @@ describe('resolveHomeMarketRangeStatus', () => {
     ).toEqual({ kind: 'beyond', axis: 'daily_up' });
   });
 
+  it('uses live within when engaged cron pause and market has settled', () => {
+    expect(
+      resolveHomeMarketRangeStatus({
+        marketData: sampleQuote(0.4),
+        threshold: 5,
+        thresholdDown: 5,
+        openPauseSource: 'cron_volatility',
+        openPauseState: 'engaged',
+        openPauseContextSnapshot: {
+          change_24h_pct: -7,
+          direction: 'down',
+        },
+      }),
+    ).toEqual({ kind: 'within' });
+  });
+
   it('does not force beyond for manual open pauses', () => {
     expect(
       resolveHomeMarketRangeStatus({

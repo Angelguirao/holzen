@@ -39,7 +39,10 @@ vi.mock('sonner', () => ({
 }));
 
 const t = ((k: string) => k) as TFunction;
-const pending = { id: 'offer-1' } as import('./use-pending-pause-offer').PendingPauseOfferRow;
+const pending = {
+  id: 'offer-1',
+  context_snapshot: { context_text: 'BTC is down 15.1% in the last 24 hours.' },
+} as import('./use-pending-pause-offer').PendingPauseOfferRow;
 
 beforeEach(() => {
   runAdoptPendingPauseOfferMock.mockReset();
@@ -76,7 +79,10 @@ describe('usePendingPauseOfferMutations', () => {
     expect(runAdoptPendingPauseOfferMock).toHaveBeenCalledWith(mockPauseRepository);
     expect(trackPausePendingAdoptedMock).toHaveBeenCalledWith('inst-9');
     expect(onAfterMutation).toHaveBeenCalled();
-    expect(navigateAfterAdopt).toHaveBeenCalledWith('inst-9');
+    expect(navigateAfterAdopt).toHaveBeenCalledWith({
+      instanceId: 'inst-9',
+      context: 'BTC is down 15.1% in the last 24 hours.',
+    });
     expect(refreshPendingOffer).toHaveBeenCalled();
   });
 

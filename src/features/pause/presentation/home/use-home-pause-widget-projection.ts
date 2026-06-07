@@ -17,6 +17,7 @@ import {
   resolveHomePauseWidgetPreviewLine,
   type HomePauseWidgetPreviewLine,
 } from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
+import { resolveEngagedPauseMarketSettled } from '@/features/pause/domain/home/resolve-engaged-pause-market-settled';
 import { shouldSurfacePauseWidgetError } from '@/features/pause/domain/home/pause-home-widget-error';
 import {
   fetchRecentContextLostPause,
@@ -28,6 +29,10 @@ import {
   markHomePauseWidgetFirstVisitHandled,
   shouldExpandHomePauseWidgetFirstVisit,
 } from '@/features/pause/infrastructure/home-pause-widget-first-visit-storage';
+import {
+  shouldShowPostManualCooldownIdlePrompt,
+  clearPostManualCooldownIdlePrompt,
+} from '@/features/pause/infrastructure/home-post-manual-cooldown-idle-storage';
 
 export const HOME_PAUSE_WIDGET_EXPANDED_STORAGE_KEY = 'holzen_home_pause_widget_expanded_v1';
 
@@ -64,6 +69,11 @@ export type HomePauseWidgetBodyProjection = {
   profileLastTriggerAt: string | null;
   manualCooldownRemainingMs: number;
   pendingMarketBlock: ReturnType<typeof formatHomePauseMarketBlock> | null;
+  /** After manual cooldown ends — Figma 578:26963 (no market copy). */
+  postManualCooldownIdle: boolean;
+  /** Engaged + live market within thresholds — Figma 578:27863. */
+  engagedPauseMarketSettled: boolean;
+  openPauseEngagedAt: string | null;
 };
 
 export type UseHomePauseWidgetProjectionParams = {
@@ -102,6 +112,9 @@ export type UseHomePauseWidgetProjectionParams = {
   newPauseArrival: boolean;
   profileLastTriggerAt: string | null;
   hasOpenPauseStepEvents: boolean;
+  threshold: number;
+  thresholdDown: number;
+  openPauseEngagedAt: string | null;
 };
 
 export type HomePauseWidgetProjection = {
@@ -169,6 +182,11 @@ export function useHomePauseWidgetProjection(
 
   useEffect(() => {
     if (!userId || !params.hasOpenPause) return;
+    clearPostManualCooldownIdlePrompt(userId);
+  }, [userId, params.hasOpenPause]);
+
+  useEffect(() => {
+    if (!userId || !params.hasOpenPause) return;
     if (!shouldExpandHomePauseWidgetFirstVisit(userId)) return;
     markHomePauseWidgetFirstVisitHandled(userId);
   }, [userId, params.hasOpenPause]);
@@ -205,6 +223,19 @@ export function useHomePauseWidgetProjection(
     ],
   );
 
+  const postManualCooldownIdle =
+    Boolean(userId) &&
+    !params.hasOpenPause &&
+    manualCooldownRemainingMs <= 0 &&
+    shouldShowPostManualCooldownIdlePrompt(userId);
+
+  const engagedPauseMarketSettled = resolveEngagedPauseMarketSettled({
+    openPauseState: params.openPauseState,
+    marketData: params.marketData,
+    threshold: params.threshold,
+    thresholdDown: params.thresholdDown,
+  });
+
   useEffect(() => {
     const prev = prevModeRef.current;
     prevModeRef.current = widgetMode;
@@ -217,7 +248,19 @@ export function useHomePauseWidgetProjection(
       'D_prime_collapsed',
       'D_prime_expanded',
     ];
+    const dModes: HomePauseWidgetMode[] = [
+      'D_collapsed',
+      'D_expanded',
+      'D_prime_collapsed',
+      'D_prime_expanded',
+    ];
+    const aModes: HomePauseWidgetMode[] = ['A_collapsed', 'A_expanded'];
     const activeModes: HomePauseWidgetMode[] = ['B', 'C', 'C_prime'];
+
+    if (prev && dModes.includes(prev) && aModes.includes(widgetMode) && userId) {
+      setUserExpanded(true);
+    }
+
     if (prev && activeModes.includes(prev) && restModes.includes(widgetMode)) {
       setUserExpanded(false);
     }
@@ -229,7 +272,14 @@ export function useHomePauseWidgetProjection(
     if (params.newPauseArrival || enteredAutoExpand) {
       setUserExpanded(true);
     }
-  }, [widgetMode, params.newPauseArrival]);
+  }, [widgetMode, params.newPauseArrival, userId]);
+
+  useEffect(() => {
+    if (!userId || params.hasOpenPause || params.loading) return;
+    if (manualCooldownRemainingMs > 0) return;
+    if (!shouldShowPostManualCooldownIdlePrompt(userId)) return;
+    setUserExpanded(true);
+  }, [userId, params.hasOpenPause, params.loading, manualCooldownRemainingMs]);
 
   const collapsible = homePauseWidgetModeIsCollapsible(widgetMode);
   const collapsed = homePauseWidgetModeIsCollapsed(widgetMode);
@@ -316,6 +366,9 @@ export function useHomePauseWidgetProjection(
     profileLastTriggerAt: params.profileLastTriggerAt,
     manualCooldownRemainingMs,
     pendingMarketBlock,
+    postManualCooldownIdle,
+    engagedPauseMarketSettled,
+    openPauseEngagedAt: params.openPauseEngagedAt,
   };
 
   return {
