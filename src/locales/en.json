@@ -208,6 +208,19 @@
         }
       }
     },
+    "pauseHelpFeedback": {
+      "title": "Did this pause help?",
+      "subtitle": "Your feedback helps us improve Holzen for moments like this.",
+      "ratingLabel": "Rate this pause from 1 to 5 stars",
+      "starAria": "{{value}} stars",
+      "commentLabel": "Anything else? (optional)",
+      "commentPlaceholder": "Tell us what worked or what we could do better…",
+      "send": "Send",
+      "maybeLater": "Maybe later",
+      "thankYou": "Thank you for building it with us.",
+      "dismissThankYou": "Dismiss",
+      "submitFailed": "Could not send feedback. Try again later."
+    },
     "goalWhy": {
       "editWhys": "Edit anchor and motivations",
       "addAnchorCta": "Add your anchor",

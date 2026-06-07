@@ -256,6 +256,35 @@ npm run check:posthog-events-allowlist   # pending + dismiss events documented
 
 ---
 
+## Post-pause help feedback (Figma 581 / 582 / 584)
+
+After a **deep** pause ritual completes, the user returns Home and may see a bottom sheet: “Did this pause help?” (1–5 stars, optional comment, **Send** / **Maybe later**). On submit, an inline thank-you banner appears above the tab bar (not a toast).
+
+### When it shows
+
+| Rule | Behavior |
+|------|----------|
+| **Trigger** | First Home visit after **deep** pause **Done** / **Return** (or chrome **Close** on the done screen). Brief pauses exit to Journey — no sheet. |
+| **Anchor** | One prompt max per `pause_instance_id` (rated or deferred instances never re-prompt). |
+| **Daily cap** | At most **one** sheet per local calendar day (second completed pause same day skips). |
+| **Submit cooldown** | After a successful **Send**, no sheet for **7 days** (even on new pauses). Deferrals are not cooldown-gated. |
+| **Defer cap** | **Maybe later** or **X** counts as deferral; after **3** lifetime deferrals, stop asking (`optedOut` in localStorage). |
+| **Blocked** | Waits if Home Customize sheet is open; shows when Customize closes. |
+
+### Code map
+
+| Layer | Location |
+|-------|----------|
+| Eligibility | `src/features/pause/domain/home/pause-help-feedback-eligibility.ts` |
+| Per-user storage | `src/features/pause/infrastructure/pause-help-feedback-storage.ts` |
+| Nav payload | `navigate('/', { state: { pauseHelpFeedback: { pauseInstanceId } } })` from `use-pause-session-ritual-surface.ts` |
+| Home hook + UI | `use-home-pause-help-feedback.ts`, `HomePauseHelpFeedbackSheet.tsx`, `HomePauseHelpFeedbackThankYou.tsx` |
+| Persist + Slack | `send-feedback` edge, category `pause_help` |
+
+PostHog: `home.pause_help_feedback_*` — see [event-taxonomy.md](../ops/event-taxonomy.md).
+
+---
+
 ## Related
 
 - [pause-system.md](pause-system.md) — instance lifecycle, `engaged`, RPCs  

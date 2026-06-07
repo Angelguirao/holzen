@@ -36,7 +36,11 @@ export function usePauseSessionFlowWithChrome(
   chrome: PauseSessionScaffoldVmChromeSlots,
 ): PauseSessionRitualSurfaceResult {
   const scaffoldVm = usePauseSessionScaffoldVm(p, step, chrome);
-  return usePauseSessionRitualSurface({ prefersReducedMotion: p.prefersReducedMotion }, step, scaffoldVm);
+  return usePauseSessionRitualSurface(
+    { prefersReducedMotion: p.prefersReducedMotion, navigate: p.navigate },
+    step,
+    scaffoldVm,
+  );
 }
 
 /** Shell hydrate, ritual state, step handlers (before chrome slots). */
