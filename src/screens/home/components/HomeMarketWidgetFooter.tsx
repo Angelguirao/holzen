@@ -69,7 +69,7 @@ export function HomeMarketWidgetFooter({
   if (!rangeStatus && !marketData) return null;
 
   return (
-    <div className="flex w-full flex-col gap-1 pt-0.5">
+    <div className="flex w-full flex-col gap-1 pt-0.5 @[400px]/shell:flex-row @[400px]/shell:items-start @[400px]/shell:justify-between @[400px]/shell:gap-x-3">
       {rangeStatus ? <RangeStatusLine status={rangeStatus} /> : null}
       <HomeMarketCommunityStats />
     </div>

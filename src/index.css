@@ -148,9 +148,3 @@ body.ambient-active header {
 .tabs-scroll-y::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--primary) / 0.4);
 }
-
-/** Named container for opt-in shell layouts (Phase 2+). Pair with `APP_SHELL_*` in app-shell-layout.ts. */
-.app-shell {
-  container-type: inline-size;
-  container-name: shell;
-}

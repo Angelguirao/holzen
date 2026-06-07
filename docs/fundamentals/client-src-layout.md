@@ -52,7 +52,7 @@ flowchart TB
 
 ## Shell width and responsive layout
 
-Authenticated **four-tab routes** (`/`, `/archive`, `/journey`, `/settings/*`) render inside [`AppLayout`](../../src/app/components/AppLayout.tsx) with tiered width via [`app-shell-layout.ts`](../../src/app/lib/app-shell-layout.ts): **`max-w-sm md:max-w-md lg:max-w-lg`** plus outer `p-6`. The shell column uses **`.app-shell`** (`container-name: shell`) for future opt-in layouts. Bottom nav inner wrapper uses the same width classes. **`/pause`**, **`/onboarding`**, and **`/companion/*`** are full-screen and set their own max-width (often `max-w-lg`).
+Authenticated **four-tab routes** (`/`, `/archive`, `/journey`, `/settings/*`) render inside [`AppLayout`](../../src/app/components/AppLayout.tsx) with tiered width via [`app-shell-layout.ts`](../../src/app/lib/app-shell-layout.ts): **`max-w-sm md:max-w-md lg:max-w-lg`** plus outer `p-6`. The shell column uses Tailwind **`@container/shell`** for opt-in child layouts (`@[400px]/shell:…`). Bottom nav inner wrapper uses the same width classes. **`/pause`**, **`/onboarding`**, and **`/companion/*`** are full-screen and set their own max-width (often `max-w-lg`).
 
 Tailwind **`sm:`** breakpoints are **viewport-based** (640px), not container-based. On a phone, `sm:` never applies and the shell stays tier **S** (`max-w-sm`). On tablet/desktop, viewport `sm:`/`md:` may apply **while** the shell grows only to tier **M/L** — still avoid **`sm:flex-row` inside shell cards** unless tied to **`@container/shell`** (Phase 2).
 
