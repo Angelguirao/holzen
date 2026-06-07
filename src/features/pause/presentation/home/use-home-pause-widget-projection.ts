@@ -18,6 +18,7 @@ import {
   type HomePauseWidgetPreviewLine,
 } from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
 import { resolveEngagedPauseMarketSettled } from '@/features/pause/domain/home/resolve-engaged-pause-market-settled';
+import { resolvePauseOpenMaxAnchorAt } from '@/features/pause/domain/pause-open-max-anchor';
 import { shouldSurfacePauseWidgetError } from '@/features/pause/domain/home/pause-home-widget-error';
 import {
   fetchRecentContextLostPause,
@@ -73,7 +74,8 @@ export type HomePauseWidgetBodyProjection = {
   postManualCooldownIdle: boolean;
   /** Engaged + live market within thresholds — Figma 578:27863. */
   engagedPauseMarketSettled: boolean;
-  openPauseEngagedAt: string | null;
+  /** ISO anchor for open_max countdown (calm_settled_at for cron engaged, else engaged_at). */
+  openPauseOpenMaxAnchorAt: string | null;
 };
 
 export type UseHomePauseWidgetProjectionParams = {
@@ -114,7 +116,9 @@ export type UseHomePauseWidgetProjectionParams = {
   hasOpenPauseStepEvents: boolean;
   threshold: number;
   thresholdDown: number;
+  openPauseSource: string | null;
   openPauseEngagedAt: string | null;
+  openPauseMetadata: Record<string, unknown> | null;
 };
 
 export type HomePauseWidgetProjection = {
@@ -235,6 +239,23 @@ export function useHomePauseWidgetProjection(
     threshold: params.threshold,
     thresholdDown: params.thresholdDown,
   });
+
+  const openPauseOpenMaxAnchorAt = useMemo(() => {
+    if (params.openPauseState !== 'engaged' || !params.openPauseCreatedAt) return null;
+    return resolvePauseOpenMaxAnchorAt({
+      state: 'engaged',
+      source: params.openPauseSource,
+      engaged_at: params.openPauseEngagedAt,
+      created_at: params.openPauseCreatedAt,
+      metadata: params.openPauseMetadata,
+    });
+  }, [
+    params.openPauseState,
+    params.openPauseSource,
+    params.openPauseEngagedAt,
+    params.openPauseCreatedAt,
+    params.openPauseMetadata,
+  ]);
 
   useEffect(() => {
     const prev = prevModeRef.current;
@@ -368,7 +389,7 @@ export function useHomePauseWidgetProjection(
     pendingMarketBlock,
     postManualCooldownIdle,
     engagedPauseMarketSettled,
-    openPauseEngagedAt: params.openPauseEngagedAt,
+    openPauseOpenMaxAnchorAt,
   };
 
   return {

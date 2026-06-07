@@ -95,7 +95,7 @@ export function HomePauseWidgetBody(props: Props) {
           onPauseWithThis={props.onPauseWithThis}
           onDismissOpenPause={props.onDismissOpenPause}
           engagedPauseMarketSettled={props.engagedPauseMarketSettled}
-          openPauseEngagedAt={props.openPauseEngagedAt}
+          openPauseOpenMaxAnchorAt={props.openPauseOpenMaxAnchorAt}
         />
       );
 

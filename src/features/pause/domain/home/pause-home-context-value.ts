@@ -20,6 +20,7 @@ export type PauseHomeContextValue = {
   isBriefRitual: boolean;
   openPauseCreatedAt: string | null;
   openPauseEngagedAt: string | null;
+  openPauseMetadata: Record<string, unknown> | null;
   loading: boolean;
   error: string | null;
   newPauseArrival: boolean;

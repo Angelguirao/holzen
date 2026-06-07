@@ -438,6 +438,25 @@ serve(
 
     const vapidReady = await initWebPushVapidFromEnv(log);
 
+    if (toProcess.length > 0) {
+      await Promise.all(
+        toProcess.map(async (profile) => {
+          const { error: clearErr } = await supabase.rpc(
+            "pause_clear_cron_volatility_calm_settled",
+            { p_user_id: profile.user_id },
+          );
+          if (clearErr) {
+            log.error("check_volatility_clear_calm_settled", {
+              holzen_event: "check_volatility_cron",
+              phase: "pause_clear_cron_volatility_calm_settled_failed",
+              user_id_prefix: String(profile.user_id).slice(0, 8),
+              ...unknownErrorForLog(clearErr),
+            });
+          }
+        }),
+      );
+    }
+
     // Process eligible users and open-pause context refresh in parallel
     const results = await Promise.all(toProcess.map(async (profile) => {
       // Stamp last_trigger_at for audit; pause_create_or_reuse_as handles open-offer idempotency.

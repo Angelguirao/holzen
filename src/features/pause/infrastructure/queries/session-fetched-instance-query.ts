@@ -28,7 +28,7 @@ export function pauseSessionFetchedInstanceQueryKey(pauseInstanceId: string) {
 export async function fetchPauseInstanceForSession(pauseInstanceId: string): Promise<FetchedPauseInstance> {
   const { data: inst, error: instError } = await supabase
     .from('pause_instances' as never)
-    .select('id, context_snapshot, state, engaged_at')
+    .select('id, context_snapshot, state, engaged_at, created_at, source, metadata')
     .eq('id', pauseInstanceId)
     .maybeSingle();
   if (instError || !inst) {

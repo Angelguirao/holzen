@@ -34,5 +34,7 @@ export function buildOpenPausePreviewFromPendingOffer(
     hasReachedReflect: false,
     isBriefRitual: false,
     openPauseCreatedAt: pending.created_at,
+    openPauseEngagedAt: null,
+    openPauseMetadata: null,
   };
 }
