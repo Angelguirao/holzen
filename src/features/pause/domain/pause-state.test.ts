@@ -363,6 +363,7 @@ describe('computePauseState', () => {
       computePauseState({
         instance: makeInstance({
           state: 'engaged',
+          source: 'manual',
           created_at: '2026-04-21T18:00:00.000Z',
           engaged_at: '2026-04-23T19:00:00.000Z',
         }),
@@ -374,13 +375,49 @@ describe('computePauseState', () => {
     ).toBe('engaged');
   });
 
-  it('expires engaged when engaged_at is older than 12h (open max age from engagement)', () => {
+  it('expires manual engaged when engaged_at is older than 12h (open max age from engagement)', () => {
     expect(
       computePauseState({
         instance: makeInstance({
           state: 'engaged',
+          source: 'manual',
           created_at: '2026-04-21T18:00:00.000Z',
           engaged_at: '2026-04-23T07:00:00.000Z',
+        }),
+        template: volatilityTemplate,
+        stepEvents: [],
+        companionEvents: [],
+        now: NOW,
+      }),
+    ).toBe('expired');
+  });
+
+  it('keeps cron engaged without calm_settled_at even when engaged_at is older than 12h', () => {
+    expect(
+      computePauseState({
+        instance: makeInstance({
+          state: 'engaged',
+          source: 'cron_volatility',
+          created_at: '2026-04-21T18:00:00.000Z',
+          engaged_at: '2026-04-23T07:00:00.000Z',
+        }),
+        template: volatilityTemplate,
+        stepEvents: [],
+        companionEvents: [],
+        now: NOW,
+      }),
+    ).toBe('engaged');
+  });
+
+  it('expires cron engaged 12h after calm_settled_at', () => {
+    expect(
+      computePauseState({
+        instance: makeInstance({
+          state: 'engaged',
+          source: 'cron_volatility',
+          created_at: '2026-04-21T18:00:00.000Z',
+          engaged_at: '2026-04-23T07:00:00.000Z',
+          metadata: { calm_settled_at: '2026-04-23T07:00:00.000Z' },
         }),
         template: volatilityTemplate,
         stepEvents: [],
@@ -467,11 +504,12 @@ describe('shouldCountCompanion', () => {
     ).toEqual({ counts: true });
   });
 
-  it('rejects engaged past open_max_age from engaged_at (outside_window)', () => {
+  it('rejects manual engaged past open_max_age from engaged_at (outside_window)', () => {
     expect(
       shouldCountCompanion({
         openInstance: makeInstance({
           state: 'engaged',
+          source: 'manual',
           created_at: '2026-04-21T18:00:00.000Z',
           engaged_at: '2026-04-23T07:00:00.000Z',
         }),
@@ -483,11 +521,12 @@ describe('shouldCountCompanion', () => {
     ).toEqual({ counts: false, reason: 'outside_window' });
   });
 
-  it('allows engaged within open_max_age from engaged_at', () => {
+  it('allows manual engaged within open_max_age from engaged_at', () => {
     expect(
       shouldCountCompanion({
         openInstance: makeInstance({
           state: 'engaged',
+          source: 'manual',
           created_at: '2026-04-21T18:00:00.000Z',
           engaged_at: '2026-04-23T19:00:00.000Z',
         }),

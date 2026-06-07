@@ -69,4 +69,7 @@ export interface FetchedPauseInstance {
   db_state?: PauseState | null;
   /** ISO timestamp when the row entered `engaged` (for `open_max_age` UI countdown). */
   engaged_at?: string | null;
+  created_at?: string | null;
+  source?: string | null;
+  metadata?: Record<string, unknown> | null;
 }

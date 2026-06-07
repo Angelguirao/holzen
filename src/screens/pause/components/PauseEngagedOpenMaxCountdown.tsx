@@ -13,8 +13,8 @@ type Props = {
 };
 
 /**
- * Shows time remaining until `open_max_age` (12h after `engaged_at`).
- * Only mount when the pause is **engaged** and `engaged_at` is known.
+ * Shows time remaining until `open_max_age` (12h after the open-max anchor).
+ * Only mount when the pause is **engaged** and an anchor is known.
  */
 export function PauseEngagedOpenMaxCountdown({ engagedAtIso, tickMs = 30_000, className }: Props) {
   "use memo";

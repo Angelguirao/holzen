@@ -53,6 +53,7 @@ export function useOpenPauseHomePreview(
   const [isBriefRitual, setIsBriefRitual] = useState(false);
   const [openPauseCreatedAt, setOpenPauseCreatedAt] = useState<string | null>(null);
   const [openPauseEngagedAt, setOpenPauseEngagedAt] = useState<string | null>(null);
+  const [openPauseMetadata, setOpenPauseMetadata] = useState<Record<string, unknown> | null>(null);
 
   const clearOpenPausePreview = useCallback(() => {
     setLastPauseInstanceId(null);
@@ -68,6 +69,7 @@ export function useOpenPauseHomePreview(
     setIsBriefRitual(false);
     setOpenPauseCreatedAt(null);
     setOpenPauseEngagedAt(null);
+    setOpenPauseMetadata(null);
     clearPausePersistedTabSession();
   }, []);
 
@@ -106,6 +108,7 @@ export function useOpenPauseHomePreview(
       setOpenPauseSource(preview.openPauseSource);
       setOpenPauseCreatedAt(preview.createdAt);
       setOpenPauseEngagedAt(preview.engagedAt);
+      setOpenPauseMetadata(preview.openPauseMetadata);
       setContext(preview.contextText);
       setContextSnapshot(preview.contextSnapshot);
       setMessage(preview.reflectionMessage);
@@ -167,6 +170,7 @@ export function useOpenPauseHomePreview(
       isBriefRitual,
       openPauseCreatedAt,
       openPauseEngagedAt,
+      openPauseMetadata,
     });
   }, [
     message,
@@ -182,6 +186,7 @@ export function useOpenPauseHomePreview(
     isBriefRitual,
     openPauseCreatedAt,
     openPauseEngagedAt,
+    openPauseMetadata,
   ]);
 
   const restorePreviewSnapshot = useCallback((snapshot: OpenPauseHomePreviewSnapshot) => {
@@ -199,6 +204,7 @@ export function useOpenPauseHomePreview(
       setIsBriefRitual(preview.isBriefRitual);
       setOpenPauseCreatedAt(preview.openPauseCreatedAt);
       setOpenPauseEngagedAt(preview.openPauseEngagedAt);
+      setOpenPauseMetadata(preview.openPauseMetadata);
       lastSyncedInstanceIdRef.current = preview.lastPauseInstanceId;
     });
   }, []);
@@ -244,6 +250,7 @@ export function useOpenPauseHomePreview(
     isBriefRitual,
     openPauseCreatedAt,
     openPauseEngagedAt,
+    openPauseMetadata,
     setMessage,
     setContext,
     setCompanions,

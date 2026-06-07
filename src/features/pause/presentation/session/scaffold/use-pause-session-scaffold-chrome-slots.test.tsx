@@ -36,8 +36,11 @@ describe('usePauseSessionScaffoldChromeSlots', () => {
         ritualEntry: 'deep',
         briefStep: 'feel',
         fetchedInstance: {
+          id: 'p1',
           db_state: 'engaged',
+          created_at: '2026-05-16T10:00:00.000Z',
           engaged_at: '2026-05-16T12:00:00.000Z',
+          source: 'manual',
         } as UsePauseSessionScaffoldChromeSlotsParams['fetchedInstance'],
       }),
     );
@@ -51,8 +54,11 @@ describe('usePauseSessionScaffoldChromeSlots', () => {
         ritualEntry: 'deep',
         briefStep: 'feel',
         fetchedInstance: {
+          id: 'p1',
           db_state: 'engaged',
+          created_at: '2026-05-16T10:00:00.000Z',
           engaged_at: '2026-05-16T12:00:00.000Z',
+          source: 'manual',
         } as UsePauseSessionScaffoldChromeSlotsParams['fetchedInstance'],
       }),
     );

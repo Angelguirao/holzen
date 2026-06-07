@@ -1,8 +1,8 @@
-/** Mirrors `open_max_age` in Postgres: 12h after engagement anchor. */
+/** Mirrors `open_max_age` in Postgres: 12h after the open-max anchor (see pause-open-max-anchor.ts). */
 export const PAUSE_OPEN_MAX_AGE_MS = 12 * 60 * 60 * 1000;
 
-export function pauseOpenMaxDeadlineMs(engagedAtIso: string): number {
-  return new Date(engagedAtIso).getTime() + PAUSE_OPEN_MAX_AGE_MS;
+export function pauseOpenMaxDeadlineMs(anchorIso: string): number {
+  return new Date(anchorIso).getTime() + PAUSE_OPEN_MAX_AGE_MS;
 }
 
 /** Compact remaining string for UI (no i18n — wrap with t() at call site if needed). */

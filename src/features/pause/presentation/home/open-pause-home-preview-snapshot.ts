@@ -21,6 +21,7 @@ export type OpenPauseHomePreviewSnapshot = {
   isBriefRitual: boolean;
   openPauseCreatedAt: string | null;
   openPauseEngagedAt: string | null;
+  openPauseMetadata: Record<string, unknown> | null;
   persistedSession: PersistedSession | null;
 };
 

@@ -57,7 +57,7 @@ Modes are **derived**, not stored. Primary inputs to `resolveHomePauseWidgetMode
 |------|-------------------|-------------------|
 | **A** collapsed / expanded | No open pause; not in manual cooldown; **collapsed by default** — **first idle onboarding** auto-expands on every Home visit until **Let's pause** or an open pause arrives first (Figma [555:16772](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=555-16772) exception) | Title **Your pause** + moon; chevron expands to within-range copy + **Let's pause** |
 | **B** | Open `active` (pre-Reflect, with or without step events) | Figma **[559:26757](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=559-26757)** — title **Your pause**; opening line + inline market + Nox **Let's pause** |
-| **C** | Open pause, `state = engaged` (Reflect reached) | Figma **[578:28850](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-28850)** — title **Continue your pause**; *still here* + Nox **Continue** + **Discard**. **C (calm waters):** engaged + live market within thresholds — Figma **[578:27863](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27863)** — settled copy + **This pause closes in {{remaining}}** (`open_max_age` = 12h after `engaged_at`) + **Continue** / **Discard** |
+| **C** | Open pause, `state = engaged` (Reflect reached) | Figma **[578:28850](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-28850)** — title **Continue your pause**; *still here* + Nox **Continue** + **Discard**. **C (calm waters):** engaged + live market within thresholds — Figma **[578:27863](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27863)** — settled copy + **This pause closes in {{remaining}}** (cron: 12h from **`calm_settled_at`**; manual: 12h from **`engaged_at`**) + **Continue** / **Discard** |
 | **C′** | Engaged + pending | Figma **[578:27896](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27896)** / **[578:27929](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27929)** — **Continue** / **Discard**, **or**, **New pause available** + adopt CTA |
 | **D** / **D′** | No open pause, **manual** cooldown active (`localStorage` + 1h gate) | **Your pause**; collapsed by default; expanded → Figma [578:25933](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-25933) cooldown copy + **Revisit your archive** (D′ = no archive link). After cooldown → **A** post-manual idle (Figma [578:26963](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-26963)) |
 | **context_lost settled** | Cron expires offer with `context_lost`; market back within range; no open pause | Routes to **A** or **D** (not a separate body); optional Sonner toast once |
@@ -69,7 +69,7 @@ Modes are **derived**, not stored. Primary inputs to `resolveHomePauseWidgetMode
 
 | Layer | Meaning | Home widget |
 |-------|---------|-------------|
-| **Postgres `engaged`** | Deep ritual logged `reflection_step` → `engaged_at` set | Mode **C** or **C′** — Figma [578:28850](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-28850): *still here* + **Continue** + **Discard**. When live market is within thresholds: Figma [578:27863](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27863) settled copy + countdown to **`open_max_age`** (12h from `engaged_at`) |
+| **Postgres `engaged`** | Deep ritual logged `reflection_step` → `engaged_at` set | Mode **C** or **C′** — Figma [578:28850](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-28850): *still here* + **Continue** + **Discard**. When live market is within thresholds: Figma [578:27863](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27863) settled copy + countdown to **`open_max_age`** (cron: **`calm_settled_at` + 12h**; manual: **`engaged_at` + 12h**) |
 | **Pre-Reflect `active`** | Feel/Breath logged but not Reflect yet | Mode **B** — **Let's pause** (re-enter `/pause` to resume; no Home **Continue**) |
 | **Untouched open pause** | No step events | Mode **B** — **Let's pause** |
 
@@ -91,7 +91,7 @@ When the tracked asset move is **back within** the user’s daily thresholds, **
 
 **Manual** open pauses (`source ≠ cron_volatility`) are **not** auto-expired when the market calms.
 
-**Engaged countdown (Mode C, calm waters):** Figma [578:27863](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27863) shows settled copy + **This pause closes in {{remaining}}**. The timer mirrors Postgres **`open_max_age`**: **12 hours after `engaged_at`**, via `pauseOpenMaxDeadlineMs` / `formatPauseOpenMaxRemaining` in [`open-max-countdown.ts`](../../src/features/pause/application/use-cases/session/open-max-countdown.ts). Calm detection is **client-side** (`resolveEngagedPauseMarketSettled` + live quote); the sweep does **not** stamp a new server deadline at calm time. A future product change to anchor TTL to the calm-waters event would need a migration + doc update here.
+**Engaged countdown (Mode C, calm waters):** Figma [578:27863](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27863) shows settled copy + **This pause closes in {{remaining}}**. For **`cron_volatility`** engaged rows, Postgres stamps **`metadata.calm_settled_at`** on the first calm sweep after Reflect; the countdown is **12h from that stamp** (`pause_open_max_anchor_at` / `resolvePauseOpenMaxAnchorAt`). While volatility is still hot, cron engaged rows have **no** open-max anchor yet — only *still here* copy (no countdown). **Manual** engaged pauses still use **`engaged_at` + 12h**. Calm detection for copy is **client-side** (`resolveEngagedPauseMarketSettled`); the anchor comes from **`pause_instances.metadata`** via Realtime refresh.
 
 **context_lost toast** (optional Sonner): fires when cron recently expired a row and there is **no** open pause — widget stays collapsed **A** or **D**, not an expanded “moment passed” body.
 
@@ -141,7 +141,7 @@ On **`/pause`**, leave flow still uses `PauseLeaveWithPendingSheet`. There is **
 |--------|---------|
 | New mode or gate | `home-pause-widget-mode.ts` + tests in `home-pause-widget-mode.test.ts` |
 | New data for mode | `open-pause-home-preview-query.ts`, `use-home-pause-widget-projection.ts` |
-| Calm-waters engaged body | `resolve-engaged-pause-market-settled.ts`, `HomePauseEngagedBody` in `HomePauseWidgetBodies.tsx` |
+| Calm-waters engaged body | `resolve-engaged-pause-market-settled.ts`, `pause-open-max-anchor.ts`, `HomePauseEngagedBody` in `HomePauseWidgetBodies.tsx` |
 | Post-manual D → A idle | `home-post-manual-cooldown-idle-storage.ts`, `use-holzen-manual-trigger-orchestration.ts` |
 | Body layout / CTAs | `HomePauseWidgetBodies.tsx`, `HomePauseWidgetShared.tsx`, `HomePauseWidgetBody.tsx` |
 | Navigate / dismiss / adopt | `use-home-pause-actions.ts`, `use-pending-pause-offer-mutations.ts`, `use-pause-session-pending-pause-offer-navigation.ts` |
@@ -161,6 +161,7 @@ Use this when verifying the Home widget after changes to the resolver, projectio
 |--------------|-----|
 | Migration `20260527120000_pause_engaged_requires_reflection_step.sql` applied on target Supabase | Without it, `engaged` may flip before Reflect → wrong **C** vs **B** |
 | Migration `20260609180000_pause_dismiss_current_promote_pending.sql` applied on target Supabase | Without it, **C′** **Discard** may not promote pending → **B** |
+| Migration `20260609190000_pause_engaged_open_max_calm_settled_anchor.sql` applied on target Supabase | Without it, cron engaged **`open_max_age`** still uses **`engaged_at`**, not calm stamp |
 | Signed-in user with **trial or Pro** (`getHomeSubscriptionGate` passes) | Lapsed/trial prompt replaces widget body |
 | `npm run dev` (port **8080**) against staging or local Supabase with edge/cron if testing pending | Pending rows come from `pause_create_or_reuse` / cron |
 | Home tab open (`/`); bottom nav **Home** | Pending UX is **Home-only** (no shell modal on other tabs) |
@@ -179,7 +180,7 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 | 2 | **A** expanded | First idle onboarding (every visit until **Let's pause**) **or** tap chevron on A | Within-range copy + Nox **Let's pause** (Figma 555:16772); forfeited if Holzen opens a pause first |
 | 3 | **B** | Open `active` (untouched, mid-ritual pre-Reflect, manual, cron, or returning user) | Title **Your pause** (Figma [559:26757](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=559-26757)); empathy + inline BTC/F&G + Nox **Let's pause** |
 | 4 | **C** | Reach Reflect → `engaged` | Title **Continue your pause** (Figma [578:28850](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-28850)); *still here* + Nox **Continue** + **Discard** |
-| 4b | **C (calm waters)** | **C** + live market within thresholds | Figma [578:27863](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27863): settled copy + **This pause closes in …** (12h from `engaged_at`) + **Continue** / **Discard** |
+| 4b | **C (calm waters)** | **C** + live market within thresholds; cron row has **`calm_settled_at`** | Figma [578:27863](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27863): settled copy + **This pause closes in …** (12h from **`calm_settled_at`**) + **Continue** / **Discard** |
 | 5 | **C′** | **C** + cron queues new context (pending row) while still on Home | Unified card (Figma [578:27929](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27929)): **Continue** / **Discard**, **or**, **New pause available** + **Pause with new context** |
 | 6 | **D** | Complete a manual pause; manual cooldown active; no open pause; has archive | Title **Your pause** (Figma [578:25631](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-25631)); collapsed default; expanded → cooldown time + **Revisit your archive** (Figma [578:25933](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-25933)) |
 | 7 | **D′** | Same as D but `completedPauseCount = 0` | Same title; rest copy without archive link |
@@ -235,6 +236,7 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 ### Automated tests (CI-friendly)
 
 ```bash
+npx vitest run src/features/pause/domain/pause-open-max-anchor.test.ts
 npx vitest run src/features/pause/domain/home/home-pause-widget-mode.test.ts
 npx vitest run src/features/pause/domain/home/resolve-engaged-pause-market-settled.test.ts
 npx vitest run src/features/pause/presentation/home/use-home-pause-actions.integration.test.tsx

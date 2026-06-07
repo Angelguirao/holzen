@@ -66,6 +66,7 @@ export function useHomeScreen() {
     hasOpenPauseStepEvents,
     openPauseCreatedAt,
     openPauseEngagedAt,
+    openPauseMetadata,
     loading,
     error,
     newPauseArrival,
@@ -213,7 +214,9 @@ export function useHomeScreen() {
     profileLastTriggerAt,
     threshold,
     thresholdDown,
+    openPauseSource,
     openPauseEngagedAt,
+    openPauseMetadata,
   });
 
   const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = useHomePullFullReload();

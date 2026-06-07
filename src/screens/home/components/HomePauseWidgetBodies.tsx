@@ -86,22 +86,22 @@ export function HomePauseEngagedBody({
   onPauseWithThis,
   onDismissOpenPause,
   engagedPauseMarketSettled,
-  openPauseEngagedAt,
+  openPauseOpenMaxAnchorAt,
 }: EngagedProps &
-  Pick<HomePauseWidgetBodyProjection, 'engagedPauseMarketSettled' | 'openPauseEngagedAt'>) {
+  Pick<HomePauseWidgetBodyProjection, 'engagedPauseMarketSettled' | 'openPauseOpenMaxAnchorAt'>) {
   "use memo";
   const { t } = useTranslation();
   const [nowMs, setNowMs] = useState(() => Date.now());
 
   useEffect(() => {
-    if (!engagedPauseMarketSettled || !openPauseEngagedAt) return;
+    if (!engagedPauseMarketSettled || !openPauseOpenMaxAnchorAt) return;
     const id = window.setInterval(() => setNowMs(Date.now()), 30_000);
     return () => window.clearInterval(id);
-  }, [engagedPauseMarketSettled, openPauseEngagedAt]);
+  }, [engagedPauseMarketSettled, openPauseOpenMaxAnchorAt]);
 
   const openMaxRemaining =
-    engagedPauseMarketSettled && openPauseEngagedAt
-      ? formatPauseOpenMaxRemaining(pauseOpenMaxDeadlineMs(openPauseEngagedAt), nowMs)
+    engagedPauseMarketSettled && openPauseOpenMaxAnchorAt
+      ? formatPauseOpenMaxRemaining(pauseOpenMaxDeadlineMs(openPauseOpenMaxAnchorAt), nowMs)
       : null;
 
   return (
