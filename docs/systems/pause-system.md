@@ -111,7 +111,7 @@ Holzen stores **one `pause_instances` row per pause**. Product language below ma
 | `**pause_log_step**`             | Append one `**pause_step_events**` row; then the DB re-evaluates state.                                                    |
 | `**pause_log_companion**`        | Append companion open/complete; may set `**counts_for_pause**`.                                                            |
 | `**pause_evaluate_transitions**` | **Not called from the client**; invoked from triggers after relevant inserts so `**pause_instances.state`** stays in sync. |
-| `**pause_dismiss_current**` | Expires any `**pending**` rows for the caller (`**system_cancelled**`), then dismisses the open `**active|engaged**` instance (`**user_dismissed_current**`). Invoked from Home (Zen **Done**, dashboard **Dismiss pause**) and from `/pause` when the user closes before completing (header **Close** / depth picker **Close**). |
+| `**pause_dismiss_current**` | When a `**pending**` row exists: dismiss the open `**active|engaged**` instance (`**user_dismissed_current**`), then promote pending → `**active**` (Home **C′** **Discard**, Figma 578:29994). When no pending: expire stale pending rows (`**system_cancelled**`), then dismiss the open instance. Also used from `/pause` header **Close** (no pending promotion). |
 
 
 **Client entrypoint:** `src/features/pause/infrastructure/pause-rpc-client.ts` — consumed only by `supabase-pause-repository` (`PauseRepository` adapter). Cross-context code may import default adapters from `@/features/pause/public-rpc`; feature presentation wires `infrastructure/supabase-pause-repository` directly (May 2026).
