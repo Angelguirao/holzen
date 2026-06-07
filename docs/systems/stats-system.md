@@ -52,7 +52,7 @@ Typical range: brief **10**; deep **18–36** when all optional practice is done
 
 | Surface | What |
 |---------|------|
-| **Home** (`journey-pulse`) | Presence total + completed count — glimpse; links to Journey ([screens/home.md](../screens/home.md)) |
+| **Home** (`journey-pulse`) | Presence total + completed count — read-only glimpse ([screens/home.md](../screens/home.md)) |
 | **Journey** (`/journey`) | Presence, completed, brief/deep mix, XP-by-signal bars (`JourneyPracticeXpBreakdown`) |
 | **Pause Done** | Qualitative `ScoreImpact` rows — not lifetime totals |
 

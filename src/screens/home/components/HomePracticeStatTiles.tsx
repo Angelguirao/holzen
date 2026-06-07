@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
@@ -15,18 +14,16 @@ function StatTile({
   value,
   unit,
   isLoading,
-  to,
 }: {
   label: string;
   value: number | null;
   unit: string;
   isLoading: boolean;
-  to: string;
 }) {
   return (
-    <Link
-      to={to}
-      className="flex min-h-[96px] flex-col rounded-lg border border-border/40 bg-card/40 p-4 transition-colors hover:border-border/60 hover:bg-card/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    <div
+      className="flex min-h-[96px] flex-col rounded-lg border border-border/40 bg-card/40 p-4"
+      aria-label={`${label}: ${value ?? 0} ${unit}`}
     >
       <p className={cn(homeInWidget.kicker, 'text-[10px] tracking-widest')}>{label}</p>
       <div className="mt-2 flex flex-1 items-end">
@@ -41,11 +38,11 @@ function StatTile({
           </div>
         )}
       </div>
-    </Link>
+    </div>
   );
 }
 
-/** Presence + completed-count glimpse — entire tile links to Journey. */
+/** Presence + completed-count glimpse — read-only; full breakdown on Journey. */
 export function HomePracticeStatTiles({
   presenceXp,
   completedPauseCount,
@@ -57,7 +54,6 @@ export function HomePracticeStatTiles({
   return (
     <div className="grid grid-cols-2 gap-3">
       <StatTile
-        to="/journey"
         label={t('home.practiceStats.presence', { defaultValue: 'Presence' })}
         value={presenceXp}
         unit={t('home.practiceStats.presenceUnit', {
@@ -66,7 +62,6 @@ export function HomePracticeStatTiles({
         isLoading={isLoading}
       />
       <StatTile
-        to="/journey"
         label={t('home.practiceStats.pauses', { defaultValue: 'Completed' })}
         value={completedPauseCount}
         unit={t('home.practiceStats.pausesUnit', {
