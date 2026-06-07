@@ -3,14 +3,23 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { User } from '@supabase/supabase-js';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import { DEFAULT_COMPANIONS } from '@/features/pause/domain/session-model';
+import { runPauseDismissCurrent } from '@/features/pause/application/use-cases/session/run-pause-dismiss-current';
 import { fetchOpenPauseHomePreview } from '@/features/pause/public-queries';
 import { pendingPauseOfferQueryKey } from '@/features/pause/infrastructure/queries/reflect/pending-offer/pending-pause-offer-query-key';
 import { HOLZEN_MARKET_DISPLAY_QUERY_PREFIX } from '@/features/market/application/queries/holzen-market-display-keys';
 import { notificationsInboxQueryKey } from '@/features/notifications/infrastructure/queries/notifications-inbox-query';
 import { HOLZEN_NUMBER_QUERY_KEY, PROFILE_QUERY_KEY } from '@/features/user/public-queries';
-import { pauseDismissOpenPauseHomePreview } from './pause-home-reflect-io';
+import {
+  pauseDismissOpenPauseHomePreview,
+  pauseHomeManualOpenPorts,
+} from './pause-home-reflect-io';
 import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import { usePauseInstancesRealtime } from '@/features/pause/presentation/realtime/use-pause-instances-realtime';
+import {
+  captureOpenPauseHomePreviewSnapshot,
+  restoreOpenPauseHomePreviewSnapshot,
+  type OpenPauseHomePreviewSnapshot,
+} from '@/features/pause/presentation/home/open-pause-home-preview-snapshot';
 
 export type UseOpenPauseHomePreviewOptions = {
   /** Fires after a debounced realtime resync when the open pause row id changed (cron / replace). */
@@ -139,6 +148,63 @@ export function useOpenPauseHomePreview(
     });
   }, [user, clearOpenPausePreview]);
 
+  const capturePreviewSnapshot = useCallback((): OpenPauseHomePreviewSnapshot => {
+    return captureOpenPauseHomePreviewSnapshot({
+      message,
+      context,
+      companions,
+      lastPauseInstanceId,
+      openPauseState,
+      openPauseSource,
+      contextSnapshot,
+      hasReflectionStep,
+      hasOpenPauseStepEvents,
+      hasReachedReflect,
+      isBriefRitual,
+      openPauseCreatedAt,
+    });
+  }, [
+    message,
+    context,
+    companions,
+    lastPauseInstanceId,
+    openPauseState,
+    openPauseSource,
+    contextSnapshot,
+    hasReflectionStep,
+    hasOpenPauseStepEvents,
+    hasReachedReflect,
+    isBriefRitual,
+    openPauseCreatedAt,
+  ]);
+
+  const restorePreviewSnapshot = useCallback((snapshot: OpenPauseHomePreviewSnapshot) => {
+    restoreOpenPauseHomePreviewSnapshot(snapshot, (preview) => {
+      setLastPauseInstanceId(preview.lastPauseInstanceId);
+      setOpenPauseState(preview.openPauseState);
+      setOpenPauseSource(preview.openPauseSource);
+      setMessage(preview.message);
+      setContext(preview.context);
+      setCompanions(preview.companions);
+      setContextSnapshot(preview.contextSnapshot);
+      setHasReflectionStep(preview.hasReflectionStep);
+      setHasOpenPauseStepEvents(preview.hasOpenPauseStepEvents);
+      setHasReachedReflect(preview.hasReachedReflect);
+      setIsBriefRitual(preview.isBriefRitual);
+      setOpenPauseCreatedAt(preview.openPauseCreatedAt);
+      lastSyncedInstanceIdRef.current = preview.lastPauseInstanceId;
+    });
+  }, []);
+
+  const commitOpenPauseDismissRpc = useCallback(async () => {
+    if (!user) return;
+    try {
+      await runPauseDismissCurrent(pauseHomeManualOpenPorts.repository);
+    } catch {
+      /* non-fatal — preview already cleared locally */
+    }
+  }, [user]);
+
   return {
     message,
     context,
@@ -165,6 +231,9 @@ export function useOpenPauseHomePreview(
     setOpenPauseCreatedAt,
     clearOpenPausePreview,
     dismissOpenPauseHome: dismissOpenPauseHomePreviewAction,
+    capturePreviewSnapshot,
+    restorePreviewSnapshot,
+    commitOpenPauseDismissRpc,
     syncOpenPauseFromDb,
   };
 }

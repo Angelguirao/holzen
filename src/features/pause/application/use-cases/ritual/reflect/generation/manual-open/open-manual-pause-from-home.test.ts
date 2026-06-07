@@ -57,6 +57,8 @@ describe('openManualPauseFromHome', () => {
         severityBand: 'mild',
         fearGreedLabel: null,
         onChainBand: null,
+        fearGreed: null,
+        onChain: null,
       },
     );
 
@@ -90,6 +92,8 @@ describe('openManualPauseFromHome', () => {
       severityBand: 'moderate',
       fearGreedLabel: null,
       onChainBand: null,
+      fearGreed: null,
+      onChain: null,
     });
     expect(result.outcome).toBe('idle');
   });
@@ -121,6 +125,8 @@ describe('openManualPauseFromHome', () => {
       severityBand: 'mild',
       fearGreedLabel: 'Fear',
       onChainBand: '1:2:3',
+      fearGreed: { label: 'Fear', value: 33 },
+      onChain: { mempoolSize: 1, fastestFee: 2, medianFee: 3 },
     });
     expect(result).toMatchObject({
       outcome: 'opened',
@@ -160,6 +166,8 @@ describe('openManualPauseFromHome', () => {
       severityBand: 'mild',
       fearGreedLabel: null,
       onChainBand: null,
+      fearGreed: null,
+      onChain: null,
     });
     expect(result).toEqual({
       outcome: 'error',
@@ -186,6 +194,8 @@ describe('openManualPauseFromHome', () => {
       severityBand: 'mild',
       fearGreedLabel: null,
       onChainBand: null,
+      fearGreed: null,
+      onChain: null,
     });
     expect(result).toMatchObject({
       outcome: 'opened',

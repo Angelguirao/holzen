@@ -61,6 +61,8 @@ vi.mock('@/features/pause/presentation/reflect/generation/manual-open/pause-home
     silentMessage: 'silent',
     fearGreedLabel: null,
     onChainBand: null,
+    fearGreed: null,
+    onChain: null,
   }),
 }));
 

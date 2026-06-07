@@ -24,8 +24,10 @@ const baseParams = {
   changePercent: 3,
   trackedAssetId: 'bitcoin',
   severityBand: 'mild',
-  fearGreedLabel: 'fear',
+  fearGreedLabel: 'Fear',
   onChainBand: 'low',
+  fearGreed: { label: 'Fear', value: 33 },
+  onChain: { mempoolSize: 120_000, fastestFee: 12, medianFee: 8 },
 } as const;
 
 describe('buildManualPauseCreateOrReuseParams', () => {
@@ -44,7 +46,7 @@ describe('buildManualPauseCreateOrReuseParams', () => {
       severityBand: 'mild',
       dailyBucketPct: 3,
       trackedAssetId: 'bitcoin',
-      fearGreedBand: 'fear',
+      fearGreedBand: 'Fear',
       onChainBand: 'low',
     });
     expect(result).toEqual({
@@ -55,6 +57,8 @@ describe('buildManualPauseCreateOrReuseParams', () => {
         direction: 'up',
         severity: 'mild',
         context_text: 'ctx',
+        fear_greed: { label: 'Fear', value: 33 },
+        on_chain: { mempoolSize: 120_000, fastestFee: 12, medianFee: 8 },
         last_reported_mood: null,
         tracked_asset_id: 'bitcoin',
       },

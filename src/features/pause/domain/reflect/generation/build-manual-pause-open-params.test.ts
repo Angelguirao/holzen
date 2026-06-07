@@ -31,6 +31,12 @@ describe('buildManualPauseOpenParams', () => {
     expect(params.trackedAssetId).toBe('bitcoin');
     expect(params.mood).toBe('anxious');
     expect(params.fearGreedLabel).toBe('Fear');
+    expect(params.fearGreed).toEqual({ value: 25, label: 'Fear' });
+    expect(params.onChain).toEqual({
+      mempoolSize: 100,
+      fastestFee: 20,
+      medianFee: 15,
+    });
     expect(params.silentMsg).toBe('BTC moved.');
   });
 });

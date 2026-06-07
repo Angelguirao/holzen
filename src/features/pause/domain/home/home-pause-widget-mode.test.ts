@@ -87,7 +87,6 @@ describe('buildHomePauseOpeningPreviewKey', () => {
 const baseInput = {
   loading: false,
   blockingError: false,
-  showCalmWaters: false,
   hasOpenPause: false,
   openPauseState: null as 'active' | 'engaged' | null,
   hasReflectionStep: false,
@@ -105,14 +104,6 @@ describe('resolveHomePauseWidgetMode', () => {
     const r = resolveHomePauseWidgetMode(baseInput);
     expect(r.mode).toBe('A_collapsed');
     expect(homePauseWidgetModeIsCollapsed(r.mode)).toBe(true);
-  });
-
-  it('A collapsed when context_lost settled — not calm_waters body', () => {
-    const r = resolveHomePauseWidgetMode({
-      ...baseInput,
-      showCalmWaters: true,
-    });
-    expect(r.mode).toBe('A_collapsed');
   });
 
   it('A expanded when user expanded', () => {
@@ -164,7 +155,7 @@ describe('resolveHomePauseWidgetMode', () => {
     expect(r.mode).toBe('C_prime');
   });
 
-  it('E when returning user has new active offer (no ritual progress)', () => {
+  it('B when returning user has untouched active offer (same as first pause)', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,
       hasOpenPause: true,
@@ -172,10 +163,10 @@ describe('resolveHomePauseWidgetMode', () => {
       completedPauseCount: 2,
       hasOpenPauseStepEvents: false,
     });
-    expect(r.mode).toBe('E');
+    expect(r.mode).toBe('B');
   });
 
-  it('B not E when first active pause (no completed archive)', () => {
+  it('B when first active pause (no completed archive)', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,
       hasOpenPause: true,
@@ -196,7 +187,7 @@ describe('resolveHomePauseWidgetMode', () => {
     expect(r.mode).toBe('B_in_progress');
   });
 
-  it('B not E when active with pending queued (banner on B)', () => {
+  it('B when active with pending queued (banner on B)', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,
       hasOpenPause: true,
@@ -216,8 +207,11 @@ describe('resolveHomePauseWidgetMode', () => {
     expect(r.mode).toBe('D_collapsed');
   });
 
-  it('section title stays Your pause for D rest modes', () => {
-    expect(homePauseWidgetSectionTitleKey('D_collapsed')).toBe('home.widget.yourPause');
+  it('section title is You paused for D rest modes', () => {
+    expect(homePauseWidgetSectionTitleKey('D_collapsed')).toBe('home.widget.youPaused');
+    expect(homePauseWidgetSectionTitleKey('D_expanded')).toBe('home.widget.youPaused');
+    expect(homePauseWidgetSectionTitleKey('D_prime_collapsed')).toBe('home.widget.youPaused');
+    expect(homePauseWidgetSectionTitleKey('D_prime_expanded')).toBe('home.widget.youPaused');
   });
 
   it('D_prime when manual cooldown without archive', () => {

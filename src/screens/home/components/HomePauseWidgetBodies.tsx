@@ -7,7 +7,6 @@ import {
   computeManualCooldownReadyAtMs,
 } from '@/features/pause/domain/reflect/generation/compute-pause-trigger-cooldowns';
 import {
-  AutoCooldownIndicator,
   formatHomePauseReadyAtClock,
 } from '@/screens/home/components/HomePauseChrome';
 import { HomePauseWidgetPreviewLine } from '@/screens/home/components/HomePauseWidgetPreviewLine';
@@ -141,14 +140,11 @@ export function HomePauseInProgressBody({ onPauseWithThis, onDismissOpenPause }:
 
   return (
     <div className={homePauseWidgetBodyStack}>
-      <HomePauseWidgetTwoToneLead
-        lead={t('home.pauseIdle.withinRangeLead', {
-          defaultValue: 'The market is within your range.',
-        })}
-        tail={t('home.pauseInProgress.stillHere', {
+      <p className="text-sm leading-5 tracking-wide text-muted-foreground">
+        {t('home.pauseInProgress.stillHere', {
           defaultValue: 'The pause you started is still here.',
         })}
-      />
+      </p>
       <div className="flex flex-col gap-6 pb-2">
         <HomePauseWidgetNoxCta label={t('home.pauseWidget.continue')} onClick={onPauseWithThis} />
         <HomePauseWidgetDiscardLink
@@ -194,7 +190,7 @@ type PendingProps = EngagedProps &
     | 'pendingOfferBusy'
   >;
 
-/** State C′ — dual layout. */
+/** State C′ — unified card (Figma 578:27896). */
 export function HomePauseEngagedPendingBody({
   previewLine,
   marketBlock,
@@ -212,7 +208,6 @@ export function HomePauseEngagedPendingBody({
 
   return (
     <div className={homePauseWidgetBodyStack}>
-      <p className={homeInWidget.kicker}>{t('home.pauseWidget.currentPauseSection')}</p>
       <HomePauseWidgetOpeningAndMarket previewLine={previewLine} marketBlock={marketBlock} />
       <div className="flex flex-col gap-6 pb-2">
         <HomePauseWidgetNoxCta label={t('home.pauseWidget.continue')} onClick={onPauseWithThis} />
@@ -223,13 +218,15 @@ export function HomePauseEngagedPendingBody({
       </div>
 
       <div className="relative py-2 text-center">
-        <span className="relative z-10 bg-card/40 px-3 text-xs uppercase tracking-wide text-muted-foreground">
+        <span className="relative z-10 bg-card/40 px-3 text-sm text-muted-foreground">
           {t('home.pauseWidget.orDivider')}
         </span>
         <div className="absolute inset-x-0 top-1/2 h-px bg-border/50" aria-hidden />
       </div>
 
-      <p className={homeInWidget.kicker}>{t('home.pauseWidget.newContextSection')}</p>
+      <p className={homeInWidget.kicker}>
+        {t('home.widget.newPauseAvailable', { defaultValue: 'New pause available' })}
+      </p>
       {pendingMarketBlock ? (
         <HomePauseWidgetOpeningAndMarket
           previewLine={pendingPreviewLine}
@@ -238,14 +235,11 @@ export function HomePauseEngagedPendingBody({
       ) : pendingPreviewLine ? (
         <HomePauseWidgetPreviewLine previewLine={pendingPreviewLine} />
       ) : null}
-      <button
-        type="button"
-        disabled={pendingOfferBusy}
+      <HomePauseWidgetNoxCta
+        label={t('home.pauseWidget.pauseWithNewContext')}
         onClick={onNewContext}
-        className={homeInWidget.ctaSecondary}
-      >
-        {t('home.pauseWidget.pauseWithNewContext')}
-      </button>
+        disabled={pendingOfferBusy}
+      />
       {onDeclinePendingOffer ? (
         <HomePauseWidgetDiscardLink
           label={t('pause.pendingKeepCta', { defaultValue: 'Keep current pause' })}
@@ -267,7 +261,7 @@ type PostPauseProps = Pick<
   | 'completedPauseCount'
 >;
 
-/** States D / D′ / E — manual cooldown rest and new-offer variants. */
+/** States D / D′ — manual cooldown rest. */
 export function HomePausePostPauseBody({
   widgetMode,
   onPauseWithThis,
@@ -278,27 +272,11 @@ export function HomePausePostPauseBody({
 }: PostPauseProps) {
   "use memo";
   const { t } = useTranslation();
-  const isE = widgetMode === 'E';
   const isDWithArchive =
     widgetMode === 'D_collapsed' || widgetMode === 'D_expanded';
   const isDPrime =
     widgetMode === 'D_prime_collapsed' || widgetMode === 'D_prime_expanded';
   const isD = isDWithArchive || isDPrime;
-
-  if (isE) {
-    return (
-      <div className={homePauseWidgetBodyStack}>
-        <p className="text-sm leading-5 tracking-wide text-muted-foreground">
-          {t('home.pausePostPause.newOfferBody')}
-        </p>
-        <HomePauseWidgetOpeningAndMarket previewLine={previewLine} marketBlock={marketBlock} />
-        <HomePauseWidgetNoxCta
-          label={t('home.pauseIdle.letsPauseCta', { defaultValue: "Let's pause" })}
-          onClick={onPauseWithThis}
-        />
-      </div>
-    );
-  }
 
   if (isD) {
     const readyAtMs = computeManualCooldownReadyAtMs(manualCooldownRemainingMs);
@@ -339,39 +317,6 @@ export function HomePausePostPauseBody({
   }
 
   return null;
-}
-
-type CalmProps = Pick<
-  HomePauseWidgetBodyProjection,
-  'showPauseScheduling' | 'autoCooldownRemaining' | 'cooldownHours' | 'nextCronCheckIn'
->;
-
-/** Calm-waters — context_lost before user acted. */
-export function HomePauseCalmWatersBody({
-  showPauseScheduling,
-  autoCooldownRemaining,
-  cooldownHours,
-  nextCronCheckIn,
-}: CalmProps) {
-  "use memo";
-  const { t } = useTranslation();
-
-  return (
-    <div className={homePauseWidgetBodyStack}>
-      <p className="text-sm leading-5 tracking-wide text-muted-foreground">
-        {t('home.pauseCalmWaters.body')}
-      </p>
-      {showPauseScheduling ? (
-        <div className="rounded-lg border border-border/40 bg-muted/10 px-3 py-2.5">
-          <AutoCooldownIndicator
-            cooldownRemaining={autoCooldownRemaining}
-            cooldownHours={cooldownHours}
-            nextCronCheckIn={nextCronCheckIn}
-          />
-        </div>
-      ) : null}
-    </div>
-  );
 }
 
 /** State A — idle, no open pause (structure: Figma 546:8975; tokens: Nox). */

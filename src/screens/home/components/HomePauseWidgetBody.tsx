@@ -80,9 +80,6 @@ export function HomePauseWidgetBody(props: Props) {
         <HomePauseBlockingErrorPanel error={blockingError} onTryAgain={props.onReflectionRetry} />
       ) : null;
 
-    case 'calm_waters':
-      return null;
-
     case 'B_in_progress':
       return (
         <HomePauseInProgressBody
@@ -132,7 +129,6 @@ export function HomePauseWidgetBody(props: Props) {
         />
       );
 
-    case 'E':
     case 'D_collapsed':
     case 'D_expanded':
     case 'D_prime_collapsed':
