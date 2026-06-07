@@ -2,102 +2,101 @@ import { useCallback, useMemo } from 'react';
 import { useAuth } from '@/features/auth/public';
 import { trackedAssetSymbol } from '@/features/market/domain/tracked-assets';
 import { formatHomePauseMarketBlock } from '@/features/pause/domain/home/format-home-pause-market-block';
-import { buildHomePauseWidgetProjection } from '@/features/pause/domain/home/build-home-pause-widget-projection';
-import { resolveHomePauseWidgetMode } from '@/features/pause/domain/home/home-pause-widget-mode';
+import { resolveHomePauseWidgetSurface } from '@/features/pause/domain/home/home-pause-widget-surface';
 import { resolveHomePauseWidgetPreviewLine } from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
 import { resolveEngagedPauseMarketSettled } from '@/features/pause/domain/home/resolve-engaged-pause-market-settled';
 import { resolveHomePauseWidgetOpenMaxAnchorAt } from '@/features/pause/domain/home/resolve-home-pause-widget-open-max-anchor';
 import { shouldSurfacePauseWidgetError } from '@/features/pause/domain/home/pause-home-widget-error';
-import type {
-  HomePauseWidgetProjection,
-  UseHomePauseWidgetProjectionParams,
-} from '@/features/pause/domain/home/home-pause-widget-projection-types';
+import type { HomePauseWidgetProjection } from '@/features/pause/domain/home/home-pause-widget-projection-types';
+import { assembleHomePauseWidgetProjection } from '@/features/pause/presentation/home/assemble-home-pause-widget-projection';
+import {
+  useHomePauseWidgetInputs,
+  type UseHomePauseWidgetScreenDeps,
+} from '@/features/pause/presentation/home/use-home-pause-widget-inputs';
 import { usePendingPauseOffer } from '@/features/pause/presentation/reflect/pending-offer/use-pending-pause-offer';
-import { useHomePauseWidgetCollapseState } from '@/features/pause/presentation/home/widget/use-home-pause-widget-collapse-state';
-import { useHomePauseWidgetCooldownClock } from '@/features/pause/presentation/home/widget/use-home-pause-widget-cooldown-clock';
-import { useHomePauseRecentContextLost } from '@/features/pause/presentation/home/widget/use-home-pause-recent-context-lost';
-import { useHomePauseWidgetModeTransition } from '@/features/pause/presentation/home/widget/use-home-pause-widget-mode-transition';
+import { useHomePauseWidgetCollapsePreference } from '@/features/pause/presentation/home/use-home-pause-widget-collapse-preference';
+import { useHomePauseWidgetCooldownClock } from '@/features/pause/presentation/home/use-home-pause-widget-cooldown-clock';
+import { useHomePauseRecentContextLost } from '@/features/pause/presentation/home/use-home-pause-recent-context-lost';
+import { useHomePauseWidgetSurfaceTransition } from '@/features/pause/presentation/home/use-home-pause-widget-surface-transition';
 
 export type {
   HomePauseWidgetBodyProjection,
   HomePauseWidgetProjection,
-  UseHomePauseWidgetProjectionParams,
 } from '@/features/pause/domain/home/home-pause-widget-projection-types';
+
+export type { UseHomePauseWidgetScreenDeps } from '@/features/pause/presentation/home/use-home-pause-widget-inputs';
 
 /** @deprecated Session-only expand flag; not persisted. Kept for grep / legacy references. */
 export const HOME_PAUSE_WIDGET_EXPANDED_STORAGE_KEY = 'holzen_home_pause_widget_expanded_v1';
 
 /**
- * Home “Your pause” widget conductor — composes domain resolver + side-effect hooks.
- *
- * Flow: `usePauseHomeContext` + screen params → mode resolver → body DTO → `HomePauseWidgetBody`.
+ * Home “Your pause” widget conductor — composes context + domain surface resolver.
  * See `docs/systems/home-pause-widget-client-architecture.md`.
  */
 export function useHomePauseWidgetProjection(
-  params: UseHomePauseWidgetProjectionParams,
+  deps: UseHomePauseWidgetScreenDeps,
 ): HomePauseWidgetProjection {
+  const ctx = useHomePauseWidgetInputs(deps);
   const { user } = useAuth();
   const userId = user?.id;
   const { pending } = usePendingPauseOffer();
 
   useHomePauseRecentContextLost({
     userId,
-    hasOpenPause: params.hasOpenPause,
+    hasOpenPause: ctx.hasOpenPause,
   });
 
-  const manualCooldownRemainingMs = useHomePauseWidgetCooldownClock(
-    params.manualCooldownRemaining,
-  );
+  const manualCooldownRemainingMs = useHomePauseWidgetCooldownClock(ctx.manualCooldownRemaining);
 
   const { userExpanded, setUserExpanded, postManualCooldownIdle } =
-    useHomePauseWidgetCollapseState({
+    useHomePauseWidgetCollapsePreference({
       userId,
-      hasOpenPause: params.hasOpenPause,
-      loading: params.loading,
+      hasOpenPause: ctx.hasOpenPause,
+      loading: ctx.loading,
       manualCooldownRemainingMs,
     });
 
   const blockingError = Boolean(
-    params.error && shouldSurfacePauseWidgetError(params.error, params.marketData),
+    ctx.error && shouldSurfacePauseWidgetError(ctx.error, ctx.marketData),
   );
 
-  const assetSymbol = trackedAssetSymbol(params.trackedAssetId);
+  const assetSymbol = trackedAssetSymbol(ctx.trackedAssetId);
 
-  const { mode: widgetMode } = useMemo(
+  const { surface } = useMemo(
     () =>
-      resolveHomePauseWidgetMode({
-        loading: params.loading,
+      resolveHomePauseWidgetSurface({
+        loading: ctx.loading,
         blockingError,
-        hasOpenPause: params.hasOpenPause,
-        openPauseState: params.openPauseState,
-        hasReflectionStep: params.hasReflectionStep,
-        reflectionMessage: params.reflectionMessage,
+        hasOpenPause: ctx.hasOpenPause,
+        openPauseState: ctx.openPauseState,
+        hasReflectionStep: ctx.hasReflectionStep,
+        reflectionMessage: ctx.reflectionMessage,
         trackedAssetSymbol: assetSymbol,
         hasPendingOffer: Boolean(pending),
         manualCooldownRemainingMs,
-        completedPauseCount: params.completedPauseCount ?? 0,
-        hasOpenPauseStepEvents: params.hasOpenPauseStepEvents,
+        completedPauseCount: ctx.completedPauseCount,
+        hasOpenPauseStepEvents: ctx.hasOpenPauseStepEvents,
         userExpanded,
       }),
     [
-      params.loading,
+      ctx.loading,
       blockingError,
-      params.hasOpenPause,
-      params.openPauseState,
-      params.hasReflectionStep,
-      params.reflectionMessage,
+      ctx.hasOpenPause,
+      ctx.openPauseState,
+      ctx.hasReflectionStep,
+      ctx.reflectionMessage,
       assetSymbol,
       pending,
       manualCooldownRemainingMs,
-      params.completedPauseCount,
-      params.hasOpenPauseStepEvents,
+      ctx.completedPauseCount,
+      ctx.hasOpenPauseStepEvents,
       userExpanded,
     ],
   );
 
-  useHomePauseWidgetModeTransition({
-    widgetMode,
-    newPauseArrival: params.newPauseArrival,
+  useHomePauseWidgetSurfaceTransition({
+    surface,
+    newPauseArrival: ctx.newPauseArrival,
     userId,
     setUserExpanded,
   });
@@ -109,36 +108,30 @@ export function useHomePauseWidgetProjection(
   const marketBlock = useMemo(
     () =>
       formatHomePauseMarketBlock({
-        contextText: params.contextText,
-        contextSnapshot: params.contextSnapshot,
-        marketData: params.marketData,
-        trackedAssetId: params.trackedAssetId,
-        instanceCreatedAt: params.openPauseCreatedAt,
+        contextText: ctx.contextText,
+        contextSnapshot: ctx.contextSnapshot,
+        marketData: ctx.marketData,
+        trackedAssetId: ctx.trackedAssetId,
+        instanceCreatedAt: ctx.openPauseCreatedAt,
       }),
-    [
-      params.contextText,
-      params.contextSnapshot,
-      params.marketData,
-      params.trackedAssetId,
-      params.openPauseCreatedAt,
-    ],
+    [ctx.contextText, ctx.contextSnapshot, ctx.marketData, ctx.trackedAssetId, ctx.openPauseCreatedAt],
   );
 
   const previewLine = useMemo(
     () =>
       resolveHomePauseWidgetPreviewLine({
-        hasReflectionStep: params.hasReflectionStep,
-        reflectionMessage: params.reflectionMessage,
+        hasReflectionStep: ctx.hasReflectionStep,
+        reflectionMessage: ctx.reflectionMessage,
         trackedAssetSymbol: assetSymbol,
-        contextSnapshot: params.contextSnapshot,
-        openPauseState: params.openPauseState,
+        contextSnapshot: ctx.contextSnapshot,
+        openPauseState: ctx.openPauseState,
       }),
     [
-      params.hasReflectionStep,
-      params.reflectionMessage,
+      ctx.hasReflectionStep,
+      ctx.reflectionMessage,
       assetSymbol,
-      params.contextSnapshot,
-      params.openPauseState,
+      ctx.contextSnapshot,
+      ctx.openPauseState,
     ],
   );
 
@@ -147,41 +140,59 @@ export function useHomePauseWidgetProjection(
     typeof pendingSnapshot?.context_text === 'string' ? pendingSnapshot.context_text : null;
 
   const pendingMarketBlock =
-    pending && widgetMode === 'C_prime'
+    pending && surface === 'open_engaged_pending_offer'
       ? formatHomePauseMarketBlock({
           contextText: pendingContextText,
           contextSnapshot: pendingSnapshot,
-          marketData: params.marketData,
-          trackedAssetId: params.trackedAssetId,
+          marketData: ctx.marketData,
+          trackedAssetId: ctx.trackedAssetId,
           instanceCreatedAt: pending.created_at ?? null,
         })
       : null;
 
   const engagedPauseMarketSettled = resolveEngagedPauseMarketSettled({
-    openPauseState: params.openPauseState,
-    marketData: params.marketData,
-    threshold: params.threshold,
-    thresholdDown: params.thresholdDown,
+    openPauseState: ctx.openPauseState,
+    marketData: ctx.marketData,
+    threshold: ctx.threshold,
+    thresholdDown: ctx.thresholdDown,
   });
 
   const openPauseOpenMaxAnchorAt = resolveHomePauseWidgetOpenMaxAnchorAt({
-    openPauseState: params.openPauseState,
-    openPauseSource: params.openPauseSource,
-    openPauseEngagedAt: params.openPauseEngagedAt,
-    openPauseCreatedAt: params.openPauseCreatedAt,
-    openPauseMetadata: params.openPauseMetadata,
+    openPauseState: ctx.openPauseState,
+    openPauseSource: ctx.openPauseSource,
+    openPauseEngagedAt: ctx.openPauseEngagedAt,
+    openPauseCreatedAt: ctx.openPauseCreatedAt,
+    openPauseMetadata: ctx.openPauseMetadata,
   });
 
-  const chromeAndBody = buildHomePauseWidgetProjection({
-    widgetMode,
-    previewLine,
-    marketBlock,
-    pendingMarketBlock,
-    postManualCooldownIdle,
-    engagedPauseMarketSettled,
-    openPauseOpenMaxAnchorAt,
-    manualCooldownRemainingMs,
-    params,
+  const chromeAndBody = assembleHomePauseWidgetProjection({
+    surface,
+    display: {
+      previewLine,
+      marketBlock,
+      pendingMarketBlock,
+      postManualCooldownIdle,
+      engagedPauseMarketSettled,
+      openPauseOpenMaxAnchorAt,
+      openPauseState: ctx.openPauseState,
+      manualCooldownRemainingMs,
+      completedPauseCount: ctx.completedPauseCount,
+      profileLastTriggerAt: ctx.profileLastTriggerAt,
+      marketData: ctx.marketData,
+      showPauseScheduling: ctx.showPauseScheduling,
+      cooldownHours: ctx.cooldownHours,
+      loading: ctx.loading,
+      error: ctx.error,
+    },
+    subscription: {
+      subLoading: ctx.subLoading,
+      hasAccess: ctx.hasAccess,
+      entitlement: ctx.entitlement,
+      checkoutLoading: ctx.checkoutLoading,
+      trialLoading: ctx.trialLoading,
+      showPauseScheduling: ctx.showPauseScheduling,
+    },
+    actions: ctx,
   });
 
   return {

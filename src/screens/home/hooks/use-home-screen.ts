@@ -4,10 +4,7 @@ import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useAuth } from '@/features/auth/public';
 import { useHolzenCommunityStatsRealtime, useProfile } from '@/features/user/public-hooks';
 import {
-  useCompletedPauseCount,
   useDismissOutletPauseReady,
-  useHomePauseActions,
-  useHomePendingPauseOfferActions,
   useHomePracticeStats,
   usePauseArrivalAudio,
 } from '@/features/pause/public-home';
@@ -54,41 +51,23 @@ export function useHomeScreen() {
 
   const {
     marketData,
-    message,
-    context,
-    companions,
-    severity,
     lastPauseInstanceId,
     openPauseState,
     openPauseSource,
     contextSnapshot,
-    hasReflectionStep,
-    hasOpenPauseStepEvents,
-    openPauseCreatedAt,
-    openPauseEngagedAt,
-    openPauseMetadata,
     loading,
     error,
     newPauseArrival,
     clearNewPauseArrival,
-    dismissMessage,
-    dismissOpenPauseFromWidget,
-    manualTrigger,
-    manualCooldownRemaining,
-    autoCooldownRemaining,
-    nextCronCheckIn,
   } = usePauseHomeContext();
 
   const {
-    companionPrefs,
-    cooldownHours,
     firstName,
     currency,
     trackedAssetId,
     threshold,
     thresholdDown,
     profileLoaded,
-    lastTriggerAt: profileLastTriggerAt,
   } = useProfile();
 
   useHomePrefetch({
@@ -101,7 +80,7 @@ export function useHomeScreen() {
 
   const hasOpenPause = Boolean(lastPauseInstanceId);
 
-  const { subscriptionReady, hasAccess, showPauseScheduling } = getHomeSubscriptionGate({
+  const { subscriptionReady } = getHomeSubscriptionGate({
     subLoading,
     entitlement,
     hasOpenPause,
@@ -124,7 +103,6 @@ export function useHomeScreen() {
     toggleMarketChartExpanded,
   } = useMarketDisplayPreferences();
   const unitBasisModeSupported = isBitcoinTrackedAsset(trackedAssetId);
-  const completedPauseCount = useCompletedPauseCount() ?? 0;
   const { stats: practiceStats, isLoading: practiceStatsLoading } = useHomePracticeStats();
 
   const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(
@@ -156,67 +134,12 @@ export function useHomeScreen() {
     toggleMarketChartExpanded,
   });
 
-  const pauseActions = useHomePauseActions({
-    message,
-    context,
-    lastPauseInstanceId,
-    companions,
-    companionPrefs,
-    severity,
-    navigate,
-    dismissMessage,
-    dismissOpenPauseFromWidget,
-    manualTrigger,
-    manualCooldownRemaining,
-    startCheckout,
-    dismissAnalyticsSurface: 'home_your_pause_widget',
-    userId: user?.id,
-  });
-
-  const pendingOfferActions = useHomePendingPauseOfferActions(navigate);
-
   const pauseProjection = useHomePauseCardProjection({
     subscriptionReady,
-    hasAccess,
-    subLoading,
-    entitlement,
-    checkoutLoading,
-    trialLoading,
-    hasOpenPause,
-    openPauseState,
-    loading,
-    error,
-    marketData,
-    showPauseScheduling,
-    autoCooldownRemaining,
-    cooldownHours,
-    nextCronCheckIn,
-    manualCooldownRemaining,
-    manualTrigger,
-    onNavigatePauseWithThis: pauseActions.handleNavigatePauseWithThis,
-    onAdoptPendingOffer: pendingOfferActions.adoptPendingOffer,
-    onDeclinePendingOffer: pendingOfferActions.declinePendingOffer,
-    pendingOfferBusy: pendingOfferActions.pendingOfferBusy,
-    onDismissOpenPause: pauseActions.handleDismiss,
-    onNeedPause: pauseActions.handleNeedAPause,
-    onStartCheckoutPro: pauseActions.startProCheckout,
-    onStartTrial: () => void ensureTrial(),
-    onReactivate: () => void startReactivationCheckout(),
-    hasReflectionStep,
-    hasOpenPauseStepEvents,
-    reflectionMessage: message,
-    contextSnapshot,
-    openPauseCreatedAt,
-    contextText: context,
-    completedPauseCount,
-    trackedAssetId,
-    newPauseArrival,
-    profileLastTriggerAt,
-    threshold,
-    thresholdDown,
-    openPauseSource,
-    openPauseEngagedAt,
-    openPauseMetadata,
+    navigate,
+    startCheckout,
+    startReactivationCheckout,
+    ensureTrial,
   });
 
   const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = useHomePullFullReload();
@@ -265,7 +188,7 @@ export function useHomeScreen() {
     renderSection,
     onOpenCustomize,
     customize: customizeSheet,
-    completedPauseCount,
+    completedPauseCount: practiceStats?.completedPauseCount ?? null,
   });
 
   return {

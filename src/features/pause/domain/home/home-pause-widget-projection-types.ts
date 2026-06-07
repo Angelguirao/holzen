@@ -1,11 +1,11 @@
 import type { MarketQuote } from '@/features/market/public';
 import type { Entitlement } from '@/features/subscription/public';
 import type { ManualPauseTriggerResult } from '@/features/pause/domain/manual-pause-trigger-result';
-import type { HomePauseWidgetMode } from '@/features/pause/domain/home/home-pause-widget-mode';
+import type { HomePauseWidgetSurface } from '@/features/pause/domain/home/home-pause-widget-surface';
 import type { HomePauseWidgetPreviewLine } from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
 import type { HomePauseMarketBlock } from '@/features/pause/domain/home/format-home-pause-market-block';
 
-/** Open pause row fields the widget needs (from `usePauseHomeContext`). */
+/** Open pause row fields from `usePauseHomeContext`. */
 export type HomePauseOpenInstanceSnapshot = {
   hasOpenPause: boolean;
   openPauseState: 'active' | 'engaged' | null;
@@ -20,31 +20,35 @@ export type HomePauseOpenInstanceSnapshot = {
   contextText: string | null;
 };
 
-/** Screen-level inputs wired in `useHomeScreen` (subscription, actions, profile). */
-export type HomePauseWidgetScreenContext = {
+export type HomePauseWidgetSubscriptionGate = {
   subLoading: boolean;
   hasAccess: boolean;
   entitlement: Entitlement;
   checkoutLoading: boolean;
   trialLoading: boolean;
+  showPauseScheduling: boolean;
+};
+
+export type HomePauseWidgetDisplayState = {
   loading: boolean;
   error: string | null;
   marketData: MarketQuote | null;
-  showPauseScheduling: boolean;
-  completedPauseCount: number | null;
+  completedPauseCount: number;
   profileLastTriggerAt: string | null;
   newPauseArrival: boolean;
   trackedAssetId: string;
   threshold: number;
   thresholdDown: number;
   cooldownHours: number;
-  autoCooldownRemaining: () => number;
-  nextCronCheckIn: () => number;
-  manualCooldownRemaining: () => number;
   manualCooldownRemainingMs: number;
+  postManualCooldownIdle: boolean;
+  engagedPauseMarketSettled: boolean;
+  openPauseOpenMaxAnchorAt: string | null;
+  previewLine: HomePauseWidgetPreviewLine;
+  marketBlock: HomePauseMarketBlock;
+  pendingMarketBlock: HomePauseMarketBlock | null;
 };
 
-/** Navigation / mutation callbacks from `useHomePauseActions` and pending-offer hooks. */
 export type HomePauseWidgetActionHandlers = {
   onNavigatePauseWithThis: () => void;
   onAdoptPendingOffer: () => void | Promise<boolean>;
@@ -56,15 +60,17 @@ export type HomePauseWidgetActionHandlers = {
   onStartTrial: () => void;
   onReactivate: () => void;
   manualTrigger: (mood?: string) => Promise<ManualPauseTriggerResult>;
+  autoCooldownRemaining: () => number;
+  nextCronCheckIn: () => number;
+  manualCooldownRemaining: () => number;
 };
 
-export type UseHomePauseWidgetProjectionParams = HomePauseOpenInstanceSnapshot &
-  HomePauseWidgetScreenContext &
+/** Composed inside `useHomePauseWidgetInputs` — not passed from the screen. */
+export type HomePauseWidgetProjectionContext = HomePauseOpenInstanceSnapshot &
+  HomePauseWidgetSubscriptionGate &
   HomePauseWidgetActionHandlers;
 
-/** Props for `HomePauseWidgetBody` — flat DTO for minimal JSX churn. */
-export type HomePauseWidgetBodyProjection = {
-  widgetMode: HomePauseWidgetMode;
+export type HomePauseWidgetBodyDisplay = {
   previewLine: HomePauseWidgetPreviewLine;
   marketBlock: HomePauseMarketBlock;
   pendingMarketBlock: HomePauseMarketBlock | null;
@@ -75,16 +81,16 @@ export type HomePauseWidgetBodyProjection = {
   manualCooldownRemainingMs: number;
   completedPauseCount: number;
   profileLastTriggerAt: string | null;
-  subLoading: boolean;
-  hasAccess: boolean;
-  entitlement: Entitlement;
-  checkoutLoading: boolean;
-  trialLoading: boolean;
-  loading: boolean;
-  error: string | null;
   marketData: MarketQuote | null;
   showPauseScheduling: boolean;
   cooldownHours: number;
+  loading: boolean;
+  error: string | null;
+};
+
+export type HomePauseWidgetBodySubscription = HomePauseWidgetSubscriptionGate;
+
+export type HomePauseWidgetBodyActions = {
   pendingOfferBusy?: boolean;
   onPauseWithThis: () => void;
   onPauseWithNewContext?: () => void;
@@ -101,6 +107,14 @@ export type HomePauseWidgetBodyProjection = {
   onReactivate: () => void;
 };
 
+/** Props for `HomePauseWidgetBody`. */
+export type HomePauseWidgetBodyProjection = {
+  surface: HomePauseWidgetSurface;
+  display: HomePauseWidgetBodyDisplay;
+  subscription: HomePauseWidgetBodySubscription;
+  actions: HomePauseWidgetBodyActions;
+};
+
 export type HomePauseWidgetProjection = {
   sectionTitleKey: string;
   showMoonIcon: boolean;
@@ -110,14 +124,9 @@ export type HomePauseWidgetProjection = {
   body: HomePauseWidgetBodyProjection;
 };
 
-export type BuildHomePauseWidgetProjectionInput = {
-  widgetMode: HomePauseWidgetMode;
-  previewLine: HomePauseWidgetPreviewLine;
-  marketBlock: HomePauseMarketBlock;
-  pendingMarketBlock: HomePauseMarketBlock | null;
-  postManualCooldownIdle: boolean;
-  engagedPauseMarketSettled: boolean;
-  openPauseOpenMaxAnchorAt: string | null;
-  manualCooldownRemainingMs: number;
-  params: UseHomePauseWidgetProjectionParams;
+export type AssembleHomePauseWidgetProjectionInput = {
+  surface: HomePauseWidgetSurface;
+  display: HomePauseWidgetBodyDisplay;
+  subscription: HomePauseWidgetBodySubscription;
+  actions: HomePauseWidgetActionHandlers;
 };

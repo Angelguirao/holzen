@@ -99,7 +99,7 @@ Zen and the inline pause card share this contract so reflection failures are not
 
 ## Your pause widget (Figma A–D + C′)
 
-Home maps **`v_pause_full.state`** to Figma modes via [`resolveHomePauseWidgetMode`](../../src/features/pause/domain/home/home-pause-widget-mode.ts). **`active` → B** (Let's pause); **`engaged` → C / C′** (Continue + Discard). Projection narrative: **[home-pause-widget-projection.md](../systems/home-pause-widget-projection.md)**.
+Home maps **`v_pause_full.state`** to widget surfaces via [`resolveHomePauseWidgetSurface`](../../src/features/pause/domain/home/home-pause-widget-surface.ts). **`active` → `open_pre_reflect`**; **`engaged` → `open_engaged` / `open_engaged_pending_offer`**. See **[home-pause-widget-projection.md](../systems/home-pause-widget-projection.md)**.
 
 | UI mode | When | Header / CTA |
 |--------|------|----------------|

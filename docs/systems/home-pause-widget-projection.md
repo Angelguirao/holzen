@@ -1,6 +1,6 @@
 # Home “Your pause” widget — pause system projection
 
-> **How the pause lifecycle read-model maps to Figma-aligned widget modes on Home.**  
+> **How the pause lifecycle read-model maps to Home widget surfaces.**  
 > **Authority:** [pause-system.md](pause-system.md) (Postgres state machine) · **Screen:** [screens/home.md](../screens/home.md) · **Client map:** [home-pause-widget-client-architecture.md](home-pause-widget-client-architecture.md) · **Pause context:** [pause-client-architecture.md](pause-client-architecture.md)
 
 The Home widget is a **UI projection** — it does not own pause truth. Postgres + `v_pause_full` / `v_pause_current` are authoritative; the widget reads that surface and chooses layout, copy, and CTAs.
@@ -13,7 +13,7 @@ The Home widget is a **UI projection** — it does not own pause truth. Postgres
 flowchart LR
   PG[(Postgres pause_instances)]
   VF[v_pause_full / HolzenProvider]
-  RES[resolveHomePauseWidgetMode]
+  RES[resolveHomePauseWidgetSurface]
   PROJ[useHomePauseWidgetProjection]
   UI[HomePauseWidgetBody]
 
@@ -28,17 +28,39 @@ flowchart LR
 |------|----------|------|
 | Server truth | `pause_instances`, steps, artifacts, pending rows | State transitions via RPC (`pause_log_step`, etc.) |
 | Browser read-model | `usePauseHomeContext` / `fetchOpenPauseHomePreview` | Open instance id, `state`, reflection artifacts, context snapshot |
-| Mode resolver | `src/features/pause/domain/home/home-pause-widget-mode.ts` | Pure function: inputs → Figma mode (`A`–`D`, `C′`, errors) |
-| Conductor hook | `use-home-pause-widget-projection.ts` + `presentation/home/widget/*` | Pending offer, calm-waters, preview lines, collapse prefs — see [home-pause-widget-client-architecture.md](home-pause-widget-client-architecture.md) |
+| Surface resolver | `home-pause-widget-surface.ts` | Pure: inputs → `HomePauseWidgetSurface` |
+| Conductor | `use-home-pause-widget-projection.ts` | Composes inputs + resolver — see [client architecture](home-pause-widget-client-architecture.md) |
 | Screen | `use-home-pause-card-projection.tsx` → `HomePauseWidgetBody` | Subscription gate, snooze toolbar, body routing |
 
 **Rule:** New widget behavior should extend the resolver + projection hook, not duplicate state checks in JSX.
 
 ---
 
-## Widget modes (Figma ↔ inputs)
+## Widget surfaces (domain vocabulary)
 
-Modes are **derived**, not stored. Primary inputs to `resolveHomePauseWidgetMode`:
+Surfaces are **derived**, not stored. Resolver: `resolveHomePauseWidgetSurface` in `home-pause-widget-surface.ts`.
+
+| Surface | Typical condition | Primary CTA / body |
+|---------|-------------------|-------------------|
+| `idle_collapsed` / `idle_expanded` | No open pause; not in manual cooldown; collapsed by default — first idle visit auto-expands until **Let's pause** or an open pause | **Your pause** + moon; expanded → within-range copy + **Let's pause** |
+| `open_pre_reflect` | Open `active` (pre-Reflect) | Opening line + market + **Let's pause** |
+| `open_engaged` | Open `engaged` (Reflect reached) | *Still here* or calm settled copy + **Continue** / **Discard** |
+| `open_engaged_pending_offer` | Engaged + pending cron offer | Continue / Discard + adopt pending branch |
+| `manual_cooldown_collapsed` / `manual_cooldown_expanded` | Manual cooldown, has archive | Cooldown copy + **Revisit archive** |
+| `manual_cooldown_first_pause_*` | Manual cooldown, no archive yet | Cooldown copy only |
+| `loading` / `blocking_error` | Holzen loading or hard market error | Skeleton or retry |
+
+**context_lost** (cron calm sweep) does not add a surface — it routes to `idle_*` or `manual_cooldown_*` plus optional toast.
+
+### Design appendix (wireframes only — not used in code)
+
+Legacy design labels for QA with Figma: **A** = idle, **B** = `open_pre_reflect`, **C** = `open_engaged`, **C′** = `open_engaged_pending_offer`, **D** / **D′** = manual cooldown variants. Wireframe node IDs remain in git history and design files; new code uses the surface column above.
+
+---
+
+## Widget surfaces — inputs (detailed)
+
+Primary inputs to `resolveHomePauseWidgetSurface`:
 
 | Input | Source |
 |-------|--------|
@@ -46,22 +68,12 @@ Modes are **derived**, not stored. Primary inputs to `resolveHomePauseWidgetMode
 | `openPauseState` | `active` \| `engaged` on open row |
 | `openPauseEngagedAt` | ISO timestamp on open row when `state = engaged` (countdown + calm-waters body) |
 | `hasPendingOffer` | `usePendingPauseOffer()` — queued instance while user still has open pause |
-| `postManualCooldownIdle` | `localStorage` flag after manual cooldown ends (D → A expand) |
-| Live market + thresholds | `resolveEngagedPauseMarketSettled` — **C** calm-waters body vs *still here* |
+| `postManualCooldownIdle` | `localStorage` flag after manual cooldown ends (manual cooldown → idle expand) |
+| Live market + thresholds | `resolveEngagedPauseMarketSettled` — calm market body on `open_engaged` |
 | `postPauseAutoCooldownRemainingMs` | Profile `last_trigger_at` + `cooldown_hours` (not instance age) |
 | `hasOpenPauseStepEvents` | Any row in `pause_step_events` for open instance |
-| `completedPauseCount` | Archive depth for D vs D′ |
-| `userExpanded` | Session preference for collapsible A / D |
-
-| Mode | Typical condition | Primary CTA / body |
-|------|-------------------|-------------------|
-| **A** collapsed / expanded | No open pause; not in manual cooldown; **collapsed by default** — **first idle onboarding** auto-expands on every Home visit until **Let's pause** or an open pause arrives first (Figma [555:16772](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=555-16772) exception) | Title **Your pause** + moon; chevron expands to within-range copy + **Let's pause** |
-| **B** | Open `active` (pre-Reflect, with or without step events) | Figma **[559:26757](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=559-26757)** — title **Your pause**; opening line + inline market + Nox **Let's pause** |
-| **C** | Open pause, `state = engaged` (Reflect reached) | Figma **[578:28850](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-28850)** — title **Continue your pause**; *still here* + Nox **Continue** + **Discard**. **C (calm waters):** engaged + live market within thresholds — Figma **[578:27863](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27863)** — settled copy + **This pause closes in {{remaining}}** (cron: 12h from **`calm_settled_at`**; manual: 12h from **`engaged_at`**) + **Continue** / **Discard** |
-| **C′** | Engaged + pending | Figma **[578:27896](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27896)** / **[578:27929](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27929)** — **Continue** / **Discard**, **or**, **New pause available** + adopt CTA |
-| **D** / **D′** | No open pause, **manual** cooldown active (`localStorage` + 1h gate) | **Your pause**; collapsed by default; expanded → Figma [578:25933](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-25933) cooldown copy + **Revisit your archive** (D′ = no archive link). After cooldown → **A** post-manual idle (Figma [578:26963](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-26963)) |
-| **context_lost settled** | Cron expires offer with `context_lost`; market back within range; no open pause | Routes to **A** or **D** (not a separate body); optional Sonner toast once |
-| **loading** / **blocking_error** | Holzen loading or hard market error | Skeleton or retry |
+| `completedPauseCount` | Archive depth for manual cooldown vs first-pause variant |
+| `userExpanded` | Session preference for collapsible idle / manual cooldown shells |
 
 **State semantics** (`active` vs `engaged`) are defined in [pause-system.md](pause-system.md). The widget **reads** `openPauseState`; it does not re-derive engagement gates in the UI.
 
@@ -69,13 +81,13 @@ Modes are **derived**, not stored. Primary inputs to `resolveHomePauseWidgetMode
 
 | Layer | Meaning | Home widget |
 |-------|---------|-------------|
-| **Postgres `engaged`** | Deep ritual logged `reflection_step` → `engaged_at` set | Mode **C** or **C′** — Figma [578:28850](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-28850): *still here* + **Continue** + **Discard**. When live market is within thresholds: Figma [578:27863](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27863) settled copy + countdown to **`open_max_age`** (cron: **`calm_settled_at` + 12h**; manual: **`engaged_at` + 12h**) |
-| **Pre-Reflect `active`** | Feel/Breath logged but not Reflect yet | Mode **B** — **Let's pause** (re-enter `/pause` to resume; no Home **Continue**) |
-| **Untouched open pause** | No step events | Mode **B** — **Let's pause** |
+| **Postgres `engaged`** | Deep ritual logged `reflection_step` → `engaged_at` set | `open_engaged` or `open_engaged_pending_offer` — *still here* or calm settled copy + **Continue** / **Discard**; countdown from **`calm_settled_at`** (cron) or **`engaged_at`** (manual) |
+| **Pre-Reflect `active`** | Feel/Breath logged but not Reflect yet | `open_pre_reflect` — **Let's pause** |
+| **Untouched open pause** | No step events | `open_pre_reflect` — **Let's pause** |
 
 **Continue** on Home appears only after Reflect (`engaged`). **`engaged_at`** is the same server milestone (stats, archive segment, 12h `open_max_age`). Brief ritual never enters `engaged`.
 
-When cron queues a **pending** row: untouched open pauses are **auto-superseded** (silent). **C′** pending adopt/decline on Home appears only when the open pause is **`engaged`**; pre-Reflect pending is handled on **`/pause`** leave sheet only.
+When cron queues a **pending** row: untouched open pauses are **auto-superseded** (silent). `open_engaged_pending_offer` adopt/decline on Home appears only when the open pause is **`engaged`**; pre-Reflect pending is handled on **`/pause`** leave sheet only.
 
 ---
 
@@ -85,24 +97,24 @@ When the tracked asset move is **back within** the user’s daily thresholds, **
 
 | Open row (`source = cron_volatility`) | On calm sweep |
 |---------------------------------------|---------------|
-| **pending** | Expired — `context_lost` (queued offer gone; **C′** → **C**) |
-| **active** (pre-Reflect) | Expired — `context_lost` (widget → **A** / **D**; optional context-lost toast) |
+| **pending** | Expired — `context_lost` (queued offer gone; pending branch closes) |
+| **active** (pre-Reflect) | Expired — `context_lost` (widget → `idle_*` / `manual_cooldown_*`; optional context-lost toast) |
 | **engaged** | **Not** expired by sweep — user may **Continue** / **Discard** on Home |
 
 **Manual** open pauses (`source ≠ cron_volatility`) are **not** auto-expired when the market calms.
 
-**Engaged countdown (Mode C, calm waters):** Figma [578:27863](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27863) shows settled copy + **This pause closes in {{remaining}}**. For **`cron_volatility`** engaged rows, Postgres stamps **`metadata.calm_settled_at`** on the first calm sweep after Reflect; the countdown is **12h from that stamp** (`pause_open_max_anchor_at` / `resolvePauseOpenMaxAnchorAt`). While volatility is still hot, cron engaged rows have **no** open-max anchor yet — only *still here* copy (no countdown). **Manual** engaged pauses still use **`engaged_at` + 12h**. Calm detection for copy is **client-side** (`resolveEngagedPauseMarketSettled`); the anchor comes from **`pause_instances.metadata`** via Realtime refresh.
+**Engaged countdown (calm market on `open_engaged`):** When live market is within thresholds, settled copy + **This pause closes in {{remaining}}**. For **`cron_volatility`** engaged rows, Postgres stamps **`metadata.calm_settled_at`** on the first calm sweep after Reflect; the countdown is **12h from that stamp**. While volatility is still hot, cron engaged rows have **no** open-max anchor yet — only *still here* copy. **Manual** engaged pauses use **`engaged_at` + 12h**.
 
-**context_lost toast** (optional Sonner): fires when cron recently expired a row and there is **no** open pause — widget stays collapsed **A** or **D**, not an expanded “moment passed” body.
+**context_lost toast** (optional Sonner): fires when cron recently expired a row and there is **no** open pause — widget stays on `idle_collapsed` or `manual_cooldown_collapsed`, not an expanded “moment passed” body.
 
 ---
 
 ## Post-manual cooldown → idle (D → A)
 
-After a **manual** pause completes, profile **`last_trigger_at`** + **`cooldown_hours`** drive Mode **D** / **D′** (collapsed by default). When that cooldown elapses and there is still no open pause:
+After a **manual** pause completes, profile **`last_trigger_at`** + **`cooldown_hours`** drive `manual_cooldown_*` surfaces (collapsed by default). When that cooldown elapses and there is still no open pause:
 
 1. **`markPostManualCooldownIdlePrompt`** (`home-post-manual-cooldown-idle-storage.ts`) sets a per-user `localStorage` flag when the manual cooldown is written.
-2. **`useHomePauseWidgetProjection`** reads it → **`postManualCooldownIdle`** → resolver auto-expands **A** with Figma [578:26963](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-26963) copy (**The time has passed.** / **Another pause is available, if you need it.** — no market mention).
+2. **`useHomePauseWidgetProjection`** reads it → **`postManualCooldownIdle`** → resolver auto-expands **`idle_expanded`** with post-cooldown copy (**The time has passed.** / **Another pause is available, if you need it.**).
 3. Flag clears on **Let's pause** or any navigation that opens `/pause`.
 
 ---
@@ -139,7 +151,7 @@ On **`/pause`**, leave flow still uses `PauseLeaveWithPendingSheet`. There is **
 
 | Change | File(s) |
 |--------|---------|
-| New mode or gate | `home-pause-widget-mode.ts` + tests in `home-pause-widget-mode.test.ts` |
+| New surface or gate | `home-pause-widget-surface.ts` + tests in `home-pause-widget-surface.test.ts` |
 | New data for mode | `open-pause-home-preview-query.ts`, `use-home-pause-widget-projection.ts` |
 | Calm-waters engaged body | `resolve-engaged-pause-market-settled.ts`, `pause-open-max-anchor.ts`, `HomePauseEngagedBody` in `HomePauseWidgetBodies.tsx` |
 | Post-manual D → A idle | `home-post-manual-cooldown-idle-storage.ts`, `use-holzen-manual-trigger-orchestration.ts` |
@@ -153,7 +165,7 @@ On **`/pause`**, leave flow still uses `PauseLeaveWithPendingSheet`. There is **
 
 ## Manual QA checklist
 
-Use this when verifying the Home widget after changes to the resolver, projection hook, or pending-offer wiring. **Automated gate:** `npx vitest run src/features/pause/domain/home/home-pause-widget-mode.test.ts`.
+Use this when verifying the Home widget after changes to the resolver, projection hook, or pending-offer wiring. **Automated gate:** `npx vitest run src/features/pause/domain/home/home-pause-widget-surface.test.ts`.
 
 ### Before you start
 
@@ -237,7 +249,7 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 
 ```bash
 npx vitest run src/features/pause/domain/pause-open-max-anchor.test.ts
-npx vitest run src/features/pause/domain/home/home-pause-widget-mode.test.ts
+npx vitest run src/features/pause/domain/home/home-pause-widget-surface.test.ts
 npx vitest run src/features/pause/domain/home/resolve-engaged-pause-market-settled.test.ts
 npx vitest run src/features/pause/presentation/home/use-home-pause-actions.integration.test.tsx
 npm run check:posthog-events-allowlist   # pending + dismiss events documented

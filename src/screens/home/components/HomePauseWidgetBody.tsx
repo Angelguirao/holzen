@@ -17,19 +17,21 @@ import type { HomePauseWidgetBodyProjection } from '@/features/pause/public-home
 
 type Props = HomePauseWidgetBodyProjection;
 
-/** Routes Home “Your pause” widget body by Figma-aligned {@link HomePauseWidgetBodyProjection.widgetMode}. */
-export function HomePauseWidgetBody(props: Props) {
+/** Routes Home “Your pause” widget body by derived {@link HomePauseWidgetBodyProjection.surface}. */
+export function HomePauseWidgetBody({ surface, display, subscription, actions }: Props) {
   "use memo";
   const { t } = useTranslation();
 
   const blockingError =
-    props.error && shouldSurfacePauseWidgetError(props.error, props.marketData) ? props.error : null;
+    display.error && shouldSurfacePauseWidgetError(display.error, display.marketData)
+      ? display.error
+      : null;
 
-  if (!props.subLoading && !props.hasAccess) {
+  if (!subscription.subLoading && !subscription.hasAccess) {
     return (
       <div className="space-y-3">
         <p className={homeInWidget.bodyMuted}>
-          {props.entitlement === 'lapsed'
+          {subscription.entitlement === 'lapsed'
             ? t('home.subscription.trialEnded', {
                 defaultValue: 'Your free trial has ended. Subscribe to start and complete pauses again.',
               })
@@ -38,16 +40,22 @@ export function HomePauseWidgetBody(props: Props) {
               })}
         </p>
         <LoadingButton
-          onClick={props.entitlement === 'lapsed' ? props.onReactivate : props.onStartTrial}
-          loading={props.entitlement === 'lapsed' ? props.checkoutLoading : props.trialLoading}
+          onClick={
+            subscription.entitlement === 'lapsed' ? actions.onReactivate : actions.onStartTrial
+          }
+          loading={
+            subscription.entitlement === 'lapsed'
+              ? subscription.checkoutLoading
+              : subscription.trialLoading
+          }
           loadingText={
-            props.entitlement === 'lapsed'
+            subscription.entitlement === 'lapsed'
               ? t('home.subscription.openingCheckout')
               : t('onboarding.ready.startingTrial', { defaultValue: 'Starting trial…' })
           }
           className="w-full text-sm font-medium mt-4"
         >
-          {props.entitlement === 'lapsed'
+          {subscription.entitlement === 'lapsed'
             ? t('pro.upgradeCta')
             : t('home.subscription.startTrialCta', { defaultValue: 'Start free trial' })}
         </LoadingButton>
@@ -55,11 +63,11 @@ export function HomePauseWidgetBody(props: Props) {
     );
   }
 
-  if (props.subLoading) {
+  if (subscription.subLoading) {
     return <SubscriptionSkeleton variant="inline" />;
   }
 
-  switch (props.widgetMode) {
+  switch (surface) {
     case 'loading':
       return (
         <div className="space-y-4">
@@ -76,65 +84,65 @@ export function HomePauseWidgetBody(props: Props) {
 
     case 'blocking_error':
       return blockingError ? (
-        <HomePauseBlockingErrorPanel error={blockingError} onTryAgain={props.onReflectionRetry} />
+        <HomePauseBlockingErrorPanel error={blockingError} onTryAgain={actions.onReflectionRetry} />
       ) : null;
 
-    case 'B':
+    case 'open_pre_reflect':
       return (
         <HomePauseOpenActiveBody
-          previewLine={props.previewLine}
-          marketBlock={props.marketBlock}
-          onPauseWithThis={props.onPauseWithThis}
+          previewLine={display.previewLine}
+          marketBlock={display.marketBlock}
+          onPauseWithThis={actions.onPauseWithThis}
           ctaLabelKey="home.pauseIdle.letsPauseCta"
         />
       );
 
-    case 'C':
+    case 'open_engaged':
       return (
         <HomePauseEngagedBody
-          onPauseWithThis={props.onPauseWithThis}
-          onDismissOpenPause={props.onDismissOpenPause}
-          engagedPauseMarketSettled={props.engagedPauseMarketSettled}
-          openPauseOpenMaxAnchorAt={props.openPauseOpenMaxAnchorAt}
+          onPauseWithThis={actions.onPauseWithThis}
+          onDismissOpenPause={actions.onDismissOpenPause}
+          engagedPauseMarketSettled={display.engagedPauseMarketSettled}
+          openPauseOpenMaxAnchorAt={display.openPauseOpenMaxAnchorAt}
         />
       );
 
-    case 'C_prime':
+    case 'open_engaged_pending_offer':
       return (
         <HomePauseEngagedPendingBody
-          pendingMarketBlock={props.pendingMarketBlock}
-          onPauseWithThis={props.onPauseWithThis}
-          onDismissOpenPause={props.onDismissOpenPause}
-          onPauseWithNewContext={props.onPauseWithNewContext}
-          pendingOfferBusy={props.pendingOfferBusy}
+          pendingMarketBlock={display.pendingMarketBlock}
+          onPauseWithThis={actions.onPauseWithThis}
+          onDismissOpenPause={actions.onDismissOpenPause}
+          onPauseWithNewContext={actions.onPauseWithNewContext}
+          pendingOfferBusy={actions.pendingOfferBusy}
         />
       );
 
-    case 'D_collapsed':
-    case 'D_expanded':
-    case 'D_prime_collapsed':
-    case 'D_prime_expanded':
+    case 'manual_cooldown_collapsed':
+    case 'manual_cooldown_expanded':
+    case 'manual_cooldown_first_pause_collapsed':
+    case 'manual_cooldown_first_pause_expanded':
       return (
         <HomePausePostPauseBody
-          widgetMode={props.widgetMode}
-          onPauseWithThis={props.onPauseWithThis}
-          previewLine={props.previewLine}
-          marketBlock={props.marketBlock}
-          manualCooldownRemainingMs={props.manualCooldownRemainingMs}
-          completedPauseCount={props.completedPauseCount}
+          surface={surface}
+          onPauseWithThis={actions.onPauseWithThis}
+          previewLine={display.previewLine}
+          marketBlock={display.marketBlock}
+          manualCooldownRemainingMs={display.manualCooldownRemainingMs}
+          completedPauseCount={display.completedPauseCount}
         />
       );
 
-    case 'A_expanded':
+    case 'idle_expanded':
       return (
         <HomePauseIdleExpandedBody
-          onNeedPause={props.onNeedPause}
-          loading={props.loading}
-          postManualCooldownIdle={props.postManualCooldownIdle}
+          onNeedPause={actions.onNeedPause}
+          loading={display.loading}
+          postManualCooldownIdle={display.postManualCooldownIdle}
         />
       );
 
-    case 'A_collapsed':
+    case 'idle_collapsed':
       return null;
 
     default:

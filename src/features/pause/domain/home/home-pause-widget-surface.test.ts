@@ -4,10 +4,10 @@ import { isSilentReflectionStubMessage } from '@/features/pause/domain/home/is-s
 import { hasReachedReflectForHome } from '@/features/pause/domain/home/has-reached-reflect-for-home';
 import { buildHomePauseOpeningPreviewKey } from '@/features/pause/domain/home/build-home-pause-opening-preview-key';
 import {
-  homePauseWidgetModeIsCollapsed,
+  homePauseWidgetSurfaceIsCollapsed,
   homePauseWidgetSectionTitleKey,
-  resolveHomePauseWidgetMode,
-} from '@/features/pause/domain/home/home-pause-widget-mode';
+  resolveHomePauseWidgetSurface,
+} from '@/features/pause/domain/home/home-pause-widget-surface';
 
 describe('isSilentReflectionStubMessage', () => {
   it('matches silent stub copy', () => {
@@ -99,64 +99,64 @@ const baseInput = {
   userExpanded: false,
 };
 
-describe('resolveHomePauseWidgetMode', () => {
-  it('A collapsed when idle (including after context_lost)', () => {
-    const r = resolveHomePauseWidgetMode(baseInput);
-    expect(r.mode).toBe('A_collapsed');
-    expect(homePauseWidgetModeIsCollapsed(r.mode)).toBe(true);
+describe('resolveHomePauseWidgetSurface', () => {
+  it('idle collapsed when no open pause (including after context_lost)', () => {
+    const r = resolveHomePauseWidgetSurface(baseInput);
+    expect(r.surface).toBe('idle_collapsed');
+    expect(homePauseWidgetSurfaceIsCollapsed(r.surface)).toBe(true);
   });
 
-  it('A expanded when user expanded', () => {
-    const r = resolveHomePauseWidgetMode({ ...baseInput, userExpanded: true });
-    expect(r.mode).toBe('A_expanded');
+  it('idle expanded when user expanded', () => {
+    const r = resolveHomePauseWidgetSurface({ ...baseInput, userExpanded: true });
+    expect(r.surface).toBe('idle_expanded');
   });
 
-  it('B for active open pause (pre-Reflect mid-ritual)', () => {
-    const r = resolveHomePauseWidgetMode({
+  it('open_pre_reflect for active open pause (pre-Reflect mid-ritual)', () => {
+    const r = resolveHomePauseWidgetSurface({
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'active',
     });
-    expect(r.mode).toBe('B');
+    expect(r.surface).toBe('open_pre_reflect');
     expect(r.hasReachedReflect).toBe(false);
   });
 
-  it('C when Postgres engaged (deep + reflection_step)', () => {
-    const r = resolveHomePauseWidgetMode({
+  it('open_engaged when Postgres engaged (deep + reflection_step)', () => {
+    const r = resolveHomePauseWidgetSurface({
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'engaged',
       hasReflectionStep: true,
       reflectionMessage: 'You can pause here.',
     });
-    expect(r.mode).toBe('C');
+    expect(r.surface).toBe('open_engaged');
     expect(r.hasReachedReflect).toBe(true);
   });
 
-  it('stays B when active and pending but ritual not started (server should supersede)', () => {
-    const r = resolveHomePauseWidgetMode({
+  it('stays open_pre_reflect when active and pending but ritual not started', () => {
+    const r = resolveHomePauseWidgetSurface({
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'active',
       hasPendingOffer: true,
       hasOpenPauseStepEvents: false,
     });
-    expect(r.mode).toBe('B');
+    expect(r.surface).toBe('open_pre_reflect');
   });
 
-  it('stays B when active mid-ritual and pending queued (pending UX after Reflect)', () => {
-    const r = resolveHomePauseWidgetMode({
+  it('stays open_pre_reflect when active mid-ritual and pending queued', () => {
+    const r = resolveHomePauseWidgetSurface({
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'active',
       hasPendingOffer: true,
       hasOpenPauseStepEvents: true,
     });
-    expect(r.mode).toBe('B');
+    expect(r.surface).toBe('open_pre_reflect');
   });
 
-  it('C_prime when engaged and pending queued', () => {
-    const r = resolveHomePauseWidgetMode({
+  it('open_engaged_pending_offer when engaged and pending queued', () => {
+    const r = resolveHomePauseWidgetSurface({
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'engaged',
@@ -164,79 +164,84 @@ describe('resolveHomePauseWidgetMode', () => {
       reflectionMessage: 'Copy',
       hasPendingOffer: true,
     });
-    expect(r.mode).toBe('C_prime');
+    expect(r.surface).toBe('open_engaged_pending_offer');
   });
 
-  it('B when returning user has untouched active offer (same as first pause)', () => {
-    const r = resolveHomePauseWidgetMode({
+  it('open_pre_reflect when returning user has untouched active offer', () => {
+    const r = resolveHomePauseWidgetSurface({
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'active',
       completedPauseCount: 2,
       hasOpenPauseStepEvents: false,
     });
-    expect(r.mode).toBe('B');
+    expect(r.surface).toBe('open_pre_reflect');
   });
 
-  it('B when first active pause (no completed archive)', () => {
-    const r = resolveHomePauseWidgetMode({
+  it('open_pre_reflect when first active pause (no completed archive)', () => {
+    const r = resolveHomePauseWidgetSurface({
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'active',
       completedPauseCount: 0,
     });
-    expect(r.mode).toBe('B');
+    expect(r.surface).toBe('open_pre_reflect');
   });
 
-  it('stays B when active mid-ritual (Continue only after Reflect)', () => {
-    const r = resolveHomePauseWidgetMode({
+  it('stays open_pre_reflect when active mid-ritual (Continue only after Reflect)', () => {
+    const r = resolveHomePauseWidgetSurface({
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'active',
       completedPauseCount: 3,
       hasOpenPauseStepEvents: true,
     });
-    expect(r.mode).toBe('B');
-    expect(homePauseWidgetSectionTitleKey(r.mode)).toBe('home.widget.yourPause');
+    expect(r.surface).toBe('open_pre_reflect');
+    expect(homePauseWidgetSectionTitleKey(r.surface)).toBe('home.widget.yourPause');
   });
 
-
-  it('D collapsed when manual cooldown with archive', () => {
-    const r = resolveHomePauseWidgetMode({
+  it('manual_cooldown_collapsed when manual cooldown with archive', () => {
+    const r = resolveHomePauseWidgetSurface({
       ...baseInput,
       manualCooldownRemainingMs: 60_000,
       completedPauseCount: 3,
     });
-    expect(r.mode).toBe('D_collapsed');
+    expect(r.surface).toBe('manual_cooldown_collapsed');
   });
 
-  it('section title is Continue your pause for engaged modes', () => {
-    expect(homePauseWidgetSectionTitleKey('C')).toBe('home.widget.continueYourPause');
-    expect(homePauseWidgetSectionTitleKey('C_prime')).toBe('home.widget.continueYourPause');
-    expect(homePauseWidgetSectionTitleKey('B')).toBe('home.widget.yourPause');
+  it('section title is Continue your pause for engaged surfaces', () => {
+    expect(homePauseWidgetSectionTitleKey('open_engaged')).toBe('home.widget.continueYourPause');
+    expect(homePauseWidgetSectionTitleKey('open_engaged_pending_offer')).toBe(
+      'home.widget.continueYourPause',
+    );
+    expect(homePauseWidgetSectionTitleKey('open_pre_reflect')).toBe('home.widget.yourPause');
   });
 
-  it('section title is Your pause for D rest modes (Figma 578:25631)', () => {
-    expect(homePauseWidgetSectionTitleKey('D_collapsed')).toBe('home.widget.yourPause');
-    expect(homePauseWidgetSectionTitleKey('D_expanded')).toBe('home.widget.yourPause');
-    expect(homePauseWidgetSectionTitleKey('D_prime_collapsed')).toBe('home.widget.yourPause');
-    expect(homePauseWidgetSectionTitleKey('D_prime_expanded')).toBe('home.widget.yourPause');
+  it('section title is Your pause for manual cooldown surfaces', () => {
+    expect(homePauseWidgetSectionTitleKey('manual_cooldown_collapsed')).toBe('home.widget.yourPause');
+    expect(homePauseWidgetSectionTitleKey('manual_cooldown_expanded')).toBe('home.widget.yourPause');
+    expect(homePauseWidgetSectionTitleKey('manual_cooldown_first_pause_collapsed')).toBe(
+      'home.widget.yourPause',
+    );
+    expect(homePauseWidgetSectionTitleKey('manual_cooldown_first_pause_expanded')).toBe(
+      'home.widget.yourPause',
+    );
   });
 
-  it('D_prime when manual cooldown without archive', () => {
-    const r = resolveHomePauseWidgetMode({
+  it('manual_cooldown_first_pause when manual cooldown without archive', () => {
+    const r = resolveHomePauseWidgetSurface({
       ...baseInput,
       manualCooldownRemainingMs: 60_000,
       completedPauseCount: 0,
     });
-    expect(r.mode).toBe('D_prime_collapsed');
+    expect(r.surface).toBe('manual_cooldown_first_pause_collapsed');
   });
 
   it('loading when opening pause', () => {
-    const r = resolveHomePauseWidgetMode({
+    const r = resolveHomePauseWidgetSurface({
       ...baseInput,
       loading: true,
     });
-    expect(r.mode).toBe('loading');
+    expect(r.surface).toBe('loading');
   });
 });

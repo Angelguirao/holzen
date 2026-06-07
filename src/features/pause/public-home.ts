@@ -23,17 +23,17 @@ export {
 export {
   useHomePauseWidgetProjection,
   HOME_PAUSE_WIDGET_EXPANDED_STORAGE_KEY,
+  type UseHomePauseWidgetScreenDeps,
 } from './presentation/home/use-home-pause-widget-projection';
 export type {
   HomePauseWidgetProjection,
   HomePauseWidgetBodyProjection,
-  UseHomePauseWidgetProjectionParams,
 } from './domain/home/home-pause-widget-projection-types';
 export {
-  resolveHomePauseWidgetMode,
+  resolveHomePauseWidgetSurface,
   homePauseWidgetSectionTitleKey,
-  type HomePauseWidgetMode,
-} from './domain/home/home-pause-widget-mode';
+  type HomePauseWidgetSurface,
+} from './domain/home/home-pause-widget-surface';
 export { hasReachedReflectForHome } from './domain/home/has-reached-reflect-for-home';
 export {
   useCompletedPauseCount,
