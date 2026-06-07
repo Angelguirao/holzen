@@ -121,6 +121,7 @@
       "discardUndo": "Undo",
       "pauseAgain": "Pause again",
       "pauseWithNewContext": "Pause with new context",
+      "newContextLead": "The market has moved sharply.",
       "updatedAt": "Updated {{time}}",
       "currentPauseSection": "Current pause",
       "newContextSection": "New context",

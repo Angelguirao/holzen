@@ -8,7 +8,6 @@ import {
   HomePauseEngagedBody,
   HomePauseEngagedPendingBody,
   HomePauseIdleExpandedBody,
-  HomePauseInProgressBody,
   HomePauseOpenActiveBody,
   HomePausePostPauseBody,
 } from '@/screens/home/components/HomePauseWidgetBodies';
@@ -80,26 +79,12 @@ export function HomePauseWidgetBody(props: Props) {
         <HomePauseBlockingErrorPanel error={blockingError} onTryAgain={props.onReflectionRetry} />
       ) : null;
 
-    case 'B_in_progress':
-      return (
-        <HomePauseInProgressBody
-          onPauseWithThis={props.onPauseWithThis}
-          onDismissOpenPause={props.onDismissOpenPause}
-        />
-      );
-
     case 'B':
       return (
         <HomePauseOpenActiveBody
           previewLine={props.previewLine}
           marketBlock={props.marketBlock}
           onPauseWithThis={props.onPauseWithThis}
-          showPendingQueuedBanner={props.showPendingQueuedBanner}
-          pendingPreviewLine={props.pendingPreviewLine}
-          pendingMarketBlock={props.pendingMarketBlock}
-          onPauseWithNewContext={props.onPauseWithNewContext}
-          onDeclinePendingOffer={props.onDeclinePendingOffer}
-          pendingOfferBusy={props.pendingOfferBusy}
           ctaLabelKey="home.pauseIdle.letsPauseCta"
         />
       );
@@ -107,8 +92,6 @@ export function HomePauseWidgetBody(props: Props) {
     case 'C':
       return (
         <HomePauseEngagedBody
-          previewLine={props.previewLine}
-          marketBlock={props.marketBlock}
           onPauseWithThis={props.onPauseWithThis}
           onDismissOpenPause={props.onDismissOpenPause}
         />
@@ -117,14 +100,10 @@ export function HomePauseWidgetBody(props: Props) {
     case 'C_prime':
       return (
         <HomePauseEngagedPendingBody
-          previewLine={props.previewLine}
-          marketBlock={props.marketBlock}
-          pendingPreviewLine={props.pendingPreviewLine}
           pendingMarketBlock={props.pendingMarketBlock}
           onPauseWithThis={props.onPauseWithThis}
           onDismissOpenPause={props.onDismissOpenPause}
           onPauseWithNewContext={props.onPauseWithNewContext}
-          onDeclinePendingOffer={props.onDeclinePendingOffer}
           pendingOfferBusy={props.pendingOfferBusy}
         />
       );
