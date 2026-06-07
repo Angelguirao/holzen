@@ -30,10 +30,9 @@ export function useSnooze() {
     void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(userId) });
   }, [queryClient, userId]);
 
-  const snooze = useCallback(
-    async (hours: number) => {
-      if (!userId) return;
-      const until = new Date(Date.now() + hours * 60 * 60 * 1000);
+  const snoozeUntil = useCallback(
+    async (until: Date) => {
+      if (!userId || until <= new Date()) return;
       addOptimisticSnoozedUntil(until);
       const iso = until.toISOString();
       const { error } = await updateProfileSnoozedUntil(userId, iso);
@@ -41,6 +40,13 @@ export function useSnooze() {
       else void queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY(userId) });
     },
     [userId, addOptimisticSnoozedUntil, bumpProfileCache, queryClient],
+  );
+
+  const snooze = useCallback(
+    async (hours: number) => {
+      await snoozeUntil(new Date(Date.now() + hours * 60 * 60 * 1000));
+    },
+    [snoozeUntil],
   );
 
   const cancelSnooze = useCallback(async () => {
@@ -53,5 +59,5 @@ export function useSnooze() {
 
   const isActive = snoozedUntil ? snoozedUntil > new Date() : false;
 
-  return { snoozedUntil, isActive, snooze, cancelSnooze };
+  return { snoozedUntil, isActive, snooze, snoozeUntil, cancelSnooze };
 }
