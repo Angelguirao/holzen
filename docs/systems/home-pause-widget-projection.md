@@ -1,7 +1,7 @@
 # Home “Your pause” widget — pause system projection
 
 > **How the pause lifecycle read-model maps to Figma-aligned widget modes on Home.**  
-> **Authority:** [pause-system.md](pause-system.md) (Postgres state machine) · **Screen:** [screens/home.md](../screens/home.md) · **Client layout:** [pause-client-architecture.md](pause-client-architecture.md)
+> **Authority:** [pause-system.md](pause-system.md) (Postgres state machine) · **Screen:** [screens/home.md](../screens/home.md) · **Client map:** [home-pause-widget-client-architecture.md](home-pause-widget-client-architecture.md) · **Pause context:** [pause-client-architecture.md](pause-client-architecture.md)
 
 The Home widget is a **UI projection** — it does not own pause truth. Postgres + `v_pause_full` / `v_pause_current` are authoritative; the widget reads that surface and chooses layout, copy, and CTAs.
 
@@ -29,7 +29,7 @@ flowchart LR
 | Server truth | `pause_instances`, steps, artifacts, pending rows | State transitions via RPC (`pause_log_step`, etc.) |
 | Browser read-model | `usePauseHomeContext` / `fetchOpenPauseHomePreview` | Open instance id, `state`, reflection artifacts, context snapshot |
 | Mode resolver | `src/features/pause/domain/home/home-pause-widget-mode.ts` | Pure function: inputs → Figma mode (`A`–`D`, `C′`, errors) |
-| Conductor hook | `use-home-pause-widget-projection.ts` | Pending offer, calm-waters query, preview lines, collapse prefs |
+| Conductor hook | `use-home-pause-widget-projection.ts` + `presentation/home/widget/*` | Pending offer, calm-waters, preview lines, collapse prefs — see [home-pause-widget-client-architecture.md](home-pause-widget-client-architecture.md) |
 | Screen | `use-home-pause-card-projection.tsx` → `HomePauseWidgetBody` | Subscription gate, snooze toolbar, body routing |
 
 **Rule:** New widget behavior should extend the resolver + projection hook, not duplicate state checks in JSX.

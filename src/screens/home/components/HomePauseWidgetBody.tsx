@@ -13,7 +13,7 @@ import {
 } from '@/screens/home/components/HomePauseWidgetBodies';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { shouldSurfacePauseWidgetError } from '@/features/pause/public-home';
-import type { HomePauseWidgetBodyProjection } from '@/features/pause/presentation/home/use-home-pause-widget-projection';
+import type { HomePauseWidgetBodyProjection } from '@/features/pause/public-home';
 
 type Props = HomePauseWidgetBodyProjection;
 

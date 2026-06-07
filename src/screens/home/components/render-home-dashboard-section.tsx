@@ -5,7 +5,7 @@ import { MarketStatus } from '@/screens/home/components/MarketStatus';
 import { HomeGoalWhyCard } from '@/screens/home/components/HomeGoalWhyCard';
 import { HomeSectionCard } from '@/screens/home/components/HomeSectionCard';
 import { HomePracticeStatTiles } from '@/screens/home/components/HomePracticeStatTiles';
-import type { HomePauseWidgetProjection } from '@/features/pause/presentation/home/use-home-pause-widget-projection';
+import type { HomePauseWidgetProjection } from '@/features/pause/public-home';
 import type { MarketQuote, TrackedAssetId } from '@/features/market/public';
 
 /** Everything needed to render one Home dashboard section by id. */
