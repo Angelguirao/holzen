@@ -21,7 +21,7 @@ function RangeStatusLine({ status }: { status: MarketVolatilityRangeStatus }) {
 
   if (status.kind === 'within') {
     return (
-      <p className="min-w-0 flex-1 text-xs font-medium leading-4 tracking-wide text-foreground">
+      <p className="min-w-0 text-xs font-medium leading-4 tracking-wide text-foreground">
         {t('home.market.withinYourRange', { defaultValue: 'Within your range' })}
       </p>
     );
@@ -39,7 +39,7 @@ function RangeStatusLine({ status }: { status: MarketVolatilityRangeStatus }) {
     );
 
   return (
-    <p className="min-w-0 flex-1 text-xs font-medium leading-4 tracking-wide text-foreground">
+    <p className="min-w-0 text-xs font-medium leading-4 tracking-wide text-foreground">
       {arrow}{' '}
       <span>{t('home.market.beyondYourRange', { defaultValue: 'Beyond your range' })}</span>
     </p>
@@ -69,8 +69,8 @@ export function HomeMarketWidgetFooter({
   if (!rangeStatus && !marketData) return null;
 
   return (
-    <div className="flex items-start gap-1 pt-0.5">
-      {rangeStatus ? <RangeStatusLine status={rangeStatus} /> : <span className="flex-1" />}
+    <div className="flex w-full flex-col gap-1 pt-0.5">
+      {rangeStatus ? <RangeStatusLine status={rangeStatus} /> : null}
       <HomeMarketCommunityStats />
     </div>
   );

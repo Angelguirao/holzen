@@ -28,11 +28,10 @@ export function HomePauseWidgetMarketRow({ block }: Props) {
   return (
     <div className="text-sm leading-5 tracking-wide text-foreground">
       {block.moveLine || block.sentimentLine ? (
-        <p>
+        <p className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
           {block.moveLine ? (
             <span className="tabular-nums">{block.moveLine}</span>
           ) : null}
-          {block.moveLine && block.sentimentLine ? '    ' : null}
           {block.sentimentLine ? <span>{block.sentimentLine}</span> : null}
         </p>
       ) : null}
