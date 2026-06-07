@@ -32,7 +32,12 @@ export function SnoozeToolbarControl() {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
-          className="max-w-[calc(100%-2rem)] gap-0 rounded-lg border-2 border-border bg-card p-4 sm:max-w-[344px] [&>button]:hidden"
+          className={cn(
+            'gap-0 rounded-lg border-2 border-border bg-card p-4',
+            'w-[min(344px,calc(100vw-2rem))] max-w-[344px]',
+            'max-h-[min(90dvh,calc(100dvh-2rem))] overflow-y-auto overscroll-contain',
+            '[&>button]:hidden',
+          )}
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
           <SnoozePanel open={open} onClose={() => setOpen(false)} />

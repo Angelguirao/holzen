@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { ChevronDown, ChevronUp, Moon, Pencil, X } from 'lucide-react';
@@ -31,6 +31,14 @@ import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 
 const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => i);
 const MINUTE_OPTIONS = Array.from({ length: 60 }, (_, i) => i);
+
+/** Compact calendar for the ~344px snooze dialog (Figma 475:27864). */
+const SNOOZE_CALENDAR_CLASS_NAMES: ComponentProps<typeof Calendar>['classNames'] = {
+  weekday: 'text-muted-foreground w-8 rounded-md font-normal text-[0.75rem]',
+  week: 'mt-1 flex w-full',
+  day: 'relative h-8 w-8 p-0 text-center text-sm [&:has([aria-selected])]:bg-accent',
+  day_button: 'h-8 w-8 p-0 font-normal aria-selected:opacity-100',
+};
 
 type SnoozePanelProps = {
   open: boolean;
@@ -141,7 +149,7 @@ export function SnoozePanel({ open, onClose }: SnoozePanelProps) {
       const next = value as SnoozeDurationPreset;
       setPreset(next);
       if (next === 'custom') {
-        setCustomCalendarExpanded(true);
+        setCustomCalendarExpanded(false);
         return;
       }
       setCustomCalendarExpanded(false);
@@ -236,109 +244,94 @@ export function SnoozePanel({ open, onClose }: SnoozePanelProps) {
         </RadioGroup>
 
         {preset === 'custom' ? (
-          savedCustomSummary && !customCalendarExpanded ? (
-            <div className="rounded-lg bg-background p-2">
-              <button
-                type="button"
-                onClick={() => setCustomCalendarExpanded(true)}
-                className="flex w-full items-center justify-between gap-2 rounded-md p-1 text-left"
-              >
-                <span className="w-14 shrink-0 text-sm text-muted-foreground">
-                  {t('snooze.untilLabel', { defaultValue: 'Until' })}
+          <div className="rounded-lg bg-background p-2">
+            <button
+              type="button"
+              onClick={() => setCustomCalendarExpanded((v) => !v)}
+              className="flex w-full items-center justify-between gap-2 rounded-md p-1 text-left"
+            >
+              <span className="w-14 shrink-0 text-sm text-muted-foreground">
+                {t('snooze.untilLabel', { defaultValue: 'Until' })}
+              </span>
+              <span className="flex min-w-0 flex-1 items-center gap-2 rounded border border-border/60 px-2 py-1.5 text-sm text-foreground">
+                <span className="min-w-0 flex-1 truncate">
+                  {savedCustomSummary ?? formatSnoozeUntilSummary(customUntilDraft)}
                 </span>
-                <span className="flex min-w-0 flex-1 items-center gap-2 rounded border border-border/60 px-2 py-1.5 text-sm text-foreground">
-                  <span className="min-w-0 flex-1 truncate">{savedCustomSummary}</span>
+                {savedCustomSummary && !customCalendarExpanded ? (
                   <Pencil className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                </span>
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4 rounded-2xl border border-border bg-background p-4">
-              <button
-                type="button"
-                onClick={() => setCustomCalendarExpanded((v) => !v)}
-                className="flex w-full items-center justify-between gap-2 text-left"
-              >
-                <span className="w-14 shrink-0 text-sm text-muted-foreground">
-                  {t('snooze.untilLabel', { defaultValue: 'Until' })}
-                </span>
-                <span className="flex min-w-0 flex-1 items-center gap-2 rounded px-2 py-1.5 text-sm text-foreground">
-                  <span className="min-w-0 flex-1 truncate">
-                    {formatSnoozeUntilSummary(customUntilDraft)}
-                  </span>
-                  {customCalendarExpanded ? (
-                    <ChevronUp className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden />
-                  ) : (
-                    <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden />
-                  )}
-                </span>
-              </button>
+                ) : customCalendarExpanded ? (
+                  <ChevronUp className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden />
+                ) : (
+                  <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden />
+                )}
+              </span>
+            </button>
 
-              {customCalendarExpanded ? (
-                <>
-                  <Calendar
-                    mode="single"
-                    selected={customDate}
-                    onSelect={(day) => {
-                      if (day) setCustomDate(day);
-                    }}
-                    disabled={(day) => day < new Date(new Date().setHours(0, 0, 0, 0))}
-                    className="mx-auto p-0"
-                  />
+            {customCalendarExpanded ? (
+              <div className="mt-3 space-y-3 border-t border-border/40 pt-3">
+                <Calendar
+                  mode="single"
+                  selected={customDate}
+                  onSelect={(day) => {
+                    if (day) setCustomDate(day);
+                  }}
+                  disabled={(day) => day < new Date(new Date().setHours(0, 0, 0, 0))}
+                  className="mx-auto p-0"
+                  classNames={SNOOZE_CALENDAR_CLASS_NAMES}
+                />
 
-                  <div className="space-y-2">
-                    <p className="text-center text-sm leading-5 text-foreground">
-                      {t('snooze.hour', { defaultValue: 'Hour' })}
-                    </p>
-                    <div className="flex justify-center gap-2">
-                      <Select
-                        value={String(customHour)}
-                        onValueChange={(value) => setCustomHour(Number(value))}
-                      >
-                        <SelectTrigger className="w-[72px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {HOUR_OPTIONS.map((hour) => (
-                            <SelectItem key={hour} value={String(hour)}>
-                              {format(new Date(2000, 0, 1, hour), 'HH')}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Select
-                        value={String(customMinute)}
-                        onValueChange={(value) => setCustomMinute(Number(value))}
-                      >
-                        <SelectTrigger className="w-[72px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {MINUTE_OPTIONS.map((minute) => (
-                            <SelectItem key={minute} value={String(minute)}>
-                              {format(new Date(2000, 0,  1, 0, minute), 'mm')}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                <div className="space-y-2">
+                  <p className="text-center text-sm leading-5 text-foreground">
+                    {t('snooze.hour', { defaultValue: 'Hour' })}
+                  </p>
+                  <div className="flex justify-center gap-2">
+                    <Select
+                      value={String(customHour)}
+                      onValueChange={(value) => setCustomHour(Number(value))}
+                    >
+                      <SelectTrigger className="w-[72px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {HOUR_OPTIONS.map((hour) => (
+                          <SelectItem key={hour} value={String(hour)}>
+                            {format(new Date(2000, 0, 1, hour), 'HH')}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={String(customMinute)}
+                      onValueChange={(value) => setCustomMinute(Number(value))}
+                    >
+                      <SelectTrigger className="w-[72px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {MINUTE_OPTIONS.map((minute) => (
+                          <SelectItem key={minute} value={String(minute)}>
+                            {format(new Date(2000, 0, 1, 0, minute), 'mm')}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
+                </div>
 
-                  <button
-                    type="button"
-                    disabled={!customSaveValid || savingCustom}
-                    onClick={handleSaveCustom}
-                    className={cn(
-                      homeInWidget.ctaNoxPrimary,
-                      'mt-2 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground',
-                    )}
-                  >
-                    {t('snooze.save', { defaultValue: 'Save' })}
-                  </button>
-                </>
-              ) : null}
-            </div>
-          )
+                <button
+                  type="button"
+                  disabled={!customSaveValid || savingCustom}
+                  onClick={handleSaveCustom}
+                  className={cn(
+                    homeInWidget.ctaNoxPrimary,
+                    'disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground',
+                  )}
+                >
+                  {t('snooze.save', { defaultValue: 'Save' })}
+                </button>
+              </div>
+            ) : null}
+          </div>
         ) : null}
       </div>
     </div>
