@@ -1,199 +1,67 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useCallback, useMemo } from 'react';
 import { useAuth } from '@/features/auth/public';
 import { trackedAssetSymbol } from '@/features/market/domain/tracked-assets';
-import type { MarketQuote } from '@/features/market/public';
-import type { Entitlement } from '@/features/subscription/public';
-import type { ManualPauseTriggerResult } from '@/features/pause/domain/manual-pause-trigger-result';
 import { formatHomePauseMarketBlock } from '@/features/pause/domain/home/format-home-pause-market-block';
-import {
-  homePauseWidgetModeIsCollapsible,
-  homePauseWidgetModeIsCollapsed,
-  homePauseWidgetSectionTitleKey,
-  resolveHomePauseWidgetMode,
-  type HomePauseWidgetMode,
-} from '@/features/pause/domain/home/home-pause-widget-mode';
-import {
-  resolveHomePauseWidgetPreviewLine,
-  type HomePauseWidgetPreviewLine,
-} from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
+import { buildHomePauseWidgetProjection } from '@/features/pause/domain/home/build-home-pause-widget-projection';
+import { resolveHomePauseWidgetMode } from '@/features/pause/domain/home/home-pause-widget-mode';
+import { resolveHomePauseWidgetPreviewLine } from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
 import { resolveEngagedPauseMarketSettled } from '@/features/pause/domain/home/resolve-engaged-pause-market-settled';
-import { resolvePauseOpenMaxAnchorAt } from '@/features/pause/domain/pause-open-max-anchor';
+import { resolveHomePauseWidgetOpenMaxAnchorAt } from '@/features/pause/domain/home/resolve-home-pause-widget-open-max-anchor';
 import { shouldSurfacePauseWidgetError } from '@/features/pause/domain/home/pause-home-widget-error';
-import {
-  fetchRecentContextLostPause,
-  CONTEXT_LOST_HOME_WINDOW_MS,
-} from '@/features/pause/infrastructure/queries/recent-context-lost-pause-query';
+import type {
+  HomePauseWidgetProjection,
+  UseHomePauseWidgetProjectionParams,
+} from '@/features/pause/domain/home/home-pause-widget-projection-types';
 import { usePendingPauseOffer } from '@/features/pause/presentation/reflect/pending-offer/use-pending-pause-offer';
-import { useCalmWatersToast } from '@/features/pause/presentation/home/use-calm-waters-toast';
-import {
-  markHomePauseWidgetFirstVisitHandled,
-  shouldExpandHomePauseWidgetFirstVisit,
-} from '@/features/pause/infrastructure/home-pause-widget-first-visit-storage';
-import {
-  shouldShowPostManualCooldownIdlePrompt,
-  clearPostManualCooldownIdlePrompt,
-} from '@/features/pause/infrastructure/home-post-manual-cooldown-idle-storage';
+import { useHomePauseWidgetCollapseState } from '@/features/pause/presentation/home/widget/use-home-pause-widget-collapse-state';
+import { useHomePauseWidgetCooldownClock } from '@/features/pause/presentation/home/widget/use-home-pause-widget-cooldown-clock';
+import { useHomePauseRecentContextLost } from '@/features/pause/presentation/home/widget/use-home-pause-recent-context-lost';
+import { useHomePauseWidgetModeTransition } from '@/features/pause/presentation/home/widget/use-home-pause-widget-mode-transition';
 
+export type {
+  HomePauseWidgetBodyProjection,
+  HomePauseWidgetProjection,
+  UseHomePauseWidgetProjectionParams,
+} from '@/features/pause/domain/home/home-pause-widget-projection-types';
+
+/** @deprecated Session-only expand flag; not persisted. Kept for grep / legacy references. */
 export const HOME_PAUSE_WIDGET_EXPANDED_STORAGE_KEY = 'holzen_home_pause_widget_expanded_v1';
 
-export type HomePauseWidgetBodyProjection = {
-  widgetMode: HomePauseWidgetMode;
-  previewLine: HomePauseWidgetPreviewLine;
-  marketBlock: ReturnType<typeof formatHomePauseMarketBlock>;
-  subLoading: boolean;
-  hasAccess: boolean;
-  entitlement: Entitlement;
-  checkoutLoading: boolean;
-  trialLoading: boolean;
-  onStartCheckoutPro: () => void;
-  onStartTrial: () => void;
-  onReactivate: () => void;
-  onPauseWithThis: () => void;
-  onPauseWithNewContext?: () => void;
-  onDeclinePendingOffer?: () => void;
-  pendingOfferBusy?: boolean;
-  openPauseState: 'active' | 'engaged' | null;
-  onDismissOpenPause: () => void;
-  loading: boolean;
-  error: string | null;
-  marketData: MarketQuote | null;
-  onReflectionRetry: (mood?: string) => Promise<ManualPauseTriggerResult>;
-  showPauseScheduling: boolean;
-  autoCooldownRemaining: () => number;
-  cooldownHours: number;
-  nextCronCheckIn: () => number;
-  manualCooldownRemaining: () => number;
-  onNeedPause: () => void;
-  onPauseAgain: () => void;
-  completedPauseCount: number;
-  profileLastTriggerAt: string | null;
-  manualCooldownRemainingMs: number;
-  pendingMarketBlock: ReturnType<typeof formatHomePauseMarketBlock> | null;
-  /** After manual cooldown ends — Figma 578:26963 (no market copy). */
-  postManualCooldownIdle: boolean;
-  /** Engaged + live market within thresholds — Figma 578:27863. */
-  engagedPauseMarketSettled: boolean;
-  /** ISO anchor for open_max countdown (calm_settled_at for cron engaged, else engaged_at). */
-  openPauseOpenMaxAnchorAt: string | null;
-};
-
-export type UseHomePauseWidgetProjectionParams = {
-  subLoading: boolean;
-  hasAccess: boolean;
-  entitlement: Entitlement;
-  checkoutLoading: boolean;
-  trialLoading: boolean;
-  hasOpenPause: boolean;
-  openPauseState: 'active' | 'engaged' | null;
-  hasReflectionStep: boolean;
-  reflectionMessage: string | null;
-  contextSnapshot: Record<string, unknown> | null;
-  openPauseCreatedAt: string | null;
-  contextText: string | null;
-  loading: boolean;
-  error: string | null;
-  marketData: MarketQuote | null;
-  showPauseScheduling: boolean;
-  autoCooldownRemaining: () => number;
-  cooldownHours: number;
-  nextCronCheckIn: () => number;
-  manualCooldownRemaining: () => number;
-  manualTrigger: (mood?: string) => Promise<ManualPauseTriggerResult>;
-  onNavigatePauseWithThis: () => void;
-  onAdoptPendingOffer: () => void | Promise<boolean>;
-  onDeclinePendingOffer: () => void | Promise<boolean>;
-  pendingOfferBusy: boolean;
-  onDismissOpenPause: () => void;
-  onNeedPause: () => void;
-  onStartCheckoutPro: () => void;
-  onStartTrial: () => void;
-  onReactivate: () => void;
-  completedPauseCount: number | null;
-  trackedAssetId: string;
-  newPauseArrival: boolean;
-  profileLastTriggerAt: string | null;
-  hasOpenPauseStepEvents: boolean;
-  threshold: number;
-  thresholdDown: number;
-  openPauseSource: string | null;
-  openPauseEngagedAt: string | null;
-  openPauseMetadata: Record<string, unknown> | null;
-};
-
-export type HomePauseWidgetProjection = {
-  sectionTitleKey: string;
-  showMoonIcon: boolean;
-  collapsible: boolean;
-  collapsed: boolean;
-  onToggleCollapse: () => void;
-  body: HomePauseWidgetBodyProjection;
-};
-
+/**
+ * Home “Your pause” widget conductor — composes domain resolver + side-effect hooks.
+ *
+ * Flow: `usePauseHomeContext` + screen params → mode resolver → body DTO → `HomePauseWidgetBody`.
+ * See `docs/systems/home-pause-widget-client-architecture.md`.
+ */
 export function useHomePauseWidgetProjection(
   params: UseHomePauseWidgetProjectionParams,
 ): HomePauseWidgetProjection {
   const { user } = useAuth();
   const userId = user?.id;
   const { pending } = usePendingPauseOffer();
-  const prevModeRef = useRef<HomePauseWidgetMode | null>(null);
 
-  const calmQuery = useQuery({
-    queryKey: ['home-recent-context-lost', userId],
-    queryFn: () => fetchRecentContextLostPause(userId!),
-    enabled: Boolean(userId) && !params.hasOpenPause,
-    staleTime: 30_000,
-    refetchOnWindowFocus: false,
+  useHomePauseRecentContextLost({
+    userId,
+    hasOpenPause: params.hasOpenPause,
   });
 
-  const showCalmWaters = Boolean(
-    !params.hasOpenPause &&
-      calmQuery.data &&
-      Date.now() - new Date(calmQuery.data.expiredAt).getTime() < CONTEXT_LOST_HOME_WINDOW_MS,
+  const manualCooldownRemainingMs = useHomePauseWidgetCooldownClock(
+    params.manualCooldownRemaining,
   );
 
-  useCalmWatersToast({
-    userId,
-    showCalmWaters,
-    pauseInstanceId: calmQuery.data?.pauseInstanceId ?? null,
-  });
+  const { userExpanded, setUserExpanded, postManualCooldownIdle } =
+    useHomePauseWidgetCollapseState({
+      userId,
+      hasOpenPause: params.hasOpenPause,
+      loading: params.loading,
+      manualCooldownRemainingMs,
+    });
 
   const blockingError = Boolean(
     params.error && shouldSurfacePauseWidgetError(params.error, params.marketData),
   );
 
   const assetSymbol = trackedAssetSymbol(params.trackedAssetId);
-
-  const [userExpanded, setUserExpanded] = useState(false);
-  const [cooldownNowMs, setCooldownNowMs] = useState(() => Date.now());
-
-  useEffect(() => {
-    const id = window.setInterval(() => setCooldownNowMs(Date.now()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-
-  const manualCooldownRemainingMs = useMemo(
-    () => params.manualCooldownRemaining(),
-    [params.manualCooldownRemaining, cooldownNowMs],
-  );
-
-  useEffect(() => {
-    if (!userId || params.hasOpenPause || params.loading) return;
-    if (manualCooldownRemainingMs > 0) return;
-    if (!shouldExpandHomePauseWidgetFirstVisit(userId)) return;
-    setUserExpanded(true);
-  }, [userId, params.hasOpenPause, params.loading, manualCooldownRemainingMs]);
-
-  useEffect(() => {
-    if (!userId || !params.hasOpenPause) return;
-    clearPostManualCooldownIdlePrompt(userId);
-  }, [userId, params.hasOpenPause]);
-
-  useEffect(() => {
-    if (!userId || !params.hasOpenPause) return;
-    if (!shouldExpandHomePauseWidgetFirstVisit(userId)) return;
-    markHomePauseWidgetFirstVisitHandled(userId);
-  }, [userId, params.hasOpenPause]);
 
   const { mode: widgetMode } = useMemo(
     () =>
@@ -227,87 +95,16 @@ export function useHomePauseWidgetProjection(
     ],
   );
 
-  const postManualCooldownIdle =
-    Boolean(userId) &&
-    !params.hasOpenPause &&
-    manualCooldownRemainingMs <= 0 &&
-    shouldShowPostManualCooldownIdlePrompt(userId);
-
-  const engagedPauseMarketSettled = resolveEngagedPauseMarketSettled({
-    openPauseState: params.openPauseState,
-    marketData: params.marketData,
-    threshold: params.threshold,
-    thresholdDown: params.thresholdDown,
+  useHomePauseWidgetModeTransition({
+    widgetMode,
+    newPauseArrival: params.newPauseArrival,
+    userId,
+    setUserExpanded,
   });
-
-  const openPauseOpenMaxAnchorAt = useMemo(() => {
-    if (params.openPauseState !== 'engaged' || !params.openPauseCreatedAt) return null;
-    return resolvePauseOpenMaxAnchorAt({
-      state: 'engaged',
-      source: params.openPauseSource,
-      engaged_at: params.openPauseEngagedAt,
-      created_at: params.openPauseCreatedAt,
-      metadata: params.openPauseMetadata,
-    });
-  }, [
-    params.openPauseState,
-    params.openPauseSource,
-    params.openPauseEngagedAt,
-    params.openPauseCreatedAt,
-    params.openPauseMetadata,
-  ]);
-
-  useEffect(() => {
-    const prev = prevModeRef.current;
-    prevModeRef.current = widgetMode;
-
-    const restModes: HomePauseWidgetMode[] = [
-      'A_collapsed',
-      'A_expanded',
-      'D_collapsed',
-      'D_expanded',
-      'D_prime_collapsed',
-      'D_prime_expanded',
-    ];
-    const dModes: HomePauseWidgetMode[] = [
-      'D_collapsed',
-      'D_expanded',
-      'D_prime_collapsed',
-      'D_prime_expanded',
-    ];
-    const aModes: HomePauseWidgetMode[] = ['A_collapsed', 'A_expanded'];
-    const activeModes: HomePauseWidgetMode[] = ['B', 'C', 'C_prime'];
-
-    if (prev && dModes.includes(prev) && aModes.includes(widgetMode) && userId) {
-      setUserExpanded(true);
-    }
-
-    if (prev && activeModes.includes(prev) && restModes.includes(widgetMode)) {
-      setUserExpanded(false);
-    }
-
-    const autoExpandModes: HomePauseWidgetMode[] = ['B', 'C', 'C_prime'];
-    const enteredAutoExpand =
-      prev !== null && autoExpandModes.includes(widgetMode) && !autoExpandModes.includes(prev);
-
-    if (params.newPauseArrival || enteredAutoExpand) {
-      setUserExpanded(true);
-    }
-  }, [widgetMode, params.newPauseArrival, userId]);
-
-  useEffect(() => {
-    if (!userId || params.hasOpenPause || params.loading) return;
-    if (manualCooldownRemainingMs > 0) return;
-    if (!shouldShowPostManualCooldownIdlePrompt(userId)) return;
-    setUserExpanded(true);
-  }, [userId, params.hasOpenPause, params.loading, manualCooldownRemainingMs]);
-
-  const collapsible = homePauseWidgetModeIsCollapsible(widgetMode);
-  const collapsed = homePauseWidgetModeIsCollapsed(widgetMode);
 
   const onToggleCollapse = useCallback(() => {
     setUserExpanded((prev) => !prev);
-  }, []);
+  }, [setUserExpanded]);
 
   const marketBlock = useMemo(
     () =>
@@ -318,7 +115,13 @@ export function useHomePauseWidgetProjection(
         trackedAssetId: params.trackedAssetId,
         instanceCreatedAt: params.openPauseCreatedAt,
       }),
-    [params.contextText, params.contextSnapshot, params.marketData, params.trackedAssetId, params.openPauseCreatedAt],
+    [
+      params.contextText,
+      params.contextSnapshot,
+      params.marketData,
+      params.trackedAssetId,
+      params.openPauseCreatedAt,
+    ],
   );
 
   const previewLine = useMemo(
@@ -354,50 +157,35 @@ export function useHomePauseWidgetProjection(
         })
       : null;
 
-  const body: HomePauseWidgetBodyProjection = {
+  const engagedPauseMarketSettled = resolveEngagedPauseMarketSettled({
+    openPauseState: params.openPauseState,
+    marketData: params.marketData,
+    threshold: params.threshold,
+    thresholdDown: params.thresholdDown,
+  });
+
+  const openPauseOpenMaxAnchorAt = resolveHomePauseWidgetOpenMaxAnchorAt({
+    openPauseState: params.openPauseState,
+    openPauseSource: params.openPauseSource,
+    openPauseEngagedAt: params.openPauseEngagedAt,
+    openPauseCreatedAt: params.openPauseCreatedAt,
+    openPauseMetadata: params.openPauseMetadata,
+  });
+
+  const chromeAndBody = buildHomePauseWidgetProjection({
     widgetMode,
     previewLine,
     marketBlock,
-    subLoading: params.subLoading,
-    hasAccess: params.hasAccess,
-    entitlement: params.entitlement,
-    checkoutLoading: params.checkoutLoading,
-    trialLoading: params.trialLoading,
-    onStartCheckoutPro: params.onStartCheckoutPro,
-    onStartTrial: params.onStartTrial,
-    onReactivate: params.onReactivate,
-    onPauseWithThis: params.onNavigatePauseWithThis,
-    onPauseWithNewContext: () => void params.onAdoptPendingOffer(),
-    onDeclinePendingOffer: () => void params.onDeclinePendingOffer(),
-    pendingOfferBusy: params.pendingOfferBusy,
-    openPauseState: params.openPauseState,
-    onDismissOpenPause: params.onDismissOpenPause,
-    loading: params.loading,
-    error: params.error,
-    marketData: params.marketData,
-    onReflectionRetry: params.manualTrigger,
-    showPauseScheduling: params.showPauseScheduling,
-    autoCooldownRemaining: params.autoCooldownRemaining,
-    cooldownHours: params.cooldownHours,
-    nextCronCheckIn: params.nextCronCheckIn,
-    manualCooldownRemaining: params.manualCooldownRemaining,
-    onNeedPause: params.onNeedPause,
-    onPauseAgain: params.onNeedPause,
-    completedPauseCount: params.completedPauseCount ?? 0,
-    profileLastTriggerAt: params.profileLastTriggerAt,
-    manualCooldownRemainingMs,
     pendingMarketBlock,
     postManualCooldownIdle,
     engagedPauseMarketSettled,
     openPauseOpenMaxAnchorAt,
-  };
+    manualCooldownRemainingMs,
+    params,
+  });
 
   return {
-    sectionTitleKey: homePauseWidgetSectionTitleKey(widgetMode),
-    showMoonIcon: true,
-    collapsible,
-    collapsed,
+    ...chromeAndBody,
     onToggleCollapse,
-    body,
   };
 }

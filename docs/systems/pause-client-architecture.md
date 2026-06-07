@@ -320,6 +320,8 @@ Do not big-bang rename folders; one vertical slice per commit ([refactoring-stra
 | Doc | Role |
 |-----|------|
 | [pause-system.md](pause-system.md) | Postgres contracts |
+| [home-pause-widget-client-architecture.md](home-pause-widget-client-architecture.md) | Home widget client layering + file map |
+| [home-pause-widget-projection.md](home-pause-widget-projection.md) | Figma modes + QA matrix |
 | [pause/ritual-reflect-vs-frame.md](pause/ritual-reflect-vs-frame.md) | Product intent — Reflect (inward) vs Frame (optional companions) |
 | [ai-powered-pause-system.md](pause/ai-powered-pause-system.md) | Edge + cron pipeline |
 | [screens/pause.md](../screens/pause.md) | Route component map |
