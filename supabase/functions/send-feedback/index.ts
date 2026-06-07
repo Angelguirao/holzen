@@ -23,9 +23,10 @@ const CATEGORY_EMOJI: Record<string, string> = {
   bug: "🐛",
   feature: "💡",
   question: "❓",
+  pause_help: "⭐",
 };
 
-const VALID_CATEGORIES = new Set(["bug", "feature", "question"]);
+const VALID_CATEGORIES = new Set(["bug", "feature", "question", "pause_help"]);
 
 /** Trim + hard-cap incoming text so no single column blows up (defense in depth). */
 function trimTo(text: unknown, max: number): string | null {

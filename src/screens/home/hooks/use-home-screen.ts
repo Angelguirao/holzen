@@ -26,6 +26,7 @@ import { useHomePauseCardProjection } from '@/screens/home/hooks/use-home-pause-
 import { useHomePullFullReload } from '@/screens/home/hooks/use-home-pull-full-reload';
 import { useHomeVisibleSections } from '@/screens/home/hooks/use-home-visible-sections';
 import { useHomePrefetch } from '@/screens/home/hooks/use-home-prefetch';
+import { useHomePauseHelpFeedback } from '@/features/pause/presentation/home/use-home-pause-help-feedback';
 
 /**
  * Home route conductor — composes Holzen outlet, subscription gate, pause card, and dashboard layout.
@@ -191,8 +192,13 @@ export function useHomeScreen() {
     completedPauseCount: practiceStats?.completedPauseCount ?? null,
   });
 
+  const pauseHelpFeedback = useHomePauseHelpFeedback({
+    blocked: customizeSheet.open,
+  });
+
   return {
     profileLoaded,
     dashboardLayout,
+    pauseHelpFeedback,
   };
 }

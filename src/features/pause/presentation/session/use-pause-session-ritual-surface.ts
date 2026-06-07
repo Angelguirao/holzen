@@ -1,8 +1,12 @@
+import { useCallback } from 'react';
+import type { NavigateFunction } from 'react-router-dom';
+import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import type { PauseSessionScaffoldVmResult } from './scaffold/use-pause-session-scaffold-vm';
 import type { PauseSessionStepHandlersResult } from './use-pause-session-step-handlers';
 
 export type PauseSessionRitualSurfaceMotionSlice = {
   prefersReducedMotion: boolean | null;
+  navigate: NavigateFunction;
 };
 
 /** Merges step handlers + scaffold VM into props for the pause session ritual surface. */
@@ -11,11 +15,30 @@ export function usePauseSessionRitualSurface(
   step: PauseSessionStepHandlersResult,
   scaffoldVm: PauseSessionScaffoldVmResult,
 ) {
-  const { prefersReducedMotion } = motion;
+  const { prefersReducedMotion, navigate } = motion;
   const { shell, ritual } = step;
 
+  const handleReturn = useCallback(() => {
+    const pauseInstanceId = shell.pauseInstanceIdForTerminal;
+    if (ritual.phase === 'done' && ritual.ritualEntry === 'deep' && pauseInstanceId) {
+      clearPausePersistedTabSession();
+      navigate('/', {
+        replace: true,
+        state: { pauseHelpFeedback: { pauseInstanceId } },
+      });
+      return;
+    }
+    shell.handleReturn();
+  }, [
+    navigate,
+    ritual.phase,
+    ritual.ritualEntry,
+    shell.handleReturn,
+    shell.pauseInstanceIdForTerminal,
+  ]);
+
   return {
-    handleReturn: shell.handleReturn,
+    handleReturn,
     leaveWithPendingOpen: shell.leaveWithPendingOpen,
     setLeaveWithPendingOpen: shell.setLeaveWithPendingOpen,
     pending: shell.pending,
