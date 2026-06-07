@@ -9,7 +9,7 @@ import {
 } from '@/features/pause/infrastructure/home-post-manual-cooldown-idle-storage';
 
 /** Session expand preference + first-visit / post-manual idle localStorage side effects. */
-export function useHomePauseWidgetCollapseState(input: {
+export function useHomePauseWidgetCollapsePreference(input: {
   userId: string | undefined;
   hasOpenPause: boolean;
   loading: boolean;

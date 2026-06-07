@@ -21,16 +21,20 @@ import {
 } from '@/screens/home/components/HomePauseWidgetShared';
 import type { HomePauseWidgetPreviewLine as HomePauseWidgetPreviewLineModel } from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
 import type { HomePauseMarketBlock } from '@/features/pause/domain/home/format-home-pause-market-block';
-import type { HomePauseWidgetBodyProjection } from '@/features/pause/public-home';
+import type { HomePauseWidgetSurface } from '@/features/pause/domain/home/home-pause-widget-surface';
+import {
+  homePauseWidgetSurfaceIsManualCooldownFirstPause,
+  homePauseWidgetSurfaceIsManualCooldownWithArchive,
+} from '@/features/pause/domain/home/home-pause-widget-surface';
 import {
   formatPauseOpenMaxRemaining,
   pauseOpenMaxDeadlineMs,
 } from '@/features/pause/public-session';
 
-type OpenBodyProps = Pick<
-  HomePauseWidgetBodyProjection,
-  'previewLine' | 'marketBlock' | 'onPauseWithThis'
-> & {
+type OpenBodyProps = {
+  previewLine: HomePauseWidgetPreviewLineModel | null;
+  marketBlock: HomePauseMarketBlock;
+  onPauseWithThis: () => void;
   ctaLabelKey: string;
 };
 
@@ -58,7 +62,7 @@ function HomePauseWidgetOpeningAndMarket({
   );
 }
 
-/** State B — new pause offer (Figma 559:26757). */
+/** Open pause before Reflect — Let's pause CTA. */
 export function HomePauseOpenActiveBody({
   previewLine,
   marketBlock,
@@ -76,19 +80,21 @@ export function HomePauseOpenActiveBody({
   );
 }
 
-type EngagedProps = Pick<
-  HomePauseWidgetBodyProjection,
-  'onPauseWithThis' | 'onDismissOpenPause'
->;
+type EngagedProps = {
+  onPauseWithThis: () => void;
+  onDismissOpenPause: () => void;
+};
 
-/** State C — reached Reflect (Figma 578:28850); C calm waters (578:27863). */
+/** Open pause after Reflect — Continue / Discard; calm market shows settled copy. */
 export function HomePauseEngagedBody({
   onPauseWithThis,
   onDismissOpenPause,
   engagedPauseMarketSettled,
   openPauseOpenMaxAnchorAt,
-}: EngagedProps &
-  Pick<HomePauseWidgetBodyProjection, 'engagedPauseMarketSettled' | 'openPauseOpenMaxAnchorAt'>) {
+}: EngagedProps & {
+  engagedPauseMarketSettled: boolean;
+  openPauseOpenMaxAnchorAt: string | null;
+}) {
   "use memo";
   const { t } = useTranslation();
   const [nowMs, setNowMs] = useState(() => Date.now());
@@ -145,13 +151,13 @@ export function HomePauseEngagedBody({
   );
 }
 
-type PendingProps = EngagedProps &
-  Pick<
-    HomePauseWidgetBodyProjection,
-    'pendingMarketBlock' | 'onPauseWithNewContext' | 'pendingOfferBusy'
-  >;
+type PendingProps = EngagedProps & {
+  pendingMarketBlock: HomePauseMarketBlock | null;
+  onPauseWithNewContext?: () => void;
+  pendingOfferBusy?: boolean;
+};
 
-/** State C′ — unified card (Figma 578:27896 / 578:27929). Engaged + pending only. */
+/** Engaged open pause with a cron pending offer — adopt new context branch. */
 export function HomePauseEngagedPendingBody({
   pendingMarketBlock,
   onPauseWithThis,
@@ -212,31 +218,28 @@ export function HomePauseEngagedPendingBody({
   );
 }
 
-type PostPauseProps = Pick<
-  HomePauseWidgetBodyProjection,
-  | 'widgetMode'
-  | 'onPauseWithThis'
-  | 'previewLine'
-  | 'marketBlock'
-  | 'manualCooldownRemainingMs'
-  | 'completedPauseCount'
->;
+type PostPauseProps = {
+  surface: HomePauseWidgetSurface;
+  onPauseWithThis: () => void;
+  previewLine: HomePauseWidgetPreviewLineModel | null;
+  marketBlock: HomePauseMarketBlock;
+  manualCooldownRemainingMs: number;
+  completedPauseCount: number;
+};
 
-/** States D / D′ — manual cooldown rest. */
+/** Manual trigger cooldown — rest copy until next Let's pause. */
 export function HomePausePostPauseBody({
-  widgetMode,
-  onPauseWithThis,
-  previewLine,
-  marketBlock,
+  surface,
+  onPauseWithThis: _onPauseWithThis,
+  previewLine: _previewLine,
+  marketBlock: _marketBlock,
   manualCooldownRemainingMs,
   completedPauseCount,
 }: PostPauseProps) {
   "use memo";
   const { t } = useTranslation();
-  const isDWithArchive =
-    widgetMode === 'D_collapsed' || widgetMode === 'D_expanded';
-  const isDPrime =
-    widgetMode === 'D_prime_collapsed' || widgetMode === 'D_prime_expanded';
+  const isDWithArchive = homePauseWidgetSurfaceIsManualCooldownWithArchive(surface);
+  const isDPrime = homePauseWidgetSurfaceIsManualCooldownFirstPause(surface);
   const isD = isDWithArchive || isDPrime;
 
   if (isD) {
@@ -280,10 +283,12 @@ export function HomePausePostPauseBody({
   return null;
 }
 
-/** State A — idle, no open pause (structure: Figma 546:8975; tokens: Nox). */
-export function HomePauseIdleExpandedBody(
-  props: Pick<HomePauseWidgetBodyProjection, 'onNeedPause' | 'loading' | 'postManualCooldownIdle'>,
-) {
+/** No open pause — expanded idle / onboarding Let's pause. */
+export function HomePauseIdleExpandedBody(props: {
+  onNeedPause: () => void;
+  loading: boolean;
+  postManualCooldownIdle: boolean;
+}) {
   "use memo";
   const { t } = useTranslation();
 

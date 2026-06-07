@@ -1,9 +1,9 @@
 # Home “Your pause” widget — client architecture
 
 > **Canonical client map** for the Home pause widget stack.  
-> **Product / Figma modes:** [home-pause-widget-projection.md](home-pause-widget-projection.md) · **Postgres authority:** [pause-system.md](pause-system.md) · **Pause context layout:** [pause-client-architecture.md](pause-client-architecture.md)
+> **Product / user journeys:** [home-pause-widget-projection.md](home-pause-widget-projection.md) · **Postgres authority:** [pause-system.md](pause-system.md) · **Pause context:** [pause-client-architecture.md](pause-client-architecture.md)
 
-The widget is a **read-model projection**: Postgres owns pause truth; React chooses Figma-aligned layout, copy, and CTAs. No widget code writes lifecycle state except through existing RPC/use-case paths (`manualTrigger`, discard, pending adopt/decline).
+The widget is a **read-model projection**: Postgres owns pause truth; React derives **surfaces** (layout + copy + CTAs). Domain code uses **business surface names** (`open_engaged`, `idle_expanded`, …) — not design artifact labels.
 
 ---
 
@@ -11,12 +11,12 @@ The widget is a **read-model projection**: Postgres owns pause truth; React choo
 
 | Layer | Responsibility | Home widget files |
 |-------|----------------|-------------------|
-| **Domain** | Pure mode resolution, copy/market blocks, collapse rules, DTO assembly | `src/features/pause/domain/home/*` |
-| **Infrastructure** | Supabase reads, localStorage prefs, context-lost query | `infrastructure/queries/recent-context-lost-pause-query.ts`, `home-pause-widget-first-visit-storage.ts`, `home-post-manual-cooldown-idle-storage.ts` |
-| **Presentation** | React conductors, context provider, side effects (toast, 1s clock) | `src/features/pause/presentation/home/` + `presentation/home/widget/` |
-| **Screen** | Thin wiring: subscription gate, snooze toolbar, dashboard slot | `src/screens/home/hooks/use-home-pause-card-projection.tsx`, `components/HomePauseWidgetBody*.tsx` |
+| **Domain** | Pure surface resolver, copy/market blocks, expand preference | `src/features/pause/domain/home/*` |
+| **Infrastructure** | Supabase reads, localStorage prefs, context-lost query | `infrastructure/queries/recent-context-lost-pause-query.ts`, `home-pause-widget-first-visit-storage.ts`, … |
+| **Presentation** | React conductors, context, side effects | `src/features/pause/presentation/home/` |
+| **Screen** | Dashboard slot + snooze chrome | `src/screens/home/hooks/use-home-pause-card-projection.tsx`, `components/HomePauseWidgetBody*.tsx` |
 
-**Rule:** New behavior → extend **domain resolver** first, then **projection conductor**; avoid mode checks in JSX.
+**Rule:** Extend **`resolveHomePauseWidgetSurface`** first, then the projection conductor — not JSX `if` chains.
 
 ---
 
@@ -31,172 +31,93 @@ flowchart TB
 
   subgraph read [Browser read-model]
     OPP[useOpenPauseHomePreview]
-    PHC[PauseHomeProvider / usePauseHomeContext]
-    MKT[Holzen market display query]
+    PHC[PauseHomeProvider]
   end
 
-  subgraph screen [Home screen]
-    HS[useHomeScreen]
-    HPC[useHomePauseCardProjection]
-  end
-
-  subgraph widget [Widget projection]
+  subgraph compose [Widget composition]
+    IN[useHomePauseWidgetInputs]
     PROJ[useHomePauseWidgetProjection]
-    RES[resolveHomePauseWidgetMode]
-    BUILD[buildHomePauseWidgetProjection]
+    RES[resolveHomePauseWidgetSurface]
+    ASM[assembleHomePauseWidgetProjection]
     BODY[HomePauseWidgetBody]
   end
 
-  PG --> VF
-  VF --> OPP
-  OPP --> PHC
-  MKT --> PHC
-  PHC --> HS
-  HS --> HPC
-  HPC --> PROJ
-  PROJ --> RES
-  PROJ --> BUILD
-  BUILD --> BODY
+  PG --> VF --> OPP --> PHC --> IN --> PROJ
+  PROJ --> RES --> ASM --> BODY
 ```
 
-| Step | Hook / module | Output |
-|------|---------------|--------|
-| 1 | `useOpenPauseHomePreview` | Open instance id, `state`, artifacts, context snapshot, metadata |
-| 2 | `useHolzenHomeContextState` | Market quote (possibly frozen from snapshot), manual trigger, discard, `newPauseArrival` |
-| 3 | `useHomeScreen` | Profile thresholds, subscription gate, pending-offer actions, completed count |
-| 4 | `useHomePauseWidgetProjection` | `HomePauseWidgetProjection` (chrome + flat body DTO) |
-| 5 | `HomePauseWidgetBody` | Routes by `widgetMode` to body components |
+| Step | Module | Output |
+|------|--------|--------|
+| 1 | `useOpenPauseHomePreview` | Open instance, artifacts, metadata |
+| 2 | `useHolzenHomeContextState` | Market quote, manual trigger, discard |
+| 3 | `useHomePauseWidgetInputs` | Subscription gate + actions + open pause snapshot |
+| 4 | `useHomePauseWidgetProjection` | `HomePauseWidgetProjection` (chrome + nested body DTO) |
+| 5 | `HomePauseWidgetBody` | Routes by `surface` |
+
+The screen passes only **`UseHomePauseWidgetScreenDeps`** (subscription ready, navigate, checkout helpers) — not 40 individual widget fields.
 
 ---
 
-## Domain modules (`domain/home/`)
+## Domain (`domain/home/`)
 
 | Module | Role |
 |--------|------|
-| `home-pause-widget-mode.ts` | **Mode resolver** — inputs → `HomePauseWidgetMode` (`A_*`, `B`, `C`, `C_prime`, `D_*`, loading, error) |
-| `home-pause-widget-mode.test.ts` | QA matrix for resolver |
-| `resolve-home-pause-widget-preview-line.ts` | Opening line under title |
-| `format-home-pause-market-block.ts` | Inline market line (live or snapshot) |
-| `resolve-engaged-pause-market-settled.ts` | Calm-waters body branch (C settled vs *still here*) |
-| `resolve-home-pause-widget-open-max-anchor.ts` | `open_max` countdown anchor (`calm_settled_at` vs `engaged_at`) |
-| `home-pause-widget-collapse-rules.ts` | Pure expand/collapse when mode transitions |
-| `build-home-pause-widget-projection.ts` | Assembles `HomePauseWidgetProjection` body + chrome fields |
-| `home-pause-widget-projection-types.ts` | Shared TypeScript contracts |
-| `pause-home-context-value.ts` | `PauseHomeContextValue` shape for provider |
-| `pause-home-widget-error.ts` | When to surface blocking error vs skeleton |
-| `build-open-pause-preview-from-pending-offer.ts` | C′ discard → promote pending preview |
+| `home-pause-widget-surface.ts` | **Surface resolver** — lifecycle inputs → `HomePauseWidgetSurface` |
+| `home-pause-widget-surface.test.ts` | QA matrix |
+| `home-pause-widget-expand-preference.ts` | Pure expand/collapse on surface transitions |
+| `resolve-home-pause-widget-preview-line.ts` | Opening line |
+| `format-home-pause-market-block.ts` | Inline market line |
+| `resolve-engaged-pause-market-settled.ts` | Calm market body branch |
+| `resolve-home-pause-widget-open-max-anchor.ts` | `open_max` countdown anchor |
+| `home-pause-widget-projection-types.ts` | Nested DTO types (`display`, `subscription`, `actions`) |
 
 ---
 
-## Presentation conductors
+## Presentation (`presentation/home/`)
 
-### Context (shared Home + `/pause`)
-
-| File | Role |
-|------|------|
-| `pause-home-context.tsx` | Provider + `usePauseHomeContext` |
-| `use-holzen-home-context-state.ts` | Composes market query + open preview + manual trigger |
-| `use-open-pause-home-preview.ts` | **Canonical** open-pause read-model (realtime + `fetchOpenPauseHomePreview`) |
-| `use-pause-home-discard-from-widget.ts` | Discard + undo toast + RPC (C′ promote pending) |
-| `open-pause-home-preview-snapshot.ts` | Optimistic undo snapshots |
-
-Manual-open RPC I/O stays under `presentation/reflect/generation/manual-open/pause-home-reflect-io.ts`; Home hooks import it from there.
-
-### Widget projection (`use-home-pause-widget-projection.ts`)
-
-Thin orchestrator; side effects live in `presentation/home/widget/`:
-
-| Sub-hook | Concern |
-|----------|---------|
+| Module | Role |
+|--------|------|
+| `use-home-pause-widget-inputs.ts` | Composes context + profile + subscription + pause actions |
+| `use-home-pause-widget-projection.ts` | Thin conductor (surface + formatters + assemble) |
+| `assemble-home-pause-widget-projection.ts` | Maps domain display + handlers → body DTO |
+| `use-home-pause-widget-collapse-preference.ts` | Session expand + first-visit localStorage |
+| `use-home-pause-widget-surface-transition.ts` | Auto expand when open pause arrives / ends |
 | `use-home-pause-widget-cooldown-clock.ts` | 1s tick for manual cooldown labels |
-| `use-home-pause-widget-collapse-state.ts` | `userExpanded` + first-visit / post-manual idle localStorage |
-| `use-home-pause-widget-mode-transition.ts` | Auto expand/collapse on mode changes (B/C arrival, open pause ends, D→A) |
-| `use-home-pause-recent-context-lost.ts` | Calm-waters query + Sonner toast |
-
-Composition order inside the conductor:
-
-1. Side-effect hooks (calm toast, cooldown clock, collapse prefs)
-2. `resolveHomePauseWidgetMode(..., userExpanded)`
-3. Mode transition effect
-4. Pure formatters (`marketBlock`, `previewLine`, settled / anchor helpers)
-5. `buildHomePauseWidgetProjection` → return with `onToggleCollapse`
-
-### Screen-level actions (not in projection hook)
-
-| File | Role |
-|------|------|
-| `use-home-pause-actions.ts` | Navigate to `/pause`, manual trigger entry |
-| `use-home-pending-pause-offer-actions.ts` | Adopt / decline pending on Home |
-| `use-home-pause-card-projection.tsx` | Subscription snooze + `useHomePauseWidgetProjection` |
+| `use-home-pause-recent-context-lost.ts` | Calm-waters toast query |
 
 ---
 
-## Screen layer (`src/screens/home/`)
+## Surface vocabulary (code)
 
-| File | Role |
-|------|------|
-| `hooks/use-home-screen.ts` | Pulls `usePauseHomeContext`, profile, subscription, wires pause card params |
-| `hooks/use-home-pause-card-projection.tsx` | Pause card chrome (snooze, subscription overlay) + widget projection |
-| `components/HomePauseWidgetBody.tsx` | **Router** — `switch (widgetMode)` |
-| `components/HomePauseWidgetBodies.tsx` | Per-mode bodies (A, B, C, C′, D, errors) |
+| `HomePauseWidgetSurface` | User situation |
+|--------------------------|----------------|
+| `idle_collapsed` / `idle_expanded` | No open pause; optional onboarding expand |
+| `open_pre_reflect` | Open pause before Reflect — **Let's pause** |
+| `open_engaged` | Reflect reached — **Continue** / **Discard** |
+| `open_engaged_pending_offer` | Engaged + cron pending — adopt branch |
+| `manual_cooldown_*` | After manual **Let's pause** — rest until cooldown |
+| `loading` / `blocking_error` | Transient states |
 
-Screens import types from `@/features/pause/public-home` or `@/features/pause/domain/home/home-pause-widget-projection-types` — not deep paths into `presentation/`.
-
----
-
-## Public exports (`public-home.ts`)
-
-Cross-route surface:
-
-- `usePauseHomeContext`, `PauseHomeProvider`
-- `useHomePauseWidgetProjection` + projection types
-- `resolveHomePauseWidgetMode`, `HomePauseWidgetMode`
-- Pending offer, pause actions, completed count
+Design wireframe IDs live only in [home-pause-widget-projection.md](home-pause-widget-projection.md) (appendix) — not in `src/`.
 
 ---
 
-## localStorage keys (UI-only)
+## Adding a new surface
 
-| Key / module | Purpose |
-|--------------|---------|
-| `home-pause-widget-first-visit-storage` | First idle Home visit → auto-expand A |
-| `home-post-manual-cooldown-idle-storage` | After manual cooldown → expand A once (Figma 578:26963) |
-| `HOME_PAUSE_WIDGET_EXPANDED_STORAGE_KEY` | **Deprecated** — expand is session-only via `userExpanded` state |
-
----
-
-## Adding a new widget mode or body branch
-
-1. **Product** — Update [home-pause-widget-projection.md](home-pause-widget-projection.md) mode table + Figma link.
-2. **Domain** — Extend `resolveHomePauseWidgetMode` + tests in `home-pause-widget-mode.test.ts`.
-3. **Collapse** — If mode is collapsible, update `home-pause-widget-mode.ts` helpers + `home-pause-widget-collapse-rules.ts` if transitions change.
-4. **Projection** — Add inputs to `UseHomePauseWidgetProjectionParams` only if the screen must supply them; prefer deriving inside the conductor from context.
-5. **UI** — New body in `HomePauseWidgetBodies.tsx`; register in `HomePauseWidgetBody.tsx`.
-6. **Docs** — This file + product projection doc in the same PR.
+1. Product — update [home-pause-widget-projection.md](home-pause-widget-projection.md).
+2. Domain — extend `resolveHomePauseWidgetSurface` + `home-pause-widget-surface.test.ts`.
+3. Expand rules — update `home-pause-widget-expand-preference.ts` if transitions change.
+4. UI — body in `HomePauseWidgetBodies.tsx`; route in `HomePauseWidgetBody.tsx`.
+5. This doc + product doc in the same PR.
 
 ---
 
-## Testing map
+## Testing
 
 | Layer | Tests |
 |-------|-------|
-| Mode resolver | `home-pause-widget-mode.test.ts` |
-| Collapse rules | `home-pause-widget-collapse-rules.test.ts` |
+| Surface resolver | `home-pause-widget-surface.test.ts` |
+| Expand preference | `home-pause-widget-expand-preference.test.ts` |
 | Open max anchor | `pause-open-max-anchor.test.ts` |
-| First-visit storage | `home-pause-widget-first-visit-storage.test.ts` |
-| Open preview dismiss | `use-open-pause-home-preview-dismiss.test.tsx` |
-
-Prefer domain tests for new branching; hook tests only for non-trivial orchestration.
-
----
-
-## Related docs
-
-| Doc | Role |
-|-----|------|
-| [home-pause-widget-projection.md](home-pause-widget-projection.md) | Figma modes, calm sweep, QA matrix |
-| [pause-system.md](pause-system.md) | Postgres states, RPCs, cron |
-| [pause-client-architecture.md](pause-client-architecture.md) | Whole pause client context |
-| [screens/home.md](../screens/home.md) | Home route overview |
 
 When this tree changes materially, update **this file** in the same PR.
