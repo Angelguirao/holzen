@@ -4,12 +4,10 @@ import { hasReachedReflectForHome } from '@/features/pause/domain/home/has-reach
 export type HomePauseWidgetMode =
   | 'loading'
   | 'blocking_error'
-  | 'calm_waters'
   | 'B'
   | 'B_in_progress'
   | 'C'
   | 'C_prime'
-  | 'E'
   | 'D_collapsed'
   | 'D_expanded'
   | 'D_prime_collapsed'
@@ -20,7 +18,6 @@ export type HomePauseWidgetMode =
 export type ResolveHomePauseWidgetModeInput = {
   loading: boolean;
   blockingError: boolean;
-  showCalmWaters: boolean;
   hasOpenPause: boolean;
   openPauseState: 'active' | 'engaged' | null;
   hasReflectionStep: boolean;
@@ -30,7 +27,7 @@ export type ResolveHomePauseWidgetModeInput = {
   /** Ms remaining on Home manual “Let’s pause” local cooldown (localStorage; not profile `cooldown_hours`). */
   manualCooldownRemainingMs: number;
   completedPauseCount: number;
-  /** Any `pause_step_events` on the open instance — mid-ritual stays B, not E. */
+  /** Any `pause_step_events` on the open instance — mid-ritual → B_in_progress. */
   hasOpenPauseStepEvents: boolean;
   /** User expanded the widget manually (A′ / D expanded). */
   userExpanded: boolean;
@@ -71,7 +68,7 @@ export function resolveHomePauseWidgetMode(
       return { mode: 'C', defaultCollapsed: false, hasReachedReflect };
     }
 
-    // Queued context while still `active` — inline banner on B (not E).
+    // Queued context while still `active` — inline banner on B.
     if (input.hasPendingOffer) {
       return { mode: 'B', defaultCollapsed: false, hasReachedReflect };
     }
@@ -80,13 +77,7 @@ export function resolveHomePauseWidgetMode(
       return { mode: 'B_in_progress', defaultCollapsed: false, hasReachedReflect };
     }
 
-    const isReturningUserNewActiveOffer =
-      input.completedPauseCount > 0 && !input.hasOpenPauseStepEvents;
-
-    if (isReturningUserNewActiveOffer) {
-      return { mode: 'E', defaultCollapsed: false, hasReachedReflect };
-    }
-
+    // Figma 559:26757 — any open `active` pre-ritual (manual, cron, returning user).
     return { mode: 'B', defaultCollapsed: false, hasReachedReflect };
   }
 
@@ -120,8 +111,11 @@ export function homePauseWidgetSectionTitleKey(mode: HomePauseWidgetMode): strin
     case 'C':
     case 'C_prime':
       return 'home.widget.continueYourPause';
-    case 'E':
-      return 'home.widget.newPauseAvailable';
+    case 'D_collapsed':
+    case 'D_expanded':
+    case 'D_prime_collapsed':
+    case 'D_prime_expanded':
+      return 'home.widget.youPaused';
     default:
       return 'home.widget.yourPause';
   }
@@ -134,8 +128,7 @@ export function homePauseWidgetModeIsCollapsible(mode: HomePauseWidgetMode): boo
     mode === 'D_collapsed' ||
     mode === 'D_expanded' ||
     mode === 'D_prime_collapsed' ||
-    mode === 'D_prime_expanded' ||
-    mode === 'calm_waters'
+    mode === 'D_prime_expanded'
   );
 }
 
@@ -143,7 +136,6 @@ export function homePauseWidgetModeIsCollapsed(mode: HomePauseWidgetMode): boole
   return (
     mode === 'A_collapsed' ||
     mode === 'D_collapsed' ||
-    mode === 'D_prime_collapsed' ||
-    mode === 'calm_waters'
+    mode === 'D_prime_collapsed'
   );
 }

@@ -69,10 +69,12 @@ export function renderHomeDashboardSection(sectionId: string, d: HomeDashboardSe
           title={d.t(d.pauseWidgetProjection.sectionTitleKey, {
             defaultValue:
               d.pauseWidgetProjection.sectionTitleKey === 'home.widget.continueYourPause'
-                ? 'Continue pause'
+                ? 'Continue your pause'
                 : d.pauseWidgetProjection.sectionTitleKey === 'home.widget.newPauseAvailable'
                     ? 'New pause available'
-                    : 'Your pause',
+                    : d.pauseWidgetProjection.sectionTitleKey === 'home.widget.youPaused'
+                        ? 'You paused'
+                        : 'Your pause',
           })}
           headerRight={
             d.pauseSectionHeaderRight ??

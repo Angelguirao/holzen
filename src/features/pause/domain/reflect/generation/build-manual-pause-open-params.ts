@@ -1,4 +1,5 @@
 import type { MarketQuote } from '@/features/market/public';
+import { isBitcoinTrackedAsset } from '@/features/market/public';
 import {
   buildManualPauseMarketContext,
   type ManualPauseMarketContext,
@@ -38,5 +39,10 @@ export function buildManualPauseOpenParams(
     trackedAssetId: assetId,
     fearGreedLabel: input.data.fearGreed?.label ?? null,
     onChainBand,
+    fearGreed: input.data.fearGreed ?? null,
+    onChain:
+      isBitcoinTrackedAsset(assetId) && input.data.onChain
+        ? (input.data.onChain as Record<string, unknown>)
+        : null,
   };
 }

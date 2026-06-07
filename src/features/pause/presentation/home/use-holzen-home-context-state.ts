@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getHolzenMarketDisplayQueryOptions,
@@ -10,6 +11,8 @@ import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
 import { millisecondsUntilNextVolatilityCheck } from '@/features/pause/public-scheduling';
 import { useOpenPauseHomePreview } from '@/features/pause/presentation/reflect/generation/manual-open/use-open-pause-home-preview';
+import { showHomePauseDiscardUndoToast } from '@/features/pause/presentation/home/home-pause-discard-with-undo';
+import { trackPauseOpenDismissed } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io';
 import { useHolzenManualTriggerOrchestration } from './use-holzen-manual-trigger-orchestration';
 import { useManualPauseTrigger } from '@/features/pause/presentation/reflect/generation/manual-open/use-manual-pause-trigger';
 import type { PauseHomeContextValue } from '@/features/pause/domain/home/pause-home-context-value';
@@ -21,6 +24,7 @@ import type { PauseHomeContextValue } from '@/features/pause/domain/home/pause-h
  */
 export function useHolzenHomeContextState(): PauseHomeContextValue {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const profile = useProfile();
   const queryClient = useQueryClient();
 
@@ -64,6 +68,10 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
     setLastPauseInstanceId,
     setOpenPauseState,
     dismissOpenPauseHome: dismissMessage,
+    clearOpenPausePreview,
+    capturePreviewSnapshot,
+    restorePreviewSnapshot,
+    commitOpenPauseDismissRpc,
     syncOpenPauseFromDb,
   } = useOpenPauseHomePreview(user, {
     onOpenPauseInstanceChanged: () => setNewPauseArrival(true),
@@ -95,6 +103,27 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
     });
 
   const nextCronCheckIn = useCallback(() => millisecondsUntilNextVolatilityCheck(), []);
+
+  const dismissOpenPauseFromWidget = useCallback(() => {
+    const pauseInstanceId = lastPauseInstanceId;
+    const snapshot = capturePreviewSnapshot();
+    clearOpenPausePreview();
+    showHomePauseDiscardUndoToast({
+      t,
+      onUndo: () => restorePreviewSnapshot(snapshot),
+      onCommit: () => {
+        trackPauseOpenDismissed('home_your_pause_widget', pauseInstanceId);
+        void commitOpenPauseDismissRpc();
+      },
+    });
+  }, [
+    lastPauseInstanceId,
+    capturePreviewSnapshot,
+    clearOpenPausePreview,
+    restorePreviewSnapshot,
+    commitOpenPauseDismissRpc,
+    t,
+  ]);
 
   const marketData = useMemo(() => {
     const live = marketQuery.data ?? null;
@@ -144,6 +173,7 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
     newPauseArrival,
     clearNewPauseArrival: () => setNewPauseArrival(false),
     dismissMessage,
+    dismissOpenPauseFromWidget,
     manualTrigger,
     manualCooldownRemaining,
     autoCooldownRemaining,

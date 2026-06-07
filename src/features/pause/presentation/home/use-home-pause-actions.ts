@@ -27,6 +27,7 @@ export function useHomePauseActions(args: {
   severity: MarketMoveSeverity;
   navigate: NavigateFunction;
   dismissMessage: () => void;
+  dismissOpenPauseFromWidget?: () => void;
   manualTrigger: (
     mood?: string,
     options?: ManualPauseTriggerOptions,
@@ -46,6 +47,7 @@ export function useHomePauseActions(args: {
     severity,
     navigate,
     dismissMessage,
+    dismissOpenPauseFromWidget,
     manualTrigger,
     manualCooldownRemaining,
     startCheckout,
@@ -110,9 +112,18 @@ export function useHomePauseActions(args: {
   ]);
 
   const handleDismiss = useCallback(() => {
+    if (dismissAnalyticsSurface === 'home_your_pause_widget' && dismissOpenPauseFromWidget) {
+      dismissOpenPauseFromWidget();
+      return;
+    }
     trackPauseOpenDismissed(dismissAnalyticsSurface, lastPauseInstanceId);
     void dismissMessage();
-  }, [dismissMessage, dismissAnalyticsSurface, lastPauseInstanceId]);
+  }, [
+    dismissOpenPauseFromWidget,
+    dismissMessage,
+    dismissAnalyticsSurface,
+    lastPauseInstanceId,
+  ]);
 
   const handleNavigatePauseWithThis = useCallback(() => {
     if (!canNavigateToPauseSession(message, lastPauseInstanceId)) return;

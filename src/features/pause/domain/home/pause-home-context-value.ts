@@ -24,6 +24,8 @@ export type PauseHomeContextValue = {
   newPauseArrival: boolean;
   clearNewPauseArrival: () => void;
   dismissMessage: () => void | Promise<void>;
+  /** Home “Your pause” widget discard — optimistic clear + undo snackbar before RPC. */
+  dismissOpenPauseFromWidget: () => void;
   manualTrigger: (
     mood?: string,
     options?: ManualPauseTriggerOptions,

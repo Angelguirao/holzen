@@ -4,6 +4,7 @@ import {
   formatCompactMarketSentimentFromContextText,
   formatCompactMarketSentimentFromFearGreed,
 } from '@/features/market/application/format-compact-market-sentiment-line';
+import { fearGreedFromPauseContextSnapshot } from '@/features/market/domain/home-market-display-quote';
 import { trackedAssetSymbol } from '@/features/market/domain/tracked-assets';
 
 export type HomePauseMarketBlock = {
@@ -39,15 +40,17 @@ function compactSentimentFromLiveQuote(data: MarketQuote): string | null {
   return formatCompactMarketSentimentFromFearGreed(data.fearGreed);
 }
 
-/** Formats the compact BTC/F&G block for Home pause widget states B/C. */
+/** Formats the compact BTC/F&G block for Home pause widget states B/C (Figma 559:26757). */
 export function formatHomePauseMarketBlock(input: {
   contextText: string | null;
+  contextSnapshot?: Record<string, unknown> | null;
   marketData: MarketQuote | null;
   trackedAssetId: string;
   instanceCreatedAt: string | null;
 }): HomePauseMarketBlock {
   const assetSymbol = trackedAssetSymbol(input.trackedAssetId);
   const parsed = parsePauseContextForHomePreview(input.contextText);
+  const snapshotFearGreed = fearGreedFromPauseContextSnapshot(input.contextSnapshot);
 
   const moveLine =
     compactMoveFromContext(parsed.btc24h, assetSymbol) ??
@@ -55,6 +58,7 @@ export function formatHomePauseMarketBlock(input: {
 
   const sentimentLine =
     compactSentimentFromContext(parsed.marketSentiment) ??
+    formatCompactMarketSentimentFromFearGreed(snapshotFearGreed) ??
     (input.marketData ? compactSentimentFromLiveQuote(input.marketData) : null);
 
   return {

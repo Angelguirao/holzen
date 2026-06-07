@@ -29,6 +29,8 @@ export async function buildManualPauseCreateOrReuseParams(
       direction: directionBucket,
       severity: params.severityBand,
       context_text: params.contextText,
+      fear_greed: params.fearGreed ?? null,
+      on_chain: params.onChain ?? null,
       last_reported_mood: params.mood ?? null,
       tracked_asset_id: params.trackedAssetId,
     },

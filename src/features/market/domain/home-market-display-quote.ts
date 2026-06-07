@@ -27,6 +27,13 @@ function fearGreedFromSnapshot(
   return { value, label };
 }
 
+/** Read trigger-time F&G from a pause `context_snapshot` (Home pause widget + market strip). */
+export function fearGreedFromPauseContextSnapshot(
+  snapshot: Record<string, unknown> | null | undefined,
+): FearGreedData | undefined {
+  return fearGreedFromSnapshot(snapshot);
+}
+
 function directionFromSnapshot(
   snapshot: Record<string, unknown>,
   snapPct: number,

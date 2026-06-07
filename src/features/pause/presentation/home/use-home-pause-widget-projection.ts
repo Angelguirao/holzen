@@ -65,7 +65,6 @@ export type HomePauseWidgetBodyProjection = {
   manualCooldownRemainingMs: number;
   pendingPreviewLine: HomePauseWidgetPreviewLine | null;
   pendingMarketBlock: ReturnType<typeof formatHomePauseMarketBlock> | null;
-  calmWatersExpiredAt: string | null;
 };
 
 export type UseHomePauseWidgetProjectionParams = {
@@ -180,7 +179,6 @@ export function useHomePauseWidgetProjection(
       resolveHomePauseWidgetMode({
         loading: params.loading,
         blockingError,
-        showCalmWaters,
         hasOpenPause: params.hasOpenPause,
         openPauseState: params.openPauseState,
         hasReflectionStep: params.hasReflectionStep,
@@ -195,7 +193,6 @@ export function useHomePauseWidgetProjection(
     [
       params.loading,
       blockingError,
-      showCalmWaters,
       params.hasOpenPause,
       params.openPauseState,
       params.hasReflectionStep,
@@ -221,12 +218,12 @@ export function useHomePauseWidgetProjection(
       'D_prime_collapsed',
       'D_prime_expanded',
     ];
-    const activeModes: HomePauseWidgetMode[] = ['B', 'B_in_progress', 'C', 'C_prime', 'E'];
+    const activeModes: HomePauseWidgetMode[] = ['B', 'B_in_progress', 'C', 'C_prime'];
     if (prev && activeModes.includes(prev) && restModes.includes(widgetMode)) {
       setUserExpanded(false);
     }
 
-    const autoExpandModes: HomePauseWidgetMode[] = ['B', 'B_in_progress', 'C', 'C_prime', 'E'];
+    const autoExpandModes: HomePauseWidgetMode[] = ['B', 'B_in_progress', 'C', 'C_prime'];
     const enteredAutoExpand =
       prev !== null && autoExpandModes.includes(widgetMode) && !autoExpandModes.includes(prev);
 
@@ -246,11 +243,12 @@ export function useHomePauseWidgetProjection(
     () =>
       formatHomePauseMarketBlock({
         contextText: params.contextText,
+        contextSnapshot: params.contextSnapshot,
         marketData: params.marketData,
         trackedAssetId: params.trackedAssetId,
         instanceCreatedAt: params.openPauseCreatedAt,
       }),
-    [params.contextText, params.marketData, params.trackedAssetId, params.openPauseCreatedAt],
+    [params.contextText, params.contextSnapshot, params.marketData, params.trackedAssetId, params.openPauseCreatedAt],
   );
 
   const previewLine = useMemo(
@@ -276,7 +274,7 @@ export function useHomePauseWidgetProjection(
     typeof pendingSnapshot?.context_text === 'string' ? pendingSnapshot.context_text : null;
 
   const pendingPreviewLine =
-    pending && (widgetMode === 'C_prime' || widgetMode === 'B' || widgetMode === 'E')
+    pending && (widgetMode === 'C_prime' || widgetMode === 'B')
       ? resolveHomePauseWidgetPreviewLine({
           hasReflectionStep: false,
           reflectionMessage: pending.preview_message,
@@ -287,17 +285,17 @@ export function useHomePauseWidgetProjection(
       : null;
 
   const pendingMarketBlock =
-    pending && (widgetMode === 'C_prime' || widgetMode === 'B' || widgetMode === 'E')
+    pending && (widgetMode === 'C_prime' || widgetMode === 'B')
       ? formatHomePauseMarketBlock({
           contextText: pendingContextText,
+          contextSnapshot: pendingSnapshot,
           marketData: params.marketData,
           trackedAssetId: params.trackedAssetId,
           instanceCreatedAt: pending.created_at ?? null,
         })
       : null;
 
-  const showPendingQueuedBanner =
-    (widgetMode === 'B' || widgetMode === 'E') && Boolean(pending);
+  const showPendingQueuedBanner = widgetMode === 'B' && Boolean(pending);
 
   const body: HomePauseWidgetBodyProjection = {
     widgetMode,
@@ -333,7 +331,6 @@ export function useHomePauseWidgetProjection(
     manualCooldownRemainingMs,
     pendingPreviewLine,
     pendingMarketBlock,
-    calmWatersExpiredAt: calmQuery.data?.expiredAt ?? null,
   };
 
   return {
