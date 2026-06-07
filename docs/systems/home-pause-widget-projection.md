@@ -53,16 +53,26 @@ Modes are **derived**, not stored. Primary inputs to `resolveHomePauseWidgetMode
 | Mode | Typical condition | Primary CTA / body |
 |------|-------------------|-------------------|
 | **A** collapsed / expanded | No open pause; not in manual cooldown; **collapsed by default** — **first idle onboarding** auto-expands on every Home visit until **Let's pause** or an open pause arrives first (Figma [555:16772](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=555-16772) exception) | Title **Your pause** + moon; chevron expands to within-range copy + **Let's pause** |
-| **B** | Open `active`, no step events yet (manual, cron, or returning user — same UI) | Figma **[559:26757](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=559-26757)** — title **Your pause**; opening line + inline market + Nox **Let's pause** |
-| **B_in_progress** | Open `active`, `hasOpenPauseStepEvents` | Figma **578:28850** — *“The pause you started is still here.”* only; Nox **Continue** + primary **Discard** |
-| **C** | Open pause, `state = engaged` | Same CTA stack as **B_in_progress**; opening/reflection + inline market when present |
-| **C′** | Engaged + pending offer row | Figma **578:27896** — current pause + Continue/Discard, **or**, inner kicker **New pause available** + adopt CTA |
+| **B** | Open `active` (pre-Reflect, with or without step events) | Figma **[559:26757](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=559-26757)** — title **Your pause**; opening line + inline market + Nox **Let's pause** |
+| **C** | Open pause, `state = engaged` (Reflect reached) | Figma **[578:28850](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-28850)** — title **Continue your pause**; *still here* + Nox **Continue** + **Discard** |
+| **C′** | Engaged + pending | Figma **[578:27896](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27896)** / **[578:27929](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27929)** — **Continue** / **Discard**, **or**, **New pause available** + adopt CTA |
 | **D** / **D′** | No open pause, auto cooldown active | **You paused**; collapsed by default; expanded → Figma [578:25933](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-25933) cooldown copy + **Revisit your archive** (D′ = no archive link) |
-| **B** + pending | Open `active` + pending row | Inline queued banner + adopt/decline; title stays **Your pause** |
 | **context_lost settled** | Cron expires offer with `context_lost`; market back within range; no open pause | Routes to **A** or **D** (not a separate body); optional Sonner toast once |
 | **loading** / **blocking_error** | Holzen loading or hard market error | Skeleton or retry |
 
 **State semantics** (`active` vs `engaged`) are defined in [pause-system.md](pause-system.md). The widget **reads** `openPauseState`; it does not re-derive engagement gates in the UI.
+
+### “Continue” vs Postgres `engaged` / `engaged_at`
+
+| Layer | Meaning | Home widget |
+|-------|---------|-------------|
+| **Postgres `engaged`** | Deep ritual logged `reflection_step` → `engaged_at` set | Mode **C** or **C′** — Figma [578:28850](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-28850): *still here* + **Continue** + **Discard** |
+| **Pre-Reflect `active`** | Feel/Breath logged but not Reflect yet | Mode **B** — **Let's pause** (re-enter `/pause` to resume; no Home **Continue**) |
+| **Untouched open pause** | No step events | Mode **B** — **Let's pause** |
+
+**Continue** on Home appears only after Reflect (`engaged`). **`engaged_at`** is the same server milestone (stats, archive segment, 12h `open_max_age`). Brief ritual never enters `engaged`.
+
+When cron queues a **pending** row: untouched open pauses are **auto-superseded** (silent). **C′** pending adopt/decline on Home appears only when the open pause is **`engaged`**; pre-Reflect pending is handled on **`/pause`** leave sheet only.
 
 ---
 
@@ -84,8 +94,9 @@ When cron/manual trigger queues a **pending** instance while the user still has 
 
 | Open pause state | Widget UX | Mutations |
 |------------------|-----------|-----------|
-| `engaged` | **C′** — side-by-side current vs new context | Adopt / decline via `usePendingPauseOfferMutations` on Home |
-| `active` | **B** + inline queued banner | Same mutations; banner CTA adopts pending |
+| `engaged` | **C′** — unified card (Figma 578:27896 / 578:27929) | Adopt / decline via `usePendingPauseOfferMutations` on Home |
+| `active` (pre-Reflect) | **B** — pending row may exist in Postgres but is **not** surfaced on Home | Adopt / decline on **`/pause`** leave sheet only |
+| `active`, untouched | **No pending row** — Postgres auto-supersedes open pause with fresh `active` instance | N/A (silent replace) |
 
 On **`/pause`**, leave flow still uses `PauseLeaveWithPendingSheet`. There is **no** app-shell blocking dialog.
 
@@ -131,23 +142,21 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 |---|-------------|------------------|------------------|
 | 1 | **A** collapsed | No open pause; not in manual cooldown; **return visit** | Title **Your pause** + moon; collapsed header only (Figma 578:30689) |
 | 2 | **A** expanded | First idle onboarding (every visit until **Let's pause**) **or** tap chevron on A | Within-range copy + Nox **Let's pause** (Figma 555:16772); forfeited if Holzen opens a pause first |
-| 3 | **B** | Open `active`; no `pause_step_events` yet (manual, cron, or returning user) | Title **Your pause** (Figma [559:26757](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=559-26757)); empathy + inline BTC/F&G + Nox **Let's pause** — **not** “New pause available” or “market moved again” copy |
-| 3b | **B_in_progress** | Open `active`; log Feel (or any step) | **Continue your pause**; *“The pause you started is still here.”* only; Nox **Continue** + primary **Discard** |
-| 4 | **C** | Reach Reflect → `engaged` | Same title/CTAs as 3b; reflection or opening + inline market when present |
-| 5 | **C′** | **C** + cron queues new context (pending row) while still on Home | Unified card (Figma 578:27896): current pause + **Continue** / **Discard**, **or**, **New pause available** + **Pause with new context** + keep-current link |
-| 6 | **B + pending** | Open `active` (pre-Reflect) + pending row | Amber **New moment queued** banner; **Switch to new pause** / **Keep current pause**; main CTA still **Let's pause** |
-| 7 | **D** | Complete a pause; stay on profile cooldown; no open pause; has archive | **You paused**; collapsed default; expanded → cooldown time + Nox **Revisit your archive** (Figma 578:25933) |
-| 8 | **D′** | Same as D but `completedPauseCount = 0` | Rest copy without archive link |
-| 9 | **context_lost → A/D** | Cron expires offer with `context_lost`; no open pause; within 24h window | Widget stays **A** or **D** (collapsed); optional Sonner toast once — not expanded “moment passed” body |
-| 10 | **loading** | Hard refresh Home while Holzen loading (no open pause yet) | “Opening your pause…” skeleton |
-| 11 | **Trial gate** | Lapsed / no entitlement user | Trial/reactivate CTA instead of ritual body |
+| 3 | **B** | Open `active` (untouched, mid-ritual pre-Reflect, manual, cron, or returning user) | Title **Your pause** (Figma [559:26757](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=559-26757)); empathy + inline BTC/F&G + Nox **Let's pause** |
+| 4 | **C** | Reach Reflect → `engaged` | Title **Continue your pause** (Figma [578:28850](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-28850)); *still here* + Nox **Continue** + **Discard** |
+| 5 | **C′** | **C** + cron queues new context (pending row) while still on Home | Unified card (Figma [578:27929](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27929)): **Continue** / **Discard**, **or**, **New pause available** + **Pause with new context** |
+| 6 | **D** | Complete a pause; stay on profile cooldown; no open pause; has archive | **You paused**; collapsed default; expanded → cooldown time + Nox **Revisit your archive** (Figma 578:25933) |
+| 7 | **D′** | Same as D but `completedPauseCount = 0` | Rest copy without archive link |
+| 8 | **context_lost → A/D** | Cron expires offer with `context_lost`; no open pause; within 24h window | Widget stays **A** or **D** (collapsed); optional Sonner toast once — not expanded “moment passed” body |
+| 9 | **loading** | Hard refresh Home while Holzen loading (no open pause yet) | “Opening your pause…” skeleton |
+| 10 | **Trial gate** | Lapsed / no entitlement user | Trial/reactivate CTA instead of ritual body |
 
 **Regression checks (open pause + pending):**
 
 - Returning user with untouched cron/manual `active` pause → **B** with title **Your pause**, same as first pause.
-- **Active + pending** → **B** with banner; title stays **Your pause**.
-- **New pause available** copy appears only as the **C′** inner kicker (engaged + pending), not as the section title for an open `active` pause.
-- **Continue** appears in **B_in_progress**, **C**, and **C′** — not on untouched **B** (use **Let's pause**).
+- Cron new context while open pause is **untouched** → silent supersede; widget stays **B** with fresh copy (no pending UX).
+- **New pause available** copy appears only inside **C′** (engaged + pending), not on **B**.
+- **Continue** appears in **C** and **C′** only (after Reflect / `engaged`) — not on **B** (use **Let's pause**, including mid-ritual pre-Reflect).
 
 ---
 
@@ -159,7 +168,7 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 | **Continue** | **C** → tap | Same instance on `/pause`; session resumes |
 | **Discard** | **C** → **Discard** | Optimistic clear + Sonner **Pause discarded.** / **Undo** (Figma 579:32066); RPC after undo window; widget → **A** or **D**; `pause_open_dismissed` with `surface: home_your_pause_widget` |
 | **Adopt pending** | **B** or **C′** → switch/adopt | Pending cleared; new instance active; `/pause` opens with **new** id; persisted tab session cleared; `pause_pending_adopted` |
-| **Decline pending** | Banner or **C′** → keep current | Pending row gone; current open pause unchanged; `pause_pending_declined` |
+| **Decline pending** | **`/pause`** leave sheet → keep current | Pending row gone; current open pause unchanged; `pause_pending_declined` |
 | **I need a pause** | **A′** → manual trigger (cooldown clear) | Navigates `/pause` or silent open; no `/tools` route |
 | **Pending on other tabs** | Queue pending while on **Journey** | **No** global modal; return **Home** → banner or **C′** |
 
