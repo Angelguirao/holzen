@@ -59,7 +59,7 @@ Presentation hooks (`src/features/pause/presentation/session/`, `presentation/re
 
 ## Navigation out
 
-[`usePauseSessionExitNavigation`](../../src/features/pause/presentation/session/use-pause-session-exit-navigation.ts) (`public-hooks`) provides close/return handlers consumed by the gate and scaffold. Pending-offer on Home: [`useHomePendingPauseOfferActions`](../../src/features/pause/presentation/home/use-home-pending-pause-offer-actions.ts) + inline widget (B / C′). On `/pause`: **`PauseLeaveWithPendingSheet`** with [`usePendingPauseOfferMutations`](../../src/features/pause/presentation/reflect/pending-offer/use-pending-pause-offer-mutations.ts) (`public-session` / `public-hooks`). Adopt/resync navigation: [`usePauseSessionPendingPauseOfferNavigation`](../../src/features/pause/presentation/reflect/pending-offer/use-pause-session-pending-pause-offer-navigation.ts) (`public-hooks`).
+[`usePauseSessionExitNavigation`](../../src/features/pause/presentation/session/use-pause-session-exit-navigation.ts) (`public-hooks`) provides close/return handlers consumed by the gate and scaffold. Pending-offer on Home: [`useHomePendingPauseOfferActions`](../../src/features/pause/presentation/home/use-home-pending-pause-offer-actions.ts) + inline widget (`open_engaged_pending_offer`). On `/pause`: **`PauseLeaveWithPendingSheet`** with [`usePendingPauseOfferMutations`](../../src/features/pause/presentation/reflect/pending-offer/use-pending-pause-offer-mutations.ts) (`public-session` / `public-hooks`). Adopt/resync navigation: [`usePauseSessionPendingPauseOfferNavigation`](../../src/features/pause/presentation/reflect/pending-offer/use-pause-session-pending-pause-offer-navigation.ts) (`public-hooks`).
 
 ## Analytics
 

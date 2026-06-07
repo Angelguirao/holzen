@@ -254,18 +254,18 @@
       <span>Figma 469:14301 · pause-system §3</span>
       <span class="status resolved">resolved</span>
     </header>
-    <h3>Home widget A–E projection + opening preview</h3>
+    <h3>Home widget surface projection + opening preview</h3>
     <dl>
       <dt>Design decision</dt>
       <dd>
-        Figma states are a client read-model (<code>resolveHomePauseWidgetMode</code>), not new Postgres states.
-        Figma states map from Postgres: <code>active</code> → B, <code>engaged</code> → C (deep + <code>reflection_step</code>).
+        Widget surfaces are a client read-model (<code>resolveHomePauseWidgetSurface</code>), not new Postgres states.
+        Postgres maps to surfaces: <code>active</code> → <code>open_pre_reflect</code>, <code>engaged</code> → <code>open_engaged</code> (deep + <code>reflection_step</code>).
         See <a href="../../docs/systems/home-pause-widget-projection.md">home-pause-widget-projection.md</a>.
         Pre-Reflect empathy line uses deterministic i18n from <code>context_snapshot</code> — no holzen-reflect at cron/Home open.
       </dd>
       <dt>Calm-waters</dt>
       <dd>
-        When cron expires <code>active|pending</code> with <code>context_lost</code>, show reassurance copy (not state B);
+        When cron expires <code>active|pending</code> with <code>context_lost</code>, show reassurance copy (not <code>open_pre_reflect</code>);
         optional Sonner toast; query <code>fetchRecentContextLostPause</code> within 24h.
       </dd>
       <dt>Mode E gate (2026-05-27 follow-up)</dt>

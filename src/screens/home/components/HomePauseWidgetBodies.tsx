@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { LoadingButton } from '@/components/ui/loading-button';
@@ -26,10 +25,7 @@ import {
   homePauseWidgetSurfaceIsManualCooldownFirstPause,
   homePauseWidgetSurfaceIsManualCooldownWithArchive,
 } from '@/features/pause/domain/home/home-pause-widget-surface';
-import {
-  formatPauseOpenMaxRemaining,
-  pauseOpenMaxDeadlineMs,
-} from '@/features/pause/public-session';
+import { PauseEngagedOpenMaxCountdown } from '@/screens/pause/components/PauseEngagedOpenMaxCountdown';
 
 type OpenBodyProps = {
   previewLine: HomePauseWidgetPreviewLineModel | null;
@@ -85,54 +81,67 @@ type EngagedProps = {
   onDismissOpenPause: () => void;
 };
 
+type EngagedCalmWatersProps = {
+  engagedPauseMarketSettled: boolean;
+  openPauseOpenMaxAnchorAt: string | null;
+};
+
+function HomePauseEngagedCalmWatersBlock({
+  engagedPauseMarketSettled,
+  openPauseOpenMaxAnchorAt,
+}: EngagedCalmWatersProps) {
+  "use memo";
+  const { t } = useTranslation();
+
+  if (!engagedPauseMarketSettled) return null;
+
+  return (
+    <div className="space-y-1 text-sm leading-5 tracking-wide text-foreground">
+      <p>
+        {t('home.pauseInProgress.marketSettledLead', {
+          defaultValue: 'The market that disturbed you has settled.',
+        })}
+      </p>
+      <p>
+        {t('home.pauseInProgress.marketSettledBody', {
+          defaultValue: 'Your pause is still open if you want to finish.',
+        })}
+      </p>
+      {openPauseOpenMaxAnchorAt ? (
+        <PauseEngagedOpenMaxCountdown
+          anchorIso={openPauseOpenMaxAnchorAt}
+          className="pt-1 text-sm leading-5 tracking-wide text-foreground"
+          countdownTranslationKey="home.pauseInProgress.closesIn"
+          countdownTranslationDefault="This pause closes in {{remaining}}"
+        />
+      ) : (
+        <p className="pt-1 text-muted-foreground">
+          {t('home.pauseInProgress.closesAfterSettle', {
+            defaultValue: 'This pause closes 12 hours after the market settles.',
+          })}
+        </p>
+      )}
+    </div>
+  );
+}
+
 /** Open pause after Reflect — Continue / Discard; calm market shows settled copy. */
 export function HomePauseEngagedBody({
   onPauseWithThis,
   onDismissOpenPause,
   engagedPauseMarketSettled,
   openPauseOpenMaxAnchorAt,
-}: EngagedProps & {
-  engagedPauseMarketSettled: boolean;
-  openPauseOpenMaxAnchorAt: string | null;
-}) {
+}: EngagedProps & EngagedCalmWatersProps) {
   "use memo";
   const { t } = useTranslation();
-  const [nowMs, setNowMs] = useState(() => Date.now());
-
-  useEffect(() => {
-    if (!engagedPauseMarketSettled || !openPauseOpenMaxAnchorAt) return;
-    const id = window.setInterval(() => setNowMs(Date.now()), 30_000);
-    return () => window.clearInterval(id);
-  }, [engagedPauseMarketSettled, openPauseOpenMaxAnchorAt]);
-
-  const openMaxRemaining =
-    engagedPauseMarketSettled && openPauseOpenMaxAnchorAt
-      ? formatPauseOpenMaxRemaining(pauseOpenMaxDeadlineMs(openPauseOpenMaxAnchorAt), nowMs)
-      : null;
 
   return (
     <div className={homePauseWidgetBodyStack}>
       {engagedPauseMarketSettled ? (
-        <div className="space-y-1 text-sm leading-5 tracking-wide text-foreground">
-          <p>
-            {t('home.pauseInProgress.marketSettledLead', {
-              defaultValue: 'The market that disturbed you has settled.',
-            })}
-          </p>
-          <p>
-            {t('home.pauseInProgress.marketSettledBody', {
-              defaultValue: 'Your pause is still open if you want to finish.',
-            })}
-          </p>
-          {openMaxRemaining ? (
-            <p className="pt-1">
-              {t('home.pauseInProgress.closesIn', {
-                remaining: openMaxRemaining,
-                defaultValue: 'This pause closes in {{remaining}}',
-              })}
-            </p>
-          ) : null}
-        </div>
+        <HomePauseEngagedCalmWatersBlock
+          engagedPauseMarketSettled={engagedPauseMarketSettled}
+          openPauseOpenMaxAnchorAt={openPauseOpenMaxAnchorAt}
+        />
       ) : (
         <p className="text-sm leading-5 tracking-wide text-muted-foreground">
           {t('home.pauseInProgress.stillHere', {
@@ -151,7 +160,8 @@ export function HomePauseEngagedBody({
   );
 }
 
-type PendingProps = EngagedProps & {
+type PendingProps = EngagedProps &
+  EngagedCalmWatersProps & {
   pendingMarketBlock: HomePauseMarketBlock | null;
   onPauseWithNewContext?: () => void;
   pendingOfferBusy?: boolean;
@@ -164,6 +174,8 @@ export function HomePauseEngagedPendingBody({
   onDismissOpenPause,
   onPauseWithNewContext,
   pendingOfferBusy,
+  engagedPauseMarketSettled,
+  openPauseOpenMaxAnchorAt,
 }: PendingProps) {
   "use memo";
   const { t } = useTranslation();
@@ -171,11 +183,18 @@ export function HomePauseEngagedPendingBody({
 
   return (
     <div className={homePauseWidgetBodyStack}>
-      <p className="text-sm leading-5 tracking-wide text-muted-foreground">
-        {t('home.pauseInProgress.stillHere', {
-          defaultValue: 'The pause you started is still here.',
-        })}
-      </p>
+      {engagedPauseMarketSettled ? (
+        <HomePauseEngagedCalmWatersBlock
+          engagedPauseMarketSettled={engagedPauseMarketSettled}
+          openPauseOpenMaxAnchorAt={openPauseOpenMaxAnchorAt}
+        />
+      ) : (
+        <p className="text-sm leading-5 tracking-wide text-muted-foreground">
+          {t('home.pauseInProgress.stillHere', {
+            defaultValue: 'The pause you started is still here.',
+          })}
+        </p>
+      )}
       <div className="flex flex-col gap-6 pb-2">
         <HomePauseWidgetNoxCta label={t('home.pauseWidget.continue')} onClick={onPauseWithThis} />
         <HomePauseWidgetDiscardLink

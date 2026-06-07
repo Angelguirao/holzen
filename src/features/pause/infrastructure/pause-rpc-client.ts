@@ -180,3 +180,15 @@ export async function pauseDismissCurrent(): Promise<PauseState | null> {
   if (error) throw error;
   return (data as PauseState | null) ?? null;
 }
+
+export async function pauseApplyCronCalmSweepForSelf(input: {
+  changePercent: number;
+  direction: 'up' | 'down';
+}): Promise<Record<string, unknown> | null> {
+  const { data, error } = await supabase.rpc('pause_apply_cron_calm_sweep_for_self' as never, {
+    p_change_percent: input.changePercent,
+    p_direction: input.direction,
+  } as never);
+  if (error) throw error;
+  return (data as Record<string, unknown> | null) ?? null;
+}

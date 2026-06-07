@@ -88,7 +88,7 @@ export function CurrentPauseCard() {
             </div>
             {isEngaged && current.engaged_at ? (
               <PauseEngagedOpenMaxCountdown
-                engagedAtIso={current.engaged_at}
+                anchorIso={current.engaged_at}
                 className="text-[11px] font-mono tabular-nums text-muted-foreground"
               />
             ) : null}
