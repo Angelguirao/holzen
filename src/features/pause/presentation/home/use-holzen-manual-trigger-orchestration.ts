@@ -13,6 +13,7 @@ import {
   readManualTriggerCooldownAtMs,
   writeManualTriggerCooldownAtMs,
 } from '@/features/pause/public-trigger';
+import { markPostManualCooldownIdlePrompt } from '@/features/pause/infrastructure/home-post-manual-cooldown-idle-storage';
 import type { ManualPauseTriggerOptions } from '@/features/pause/domain/manual-pause-trigger-options';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
@@ -107,6 +108,7 @@ export function useHolzenManualTriggerOrchestration({
           const now = Date.now();
           setLastManualAt(now);
           writeManualTriggerCooldownAtMs(manualCooldownKey, now);
+          if (user?.id) markPostManualCooldownIdlePrompt(user.id);
         }
         return result;
       } catch (e: unknown) {

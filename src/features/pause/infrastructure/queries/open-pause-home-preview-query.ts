@@ -8,6 +8,7 @@ import { trackedAssetSymbol, normalizeTrackedAssetId } from '@/features/market/d
 export type OpenPauseHomePreview = {
   pauseInstanceId: string;
   createdAt: string;
+  engagedAt: string | null;
   openPauseState: 'active' | 'engaged';
   openPauseSource: string | null;
   contextText: string | null;
@@ -45,7 +46,7 @@ async function fetchPauseStepEventCount(
 export async function fetchOpenPauseHomePreview(userId: string): Promise<OpenPauseHomePreview | null> {
   const { data, error } = await supabase
     .from('v_pause_full' as never)
-    .select('id, created_at, context_snapshot, state, is_brief_ritual, source')
+    .select('id, created_at, engaged_at, context_snapshot, state, is_brief_ritual, source')
     .eq('user_id', userId)
     .in('state', ['active', 'engaged'])
     .maybeSingle();
@@ -55,6 +56,7 @@ export async function fetchOpenPauseHomePreview(userId: string): Promise<OpenPau
   const row = data as {
     id: string;
     created_at: string;
+    engaged_at: string | null;
     context_snapshot: Record<string, unknown> | null;
     state?: string;
     is_brief_ritual?: boolean | null;
@@ -101,6 +103,7 @@ export async function fetchOpenPauseHomePreview(userId: string): Promise<OpenPau
   return {
     pauseInstanceId: row.id,
     createdAt: row.created_at,
+    engagedAt: row.engaged_at ?? null,
     openPauseState,
     openPauseSource: row.source ?? null,
     contextText,

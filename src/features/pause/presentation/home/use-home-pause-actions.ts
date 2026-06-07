@@ -14,6 +14,7 @@ import {
   type PauseDismissAnalyticsSurface,
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io';
 import { markHomePauseWidgetFirstVisitHandled } from '@/features/pause/infrastructure/home-pause-widget-first-visit-storage';
+import { clearPostManualCooldownIdlePrompt } from '@/features/pause/infrastructure/home-post-manual-cooldown-idle-storage';
 import { holzenLog } from '@/lib/holzen-console';
 
 export type { PauseDismissAnalyticsSurface };
@@ -64,6 +65,7 @@ export function useHomePauseActions(args: {
 
     if (userId) {
       markHomePauseWidgetFirstVisitHandled(userId);
+      clearPostManualCooldownIdlePrompt(userId);
     }
 
     holzenLog.home('Navigate to /pause immediately (Let\'s pause from idle)');

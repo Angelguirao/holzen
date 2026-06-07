@@ -19,6 +19,7 @@ export type PauseHomeContextValue = {
   hasReachedReflect: boolean;
   isBriefRitual: boolean;
   openPauseCreatedAt: string | null;
+  openPauseEngagedAt: string | null;
   loading: boolean;
   error: string | null;
   newPauseArrival: boolean;

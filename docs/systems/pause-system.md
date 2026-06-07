@@ -100,6 +100,26 @@ Holzen stores **one `pause_instances` row per pause**. Product language below ma
 
 **Note:** `**engaged_at**` means **“the row reached Reflect (`reflection_step`) on deep `volatility_v1`”** (or template **`required_for_engaged`** on other slugs). Echoes use `**engaged_at IS NULL**` as **“ended before Reflect”** (see `**src/features/pause/domain/archive-segment.ts**`).
 
+### 3.2 Calm market sweep (`cron_volatility`)
+
+Each **`check-volatility`** tick computes users whose live move is **below** daily thresholds while they still have open **`cron_volatility`** rows, then calls **`pause_expire_cron_volatility_context_lost(p_user_id)`** (migration `**20260523150200_pause_expire_cron_volatility_context_lost.sql**`; invoked from `**supabase/functions/check-volatility/index.ts**`).
+
+| Row state | On calm sweep |
+| --------- | ------------- |
+| **`pending`** | **`expired`**, `**expired_reason = context_lost**`, `metadata.volatility_calm_sweep = true` |
+| **`active`** (pre-Reflect) | Same — offer no longer justified by volatility |
+| **`engaged`** | **Unchanged** — user may finish via **Continue** / **Discard** on Home |
+
+**Scope:** only `**source = 'cron_volatility'**`. **Manual** pauses are **not** auto-expired when the market calms.
+
+When the sweep clears **all** open rows for the user, **`profiles.last_context`** is set to **NULL**.
+
+**Engaged TTL after calm:** Postgres still expires **`engaged`** via **`open_max_age`** — **12 hours after `COALESCE(engaged_at, created_at)`** — not from the calm-waters timestamp. The Home calm-waters card (Figma 578:27863) shows that same deadline in UI; it does **not** reset the clock when volatility settles. Product change to anchor grace to calm time would require a new column/metadata stamp on sweep + migration to `**pause_evaluate_transitions**`.
+
+**Pending safety net:** if volatility never calms, a lone **`pending`** row can still expire after **12h** from **`created_at`** via **`pause_sweep_window_elapsed`** (`**pending_stale_ttl**` in metadata) — usually superseded by calm sweep or fingerprint churn first.
+
+**Home projection:** [home-pause-widget-projection.md § Calm market sweep](home-pause-widget-projection.md#calm-market-sweep-server-vs-home-ui).
+
 ---
 
 ## 4. RPCs and transitions
@@ -111,7 +131,9 @@ Holzen stores **one `pause_instances` row per pause**. Product language below ma
 | `**pause_log_step**`             | Append one `**pause_step_events**` row; then the DB re-evaluates state.                                                    |
 | `**pause_log_companion**`        | Append companion open/complete; may set `**counts_for_pause**`.                                                            |
 | `**pause_evaluate_transitions**` | **Not called from the client**; invoked from triggers after relevant inserts so `**pause_instances.state`** stays in sync. |
-| `**pause_dismiss_current**` | When a `**pending**` row exists: dismiss the open `**active|engaged**` instance (`**user_dismissed_current**`), then promote pending → `**active**` (Home **C′** **Discard**, Figma 578:29994). When no pending: expire stale pending rows (`**system_cancelled**`), then dismiss the open instance. Also used from `/pause` header **Close** (no pending promotion). |
+| `**pause_dismiss_current**` | When a `**pending**` row exists: dismiss the open `**active|engaged**` instance (`**user_dismissed_current**`), then promote pending → `**active**` (Home **C′** **Discard**, Figma 578:29994; migration `**20260609180000_pause_dismiss_current_promote_pending.sql**`). When no pending: expire stale pending rows (`**system_cancelled**`), then dismiss the open instance. Also used from `/pause` header **Close** (no pending promotion). |
+| `**pause_adopt_pending_offer**` | Supersede open `**active|engaged**`, promote `**pending**` → `**active**`. Home **C′** adopt navigates to `/pause` with **`startAtDepthPicker: true`** and pending **`context_snapshot`** (Figma 578:30151). |
+| `**pause_decline_pending_offer**` | Expire the `**pending**` row without changing the open pause. |
 
 
 **Client entrypoint:** `src/features/pause/infrastructure/pause-rpc-client.ts` — consumed only by `supabase-pause-repository` (`PauseRepository` adapter). Cross-context code may import default adapters from `@/features/pause/public-rpc`; feature presentation wires `infrastructure/supabase-pause-repository` directly (May 2026).

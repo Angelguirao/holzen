@@ -105,9 +105,10 @@ Home maps **`v_pause_full.state`** to Figma modes via [`resolveHomePauseWidgetMo
 |--------|------|----------------|
 | **A** | Idle, no open pause | YOUR PAUSE + moon; two-tone copy + Nox primary **Let's pause** (Wireframes 546:8975 structure) |
 | **B** | `state = active`, no step events (manual, cron, or returning user — same UI) | Title **Your pause** (Figma [559:26757](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=559-26757)); opening + **Let's pause** |
-| **C** | `state = engaged` (deep + `reflection_step`) | **Continue your pause** + Continue / Discard |
-| **C′** | C + pending offer | Section **Continue your pause**; inner **New pause available** + **Pause with new context** |
-| **D / D′** | No open pause, profile auto cooldown | **You paused** + archive link when expanded |
+| **C** | `state = engaged` (deep + `reflection_step`) | **Continue your pause** + Continue / Discard; **calm waters** variant when live quote within thresholds — settled copy + countdown to `open_max_age` (12h from `engaged_at`) |
+| **C′** | C + pending offer | Section **Continue your pause**; inner **New pause available** + **Pause with new context** (adopt → depth picker on `/pause`) |
+| **D / D′** | No open pause, manual cooldown active | Title **Your pause**; expanded cooldown copy + optional **Revisit your archive** |
+| **A (post-manual)** | Manual cooldown elapsed, `localStorage` idle flag | Auto-expanded idle copy (Figma 578:26963) — no market mention |
 
 Opening preview: deterministic i18n templates pre-Reflect (`home.pauseOpening.*`); post-Reflect uses `reflection_text`. Market block: compact BTC/F&G + Updated HH:mm from [`formatHomePauseMarketBlock`](../../src/features/pause/domain/home/format-home-pause-market-block.ts).
 

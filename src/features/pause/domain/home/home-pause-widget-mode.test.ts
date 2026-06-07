@@ -133,12 +133,24 @@ describe('resolveHomePauseWidgetMode', () => {
     expect(r.hasReachedReflect).toBe(true);
   });
 
-  it('stays B when active and pending queued (not C_prime)', () => {
+  it('stays B when active and pending but ritual not started (server should supersede)', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,
       hasOpenPause: true,
       openPauseState: 'active',
       hasPendingOffer: true,
+      hasOpenPauseStepEvents: false,
+    });
+    expect(r.mode).toBe('B');
+  });
+
+  it('stays B when active mid-ritual and pending queued (pending UX after Reflect)', () => {
+    const r = resolveHomePauseWidgetMode({
+      ...baseInput,
+      hasOpenPause: true,
+      openPauseState: 'active',
+      hasPendingOffer: true,
+      hasOpenPauseStepEvents: true,
     });
     expect(r.mode).toBe('B');
   });
@@ -176,7 +188,7 @@ describe('resolveHomePauseWidgetMode', () => {
     expect(r.mode).toBe('B');
   });
 
-  it('B_in_progress when active mid-ritual (step events logged)', () => {
+  it('stays B when active mid-ritual (Continue only after Reflect)', () => {
     const r = resolveHomePauseWidgetMode({
       ...baseInput,
       hasOpenPause: true,
@@ -184,19 +196,10 @@ describe('resolveHomePauseWidgetMode', () => {
       completedPauseCount: 3,
       hasOpenPauseStepEvents: true,
     });
-    expect(r.mode).toBe('B_in_progress');
+    expect(r.mode).toBe('B');
+    expect(homePauseWidgetSectionTitleKey(r.mode)).toBe('home.widget.yourPause');
   });
 
-  it('B when active with pending queued (banner on B)', () => {
-    const r = resolveHomePauseWidgetMode({
-      ...baseInput,
-      hasOpenPause: true,
-      openPauseState: 'active',
-      completedPauseCount: 2,
-      hasPendingOffer: true,
-    });
-    expect(r.mode).toBe('B');
-  });
 
   it('D collapsed when manual cooldown with archive', () => {
     const r = resolveHomePauseWidgetMode({
@@ -207,11 +210,17 @@ describe('resolveHomePauseWidgetMode', () => {
     expect(r.mode).toBe('D_collapsed');
   });
 
-  it('section title is You paused for D rest modes', () => {
-    expect(homePauseWidgetSectionTitleKey('D_collapsed')).toBe('home.widget.youPaused');
-    expect(homePauseWidgetSectionTitleKey('D_expanded')).toBe('home.widget.youPaused');
-    expect(homePauseWidgetSectionTitleKey('D_prime_collapsed')).toBe('home.widget.youPaused');
-    expect(homePauseWidgetSectionTitleKey('D_prime_expanded')).toBe('home.widget.youPaused');
+  it('section title is Continue your pause for engaged modes', () => {
+    expect(homePauseWidgetSectionTitleKey('C')).toBe('home.widget.continueYourPause');
+    expect(homePauseWidgetSectionTitleKey('C_prime')).toBe('home.widget.continueYourPause');
+    expect(homePauseWidgetSectionTitleKey('B')).toBe('home.widget.yourPause');
+  });
+
+  it('section title is Your pause for D rest modes (Figma 578:25631)', () => {
+    expect(homePauseWidgetSectionTitleKey('D_collapsed')).toBe('home.widget.yourPause');
+    expect(homePauseWidgetSectionTitleKey('D_expanded')).toBe('home.widget.yourPause');
+    expect(homePauseWidgetSectionTitleKey('D_prime_collapsed')).toBe('home.widget.yourPause');
+    expect(homePauseWidgetSectionTitleKey('D_prime_expanded')).toBe('home.widget.yourPause');
   });
 
   it('D_prime when manual cooldown without archive', () => {

@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { LoadingButton } from '@/components/ui/loading-button';
@@ -21,6 +22,10 @@ import {
 import type { HomePauseWidgetPreviewLine as HomePauseWidgetPreviewLineModel } from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
 import type { HomePauseMarketBlock } from '@/features/pause/domain/home/format-home-pause-market-block';
 import type { HomePauseWidgetBodyProjection } from '@/features/pause/presentation/home/use-home-pause-widget-projection';
+import {
+  formatPauseOpenMaxRemaining,
+  pauseOpenMaxDeadlineMs,
+} from '@/features/pause/public-session';
 
 type OpenBodyProps = Pick<
   HomePauseWidgetBodyProjection,
@@ -76,18 +81,59 @@ type EngagedProps = Pick<
   'onPauseWithThis' | 'onDismissOpenPause'
 >;
 
-/** State C — reached Reflect (Figma 578:28850). */
-export function HomePauseEngagedBody({ onPauseWithThis, onDismissOpenPause }: EngagedProps) {
+/** State C — reached Reflect (Figma 578:28850); C calm waters (578:27863). */
+export function HomePauseEngagedBody({
+  onPauseWithThis,
+  onDismissOpenPause,
+  engagedPauseMarketSettled,
+  openPauseEngagedAt,
+}: EngagedProps &
+  Pick<HomePauseWidgetBodyProjection, 'engagedPauseMarketSettled' | 'openPauseEngagedAt'>) {
   "use memo";
   const { t } = useTranslation();
+  const [nowMs, setNowMs] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (!engagedPauseMarketSettled || !openPauseEngagedAt) return;
+    const id = window.setInterval(() => setNowMs(Date.now()), 30_000);
+    return () => window.clearInterval(id);
+  }, [engagedPauseMarketSettled, openPauseEngagedAt]);
+
+  const openMaxRemaining =
+    engagedPauseMarketSettled && openPauseEngagedAt
+      ? formatPauseOpenMaxRemaining(pauseOpenMaxDeadlineMs(openPauseEngagedAt), nowMs)
+      : null;
 
   return (
     <div className={homePauseWidgetBodyStack}>
-      <p className="text-sm leading-5 tracking-wide text-muted-foreground">
-        {t('home.pauseInProgress.stillHere', {
-          defaultValue: 'The pause you started is still here.',
-        })}
-      </p>
+      {engagedPauseMarketSettled ? (
+        <div className="space-y-1 text-sm leading-5 tracking-wide text-foreground">
+          <p>
+            {t('home.pauseInProgress.marketSettledLead', {
+              defaultValue: 'The market that disturbed you has settled.',
+            })}
+          </p>
+          <p>
+            {t('home.pauseInProgress.marketSettledBody', {
+              defaultValue: 'Your pause is still open if you want to finish.',
+            })}
+          </p>
+          {openMaxRemaining ? (
+            <p className="pt-1">
+              {t('home.pauseInProgress.closesIn', {
+                remaining: openMaxRemaining,
+                defaultValue: 'This pause closes in {{remaining}}',
+              })}
+            </p>
+          ) : null}
+        </div>
+      ) : (
+        <p className="text-sm leading-5 tracking-wide text-muted-foreground">
+          {t('home.pauseInProgress.stillHere', {
+            defaultValue: 'The pause you started is still here.',
+          })}
+        </p>
+      )}
       <div className="flex flex-col gap-6 pb-2">
         <HomePauseWidgetNoxCta label={t('home.pauseWidget.continue')} onClick={onPauseWithThis} />
         <HomePauseWidgetDiscardLink
@@ -212,8 +258,8 @@ export function HomePausePostPauseBody({
           {t(bodyKey, {
             time: readyAtClock,
             defaultValue: isDWithArchive && completedPauseCount > 0
-              ? 'You can start another pause yourself at {{time}}. If the market moves before then, Holzen can still offer one here. Until then, your past words are in your archive.'
-              : 'You can start another pause yourself at {{time}}. If the market moves before then, Holzen can still offer one here.',
+              ? 'If the urge returns, another pause is available at {{time}}. Until then, your past words are here.'
+              : 'If the urge returns, another pause is available at {{time}}.',
           })}
         </p>
         {isDWithArchive && completedPauseCount > 0 ? (
@@ -236,21 +282,32 @@ export function HomePausePostPauseBody({
 
 /** State A — idle, no open pause (structure: Figma 546:8975; tokens: Nox). */
 export function HomePauseIdleExpandedBody(
-  props: Pick<HomePauseWidgetBodyProjection, 'onNeedPause' | 'loading'>,
+  props: Pick<HomePauseWidgetBodyProjection, 'onNeedPause' | 'loading' | 'postManualCooldownIdle'>,
 ) {
   "use memo";
   const { t } = useTranslation();
 
   return (
     <div className={homePauseWidgetBodyStack}>
-      <HomePauseWidgetTwoToneLead
-        lead={t('home.pauseIdle.withinRangeLead', {
-          defaultValue: 'The market is within your range.',
-        })}
-        tail={t('home.pauseIdle.withinRangeTail', {
-          defaultValue: 'This is the moment to pause without urgency.',
-        })}
-      />
+      {props.postManualCooldownIdle ? (
+        <HomePauseWidgetTwoToneLead
+          lead={t('home.pauseIdle.postManualCooldownLead', {
+            defaultValue: 'The time has passed.',
+          })}
+          tail={t('home.pauseIdle.postManualCooldownTail', {
+            defaultValue: 'Another pause is available, if you need it.',
+          })}
+        />
+      ) : (
+        <HomePauseWidgetTwoToneLead
+          lead={t('home.pauseIdle.withinRangeLead', {
+            defaultValue: 'The market is within your range.',
+          })}
+          tail={t('home.pauseIdle.withinRangeTail', {
+            defaultValue: 'This is the moment to pause without urgency.',
+          })}
+        />
+      )}
       <LoadingButton
         type="button"
         variant="default"

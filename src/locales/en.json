@@ -105,10 +105,15 @@
     "pauseIdle": {
       "withinRangeLead": "The market is within your range.",
       "withinRangeTail": "This is the moment to pause without urgency.",
+      "postManualCooldownLead": "The time has passed.",
+      "postManualCooldownTail": "Another pause is available, if you need it.",
       "letsPauseCta": "Let's pause"
     },
     "pauseInProgress": {
-      "stillHere": "The pause you started is still here."
+      "stillHere": "The pause you started is still here.",
+      "marketSettledLead": "The market that disturbed you has settled.",
+      "marketSettledBody": "Your pause is still open if you want to finish.",
+      "closesIn": "This pause closes in {{remaining}}"
     },
     "generatingReflection": "Preparing your pause…",
     "pauseCtaActive": "Start this pause",
@@ -139,8 +144,8 @@
     "pausePostPause": {
       "restBody": "You completed a pause recently. Rest is part of the practice — when you are ready, you can pause again.",
       "noArchiveBody": "You completed a pause. Your archive will collect these moments over time — for now, rest or start another pause when you need it.",
-      "cooldownArchiveBody": "You can start another pause yourself at {{time}}. If the market moves before then, Holzen can still offer one here. Until then, your past words are in your archive.",
-      "cooldownNoArchiveBody": "You can start another pause yourself at {{time}}. If the market moves before then, Holzen can still offer one here.",
+      "cooldownArchiveBody": "If the urge returns, another pause is available at {{time}}. Until then, your past words are here.",
+      "cooldownNoArchiveBody": "If the urge returns, another pause is available at {{time}}.",
       "newOfferBody": "The market moved again. Holzen has a pause ready for you — you can start it below without waiting for your personal cooldown.",
       "availableAt": "Another manual pause is available at {{time}}",
       "manualCooldownBody": "You can start another pause yourself at {{time}}. If the market moves before then, Holzen can still offer one here.",

@@ -20,6 +20,7 @@ export type OpenPauseHomePreviewSnapshot = {
   hasReachedReflect: boolean;
   isBriefRitual: boolean;
   openPauseCreatedAt: string | null;
+  openPauseEngagedAt: string | null;
   persistedSession: PersistedSession | null;
 };
 

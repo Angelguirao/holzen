@@ -14,7 +14,7 @@ import type { PendingPauseOfferRow } from './use-pending-pause-offer';
 export function usePendingPauseOfferMutations(options: {
   pending: PendingPauseOfferRow | null | undefined;
   onAfterMutation: () => void | Promise<void>;
-  navigateAfterAdopt?: (instanceId: string) => void;
+  navigateAfterAdopt?: (target: import('./use-pause-session-pending-pause-offer-navigation').PendingAdoptNavigationTarget) => void;
   refreshPendingOffer: () => Promise<unknown>;
   t: TFunction;
 }) {
@@ -33,8 +33,13 @@ export function usePendingPauseOfferMutations(options: {
             return;
           }
           trackPausePendingAdopted(r.instanceId);
-          await Promise.resolve(onAfterMutation());
-          navigateAfterAdopt?.(r.instanceId);
+          await onAfterMutation();
+          const pendingContext =
+            pending.context_snapshot &&
+            typeof pending.context_snapshot.context_text === 'string'
+              ? pending.context_snapshot.context_text
+              : null;
+          navigateAfterAdopt?.({ instanceId: r.instanceId, context: pendingContext });
           await refreshPendingOffer();
           resolve(true);
         } catch {
