@@ -95,6 +95,7 @@ export function useHomePauseWidgetInputs(
 
   return useMemo(
     (): HomePauseWidgetProjectionContext => ({
+      lastPauseInstanceId,
       hasOpenPause,
       openPauseState,
       openPauseSource,
@@ -137,6 +138,7 @@ export function useHomePauseWidgetInputs(
       manualTrigger,
     }),
     [
+      lastPauseInstanceId,
       hasOpenPause,
       openPauseState,
       openPauseSource,

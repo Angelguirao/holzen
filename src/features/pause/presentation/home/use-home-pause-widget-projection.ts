@@ -18,6 +18,7 @@ import { useHomePauseWidgetCollapsePreference } from '@/features/pause/presentat
 import { useHomePauseWidgetCooldownClock } from '@/features/pause/presentation/home/use-home-pause-widget-cooldown-clock';
 import { useHomePauseRecentContextLost } from '@/features/pause/presentation/home/use-home-pause-recent-context-lost';
 import { useHomePauseWidgetSurfaceTransition } from '@/features/pause/presentation/home/use-home-pause-widget-surface-transition';
+import { useHomeCronCalmSweepOnce } from '@/features/pause/presentation/home/use-home-cron-calm-sweep-once';
 
 export type {
   HomePauseWidgetBodyProjection,
@@ -155,6 +156,16 @@ export function useHomePauseWidgetProjection(
     marketData: ctx.marketData,
     threshold: ctx.threshold,
     thresholdDown: ctx.thresholdDown,
+  });
+
+  useHomeCronCalmSweepOnce({
+    userId: user?.id,
+    openPauseInstanceId: ctx.lastPauseInstanceId,
+    openPauseState: ctx.openPauseState,
+    openPauseSource: ctx.openPauseSource,
+    openPauseMetadata: ctx.openPauseMetadata,
+    marketData: ctx.marketData,
+    engagedPauseMarketSettled,
   });
 
   const openPauseOpenMaxAnchorAt = resolveHomePauseWidgetOpenMaxAnchorAt({

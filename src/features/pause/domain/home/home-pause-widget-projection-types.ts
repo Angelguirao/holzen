@@ -7,6 +7,7 @@ import type { HomePauseMarketBlock } from '@/features/pause/domain/home/format-h
 
 /** Open pause row fields from `usePauseHomeContext`. */
 export type HomePauseOpenInstanceSnapshot = {
+  lastPauseInstanceId: string | null;
   hasOpenPause: boolean;
   openPauseState: 'active' | 'engaged' | null;
   openPauseSource: string | null;
@@ -68,7 +69,20 @@ export type HomePauseWidgetActionHandlers = {
 /** Composed inside `useHomePauseWidgetInputs` — not passed from the screen. */
 export type HomePauseWidgetProjectionContext = HomePauseOpenInstanceSnapshot &
   HomePauseWidgetSubscriptionGate &
-  HomePauseWidgetActionHandlers;
+  HomePauseWidgetActionHandlers &
+  Pick<
+    HomePauseWidgetDisplayState,
+    | 'loading'
+    | 'error'
+    | 'marketData'
+    | 'completedPauseCount'
+    | 'profileLastTriggerAt'
+    | 'newPauseArrival'
+    | 'trackedAssetId'
+    | 'threshold'
+    | 'thresholdDown'
+    | 'cooldownHours'
+  >;
 
 export type HomePauseWidgetBodyDisplay = {
   previewLine: HomePauseWidgetPreviewLine;

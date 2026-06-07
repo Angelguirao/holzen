@@ -52,10 +52,6 @@ Surfaces are **derived**, not stored. Resolver: `resolveHomePauseWidgetSurface` 
 
 **context_lost** (cron calm sweep) does not add a surface — it routes to `idle_*` or `manual_cooldown_*` plus optional toast.
 
-### Design appendix (wireframes only — not used in code)
-
-Legacy design labels for QA with Figma: **A** = idle, **B** = `open_pre_reflect`, **C** = `open_engaged`, **C′** = `open_engaged_pending_offer`, **D** / **D′** = manual cooldown variants. Wireframe node IDs remain in git history and design files; new code uses the surface column above.
-
 ---
 
 ## Widget surfaces — inputs (detailed)
@@ -105,11 +101,13 @@ When the tracked asset move is **back within** the user’s daily thresholds, **
 
 **Engaged countdown (calm market on `open_engaged`):** When live market is within thresholds, settled copy + **This pause closes in {{remaining}}**. For **`cron_volatility`** engaged rows, Postgres stamps **`metadata.calm_settled_at`** on the first calm sweep after Reflect; the countdown is **12h from that stamp**. While volatility is still hot, cron engaged rows have **no** open-max anchor yet — only *still here* copy. **Manual** engaged pauses use **`engaged_at` + 12h**.
 
+**Home one-shot calm sweep:** When Home already projects calm-waters (`engagedPauseMarketSettled`) but **`calm_settled_at`** is missing on a cron engaged row, `useHomeCronCalmSweepOnce` calls **`pause_apply_cron_calm_sweep_for_self`** once per open instance (server re-validates thresholds). No polling — countdown ticks locally via `PauseEngagedOpenMaxCountdown` after metadata arrives.
+
 **context_lost toast** (optional Sonner): fires when cron recently expired a row and there is **no** open pause — widget stays on `idle_collapsed` or `manual_cooldown_collapsed`, not an expanded “moment passed” body.
 
 ---
 
-## Post-manual cooldown → idle (D → A)
+## Post-manual cooldown → idle (`manual_cooldown_*` → `idle_expanded`)
 
 After a **manual** pause completes, profile **`last_trigger_at`** + **`cooldown_hours`** drive `manual_cooldown_*` surfaces (collapsed by default). When that cooldown elapses and there is still no open pause:
 
@@ -127,7 +125,7 @@ Preview line + market block come from `resolveHomePauseWidgetPreviewLine` and `f
 - `reflection_step` artifact (`reflection_text` after Reflect)  
 - Tracked asset symbol for template fallbacks  
 
-Helper `hasReachedReflectForHome()` informs preview **wording** only; mode **C** vs **B** follows Postgres `state`.
+Helper `hasReachedReflectForHome()` informs preview **wording** only; `open_engaged` vs `open_pre_reflect` follows Postgres `state`.
 
 ---
 
@@ -135,10 +133,10 @@ Helper `hasReachedReflectForHome()` informs preview **wording** only; mode **C**
 
 When cron/manual trigger queues a **pending** instance while the user still has an open pause:
 
-| Open pause state | Widget UX | Mutations |
-|------------------|-----------|-----------|
-| `engaged` | **C′** — unified card (Figma 578:27896 / 578:27929) | Adopt / decline via `usePendingPauseOfferMutations` on Home |
-| `active` (pre-Reflect) | **B** — pending row may exist in Postgres but is **not** surfaced on Home | Adopt / decline on **`/pause`** leave sheet only |
+| Open pause state | Widget surface | Mutations |
+|------------------|----------------|-----------|
+| `engaged` | `open_engaged_pending_offer` — unified card with adopt / decline branch | Adopt / decline via `usePendingPauseOfferMutations` on Home |
+| `active` (pre-Reflect) | `open_pre_reflect` — pending row may exist in Postgres but is **not** surfaced on Home | Adopt / decline on **`/pause`** leave sheet only |
 | `active`, untouched | **No pending row** — Postgres auto-supersedes open pause with fresh `active` instance | N/A (silent replace) |
 
 On **`/pause`**, leave flow still uses `PauseLeaveWithPendingSheet`. There is **no** app-shell blocking dialog.
@@ -152,9 +150,9 @@ On **`/pause`**, leave flow still uses `PauseLeaveWithPendingSheet`. There is **
 | Change | File(s) |
 |--------|---------|
 | New surface or gate | `home-pause-widget-surface.ts` + tests in `home-pause-widget-surface.test.ts` |
-| New data for mode | `open-pause-home-preview-query.ts`, `use-home-pause-widget-projection.ts` |
+| New data for surface | `open-pause-home-preview-query.ts`, `use-home-pause-widget-projection.ts` |
 | Calm-waters engaged body | `resolve-engaged-pause-market-settled.ts`, `pause-open-max-anchor.ts`, `HomePauseEngagedBody` in `HomePauseWidgetBodies.tsx` |
-| Post-manual D → A idle | `home-post-manual-cooldown-idle-storage.ts`, `use-holzen-manual-trigger-orchestration.ts` |
+| Post-manual cooldown → idle expand | `home-post-manual-cooldown-idle-storage.ts`, `use-holzen-manual-trigger-orchestration.ts` |
 | Body layout / CTAs | `HomePauseWidgetBodies.tsx`, `HomePauseWidgetShared.tsx`, `HomePauseWidgetBody.tsx` |
 | Navigate / dismiss / adopt | `use-home-pause-actions.ts`, `use-pending-pause-offer-mutations.ts`, `use-pause-session-pending-pause-offer-navigation.ts` |
 | Market footer “within range” when engaged + calm | `market-volatility-range-status.ts` |
@@ -171,8 +169,8 @@ Use this when verifying the Home widget after changes to the resolver, projectio
 
 | Prerequisite | Why |
 |--------------|-----|
-| Migration `20260527120000_pause_engaged_requires_reflection_step.sql` applied on target Supabase | Without it, `engaged` may flip before Reflect → wrong **C** vs **B** |
-| Migration `20260609180000_pause_dismiss_current_promote_pending.sql` applied on target Supabase | Without it, **C′** **Discard** may not promote pending → **B** |
+| Migration `20260527120000_pause_engaged_requires_reflection_step.sql` applied on target Supabase | Without it, `engaged` may flip before Reflect → wrong `open_engaged` vs `open_pre_reflect` |
+| Migration `20260609180000_pause_dismiss_current_promote_pending.sql` applied on target Supabase | Without it, `open_engaged_pending_offer` **Discard** may not promote pending → `open_pre_reflect` |
 | Migration `20260609190000_pause_engaged_open_max_calm_settled_anchor.sql` applied on target Supabase | Without it, cron engaged **`open_max_age`** still uses **`engaged_at`**, not calm stamp |
 | Signed-in user with **trial or Pro** (`getHomeSubscriptionGate` passes) | Lapsed/trial prompt replaces widget body |
 | `npm run dev` (port **8080**) against staging or local Supabase with edge/cron if testing pending | Pending rows come from `pause_create_or_reuse` / cron |
@@ -182,32 +180,32 @@ Use this when verifying the Home widget after changes to the resolver, projectio
 
 ---
 
-### Mode matrix
+### Surface matrix
 
 For each row: note **section title**, **body copy**, **primary CTA**, and **no blocking “Market context changed” modal**.
 
-| # | Target mode | How to get there | Expect on Home |
-|---|-------------|------------------|------------------|
-| 1 | **A** collapsed | No open pause; not in manual cooldown; **return visit** | Title **Your pause** + moon; collapsed header only (Figma 578:30689) |
-| 2 | **A** expanded | First idle onboarding (every visit until **Let's pause**) **or** tap chevron on A | Within-range copy + Nox **Let's pause** (Figma 555:16772); forfeited if Holzen opens a pause first |
-| 3 | **B** | Open `active` (untouched, mid-ritual pre-Reflect, manual, cron, or returning user) | Title **Your pause** (Figma [559:26757](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=559-26757)); empathy + inline BTC/F&G + Nox **Let's pause** |
-| 4 | **C** | Reach Reflect → `engaged` | Title **Continue your pause** (Figma [578:28850](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-28850)); *still here* + Nox **Continue** + **Discard** |
-| 4b | **C (calm waters)** | **C** + live market within thresholds; cron row has **`calm_settled_at`** | Figma [578:27863](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27863): settled copy + **This pause closes in …** (12h from **`calm_settled_at`**) + **Continue** / **Discard** |
-| 5 | **C′** | **C** + cron queues new context (pending row) while still on Home | Unified card (Figma [578:27929](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-27929)): **Continue** / **Discard**, **or**, **New pause available** + **Pause with new context** |
-| 6 | **D** | Complete a manual pause; manual cooldown active; no open pause; has archive | Title **Your pause** (Figma [578:25631](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-25631)); collapsed default; expanded → cooldown time + **Revisit your archive** (Figma [578:25933](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-25933)) |
-| 7 | **D′** | Same as D but `completedPauseCount = 0` | Same title; rest copy without archive link |
-| 7b | **A (post manual cooldown)** | Manual cooldown elapsed; market within range; no cron offer | Auto-expands (Figma [578:26963](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-26963)): **The time has passed.** + **Another pause is available, if you need it.** + **Let's pause** |
-| 8 | **context_lost → A/D** | Cron expires offer with `context_lost`; no open pause; within 24h window | Widget stays **A** or **D** (collapsed); optional Sonner toast once — not expanded “moment passed” body |
-| 9 | **loading** | Hard refresh Home while Holzen loading (no open pause yet) | “Opening your pause…” skeleton |
-| 10 | **Trial gate** | Lapsed / no entitlement user | Trial/reactivate CTA instead of ritual body |
+| # | Target surface | How to get there | Expect on Home |
+|---|----------------|------------------|------------------|
+| 1 | `idle_collapsed` | No open pause; not in manual cooldown; **return visit** | Title **Your pause** + moon; collapsed header only |
+| 2 | `idle_expanded` | First idle onboarding (every visit until **Let's pause**) **or** tap chevron on `idle_collapsed` | Within-range copy + Nox **Let's pause**; forfeited if Holzen opens a pause first |
+| 3 | `open_pre_reflect` | Open `active` (untouched, mid-ritual pre-Reflect, manual, cron, or returning user) | Title **Your pause**; empathy + inline BTC/F&G + Nox **Let's pause** |
+| 4 | `open_engaged` | Reach Reflect → `engaged` | Title **Continue your pause**; *still here* + Nox **Continue** + **Discard** |
+| 4b | `open_engaged` (calm waters body) | `open_engaged` + live market within thresholds; cron row has **`calm_settled_at`** | Settled copy + **This pause closes in …** (12h from **`calm_settled_at`**) + **Continue** / **Discard** |
+| 5 | `open_engaged_pending_offer` | `open_engaged` + cron queues new context (pending row) while still on Home | Unified card: **Continue** / **Discard**, **or**, **New pause available** + **Pause with new context** |
+| 6 | `manual_cooldown_collapsed` / `manual_cooldown_expanded` | Complete a manual pause; manual cooldown active; no open pause; has archive | Title **Your pause**; collapsed default; expanded → cooldown time + **Revisit your archive** |
+| 7 | `manual_cooldown_first_pause_collapsed` / `manual_cooldown_first_pause_expanded` | Same as row 6 but `completedPauseCount = 0` | Same title; rest copy without archive link |
+| 7b | `idle_expanded` (post-manual cooldown) | Manual cooldown elapsed; market within range; no cron offer | Auto-expands: **The time has passed.** + **Another pause is available, if you need it.** + **Let's pause** |
+| 8 | `context_lost` → `idle_collapsed` or `manual_cooldown_collapsed` | Cron expires offer with `context_lost`; no open pause; within 24h window | Widget stays collapsed on idle or manual cooldown shell; optional Sonner toast once — not expanded “moment passed” body |
+| 9 | `loading` | Hard refresh Home while Holzen loading (no open pause yet) | “Opening your pause…” skeleton |
+| 10 | Subscription gate (not a widget surface) | Lapsed / no entitlement user | Trial/reactivate CTA instead of ritual body |
 
 **Regression checks (open pause + pending):**
 
-- Returning user with untouched cron/manual `active` pause → **B** with title **Your pause**, same as first pause.
-- Cron new context while open pause is **untouched** → silent supersede; widget stays **B** with fresh copy (no pending UX).
-- **New pause available** copy appears only inside **C′** (engaged + pending), not on **B**.
-- **Continue** appears in **C** and **C′** only (after Reflect / `engaged`) — not on **B** (use **Let's pause**, including mid-ritual pre-Reflect).
-- Cron **pending** + market calms → pending **`context_lost`**; engaged user sees **C** (calm waters if quote within range), not **C′**.
+- Returning user with untouched cron/manual `active` pause → `open_pre_reflect` with title **Your pause**, same as first pause.
+- Cron new context while open pause is **untouched** → silent supersede; widget stays `open_pre_reflect` with fresh copy (no pending UX).
+- **New pause available** copy appears only on `open_engaged_pending_offer`, not on `open_pre_reflect`.
+- **Continue** appears on `open_engaged` and `open_engaged_pending_offer` only (after Reflect / `engaged`) — not on `open_pre_reflect` (use **Let's pause**, including mid-ritual pre-Reflect).
+- Cron **pending** + market calms → pending **`context_lost`**; engaged user sees `open_engaged` (calm waters body if quote within range), not `open_engaged_pending_offer`.
 - Mid-ritual **`active`** on `/pause` when calm sweep runs → instance may **`context_lost`** while user is in Feel/Breathe (engaged mid-Reflect is protected).
 
 ---
@@ -216,13 +214,13 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 
 | Action | Steps | Pass criteria |
 |--------|-------|---------------|
-| **Let's pause** | **B** → tap CTA | Navigates `/pause` with correct `pauseInstanceId` in location state |
-| **Continue** | **C** → tap | Same instance on `/pause`; session resumes |
-| **Discard** | **C** or **C′** → **Discard** | Optimistic undo snackbar (Figma 579:32066). **C′:** dismisses engaged open pause and **promotes pending → active** (Mode **B**, Figma 578:29994 / 579:31734); **C:** clears open pause only. RPC `pause_dismiss_current`; `pause_open_dismissed` with `surface: home_your_pause_widget` |
-| **Adopt pending** | **C′** → **Pause with new context** (Figma [578:30151](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=578-30151)) | `pause_adopt_pending_offer`: prior open pause **superseded**, pending → **active**; navigate `/pause` with `startAtDepthPicker` + new context; `pause_pending_adopted` |
+| **Let's pause** | `open_pre_reflect` or `idle_expanded` → tap CTA | Navigates `/pause` with correct `pauseInstanceId` in location state |
+| **Continue** | `open_engaged` → tap | Same instance on `/pause`; session resumes |
+| **Discard** | `open_engaged` or `open_engaged_pending_offer` → **Discard** | Optimistic undo snackbar. **`open_engaged_pending_offer`:** dismisses engaged open pause and **promotes pending → active** (`open_pre_reflect`); **`open_engaged`:** clears open pause only. RPC `pause_dismiss_current`; `pause_open_dismissed` with `surface: home_your_pause_widget` |
+| **Adopt pending** | `open_engaged_pending_offer` → **Pause with new context** | `pause_adopt_pending_offer`: prior open pause **superseded**, pending → **active**; navigate `/pause` with `startAtDepthPicker` + new context; `pause_pending_adopted` |
 | **Decline pending** | **`/pause`** leave sheet → keep current | Pending row gone; current open pause unchanged; `pause_pending_declined` |
-| **I need a pause** | **A′** → manual trigger (cooldown clear) | Navigates `/pause` or silent open; no `/tools` route |
-| **Pending on other tabs** | Queue pending while on **Journey** | **No** global modal; return **Home** → banner or **C′** |
+| **I need a pause** | `idle_expanded` → manual trigger (cooldown clear) | Navigates `/pause` or silent open; no `/tools` route |
+| **Pending on other tabs** | Queue pending while on **Journey** | **No** global modal; return **Home** → `open_engaged_pending_offer` or pending banner |
 
 ---
 

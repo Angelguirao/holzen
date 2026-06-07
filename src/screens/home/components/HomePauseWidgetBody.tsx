@@ -115,6 +115,8 @@ export function HomePauseWidgetBody({ surface, display, subscription, actions }:
           onDismissOpenPause={actions.onDismissOpenPause}
           onPauseWithNewContext={actions.onPauseWithNewContext}
           pendingOfferBusy={actions.pendingOfferBusy}
+          engagedPauseMarketSettled={display.engagedPauseMarketSettled}
+          openPauseOpenMaxAnchorAt={display.openPauseOpenMaxAnchorAt}
         />
       );
 

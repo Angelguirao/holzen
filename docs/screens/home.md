@@ -97,18 +97,18 @@ Logic lives in [`src/features/pause/domain/home/pause-home-widget-error.ts`](../
 
 Zen and the inline pause card share this contract so reflection failures are not hidden behind a healthy cached market strip.
 
-## Your pause widget (Figma A–D + C′)
+## Your pause widget (`HomePauseWidgetSurface`)
 
 Home maps **`v_pause_full.state`** to widget surfaces via [`resolveHomePauseWidgetSurface`](../../src/features/pause/domain/home/home-pause-widget-surface.ts). **`active` → `open_pre_reflect`**; **`engaged` → `open_engaged` / `open_engaged_pending_offer`**. See **[home-pause-widget-projection.md](../systems/home-pause-widget-projection.md)**.
 
-| UI mode | When | Header / CTA |
+| Surface | When | Header / CTA |
 |--------|------|----------------|
-| **A** | Idle, no open pause | YOUR PAUSE + moon; two-tone copy + Nox primary **Let's pause** (Wireframes 546:8975 structure) |
-| **B** | `state = active`, no step events (manual, cron, or returning user — same UI) | Title **Your pause** (Figma [559:26757](https://www.figma.com/design/wFCCcvr3uOQRzwkjAfSiNI/Wireframes?node-id=559-26757)); opening + **Let's pause** |
-| **C** | `state = engaged` (deep + `reflection_step`) | **Continue your pause** + Continue / Discard; **calm waters** variant when live quote within thresholds — settled copy + countdown to `open_max_age` (12h from `engaged_at`) |
-| **C′** | C + pending offer | Section **Continue your pause**; inner **New pause available** + **Pause with new context** (adopt → depth picker on `/pause`) |
-| **D / D′** | No open pause, manual cooldown active | Title **Your pause**; expanded cooldown copy + optional **Revisit your archive** |
-| **A (post-manual)** | Manual cooldown elapsed, `localStorage` idle flag | Auto-expanded idle copy (Figma 578:26963) — no market mention |
+| `idle_collapsed` / `idle_expanded` | Idle, no open pause | YOUR PAUSE + moon; expanded → two-tone copy + Nox **Let's pause** |
+| `open_pre_reflect` | `state = active` (manual, cron, mid-ritual pre-Reflect, or returning user) | Title **Your pause**; opening + **Let's pause** |
+| `open_engaged` | `state = engaged` (deep + `reflection_step`) | **Continue your pause** + Continue / Discard; calm-waters body when live quote within thresholds — settled copy + countdown to `open_max_age` |
+| `open_engaged_pending_offer` | `open_engaged` + pending offer | Section **Continue your pause**; inner **New pause available** + **Pause with new context** (adopt → depth picker on `/pause`) |
+| `manual_cooldown_*` | No open pause, manual cooldown active | Title **Your pause**; expanded cooldown copy + optional **Revisit your archive** (`manual_cooldown_first_pause_*` when no archive yet) |
+| `idle_expanded` (post-manual) | Manual cooldown elapsed, `localStorage` idle flag | Auto-expanded idle copy — no market mention |
 
 Opening preview: deterministic i18n templates pre-Reflect (`home.pauseOpening.*`); post-Reflect uses `reflection_text`. Market block: compact BTC/F&G + Updated HH:mm from [`formatHomePauseMarketBlock`](../../src/features/pause/domain/home/format-home-pause-market-block.ts).
 
@@ -116,7 +116,7 @@ Opening preview: deterministic i18n templates pre-Reflect (`home.pauseOpening.*`
 
 ## Navigation to Pause
 
-From the pause card, **Let's pause** (**B**) navigates to `/pause` with [`PauseSessionLocationState`](../../src/lib/router-location-state.ts): reflection text, context, instance id, companions, prefs, severity. See [phase-2 manual pause pipeline](../reviews/phase-2-manual-pause-pipeline.md) for the producer/consumer contract.
+From the pause card, **Let's pause** (`open_pre_reflect` or `idle_expanded`) navigates to `/pause` with [`PauseSessionLocationState`](../../src/lib/router-location-state.ts): reflection text, context, instance id, companions, prefs, severity. See [phase-2 manual pause pipeline](../reviews/phase-2-manual-pause-pipeline.md) for the producer/consumer contract.
 
 ## Analytics
 
