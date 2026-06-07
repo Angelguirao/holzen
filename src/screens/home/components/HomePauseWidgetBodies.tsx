@@ -102,11 +102,6 @@ function HomePauseEngagedCalmWatersBlock({
           defaultValue: 'The market that disturbed you has settled.',
         })}
       </p>
-      <p>
-        {t('home.pauseInProgress.marketSettledBody', {
-          defaultValue: 'Your pause is still open if you want to finish.',
-        })}
-      </p>
       <HomePauseEngagedOpenMaxCountdownLine openPauseOpenMaxAnchorAt={openPauseOpenMaxAnchorAt} />
     </div>
   );

@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { ChevronDown, ChevronUp, Moon, Pencil, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Calendar } from '@/components/ui/calendar';
+import { DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Select,
@@ -82,10 +83,22 @@ export function SnoozePanel({ open, onClose }: SnoozePanelProps) {
 
   const customSaveValid = isSnoozeUntilValid(customUntilDraft);
 
-  const twoHourUntilClock = formatSnoozePresetUntilClock(preset, {
-    snoozedUntil,
-    isActive: silenceEnabled && isActive,
-  });
+  const presetUntilClock =
+    preset === 'custom'
+      ? null
+      : formatSnoozePresetUntilClock(preset, {
+          snoozedUntil,
+          isActive: silenceEnabled && isActive,
+        });
+
+  const presetUntilSuffix = presetUntilClock ? (
+    <span className="ml-1 italic text-muted-foreground">
+      {t('snooze.untilTimeSuffix', {
+        time: presetUntilClock,
+        defaultValue: `Until ${presetUntilClock}`,
+      })}
+    </span>
+  ) : null;
 
   const applyPreset = useCallback(
     async (nextPreset: SnoozeDurationPreset) => {
@@ -168,9 +181,9 @@ export function SnoozePanel({ open, onClose }: SnoozePanelProps) {
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-3">
         <Moon className="h-6 w-6 shrink-0 text-foreground" aria-hidden />
-        <p className={cn(homeInWidget.kicker, 'flex-1 text-secondary-foreground')}>
+        <DialogTitle className={cn(homeInWidget.kicker, 'flex-1 text-left font-normal text-secondary-foreground')}>
           {t('snooze.panelTitle', { defaultValue: 'Snoozed pauses' })}
-        </p>
+        </DialogTitle>
         <button
           type="button"
           onClick={onClose}
@@ -193,30 +206,24 @@ export function SnoozePanel({ open, onClose }: SnoozePanelProps) {
           />
         </div>
 
-        <p className="text-sm leading-5 tracking-wide text-foreground">
+        <DialogDescription className="text-sm leading-5 tracking-wide text-foreground">
           {t('snooze.selectHowLong', { defaultValue: 'Select how long' })}
-        </p>
+        </DialogDescription>
 
         <RadioGroup value={preset} onValueChange={handlePresetChange} className="gap-2">
           <label className="flex cursor-pointer items-center gap-2 rounded-md p-1">
             <RadioGroupItem value="2h" id="snooze-2h" className="h-5 w-5 border-2 border-border" />
             <span className="flex-1 text-sm leading-5 tracking-wide text-foreground">
               {t('snooze.2h', { defaultValue: '2 hours' })}
-              {preset === '2h' && twoHourUntilClock ? (
-                <span className="ml-1 italic text-muted-foreground">
-                  {t('snooze.untilTimeSuffix', {
-                    time: twoHourUntilClock,
-                    defaultValue: `Until ${twoHourUntilClock}`,
-                  })}
-                </span>
-              ) : null}
+              {preset === '2h' ? presetUntilSuffix : null}
             </span>
           </label>
 
           <label className="flex cursor-pointer items-center gap-2 rounded-md p-1">
             <RadioGroupItem value="6h" id="snooze-6h" className="h-5 w-5 border-2 border-border" />
-            <span className="text-sm leading-5 tracking-wide text-foreground">
+            <span className="flex-1 text-sm leading-5 tracking-wide text-foreground">
               {t('snooze.6h', { defaultValue: '6 hours' })}
+              {preset === '6h' ? presetUntilSuffix : null}
             </span>
           </label>
 

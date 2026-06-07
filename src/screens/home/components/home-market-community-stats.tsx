@@ -17,7 +17,7 @@ function CommunityStatLine({
   label: string;
 }) {
   return (
-    <p className={cn(homeInWidget.meta, 'whitespace-nowrap text-right leading-4 tracking-wide')}>
+    <p className={cn(homeInWidget.meta, 'text-right leading-4 tracking-wide')}>
       <span className="font-medium tabular-nums text-foreground">{percent}%</span> {label}
     </p>
   );
@@ -32,7 +32,7 @@ export function HomeMarketCommunityStats() {
   if (isPending || !data || !hasPausedTodayStat(data)) return null;
 
   return (
-    <div className="flex shrink-0 flex-col items-end gap-0.5">
+    <div className="flex min-w-0 flex-col items-end gap-0.5">
       <CommunityStatLine
         percent={data.percent_paused_today}
         label={t('holzenNumber.pausedToday', { defaultValue: 'of users paused today' })}

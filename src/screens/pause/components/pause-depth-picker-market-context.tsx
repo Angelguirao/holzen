@@ -59,7 +59,7 @@ export function PauseDepthPickerMarketContext({
   return (
     <div className="flex flex-col gap-2">
       {lines ? (
-        <p className="text-center text-sm leading-5 tracking-[0.005em] text-foreground">
+        <p className="flex flex-wrap items-baseline justify-center gap-x-3 gap-y-0.5 text-center text-sm leading-5 tracking-[0.005em] text-foreground">
           <span className="tabular-nums">{lines.sym} </span>
           <span
             className={cn(
@@ -74,12 +74,7 @@ export function PauseDepthPickerMarketContext({
             {' '}
             {lines.pct}% · 24h
           </span>
-          {lines.sentimentLine ? (
-            <>
-              {'    '}
-              <span>{lines.sentimentLine}</span>
-            </>
-          ) : null}
+          {lines.sentimentLine ? <span>{lines.sentimentLine}</span> : null}
         </p>
       ) : null}
       <p className="text-center text-sm leading-5 tracking-[0.005em] text-muted-foreground">

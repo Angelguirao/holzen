@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useOptimistic, useRef } from 'react';
+import { useState, useEffect, useCallback, useOptimistic, useRef, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -96,6 +96,7 @@ export function useProfile() {
   );
   const [hasOnboardedState, setHasOnboarded] = useState(false);
   const sessionInvalidHandledRef = useRef(false);
+  const [, startProfileTransition] = useTransition();
 
   useEffect(() => {
     sessionInvalidHandledRef.current = false;
@@ -191,67 +192,111 @@ export function useProfile() {
     if (!error) invalidateProfileQuery();
   }, [user, invalidateProfileQuery]);
 
-  const setEmailNotifications = useCallback(async (val: boolean) => {
-    const previous = emailNotificationsCommitted;
-    addOptimisticEmailNotifications(val);
-    if (!user) return;
-    const { error } = await updateProfileFields(user.id, { email_notifications: val });
-    if (!error) {
-      setEmailNotificationsCommitted(val);
-      invalidateProfileQuery();
-    } else {
-      setEmailNotificationsCommitted(previous);
-      addOptimisticEmailNotifications(previous);
-    }
-  }, [user, invalidateProfileQuery, emailNotificationsCommitted, addOptimisticEmailNotifications]);
+  const setEmailNotifications = useCallback(
+    (val: boolean) => {
+      startProfileTransition(async () => {
+        const previous = emailNotificationsCommitted;
+        addOptimisticEmailNotifications(val);
+        if (!user) return;
+        const { error } = await updateProfileFields(user.id, { email_notifications: val });
+        if (!error) {
+          setEmailNotificationsCommitted(val);
+          invalidateProfileQuery();
+        } else {
+          setEmailNotificationsCommitted(previous);
+          addOptimisticEmailNotifications(previous);
+        }
+      });
+    },
+    [
+      user,
+      invalidateProfileQuery,
+      emailNotificationsCommitted,
+      addOptimisticEmailNotifications,
+      startProfileTransition,
+    ],
+  );
 
-  const setReflectionTone = useCallback(async (val: string) => {
-    const previous = reflectionToneCommitted;
-    addOptimisticReflectionTone(val);
-    if (!user) return;
-    const { error } = await updateProfileFields(user.id, { reflection_tone: val });
-    if (!error) {
-      setReflectionToneCommitted(val);
-      invalidateProfileQuery();
-    } else {
-      setReflectionToneCommitted(previous);
-      addOptimisticReflectionTone(previous);
-    }
-  }, [user, invalidateProfileQuery, reflectionToneCommitted, addOptimisticReflectionTone]);
+  const setReflectionTone = useCallback(
+    (val: string) => {
+      startProfileTransition(async () => {
+        const previous = reflectionToneCommitted;
+        addOptimisticReflectionTone(val);
+        if (!user) return;
+        const { error } = await updateProfileFields(user.id, { reflection_tone: val });
+        if (!error) {
+          setReflectionToneCommitted(val);
+          invalidateProfileQuery();
+        } else {
+          setReflectionToneCommitted(previous);
+          addOptimisticReflectionTone(previous);
+        }
+      });
+    },
+    [
+      user,
+      invalidateProfileQuery,
+      reflectionToneCommitted,
+      addOptimisticReflectionTone,
+      startProfileTransition,
+    ],
+  );
 
-  const setSilentMode = useCallback(async (val: boolean) => {
-    const previous = silentModeCommitted;
-    addOptimisticSilentMode(val);
-    if (!user) return;
-    const { error } = await updateProfileFields(user.id, { silent_mode: val });
-    if (!error) {
-      setSilentModeCommitted(val);
-      invalidateProfileQuery();
-    } else {
-      setSilentModeCommitted(previous);
-      addOptimisticSilentMode(previous);
-    }
-  }, [user, invalidateProfileQuery, silentModeCommitted, addOptimisticSilentMode]);
+  const setSilentMode = useCallback(
+    (val: boolean) => {
+      startProfileTransition(async () => {
+        const previous = silentModeCommitted;
+        addOptimisticSilentMode(val);
+        if (!user) return;
+        const { error } = await updateProfileFields(user.id, { silent_mode: val });
+        if (!error) {
+          setSilentModeCommitted(val);
+          invalidateProfileQuery();
+        } else {
+          setSilentModeCommitted(previous);
+          addOptimisticSilentMode(previous);
+        }
+      });
+    },
+    [
+      user,
+      invalidateProfileQuery,
+      silentModeCommitted,
+      addOptimisticSilentMode,
+      startProfileTransition,
+    ],
+  );
 
-  const setCompanionPref = useCallback(async (key: keyof CompanionPrefs, val: boolean) => {
-    const previous = companionPrefsCommitted;
-    const next = { ...previous, [key]: val };
-    addOptimisticCompanionPrefs(next);
-    if (!user || key === 'breathing') {
-      setCompanionPrefsCommitted(next);
-      return;
-    }
-    const snakeKey = key === 'zoomOut' ? 'zoom_out' : key;
-    const dbKey = `companion_${snakeKey}` as string;
-    const { error } = await updateProfileFields(user.id, { [dbKey]: val } as ProfileUpdate);
-    if (!error) {
-      setCompanionPrefsCommitted(next);
-      invalidateProfileQuery();
-    } else {
-      setCompanionPrefsCommitted(previous);
-      addOptimisticCompanionPrefs(previous);
-    }
-  }, [user, invalidateProfileQuery, companionPrefsCommitted, addOptimisticCompanionPrefs]);
+  const setCompanionPref = useCallback(
+    (key: keyof CompanionPrefs, val: boolean) => {
+      startProfileTransition(async () => {
+        const previous = companionPrefsCommitted;
+        const next = { ...previous, [key]: val };
+        addOptimisticCompanionPrefs(next);
+        if (!user || key === 'breathing') {
+          setCompanionPrefsCommitted(next);
+          return;
+        }
+        const snakeKey = key === 'zoomOut' ? 'zoom_out' : key;
+        const dbKey = `companion_${snakeKey}` as string;
+        const { error } = await updateProfileFields(user.id, { [dbKey]: val } as ProfileUpdate);
+        if (!error) {
+          setCompanionPrefsCommitted(next);
+          invalidateProfileQuery();
+        } else {
+          setCompanionPrefsCommitted(previous);
+          addOptimisticCompanionPrefs(previous);
+        }
+      });
+    },
+    [
+      user,
+      invalidateProfileQuery,
+      companionPrefsCommitted,
+      addOptimisticCompanionPrefs,
+      startProfileTransition,
+    ],
+  );
 
   const saveOnboardingDraft = useCallback(async (draft: {
     trackedAssetId: string;
@@ -349,18 +394,20 @@ export function useProfile() {
       if (!error) invalidateProfileQuery();
     },
     reflectionStyle,
-    setReflectionStyle: async (val: string) => {
-      const previous = reflectionStyleCommitted;
-      addOptimisticReflectionStyle(val);
-      if (!user) return;
-      const { error } = await updateProfileFields(user.id, { reflection_style: val });
-      if (!error) {
-        setReflectionStyleCommitted(val);
-        invalidateProfileQuery();
-      } else {
-        setReflectionStyleCommitted(previous);
-        addOptimisticReflectionStyle(previous);
-      }
+    setReflectionStyle: (val: string) => {
+      startProfileTransition(async () => {
+        const previous = reflectionStyleCommitted;
+        addOptimisticReflectionStyle(val);
+        if (!user) return;
+        const { error } = await updateProfileFields(user.id, { reflection_style: val });
+        if (!error) {
+          setReflectionStyleCommitted(val);
+          invalidateProfileQuery();
+        } else {
+          setReflectionStyleCommitted(previous);
+          addOptimisticReflectionStyle(previous);
+        }
+      });
     },
     quietHoursStart,
     quietHoursEnd,
@@ -406,53 +453,59 @@ export function useProfile() {
       invalidateProfileQuery();
     },
     currency,
-    setCurrency: async (val: string) => {
-      const previous = currencyCommitted;
-      addOptimisticCurrency(val);
-      if (!user) return;
-      const { error } = await updateProfileFields(user.id, { display_currency: val });
-      if (!error) {
-        setCurrencyCommitted(val);
-        invalidateProfileQuery();
-      } else {
-        setCurrencyCommitted(previous);
-        addOptimisticCurrency(previous);
-      }
+    setCurrency: (val: string) => {
+      startProfileTransition(async () => {
+        const previous = currencyCommitted;
+        addOptimisticCurrency(val);
+        if (!user) return;
+        const { error } = await updateProfileFields(user.id, { display_currency: val });
+        if (!error) {
+          setCurrencyCommitted(val);
+          invalidateProfileQuery();
+        } else {
+          setCurrencyCommitted(previous);
+          addOptimisticCurrency(previous);
+        }
+      });
     },
     trackedAssetId,
-    setTrackedAssetId: async (val: string) => {
-      const next = normalizeTrackedAssetId(val);
-      const previous = trackedAssetIdCommitted;
-      addOptimisticTrackedAssetId(next);
-      if (!user) return;
-      const { error } = await updateProfileFields(user.id, { tracked_asset_id: next });
-      if (!error) {
-        setTrackedAssetIdCommitted(next);
-        invalidateProfileQuery();
-      } else {
-        setTrackedAssetIdCommitted(previous);
-        addOptimisticTrackedAssetId(previous);
-      }
+    setTrackedAssetId: (val: string) => {
+      startProfileTransition(async () => {
+        const next = normalizeTrackedAssetId(val);
+        const previous = trackedAssetIdCommitted;
+        addOptimisticTrackedAssetId(next);
+        if (!user) return;
+        const { error } = await updateProfileFields(user.id, { tracked_asset_id: next });
+        if (!error) {
+          setTrackedAssetIdCommitted(next);
+          invalidateProfileQuery();
+        } else {
+          setTrackedAssetIdCommitted(previous);
+          addOptimisticTrackedAssetId(previous);
+        }
+      });
     },
     language,
-    setLanguage: async (val: string) => {
-      if (!user) {
-        setLanguageCommitted(val);
+    setLanguage: (val: string) => {
+      startProfileTransition(async () => {
+        if (!user) {
+          setLanguageCommitted(val);
+          addOptimisticLanguage(val);
+          return;
+        }
+        const previous = languageCommitted;
         addOptimisticLanguage(val);
-        return;
-      }
-      const previous = languageCommitted;
-      addOptimisticLanguage(val);
-      const { error } = await updateProfileFields(user.id, { language: val });
-      if (error) {
-        holzenLog.profile('language update failed', { error: error.message });
-        setLanguageCommitted(previous);
-        addOptimisticLanguage(previous);
-        toast.error(t('common.profileWriteFailed'));
-      } else {
-        setLanguageCommitted(val);
-        invalidateProfileQuery();
-      }
+        const { error } = await updateProfileFields(user.id, { language: val });
+        if (error) {
+          holzenLog.profile('language update failed', { error: error.message });
+          setLanguageCommitted(previous);
+          addOptimisticLanguage(previous);
+          toast.error(t('common.profileWriteFailed'));
+        } else {
+          setLanguageCommitted(val);
+          invalidateProfileQuery();
+        }
+      });
     },
     companionPrefs,
     setCompanionPref,

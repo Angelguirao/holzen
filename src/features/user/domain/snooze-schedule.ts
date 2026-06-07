@@ -40,17 +40,18 @@ export function formatSnoozeUntilSummary(until: Date, from = new Date()): string
   return `${format(until, 'EEEE d')}, ${time}`;
 }
 
-/** Clock suffix for the 2-hour preset row — "Until HH:mm". */
+/** Clock suffix for 2h / 6h preset rows — "Until HH:mm". */
 export function formatSnoozePresetUntilClock(
-  preset: SnoozeDurationPreset,
+  preset: Exclude<SnoozeDurationPreset, 'custom'>,
   opts: { snoozedUntil: Date | null; isActive: boolean; from?: Date },
-): string | null {
-  if (preset !== '2h') return null;
+): string {
   const from = opts.from ?? new Date();
-  const end =
-    opts.isActive && opts.snoozedUntil && opts.snoozedUntil > from
-      ? opts.snoozedUntil
-      : addSnoozePresetHours('2h', from);
+  const useActiveSnooze =
+    opts.isActive &&
+    opts.snoozedUntil &&
+    opts.snoozedUntil > from &&
+    inferSnoozeDurationPreset(opts.snoozedUntil, from) === preset;
+  const end = useActiveSnooze ? opts.snoozedUntil! : addSnoozePresetHours(preset, from);
   return format(end, 'HH:mm');
 }
 
