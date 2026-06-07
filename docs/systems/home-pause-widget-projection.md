@@ -99,7 +99,7 @@ When the tracked asset move is **back within** the user’s daily thresholds, **
 
 **Manual** open pauses (`source ≠ cron_volatility`) are **not** auto-expired when the market calms.
 
-**Engaged countdown (calm market on `open_engaged`):** When live market is within thresholds, settled copy + **This pause closes in {{remaining}}**. For **`cron_volatility`** engaged rows, Postgres stamps **`metadata.calm_settled_at`** on the first calm sweep after Reflect; the countdown is **12h from that stamp**. While volatility is still hot, cron engaged rows have **no** open-max anchor yet — only *still here* copy. **Manual** engaged pauses use **`engaged_at` + 12h**.
+**Engaged countdown (calm market on `open_engaged` / `open_engaged_pending_offer`):** When live market is within thresholds, settled copy + **This pause closes in {{remaining}}**. For **`cron_volatility`** engaged rows, Postgres stamps **`metadata.calm_settled_at`** on the first calm sweep after Reflect; the countdown is **12h from that stamp**. While volatility is still hot, cron engaged rows have **no** open-max anchor yet — only *still here* copy (no countdown). **Manual** engaged pauses use **`engaged_at` + 12h**; the countdown also appears under *still here* on rows **4** and **5** when an anchor exists (hot market + manual engaged, or row **5** with pending). Row **4b** adds calm-waters body copy above the same countdown line.
 
 **Home one-shot calm sweep:** When Home already projects calm-waters (`engagedPauseMarketSettled`) but **`calm_settled_at`** is missing on a cron engaged row, `useHomeCronCalmSweepOnce` calls **`pause_apply_cron_calm_sweep_for_self`** once per open instance (server re-validates thresholds). No polling — countdown ticks locally via `PauseEngagedOpenMaxCountdown` after metadata arrives.
 
@@ -189,9 +189,9 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 | 1 | `idle_collapsed` | No open pause; not in manual cooldown; **return visit** | Title **Your pause** + moon; collapsed header only |
 | 2 | `idle_expanded` | First idle onboarding (every visit until **Let's pause**) **or** tap chevron on `idle_collapsed` | Within-range copy + Nox **Let's pause**; forfeited if Holzen opens a pause first |
 | 3 | `open_pre_reflect` | Open `active` (untouched, mid-ritual pre-Reflect, manual, cron, or returning user) | Title **Your pause**; empathy + inline BTC/F&G + Nox **Let's pause** |
-| 4 | `open_engaged` | Reach Reflect → `engaged` | Title **Continue your pause**; *still here* + Nox **Continue** + **Discard** |
+| 4 | `open_engaged` | Reach Reflect → `engaged` | Title **Continue your pause**; *still here* (+ **This pause closes in …** when open-max anchor exists, e.g. manual engaged) + Nox **Continue** + **Discard** |
 | 4b | `open_engaged` (calm waters body) | `open_engaged` + live market within thresholds; cron row has **`calm_settled_at`** | Settled copy + **This pause closes in …** (12h from **`calm_settled_at`**) + **Continue** / **Discard** |
-| 5 | `open_engaged_pending_offer` | `open_engaged` + cron queues new context (pending row) while still on Home | Unified card: **Continue** / **Discard**, **or**, **New pause available** + **Pause with new context** |
+| 5 | `open_engaged_pending_offer` | `open_engaged` + cron queues new context (pending row) while still on Home | Top: *still here* or calm-waters + **This pause closes in …** when anchor exists + **Continue** / **Discard**; then **New pause available** + **Pause with new context**. When engaged **`open_max_age`** expires with pending still queued, Postgres promotes pending → **`open_pre_reflect`** (migration **`20260610140000`**). |
 | 6 | `manual_cooldown_collapsed` / `manual_cooldown_expanded` | Complete a manual pause; manual cooldown active; no open pause; has archive | Title **Your pause**; collapsed default; expanded → cooldown time + **Revisit your archive** |
 | 7 | `manual_cooldown_first_pause_collapsed` / `manual_cooldown_first_pause_expanded` | Same as row 6 but `completedPauseCount = 0` | Same title; rest copy without archive link |
 | 7b | `idle_expanded` (post-manual cooldown) | Manual cooldown elapsed; market within range; no cron offer | Auto-expands: **The time has passed.** + **Another pause is available, if you need it.** + **Let's pause** |
@@ -206,6 +206,7 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 - **New pause available** copy appears only on `open_engaged_pending_offer`, not on `open_pre_reflect`.
 - **Continue** appears on `open_engaged` and `open_engaged_pending_offer` only (after Reflect / `engaged`) — not on `open_pre_reflect` (use **Let's pause**, including mid-ritual pre-Reflect).
 - Cron **pending** + market calms → pending **`context_lost`**; engaged user sees `open_engaged` (calm waters body if quote within range), not `open_engaged_pending_offer`.
+- Engaged **`open_max_age`** with pending still queued → engaged **`expired`**; pending promoted → **`active`**; Home **`open_pre_reflect`** after Realtime refresh (same end state as **Discard** on row **5**, without user action).
 - Mid-ritual **`active`** on `/pause` when calm sweep runs → instance may **`context_lost`** while user is in Feel/Breathe (engaged mid-Reflect is protected).
 
 ---
