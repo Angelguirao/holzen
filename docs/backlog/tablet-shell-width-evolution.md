@@ -140,13 +140,13 @@ Do **not** scatter `md:flex-row` inside shell cards without `@container/shell`.
 
 Pick **1–2** high-value surfaces with Figma approval:
 
-| Candidate | Layout at M+ | Product gate |
-|-----------|--------------|--------------|
-| [`HomeMarketWidgetFooter`](../../src/screens/home/components/HomeMarketWidgetFooter.tsx) | Row: range left, community right | Must not re-introduce monitoring density |
-| Archive pause row | Meta column beside title | Archive owner doc |
-| Journey pulse strip | 2-up tiles | Journey backlog |
+| Candidate | Layout at M+ | Product gate | Status |
+|-----------|--------------|--------------|--------|
+| [`HomeMarketWidgetFooter`](../../src/screens/home/components/HomeMarketWidgetFooter.tsx) | Row: range left, community right | Must not re-introduce monitoring density | **Shipped** (`@[400px]/shell`) |
+| Archive pause row | Meta column beside title | Archive owner doc | |
+| Journey pulse strip | 2-up tiles | Journey backlog | |
 
-Each PR: `@container/shell` + screenshot at 375 / 768 / 1280 viewports.
+Each PR: `@…/shell:` + screenshot at 375 / 768 / 1280 viewports.
 
 **Exit:** chosen surfaces pass VR / manual QA; no new chart or dashboard widgets smuggled in.
 

@@ -88,7 +88,7 @@ Customize id remains **`journey-pulse`** (historical); default visibility **on**
 
 [`HomeMarketWidgetFooter`](../../src/screens/home/components/HomeMarketWidgetFooter.tsx) sits under the BTC price: **within / beyond your range** (left) and **% of users paused today** (UTC day, right; hides at 0). Live **“pausing now”** UI archived in [`src/legacy/holzen-pausing-now/`](../../src/legacy/holzen-pausing-now/README.md). Data: `get_holzen_number()` → `holzen_community_stats` (`id = live`), warmed on Home mount via parallel `holzen-number` + `market-quote` prefetch (`useHomePrefetch`), invalidated on own pause lifecycle + **`holzen_community_stats` Realtime** (no polling).
 
-**Layout:** Footer uses a **column stack** (not viewport `sm:flex-row`) because the authenticated shell is **`max-w-sm`** — see [client-src-layout.md](../fundamentals/client-src-layout.md) § Shell width and responsive layout.
+**Layout:** Footer uses a **column stack** at tier S; at tier **M+** (`@[400px]/shell`) range and community stats sit in one row — see [client-src-layout.md](../fundamentals/client-src-layout.md) § Shell width.
 
 ## Pause widget error surfacing
 
