@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { RobotsNoIndex } from '@/app/components/PageMeta';
+import { APP_SHELL_ROOT_CLASS, APP_SHELL_WIDTH_CLASS } from '@/app/lib/app-shell-layout';
 
 /**
  * Lightweight fallback shown while a lazy page chunk downloads *within*
@@ -103,7 +104,7 @@ export function AppLayout() {
       <ShellPauseChrome pauseReady={pauseReady} onDismissPauseReady={dismiss} />
       <CheckoutConfirmation />
       <PaywallSubscribedTracker />
-      <div className="w-full max-w-sm">
+      <div className={APP_SHELL_ROOT_CLASS}>
         {profileLoadError ? (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription className="flex flex-col gap-3 text-left">

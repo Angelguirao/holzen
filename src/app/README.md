@@ -39,6 +39,7 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 | `hooks/use-feedback-widget.ts` | Error-boundary feedback sheet conductor |
 | `lib/navigation-telemetry.ts` | Shell nav PostHog (`navigation.primary_tab_opened`) |
 | `lib/app-route-telemetry.ts` | App 404 PostHog (`app.route_not_found`) |
+| `lib/app-shell-layout.ts` | Shared shell width tiers (`APP_SHELL_WIDTH_CLASS`) + container root class |
 
 ## Placement rationale (what lives elsewhere)
 
