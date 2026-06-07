@@ -107,20 +107,69 @@ function HomePauseEngagedCalmWatersBlock({
           defaultValue: 'Your pause is still open if you want to finish.',
         })}
       </p>
+      <HomePauseEngagedOpenMaxCountdownLine openPauseOpenMaxAnchorAt={openPauseOpenMaxAnchorAt} />
+    </div>
+  );
+}
+
+function HomePauseEngagedOpenMaxCountdownLine({
+  openPauseOpenMaxAnchorAt,
+}: Pick<EngagedCalmWatersProps, 'openPauseOpenMaxAnchorAt'>) {
+  "use memo";
+  const { t } = useTranslation();
+
+  if (openPauseOpenMaxAnchorAt) {
+    return (
+      <PauseEngagedOpenMaxCountdown
+        anchorIso={openPauseOpenMaxAnchorAt}
+        className="pt-1 text-sm leading-5 tracking-wide text-foreground"
+        countdownTranslationKey="home.pauseInProgress.closesIn"
+        countdownTranslationDefault="This pause closes in {{remaining}}"
+      />
+    );
+  }
+
+  return (
+    <p className="pt-1 text-muted-foreground">
+      {t('home.pauseInProgress.closesAfterSettle', {
+        defaultValue: 'This pause closes 12 hours after the market settles.',
+      })}
+    </p>
+  );
+}
+
+/** Row 4 / 5 top copy — calm waters or still-here; countdown whenever open-max anchor exists. */
+function HomePauseEngagedTopBlock({
+  engagedPauseMarketSettled,
+  openPauseOpenMaxAnchorAt,
+}: EngagedCalmWatersProps) {
+  "use memo";
+  const { t } = useTranslation();
+
+  if (engagedPauseMarketSettled) {
+    return (
+      <HomePauseEngagedCalmWatersBlock
+        engagedPauseMarketSettled={engagedPauseMarketSettled}
+        openPauseOpenMaxAnchorAt={openPauseOpenMaxAnchorAt}
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-1">
+      <p className="text-sm leading-5 tracking-wide text-muted-foreground">
+        {t('home.pauseInProgress.stillHere', {
+          defaultValue: 'The pause you started is still here.',
+        })}
+      </p>
       {openPauseOpenMaxAnchorAt ? (
         <PauseEngagedOpenMaxCountdown
           anchorIso={openPauseOpenMaxAnchorAt}
-          className="pt-1 text-sm leading-5 tracking-wide text-foreground"
+          className="text-sm leading-5 tracking-wide text-foreground"
           countdownTranslationKey="home.pauseInProgress.closesIn"
           countdownTranslationDefault="This pause closes in {{remaining}}"
         />
-      ) : (
-        <p className="pt-1 text-muted-foreground">
-          {t('home.pauseInProgress.closesAfterSettle', {
-            defaultValue: 'This pause closes 12 hours after the market settles.',
-          })}
-        </p>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -137,18 +186,10 @@ export function HomePauseEngagedBody({
 
   return (
     <div className={homePauseWidgetBodyStack}>
-      {engagedPauseMarketSettled ? (
-        <HomePauseEngagedCalmWatersBlock
-          engagedPauseMarketSettled={engagedPauseMarketSettled}
-          openPauseOpenMaxAnchorAt={openPauseOpenMaxAnchorAt}
-        />
-      ) : (
-        <p className="text-sm leading-5 tracking-wide text-muted-foreground">
-          {t('home.pauseInProgress.stillHere', {
-            defaultValue: 'The pause you started is still here.',
-          })}
-        </p>
-      )}
+      <HomePauseEngagedTopBlock
+        engagedPauseMarketSettled={engagedPauseMarketSettled}
+        openPauseOpenMaxAnchorAt={openPauseOpenMaxAnchorAt}
+      />
       <div className="flex flex-col gap-6 pb-2">
         <HomePauseWidgetNoxCta label={t('home.pauseWidget.continue')} onClick={onPauseWithThis} />
         <HomePauseWidgetDiscardLink
@@ -183,18 +224,10 @@ export function HomePauseEngagedPendingBody({
 
   return (
     <div className={homePauseWidgetBodyStack}>
-      {engagedPauseMarketSettled ? (
-        <HomePauseEngagedCalmWatersBlock
-          engagedPauseMarketSettled={engagedPauseMarketSettled}
-          openPauseOpenMaxAnchorAt={openPauseOpenMaxAnchorAt}
-        />
-      ) : (
-        <p className="text-sm leading-5 tracking-wide text-muted-foreground">
-          {t('home.pauseInProgress.stillHere', {
-            defaultValue: 'The pause you started is still here.',
-          })}
-        </p>
-      )}
+      <HomePauseEngagedTopBlock
+        engagedPauseMarketSettled={engagedPauseMarketSettled}
+        openPauseOpenMaxAnchorAt={openPauseOpenMaxAnchorAt}
+      />
       <div className="flex flex-col gap-6 pb-2">
         <HomePauseWidgetNoxCta label={t('home.pauseWidget.continue')} onClick={onPauseWithThis} />
         <HomePauseWidgetDiscardLink
