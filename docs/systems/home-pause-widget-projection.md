@@ -166,7 +166,7 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 |--------|-------|---------------|
 | **Let's pause** | **B** → tap CTA | Navigates `/pause` with correct `pauseInstanceId` in location state |
 | **Continue** | **C** → tap | Same instance on `/pause`; session resumes |
-| **Discard** | **C** → **Discard** | Optimistic clear + Sonner **Pause discarded.** / **Undo** (Figma 579:32066); RPC after undo window; widget → **A** or **D**; `pause_open_dismissed` with `surface: home_your_pause_widget` |
+| **Discard** | **C** or **C′** → **Discard** | Optimistic undo snackbar (Figma 579:32066). **C′:** dismisses engaged open pause and **promotes pending → active** (Mode **B**, Figma 578:29994 / 579:31734); **C:** clears open pause only. RPC `pause_dismiss_current`; `pause_open_dismissed` with `surface: home_your_pause_widget` |
 | **Adopt pending** | **B** or **C′** → switch/adopt | Pending cleared; new instance active; `/pause` opens with **new** id; persisted tab session cleared; `pause_pending_adopted` |
 | **Decline pending** | **`/pause`** leave sheet → keep current | Pending row gone; current open pause unchanged; `pause_pending_declined` |
 | **I need a pause** | **A′** → manual trigger (cooldown clear) | Navigates `/pause` or silent open; no `/tools` route |

@@ -19,6 +19,7 @@ import {
   captureOpenPauseHomePreviewSnapshot,
   restoreOpenPauseHomePreviewSnapshot,
   type OpenPauseHomePreviewSnapshot,
+  type OpenPauseHomePreviewSnapshotSource,
 } from '@/features/pause/presentation/home/open-pause-home-preview-snapshot';
 
 export type UseOpenPauseHomePreviewOptions = {
@@ -196,6 +197,23 @@ export function useOpenPauseHomePreview(
     });
   }, []);
 
+  const applyOpenPausePreviewSource = useCallback((preview: OpenPauseHomePreviewSnapshotSource) => {
+    setLastPauseInstanceId(preview.lastPauseInstanceId);
+    setOpenPauseState(preview.openPauseState);
+    setOpenPauseSource(preview.openPauseSource);
+    setMessage(preview.message);
+    setContext(preview.context);
+    setCompanions(preview.companions);
+    setContextSnapshot(preview.contextSnapshot);
+    setHasReflectionStep(preview.hasReflectionStep);
+    setHasOpenPauseStepEvents(preview.hasOpenPauseStepEvents);
+    setHasReachedReflect(preview.hasReachedReflect);
+    setIsBriefRitual(preview.isBriefRitual);
+    setOpenPauseCreatedAt(preview.openPauseCreatedAt);
+    lastSyncedInstanceIdRef.current = preview.lastPauseInstanceId;
+    clearPausePersistedTabSession();
+  }, []);
+
   const commitOpenPauseDismissRpc = useCallback(async () => {
     if (!user) return;
     try {
@@ -233,6 +251,7 @@ export function useOpenPauseHomePreview(
     dismissOpenPauseHome: dismissOpenPauseHomePreviewAction,
     capturePreviewSnapshot,
     restorePreviewSnapshot,
+    applyOpenPausePreviewSource,
     commitOpenPauseDismissRpc,
     syncOpenPauseFromDb,
   };
