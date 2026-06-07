@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import type { HomePauseMarketBlock } from '@/features/pause/domain/home/format-home-pause-market-block';
 
@@ -28,7 +29,7 @@ export function HomePauseWidgetMarketRow({ block }: Props) {
   return (
     <div className="text-sm leading-5 tracking-wide text-foreground">
       {block.moveLine || block.sentimentLine ? (
-        <p className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+        <p className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
           {block.moveLine ? (
             <span className="tabular-nums">{block.moveLine}</span>
           ) : null}
@@ -36,7 +37,7 @@ export function HomePauseWidgetMarketRow({ block }: Props) {
         </p>
       ) : null}
       {updated ? (
-        <p className={`${homeInWidget.metaFaint} leading-5`}>
+        <p className={cn(homeInWidget.metaRow, homeInWidget.metaRowMuted)}>
           {t('home.pauseWidget.updatedAt', { time: updated, defaultValue: 'Updated {{time}}' })}
         </p>
       ) : null}

@@ -17,8 +17,9 @@ function CommunityStatLine({
   label: string;
 }) {
   return (
-    <p className={cn(homeInWidget.meta, 'text-right leading-4 tracking-wide')}>
-      <span className="font-medium tabular-nums text-foreground">{percent}%</span> {label}
+    <p className={homeInWidget.footerSplitEnd}>
+      <span className={cn(homeInWidget.metaRowEmphasis, 'tabular-nums')}>{percent}%</span>{' '}
+      <span className={homeInWidget.metaRowMuted}>{label}</span>
     </p>
   );
 }
@@ -32,12 +33,10 @@ export function HomeMarketCommunityStats() {
   if (isPending || !data || !hasPausedTodayStat(data)) return null;
 
   return (
-    <div className="flex min-w-0 flex-col items-end gap-0.5">
-      <CommunityStatLine
-        percent={data.percent_paused_today}
-        label={t('holzenNumber.pausedToday', { defaultValue: 'of users paused today' })}
-      />
-    </div>
+    <CommunityStatLine
+      percent={data.percent_paused_today}
+      label={t('holzenNumber.pausedToday', { defaultValue: 'of users paused today' })}
+    />
   );
 }
 
