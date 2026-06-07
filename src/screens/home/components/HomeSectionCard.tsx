@@ -90,7 +90,9 @@ export function HomeSectionCard({
         ) : null}
       </AnimatePresence>
 
-      {footer ? <div className="border-t border-border/30 px-4 py-3">{footer}</div> : null}
+      {footer ? (
+        <div className="flex min-h-11 items-center border-t border-border/30 px-4 py-3">{footer}</div>
+      ) : null}
     </div>
   );
 }

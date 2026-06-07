@@ -4,6 +4,7 @@ import {
   type MarketVolatilityRangeStatus,
 } from '@/features/market/domain/market-volatility-range-status';
 import type { MarketQuote } from '@/features/market/public';
+import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { HomeMarketCommunityStats } from '@/screens/home/components/home-market-community-stats';
 
 type Props = {
@@ -21,7 +22,7 @@ function RangeStatusLine({ status }: { status: MarketVolatilityRangeStatus }) {
 
   if (status.kind === 'within') {
     return (
-      <p className="min-w-0 text-xs font-medium leading-4 tracking-wide text-foreground">
+      <p className={homeInWidget.footerSplitStart}>
         {t('home.market.withinYourRange', { defaultValue: 'Within your range' })}
       </p>
     );
@@ -39,7 +40,7 @@ function RangeStatusLine({ status }: { status: MarketVolatilityRangeStatus }) {
     );
 
   return (
-    <p className="min-w-0 text-xs font-medium leading-4 tracking-wide text-foreground">
+    <p className={homeInWidget.footerSplitStart}>
       {arrow}{' '}
       <span>{t('home.market.beyondYourRange', { defaultValue: 'Beyond your range' })}</span>
     </p>
@@ -69,8 +70,8 @@ export function HomeMarketWidgetFooter({
   if (!rangeStatus && !marketData) return null;
 
   return (
-    <div className="flex w-full flex-col gap-1 pt-0.5 @[400px]/shell:flex-row @[400px]/shell:items-start @[400px]/shell:justify-between @[400px]/shell:gap-x-3">
-      {rangeStatus ? <RangeStatusLine status={rangeStatus} /> : null}
+    <div className={homeInWidget.footerSplitRow}>
+      {rangeStatus ? <RangeStatusLine status={rangeStatus} /> : <span className="min-w-0 flex-1" aria-hidden />}
       <HomeMarketCommunityStats />
     </div>
   );

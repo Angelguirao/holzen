@@ -13,9 +13,9 @@ export function HomePauseContextMeta({ btc24h, marketSentiment, className }: Hom
   "use memo";
   if (!btc24h && !marketSentiment) return null;
   return (
-    <div className={cn(homeInWidget.meta, 'space-y-1', className)}>
-      {btc24h ? <p className="leading-snug">{btc24h}</p> : null}
-      {marketSentiment ? <p className="leading-snug">{marketSentiment}</p> : null}
+    <div className={cn(homeInWidget.metaRow, homeInWidget.metaRowMuted, 'space-y-1', className)}>
+      {btc24h ? <p>{btc24h}</p> : null}
+      {marketSentiment ? <p>{marketSentiment}</p> : null}
     </div>
   );
 }

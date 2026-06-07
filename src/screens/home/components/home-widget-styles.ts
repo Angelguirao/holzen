@@ -8,6 +8,15 @@ export const homeInWidget = {
   bodyMuted: 'text-base leading-relaxed text-muted-foreground',
   meta: 'leading-snug text-muted-foreground text-sm',
   metaFaint: 'text-xs leading-snug text-muted-foreground/70',
+  /** Single-line meta under widgets / section footers — shared 16px rhythm (Figma footer rows). */
+  metaRow: 'text-xs font-medium leading-4 tracking-wide',
+  metaRowMuted: 'text-muted-foreground',
+  metaRowEmphasis: 'text-foreground',
+  /** Left/right pair in {@link HomeSectionCard} footers — one row, same vertical center. */
+  footerSplitRow: 'flex w-full flex-row items-center justify-between gap-x-3',
+  footerSplitStart: 'min-w-0 flex-1 text-left text-xs font-medium leading-4 tracking-wide text-foreground',
+  footerSplitEnd:
+    'min-w-0 shrink-0 text-right text-xs font-medium leading-4 tracking-wide',
   /** Row label — matches HomeWidget chrome (uppercase module tone) */
   kicker: 'uppercase tracking-wide font-normal text-muted-foreground text-xs',
   kickerAccent: 'text-xs font-semibold uppercase tracking-wide text-nox-text-highlight/90',
