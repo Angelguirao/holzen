@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { APP_SHELL_TABS, JOURNEY_PREFIX, type AppShellTabKey } from '@/lib/app-routes';
 import { trackPrimaryTabOpened } from '@/app/lib/navigation-telemetry';
+import { APP_SHELL_WIDTH_CLASS } from '@/app/lib/app-shell-layout';
 
 export type PrimaryTabKey = AppShellTabKey;
 
@@ -24,7 +25,7 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-sm items-center justify-between gap-0.5 px-1 py-2">
+      <div className={cn('mx-auto flex items-center justify-between gap-0.5 px-1 py-2', APP_SHELL_WIDTH_CLASS)}>
         {APP_SHELL_TABS.map(({ to, key }) => {
           const Icon =
             key === 'home'

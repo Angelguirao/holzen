@@ -50,6 +50,18 @@ flowchart TB
 
 ---
 
+## Shell width and responsive layout
+
+Authenticated **four-tab routes** (`/`, `/archive`, `/journey`, `/settings/*`) render inside [`AppLayout`](../../src/app/components/AppLayout.tsx) with tiered width via [`app-shell-layout.ts`](../../src/app/lib/app-shell-layout.ts): **`max-w-sm md:max-w-md lg:max-w-lg`** plus outer `p-6`. The shell column uses **`.app-shell`** (`container-name: shell`) for future opt-in layouts. Bottom nav inner wrapper uses the same width classes. **`/pause`**, **`/onboarding`**, and **`/companion/*`** are full-screen and set their own max-width (often `max-w-lg`).
+
+Tailwind **`sm:`** breakpoints are **viewport-based** (640px), not container-based. On a phone, `sm:` never applies and the shell stays tier **S** (`max-w-sm`). On tablet/desktop, viewport `sm:`/`md:` may apply **while** the shell grows only to tier **M/L** — still avoid **`sm:flex-row` inside shell cards** unless tied to **`@container/shell`** (Phase 2).
+
+**Norm for shell screens:** design for tier **S** first (~274–336px usable at `max-w-sm` + `p-6`) — column stacks, `min-w-0`, `truncate`, horizontal scroll for chips, `flex-wrap` + gap instead of space-padding in one `<p>`. At tiers **M/L**, opt in to wider layouts only via **`@container/shell`** (see backlog spec). Reserve viewport `sm:` for **overlays** (dialogs/sheets), **`/pause`**, and marketing pages. See [home.md](../screens/home.md) § Market widget footer for a concrete example.
+
+**Future widening (tablet/desktop):** Phase 1 (shell tiers + container root) shipped — [`app-shell-layout.ts`](../../src/app/lib/app-shell-layout.ts). Phase 2+ (opt-in `@container/shell` layouts): [tablet-shell-width-evolution.md](../backlog/tablet-shell-width-evolution.md).
+
+---
+
 ## Ongoing alignment review
 
 Use this checklist when opening a PR that touches `src/` (human or agent). Full principles: [holzen-application-architecture.md](holzen-application-architecture.md) P1–P9.
