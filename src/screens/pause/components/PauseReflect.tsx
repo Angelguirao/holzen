@@ -21,8 +21,6 @@ interface Props {
   reflectionLoading?: boolean;
   reflectionError?: string | null;
   onReflectionRetry?: () => void;
-  /** When false, skip loading / showing the haiku line (profile companion toggle). */
-  companionHaikuEnabled: boolean;
   isFavorite: boolean;
   onToggleFavorite: () => void;
   subscribed: boolean;
@@ -40,7 +38,6 @@ export function PauseReflect({
   reflectionLoading = false,
   reflectionError = null,
   onReflectionRetry,
-  companionHaikuEnabled,
   isFavorite,
   onToggleFavorite,
   subscribed,
@@ -108,7 +105,6 @@ export function PauseReflect({
         reflectionLoading={reflectionLoading}
         reflectionError={reflectionError}
         onReflectionRetry={onReflectionRetry}
-        companionHaikuEnabled={companionHaikuEnabled}
         isFavorite={isFavorite}
         onToggleFavorite={onToggleFavorite}
         subscribed={subscribed}

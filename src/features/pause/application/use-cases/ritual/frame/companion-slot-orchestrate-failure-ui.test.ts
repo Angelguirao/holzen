@@ -75,6 +75,7 @@ describe('resolveCompanionSlotOrchestrateFailureUi', () => {
 describe('applyCompanionSlotOrchestrateFailureUi', () => {
   const ports = () => ({
     clearLazyFetchSlot: vi.fn(),
+    markLazyFetchSlotComplete: vi.fn(),
     requirePro: vi.fn(),
     showLimitReached: vi.fn(),
     showErrorToast: vi.fn(),

@@ -34,8 +34,8 @@ export function usePauseSessionProvidersFromHolzenSlice(
   const breathSecondLabelVariant = usePauseSessionBreathSecondLabelVariant();
 
   const {
-    mantra,
     dismissMessage,
+    dismissOpenPauseFromWidget,
     message,
     context,
     companions,
@@ -82,8 +82,8 @@ export function usePauseSessionProvidersFromHolzenSlice(
     prefersReducedMotion,
     breathSecondLabelVariant,
     holzenForShell,
-    mantra,
     dismissMessage,
+    dismissOpenPauseFromWidget,
     profileLoaded,
     resyncOpenPauseFromDb,
     marketData,

@@ -21,7 +21,6 @@ import type { PauseBreathingHandle } from '@/features/pause/public-session-ritua
 export type { PauseBreathSegment };
 
 interface Props {
-  mantra: string | null;
   /** Retained for future Feel-tile pattern routing (`pause-breathing-pattern.ts`). */
   severity?: 'mild' | 'moderate' | 'high';
   /**
@@ -55,7 +54,6 @@ interface Props {
 
 export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function PauseBreathing(
   {
-    mantra,
     severity = 'mild',
     ritualVariant,
     breathSegment = 'first',
@@ -140,7 +138,6 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
       started={started}
       completed={completed}
       breathSegment={breathSegment}
-      mantra={mantra}
       ritualVariant={ritualVariant}
       ritualVar={ritualVar}
       prefersReducedMotion={!!prefersReduced}

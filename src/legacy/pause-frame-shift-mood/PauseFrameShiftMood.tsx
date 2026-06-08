@@ -13,7 +13,7 @@ export interface PauseFrameShiftMoodProps {
   onSelectShiftMood: (mood: MoodValue) => void;
 }
 
-/** Optional Frame check-in — logs `shift_emotion_logged` with mood for Presence XP bonus. */
+/** Quarantined — not in Wireframes Frame step (330:22288). Optional post-companion mood check-in. */
 export function PauseFrameShiftMood({
   selectedShiftMood,
   onSelectShiftMood,

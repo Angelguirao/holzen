@@ -14,7 +14,6 @@ export type PauseBreathingBodyProps = {
   started: boolean;
   completed: boolean;
   breathSegment: PauseBreathSegment;
-  mantra: string | null;
   ritualVariant: 'brief' | 'deep' | undefined;
   ritualVar: 'brief' | 'deep';
   prefersReducedMotion: boolean;
@@ -39,7 +38,6 @@ export function PauseBreathingBody({
   started,
   completed,
   breathSegment,
-  mantra,
   ritualVariant,
   ritualVar,
   prefersReducedMotion,
@@ -70,7 +68,6 @@ export function PauseBreathingBody({
       {!started ? (
         <PauseBreathIntro
           breathSegment={breathSegment}
-          mantra={mantra}
           ritualVariant={ritualVar}
           prefersReducedMotion={prefersReducedMotion}
           onStart={() => {

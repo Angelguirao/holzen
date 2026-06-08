@@ -12,7 +12,7 @@ export function usePauseSessionScaffoldVm(
   step: PauseSessionStepHandlersResult,
   chrome: PauseSessionScaffoldVmChromeSlots,
 ) {
-  const { mantra, marketData, trackedAssetId, prefersReducedMotion, breathSecondLabelVariant, t } = p;
+  const { marketData, trackedAssetId, prefersReducedMotion, breathSecondLabelVariant, t } = p;
   const { shell, ritual, mood, breath, reflect, toggleFavorite, handleFrameImDone, subscribed } =
     step;
 
@@ -37,7 +37,6 @@ export function usePauseSessionScaffoldVm(
     onFeelTilesSelect: mood.onFeelTilesSelect,
     setBriefStep: ritual.setBriefStep,
     breathingRef: breath.breathingRef,
-    mantra,
     severity: shell.severity,
     breathingFirstCompleted: ritual.breathingFirstCompleted,
     breathingSecondCompleted: ritual.breathingSecondCompleted,

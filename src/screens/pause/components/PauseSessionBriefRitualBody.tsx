@@ -23,7 +23,6 @@ export function PauseSessionBriefRitualBody({
   onFeelTilesSelect,
   onBriefFeelContinueToBreath,
   breathingRef,
-  mantra,
   severity,
   breathingFirstCompleted,
   onTimedBreathingChange,
@@ -67,7 +66,6 @@ export function PauseSessionBriefRitualBody({
             key="breath-brief"
             breathSegment="first"
             ritualVariant="brief"
-            mantra={mantra}
             severity={severity}
             completed={breathingFirstCompleted}
             onTimedBreathingChange={onTimedBreathingChange}

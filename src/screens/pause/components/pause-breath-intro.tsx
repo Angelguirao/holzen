@@ -8,7 +8,6 @@ export type PauseBreathSegment = 'first' | 'second';
 
 export type PauseBreathIntroProps = {
   breathSegment: PauseBreathSegment;
-  mantra: string | null;
   ritualVariant: 'brief' | 'deep';
   prefersReducedMotion: boolean;
   onStart: () => void;
@@ -16,10 +15,9 @@ export type PauseBreathIntroProps = {
   onSkipBreath?: () => void | Promise<void>;
 };
 
-/** Pre-start breath ritual intro (first/second segment copy, mantra, start/skip CTAs). */
+/** Pre-start breath ritual intro (first/second segment copy, start/skip CTAs). */
 export function PauseBreathIntro({
   breathSegment,
-  mantra,
   ritualVariant,
   prefersReducedMotion,
   onStart,
@@ -63,16 +61,6 @@ export function PauseBreathIntro({
             })}
           </p>
         )}
-        {breathSegment === 'first' && mantra ? (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 1 }}
-            className="max-w-sm text-sm italic leading-relaxed text-muted-foreground"
-          >
-            {`"${mantra}"`}
-          </motion.p>
-        ) : null}
       </div>
 
       <div className="flex flex-col items-center gap-3">

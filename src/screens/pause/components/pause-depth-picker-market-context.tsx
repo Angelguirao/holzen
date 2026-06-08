@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
@@ -9,6 +10,8 @@ import {
   type MarketQuote,
 } from '@/features/market/public';
 import { useProfile } from '@/features/user/public-hooks';
+import { shouldShowPauseRitualMarketContext } from '@/features/pause/domain/session/should-show-pause-ritual-market-context';
+import { usePendingPauseOffer } from '@/features/pause/presentation/reflect/pending-offer/use-pending-pause-offer';
 import { formatPauseDepthPickerMarketLines } from '@/features/pause/domain/feel/format-pause-depth-picker-market-lines';
 
 type Props = {
@@ -29,7 +32,8 @@ export function PauseDepthPickerMarketContext({
 }: Props) {
   "use memo";
   const { t } = useTranslation();
-  const { currency, profileLoaded } = useProfile();
+  const { currency, profileLoaded, threshold, thresholdDown } = useProfile();
+  const { pending } = usePendingPauseOffer();
 
   const marketQuery = useQuery(
     getHolzenMarketDisplayQueryOptions({
@@ -58,6 +62,20 @@ export function PauseDepthPickerMarketContext({
     trackedAssetId,
     contextText,
   );
+
+  const showMarketContext = useMemo(
+    () =>
+      shouldShowPauseRitualMarketContext({
+        hasPendingOffer: pending != null,
+        marketData: marketWithSentiment,
+        threshold,
+        thresholdDown,
+        profileLoaded,
+      }),
+    [pending, marketWithSentiment, threshold, thresholdDown, profileLoaded],
+  );
+
+  if (!showMarketContext) return null;
 
   if (!lines && !showRangeLine) return null;
 

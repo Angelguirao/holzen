@@ -2,6 +2,7 @@ import { usePauseSessionFlowCore } from './use-pause-session-flow-core';
 import { usePauseSessionScaffoldVm } from './scaffold/use-pause-session-scaffold-vm';
 import { usePauseSessionRitualSurface } from './use-pause-session-ritual-surface';
 import { usePauseSessionScaffoldChromeSlots } from './scaffold/use-pause-session-scaffold-chrome-slots';
+import { usePauseSessionInactivitySheet, type PauseSessionInactivitySheetSlice } from './use-pause-session-inactivity-sheet';
 import type { PauseSessionProviders } from './pause-session-providers-types';
 import type {
   PauseScaffoldChromeRegistry,
@@ -34,13 +35,43 @@ export function usePauseSessionFlowWithChrome(
   p: PauseSessionProviders,
   step: PauseSessionStepHandlersResult,
   chrome: PauseSessionScaffoldVmChromeSlots,
-): PauseSessionRitualSurfaceResult {
+): PauseSessionRitualSurfaceResult & PauseSessionInactivitySheetSlice {
   const scaffoldVm = usePauseSessionScaffoldVm(p, step, chrome);
-  return usePauseSessionRitualSurface(
+  const ritualSurface = usePauseSessionRitualSurface(
     { prefersReducedMotion: p.prefersReducedMotion, navigate: p.navigate },
     step,
     scaffoldVm,
   );
+  const { ritual, shell, breath } = step;
+  const inactivity = usePauseSessionInactivitySheet({
+    phase: ritual.phase,
+    ritualEntry: ritual.ritualEntry,
+    leaveWithPendingOpen: shell.leaveWithPendingOpen,
+    breathTimedActive: breath.breathTimedActive,
+    hasCoalescedShellSession: shell.hasCoalescedShellSession,
+    dismissOpenPauseFromWidget: p.dismissOpenPauseFromWidget,
+    handleReturn: ritualSurface.handleReturn,
+    setStep: ritual.setStep,
+    setBriefStep: ritual.setBriefStep,
+    setPhase: ritual.setPhase,
+    setMoodDone: ritual.setMoodDone,
+    setMoodAfterDone: ritual.setMoodAfterDone,
+    setSelectedMood: ritual.setSelectedMood,
+    setSelectedMoodAfter: ritual.setSelectedMoodAfter,
+    setFeelIntensity: ritual.setFeelIntensity,
+    setShiftIntensity: ritual.setShiftIntensity,
+    setBreathingFirstCompleted: ritual.setBreathingFirstCompleted,
+    setBreathingSecondCompleted: ritual.setBreathingSecondCompleted,
+    setFrameDone: ritual.setFrameDone,
+    setBriefIntegrateDone: ritual.setBriefIntegrateDone,
+    setDecision: ritual.setDecision,
+    setSwipeDirection: ritual.setSwipeDirection,
+    setBreathTimedActive: breath.setBreathTimedActive,
+    setBreathFirstTimedPatternStarted: breath.setBreathFirstTimedPatternStarted,
+    setBreathSecondTimedPatternStarted: breath.setBreathSecondTimedPatternStarted,
+    breathingRef: breath.breathingRef,
+  });
+  return { ...ritualSurface, ...inactivity };
 }
 
 /** Shell hydrate, ritual state, step handlers (before chrome slots). */

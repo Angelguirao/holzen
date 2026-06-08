@@ -23,7 +23,6 @@ export type PauseSessionBriefRitualBodyProps = {
   onFeelTilesSelect: (mood: MoodValue, intensity: number, tile: FeelStepTile) => void;
   onBriefFeelContinueToBreath: () => void;
   breathingRef: RefObject<PauseBreathingHandle | null>;
-  mantra: string | null;
   severity: 'mild' | 'moderate' | 'high';
   breathingFirstCompleted: boolean;
   onTimedBreathingChange: (active: boolean) => void;
@@ -53,7 +52,6 @@ export type PauseSessionDeepRitualBodyProps = {
   onFeelTilesSelect: (mood: MoodValue, intensity: number, tile: FeelStepTile) => void;
   goToStep: (next: PauseStep) => void;
   breathingRef: RefObject<PauseBreathingHandle | null>;
-  mantra: string | null;
   severity: 'mild' | 'moderate' | 'high';
   breathingFirstCompleted: boolean;
   breathingSecondCompleted: boolean;
@@ -83,8 +81,6 @@ export type PauseSessionDeepRitualBodyProps = {
   onToggleFavorite: () => void | Promise<void>;
   subscribed: boolean;
   mood?: MoodValue | null;
-  selectedShiftMood: MoodValue | null;
-  onSelectShiftMood: (mood: MoodValue) => void;
   onFrameImDone: () => void;
   onDecide: (decision: string) => void;
   onRepeatDeepFirstBreathPattern: () => void;

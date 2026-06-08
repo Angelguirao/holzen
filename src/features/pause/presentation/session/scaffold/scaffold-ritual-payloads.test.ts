@@ -28,7 +28,6 @@ function setup(overrides: Partial<Parameters<typeof buildPauseSessionScaffoldRit
     onFeelTilesSelect: vi.fn(),
     setBriefStep,
     breathingRef,
-    mantra: null,
     severity: 'mild' as const,
     breathingFirstCompleted: false,
     breathingSecondCompleted: false,

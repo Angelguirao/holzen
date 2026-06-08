@@ -76,7 +76,7 @@ export function SignalFullView({
   return (
     <div className="space-y-4">
       <div className="flex flex-col items-center gap-4">
-        <div className="inline-flex items-center justify-center gap-1 text-sm text-muted-foreground">
+        <div className="inline-flex items-center justify-center gap-1 text-sm leading-6 text-muted-foreground">
           <Clock className="h-4 w-4 shrink-0" aria-hidden />
           <span>{readLabel}</span>
         </div>
@@ -93,7 +93,7 @@ export function SignalFullView({
         </div>
       </div>
 
-      <p className="text-sm leading-5 tracking-wide text-foreground whitespace-pre-line">{signal.body}</p>
+      <p className="whitespace-pre-line text-sm leading-5 tracking-wide text-foreground">{signal.body}</p>
 
       <SignalKeyIdeasBlock keyIdeas={keyIdeas} variant="wireframe" />
 

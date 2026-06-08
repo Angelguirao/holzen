@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import type {
   CompanionSlotCacheIds,
   CompanionSlotCommitters,
@@ -66,6 +66,8 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
     companionSlotErrorSetters,
   } = params;
 
+  const lazyFetchInFlightRef = useRef<Set<string>>(new Set());
+
   const failureUiPorts = useCompanionSlotOrchestrateFailurePorts({
     fetchedSlotsRef,
     requirePro,
@@ -95,10 +97,15 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
       if (!pauseInstanceId) return;
       await whenArtifactHydrateReady();
       if (fetchedSlotsRef.current.has(slot)) return;
+      if (lazyFetchInFlightRef.current.has(slot)) return;
       if (!canAccessCompanion()) return;
 
-      fetchedSlotsRef.current.add(slot);
-      await runSlotOrchestrate(slot, 'lazy_fetch');
+      lazyFetchInFlightRef.current.add(slot);
+      try {
+        await runSlotOrchestrate(slot, 'lazy_fetch');
+      } finally {
+        lazyFetchInFlightRef.current.delete(slot);
+      }
     },
     [
       pauseInstanceId,

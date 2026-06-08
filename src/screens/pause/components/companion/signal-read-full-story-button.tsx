@@ -2,15 +2,13 @@ import { Maximize2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { hapticFeedback } from '@/lib/haptics';
-import { cn } from '@/lib/utils';
 
 export type SignalReadFullStoryButtonProps = {
   pauseInstanceId: string;
-  className?: string;
 };
 
-/** Frame / inline Signal CTA — Figma "Read the full story" + maximize icon. */
-export function SignalReadFullStoryButton({ pauseInstanceId, className }: SignalReadFullStoryButtonProps) {
+/** Frame Signal CTA — Figma "Read the full story" pill + maximize icon (435:16214). */
+export function SignalReadFullStoryButton({ pauseInstanceId }: SignalReadFullStoryButtonProps) {
   "use memo";
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -18,10 +16,7 @@ export function SignalReadFullStoryButton({ pauseInstanceId, className }: Signal
   return (
     <button
       type="button"
-      className={cn(
-        'inline-flex w-full items-center justify-center gap-1.5 py-4 text-sm font-medium text-primary transition-colors hover:text-primary/80',
-        className,
-      )}
+      className="inline-flex items-center justify-center gap-1.5 rounded-full bg-primary/10 px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/15"
       onClick={(e) => {
         e.stopPropagation();
         hapticFeedback('light');

@@ -11,7 +11,6 @@ import {
   trackPauseReflectBlockViewed,
   trackPauseReflectInquiryDisplayed,
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
-import { HaikuDisplay } from '@/screens/pause/components/HaikuDisplay';
 import { PauseReflectInlineNotice } from '@/screens/pause/components/pause-reflect-inline-notice';
 import { PauseReflectMarketContext } from '@/screens/pause/components/pause-reflect-market-context';
 
@@ -25,10 +24,9 @@ export type PauseReflectMessageBodyProps = {
   reflectionLoading: boolean;
   reflectionError: string | null;
   onReflectionRetry?: () => void;
-  artifactHaiku: string | null | undefined;
 };
 
-/** Reflect card: Feel recap + one letter + optional haiku aside + collapsed market context. */
+/** Reflect card: Feel recap + reflection letter + collapsed market context. */
 export function PauseReflectMessageBody({
   pauseInstanceId,
   context,
@@ -39,7 +37,6 @@ export function PauseReflectMessageBody({
   reflectionLoading,
   reflectionError,
   onReflectionRetry,
-  artifactHaiku,
 }: PauseReflectMessageBodyProps) {
   "use memo";
   const { t } = useTranslation();
@@ -119,9 +116,6 @@ export function PauseReflectMessageBody({
         <p className="whitespace-pre-line font-editorial text-base leading-relaxed text-foreground sm:text-lg">
           {letter}
         </p>
-      ) : null}
-      {view === 'body' && artifactHaiku?.trim() ? (
-        <HaikuDisplay haiku={artifactHaiku} variant="verse" />
       ) : null}
       {view === 'body' ? (
         <PauseReflectMarketContext
