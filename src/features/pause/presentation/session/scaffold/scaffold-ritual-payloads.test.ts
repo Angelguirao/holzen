@@ -51,6 +51,8 @@ function setup(overrides: Partial<Parameters<typeof buildPauseSessionScaffoldRit
     companionPrefs: DEFAULT_PREFS,
     pauseInstanceId: 'p1',
     context: null,
+    marketData: null,
+    trackedAssetId: 'bitcoin',
     message: 'hello',
     reflectionContent: null,
     isFavorite: false,

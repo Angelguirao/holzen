@@ -52,6 +52,7 @@ export type HomePauseWidgetDisplayState = {
 
 export type HomePauseWidgetActionHandlers = {
   onNavigatePauseWithThis: () => void;
+  onOpenWelcomeBackSheet: () => void;
   onAdoptPendingOffer: () => void | Promise<boolean>;
   onDeclinePendingOffer: () => void | Promise<boolean>;
   pendingOfferBusy: boolean;
@@ -64,6 +65,13 @@ export type HomePauseWidgetActionHandlers = {
   autoCooldownRemaining: () => number;
   nextCronCheckIn: () => number;
   manualCooldownRemaining: () => number;
+  welcomeBackOpen: boolean;
+  setWelcomeBackOpen: (open: boolean) => void;
+  welcomeBackHandlers: {
+    onContinue: () => void;
+    onStartOver: () => void;
+    onDiscard: () => void;
+  };
 };
 
 /** Composed inside `useHomePauseWidgetInputs` — not passed from the screen. */
@@ -107,6 +115,8 @@ export type HomePauseWidgetBodySubscription = HomePauseWidgetSubscriptionGate;
 export type HomePauseWidgetBodyActions = {
   pendingOfferBusy?: boolean;
   onPauseWithThis: () => void;
+  /** Engaged surfaces — opens welcome-back sheet instead of navigating immediately. */
+  onOpenWelcomeBackSheet?: () => void;
   onPauseWithNewContext?: () => void;
   onDeclinePendingOffer?: () => void;
   onDismissOpenPause: () => void;
@@ -136,6 +146,15 @@ export type HomePauseWidgetProjection = {
   collapsed: boolean;
   onToggleCollapse: () => void;
   body: HomePauseWidgetBodyProjection;
+  welcomeBackOpen: boolean;
+  setWelcomeBackOpen: (open: boolean) => void;
+  welcomeBackHandlers: {
+    onContinue: () => void;
+    onStartOver: () => void;
+    onDiscard: () => void;
+  };
+  welcomeBackHasPendingOffer: boolean;
+  welcomeBackOpenMaxAnchorAt: string | null;
 };
 
 export type AssembleHomePauseWidgetProjectionInput = {

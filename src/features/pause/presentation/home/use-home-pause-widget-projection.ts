@@ -209,5 +209,10 @@ export function useHomePauseWidgetProjection(
   return {
     ...chromeAndBody,
     onToggleCollapse,
+    welcomeBackOpen: ctx.welcomeBackOpen,
+    setWelcomeBackOpen: ctx.setWelcomeBackOpen,
+    welcomeBackHandlers: ctx.welcomeBackHandlers,
+    welcomeBackHasPendingOffer: Boolean(pending),
+    welcomeBackOpenMaxAnchorAt: openPauseOpenMaxAnchorAt,
   };
 }

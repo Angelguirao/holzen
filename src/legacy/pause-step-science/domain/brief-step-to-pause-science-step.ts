@@ -1,5 +1,5 @@
-import type { PauseStep } from '../pause-ritual-steps';
-import type { BriefPauseStep } from '../ritual-types';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
+import type { BriefPauseStep } from '@/features/pause/domain/ritual-types';
 
 /** Brief “Integrate” has no dedicated citations row — highlight Reflect (regulation) sources. */
 export function briefStepToPauseScienceStep(brief: BriefPauseStep): PauseStep {

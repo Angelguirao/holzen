@@ -38,6 +38,8 @@ export function PauseSessionDeepRitualBody({
   companionPrefs,
   pauseInstanceId,
   context,
+  marketData,
+  trackedAssetId,
   reflectionMessage,
   reflectionContent,
   currentFeel,
@@ -74,6 +76,9 @@ export function PauseSessionDeepRitualBody({
             feelIntensity={feelIntensity}
             onSelect={onFeelTilesSelect}
             onContinue={() => goToStep('breathe')}
+            marketData={marketData}
+            trackedAssetId={trackedAssetId}
+            contextText={context}
           />
         </motion.div>
       )}

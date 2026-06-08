@@ -17,6 +17,7 @@ export function assembleHomePauseWidgetProjection(
   const bodyActions: HomePauseWidgetBodyActions = {
     pendingOfferBusy: actions.pendingOfferBusy,
     onPauseWithThis: actions.onNavigatePauseWithThis,
+    onOpenWelcomeBackSheet: actions.onOpenWelcomeBackSheet,
     onPauseWithNewContext: () => void actions.onAdoptPendingOffer(),
     onDeclinePendingOffer: () => void actions.onDeclinePendingOffer(),
     onDismissOpenPause: actions.onDismissOpenPause,

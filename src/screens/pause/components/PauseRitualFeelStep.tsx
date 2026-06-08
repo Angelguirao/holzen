@@ -4,8 +4,10 @@ import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { FeelStepTile, MoodValue } from '@/features/pause/public-ritual-feel';
 import { PAUSE_FEEL_STEP_TILE_ROWS } from '@/features/pause/public-ritual-feel';
+import type { MarketQuote } from '@/features/market/public';
 import { pauseStepLayout } from '@/features/pause/public-session';
 import { Button } from '@/components/ui/button';
+import { PauseDepthPickerMarketContext } from '@/screens/pause/components/pause-depth-picker-market-context';
 import { PauseRitualFeelIntensitySlider } from '@/screens/pause/components/pause-ritual-feel-intensity-slider';
 import { PauseRitualFeelTileGrid } from '@/screens/pause/components/pause-ritual-feel-tile-grid';
 
@@ -16,6 +18,9 @@ interface Props {
   feelIntensity: number | null;
   onSelect: (mood: MoodValue, intensity: number, tile: FeelStepTile) => void;
   onContinue: () => void;
+  marketData: MarketQuote | null;
+  trackedAssetId: string;
+  contextText: string | null;
 }
 
 /** Shared Feel step for brief and deep pause rituals (tile grid + intensity slider). */
@@ -26,6 +31,9 @@ export function PauseRitualFeelStep({
   feelIntensity,
   onSelect,
   onContinue,
+  marketData,
+  trackedAssetId,
+  contextText,
 }: Props) {
   "use memo";
   const { t } = useTranslation();
@@ -58,12 +66,19 @@ export function PauseRitualFeelStep({
       transition={{ duration: 0.45 }}
     >
       <div className="mx-auto flex w-full max-w-md flex-col gap-8">
+        <PauseDepthPickerMarketContext
+          marketData={marketData}
+          trackedAssetId={trackedAssetId}
+          contextText={contextText}
+          showRangeLine={false}
+        />
+
         <div className="flex flex-col gap-2 text-center">
           <h2 className="text-[22px] font-normal leading-7 tracking-tight text-foreground">
             {t('pause.feelStep.title', { defaultValue: "What's here?" })}
           </h2>
           <p className="text-base leading-6 text-muted-foreground">
-            {t('pause.feelStep.subtitle', { defaultValue: 'No need to be sure' })}
+            {t('pause.feelStep.subtitle', { defaultValue: "Whatever's here counts." })}
           </p>
         </div>
 

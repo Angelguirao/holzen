@@ -5,7 +5,7 @@ import { HomePauseHelpFeedbackThankYou } from '@/screens/home/components/HomePau
 import { useHomeScreen } from '@/screens/home/hooks/use-home-screen';
 
 const Home = () => {
-  const { profileLoaded, dashboardLayout, pauseHelpFeedback } = useHomeScreen();
+  const { profileLoaded, dashboardLayout, pauseHelpFeedback, pauseWelcomeBackSheet } = useHomeScreen();
 
   if (!profileLoaded) {
     return <AuthLoading />;
@@ -21,6 +21,7 @@ const Home = () => {
         onSubmit={pauseHelpFeedback.onSubmit}
         onDefer={pauseHelpFeedback.onDefer}
       />
+      {pauseWelcomeBackSheet}
       <HomePauseHelpFeedbackThankYou
         visible={pauseHelpFeedback.showThankYou}
         onDismiss={pauseHelpFeedback.onDismissThankYou}

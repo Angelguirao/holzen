@@ -16,6 +16,8 @@ type Props = {
   trackedAssetId: string;
   /** Pause instance context — sentiment fallback after manual trigger. */
   contextText?: string | null;
+  /** Depth picker shows “Within your range”; Feel step shows market line only (Figma 330:19905). */
+  showRangeLine?: boolean;
 };
 
 /** Market move + “Within your range” block (Figma Wireframes 589:19181). */
@@ -23,6 +25,7 @@ export function PauseDepthPickerMarketContext({
   marketData,
   trackedAssetId,
   contextText = null,
+  showRangeLine = true,
 }: Props) {
   "use memo";
   const { t } = useTranslation();
@@ -56,6 +59,8 @@ export function PauseDepthPickerMarketContext({
     contextText,
   );
 
+  if (!lines && !showRangeLine) return null;
+
   return (
     <div className="flex flex-col gap-2">
       {lines ? (
@@ -77,9 +82,11 @@ export function PauseDepthPickerMarketContext({
           {lines.sentimentLine ? <span>{lines.sentimentLine}</span> : null}
         </p>
       ) : null}
-      <p className="text-center text-sm leading-5 tracking-[0.005em] text-muted-foreground">
-        {t('home.market.withinYourRange', { defaultValue: 'Within your range' })}
-      </p>
+      {showRangeLine ? (
+        <p className="text-center text-sm leading-5 tracking-[0.005em] text-muted-foreground">
+          {t('home.market.withinYourRange', { defaultValue: 'Within your range' })}
+        </p>
+      ) : null}
     </div>
   );
 }
