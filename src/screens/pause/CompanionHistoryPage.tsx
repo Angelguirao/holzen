@@ -7,6 +7,7 @@ import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useProfile } from '@/features/user/public-hooks';
 import { useCompanionFullViewPage } from '@/features/pause/public-ritual-frame';
 import { HistoricalInsightDisplay } from '@/screens/pause/components/HistoricalInsightDisplay';
+import { LookBackFullView } from '@/screens/pause/components/look-back-full-view';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
 import { ReadTime } from '@/screens/pause/components/companion/ReadTime';
@@ -95,12 +96,16 @@ export default function CompanionHistoryPage() {
           </div>
         )}
 
-        <HistoricalInsightDisplay
-          data={historyDisplay}
-          loading={historyLoading}
-          error={historyError}
-          onRetry={retryHistory}
-        />
+        {historyLoading || historyError || !historyDisplay ? (
+          <HistoricalInsightDisplay
+            data={historyDisplay}
+            loading={historyLoading}
+            error={historyError}
+            onRetry={retryHistory}
+          />
+        ) : (
+          <LookBackFullView data={historyDisplay} />
+        )}
         {historyDisplay && cacheRelaxations.history && (
           <p className="text-[10px] text-muted-foreground/55 font-mono leading-snug">
             {t(`companions.cacheRelaxation.${cacheRelaxations.history}`)}

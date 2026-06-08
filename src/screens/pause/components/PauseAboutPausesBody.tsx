@@ -42,9 +42,21 @@ function AboutPausesSection({
       </CollapsibleTrigger>
       <CollapsibleContent>
         <div className={cn('space-y-4 pb-4 pt-0 text-base leading-6 text-muted-foreground')}>
-          {paragraphs.map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
+          {paragraphs.map((paragraph, index) => {
+            const lines = paragraph.split('\n').filter((line) => line.trim().length > 0);
+            if (lines.length <= 1) {
+              return <p key={index}>{paragraph}</p>;
+            }
+            return (
+              <div key={index} className="flex flex-col">
+                {lines.map((line, lineIndex) => (
+                  <p key={lineIndex} className="mb-0">
+                    {line}
+                  </p>
+                ))}
+              </div>
+            );
+          })}
         </div>
       </CollapsibleContent>
     </Collapsible>

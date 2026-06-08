@@ -35,7 +35,6 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   onFeelTilesSelect: PauseSessionBriefRitualBodyProps['onFeelTilesSelect'];
   setBriefStep: (next: BriefPauseStep) => void;
   breathingRef: RefObject<PauseBreathingHandle | null>;
-  mantra: string | null;
   severity: 'mild' | 'moderate' | 'high';
   breathingFirstCompleted: boolean;
   breathingSecondCompleted: boolean;
@@ -95,7 +94,6 @@ export function buildPauseSessionScaffoldRitualPayloads(
       onFeelTilesSelect: p.onFeelTilesSelect,
       onBriefFeelContinueToBreath: () => p.setBriefStep('breath'),
       breathingRef: p.breathingRef,
-      mantra: p.mantra,
       severity: p.severity,
       breathingFirstCompleted: p.breathingFirstCompleted,
       onTimedBreathingChange: p.setBreathTimedActive,
@@ -124,7 +122,6 @@ export function buildPauseSessionScaffoldRitualPayloads(
       onFeelTilesSelect: p.onFeelTilesSelect,
       goToStep: p.goToStep,
       breathingRef: p.breathingRef,
-      mantra: p.mantra,
       severity: p.severity,
       breathingFirstCompleted: p.breathingFirstCompleted,
       breathingSecondCompleted: p.breathingSecondCompleted,
@@ -150,8 +147,6 @@ export function buildPauseSessionScaffoldRitualPayloads(
       onToggleFavorite: p.toggleFavorite,
       subscribed: p.subscribed,
       mood: p.selectedMood,
-      selectedShiftMood: p.selectedMoodAfter,
-      onSelectShiftMood: p.setSelectedMoodAfter,
       onFrameImDone: () => void p.handleFrameImDone(),
       onDecide: p.handleDecide,
       onRepeatDeepFirstBreathPattern: p.handleDeepFirstBreathRepeat,

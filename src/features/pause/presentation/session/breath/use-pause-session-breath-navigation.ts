@@ -108,6 +108,7 @@ export function usePauseSessionBreathNavigation({
     breathTimedActive,
     setBreathTimedActiveInner,
     setBreathFirstTimedPatternStarted,
+    setBreathSecondTimedPatternStarted,
     trackBreathTimedActive,
     handleBriefRepeatBreaths,
     handleDeepFirstBreathRepeat,

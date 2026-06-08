@@ -22,7 +22,6 @@ export function PauseSessionDeepRitualBody({
   onFeelTilesSelect,
   goToStep,
   breathingRef,
-  mantra,
   severity,
   breathingFirstCompleted,
   breathingSecondCompleted,
@@ -51,8 +50,6 @@ export function PauseSessionDeepRitualBody({
   onToggleFavorite,
   subscribed,
   mood,
-  selectedShiftMood,
-  onSelectShiftMood,
   onFrameImDone,
   onDecide,
   onRepeatDeepFirstBreathPattern,
@@ -90,7 +87,6 @@ export function PauseSessionDeepRitualBody({
             key="breath-segment-first"
             breathSegment="first"
             ritualVariant="deep"
-            mantra={mantra}
             severity={severity}
             feelTile={selectedBriefFace}
             completed={breathingFirstCompleted}
@@ -115,7 +111,6 @@ export function PauseSessionDeepRitualBody({
             reflectionLoading={reflectionLoading}
             reflectionError={reflectionError}
             onReflectionRetry={onReflectionRetry}
-            companionHaikuEnabled={companionPrefs.haiku}
             isFavorite={isFavorite}
             onToggleFavorite={() => {
               void onToggleFavorite();
@@ -141,8 +136,6 @@ export function PauseSessionDeepRitualBody({
               void onToggleFavorite();
             }}
             subscribed={subscribed}
-            selectedShiftMood={selectedShiftMood}
-            onSelectShiftMood={onSelectShiftMood}
             onImDone={onFrameImDone}
           />
         </motion.div>
@@ -155,7 +148,6 @@ export function PauseSessionDeepRitualBody({
             key="breath-segment-second"
             breathSegment="second"
             ritualVariant="deep"
-            mantra={mantra}
             severity={severity}
             feelTile={selectedBriefFace}
             completed={breathingSecondCompleted}

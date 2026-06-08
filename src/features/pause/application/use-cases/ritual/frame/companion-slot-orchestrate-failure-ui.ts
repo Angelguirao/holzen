@@ -45,6 +45,7 @@ export function resolveCompanionSlotOrchestrateFailureUi(
 
 export type ApplyCompanionSlotOrchestrateFailureUiPorts = {
   clearLazyFetchSlot: (slot: RegenerateCompanionSlot) => void;
+  markLazyFetchSlotComplete: (slot: RegenerateCompanionSlot) => void;
   requirePro: () => void;
   showLimitReached: () => void;
   showErrorToast: (title: string, description: string) => void;

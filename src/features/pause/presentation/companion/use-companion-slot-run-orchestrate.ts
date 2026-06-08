@@ -75,7 +75,13 @@ export function useCompanionSlotRunOrchestrate({
 
           try {
             const orchestrateSession = await buildOrchestrateSession();
-            if (!orchestrateSession) return;
+            if (!orchestrateSession) {
+              if (mode === 'lazy_fetch') {
+                failureUiPorts.clearLazyFetchSlot(slot);
+              }
+              setCompanionSlotError(slot, companionSlotErrorSetters, true);
+              return;
+            }
 
             logCompanionSlotOrchestrateInvoke(mode, slot, pauseInstanceId);
             trackCompanionGenerationInitiated(slot, mode);
@@ -102,6 +108,9 @@ export function useCompanionSlotRunOrchestrate({
             console.error(`[useCompanionSlotRunOrchestrate] ${mode}`, slot, e);
             if (mode === 'regenerate') {
               toast({ title: 'Regenerate failed', description: 'Network error', variant: 'destructive' });
+            }
+            if (mode === 'lazy_fetch') {
+              failureUiPorts.clearLazyFetchSlot(slot);
             }
             setCompanionSlotError(slot, companionSlotErrorSetters, true);
           } finally {

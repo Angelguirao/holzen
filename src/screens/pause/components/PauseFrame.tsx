@@ -14,10 +14,6 @@ import type { PauseSeverity } from '@/features/pause/public-navigation';
 import { pauseStepLayout } from '@/features/pause/public-session';
 import { hapticFeedback } from '@/lib/haptics';
 import { CompanionSection } from '@/screens/pause/components/CompanionSection';
-import {
-  PauseFrameShiftMood,
-  type PauseFrameShiftMoodProps,
-} from '@/screens/pause/components/PauseFrameShiftMood';
 
 export interface PauseFrameProps {
   pauseInstanceId: string | null;
@@ -30,13 +26,11 @@ export interface PauseFrameProps {
   isFavorite: boolean;
   onToggleFavorite: () => void;
   subscribed: boolean;
-  selectedShiftMood: PauseFrameShiftMoodProps['selectedShiftMood'];
-  onSelectShiftMood: PauseFrameShiftMoodProps['onSelectShiftMood'];
   onImDone: () => void;
 }
 
 /**
- * Figma "Frame" hub: inline accordion companion cards (lazy orchestrate on expand).
+ * Figma "Frame" hub (330:22288): inline accordion companion cards, then Move on.
  * Full-view routes remain optional inside an expanded card.
  */
 export function PauseFrame({
@@ -50,8 +44,6 @@ export function PauseFrame({
   isFavorite: _isFavorite,
   onToggleFavorite: _onToggleFavorite,
   subscribed: _subscribed,
-  selectedShiftMood,
-  onSelectShiftMood,
   onImDone,
 }: PauseFrameProps) {
   "use memo";
@@ -115,12 +107,7 @@ export function PauseFrame({
         />
       </div>
 
-      <PauseFrameShiftMood
-        selectedShiftMood={selectedShiftMood}
-        onSelectShiftMood={onSelectShiftMood}
-      />
-
-      <div className="mt-10 flex w-full justify-center">
+      <div className="mt-6 flex w-full justify-center">
         <Button
           type="button"
           variant="outline"
@@ -130,7 +117,7 @@ export function PauseFrame({
             onImDone();
           }}
         >
-          {t('pause.frame.imDone', { defaultValue: "I'm done" })}
+          {t('pause.frame.moveOn', { defaultValue: 'Move on' })}
           <ChevronRight className="ml-1 h-4 w-4" aria-hidden />
         </Button>
       </div>

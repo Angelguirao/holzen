@@ -21,8 +21,8 @@ import {
 describe('pause-session-providers-io', () => {
   it('re-exports pickPauseHolzenProvidersSlice from pause-holzen-providers-slice', () => {
     const slice: PauseHolzenProvidersSlice = pickPauseHolzenProvidersSlice({
-      mantra: null,
       dismissMessage: async () => {},
+      dismissOpenPauseFromWidget: () => {},
       message: 'Take a breath.',
       context: 'btc_move',
       companions: { haiku: 'line' },
@@ -42,7 +42,6 @@ describe('pause-session-providers-io', () => {
       trackedAssetId: 'bitcoin',
     });
 
-    expect(slice.mantra).toBe('');
     expect(slice.message).toBe('Take a breath.');
   });
 

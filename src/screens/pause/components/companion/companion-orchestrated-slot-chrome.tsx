@@ -18,7 +18,7 @@ export type CompanionOrchestratedSlotChromeProps = {
   onRegenerate: () => void;
   regenerating: boolean;
   routeSegment: CompanionFullViewRouteSegment;
-  /** Frame Signal inline card provides its own full-story CTA. */
+  /** Frame Signal / Look back provide their own full-story CTA; Frame Ground yourself / Zoom out are inline only. */
   showFullViewButton?: boolean;
   children: React.ReactNode;
 };

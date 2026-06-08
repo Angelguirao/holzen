@@ -163,7 +163,7 @@ export function CompanionSectionOrchestratedSlots({
           routeSegment="signal"
           appearance={appearance}
           iconHelp={iconHelps?.signal}
-          showFullViewButton={showFullViewButton}
+          showFullViewButton={frameAppearance ? false : showFullViewButton}
           {...proFavorite('signal')}
         >
           <SignalDisplay
@@ -205,7 +205,6 @@ export function CompanionSectionOrchestratedSlots({
             error={groundingError}
             onRetry={retryGrounding}
             variant={frameAppearance ? 'frame' : 'default'}
-            pauseInstanceId={pauseInstanceId}
           />
         </CompanionOrchestratedCard>
       ) : null,
@@ -229,10 +228,16 @@ export function CompanionSectionOrchestratedSlots({
           routeSegment="zoom-out"
           appearance={appearance}
           iconHelp={iconHelps?.zoomOut}
-          showFullViewButton={showFullViewButton}
+          showFullViewButton={frameAppearance ? false : showFullViewButton}
           {...proFavorite('zoom_out')}
         >
-          <ZoomOutDisplay data={zoomOut} loading={zoomOutLoading} error={zoomOutError} onRetry={retryZoomOut} />
+          <ZoomOutDisplay
+            data={zoomOut}
+            loading={zoomOutLoading}
+            error={zoomOutError}
+            onRetry={retryZoomOut}
+            variant={frameAppearance ? 'frame' : 'default'}
+          />
         </CompanionOrchestratedCard>
       ) : null,
     history: hasHistory ? (
@@ -255,7 +260,7 @@ export function CompanionSectionOrchestratedSlots({
           routeSegment="history"
           appearance={appearance}
           iconHelp={iconHelps?.lookBack}
-          showFullViewButton={showFullViewButton}
+          showFullViewButton={frameAppearance ? false : showFullViewButton}
           {...proFavorite('history_insight')}
         >
           <HistoricalInsightDisplay
@@ -264,6 +269,7 @@ export function CompanionSectionOrchestratedSlots({
             error={historyError}
             onRetry={retryHistory}
             variant={frameAppearance ? 'frame' : 'default'}
+            pauseInstanceId={pauseInstanceId}
           />
         </CompanionOrchestratedCard>
       ) : null,

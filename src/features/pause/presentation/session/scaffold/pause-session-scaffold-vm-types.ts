@@ -8,7 +8,6 @@ import type { PauseSessionStepHandlersProvidersSlice } from '../pause-session-st
 /** Provider fields for scaffold VM (subset of `usePauseSessionProviders`). */
 export type PauseSessionScaffoldVmProvidersSlice = PauseSessionStepHandlersProvidersSlice & {
   t: TFunction;
-  mantra: string;
   marketData: MarketQuote | null;
   trackedAssetId: string;
   prefersReducedMotion: boolean | null;

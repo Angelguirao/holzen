@@ -33,7 +33,7 @@ export function SignalKeyIdeasBlock({ keyIdeas, variant = 'full', className }: S
             {heading}
           </h3>
         </div>
-        <ul className="list-disc space-y-2 pl-6 text-base leading-6 text-foreground">
+        <ul className="list-disc space-y-2 pl-6 text-base leading-6 text-foreground marker:text-foreground">
           {items.map((idea) => (
             <li key={idea}>{idea}</li>
           ))}

@@ -22,7 +22,12 @@ export function useCompanionSlotOrchestrateFailurePorts({
 }: UseCompanionSlotOrchestrateFailurePortsParams): ApplyCompanionSlotOrchestrateFailureUiPorts {
   return useMemo(
     () => ({
-      clearLazyFetchSlot: (slot) => fetchedSlotsRef.current.delete(slot),
+      clearLazyFetchSlot: (slot) => {
+        fetchedSlotsRef.current.delete(slot);
+      },
+      markLazyFetchSlotComplete: (slot) => {
+        fetchedSlotsRef.current.add(slot);
+      },
       requirePro: () => requirePro('companions'),
       showLimitReached: () => showLimitReachedToast({ feature: 'companion', startCheckout }),
       showErrorToast: (title, description) =>

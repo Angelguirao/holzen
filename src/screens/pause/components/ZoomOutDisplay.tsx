@@ -6,25 +6,31 @@ import { toast } from 'sonner';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import type { ZoomOutData } from '@/features/pause/public-ritual-frame';
 import { companionHistoryPath } from '@/lib/app-routes';
+import { cn } from '@/lib/utils';
 import { CompanionError } from '@/screens/pause/components/CompanionError';
 import { ZoomOutDeepTime } from '@/screens/pause/components/zoom-out-deep-time';
 import { ZoomOutEchoPanel } from '@/screens/pause/components/zoom-out-echo-panel';
+import { ZoomOutFrameDisplay } from '@/screens/pause/components/zoom-out-frame-display';
 
 export type { EchoUserWord, ZoomOutData, ZoomOutEchoData } from '@/features/pause/public-ritual-frame';
+
+export type ZoomOutDisplayVariant = 'default' | 'frame';
 
 interface Props {
   data: ZoomOutData | null;
   loading: boolean;
   error: boolean;
   onRetry?: () => void;
+  variant?: ZoomOutDisplayVariant;
 }
 
-export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
+export function ZoomOutDisplay({ data, loading, error, onRetry, variant = 'default' }: Props) {
   "use memo";
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { subscribed, startCheckout } = useSubscription();
+  const isFrame = variant === 'frame';
 
   const goToReplay = useCallback(() => {
     const echoId = data?.echo?.id;
@@ -46,18 +52,26 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
 
   if (loading) {
     return (
-      <div className="space-y-3">
-        <Skeleton className="h-3 w-full" />
-        <Skeleton className="h-3 w-4/5" />
-        <Skeleton className="h-3 w-3/5" />
+      <div className={cn('space-y-3', isFrame && 'px-1 pt-2')}>
+        <Skeleton className={cn(isFrame ? 'h-4 w-4/5' : 'h-3 w-full')} />
+        <Skeleton className={cn(isFrame ? 'h-4 w-full' : 'h-3 w-4/5')} />
+        <Skeleton className={cn(isFrame ? 'h-4 w-3/5' : 'h-3 w-3/5')} />
       </div>
     );
   }
 
   if (error) {
-    return <CompanionError companionType="zoomOut" onRetry={onRetry} />;
+    return (
+      <div className={cn(isFrame && 'px-1 pt-2')}>
+        <CompanionError companionType="zoomOut" onRetry={onRetry} />
+      </div>
+    );
   }
   if (!data) return null;
+
+  if (isFrame) {
+    return <ZoomOutFrameDisplay data={data} onGoToReplay={goToReplay} />;
+  }
 
   const { echo, deepTime } = data;
   const hasEcho = !!echo && (echo.userWords?.length ?? 0) > 0;

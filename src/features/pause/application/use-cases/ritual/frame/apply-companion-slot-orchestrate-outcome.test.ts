@@ -19,6 +19,7 @@ import { tryApplyOrchestrateSlotFromBody } from './orchestrate-slot-apply';
 
 const failureUiPorts = {
   clearLazyFetchSlot: vi.fn(),
+  markLazyFetchSlotComplete: vi.fn(),
   requirePro: vi.fn(),
   showLimitReached: vi.fn(),
   showErrorToast: vi.fn(),
@@ -47,6 +48,7 @@ describe('applyCompanionSlotOrchestrateOutcome', () => {
       setSlotError,
     });
     expect(setSlotError).toHaveBeenCalledWith(true);
+    expect(failureUiPorts.clearLazyFetchSlot).toHaveBeenCalledWith('signal');
     expect(failureUiPorts.showErrorToast).toHaveBeenCalledWith(
       'Companion unavailable',
       'Unavailable',
@@ -68,6 +70,7 @@ describe('applyCompanionSlotOrchestrateOutcome', () => {
       setSlotError,
     });
     expect(setSlotError).not.toHaveBeenCalled();
+    expect(failureUiPorts.markLazyFetchSlotComplete).not.toHaveBeenCalled();
     expect(tryApplyOrchestrateSlotFromBody).toHaveBeenCalled();
   });
 
@@ -86,5 +89,23 @@ describe('applyCompanionSlotOrchestrateOutcome', () => {
       setSlotError,
     });
     expect(setSlotError).toHaveBeenCalledWith(true);
+    expect(failureUiPorts.clearLazyFetchSlot).toHaveBeenCalledWith('history');
+  });
+
+  it('marks lazy fetch complete when lazy_fetch body fills slot', () => {
+    vi.mocked(tryApplyOrchestrateSlotFromBody).mockReturnValueOnce(true);
+    const setSlotError = vi.fn();
+    applyCompanionSlotOrchestrateOutcome({
+      mode: 'lazy_fetch',
+      slot: 'signal',
+      pauseInstanceId: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+      result: { status: 'success', body: { ok: true }, hasFilledSlot: true },
+      setCacheIds: vi.fn(),
+      slotCommitters: {} as never,
+      setCacheRelaxations: vi.fn(),
+      failureUiPorts,
+      setSlotError,
+    });
+    expect(failureUiPorts.markLazyFetchSlotComplete).toHaveBeenCalledWith('signal');
   });
 });

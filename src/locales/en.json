@@ -1494,6 +1494,11 @@
       "leaveCta": "Leave",
       "switchBriefCta": "Or switch to brief pause (~2 min)"
     },
+    "inactivity": {
+      "header": "Hello",
+      "headline": "Still with us?",
+      "body": "Your pause is here whenever you're ready."
+    },
     "sessionTitle": "Your pause",
     "deep": {
       "sessionTitle": "Your deep pause",
@@ -1711,6 +1716,8 @@
       "toggleSignalAria": "Expand or collapse Signal",
       "companionSeen": "Seen",
       "imDone": "I'm done",
+      "moveOn": "Move on",
+      "groundingArchiveHint": "Meets you where you are. Dwell on it later in your Archive.",
       "shiftMoodTitle": "How are you feeling now?",
       "shiftMoodHint": "Optional — tap a mood if something shifted after companions.",
       "haikuLoading": "Loading…",
@@ -1726,14 +1733,26 @@
         "yearsAgo_other": "{{count}}y ago",
         "now": "Now",
         "today": "Today",
-        "mirrorHeading": "A moment that mirrors today",
+        "mirrorHeading": "A MOMENT THAT MIRRORS TODAY",
         "analogyHeading": "Cross-asset parallel",
+        "howItResolved": "HOW IT RESOLVED",
         "mirrorMoment": "A moment that mirrors today",
         "mirrorMomentWithAsset": "{{assetClass}} parallel"
       },
       "zoomOutContent": {
         "emptyTitle": "Perspective takes time to build.",
-        "emptyBody": "The more you pause and add notes, the richer your zoom-out view becomes. Deep-time perspective and your own words from past pauses will appear here over time."
+        "emptyBody": "The more you pause and add notes, the richer your zoom-out view becomes. Deep-time perspective and your own words from past pauses will appear here over time.",
+        "lead": "More perspective before you decide.",
+        "storyLead": "Today is one moment in a longer story.",
+        "deepTimeLabel": "DEEP TIME",
+        "postItLabel": "Post-it",
+        "promptIntro": "YOU MIGHT ASK:",
+        "prompt1": "What feels different now?",
+        "prompt2": "Would past-me be surprised?",
+        "prompt3": "What one line do I want to remember next time?",
+        "dropWaypoint": "Drop a waypoint",
+        "yourWaypoint": "YOUR WAYPOINT",
+        "changeWaypoint": "Change"
       },
       "companions": {
         "haikuHelp": "A short poem that distills your reflection.",
@@ -1762,6 +1781,8 @@
       "haikuAside": "Haiku",
       "yourNoteSection": "Your note (optional)",
       "addPostIt": "Add your post-it",
+      "postItDialogBody": "Write something to remember.",
+      "postItDialogPlaceholder": "Your reflection within the reflection...",
       "favoriteAria": "Favorite this reflection",
       "heading": "Sit with this reflection",
       "subcopy": "Read at your own pace. Notes and tags are optional; open a companion when you want another angle.",

@@ -3,7 +3,7 @@ import { SignalReadFullStoryButton } from '@/screens/pause/components/companion/
 
 export type SignalFrameDisplayProps = {
   signal: SignalPayload;
-  pauseInstanceId: string;
+  pauseInstanceId?: string | null;
 };
 
 function truncateExcerpt(body: string, maxChars = 220): string {
@@ -15,15 +15,15 @@ function truncateExcerpt(body: string, maxChars = 220): string {
   return `${cut.trimEnd()}…`;
 }
 
-/** Frame accordion Signal — title → byline → excerpt → Read the full story (Figma 435:16214). */
+/** Frame accordion Signal — title → byline → excerpt → Read the full story (Figma 435:16214 / Lore). */
 export function SignalFrameDisplay({ signal, pauseInstanceId }: SignalFrameDisplayProps) {
   "use memo";
   const excerpt = truncateExcerpt(signal.body);
 
   return (
-    <div className="flex w-full flex-col gap-2 pt-4">
+    <div className="flex w-full flex-col gap-2 pt-2">
       {signal.title ? (
-        <p className="text-sm font-medium leading-5 tracking-wide text-foreground">{signal.title}</p>
+        <p className="pt-2 text-sm font-medium leading-5 tracking-wide text-foreground">{signal.title}</p>
       ) : null}
       {signal.source ? (
         <p className="text-sm font-medium leading-5 tracking-wide text-muted-foreground">{signal.source}</p>
@@ -31,7 +31,11 @@ export function SignalFrameDisplay({ signal, pauseInstanceId }: SignalFrameDispl
       {excerpt ? (
         <p className="pb-2 text-sm leading-5 tracking-wide text-foreground">{excerpt}</p>
       ) : null}
-      <SignalReadFullStoryButton pauseInstanceId={pauseInstanceId} className="py-4" />
+      {pauseInstanceId ? (
+        <div className="flex justify-center pb-2 pt-2">
+          <SignalReadFullStoryButton pauseInstanceId={pauseInstanceId} />
+        </div>
+      ) : null}
     </div>
   );
 }

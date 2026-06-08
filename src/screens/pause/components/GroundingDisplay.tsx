@@ -3,9 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { CompanionError } from './CompanionError';
-import {
-  CompanionOpenFullViewButton,
-} from '@/screens/pause/components/companion/companion-open-full-view-button';
 
 export type GroundingNudgePayload = {
   title: string;
@@ -22,16 +19,12 @@ export type GroundingDisplayProps = {
   error: boolean;
   onRetry?: () => void;
   variant?: GroundingDisplayVariant;
-  pauseInstanceId?: string | null;
 };
 
-function truncateExcerpt(body: string, maxChars = 220): string {
-  const trimmed = body.trim();
-  if (trimmed.length <= maxChars) return trimmed;
-  const slice = trimmed.slice(0, maxChars);
-  const lastSpace = slice.lastIndexOf(' ');
-  const cut = lastSpace > maxChars * 0.6 ? slice.slice(0, lastSpace) : slice;
-  return `${cut.trimEnd()}…`;
+function frameBodyText(grounding: GroundingNudgePayload): string {
+  const body = grounding.body.trim();
+  if (body) return body;
+  return grounding.title.trim();
 }
 
 /** Grounding companion body — same lazy-fetch path as Signal, Look Back, and Zoom Out. */
@@ -41,7 +34,6 @@ export function GroundingDisplay({
   error = false,
   onRetry,
   variant = 'default',
-  pauseInstanceId = null,
 }: GroundingDisplayProps) {
   "use memo";
   const { t } = useTranslation();
@@ -68,21 +60,15 @@ export function GroundingDisplay({
   if (!grounding) return null;
 
   if (isFrame) {
-    const excerpt = truncateExcerpt(grounding.body);
+    const bodyText = frameBodyText(grounding);
+    if (!bodyText) return null;
+
     return (
-      <div className="space-y-2 pt-2">
-        {grounding.title ? (
-          <p className="text-sm font-medium leading-snug tracking-wide text-foreground">{grounding.title}</p>
-        ) : null}
-        {excerpt ? (
-          <p className="text-sm leading-relaxed tracking-wide text-foreground">{excerpt}</p>
-        ) : null}
-        {grounding.citation ? (
-          <p className="text-sm font-medium leading-snug tracking-wide text-muted-foreground">{grounding.citation}</p>
-        ) : null}
-        {pauseInstanceId ? (
-          <CompanionOpenFullViewButton pauseInstanceId={pauseInstanceId} routeSegment="grounding" />
-        ) : null}
+      <div className="pb-2 pt-2">
+        <p className="whitespace-pre-wrap text-base leading-6 text-foreground">{bodyText}</p>
+        <p className="mt-4 text-base leading-6 text-muted-foreground">
+          {t('pause.frame.groundingArchiveHint')}
+        </p>
       </div>
     );
   }

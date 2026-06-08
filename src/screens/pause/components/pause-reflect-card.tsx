@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { usePauseArtifactHaiku } from '@/features/pause/public-ritual-reflect';
 import type { CurrentFeelForReflect, ReflectionContentV2 } from '@/features/pause/public-ritual-reflect';
 import { PauseReflectFavoriteButton } from '@/screens/pause/components/pause-reflect-favorite-button';
 import { PauseReflectMessageBody } from '@/screens/pause/components/pause-reflect-message-body';
@@ -15,13 +14,12 @@ export type PauseReflectCardProps = {
   reflectionLoading: boolean;
   reflectionError: string | null;
   onReflectionRetry?: () => void;
-  companionHaikuEnabled: boolean;
   isFavorite: boolean;
   onToggleFavorite: () => void;
   subscribed: boolean;
 };
 
-/** Reflection letter card + optional Pro note/tags below. */
+/** Reflection letter card; Pro post-it note lives inside the card (Wireframes 353:6201). */
 export function PauseReflectCard({
   pauseInstanceId,
   context,
@@ -32,18 +30,12 @@ export function PauseReflectCard({
   reflectionLoading,
   reflectionError,
   onReflectionRetry,
-  companionHaikuEnabled,
   isFavorite,
   onToggleFavorite,
   subscribed,
 }: PauseReflectCardProps) {
   "use memo";
   const { t } = useTranslation();
-  const { artifactHaiku } = usePauseArtifactHaiku({
-    pauseInstanceId,
-    companionHaikuEnabled,
-    trigger: 'immediate',
-  });
 
   return (
     <div className="w-full space-y-6">
@@ -51,8 +43,8 @@ export function PauseReflectCard({
         <h2 id="pause-reflect-card-label" className="sr-only">
           {t('pause.reflect.letterAria', { defaultValue: 'Your reflection' })}
         </h2>
-        <div className="rounded-2xl border-2 border-primary bg-card/40 px-4 py-5 shadow-sm backdrop-blur-sm sm:px-6 sm:py-6">
-          <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-6 rounded-2xl border-2 border-primary bg-card/40 px-4 py-5 shadow-sm backdrop-blur-sm sm:px-6 sm:py-6">
+          <div className="flex items-start justify-between gap-4">
             <PauseReflectMessageBody
               pauseInstanceId={pauseInstanceId}
               context={context}
@@ -63,26 +55,16 @@ export function PauseReflectCard({
               reflectionLoading={reflectionLoading}
               reflectionError={reflectionError}
               onReflectionRetry={onReflectionRetry}
-              artifactHaiku={artifactHaiku}
             />
             {subscribed ? (
               <PauseReflectFavoriteButton isFavorite={isFavorite} onToggleFavorite={onToggleFavorite} />
             ) : null}
           </div>
+          {pauseInstanceId && subscribed ? (
+            <PauseReflectPostItSection pauseInstanceId={pauseInstanceId} />
+          ) : null}
         </div>
       </section>
-
-      {pauseInstanceId && subscribed ? (
-        <section aria-labelledby="pause-reflect-note-label" className="space-y-3">
-          <h3
-            id="pause-reflect-note-label"
-            className="text-center text-xs font-mono uppercase tracking-wide text-muted-foreground"
-          >
-            {t('pause.reflect.yourNoteSection', { defaultValue: 'Your note (optional)' })}
-          </h3>
-          <PauseReflectPostItSection pauseInstanceId={pauseInstanceId} />
-        </section>
-      ) : null}
 
       {pauseInstanceId && !subscribed ? (
         <p className="text-center text-xs leading-relaxed text-muted-foreground">

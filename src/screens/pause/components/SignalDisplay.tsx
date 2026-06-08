@@ -50,7 +50,7 @@ export function SignalDisplay({
 
   if (!signal) return null;
 
-  if (isFrame && pauseInstanceId) {
+  if (isFrame) {
     return <SignalFrameDisplay signal={signal} pauseInstanceId={pauseInstanceId} />;
   }
 

@@ -15,7 +15,7 @@ export type {
 } from './use-pause-artifact-haiku-types';
 
 /**
- * Loads persisted haiku text from `pause_ai_artifacts` for Reflect / Frame steps.
+ * Loads persisted haiku text from `pause_ai_artifacts` for the Frame haiku companion.
  */
 export function usePauseArtifactHaiku(params: UsePauseArtifactHaikuParams): UsePauseArtifactHaikuResult {
   const { pauseInstanceId, companionHaikuEnabled, trigger } = params;

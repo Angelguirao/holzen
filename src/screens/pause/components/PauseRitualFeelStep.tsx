@@ -42,6 +42,7 @@ export function PauseRitualFeelStep({
 
   const tile = moodDone ? selectedTile : localTile;
   const intensity = moodDone ? (feelIntensity ?? 3) : localIntensity;
+  const hasSelectedTile = tile !== null;
 
   const pickTile = (feelTile: FeelStepTile, mood: MoodValue) => {
     const n = moodDone ? (feelIntensity ?? 3) : localIntensity;
@@ -84,20 +85,27 @@ export function PauseRitualFeelStep({
 
         <PauseRitualFeelTileGrid activeTile={tile} onPickTile={pickTile} />
 
-        <PauseRitualFeelIntensitySlider intensity={intensity} onIntensityChange={setIntensityAndSync} />
+        {hasSelectedTile ? (
+          <>
+            <PauseRitualFeelIntensitySlider
+              intensity={intensity}
+              onIntensityChange={setIntensityAndSync}
+            />
 
-        <div className="flex justify-center pt-1">
-          <Button
-            type="button"
-            variant="outline"
-            disabled={!moodDone}
-            className={pauseStepLayout.ritualPrimaryOutlineCta}
-            onClick={onContinue}
-          >
-            {t('pause.steps.continue', { defaultValue: 'Continue' })}
-            <ChevronRight className="ml-1 h-4 w-4 shrink-0" aria-hidden />
-          </Button>
-        </div>
+            <div className="flex justify-center pt-1">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!moodDone}
+                className={pauseStepLayout.ritualPrimaryOutlineCta}
+                onClick={onContinue}
+              >
+                {t('pause.steps.continue', { defaultValue: 'Continue' })}
+                <ChevronRight className="ml-1 h-4 w-4 shrink-0" aria-hidden />
+              </Button>
+            </div>
+          </>
+        ) : null}
       </div>
     </motion.div>
   );

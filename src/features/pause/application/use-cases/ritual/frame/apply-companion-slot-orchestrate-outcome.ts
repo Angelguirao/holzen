@@ -51,6 +51,9 @@ export function applyCompanionSlotOrchestrateOutcome({
       slot,
       failureUiPorts,
     );
+    if (mode === 'lazy_fetch') {
+      failureUiPorts.clearLazyFetchSlot(slot);
+    }
     setSlotError(true);
     return;
   }
@@ -64,8 +67,14 @@ export function applyCompanionSlotOrchestrateOutcome({
   );
   if (filled) {
     logCompanionSlotOrchestrateFilled(mode, slot, pauseInstanceId);
+    if (mode === 'lazy_fetch') {
+      failureUiPorts.markLazyFetchSlotComplete(slot);
+    }
   } else {
     logCompanionSlotOrchestrateEmpty(mode, slot, pauseInstanceId);
+    if (mode === 'lazy_fetch') {
+      failureUiPorts.clearLazyFetchSlot(slot);
+    }
     setSlotError(true);
   }
 }

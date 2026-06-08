@@ -19,6 +19,7 @@ interface Props {
   error: boolean;
   onRetry?: () => void;
   variant?: HistoricalInsightDisplayVariant;
+  pauseInstanceId?: string | null;
 }
 
 export function HistoricalInsightDisplay({
@@ -27,6 +28,7 @@ export function HistoricalInsightDisplay({
   error,
   onRetry,
   variant = 'default',
+  pauseInstanceId = null,
 }: Props) {
   "use memo";
   const { t } = useTranslation();
@@ -55,7 +57,9 @@ export function HistoricalInsightDisplay({
   if (!data) return null;
 
   if (isFrame) {
-    return <LookBackFrameDisplay data={data} formatPrice={fmtPrice} />;
+    return (
+      <LookBackFrameDisplay data={data} formatPrice={fmtPrice} pauseInstanceId={pauseInstanceId} />
+    );
   }
 
   const hasBtcPrices =
