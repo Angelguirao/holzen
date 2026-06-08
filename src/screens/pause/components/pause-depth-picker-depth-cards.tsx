@@ -19,7 +19,7 @@ export function PauseDepthPickerDepthCards({
   const { t } = useTranslation();
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="grid grid-cols-2 gap-4">
       <button
         type="button"
         onClick={onBrief}
@@ -57,12 +57,12 @@ export function PauseDepthPickerDepthCards({
             : t('pause.depthPicker.deep.label', { defaultValue: 'Deep pause' })
         }
       >
-        <span className="flex w-full items-center justify-center gap-2">
+        <span className="flex w-full flex-col items-center gap-0">
           <span className="text-base font-medium leading-6 tracking-[0.01em] text-muted-foreground">
             {t('pause.depthPicker.deep.label', { defaultValue: 'Deep pause' })}
           </span>
           {deepPauseLocked ? (
-            <span className="rounded-full border border-border/70 bg-muted/50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+            <span className="mt-1 rounded-full border border-border/70 bg-muted/50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
               {t('pause.depthPicker.deep.proRequiredHint', { defaultValue: 'Pro or free trial' })}
             </span>
           ) : null}
