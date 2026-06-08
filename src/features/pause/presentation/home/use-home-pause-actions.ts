@@ -15,6 +15,7 @@ import {
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io';
 import { markHomePauseWidgetFirstVisitHandled } from '@/features/pause/infrastructure/home-pause-widget-first-visit-storage';
 import { clearPostManualCooldownIdlePrompt } from '@/features/pause/infrastructure/home-post-manual-cooldown-idle-storage';
+import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import { holzenLog } from '@/lib/holzen-console';
 
 export type { PauseDismissAnalyticsSurface };
@@ -151,6 +152,25 @@ export function useHomePauseActions(args: {
     navigate('/pause', { state: navState });
   }, [message, context, lastPauseInstanceId, companions, companionPrefs, severity, navigate]);
 
+  const handleStartOverEngagedPause = useCallback(() => {
+    if (!canNavigateToPauseSession(message, lastPauseInstanceId)) return;
+    clearPausePersistedTabSession();
+    holzenLog.home('Navigate to /pause (engaged start over)', {
+      pauseInstanceId: lastPauseInstanceId,
+    });
+    navigate('/pause', {
+      state: buildHomePauseSessionLocationState({
+        message,
+        context,
+        pauseInstanceId: lastPauseInstanceId ?? undefined,
+        companions,
+        companionPrefs,
+        severity,
+        restartEngagedRitual: true,
+      }),
+    });
+  }, [message, context, lastPauseInstanceId, companions, companionPrefs, severity, navigate]);
+
   const startProCheckout = useCallback(() => {
     startCheckout('pro');
   }, [startCheckout]);
@@ -159,6 +179,7 @@ export function useHomePauseActions(args: {
     handleNeedAPause,
     handleDismiss,
     handleNavigatePauseWithThis,
+    handleStartOverEngagedPause,
     startProCheckout,
   };
 }

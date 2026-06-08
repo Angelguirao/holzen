@@ -1,7 +1,7 @@
 import { Wind, Heart, BookOpen, Compass, Target, ExternalLink, type LucideIcon } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import type { PauseScienceStepConfig } from '@/features/pause/public-ritual-progress';
+import { PAUSE_STEP_SCIENCE_COPY } from '@/legacy/pause-step-science/copy';
+import type { PauseScienceStepConfig } from '@/legacy/pause-step-science/domain/pause-science-steps';
 
 const STEP_ICONS: Record<PauseScienceStepConfig['key'], LucideIcon> = {
   feel: Heart,
@@ -19,8 +19,7 @@ export type PauseScienceStepRowProps = {
 
 /** One ritual step block in the “science behind the pause” sheet. */
 export function PauseScienceStepRow({ step, highlighted }: PauseScienceStepRowProps) {
-  "use memo";
-  const { t } = useTranslation();
+  const copy = PAUSE_STEP_SCIENCE_COPY.steps[step.key];
   const Icon = STEP_ICONS[step.key];
 
   return (
@@ -34,8 +33,8 @@ export function PauseScienceStepRow({ step, highlighted }: PauseScienceStepRowPr
         <Icon className="h-3 w-3 text-muted-foreground/60" />
       </div>
       <div className="space-y-1.5">
-        <p className="text-xs font-medium text-foreground">{t(`pauseScience.${step.key}`)}</p>
-        <p className="text-sm leading-relaxed text-muted-foreground">{t(`pauseScience.${step.key}Desc`)}</p>
+        <p className="text-xs font-medium text-foreground">{copy.label}</p>
+        <p className="text-sm leading-relaxed text-muted-foreground">{copy.desc}</p>
         <div className="flex flex-wrap gap-x-3 gap-y-1">
           {step.sources.map((source) => (
             <a

@@ -15,6 +15,8 @@ export type BuildHomePauseSessionLocationStateInput = {
   startAtDepthPicker?: boolean;
   /** Navigate before `manualTrigger` finishes — depth picker shows while instance is created. */
   openingManualPause?: boolean;
+  /** Engaged “Start over” from Home welcome sheet — restart deep ritual at Feel on same instance. */
+  restartEngagedRitual?: boolean;
 };
 
 /** Router state for Home → `/pause` (open pause card or post manual trigger). */
@@ -30,5 +32,6 @@ export function buildHomePauseSessionLocationState(
     severity: input.severity,
     ...(input.startAtDepthPicker ? { startAtDepthPicker: true } : {}),
     ...(input.openingManualPause ? { openingManualPause: true } : {}),
+    ...(input.restartEngagedRitual ? { restartEngagedRitual: true } : {}),
   };
 }

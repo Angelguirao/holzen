@@ -1,13 +1,9 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import type { MarketQuote } from '@/features/market/public';
-import { PauseAboutPausesBody } from '@/screens/pause/components/PauseAboutPausesBody';
+import { PauseAboutPausesSheet } from '@/screens/pause/components/PauseAboutPausesSheet';
 import { PauseDepthPicker } from '@/screens/pause/components/PauseDepthPicker';
-import { PauseScienceScrollBody } from '@/screens/pause/components/PauseScienceSheet';
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-/** Depth choice on `/pause` before a ritual starts; About + Step science live here only. */
+/** Depth choice on `/pause` before a ritual starts; About pauses sheet from info icon + footer link. */
 export function PauseSessionDepthPickerStack(props: {
   marketData: MarketQuote | null;
   trackedAssetId: string;
@@ -21,7 +17,6 @@ export function PauseSessionDepthPickerStack(props: {
   onClose: () => void;
 }) {
   "use memo";
-  const { t } = useTranslation();
   const {
     marketData,
     trackedAssetId,
@@ -33,13 +28,9 @@ export function PauseSessionDepthPickerStack(props: {
     onClose,
   } = props;
 
-  const [helpOpen, setHelpOpen] = useState(false);
-  const [helpTab, setHelpTab] = useState<'about' | 'steps'>('about');
+  const [aboutOpen, setAboutOpen] = useState(false);
 
-  const openAbout = () => {
-    setHelpTab('about');
-    setHelpOpen(true);
-  };
+  const openAbout = () => setAboutOpen(true);
 
   return (
     <>
@@ -54,30 +45,7 @@ export function PauseSessionDepthPickerStack(props: {
         onAboutPauses={openAbout}
         onClose={onClose}
       />
-      <Sheet open={helpOpen} onOpenChange={setHelpOpen}>
-        <SheetContent
-          side="bottom"
-          className="z-[120] max-h-[88vh] overflow-y-auto rounded-t-2xl border-t p-6 sm:p-8"
-        >
-          <SheetTitle className="sr-only">{t('pause.scienceSheet.sheetTitle')}</SheetTitle>
-          <Tabs value={helpTab} onValueChange={(v) => setHelpTab(v === 'steps' ? 'steps' : 'about')} className="w-full">
-            <TabsList className="mb-4 grid h-auto w-full grid-cols-2 gap-1 rounded-lg p-1 sm:mb-6">
-              <TabsTrigger value="about" className="text-xs sm:text-sm">
-                {t('pause.scienceSheet.tabAbout')}
-              </TabsTrigger>
-              <TabsTrigger value="steps" className="text-xs sm:text-sm">
-                {t('pause.scienceSheet.tabSteps')}
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="about" className="mt-0 focus-visible:outline-none">
-              <PauseAboutPausesBody />
-            </TabsContent>
-            <TabsContent value="steps" className="mt-0 focus-visible:outline-none">
-              <PauseScienceScrollBody currentStep="feel" />
-            </TabsContent>
-          </Tabs>
-        </SheetContent>
-      </Sheet>
+      <PauseAboutPausesSheet open={aboutOpen} onOpenChange={setAboutOpen} />
     </>
   );
 }

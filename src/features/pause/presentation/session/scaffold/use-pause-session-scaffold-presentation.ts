@@ -71,6 +71,8 @@ export function usePauseSessionScaffoldPresentation(params: UsePauseSessionScaff
     },
     payloads: {
       ...ritualPayloads,
+      marketData,
+      trackedAssetId,
       stepTransition,
       prefersReducedMotion: !!prefersReducedMotion,
     },

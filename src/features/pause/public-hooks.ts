@@ -105,14 +105,6 @@ export {
   applyBreathSegmentLogOutcome,
   initialBreathSegmentRpcLoggedFlagsFromRestored,
 } from './public-ritual-breathe';
-export {
-  PAUSE_SCIENCE_STEPS,
-  type PauseScienceSource,
-  type PauseScienceStepConfig,
-  type PauseScienceStepKey,
-  stepHighlightsScienceRow,
-  briefStepToPauseScienceStep,
-} from './public-ritual-progress';
 export type { FeelStepTile } from './public-ritual-feel';
 export { PAUSE_FEEL_STEP_TILE_ROWS, PAUSE_FEEL_INTENSITY_KEYS, type PauseFeelIntensityKey } from './public-ritual-feel';
 export {

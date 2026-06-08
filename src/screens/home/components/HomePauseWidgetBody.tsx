@@ -101,6 +101,7 @@ export function HomePauseWidgetBody({ surface, display, subscription, actions }:
       return (
         <HomePauseEngagedBody
           onPauseWithThis={actions.onPauseWithThis}
+          onOpenWelcomeBackSheet={actions.onOpenWelcomeBackSheet}
           onDismissOpenPause={actions.onDismissOpenPause}
           engagedPauseMarketSettled={display.engagedPauseMarketSettled}
           openPauseOpenMaxAnchorAt={display.openPauseOpenMaxAnchorAt}
@@ -112,6 +113,7 @@ export function HomePauseWidgetBody({ surface, display, subscription, actions }:
         <HomePauseEngagedPendingBody
           pendingMarketBlock={display.pendingMarketBlock}
           onPauseWithThis={actions.onPauseWithThis}
+          onOpenWelcomeBackSheet={actions.onOpenWelcomeBackSheet}
           onDismissOpenPause={actions.onDismissOpenPause}
           onPauseWithNewContext={actions.onPauseWithNewContext}
           pendingOfferBusy={actions.pendingOfferBusy}

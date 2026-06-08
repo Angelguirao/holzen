@@ -1,46 +1,76 @@
-import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 
 const SECTIONS = [
-  'holzen',
-  'challenge',
-  'ninety',
+  'holzenChallenge',
+  'ninetySeconds',
   'mechanisms',
   'sixSteps',
   'ritual',
 ] as const;
+
+type SectionKey = (typeof SECTIONS)[number];
+
+function AboutPausesSection({
+  sectionKey,
+  defaultOpen = false,
+}: {
+  sectionKey: SectionKey;
+  defaultOpen?: boolean;
+}) {
+  const { t } = useTranslation();
+  const body = t(`pause.aboutPauses.sections.${sectionKey}.body`);
+  const paragraphs = body.split('\n\n').filter((paragraph) => paragraph.trim().length > 0);
+
+  return (
+    <Collapsible
+      defaultOpen={defaultOpen}
+      className="rounded-2xl border-2 border-muted-foreground px-4 py-2"
+    >
+      <CollapsibleTrigger className="group flex w-full items-center gap-4 py-1 text-left">
+        <span className="flex-1 text-base leading-6 text-foreground">
+          {t(`pause.aboutPauses.sections.${sectionKey}.title`)}
+        </span>
+        <span className="shrink-0 rounded-full p-3">
+          <ChevronDown
+            className="h-5 w-5 text-foreground transition-transform duration-200 group-data-[state=open]:rotate-180"
+            aria-hidden
+          />
+        </span>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className={cn('space-y-4 pb-4 pt-0 text-base leading-6 text-muted-foreground')}>
+          {paragraphs.map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
 
 export function PauseAboutPausesBody() {
   "use memo";
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-2 pb-4">
-      <div className="space-y-1 pb-4">
-        <h2 className="text-lg font-semibold text-foreground">{t('pause.aboutPauses.title')}</h2>
-        <p className="text-sm text-muted-foreground">{t('pause.aboutPauses.subtitle')}</p>
+    <div className="flex flex-col gap-6 pb-2">
+      <div className="space-y-1 text-center">
+        <h2 className="text-2xl font-normal leading-8 text-foreground">
+          {t('pause.aboutPauses.title', { defaultValue: 'Why pause?' })}
+        </h2>
+        <p className="text-base font-medium leading-6 tracking-[0.01em] text-foreground">
+          {t('pause.aboutPauses.subtitle', { defaultValue: 'The science behind it' })}
+        </p>
       </div>
 
-      {SECTIONS.map((key) => (
-        <Collapsible key={key} defaultOpen={key === 'holzen' || key === 'challenge'} className="border-b border-border/50 py-1">
-          <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 py-3 text-left text-sm font-medium text-foreground transition-colors hover:text-nox-text-link">
-            {t(`pause.aboutPauses.sections.${key}.title`)}
-            <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 [[data-state=open]_&]:rotate-180" />
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <div
-              className={cn(
-                'space-y-3 pb-4 text-sm leading-relaxed text-muted-foreground',
-                '[&_a]:text-nox-text-link [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-nox-text-link/80',
-              )}
-            >
-              <p>{t(`pause.aboutPauses.sections.${key}.body`)}</p>
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-      ))}
+      <div className="flex flex-col gap-4">
+        {SECTIONS.map((key) => (
+          <AboutPausesSection key={key} sectionKey={key} defaultOpen={key === 'holzenChallenge'} />
+        ))}
+      </div>
     </div>
   );
 }

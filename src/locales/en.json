@@ -115,6 +115,15 @@
       "closesIn": "This pause closes in {{remaining}}",
       "closesAfterSettle": "This pause closes 12 hours after the market settles."
     },
+    "welcomeBack": {
+      "title": "Welcome back",
+      "body": "Continue your pause where you left it.",
+      "startOver": "Start over",
+      "pendingHeadline": "You have a pause waiting",
+      "pendingBodyWithRemaining": "The market context has changed since you started. You have {{remaining}} left to finish this pause before it closes.",
+      "pendingBodyNoAnchor": "The market context has changed since you started. Finish this pause before it closes — the window starts once the market settles.",
+      "discardThisPause": "Discard this pause"
+    },
     "generatingReflection": "Preparing your pause…",
     "pauseCtaActive": "Start this pause",
     "pauseCtaEngaged": "Continue this pause",
@@ -122,7 +131,7 @@
       "pauseWithThis": "Pause with this",
       "continue": "Continue",
       "discard": "Discard",
-      "discardSnackbar": "Pause discarded.",
+      "discardSnackbar": "Pause discarded",
       "discardUndo": "Undo",
       "pauseAgain": "Pause again",
       "pauseWithNewContext": "Pause with new context",
@@ -1502,7 +1511,7 @@
     },
     "feelStep": {
       "title": "What's here?",
-      "subtitle": "No need to be sure",
+      "subtitle": "Whatever's here counts.",
       "tiles": {
         "fomo": "FOMO",
         "fearful": "Fearful",
@@ -1614,38 +1623,28 @@
       "title": "Why pause?",
       "subtitle": "The science behind it",
       "sections": {
-        "holzen": {
-          "title": "Holzen, in one breath",
-          "body": "Holzen is a structured pause for investors: you name what you feel, slow your body with breath, then choose from a steadier state. It is not price advice — it is a regulation ritual so impulses have less room to steer. We start with Bitcoin volatility as the trigger."
+        "holzenChallenge": {
+          "title": "Holzen, the challenge",
+          "body": "The market moves. Your body reacts before you choose to. That reaction has a name: the limbic system — the part of your brain that handles emotion and impulse.\n\nWhen BTC drops sharply, your amygdala fires. Cortisol rises. Your prefrontal cortex — the part that thinks long-term — gets quieter.\n\nMost regrettable financial decisions happen here."
         },
-        "challenge": {
-          "title": "The challenge you are in",
-          "body": "Markets compress time. A chart can feel like a verdict on your judgment, your security, your future. Volatility pulls attention toward threat and reward at once — a recipe for reactive trades. Pausing widens the gap between stimulus and response."
-        },
-        "ninety": {
-          "title": "The 90-second window",
-          "body": "Strong emotional surges often crest within roughly 90 seconds if you do not feed them with new stories or new clicks. A short breathing sequence can help your nervous system shift out of emergency pacing so your prefrontal cortex can come back online for a deliberate choice."
+        "ninetySeconds": {
+          "title": "The 90-seconds window",
+          "body": "Neuroscientist Jill Bolte Taylor found that the chemical response to an emotional trigger lasts about 90 seconds.\n\nAfter that, the feeling only stays if you keep feeding it with thought.\n\nPause for those 90 seconds without acting and the wave passes.\n\nYour prefrontal cortex returns. Now you can decide from clarity, not reactivity."
         },
         "mechanisms": {
           "title": "Three proven mechanisms",
-          "body": "Putting feelings into words (affect labeling) can blunt amygdala drive. Slow exhales lean on the parasympathetic side of regulation. Stepping back to reappraise — “what story am I believing?” — creates distance between you and the urge to act immediately."
+          "body": "Holzen builds the pause around three practices supported by research:\n\nSlow breathing activates your parasympathetic nervous system. The body shifts from \"act now\" to \"rest and assess.\"\n\nAffect labeling, naming what you feel, reduces amygdala activity. Studied by Matthew Lieberman at UCLA.\n\nCognitive distance, observing emotion as something you have, not something you are. A foundation of stoic practice and modern behavioral therapy."
         },
         "sixSteps": {
-          "title": "The deep pause (six beats)",
-          "body": "The header shows six beats: Feel, Breathe, Reflect, Frame, a second Breathe, then Decide. After that second breath, one short settle screen appears before you log what you chose — for your awareness only. Each beat maps to skills psychologists study: interoception, autonomic settling, perspective-taking, metacognition, re-centering, and values-aligned action."
+          "title": "The six steps",
+          "body": "Each step in the deep pause maps to one of these mechanisms:\n\nFeel: affect labeling\nBreathe: parasympathetic activation\nReflect: cognitive distance\nFrame: perspective and context\nBreathe: somatic closure\nDecide: conscious choice\n\nThe brief pause keeps the essentials: Feel, Breathe, Sit, Decide."
         },
         "ritual": {
-          "title": "Not a remedy — a ritual",
-          "body": "A ritual is not a guarantee of profit. It is a repeatable way to practice composure under uncertainty. Over time, the win is fewer decisions made in the red zone of panic or euphoria — and more that match who you want to be across cycles."
+          "title": "Not a remedy: a ritual",
+          "body": "Holzen doesn't tell you what to do. It gives your prefrontal cortex space to come back online, so the decision is yours, not your amygdala's.\n\nPause. Notice. Choose deliberately."
         }
       }
     },
-    "scienceSheet": {
-      "sheetTitle": "Pause information",
-      "tabAbout": "About pauses",
-      "tabSteps": "Step science"
-    },
-    "scienceInfoAria": "The science behind this pause",
     "sessionEmptyTitle": "No pause to open",
     "reflectMissingContext": "This pause is missing market context. Go back to Home and start a new pause.",
     "sessionEmptyBody": "Start from Home with “I need a pause,” or open one from a pause-ready notification.",
@@ -2616,22 +2615,6 @@
     "readyToPauseName": "You paused, {{name}}. That's the hardest part.",
     "enterPause": "Enter the pause",
     "notNow": "Not now"
-  },
-  "pauseScience": {
-    "whyThisOrder": "Why this order?",
-    "title": "Each step follows research",
-    "feel": "Feel",
-    "feelDesc": "Labeling emotions ('affect labeling') reduces amygdala activation — but naming comes early so the rest of the ritual can work with what you named. (Lieberman et al., 2007)",
-    "breathe": "Breathe",
-    "breatheDesc": "Slow breathing activates the parasympathetic nervous system, shifting from fight-or-flight to regulation before deeper reflection. (Porges, 2011)",
-    "reflect": "Reflect",
-    "reflectDesc": "Cognitive reappraisal after regulation leads to better decisions than suppression. (Gross, 2002)",
-    "frame": "Frame",
-    "frameDesc": "Step back into tools and companions — metacognitive choice about where to look next before you decide. (Flavell, 1979)",
-    "breath2": "Breathe again",
-    "breath2Desc": "A second regulation pass after reframing lowers arousal again before commitment. (Lehrer & Gevirtz, 2014)",
-    "decide": "Decide",
-    "decideDesc": "System 2 is now online. You can act from intention, not impulse. (Kahneman, 2011)"
   },
   "breathe": {
     "startTimer": "Start a 60s timer"

@@ -37,6 +37,9 @@ export function PauseSessionBriefRitualBody({
   deepPauseLocked,
   onDecide,
   onBriefDecideBack,
+  marketData,
+  trackedAssetId,
+  context,
 }: PauseSessionBriefRitualBodyProps) {
   "use memo";
   return (
@@ -50,6 +53,9 @@ export function PauseSessionBriefRitualBody({
             feelIntensity={feelIntensity}
             onSelect={onFeelTilesSelect}
             onContinue={onBriefFeelContinueToBreath}
+            marketData={marketData}
+            trackedAssetId={trackedAssetId}
+            contextText={context}
           />
         </motion.div>
       )}

@@ -1,4 +1,5 @@
 import type { RefObject } from 'react';
+import type { MarketQuote } from '@/features/market/public';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { BriefPauseStep } from '@/features/pause/domain/ritual-types';
@@ -36,6 +37,9 @@ export type PauseSessionBriefRitualBodyProps = {
   deepPauseLocked: boolean;
   onDecide: (decision: string) => void;
   onBriefDecideBack: () => void;
+  marketData: MarketQuote | null;
+  trackedAssetId: string;
+  context: string | null;
 };
 
 /** Props for `PauseSessionDeepRitualBody` (pause screen presentation). */
@@ -66,6 +70,8 @@ export type PauseSessionDeepRitualBodyProps = {
   companionPrefs: CompanionPrefs;
   pauseInstanceId: string | null;
   context: string | null;
+  marketData: MarketQuote | null;
+  trackedAssetId: string;
   reflectionMessage: string;
   reflectionContent?: ReflectionContentV2 | null;
   currentFeel?: CurrentFeelForReflect;

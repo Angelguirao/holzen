@@ -1,4 +1,4 @@
-import type { PauseStep } from '../pause-ritual-steps';
+import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 
 /** Science sheet rows align 1:1 with deep-ritual `PauseStep` beats. */
 export type PauseScienceStepKey = PauseStep;

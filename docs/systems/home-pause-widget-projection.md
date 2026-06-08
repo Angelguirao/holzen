@@ -44,8 +44,8 @@ Surfaces are **derived**, not stored. Resolver: `resolveHomePauseWidgetSurface` 
 |---------|-------------------|-------------------|
 | `idle_collapsed` / `idle_expanded` | No open pause; not in manual cooldown; collapsed by default — first idle visit auto-expands until **Let's pause** or an open pause | **Your pause** + moon; expanded → within-range copy + **Let's pause** |
 | `open_pre_reflect` | Open `active` (pre-Reflect) | Opening line + market + **Let's pause** |
-| `open_engaged` | Open `engaged` (Reflect reached) | *Still here* or calm settled copy + **Continue** / **Discard** |
-| `open_engaged_pending_offer` | Engaged + pending cron offer | Continue / Discard + adopt pending branch |
+| `open_engaged` | Open `engaged` (Reflect reached) | *Still here* or calm settled copy + **Continue** (opens welcome-back sheet) |
+| `open_engaged_pending_offer` | Engaged + pending cron offer | Same welcome-back entry + adopt pending branch |
 | `manual_cooldown_collapsed` / `manual_cooldown_expanded` | Manual cooldown, has archive | Cooldown copy + **Revisit archive** |
 | `manual_cooldown_first_pause_*` | Manual cooldown, no archive yet | Cooldown copy only |
 | `loading` / `blocking_error` | Holzen loading or hard market error | Skeleton or retry |
@@ -77,11 +77,11 @@ Primary inputs to `resolveHomePauseWidgetSurface`:
 
 | Layer | Meaning | Home widget |
 |-------|---------|-------------|
-| **Postgres `engaged`** | Deep ritual logged `reflection_step` → `engaged_at` set | `open_engaged` or `open_engaged_pending_offer` — *still here* or calm settled copy + **Continue** / **Discard**; countdown from **`calm_settled_at`** (cron) or **`engaged_at`** (manual) |
+| **Postgres `engaged`** | Deep ritual logged `reflection_step` → `engaged_at` set | `open_engaged` or `open_engaged_pending_offer` — *still here* or calm settled copy + **Continue** (Figma 411:7503 welcome-back sheet: resume, start over, discard); countdown from **`calm_settled_at`** (cron) or **`engaged_at`** (manual) |
 | **Pre-Reflect `active`** | Feel/Breath logged but not Reflect yet | `open_pre_reflect` — **Let's pause** |
 | **Untouched open pause** | No step events | `open_pre_reflect` — **Let's pause** |
 
-**Continue** on Home appears only after Reflect (`engaged`). **`engaged_at`** is the same server milestone (stats, archive segment, 12h `open_max_age`). Brief ritual never enters `engaged`.
+**Engaged welcome-back sheet (Figma 411:7503 / 411:8073):** **Continue** on `open_engaged` / `open_engaged_pending_offer` opens a half sheet before `/pause`. With a cron **pending** row, copy uses the open-max **remaining** countdown when an anchor exists (`calm_settled_at` or `engaged_at`) — it does **not** claim the pause will be replaced by the pending offer (pending may expire on calm sweep). **Discard** uses the Figma 435:19719 undo snackbar.
 
 When cron queues a **pending** row: untouched open pauses are **auto-superseded** (silent). `open_engaged_pending_offer` adopt/decline on Home appears only when the open pause is **`engaged`**; pre-Reflect pending is handled on **`/pause`** leave sheet only.
 

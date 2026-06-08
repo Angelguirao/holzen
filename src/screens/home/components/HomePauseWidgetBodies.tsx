@@ -13,7 +13,6 @@ import { HomePauseWidgetPreviewLine } from '@/screens/home/components/HomePauseW
 import { HomePauseWidgetMarketRow } from '@/screens/home/components/HomePauseWidgetMarketRow';
 import {
   homePauseWidgetBodyStack,
-  HomePauseWidgetDiscardLink,
   HomePauseWidgetNoxCta,
   HomePauseWidgetOpeningStack,
   HomePauseWidgetTwoToneLead,
@@ -78,6 +77,7 @@ export function HomePauseOpenActiveBody({
 
 type EngagedProps = {
   onPauseWithThis: () => void;
+  onOpenWelcomeBackSheet?: () => void;
   onDismissOpenPause: () => void;
 };
 
@@ -169,15 +169,17 @@ function HomePauseEngagedTopBlock({
   );
 }
 
-/** Open pause after Reflect — Continue / Discard; calm market shows settled copy. */
+/** Open pause after Reflect — welcome-back sheet entry; calm market shows settled copy. */
 export function HomePauseEngagedBody({
   onPauseWithThis,
-  onDismissOpenPause,
+  onOpenWelcomeBackSheet,
+  onDismissOpenPause: _onDismissOpenPause,
   engagedPauseMarketSettled,
   openPauseOpenMaxAnchorAt,
 }: EngagedProps & EngagedCalmWatersProps) {
   "use memo";
   const { t } = useTranslation();
+  const openPause = onOpenWelcomeBackSheet ?? onPauseWithThis;
 
   return (
     <div className={homePauseWidgetBodyStack}>
@@ -185,13 +187,7 @@ export function HomePauseEngagedBody({
         engagedPauseMarketSettled={engagedPauseMarketSettled}
         openPauseOpenMaxAnchorAt={openPauseOpenMaxAnchorAt}
       />
-      <div className="flex flex-col gap-6 pb-2">
-        <HomePauseWidgetNoxCta label={t('home.pauseWidget.continue')} onClick={onPauseWithThis} />
-        <HomePauseWidgetDiscardLink
-          label={t('home.pauseWidget.discard')}
-          onClick={onDismissOpenPause}
-        />
-      </div>
+      <HomePauseWidgetNoxCta label={t('home.pauseWidget.continue')} onClick={openPause} />
     </div>
   );
 }
@@ -207,7 +203,8 @@ type PendingProps = EngagedProps &
 export function HomePauseEngagedPendingBody({
   pendingMarketBlock,
   onPauseWithThis,
-  onDismissOpenPause,
+  onOpenWelcomeBackSheet,
+  onDismissOpenPause: _onDismissOpenPause,
   onPauseWithNewContext,
   pendingOfferBusy,
   engagedPauseMarketSettled,
@@ -216,6 +213,7 @@ export function HomePauseEngagedPendingBody({
   "use memo";
   const { t } = useTranslation();
   const onNewContext = onPauseWithNewContext ?? onPauseWithThis;
+  const openPause = onOpenWelcomeBackSheet ?? onPauseWithThis;
 
   return (
     <div className={homePauseWidgetBodyStack}>
@@ -223,13 +221,7 @@ export function HomePauseEngagedPendingBody({
         engagedPauseMarketSettled={engagedPauseMarketSettled}
         openPauseOpenMaxAnchorAt={openPauseOpenMaxAnchorAt}
       />
-      <div className="flex flex-col gap-6 pb-2">
-        <HomePauseWidgetNoxCta label={t('home.pauseWidget.continue')} onClick={onPauseWithThis} />
-        <HomePauseWidgetDiscardLink
-          label={t('home.pauseWidget.discard')}
-          onClick={onDismissOpenPause}
-        />
-      </div>
+      <HomePauseWidgetNoxCta label={t('home.pauseWidget.continue')} onClick={openPause} />
 
       <div className="relative py-2 text-center">
         <span className="relative z-10 bg-card/40 px-3 text-sm text-muted-foreground">

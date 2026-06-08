@@ -8,6 +8,7 @@ import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useCompletedPauseCount } from '@/features/pause/presentation/home/use-completed-pause-count';
 import { useHomePauseActions } from '@/features/pause/presentation/home/use-home-pause-actions';
 import { useHomePendingPauseOfferActions } from '@/features/pause/presentation/home/use-home-pending-pause-offer-actions';
+import { useHomePauseWelcomeBackSheet } from '@/features/pause/presentation/home/use-home-pause-welcome-back-sheet';
 import type { HomePauseWidgetProjectionContext } from '@/features/pause/domain/home/home-pause-widget-projection-types';
 
 export type UseHomePauseWidgetScreenDeps = {
@@ -93,6 +94,12 @@ export function useHomePauseWidgetInputs(
   const pendingOfferActions = useHomePendingPauseOfferActions(deps.navigate);
   const completedPauseCount = useCompletedPauseCount() ?? 0;
 
+  const welcomeBack = useHomePauseWelcomeBackSheet({
+    handleNavigatePauseWithThis: pauseActions.handleNavigatePauseWithThis,
+    handleStartOverEngagedPause: pauseActions.handleStartOverEngagedPause,
+    handleDismiss: pauseActions.handleDismiss,
+  });
+
   return useMemo(
     (): HomePauseWidgetProjectionContext => ({
       lastPauseInstanceId,
@@ -127,6 +134,7 @@ export function useHomePauseWidgetInputs(
       nextCronCheckIn,
       manualCooldownRemaining,
       onNavigatePauseWithThis: pauseActions.handleNavigatePauseWithThis,
+      onOpenWelcomeBackSheet: welcomeBack.openWelcomeBackSheet,
       onAdoptPendingOffer: pendingOfferActions.adoptPendingOffer,
       onDeclinePendingOffer: pendingOfferActions.declinePendingOffer,
       pendingOfferBusy: pendingOfferActions.pendingOfferBusy,
@@ -136,6 +144,9 @@ export function useHomePauseWidgetInputs(
       onStartTrial: () => void deps.ensureTrial(),
       onReactivate: () => void deps.startReactivationCheckout(),
       manualTrigger,
+      welcomeBackOpen: welcomeBack.welcomeBackOpen,
+      setWelcomeBackOpen: welcomeBack.setWelcomeBackOpen,
+      welcomeBackHandlers: welcomeBack.welcomeBackHandlers,
     }),
     [
       lastPauseInstanceId,
@@ -170,13 +181,18 @@ export function useHomePauseWidgetInputs(
       nextCronCheckIn,
       manualCooldownRemaining,
       pauseActions.handleNavigatePauseWithThis,
+      pauseActions.handleStartOverEngagedPause,
       pauseActions.handleDismiss,
+      welcomeBack.openWelcomeBackSheet,
       pauseActions.handleNeedAPause,
       pauseActions.startProCheckout,
       pendingOfferActions.adoptPendingOffer,
       pendingOfferActions.declinePendingOffer,
       pendingOfferActions.pendingOfferBusy,
       manualTrigger,
+      welcomeBack.welcomeBackOpen,
+      welcomeBack.setWelcomeBackOpen,
+      welcomeBack.welcomeBackHandlers,
       deps.ensureTrial,
       deps.startReactivationCheckout,
     ],

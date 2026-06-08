@@ -1,4 +1,5 @@
 import type { RefObject } from 'react';
+import type { MarketQuote } from '@/features/market/public';
 import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import type {
   CurrentFeelForReflect,
@@ -57,6 +58,8 @@ export type PauseSessionScaffoldRitualPayloadsParams = {
   companionPrefs: CompanionPrefs;
   pauseInstanceId: string | null;
   context: string | null;
+  marketData: MarketQuote | null;
+  trackedAssetId: string;
   message: string;
   reflectionContent: ReflectionContentV2 | null;
   currentFeel?: CurrentFeelForReflect;
@@ -107,6 +110,9 @@ export function buildPauseSessionScaffoldRitualPayloads(
       deepPauseLocked: !p.subscribed,
       onDecide: p.handleDecide,
       onBriefDecideBack: () => p.setBriefStep('integrate'),
+      marketData: p.marketData,
+      trackedAssetId: p.trackedAssetId,
+      context: p.context,
     },
     deepRitual: {
       step: p.step,
@@ -134,6 +140,8 @@ export function buildPauseSessionScaffoldRitualPayloads(
       companionPrefs: p.companionPrefs,
       pauseInstanceId: p.pauseInstanceId,
       context: p.context,
+      marketData: p.marketData,
+      trackedAssetId: p.trackedAssetId,
       reflectionMessage: p.message,
       reflectionContent: p.reflectionContent,
       currentFeel: p.currentFeel,

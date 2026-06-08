@@ -200,5 +200,6 @@ export function useHomeScreen() {
     profileLoaded,
     dashboardLayout,
     pauseHelpFeedback,
+    pauseWelcomeBackSheet: pauseProjection.pauseWelcomeBackSheet,
   };
 }
