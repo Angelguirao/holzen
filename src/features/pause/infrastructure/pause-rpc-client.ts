@@ -48,7 +48,7 @@ export type {
 
 function scheduleInvalidatePauseStatsOnCompleted(pauseInstanceId: string) {
   void supabase.auth.getUser().then(({ data: { user } }) => {
-    invalidatePauseStatsDataForUser(user?.id);
+    invalidatePauseStatsDataForUser(user?.id, { pauseInstanceId });
     invalidateCompanionUiCompletionQuery(pauseInstanceId);
     const qc = getHolzenQueryClient();
     if (qc) {
@@ -110,7 +110,7 @@ export async function pauseLogStep(params: {
   const state = (data as PauseState | null) ?? null;
   if (params.stepType === 'post_pause_emotion_logged') {
     void supabase.auth.getUser().then(({ data: { user } }) => {
-      invalidatePauseStatsDataForUser(user?.id);
+      invalidatePauseStatsDataForUser(user?.id, { pauseInstanceId: params.instanceId });
     });
   }
   if (state === 'engaged') {

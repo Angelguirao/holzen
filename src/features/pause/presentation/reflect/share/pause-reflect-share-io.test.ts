@@ -80,12 +80,13 @@ describe('pause-reflect-share-io', () => {
   it('delegates to runReflectionShareImage', async () => {
     runReflectionShareImageMock.mockResolvedValue('downloaded');
 
-    await pauseReflectionShareImage('Stay calm.', 'ctx', 'haiku line');
+    await pauseReflectionShareImage('Stay calm.', 'ctx', 'haiku line', 'calm');
 
     expect(runReflectionShareImageMock).toHaveBeenCalledWith(
       'Stay calm.',
       'ctx',
       'haiku line',
+      'calm',
       undefined,
     );
   });

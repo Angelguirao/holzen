@@ -9,24 +9,38 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useReflectionShareHandlers } from '@/features/pause/public-ritual-reflect';
 
-interface Props {
-  message: string;
-  context?: string | null;
-  haiku?: string | null;
+export type ShareReflectionHandlers = {
+  copyText: () => Promise<void>;
+  shareImage: () => Promise<void>;
+  shareToX: () => void;
+  shareToWhatsApp: () => void;
+  shareToTelegram: () => void;
+};
+
+type Props = ShareReflectionHandlers & {
   /** Fires when the share menu opens (product analytics). */
   onMenuOpen?: () => void;
   triggerClassName?: string;
   triggerLabel?: string;
-}
+};
 
 export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
-  function ShareReflection({ message, context, haiku, onMenuOpen, triggerClassName, triggerLabel }, ref) {
+  function ShareReflection(
+    {
+      copyText,
+      shareImage,
+      shareToX,
+      shareToWhatsApp,
+      shareToTelegram,
+      onMenuOpen,
+      triggerClassName,
+      triggerLabel,
+    },
+    ref,
+  ) {
     "use memo";
     const { t } = useTranslation();
-    const { copyText, shareImage, shareToX, shareToWhatsApp, shareToTelegram } =
-      useReflectionShareHandlers({ message, context, haiku, t });
 
     return (
       <DropdownMenu
