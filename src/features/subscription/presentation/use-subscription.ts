@@ -24,7 +24,13 @@ import {
   readSubCache,
   subscriptionQueryKey,
 } from '../public-queries';
-import { trackTrialExpired, trackTrialStarted } from '../application/paywall-telemetry';
+import {
+  trackTrialDenied,
+  trackTrialExpired,
+  trackTrialStarted,
+  type TrialDeniedReason,
+} from '../application/paywall-telemetry';
+import type { EnsureTrialDenyReason } from '../infrastructure/edge/subscription-billing-edge';
 
 const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';
 /** Set when a checkout return includes `?subscribed=true` (timestamp for PaywallSubscribedTracker TTL) */
@@ -226,6 +232,43 @@ export function useSubscription() {
         try {
           const { data, error } = await ensureTrialSubscription();
           if (error) throw error;
+
+          if (data?.ok === false && data.reason) {
+            trackTrialDenied(data.reason as TrialDeniedReason);
+            subscriptionNextFetchMode = 'force';
+            subscriptionNextFetchSource = 'invalidate';
+            await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
+
+            const reason = data.reason as EnsureTrialDenyReason;
+            if (reason === 'trial_already_used') {
+              toast.info(
+                t('home.subscription.trialAlreadyUsed', {
+                  defaultValue: 'Your free trial has already been used. Subscribe to continue.',
+                }),
+              );
+              resolve();
+              return;
+            }
+            if (reason === 'email_not_verified') {
+              toast.error(
+                t('home.subscription.trialEmailNotVerified', {
+                  defaultValue: 'Confirm your email before starting your trial.',
+                }),
+              );
+              reject(new Error(reason));
+              return;
+            }
+            if (reason === 'disposable_email') {
+              toast.error(
+                t('home.subscription.trialDisposableEmail', {
+                  defaultValue: 'Use a permanent email address to start a trial.',
+                }),
+              );
+              reject(new Error(reason));
+              return;
+            }
+          }
+
           if (!data?.ok) throw new Error('Trial not started');
           if (data.created) {
             trackTrialStarted('ensure_trial');
