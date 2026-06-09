@@ -108,4 +108,24 @@ describe('useCompanionSectionExpansion', () => {
     expect(result.current.expandedHaiku).toBe(true);
     expect(result.current.expandedSignal).toBe(true);
   });
+
+  it('lazy-fetches when expanding with empty grounding shell', () => {
+    const fetchCompanion = vi.fn();
+    const { result } = renderHook(() =>
+      useCompanionSectionExpansion({
+        ...baseParams({
+          fetchCompanion,
+          grounding: { title: '', body: '', citation: '', url: '' },
+        }),
+        exclusiveExpand: true,
+      }),
+    );
+
+    act(() => {
+      result.current.toggleGrounding();
+    });
+
+    expect(result.current.expandedLearning).toBe(true);
+    expect(fetchCompanion).toHaveBeenCalledWith('grounding');
+  });
 });
