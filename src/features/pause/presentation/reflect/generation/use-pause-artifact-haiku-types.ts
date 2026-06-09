@@ -15,6 +15,8 @@ export type UsePauseArtifactHaikuWhenEnabledParams = UsePauseArtifactHaikuBase &
   /** Fetch only when true (Frame step — user expanded haiku). */
   trigger: 'whenEnabled';
   fetchEnabled: boolean;
+  /** When this changes after a prior fetch, retries artifact read (late holzen-reflect persist). */
+  reflectionMessage?: string;
 };
 
 export type UsePauseArtifactHaikuParams =

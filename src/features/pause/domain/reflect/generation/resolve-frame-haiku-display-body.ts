@@ -6,8 +6,11 @@ export function resolveFrameHaikuDisplayBody(input: {
 }): string {
   const trimmedArtifact = input.artifactHaiku?.trim();
   if (trimmedArtifact) return trimmedArtifact;
-  if (input.haikuFetch === 'error' || input.haikuFetch === 'done') {
-    return input.reflectionMessage.trim();
-  }
-  return '';
+
+  const trimmedReflection = input.reflectionMessage.trim();
+  if (!trimmedReflection) return '';
+
+  // Show the card while the artifact read is in flight (and when no row exists yet).
+  // Real haiku replaces this once `artifactHaiku` hydrates.
+  return trimmedReflection;
 }
