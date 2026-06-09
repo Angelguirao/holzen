@@ -12,3 +12,6 @@ export const PRACTICE_XP_COMPANION_SLOT_FAVORITE_EACH = 2;
 export const PRACTICE_XP_COMPANION_SLOT_FAVORITE_MAX = 4;
 export const PRACTICE_XP_BREATH_SECOND_BONUS = 4;
 export const PRACTICE_XP_SHIFT_MOOD_BONUS = 3;
+
+/** Brief Done optional post-pause check-in (UI estimate when feel changed on save). */
+export const PRACTICE_XP_POST_PAUSE_CHECK_IN_BONUS = 5;

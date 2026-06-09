@@ -53,6 +53,33 @@ describe('usePauseBriefDoneCheckIn', () => {
     expect(showPauseStepSyncFailedToast).not.toHaveBeenCalled();
   });
 
+  it('sets saved ended feel and post-check-in XP when feel changed and save succeeds', async () => {
+    pausePostPauseEmotionLogIfDirtyMock.mockResolvedValue({ status: 'logged' });
+    const onSaveToJourney = vi.fn();
+    const { result } = renderHook(() =>
+      usePauseBriefDoneCheckIn({
+        doneVariant: 'brief',
+        pauseInstanceId: 'inst-1',
+        pauseData: { mood: 'calm', feelIntensity: 3 },
+        onSaveToJourney,
+        t,
+      }),
+    );
+
+    act(() => {
+      result.current.setBriefDoneMood('anxious');
+      result.current.setBriefDoneIntensity(4);
+    });
+
+    await act(async () => {
+      await result.current.handleSaveToJourney();
+    });
+
+    expect(onSaveToJourney).toHaveBeenCalledOnce();
+    expect(result.current.savedEndedFeel).toEqual({ mood: 'anxious', intensity: 4 });
+    expect(result.current.postCheckInXpBonus).toBe(5);
+  });
+
   it('logs post_pause_emotion when feel changed and sync fails shows toast', async () => {
     pausePostPauseEmotionLogIfDirtyMock.mockResolvedValue({ status: 'sync_failed' });
     const onSaveToJourney = vi.fn();
