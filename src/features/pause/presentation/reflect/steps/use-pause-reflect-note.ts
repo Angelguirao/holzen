@@ -47,5 +47,5 @@ export function usePauseReflectNote(pauseInstanceId: string) {
 
   const commitOnBlur = useCallback(() => commit(note), [commit, note]);
 
-  return { note, setNote, saving, commit, commitOnBlur };
+  return { note, setNote, saving: isPending, commit, commitOnBlur };
 }

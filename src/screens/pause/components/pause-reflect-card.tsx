@@ -43,7 +43,7 @@ export function PauseReflectCard({
         <h2 id="pause-reflect-card-label" className="sr-only">
           {t('pause.reflect.letterAria', { defaultValue: 'Your reflection' })}
         </h2>
-        <div className="flex flex-col gap-6 rounded-2xl border-2 border-primary bg-card/40 px-4 py-5 shadow-sm backdrop-blur-sm sm:px-6 sm:py-6">
+        <div className="flex min-w-0 flex-col gap-6 rounded-2xl border-2 border-primary bg-card/40 px-4 py-5 shadow-sm backdrop-blur-sm sm:px-6 sm:py-6">
           <div className="flex items-start justify-between gap-4">
             <PauseReflectMessageBody
               pauseInstanceId={pauseInstanceId}
