@@ -957,10 +957,10 @@
       "iveReflected": "I've reflected"
     },
     "decide": {
-      "prompt": "What did you choose?",
-      "hold": "No change",
-      "sell": "Sold",
-      "buy": "Bought",
+      "prompt": "What will you do?",
+      "hold": "Hold",
+      "sell": "Sell",
+      "buy": "Buy",
       "nothing": "Wait"
     }
   },
@@ -1487,8 +1487,20 @@
     "breathRoundLabel": "Round {{current}}/{{total}}",
     "startRitual": "Start a ritual",
     "orDecideNow": "or scroll down to decide without a ritual",
-    "whatWillYouDo": "What did you choose?",
-    "decideSubcopy": "Record your decision — Holzen does not judge your strategy.",
+    "whatWillYouDo": "What will you do?",
+    "decideSubcopy": "You've paused. What's next is yours.",
+    "decideDisclaimerTitle": "This doesn't trade",
+    "decideDisclaimerLine1": "Holzen doesn't act for you.",
+    "decideDisclaimerLine2": "This just records what you intend.",
+    "decide": {
+      "hold": "Hold",
+      "buy": "Buy",
+      "sell": "Sell"
+    },
+    "done": {
+      "heroTitle": "You paused",
+      "heroSubcopy": "You held yourself. What was done is done."
+    },
     "youChose": "You chose deliberately.",
     "return": "Return",
     "leaveSessionTitle": "Leave ritual?",
@@ -1568,7 +1580,7 @@
       },
       "decideStepDurationHint": "< 15 sec",
       "decide": {
-        "holdPrimary": "No change"
+        "holdPrimary": "Hold"
       },
       "done": {
         "completedSaved": "Completed and saved",
@@ -1592,8 +1604,9 @@
         "impactSold": "You recorded what you chose after pausing.",
         "impactDecisionRecorded": "You recorded what you chose after pausing — that is the practice.",
         "impactEntryMood": "You named how you felt before deciding.",
-        "checkInSectionTitle": "How are you now?",
+        "checkInSectionTitle": "A second look (Optional)",
         "checkInRowLeft": "Check in again",
+        "checkInRowXpReward": "+{{count}} XP",
         "checkInRowRightHint": "Optional: if how you feel now changed after deciding, adjust mood or intensity and tap Save.",
         "contributionFootnote": "These lines describe how you practiced — not whether your trade was correct.",
         "practiceAffirmLead": "Stopping to decide is what matters here. Journey tracks completed pauses and your rhythm over time.",
@@ -1604,9 +1617,9 @@
         "moodPickerTitle": "Choose emotion",
         "saveToJourney": "Save to journey",
         "saveToJourneySaving": "Saving…",
-        "outcomeHeld": "No change",
-        "outcomeSold": "Sold",
-        "outcomeBought": "Bought",
+        "outcomeHeld": "Hold",
+        "outcomeSold": "Sell",
+        "outcomeBought": "Buy",
         "outcomeFallback": "Nice work"
       },
       "breathIntroKicker": "Breathe",
