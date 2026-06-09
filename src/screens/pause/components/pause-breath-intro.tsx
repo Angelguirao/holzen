@@ -45,15 +45,16 @@ export function PauseBreathIntro({
           </p>
         )}
         {breathSegment === 'second' ? (
-          <>
-            <p className={pauseStepLayout.screenTitle}>
-              {t('pause.breathSecondHeadline', { defaultValue: 'Just two more breaths' })}
+          <div className="flex max-w-md flex-col items-center gap-2 text-center">
+            <p className="max-w-md text-center font-editorial text-[1.375rem] leading-7 tracking-wide text-foreground">
+              {t('pause.breathSecondHeadline', { defaultValue: 'Final breath' })}
             </p>
-            <div className={`${pauseStepLayout.screenSubtitle} flex flex-col gap-0`}>
-              <p>{t('pause.breathSecondSubline1', { defaultValue: 'Decisions land differently' })}</p>
-              <p>{t('pause.breathSecondSubline2', { defaultValue: 'when the body is here.' })}</p>
-            </div>
-          </>
+            <p className="max-w-md text-center text-base leading-6 tracking-wide text-foreground">
+              {t('pause.breathSecondSubline', {
+                defaultValue: "A breath to settle what you've moved through",
+              })}
+            </p>
+          </div>
         ) : (
           <p className={`${pauseStepLayout.screenTitle} max-w-md`}>
             {t('pause.breathIntroSingle', {
@@ -87,13 +88,15 @@ export function PauseBreathIntro({
           <Button
             type="button"
             variant="ghost"
-            className={`${pauseStepLayout.textContinue} font-medium`}
+            className="text-sm font-medium tracking-wide text-primary hover:bg-transparent hover:text-primary/90"
             onClick={() => {
               hapticFeedback('light');
               void onSkipBreath();
             }}
           >
-            {t('pause.breathSkipToDecide', { defaultValue: 'Skip to decide' })}
+            {t('pause.breathContinueWithoutFinalBreath', {
+              defaultValue: 'Continue without final breath',
+            })}
           </Button>
         ) : null}
       </div>
