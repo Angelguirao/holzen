@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { LandingComparison } from '@/screens/marketing/components/LandingComparison';
-import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { motion, useReducedMotion, useInView } from 'framer-motion';
@@ -47,16 +47,7 @@ const LandingScreen = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const prefersReduced = useReducedMotion();
-
-  useEffect(() => {
-    const ref = searchParams.get('ref');
-    if (ref) localStorage.setItem('holzen_ref', ref);
-  }, [searchParams]);
-
-
-
   const COMPANIONS = [
     { icon: <Feather className="h-4 w-4" />, label: t('landing.companions.haiku'), desc: t('landing.companions.haikuDesc') },
     { icon: <Zap className="h-4 w-4" />, label: t('landing.companions.signal'), desc: t('landing.companions.signalDesc') },

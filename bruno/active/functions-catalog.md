@@ -21,7 +21,6 @@ Source of truth: `supabase/config.toml` + [active-surface.md](../../docs/ops/act
 | `admin-check-stripe-prices` | `billing/` | Admin user JWT | ops |
 | `send-feedback` | `platform/` | User JWT | n |
 | `register-push` | `platform/` | User JWT | n |
-| `record-referral` | `platform/` | User JWT | n |
 | `delete-account` | `platform/` | User JWT | DANGEROUS |
 | `preview-transactional-email` | `email/` | Ops bearer (`EMAIL_PREVIEW_SECRET` or `CRON_SECRET`) | ops |
 | `send-transactional-email` | `email/` | User JWT or service-role JWT | ops |
@@ -30,7 +29,6 @@ Source of truth: `supabase/config.toml` + [active-surface.md](../../docs/ops/act
 | `check-volatility` | `service-cron/` | `SERVICE_CRON_BEARER` | staging |
 | `refresh-market-prices` | `service-cron/` | `SERVICE_CRON_BEARER` | staging |
 | `pregenerate-companions` | `service-cron/` | `SERVICE_CRON_BEARER` | staging |
-| `process-referral-pending` | `service-cron/` | `SERVICE_CRON_BEARER` | staging |
 | `backfill-market-prices` | `service-cron/` | `SERVICE_CRON_BEARER` | ops |
 | `seed-market-history` | `service-cron/` | `SERVICE_CRON_BEARER` | ops |
 | `ai-cost-alert` | `service-cron/` | `SERVICE_CRON_BEARER` | ops |

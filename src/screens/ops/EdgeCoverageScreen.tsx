@@ -45,8 +45,6 @@ const COVERAGE: Row[] = [
   { name: "pregenerate-companions", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "preview-transactional-email", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "process-email-queue", wrl: true, edgeError: false, logger: false, audit: false },
-  { name: "process-referral-pending", wrl: true, edgeError: false, logger: true, audit: false },
-  { name: "record-referral", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "refresh-market-prices", wrl: true, edgeError: false, logger: true, audit: false },
   { name: "register-push", wrl: true, edgeError: false, logger: false, audit: false },
   { name: "retry-flex-credit", wrl: true, edgeError: false, logger: false, audit: false },

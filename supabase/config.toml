@@ -77,10 +77,6 @@ skip_nonce_check = true
     verify_jwt = false
   [functions.delete-account]
     verify_jwt = false
-  [functions.record-referral]
-    verify_jwt = false
-  [functions.process-referral-pending]
-    verify_jwt = false
   [functions.send-feedback]
     verify_jwt = false
   [functions.pregenerate-companions]

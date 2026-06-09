@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { PRICING } from '@/features/subscription/public';
 import { CreditsDashboard } from '@/screens/settings/components/CreditsDashboard';
-import { ReferralSection } from '@/screens/settings/components/ReferralSection';
 import { useSettingsState } from '@/screens/settings/hooks/use-settings-state';
 
 export function SettingsSubscriptionPanel() {
@@ -118,8 +117,6 @@ export function SettingsSubscriptionPanel() {
       </div>
 
       <CreditsDashboard />
-
-      <ReferralSection />
     </>
   );
 }
