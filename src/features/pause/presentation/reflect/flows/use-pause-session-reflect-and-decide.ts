@@ -34,6 +34,9 @@ export function usePauseSessionReflectAndDecide({
   breathingSecondCompleted,
   feelIntensity,
   shiftIntensity,
+  ritualStartedAtMs,
+  companionPrefs,
+  isFavorite,
 }: UsePauseSessionReflectAndDecideParams) {
   const decidingRef = useRef(false);
   const { reflectGenEnabled, severityAbsPct } = resolvePauseSessionReflectAndDecidePreflight({
@@ -99,6 +102,9 @@ export function usePauseSessionReflectAndDecide({
     shiftIntensity,
     reflectionMessage: effectiveReflectionMessage,
     haiku: companionsHaiku,
+    ritualStartedAtMs,
+    companionPrefs,
+    isFavorite,
   });
 
   return {

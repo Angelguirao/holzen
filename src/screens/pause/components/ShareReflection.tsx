@@ -17,10 +17,12 @@ interface Props {
   haiku?: string | null;
   /** Fires when the share menu opens (product analytics). */
   onMenuOpen?: () => void;
+  triggerClassName?: string;
+  triggerLabel?: string;
 }
 
 export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
-  function ShareReflection({ message, context, haiku, onMenuOpen }, ref) {
+  function ShareReflection({ message, context, haiku, onMenuOpen, triggerClassName, triggerLabel }, ref) {
     "use memo";
     const { t } = useTranslation();
     const { copyText, shareImage, shareToX, shareToWhatsApp, shareToTelegram } =
@@ -37,10 +39,13 @@ export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
             ref={ref}
             variant="ghost"
             size="sm"
-            className="text-xs font-mono text-muted-foreground gap-1.5"
+            className={
+              triggerClassName ??
+              'text-xs font-mono text-muted-foreground gap-1.5'
+            }
           >
             <Share2 className="h-3 w-3" />
-            {t('share.share')}
+            {triggerLabel ?? t('share.share')}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-44">

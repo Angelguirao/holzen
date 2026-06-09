@@ -97,7 +97,8 @@ describe('pause-reflect-flows-io', () => {
       context: null,
       engagedTools: 0,
       wroteNote: false,
-      usedTags: false
+      usedTags: false,
+      ritualDepth: 'deep',
     };
     expect(sample.decision).toBe('hold');
   });
@@ -123,7 +124,8 @@ describe('pause-reflect-flows-io', () => {
         context: null,
         engagedTools: 0,
         wroteNote: false,
-        usedTags: false
+        usedTags: false,
+        ritualDepth: 'brief',
       },
       ((key: string) => key) as unknown as import('i18next').TFunction,
       'brief',

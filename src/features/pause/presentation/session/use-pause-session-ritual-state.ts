@@ -1,4 +1,4 @@
-import { useOptimistic, useState } from 'react';
+import { useLayoutEffect, useOptimistic, useState } from 'react';
 import {
   initialBreathingFirstCompletedFromRestored,
   initialBreathingSecondCompletedFromRestored,
@@ -57,6 +57,11 @@ export function usePauseSessionRitualState(
   const [frameDone, setFrameDone] = useState(() => initialFrameDoneFromRestored(ritualBootstrap));
   const [curtainLifted, setCurtainLifted] = useState(false);
   const [pauseImpactData, setPauseImpactData] = useState<PauseImpactData | null>(null);
+  const [ritualStartedAtMs, setRitualStartedAtMs] = useState<number | null>(() => {
+    if (restartEngagedRitual) return Date.now();
+    if (ritualBootstrap?.ritualDepth) return Date.now();
+    return null;
+  });
 
   const [ritualEntry, setRitualEntry] = useState<RitualDepth | 'picker'>(() => {
     if (startAtDepthPicker) return 'picker';
@@ -73,6 +78,11 @@ export function usePauseSessionRitualState(
   const [soundMuted, setSoundMuted] = useState(true);
 
   usePauseSessionEntryPresentationEffects({ setCurtainLifted });
+
+  useLayoutEffect(() => {
+    if (ritualEntry === 'picker') return;
+    setRitualStartedAtMs((prev) => prev ?? Date.now());
+  }, [ritualEntry]);
 
   return {
     step,
@@ -106,6 +116,7 @@ export function usePauseSessionRitualState(
     curtainLifted,
     pauseImpactData,
     setPauseImpactData,
+    ritualStartedAtMs,
     ritualEntry,
     setRitualEntry,
     briefStep,

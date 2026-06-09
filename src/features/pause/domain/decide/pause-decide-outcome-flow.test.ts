@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 import type { BuildPauseImpactDataOnCompleteInput } from './build-pause-impact-data-on-complete';
 import { resolvePauseDecideOutcomeFlow } from './pause-decide-outcome-flow';
 
@@ -13,6 +14,9 @@ const ritualSnapshot: Omit<BuildPauseImpactDataOnCompleteInput, 'decision'> = {
   shiftIntensity: 2,
   reflectionMessage: 'Stay steady',
   haiku: null,
+  ritualStartedAtMs: Date.now() - 60_000,
+  companionPrefs: DEFAULT_PREFS,
+  isFavorite: true,
 };
 
 describe('pause-decide-outcome-flow', () => {

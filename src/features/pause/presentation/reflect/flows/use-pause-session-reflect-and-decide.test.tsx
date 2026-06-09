@@ -1,6 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TFunction } from 'i18next';
+import { DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
@@ -76,6 +77,9 @@ function baseParams(
     breathingSecondCompleted: false,
     feelIntensity: 3,
     shiftIntensity: null,
+    ritualStartedAtMs: Date.now() - 60_000,
+    companionPrefs: DEFAULT_PREFS,
+    isFavorite: false,
     ...overrides,
   };
 }

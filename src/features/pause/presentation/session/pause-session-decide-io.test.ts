@@ -12,6 +12,7 @@ describe('pause-session-decide-io', () => {
       engagedTools: 0,
       wroteNote: false,
       usedTags: false,
+      ritualDepth: 'deep',
     };
     expect(sample.decision).toBe('hold');
   });

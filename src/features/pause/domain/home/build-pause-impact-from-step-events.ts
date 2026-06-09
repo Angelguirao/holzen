@@ -54,6 +54,7 @@ export function buildPauseImpactFromStepEvents(
     engagedTools,
     wroteNote,
     usedTags,
+    ritualDepth: resolveHomePracticeRitualVariant(events) === 'brief' ? 'brief' : 'deep',
   };
 }
 
