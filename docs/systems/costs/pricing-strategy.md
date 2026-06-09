@@ -195,6 +195,9 @@ Stripe wiring for this flow:
   - `checkoutKind: "flex_pack_s" | "flex_pack_m"`
 - `stripe-webhook` handles `checkout.session.completed` /
   `checkout.session.async_payment_succeeded` and grants credits idempotently.
+- **Trial fraud:** prepaid blocked on trial Checkout in webhook
+  (`trial-checkout-finalize.ts`); optional Stripe Radar rule scoped with
+  `::holzen_trial::` — see [stripe-radar-trial-rules.md](../ops/stripe-radar-trial-rules.md).
 - Required env vars:
   - `STRIPE_PRICE_ID_PRO`
   - `STRIPE_PRICE_ID_PRO_PLUS`
