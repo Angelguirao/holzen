@@ -28,7 +28,6 @@ const INTEGRATION_PROFILE_ROW = {
   tracked_asset_id: 'bitcoin',
   language: 'en',
   grounding_activities: [],
-  referral_code: null,
   created_at: new Date().toISOString(),
   snoozed_until: null,
   is_admin: false,

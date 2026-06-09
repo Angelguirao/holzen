@@ -119,8 +119,6 @@ serve(
       serviceClient.from("testimonials").delete().eq("user_id", userId),
       serviceClient.from("roadmap_votes").delete().eq("user_id", userId),
       serviceClient.from("push_subscriptions").delete().eq("user_id", userId),
-      serviceClient.from("referral_rewards").delete().eq("user_id", userId),
-      serviceClient.from("referrals").delete().eq("referrer_id", userId),
       serviceClient.from("pause_ai_artifacts").delete().eq("user_id", userId),
       serviceClient.from("pause_step_events").delete().eq("user_id", userId),
       serviceClient.from("pause_companion_events").delete().eq("user_id", userId),

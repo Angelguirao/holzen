@@ -4,15 +4,16 @@ Invite-friends UI, `?ref=` capture, auth sign-in side-effects, and referral mile
 
 Moved from active `src/features/auth/`, `src/features/user/`, and `src/screens/settings/` per product scope strip.
 
-## Postgres (still present)
+## Postgres (dropped)
 
-Tables remain in production DB until an explicit cutover migration:
+Migration `20260610210000_pause_first_referral_schema_cleanup.sql` drops:
 
-- `profiles.referral_code`, `profiles.referred_by`
 - `referrals`, `referral_rewards`, `referral_pending_jobs`
+- `profiles.referral_code`, `profiles.referred_by`
 - RPC `claim_referral_pending_jobs`
+- `app_config` key `heartbeat.process_referral_pending`
 
-`npm run check:active-surface` blocks `.from('referrals'|'referral_rewards'|'referral_pending_jobs')`, `holzen_ref`, and `record-referral` in active `src/`.
+Re-enabling requires restoring schema from git history **before** that migration, then following the steps below.
 
 ## Edge (undeployed)
 

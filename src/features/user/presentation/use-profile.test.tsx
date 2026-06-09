@@ -84,7 +84,6 @@ function buildProfileRow(overrides: Partial<ProfileRow> = {}): ProfileRow {
     tracked_asset_id: 'bitcoin',
     language: 'en',
     grounding_activities: [],
-    referral_code: null,
     created_at: null,
     snoozed_until: null,
     is_admin: false,

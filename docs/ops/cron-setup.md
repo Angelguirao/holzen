@@ -261,7 +261,12 @@ SELECT cron.schedule(
 
 </details>
 
-## Referral pending queue (process-referral-pending)
+## Referral pending queue (process-referral-pending) — **dropped**
+
+> **Not shipped:** Referral tables and edges removed in pause-first strip (`20260610210000_pause_first_referral_schema_cleanup.sql`). Do **not** schedule this job on owned projects. Recovery: [`src/legacy/referrals/README.md`](../../src/legacy/referrals/README.md).
+
+<details>
+<summary>Historical setup (full-IA only)</summary>
 
 Processes rows in `referral_pending_jobs` when the client’s first `record-referral` invoke fails (network / transient errors). Uses `verifyServiceAuth` — same Bearer header as other service crons.
 
@@ -284,6 +289,8 @@ SELECT cron.schedule(
   $$
 );
 ```
+
+</details>
 
 ## Night Reflection
 
