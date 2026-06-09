@@ -1,6 +1,6 @@
 import { Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { BottomNav, isPrimaryTabActive } from './BottomNav';
 import { ShellPauseChrome } from '@/app/components/ShellPauseChrome';
 import {
@@ -10,6 +10,7 @@ import {
 import { NotificationBell } from '@/features/notifications/public-hooks';
 import { useShellProfile } from '@/app/hooks/use-shell-profile';
 import { useAutoTrigger } from '@/app/hooks/use-auto-trigger';
+import { usePauseReadyDeepLink } from '@/app/hooks/use-pause-ready-deep-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -92,9 +93,11 @@ function shellCenterNavLabel(pathname: string, t: (key: string) => string): stri
 
 export function AppLayout() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { profileLoadError, retryProfileLoad } = useShellProfile();
   useTabChunkPrefetch();
-  const { pauseReady, dismiss } = useAutoTrigger();
+  const { pauseReady, dismiss, setPauseReady } = useAutoTrigger();
+  usePauseReadyDeepLink({ navigate, setPauseReadyBanner: setPauseReady });
   const location = useLocation();
   const centerNavLabel = shellCenterNavLabel(location.pathname, t);
 

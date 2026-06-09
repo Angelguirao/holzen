@@ -29,15 +29,12 @@ export function useAutoTrigger() {
   const lastContextRef = useRef<string | null>(null);
   const initializedRef = useRef(false);
 
-  // Check URL for ?pause=ready (from push notification deep-link)
+  // Banner-only deep links (`/?pause=ready` without instance id) — instance navigation is
+  // handled by `usePauseReadyDeepLink` in `AppLayout`.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('pause') === 'ready') {
+    if (params.get('pause') === 'ready' && !params.get('pauseInstanceId')?.trim()) {
       setPauseReady(true);
-      // Clean the URL without reload
-      const url = new URL(window.location.href);
-      url.searchParams.delete('pause');
-      window.history.replaceState({}, '', url.pathname + url.search);
     }
   }, []);
 
@@ -117,5 +114,5 @@ export function useAutoTrigger() {
   /** Hide the non-Home banner only. Intentionally does **not** call `pause_dismiss_current` — same pattern as dismissing a toast (avoid accidental end-pause from Archive/Tools). */
   const dismiss = useCallback(() => setPauseReady(false), []);
 
-  return { pauseReady, dismiss };
+  return { pauseReady, dismiss, setPauseReady };
 }
