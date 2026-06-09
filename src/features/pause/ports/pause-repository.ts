@@ -40,7 +40,7 @@ export interface PauseRepository {
   /** Companion slot heart — `pause_instances.metadata` (not `pause_log_step`). */
   toggleCompanionSlotFavorite(params: {
     pauseInstanceId: string;
-    sourceType: string;
+    nextBucket: Record<string, boolean>;
     onBucketComputed?: (bucket: Record<string, boolean>) => void;
   }): Promise<boolean>;
 }

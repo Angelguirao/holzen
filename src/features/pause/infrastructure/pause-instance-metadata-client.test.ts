@@ -19,20 +19,20 @@ describe('pause-instance-metadata-client', () => {
     update.mockClear();
   });
 
-  it('toggleCompanionSlotFavoriteOnInstance updates metadata and calls onBucketComputed', async () => {
+  it('toggleCompanionSlotFavoriteOnInstance merges nextBucket over DB favorites', async () => {
     const { toggleCompanionSlotFavoriteOnInstance } = await import('./pause-instance-metadata-client');
     const buckets: Record<string, boolean>[] = [];
     const ok = await toggleCompanionSlotFavoriteOnInstance({
       pauseInstanceId: 'pause-1',
-      sourceType: 'signal',
+      nextBucket: { signal: false, grounding: true },
       onBucketComputed: (bucket) => buckets.push(bucket),
     });
     expect(ok).toBe(true);
-    expect(buckets[0]).toEqual({ signal: false });
+    expect(buckets[0]).toEqual({ signal: false, grounding: true });
     expect(update).toHaveBeenCalledWith(
       expect.objectContaining({
         metadata: expect.objectContaining({
-          [COMPANION_SLOT_FAVORITES_METADATA_KEY]: { signal: false },
+          [COMPANION_SLOT_FAVORITES_METADATA_KEY]: { signal: false, grounding: true },
         }),
       }),
     );
