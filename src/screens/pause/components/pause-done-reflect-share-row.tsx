@@ -23,14 +23,14 @@ export function PauseDoneReflectShareRow({
   reflectionMessage,
   context,
   haiku,
-  wallpaperMood: _wallpaperMood,
+  wallpaperMood,
   pauseInstanceId,
 }: PauseDoneReflectShareRowProps) {
   "use memo";
   const { t } = useTranslation();
   const msg = (reflectionMessage ?? '').trim();
   const { onShareMenuOpen, onWallpaperTap } = usePauseReflectUiTelemetry(pauseInstanceId, 'pause_done');
-  const { shareImage } = useReflectionShareHandlers({ message: msg, context, haiku, t });
+  const { shareImage } = useReflectionShareHandlers({ message: msg, context, haiku, wallpaperMood, t });
 
   if (!subscribed || !msg) return null;
 

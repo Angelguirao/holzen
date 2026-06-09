@@ -10,8 +10,9 @@ export async function runReflectionShareImage(
   message: string,
   context: string | null | undefined,
   haiku: string | null | undefined,
+  mood?: string | null,
   deps?: DeliverReflectionShareImageDeps,
 ): Promise<DeliverReflectionShareImageOutcome> {
-  const blob = await generateReflectionShareImage(message, context, haiku);
+  const blob = await generateReflectionShareImage(message, context, haiku, mood);
   return deliverReflectionShareImage(blob, deps);
 }

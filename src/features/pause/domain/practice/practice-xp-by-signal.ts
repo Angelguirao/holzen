@@ -8,6 +8,7 @@ export const PRACTICE_XP_SIGNAL_KEYS = [
   'companion_favorites',
   'breath_second',
   'shift_mood',
+  'post_pause_check_in',
 ] as const;
 
 export type PracticeXpSignalKey = (typeof PRACTICE_XP_SIGNAL_KEYS)[number];
@@ -23,6 +24,7 @@ export const EMPTY_PRACTICE_XP_BY_SIGNAL: PracticeXpBySignal = {
   companion_favorites: 0,
   breath_second: 0,
   shift_mood: 0,
+  post_pause_check_in: 0,
 };
 
 export function mapPracticeXpBySignalRpc(raw: unknown): PracticeXpBySignal {

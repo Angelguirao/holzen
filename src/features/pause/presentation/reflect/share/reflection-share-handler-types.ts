@@ -5,5 +5,6 @@ export type UseReflectionShareHandlersParams = {
   message: string;
   context?: string | null;
   haiku?: string | null;
+  wallpaperMood?: string | null;
   t: TFunction;
 };

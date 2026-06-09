@@ -35,6 +35,7 @@ describe('buildPracticeXpSignalRows', () => {
         companion_favorites: 0,
         breath_second: 0,
         shift_mood: 3,
+        post_pause_check_in: 0,
       },
       27,
     );

@@ -24,11 +24,14 @@ function wrapCanvasText(
   return currentY;
 }
 
+import { reflectionShareCanvasAccentRgb } from '@/features/pause/domain/reflect/share/reflection-share-canvas-mood-accent';
+
 /** Renders a branded PNG for native share / download (browser canvas API). */
 export function generateReflectionShareImage(
   message: string,
   context?: string | null,
   haiku?: string | null,
+  mood?: string | null,
 ): Promise<Blob> {
   return new Promise((resolve) => {
     const scale = 2;
@@ -81,7 +84,7 @@ export function generateReflectionShareImage(
     ctx.fillStyle = 'rgb(245 242 236)';
     ctx.fillRect(0, 0, width, height);
 
-    ctx.fillStyle = 'rgb(42 42 42)';
+    ctx.fillStyle = reflectionShareCanvasAccentRgb(mood);
     ctx.fillRect(0, 0, width, 3);
 
     let y = pad + 16;
