@@ -1236,8 +1236,6 @@ export type Database = {
           pause_thesis: string | null
           quiet_hours_end: number | null
           quiet_hours_start: number | null
-          referral_code: string
-          referred_by: string | null
           reflection_style: string
           reflection_tone: string
           silent_mode: boolean
@@ -1278,8 +1276,6 @@ export type Database = {
           pause_thesis?: string | null
           quiet_hours_end?: number | null
           quiet_hours_start?: number | null
-          referral_code?: string
-          referred_by?: string | null
           reflection_style?: string
           reflection_tone?: string
           silent_mode?: boolean
@@ -1320,8 +1316,6 @@ export type Database = {
           pause_thesis?: string | null
           quiet_hours_end?: number | null
           quiet_hours_start?: number | null
-          referral_code?: string
-          referred_by?: string | null
           reflection_style?: string
           reflection_tone?: string
           silent_mode?: boolean
@@ -1396,90 +1390,6 @@ export type Database = {
           label?: string
           start_hour?: number
           user_id?: string
-        }
-        Relationships: []
-      }
-      referral_pending_jobs: {
-        Row: {
-          attempts: number
-          created_at: string
-          id: string
-          last_error: string | null
-          max_attempts: number
-          next_attempt_at: string | null
-          referral_code: string
-          referred_user_id: string
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          attempts?: number
-          created_at?: string
-          id?: string
-          last_error?: string | null
-          max_attempts?: number
-          next_attempt_at?: string | null
-          referral_code: string
-          referred_user_id: string
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          attempts?: number
-          created_at?: string
-          id?: string
-          last_error?: string | null
-          max_attempts?: number
-          next_attempt_at?: string | null
-          referral_code?: string
-          referred_user_id?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      referral_rewards: {
-        Row: {
-          granted_at: string
-          id: string
-          milestone: number
-          reward_type: string
-          user_id: string
-        }
-        Insert: {
-          granted_at?: string
-          id?: string
-          milestone: number
-          reward_type: string
-          user_id: string
-        }
-        Update: {
-          granted_at?: string
-          id?: string
-          milestone?: number
-          reward_type?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      referrals: {
-        Row: {
-          created_at: string
-          id: string
-          referred_user_id: string
-          referrer_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          referred_user_id: string
-          referrer_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          referred_user_id?: string
-          referrer_id?: string
         }
         Relationships: []
       }
@@ -2655,27 +2565,6 @@ export type Database = {
           p_user_id: string
         }
         Returns: Json
-      }
-      claim_referral_pending_jobs: {
-        Args: { p_limit?: number }
-        Returns: {
-          attempts: number
-          created_at: string
-          id: string
-          last_error: string | null
-          max_attempts: number
-          next_attempt_at: string | null
-          referral_code: string
-          referred_user_id: string
-          status: string
-          updated_at: string
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "referral_pending_jobs"
-          isOneToOne: false
-          isSetofReturn: true
-        }
       }
       claim_trigger_slot: {
         Args: { _cooldown_hours: number; _user_id: string }

@@ -60,7 +60,7 @@ Holzen **pauses** and rewards **completed rituals** (Journey streak + count). It
 | `?ref=` on landing / welcome | **No (stripped)** | Was `localStorage.holzen_ref` → `record-referral` on sign-in |
 | Edges `record-referral`, `process-referral-pending` | **No (undeployed)** | `supabase/functions/legacy/referrals/`; removed from `config.toml` |
 
-**DB:** `referrals`, `referral_rewards`, `referral_pending_jobs`, and `profiles.referral_code` **remain** until an explicit cutover migration. `delete-account` still cleans referral rows for deleted users.
+**DB:** `referrals`, `referral_rewards`, `referral_pending_jobs`, and `profiles.referral_code` / `referred_by` **dropped** in `20260610210000_pause_first_referral_schema_cleanup.sql`. Recovery requires restoring those objects from pre-cleanup migration history.
 
 ## Subscription
 
@@ -125,6 +125,14 @@ Migration `20260604120000_pause_first_zombie_schema_cleanup.sql`:
 | `grounding_enrichment_cache` | Cross-user cache for undeployed `grounding-enrich` edge | Restore table + edge from `src/legacy/grounding-enrich/README.md` |
 | `collections` / `collection_items` | User Archive collections (UI in `src/legacy/archive-collections/`) | Restore tables from pre-cleanup migration history |
 | `profiles.hold_goal_type` … `hold_goal_target_price` | Home hold-goal widget (not shipped) | Renamed to **`display_currency`** in Tier E — Settings + market quotes |
+
+Migration `20260610210000_pause_first_referral_schema_cleanup.sql`:
+
+| Dropped | Was | Recovery |
+| --- | --- | --- |
+| `referrals`, `referral_rewards`, `referral_pending_jobs` | Invite-friends program + cron worker | Restore from pre-cleanup migration history; see `src/legacy/referrals/README.md` |
+| `profiles.referral_code`, `profiles.referred_by` | Referral link + attribution | Same migration rollback path |
+| `claim_referral_pending_jobs` | Queue worker RPC | Same |
 
 ## Postgres — Tier E (schema hygiene)
 
