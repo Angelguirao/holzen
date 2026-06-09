@@ -22,6 +22,7 @@ vi.mock('@/features/pause/public-queries', () => ({
 vi.mock('@tanstack/react-query', () => ({
   useQuery: () => ({ data: { article: true } }),
   useQueryClient: () => ({
+    getQueryData: () => ({ article: true }),
     setQueryData: setQueryDataMock,
   }),
 }));
@@ -54,6 +55,7 @@ describe('useCompanionLibraryFavorites', () => {
       expect.objectContaining({
         pauseInstanceId: 'inst-1',
         sourceType: 'article',
+        nextBucket: { article: false },
         onBucketComputed: expect.any(Function),
       }),
     );

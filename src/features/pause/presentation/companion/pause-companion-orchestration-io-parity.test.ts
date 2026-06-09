@@ -109,12 +109,14 @@ describe('pause-companion-orchestration-io parity', () => {
     await pauseToggleCompanionLibraryFavorite({
       pauseInstanceId: 'pi-parity',
       sourceType: 'article',
+      nextBucket: { article: true },
       onBucketComputed,
     });
 
     expect(toggleFavoriteDirect).toHaveBeenCalledWith(companionPauseRepository, {
       pauseInstanceId: 'pi-parity',
       sourceType: 'article',
+      nextBucket: { article: true },
       onBucketComputed,
     });
   });
@@ -133,11 +135,13 @@ describe('pause-companion-orchestration-io parity', () => {
     await pauseToggleCompanionLibraryFavoriteWithRepository(customRepo, {
       pauseInstanceId: 'pi-injected',
       sourceType: 'podcast',
+      nextBucket: { podcast: true },
     });
 
     expect(toggleFavoriteDirect).toHaveBeenCalledWith(customRepo, {
       pauseInstanceId: 'pi-injected',
       sourceType: 'podcast',
+      nextBucket: { podcast: true },
     });
   });
 

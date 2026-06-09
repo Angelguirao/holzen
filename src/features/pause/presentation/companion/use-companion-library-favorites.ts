@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { flipCompanionSlotFavoriteInBucket } from '@/features/pause/domain/companion/companion-slot-favorites-metadata';
 import { pauseToggleCompanionLibraryFavorite } from './pause-companion-orchestration-io';
 import {
   companionLibraryFavoritesQueryKey,
@@ -19,9 +20,13 @@ export function useCompanionLibraryFavorites(pauseInstanceId: string | null | un
     async (sourceType: string) => {
       if (!pauseInstanceId) return;
       const key = companionLibraryFavoritesQueryKey(pauseInstanceId);
+      const current = queryClient.getQueryData<Record<string, boolean>>(key) ?? {};
+      const nextBucket = flipCompanionSlotFavoriteInBucket(current, sourceType);
+      queryClient.setQueryData<Record<string, boolean>>(key, nextBucket);
       await pauseToggleCompanionLibraryFavorite({
         pauseInstanceId,
         sourceType,
+        nextBucket,
         onBucketComputed: (bucket) => {
           queryClient.setQueryData<Record<string, boolean>>(key, bucket);
         },
