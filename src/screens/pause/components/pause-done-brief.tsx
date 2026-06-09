@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { usePauseBriefDoneCheckIn } from '@/features/pause/public-ritual-done';
+import { resolveDoneWallpaperMood, usePauseBriefDoneCheckIn } from '@/features/pause/public-ritual-done';
 import { pauseStepLayout } from '@/features/pause/public-session';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { PauseDoneBriefCheckInPanel } from '@/screens/pause/components/pause-done-brief-check-in-panel';
@@ -30,6 +30,8 @@ export function PauseDoneBrief({ decision, pauseData, pauseInstanceId, onSaveToJ
     setMoodEditorOpen,
     saveBusy,
     handleSaveToJourney,
+    savedEndedFeel,
+    postCheckInXpBonus,
   } = usePauseBriefDoneCheckIn({
     doneVariant: 'brief',
     pauseInstanceId,
@@ -37,6 +39,12 @@ export function PauseDoneBrief({ decision, pauseData, pauseInstanceId, onSaveToJ
     onSaveToJourney,
     t,
   });
+
+  const wallpaperMood = resolveDoneWallpaperMood(
+    savedEndedFeel
+      ? { mood: pauseData?.mood, moodAfter: savedEndedFeel.mood }
+      : pauseData,
+  );
 
   return (
     <motion.div
@@ -51,8 +59,9 @@ export function PauseDoneBrief({ decision, pauseData, pauseInstanceId, onSaveToJ
         {pauseData ? (
           <PauseDoneSummaryCard
             pauseData={pauseData}
-            endedMood={briefDoneMood}
-            endedIntensity={briefDoneIntensity}
+            endedMood={savedEndedFeel?.mood ?? null}
+            endedIntensity={savedEndedFeel?.intensity ?? null}
+            postCheckInXpBonus={postCheckInXpBonus}
           />
         ) : null}
 
@@ -74,7 +83,7 @@ export function PauseDoneBrief({ decision, pauseData, pauseInstanceId, onSaveToJ
           reflectionMessage={pauseData?.reflectionMessage}
           context={pauseData?.context}
           haiku={pauseData?.haiku}
-          wallpaperMood={briefDoneMood}
+          wallpaperMood={wallpaperMood}
           pauseInstanceId={pauseInstanceId}
         />
       </div>

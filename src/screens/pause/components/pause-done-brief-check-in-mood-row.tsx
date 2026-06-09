@@ -1,8 +1,7 @@
 import { Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { PAUSE_MOOD_VALUES } from '@/screens/pause/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
-import type { MoodValue } from '@/features/pause/public-ritual-feel';
+import { PAUSE_MOOD_GROUPS, type MoodValue } from '@/features/pause/public-ritual-feel';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -14,7 +13,7 @@ export type PauseDoneBriefCheckInMoodRowProps = {
   onMoodEditorOpenChange: (open: boolean) => void;
 };
 
-/** Brief Done check-in: current feel label + popover mood grid. */
+/** Brief Done check-in: current feel label + grouped mood grid (Figma / MoodCheck parity). */
 export function PauseDoneBriefCheckInMoodRow({
   mood,
   onMoodChange,
@@ -25,6 +24,11 @@ export function PauseDoneBriefCheckInMoodRow({
   const { t } = useTranslation();
 
   const moodLabel = mood != null ? t(`moodCheck.moods.${mood}`, { defaultValue: mood }) : null;
+
+  const selectMood = (value: MoodValue) => {
+    onMoodChange(value);
+    onMoodEditorOpenChange(false);
+  };
 
   return (
     <div className="flex items-center justify-between gap-2">
@@ -63,26 +67,32 @@ export function PauseDoneBriefCheckInMoodRow({
           <p className="mb-2 text-center text-xs font-medium text-muted-foreground">
             {t('pause.brief.done.moodPickerTitle', { defaultValue: 'Choose emotion' })}
           </p>
-          <div className="grid grid-cols-4 gap-1.5">
-            {PAUSE_MOOD_VALUES.map((value) => (
-              <Button
-                key={value}
-                type="button"
-                variant="outline"
-                size="sm"
-                aria-pressed={mood === value}
-                onClick={() => {
-                  onMoodChange(value);
-                  onMoodEditorOpenChange(false);
-                }}
-                className={cn(
-                  'flex h-auto flex-col items-center gap-1 border-border/60 py-2 text-[10px] font-medium leading-tight text-foreground transition-colors',
-                  mood === value && 'border-primary/70 bg-primary/8',
-                )}
-              >
-                <MoodIcon mood={value} size={18} className="text-muted-foreground" />
-                {t(`moodCheck.moods.${value}`, { defaultValue: value })}
-              </Button>
+          <div className="space-y-3">
+            {PAUSE_MOOD_GROUPS.map((group) => (
+              <div key={group.key} className="space-y-1.5">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  {t(`moodCheck.${group.key}`)}
+                </p>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {group.moods.map(({ value, key }) => (
+                    <Button
+                      key={value}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      aria-pressed={mood === value}
+                      onClick={() => selectMood(value)}
+                      className={cn(
+                        'flex h-auto flex-col items-center gap-1 border-border/60 py-2 text-[10px] font-medium leading-tight text-foreground transition-colors',
+                        mood === value && 'border-primary/70 bg-primary/8',
+                      )}
+                    >
+                      <MoodIcon mood={value} size={18} className="text-muted-foreground" />
+                      {t(`moodCheck.moods.${key}`)}
+                    </Button>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </PopoverContent>

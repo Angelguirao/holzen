@@ -15,13 +15,20 @@ import { PauseDoneSummaryRow } from '@/screens/pause/components/pause-done-summa
 
 export type PauseDoneSummaryCardProps = {
   pauseData: PauseImpactData;
-  /** Brief check-in: optional post-decide mood shift row. */
+  /** Brief check-in: optional post-decide mood shift row (after Save). */
   endedMood?: MoodValue | null;
   endedIntensity?: number | null;
+  /** Brief check-in: +XP after post_pause_emotion_logged on save. */
+  postCheckInXpBonus?: number;
 };
 
 /** Figma Done summary card — Started, Time, Frame, Choice, Presence (+ optional Ended). */
-export function PauseDoneSummaryCard({ pauseData, endedMood, endedIntensity }: PauseDoneSummaryCardProps) {
+export function PauseDoneSummaryCard({
+  pauseData,
+  endedMood,
+  endedIntensity,
+  postCheckInXpBonus = 0,
+}: PauseDoneSummaryCardProps) {
   "use memo";
   const { t } = useTranslation();
 
@@ -37,7 +44,10 @@ export function PauseDoneSummaryCard({ pauseData, endedMood, endedIntensity }: P
     () => formatPauseDoneDecisionLabel(pauseData.decision, t),
     [pauseData.decision, t],
   );
-  const presenceXp = useMemo(() => estimatePresenceXpFromImpact(pauseData), [pauseData]);
+  const presenceXp = useMemo(
+    () => estimatePresenceXpFromImpact(pauseData) + postCheckInXpBonus,
+    [pauseData, postCheckInXpBonus],
+  );
   const frameSlots = useMemo(
     () => pauseData.completedFrameCompanions ?? [],
     [pauseData.completedFrameCompanions],
