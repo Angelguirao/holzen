@@ -5,7 +5,7 @@ Requires a **signed-in user JWT** (`../auth/01-sign-in-password` or paste `SUPAB
 | Request | Edge function | Body |
 |---------|----------------|------|
 | `01-create-checkout` | [create-checkout](../../supabase/functions/create-checkout/index.ts) | None — paid subscription Checkout. Use **`01-create-checkout-trial`** for onboarding trial (`{ "trial": true }`). |
-| `01-create-checkout-trial` | [create-checkout](../../supabase/functions/create-checkout/index.ts) | `{ "checkoutKind": "subscription", "trial": true }` — **$0** 7-day trial, card required, cancels at trial end. |
+| `01-create-checkout-trial` | [create-checkout](../../supabase/functions/create-checkout/index.ts) | `{ "checkoutKind": "subscription", "trial": true }` — **$0** 7-day trial, standard debit/credit only (prepaid rejected in webhook). |
 | `02-check-subscription` | [check-subscription](../../supabase/functions/check-subscription/index.ts) | JSON: `{ "force": false }` — set **`force`: true** to bypass profile cache (see function). |
 | `03-customer-portal` | [customer-portal](../../supabase/functions/customer-portal/index.ts) | None — returns `{ url }` to Stripe Billing Portal; **requires** an existing Stripe customer. |
 | `04-ensure-trial-subscription` | [ensure-trial-subscription](../../supabase/functions/ensure-trial-subscription/index.ts) | `{}` — returns existing **trialing/active** sub or `{ reason: 'checkout_required' }`. New trials start via **`create-checkout`** with `{ "trial": true }`. |

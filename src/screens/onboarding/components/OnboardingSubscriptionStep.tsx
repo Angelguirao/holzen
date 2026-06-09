@@ -97,7 +97,7 @@ export function OnboardingSubscriptionStep({
           {t('onboarding.ready.trialFinePrintCard', {
             price: PRICING.monthlyPrice,
             defaultValue:
-              '$0 today · Card required · No charge at trial end · Subscribe anytime at ${{price}}/mo',
+              '$0 today · Card required · No charge at trial end · Standard debit/credit only (no prepaid).',
           })}
         </p>
       </motion.div>

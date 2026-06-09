@@ -33,6 +33,7 @@ import {
   trackTrialStarted,
   type TrialDeniedReason,
 } from '../application/paywall-telemetry';
+import { fetchTrialCheckoutGrantStatus } from '../application/trial-checkout-grant';
 import type { EnsureTrialDenyReason } from '../infrastructure/edge/subscription-billing-edge';
 
 const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';
@@ -396,7 +397,17 @@ export function useSubscription() {
     }
 
     if (result === 'success') {
-      void manualRetry().then(() => {
+      void fetchTrialCheckoutGrantStatus(userId).then((granted) => {
+        if (!granted) {
+          trackTrialDenied('trial_card_not_accepted');
+          toast.error(
+            t('home.subscription.trialCardNotAccepted', {
+              defaultValue:
+                'We could not start your trial with this card. Free trials require a standard debit or credit card — prepaid and virtual cards are not supported.',
+            }),
+          );
+          return;
+        }
         trackTrialStarted('trial_checkout');
         toast.success(
           t('home.subscription.trialStarted', {
@@ -405,7 +416,7 @@ export function useSubscription() {
         );
       });
     }
-  }, [manualRetry, t, userId]);
+  }, [t, userId]);
 
   /**
    * Optimistically decrement a feature counter (and/or flex credits) in the
