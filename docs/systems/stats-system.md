@@ -1,6 +1,6 @@
 # Stats System
 
-> **Pause-first shipped (2026-06):** **Practice Presence XP** (lifetime total, per-pause awards, Journey breakdown) — see [**Pause-first MVP — Practice Presence XP**](#pause-first-mvp--practice-presence-xp) below. Surfaces: Home `journey-pulse` glimpse, Journey overview; Done uses qualitative impacts only (not the XP ledger).
+> **Pause-first shipped (2026-06):** **Practice Presence XP** (lifetime total, per-pause awards, Journey breakdown) — see [**Pause-first MVP — Practice Presence XP**](#pause-first-mvp--practice-presence-xp) below. Surfaces: Home `journey-pulse` glimpse, Journey overview; Done shows a **session summary card** with a **client-side XP estimate** (not the lifetime ledger).
 >
 > **Not shipped in pause-first:** Holzen Score ring, five skills, Profile → Stats tab, badges alignment scoring — reference `src/legacy/full-shell/` or tag `full-ia-pre-strip`. Manifest: [active-surface.md](../ops/active-surface.md).
 
@@ -26,7 +26,7 @@ Migrations: `20260601120000_pause_practice_xp_persistence.sql`, `20260602120000_
 
 **Completion contract (`volatility_v1`):** `outcome_logged` is accepted only when ritual beats are met (`pause_volatility_v1_ritual_beats_met`). Postgres `completed` requires both outcome and beats. Brief: Feel + unskipped Breathe + Decide. Deep: Feel + Breathe₁ + Reflect + Frame (`shift_emotion_logged`) + Breathe₂ + Decide (second breath may be skipped in UI but must log segment 2).
 
-**Client parity reference (must match SQL when weights change):** `src/features/pause/domain/practice/compute-practice-xp-breakdown.ts`, `practice-xp-constants.ts` (Vitest). Done-screen `buildPauseScoreImpacts` remains qualitative copy only.
+**Client parity reference (must match SQL when weights change):** `src/features/pause/domain/practice/compute-practice-xp-breakdown.ts`, `practice-xp-constants.ts` (Vitest). Done summary uses `estimatePresenceXpFromImpact` (`src/features/pause/domain/done/estimate-presence-xp-from-impact.ts`) — same weights, hydrated from Query cache at decide time; authoritative award remains `pause_finalize_practice_xp`.
 
 ### Formula per completed pause (v2)
 
@@ -54,7 +54,7 @@ Typical range: brief **10**; deep **18–36** when all optional practice is done
 |---------|------|
 | **Home** (`journey-pulse`) | Presence total + completed count — read-only glimpse ([screens/home.md](../screens/home.md)) |
 | **Journey** (`/journey`) | Presence, completed, brief/deep mix, XP-by-signal bars (`JourneyPracticeXpBreakdown`) |
-| **Pause Done** | Qualitative `ScoreImpact` rows — not lifetime totals |
+| **Pause Done** | [`PauseDoneSummaryCard`](../../src/screens/pause/components/pause-done-summary-card.tsx): Started, Time, Frame (deep + completed companions), Choice, Presence (+XP estimate). Brief check-in may append Ended row. Not lifetime totals — see Journey. |
 
 **Query:** `PRACTICE_SUMMARY_QUERY_KEY` → `get_practice_summary`. Invalidate: `invalidatePauseStatsDataForUser` after completion.
 

@@ -63,16 +63,42 @@ describe('buildPauseImpactDataOnComplete', () => {
       ritualEntry: 'brief',
       breathingFirstCompleted: true,
       breathingSecondCompleted: false,
+      wroteNote: true,
+      engagedTools: 1,
+      completedFrameCompanions: ['grounding'],
+      companionSlotFavoriteXp: 2,
     });
     expect(d.decision).toBe('hold');
     expect(d.context).toBe('c');
-    expect(d.engagedTools).toBe(0);
-    expect(d.wroteNote).toBe(false);
+    expect(d.engagedTools).toBe(1);
+    expect(d.wroteNote).toBe(true);
     expect(d.usedTags).toBe(false);
     expect(d.reflectionMessage).toBe('Reflection body');
     expect(d.haiku).toBe('one\ntwo\nthree');
     expect(d.ritualDepth).toBe('brief');
     expect(d.ritualDurationMs).toBeGreaterThan(600_000);
     expect(d.isFavorite).toBe(false);
+    expect(d.completedFrameCompanions).toEqual(['grounding']);
+    expect(d.companionSlotFavoriteXp).toBe(2);
+  });
+
+  it('sets shiftMoodLogged when mood after is present', () => {
+    expect(
+      buildPauseImpactDataOnComplete({
+        ...base(),
+        ritualEntry: 'deep',
+        breathingFirstCompleted: true,
+        breathingSecondCompleted: true,
+        selectedMoodAfter: null,
+      }).shiftMoodLogged,
+    ).toBe(false);
+    expect(
+      buildPauseImpactDataOnComplete({
+        ...base(),
+        ritualEntry: 'deep',
+        breathingFirstCompleted: true,
+        breathingSecondCompleted: true,
+      }).shiftMoodLogged,
+    ).toBe(true);
   });
 });

@@ -1,6 +1,8 @@
 import { useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/features/auth/public';
+import { readPauseImpactPracticeFieldsFromCache } from '@/features/pause/application/use-cases/ritual/done/read-pause-impact-practice-fields';
 import {
   pauseReflectOutcomeLog,
   resolvePauseDecideOutcomeFlow,
@@ -17,6 +19,7 @@ export function usePauseSessionDecideHandler(
   input: UsePauseSessionDecideHandlerParams,
 ): { handleDecide: (d: string) => Promise<void> } {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const {
     decidingRef,
     pauseInstanceId,
@@ -39,6 +42,7 @@ export function usePauseSessionDecideHandler(
     ritualStartedAtMs,
     companionPrefs,
     isFavorite,
+    pauseInstanceMetadata,
   } = input;
 
   const handleDecide = useCallback(
@@ -52,6 +56,12 @@ export function usePauseSessionDecideHandler(
           pauseInstanceId,
           decision: d,
         });
+
+        const practiceFields = readPauseImpactPracticeFieldsFromCache(
+          queryClient,
+          pauseInstanceId,
+          pauseInstanceMetadata,
+        );
 
         const flow = resolvePauseDecideOutcomeFlow({
           outcome,
@@ -70,6 +80,11 @@ export function usePauseSessionDecideHandler(
             ritualStartedAtMs,
             companionPrefs,
             isFavorite,
+            engagedTools: practiceFields.engagedTools,
+            wroteNote: practiceFields.wroteNote,
+            usedTags: practiceFields.usedTags,
+            completedFrameCompanions: practiceFields.completedFrameCompanions,
+            companionSlotFavoriteXp: practiceFields.companionSlotFavoriteXp,
           },
         });
 
@@ -119,8 +134,10 @@ export function usePauseSessionDecideHandler(
       ritualStartedAtMs,
       companionPrefs,
       isFavorite,
+      pauseInstanceMetadata,
       refreshSubscription,
       user?.id,
+      queryClient,
       t,
       setDecision,
       setPauseImpactData,

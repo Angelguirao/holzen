@@ -21,7 +21,8 @@ export function usePauseSessionBreathReflectHandlers(
   mood: PauseSessionBreathReflectMoodSlice,
 ) {
   const { t, dismissMessage, marketData, subscribed, subLoading, requirePro, refreshSubscription } = p;
-  const { restored, message, context, pauseInstanceId, companions, companionPrefs } = shell;
+  const { restored, message, context, pauseInstanceId, companions, companionPrefs, pauseInstanceMetadata } =
+    shell;
   const {
     step,
     phase,
@@ -109,6 +110,7 @@ export function usePauseSessionBreathReflectHandlers(
     ritualStartedAtMs,
     companionPrefs,
     isFavorite,
+    pauseInstanceMetadata,
   });
 
   return { breath, reflect, handleFrameImDone };

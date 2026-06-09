@@ -37,6 +37,7 @@ export function usePauseSessionReflectAndDecide({
   ritualStartedAtMs,
   companionPrefs,
   isFavorite,
+  pauseInstanceMetadata,
 }: UsePauseSessionReflectAndDecideParams) {
   const decidingRef = useRef(false);
   const { reflectGenEnabled, severityAbsPct } = resolvePauseSessionReflectAndDecidePreflight({
@@ -105,6 +106,7 @@ export function usePauseSessionReflectAndDecide({
     ritualStartedAtMs,
     companionPrefs,
     isFavorite,
+    pauseInstanceMetadata,
   });
 
   return {

@@ -1,4 +1,5 @@
 import type { CompanionPrefs } from '@/features/pause/domain/companion-card-types';
+import type { PauseFrameCompanionSlot } from '@/features/pause/domain/done/pause-frame-companion-slots';
 import type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { RitualDepth } from '@/features/pause/domain/ritual-types';
@@ -23,6 +24,8 @@ export type BuildPauseImpactDataOnCompleteInput = {
   wroteNote?: boolean;
   usedTags?: boolean;
   engagedTools?: number;
+  completedFrameCompanions?: readonly PauseFrameCompanionSlot[];
+  companionSlotFavoriteXp?: number;
 };
 
 function resolveRitualDepth(ritualEntry: RitualDepth | 'picker'): RitualDepth {
@@ -58,6 +61,9 @@ export function buildPauseImpactDataOnComplete(p: BuildPauseImpactDataOnComplete
     ritualDepth,
     ritualDurationMs,
     companionPrefs: p.companionPrefs,
+    completedFrameCompanions: p.completedFrameCompanions ?? [],
     isFavorite: p.isFavorite,
+    shiftMoodLogged: p.selectedMoodAfter != null,
+    companionSlotFavoriteXp: p.companionSlotFavoriteXp ?? 0,
   };
 }

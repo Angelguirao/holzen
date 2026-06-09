@@ -59,6 +59,7 @@ export function usePauseSessionRitualState(
   const [pauseImpactData, setPauseImpactData] = useState<PauseImpactData | null>(null);
   const [ritualStartedAtMs, setRitualStartedAtMs] = useState<number | null>(() => {
     if (restartEngagedRitual) return Date.now();
+    if (typeof ritualBootstrap?.ritualStartedAtMs === 'number') return ritualBootstrap.ritualStartedAtMs;
     if (ritualBootstrap?.ritualDepth) return Date.now();
     return null;
   });

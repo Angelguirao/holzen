@@ -28,4 +28,5 @@ export type UsePauseSessionDecideHandlerParams = {
   ritualStartedAtMs: number | null;
   companionPrefs: CompanionPrefs;
   isFavorite: boolean;
+  pauseInstanceMetadata?: unknown;
 };

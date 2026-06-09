@@ -28,6 +28,7 @@ export type PauseSessionBreathReflectShellSlice = {
   pauseInstanceId: string | null;
   companions: CompanionData;
   companionPrefs: CompanionPrefs;
+  pauseInstanceMetadata?: unknown;
 };
 
 /** Subset of ritual state passed into breath/reflect handlers. */
