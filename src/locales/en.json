@@ -2517,7 +2517,13 @@
     "basedOnReflections": "Based on {{count}} pauses",
     "viewInsights": "View insights",
     "pauseReady": "Pause ready",
-    "openPause": "Open pause"
+    "openPause": "Open pause",
+    "continueYourPause": "Continue your pause",
+    "continuePause": "Continue",
+    "pauseClosed": "This pause has closed.",
+    "pauseNoLongerAvailable": "This offer is no longer available.",
+    "newPauseAvailable": "New pause available",
+    "viewOnHome": "View on Home"
   },
   "aiInsights": {
     "title": "AI Pattern Analysis",
