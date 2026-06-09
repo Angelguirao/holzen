@@ -20,14 +20,18 @@ export type {
 export function usePauseArtifactHaiku(params: UsePauseArtifactHaikuParams): UsePauseArtifactHaikuResult {
   const { pauseInstanceId, companionHaikuEnabled, trigger } = params;
   const fetchEnabled = params.trigger === 'whenEnabled' ? params.fetchEnabled : true;
+  const reflectionMessage =
+    params.trigger === 'whenEnabled' ? (params.reflectionMessage?.trim() ?? '') : '';
   const [artifactHaiku, setArtifactHaiku] = useState<string | null>(null);
   const [haikuFetch, setHaikuFetch] = useState<PauseArtifactHaikuFetchPhase>('idle');
   const fetchedForPauseRef = useRef<string | null>(null);
+  const fetchedForReflectionRef = useRef<string>('');
 
   useEffect(() => {
     setArtifactHaiku(null);
     setHaikuFetch('idle');
     fetchedForPauseRef.current = null;
+    fetchedForReflectionRef.current = '';
   }, [pauseInstanceId]);
 
   useEffect(() => {
@@ -35,7 +39,10 @@ export function usePauseArtifactHaiku(params: UsePauseArtifactHaikuParams): UseP
     if (!pauseInstanceId || !companionHaikuEnabled) return;
 
     if (trigger === 'whenEnabled' && fetchedForPauseRef.current === pauseInstanceId) {
-      return;
+      if (reflectionMessage === fetchedForReflectionRef.current) {
+        return;
+      }
+      fetchedForPauseRef.current = null;
     }
 
     const myId = pauseInstanceId;
@@ -43,6 +50,7 @@ export function usePauseArtifactHaiku(params: UsePauseArtifactHaikuParams): UseP
 
     if (trigger === 'whenEnabled') {
       fetchedForPauseRef.current = myId;
+      fetchedForReflectionRef.current = reflectionMessage;
       setHaikuFetch('loading');
     }
 
@@ -59,6 +67,7 @@ export function usePauseArtifactHaiku(params: UsePauseArtifactHaikuParams): UseP
           if (fetchedForPauseRef.current === myId) {
             setHaikuFetch('error');
             fetchedForPauseRef.current = null;
+            fetchedForReflectionRef.current = '';
           }
         }
       });
@@ -66,7 +75,7 @@ export function usePauseArtifactHaiku(params: UsePauseArtifactHaikuParams): UseP
     return () => {
       cancelled = true;
     };
-  }, [pauseInstanceId, companionHaikuEnabled, trigger, fetchEnabled]);
+  }, [pauseInstanceId, companionHaikuEnabled, trigger, fetchEnabled, reflectionMessage]);
 
   return { artifactHaiku, haikuFetch };
 }

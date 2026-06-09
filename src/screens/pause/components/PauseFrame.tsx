@@ -64,6 +64,7 @@ export function PauseFrame({
     companionHaikuEnabled: companionPrefs.haiku,
     trigger: 'whenEnabled',
     fetchEnabled: companionPrefs.haiku && Boolean(pauseInstanceId),
+    reflectionMessage: effectiveReflectionMessage,
   });
 
   const frameCompanions = useMemo((): CompanionData => {

@@ -72,6 +72,35 @@ describe('usePauseArtifactHaiku', () => {
     });
   });
 
+  it('refetches when reflection copy lands after an empty first read', async () => {
+    fetchHaikuTextMock.mockResolvedValueOnce(null).mockResolvedValueOnce('late haiku');
+
+    const { result, rerender } = renderHook(
+      ({ reflectionMessage }: { reflectionMessage: string }) =>
+        usePauseArtifactHaiku({
+          pauseInstanceId: 'pause-4',
+          companionHaikuEnabled: true,
+          trigger: 'whenEnabled',
+          fetchEnabled: true,
+          reflectionMessage,
+        }),
+      { initialProps: { reflectionMessage: '' } },
+    );
+
+    await waitFor(() => {
+      expect(result.current.haikuFetch).toBe('done');
+    });
+    expect(fetchHaikuTextMock).toHaveBeenCalledTimes(1);
+    expect(result.current.artifactHaiku).toBeNull();
+
+    rerender({ reflectionMessage: 'reflection landed' });
+
+    await waitFor(() => {
+      expect(result.current.artifactHaiku).toBe('late haiku');
+    });
+    expect(fetchHaikuTextMock).toHaveBeenCalledTimes(2);
+  });
+
   it('routes artifact reads through the default ReflectGenerator port adapter', async () => {
     fetchHaikuTextMock.mockResolvedValue('port haiku');
 
