@@ -8,26 +8,31 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { usePauseReflectNote } from '@/features/pause/public-ritual-reflect';
 import { hapticFeedback } from '@/lib/haptics';
 
 export type PauseReflectPostItDialogProps = {
-  pauseInstanceId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  note: string;
+  setNote: (value: string) => void;
+  saving: boolean;
+  commit: (next: string) => void;
 };
 
 /** Figma 369:7967 — modal post-it editor (not inline in the reflect card). */
 export function PauseReflectPostItDialog({
-  pauseInstanceId,
   open,
   onOpenChange,
+  note,
+  setNote,
+  saving,
+  commit,
 }: PauseReflectPostItDialogProps) {
   "use memo";
   const { t } = useTranslation();
-  const { note, setNote, saving, commit } = usePauseReflectNote(pauseInstanceId);
   const [draft, setDraft] = useState(note);
   const noteFieldId = useId();
+  const isEditing = note.trim().length > 0;
 
   useEffect(() => {
     if (open) setDraft(note);
@@ -51,7 +56,9 @@ export function PauseReflectPostItDialog({
       >
         <div className="flex items-start justify-between gap-4">
           <DialogTitle className="text-left text-2xl font-normal leading-8 tracking-normal">
-            {t('pause.reflect.addPostIt', { defaultValue: 'Add your post-it' })}
+            {isEditing
+              ? t('pause.reflect.editPostIt', { defaultValue: 'Edit your post-it' })
+              : t('pause.reflect.addPostIt', { defaultValue: 'Add your post-it' })}
           </DialogTitle>
           <Button
             type="button"

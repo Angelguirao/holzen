@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
-import { Binoculars, CirclePlus, Globe, StickyNote } from 'lucide-react';
+import { CirclePlus, Globe, StickyNote } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { PausePersonalNoteSurface } from '@/screens/pause/components/pause-personal-note-surface';
 import type { EchoUserWord, ZoomOutData, ZoomOutEchoData } from '@/features/pause/public-ritual-frame';
 
 const OUTCOME_LABELS: Record<string, string> = {
@@ -117,27 +118,7 @@ function ZoomOutFrameYourWaypoint({
   body: string;
   onChange: () => void;
 }) {
-  "use memo";
-  const { t } = useTranslation();
-
-  return (
-    <div className="space-y-2.5 bg-primary/10 p-4">
-      <div className="flex items-start gap-2.5">
-        <Binoculars className="h-6 w-6 shrink-0 text-primary" aria-hidden />
-        <p className="flex-1 text-base leading-6 text-primary">
-          {t('pause.frame.zoomOutContent.yourWaypoint')}
-        </p>
-        <button
-          type="button"
-          onClick={onChange}
-          className="shrink-0 text-sm leading-5 text-primary underline underline-offset-2"
-        >
-          {t('pause.frame.zoomOutContent.changeWaypoint')}
-        </button>
-      </div>
-      <p className="whitespace-pre-wrap text-base italic leading-6 text-primary/90">&ldquo;{body}&rdquo;</p>
-    </div>
-  );
+  return <PausePersonalNoteSurface variant="waypoint" body={body} onChange={onChange} />;
 }
 
 /** Frame accordion Zoom out — deep time, echo post-it, prompts, waypoint (Figma 362:15111 / 366:15946 / 432:8982). */
