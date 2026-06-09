@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 import { ChevronRight, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { pauseStepLayout } from '@/features/pause/public-session';
+import { formatMotivationLine } from '@/features/user/domain/profile-motivations';
+import { useProfile } from '@/features/user/public-hooks';
 import { Button } from '@/components/ui/button';
 import { hapticFeedback } from '@/lib/haptics';
 import { BreathOrbVisual } from '@/screens/pause/components/breath-orb-visual';
@@ -24,7 +27,15 @@ export function DeepBreathPostPatternInterstitial({
 }: DeepBreathPostPatternInterstitialProps) {
   "use memo";
   const { t } = useTranslation();
+  const { mantra, motivations } = useProfile();
   const isFirst = segment === 'first';
+  const mantraLine = mantra?.trim() ?? '';
+  const motivationLine = useMemo(
+    () =>
+      formatMotivationLine(motivations, (id) => t(`settings.motivations.${id}`, id)),
+    [motivations, t],
+  );
+  const showAnchorRecall = !isFirst && (Boolean(mantraLine) || Boolean(motivationLine));
 
   return (
     <motion.div
@@ -35,7 +46,7 @@ export function DeepBreathPostPatternInterstitial({
     >
       {!isFirst ? (
         <motion.div
-          className="flex shrink-0 items-center justify-center"
+          className="flex shrink-0 items-center justify-center pb-10"
           animate={prefersReducedMotion ? {} : { scale: [1, 1.04, 1] }}
           transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
         >
@@ -48,7 +59,7 @@ export function DeepBreathPostPatternInterstitial({
           />
         </motion.div>
       ) : null}
-      <p className={pauseStepLayout.screenTitle}>
+      <p className="max-w-md text-center font-editorial text-[1.375rem] leading-7 tracking-wide text-foreground">
         {isFirst
           ? t('pause.deep.breathFirstInterstitialTitle', { defaultValue: 'Three breaths' })
           : t('pause.deep.breathSecondInterstitialTitle', { defaultValue: 'You already know' })}
@@ -57,6 +68,32 @@ export function DeepBreathPostPatternInterstitial({
         <p className={`${pauseStepLayout.screenSubtitle} max-w-sm`}>
           {t('pause.deep.breathFirstInterstitialBody', { defaultValue: "You've arrived" })}
         </p>
+      ) : null}
+      {showAnchorRecall ? (
+        <div className="flex w-full max-w-md flex-col gap-8 text-center">
+          {mantraLine ? (
+            <div className="flex flex-col gap-1">
+              <p className="text-base font-medium leading-6 tracking-wide text-muted-foreground">
+                {t('pause.deep.breathSecondInterstitialRemember', { defaultValue: 'Remember' })}
+              </p>
+              <p className="font-editorial text-[1.375rem] leading-7 tracking-wide text-foreground">
+                {`"${mantraLine}"`}
+              </p>
+            </div>
+          ) : null}
+          {motivationLine ? (
+            <div className="flex flex-col gap-1">
+              <p className="text-base font-medium leading-6 tracking-wide text-muted-foreground">
+                {t('pause.deep.breathSecondInterstitialWhyHeading', {
+                  defaultValue: 'And your why',
+                })}
+              </p>
+              <p className="text-xs font-medium italic leading-4 tracking-widest text-muted-foreground">
+                {motivationLine}
+              </p>
+            </div>
+          ) : null}
+        </div>
       ) : null}
       <motion.div
         initial={{ opacity: 0 }}

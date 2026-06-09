@@ -1520,6 +1520,8 @@
       "breathFirstInterstitialBody": "You've arrived",
       "breathFirstRepeatCta": "Three more",
       "breathSecondInterstitialTitle": "You already know",
+      "breathSecondInterstitialRemember": "Remember",
+      "breathSecondInterstitialWhyHeading": "And your why",
       "breathSecondRepeatCta": "Three more"
     },
     "feelStep": {
