@@ -17,6 +17,7 @@ export function useReflectionShareHandlers({
   message,
   context,
   haiku,
+  wallpaperMood,
   t,
 }: UseReflectionShareHandlersParams) {
   const copyText = useCallback(async () => {
@@ -27,14 +28,14 @@ export function useReflectionShareHandlers({
 
   const shareImage = useCallback(async () => {
     try {
-      const outcome = await pauseReflectionShareImage(message, context, haiku);
+      const outcome = await pauseReflectionShareImage(message, context, haiku, wallpaperMood);
       if (outcome === 'downloaded') {
         toast(t('share.imageDownloaded'));
       }
     } catch {
       toast.error(t('share.couldNotShareImage'));
     }
-  }, [message, context, haiku, t]);
+  }, [message, context, haiku, wallpaperMood, t]);
 
   const shareToX = useCallback(() => {
     const text = buildReflectionShareText(message);

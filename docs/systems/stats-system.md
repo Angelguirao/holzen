@@ -20,7 +20,7 @@ Holzen’s **shipped** numeric practice model is **Presence XP**: reward complet
 | `get_practice_summary(user_id)` | Read model: totals, brief/deep split, `xp_by_signal` |
 | `pause_compute_practice_xp_breakdown` / `pause_finalize_practice_xp` | Compute + sync (SQL) |
 
-Migrations: `20260601120000_pause_practice_xp_persistence.sql`, `20260602120000_practice_summary_xp_by_signal.sql`, `20260603120000_pause_practice_xp_v2_ritual_completion.sql`.
+Migrations: `20260601120000_pause_practice_xp_persistence.sql`, `20260602120000_practice_summary_xp_by_signal.sql`, `20260603120000_pause_practice_xp_v2_ritual_completion.sql`, `20260607120000_pause_practice_xp_post_pause_check_in.sql`.
 
 **When XP is written:** After `pause_step_events` / qualifying `pause_companion_events` inserts → `pause_evaluate_transitions` → `pause_finalize_practice_xp` when `state = completed` (including late `post_pause_emotion_logged`).
 
@@ -32,7 +32,7 @@ Migrations: `20260601120000_pause_practice_xp_persistence.sql`, `20260602120000_
 
 | Depth | Base XP | Bonuses |
 |-------|---------|---------|
-| **Brief** | **10** — full brief path only | **None** |
+| **Brief** | **10** — full brief path only | Optional: **+5** post-pause check-in when feel changed |
 | **Deep** | **18** — full deep path only | Optional only (stack) |
 
 | Deep bonus | XP | Detection |
@@ -43,10 +43,11 @@ Migrations: `20260601120000_pause_practice_xp_persistence.sql`, `20260602120000_
 | Frame slot favorites | +2 each, max +4 | `pause_instances.metadata.companion_slot_favorites` |
 | Second breath completed | +4 | `breath_completed` segment 2, not `skipped` |
 | Frame mood check-in | +3 | `shift_emotion_logged` with `mood`, not `from_frame_hub` only |
+| Brief Done check-in | +5 | `post_pause_emotion_logged` when mood or intensity differs from `initial_emotion_logged` |
 
-Typical range: brief **10**; deep **18–36** when all optional practice is done. Tags do not award XP (legacy only).
+Typical range: brief **10–15**; deep **18–36** when all optional practice is done. Tags do not award XP (legacy only).
 
-**`xp_by_signal` keys** (lifetime sums on Journey): `base_brief`, `base_deep`, `favorite`, `note`, `companions`, `companion_favorites`, `breath_second`, `shift_mood`.
+**`xp_by_signal` keys** (lifetime sums on Journey): `base_brief`, `base_deep`, `favorite`, `note`, `companions`, `companion_favorites`, `breath_second`, `shift_mood`, `post_pause_check_in`.
 
 ### UI surfaces (pause-first)
 
@@ -54,7 +55,7 @@ Typical range: brief **10**; deep **18–36** when all optional practice is done
 |---------|------|
 | **Home** (`journey-pulse`) | Presence total + completed count — read-only glimpse ([screens/home.md](../screens/home.md)) |
 | **Journey** (`/journey`) | Presence, completed, brief/deep mix, XP-by-signal bars (`JourneyPracticeXpBreakdown`) |
-| **Pause Done** | [`PauseDoneSummaryCard`](../../src/screens/pause/components/pause-done-summary-card.tsx): Started, Time, Frame (deep + completed companions), Choice, Presence (+XP estimate). Brief check-in may append Ended row. Not lifetime totals — see Journey. |
+| **Pause Done** | [`PauseDoneSummaryCard`](../../src/screens/pause/components/pause-done-summary-card.tsx): Started, Time, Frame (deep + completed companions), Choice, Presence (`practice_xp_awarded` when available, else client estimate). Brief check-in may append Ended row. Not lifetime totals — see Journey. |
 
 **Query:** `PRACTICE_SUMMARY_QUERY_KEY` → `get_practice_summary`. Invalidate: `invalidatePauseStatsDataForUser` after completion.
 

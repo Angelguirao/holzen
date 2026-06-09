@@ -1,6 +1,7 @@
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { resolveDoneWallpaperMood, usePauseBriefDoneCheckIn } from '@/features/pause/public-ritual-done';
+import { resolveDoneWallpaperMood, usePauseBriefDoneCheckIn, usePauseDonePracticeXp } from '@/features/pause/public-ritual-done';
 import { pauseStepLayout } from '@/features/pause/public-session';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { PauseDoneBriefCheckInPanel } from '@/screens/pause/components/pause-done-brief-check-in-panel';
@@ -21,6 +22,7 @@ export function PauseDoneBrief({ decision, pauseData, pauseInstanceId, onSaveToJ
   "use memo";
   const { t } = useTranslation();
   const { subscribed } = useSubscription();
+  const refetchPracticeXpRef = useRef<(() => void) | null>(null);
   const {
     briefDoneMood,
     setBriefDoneMood,
@@ -37,8 +39,19 @@ export function PauseDoneBrief({ decision, pauseData, pauseInstanceId, onSaveToJ
     pauseInstanceId,
     pauseData,
     onSaveToJourney,
+    onPostPauseCheckInLogged: () => {
+      void refetchPracticeXpRef.current?.();
+    },
     t,
   });
+  const { presenceXp, refetchPracticeXp } = usePauseDonePracticeXp(
+    pauseInstanceId,
+    pauseData,
+    postCheckInXpBonus,
+  );
+  refetchPracticeXpRef.current = () => {
+    void refetchPracticeXp();
+  };
 
   const wallpaperMood = resolveDoneWallpaperMood(
     savedEndedFeel
@@ -61,7 +74,7 @@ export function PauseDoneBrief({ decision, pauseData, pauseInstanceId, onSaveToJ
             pauseData={pauseData}
             endedMood={savedEndedFeel?.mood ?? null}
             endedIntensity={savedEndedFeel?.intensity ?? null}
-            postCheckInXpBonus={postCheckInXpBonus}
+            presenceXp={presenceXp}
           />
         ) : null}
 

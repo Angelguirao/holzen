@@ -406,7 +406,8 @@
           "companions": "Companion completes",
           "companion_favorites": "Frame companion favorites",
           "breath_second": "Second breath completed",
-          "shift_mood": "Frame mood check-in"
+          "shift_mood": "Frame mood check-in",
+          "post_pause_check_in": "Brief Done check-in"
         }
       },
       "completed": {

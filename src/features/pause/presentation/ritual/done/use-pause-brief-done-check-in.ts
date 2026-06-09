@@ -22,6 +22,8 @@ export type UsePauseBriefDoneCheckInParams = {
   pauseInstanceId: string | null | undefined;
   pauseData?: { mood: string | null; feelIntensity?: number | null } | null;
   onSaveToJourney?: () => void;
+  /** Called after successful post_pause_emotion_logged (server XP recompute). */
+  onPostPauseCheckInLogged?: () => void;
   t: TFunction;
 };
 
@@ -31,6 +33,7 @@ export function usePauseBriefDoneCheckIn({
   pauseInstanceId,
   pauseData,
   onSaveToJourney,
+  onPostPauseCheckInLogged,
   t,
 }: UsePauseBriefDoneCheckInParams) {
   const [briefDoneMood, setBriefDoneMood] = useState<MoodValue | null>(null);
@@ -68,12 +71,20 @@ export function usePauseBriefDoneCheckIn({
       if (outcome.status === 'logged' && briefDoneMood != null) {
         setSavedEndedFeel({ mood: briefDoneMood, intensity: briefDoneIntensity });
         setPostCheckInXpBonus(PRACTICE_XP_POST_PAUSE_CHECK_IN_BONUS);
+        onPostPauseCheckInLogged?.();
       }
       onSaveToJourney();
     } finally {
       setSaveBusy(false);
     }
-  }, [onSaveToJourney, pauseInstanceId, briefDoneMood, briefDoneIntensity, t]);
+  }, [
+    onSaveToJourney,
+    onPostPauseCheckInLogged,
+    pauseInstanceId,
+    briefDoneMood,
+    briefDoneIntensity,
+    t,
+  ]);
 
   return {
     briefDoneMood,

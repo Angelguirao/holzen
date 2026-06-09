@@ -21,7 +21,24 @@ describe('computePracticeXpBreakdown', () => {
     expect(signals.base_brief).toBe(10);
     expect(signals.base_deep).toBe(0);
     expect(signals.favorite).toBe(0);
+    expect(signals.post_pause_check_in).toBe(0);
     expect(sumPracticeXpBreakdown(signals)).toBe(10);
+  });
+
+  it('awards brief post-pause check-in when feel changed', () => {
+    const signals = computePracticeXpBreakdown({
+      instanceId,
+      engagedTools: 0,
+      events: [
+        { step_type: 'initial_emotion_logged', payload: { mood: 'calm', intensity: 3, brief_ritual: true } },
+        { step_type: 'breath_completed', payload: { breath_segment: 1, brief_ritual: true } },
+        { step_type: 'outcome_logged', payload: { outcome: 'held' } },
+        { step_type: 'post_pause_emotion_logged', payload: { mood: 'anxious', intensity: 4 } },
+      ],
+    });
+    expect(signals.base_brief).toBe(10);
+    expect(signals.post_pause_check_in).toBe(5);
+    expect(sumPracticeXpBreakdown(signals)).toBe(15);
   });
 
   it('awards deep base plus optional bonuses', () => {

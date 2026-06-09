@@ -1,3 +1,4 @@
+import { briefPostPauseCheckInXpFromEvents } from '@/features/pause/domain/practice/brief-post-pause-check-in-xp';
 import { parseCompanionSlotFavoritesFromMetadata } from '@/features/pause/domain/companion/companion-slot-favorites-metadata';
 import { pauseInstanceHasBriefRitualTag } from '@/features/pause/domain/pause-state';
 import type { PauseStepType } from '@/features/pause/domain/pause-state';
@@ -77,6 +78,7 @@ export function computePracticeXpBreakdown(input: {
 
   if (isBrief) {
     out.base_brief = PRACTICE_XP_BRIEF_BASE;
+    out.post_pause_check_in = briefPostPauseCheckInXpFromEvents(scoped);
     return out;
   }
 
@@ -138,6 +140,7 @@ export function sumPracticeXpBreakdown(signals: PracticeXpBySignal): number {
     signals.companions +
     signals.companion_favorites +
     signals.breath_second +
-    signals.shift_mood
+    signals.shift_mood +
+    signals.post_pause_check_in
   );
 }

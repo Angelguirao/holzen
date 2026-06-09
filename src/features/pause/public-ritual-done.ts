@@ -10,3 +10,4 @@ export {
   usePauseBriefDoneCheckIn,
   type UsePauseBriefDoneCheckInParams,
 } from './presentation/ritual/done/use-pause-brief-done-check-in';
+export { usePauseDonePracticeXp } from './presentation/ritual/done/use-pause-done-practice-xp';
