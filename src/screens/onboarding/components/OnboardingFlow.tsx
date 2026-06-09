@@ -5,7 +5,6 @@ import {
   normalizeTrackedAssetId,
 } from '@/features/market/public';
 import { hasMinimumMotivations } from '@/features/user/domain/profile-motivations';
-import { trackOnboardingCompleted } from '@/features/pause/public-home';
 import { OnboardingAssetStep } from '@/screens/onboarding/components/OnboardingAssetStep';
 import { OnboardingSubscriptionStep } from '@/screens/onboarding/components/OnboardingSubscriptionStep';
 import { OnboardingThresholdStep } from '@/screens/onboarding/components/OnboardingThresholdStep';
@@ -25,7 +24,6 @@ interface Props {
   onSaveMotivations: (motivations: string[]) => Promise<void>;
   onSaveDraft: (draft: OnboardingDraft) => Promise<void>;
   onStartTrial: () => Promise<void>;
-  onComplete: () => Promise<void>;
   trialLoading: boolean;
 }
 
@@ -40,7 +38,6 @@ export function OnboardingFlow({
   onSaveMotivations,
   onSaveDraft,
   onStartTrial,
-  onComplete,
   trialLoading,
 }: Props) {
   "use memo";
@@ -97,18 +94,11 @@ export function OnboardingFlow({
         const draft = buildDraft();
         await onSaveDraft(draft);
         await onStartTrial();
-        await onComplete();
-        trackOnboardingCompleted({
-          stepsCompleted: TOTAL_STEPS,
-          trackedAssetId: draft.trackedAssetId,
-          thresholdUp: draft.threshold,
-          thresholdDown: draft.thresholdDown,
-        });
       } catch {
         // Profile writes and trial-start errors surface their own toast copy.
       }
     });
-  }, [buildDraft, onComplete, onSaveDraft, onStartTrial]);
+  }, [buildDraft, onSaveDraft, onStartTrial]);
 
   const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 

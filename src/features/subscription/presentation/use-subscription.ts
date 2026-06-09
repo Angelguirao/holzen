@@ -5,11 +5,14 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
 import {
   createCheckoutSession,
-  ensureTrialSubscription,
   openCustomerPortal,
 } from '../public-rpc';
 import { holzenLog } from '@/lib/holzen-console';
 import { getCheckoutSuppressionWindowMs } from '../application/checkout-suppression-window';
+import {
+  ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY,
+  TRIAL_CHECKOUT_STARTED_KEY,
+} from '../application/trial-checkout-flow';
 import {
   canEngagePauseFromEntitlement,
   deriveEntitlement,
@@ -92,6 +95,42 @@ export function useSubscription() {
     'pro' | 'flex_pack_s' | 'flex_pack_m' | null
   >(null);
   const lastLoggedSubRef = useRef<{ subscribed: boolean; monthlyRemaining: number | undefined } | null>(null);
+  const trialReturnHandledRef = useRef(false);
+
+  const handleTrialDenied = useCallback(
+    async (reason: EnsureTrialDenyReason) => {
+      if (!userId) return;
+      trackTrialDenied(reason as TrialDeniedReason);
+      subscriptionNextFetchMode = 'force';
+      subscriptionNextFetchSource = 'invalidate';
+      await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
+
+      if (reason === 'trial_already_used') {
+        toast.info(
+          t('home.subscription.trialAlreadyUsed', {
+            defaultValue: 'Your free trial has already been used. Subscribe to continue.',
+          }),
+        );
+        return;
+      }
+      if (reason === 'email_not_verified') {
+        toast.error(
+          t('home.subscription.trialEmailNotVerified', {
+            defaultValue: 'Confirm your email before starting your trial.',
+          }),
+        );
+        return;
+      }
+      if (reason === 'disposable_email') {
+        toast.error(
+          t('home.subscription.trialDisposableEmail', {
+            defaultValue: 'Use a permanent email address to start a trial.',
+          }),
+        );
+      }
+    },
+    [queryClient, t, userId],
+  );
 
   const query = useQuery({
     queryKey: userId != null ? subscriptionQueryKey(userId) : (['subscription', null] as const),
@@ -224,69 +263,68 @@ export function useSubscription() {
     });
   }, [t, startCheckoutTransition]);
 
-  const ensureTrial = useCallback((): Promise<void> => {
-    if (!userId) return Promise.resolve();
-    holzenLog.subscription('trial', { action: 'ensure' });
-    return new Promise((resolve, reject) => {
-      startTrialTransition(async () => {
-        try {
-          const { data, error } = await ensureTrialSubscription();
-          if (error) throw error;
+  const startTrialCheckout = useCallback(
+    (options?: { fromOnboarding?: boolean }): Promise<void> => {
+      if (!userId) return Promise.resolve();
+      holzenLog.subscription('trial', { action: 'checkout', fromOnboarding: options?.fromOnboarding === true });
+      return new Promise((resolve, reject) => {
+        startTrialTransition(async () => {
+          try {
+            if (options?.fromOnboarding) {
+              sessionStorage.setItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY, '1');
+            }
+            sessionStorage.setItem(TRIAL_CHECKOUT_STARTED_KEY, String(Date.now()));
 
-          if (data?.ok === false && data.reason) {
-            trackTrialDenied(data.reason as TrialDeniedReason);
-            subscriptionNextFetchMode = 'force';
-            subscriptionNextFetchSource = 'invalidate';
-            await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
+            const { data, error } = await createCheckoutSession({
+              checkoutKind: 'subscription',
+              trial: true,
+              trialReturnTo: options?.fromOnboarding ? 'onboarding' : 'home',
+            });
+            if (error) throw error;
 
-            const reason = data.reason as EnsureTrialDenyReason;
-            if (reason === 'trial_already_used') {
-              toast.info(
-                t('home.subscription.trialAlreadyUsed', {
-                  defaultValue: 'Your free trial has already been used. Subscribe to continue.',
-                }),
-              );
+            if (data?.trial_denied && data.reason) {
+              sessionStorage.removeItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
+              await handleTrialDenied(data.reason);
               resolve();
               return;
             }
-            if (reason === 'email_not_verified') {
-              toast.error(
-                t('home.subscription.trialEmailNotVerified', {
-                  defaultValue: 'Confirm your email before starting your trial.',
-                }),
-              );
-              reject(new Error(reason));
-              return;
-            }
-            if (reason === 'disposable_email') {
-              toast.error(
-                t('home.subscription.trialDisposableEmail', {
-                  defaultValue: 'Use a permanent email address to start a trial.',
-                }),
-              );
-              reject(new Error(reason));
-              return;
-            }
-          }
 
-          if (!data?.ok) throw new Error('Trial not started');
-          if (data.created) {
-            trackTrialStarted('ensure_trial');
+            if (data?.trial_already_active) {
+              sessionStorage.removeItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
+              subscriptionNextFetchMode = 'force';
+              subscriptionNextFetchSource = 'invalidate';
+              await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
+              resolve();
+              return;
+            }
+
+            if (!data?.url) throw new Error('Trial checkout did not return a link');
+
+            try {
+              if (window.self !== window.top && window.top) {
+                window.top.location.href = data.url;
+              } else {
+                window.location.href = data.url;
+              }
+            } catch {
+              window.location.href = data.url;
+            }
+          } catch (e) {
+            sessionStorage.removeItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
+            console.error('Trial checkout error:', e);
+            toast.error(
+              t('home.subscription.trialFailed', { defaultValue: 'Could not start trial. Try again.' }),
+            );
+            reject(e);
           }
-          subscriptionNextFetchMode = 'force';
-          subscriptionNextFetchSource = 'invalidate';
-          await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
-          resolve();
-        } catch (e) {
-          console.error('Trial error:', e);
-          toast.error(
-            t('home.subscription.trialFailed', { defaultValue: 'Could not start trial. Try again.' }),
-          );
-          reject(e);
-        }
+        });
       });
-    });
-  }, [userId, queryClient, t, startTrialTransition]);
+    },
+    [handleTrialDenied, queryClient, startTrialTransition, t, userId],
+  );
+
+  /** @deprecated alias — trial starts via Stripe Checkout (`startTrialCheckout`). */
+  const ensureTrial = startTrialCheckout;
 
   const openPortal = useCallback(() => {
     holzenLog.subscription('portal', { action: 'open' });
@@ -333,6 +371,41 @@ export function useSubscription() {
     holzenLog.subscription('manual_retry', { trigger: 'user_click' });
     return queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
   }, [userId, queryClient]);
+
+  useEffect(() => {
+    if (!userId || trialReturnHandledRef.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const result = params.get('trial_checkout');
+    if (!result) return;
+
+    const pendingOnboarding = sessionStorage.getItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
+    if (pendingOnboarding) return;
+
+    trialReturnHandledRef.current = true;
+    const url = new URL(window.location.href);
+    url.searchParams.delete('trial_checkout');
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+
+    if (result === 'cancelled') {
+      toast.info(
+        t('home.subscription.trialCheckoutCancelled', {
+          defaultValue: 'Trial setup was cancelled. You can try again when ready.',
+        }),
+      );
+      return;
+    }
+
+    if (result === 'success') {
+      void manualRetry().then(() => {
+        trackTrialStarted('trial_checkout');
+        toast.success(
+          t('home.subscription.trialStarted', {
+            defaultValue: 'Your free trial is active.',
+          }),
+        );
+      });
+    }
+  }, [manualRetry, t, userId]);
 
   /**
    * Optimistically decrement a feature counter (and/or flex credits) in the
@@ -387,6 +460,7 @@ export function useSubscription() {
       portalLoading: isPortalPending,
       checkoutLoadingTarget,
       startCheckout,
+      startTrialCheckout,
       ensureTrial,
       openPortal,
       refresh,
@@ -420,6 +494,7 @@ export function useSubscription() {
     portalLoading: isPortalPending,
     checkoutLoadingTarget,
     startCheckout,
+    startTrialCheckout,
     ensureTrial,
     openPortal,
     refresh,

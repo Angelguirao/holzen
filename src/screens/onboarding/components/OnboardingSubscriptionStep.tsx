@@ -76,7 +76,7 @@ export function OnboardingSubscriptionStep({
           asset: assetSymbol,
           threshold: threshold.toFixed(1),
           defaultValue:
-            'Start your {{days}}-day trial and Holzen will watch {{asset}} for moves of about +/-{{threshold}}%. No card required - cancel anytime before it ends.',
+            '$0 today. Add a card to start your {{days}}-day trial — Holzen will watch {{asset}} for moves of about +/-{{threshold}}%. We will not charge you when the trial ends.',
         })}
       </motion.p>
 
@@ -84,19 +84,20 @@ export function OnboardingSubscriptionStep({
         <LoadingButton
           onClick={onStartTrial}
           loading={trialLoading}
-          loadingText={t('onboarding.ready.startingTrial', { defaultValue: 'Starting trial...' })}
+          loadingText={t('onboarding.ready.startingTrial', { defaultValue: 'Opening checkout…' })}
           className="h-10 w-full gap-2 font-mono text-xs"
         >
           <Sparkles className="h-3 w-3" />
-          {t('onboarding.ready.startTrialNoCard', {
+          {t('onboarding.ready.startTrialWithCard', {
             days: PRICING.trialDays,
             defaultValue: 'Start {{days}}-day free trial',
           })}
         </LoadingButton>
         <p className="text-center text-[10px] font-mono text-muted-foreground/40">
-          {t('onboarding.ready.trialFinePrintNoCard', {
+          {t('onboarding.ready.trialFinePrintCard', {
             price: PRICING.monthlyPrice,
-            defaultValue: 'Then ${{price}}/mo if you keep going · Cancel anytime',
+            defaultValue:
+              '$0 today · Card required · No charge at trial end · Subscribe anytime at ${{price}}/mo',
           })}
         </p>
       </motion.div>

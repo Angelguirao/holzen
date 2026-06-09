@@ -25,7 +25,10 @@ const DISPOSABLE_EMAIL_DOMAINS = new Set([
 export type TrialDenyReason =
   | "trial_already_used"
   | "email_not_verified"
-  | "disposable_email";
+  | "disposable_email"
+  | "checkout_required";
+
+export const TRIAL_PERIOD_DAYS = 7;
 
 /** Normalize inbox identity so Gmail +alias and dot variants collide. */
 export function normalizeEmailForTrialFingerprint(email: string): string {
@@ -100,6 +103,34 @@ export async function findFingerprintOwner(
   if (error) throw error;
   const id = data?.user_id;
   return typeof id === "string" && id.length > 0 ? id : null;
+}
+
+export async function findPaymentMethodFingerprintOwner(
+  svcClient: SupabaseClient,
+  fingerprint: string,
+): Promise<string | null> {
+  const { data, error } = await svcClient
+    .from("trial_payment_method_fingerprints")
+    .select("user_id")
+    .eq("payment_method_fingerprint", fingerprint)
+    .maybeSingle();
+  if (error) throw error;
+  const id = data?.user_id;
+  return typeof id === "string" && id.length > 0 ? id : null;
+}
+
+export async function markPaymentMethodFingerprint(
+  svcClient: SupabaseClient,
+  userId: string,
+  fingerprint: string,
+): Promise<void> {
+  const { error } = await svcClient
+    .from("trial_payment_method_fingerprints")
+    .upsert(
+      { payment_method_fingerprint: fingerprint, user_id: userId },
+      { onConflict: "payment_method_fingerprint", ignoreDuplicates: true },
+    );
+  if (error) throw error;
 }
 
 /** Idempotent: records trial consumption for this user + normalized email fingerprint. */

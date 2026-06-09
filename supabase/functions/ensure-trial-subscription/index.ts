@@ -2,11 +2,9 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
-import { syncProfileFromStripeSubscription } from "../_shared/subscription-profile-sync.ts";
 import {
   assertTrialEligible,
   isEmailVerified,
-  markTrialConsumed,
   type TrialDenyReason,
 } from "../_shared/trial-eligibility.ts";
 
@@ -15,8 +13,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
-
-const TRIAL_DAYS = 7;
 
 function jsonResponse(body: Record<string, unknown>, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -52,9 +48,6 @@ serve(
       const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
       if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
 
-      const priceIdPro = Deno.env.get("STRIPE_PRICE_ID_PRO");
-      if (!priceIdPro) throw new Error("Missing STRIPE_PRICE_ID_PRO");
-
       const token = authHeader.replace("Bearer ", "");
       const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
       const user = userData.user;
@@ -75,20 +68,15 @@ serve(
       const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
       const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-      let customerId = customers.data[0]?.id;
-      if (!customerId) {
-        const created = await stripe.customers.create({
-          email: user.email,
-          metadata: { user_id: user.id },
-        });
-        customerId = created.id;
-      }
+      const customerId = customers.data[0]?.id;
 
-      const existing = await stripe.subscriptions.list({
-        customer: customerId,
-        status: "all",
-        limit: 20,
-      });
+      const existing = customerId
+        ? await stripe.subscriptions.list({
+            customer: customerId,
+            status: "all",
+            limit: 20,
+          })
+        : { data: [] as Stripe.Subscription[] };
 
       const current = existing.data.find((s: Stripe.Subscription) =>
         s.status === "trialing" || s.status === "active"
@@ -117,36 +105,12 @@ serve(
         return denyTrial(eligibility.reason, log);
       }
 
-      const subscription = await stripe.subscriptions.create({
-        customer: customerId,
-        items: [{ price: priceIdPro }],
-        trial_period_days: TRIAL_DAYS,
-        trial_settings: {
-          end_behavior: {
-            missing_payment_method: "cancel",
-          },
-        },
-        metadata: { user_id: user.id, plan_tier: "pro", source: "ensure_trial" },
-      });
-
-      await markTrialConsumed(serviceClient, user.id, user.email);
-      await syncProfileFromStripeSubscription(
-        serviceClient,
-        user.id,
-        subscription,
-        priceIdPro,
-      );
-
-      log("trial_created", { subscription_id: subscription.id, status: subscription.status });
-
+      log("trial_checkout_required", { user_id: user.id });
       return jsonResponse({
-        ok: true,
-        created: true,
+        ok: false,
+        created: false,
         trial_eligible: true,
-        subscription_status: subscription.status,
-        trial_end: subscription.trial_end
-          ? new Date(subscription.trial_end * 1000).toISOString()
-          : null,
+        reason: "checkout_required",
       });
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
