@@ -65,6 +65,7 @@ export type HomePauseWidgetActionHandlers = {
   autoCooldownRemaining: () => number;
   nextCronCheckIn: () => number;
   manualCooldownRemaining: () => number;
+  resyncOpenPauseFromDb: () => void | Promise<void>;
   welcomeBackOpen: boolean;
   setWelcomeBackOpen: (open: boolean) => void;
   welcomeBackHandlers: {

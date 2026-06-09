@@ -19,6 +19,7 @@ import { useHomePauseWidgetCooldownClock } from '@/features/pause/presentation/h
 import { useHomePauseRecentContextLost } from '@/features/pause/presentation/home/use-home-pause-recent-context-lost';
 import { useHomePauseWidgetSurfaceTransition } from '@/features/pause/presentation/home/use-home-pause-widget-surface-transition';
 import { useHomeCronCalmSweepOnce } from '@/features/pause/presentation/home/use-home-cron-calm-sweep-once';
+import { useHomeOpenMaxExpireOnce } from '@/features/pause/presentation/home/use-home-open-max-expire-once';
 
 export type {
   HomePauseWidgetBodyProjection,
@@ -42,9 +43,31 @@ export function useHomePauseWidgetProjection(
   const userId = user?.id;
   const { pending } = usePendingPauseOffer();
 
+  const openPauseOpenMaxAnchorAt = resolveHomePauseWidgetOpenMaxAnchorAt({
+    openPauseState: ctx.openPauseState,
+    openPauseSource: ctx.openPauseSource,
+    openPauseEngagedAt: ctx.openPauseEngagedAt,
+    openPauseCreatedAt: ctx.openPauseCreatedAt,
+    openPauseMetadata: ctx.openPauseMetadata,
+  });
+
+  const { openPauseOpenMaxExpired } = useHomeOpenMaxExpireOnce({
+    userId,
+    openPauseInstanceId: ctx.lastPauseInstanceId,
+    openPauseState: ctx.openPauseState,
+    openPauseSource: ctx.openPauseSource,
+    openPauseEngagedAt: ctx.openPauseEngagedAt,
+    openPauseCreatedAt: ctx.openPauseCreatedAt,
+    openPauseMetadata: ctx.openPauseMetadata,
+    openPauseOpenMaxAnchorAt,
+    resyncOpenPauseFromDb: ctx.resyncOpenPauseFromDb,
+  });
+
+  const hasOpenPauseForWidget = ctx.hasOpenPause && !openPauseOpenMaxExpired;
+
   useHomePauseRecentContextLost({
     userId,
-    hasOpenPause: ctx.hasOpenPause,
+    hasOpenPause: hasOpenPauseForWidget,
   });
 
   const manualCooldownRemainingMs = useHomePauseWidgetCooldownClock(ctx.manualCooldownRemaining);
@@ -52,7 +75,7 @@ export function useHomePauseWidgetProjection(
   const { userExpanded, setUserExpanded, postManualCooldownIdle } =
     useHomePauseWidgetCollapsePreference({
       userId,
-      hasOpenPause: ctx.hasOpenPause,
+      hasOpenPause: hasOpenPauseForWidget,
       loading: ctx.loading,
       manualCooldownRemainingMs,
     });
@@ -68,8 +91,8 @@ export function useHomePauseWidgetProjection(
       resolveHomePauseWidgetSurface({
         loading: ctx.loading,
         blockingError,
-        hasOpenPause: ctx.hasOpenPause,
-        openPauseState: ctx.openPauseState,
+        hasOpenPause: hasOpenPauseForWidget,
+        openPauseState: openPauseOpenMaxExpired ? null : ctx.openPauseState,
         hasReflectionStep: ctx.hasReflectionStep,
         reflectionMessage: ctx.reflectionMessage,
         trackedAssetSymbol: assetSymbol,
@@ -82,8 +105,9 @@ export function useHomePauseWidgetProjection(
     [
       ctx.loading,
       blockingError,
-      ctx.hasOpenPause,
+      hasOpenPauseForWidget,
       ctx.openPauseState,
+      openPauseOpenMaxExpired,
       ctx.hasReflectionStep,
       ctx.reflectionMessage,
       assetSymbol,
@@ -166,14 +190,7 @@ export function useHomePauseWidgetProjection(
     openPauseMetadata: ctx.openPauseMetadata,
     marketData: ctx.marketData,
     engagedPauseMarketSettled,
-  });
-
-  const openPauseOpenMaxAnchorAt = resolveHomePauseWidgetOpenMaxAnchorAt({
-    openPauseState: ctx.openPauseState,
-    openPauseSource: ctx.openPauseSource,
-    openPauseEngagedAt: ctx.openPauseEngagedAt,
-    openPauseCreatedAt: ctx.openPauseCreatedAt,
-    openPauseMetadata: ctx.openPauseMetadata,
+    resyncOpenPauseFromDb: ctx.resyncOpenPauseFromDb,
   });
 
   const chromeAndBody = assembleHomePauseWidgetProjection({
