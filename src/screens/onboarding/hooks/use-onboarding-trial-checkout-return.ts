@@ -1,0 +1,92 @@
+import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { trackOnboardingCompleted } from '@/features/pause/public-home';
+import {
+  ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY,
+} from '@/features/subscription/application/trial-checkout-flow';
+import {
+  trackTrialStarted,
+} from '@/features/subscription/application/paywall-telemetry';
+
+type Args = {
+  userId: string | null;
+  profileLoaded: boolean;
+  trackedAssetId: string;
+  threshold: number;
+  completeOnboarding: () => Promise<void>;
+  refreshSubscription: () => Promise<unknown>;
+};
+
+/** Finishes onboarding after Stripe trial Checkout returns to `/onboarding?trial_checkout=success`. */
+export function useOnboardingTrialCheckoutReturn({
+  userId,
+  profileLoaded,
+  trackedAssetId,
+  threshold,
+  completeOnboarding,
+  refreshSubscription,
+}: Args) {
+  const { t } = useTranslation();
+  const handledRef = useRef(false);
+
+  useEffect(() => {
+    if (!userId || !profileLoaded || handledRef.current) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const result = params.get('trial_checkout');
+    if (!result) return;
+
+    const pending = sessionStorage.getItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
+    if (!pending) return;
+
+    handledRef.current = true;
+    sessionStorage.removeItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete('trial_checkout');
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+
+    if (result === 'cancelled') {
+      toast.info(
+        t('home.subscription.trialCheckoutCancelled', {
+          defaultValue: 'Trial setup was cancelled. You can try again when ready.',
+        }),
+      );
+      return;
+    }
+
+    if (result !== 'success') return;
+
+    void (async () => {
+      try {
+        await refreshSubscription();
+        await completeOnboarding();
+        trackTrialStarted('trial_checkout');
+        trackOnboardingCompleted({
+          stepsCompleted: 4,
+          trackedAssetId,
+          thresholdUp: threshold,
+          thresholdDown: threshold,
+        });
+        toast.success(
+          t('home.subscription.trialStarted', {
+            defaultValue: 'Your free trial is active.',
+          }),
+        );
+      } catch {
+        toast.error(
+          t('home.subscription.trialFailed', { defaultValue: 'Could not start trial. Try again.' }),
+        );
+      }
+    })();
+  }, [
+    completeOnboarding,
+    profileLoaded,
+    refreshSubscription,
+    t,
+    threshold,
+    trackedAssetId,
+    userId,
+  ]);
+}

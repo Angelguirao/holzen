@@ -8,11 +8,12 @@ vi.mock('framer-motion', async () => {
   return { ...actual, useReducedMotion: () => true };
 });
 
-const ensureTrial = vi.fn().mockResolvedValue(undefined);
+const startTrialCheckout = vi.fn().mockResolvedValue(undefined);
 
 vi.mock('@/features/subscription/public-hooks', () => ({
   useSubscription: () => ({
-    ensureTrial,
+    startTrialCheckout,
+    ensureTrial: startTrialCheckout,
     trialLoading: false,
     checkoutLoading: false,
     startCheckout: vi.fn(),
@@ -23,13 +24,12 @@ import { OnboardingFlow } from '@/screens/onboarding/components/OnboardingFlow';
 
 describe('F1 — Sign up → onboard → trial', () => {
   beforeEach(() => {
-    ensureTrial.mockClear();
+    startTrialCheckout.mockClear();
   });
 
-  it('runs the 4-step flow and calls ensureTrial after saving the draft', async () => {
+  it('runs the 4-step flow and opens trial Checkout after saving the draft', async () => {
     const onSaveMotivations = vi.fn().mockResolvedValue(undefined);
     const onSaveDraft = vi.fn().mockResolvedValue(undefined);
-    const onComplete = vi.fn().mockResolvedValue(undefined);
     render(
       <QueryClientProvider client={new QueryClient()}>
         <OnboardingFlow
@@ -38,8 +38,7 @@ describe('F1 — Sign up → onboard → trial', () => {
           initialThreshold={5}
           onSaveMotivations={onSaveMotivations}
           onSaveDraft={onSaveDraft}
-          onStartTrial={ensureTrial}
-          onComplete={onComplete}
+          onStartTrial={startTrialCheckout}
           trialLoading={false}
         />
       </QueryClientProvider>,
@@ -64,8 +63,7 @@ describe('F1 — Sign up → onboard → trial', () => {
 
     await waitFor(() => {
       expect(onSaveDraft).toHaveBeenCalledTimes(1);
-      expect(ensureTrial).toHaveBeenCalledTimes(1);
-      expect(onComplete).toHaveBeenCalledTimes(1);
+      expect(startTrialCheckout).toHaveBeenCalledTimes(1);
     });
     expect(onSaveDraft).toHaveBeenCalledWith({
       trackedAssetId: 'bitcoin',

@@ -1,17 +1,30 @@
+import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { OnboardingFlow } from '@/screens/onboarding/components/OnboardingFlow';
+import { useOnboardingTrialCheckoutReturn } from '@/screens/onboarding/hooks/use-onboarding-trial-checkout-return';
 
 const OnboardingScreen = () => {
+  const { user } = useAuth();
   const {
     motivations,
     threshold,
     trackedAssetId,
+    profileLoaded,
     setMotivations,
     saveOnboardingDraft,
     completeOnboarding,
   } = useProfile();
-  const { ensureTrial, trialLoading } = useSubscription();
+  const { startTrialCheckout, trialLoading, manualRetry } = useSubscription();
+
+  useOnboardingTrialCheckoutReturn({
+    userId: user?.id ?? null,
+    profileLoaded,
+    trackedAssetId,
+    threshold,
+    completeOnboarding,
+    refreshSubscription: manualRetry,
+  });
 
   return (
     <OnboardingFlow
@@ -20,8 +33,7 @@ const OnboardingScreen = () => {
       initialThreshold={threshold}
       onSaveMotivations={setMotivations}
       onSaveDraft={saveOnboardingDraft}
-      onStartTrial={ensureTrial}
-      onComplete={completeOnboarding}
+      onStartTrial={() => startTrialCheckout({ fromOnboarding: true })}
       trialLoading={trialLoading}
     />
   );

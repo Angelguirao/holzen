@@ -3,7 +3,7 @@ import type { SubscriptionBillingInterval } from '../domain/subscription-snapsho
 
 export type PaywallViewedSource = 'feature-gate' | 'limit-hit' | 'settings';
 export type PaywallSubscribedPlan = 'monthly' | 'yearly' | 'unknown';
-export type TrialStartedSource = 'ensure_trial';
+export type TrialStartedSource = 'ensure_trial' | 'trial_checkout';
 
 /** Paywall UI impression (taxonomy: paywall.viewed). */
 export function trackPaywallViewed(source: PaywallViewedSource): void {
@@ -40,7 +40,11 @@ export function trackTrialStarted(source: TrialStartedSource): void {
   }
 }
 
-export type TrialDeniedReason = 'trial_already_used' | 'email_not_verified' | 'disposable_email';
+export type TrialDeniedReason =
+  | 'trial_already_used'
+  | 'email_not_verified'
+  | 'disposable_email'
+  | 'checkout_required';
 
 /** Server rejected trial start (abuse guard or verification). */
 export function trackTrialDenied(reason: TrialDeniedReason): void {

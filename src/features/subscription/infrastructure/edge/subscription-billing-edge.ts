@@ -5,14 +5,24 @@ export type CreateCheckoutBody =
   | {
       checkoutKind: 'subscription';
       reactivation?: boolean;
+      trial?: boolean;
+      /** Where Stripe sends the user after trial Checkout (`onboarding` default). */
+      trialReturnTo?: 'onboarding' | 'home';
     };
 
-export type CreateCheckoutResponse = { url?: string };
+export type CreateCheckoutResponse = {
+  url?: string;
+  trial_denied?: boolean;
+  reason?: EnsureTrialDenyReason;
+  trial_already_active?: boolean;
+  subscription_status?: string;
+};
 
 export type EnsureTrialDenyReason =
   | 'trial_already_used'
   | 'email_not_verified'
-  | 'disposable_email';
+  | 'disposable_email'
+  | 'checkout_required';
 
 export type EnsureTrialSubscriptionResponse = {
   ok?: boolean;
