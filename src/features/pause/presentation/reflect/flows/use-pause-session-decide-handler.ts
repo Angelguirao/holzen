@@ -94,7 +94,7 @@ export function usePauseSessionDecideHandler(
         }
 
         if (flow.kind === 'abort_not_completed') {
-          invalidatePauseStatsDataForUser(user?.id);
+          invalidatePauseStatsDataForUser(user?.id, { pauseInstanceId });
           showPauseOutcomeNotCompletedToast(t);
           void refreshSubscription();
           return;

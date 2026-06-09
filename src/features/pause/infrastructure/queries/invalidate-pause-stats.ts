@@ -6,13 +6,22 @@ import { pendingPauseOfferQueryKey } from '@/features/pause/infrastructure/queri
 import { HOLZEN_NUMBER_QUERY_KEY } from '@/features/user/infrastructure/queries/holzen-number-query';
 import { getHolzenQueryClient } from '../holzen-query-client-ref';
 import { archivePausesTabHasRowsQueryPrefix } from '@/features/pause/infrastructure/queries/archive/archive-pauses-tab-keys';
+import { pauseInstancePracticeXpQueryKey } from './pause-instance-practice-xp-query';
+
+export type InvalidatePauseStatsOptions = {
+  /** When set, also refreshes Done `practice_xp_awarded` for this pause instance. */
+  pauseInstanceId?: string | null;
+};
 
 /**
  * Call after a pause reaches `completed` (or practice XP is recomputed) so Home,
- * Journey overview, Archive lists, pending offer, current open pause, and the
- * public “paused today” aggregate stay fresh.
+ * Journey overview, Archive lists, pending offer, current open pause, Done Presence row,
+ * and the public “paused today” aggregate stay fresh.
  */
-export function invalidatePauseStatsDataForUser(userId: string | null | undefined): void {
+export function invalidatePauseStatsDataForUser(
+  userId: string | null | undefined,
+  options?: InvalidatePauseStatsOptions,
+): void {
   if (!userId) return;
   const qc = getHolzenQueryClient();
   if (!qc) return;
@@ -23,4 +32,9 @@ export function invalidatePauseStatsDataForUser(userId: string | null | undefine
   void qc.invalidateQueries({ queryKey: pauseArchiveListQueryPrefix(userId) });
   void qc.invalidateQueries({ queryKey: pendingPauseOfferQueryKey(userId) });
   void qc.invalidateQueries({ queryKey: currentPauseQueryKey(userId) });
+
+  const pauseInstanceId = options?.pauseInstanceId;
+  if (pauseInstanceId) {
+    void qc.invalidateQueries({ queryKey: pauseInstancePracticeXpQueryKey(pauseInstanceId) });
+  }
 }

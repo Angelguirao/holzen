@@ -170,7 +170,9 @@ describe('usePauseSessionDecideHandler', () => {
       await result.current.handleDecide('hold');
     });
     expect(showPauseOutcomeNotCompletedToast).toHaveBeenCalledWith(t);
-    expect(invalidatePauseStatsMock).toHaveBeenCalledWith('user-decide-handler-test');
+    expect(invalidatePauseStatsMock).toHaveBeenCalledWith('user-decide-handler-test', {
+      pauseInstanceId: 'pi-1',
+    });
     expect(input.refreshSubscription).toHaveBeenCalled();
     expect(input.setDecision).not.toHaveBeenCalled();
     expect(clearSessionMock).not.toHaveBeenCalled();

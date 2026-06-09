@@ -22,7 +22,6 @@ export function PauseDoneBrief({ decision, pauseData, pauseInstanceId, onSaveToJ
   "use memo";
   const { t } = useTranslation();
   const { subscribed } = useSubscription();
-  const refetchPracticeXpRef = useRef<(() => void) | null>(null);
   const {
     briefDoneMood,
     setBriefDoneMood,
@@ -39,19 +38,9 @@ export function PauseDoneBrief({ decision, pauseData, pauseInstanceId, onSaveToJ
     pauseInstanceId,
     pauseData,
     onSaveToJourney,
-    onPostPauseCheckInLogged: () => {
-      void refetchPracticeXpRef.current?.();
-    },
     t,
   });
-  const { presenceXp, refetchPracticeXp } = usePauseDonePracticeXp(
-    pauseInstanceId,
-    pauseData,
-    postCheckInXpBonus,
-  );
-  refetchPracticeXpRef.current = () => {
-    void refetchPracticeXp();
-  };
+  const { presenceXp } = usePauseDonePracticeXp(pauseInstanceId, pauseData, postCheckInXpBonus);
 
   const wallpaperMood = resolveDoneWallpaperMood(
     savedEndedFeel

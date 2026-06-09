@@ -1,6 +1,6 @@
 # Stats System
 
-> **Pause-first shipped (2026-06):** **Practice Presence XP** (lifetime total, per-pause awards, Journey breakdown) — see [**Pause-first MVP — Practice Presence XP**](#pause-first-mvp--practice-presence-xp) below. Surfaces: Home `journey-pulse` glimpse, Journey overview; Done shows a **session summary card** with a **client-side XP estimate** (not the lifetime ledger).
+> **Pause-first shipped (2026-06):** **Practice Presence XP** (lifetime total, per-pause awards, Journey breakdown) — see [**Pause-first MVP — Practice Presence XP**](#pause-first-mvp--practice-presence-xp) below. Surfaces: Home `journey-pulse` glimpse, Journey overview; Done shows a **session summary card** preferring `practice_xp_awarded` with client estimate fallback.
 >
 > **Not shipped in pause-first:** Holzen Score ring, five skills, Profile → Stats tab, badges alignment scoring — reference `src/legacy/full-shell/` or tag `full-ia-pre-strip`. Manifest: [active-surface.md](../ops/active-surface.md).
 
@@ -26,7 +26,7 @@ Migrations: `20260601120000_pause_practice_xp_persistence.sql`, `20260602120000_
 
 **Completion contract (`volatility_v1`):** `outcome_logged` is accepted only when ritual beats are met (`pause_volatility_v1_ritual_beats_met`). Postgres `completed` requires both outcome and beats. Brief: Feel + unskipped Breathe + Decide. Deep: Feel + Breathe₁ + Reflect + Frame (`shift_emotion_logged`) + Breathe₂ + Decide (second breath may be skipped in UI but must log segment 2).
 
-**Client parity reference (must match SQL when weights change):** `src/features/pause/domain/practice/compute-practice-xp-breakdown.ts`, `practice-xp-constants.ts` (Vitest). Done summary uses `estimatePresenceXpFromImpact` (`src/features/pause/domain/done/estimate-presence-xp-from-impact.ts`) — same weights, hydrated from Query cache at decide time; authoritative award remains `pause_finalize_practice_xp`.
+**Client parity reference (must match SQL when weights change):** `src/features/pause/domain/practice/compute-practice-xp-breakdown.ts`, `practice-xp-constants.ts` (Vitest). Done summary reads `practice_xp_awarded` via `usePauseDonePracticeXp`; falls back to `estimatePresenceXpFromImpact` until the row is available. Authoritative award remains `pause_finalize_practice_xp`. Invalidate: `invalidatePauseStatsDataForUser(userId, { pauseInstanceId })` after completion / post-check-in.
 
 ### Formula per completed pause (v2)
 

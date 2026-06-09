@@ -30,16 +30,14 @@ export function PauseDoneReflectShareRow({
   const { t } = useTranslation();
   const msg = (reflectionMessage ?? '').trim();
   const { onShareMenuOpen, onWallpaperTap } = usePauseReflectUiTelemetry(pauseInstanceId, 'pause_done');
-  const { shareImage } = useReflectionShareHandlers({ message: msg, context, haiku, wallpaperMood, t });
+  const shareHandlers = useReflectionShareHandlers({ message: msg, context, haiku, wallpaperMood, t });
 
   if (!subscribed || !msg) return null;
 
   return (
     <div className="flex w-full max-w-md flex-wrap items-center justify-center gap-3 pt-2">
       <ShareReflection
-        message={msg}
-        context={context ?? null}
-        haiku={haiku ?? null}
+        {...shareHandlers}
         onMenuOpen={onShareMenuOpen}
         triggerClassName={DONE_SHARE_PILL_CLASS}
         triggerLabel={t('pause.reflect.shareCta')}
@@ -51,7 +49,7 @@ export function PauseDoneReflectShareRow({
         className={DONE_SHARE_PILL_CLASS}
         onClick={() => {
           onWallpaperTap();
-          void shareImage();
+          void shareHandlers.shareImage();
         }}
       >
         <Image className="h-3.5 w-3.5" aria-hidden />
