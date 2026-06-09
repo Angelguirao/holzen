@@ -181,6 +181,12 @@ serve(
               source: "trial_checkout",
             },
           },
+          setup_intent_data: {
+            metadata: {
+              holzen_trial: TRIAL_CHECKOUT_METADATA,
+              user_id: user.id,
+            },
+          },
         });
 
         log("trial_checkout_session_created", {
