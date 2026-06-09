@@ -60,7 +60,7 @@ The Archive tab uses route `/archive` and reports `tab: 'archive'`.
 | Event | When | Properties | Owner |
 |---|---|---|---|
 | `trial.started` | Stripe trial subscription created via trial Checkout or legacy ensure path | `{ source: 'trial_checkout' \| 'ensure_trial' }` | @holzen |
-| `trial.denied` | Server rejected trial start (one-trial guard, unverified email, disposable domain) | `{ reason: 'trial_already_used' \| 'email_not_verified' \| 'disposable_email' }` | @holzen |
+| `trial.denied` | Server rejected trial start (one-trial guard, unverified email, disposable domain, prepaid card on trial Checkout, card fingerprint reuse) | `{ reason: 'trial_already_used' \| 'email_not_verified' \| 'disposable_email' \| 'trial_card_not_accepted' }` | @holzen |
 | `trial.expired` | Client entitlement transitions to `lapsed` (trial ended without active paid sub) | `{}` | @holzen |
 
 ### journey

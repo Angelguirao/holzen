@@ -331,6 +331,7 @@
       "trialDisposableEmail": "Use a permanent email address to start a trial.",
       "trialCheckoutCancelled": "Trial setup was cancelled. You can try again when ready.",
       "trialStarted": "Your free trial is active.",
+      "trialCardNotAccepted": "We could not start your trial with this card. Free trials require a standard debit or credit card — prepaid and virtual cards are not supported.",
       "pricePerMonth": "${{price}} per month · Cancel anytime",
       "openingCheckout": "Opening checkout…",
       "checkoutFailed": "Checkout could not be started. Check your connection and try again.",
@@ -821,7 +822,7 @@
       "startTrialNoCard": "Start {{days}}-day free trial",
       "startTrialWithCard": "Start {{days}}-day free trial",
       "trialFinePrintNoCard": "Then ${{price}}/mo if you keep going · Cancel anytime",
-      "trialFinePrintCard": "$0 today · Card required · No charge at trial end · Subscribe anytime at ${{price}}/mo"
+      "trialFinePrintCard": "$0 today · Standard debit/credit only · No prepaid · No charge at trial end · Subscribe anytime at ${{price}}/mo"
     },
     "groundingAddMore": "Add another",
     "groundingPlaceholder": "e.g. Walk outside without checking price",

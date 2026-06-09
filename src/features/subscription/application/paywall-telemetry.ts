@@ -44,7 +44,8 @@ export type TrialDeniedReason =
   | 'trial_already_used'
   | 'email_not_verified'
   | 'disposable_email'
-  | 'checkout_required';
+  | 'checkout_required'
+  | 'trial_card_not_accepted';
 
 /** Server rejected trial start (abuse guard or verification). */
 export function trackTrialDenied(reason: TrialDeniedReason): void {

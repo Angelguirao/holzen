@@ -12,19 +12,34 @@ export const TRIAL_CHECKOUT_METADATA = "true";
 
 type EdgeLog = ReturnType<typeof createLogger>;
 
-export type TrialCheckoutFinalizeResult = "ok" | "card_already_used";
+export type TrialCheckoutFinalizeResult = "ok" | "card_already_used" | "prepaid_not_allowed";
 
-async function resolveDefaultPaymentMethodFingerprint(
+type ResolvedTrialPaymentMethod = {
+  fingerprint: string | null;
+  funding: string | null;
+};
+
+async function resolveDefaultTrialPaymentMethod(
   stripe: Stripe,
   sub: Stripe.Subscription,
-): Promise<string | null> {
+): Promise<ResolvedTrialPaymentMethod> {
   const raw = sub.default_payment_method;
   const paymentMethodId = typeof raw === "string" ? raw : raw?.id;
-  if (!paymentMethodId) return null;
+  if (!paymentMethodId) return { fingerprint: null, funding: null };
 
   const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
   const fingerprint = paymentMethod.card?.fingerprint;
-  return typeof fingerprint === "string" && fingerprint.length > 0 ? fingerprint : null;
+  return {
+    fingerprint: typeof fingerprint === "string" && fingerprint.length > 0 ? fingerprint : null,
+    funding: paymentMethod.card?.funding ?? null,
+  };
+}
+
+async function cancelTrialSubscription(
+  stripe: Stripe,
+  subId: string,
+): Promise<void> {
+  await stripe.subscriptions.cancel(subId);
 }
 
 /** Trial checkout: bind card fingerprint, cancel at trial end (no auto-charge), sync profile. */
@@ -39,7 +54,18 @@ export async function finalizeTrialCheckoutSubscription(args: {
 }): Promise<TrialCheckoutFinalizeResult> {
   const { stripe, svcClient, sub, userId, email, proPriceId, log } = args;
 
-  const cardFingerprint = await resolveDefaultPaymentMethodFingerprint(stripe, sub);
+  const paymentMethod = await resolveDefaultTrialPaymentMethod(stripe, sub);
+  const cardFingerprint = paymentMethod.fingerprint;
+
+  if (paymentMethod.funding === "prepaid") {
+    log.warn("trial_checkout_prepaid_rejected", {
+      user_id: userId,
+      subscription_id: sub.id,
+    });
+    await cancelTrialSubscription(stripe, sub.id);
+    return "prepaid_not_allowed";
+  }
+
   if (cardFingerprint) {
     const owner = await findPaymentMethodFingerprintOwner(svcClient, cardFingerprint);
     if (owner && owner !== userId) {
@@ -48,7 +74,7 @@ export async function finalizeTrialCheckoutSubscription(args: {
         existing_user_id: owner,
         subscription_id: sub.id,
       });
-      await stripe.subscriptions.cancel(sub.id);
+      await cancelTrialSubscription(stripe, sub.id);
       return "card_already_used";
     }
   }

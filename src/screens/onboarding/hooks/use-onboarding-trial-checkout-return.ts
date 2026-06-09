@@ -6,8 +6,10 @@ import {
   ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY,
 } from '@/features/subscription/application/trial-checkout-flow';
 import {
+  trackTrialDenied,
   trackTrialStarted,
 } from '@/features/subscription/application/paywall-telemetry';
+import { fetchTrialCheckoutGrantStatus } from '@/features/subscription/application/trial-checkout-grant';
 
 type Args = {
   userId: string | null;
@@ -61,6 +63,17 @@ export function useOnboardingTrialCheckoutReturn({
     void (async () => {
       try {
         await refreshSubscription();
+        const granted = userId ? await fetchTrialCheckoutGrantStatus(userId) : false;
+        if (!granted) {
+          trackTrialDenied('trial_card_not_accepted');
+          toast.error(
+            t('home.subscription.trialCardNotAccepted', {
+              defaultValue:
+                'We could not start your trial with this card. Free trials require a standard debit or credit card — prepaid and virtual cards are not supported.',
+            }),
+          );
+          return;
+        }
         await completeOnboarding();
         trackTrialStarted('trial_checkout');
         trackOnboardingCompleted({
