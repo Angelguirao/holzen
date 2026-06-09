@@ -3,7 +3,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { MarketQuote } from '@/features/market/domain/market-quote';
 import { parsePauseCalmSettledAt } from '@/features/pause/domain/pause-open-max-anchor';
 import { runPauseApplyCronCalmSweepForSelf } from '@/features/pause/application/use-cases/home/run-pause-apply-cron-calm-sweep-for-self';
-import { usePauseHomeContext } from '@/features/pause/public-home';
 import { pendingPauseOfferQueryKey } from '@/features/pause/presentation/reflect/pending-offer/use-pending-pause-offer';
 
 type Input = {
@@ -14,6 +13,7 @@ type Input = {
   openPauseMetadata: Record<string, unknown> | null;
   marketData: MarketQuote | null;
   engagedPauseMarketSettled: boolean;
+  resyncOpenPauseFromDb: () => void | Promise<void>;
 };
 
 /**
@@ -22,7 +22,6 @@ type Input = {
  */
 export function useHomeCronCalmSweepOnce(input: Input): void {
   const queryClient = useQueryClient();
-  const { resyncOpenPauseFromDb } = usePauseHomeContext();
   const attemptedKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -53,7 +52,7 @@ export function useHomeCronCalmSweepOnce(input: Input): void {
     })
       .then((result) => {
         if (cancelled || !result.applied) return;
-        void resyncOpenPauseFromDb();
+        void input.resyncOpenPauseFromDb();
         void queryClient.invalidateQueries({ queryKey: pendingPauseOfferQueryKey(userId) });
       })
       .catch(() => {
@@ -72,6 +71,5 @@ export function useHomeCronCalmSweepOnce(input: Input): void {
     input.marketData,
     input.engagedPauseMarketSettled,
     queryClient,
-    resyncOpenPauseFromDb,
   ]);
 }

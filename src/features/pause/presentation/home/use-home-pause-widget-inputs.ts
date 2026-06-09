@@ -4,7 +4,7 @@ import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
 import { getHomeSubscriptionGate } from '@/features/subscription/public';
 import { useSubscription } from '@/features/subscription/public-hooks';
-import { usePauseHomeContext } from '@/features/pause/public-home';
+import { usePauseHomeContext } from '@/features/pause/presentation/home/pause-home-context';
 import { useCompletedPauseCount } from '@/features/pause/presentation/home/use-completed-pause-count';
 import { useHomePauseActions } from '@/features/pause/presentation/home/use-home-pause-actions';
 import { useHomePendingPauseOfferActions } from '@/features/pause/presentation/home/use-home-pending-pause-offer-actions';
@@ -64,6 +64,7 @@ export function useHomePauseWidgetInputs(
     manualCooldownRemaining,
     autoCooldownRemaining,
     nextCronCheckIn,
+    resyncOpenPauseFromDb,
   } = usePauseHomeContext();
 
   const hasOpenPause = Boolean(lastPauseInstanceId);
@@ -133,6 +134,7 @@ export function useHomePauseWidgetInputs(
       autoCooldownRemaining,
       nextCronCheckIn,
       manualCooldownRemaining,
+      resyncOpenPauseFromDb,
       onNavigatePauseWithThis: pauseActions.handleNavigatePauseWithThis,
       onOpenWelcomeBackSheet: welcomeBack.openWelcomeBackSheet,
       onAdoptPendingOffer: pendingOfferActions.adoptPendingOffer,
@@ -180,6 +182,7 @@ export function useHomePauseWidgetInputs(
       autoCooldownRemaining,
       nextCronCheckIn,
       manualCooldownRemaining,
+      resyncOpenPauseFromDb,
       pauseActions.handleNavigatePauseWithThis,
       pauseActions.handleStartOverEngagedPause,
       pauseActions.handleDismiss,

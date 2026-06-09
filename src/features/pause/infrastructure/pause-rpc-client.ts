@@ -192,3 +192,12 @@ export async function pauseApplyCronCalmSweepForSelf(input: {
   if (error) throw error;
   return (data as Record<string, unknown> | null) ?? null;
 }
+
+/** Re-run transition engine for one instance (open_max_age, completion gates, etc.). */
+export async function pauseEvaluateTransitions(instanceId: string): Promise<PauseState | null> {
+  const { data, error } = await supabase.rpc('pause_evaluate_transitions' as never, {
+    p_instance_id: instanceId,
+  } as never);
+  if (error) throw error;
+  return (data as PauseState | null) ?? null;
+}
