@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 import { buildPauseImpactDataOnComplete } from './build-pause-impact-data-on-complete';
 
 const base = () => ({
@@ -10,6 +11,9 @@ const base = () => ({
   shiftIntensity: 4,
   reflectionMessage: 'Reflection body',
   haiku: 'one\ntwo\nthree' as string | null,
+  ritualStartedAtMs: Date.now() - 623_000,
+  companionPrefs: DEFAULT_PREFS,
+  isFavorite: false,
 });
 
 describe('buildPauseImpactDataOnComplete', () => {
@@ -67,5 +71,8 @@ describe('buildPauseImpactDataOnComplete', () => {
     expect(d.usedTags).toBe(false);
     expect(d.reflectionMessage).toBe('Reflection body');
     expect(d.haiku).toBe('one\ntwo\nthree');
+    expect(d.ritualDepth).toBe('brief');
+    expect(d.ritualDurationMs).toBeGreaterThan(600_000);
+    expect(d.isFavorite).toBe(false);
   });
 });

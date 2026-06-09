@@ -78,6 +78,16 @@ function baseInput(overrides: Partial<UsePauseSessionDecideHandlerParams> = {}) 
     shiftIntensity: null as number | null,
     reflectionMessage: 'Reflection text',
     haiku: null as string | null,
+    ritualStartedAtMs: Date.now() - 120_000,
+    companionPrefs: {
+      breathing: true,
+      haiku: true,
+      grounding: true,
+      signal: true,
+      zoomOut: true,
+      history: true,
+    },
+    isFavorite: false,
     ...overrides,
   };
 }

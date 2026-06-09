@@ -2,6 +2,7 @@ import { renderHook, act } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
+import { DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 import { usePauseSessionBreathReflectHandlers } from './use-pause-session-breath-reflect-handlers';
 
 const {
@@ -86,6 +87,7 @@ function baseShell() {
     context: 'btc_dip',
     pauseInstanceId: 'pause-inst-1',
     companions: { haiku: 'haiku line' } as import('@/features/pause/domain/companion-card-types').CompanionData,
+    companionPrefs: DEFAULT_PREFS,
   };
 }
 
@@ -101,6 +103,8 @@ function baseRitual() {
     selectedMoodAfter: null,
     feelIntensity: 2,
     shiftIntensity: 4,
+    isFavorite: false,
+    ritualStartedAtMs: Date.now() - 90_000,
     setSwipeDirection: vi.fn(),
     setStep: vi.fn(),
     setBriefStep: vi.fn(),

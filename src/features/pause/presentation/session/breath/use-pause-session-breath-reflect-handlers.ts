@@ -21,7 +21,7 @@ export function usePauseSessionBreathReflectHandlers(
   mood: PauseSessionBreathReflectMoodSlice,
 ) {
   const { t, dismissMessage, marketData, subscribed, subLoading, requirePro, refreshSubscription } = p;
-  const { restored, message, context, pauseInstanceId, companions } = shell;
+  const { restored, message, context, pauseInstanceId, companions, companionPrefs } = shell;
   const {
     step,
     phase,
@@ -34,6 +34,8 @@ export function usePauseSessionBreathReflectHandlers(
     selectedMoodAfter,
     feelIntensity,
     shiftIntensity,
+    isFavorite,
+    ritualStartedAtMs,
     setSwipeDirection,
     setStep,
     setBriefStep,
@@ -104,6 +106,9 @@ export function usePauseSessionBreathReflectHandlers(
     breathingSecondCompleted,
     feelIntensity,
     shiftIntensity,
+    ritualStartedAtMs,
+    companionPrefs,
+    isFavorite,
   });
 
   return { breath, reflect, handleFrameImDone };

@@ -37,6 +37,7 @@ describe('pause-session-decide-flow', () => {
       engagedTools: 0,
       wroteNote: false,
       usedTags: false,
+      ritualDepth: 'deep',
     };
     const direct: PauseImpactDataDirect = sample;
     expect(direct.engagedTools).toBe(0);

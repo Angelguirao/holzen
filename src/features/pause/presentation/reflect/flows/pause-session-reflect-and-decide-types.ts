@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import type { MarketQuote } from '@/features/market/public';
+import type { CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
 import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
@@ -29,4 +30,7 @@ export type UsePauseSessionReflectAndDecideParams = {
   breathingSecondCompleted: boolean;
   feelIntensity: number | null;
   shiftIntensity: number | null;
+  ritualStartedAtMs: number | null;
+  companionPrefs: CompanionPrefs;
+  isFavorite: boolean;
 };

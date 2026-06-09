@@ -4,9 +4,9 @@ import { resolveDoneWallpaperMood } from '@/features/pause/public-ritual-done';
 import { pauseStepLayout } from '@/features/pause/public-session';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { Button } from '@/components/ui/button';
-import { ScoreImpact } from '@/screens/pause/components/ScoreImpact';
 import { PauseDoneDefaultStreakHero } from '@/screens/pause/components/pause-done-default-streak-hero';
 import { PauseDoneReflectShareRow } from '@/screens/pause/components/pause-done-reflect-share-row';
+import { PauseDoneSummaryCard } from '@/screens/pause/components/pause-done-summary-card';
 import type { PauseDonePauseData } from '@/screens/pause/components/pause-done-types';
 export type PauseDoneDefaultProps = {
   decision: string | null;
@@ -31,7 +31,7 @@ export function PauseDoneDefault({ decision, onReturn, pauseData, pauseInstanceI
     >
       <PauseDoneDefaultStreakHero decision={decision} />
 
-      {pauseData ? <ScoreImpact data={pauseData} /> : null}
+      {pauseData ? <PauseDoneSummaryCard pauseData={pauseData} /> : null}
 
       <PauseDoneReflectShareRow
         subscribed={subscribed}

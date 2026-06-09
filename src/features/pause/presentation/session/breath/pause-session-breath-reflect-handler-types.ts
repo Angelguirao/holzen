@@ -2,7 +2,7 @@ import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 import type { MarketQuote } from '@/features/market/public';
 import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
-import type { CompanionData } from '@/features/pause/domain/companion-card-types';
+import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { BriefPauseStep, RitualDepth } from '@/features/pause/domain/ritual-types';
@@ -27,6 +27,7 @@ export type PauseSessionBreathReflectShellSlice = {
   context: string | null;
   pauseInstanceId: string | null;
   companions: CompanionData;
+  companionPrefs: CompanionPrefs;
 };
 
 /** Subset of ritual state passed into breath/reflect handlers. */
@@ -42,6 +43,8 @@ export type PauseSessionBreathReflectRitualSlice = {
   selectedMoodAfter: MoodValue | null;
   feelIntensity: number | null;
   shiftIntensity: number | null;
+  isFavorite: boolean;
+  ritualStartedAtMs: number | null;
   setSwipeDirection: Dispatch<SetStateAction<'forward' | 'back'>>;
   setStep: Dispatch<SetStateAction<PauseStep>>;
   setBriefStep: Dispatch<SetStateAction<BriefPauseStep>>;

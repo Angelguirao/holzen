@@ -1,5 +1,6 @@
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
+import type { CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { RitualDepth } from '@/features/pause/domain/ritual-types';
@@ -24,4 +25,7 @@ export type UsePauseSessionDecideHandlerParams = {
   shiftIntensity: number | null;
   reflectionMessage: string;
   haiku: string | null;
+  ritualStartedAtMs: number | null;
+  companionPrefs: CompanionPrefs;
+  isFavorite: boolean;
 };

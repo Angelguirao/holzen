@@ -36,6 +36,9 @@ export function usePauseSessionDecideHandler(
     shiftIntensity,
     reflectionMessage,
     haiku,
+    ritualStartedAtMs,
+    companionPrefs,
+    isFavorite,
   } = input;
 
   const handleDecide = useCallback(
@@ -64,6 +67,9 @@ export function usePauseSessionDecideHandler(
             shiftIntensity,
             reflectionMessage,
             haiku,
+            ritualStartedAtMs,
+            companionPrefs,
+            isFavorite,
           },
         });
 
@@ -110,6 +116,9 @@ export function usePauseSessionDecideHandler(
       shiftIntensity,
       reflectionMessage,
       haiku,
+      ritualStartedAtMs,
+      companionPrefs,
+      isFavorite,
       refreshSubscription,
       user?.id,
       t,

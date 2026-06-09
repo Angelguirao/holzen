@@ -1499,7 +1499,17 @@
     },
     "done": {
       "heroTitle": "You paused",
-      "heroSubcopy": "You held yourself. What was done is done."
+      "heroSubcopy": "You held yourself. What was done is done.",
+      "generateWallpaper": "Generate wallpaper",
+      "summary": {
+        "started": "Started",
+        "time": "Time",
+        "frame": "Frame",
+        "choice": "Choice",
+        "presence": "Presence",
+        "presenceXp": "+{{count}} XP",
+        "ended": "Ended"
+      }
     },
     "youChose": "You chose deliberately.",
     "return": "Return",
