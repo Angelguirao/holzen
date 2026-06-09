@@ -48,6 +48,9 @@ const TIER_B_TABLES = [
 /** User Archive collections — quarantined in `src/legacy/archive-collections/` (not in shipped scope). */
 const CLIENT_QUARANTINED_TABLES = ['collections', 'collection_items'];
 
+/** Referral program — quarantined in `src/legacy/referrals/` (not in shipped scope). */
+const REFERRAL_QUARANTINED_TABLES = ['referrals', 'referral_rewards', 'referral_pending_jobs'];
+
 /** Zen Home — quarantined in `src/legacy/zen-mode/` (not in shipped scope). */
 const ZEN_MODE_FORBIDDEN = [
   { re: /\bZenModeHome\b/, label: 'ZenModeHome (use legacy/zen-mode)' },
@@ -69,6 +72,19 @@ const QUARANTINED_FROM_RES = CLIENT_QUARANTINED_TABLES.map(
   }),
 );
 
+const REFERRAL_FROM_RES = REFERRAL_QUARANTINED_TABLES.map(
+  (t) => ({
+    re: new RegExp(`\\.from\\(['"]${t}['"]\\)`),
+    label: `.from('${t}') (referrals — use legacy/referrals)`,
+  }),
+);
+
+const REFERRAL_FORBIDDEN = [
+  { re: /['"]holzen_ref['"]/, label: 'holzen_ref localStorage (referrals not in shipped scope)' },
+  { re: /record-referral/, label: 'record-referral edge invoke (legacy/referrals)' },
+  { re: /process-referral-pending/, label: 'process-referral-pending edge (legacy/referrals)' },
+];
+
 const SKIP_TIER_B_FILES = new Set([
   'src/integrations/supabase/types.ts',
 ]);
@@ -89,13 +105,13 @@ for (const file of walk(srcRoot)) {
   const rel = relative(root, file).replace(/\\/g, '/');
   if (rel.startsWith('src/legacy/')) continue;
   const text = readFileSync(file, 'utf8');
-  for (const { re, label } of [...FORBIDDEN_PATTERNS, ...ZEN_MODE_FORBIDDEN]) {
+  for (const { re, label } of [...FORBIDDEN_PATTERNS, ...ZEN_MODE_FORBIDDEN, ...REFERRAL_FORBIDDEN]) {
     if (re.test(text)) {
       violations.push({ file: rel, label });
     }
   }
   if (!SKIP_TIER_B_FILES.has(rel)) {
-    for (const { re, label } of [...TIER_B_FROM_RES, ...QUARANTINED_FROM_RES]) {
+    for (const { re, label } of [...TIER_B_FROM_RES, ...QUARANTINED_FROM_RES, ...REFERRAL_FROM_RES]) {
       if (re.test(text)) {
         violations.push({ file: rel, label });
       }

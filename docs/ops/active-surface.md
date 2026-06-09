@@ -50,7 +50,17 @@ Example: `WHERE created_at >= '2026-05-21T20:00:00.000Z'` on truncated tables is
 
 Holzen **pauses** and rewards **completed rituals** (Journey streak + count). It does **not** judge hold/buy/sell strategy, portfolio targets, or retrospective trade-label hygiene. In-ritual **Decide** records what the user chose when finishing `/pause`; Archive is read-only for expired rows without a decision. This neutrality stance is **Tier A defensibility** — see [strategy-and-defensibility.md](../fundamentals/strategy-and-defensibility.md) §3.
 
-**Not shipped:** Home bulk hold, Archive retrospective “Log decision”, hold-goal **price targets** (legacy DB rows show a migration nudge only). Full stats / alignment scoring: `src/legacy/full-shell/`.
+**Not shipped:** Home bulk hold, Archive retrospective “Log decision”, hold-goal **price targets** (legacy DB rows show a migration nudge only). Full stats / alignment scoring: `src/legacy/full-shell/`. Referral program: `src/legacy/referrals/`.
+
+## Referrals (legacy)
+
+| Surface | Shipped now | Notes |
+| --- | --- | --- |
+| Settings **Invite friends** / milestone rewards | **No (stripped)** | `src/legacy/referrals/`; `npm run check:active-surface` blocks referral table queries, `holzen_ref`, and `record-referral` in active `src/` |
+| `?ref=` on landing / welcome | **No (stripped)** | Was `localStorage.holzen_ref` → `record-referral` on sign-in |
+| Edges `record-referral`, `process-referral-pending` | **No (undeployed)** | `supabase/functions/legacy/referrals/`; removed from `config.toml` |
+
+**DB:** `referrals`, `referral_rewards`, `referral_pending_jobs`, and `profiles.referral_code` **remain** until an explicit cutover migration. `delete-account` still cleans referral rows for deleted users.
 
 ## Subscription
 
@@ -81,11 +91,11 @@ Listed in `supabase/config.toml` `[functions.*]` and `src/screens/ops/EdgeCovera
 | Pause | `holzen-reflect`, `companion-orchestrate`, `pregenerate-companions` |
 | Volatility | `check-volatility`, `refresh-market-prices`, `backfill-market-prices`, `seed-market-history` |
 | Billing | `check-subscription`, `create-checkout`, `ensure-trial-subscription`, `stripe-webhook`, `customer-portal`, `retry-flex-credit`, `list-checkout-events`, `notify-checkout-confirmation` |
-| Account / platform | `delete-account`, `health`, `send-feedback`, `register-push`, `record-referral`, `process-referral-pending`, `holzen-number` |
+| Account / platform | `delete-account`, `health`, `send-feedback`, `register-push`, `holzen-number` |
 | Email | `process-email-queue`, `send-transactional-email`, `preview-transactional-email`, `handle-email-unsubscribe`, `handle-email-suppression`, `auth-email-hook` |
 | Ops / admin | `ai-cost-alert`, `admin-check-stripe-prices` |
 
-**Undeployed / legacy:** `supabase/functions/legacy/full-shell/` (ingest, badges, night reflection, letters, digest, `fetch-source-feeds`, …) and `supabase/functions/legacy/grounding-enrich/` (citation enrichment — client in `src/legacy/grounding-enrich/`). No `export-user-data` edge exists in this repo.
+**Undeployed / legacy:** `supabase/functions/legacy/full-shell/` (ingest, badges, night reflection, letters, digest, `fetch-source-feeds`, …), `supabase/functions/legacy/grounding-enrich/` (citation enrichment — client in `src/legacy/grounding-enrich/`), and `supabase/functions/legacy/referrals/` (`record-referral`, `process-referral-pending` — client in `src/legacy/referrals/`). No `export-user-data` edge exists in this repo.
 
 ## pg_cron (kept)
 

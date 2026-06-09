@@ -9,8 +9,6 @@ export {
   type EmailUnsubscribeLinkResponse,
 } from './infrastructure/edge/handle-email-unsubscribe-edge';
 export {
-  invokeRecordReferral,
   sendWelcomeTransactionalEmail,
-  type RecordReferralResponse,
   type SendWelcomeEmailBody,
 } from './infrastructure/edge/auth-signed-in-edge';

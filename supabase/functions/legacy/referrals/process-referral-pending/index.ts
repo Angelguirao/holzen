@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
-import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { unknownErrorForLog } from "../../../_shared/log-unknown-error.ts";
+import { withRequestLogging } from "../../../_shared/with-request-logging.ts";
 import {
   applyReferralRecord,
   referralBackoffMsAfterAttempt,
@@ -22,7 +22,7 @@ serve(
         phase: "handler_enter",
         method: req.method,
       });
-      const { verifyServiceAuth } = await import("../_shared/auth.ts");
+      const { verifyServiceAuth } = await import("../../../_shared/auth.ts");
       if (!verifyServiceAuth(req)) {
         log.warn("referral_pending_phase", {
           holzen_event: "referral_pending_cron",

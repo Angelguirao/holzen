@@ -21,11 +21,9 @@ const ALLOWED = new Set([
   'register-push',
   'delete-account',
   'send-feedback',
-  'record-referral',
   'send-transactional-email',
   'handle-email-unsubscribe',
   'admin-check-stripe-prices',
-  'process-referral-pending',
 ]);
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

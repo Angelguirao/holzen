@@ -22,20 +22,6 @@ export {
 export { subscribeProfileLastContextUpdates } from './infrastructure/realtime/profile-last-context-realtime';
 export { getHoldGoalProfileQueryOptions } from './infrastructure/queries/hold-goal-profile-query';
 export {
-  REFERRAL_QUERY_DISABLED_USER_ID,
-  REFERRAL_REWARDS_NONE_QUERY_KEY,
-  REFERRAL_REWARDS_QUERY_PREFIX,
-  REFERRALS_COUNT_NONE_QUERY_KEY,
-  REFERRALS_COUNT_QUERY_PREFIX,
-  fetchReferralRewards,
-  fetchReferralsCount,
-  getReferralRewardsQueryOptions,
-  getReferralsCountQueryOptions,
-  referralRewardsQueryKey,
-  referralsCountQueryKey,
-  type ReferralGrantedRewardRow,
-} from './infrastructure/queries/referral-query';
-export {
   deleteQuietWindow,
   insertQuietWindow,
   updateQuietWindow,

@@ -5,7 +5,7 @@ import {
   markReferralJobCompleted,
   markReferralJobFailedTerminal,
 } from "../_shared/referral-record-core.ts";
-import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { withRequestLogging } from "../../../_shared/with-request-logging.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

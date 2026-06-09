@@ -4,9 +4,9 @@
  */
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { redactEmailForLog } from "./email-log-helpers.ts";
-import { sendTransactionalEmail, type EmailDeliveryLogger } from "./transactional-email.ts";
-import { prefixEmailSubject, resolveNotifyFromAddress } from "./email-env.ts";
+import { redactEmailForLog } from "../../../_shared/email-log-helpers.ts";
+import { sendTransactionalEmail, type EmailDeliveryLogger } from "../../../_shared/transactional-email.ts";
+import { prefixEmailSubject, resolveNotifyFromAddress } from "../../../_shared/email-env.ts";
 
 /** Matches `ReturnType<typeof createLogger>` — callers pass `log` from `withRequestLogging`. */
 export interface ReferralRecordLogger {

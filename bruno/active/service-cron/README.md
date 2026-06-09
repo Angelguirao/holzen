@@ -1,6 +1,6 @@
 # Service / cron (shipped)
 
-Shipped workers: volatility, BTC cache, companion pregeneration, referral processing, AI cost alerting, and optional BTC backfill/seed. **Digest, night reflection, letters, and library ingest** moved to [`../../legacy/full-shell/service-cron/`](../../legacy/full-shell/service-cron/).
+Shipped workers: volatility, BTC cache, companion pregeneration, AI cost alerting, and optional BTC backfill/seed. **Digest, night reflection, letters, library ingest, and referral processing** moved to legacy — see [`../../legacy/full-shell/service-cron/`](../../legacy/full-shell/service-cron/) and [`../../legacy/referrals/`](../../legacy/referrals/).
 
 ## `SERVICE_CRON_BEARER`
 
@@ -18,7 +18,6 @@ Set **`SERVICE_CRON_BEARER`** in `environments/local.bru`, `staging.bru`, or `pr
 | `check-volatility.bru` | `check-volatility` |
 | `refresh-market-prices.bru` | `refresh-market-prices` |
 | `pregenerate-companions.bru` | `pregenerate-companions` |
-| `process-referral-pending.bru` | `process-referral-pending` |
 | `backfill-market-prices.bru` | `backfill-market-prices` (ops; chain `resumeFrom`) |
 | `seed-market-history.bru` | `seed-market-history` (ops bulk seed) |
 | `ai-cost-alert.bru` | `ai-cost-alert` (ops daily-cost alert smoke) |
