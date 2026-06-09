@@ -40,6 +40,17 @@ export function trackTrialStarted(source: TrialStartedSource): void {
   }
 }
 
+export type TrialDeniedReason = 'trial_already_used' | 'email_not_verified' | 'disposable_email';
+
+/** Server rejected trial start (abuse guard or verification). */
+export function trackTrialDenied(reason: TrialDeniedReason): void {
+  try {
+    trackEvent('trial.denied', { reason });
+  } catch {
+    /* no-op */
+  }
+}
+
 /** Client entitlement transitions to lapsed (trial ended without paid sub). */
 export function trackTrialExpired(): void {
   try {

@@ -9,7 +9,19 @@ export type CreateCheckoutBody =
 
 export type CreateCheckoutResponse = { url?: string };
 
-export type EnsureTrialSubscriptionResponse = { ok?: boolean; created?: boolean };
+export type EnsureTrialDenyReason =
+  | 'trial_already_used'
+  | 'email_not_verified'
+  | 'disposable_email';
+
+export type EnsureTrialSubscriptionResponse = {
+  ok?: boolean;
+  created?: boolean;
+  trial_eligible?: boolean;
+  reason?: EnsureTrialDenyReason;
+  subscription_status?: string;
+  trial_end?: string | null;
+};
 
 export type CustomerPortalResponse = { url?: string };
 
