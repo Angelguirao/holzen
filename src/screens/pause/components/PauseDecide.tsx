@@ -1,9 +1,7 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { hapticFeedback } from '@/lib/haptics';
 import { pauseStepLayout } from '@/features/pause/public-session';
 import { PauseDecideChoices } from '@/screens/pause/components/pause-decide-choices';
-import { PauseDecideMirror } from '@/screens/pause/components/pause-decide-mirror';
 import { PauseRitualBackRow } from '@/screens/pause/components/pause-ritual-back-row';
 
 interface Props {
@@ -18,30 +16,12 @@ interface Props {
 
 export function PauseDecide({ onDecide, onBack, introKicker, hideChoicesBack }: Props) {
   "use memo";
-  const [mirrorDecision, setMirrorDecision] = useState<string | null>(null);
 
   const introLine = introKicker != null && introKicker.trim() !== '' ? introKicker : null;
 
-  const handleHold = () => {
+  const handleDecision = (decision: 'held' | 'bought' | 'sold') => {
     hapticFeedback('medium');
-    onDecide('held');
-  };
-
-  const handleAction = (value: 'sold' | 'bought') => {
-    hapticFeedback('medium');
-    setMirrorDecision(value);
-  };
-
-  const confirmMirror = () => {
-    if (mirrorDecision) {
-      hapticFeedback('medium');
-      onDecide(mirrorDecision);
-    }
-  };
-
-  const cancelMirror = () => {
-    hapticFeedback('light');
-    setMirrorDecision(null);
+    onDecide(decision);
   };
 
   return (
@@ -52,25 +32,14 @@ export function PauseDecide({ onDecide, onBack, introKicker, hideChoicesBack }: 
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.6 }}
     >
-      <AnimatePresence mode="wait">
-        {!mirrorDecision ? (
-          <PauseDecideChoices
-            introLine={introLine}
-            onHold={handleHold}
-            onBought={() => handleAction('bought')}
-            onSold={() => handleAction('sold')}
-          />
-        ) : (
-          <PauseDecideMirror
-            mirrorDecision={mirrorDecision as 'sold' | 'bought'}
-            onConfirm={confirmMirror}
-            onCancel={cancelMirror}
-            onBack={onBack}
-          />
-        )}
-      </AnimatePresence>
+      <PauseDecideChoices
+        introLine={introLine}
+        onHold={() => handleDecision('held')}
+        onBought={() => handleDecision('bought')}
+        onSold={() => handleDecision('sold')}
+      />
 
-      {!mirrorDecision && !hideChoicesBack ? <PauseRitualBackRow onBack={onBack} /> : null}
+      {!hideChoicesBack ? <PauseRitualBackRow onBack={onBack} /> : null}
     </motion.div>
   );
 }

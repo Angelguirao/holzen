@@ -13,7 +13,7 @@ export type PauseDecideChoicesProps = {
 const decideChoiceClassName =
   'flex w-full max-w-[225px] items-center justify-center rounded-lg bg-primary/5 px-4 py-5 text-sm font-medium tracking-wide text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2';
 
-/** Primary decide step: hold vs buy/sell (before decision mirror). */
+/** Decide step — Hold / Buy / Sell (Figma wireframe 604:37736; one tap → outcome). */
 export function PauseDecideChoices({ introLine, onHold, onBought, onSold }: PauseDecideChoicesProps) {
   "use memo";
   const { t } = useTranslation();

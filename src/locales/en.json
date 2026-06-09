@@ -1703,7 +1703,6 @@
     "muteAriaOn": "Sound on (tap to mute)",
     "muteAriaOff": "Sound off (tap to unmute)",
     "decideIntroKicker": "Step 6 · Decide",
-    "decideMirrorKicker": "Before you confirm",
     "breathIntroKickerFirst": "Step 2 · Breathe",
     "breathIntroKickerSecond": "Step 5 · Breathe",
     "breathSecondHeadline": "Final breath",
@@ -2743,24 +2742,6 @@
     "suggestJournal": "A guided journal might surface new patterns",
     "suggestReplay": "Revisit a past reflection with fresh eyes",
     "replayUntitled": "Pause"
-  },
-  "mirror": {
-    "title": "Decision Mirror",
-    "sell": {
-      "q1": "Is this decision aligned with your long-term plan — or driven by today's price?",
-      "q2": "If the price recovers next week, will you regret this?",
-      "q3": "Are you selling because of data — or because of a feeling?"
-    },
-    "buy": {
-      "q1": "Is this purchase part of your strategy — or are you chasing momentum?",
-      "q2": "If the price drops 20% tomorrow, will you still feel good about this?",
-      "q3": "Are you buying because of conviction — or because of FOMO?"
-    },
-    "confirm": {
-      "sell": "I still want to sell",
-      "buy": "I still want to buy"
-    },
-    "reconsider": "Let me reconsider"
   },
   "bulkHold": {
     "kicker": "Waiting for you",
