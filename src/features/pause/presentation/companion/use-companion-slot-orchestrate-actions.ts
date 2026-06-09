@@ -5,6 +5,7 @@ import type {
   CompanionSlotRelaxations,
 } from './pause-companion-orchestrate-io';
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
+import { companionSlotHasDisplayableContent } from '@/features/pause/domain/companion-slot-display-content';
 import type { CompanionSlotTransitionStarters } from './pause-companion-orchestrate-io';
 import { useCompanionSlotOrchestrateFailurePorts } from './use-companion-slot-orchestrate-failure-ports';
 import { useCompanionSlotRunOrchestrate } from './use-companion-slot-run-orchestrate';
@@ -27,6 +28,7 @@ export interface UseCompanionSlotOrchestrateActionsParams {
   requirePro: (feature: 'companions') => boolean;
   startCheckout: () => void;
   fetchedSlotsRef: React.MutableRefObject<Set<string>>;
+  getSlotPayload: (slot: RegenerateCompanionSlot) => unknown;
   whenArtifactHydrateReady: () => Promise<void>;
   setCacheIds: React.Dispatch<React.SetStateAction<CompanionSlotCacheIds>>;
   setCacheRelaxations: React.Dispatch<React.SetStateAction<CompanionSlotRelaxations>>;
@@ -58,6 +60,7 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
     requirePro,
     startCheckout,
     fetchedSlotsRef,
+    getSlotPayload,
     whenArtifactHydrateReady,
     setCacheIds,
     setCacheRelaxations,
@@ -96,7 +99,15 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
     async (slot: RegenerateCompanionSlot) => {
       if (!pauseInstanceId) return;
       await whenArtifactHydrateReady();
-      if (fetchedSlotsRef.current.has(slot)) return;
+      if (
+        fetchedSlotsRef.current.has(slot) &&
+        companionSlotHasDisplayableContent(slot, getSlotPayload(slot))
+      ) {
+        return;
+      }
+      if (fetchedSlotsRef.current.has(slot)) {
+        fetchedSlotsRef.current.delete(slot);
+      }
       if (lazyFetchInFlightRef.current.has(slot)) return;
       if (!canAccessCompanion()) return;
 
@@ -113,6 +124,7 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
       canAccessCompanion,
       runSlotOrchestrate,
       fetchedSlotsRef,
+      getSlotPayload,
     ],
   );
 

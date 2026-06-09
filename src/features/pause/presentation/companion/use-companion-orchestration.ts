@@ -62,6 +62,20 @@ export function useCompanionOrchestration({
     requirePro,
     startCheckout,
     fetchedSlotsRef: slotUi.fetchedSlotsRef,
+    getSlotPayload: (slot) => {
+      switch (slot) {
+        case 'signal':
+          return slotUi.signal;
+        case 'grounding':
+          return slotUi.grounding;
+        case 'zoomOut':
+          return slotUi.zoomOut;
+        case 'history':
+          return slotUi.historyInsight;
+        default:
+          return null;
+      }
+    },
     whenArtifactHydrateReady,
     setCacheIds: slotUi.setCacheIds,
     setCacheRelaxations: slotUi.setCacheRelaxations,

@@ -1,6 +1,12 @@
 import { trackCompanionServed } from '@/features/pause/application/use-cases/ritual/frame/companion-generation-telemetry';
 import type { ParsedPauseArtifactCache } from '@/features/pause/application/use-cases/ritual/frame/artifact-cache-parse';
 import type { CompanionSlotCommitters } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
+import {
+  hasDisplayableGroundingContent,
+  hasDisplayableHistoryContent,
+  hasDisplayableSignalContent,
+  hasDisplayableZoomOutContent,
+} from '@/features/pause/domain/companion-slot-display-content';
 import { resolveHistoricalMarketInsight } from '@/features/pause/domain/historical-insight';
 import {
   toZoomOutDisplayData,
@@ -27,7 +33,7 @@ export function hydrateCompanionSlotsFromArtifactCache(
   const { cached, fetchedSlots, committers, setIntervention } = input;
   const { setSignal, setGrounding, setHistoryInsight, setZoomOut, autoSaveToLibrary } = committers;
 
-  if (cached.signal) {
+  if (cached.signal && hasDisplayableSignalContent(cached.signal)) {
     setSignal(cached.signal);
     fetchedSlots.add('signal');
     trackCompanionServed('signal', 'cache');
@@ -38,7 +44,7 @@ export function hydrateCompanionSlotsFromArtifactCache(
       sourceUrl: cached.signal.url,
     });
   }
-  if (cached.grounding) {
+  if (cached.grounding && hasDisplayableGroundingContent(cached.grounding)) {
     setGrounding(cached.grounding);
     fetchedSlots.add('grounding');
     trackCompanionServed('grounding', 'cache');
@@ -49,7 +55,7 @@ export function hydrateCompanionSlotsFromArtifactCache(
       sourceUrl: cached.grounding.url,
     });
   }
-  if (cached.history) {
+  if (cached.history && hasDisplayableHistoryContent(cached.history)) {
     setHistoryInsight(cached.history);
     fetchedSlots.add('history');
     trackCompanionServed('history', 'cache');
@@ -61,11 +67,13 @@ export function hydrateCompanionSlotsFromArtifactCache(
   }
   if (cached.zoomOut) {
     const display = toZoomOutDisplayData(cached.zoomOut);
-    setZoomOut(display);
-    fetchedSlots.add('zoomOut');
-    trackCompanionServed('zoomOut', 'cache');
-    const { title, body } = zoomOutLibraryAutosaveFromDisplayData(display);
-    void autoSaveToLibrary({ title, body, sourceType: 'zoom_out' });
+    if (hasDisplayableZoomOutContent(display)) {
+      setZoomOut(display);
+      fetchedSlots.add('zoomOut');
+      trackCompanionServed('zoomOut', 'cache');
+      const { title, body } = zoomOutLibraryAutosaveFromDisplayData(display);
+      void autoSaveToLibrary({ title, body, sourceType: 'zoom_out' });
+    }
   }
   if (cached.intervention && setIntervention) {
     setIntervention(cached.intervention);

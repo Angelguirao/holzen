@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
+import { companionSlotHasDisplayableContent } from '@/features/pause/domain/companion-slot-display-content';
 
 type LazyToggleArgs = {
   slot: RegenerateCompanionSlot;
@@ -45,12 +46,15 @@ function openExclusive(slot: CompanionSectionExpandSlot): ExpansionMap {
 
 /** True when the user may expand (has payload, in-flight, error, or Pro access to fetch). */
 function canOpenLazySlot(args: LazyToggleArgs, canAccess: () => boolean): boolean {
-  if (args.data || args.loading || args.error) return true;
+  if (args.loading || args.error) return true;
+  if (companionSlotHasDisplayableContent(args.slot, args.data)) return true;
   return canAccess();
 }
 
 function needsLazyFetch(args: LazyToggleArgs): boolean {
-  return !args.data && !args.loading && !args.error;
+  if (args.loading) return false;
+  if (args.error) return true;
+  return !companionSlotHasDisplayableContent(args.slot, args.data);
 }
 
 /** Expand/collapse state for inline `CompanionSection` cards (lazy fetch on first open). */
