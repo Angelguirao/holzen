@@ -25,7 +25,6 @@ export {
   type CompanionSectionVisibility,
 } from './application/use-cases/ritual/frame/section-visibility';
 export { estimateReadTime } from './application/use-cases/ritual/frame/estimate-read-time';
-export { formatCompanionHistoryRelativeDay } from './application/use-cases/ritual/frame/format-companion-history-relative-day';
 export { zoomOutTotalCharsForReadTime } from './application/use-cases/ritual/frame/zoom-out-payload';
 export type {
   EchoUserWord,
@@ -34,10 +33,6 @@ export type {
   ZoomOutOnThisDayEntry,
 } from './domain/zoom-out-display';
 
-export {
-  useCompanionHistoryThread,
-  type HistoryThreadRow,
-} from './presentation/companion/use-companion-history-thread';
 export { useRelatedBiasesThisMonth } from './presentation/companion/use-related-biases-this-month';
 export { useCompanionFeedbackVote } from './presentation/companion/use-companion-feedback-vote';
 export { isCompanionRegenerateUiEnabled } from './presentation/companion/is-companion-regenerate-ui-enabled';

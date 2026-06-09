@@ -9,7 +9,6 @@ import {
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
 import { SignalFullView } from '@/screens/pause/components/companion/SignalFullView';
-import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
 import { PageMeta } from '@/app/components/PageMeta';
 
 /**
@@ -108,8 +107,6 @@ export default function CompanionSignalPage() {
             />
           </div>
         )}
-
-        <HistoryThread companion="signal" currentPauseInstanceId={pauseInstanceId} />
       </div>
     </CompanionFocusLayout>
   );

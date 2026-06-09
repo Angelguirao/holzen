@@ -11,7 +11,6 @@ import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback'
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
 import { ReadTime } from '@/screens/pause/components/companion/ReadTime';
 import { WhyThisCard } from '@/screens/pause/components/companion/WhyThisCard';
-import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
 import { PageMeta } from '@/app/components/PageMeta';
 
 export default function CompanionZoomOutPage() {
@@ -106,8 +105,6 @@ export default function CompanionZoomOutPage() {
             />
           </div>
         )}
-
-        <HistoryThread companion="zoomOut" currentPauseInstanceId={pauseInstanceId} />
       </div>
     </CompanionFocusLayout>
   );

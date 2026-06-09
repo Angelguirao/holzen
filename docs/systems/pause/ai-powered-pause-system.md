@@ -664,7 +664,7 @@ Shared primitives reused across all four pages (in `src/screens/pause/components
 
 - `**ReadTime**` — chars/WPM-bucketed read-time indicator.
 - `**WhyThisCard**` — collapsible disclosure that explains the orchestrator's pick in terms of mood + market direction + session `preferredBias`. Renders nothing if none of the three are known.
-- `**HistoryThread**` — the last 5 cards of the same companion type for this user, deep-linking to their own Full Views.
+- `**HistoryThread**` — **legacy only** (`src/legacy/companion-history-thread/`): last 5 cards of the same companion type; not mounted on pause-first Full View pages.
 - `**InterventionCrossRefBadge**` — **legacy only** (`src/legacy/pause-featured-intervention/`): "This was also today's headline" when featured intervention is re-enabled (see §7.2 / §7.3 / §7.5).
 - `**useStaggeredReveal**` — 8 s breathing-room delay before feedback CTAs appear. Honors `prefers-reduced-motion` (skips the delay for accessibility).
 

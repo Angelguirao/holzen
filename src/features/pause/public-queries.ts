@@ -38,10 +38,6 @@ export {
   type PauseArchiveSegment,
 } from './infrastructure/queries/archive/archive-list-query';
 export {
-  getHistoryThreadQueryOptions,
-  type HistoryThreadRow,
-} from './infrastructure/queries/history-thread-query';
-export {
   companionFeedbackVoteQueryKey,
   getCompanionFeedbackVoteQueryOptions,
 } from './infrastructure/queries/companion-feedback-vote-query';

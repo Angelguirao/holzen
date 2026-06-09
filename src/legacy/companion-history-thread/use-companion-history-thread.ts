@@ -5,7 +5,7 @@ import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-
 import {
   getHistoryThreadQueryOptions,
   type HistoryThreadRow,
-} from '../../public-queries';
+} from '@/legacy/companion-history-thread/history-thread-query';
 
 export type { HistoryThreadRow };
 

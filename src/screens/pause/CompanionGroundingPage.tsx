@@ -6,7 +6,6 @@ import { useCompanionFullViewPage } from '@/features/pause/public-ritual-frame';
 import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
 import { GroundingFullView } from '@/screens/pause/components/companion/GroundingFullView';
-import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
 import { RelatedBiasesThisMonth } from '@/screens/pause/components/companion/RelatedBiasesThisMonth';
 import { PageMeta } from '@/app/components/PageMeta';
 
@@ -104,8 +103,6 @@ export default function CompanionGroundingPage() {
           currentPauseInstanceId={pauseInstanceId}
           currentTitle={grounding?.title ?? null}
         />
-
-        <HistoryThread companion="grounding" currentPauseInstanceId={pauseInstanceId} />
       </div>
     </CompanionFocusLayout>
   );
