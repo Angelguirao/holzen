@@ -122,5 +122,6 @@ export function usePauseSessionShellBootstrap({
     hasCoalescedShellSession,
     openingManualPausePending,
     waitingForFetch,
+    pauseInstanceMetadata: fetchedInstance?.metadata ?? null,
   };
 }

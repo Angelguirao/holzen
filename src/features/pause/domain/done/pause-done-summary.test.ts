@@ -57,11 +57,12 @@ describe('estimatePresenceXpFromImpact', () => {
       engagedTools: 2,
       wroteNote: true,
       usedTags: false,
-      shiftIntensity: 3,
+      shiftMoodLogged: true,
       ritualDepth: 'deep',
       isFavorite: true,
       companionPrefs: DEFAULT_PREFS,
+      companionSlotFavoriteXp: 2,
     };
-    expect(estimatePresenceXpFromImpact(data)).toBe(18 + 2 + 3 + 4 + 4 + 3);
+    expect(estimatePresenceXpFromImpact(data)).toBe(18 + 2 + 3 + 4 + 4 + 3 + 2);
   });
 });

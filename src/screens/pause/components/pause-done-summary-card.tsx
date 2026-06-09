@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import type { CompanionPrefs } from '@/features/pause/domain/companion-card-types';
+import type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
 import { estimatePresenceXpFromImpact } from '@/features/pause/domain/done/estimate-presence-xp-from-impact';
 import {
   formatPauseDoneDecisionLabel,
@@ -9,17 +9,9 @@ import {
   formatPauseDoneMoodIntensityLine,
 } from '@/features/pause/domain/done/format-pause-done-summary-labels';
 import { formatPauseRitualDurationMs } from '@/features/pause/domain/done/format-pause-ritual-duration';
-import type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
 import { clampFeelIntensity, type MoodValue } from '@/features/pause/domain/mood-value';
 import { COMPANION_SECTION_ICONS } from '@/screens/pause/components/companion/companion-section-icons';
 import { PauseDoneSummaryRow } from '@/screens/pause/components/pause-done-summary-row';
-
-const FRAME_COMPANION_SLOTS = ['haiku', 'grounding', 'signal', 'zoomOut', 'history'] as const;
-
-function enabledFrameCompanionSlots(prefs: CompanionPrefs | null | undefined): string[] {
-  if (!prefs) return [];
-  return FRAME_COMPANION_SLOTS.filter((slot) => prefs[slot as keyof CompanionPrefs]);
-}
 
 export type PauseDoneSummaryCardProps = {
   pauseData: PauseImpactData;
@@ -47,9 +39,10 @@ export function PauseDoneSummaryCard({ pauseData, endedMood, endedIntensity }: P
   );
   const presenceXp = useMemo(() => estimatePresenceXpFromImpact(pauseData), [pauseData]);
   const frameSlots = useMemo(
-    () => enabledFrameCompanionSlots(pauseData.companionPrefs),
-    [pauseData.companionPrefs],
+    () => pauseData.completedFrameCompanions ?? [],
+    [pauseData.completedFrameCompanions],
   );
+  const showFrameRow = pauseData.ritualDepth === 'deep' && frameSlots.length > 0;
 
   const endedLine = useMemo(() => {
     if (endedMood == null && endedIntensity == null) return null;
@@ -85,7 +78,7 @@ export function PauseDoneSummaryCard({ pauseData, endedMood, endedIntensity }: P
         {timeLine ? (
           <PauseDoneSummaryRow label={t('pause.done.summary.time')}>{timeLine}</PauseDoneSummaryRow>
         ) : null}
-        {frameSlots.length > 0 ? (
+        {showFrameRow ? (
           <PauseDoneSummaryRow label={t('pause.done.summary.frame')}>
             <div className="flex flex-wrap items-center justify-end gap-2">
               {frameSlots.map((slot) => {

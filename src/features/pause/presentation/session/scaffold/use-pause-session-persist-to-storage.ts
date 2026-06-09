@@ -35,5 +35,6 @@ export function usePauseSessionPersistToStorage(p: PauseSessionPersistSnapshotIn
     p.briefStep,
     p.briefIntegrateDone,
     p.selectedBriefFace,
+    p.ritualStartedAtMs,
   ]);
 }

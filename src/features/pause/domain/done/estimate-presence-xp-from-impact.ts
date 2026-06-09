@@ -24,6 +24,7 @@ export function estimatePresenceXpFromImpact(data: PauseImpactData): number {
     total += Math.min(PRACTICE_XP_COMPANION_MAX, PRACTICE_XP_COMPANION_EACH * data.engagedTools);
   }
   if (data.breathingSecondCompleted) total += PRACTICE_XP_BREATH_SECOND_BONUS;
-  if (data.moodAfter && data.shiftIntensity != null) total += PRACTICE_XP_SHIFT_MOOD_BONUS;
+  if (data.shiftMoodLogged) total += PRACTICE_XP_SHIFT_MOOD_BONUS;
+  if ((data.companionSlotFavoriteXp ?? 0) > 0) total += data.companionSlotFavoriteXp ?? 0;
   return total;
 }

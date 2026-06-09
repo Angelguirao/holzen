@@ -45,6 +45,8 @@ export interface PersistedSession {
   briefIntegrateDone?: boolean;
   /** v4: which tile was chosen on the brief Feel grid (Other maps to uncertain in RPC mood). */
   briefFace?: FeelStepTile | null;
+  /** Client ritual clock anchor (ms since epoch) for Done Time row. */
+  ritualStartedAtMs?: number;
 }
 
 export const DEFAULT_COMPANIONS: CompanionData = {
