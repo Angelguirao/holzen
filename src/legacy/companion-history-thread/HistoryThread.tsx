@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import type { RegenerateCompanionSlot } from '@/features/pause/public-ritual-frame';
-import { formatCompanionHistoryRelativeDay } from '@/features/pause/public-ritual-frame';
-import { useCompanionHistoryThread } from '@/features/pause/public-ritual-frame';
+import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
+import { formatCompanionHistoryRelativeDay } from '@/legacy/companion-history-thread/format-companion-history-relative-day';
+import { useCompanionHistoryThread } from '@/legacy/companion-history-thread/use-companion-history-thread';
 
 /**
  * Maps an internal orchestrator slot name to the Full View route prefix.
@@ -26,6 +26,8 @@ interface Props {
 /**
  * Renders the user's last few cards of the same companion type, excluding
  * the current one. Reads from `pause_ai_artifacts`.
+ *
+ * @legacy Not mounted in pause-first Full View pages — see README.md.
  */
 export function HistoryThread({
   companion,

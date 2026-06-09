@@ -25,6 +25,7 @@ legacy/
   locales/           ← full i18n bundles (Step 4)
   pause-wisdom-quotes/   ← session investor quotes + Done reinforcement card
   personal-grounding/    ← profile grounding_activities tag editor (Settings → You)
+  companion-history-thread/  ← Full View "recent cards of same type" footer (HistoryThread)
   referrals/             ← invite-friends UI + record-referral side-effects (not shipped)
 ```
 
