@@ -14,7 +14,7 @@ All sends go through Supabase Edge Functions → [`transactional-email.ts`](../.
 |------|---------------|--------|
 | Auth (signup, magic link, reset, …) | `auth-email-hook` | Supabase **Send Email Hook** |
 | Welcome, checkout confirmation | `send-transactional-email` | Queued via `process-email-queue` |
-| Volatility pause offers | `check-volatility` → `notifications-deliver-pause-offer.ts` | Respects `profiles.email_notifications` |
+| Volatility pause offers | `check-volatility` → `notifications-deliver-pause-offer.ts` | Respects `profiles.email_notifications`; kill switch `PAUSE_VOLATILITY_EMAIL_ENABLED` (default on) |
 | Referral rewards | `record-referral` / `process-referral-pending` | |
 | Feedback copy | `send-feedback` | Optional if key set |
 | AI cost alerts | `ai-cost-alert` | Ops recipients in `app_config` |
@@ -55,6 +55,9 @@ Read at runtime by [`email-env.ts`](../../supabase/functions/_shared/email-env.t
 | `EMAIL_ROOT_DOMAIN` | `holzen.app` | `holzen.app` (links in templates) |
 | `EMAIL_APP_URL` | `https://holzen.app` | `http://localhost:8080` or Vercel preview URL |
 | `EMAIL_FEEDBACK_INBOX` | `hello@holzen.app` | Same or a test inbox |
+| `PAUSE_VOLATILITY_EMAIL_ENABLED` | `true` (unset = on) | `false` to disable pause-offer email only |
+
+Set `PAUSE_VOLATILITY_EMAIL_ENABLED=false` in **Supabase Dashboard → Edge Functions → Secrets** (staging and/or prod) to stop “A moment to pause” mail without redeploying. Web push and in-app bell notifications are unchanged.
 
 Staging example (add to `.env.staging.secrets`):
 

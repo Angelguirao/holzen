@@ -362,6 +362,7 @@ These exist in hosted Edge Functions without you creating matching secrets manua
 | `EMAIL_ROOT_DOMAIN` | Root domain for templates | Manual value | Defaults to `holzen.app`. |
 | `EMAIL_FEEDBACK_INBOX` | Feedback/contact inbox | Manual value | Defaults to `hello@holzen.app`. |
 | `EMAIL_PREVIEW_SECRET` | Bearer secret for preview email endpoints | Manual value | Optional ops-only secret; not a normal product flow. |
+| `PAUSE_VOLATILITY_EMAIL_ENABLED` | Send “A moment to pause” mail from `check-volatility` | Manual value | Default **on** (unset). Set `false` to disable pause-offer email only; web push + in-app bell unchanged. |
 | `VAPID_PUBLIC_KEY` | Web Push public key | Web Push/VAPID keypair | Optional unless push is enabled for the environment. |
 | `VAPID_PRIVATE_KEY` | Web Push private key | Web Push/VAPID keypair | Server-only. |
 

@@ -11,6 +11,7 @@ import {
   sendTransactionalEmail,
 } from "./transactional-email.ts";
 import {
+  isPauseVolatilityEmailEnabled,
   prefixEmailSubject,
   resolveNotifyFromAddress,
   resolveVapidMailto,
@@ -222,6 +223,13 @@ export async function deliverPauseOfferChannels(
   await Promise.all([
     (async () => {
       if (!input.emailNotifications) return;
+      if (!isPauseVolatilityEmailEnabled()) {
+        log("notifications_deliver_email", {
+          holzen_event: holzenEvent,
+          phase: "volatility_email_disabled_by_env",
+        });
+        return;
+      }
       const { data: userData } = await input.supabase.auth.admin.getUserById(input.userId);
       const email = userData?.user?.email;
       if (email) {
