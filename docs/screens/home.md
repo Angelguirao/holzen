@@ -107,7 +107,7 @@ Home maps **`v_pause_full.state`** to widget surfaces via [`resolveHomePauseWidg
 |--------|------|----------------|
 | `idle_collapsed` / `idle_expanded` | Idle, no open pause | YOUR PAUSE + moon; expanded → two-tone copy + Nox **Let's pause** |
 | `open_pre_reflect` | `state = active` (manual, cron, mid-ritual pre-Reflect, or returning user) | Title **Your pause**; opening + **Let's pause** |
-| `open_engaged` | `state = engaged` (deep + `reflection_step`) | **Continue your pause** + Continue / Discard; calm-waters body when live quote within thresholds — settled copy + countdown to `open_max_age` |
+| `open_engaged` | `state = engaged` (deep + `reflection_step`) | **Continue your pause** + Continue / Discard; countdown after market context shift (`calm_settled_at` or `pending_offered_at` + 12h); calm-waters body when quote within thresholds |
 | `open_engaged_pending_offer` | `open_engaged` + pending offer | Section **Continue your pause**; inner **New pause available** + **Pause with new context** (adopt → depth picker on `/pause`) |
 | `manual_cooldown_*` | No open pause, manual cooldown active | Title **Your pause**; expanded cooldown copy + optional **Revisit your archive** (`manual_cooldown_first_pause_*` when no archive yet) |
 | `idle_expanded` (post-manual) | Manual cooldown elapsed, `localStorage` idle flag | Auto-expanded idle copy — no market mention |

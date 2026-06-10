@@ -77,11 +77,11 @@ Primary inputs to `resolveHomePauseWidgetSurface`:
 
 | Layer | Meaning | Home widget |
 |-------|---------|-------------|
-| **Postgres `engaged`** | Deep ritual logged `reflection_step` → `engaged_at` set | `open_engaged` or `open_engaged_pending_offer` — *still here* or calm settled copy + **Continue** (Figma 411:7503 welcome-back sheet: resume, start over, discard); countdown from **`calm_settled_at`** (cron) or **`engaged_at`** (manual) |
+| **Postgres `engaged`** | Deep ritual logged `reflection_step` → `engaged_at` set | `open_engaged` or `open_engaged_pending_offer` — *still here* or calm settled copy + **Continue** (Figma 411:7503 welcome-back sheet: resume, start over, discard); countdown from latest context-shift anchor (**`calm_settled_at`** or **`pending_offered_at`**) — see [pause-system.md §3.3](pause-system.md#33-engaged-grace-after-market-context-shifts) |
 | **Pre-Reflect `active`** | Feel/Breath logged but not Reflect yet | `open_pre_reflect` — **Let's pause** |
 | **Untouched open pause** | No step events | `open_pre_reflect` — **Let's pause** |
 
-**Engaged welcome-back sheet (Figma 411:7503 / 411:8073):** **Continue** on `open_engaged` / `open_engaged_pending_offer` opens a half sheet before `/pause`. With a cron **pending** row, copy uses the open-max **remaining** countdown when an anchor exists (`calm_settled_at` or `engaged_at`) — it does **not** claim the pause will be replaced by the pending offer (pending may expire on calm sweep). **Discard** uses the Figma 435:19719 undo snackbar.
+**Engaged welcome-back sheet (Figma 411:7503 / 411:8073):** **Continue** on `open_engaged` / `open_engaged_pending_offer` opens a half sheet before `/pause`. Copy uses the open-max **remaining** countdown when a context-shift anchor exists (`calm_settled_at` after calm, `pending_offered_at` after hot + pending) — it does **not** claim the pause will be replaced by the pending offer (pending may expire on calm sweep). **Discard** uses the Figma 435:19719 undo snackbar.
 
 When cron queues a **pending** row: untouched open pauses are **auto-superseded** (silent). `open_engaged_pending_offer` adopt/decline on Home appears only when the open pause is **`engaged`**; pre-Reflect pending is handled on **`/pause`** leave sheet only.
 
@@ -99,9 +99,18 @@ When the tracked asset move is **back within** the user’s daily thresholds, **
 
 **Manual** open pauses (`source ≠ cron_volatility`) are **not** auto-expired when the market calms.
 
-**Engaged countdown (calm market on `open_engaged` / `open_engaged_pending_offer`):** When live market is within thresholds, settled copy + **This pause closes in {{remaining}}**. For **`cron_volatility`** engaged rows, Postgres stamps **`metadata.calm_settled_at`** on the first calm sweep after Reflect; the countdown is **12h from that stamp**. While volatility is still hot, cron engaged rows have **no** open-max anchor yet — only *still here* copy (no countdown). **Manual** engaged pauses use **`engaged_at` + 12h**; the countdown also appears under *still here* on rows **4** and **5** when an anchor exists (hot market + manual engaged, or row **5** with pending). Row **4b** adds calm-waters body copy above the same countdown line.
+**Engaged countdown (`open_engaged` / `open_engaged_pending_offer`):** **12h grace** starts on each **market context shift** (see [pause-system.md §3.3](pause-system.md#33-engaged-grace-after-market-context-shifts)):
 
-**Home one-shot calm sweep:** When Home already projects calm-waters (`engagedPauseMarketSettled`) but **`calm_settled_at`** is missing on a cron engaged row, `useHomeCronCalmSweepOnce` calls **`pause_apply_cron_calm_sweep_for_self`** once per open instance (server re-validates thresholds). No polling — countdown ticks locally via `PauseEngagedOpenMaxCountdown` after metadata arrives.
+| Market | Typical surface | Countdown anchor |
+| ------ | --------------- | ---------------- |
+| **Calm** (within thresholds) | Row **4b** — settled copy | **`calm_settled_at`** (stamped on first calm sweep) |
+| **Hot + pending** | Row **5** — *still here* + new-context branch | **`pending_offered_at`** (stamped when pending is queued behind engaged) |
+| **Hot, no shift yet** | Row **4** — *still here* only | **None** — no countdown until first shift |
+| **Hot, same fingerprint** | Row **4** — snapshot refresh | **None** — anchors cleared on hot but not replaced until a new shift |
+
+Row **4b** adds calm-waters body copy above the countdown line. Row **5** shows the same countdown under *still here* when **`pending_offered_at`** is set.
+
+**Home one-shot calm sweep:** When Home projects calm-waters (`engagedPauseMarketSettled`) but **`calm_settled_at`** is missing, `useHomeCronCalmSweepOnce` calls **`pause_apply_cron_calm_sweep_for_self`** once per open engaged instance (any `source`; server re-validates thresholds). No polling — countdown ticks locally via `PauseEngagedOpenMaxCountdown` after metadata arrives.
 
 **context_lost toast** (optional Sonner): fires when cron recently expired a row and there is **no** open pause — widget stays on `idle_collapsed` or `manual_cooldown_collapsed`, not an expanded “moment passed” body.
 
@@ -171,7 +180,7 @@ Use this when verifying the Home widget after changes to the resolver, projectio
 |--------------|-----|
 | Migration `20260527120000_pause_engaged_requires_reflection_step.sql` applied on target Supabase | Without it, `engaged` may flip before Reflect → wrong `open_engaged` vs `open_pre_reflect` |
 | Migration `20260609180000_pause_dismiss_current_promote_pending.sql` applied on target Supabase | Without it, `open_engaged_pending_offer` **Discard** may not promote pending → `open_pre_reflect` |
-| Migration `20260609190000_pause_engaged_open_max_calm_settled_anchor.sql` applied on target Supabase | Without it, cron engaged **`open_max_age`** still uses **`engaged_at`**, not calm stamp |
+| Migration `20260610220000_pause_engaged_symmetric_context_shift_grace.sql` applied on target Supabase | Without it, engaged **`open_max_age`** may still use **`engaged_at`** or calm-only anchors |
 | Signed-in user with **trial or Pro** (`getHomeSubscriptionGate` passes) | Lapsed/trial prompt replaces widget body |
 | `npm run dev` (port **8080**) against staging or local Supabase with edge/cron if testing pending | Pending rows come from `pause_create_or_reuse` / cron |
 | Home tab open (`/`); bottom nav **Home** | Pending UX is **Home-only** (no shell modal on other tabs) |
@@ -189,9 +198,9 @@ For each row: note **section title**, **body copy**, **primary CTA**, and **no b
 | 1 | `idle_collapsed` | No open pause; not in manual cooldown; **return visit** | Title **Your pause** + moon; collapsed header only |
 | 2 | `idle_expanded` | First idle onboarding (every visit until **Let's pause**) **or** tap chevron on `idle_collapsed` | Within-range copy + Nox **Let's pause**; forfeited if Holzen opens a pause first |
 | 3 | `open_pre_reflect` | Open `active` (untouched, mid-ritual pre-Reflect, manual, cron, or returning user) | Title **Your pause**; empathy + inline BTC/F&G + Nox **Let's pause** |
-| 4 | `open_engaged` | Reach Reflect → `engaged` | Title **Continue your pause**; *still here* (+ **This pause closes in …** when open-max anchor exists, e.g. manual engaged) + Nox **Continue** + **Discard** |
-| 4b | `open_engaged` (calm waters body) | `open_engaged` + live market within thresholds; cron row has **`calm_settled_at`** | Settled copy + **This pause closes in …** (12h from **`calm_settled_at`**) + **Continue** / **Discard** |
-| 5 | `open_engaged_pending_offer` | `open_engaged` + cron queues new context (pending row) while still on Home | Top: *still here* or calm-waters + **This pause closes in …** when anchor exists + **Continue** / **Discard**; then **New pause available** + **Pause with new context**. When engaged **`open_max_age`** expires with pending still queued, Postgres promotes pending → **`open_pre_reflect`** (migration **`20260610140000`**). |
+| 4 | `open_engaged` | Reach Reflect → `engaged`; market hot, no context shift yet | Title **Continue your pause**; *still here* (no countdown) + Nox **Continue** + **Discard** |
+| 4b | `open_engaged` (calm waters body) | `open_engaged` + live market within thresholds; **`calm_settled_at`** stamped | Settled copy + **This pause closes in …** (12h from **`calm_settled_at`**) + **Continue** / **Discard** |
+| 5 | `open_engaged_pending_offer` | `open_engaged` + cron queues new context (pending row) | Top: *still here* + **This pause closes in …** (12h from **`pending_offered_at`**) + **Continue** / **Discard**; then **New pause available** + **Pause with new context**. When engaged **`open_max_age`** expires with pending still queued, Postgres promotes pending → **`open_pre_reflect`** (migration **`20260610140000`**). |
 | 6 | `manual_cooldown_collapsed` / `manual_cooldown_expanded` | Complete a manual pause; manual cooldown active; no open pause; has archive | Title **Your pause**; collapsed default; expanded → cooldown time + **Revisit your archive** |
 | 7 | `manual_cooldown_first_pause_collapsed` / `manual_cooldown_first_pause_expanded` | Same as row 6 but `completedPauseCount = 0` | Same title; rest copy without archive link |
 | 7b | `idle_expanded` (post-manual cooldown) | Manual cooldown elapsed; market within range; no cron offer | Auto-expands: **The time has passed.** + **Another pause is available, if you need it.** + **Let's pause** |

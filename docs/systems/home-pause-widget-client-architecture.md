@@ -84,7 +84,7 @@ The screen passes only **`UseHomePauseWidgetScreenDeps`** (subscription ready, n
 | `use-home-pause-widget-surface-transition.ts` | Auto expand when open pause arrives / ends |
 | `use-home-pause-widget-cooldown-clock.ts` | 1s tick for manual cooldown labels |
 | `use-home-pause-recent-context-lost.ts` | Calm-waters toast query |
-| `use-home-cron-calm-sweep-once.ts` | One-shot `pause_apply_cron_calm_sweep_for_self` when calm UI lacks `calm_settled_at` |
+| `use-home-cron-calm-sweep-once.ts` | One-shot `pause_apply_cron_calm_sweep_for_self` when calm UI lacks `calm_settled_at` (any engaged `source`) |
 
 ---
 
