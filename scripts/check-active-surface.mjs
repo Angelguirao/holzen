@@ -51,6 +51,9 @@ const CLIENT_QUARANTINED_TABLES = ['collections', 'collection_items'];
 /** Referral program — quarantined in `src/legacy/referrals/` (not in shipped scope). */
 const REFERRAL_QUARANTINED_TABLES = ['referrals', 'referral_rewards', 'referral_pending_jobs'];
 
+/** Public roadmap voting — quarantined in `src/legacy/marketing-roadmap-reserve/` (not in shipped scope). */
+const ROADMAP_QUARANTINED_TABLES = ['roadmap_items', 'roadmap_votes'];
+
 /** Zen Home — quarantined in `src/legacy/zen-mode/` (not in shipped scope). */
 const ZEN_MODE_FORBIDDEN = [
   { re: /\bZenModeHome\b/, label: 'ZenModeHome (use legacy/zen-mode)' },
@@ -76,6 +79,13 @@ const REFERRAL_FROM_RES = REFERRAL_QUARANTINED_TABLES.map(
   (t) => ({
     re: new RegExp(`\\.from\\(['"]${t}['"]\\)`),
     label: `.from('${t}') (referrals — use legacy/referrals)`,
+  }),
+);
+
+const ROADMAP_FROM_RES = ROADMAP_QUARANTINED_TABLES.map(
+  (t) => ({
+    re: new RegExp(`\\.from\\(['"]${t}['"]\\)`),
+    label: `.from('${t}') (roadmap — use legacy/marketing-roadmap-reserve)`,
   }),
 );
 
@@ -111,7 +121,7 @@ for (const file of walk(srcRoot)) {
     }
   }
   if (!SKIP_TIER_B_FILES.has(rel)) {
-    for (const { re, label } of [...TIER_B_FROM_RES, ...QUARANTINED_FROM_RES, ...REFERRAL_FROM_RES]) {
+    for (const { re, label } of [...TIER_B_FROM_RES, ...QUARANTINED_FROM_RES, ...REFERRAL_FROM_RES, ...ROADMAP_FROM_RES]) {
       if (re.test(text)) {
         violations.push({ file: rel, label });
       }

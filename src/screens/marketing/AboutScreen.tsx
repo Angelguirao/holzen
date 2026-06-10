@@ -1,12 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { PageMeta } from '@/app/components/PageMeta';
 import { PublicFooter } from '@/screens/marketing/components/PublicFooter';
 import { PageHeading } from '@/components/ui/page-heading';
-import { prefetchCoingeckoSpotPriceUsd } from '@/features/market/public';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -16,7 +14,6 @@ const fade = (delay = 0) => ({
 });
 
 const AboutScreen = () => {
-  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
@@ -159,14 +156,6 @@ const AboutScreen = () => {
             <p className="text-xs text-muted-foreground leading-relaxed">
               {t('about.reserveBody2')}
             </p>
-            <Link
-              to="/reserve"
-              className="inline-flex items-center gap-1.5 text-xs font-sans font-medium text-nox-text-link underline-offset-4 transition-colors hover:text-nox-text-link/80"
-              onMouseEnter={() => void prefetchCoingeckoSpotPriceUsd(queryClient)}
-              onFocus={() => void prefetchCoingeckoSpotPriceUsd(queryClient)}
-            >
-              {t('about.readReserveStrategy')}
-            </Link>
           </div>
         </motion.div>
 

@@ -21,7 +21,9 @@ Example: `WHERE created_at >= '2026-05-21T20:00:00.000Z'` on truncated tables is
 | `/journey` | Journey overview |
 | `/settings` | Settings hub + sections |
 
-**Public:** `/roadmap` (voting), landing, auth, legal.
+**Public (SPA, interim):** `/welcome` landing, `/auth`, legal, `/blog` — until Astro cutover on `holzen.app`.
+
+**Not shipped (404):** `/roadmap`, `/reserve` — quarantined in `src/legacy/marketing-roadmap-reserve/`. See [marketing-site-split.md](./marketing-site-split.md).
 
 **Full-screen (no bottom nav):** `/onboarding`, `/pause`, `/companion/*` (grounding full view reads orchestrate/hydrated nudge only — no `grounding-enrich`)
 

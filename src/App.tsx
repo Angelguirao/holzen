@@ -39,7 +39,6 @@ const NotFound = lazy(() => import("./screens/marketing/NotFoundScreen"));
 const About = lazy(() => import("./screens/marketing/AboutScreen"));
 const Blog = lazy(() => import("./screens/marketing/BlogScreen"));
 const BlogPost = lazy(() => import("./screens/marketing/BlogPostScreen"));
-const Reserve = lazy(() => import("./screens/marketing/ReserveScreen"));
 const PauseSession = lazy(() => import("./screens/pause/PauseSessionScreen"));
 const CompanionZoomOutPage = lazy(() => import("./screens/pause/CompanionZoomOutPage"));
 const CompanionHistoryPage = lazy(() => import("./screens/pause/CompanionHistoryPage"));
@@ -52,7 +51,6 @@ const EdgeCoverage = lazy(() => import("./screens/ops/EdgeCoverageScreen"));
 const Unsubscribe = lazy(() => import("./screens/marketing/UnsubscribeScreen"));
 const BillingHistory = lazy(() => import("./screens/settings/BillingHistoryScreen"));
 const SettingsAbout = lazy(() => import("./screens/settings/SettingsAboutScreen"));
-const Roadmap = lazy(() => import("./screens/marketing/RoadmapScreen"));
 
 const queryClient = createHolzenQueryClient();
 
@@ -267,8 +265,6 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/roadmap" element={<Roadmap />} />
-                <Route path="/reserve" element={<Reserve />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

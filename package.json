@@ -3,8 +3,14 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "vite",
+    "dev:site": "npm run dev --workspace=@holzen/site",
+    "build:site": "npm run build --workspace=@holzen/site",
     "dev:prod": "vite --mode prod",
     "dev:local": "vite --mode localstack",
     "dev:staging": "vite --mode staging",

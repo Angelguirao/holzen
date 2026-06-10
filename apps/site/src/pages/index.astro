@@ -1,0 +1,41 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+import { appAuthUrl, getAppUrl } from '../lib/app-url';
+
+const ref = Astro.url.searchParams.get('ref');
+const signUpUrl = appAuthUrl('sign-up', ref);
+const signInUrl = appAuthUrl('sign-in');
+const appUrl = getAppUrl();
+---
+
+<MarketingLayout
+  title="Holzen — When Bitcoin moves, pause before you do"
+  description="Holzen watches Bitcoin volatility and sends AI pause prompts to help you slow down before acting on impulse."
+  canonicalPath="/"
+>
+  <header class="nav">
+    <span class="brand">Holzen</span>
+    <a href={signInUrl}>Sign in</a>
+  </header>
+
+  <main class="hero">
+    <h1>When Bitcoin moves, pause before you do</h1>
+    <p>
+      Holzen watches volatility and guides you through a short ritual so you can
+      slow down before acting on impulse.
+    </p>
+    <a class="cta" href={signUpUrl}>Get started for free</a>
+    <p class="muted">No credit card required · Opens in the app</p>
+  </main>
+
+  <footer class="footer">
+    <p>Holzen is behavioral practice for volatile markets — not financial advice.</p>
+    <nav>
+      <a href={`${appUrl}/about`}>About</a>
+      <a href={`${appUrl}/blog`}>Blog</a>
+      <a href={`${appUrl}/terms`}>Terms</a>
+      <a href={`${appUrl}/privacy`}>Privacy</a>
+      <a href="mailto:hello@holzen.app">Contact</a>
+    </nav>
+  </footer>
+</MarketingLayout>

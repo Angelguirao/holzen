@@ -84,19 +84,6 @@ export {
   type LandingTestimonialRow,
 } from './infrastructure/queries/landing-testimonials-query';
 export {
-  deleteRoadmapVote,
-  fetchRoadmapItemsPage,
-  fetchRoadmapVotes,
-  getRoadmapItemsInfiniteQueryOptions,
-  getRoadmapVotesQueryOptions,
-  insertRoadmapVote,
-  roadmapVotesQueryKey,
-  ROADMAP_ITEMS_PAGE_SIZE,
-  ROADMAP_ITEMS_QUERY_KEY,
-  ROADMAP_VOTES_NONE_QUERY_KEY,
-  type RoadmapListItem,
-} from './infrastructure/queries/roadmap-query';
-export {
   CHANGELOG_ENTRIES_PAGE_SIZE,
   CHANGELOG_ENTRIES_QUERY_KEY,
   CHANGELOG_ENTRIES_QUERY_LEAF,
