@@ -1,0 +1,115 @@
+@import '@holzen/design-tokens/tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background: hsl(var(--nox-color-background-deep));
+  color: hsl(var(--nox-color-text-primary));
+  line-height: 1.6;
+}
+
+a {
+  color: hsl(var(--nox-color-text-link));
+  text-decoration: none;
+}
+
+a:hover {
+  opacity: 0.85;
+}
+
+.page {
+  min-height: 100vh;
+}
+
+.nav {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  backdrop-filter: blur(8px);
+  background: hsl(var(--nox-color-background-primary) / 0.85);
+}
+
+.brand {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: hsl(var(--nox-color-text-highlight));
+}
+
+.hero {
+  min-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 1.5rem 4rem;
+  text-align: center;
+}
+
+.hero h1 {
+  font-family: var(--font-editorial);
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1.25;
+  max-width: 28rem;
+  margin: 0 0 1rem;
+}
+
+.hero p {
+  color: hsl(var(--nox-color-text-muted));
+  font-size: 0.95rem;
+  max-width: 24rem;
+  margin: 0 auto 2rem;
+}
+
+.cta {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  border-radius: var(--nox-radius-m);
+  background: hsl(var(--nox-color-background-inverse));
+  color: hsl(var(--nox-color-background-deep));
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.cta:hover {
+  opacity: 1;
+  filter: brightness(1.05);
+}
+
+.muted {
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: hsl(var(--nox-color-text-muted));
+}
+
+.footer {
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+  font-size: 0.75rem;
+  color: hsl(var(--nox-color-text-muted));
+}
+
+.footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}

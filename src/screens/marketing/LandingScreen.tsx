@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { PageMeta } from '@/app/components/PageMeta';
 import { PRICING } from '@/features/subscription/public';
-import { prefetchCoingeckoSpotPriceUsd } from '@/features/market/public';
 import { prefetchBlogPublishedFirstPage } from '@/features/user/public-queries';
 
 function Section({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
@@ -393,15 +392,6 @@ const LandingScreen = () => {
             <Link to="/about" className="hover:text-foreground transition-colors">{t('landing.about')}</Link>
             <span className="text-muted-foreground/20">·</span>
             <Link
-              to="/reserve"
-              className="hover:text-foreground transition-colors"
-              onMouseEnter={() => void prefetchCoingeckoSpotPriceUsd(queryClient)}
-              onFocus={() => void prefetchCoingeckoSpotPriceUsd(queryClient)}
-            >
-              {t('landing.reserveLabel')}
-            </Link>
-            <span className="text-muted-foreground/20">·</span>
-            <Link
               to="/blog"
               className="hover:text-foreground transition-colors"
               onMouseEnter={() => void prefetchBlogPublishedFirstPage(queryClient)}
@@ -409,8 +399,6 @@ const LandingScreen = () => {
             >
               {t('landing.blog')}
             </Link>
-            <span className="text-muted-foreground/20">·</span>
-            <Link to="/roadmap" className="hover:text-foreground transition-colors">{t('landing.roadmap')}</Link>
             <span className="text-muted-foreground/20">·</span>
             <Link to="/terms" className="hover:text-foreground transition-colors">{t('landing.terms')}</Link>
             <span className="text-muted-foreground/20">·</span>

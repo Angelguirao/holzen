@@ -19,7 +19,7 @@ import {
   roadmapVotesQueryKey,
   ROADMAP_ITEMS_QUERY_KEY,
   type RoadmapListItem,
-} from '@/features/user/public-queries';
+} from '@/legacy/marketing-roadmap-reserve/infrastructure/roadmap-query';
 
 const CATEGORIES = ['all', 'self', 'together', 'intelligence', 'reach'] as const;
 
@@ -127,7 +127,6 @@ const RoadmapScreen = () => {
           />
         </div>
 
-        {/* Category filter chips */}
         <div className="flex flex-wrap gap-1.5">
           {CATEGORIES.map((cat) => (
             <button type="button"

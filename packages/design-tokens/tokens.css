@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&family=Newsreader:ital,wght@0,300;0,400;1,300;1,400&display=swap');
+
+:root {
+  --nox-color-background-primary: 219 38% 13%;
+  --nox-color-background-secondary: 218 35% 19%;
+  --nox-color-background-accent: 218 35% 28%;
+  --nox-color-background-deep: 219 45% 10%;
+  --nox-color-background-inverse: 217 22% 89%;
+  --nox-color-text-primary: 217 22% 89%;
+  --nox-color-text-secondary: 213 22% 80%;
+  --nox-color-text-muted: 214 15% 55%;
+  --nox-color-text-link: 213 53% 67%;
+  --nox-color-text-highlight: 36 58% 63%;
+  --nox-color-border-default: 218 35% 28%;
+  --nox-radius-m: 0.75rem;
+
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-editorial: 'Newsreader', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  color-scheme: dark;
+}

@@ -70,7 +70,8 @@ return <>{children}</>;
 | Protected, first-run only | `/onboarding` | `ProtectedRoute` → `PendingOnboardingRoute` → full-screen route |
 | Dead (404) | `/tools`, `/tools/*`, `/library`, `/journey/stats`, `/journey/:tab` | `NotFound` — no redirect map |
 | Public-only | `/welcome`, `/auth` | `PublicOnlyRoute` |
-| Ungated | `/terms`, `/privacy`, `/about`, `/blog`, `/roadmap`, `/reserve`, `/reset-password`, `*` | No wrapper; available without login |
+| Ungated | `/terms`, `/privacy`, `/about`, `/blog`, `/reset-password`, `*` | No wrapper; available without login |
+| Dead (404) | `/roadmap`, `/reserve` | Legacy quarantine — `src/legacy/marketing-roadmap-reserve/` |
 
 Ungated routes are intentional: marketing/legal/blog content and password reset flow do not use `ProtectedRoute` or `PublicOnlyRoute`.
 

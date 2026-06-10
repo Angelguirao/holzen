@@ -15,8 +15,8 @@ Public routes (no auth shell). Shared marketing chrome: `components/PublicFooter
 | `NotFoundScreen` | `*` catch-all |
 | `BlogScreen` | `/blog` |
 | `BlogPostScreen` | `/blog/:slug` |
-| `RoadmapScreen` | `/roadmap` |
-| `ReserveScreen` | `/reserve` |
+| ~~`RoadmapScreen`~~ | `/roadmap` — **legacy** (`src/legacy/marketing-roadmap-reserve/`) |
+| ~~`ReserveScreen`~~ | `/reserve` — **legacy** (`src/legacy/marketing-roadmap-reserve/`) |
 | `UnsubscribeScreen` | `/unsubscribe` |
 
 `App.tsx` lazy-loads `screens/marketing/*Screen` directly.
