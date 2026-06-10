@@ -245,6 +245,58 @@ Locally we **do not merge** Astro + SPA into one dev server (yet). You run them 
 
 ---
 
+## CI/CD — how this fits the pipeline
+
+Holzen uses **one frontend deploy path**. You do **not** add a second Vercel project or separate marketing workflow.
+
+```mermaid
+flowchart LR
+  PR[Pull request] --> CI[ci.yml]
+  CI --> T[test:ci]
+  CI --> B[build:unified]
+  B --> BS[check:bundle-shipped]
+
+  STG[Push staging] --> SD[staging-deploy.yml]
+  SD --> PF[preflight: test:ci + build:unified]
+  PF --> BE[deploy-backend]
+  BE --> FE[vercel-ci-deploy]
+
+  MAIN[Push main] --> PD[deploy-production.yml]
+  PD --> PF2[preflight: test:ci + build:unified]
+  PF2 --> BE2[deploy-backend]
+  BE2 --> FE2[vercel-ci-deploy]
+
+  FE --> V[Vercel preview]
+  FE2 --> VP[Vercel production]
+```
+
+| Stage | Workflow | Frontend build | What deploys |
+| --- | --- | --- | --- |
+| **PR / push** | `.github/workflows/ci.yml` | `npm run build:unified` + `check:bundle-shipped` | Nothing (validate only) |
+| **Staging** | `staging-deploy.yml` preflight | `npm run build:unified` | — |
+| **Staging** | `staging-deploy.yml` deploy-frontend | `vercel build` (same `vercel.json`) | Preview URL |
+| **Production** | `deploy-production.yml` | Same chain | `holzen.app` |
+| **PR preview** | Vercel Git integration (auto) | `vercel.json` → `build:unified` | Ephemeral preview |
+
+**Order:** Backend (migrations + edges) **always** runs before frontend deploy on `staging` / `main` — unchanged. Marketing HTML ships in the **same** prebuilt `dist/` as the SPA.
+
+### New secrets or jobs?
+
+**No** for the current Astro scaffold:
+
+- Astro `/welcome` is static — no extra `VITE_*` or Supabase keys at build time.
+- When you port **blog** to Astro with live Supabase data at build time, add those vars to GitHub + Vercel **build** env (same as SPA today).
+
+### What to verify once
+
+- [ ] GitHub Actions preflight uses `build:unified` (not SPA-only `build`)
+- [ ] Root `vercel.json` has `buildCommand: npm run build:unified` and rewrite to `/spa.html`
+- [ ] After deploy: `/welcome` serves Astro HTML, `/auth` serves React
+
+Details: [cicd-overview.md](./cicd-overview.md).
+
+---
+
 ## Vercel settings (single project)
 
 | Setting | Value |
@@ -321,7 +373,8 @@ Implemented in `apps/site/src/lib/app-url.ts`.
 - [x] `/roadmap`, `/reserve` → legacy
 - [ ] Port full landing content from `LandingScreen.tsx` → `welcome.astro`
 - [ ] Port `/about`, legal, `/blog` to Astro; remove duplicate SPA routes
-- [ ] Confirm production Vercel project uses `npm run build:unified`
+- [x] CI + deploy preflight use `npm run build:unified` (`.github/workflows/*.yml`)
+- [ ] Smoke-test after deploy: `/welcome` (Astro) + `/auth` (SPA)
 
 ---
 

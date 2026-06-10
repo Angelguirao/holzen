@@ -51,8 +51,8 @@ jobs:
       - name: CI gate
         run: npm run test:ci
 
-      - name: Staging build
-        run: npm run build
+      - name: Staging build (unified marketing + SPA)
+        run: npm run build:unified
         env:
           VITE_APP_VERSION: ${{ github.sha }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_STAGING_URL }}
