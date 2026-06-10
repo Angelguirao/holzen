@@ -81,7 +81,7 @@ describe('pause-reflect-flows-io ↔ pause-reflect-flows-flow sibling parity (pr
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(runPauseOutcomeLog);
     expect(pauseReflectOutcomeLog).not.toBe(pauseReflectOutcomeLogWithRepository);
     expect(resolvePreflightFromFlowsIo).not.toBe(pauseReflectOutcomeLog);
-    expect(formatQuoteFromFlowsIo).not.toBe(pauseReflectOutcomeLogWithRepository);
+    expect(resolvePreflightFromFlowsIo).not.toBe(pauseReflectOutcomeLogWithRepository);
     expect(reflectPauseRepository).not.toBe(runPauseOutcomeLog);
   });
 

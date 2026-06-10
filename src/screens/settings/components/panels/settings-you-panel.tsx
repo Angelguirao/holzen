@@ -1,6 +1,5 @@
 import { Input } from '@/components/ui/input';
-import { ANCHOR_MANTRA_MAX_LENGTH } from '@/features/user/domain/profile-motivations';
-import { MotivationPickerGrid } from '@/features/user/presentation/MotivationPickerGrid';
+import { ANCHOR_MANTRA_MAX_LENGTH, MotivationPickerGrid } from '@/features/user/public';
 import { useSettingsState } from '@/screens/settings/hooks/use-settings-state';
 
 export function SettingsYouPanel() {

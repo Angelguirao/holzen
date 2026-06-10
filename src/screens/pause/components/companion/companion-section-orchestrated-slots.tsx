@@ -6,14 +6,16 @@ import type {
   RegenerateCompanionSlot,
 } from '@/features/pause/public-ritual-frame';
 import type { ZoomOutData } from '@/features/pause/public-ritual-frame';
-import { mergeHistoryMarketOverlay } from '@/features/pause/application/use-cases/ritual/frame/historical-insight-payload';
+import { mergeHistoryMarketOverlay } from '@/features/pause/public-ritual-frame';
 import type {
   CompanionUiCompletionState,
   CompanionUiCompletionStep,
 } from '@/features/pause/public-queries';
 
-import type { SignalPayload } from '@/features/pause/domain/signal-payload';
-import { companionSlotHasDisplayableContent } from '@/features/pause/domain/companion-slot-display-content';
+import {
+  companionSlotHasDisplayableContent,
+  type SignalPayload,
+} from '@/features/pause/public-ritual-frame';
 
 type CompanionSignalPayload = SignalPayload | null;
 

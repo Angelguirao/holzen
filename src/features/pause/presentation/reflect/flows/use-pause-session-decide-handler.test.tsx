@@ -45,9 +45,13 @@ vi.mock('@/lib/haptics', () => ({
   hapticFeedback: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-queries', () => ({
-  invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
-}));
+vi.mock('@/features/pause/public-queries', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/pause/public-queries')>();
+  return {
+    ...actual,
+    invalidatePauseStatsDataForUser: (...args: unknown[]) => invalidatePauseStatsMock(...args),
+  };
+});
 
 vi.mock('@/features/auth/public', () => ({
   useAuth: () => ({

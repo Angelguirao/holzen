@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { subscribePauseAiArtifactsForInstance } from '@/features/pause/infrastructure/realtime/pause-ai-artifacts-realtime';
+import { subscribePauseAiArtifactsForInstance } from '@/features/pause/public-queries';
 
 const DEFAULT_DEBOUNCE_MS = 300;
 

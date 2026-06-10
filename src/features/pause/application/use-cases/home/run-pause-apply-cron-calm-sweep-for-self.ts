@@ -1,4 +1,4 @@
-import { pauseApplyCronCalmSweepForSelf } from '@/features/pause/infrastructure/pause-rpc-client';
+import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 
 export type PauseApplyCronCalmSweepResult = {
   applied: boolean;
@@ -8,11 +8,14 @@ export type PauseApplyCronCalmSweepResult = {
 };
 
 /** One-shot Home calm sweep — server validates thresholds; no polling. */
-export async function runPauseApplyCronCalmSweepForSelf(input: {
-  changePercent: number;
-  direction: 'up' | 'down';
-}): Promise<PauseApplyCronCalmSweepResult> {
-  const raw = await pauseApplyCronCalmSweepForSelf(input);
+export async function runPauseApplyCronCalmSweepForSelf(
+  repository: PauseRepository,
+  input: {
+    changePercent: number;
+    direction: 'up' | 'down';
+  },
+): Promise<PauseApplyCronCalmSweepResult> {
+  const raw = await repository.applyCronCalmSweepForSelf(input);
   if (!raw || typeof raw !== 'object') {
     return { applied: false, reason: 'empty_response' };
   }

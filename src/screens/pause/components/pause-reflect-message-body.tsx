@@ -2,15 +2,18 @@ import { useEffect, useMemo, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
-import { buildReflectFeelRecapLine } from '@/features/pause/domain/reflect/generation/build-reflect-feel-recap-line';
-import { formatReflectDisplayLetter } from '@/features/pause/domain/reflect/generation/format-reflect-display-letter';
-import { resolvePauseReflectDisplayContent } from '@/features/pause/domain/reflect/generation/resolve-pause-reflect-display-content';
-import type { CurrentFeelForReflect, ReflectionContentV2 } from '@/features/pause/domain/reflect/generation/reflection-content-v2';
-import { resolvePauseReflectMessageView } from '@/features/pause/public-ritual-reflect';
 import {
+  buildReflectFeelRecapLine,
+  formatReflectDisplayLetter,
+  resolvePauseReflectDisplayContent,
+  type CurrentFeelForReflect,
+  type ReflectionContentV2,
+} from '@/features/pause/public-ritual-reflect';
+import {
+  resolvePauseReflectMessageView,
   trackPauseReflectBlockViewed,
   trackPauseReflectInquiryDisplayed,
-} from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+} from '@/features/pause/public-ritual-reflect';
 import { PauseReflectInlineNotice } from '@/screens/pause/components/pause-reflect-inline-notice';
 import { PauseReflectMarketContext } from '@/screens/pause/components/pause-reflect-market-context';
 

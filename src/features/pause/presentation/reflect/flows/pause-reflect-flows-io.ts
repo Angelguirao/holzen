@@ -68,6 +68,7 @@ import {
 } from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
+import { readPauseImpactPracticeFieldsFromCache } from './read-pause-impact-practice-fields';
 
 /** Default `PauseRepository` for reflect+decide presentation hooks. */
 export const reflectPauseRepository = supabasePauseRepository;
@@ -75,6 +76,7 @@ export const reflectPauseRepository = supabasePauseRepository;
 export {
   buildPauseScoreImpacts,
   parseScoreImpactVolatilityPct,
+  readPauseImpactPracticeFieldsFromCache,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
@@ -89,6 +91,7 @@ export {
   type ScoreImpactVariant,
   type ScoreImpactViewMode,
 };
+export type { PauseImpactPracticeFields } from './read-pause-impact-practice-fields';
 
 /** Default port + use case: decide step `outcome_logged` RPC. */
 export function pauseReflectOutcomeLog(

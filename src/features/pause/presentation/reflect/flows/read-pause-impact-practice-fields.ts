@@ -1,6 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query';
-import { EMPTY_COMPANION_UI_COMPLETION } from '@/features/pause/application/use-cases/ritual/frame/companion-ui-completion-types';
-import type { CompanionUiCompletionState } from '@/features/pause/application/use-cases/ritual/frame/companion-ui-completion-types';
+import { EMPTY_COMPANION_UI_COMPLETION } from '@/features/pause/domain/companion/companion-ui-completion-types';
+import type { CompanionUiCompletionState } from '@/features/pause/domain/companion/companion-ui-completion-types';
 import {
   countEngagedFrameCompanionTools,
   listCompletedFrameCompanionSlots,
@@ -17,8 +17,8 @@ import {
   PRACTICE_XP_COMPANION_SLOT_FAVORITE_EACH,
   PRACTICE_XP_COMPANION_SLOT_FAVORITE_MAX,
 } from '@/features/pause/domain/practice/practice-xp-constants';
-import { companionUiCompletionQueryKey } from '@/features/pause/infrastructure/queries/companion/companion-ui-completion-query-key';
-import { pauseReflectStepLatestQueryKey } from '@/features/pause/infrastructure/queries/reflect/steps/reflect-step-query-key';
+import { companionUiCompletionQueryKey } from '@/features/pause/public-queries';
+import { pauseReflectStepLatestQueryKey } from '@/features/pause/public-queries';
 
 export type PauseImpactPracticeFields = {
   engagedTools: number;

@@ -37,8 +37,8 @@ export function usePauseShiftFrameDoneHandler(input: {
       await pauseShiftEmotionFrameHubDone({
         pauseInstanceId,
         lastShiftLogKey: lastShiftLogKeyRef.current,
-        shiftMood: frameShiftMood,
-        shiftIntensity: frameShiftIntensity,
+        shiftMood: frameShiftMood ?? null,
+        shiftIntensity: frameShiftIntensity ?? null,
       }),
     );
 

@@ -61,13 +61,14 @@ import {
   pauseReflectGeneration,
   reflectGenerator
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
+import { formatReinforcementQuoteFromSession as formatQuoteFromFlowsFlow } from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
 import {
   buildPauseScoreImpacts,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
-  resolvePauseSessionReflectAndDecidePreflight
+  resolvePauseSessionReflectAndDecidePreflight,
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   pauseReflectFavoriteToggle,

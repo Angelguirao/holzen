@@ -1,7 +1,4 @@
-import {
-  type PauseHelpFeedbackStorageState,
-  readPauseHelpFeedbackStorage,
-} from '@/features/pause/infrastructure/pause-help-feedback-storage';
+import type { PauseHelpFeedbackStorageState } from '@/features/pause/domain/home/pause-help-feedback-storage-types';
 
 export const PAUSE_HELP_FEEDBACK_MAX_DEFERRALS = 3;
 export const PAUSE_HELP_FEEDBACK_MAX_PROMPTS_PER_LOCAL_DAY = 1;
@@ -19,16 +16,15 @@ export function localCalendarYmd(date: Date): string {
 export type PauseHelpFeedbackEligibilityInput = {
   userId: string | undefined;
   pauseInstanceId: string | null;
-  storage?: PauseHelpFeedbackStorageState;
+  storage: PauseHelpFeedbackStorageState;
   now?: Date;
 };
 
 /** Whether Home should open the post-pause help bottom sheet for this completed instance. */
 export function shouldShowPauseHelpFeedback(input: PauseHelpFeedbackEligibilityInput): boolean {
-  const { userId, pauseInstanceId } = input;
+  const { userId, pauseInstanceId, storage } = input;
   if (!userId || !pauseInstanceId) return false;
 
-  const storage = input.storage ?? readPauseHelpFeedbackStorage(userId);
   if (storage.optedOut) return false;
   if (storage.ratedPauseIds.includes(pauseInstanceId)) return false;
   if (storage.deferredPauseIds.includes(pauseInstanceId)) return false;

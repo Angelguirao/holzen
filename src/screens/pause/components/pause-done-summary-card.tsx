@@ -1,15 +1,15 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import type { PauseImpactData } from '@/features/pause/domain/decide/pause-impact-data';
-import { estimatePresenceXpFromImpact } from '@/features/pause/domain/done/estimate-presence-xp-from-impact';
 import {
+  estimatePresenceXpFromImpact,
   formatPauseDoneDecisionLabel,
   formatPauseDoneEndedShiftLine,
   formatPauseDoneMoodIntensityLine,
-} from '@/features/pause/domain/done/format-pause-done-summary-labels';
-import { formatPauseRitualDurationMs } from '@/features/pause/domain/done/format-pause-ritual-duration';
-import { clampFeelIntensity, type MoodValue } from '@/features/pause/domain/mood-value';
+  formatPauseRitualDurationMs,
+  type PauseImpactData,
+} from '@/features/pause/public-ritual-done';
+import { clampFeelIntensity, type MoodValue } from '@/features/pause/public-ritual-feel';
 import { COMPANION_SECTION_ICONS } from '@/screens/pause/components/companion/companion-section-icons';
 import { PauseDoneSummaryRow } from '@/screens/pause/components/pause-done-summary-row';
 

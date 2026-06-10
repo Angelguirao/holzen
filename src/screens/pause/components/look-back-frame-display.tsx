@@ -1,6 +1,6 @@
 import { BookOpen, GitCompare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { resolveHistoricalMarketInsight } from '@/features/pause/domain/historical-insight';
+import { resolveHistoricalMarketInsight } from '@/features/pause/public-ritual-frame';
 import type { CachedHistoricalInsightShape } from '@/features/pause/public-ritual-frame';
 import { LookBackReadFullStoryButton } from '@/screens/pause/components/companion/look-back-read-full-story-button';
 import { MarketOnThisDayBlock } from '@/screens/pause/components/market-on-this-day-block';

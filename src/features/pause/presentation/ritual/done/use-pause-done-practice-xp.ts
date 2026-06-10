@@ -5,7 +5,7 @@ import { estimatePresenceXpFromImpact } from '@/features/pause/domain/done/estim
 import {
   fetchPauseInstancePracticeXpAwarded,
   pauseInstancePracticeXpQueryKey,
-} from '@/features/pause/infrastructure/queries/pause-instance-practice-xp-query';
+} from '@/features/pause/public-queries';
 
 /** Done summary Presence row — prefers `practice_xp_awarded`, falls back to client estimate. */
 export function usePauseDonePracticeXp(

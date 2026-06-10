@@ -36,8 +36,9 @@ import {
   trackPauseReflectWallpaperTap as trackWallpaperFromTelemetryIo
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
+  formatReinforcementQuoteFromSession as formatQuoteFromFlowsFlow,
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
-  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow
+  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
 } from '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-flows-flow';
 import {
   runPauseFavoriteToggle as runFavoriteFromStepsFlow,

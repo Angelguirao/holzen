@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   normalizeTrackedAssetId,
 } from '@/features/market/public';
-import { hasMinimumMotivations } from '@/features/user/domain/profile-motivations';
+import { hasMinimumMotivations } from '@/features/user/public';
 import { OnboardingAssetStep } from '@/screens/onboarding/components/OnboardingAssetStep';
 import { OnboardingSubscriptionStep } from '@/screens/onboarding/components/OnboardingSubscriptionStep';
 import { OnboardingThresholdStep } from '@/screens/onboarding/components/OnboardingThresholdStep';

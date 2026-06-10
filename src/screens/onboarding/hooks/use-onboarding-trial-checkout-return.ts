@@ -2,12 +2,10 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
+  fetchTrialCheckoutGrantStatus,
   ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY,
-} from '@/features/subscription/application/trial-checkout-flow';
-import {
   trackTrialDenied,
-} from '@/features/subscription/application/paywall-telemetry';
-import { fetchTrialCheckoutGrantStatus } from '@/features/subscription/application/trial-checkout-grant';
+} from '@/features/subscription/public';
 
 type Args = {
   userId: string | null;

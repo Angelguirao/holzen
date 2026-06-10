@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
-import { mergeHistoryMarketOverlay } from '@/features/pause/application/use-cases/ritual/frame/historical-insight-payload';
-import { resolveHistoricalMarketInsight } from '@/features/pause/domain/historical-insight';
+import {
+  mergeHistoryMarketOverlay,
+  resolveHistoricalMarketInsight,
+} from '@/features/pause/public-ritual-frame';
 import { useTranslation } from 'react-i18next';
 import { usePauseHomeContext } from '@/features/pause/public-home';
 import { useProfile } from '@/features/user/public-hooks';

@@ -1,5 +1,6 @@
-/** Mirrors `open_max_age` in Postgres: 12h after the open-max anchor (see pause-open-max-anchor.ts). */
-export const PAUSE_OPEN_MAX_AGE_MS = 12 * 60 * 60 * 1000;
+import { PAUSE_OPEN_MAX_AGE_MS } from '@/features/pause/domain/pause-open-max-age';
+
+export { PAUSE_OPEN_MAX_AGE_MS };
 
 export function pauseOpenMaxDeadlineMs(anchorIso: string): number {
   return new Date(anchorIso).getTime() + PAUSE_OPEN_MAX_AGE_MS;

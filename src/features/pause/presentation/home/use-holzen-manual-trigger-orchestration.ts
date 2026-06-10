@@ -13,7 +13,7 @@ import {
   readManualTriggerCooldownAtMs,
   writeManualTriggerCooldownAtMs,
 } from '@/features/pause/public-trigger';
-import { markPostManualCooldownIdlePrompt } from '@/features/pause/infrastructure/home-post-manual-cooldown-idle-storage';
+import { markPostManualCooldownIdlePrompt } from '@/features/pause/public-queries';
 import type { ManualPauseTriggerOptions } from '@/features/pause/domain/manual-pause-trigger-options';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,

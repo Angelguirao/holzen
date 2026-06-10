@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
-import { isPauseReflectContinueDisabled } from '@/features/pause/domain/reflect/generation/is-pause-reflect-continue-disabled';
+import { isPauseReflectContinueDisabled } from '@/features/pause/public-ritual-reflect';
 import { pauseStepLayout } from '@/features/pause/public-session';
 import { Button } from '@/components/ui/button';
 import { PauseRitualBackRow } from '@/screens/pause/components/pause-ritual-back-row';

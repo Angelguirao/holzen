@@ -1,9 +1,10 @@
-import { trackedAssetSymbol, type MarketQuote } from '@/features/market/public';
-import { parsePauseContextForHomePreview } from '@/features/market/application/pause-context-home-preview';
 import {
   formatCompactMarketSentimentFromContextText,
   formatCompactMarketSentimentFromFearGreed,
-} from '@/features/market/application/format-compact-market-sentiment-line';
+  parsePauseContextForHomePreview,
+  trackedAssetSymbol,
+  type MarketQuote,
+} from '@/features/market/public';
 
 export type PauseDepthPickerMarketLines = {
   sym: string;

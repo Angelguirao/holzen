@@ -6,8 +6,7 @@ import { cn } from '@/lib/utils';
 import { CompanionError } from '../CompanionError';
 import { WhyThisCard } from './WhyThisCard';
 import { SignalKeyIdeasBlock } from '@/screens/pause/components/companion/signal-key-ideas-block';
-import type { SignalPayload } from '@/features/pause/domain/signal-payload';
-import { normalizeSignalKeyIdeas } from '@/features/pause/domain/signal-payload';
+import { normalizeSignalKeyIdeas, type SignalPayload } from '@/features/pause/public-ritual-frame';
 
 type SignalData = SignalPayload;
 

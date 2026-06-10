@@ -1,7 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { writeUnitBasisModeToStorage } from '@/features/market/domain/unit-basis-mode-storage';
+import { writeUnitBasisModeToStorage } from '@/features/market/public';
 import { isBitcoinTrackedAsset } from '@/features/market/public';
 import {
   CHECKOUT_SUPPRESSION_WINDOW_DEFAULT_MINUTES,

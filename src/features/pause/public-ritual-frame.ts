@@ -5,6 +5,12 @@
  */
 export type { CompanionData, CompanionPrefs } from './domain/companion-card-types';
 export type { CachedHistoricalInsightShape } from './domain/historical-insight';
+export { resolveHistoricalMarketInsight } from './domain/historical-insight';
+export { mergeHistoryMarketOverlay } from './application/use-cases/ritual/frame/historical-insight-payload';
+export { companionSlotHasDisplayableContent } from './domain/companion-slot-display-content';
+export type { SignalPayload } from './domain/signal-payload';
+export { normalizeSignalKeyIdeas } from './domain/signal-payload';
+export type { MarketOnThisDayEntry } from './domain/market-on-this-day';
 export type { RegenerateCompanionSlot } from './domain/companion-orchestrate';
 export type { CompanionFeedbackVote } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
 export type {

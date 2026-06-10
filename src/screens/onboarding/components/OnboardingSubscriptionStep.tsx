@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { LoadingButton } from '@/components/ui/loading-button';
 import {
   formatMotivationLine,
-} from '@/features/user/domain/profile-motivations';
+} from '@/features/user/public';
 import { trackedAssetSymbol } from '@/features/market/public';
 import { PRICING } from '@/features/subscription/public';
 

@@ -10,9 +10,8 @@ import {
   type MarketQuote,
 } from '@/features/market/public';
 import { useProfile } from '@/features/user/public-hooks';
-import { shouldShowPauseRitualMarketContext } from '@/features/pause/domain/session/should-show-pause-ritual-market-context';
-import { usePendingPauseOffer } from '@/features/pause/presentation/reflect/pending-offer/use-pending-pause-offer';
-import { formatPauseDepthPickerMarketLines } from '@/features/pause/domain/feel/format-pause-depth-picker-market-lines';
+import { formatPauseDepthPickerMarketLines, shouldShowPauseRitualMarketContext } from '@/features/pause/public-ritual-feel';
+import { usePendingPauseOffer } from '@/features/pause/public-home';
 
 type Props = {
   marketData: MarketQuote | null;

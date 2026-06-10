@@ -2,12 +2,13 @@ import type { ReactNode } from 'react';
 import { Outlet } from 'react-router-dom';
 import { vi } from 'vitest';
 import '@/i18n';
-import { createIntegrationSupabaseMock } from './integration-supabase-mock';
 
-const TEST_USER = {
-  id: '00000000-0000-4000-8000-000000000001',
-  email: 'pause@test.holzen.app',
-};
+const { TEST_USER } = vi.hoisted(() => ({
+  TEST_USER: {
+    id: '00000000-0000-4000-8000-000000000001',
+    email: 'pause@test.holzen.app',
+  },
+}));
 
 vi.mock('@/features/auth/public', () => ({
   AuthProvider: ({ children }: { children: ReactNode }) => children,
@@ -41,7 +42,8 @@ vi.mock('@/features/subscription/public-hooks', () => ({
   }),
 }));
 
-vi.mock('@/integrations/supabase/client', () => {
+vi.mock('@/integrations/supabase/client', async () => {
+  const { createIntegrationSupabaseMock } = await import('./integration-supabase-mock');
   const base = createIntegrationSupabaseMock();
   return {
     supabase: {

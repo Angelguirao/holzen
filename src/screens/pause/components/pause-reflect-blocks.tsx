@@ -6,8 +6,11 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import type { CurrentFeelForReflect, ReflectionContentV2 } from '@/features/pause/domain/reflect/generation/reflection-content-v2';
-import { trackPauseReflectContextStripExpanded } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import {
+  trackPauseReflectContextStripExpanded,
+  type CurrentFeelForReflect,
+  type ReflectionContentV2,
+} from '@/features/pause/public-ritual-reflect';
 
 export type PauseReflectBlocksProps = {
   pauseInstanceId: string | null;

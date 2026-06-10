@@ -13,8 +13,10 @@ import {
   trackPauseOpenDismissed,
   type PauseDismissAnalyticsSurface,
 } from '@/features/pause/presentation/reflect/generation/manual-open/pause-home-reflect-telemetry-io';
-import { markHomePauseWidgetFirstVisitHandled } from '@/features/pause/infrastructure/home-pause-widget-first-visit-storage';
-import { clearPostManualCooldownIdlePrompt } from '@/features/pause/infrastructure/home-post-manual-cooldown-idle-storage';
+import {
+  clearPostManualCooldownIdlePrompt,
+  markHomePauseWidgetFirstVisitHandled,
+} from '@/features/pause/public-queries';
 import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import { holzenLog } from '@/lib/holzen-console';
 

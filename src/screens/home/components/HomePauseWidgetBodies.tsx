@@ -3,9 +3,7 @@ import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
-import {
-  computeManualCooldownReadyAtMs,
-} from '@/features/pause/domain/reflect/generation/compute-pause-trigger-cooldowns';
+import { computeManualCooldownReadyAtMs } from '@/features/pause/public-home';
 import {
   formatHomePauseReadyAtClock,
 } from '@/screens/home/components/HomePauseChrome';
@@ -17,13 +15,15 @@ import {
   HomePauseWidgetOpeningStack,
   HomePauseWidgetTwoToneLead,
 } from '@/screens/home/components/HomePauseWidgetShared';
-import type { HomePauseWidgetPreviewLine as HomePauseWidgetPreviewLineModel } from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
-import type { HomePauseMarketBlock } from '@/features/pause/domain/home/format-home-pause-market-block';
-import type { HomePauseWidgetSurface } from '@/features/pause/domain/home/home-pause-widget-surface';
+import type {
+  HomePauseMarketBlock,
+  HomePauseWidgetPreviewLine as HomePauseWidgetPreviewLineModel,
+  HomePauseWidgetSurface,
+} from '@/features/pause/public-home';
 import {
   homePauseWidgetSurfaceIsManualCooldownFirstPause,
   homePauseWidgetSurfaceIsManualCooldownWithArchive,
-} from '@/features/pause/domain/home/home-pause-widget-surface';
+} from '@/features/pause/public-home';
 import { PauseEngagedOpenMaxCountdown } from '@/screens/pause/components/PauseEngagedOpenMaxCountdown';
 
 type OpenBodyProps = {

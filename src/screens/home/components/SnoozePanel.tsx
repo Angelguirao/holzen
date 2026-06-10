@@ -24,7 +24,7 @@ import {
   defaultCustomSnoozeDate,
   SNOOZE_PRESET_HOURS,
   type SnoozeDurationPreset,
-} from '@/features/user/domain/snooze-schedule';
+} from '@/features/user/public';
 import { hapticFeedback } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';

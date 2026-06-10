@@ -1,11 +1,11 @@
-import type { MarketQuote } from '@/features/market/domain/market-quote';
-import { parsePauseContextForHomePreview } from '@/features/market/application/pause-context-home-preview';
 import {
+  fearGreedFromPauseContextSnapshot,
   formatCompactMarketSentimentFromContextText,
   formatCompactMarketSentimentFromFearGreed,
-} from '@/features/market/application/format-compact-market-sentiment-line';
-import { fearGreedFromPauseContextSnapshot } from '@/features/market/domain/home-market-display-quote';
-import { trackedAssetSymbol } from '@/features/market/domain/tracked-assets';
+  parsePauseContextForHomePreview,
+  trackedAssetSymbol,
+  type MarketQuote,
+} from '@/features/market/public';
 
 export type HomePauseMarketBlock = {
   /** Compact line e.g. "BTC ↓ 1.1% · 24h" */

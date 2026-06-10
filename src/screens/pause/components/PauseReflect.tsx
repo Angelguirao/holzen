@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { resolvePauseReflectDisplayContent } from '@/features/pause/domain/reflect/generation/resolve-pause-reflect-display-content';
+import { resolvePauseReflectDisplayContent } from '@/features/pause/public-ritual-reflect';
 import {
   usePauseReflectionStepLog,
   type CurrentFeelForReflect,

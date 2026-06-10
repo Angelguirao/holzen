@@ -91,3 +91,21 @@ export {
   trackHomeOptionalWidgetToggled,
   trackOnboardingCompleted,
 } from './presentation/home/home-screen-telemetry-io';
+export type { HomePauseWidgetPreviewLine } from './domain/home/resolve-home-pause-widget-preview-line';
+export type { HomePauseMarketBlock } from './domain/home/format-home-pause-market-block';
+export {
+  homePauseWidgetSectionTitleKey,
+  resolveHomePauseWidgetSurface,
+  type HomePauseWidgetSurface,
+} from './domain/home/home-pause-widget-surface';
+export { computeManualCooldownReadyAtMs } from './domain/reflect/generation/compute-pause-trigger-cooldowns';
+export {
+  homePauseWidgetSurfaceIsManualCooldownFirstPause,
+  homePauseWidgetSurfaceIsManualCooldownWithArchive,
+} from './domain/home/home-pause-widget-surface';
+export { useHomePauseHelpFeedback } from './presentation/home/use-home-pause-help-feedback';
+export {
+  isPauseOpenMaxExpired,
+  resolvePauseOpenMaxAnchorAt,
+} from './domain/pause-open-max-anchor';
+export { resolveHomePauseWidgetOpenMaxAnchorAt } from './domain/home/resolve-home-pause-widget-open-max-anchor';

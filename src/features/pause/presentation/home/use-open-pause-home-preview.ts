@@ -3,10 +3,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { User } from '@supabase/supabase-js';
 import type { CompanionData } from '@/features/pause/domain/companion-card-types';
 import { DEFAULT_COMPANIONS } from '@/features/pause/domain/session-model';
-import { runPauseDismissCurrent } from '@/features/pause/application/use-cases/session/run-pause-dismiss-current';
-import { fetchOpenPauseHomePreview } from '@/features/pause/public-queries';
-import { pendingPauseOfferQueryKey } from '@/features/pause/infrastructure/queries/reflect/pending-offer/pending-pause-offer-query-key';
-import { HOLZEN_MARKET_DISPLAY_QUERY_PREFIX } from '@/features/market/application/queries/holzen-market-display-keys';
+import { fetchOpenPauseHomePreview, pendingPauseOfferQueryKey } from '@/features/pause/public-queries';
+import { pauseCommitOpenPauseDismissRpc } from '@/features/pause/presentation/home/pause-open-pause-home-preview-io';
+import { HOLZEN_MARKET_DISPLAY_QUERY_PREFIX } from '@/features/market/public';
 import { notificationsInboxQueryKey } from '@/features/notifications/infrastructure/queries/notifications-inbox-query';
 import { HOLZEN_NUMBER_QUERY_KEY, PROFILE_QUERY_KEY } from '@/features/user/public-queries';
 import {
@@ -230,7 +229,7 @@ export function useOpenPauseHomePreview(
   const commitOpenPauseDismissRpc = useCallback(async () => {
     if (!user) return;
     try {
-      await runPauseDismissCurrent(pauseHomeManualOpenPorts.repository);
+      await pauseCommitOpenPauseDismissRpc(pauseHomeManualOpenPorts.repository);
     } catch {
       /* non-fatal — preview already cleared locally */
     }

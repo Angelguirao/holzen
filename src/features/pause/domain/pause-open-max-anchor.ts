@@ -1,5 +1,5 @@
 import type { PauseState } from '@/features/pause/domain/pause-state';
-import { PAUSE_OPEN_MAX_AGE_MS } from '@/features/pause/application/use-cases/session/open-max-countdown';
+import { PAUSE_OPEN_MAX_AGE_MS } from '@/features/pause/domain/pause-open-max-age';
 
 export const PAUSE_CALM_SETTLED_AT_METADATA_KEY = 'calm_settled_at';
 export const PAUSE_PENDING_OFFERED_AT_METADATA_KEY = 'pending_offered_at';

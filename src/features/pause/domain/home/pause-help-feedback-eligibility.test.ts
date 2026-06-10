@@ -4,7 +4,7 @@ import {
   PAUSE_HELP_FEEDBACK_SUBMIT_COOLDOWN_DAYS,
   shouldShowPauseHelpFeedback,
 } from './pause-help-feedback-eligibility';
-import type { PauseHelpFeedbackStorageState } from '@/features/pause/infrastructure/pause-help-feedback-storage';
+import type { PauseHelpFeedbackStorageState } from '@/features/pause/domain/home/pause-help-feedback-storage-types';
 
 const baseStorage: PauseHelpFeedbackStorageState = {
   ratedPauseIds: [],
@@ -79,7 +79,7 @@ describe('shouldShowPauseHelpFeedback', () => {
   });
 
   it('blocks re-prompt within 7 days of a successful submit', () => {
-    const now = new Date('2026-06-10T12:00:00');
+    const now = new Date('2026-06-10T12:00:00.000Z');
     expect(
       shouldShowPauseHelpFeedback({
         userId: 'u1',

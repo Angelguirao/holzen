@@ -183,9 +183,15 @@ describe('pause-reflect-share-io parity (application)', () => {
     const haiku = 'still water';
     const deps = { share: vi.fn() };
 
-    await pauseReflectionShareImage(message, context, haiku, deps);
+    await pauseReflectionShareImage(message, context, haiku, undefined, deps);
 
-    expect(runReflectionShareImageDirect).toHaveBeenCalledWith(message, context, haiku, deps);
+    expect(runReflectionShareImageDirect).toHaveBeenCalledWith(
+      message,
+      context,
+      haiku,
+      undefined,
+      deps,
+    );
   });
 
   it('presentation share wrapper stays distinct from run-reflection-share-image leaf', () => {

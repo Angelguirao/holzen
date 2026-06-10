@@ -1,34 +1,29 @@
+import { describe, expect, it } from "vitest";
 import {
   customerHasPriorSubscriptionHistory,
   isDisposableEmailDomain,
   normalizeEmailForTrialFingerprint,
 } from "./trial-eligibility.ts";
 
-function assert(cond: boolean, msg: string): void {
-  if (!cond) throw new Error(msg);
-}
-
-Deno.test("normalizeEmailForTrialFingerprint collapses Gmail aliases", () => {
-  assert(
-    normalizeEmailForTrialFingerprint("Jane.Doe+promo@gmail.com") ===
+describe("normalizeEmailForTrialFingerprint", () => {
+  it("collapses Gmail aliases", () => {
+    expect(normalizeEmailForTrialFingerprint("Jane.Doe+promo@gmail.com")).toBe(
       normalizeEmailForTrialFingerprint("janedoe@gmail.com"),
-    "gmail alias normalization",
-  );
-  assert(
-    normalizeEmailForTrialFingerprint("a@googlemail.com") === "a@gmail.com",
-    "googlemail domain",
-  );
+    );
+    expect(normalizeEmailForTrialFingerprint("a@googlemail.com")).toBe("a@gmail.com");
+  });
 });
 
-Deno.test("isDisposableEmailDomain blocks known throwaways", () => {
-  assert(isDisposableEmailDomain("x@mailinator.com"), "mailinator");
-  assert(!isDisposableEmailDomain("x@gmail.com"), "gmail ok");
+describe("isDisposableEmailDomain", () => {
+  it("blocks known throwaways", () => {
+    expect(isDisposableEmailDomain("x@mailinator.com")).toBe(true);
+    expect(isDisposableEmailDomain("x@gmail.com")).toBe(false);
+  });
 });
 
-Deno.test("customerHasPriorSubscriptionHistory is true when any sub exists", () => {
-  assert(
-    customerHasPriorSubscriptionHistory([{ id: "sub_1" } as never]),
-    "prior sub blocks",
-  );
-  assert(!customerHasPriorSubscriptionHistory([]), "empty allows");
+describe("customerHasPriorSubscriptionHistory", () => {
+  it("is true when any sub exists", () => {
+    expect(customerHasPriorSubscriptionHistory([{ id: "sub_1" } as never])).toBe(true);
+    expect(customerHasPriorSubscriptionHistory([])).toBe(false);
+  });
 });

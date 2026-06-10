@@ -141,12 +141,13 @@ describe('pause-reflect-share-io parity', () => {
   it('pauseReflectionShareImage delegates to run-reflection-share-image leaf', async () => {
     const deps = { share: vi.fn() };
 
-    await pauseReflectionShareImage('parity-msg', 'parity-ctx', 'parity-haiku', deps);
+    await pauseReflectionShareImage('parity-msg', 'parity-ctx', 'parity-haiku', undefined, deps);
 
     expect(runReflectionShareImageDirect).toHaveBeenCalledWith(
       'parity-msg',
       'parity-ctx',
       'parity-haiku',
+      undefined,
       deps,
     );
   });
@@ -195,9 +196,15 @@ describe('pause-reflect-share-io parity', () => {
     const haiku = 'still water';
     const deps = { share: vi.fn() };
 
-    await pauseReflectionShareImage(message, context, haiku, deps);
+    await pauseReflectionShareImage(message, context, haiku, undefined, deps);
 
-    expect(runReflectionShareImageDirect).toHaveBeenCalledWith(message, context, haiku, deps);
+    expect(runReflectionShareImageDirect).toHaveBeenCalledWith(
+      message,
+      context,
+      haiku,
+      undefined,
+      deps,
+    );
   });
 
   /**

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { HomePauseWidgetPreviewLine } from '@/features/pause/domain/home/resolve-home-pause-widget-preview-line';
+import type { HomePauseWidgetPreviewLine } from '@/features/pause/public-home';
 
 type Props = {
   previewLine: HomePauseWidgetPreviewLine;

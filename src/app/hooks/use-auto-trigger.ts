@@ -1,19 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth/public';
+import { subscribePauseInstanceOpenUpdates } from '@/features/pause/public-queries';
 import {
   getProfileRowQueryOptions,
   subscribeProfileLastContextUpdates,
 } from '@/features/user/public-queries';
-import { supabase } from '@/integrations/supabase/client';
-
-type PauseInstanceRealtimeRow = {
-  state?: string | null;
-};
-
-function isOpenPauseRow(row: PauseInstanceRealtimeRow | undefined): boolean {
-  return row?.state === 'active' || row?.state === 'engaged';
-}
 
 /**
  * Listens for server-side auto-triggered pause notifications.
@@ -71,44 +63,10 @@ export function useAutoTrigger() {
   useEffect(() => {
     if (!userId) return;
 
-    const channel = supabase
-      .channel(`auto-trigger-pause-${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'pause_instances',
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload) => {
-          if (!initializedRef.current) return;
-          const row = payload.new as PauseInstanceRealtimeRow;
-          if (isOpenPauseRow(row)) setPauseReady(true);
-        },
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'pause_instances',
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload) => {
-          if (!initializedRef.current) return;
-          const row = payload.new as PauseInstanceRealtimeRow;
-          const oldRow = payload.old as PauseInstanceRealtimeRow;
-          if (isOpenPauseRow(row) && !isOpenPauseRow(oldRow)) {
-            setPauseReady(true);
-          }
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return subscribePauseInstanceOpenUpdates(userId, `auto-trigger-pause-${userId}`, () => {
+      if (!initializedRef.current) return;
+      setPauseReady(true);
+    });
   }, [userId]);
 
   /** Hide the non-Home banner only. Intentionally does **not** call `pause_dismiss_current` — same pattern as dismissing a toast (avoid accidental end-pause from Archive/Tools). */

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CirclePlus, Pencil } from 'lucide-react';
 import { useProfile } from '@/features/user/public-hooks';
-import { formatMotivationLine } from '@/features/user/domain/profile-motivations';
+import { formatMotivationLine } from '@/features/user/public';
 import { AddAnchorDialog } from '@/screens/home/components/AddAnchorDialog';
 import { GoalWhyEditSheet } from '@/screens/home/components/GoalWhyEditSheet';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';

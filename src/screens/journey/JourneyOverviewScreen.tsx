@@ -5,8 +5,7 @@ import { JourneyStreakCard } from '@/screens/journey/components/JourneyStreakCar
 import { JourneyPracticeXpBreakdown } from '@/screens/journey/components/JourneyPracticeXpBreakdown';
 import { Button } from '@/components/ui/button';
 import { useJourneyPauseInstances } from '@/features/pause/public-hooks';
-import { usePracticeSummary } from '@/features/pause/presentation/practice/use-practice-summary';
-import { EMPTY_PRACTICE_XP_BY_SIGNAL } from '@/features/pause/domain/practice/practice-xp-by-signal';
+import { EMPTY_PRACTICE_XP_BY_SIGNAL, usePracticeSummary } from '@/features/pause/public-hooks';
 import { trackJourneyOverviewViewed } from '@/features/pause/public-hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 

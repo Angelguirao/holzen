@@ -4,6 +4,11 @@ import {
   type PauseImpactData,
 } from '@/features/pause/domain/decide/build-pause-impact-data-on-complete';
 import type { RunPauseOutcomeLogResult } from '@/features/pause/domain/decide/pause-outcome-log-result';
+import type { WisdomQuote } from '@/features/pause/domain/decide/wisdom-quote-types';
+
+export function formatReinforcementQuoteFromSession(quote: WisdomQuote): string {
+  return `"${quote.text}" ? ${quote.author}`;
+}
 
 export type PauseDecideOutcomeFlow =
   | { kind: 'abort_sync_failed' }
