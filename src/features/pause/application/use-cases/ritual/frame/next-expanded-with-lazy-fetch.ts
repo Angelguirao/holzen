@@ -11,7 +11,6 @@ export type LazyFetchCompanionExpandArgs = {
 };
 
 function shouldLazyFetchOnExpand(args: LazyFetchCompanionExpandArgs): boolean {
-  if (args.loading) return false;
   if (args.error) return true;
   return !companionSlotHasDisplayableContent(args.slot, args.data);
 }

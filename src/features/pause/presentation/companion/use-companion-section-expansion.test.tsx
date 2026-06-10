@@ -128,4 +128,61 @@ describe('useCompanionSectionExpansion', () => {
     expect(result.current.expandedLearning).toBe(true);
     expect(fetchCompanion).toHaveBeenCalledWith('grounding');
   });
+
+  it('exclusiveExpand still fetches when reopening a slot that is loading without content', () => {
+    const fetchCompanion = vi.fn();
+    const { result } = renderHook(() =>
+      useCompanionSectionExpansion({
+        ...baseParams({
+          fetchCompanion,
+          zoomOutLoading: true,
+        }),
+        exclusiveExpand: true,
+      }),
+    );
+
+    act(() => {
+      result.current.toggleZoomOut();
+    });
+
+    expect(result.current.expandedZoomOut).toBe(true);
+    expect(fetchCompanion).toHaveBeenCalledWith('zoomOut');
+  });
+
+  it('exclusiveExpand fetches the second companion while switching cards', () => {
+    const fetchCompanion = vi.fn();
+    const { result, rerender } = renderHook(
+      ({
+        groundingLoading,
+        zoomOutLoading,
+      }: {
+        groundingLoading: boolean;
+        zoomOutLoading: boolean;
+      }) =>
+        useCompanionSectionExpansion({
+          ...baseParams({
+            fetchCompanion,
+            groundingLoading,
+            zoomOutLoading,
+          }),
+          exclusiveExpand: true,
+        }),
+      { initialProps: { groundingLoading: false, zoomOutLoading: false } },
+    );
+
+    act(() => {
+      result.current.toggleGrounding();
+    });
+    expect(fetchCompanion).toHaveBeenCalledWith('grounding');
+
+    rerender({ groundingLoading: true, zoomOutLoading: false });
+
+    act(() => {
+      result.current.toggleZoomOut();
+    });
+
+    expect(result.current.expandedLearning).toBe(false);
+    expect(result.current.expandedZoomOut).toBe(true);
+    expect(fetchCompanion).toHaveBeenCalledWith('zoomOut');
+  });
 });

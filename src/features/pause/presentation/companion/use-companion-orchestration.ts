@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
 import { useCompanionArtifactHydrate } from './use-companion-artifact-hydrate';
 import { useCompanionOrchestrateRetry } from './use-companion-orchestrate-retry';
 import { useCompanionSlotOrchestrateActions } from './use-companion-slot-orchestrate-actions';
@@ -42,6 +43,34 @@ export function useCompanionOrchestration({
 
   const slotUi = useCompanionSlotUiState(pauseInstanceId);
 
+  const slotPayloadRef = useRef({
+    signal: slotUi.signal,
+    grounding: slotUi.grounding,
+    zoomOut: slotUi.zoomOut,
+    history: slotUi.historyInsight,
+  });
+  slotPayloadRef.current = {
+    signal: slotUi.signal,
+    grounding: slotUi.grounding,
+    zoomOut: slotUi.zoomOut,
+    history: slotUi.historyInsight,
+  };
+
+  const getSlotPayload = useCallback((slot: RegenerateCompanionSlot) => {
+    switch (slot) {
+      case 'signal':
+        return slotPayloadRef.current.signal;
+      case 'grounding':
+        return slotPayloadRef.current.grounding;
+      case 'zoomOut':
+        return slotPayloadRef.current.zoomOut;
+      case 'history':
+        return slotPayloadRef.current.history;
+      default:
+        return null;
+    }
+  }, []);
+
   const { whenArtifactHydrateReady } = useCompanionArtifactHydrate({
     pauseInstanceId,
     fetchedSlotsRef: slotUi.fetchedSlotsRef,
@@ -62,20 +91,7 @@ export function useCompanionOrchestration({
     requirePro,
     startCheckout,
     fetchedSlotsRef: slotUi.fetchedSlotsRef,
-    getSlotPayload: (slot) => {
-      switch (slot) {
-        case 'signal':
-          return slotUi.signal;
-        case 'grounding':
-          return slotUi.grounding;
-        case 'zoomOut':
-          return slotUi.zoomOut;
-        case 'history':
-          return slotUi.historyInsight;
-        default:
-          return null;
-      }
-    },
+    getSlotPayload,
     whenArtifactHydrateReady,
     setCacheIds: slotUi.setCacheIds,
     setCacheRelaxations: slotUi.setCacheRelaxations,
