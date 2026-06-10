@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import type { RegenerateCompanionSlot } from '@/features/pause/public-ritual-frame';
 import {
   CompanionCard,
@@ -14,7 +15,7 @@ export type CompanionOrchestratedCardProps = {
   expanded: boolean;
   onToggleExpand: () => void;
   completed: boolean;
-  /** Fires once when the user expands before UI completion is recorded (e.g. RPC persist). */
+  /** Fires once when the slot is expanded and renderable content is on screen (RPC persist). */
   onFirstExpandComplete?: () => void;
   loading: boolean;
   isFavorite?: boolean;
@@ -59,17 +60,20 @@ export function CompanionOrchestratedCard({
   children,
 }: CompanionOrchestratedCardProps) {
   "use memo";
+
+  useEffect(() => {
+    if (expanded && hasContent && !completed) {
+      onFirstExpandComplete?.();
+    }
+  }, [expanded, hasContent, completed, onFirstExpandComplete]);
+
   return (
     <CompanionCard
       id={id}
       label={label}
       icon={icon}
       expanded={expanded}
-      onToggle={() => {
-        const opening = !expanded;
-        onToggleExpand();
-        if (opening && !completed) onFirstExpandComplete?.();
-      }}
+      onToggle={onToggleExpand}
       completed={completed}
       loading={loading}
       isFavorite={isFavorite}

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import type { CompanionData } from '@/features/pause/public-ritual-frame';
 import { HaikuDisplay } from '@/screens/pause/components/HaikuDisplay';
 import {
@@ -31,17 +32,21 @@ export function CompanionSectionHaikuSlot({
   iconHelp,
 }: CompanionSectionHaikuSlotProps) {
   "use memo";
+  const hasDisplayableHaiku = haiku.trim().length > 0;
+
+  useEffect(() => {
+    if (expanded && hasDisplayableHaiku && !completed) {
+      onFirstExpandComplete();
+    }
+  }, [expanded, hasDisplayableHaiku, completed, onFirstExpandComplete]);
+
   return (
     <CompanionCard
       id="haiku"
       label={label}
       icon={COMPANION_SECTION_ICONS.haiku}
       expanded={expanded}
-      onToggle={() => {
-        const opening = !expanded;
-        onToggleExpand();
-        if (opening && !completed) onFirstExpandComplete();
-      }}
+      onToggle={onToggleExpand}
       completed={completed}
       appearance={appearance}
       iconHelp={iconHelp}
