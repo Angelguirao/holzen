@@ -1,6 +1,6 @@
 import { TrendingDown, TrendingUp, CloudOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { MarketOnThisDayEntry } from '@/features/pause/domain/market-on-this-day';
+import type { MarketOnThisDayEntry } from '@/features/pause/public-ritual-frame';
 
 export type MarketOnThisDayBlockProps = {
   currentPrice: number;

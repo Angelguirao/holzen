@@ -22,6 +22,7 @@ export {
   type HomeMarketRangeStatusInput,
 } from './domain/market-volatility-range-status';
 export {
+  fearGreedFromPauseContextSnapshot,
   resolveHomeMarketDisplayQuote,
   type HomeMarketDisplayQuoteInput,
 } from './domain/home-market-display-quote';
@@ -75,6 +76,7 @@ export {
 } from './infrastructure/queries/breathe-ambient-btc-query';
 export {
   getHolzenMarketDisplayQueryOptions,
+  HOLZEN_MARKET_DISPLAY_QUERY_PREFIX,
   holzenMarketDisplayQueryKey,
 } from './infrastructure/queries/holzen-market-display-query';
 export { getFearGreedDisplayQueryOptions } from './infrastructure/queries/fear-greed-display-query';
@@ -90,3 +92,9 @@ export {
   getCoingeckoMarketChartQueryOptions,
   type CoingeckoMarketChartPoint,
 } from './infrastructure/queries/coingecko-market-chart-query';
+export {
+  readUnitBasisModeFromStorage,
+  writeUnitBasisModeToStorage,
+} from './domain/unit-basis-mode-storage';
+export { invokeMarketQuote } from './infrastructure/edge/market-quote-edge';
+export { mapMarketQuotePayload } from './infrastructure/edge/map-market-quote-payload';

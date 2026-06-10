@@ -1,4 +1,4 @@
-import type { CompanionUiCompletionState } from '@/features/pause/application/use-cases/ritual/frame/companion-ui-completion-types';
+import type { CompanionUiCompletionState } from '@/features/pause/domain/companion/companion-ui-completion-types';
 
 /** Frame hub companion slots (excludes breathing). */
 export const PAUSE_FRAME_COMPANION_SLOTS = ['haiku', 'grounding', 'signal', 'zoomOut', 'history'] as const;

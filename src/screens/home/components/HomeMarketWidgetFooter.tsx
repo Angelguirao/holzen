@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import {
   resolveHomeMarketRangeStatus,
   type MarketVolatilityRangeStatus,
-} from '@/features/market/domain/market-volatility-range-status';
+} from '@/features/market/public';
 import type { MarketQuote } from '@/features/market/public';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { HomeMarketCommunityStats } from '@/screens/home/components/home-market-community-stats';

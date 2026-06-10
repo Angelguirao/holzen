@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 import { toast } from 'sonner';
 import { trackOnboardingCompleted } from '@/features/pause/public-home';
-import { trackTrialStarted } from '@/features/subscription/application/paywall-telemetry';
+import { trackTrialStarted } from '@/features/subscription/public';
 
 type Args = {
   completeOnboarding: () => Promise<void>;

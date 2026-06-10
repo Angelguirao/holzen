@@ -587,6 +587,7 @@
     "reflectionLanguage": "Language",
     "reflectionLanguageDesc": "Choose the language for the entire app, including AI pause prompts, haikus, and insights.",
     "cooldown": "Cooldown",
+    "cooldownLabel": "Cooldown between pauses",
     "cooldownDesc": "Minimum time between automatic pauses.",
     "tone": "Tone",
     "toneDesc": "Choose the voice of your AI pause copy.",
@@ -816,6 +817,7 @@
       "recapHoldGoal": "Hold goal",
       "recapHoldGoalSet": "Saved",
       "recapHoldGoalUnset": "Not set yet",
+      "recapWhyUnset": "Not set yet",
       "recapGrounding": "Grounds you",
       "recapThreshold": "Threshold",
       "trialBody": "$0 today. Add a card to start your {{days}}-day trial to use Pause when volatility spikes. We will not charge you when the trial ends.",
@@ -1499,20 +1501,6 @@
       "buy": "Buy",
       "sell": "Sell"
     },
-    "done": {
-      "heroTitle": "You paused",
-      "heroSubcopy": "You held yourself. What was done is done.",
-      "generateWallpaper": "Generate wallpaper",
-      "summary": {
-        "started": "Started",
-        "time": "Time",
-        "frame": "Frame",
-        "choice": "Choice",
-        "presence": "Presence",
-        "presenceXp": "+{{count}} XP",
-        "ended": "Ended"
-      }
-    },
     "youChose": "You chose deliberately.",
     "return": "Return",
     "leaveSessionTitle": "Leave ritual?",
@@ -1843,7 +1831,19 @@
       "tagsPlaceholder": "Add tags…"
     },
     "done": {
-      "reinforcementKicker": "Carry this with you"
+      "heroTitle": "You paused",
+      "heroSubcopy": "You held yourself. What was done is done.",
+      "generateWallpaper": "Generate wallpaper",
+      "reinforcementKicker": "Carry this with you",
+      "summary": {
+        "started": "Started",
+        "time": "Time",
+        "frame": "Frame",
+        "choice": "Choice",
+        "presence": "Presence",
+        "presenceXp": "+{{count}} XP",
+        "ended": "Ended"
+      }
     },
     "couldNotLoadPause": "Could not load this pause"
   },
@@ -2813,6 +2813,7 @@
   },
   "quietWindows": {
     "add": "Add window",
+    "deleteWindow": "Delete quiet window",
     "added": "Quiet window added",
     "empty": "No extended quiet windows yet.",
     "labelPlaceholder": "Label (e.g. Work hours)",

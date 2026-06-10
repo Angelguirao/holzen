@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { getHolzenNumberQueryOptions } from '@/features/user/public-queries';
-import type { HolzenNumberData } from '@/features/user/infrastructure/edge/holzen-number-edge';
+import type { HolzenNumberData } from '@/features/user/public-queries';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 import { cn } from '@/lib/utils';
 

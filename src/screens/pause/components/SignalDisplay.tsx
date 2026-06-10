@@ -2,7 +2,7 @@ import { ExternalLink } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { CompanionError } from './CompanionError';
-import type { SignalPayload } from '@/features/pause/domain/signal-payload';
+import type { SignalPayload } from '@/features/pause/public-ritual-frame';
 import { SignalFrameDisplay } from '@/screens/pause/components/signal-frame-display';
 
 export type { SignalPayload };

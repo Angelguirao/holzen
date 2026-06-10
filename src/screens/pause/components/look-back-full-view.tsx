@@ -1,6 +1,6 @@
 import { BookOpen, GitCompare, KeyRound } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { resolveHistoricalMarketInsight } from '@/features/pause/domain/historical-insight';
+import { resolveHistoricalMarketInsight } from '@/features/pause/public-ritual-frame';
 import type { CachedHistoricalInsightShape } from '@/features/pause/public-ritual-frame';
 
 export type LookBackFullViewProps = {

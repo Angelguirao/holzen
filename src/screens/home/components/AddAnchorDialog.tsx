@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { ANCHOR_MANTRA_MAX_LENGTH } from '@/features/user/domain/profile-motivations';
+import { ANCHOR_MANTRA_MAX_LENGTH } from '@/features/user/public';
 
 interface AddAnchorDialogProps {
   open: boolean;
@@ -24,7 +24,7 @@ export function AddAnchorDialog({ open, onOpenChange, initialValue = '', onSave 
   "use memo";
   const { t } = useTranslation();
   const [draft, setDraft] = useState(initialValue);
-  const [saving, setSaving] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     if (open) setDraft(initialValue);
@@ -33,19 +33,18 @@ export function AddAnchorDialog({ open, onOpenChange, initialValue = '', onSave 
   const trimmed = draft.trim();
   const canSave = trimmed.length > 0 && trimmed.length <= ANCHOR_MANTRA_MAX_LENGTH;
 
-  const handleSave = useCallback(async () => {
+  const handleSave = useCallback(() => {
     if (!canSave) return;
-    setSaving(true);
-    try {
-      await onSave(trimmed);
-      toast.success(t('home.goalWhy.anchorAdded', { defaultValue: 'Anchor added' }));
-      onOpenChange(false);
-    } catch {
-      /* profile write surfaces its own toast */
-    } finally {
-      setSaving(false);
-    }
-  }, [canSave, onSave, onOpenChange, t, trimmed]);
+    startTransition(async () => {
+      try {
+        await onSave(trimmed);
+        toast.success(t('home.goalWhy.anchorAdded', { defaultValue: 'Anchor added' }));
+        onOpenChange(false);
+      } catch {
+        /* profile write surfaces its own toast */
+      }
+    });
+  }, [canSave, onOpenChange, onSave, startTransition, t, trimmed]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -88,7 +87,7 @@ export function AddAnchorDialog({ open, onOpenChange, initialValue = '', onSave 
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             {t('common.cancel', { defaultValue: 'Cancel' })}
           </Button>
-          <Button type="button" disabled={!canSave || saving} onClick={() => void handleSave()}>
+          <Button type="button" disabled={!canSave || isPending} onClick={handleSave}>
             {t('common.save', { defaultValue: 'Save' })}
           </Button>
         </div>

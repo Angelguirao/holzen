@@ -35,6 +35,7 @@ describe('mapPracticeSummaryRpc', () => {
         companion_favorites: 4,
         breath_second: 20,
         shift_mood: 6,
+        post_pause_check_in: 0,
       },
     });
   });

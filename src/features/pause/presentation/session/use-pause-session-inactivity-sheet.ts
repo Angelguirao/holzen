@@ -4,7 +4,7 @@ import {
   PAUSE_SESSION_INACTIVITY_MS,
   PAUSE_SESSION_INACTIVITY_POLL_MS,
 } from '@/features/pause/domain/session/pause-session-inactivity-ms';
-import { pauseSessionRitualRestartFromFeelPatch } from '@/features/pause/application/use-cases/session/pause-session-ritual-restart-from-feel';
+import { pauseSessionRitualRestartFromFeelPatch } from '@/features/pause/presentation/session/pause-session-inactivity-io';
 import { clearPausePersistedTabSession } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 import type { PauseBreathingHandle } from '@/features/pause/presentation/session/breath/pause-breathing-handle';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';

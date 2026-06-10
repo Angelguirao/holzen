@@ -13,8 +13,10 @@ import {
 } from '@/features/pause/domain/reflect/flows/pause-session-reflect-and-decide-flow';
 
 import {
-  resolvePauseDecideOutcomeFlow as resolveOutcomeFlowFromOutcomeViewFlow
+  formatReinforcementQuoteFromSession as formatQuoteFromOutcomeViewFlow,
+  resolvePauseDecideOutcomeFlow as resolveOutcomeFlowFromOutcomeViewFlow,
 } from '../../decide/pause-decide-outcome-view-flow';
+import { getSessionQuote as getQuoteFromWisdomQuotesFlow } from '../../decide/wisdom-quotes';
 import { runPauseOutcomeLog as runOutcomeLogFromOutcomeLogFlow } from '../../decide/pause-decide-outcome-log-flow';
 import {
   showPauseOutcomeNotCompletedToast as showNotCompletedFromOutcomeToastFlow,
@@ -92,6 +94,8 @@ import {
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   buildPauseScoreImpacts as buildImpactsFromFlow,
+  formatReinforcementQuoteFromSession as formatQuoteFromFlow,
+  getSessionQuote as getQuoteFromFlow,
   parseScoreImpactVolatilityPct as parseVolatilityFromFlow,
   resolvePauseDecideOutcomeFlow as resolveOutcomeFlowFromFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromFlow,

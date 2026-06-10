@@ -2,8 +2,8 @@ import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { MarketQuote } from '@/features/market/domain/market-quote';
 import { parsePauseCalmSettledAt } from '@/features/pause/domain/pause-open-max-anchor';
-import { runPauseApplyCronCalmSweepForSelf } from '@/features/pause/application/use-cases/home/run-pause-apply-cron-calm-sweep-for-self';
-import { pendingPauseOfferQueryKey } from '@/features/pause/presentation/reflect/pending-offer/use-pending-pause-offer';
+import { pauseApplyCronCalmSweepForSelf } from '@/features/pause/presentation/home/pause-home-cron-io';
+import { pendingPauseOfferQueryKey } from '@/features/pause/public-queries';
 
 type Input = {
   userId: string | undefined;
@@ -45,7 +45,7 @@ export function useHomeCronCalmSweepOnce(input: Input): void {
 
     let cancelled = false;
 
-    void runPauseApplyCronCalmSweepForSelf({
+    void pauseApplyCronCalmSweepForSelf({
       changePercent: marketData.changePercent,
       direction: marketData.direction,
     })

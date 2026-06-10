@@ -1,15 +1,8 @@
-const STORAGE_KEY_PREFIX = 'holzen_pause_help_feedback_v1';
+import type { PauseHelpFeedbackStorageState } from '@/features/pause/domain/home/pause-help-feedback-storage-types';
 
-export type PauseHelpFeedbackStorageState = {
-  ratedPauseIds: string[];
-  deferredPauseIds: string[];
-  deferralCount: number;
-  optedOut: boolean;
-  lastPromptLocalDate: string | null;
-  lastPromptPauseInstanceId: string | null;
-  /** ISO timestamp of last successful rating submit — gates re-prompt cooldown. */
-  lastSubmittedAt: string | null;
-};
+export type { PauseHelpFeedbackStorageState } from '@/features/pause/domain/home/pause-help-feedback-storage-types';
+
+const STORAGE_KEY_PREFIX = 'holzen_pause_help_feedback_v1';
 
 const EMPTY: PauseHelpFeedbackStorageState = {
   ratedPauseIds: [],

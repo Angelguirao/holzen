@@ -18,6 +18,13 @@ export {
   resolvePauseReflectMessageView,
   type PauseReflectMessageView,
 } from './domain/reflect/generation/resolve-pause-reflect-message-view';
+export { resolvePauseReflectDisplayContent } from './domain/reflect/generation/resolve-pause-reflect-display-content';
+export { isPauseReflectContinueDisabled } from './domain/reflect/generation/is-pause-reflect-continue-disabled';
+export {
+  trackPauseReflectBlockViewed,
+  trackPauseReflectContextStripExpanded,
+  trackPauseReflectInquiryDisplayed,
+} from './presentation/reflect/telemetry/pause-reflect-telemetry-io';
 export { buildReflectionShareText } from './domain/reflect/share/reflection-share-text';
 
 export { usePauseReflectGeneration } from './presentation/reflect/generation/use-pause-reflect-generation';

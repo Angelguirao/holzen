@@ -1,4 +1,4 @@
-import type { SignalPayload } from '@/features/pause/domain/signal-payload';
+import type { SignalPayload } from '@/features/pause/public-ritual-frame';
 import { SignalReadFullStoryButton } from '@/screens/pause/components/companion/signal-read-full-story-button';
 
 export type SignalFrameDisplayProps = {

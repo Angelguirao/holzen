@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,8 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   ANCHOR_MANTRA_MAX_LENGTH,
   hasMinimumMotivations,
-} from '@/features/user/domain/profile-motivations';
-import { MotivationPickerGrid } from '@/features/user/presentation/MotivationPickerGrid';
+} from '@/features/user/public';
+import { MotivationPickerGrid } from '@/features/user/public';
 import { cn } from '@/lib/utils';
 
 interface GoalWhyEditSheetProps {
@@ -38,7 +38,7 @@ export function GoalWhyEditSheet({
   const [draftMantra, setDraftMantra] = useState(mantra ?? '');
   const [draftMotivations, setDraftMotivations] = useState<string[]>([...motivations]);
   const [showMinimumError, setShowMinimumError] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     if (!open) return;
@@ -58,23 +58,22 @@ export function GoalWhyEditSheet({
 
   const canSave = isDirty && hasMinimumMotivations(draftMotivations);
 
-  const handleSave = useCallback(async () => {
+  const handleSave = useCallback(() => {
     if (!hasMinimumMotivations(draftMotivations)) {
       setShowMinimumError(true);
       return;
     }
     if (!isDirty) return;
 
-    setSaving(true);
-    try {
-      await onSave({ mantra: normalizedMantra, motivations: draftMotivations });
-      onOpenChange(false);
-    } catch {
-      /* profile write surfaces its own toast */
-    } finally {
-      setSaving(false);
-    }
-  }, [draftMotivations, isDirty, normalizedMantra, onOpenChange, onSave]);
+    startTransition(async () => {
+      try {
+        await onSave({ mantra: normalizedMantra, motivations: draftMotivations });
+        onOpenChange(false);
+      } catch {
+        /* profile write surfaces its own toast */
+      }
+    });
+  }, [draftMotivations, isDirty, normalizedMantra, onOpenChange, onSave, startTransition]);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -149,8 +148,8 @@ export function GoalWhyEditSheet({
         <div className="shrink-0 border-t border-border/40 bg-background px-4 pb-6 pt-4">
           <Button
             type="button"
-            disabled={!canSave || saving}
-            onClick={() => void handleSave()}
+            disabled={!canSave || isPending}
+            onClick={handleSave}
             className={cn(
               'h-[52px] w-full rounded-full text-sm font-medium',
               canSave ? 'bg-primary text-primary-foreground' : 'bg-muted-foreground/40 text-white',

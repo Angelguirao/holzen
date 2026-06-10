@@ -37,6 +37,13 @@ export interface PauseRepository {
 
   dismissCurrent(): Promise<PauseState | null>;
 
+  applyCronCalmSweepForSelf(input: {
+    changePercent: number;
+    direction: 'up' | 'down';
+  }): Promise<Record<string, unknown> | null>;
+
+  evaluateTransitions(instanceId: string): Promise<PauseState | null>;
+
   /** Companion slot heart — `pause_instances.metadata` (not `pause_log_step`). */
   toggleCompanionSlotFavorite(params: {
     pauseInstanceId: string;

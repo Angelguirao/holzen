@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { MotivationPickerGrid } from '@/features/user/presentation/MotivationPickerGrid';
+import { MotivationPickerGrid } from '@/features/user/public';
 
 interface Props {
   motivations: string[];

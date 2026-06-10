@@ -61,9 +61,10 @@ import {
   runShiftEmotionFrameHubDone as runShiftHubDoneFromHubFlow
 } from '../reflect/hub/pause-reflect-hub-flow';
 import {
+  formatReinforcementQuoteFromSession as formatQuoteFromFlowsFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration as resolveAfterGenFromFlowsFlow,
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
-  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow
+  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
 } from '../reflect/flows/pause-reflect-flows-flow';
 import {
   dismissOpenPauseHome as dismissFromGenerationFlow,

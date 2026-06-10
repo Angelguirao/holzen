@@ -145,6 +145,13 @@ export {
   useJourneyPauseInstances,
   type JourneyPauseRow,
 } from './presentation/archive/use-journey-pause-instances';
+export { usePracticeSummary } from './presentation/practice/use-practice-summary';
+export {
+  buildPracticeXpSignalRows,
+  EMPTY_PRACTICE_XP_BY_SIGNAL,
+  type PracticeXpBySignal,
+  type PracticeXpSignalKey,
+} from './domain/practice/practice-xp-by-signal';
 export {
   trackJourneyOverviewViewed,
   type JourneyOverviewViewedPayload,

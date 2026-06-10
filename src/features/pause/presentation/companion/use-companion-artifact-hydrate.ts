@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, type MutableRefObject } from 'react';
-import { hydrateCompanionSlotsFromArtifactCache } from '@/features/pause/application/use-cases/ritual/frame/hydrate-companion-slots-from-artifact-cache';
+import { hydrateCompanionSlotsFromArtifactCache } from '@/features/pause/presentation/companion/pause-companion-orchestrate-io';
 import { fetchParsedPauseArtifactCache } from '@/features/pause/public-queries';
 import type { CompanionSlotCommitters } from './pause-companion-orchestrate-io';
 

@@ -19,6 +19,9 @@ describe('buildFetchedPauseInstanceFromFetch', () => {
       haiku: 'line / line / line',
       db_state: null,
       engaged_at: null,
+      created_at: null,
+      source: null,
+      metadata: null,
     });
   });
 
@@ -31,6 +34,9 @@ describe('buildFetchedPauseInstanceFromFetch', () => {
       haiku: null,
       db_state: null,
       engaged_at: null,
+      created_at: null,
+      source: null,
+      metadata: null,
     });
   });
 

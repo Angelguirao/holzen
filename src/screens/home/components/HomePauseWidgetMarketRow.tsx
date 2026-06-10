@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
-import type { HomePauseMarketBlock } from '@/features/pause/domain/home/format-home-pause-market-block';
+import type { HomePauseMarketBlock } from '@/features/pause/public-home';
 
 type Props = {
   block: HomePauseMarketBlock;

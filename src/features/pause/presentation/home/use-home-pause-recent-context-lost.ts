@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import {
-  fetchRecentContextLostPause,
   CONTEXT_LOST_HOME_WINDOW_MS,
-} from '@/features/pause/infrastructure/queries/recent-context-lost-pause-query';
+  fetchRecentContextLostPause,
+} from '@/features/pause/public-queries';
 import { useCalmWatersToast } from '@/features/pause/presentation/home/use-calm-waters-toast';
 
 /** Calm-waters toast eligibility — recent cron `context_lost` within Home window. */

@@ -4,7 +4,7 @@ import {
   EMPTY_PRACTICE_SUMMARY,
   type PracticeSummary,
 } from '@/features/pause/domain/practice/practice-summary';
-import { getPracticeSummaryQueryOptions } from '@/features/pause/infrastructure/queries/practice-summary-query';
+import { getPracticeSummaryQueryOptions } from '@/features/pause/public-queries';
 
 export type { PracticeSummary };
 

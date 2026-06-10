@@ -2,9 +2,9 @@ import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/features/auth/public';
-import { readPauseImpactPracticeFieldsFromCache } from '@/features/pause/application/use-cases/ritual/done/read-pause-impact-practice-fields';
 import {
   pauseReflectOutcomeLog,
+  readPauseImpactPracticeFieldsFromCache,
   resolvePauseDecideOutcomeFlow,
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,

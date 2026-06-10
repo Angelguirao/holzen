@@ -1,12 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { holzenMarketDisplayQueryKey } from '@/features/market/application/queries/holzen-market-display-keys';
-import { invokeMarketQuote } from '@/features/market/infrastructure/edge/market-quote-edge';
-import { mapMarketQuotePayload } from '@/features/market/infrastructure/edge/map-market-quote-payload';
+import {
+  holzenMarketDisplayQueryKey,
+  invokeMarketQuote,
+  mapMarketQuotePayload,
+} from '@/features/market/public';
 import {
   fetchHolzenNumber,
   HOLZEN_NUMBER_QUERY_KEY,
-} from '@/features/user/infrastructure/queries/holzen-number-query';
+} from '@/features/user/public-queries';
 
 /**
  * Seeds market display + community stats caches on Home mount (parallel edges).

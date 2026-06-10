@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { isPauseOpenMaxExpired } from '@/features/pause/domain/pause-open-max-anchor';
-import { runPauseEvaluateTransitionsForInstance } from '@/features/pause/application/use-cases/home/run-pause-evaluate-transitions-for-instance';
-import { pendingPauseOfferQueryKey } from '@/features/pause/presentation/reflect/pending-offer/use-pending-pause-offer';
+import { pauseEvaluateTransitionsForInstance } from '@/features/pause/presentation/home/pause-home-cron-io';
+import { pendingPauseOfferQueryKey } from '@/features/pause/public-queries';
 
 type Input = {
   userId: string | undefined;
@@ -64,7 +64,7 @@ export function useHomeOpenMaxExpireOnce(input: Input): { openPauseOpenMaxExpire
 
     let cancelled = false;
 
-    void runPauseEvaluateTransitionsForInstance(input.openPauseInstanceId)
+    void pauseEvaluateTransitionsForInstance(input.openPauseInstanceId)
       .then((state) => {
         if (cancelled) return;
         if (state === 'expired') {

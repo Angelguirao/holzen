@@ -11,7 +11,7 @@ describe('runReflectionShareImage', () => {
     const canShare = vi.fn(() => true);
 
     await expect(
-      runReflectionShareImage('Stay calm.', null, null, { share, canShare }),
+      runReflectionShareImage('Stay calm.', null, null, undefined, { share, canShare }),
     ).resolves.toBe('shared');
 
     expect(share).toHaveBeenCalled();

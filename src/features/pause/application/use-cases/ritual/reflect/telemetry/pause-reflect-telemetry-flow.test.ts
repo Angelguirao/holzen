@@ -26,8 +26,9 @@ import {
   runReflectionShareImage as runShareImageFromShareFlow
 } from '../share/pause-reflect-share-flow';
 import {
+  formatReinforcementQuoteFromSession as formatQuoteFromFlowsFlow,
   resolvePauseSessionReflectAndDecidePreflight as resolvePreflightFromFlowsFlow,
-  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow
+  runPauseOutcomeLog as runOutcomeLogFromFlowsFlow,
 } from '../flows/pause-reflect-flows-flow';
 import {
   runPauseFavoriteToggle as runFavoriteFromStepsFlow,

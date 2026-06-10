@@ -6,7 +6,7 @@ import { formatMarketPrice } from '@/features/market/public';
 import { cn } from '@/lib/utils';
 export type { CachedHistoricalInsightShape } from '@/features/pause/public-ritual-frame';
 import type { CachedHistoricalInsightShape } from '@/features/pause/public-ritual-frame';
-import { resolveHistoricalMarketInsight } from '@/features/pause/domain/historical-insight';
+import { resolveHistoricalMarketInsight } from '@/features/pause/public-ritual-frame';
 import { CompanionError } from './CompanionError';
 import { MarketOnThisDayBlock } from '@/screens/pause/components/market-on-this-day-block';
 import { LookBackFrameDisplay } from '@/screens/pause/components/look-back-frame-display';

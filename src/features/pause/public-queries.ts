@@ -26,7 +26,10 @@ export {
   getCurrentPauseQueryOptions,
   type CurrentPauseRow,
 } from './infrastructure/queries/current-pause-query';
-export { subscribePauseInstancesForUser } from './infrastructure/realtime/pause-instances-realtime';
+export {
+  subscribePauseInstanceOpenUpdates,
+  subscribePauseInstancesForUser,
+} from './infrastructure/realtime/pause-instances-realtime';
 export {
   getPendingPauseOfferQueryOptions,
   pendingPauseOfferQueryKey,
@@ -209,7 +212,10 @@ export {
   companionUiCompletionQueryKey,
   getCompanionUiCompletionQueryOptions,
 } from './infrastructure/queries/companion/companion-ui-completion-query';
-export { invalidateCompanionUiCompletionQuery } from './infrastructure/queries/companion/companion-ui-completion-query-key';
+export {
+  companionUiCompletionQueryKey,
+  invalidateCompanionUiCompletionQuery,
+} from './infrastructure/queries/companion/companion-ui-completion-query-key';
 export {
   EMPTY_COMPANION_UI_COMPLETION,
   loadCompanionUiCompletionState,
@@ -266,3 +272,25 @@ export {
   type SettingsExportPauseRow,
   type SettingsExportStepEvent,
 } from './infrastructure/queries/settings-data-export-query';
+export {
+  clearPostManualCooldownIdlePrompt,
+  markPostManualCooldownIdlePrompt,
+  shouldShowPostManualCooldownIdlePrompt,
+} from './infrastructure/home-post-manual-cooldown-idle-storage';
+export {
+  markHomePauseWidgetFirstVisitHandled,
+  shouldExpandHomePauseWidgetFirstVisit,
+} from './infrastructure/home-pause-widget-first-visit-storage';
+export {
+  readPauseHelpFeedbackStorage,
+  writePauseHelpFeedbackStorage,
+} from './infrastructure/pause-help-feedback-storage';
+export {
+  CONTEXT_LOST_HOME_WINDOW_MS,
+  fetchRecentContextLostPause,
+} from './infrastructure/queries/recent-context-lost-pause-query';
+export { subscribePauseAiArtifactsForInstance } from './infrastructure/realtime/pause-ai-artifacts-realtime';
+export {
+  fetchPauseInstancePracticeXpAwarded,
+  pauseInstancePracticeXpQueryKey,
+} from './infrastructure/queries/pause-instance-practice-xp-query';

@@ -41,4 +41,7 @@ export {
   type PaywallViewedSource,
   type TrialStartedSource,
 } from './application/paywall-telemetry';
+export { ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY } from './application/trial-checkout-flow';
+export { fetchTrialCheckoutGrantStatus } from './application/trial-checkout-grant';
+export { trackTrialDenied, type TrialDeniedReason } from './application/paywall-telemetry';
 /** Shell-only — import from `@/features/subscription/presentation/*` in `app/components`. */

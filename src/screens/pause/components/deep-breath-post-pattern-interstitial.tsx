@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { ChevronRight, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { pauseStepLayout } from '@/features/pause/public-session';
-import { formatMotivationLine } from '@/features/user/domain/profile-motivations';
+import { formatMotivationLine } from '@/features/user/public';
 import { useProfile } from '@/features/user/public-hooks';
 import { Button } from '@/components/ui/button';
 import { hapticFeedback } from '@/lib/haptics';

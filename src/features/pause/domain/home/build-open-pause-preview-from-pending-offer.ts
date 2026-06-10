@@ -1,5 +1,5 @@
 import { DEFAULT_COMPANIONS } from '@/features/pause/domain/session-model';
-import type { OpenPauseHomePreviewSnapshotSource } from '@/features/pause/presentation/home/open-pause-home-preview-snapshot';
+import type { OpenPauseHomePreviewSnapshotSource } from '@/features/pause/domain/home/open-pause-home-preview-snapshot-types';
 
 type PendingOfferLike = {
   id: string;

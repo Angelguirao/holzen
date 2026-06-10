@@ -5,7 +5,7 @@ import {
   buildPracticeXpSignalRows,
   type PracticeXpBySignal,
   type PracticeXpSignalKey,
-} from '@/features/pause/domain/practice/practice-xp-by-signal';
+} from '@/features/pause/public-hooks';
 
 interface JourneyPracticeXpBreakdownProps {
   xpBySignal: PracticeXpBySignal;

@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 import {
+  clearPostManualCooldownIdlePrompt,
   markHomePauseWidgetFirstVisitHandled,
   shouldExpandHomePauseWidgetFirstVisit,
-} from '@/features/pause/infrastructure/home-pause-widget-first-visit-storage';
-import {
-  clearPostManualCooldownIdlePrompt,
   shouldShowPostManualCooldownIdlePrompt,
-} from '@/features/pause/infrastructure/home-post-manual-cooldown-idle-storage';
+} from '@/features/pause/public-queries';
 
 /** Session expand preference + first-visit / post-manual idle localStorage side effects. */
 export function useHomePauseWidgetCollapsePreference(input: {

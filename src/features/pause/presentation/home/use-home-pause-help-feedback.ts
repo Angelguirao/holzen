@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/public';
 import {
@@ -11,7 +11,7 @@ import { parseHomePauseHelpFeedbackLocationState } from '@/features/pause/domain
 import {
   readPauseHelpFeedbackStorage,
   writePauseHelpFeedbackStorage,
-} from '@/features/pause/infrastructure/pause-help-feedback-storage';
+} from '@/features/pause/public-queries';
 import { sendFeedback } from '@/features/user/infrastructure/edge/send-feedback-edge';
 import { trackEvent } from '@/lib/posthog';
 import { toast } from 'sonner';
@@ -33,7 +33,7 @@ export function useHomePauseHelpFeedback({ blocked = false }: UseHomePauseHelpFe
   const [open, setOpen] = useState(false);
   const [pauseInstanceId, setPauseInstanceId] = useState<string | null>(null);
   const [showThankYou, setShowThankYou] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const clearNavState = useCallback(() => {
     if (!location.state) return;
@@ -57,14 +57,14 @@ export function useHomePauseHelpFeedback({ blocked = false }: UseHomePauseHelpFe
     const pendingId = pendingPauseInstanceIdRef.current;
     if (!pendingId) return;
 
-    if (!shouldShowPauseHelpFeedback({ userId: user.id, pauseInstanceId: pendingId })) {
+    const storage = readPauseHelpFeedbackStorage(user.id);
+    if (!shouldShowPauseHelpFeedback({ userId: user.id, pauseInstanceId: pendingId, storage })) {
       pendingPauseInstanceIdRef.current = null;
       return;
     }
 
     pendingPauseInstanceIdRef.current = null;
 
-    const storage = readPauseHelpFeedbackStorage(user.id);
     const today = localCalendarYmd(new Date());
     writePauseHelpFeedbackStorage(user.id, {
       ...storage,
@@ -124,44 +124,43 @@ export function useHomePauseHelpFeedback({ blocked = false }: UseHomePauseHelpFe
   }, [recordDeferral]);
 
   const submitFeedback = useCallback(
-    async (rating: number, comment: string) => {
+    (rating: number, comment: string) => {
       if (!user?.id || !pauseInstanceId || rating < 1 || rating > 5) return;
 
-      setSubmitting(true);
-      try {
-        await sendFeedback({
-          category: 'pause_help',
-          message: buildPauseHelpFeedbackMessage(rating, comment),
-          page: '/',
-          pause_instance_id: pauseInstanceId,
-          rating,
-        });
+      startTransition(async () => {
+        try {
+          await sendFeedback({
+            category: 'pause_help',
+            message: buildPauseHelpFeedbackMessage(rating, comment),
+            page: '/',
+            pause_instance_id: pauseInstanceId,
+            rating,
+          });
 
-        const storage = readPauseHelpFeedbackStorage(user.id);
-        writePauseHelpFeedbackStorage(user.id, {
-          ...storage,
-          ratedPauseIds: storage.ratedPauseIds.includes(pauseInstanceId)
-            ? storage.ratedPauseIds
-            : [...storage.ratedPauseIds, pauseInstanceId],
-          lastSubmittedAt: new Date().toISOString(),
-        });
+          const storage = readPauseHelpFeedbackStorage(user.id);
+          writePauseHelpFeedbackStorage(user.id, {
+            ...storage,
+            ratedPauseIds: storage.ratedPauseIds.includes(pauseInstanceId)
+              ? storage.ratedPauseIds
+              : [...storage.ratedPauseIds, pauseInstanceId],
+            lastSubmittedAt: new Date().toISOString(),
+          });
 
-        trackEvent('home.pause_help_feedback_submitted', {
-          pause_instance_id: pauseInstanceId,
-          rating,
-          has_comment: Boolean(comment.trim()),
-        });
+          trackEvent('home.pause_help_feedback_submitted', {
+            pause_instance_id: pauseInstanceId,
+            rating,
+            has_comment: Boolean(comment.trim()),
+          });
 
-        closeSheet();
-        setShowThankYou(true);
-      } catch {
-        toast.error(t('home.pauseHelpFeedback.submitFailed'));
-        closeSheet();
-      } finally {
-        setSubmitting(false);
-      }
+          closeSheet();
+          setShowThankYou(true);
+        } catch {
+          toast.error(t('home.pauseHelpFeedback.submitFailed'));
+          closeSheet();
+        }
+      });
     },
-    [closeSheet, pauseInstanceId, t, user?.id],
+    [closeSheet, pauseInstanceId, startTransition, t, user?.id],
   );
 
   const dismissThankYou = useCallback(() => {
@@ -171,7 +170,7 @@ export function useHomePauseHelpFeedback({ blocked = false }: UseHomePauseHelpFe
   return {
     sheetOpen: open,
     showThankYou,
-    submitting,
+    submitting: isPending,
     onSheetOpenChange: (next: boolean) => {
       if (!next) dismissSheet();
       else setOpen(true);

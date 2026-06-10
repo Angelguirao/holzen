@@ -2,9 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { NavigateFunction } from 'react-router-dom';
 import { useProfile } from '@/features/user/public-hooks';
 import { buildHomePauseSessionLocationState } from '@/features/pause/public-navigation';
-import { usePauseHomeContext } from '@/features/pause/presentation/home/pause-home-context';
-import { resolveHomePauseWidgetOpenMaxAnchorAt } from '@/features/pause/domain/home/resolve-home-pause-widget-open-max-anchor';
-import { isPauseOpenMaxExpired } from '@/features/pause/domain/pause-open-max-anchor';
+import {
+  isPauseOpenMaxExpired,
+  resolveHomePauseWidgetOpenMaxAnchorAt,
+  usePauseHomeContext,
+} from '@/features/pause/public-home';
 
 type Input = {
   navigate: NavigateFunction;

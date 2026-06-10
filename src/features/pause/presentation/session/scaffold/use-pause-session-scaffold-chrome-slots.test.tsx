@@ -41,6 +41,7 @@ describe('usePauseSessionScaffoldChromeSlots', () => {
           created_at: '2026-05-16T10:00:00.000Z',
           engaged_at: '2026-05-16T12:00:00.000Z',
           source: 'manual',
+          metadata: { calm_settled_at: '2026-05-16T12:00:00.000Z' },
         } as UsePauseSessionScaffoldChromeSlotsParams['fetchedInstance'],
       }),
     );
@@ -59,6 +60,7 @@ describe('usePauseSessionScaffoldChromeSlots', () => {
           created_at: '2026-05-16T10:00:00.000Z',
           engaged_at: '2026-05-16T12:00:00.000Z',
           source: 'manual',
+          metadata: { calm_settled_at: '2026-05-16T12:00:00.000Z' },
         } as UsePauseSessionScaffoldChromeSlotsParams['fetchedInstance'],
       }),
     );

@@ -1,5 +1,7 @@
-import type { CompanionData } from '@/features/pause/domain/companion-card-types';
+import type { OpenPauseHomePreviewSnapshotSource } from '@/features/pause/domain/home/open-pause-home-preview-snapshot-types';
 import type { PersistedSession } from '@/features/pause/domain/session-model';
+
+export type { OpenPauseHomePreviewSnapshotSource } from '@/features/pause/domain/home/open-pause-home-preview-snapshot-types';
 import {
   clearPausePersistedTabSession,
   loadPausePersistedTabSession,
@@ -7,28 +9,9 @@ import {
 } from '@/features/pause/presentation/session/pause-persisted-tab-session-io';
 
 /** Local snapshot for Home discard undo — preview state before optimistic clear. */
-export type OpenPauseHomePreviewSnapshot = {
-  message: string | null;
-  context: string | null;
-  companions: CompanionData;
-  lastPauseInstanceId: string | null;
-  openPauseState: 'active' | 'engaged' | null;
-  openPauseSource: string | null;
-  contextSnapshot: Record<string, unknown> | null;
-  hasReflectionStep: boolean;
-  hasOpenPauseStepEvents: boolean;
-  hasReachedReflect: boolean;
-  isBriefRitual: boolean;
-  openPauseCreatedAt: string | null;
-  openPauseEngagedAt: string | null;
-  openPauseMetadata: Record<string, unknown> | null;
+export type OpenPauseHomePreviewSnapshot = OpenPauseHomePreviewSnapshotSource & {
   persistedSession: PersistedSession | null;
 };
-
-export type OpenPauseHomePreviewSnapshotSource = Omit<
-  OpenPauseHomePreviewSnapshot,
-  'persistedSession'
->;
 
 export function captureOpenPauseHomePreviewSnapshot(
   source: OpenPauseHomePreviewSnapshotSource,

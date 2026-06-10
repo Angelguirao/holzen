@@ -360,7 +360,7 @@ Implemented in `apps/site/src/lib/app-url.ts`.
 | **Static page** | Full HTML file generated at build time (Astro) |
 | **Merge** | Copy Astro `dist/` into Vite `dist/` after renaming SPA entry to `spa.html` |
 | **Rewrite** | Vercel rule: "if no file matches, serve `spa.html` instead" |
-| **Active surface** | Routes and features shipped in pause-first MVP — see [active-surface.md](./active-surface.md) |
+| **Active surface** | Routes and features in pause-first shipped scope — see [active-surface.md](./active-surface.md) |
 
 ---
 

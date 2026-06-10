@@ -14,7 +14,7 @@ const COMPOSURE: Record<string, number> = {
 /**
  * Ritual signal bonus weights for Home Presence XP — aligned with
  * {@link buildPauseScoreImpacts} `points` (Done screen uses the same events for copy only).
- * See docs/systems/stats-system.md § Pause-first MVP — Practice Presence XP.
+ * See docs/systems/stats-system.md § Practice Presence XP (pause-first shipped scope).
  */
 export function sumPauseScoreImpactPoints(
   data: PauseImpactData,

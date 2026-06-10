@@ -6,7 +6,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { trackPauseReflectContextStripExpanded } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
+import { trackPauseReflectContextStripExpanded } from '@/features/pause/public-ritual-reflect';
 
 export type PauseReflectMarketContextProps = {
   pauseInstanceId: string | null;

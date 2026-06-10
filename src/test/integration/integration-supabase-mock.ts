@@ -37,6 +37,7 @@ function chainForTable(table: string) {
   const c: Record<string, unknown> = {
     select: () => chainForTable(table),
     eq: () => chainForTable(table),
+    in: () => chainForTable(table),
     gte: () => chainForTable(table),
     order: () => chainForTable(table),
     insert: () => Promise.resolve({ data: null, error: null }),
