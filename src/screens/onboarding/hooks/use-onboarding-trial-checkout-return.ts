@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
@@ -28,6 +29,7 @@ export function useOnboardingTrialCheckoutReturn({
   completeOnboarding,
   refreshSubscription,
 }: Args) {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const handledRef = useRef(false);
 
@@ -79,6 +81,7 @@ export function useOnboardingTrialCheckoutReturn({
           threshold,
           t,
         });
+        navigate('/', { replace: true });
       } catch {
         toast.error(
           t('home.subscription.trialFailed', { defaultValue: 'Could not start trial. Try again.' }),
@@ -87,6 +90,7 @@ export function useOnboardingTrialCheckoutReturn({
     })();
   }, [
     completeOnboarding,
+    navigate,
     profileLoaded,
     refreshSubscription,
     t,

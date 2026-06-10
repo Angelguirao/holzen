@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
@@ -8,6 +9,7 @@ import { finishOnboardingAfterActiveTrial } from '@/screens/onboarding/hooks/fin
 import { useOnboardingTrialCheckoutReturn } from '@/screens/onboarding/hooks/use-onboarding-trial-checkout-return';
 
 const OnboardingScreen = () => {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
   const {
@@ -30,8 +32,9 @@ const OnboardingScreen = () => {
         threshold,
         t,
       });
+      navigate('/', { replace: true });
     }
-  }, [completeOnboarding, startTrialCheckout, t, threshold, trackedAssetId]);
+  }, [completeOnboarding, navigate, startTrialCheckout, t, threshold, trackedAssetId]);
 
   useOnboardingTrialCheckoutReturn({
     userId: user?.id ?? null,
