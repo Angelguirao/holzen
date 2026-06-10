@@ -78,7 +78,7 @@ stateDiagram-v2
 
 **Brief vs deep (`volatility_v1`):** **Brief** never enters `**engaged**` (stays `**active**` until `**outcome_logged**`). **Deep** enters `**engaged**` only after `**reflection_step**` (§5.1). `**completed**` is the same for both: `**outcome_logged**` present. Companion count is not used for completion on this slug.
 
-Exact rules (open max age, supersede, window elapsed) live in `**pause_evaluate_transitions**` and the batch helper `**pause_sweep_window_elapsed**` in `supabase/migrations/` (search those names for the latest definition). **`open_max_age`** applies only to **`engaged`** rows: **12 hours** after the row’s **open-max anchor** (`**pause_open_max_anchor_at**` — migration `**20260609190000_pause_engaged_open_max_calm_settled_anchor.sql**`). **`cron_volatility`** engaged rows anchor on **`metadata.calm_settled_at`** (set on first calm sweep; cleared when volatility is hot again); until then there is **no** open-max expiry. **Manual** and other engaged rows anchor on **`COALESCE(engaged_at, created_at)`**. **`active`** rows are **not** time-expired by `**open_max_age**`. **`check-volatility`** runs a **calm-market sweep** each tick: cron **`active|pending`** expire with **`context_lost`**; engaged cron rows get **`calm_settled_at`** stamped (see §3.2).
+Exact rules (open max age, supersede, window elapsed) live in `**pause_evaluate_transitions**` and the batch helper `**pause_sweep_window_elapsed**` in `supabase/migrations/` (search those names for the latest definition). **`open_max_age`** applies only to **`engaged`** rows: **12 hours** after the row’s **open-max anchor** (`**pause_open_max_anchor_at**` — latest: `**20260610220000_pause_engaged_symmetric_context_shift_grace.sql**`). The anchor is **`MAX(metadata.calm_settled_at, metadata.pending_offered_at)`** — the **latest market context shift** starts (or restarts) the finish window. Until the first shift, engaged rows have **no** open-max expiry. **`engaged_at`** is **not** used for open-max. **`active`** rows are **not** time-expired by `**open_max_age**`. See §3.3 for the full engaged grace model.
 
 ### 3.1 Product vocabulary ↔ Postgres (single row per pause)
 
@@ -102,23 +102,52 @@ Holzen stores **one `pause_instances` row per pause**. Product language below ma
 
 ### 3.2 Calm market sweep (`cron_volatility`)
 
-Each **`check-volatility`** tick computes users whose live move is **below** daily thresholds while they still have open **`cron_volatility`** rows, then calls **`pause_expire_cron_volatility_context_lost(p_user_id)`** (migration `**20260523150200_pause_expire_cron_volatility_context_lost.sql**`; invoked from `**supabase/functions/check-volatility/index.ts**`).
+Each **`check-volatility`** tick computes users whose live move is **below** daily thresholds while they still have open **`cron_volatility`** rows, then calls **`pause_expire_cron_volatility_context_lost(p_user_id)`** (core: **`_pause_cron_volatility_calm_sweep_core`**; invoked from `**supabase/functions/check-volatility/index.ts**`).
 
 | Row state | On calm sweep |
 | --------- | ------------- |
 | **`pending`** | **`expired`**, `**expired_reason = context_lost**`, `metadata.volatility_calm_sweep = true` |
 | **`active`** (pre-Reflect) | Same — offer no longer justified by volatility |
-| **`engaged`** | **Unchanged** — user may finish via **Continue** / **Discard** on Home |
+| **`engaged`** (any `source`) | **Unchanged** — stamp **`calm_settled_at`** on first calm spell; clear **`pending_offered_at`** |
 
-**Scope:** only `**source = 'cron_volatility'**`. **Manual** pauses are **not** auto-expired when the market calms.
+**Expiry scope:** only **`cron_volatility`** **`active|pending`** rows are auto-expired on calm. **Manual** **`active|pending`** rows are **not** swept.
 
 When the sweep clears **all** open rows for the user, **`profiles.last_context`** is set to **NULL**.
-
-**Engaged TTL after calm:** Postgres expires **`engaged`** cron rows **12h after `metadata.calm_settled_at`**, stamped once per calm spell by **`pause_expire_cron_volatility_context_lost`** (not refreshed on every cron tick while still calm). When volatility is **hot** again, **`check-volatility`** calls **`pause_clear_cron_volatility_calm_settled`** before creating/refreshing offers — the anchor is removed until the next calm sweep. **Manual** engaged pauses still use **`engaged_at + 12h`**. Home and `/pause` countdowns use **`resolvePauseOpenMaxAnchorAt`** (client mirror of **`pause_open_max_anchor_at`**). When **`open_max_age`** expires an **`engaged`** row and a **`pending`** row still exists, **`pause_promote_pending_for_user`** promotes pending → **`active`** (Home **`open_pre_reflect`** after refresh — same handoff as row **5** **Discard**, without user action).
 
 **Pending safety net:** if volatility never calms, a lone **`pending`** row can still expire after **12h** from **`created_at`** via **`pause_sweep_window_elapsed`** (`**pending_stale_ttl**` in metadata) — usually superseded by calm sweep or fingerprint churn first.
 
 **Home projection:** [home-pause-widget-projection.md § Calm market sweep](home-pause-widget-projection.md#calm-market-sweep-server-vs-home-ui).
+
+### 3.3 Engaged grace after market context shifts
+
+After Reflect, an **`engaged`** row is **never** killed immediately when the market moves. Instead, each **context shift** starts a **12h finish window** (`**open_max_age**`). The UI countdown mirrors **`pause_open_max_anchor_at`** via **`resolvePauseOpenMaxAnchorAt`** in `src/features/pause/domain/pause-open-max-anchor.ts`.
+
+```mermaid
+stateDiagram-v2
+  direction LR
+
+  [*] --> NoAnchor: engaged (Reflect reached)
+  NoAnchor --> CalmGrace: market calms\nstamp calm_settled_at\nclear pending_offered_at
+  NoAnchor --> HotGrace: hot + new fingerprint\nqueue pending\nstamp pending_offered_at\nclear calm_settled_at
+  CalmGrace --> NoAnchor: market hot again\n(clear calm_settled_at;\nno pending)
+  CalmGrace --> HotGrace: hot + new pending
+  HotGrace --> CalmGrace: market calms\npending context_lost\nstamp calm_settled_at\nclear pending_offered_at
+  HotGrace --> NoAnchor: hot, fingerprint match\n(refresh snapshot only)
+  CalmGrace --> Expired: 12h elapsed
+  HotGrace --> Expired: 12h elapsed
+  Expired --> [*]
+```
+
+| Context shift | What changes on the **engaged** row | Open-max anchor |
+| ------------- | ----------------------------------- | --------------- |
+| **Calm** (within thresholds) | **`pending_offered_at`** removed; **`calm_settled_at`** stamped once per calm spell (not refreshed every cron tick) | **`calm_settled_at`** (until hot again) |
+| **Hot + new fingerprint** (`pending` queued) | **`calm_settled_at`** removed; **`pending_offered_at`** set to `now` (refreshed when pending is replaced) | **`pending_offered_at`** |
+| **Hot + same fingerprint** | Snapshot refresh only — anchors unchanged | Prior anchor kept, or **none** if never shifted |
+| **Hot again after calm** | **`calm_settled_at`** cleared by **`pause_clear_cron_volatility_calm_settled`** before cron processing | **None** until next shift |
+
+**Promotion on expiry:** when **`open_max_age`** expires an **`engaged`** row and a **`pending`** row still exists, **`pause_promote_pending_for_user`** promotes pending → **`active`** (Home **`open_pre_reflect`** after refresh — same handoff as row **5** **Discard**, without user action; migration **`20260610140000`**).
+
+**Manual engaged pauses** follow the **same anchor rules** (no special **`engaged_at`** TTL). Calm stamping runs for **any** engaged row when the market is within thresholds; hot **`pending_offered_at`** applies when cron queues a pending offer behind a manual engaged pause.
 
 ---
 
@@ -134,7 +163,7 @@ When the sweep clears **all** open rows for the user, **`profiles.last_context`*
 | `**pause_dismiss_current**` | When a `**pending**` row exists: dismiss the open `**active|engaged**` instance (`**user_dismissed_current**`), then promote pending → `**active**` via `**pause_promote_pending_for_user**` (Home `open_engaged_pending_offer` **Discard**; migration `**20260609180000_pause_dismiss_current_promote_pending.sql**`). When no pending: expire stale pending rows (`**system_cancelled**`), then dismiss the open instance. Also used from `/pause` header **Close** (no pending promotion). |
 | `**pause_promote_pending_for_user**` | Shared helper: promote `**pending**` → `**active**` (+ library bookmark when needed). Called from `**pause_dismiss_current**` and when engaged **`open_max_age`** expires (`**pause_evaluate_transitions**` / `**pause_sweep_window_elapsed**`; migration `**20260610140000_pause_promote_pending_on_engaged_open_max.sql**`). |
 | `**pause_adopt_pending_offer**` | Supersede open `**active|engaged**`, promote `**pending**` → `**active**`. Home `open_engaged_pending_offer` adopt navigates to `/pause` with **`startAtDepthPicker: true`** and pending **`context_snapshot`**. |
-| `**pause_apply_cron_calm_sweep_for_self**` | Authenticated Home one-shot: when live move is within profile thresholds, runs the same calm sweep as cron for `auth.uid()` (expire cron `active|pending`, stamp `calm_settled_at` on engaged cron). Called from `useHomeCronCalmSweepOnce` — not polled. |
+| `**pause_apply_cron_calm_sweep_for_self**` | Authenticated Home one-shot: when live move is within profile thresholds, runs the same calm sweep as cron for `auth.uid()` (expire cron `active|pending`, stamp `calm_settled_at` on **any** engaged row). Called from `useHomeCronCalmSweepOnce` — not polled. |
 | `**pause_decline_pending_offer**` | Expire the `**pending**` row without changing the open pause. |
 
 

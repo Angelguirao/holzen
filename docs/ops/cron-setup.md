@@ -227,7 +227,7 @@ function batches **three** expiry paths (see
 [`docs/systems/pause-system.md`](../systems/pause-system.md) §3):
 
 1. `active|engaged` past `window_ends_at` → `window_elapsed`
-2. **`open_max_age` (engaged only):** `engaged` rows with `COALESCE(engaged_at, created_at)` older than **12 hours** — `active` rows are not swept on this path (same as `pause_evaluate_transitions`; migration `20260515180000_pause_open_max_age_engaged_only.sql`)
+2. **`open_max_age` (engaged only):** `engaged` rows whose open-max anchor (`MAX(calm_settled_at, pending_offered_at)`) is older than **12 hours** — `active` rows are not swept on this path (same as `pause_evaluate_transitions`; latest anchor rules in `20260610220000_pause_engaged_symmetric_context_shift_grace.sql`)
 3. `pending` offers older than **12 hours** → `system_cancelled` (with `pending_stale_ttl` in `metadata`) when the fingerprint **stops** changing and the offer is never adopted — a **safety net**, not the same mechanism as fingerprint-driven pending replacement. Those rows never appear in `v_pause_current`; after migration `20260518120000_pause_archive_exclude_pending_churn.sql` they are also omitted from `v_pause_archive_echoes`.
 
 Schedule with pg_cron at least **hourly** (minute cadence is fine). If

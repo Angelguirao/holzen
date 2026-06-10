@@ -126,8 +126,8 @@ function HomePauseEngagedOpenMaxCountdownLine({
 
   return (
     <p className="pt-1 text-muted-foreground">
-      {t('home.pauseInProgress.closesAfterSettle', {
-        defaultValue: 'This pause closes 12 hours after the market settles.',
+      {t('home.pauseInProgress.closesAfterContextShift', {
+        defaultValue: 'This pause closes 12 hours after the market context shifts.',
       })}
     </p>
   );

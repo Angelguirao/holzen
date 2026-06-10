@@ -113,7 +113,8 @@
       "stillHere": "The pause you started is still here.",
       "marketSettledLead": "The market that disturbed you has settled.",
       "closesIn": "This pause closes in {{remaining}}",
-      "closesAfterSettle": "This pause closes 12 hours after the market settles."
+      "closesAfterSettle": "This pause closes 12 hours after the market settles.",
+      "closesAfterContextShift": "This pause closes 12 hours after the market context shifts."
     },
     "welcomeBack": {
       "title": "Welcome back",

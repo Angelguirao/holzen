@@ -90,7 +90,7 @@ export interface PauseInstanceRow {
   completed_at: string | null;
   terminal_at: string | null;
   expired_reason: PauseExpiredReason | null;
-  /** `pause_instances.source` — cron_volatility uses calm_settled_at for open_max anchor. */
+  /** `pause_instances.source` — open_max uses calm_settled_at / pending_offered_at (not source-specific). */
   source?: string | null;
   metadata?: Record<string, unknown> | null;
 }
@@ -266,9 +266,9 @@ function allIn<T>(required: readonly T[], present: Set<T>): boolean {
  *   2. `pending` → unchanged.
  *   3. Window elapsed (`now > window_ends_at`) → `expired` **only when**
  *      `template.action_window_ms` is set (matches Postgres).
- *   4. **`open_max_age` (engaged only):** anchor from `pause_open_max_anchor_at` — cron rows use
- *      `metadata.calm_settled_at` (NULL until calm sweep → no expiry); others use
- *      `COALESCE(engaged_at, created_at)` + 12h.
+ *   4. **`open_max_age` (engaged only):** anchor from `pause_open_max_anchor_at` —
+ *      `MAX(metadata.calm_settled_at, metadata.pending_offered_at)` + 12h (NULL until
+ *      first market context shift).
  *   5. **`volatility_v1`:** **`engaged`** when **deep** and `reflection_step` exists
  *      (Reflect reached). **Brief** never enters `engaged`. **`completed`** when
  *      **`outcome_logged`** exists and ritual beats are met (see `volatilityV1RitualBeatsMet`).

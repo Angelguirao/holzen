@@ -17,7 +17,7 @@ type Input = {
 };
 
 /**
- * When Home shows calm-waters on a cron engaged pause without `calm_settled_at`,
+ * When Home shows calm-waters on an engaged pause without `calm_settled_at`,
  * request a single server calm sweep (debounced per open instance). No polling.
  */
 export function useHomeCronCalmSweepOnce(input: Input): void {
@@ -29,14 +29,13 @@ export function useHomeCronCalmSweepOnce(input: Input): void {
       userId,
       openPauseInstanceId,
       openPauseState,
-      openPauseSource,
       openPauseMetadata,
       marketData,
       engagedPauseMarketSettled,
     } = input;
 
     if (!userId || !openPauseInstanceId) return;
-    if (openPauseState !== 'engaged' || openPauseSource !== 'cron_volatility') return;
+    if (openPauseState !== 'engaged') return;
     if (!engagedPauseMarketSettled || !marketData) return;
     if (parsePauseCalmSettledAt(openPauseMetadata)) return;
 
@@ -66,7 +65,6 @@ export function useHomeCronCalmSweepOnce(input: Input): void {
     input.userId,
     input.openPauseInstanceId,
     input.openPauseState,
-    input.openPauseSource,
     input.openPauseMetadata,
     input.marketData,
     input.engagedPauseMarketSettled,

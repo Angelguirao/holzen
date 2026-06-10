@@ -358,14 +358,14 @@ describe('computePauseState', () => {
     ).toBe('active');
   });
 
-  it('does not expire engaged solely because created_at is old if engaged_at is within 12h', () => {
+  it('keeps manual engaged without context-shift stamps even when engaged_at is old', () => {
     expect(
       computePauseState({
         instance: makeInstance({
           state: 'engaged',
           source: 'manual',
           created_at: '2026-04-21T18:00:00.000Z',
-          engaged_at: '2026-04-23T19:00:00.000Z',
+          engaged_at: '2026-04-23T07:00:00.000Z',
         }),
         template: volatilityTemplate,
         stepEvents: [],
@@ -375,7 +375,7 @@ describe('computePauseState', () => {
     ).toBe('engaged');
   });
 
-  it('expires manual engaged when engaged_at is older than 12h (open max age from engagement)', () => {
+  it('expires manual engaged 12h after pending_offered_at', () => {
     expect(
       computePauseState({
         instance: makeInstance({
@@ -383,6 +383,7 @@ describe('computePauseState', () => {
           source: 'manual',
           created_at: '2026-04-21T18:00:00.000Z',
           engaged_at: '2026-04-23T07:00:00.000Z',
+          metadata: { pending_offered_at: '2026-04-23T07:00:00.000Z' },
         }),
         template: volatilityTemplate,
         stepEvents: [],
@@ -504,7 +505,7 @@ describe('shouldCountCompanion', () => {
     ).toEqual({ counts: true });
   });
 
-  it('rejects manual engaged past open_max_age from engaged_at (outside_window)', () => {
+  it('allows manual engaged without context-shift stamps even when engaged_at is old', () => {
     expect(
       shouldCountCompanion({
         openInstance: makeInstance({
@@ -518,10 +519,10 @@ describe('shouldCountCompanion', () => {
         companionType: 'signal',
         now: NOW,
       }),
-    ).toEqual({ counts: false, reason: 'outside_window' });
+    ).toEqual({ counts: true });
   });
 
-  it('allows manual engaged within open_max_age from engaged_at', () => {
+  it('rejects manual engaged past open_max_age from pending_offered_at (outside_window)', () => {
     expect(
       shouldCountCompanion({
         openInstance: makeInstance({
@@ -529,13 +530,14 @@ describe('shouldCountCompanion', () => {
           source: 'manual',
           created_at: '2026-04-21T18:00:00.000Z',
           engaged_at: '2026-04-23T19:00:00.000Z',
+          metadata: { pending_offered_at: '2026-04-23T07:00:00.000Z' },
         }),
         template: volatilityTemplate,
         companionEvents: [],
         companionType: 'signal',
         now: NOW,
       }),
-    ).toEqual({ counts: true });
+    ).toEqual({ counts: false, reason: 'outside_window' });
   });
 
   it('rejects with context_lost when instance is expired for context_lost', () => {
