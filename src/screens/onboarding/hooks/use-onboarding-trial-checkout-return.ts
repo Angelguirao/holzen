@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
@@ -9,14 +8,11 @@ import {
   trackTrialDenied,
 } from '@/features/subscription/application/paywall-telemetry';
 import { fetchTrialCheckoutGrantStatus } from '@/features/subscription/application/trial-checkout-grant';
-import { finishOnboardingAfterActiveTrial } from '@/screens/onboarding/hooks/finish-onboarding-after-active-trial';
 
 type Args = {
   userId: string | null;
   profileLoaded: boolean;
-  trackedAssetId: string;
-  threshold: number;
-  completeOnboarding: () => Promise<void>;
+  finishAndGoHome: () => Promise<void>;
   refreshSubscription: () => Promise<unknown>;
 };
 
@@ -24,12 +20,9 @@ type Args = {
 export function useOnboardingTrialCheckoutReturn({
   userId,
   profileLoaded,
-  trackedAssetId,
-  threshold,
-  completeOnboarding,
+  finishAndGoHome,
   refreshSubscription,
 }: Args) {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const handledRef = useRef(false);
 
@@ -75,13 +68,7 @@ export function useOnboardingTrialCheckoutReturn({
           );
           return;
         }
-        await finishOnboardingAfterActiveTrial({
-          completeOnboarding,
-          trackedAssetId,
-          threshold,
-          t,
-        });
-        navigate('/', { replace: true });
+        await finishAndGoHome();
       } catch {
         toast.error(
           t('home.subscription.trialFailed', { defaultValue: 'Could not start trial. Try again.' }),
@@ -89,13 +76,10 @@ export function useOnboardingTrialCheckoutReturn({
       }
     })();
   }, [
-    completeOnboarding,
-    navigate,
+    finishAndGoHome,
     profileLoaded,
     refreshSubscription,
     t,
-    threshold,
-    trackedAssetId,
     userId,
   ]);
 }

@@ -8,6 +8,8 @@ type Args = {
   trackedAssetId: string;
   threshold: number;
   t: TFunction;
+  /** Called after profile + analytics + toast — typically `navigate('/', { replace: true })`. */
+  goHome?: () => void;
 };
 
 /** Marks onboarding complete when trial entitlement already exists (Checkout skip or return). */
@@ -16,6 +18,7 @@ export async function finishOnboardingAfterActiveTrial({
   trackedAssetId,
   threshold,
   t,
+  goHome,
 }: Args): Promise<void> {
   await completeOnboarding();
   trackTrialStarted('trial_checkout');
@@ -30,4 +33,5 @@ export async function finishOnboardingAfterActiveTrial({
       defaultValue: 'Your free trial is active.',
     }),
   );
+  goHome?.();
 }

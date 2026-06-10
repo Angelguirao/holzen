@@ -53,7 +53,7 @@ The Archive tab uses route `/archive` and reports `tab: 'archive'`.
 
 | Event | When | Properties | Owner |
 |---|---|---|---|
-| `onboarding.completed` | User finishes the 4-step onboarding flow (Why → asset → threshold → trial) and `ensure-trial-subscription` succeeds | `{ steps_completed: 4, tracked_asset_id: string, threshold_up: number, threshold_down: number }` | @holzen |
+| `onboarding.completed` | User finishes the 4-step onboarding flow (Why → asset → threshold → trial) after Stripe trial Checkout succeeds or trial is already active | `{ steps_completed: 4, tracked_asset_id: string, threshold_up: number, threshold_down: number }` | @holzen |
 
 ### subscription
 

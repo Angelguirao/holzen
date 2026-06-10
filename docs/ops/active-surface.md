@@ -68,11 +68,11 @@ Holzen **pauses** and rewards **completed rituals** (Journey streak + count). It
 
 | `profiles.subscription_status` | Client `entitlement` | Pause engage |
 | --- | --- | --- |
-| `free` (no Stripe customer) | `pre_trial` | After `ensure-trial-subscription` |
+| `free` (no Stripe customer) | `pre_trial` | After Stripe trial Checkout (`create-checkout` with `trial: true`) or existing trialing/active sub |
 | `trialing` / `active` | `trialing` / `active` | Yes |
 | `lapsed` | `lapsed` | No (Archive/Journey read OK) |
 
-Server: `user_can_engage_pause(uuid)`; guards on `pause_create_or_reuse` and `pause_log_step`. Sync: `check-subscription`, `stripe-webhook`, `ensure-trial-subscription`.
+Server: `user_can_engage_pause(uuid)`; guards on `pause_create_or_reuse` and `pause_log_step`. Sync: `check-subscription`, `stripe-webhook`, `create-checkout` (trial Checkout). `ensure-trial-subscription` remains for idempotent reads / legacy callers; new trials start via Checkout.
 
 ## Pause companions — shipped vs dormant
 
@@ -159,8 +159,8 @@ Migration `20260605120000_pause_first_schema_hygiene.sql`:
 | --- | --- |
 | `app.route_not_found` | NotFound |
 | `journey.overview_viewed` | Journey overview |
-| `onboarding.completed` | 4-step onboarding completed (Why first) + trial ensure |
-| `trial.started` | New Stripe trial (`source: ensure_trial`) |
+| `onboarding.completed` | 4-step onboarding completed (Why first) + trial Checkout success or skip when trial already active |
+| `trial.started` | New Stripe trial (`source: trial_checkout`; legacy `ensure_trial` may still appear in old rows) |
 | `trial.expired` | Entitlement → `lapsed` |
 
 Full taxonomy: [event-taxonomy.md](./event-taxonomy.md).

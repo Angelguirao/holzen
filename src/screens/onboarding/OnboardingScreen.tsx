@@ -1,16 +1,11 @@
-import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { OnboardingFlow } from '@/screens/onboarding/components/OnboardingFlow';
-import { finishOnboardingAfterActiveTrial } from '@/screens/onboarding/hooks/finish-onboarding-after-active-trial';
 import { useOnboardingTrialCheckoutReturn } from '@/screens/onboarding/hooks/use-onboarding-trial-checkout-return';
+import { useOnboardingTrialStart } from '@/screens/onboarding/hooks/use-onboarding-trial-start';
 
 const OnboardingScreen = () => {
-  const navigate = useNavigate();
-  const { t } = useTranslation();
   const { user } = useAuth();
   const {
     motivations,
@@ -21,27 +16,17 @@ const OnboardingScreen = () => {
     saveOnboardingDraft,
     completeOnboarding,
   } = useProfile();
-  const { startTrialCheckout, trialLoading, manualRetry } = useSubscription();
-
-  const handleStartTrial = useCallback(async () => {
-    const outcome = await startTrialCheckout({ fromOnboarding: true });
-    if (outcome === 'trial_already_active') {
-      await finishOnboardingAfterActiveTrial({
-        completeOnboarding,
-        trackedAssetId,
-        threshold,
-        t,
-      });
-      navigate('/', { replace: true });
-    }
-  }, [completeOnboarding, navigate, startTrialCheckout, t, threshold, trackedAssetId]);
+  const { manualRetry } = useSubscription();
+  const { handleStartTrial, trialLoading, finishAndGoHome } = useOnboardingTrialStart({
+    trackedAssetId,
+    threshold,
+    completeOnboarding,
+  });
 
   useOnboardingTrialCheckoutReturn({
     userId: user?.id ?? null,
     profileLoaded,
-    trackedAssetId,
-    threshold,
-    completeOnboarding,
+    finishAndGoHome,
     refreshSubscription: manualRetry,
   });
 
