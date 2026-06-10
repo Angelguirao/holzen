@@ -11,8 +11,7 @@ const localSupabaseDir = join(root, "supabase");
 const localProjectUrl = "http://api.supabase.internal:8000";
 const rescheduleSqlPath = join(root, "scripts", "sql", "reschedule-local-active-crons.sql");
 const disableSqlPath = join(root, "scripts", "sql", "disable-local-active-crons.sql");
-const inspectCronSql =
-  "SELECT jobid, jobname, schedule, active FROM cron.job WHERE jobname IN ('check-volatility','pregenerate-companions','refresh-market-prices') ORDER BY jobname;";
+const inspectSqlPath = join(root, "scripts", "sql", "inspect-local-active-crons.sql");
 
 function runSupabaseQuery(label, args) {
   console.log(`\n▶ ${label}`);
@@ -31,12 +30,7 @@ function runSupabaseQuery(label, args) {
 }
 
 function inspectLocalCronJobs(label) {
-  const { tempDir, tempPath } = writeTempSql(`${inspectCronSql}\n`);
-  try {
-    runSupabaseQuery(label, ["--file", tempPath, "-o", "table"]);
-  } finally {
-    rmSync(tempDir, { recursive: true, force: true });
-  }
+  runSupabaseQuery(label, ["--file", inspectSqlPath]);
 }
 
 function sqlLiteral(value) {
