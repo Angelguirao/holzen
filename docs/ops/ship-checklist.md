@@ -34,7 +34,7 @@ Detail: [cicd-overview.md](./cicd-overview.md)
 
 ## You — smoke (optional, ~15 min)
 
-- [ ] `bruno/active/`: sign-in → health → check-subscription → ensure-trial
+- [ ] `bruno/active/`: sign-in → health → check-subscription → create-checkout-trial (or app onboarding → Stripe return)
 - [ ] App: onboarding → trial → Home pause → Archive/Journey when lapsed read-only
 
 ---

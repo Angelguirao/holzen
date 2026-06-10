@@ -1085,7 +1085,7 @@
     "hero": "When Bitcoin moves, pause before you do.",
     "heroDesc": "Holzen is a self-awareness practice for investors. When Bitcoin moves, you get a moment to breathe, reflect, and notice your patterns — before impulse takes over. We don't recommend buying, selling, or holding anything — only pausing long enough to choose deliberately.",
     "getStartedForFree": "Start your free trial",
-    "noCreditCard": "{{trialDays}}-day Pro trial · no card required · ${{price}}/mo after trial",
+    "noCreditCard": "{{trialDays}}-day Pro trial · card required · $0 today · ${{price}}/mo if you subscribe after",
     "reflectionLoop": "Impulse vs. Intention",
     "reaction": {
       "label": "Without Holzen",
@@ -1167,7 +1167,7 @@
     "scienceStepsSummary": "Feel, breathe, reflect, frame, breathe again, then decide — six beats, with a brief settle moment on the same final segment before you record an outcome; each maps to peer-reviewed work from Lieberman, Porges, Gross, Flavell, and Kahneman.",
     "readFullResearch": "Read the full research →",
     "freeToStart": "{{trialDays}}-day free trial",
-    "pricingDesc": "Start with a {{trialDays}}-day free trial of Pro — unlimited pauses and AI companions (${{price}}/month after, cancel anytime). When your trial ends, you can reactivate from Settings to keep pausing.",
+    "pricingDesc": "Start with a {{trialDays}}-day free trial of Pro — add a standard debit or credit card at signup ($0 today, no charge at trial end). Unlimited pauses and AI companions while trialing; ${{price}}/month if you subscribe after, cancel anytime.",
     "questions": "Common questions",
     "faq": {
       "whoQuestion": "Who is Holzen for?",
@@ -1475,7 +1475,7 @@
     "preTrial": {
       "kicker": "Start your trial",
       "title": "Start your {{days}}-day free trial",
-      "body": "No card required. Full pause ritual for {{days}} days — cancel anytime before it ends.",
+      "body": "Add a card to start your {{days}}-day trial ($0 today). Full pause ritual while trialing — no charge when the trial ends.",
       "cta": "Start {{days}}-day free trial"
     },
     "terminalEntryRedirect": "This pause already ended — opening your archive.",

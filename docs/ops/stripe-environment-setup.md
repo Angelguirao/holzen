@@ -165,7 +165,7 @@ npm run dev:staging
 
 ### C. Bruno (API-only)
 
-[bruno/active/billing/README.md](../../bruno/active/billing/README.md) — `01-create-checkout`, `02-check-subscription`, `04-ensure-trial-subscription`. Requires JWT + deployed edges + Stripe secrets.
+[bruno/active/billing/README.md](../../bruno/active/billing/README.md) — `01-create-checkout-trial`, `02-check-subscription`, `04-ensure-trial-subscription` (idempotent read / legacy). Requires JWT + deployed edges + Stripe secrets.
 
 ### D. Webhook delivery
 
@@ -200,7 +200,8 @@ Stripe Dashboard → Webhooks → endpoint → **Recent deliveries** — expect 
 |----------|------|
 | `create-checkout` | Stripe Checkout Session URL |
 | `check-subscription` | Profile cache + Stripe subscription read |
-| `ensure-trial-subscription` | 7-day trial without card at onboarding |
+| `create-checkout` (`trial: true`) | 7-day trial via Stripe Checkout (card on file; $0 today) |
+| `ensure-trial-subscription` | Idempotent trial status read; returns `checkout_required` when a new trial must start via Checkout |
 | `stripe-webhook` | Subscription sync + flex credit grants |
 | `customer-portal` | Billing portal URL |
 | `admin-check-stripe-prices` | Secret/price validation (admin) |

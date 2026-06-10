@@ -83,7 +83,7 @@ With `staging.bru` (preferred) or `prod.bru` env (JWT + Supabase URL/key). Full 
 1. `auth/01-sign-in-password`
 2. `platform/health` — 200
 3. `billing/02-check-subscription` — `subscription_status` / tier fields
-4. `billing/04-ensure-trial-subscription` — `{ ok: true }` (disposable user; idempotent)
+4. `billing/01-create-checkout-trial` — `{ url }` (disposable user) **or** app onboarding → Stripe Checkout → `trial_checkout=success`
 5. Optional: `pause-pipeline/01-holzen-reflect`, `02-companion-orchestrate`
 
 Do not use requests under `bruno/legacy/full-shell/` for launch ship checks (undeployed edges).

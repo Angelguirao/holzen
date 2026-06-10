@@ -2,7 +2,7 @@
 
 This guide walks a new contributor through the repository in roughly the order you would discover it while running the app locally. It complements [README.md](../README.md) (setup and scripts) and [AGENTS.md](../AGENTS.md) (conventions for automation). Deep dives on the AI pause pipeline and cron jobs live in [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) and [cron-setup.md](../ops/cron-setup.md).
 
-**Pause-first shipped path (2026-05):** sign in → **`/onboarding`** (asset, threshold, trial via `ensure-trial-subscription`) → **Home** → **`/pause`** ritual → **Archive** to browse past pauses → **Journey** overview (streak/count) → **Settings**. Do not import `@/legacy/*`; full IA is tag `full-ia-pre-strip`. Manifest: [active-surface.md](../ops/active-surface.md).
+**Pause-first shipped path (2026-05):** sign in → **`/onboarding`** (Why, asset, threshold, trial via Stripe Checkout) → **Home** → **`/pause`** ritual → **Archive** to browse past pauses → **Journey** overview (streak/count) → **Settings**. Do not import `@/legacy/*`; full IA is tag `full-ia-pre-strip`. Manifest: [active-surface.md](../ops/active-surface.md).
 
 ---
 

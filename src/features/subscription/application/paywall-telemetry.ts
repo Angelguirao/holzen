@@ -31,7 +31,7 @@ export function trackPaywallSubscribed(plan: PaywallSubscribedPlan): void {
   }
 }
 
-/** Stripe trial created via ensure-trial-subscription (`created: true`). */
+/** Stripe trial started (Checkout return or legacy ensure-trial path). */
 export function trackTrialStarted(source: TrialStartedSource): void {
   try {
     trackEvent('trial.started', { source });
