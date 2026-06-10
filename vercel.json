@@ -1,9 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build:unified",
   "outputDirectory": "dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "rewrites": [{ "source": "/(.*)", "destination": "/spa.html" }],
   "git": {
     "deploymentEnabled": {
       "main": false,
@@ -30,7 +30,7 @@
       ]
     },
     {
-      "source": "/index.html",
+      "source": "/spa.html",
       "headers": [
         {
           "key": "Cache-Control",

@@ -3,11 +3,5 @@
   "framework": "astro",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "redirects": [
-    {
-      "source": "/welcome",
-      "destination": "/",
-      "permanent": true
-    }
-  ]
+  "comment": "Standalone Astro preview only. Production uses repo-root vercel.json + npm run build:unified."
 }

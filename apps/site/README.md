@@ -1,21 +1,28 @@
 # @holzen/site — Astro marketing site
 
-Static marketing surface for `holzen.app`. Product auth and the signed-in app live on the SPA (`PUBLIC_APP_URL`, default `https://app.holzen.app`).
+Static marketing HTML merged into the product `dist/` on deploy. **One domain:** `holzen.app`.
 
 **Owner doc:** [docs/ops/marketing-site-split.md](../../docs/ops/marketing-site-split.md)
 
-## Commands (from repo root)
+## Production
+
+Marketing is not a separate Vercel project. Root `vercel.json` runs:
 
 ```bash
-npm run dev:site
-npm run build:site
+npm run build:unified
 ```
 
-## Vercel
+Astro output (e.g. `/welcome`) is copied into `dist/` beside `spa.html` (the React app shell).
 
-Create a **separate** Vercel project rooted at `apps/site` with:
+## Local dev
 
-- Domain: `holzen.app` (+ `www`)
-- Env: `PUBLIC_APP_URL=https://app.holzen.app`
+```bash
+npm run dev:site   # :4321 — Astro only
+npm run dev        # :8080 — SPA only
+```
 
-The product SPA project keeps `app.holzen.app` (repo root `vercel.json`).
+## Pages
+
+| Astro path | Replaces (eventually) |
+| --- | --- |
+| `/welcome` | `LandingScreen` |
