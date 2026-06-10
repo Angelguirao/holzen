@@ -13,6 +13,7 @@ import type {
 } from '@/features/pause/public-queries';
 
 import type { SignalPayload } from '@/features/pause/domain/signal-payload';
+import { companionSlotHasDisplayableContent } from '@/features/pause/domain/companion-slot-display-content';
 
 type CompanionSignalPayload = SignalPayload | null;
 
@@ -154,7 +155,7 @@ export function CompanionSectionOrchestratedSlots({
           onFirstExpandComplete={() => markCompleted('signal')}
           loading={signalLoading}
           pauseInstanceId={pauseInstanceId}
-          hasContent={Boolean(signal)}
+          hasContent={companionSlotHasDisplayableContent('signal', signal)}
           relaxationKey={cacheRelaxations.signal}
           companionType="signal"
           cacheId={cacheIds.signal}
@@ -187,7 +188,7 @@ export function CompanionSectionOrchestratedSlots({
           onFirstExpandComplete={() => markCompleted('grounding')}
           loading={groundingLoading}
           pauseInstanceId={pauseInstanceId}
-          hasContent={Boolean(grounding)}
+          hasContent={companionSlotHasDisplayableContent('grounding', grounding)}
           relaxationKey={cacheRelaxations.grounding}
           companionType="grounding"
           cacheId={cacheIds.grounding}
@@ -219,7 +220,7 @@ export function CompanionSectionOrchestratedSlots({
           onFirstExpandComplete={() => markCompleted('zoomOut')}
           loading={zoomOutLoading}
           pauseInstanceId={pauseInstanceId}
-          hasContent={Boolean(zoomOut)}
+          hasContent={companionSlotHasDisplayableContent('zoomOut', zoomOut)}
           relaxationKey={cacheRelaxations.zoomOut}
           companionType="zoom_out"
           cacheId={cacheIds.zoomOut}
@@ -251,7 +252,7 @@ export function CompanionSectionOrchestratedSlots({
           onFirstExpandComplete={() => markCompleted('history')}
           loading={historyLoading}
           pauseInstanceId={pauseInstanceId}
-          hasContent={Boolean(historyDisplay)}
+          hasContent={companionSlotHasDisplayableContent('history', historyDisplay)}
           relaxationKey={cacheRelaxations.history}
           companionType="history_insight"
           cacheId={cacheIds.history}
