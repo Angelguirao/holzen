@@ -1,15 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { trackOnboardingCompleted } from '@/features/pause/public-home';
 import {
   ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY,
 } from '@/features/subscription/application/trial-checkout-flow';
 import {
   trackTrialDenied,
-  trackTrialStarted,
 } from '@/features/subscription/application/paywall-telemetry';
 import { fetchTrialCheckoutGrantStatus } from '@/features/subscription/application/trial-checkout-grant';
+import { finishOnboardingAfterActiveTrial } from '@/screens/onboarding/hooks/finish-onboarding-after-active-trial';
 
 type Args = {
   userId: string | null;
@@ -74,19 +73,12 @@ export function useOnboardingTrialCheckoutReturn({
           );
           return;
         }
-        await completeOnboarding();
-        trackTrialStarted('trial_checkout');
-        trackOnboardingCompleted({
-          stepsCompleted: 4,
+        await finishOnboardingAfterActiveTrial({
+          completeOnboarding,
           trackedAssetId,
-          thresholdUp: threshold,
-          thresholdDown: threshold,
+          threshold,
+          t,
         });
-        toast.success(
-          t('home.subscription.trialStarted', {
-            defaultValue: 'Your free trial is active.',
-          }),
-        );
       } catch {
         toast.error(
           t('home.subscription.trialFailed', { defaultValue: 'Could not start trial. Try again.' }),

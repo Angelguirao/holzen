@@ -12,6 +12,7 @@ import { getCheckoutSuppressionWindowMs } from '../application/checkout-suppress
 import {
   ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY,
   TRIAL_CHECKOUT_STARTED_KEY,
+  type TrialCheckoutOutcome,
 } from '../application/trial-checkout-flow';
 import {
   canEngagePauseFromEntitlement,
@@ -265,8 +266,8 @@ export function useSubscription() {
   }, [t, startCheckoutTransition]);
 
   const startTrialCheckout = useCallback(
-    (options?: { fromOnboarding?: boolean }): Promise<void> => {
-      if (!userId) return Promise.resolve();
+    (options?: { fromOnboarding?: boolean }): Promise<TrialCheckoutOutcome | void> => {
+      if (!userId) return Promise.resolve('no_user');
       holzenLog.subscription('trial', { action: 'checkout', fromOnboarding: options?.fromOnboarding === true });
       return new Promise((resolve, reject) => {
         startTrialTransition(async () => {
@@ -286,7 +287,7 @@ export function useSubscription() {
             if (data?.trial_denied && data.reason) {
               sessionStorage.removeItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
               await handleTrialDenied(data.reason);
-              resolve();
+              resolve('trial_denied');
               return;
             }
 
@@ -295,7 +296,8 @@ export function useSubscription() {
               subscriptionNextFetchMode = 'force';
               subscriptionNextFetchSource = 'invalidate';
               await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
-              resolve();
+              holzenLog.subscription('trial', { action: 'already_active', fromOnboarding: options?.fromOnboarding === true });
+              resolve('trial_already_active');
               return;
             }
 
