@@ -91,7 +91,7 @@ export function useSubscription() {
   const queryClient = useQueryClient();
   const userId = user?.id ?? null;
   const [isCheckoutPending, startCheckoutTransition] = useTransition();
-  const [isTrialPending, startTrialTransition] = useTransition();
+  const [isTrialCheckoutInFlight, setIsTrialCheckoutInFlight] = useState(false);
   const [isPortalPending, startPortalTransition] = useTransition();
   const [checkoutLoadingTarget, setCheckoutLoadingTarget] = useState<
     'pro' | 'flex_pack_s' | 'flex_pack_m' | null
@@ -266,64 +266,63 @@ export function useSubscription() {
   }, [t, startCheckoutTransition]);
 
   const startTrialCheckout = useCallback(
-    (options?: { fromOnboarding?: boolean }): Promise<TrialCheckoutOutcome | void> => {
-      if (!userId) return Promise.resolve('no_user');
+    async (options?: { fromOnboarding?: boolean }): Promise<TrialCheckoutOutcome | void> => {
+      if (!userId) return 'no_user';
       holzenLog.subscription('trial', { action: 'checkout', fromOnboarding: options?.fromOnboarding === true });
-      return new Promise((resolve, reject) => {
-        startTrialTransition(async () => {
-          try {
-            if (options?.fromOnboarding) {
-              sessionStorage.setItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY, '1');
-            }
-            sessionStorage.setItem(TRIAL_CHECKOUT_STARTED_KEY, String(Date.now()));
+      setIsTrialCheckoutInFlight(true);
+      let redirecting = false;
+      try {
+        if (options?.fromOnboarding) {
+          sessionStorage.setItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY, '1');
+        }
+        sessionStorage.setItem(TRIAL_CHECKOUT_STARTED_KEY, String(Date.now()));
 
-            const { data, error } = await createCheckoutSession({
-              checkoutKind: 'subscription',
-              trial: true,
-              trialReturnTo: options?.fromOnboarding ? 'onboarding' : 'home',
-            });
-            if (error) throw error;
-
-            if (data?.trial_denied && data.reason) {
-              sessionStorage.removeItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
-              await handleTrialDenied(data.reason);
-              resolve('trial_denied');
-              return;
-            }
-
-            if (data?.trial_already_active) {
-              sessionStorage.removeItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
-              subscriptionNextFetchMode = 'force';
-              subscriptionNextFetchSource = 'invalidate';
-              await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
-              holzenLog.subscription('trial', { action: 'already_active', fromOnboarding: options?.fromOnboarding === true });
-              resolve('trial_already_active');
-              return;
-            }
-
-            if (!data?.url) throw new Error('Trial checkout did not return a link');
-
-            try {
-              if (window.self !== window.top && window.top) {
-                window.top.location.href = data.url;
-              } else {
-                window.location.href = data.url;
-              }
-            } catch {
-              window.location.href = data.url;
-            }
-          } catch (e) {
-            sessionStorage.removeItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
-            console.error('Trial checkout error:', e);
-            toast.error(
-              t('home.subscription.trialFailed', { defaultValue: 'Could not start trial. Try again.' }),
-            );
-            reject(e);
-          }
+        const { data, error } = await createCheckoutSession({
+          checkoutKind: 'subscription',
+          trial: true,
+          trialReturnTo: options?.fromOnboarding ? 'onboarding' : 'home',
         });
-      });
+        if (error) throw error;
+
+        if (data?.trial_denied && data.reason) {
+          sessionStorage.removeItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
+          await handleTrialDenied(data.reason);
+          return 'trial_denied';
+        }
+
+        if (data?.trial_already_active) {
+          sessionStorage.removeItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
+          subscriptionNextFetchMode = 'force';
+          subscriptionNextFetchSource = 'invalidate';
+          await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey(userId) });
+          holzenLog.subscription('trial', { action: 'already_active', fromOnboarding: options?.fromOnboarding === true });
+          return 'trial_already_active';
+        }
+
+        if (!data?.url) throw new Error('Trial checkout did not return a link');
+
+        redirecting = true;
+        try {
+          if (window.self !== window.top && window.top) {
+            window.top.location.href = data.url;
+          } else {
+            window.location.href = data.url;
+          }
+        } catch {
+          window.location.href = data.url;
+        }
+      } catch (e) {
+        sessionStorage.removeItem(ONBOARDING_TRIAL_CHECKOUT_PENDING_KEY);
+        console.error('Trial checkout error:', e);
+        toast.error(
+          t('home.subscription.trialFailed', { defaultValue: 'Could not start trial. Try again.' }),
+        );
+        throw e;
+      } finally {
+        if (!redirecting) setIsTrialCheckoutInFlight(false);
+      }
     },
-    [handleTrialDenied, queryClient, startTrialTransition, t, userId],
+    [handleTrialDenied, queryClient, t, userId],
   );
 
   /** @deprecated alias — trial starts via Stripe Checkout (`startTrialCheckout`). */
@@ -469,7 +468,7 @@ export function useSubscription() {
       subscribed: false,
       loading: false,
       checkoutLoading: isCheckoutPending,
-      trialLoading: isTrialPending,
+      trialLoading: isTrialCheckoutInFlight,
       portalLoading: isPortalPending,
       checkoutLoadingTarget,
       startCheckout,
@@ -503,7 +502,7 @@ export function useSubscription() {
     subscribed,
     loading,
     checkoutLoading: isCheckoutPending,
-    trialLoading: isTrialPending,
+    trialLoading: isTrialCheckoutInFlight,
     portalLoading: isPortalPending,
     checkoutLoadingTarget,
     startCheckout,

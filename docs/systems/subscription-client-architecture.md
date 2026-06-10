@@ -31,7 +31,7 @@ features/subscription/
   domain/                 # Entitlement, subscription status vocabulary
   application/use-cases/
     checkout/             # return URL handling, suppression window
-    trial/                # ensure-trial flows (client side effects)
+    trial/                # trial Checkout + return handling (client side effects)
     portal/               # customer portal invoke
     entitlement/          # map profiles row → client entitlement
   ports/

@@ -57,7 +57,7 @@ export function PauseEngagementBlocked({
             : t('pause.preTrial.body', {
                 days: PRICING.trialDays,
                 defaultValue:
-                  'No card required. Full pause ritual for {{days}} days — cancel anytime before it ends.',
+                  'Add a card to start your {{days}}-day trial ($0 today). Full pause ritual while trialing — no charge when the trial ends.',
               })}
         </p>
         <LoadingButton

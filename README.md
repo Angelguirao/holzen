@@ -4,7 +4,7 @@ Holzen is a React + TypeScript single-page app focused on **volatility-triggered
 
 ## Pause-first shipped product
 
-The active app is a **pause-first MVP**: four primary tabs (Home, Archive, Journey, Settings), full-screen `/pause` ritual, and Stripe-native **7-day trial** (no card) via `ensure-trial-subscription`. After trial, users need a paid subscription to **engage** pauses; Archive and Journey stay readable when **lapsed**. Legacy Tools, stats, and library routes return **404** (no redirects).
+The active app is a **pause-first MVP**: four primary tabs (Home, Archive, Journey, Settings), full-screen `/pause` ritual, and Stripe-native **7-day trial** via `create-checkout` (card on file at signup; $0 today, no charge at trial end). After trial, users need a paid subscription to **engage** pauses; Archive and Journey stay readable when **lapsed**. Legacy Tools, stats, and library routes return **404** (no redirects).
 
 - **What ships:** [docs/ops/active-surface.md](docs/ops/active-surface.md)
 - **Why / recovery:** [docs/decisions/2026-05-16-pause-first-shipped-scope.md](docs/decisions/2026-05-16-pause-first-shipped-scope.md) · tag `full-ia-pre-strip`

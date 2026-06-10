@@ -23,7 +23,7 @@ Use this slice when signing off **production** on `feature/mvpPauseCleanup` / po
 | Area | Verify |
 | --- | --- |
 | **Routes** | `/`, `/archive`, `/journey`, `/settings`, `/pause`, `/companion/*`, `/roadmap`; `/tools*`, `/journey/stats`, `/library` → **404** + `app.route_not_found` |
-| **Subscription** | `ensure-trial-subscription` on onboarding; `lapsed` blocks pause engage; Archive/Journey read without Pro gate |
+| **Subscription** | Stripe trial Checkout on onboarding (`create-checkout` with `trial: true`); `lapsed` blocks pause engage; Archive/Journey read without Pro gate |
 | **Integration tests** | `npm run test` — F1–F9 in `src/test/integration/flows/` |
 | **Edges** | [active-surface.md](../ops/active-surface.md) deployed list = `config.toml` = `EdgeCoverage.tsx`; Bruno [bruno/active/functions-catalog.md](../../bruno/active/functions-catalog.md) |
 | **DB cutover** | `20260521200000_holzen_mvp_launch_cutover.sql` applied; Tier B tables absent; **`companion_catalog`** + `grounding_enrichment_cache` **present** |
