@@ -113,7 +113,8 @@ export function useProfile() {
       !profileSessionInvalid &&
       (profileQueryStatus === 'success' || profileQueryStatus === 'error'),
   );
-  const hasOnboarded = profileRow?.has_onboarded ?? hasOnboardedState;
+  const hasOnboarded =
+    (profileRow?.has_onboarded ?? false) || hasOnboardedState;
   const profileLoadError = userId
     ? profileQueryError instanceof Error
       ? profileQueryError.message
@@ -159,7 +160,7 @@ export function useProfile() {
       setCurrencyCommitted(row.display_currency ?? 'USD');
       setTrackedAssetIdCommitted(normalizeTrackedAssetId(row.tracked_asset_id));
       setLanguageCommitted(row.language ?? 'en');
-      setHasOnboarded(row.has_onboarded ?? false);
+      setHasOnboarded((prev) => prev || (row.has_onboarded ?? false));
       setCompanionPrefsCommitted({
         breathing: true,
         haiku: row.companion_haiku ?? true,
@@ -328,7 +329,9 @@ export function useProfile() {
   }, [user, invalidateProfileQuery, t]);
 
   const completeOnboarding = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      throw new Error('completeOnboarding: not signed in');
+    }
 
     const { error } = await updateProfileFields(user.id, {
       has_onboarded: true,
@@ -344,8 +347,7 @@ export function useProfile() {
     queryClient.setQueryData<ProfileRow | null>(PROFILE_QUERY_KEY(user.id), (current) =>
       current ? { ...current, has_onboarded: true } : current,
     );
-    invalidateProfileQuery();
-  }, [user, queryClient, invalidateProfileQuery, t]);
+  }, [user, queryClient, t]);
 
   const isInCooldown = useCallback(async () => {
     if (!user) return true;
