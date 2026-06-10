@@ -42,6 +42,26 @@ export interface UseCompanionSlotOrchestrateActionsParams {
   };
 }
 
+function slotAlreadySatisfied(
+  slot: RegenerateCompanionSlot,
+  fetchedSlotsRef: React.MutableRefObject<Set<string>>,
+  getSlotPayload: (slot: RegenerateCompanionSlot) => unknown,
+): boolean {
+  return (
+    fetchedSlotsRef.current.has(slot) &&
+    companionSlotHasDisplayableContent(slot, getSlotPayload(slot))
+  );
+}
+
+function clearStaleFetchedMarker(
+  slot: RegenerateCompanionSlot,
+  fetchedSlotsRef: React.MutableRefObject<Set<string>>,
+): void {
+  if (fetchedSlotsRef.current.has(slot)) {
+    fetchedSlotsRef.current.delete(slot);
+  }
+}
+
 /**
  * Lazy-fetch and regenerate companion slots via `companion-orchestrate` edge (`invokeEdge` + x-cid).
  */
@@ -69,7 +89,7 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
     companionSlotErrorSetters,
   } = params;
 
-  const lazyFetchInFlightRef = useRef<Set<string>>(new Set());
+  const lazyFetchTasksRef = useRef(new Map<RegenerateCompanionSlot, Promise<void>>());
 
   const failureUiPorts = useCompanionSlotOrchestrateFailurePorts({
     fetchedSlotsRef,
@@ -99,23 +119,33 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
     async (slot: RegenerateCompanionSlot) => {
       if (!pauseInstanceId) return;
       await whenArtifactHydrateReady();
-      if (
-        fetchedSlotsRef.current.has(slot) &&
-        companionSlotHasDisplayableContent(slot, getSlotPayload(slot))
-      ) {
+
+      if (slotAlreadySatisfied(slot, fetchedSlotsRef, getSlotPayload)) {
         return;
       }
-      if (fetchedSlotsRef.current.has(slot)) {
-        fetchedSlotsRef.current.delete(slot);
-      }
-      if (lazyFetchInFlightRef.current.has(slot)) return;
+      clearStaleFetchedMarker(slot, fetchedSlotsRef);
       if (!canAccessCompanion()) return;
 
-      lazyFetchInFlightRef.current.add(slot);
-      try {
+      const existing = lazyFetchTasksRef.current.get(slot);
+      if (existing) {
+        await existing;
+        if (slotAlreadySatisfied(slot, fetchedSlotsRef, getSlotPayload)) {
+          return;
+        }
+        clearStaleFetchedMarker(slot, fetchedSlotsRef);
+      }
+
+      const task = (async () => {
         await runSlotOrchestrate(slot, 'lazy_fetch');
+      })();
+
+      lazyFetchTasksRef.current.set(slot, task);
+      try {
+        await task;
       } finally {
-        lazyFetchInFlightRef.current.delete(slot);
+        if (lazyFetchTasksRef.current.get(slot) === task) {
+          lazyFetchTasksRef.current.delete(slot);
+        }
       }
     },
     [

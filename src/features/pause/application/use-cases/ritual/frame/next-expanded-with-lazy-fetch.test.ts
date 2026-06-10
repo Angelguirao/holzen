@@ -82,7 +82,7 @@ describe('nextExpandedWithLazyFetch', () => {
     expect(fetch).toHaveBeenCalledWith('grounding');
   });
 
-  it('does not fetch while loading', () => {
+  it('still fetches while loading when payload is not displayable', () => {
     const fetch = vi.fn();
     expect(
       nextExpandedWithLazyFetch(false, {
@@ -94,7 +94,7 @@ describe('nextExpandedWithLazyFetch', () => {
         slot: 'history',
       }),
     ).toBe(true);
-    expect(fetch).not.toHaveBeenCalled();
+    expect(fetch).toHaveBeenCalledWith('history');
   });
 
   it('retries fetch when expanding after error', () => {

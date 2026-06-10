@@ -52,9 +52,11 @@ function canOpenLazySlot(args: LazyToggleArgs, canAccess: () => boolean): boolea
 }
 
 function needsLazyFetch(args: LazyToggleArgs): boolean {
-  if (args.loading) return false;
   if (args.error) return true;
-  return !companionSlotHasDisplayableContent(args.slot, args.data);
+  if (companionSlotHasDisplayableContent(args.slot, args.data)) return false;
+  // Do not skip while `loading` — exclusive Frame expand can reopen a slot whose
+  // transition is still pending; fetchCompanion coalesces in-flight work.
+  return true;
 }
 
 /** Expand/collapse state for inline `CompanionSection` cards (lazy fetch on first open). */
