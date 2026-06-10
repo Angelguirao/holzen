@@ -347,6 +347,16 @@ serve(
       .in("state", ["active", "pending", "engaged"]);
     if (openCronPauseErr) throw openCronPauseErr;
 
+    const { data: openEngagedRows, error: openEngagedErr } = await supabase
+      .from("pause_instances")
+      .select("user_id")
+      .eq("state", "engaged");
+    if (openEngagedErr) throw openEngagedErr;
+
+    const openEngagedUserIds = new Set(
+      (openEngagedRows ?? []).map((row) => row.user_id as string),
+    );
+
     const openCronActiveEngagedUserIds = new Set(
       (openCronPauseRows ?? [])
         .filter((row) => row.state === "active" || row.state === "engaged")
@@ -387,16 +397,14 @@ serve(
       total_profiles: profileRows.length,
     });
 
-    const calmSweepUserIds = [
-      ...new Set(
-        (openCronPauseRows ?? [])
-          .map((row) => row.user_id as string)
-          .filter((userId) => {
-            const profile = profileByUserId.get(userId);
-            return profile != null && !profileVolatilityBreached(profile);
-          }),
-      ),
-    ];
+    const calmSweepCandidateUserIds = new Set<string>([
+      ...(openCronPauseRows ?? []).map((row) => row.user_id as string),
+      ...openEngagedUserIds,
+    ]);
+    const calmSweepUserIds = [...calmSweepCandidateUserIds].filter((userId) => {
+      const profile = profileByUserId.get(userId);
+      return profile != null && !profileVolatilityBreached(profile);
+    });
 
     const calmSweepResults = await Promise.all(
       calmSweepUserIds.map(async (userId) => {
@@ -438,18 +446,27 @@ serve(
 
     const vapidReady = await initWebPushVapidFromEnv(log);
 
-    if (toProcess.length > 0) {
+    const hotEngagedClearUserIds = [...openEngagedUserIds].filter((userId) => {
+      const profile = profileByUserId.get(userId);
+      return profile != null && profileVolatilityBreached(profile);
+    });
+    const clearCalmSettledUserIds = new Set([
+      ...toProcess.map((profile) => profile.user_id),
+      ...hotEngagedClearUserIds,
+    ]);
+
+    if (clearCalmSettledUserIds.size > 0) {
       await Promise.all(
-        toProcess.map(async (profile) => {
+        [...clearCalmSettledUserIds].map(async (userId) => {
           const { error: clearErr } = await supabase.rpc(
             "pause_clear_cron_volatility_calm_settled",
-            { p_user_id: profile.user_id },
+            { p_user_id: userId },
           );
           if (clearErr) {
             log.error("check_volatility_clear_calm_settled", {
               holzen_event: "check_volatility_cron",
               phase: "pause_clear_cron_volatility_calm_settled_failed",
-              user_id_prefix: String(profile.user_id).slice(0, 8),
+              user_id_prefix: String(userId).slice(0, 8),
               ...unknownErrorForLog(clearErr),
             });
           }
