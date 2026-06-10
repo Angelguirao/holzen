@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useCurrentPause } from '@/features/pause/public-hooks';
 import { usePendingPauseOffer } from '@/features/pause/public-home';
 import { pauseWindowShowsClockCountdown } from '@/features/pause/public-hooks';
+import { resolvePauseOpenMaxAnchorAt } from '@/features/pause/domain/pause-open-max-anchor';
 import { PauseEngagedOpenMaxCountdown } from '@/screens/pause/components/PauseEngagedOpenMaxCountdown';
 import { cn } from '@/lib/utils';
 
@@ -31,6 +32,15 @@ export function CurrentPauseCard() {
   });
 
   const isEngaged = current.state === 'engaged';
+  const openMaxAnchor = isEngaged
+    ? resolvePauseOpenMaxAnchorAt({
+        state: current.state,
+        source: current.source,
+        engaged_at: current.engaged_at,
+        created_at: current.created_at,
+        metadata: current.metadata,
+      })
+    : null;
   const statusLabel = isEngaged
     ? t('library.currentPauseStatusEngaged', { defaultValue: 'In ritual' })
     : t('library.currentPauseStatusActive', { defaultValue: 'Active' });
@@ -86,9 +96,9 @@ export function CurrentPauseCard() {
                 {statusLabel}
               </span>
             </div>
-            {isEngaged && current.engaged_at ? (
+            {openMaxAnchor ? (
               <PauseEngagedOpenMaxCountdown
-                anchorIso={current.engaged_at}
+                anchorIso={openMaxAnchor}
                 className="text-[11px] font-mono tabular-nums text-muted-foreground"
               />
             ) : null}
