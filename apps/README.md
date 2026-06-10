@@ -1,9 +1,9 @@
 # Holzen frontends
 
-| Path | Role | Deploy target |
+| Path | Role | Deploy |
 | --- | --- | --- |
-| `apps/site/` | Astro marketing site | `holzen.app` |
-| Repo root `src/` | React/Vite product SPA (future move: `apps/app/`) | `app.holzen.app` |
+| `apps/site/` | Astro marketing HTML (`/welcome`, …) | Merged into root `dist/` via `npm run build:unified` |
+| Repo root `src/` | React/Vite product SPA (`spa.html`) | Same Vercel project → `holzen.app` |
 
 Shared tokens: `packages/design-tokens/`.
 
