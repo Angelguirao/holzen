@@ -19,9 +19,21 @@ The active app is a **pause-first MVP**: four primary tabs (Home, Archive, Journ
 | Data & auth        | Supabase (`@supabase/supabase-js`), TanStack Query                     |
 | Forms & validation | React Hook Form, Zod                                                   |
 | Build              | Vite 5, TypeScript, `@vitejs/plugin-react-swc`                         |
+| Marketing site     | Astro 5 (`apps/site/`) — static pages merged into production `dist/`   |
 | PWA                | `vite-plugin-pwa` with inject manifest (`src/sw.ts`)                   |
 | i18n               | react-i18next                                                          |
 
+
+## Frontends (one URL, two codebases)
+
+Users see **one website** (`holzen.app`). The repo builds **two** frontends that merge on deploy:
+
+| Codebase | Folder | Serves |
+| --- | --- | --- |
+| Product app | `src/` (React) | `/`, `/auth`, `/pause`, settings, … |
+| Marketing site | `apps/site/` (Astro) | `/welcome`, later blog/legal |
+
+**Read this first if it is confusing:** [docs/ops/marketing-site-split.md](docs/ops/marketing-site-split.md) — plain-language guide with diagrams, user journeys, and FAQ.
 
 Payments and server-side integrations (Stripe, email, push, AI companions) live in **Supabase Edge Functions** under `supabase/functions/`.
 
@@ -63,7 +75,10 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run dev`                          | Vite dev server with HMR (default mode; requires `VITE_SUPABASE_*` in `.env*`)                                                             |
 | `npm run dev:prod`                     | Dev server using `.env.prod` / `.env.prod.local` (optional: hit **production** Supabase from your PC)                                      |
 | `npm run dev:local`                    | Dev server using `.env.localstack` / `.env.localstack.local` (local Supabase only)                                                         |
-| `npm run build`                        | Production build (runs `**check:version-sync`** via `**prebuild**`; requires explicit Supabase env)                                        |
+| `npm run build`                        | Production build — React SPA only (runs `**check:version-sync`** via `**prebuild**`; requires explicit Supabase env)                      |
+| `npm run build:unified`                | **Production deploy** — React + Astro merged into `dist/` (see [marketing-site-split.md](docs/ops/marketing-site-split.md))              |
+| `npm run dev:site`                     | Astro marketing dev server on port **4321** (`/welcome`, etc.)                                                                           |
+| `npm run build:site`                   | Astro marketing build only → `apps/site/dist/`                                                                                             |
 | `npm run build:dev`                    | Build in development mode                                                                                                                  |
 | `npm run preview`                      | Serve the production build locally                                                                                                         |
 | `npm run test`                         | Vitest (jsdom), single run                                                                                                                 |
@@ -94,7 +109,9 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 
 ## Repository layout
 
-- `**src/**` — Application code. Import alias `**@**` maps to `./src` (see `vite.config.ts` and `vitest.config.ts`).
+- `**src/**` — React **product app**. Import alias `**@**` maps to `./src` (see `vite.config.ts` and `vitest.config.ts`).
+- `**apps/site/**` — Astro **marketing site** (static HTML; merged into `dist/` on deploy). Guide: [docs/ops/marketing-site-split.md](docs/ops/marketing-site-split.md).
+- `**packages/design-tokens/**` — Shared Nox CSS variables for marketing + product.
 - `**src/screens/**` — Route-level presentation (home, archive, pause, settings, marketing, admin, etc.); routing is defined in `src/App.tsx`.
 - `**src/components/**` — Shared UI, including `components/ui` (shadcn-style primitives).
 - `**supabase/migrations/**` — SQL migrations for the hosted database.

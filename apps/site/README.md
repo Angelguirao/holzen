@@ -1,28 +1,27 @@
 # @holzen/site — Astro marketing site
 
-Static marketing HTML merged into the product `dist/` on deploy. **One domain:** `holzen.app`.
+Static marketing HTML. **Not a separate website** — it merges into the same `holzen.app` deploy as the React app.
 
-**Owner doc:** [docs/ops/marketing-site-split.md](../../docs/ops/marketing-site-split.md)
+## Read the full guide first
 
-## Production
+**[docs/ops/marketing-site-split.md](../../docs/ops/marketing-site-split.md)** explains:
 
-Marketing is not a separate Vercel project. Root `vercel.json` runs:
+- Why there are two codebases but one URL
+- What happens when a user opens `/welcome` vs `/auth`
+- How `npm run build:unified` and `spa.html` work
+- Local dev (this folder on :4321 vs SPA on :8080)
 
-```bash
-npm run build:unified
-```
+## Quick reference
 
-Astro output (e.g. `/welcome`) is copied into `dist/` beside `spa.html` (the React app shell).
-
-## Local dev
-
-```bash
-npm run dev:site   # :4321 — Astro only
-npm run dev        # :8080 — SPA only
-```
-
-## Pages
-
-| Astro path | Replaces (eventually) |
+| Task | Command |
 | --- | --- |
-| `/welcome` | `LandingScreen` |
+| Dev this site only | `npm run dev:site` → http://localhost:4321/welcome |
+| Build for production | `npm run build:unified` (from repo root — merges SPA + Astro) |
+
+| File | Purpose |
+| --- | --- |
+| `src/pages/welcome.astro` | Landing page → `/welcome` |
+| `src/lib/app-url.ts` | Same-origin links to `/auth` |
+| `src/layouts/MarketingLayout.astro` | Shared HTML `<head>` |
+
+Production Vercel settings live in **repo root** `vercel.json`, not `apps/site/vercel.json`.
