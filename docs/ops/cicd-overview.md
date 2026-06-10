@@ -63,11 +63,11 @@ flowchart TB
 
 Catalog source of truth: [`scripts/lib/cicd-env-catalog.mjs`](../../scripts/lib/cicd-env-catalog.mjs).
 
-**preflight** — Same gate as merge quality: `npm run test:ci` (fitness checks + Vitest coverage) and `npm run build`. PR CI and staging preflight use **staging** Supabase build secrets; production uses **prod** secrets.
+**preflight** — Same gate as merge quality: `npm run test:ci` (fitness checks + Vitest coverage) and `npm run build:unified` (React SPA + Astro marketing merged into `dist/`). PR CI and staging preflight use **staging** Supabase build secrets; production uses **prod** secrets.
 
 **deploy-backend** — `npm run stamp:release` → `supabase link` → `supabase db push` → [`scripts/deploy-active-edge-functions.mjs`](../../scripts/deploy-active-edge-functions.mjs).
 
-**deploy-frontend** — [`scripts/vercel-ci-deploy.mjs`](../../scripts/vercel-ci-deploy.mjs): `vercel pull` → `vercel build` → `vercel deploy --prebuilt`. Runs **only after** backend succeeds.
+**deploy-frontend** — [`scripts/vercel-ci-deploy.mjs`](../../scripts/vercel-ci-deploy.mjs): `vercel pull` → `vercel build` → `vercel deploy --prebuilt`. `vercel build` reads root [`vercel.json`](../../vercel.json) (`buildCommand: npm run build:unified`, `spa.html` rewrites). Runs **only after** backend succeeds. **One Vercel project** — no separate marketing deploy. See [marketing-site-split.md](marketing-site-split.md).
 
 ---
 

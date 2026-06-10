@@ -52,8 +52,8 @@ jobs:
       - name: CI gate
         run: npm run test:ci
 
-      - name: Production build
-        run: npm run build
+      - name: Production build (unified marketing + SPA)
+        run: npm run build:unified
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
