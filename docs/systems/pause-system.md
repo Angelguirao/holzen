@@ -102,7 +102,7 @@ Holzen stores **one `pause_instances` row per pause**. Product language below ma
 
 ### 3.2 Calm market sweep (`cron_volatility`)
 
-Each **`check-volatility`** tick computes users whose live move is **below** daily thresholds while they still have open **`cron_volatility`** rows, then calls **`pause_expire_cron_volatility_context_lost(p_user_id)`** (core: **`_pause_cron_volatility_calm_sweep_core`**; invoked from `**supabase/functions/check-volatility/index.ts**`).
+Each **`check-volatility`** tick computes users whose live move is **below** daily thresholds while they have open **`cron_volatility`** rows **or** any **`engaged`** row, then calls **`pause_expire_cron_volatility_context_lost(p_user_id)`** (core: **`_pause_cron_volatility_calm_sweep_core`**; invoked from `**supabase/functions/check-volatility/index.ts**`). On **hot** ticks, engaged users (including manual-only) also get **`calm_settled_at`** cleared before offer processing.
 
 | Row state | On calm sweep |
 | --------- | ------------- |
@@ -147,7 +147,15 @@ stateDiagram-v2
 
 **Promotion on expiry:** when **`open_max_age`** expires an **`engaged`** row and a **`pending`** row still exists, **`pause_promote_pending_for_user`** promotes pending → **`active`** (Home **`open_pre_reflect`** after refresh — same handoff as row **5** **Discard**, without user action; migration **`20260610140000`**).
 
-**Manual engaged pauses** follow the **same anchor rules** (no special **`engaged_at`** TTL). Calm stamping runs for **any** engaged row when the market is within thresholds; hot **`pending_offered_at`** applies when cron queues a pending offer behind a manual engaged pause.
+**Manual engaged pauses** follow the **same anchor rules** (no special **`engaged_at`** TTL). Manual rows are created with a **market context snapshot** (BTC move, F&G, etc.) at tap time, but they are **not** tied to cron fingerprint churn — context shifts for grace are still detected the same way:
+
+| Shift | Manual engaged behavior |
+| ----- | ------------------------ |
+| **Calm market** | **`calm_settled_at`** stamped (cron sweep includes manual-only engaged users; Home one-shot also applies) |
+| **Hot + cron pending** | **`pending_offered_at`** stamped on the manual engaged row when a pending offer is queued |
+| **Pre-Reflect `active` manual** | **Not** auto-expired on calm (only cron `active|pending` expire) |
+
+Manual pauses are **never** created without market context in the snapshot — the difference is **who triggered** (user vs cron) and **which rows** calm sweep may expire (`cron_volatility` `active|pending` only).
 
 ---
 
