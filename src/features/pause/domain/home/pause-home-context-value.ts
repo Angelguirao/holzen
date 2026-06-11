@@ -33,7 +33,6 @@ export type PauseHomeContextValue = {
     options?: ManualPauseTriggerOptions,
   ) => Promise<ManualPauseTriggerResult>;
   manualCooldownRemaining: number;
-  autoCooldownRemaining: number;
   nextCronCheckIn: () => number;
   resyncOpenPauseFromDb: () => void | Promise<void>;
 };

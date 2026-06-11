@@ -35,12 +35,10 @@ export type HomePauseWidgetDisplayState = {
   error: string | null;
   marketData: MarketQuote | null;
   completedPauseCount: number;
-  profileLastTriggerAt: string | null;
   newPauseArrival: boolean;
   trackedAssetId: string;
   threshold: number;
   thresholdDown: number;
-  cooldownHours: number;
   manualCooldownRemainingMs: number;
   postManualCooldownIdle: boolean;
   engagedPauseMarketSettled: boolean;
@@ -62,7 +60,6 @@ export type HomePauseWidgetActionHandlers = {
   onStartTrial: () => void;
   onReactivate: () => void;
   manualTrigger: (mood?: string) => Promise<ManualPauseTriggerResult>;
-  autoCooldownRemaining: () => number;
   nextCronCheckIn: () => number;
   manualCooldownRemaining: () => number;
   resyncOpenPauseFromDb: () => void | Promise<void>;
@@ -85,12 +82,10 @@ export type HomePauseWidgetProjectionContext = HomePauseOpenInstanceSnapshot &
     | 'error'
     | 'marketData'
     | 'completedPauseCount'
-    | 'profileLastTriggerAt'
     | 'newPauseArrival'
     | 'trackedAssetId'
     | 'threshold'
     | 'thresholdDown'
-    | 'cooldownHours'
   >;
 
 export type HomePauseWidgetBodyDisplay = {
@@ -103,10 +98,8 @@ export type HomePauseWidgetBodyDisplay = {
   openPauseState: 'active' | 'engaged' | null;
   manualCooldownRemainingMs: number;
   completedPauseCount: number;
-  profileLastTriggerAt: string | null;
   marketData: MarketQuote | null;
   showPauseScheduling: boolean;
-  cooldownHours: number;
   loading: boolean;
   error: string | null;
 };
@@ -122,7 +115,6 @@ export type HomePauseWidgetBodyActions = {
   onDeclinePendingOffer?: () => void;
   onDismissOpenPause: () => void;
   onReflectionRetry: (mood?: string) => Promise<ManualPauseTriggerResult>;
-  autoCooldownRemaining: () => number;
   nextCronCheckIn: () => number;
   manualCooldownRemaining: () => number;
   onNeedPause: () => void;

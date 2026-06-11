@@ -21,8 +21,6 @@ export type BuildZenModeHomeRoutePropsInput = {
   showLimitUpsell: boolean;
   entitlement: Entitlement;
   showPauseScheduling: boolean;
-  autoCooldownRemaining: () => number;
-  cooldownHours: number;
   nextCronCheckIn: () => number;
   manualCooldownRemaining: () => number;
   checkoutLoading: boolean;

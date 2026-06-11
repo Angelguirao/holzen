@@ -66,7 +66,7 @@ Primary inputs to `resolveHomePauseWidgetSurface`:
 | `hasPendingOffer` | `usePendingPauseOffer()` — queued instance while user still has open pause |
 | `postManualCooldownIdle` | `localStorage` flag after manual cooldown ends (manual cooldown → idle expand) |
 | Live market + thresholds | `resolveEngagedPauseMarketSettled` — calm market body on `open_engaged` |
-| `postPauseAutoCooldownRemainingMs` | Profile `last_trigger_at` + `cooldown_hours` (not instance age) |
+| `manualCooldownRemainingMs` | Browser `localStorage` manual “Let’s pause” gate (not `last_trigger_at`) |
 | `hasOpenPauseStepEvents` | Any row in `pause_step_events` for open instance |
 | `completedPauseCount` | Archive depth for manual cooldown vs first-pause variant |
 | `userExpanded` | Session preference for collapsible idle / manual cooldown shells |
@@ -118,7 +118,7 @@ Row **4b** adds calm-waters body copy above the countdown line. Row **5** shows 
 
 ## Post-manual cooldown → idle (`manual_cooldown_*` → `idle_expanded`)
 
-After a **manual** pause completes, profile **`last_trigger_at`** + **`cooldown_hours`** drive `manual_cooldown_*` surfaces (collapsed by default). When that cooldown elapses and there is still no open pause:
+After a **manual** pause completes, the **browser manual cooldown** (`localStorage`) drives `manual_cooldown_*` surfaces (collapsed by default). When that cooldown elapses and there is still no open pause:
 
 1. **`markPostManualCooldownIdlePrompt`** (`home-post-manual-cooldown-idle-storage.ts`) sets a per-user `localStorage` flag when the manual cooldown is written.
 2. **`useHomePauseWidgetProjection`** reads it → **`postManualCooldownIdle`** → resolver auto-expands **`idle_expanded`** with post-cooldown copy (**The time has passed.** / **Another pause is available, if you need it.**).
@@ -185,7 +185,7 @@ Use this when verifying the Home widget after changes to the resolver, projectio
 | `npm run dev` (port **8080**) against staging or local Supabase with edge/cron if testing pending | Pending rows come from `pause_create_or_reuse` / cron |
 | Home tab open (`/`); bottom nav **Home** | Pending UX is **Home-only** (no shell modal on other tabs) |
 
-**Inspect state (optional):** Supabase → `pause_instances` for your `user_id` (`state`, `created_at`); `pause_step_events` for open instance; `profiles.last_trigger_at`, `cooldown_hours`; pending row `state = 'pending'`.
+**Inspect state (optional):** Supabase → `pause_instances` for your `user_id` (`state`, `created_at`); `pause_step_events` for open instance; `profiles.last_trigger_at` (audit); pending row `state = 'pending'`.
 
 ---
 

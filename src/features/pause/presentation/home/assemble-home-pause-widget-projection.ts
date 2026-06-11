@@ -22,7 +22,6 @@ export function assembleHomePauseWidgetProjection(
     onDeclinePendingOffer: () => void actions.onDeclinePendingOffer(),
     onDismissOpenPause: actions.onDismissOpenPause,
     onReflectionRetry: actions.manualTrigger,
-    autoCooldownRemaining: actions.autoCooldownRemaining,
     nextCronCheckIn: actions.nextCronCheckIn,
     manualCooldownRemaining: actions.manualCooldownRemaining,
     onNeedPause: actions.onNeedPause,

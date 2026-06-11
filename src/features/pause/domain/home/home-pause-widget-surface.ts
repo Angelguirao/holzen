@@ -35,7 +35,7 @@ export type ResolveHomePauseWidgetSurfaceInput = {
   reflectionMessage: string | null;
   trackedAssetSymbol: string;
   hasPendingOffer: boolean;
-  /** Ms remaining on Home manual “Let’s pause” local cooldown (localStorage; not profile `cooldown_hours`). */
+  /** Ms remaining on Home manual “Let’s pause” local cooldown (localStorage only). */
   manualCooldownRemainingMs: number;
   completedPauseCount: number;
   /** Reserved — ritual progress does not change Home surface; only `engaged` unlocks Continue. */

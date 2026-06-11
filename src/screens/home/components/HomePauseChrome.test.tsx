@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, render, screen } from '@testing-library/react';
-import { AutoCooldownIndicator } from '@/screens/home/components/HomePauseChrome';
+import { PauseCronScheduleIndicator } from '@/screens/home/components/HomePauseChrome';
 
-const SNAPSHOT_STORAGE_KEY = 'holzen_home_cooldown_snapshot_v2';
+const SNAPSHOT_STORAGE_KEY = 'holzen_home_cron_schedule_snapshot_v1';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -10,7 +10,7 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-describe('HomePauseChrome scheduling helpers', () => {
+describe('PauseCronScheduleIndicator', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-04-23T10:00:00.000Z'));
@@ -23,70 +23,29 @@ describe('HomePauseChrome scheduling helpers', () => {
     vi.restoreAllMocks();
   });
 
-  it('uses the next cron tick while idle', () => {
+  it('persists the next cron scan timestamp while idle', () => {
     const now = Date.now();
-    render(
-      <AutoCooldownIndicator
-        cooldownRemaining={() => 0}
-        cooldownHours={2}
-        nextCronCheckIn={() => 120_000}
-      />,
-    );
+    render(<PauseCronScheduleIndicator nextCronCheckIn={() => 120_000} />);
 
     const row = JSON.parse(localStorage.getItem(SNAPSHOT_STORAGE_KEY) || 'null');
-    expect(row).toMatchObject({
-      remaining: 0,
-      readyAt: now,
-      nextScanAt: now + 120_000,
-    });
-  });
-
-  it('rounds cooldown end up to the next cron grid slot', () => {
-    const now = Date.now();
-    render(
-      <AutoCooldownIndicator
-        cooldownRemaining={() => 90_000}
-        cooldownHours={2}
-        nextCronCheckIn={() => 60_000}
-      />,
-    );
-
-    // nextCronAt is +1m, cooldown ends at +1m30s, so the next actionable
-    // check is the following hourly slot (+61m from now).
-    const row = JSON.parse(localStorage.getItem(SNAPSHOT_STORAGE_KEY) || 'null');
-    expect(row).toMatchObject({
-      remaining: 90_000,
-      readyAt: now + 90_000,
-      nextScanAt: now + 3_660_000,
-    });
+    expect(row).toEqual({ nextScanAt: now + 120_000 });
+    expect(screen.getByText('home.autoCooldown.nextScanAtClock')).toBeInTheDocument();
   });
 
   it('ignores stale persisted snapshots and recomputes a fresh idle snapshot', () => {
     const now = Date.now();
     localStorage.setItem(
       SNAPSHOT_STORAGE_KEY,
-      JSON.stringify({
-        // stale: active target already passed
-        remaining: 30_000,
-        readyAt: now - 1,
-        nextScanAt: now + 60_000,
-      }),
+      JSON.stringify({ nextScanAt: now - 1 }),
     );
 
-    render(
-      <AutoCooldownIndicator
-        cooldownRemaining={() => 0}
-        cooldownHours={2}
-        nextCronCheckIn={() => 60_000}
-      />,
-    );
+    render(<PauseCronScheduleIndicator nextCronCheckIn={() => 60_000} />);
 
     expect(screen.getByText('home.autoCooldown.nextScanAtClock')).toBeInTheDocument();
-    expect(screen.queryByText('home.autoCooldown.cooldownReadyAt')).not.toBeInTheDocument();
   });
 });
 
-describe('AutoCooldownIndicator cross-tab sync', () => {
+describe('PauseCronScheduleIndicator cross-tab sync', () => {
   beforeEach(() => {
     localStorage.clear();
   });
@@ -96,31 +55,20 @@ describe('AutoCooldownIndicator cross-tab sync', () => {
     vi.restoreAllMocks();
   });
 
-  it('switches to cooldown copy when a sibling tab writes a fresh snapshot', () => {
-    render(
-      <AutoCooldownIndicator
-        cooldownRemaining={() => 0}
-        cooldownHours={2}
-        nextCronCheckIn={() => 60_000}
-      />,
-    );
-
-    expect(screen.getByText('home.autoCooldown.nextScanAtClock')).toBeInTheDocument();
+  it('mirrors a sibling tab snapshot', () => {
+    render(<PauseCronScheduleIndicator nextCronCheckIn={() => 60_000} />);
 
     act(() => {
       window.dispatchEvent(
         new StorageEvent('storage', {
           key: SNAPSHOT_STORAGE_KEY,
           newValue: JSON.stringify({
-            remaining: 30_000,
-            readyAt: Date.now() + 30_000,
-            nextScanAt: Date.now() + 60_000,
+            nextScanAt: Date.now() + 90_000,
           }),
         }),
       );
     });
 
-    expect(screen.getByText('home.autoCooldown.cooldownReadyAt')).toBeInTheDocument();
-    expect(screen.queryByText('home.autoCooldown.nextScanAtClock')).not.toBeInTheDocument();
+    expect(screen.getByText('home.autoCooldown.nextScanAtClock')).toBeInTheDocument();
   });
 });

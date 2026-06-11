@@ -2,10 +2,7 @@
  * Home manual-trigger pure helpers (cooldown math, localStorage keys, error mapping).
  * No Supabase — safe for presentation without loading pause RPC adapters.
  */
-export {
-  computeAutoCooldownRemainingMs,
-  computeManualCooldownRemainingMs,
-} from './domain/reflect/generation/compute-pause-trigger-cooldowns';
+export { computeManualCooldownRemainingMs } from './domain/reflect/generation/compute-pause-trigger-cooldowns';
 export {
   buildManualTriggerCooldownStorageKey,
   isManualTriggerBlockedByCooldown,

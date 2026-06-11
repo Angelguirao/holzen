@@ -39,8 +39,6 @@ export interface ZenModeHomeProps {
   showLimitUpsell: boolean;
   entitlement: Entitlement;
   showPauseScheduling: boolean;
-  autoCooldownRemaining: () => number;
-  cooldownHours: number;
   nextCronCheckIn: () => number;
   manualCooldownRemaining: () => number;
   checkoutLoading: boolean;
@@ -67,8 +65,6 @@ export function ZenModeHome({
   showLimitUpsell,
   entitlement,
   showPauseScheduling,
-  autoCooldownRemaining,
-  cooldownHours,
   nextCronCheckIn,
   manualCooldownRemaining,
   checkoutLoading,
@@ -172,8 +168,6 @@ export function ZenModeHome({
               <div className="mx-auto max-w-sm text-center">
               <HomePauseEmptyFlow
                 showPauseScheduling={showPauseScheduling}
-                autoCooldownRemaining={autoCooldownRemaining}
-                cooldownHours={cooldownHours}
                 nextCronCheckIn={nextCronCheckIn}
                 onNeedPause={onNeedPause}
                 manualCooldownRemaining={manualCooldownRemaining}

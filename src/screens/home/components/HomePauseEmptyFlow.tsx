@@ -1,11 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { AutoCooldownIndicator, NeedAMomentButton } from '@/screens/home/components/HomePauseChrome';
+import { PauseCronScheduleIndicator, NeedAMomentButton } from '@/screens/home/components/HomePauseChrome';
 import { homeInWidget } from '@/screens/home/components/home-widget-styles';
 
 type Props = {
   showPauseScheduling: boolean;
-  autoCooldownRemaining: () => number;
-  cooldownHours: number;
   nextCronCheckIn: () => number;
   onNeedPause: () => void;
   manualCooldownRemaining: () => number;
@@ -17,8 +15,6 @@ type Props = {
  */
 export function HomePauseEmptyFlow({
   showPauseScheduling,
-  autoCooldownRemaining,
-  cooldownHours,
   nextCronCheckIn,
   onNeedPause,
   manualCooldownRemaining,
@@ -33,11 +29,7 @@ export function HomePauseEmptyFlow({
 
       {showPauseScheduling ? (
         <div className="rounded-lg border border-border/40 bg-muted/10 px-3 py-2.5">
-          <AutoCooldownIndicator
-            cooldownRemaining={autoCooldownRemaining}
-            cooldownHours={cooldownHours}
-            nextCronCheckIn={nextCronCheckIn}
-          />
+          <PauseCronScheduleIndicator nextCronCheckIn={nextCronCheckIn} />
         </div>
       ) : null}
 
