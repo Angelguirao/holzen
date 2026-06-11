@@ -1,0 +1,37 @@
+---
+import { landingCopy } from '../lib/landing-content';
+
+const { reaction, reflection } = landingCopy;
+---
+
+<div class="comparison">
+  <div class="comparison-col comparison-col--reaction">
+    <p class="section-label section-label--reaction">{reaction.label}</p>
+    <ol class="timeline">
+      {
+        reaction.steps.map((title, i) => (
+          <li class="timeline-item">
+            {i < reaction.steps.length - 1 ? <span class="timeline-line timeline-line--reaction" aria-hidden="true" /> : null}
+            <span class="timeline-dot timeline-dot--reaction" aria-hidden="true" />
+            <p class="timeline-text timeline-text--muted">{title}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <div class="comparison-col comparison-col--reflection">
+    <p class="section-label">{reflection.label}</p>
+    <ol class="timeline">
+      {
+        reflection.steps.map((title, i) => (
+          <li class="timeline-item">
+            {i < reflection.steps.length - 1 ? <span class="timeline-line" aria-hidden="true" /> : null}
+            <span class="timeline-dot" aria-hidden="true" />
+            <p class="timeline-text">{title}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</div>

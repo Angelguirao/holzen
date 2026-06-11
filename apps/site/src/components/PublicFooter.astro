@@ -1,0 +1,29 @@
+---
+import { landingCopy } from '../lib/landing-content';
+
+const copy = landingCopy;
+---
+
+<footer class="public-footer">
+  <div class="public-footer-social">
+    <a href="https://x.com/holzenapp" target="_blank" rel="noopener noreferrer" aria-label="Follow on X">X</a>
+    <a href="https://njump.me/holzen" target="_blank" rel="noopener noreferrer" aria-label="Follow on Nostr">
+      Nostr
+    </a>
+  </div>
+
+  <p class="public-footer-contact-label">{copy.contact}</p>
+  <a class="public-footer-email" href="mailto:hello@holzen.app">hello@holzen.app</a>
+
+  <nav class="public-footer-nav" aria-label="Footer">
+    <a href="/welcome">Home</a>
+    <span class="sep" aria-hidden="true">·</span>
+    <a href="/about">{copy.about}</a>
+    <span class="sep" aria-hidden="true">·</span>
+    <a href="/blog">{copy.blog}</a>
+    <span class="sep" aria-hidden="true">·</span>
+    <a href="/terms">{copy.terms}</a>
+    <span class="sep" aria-hidden="true">·</span>
+    <a href="/privacy">{copy.privacy}</a>
+  </nav>
+</footer>

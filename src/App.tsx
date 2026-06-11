@@ -31,14 +31,9 @@ const SettingsStateLayout = lazy(() => import("./screens/settings/SettingsStateL
 const SettingsHub = lazy(() => import("./screens/settings/SettingsHubScreen"));
 const SettingsSectionPage = lazy(() => import("./screens/settings/SettingsSectionScreen"));
 const Auth = lazy(() => import("./screens/marketing/AuthScreen"));
-const Landing = lazy(() => import("./screens/marketing/LandingScreen"));
-const Terms = lazy(() => import("./screens/marketing/TermsScreen"));
-const Privacy = lazy(() => import("./screens/marketing/PrivacyScreen"));
+const MarketingDevFallback = lazy(() => import("./screens/marketing/MarketingDevFallback"));
 const ResetPassword = lazy(() => import("./screens/marketing/ResetPasswordScreen"));
 const NotFound = lazy(() => import("./screens/marketing/NotFoundScreen"));
-const About = lazy(() => import("./screens/marketing/AboutScreen"));
-const Blog = lazy(() => import("./screens/marketing/BlogScreen"));
-const BlogPost = lazy(() => import("./screens/marketing/BlogPostScreen"));
 const PauseSession = lazy(() => import("./screens/pause/PauseSessionScreen"));
 const CompanionZoomOutPage = lazy(() => import("./screens/pause/CompanionZoomOutPage"));
 const CompanionHistoryPage = lazy(() => import("./screens/pause/CompanionHistoryPage"));
@@ -254,17 +249,17 @@ const App = () => (
                 <Route element={<ProtectedRoute><PendingOnboardingRoute><PrivateExperienceLayout /></PendingOnboardingRoute></ProtectedRoute>}>
                   <Route path="/onboarding" element={<Onboarding />} />
                 </Route>
-                <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
+                <Route path="/welcome" element={<PublicOnlyRoute><MarketingDevFallback /></PublicOnlyRoute>} />
+                <Route path="/about" element={<MarketingDevFallback />} />
+                <Route path="/terms" element={<MarketingDevFallback />} />
+                <Route path="/privacy" element={<MarketingDevFallback />} />
+                <Route path="/blog" element={<MarketingDevFallback />} />
+                <Route path="/blog/:slug" element={<MarketingDevFallback />} />
                 <Route element={<UtilityNoIndexLayout />}>
                   <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/unsubscribe" element={<Unsubscribe />} />
                 </Route>
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

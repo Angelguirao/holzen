@@ -1,13 +1,15 @@
 ---
 import '../styles/site.css';
+import '../styles/marketing-page.css';
 
 interface Props {
   title: string;
   description: string;
   canonicalPath?: string;
+  jsonLd?: Record<string, unknown>;
 }
 
-const { title, description, canonicalPath = Astro.url.pathname } = Astro.props;
+const { title, description, canonicalPath = Astro.url.pathname, jsonLd } = Astro.props;
 const canonical = new URL(canonicalPath, Astro.site).href;
 ---
 
@@ -19,6 +21,7 @@ const canonical = new URL(canonicalPath, Astro.site).href;
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <title>{title}</title>
+    {jsonLd ? <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} /> : null}
   </head>
   <body>
     <div class="page">

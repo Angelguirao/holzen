@@ -1,40 +1,128 @@
 ---
 import MarketingLayout from '../layouts/MarketingLayout.astro';
+import LandingComparison from '../components/LandingComparison.astro';
+import LandingFaq from '../components/LandingFaq.astro';
+import PublicFooter from '../components/PublicFooter.astro';
 import { appAuthUrl } from '../lib/app-url';
+import { landingCopy, landingFaqJsonLd } from '../lib/landing-content';
+import '../styles/welcome.css';
 
 const ref = Astro.url.searchParams.get('ref');
 const signUpUrl = appAuthUrl('sign-up', ref);
 const signInUrl = appAuthUrl('sign-in');
+const copy = landingCopy;
 ---
 
 <MarketingLayout
-  title="Holzen — When Bitcoin moves, pause before you do"
-  description="Holzen watches Bitcoin volatility and sends AI pause prompts to help you slow down before acting on impulse."
-  canonicalPath="/welcome"
+  title={copy.meta.title}
+  description={copy.meta.description}
+  canonicalPath={copy.meta.path}
+  jsonLd={landingFaqJsonLd()}
 >
   <header class="nav">
     <span class="brand">Holzen</span>
-    <a href={signInUrl}>Sign in</a>
+    <a href={signInUrl}>{copy.signIn}</a>
   </header>
 
-  <main class="hero">
-    <h1>When Bitcoin moves, pause before you do</h1>
-    <p>
-      Holzen watches volatility and guides you through a short ritual so you can
-      slow down before acting on impulse.
-    </p>
-    <a class="cta" href={signUpUrl}>Get started for free</a>
-    <p class="muted">No credit card required</p>
-  </main>
+  <div class="hero-wrap">
+    <main class="hero">
+      <h1>{copy.hero}</h1>
+      <p>{copy.heroDesc}</p>
+      <a class="cta" href={signUpUrl}>{copy.getStartedForFree}</a>
+      <p class="muted">{copy.noCreditCard}</p>
+    </main>
+    <a class="scroll-hint" href="#reflection-loop" aria-label="Scroll to content">↓</a>
+  </div>
 
-  <footer class="footer">
-    <p>Holzen is behavioral practice for volatile markets — not financial advice.</p>
-    <nav>
-      <a href="/about">About</a>
-      <a href="/blog">Blog</a>
-      <a href="/terms">Terms</a>
-      <a href="/privacy">Privacy</a>
-      <a href="mailto:hello@holzen.app">Contact</a>
-    </nav>
-  </footer>
+  <section id="reflection-loop" class="section">
+    <p class="section-label">{copy.reflectionLoop}</p>
+    <LandingComparison />
+  </section>
+
+  <section class="section section--muted">
+    <p class="section-label">{copy.companionsTitle}</p>
+    <p class="section-intro">{copy.companionsDesc}</p>
+    <div class="card-list">
+      {
+        copy.companions.map((companion) => (
+          <article class="card">
+            <h2 class="card-title">{companion.label}</h2>
+            <p class="card-body">{companion.desc}</p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <blockquote class="science-quote">{copy.scienceQuote}</blockquote>
+    <p class="science-quote-desc">{copy.scienceDesc}</p>
+    <a
+      class="science-citation"
+      href={copy.scienceCitationUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {copy.scienceCitationLabel}
+    </a>
+  </section>
+
+  <section id="science" class="section section--muted">
+    <p class="section-label">{copy.scienceStepsTitle}</p>
+    <p class="section-intro">{copy.scienceStepsIntro}</p>
+    <div class="card-list">
+      {
+        copy.scienceSteps.map((step) => (
+          <article class="science-step">
+            <div class="science-step-header">
+              <span class="science-step-num">{step.step}</span>
+              <h2 class="science-step-name">{step.key}</h2>
+            </div>
+            <p class="science-step-body">{step.body}</p>
+            <div class="science-step-sources">
+              {
+                step.sources.map((source) => (
+                  <a href={source.url} target="_blank" rel="noopener noreferrer">
+                    {source.label} ↗
+                  </a>
+                ))
+              }
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section section--muted">
+    <p class="section-label">{copy.whatYouGet}</p>
+    <div class="features-grid">
+      {
+        copy.features.map((feature) => (
+          <article class="feature-card">
+            <h2 class="card-title">{feature.label}</h2>
+            <p class="card-body">{feature.desc}</p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="pricing-card">
+      <p class="pricing-title">{copy.freeToStart}</p>
+      <p class="pricing-desc">{copy.pricingDesc}</p>
+      <a class="cta" href={signUpUrl}>{copy.getStartedForFree}</a>
+    </div>
+  </section>
+
+  <section class="section section--muted">
+    <p class="section-label">{copy.questions}</p>
+    <LandingFaq />
+  </section>
+
+  <div class="landing-footer">
+    <p>{copy.footer}</p>
+    <PublicFooter />
+  </div>
 </MarketingLayout>

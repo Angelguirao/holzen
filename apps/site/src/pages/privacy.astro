@@ -1,0 +1,18 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+import LegalDocument from '../components/LegalDocument.astro';
+import { privacyCopy } from '../lib/legal-content';
+---
+
+<MarketingLayout
+  title={privacyCopy.meta.title}
+  description={privacyCopy.meta.description}
+  canonicalPath={privacyCopy.meta.path}
+>
+  <LegalDocument
+    title={privacyCopy.title}
+    subtitle={privacyCopy.subtitle}
+    sections={privacyCopy.sections}
+    closing={privacyCopy.closing}
+  />
+</MarketingLayout>

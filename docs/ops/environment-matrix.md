@@ -39,6 +39,8 @@ Quick rule:
 | `npm run dev:staging` | Local Vite | `holzen-staging` | Stripe **test** mode, staging email identity, staging observability tags | Best local setup for release QA against hosted infrastructure. |
 | `npm run dev:prod` | Local Vite | Usually `holzen-prod` | Can hit **live** Stripe / prod email if you use prod values | Treat as prod-like; do not test risky flows casually. |
 | `npm run dev:local` | Local Vite | Local Docker Supabase | Local-only unless you also run `npm run supabase:functions:serve` with `supabase/.env` or `supabase/.env.local` | Requires explicit local URL/key values in `.env.localstack.local`. |
+| `npm run dev:site` | Astro :4321 (marketing HTML only) | Not used at runtime | N/A | Auth CTAs link to `http://localhost:8080`; run `npm run dev` alongside. Optional `VITE_MARKETING_SITE_URL` for SPA dev stubs. |
+| `npm run build:unified` | Vite SPA + Astro → `dist/` | `VITE_SUPABASE_*` at **build** time for Astro blog static paths | Same as SPA target | Invalid/missing Supabase key → blog index builds empty; fix Vercel/GitHub build env. See [marketing-site-split.md](marketing-site-split.md). |
 | Feature-branch PR preview | Vercel Preview | `holzen-staging` | Stripe **test** mode, staging-ish behavior | PR previews are not isolated backends; they share staging Supabase. |
 | `staging` branch deploy | Vercel Preview branch alias | `holzen-staging` | Stripe **test** mode, staging Resend branding, `SENTRY_ENVIRONMENT=staging` | This is the canonical pre-prod environment. |
 | `main` deploy | Vercel Production | `holzen-prod` | Stripe **live** mode, production email defaults, `SENTRY_ENVIRONMENT=production` | `VITE_COMING_SOON` can gate the SPA, but it does not lock down Supabase. |

@@ -221,7 +221,7 @@ GET /pause
 | `/auth` | **SPA** | Sign-in / sign-up |
 | `/archive`, `/journey`, `/settings` | **SPA** | App shell tabs |
 | `/pause`, `/companion/*` | **SPA** | Full-screen flows |
-| `/about`, `/terms`, `/privacy`, `/blog` | **SPA today** → Astro later | Still in `src/screens/marketing/` |
+| `/about`, `/terms`, `/privacy`, `/blog` | **Astro** | Former SPA screens in `src/legacy/marketing-spa-screens/` |
 | `/roadmap`, `/reserve` | **404** | Moved to `src/legacy/marketing-roadmap-reserve/` |
 
 ---
@@ -234,6 +234,8 @@ Locally we **do not merge** Astro + SPA into one dev server (yet). You run them 
 | --- | --- | --- |
 | `npm run dev` | **8080** | Full React app (same as before) |
 | `npm run dev:site` | **4321** | Astro pages only (e.g. `/welcome`) |
+
+**Local gotcha:** On `:4321`, `/` redirects to `/welcome` in dev, but `/auth` and other product paths do **not** exist — Sign in / CTA links target `http://localhost:8080` automatically. Run **`npm run dev`** alongside **`npm run dev:site`** when testing the full landing → signup flow.
 
 **Why?** Vite and Astro each have their own dev server with HMR. The **unified routing** only exists after `npm run build:unified` + deploy (or `npm run preview` on the merged `dist/` if you build locally).
 
@@ -371,8 +373,8 @@ Implemented in `apps/site/src/lib/app-url.ts`.
 - [x] Unified build (`build:unified` + merge script)
 - [x] Single-domain Vercel config (`spa.html` fallback)
 - [x] `/roadmap`, `/reserve` → legacy
-- [ ] Port full landing content from `LandingScreen.tsx` → `welcome.astro`
-- [ ] Port `/about`, legal, `/blog` to Astro; remove duplicate SPA routes
+- [x] Port full landing content from `LandingScreen.tsx` → `welcome.astro` (SPA copy in `src/legacy/marketing-landing-spa/`)
+- [x] Port `/about`, legal, `/blog` to Astro; SPA dev stubs only (`MarketingDevFallback`)
 - [x] CI + deploy preflight use `npm run build:unified` (`.github/workflows/*.yml`)
 - [ ] Smoke-test after deploy: `/welcome` (Astro) + `/auth` (SPA)
 

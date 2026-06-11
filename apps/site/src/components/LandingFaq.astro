@@ -1,0 +1,26 @@
+---
+import { landingCopy } from '../lib/landing-content';
+
+const { faq, privacy } = landingCopy;
+---
+
+<div class="faq">
+  {
+    faq.map((item) => (
+      <details class="faq-item">
+        <summary class="faq-question">{item.q}</summary>
+        <div class="faq-answer">
+          <p>
+            {item.a}
+            {item.privacyLink ? (
+              <>
+                {' '}
+                <a href="/privacy">{privacy}</a>.
+              </>
+            ) : null}
+          </p>
+        </div>
+      </details>
+    ))
+  }
+</div>

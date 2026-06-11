@@ -20,8 +20,12 @@ Static marketing HTML. **Not a separate website** — it merges into the same `h
 
 | File | Purpose |
 | --- | --- |
-| `src/pages/welcome.astro` | Landing page → `/welcome` |
-| `src/lib/app-url.ts` | Same-origin links to `/auth` |
+| `src/pages/welcome.astro` | Landing → `/welcome` |
+| `src/pages/about.astro` | About → `/about` |
+| `src/pages/terms.astro`, `privacy.astro` | Legal |
+| `src/pages/blog/` | Index + `[slug]` (build-time Supabase) |
+| `src/lib/app-url.ts` | Auth links (`:8080` in dev, same-origin in prod) |
+| `src/lib/blog.ts` | Published posts fetch at build |
 | `src/layouts/MarketingLayout.astro` | Shared HTML `<head>` |
 
 Production Vercel settings live in **repo root** `vercel.json`, not `apps/site/vercel.json`.
