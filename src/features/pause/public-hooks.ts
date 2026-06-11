@@ -135,12 +135,10 @@ export { usePauseBriefIntegrateCountdown } from './public-session-ritual';
 export { usePauseBreathSegmentRpcLoggers } from './presentation/session/breath/use-pause-breath-segment-rpc-loggers';
 export {
   usePauseArchiveList,
-  type PauseArchiveListSort,
   type PauseArchiveRow,
   type PauseArchiveSegment,
   type UsePauseArchiveListOptions,
 } from './presentation/archive/use-pause-archive-list';
-export { getArchivePausesTabHasRowsQueryOptions } from './public-queries';
 export {
   useJourneyPauseInstances,
   type JourneyPauseRow,
@@ -157,14 +155,6 @@ export {
   type JourneyOverviewViewedPayload,
 } from './presentation/journey/journey-overview-telemetry-io';
 export { logPwaInstallAnalyticsEvent } from './public-queries';
-export {
-  fetchSettingsDataExportBundle,
-  type SettingsDataExportBundle,
-  type SettingsExportAiArtifact,
-  type SettingsExportCompanionEvent,
-  type SettingsExportPauseRow,
-  type SettingsExportStepEvent,
-} from './presentation/settings/load-settings-data-export-bundle';
 export {
   useCurrentPause,
   currentPauseQueryKey,

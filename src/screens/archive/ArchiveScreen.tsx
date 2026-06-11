@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, ArrowUpDown, RefreshCw, Loader2 } from 'lucide-react';
+import { RefreshCw, Loader2 } from 'lucide-react';
 import { PageMeta } from '@/app/components/PageMeta';
-import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -16,22 +15,12 @@ export default function Archive() {
     pausesScope,
     setMainSegment,
     setPausesScope,
-    search,
-    setSearch,
-    tagFilter,
-    setTagFilter,
-    hasActiveFilters,
-    clearAllFilters,
-    sortLabel,
-    cycleSortMode,
     pauseArchive,
     pullDistance,
     refreshing,
     pullHandlers,
     loadMoreRef,
-    rows,
-    filtered,
-    availableTags,
+    items,
     emptyLibraryItemsProps,
   } = useArchiveScreen();
 
@@ -135,79 +124,8 @@ export default function Archive() {
           </div>
         )}
 
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/40" />
-          <Input
-            id="archive-search"
-            name="q"
-            type="search"
-            autoComplete="off"
-            aria-label={t('archive.searchPlaceholder')}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t('archive.searchPlaceholder')}
-            className="h-9 border-border/30 pl-8 text-sm"
-          />
-          {search ? (
-            <button
-              type="button"
-              onClick={() => setSearch('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-muted-foreground"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          ) : null}
-        </div>
-
-        {availableTags.length > 0 && (
-          <div className="scrollbar-none -mx-1 flex items-center gap-1.5 overflow-x-auto px-1 pb-0.5">
-            {availableTags.slice(0, 15).map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
-                className={cn(
-                  'whitespace-nowrap rounded-full border px-2 py-1 text-xs transition-colors',
-                  tagFilter === tag
-                    ? 'border-nox-border-focus/50 bg-nox-background-accent/40 text-nox-text-link'
-                    : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70',
-                )}
-              >
-                #{tag}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {hasActiveFilters && (
-          <button
-            type="button"
-            onClick={clearAllFilters}
-            className="flex items-center gap-1 text-sm text-nox-text-link transition-colors hover:text-nox-text-link/80"
-          >
-            <X className="h-2.5 w-2.5" /> {t('archive.clearAll')}
-          </button>
-        )}
-
-        <div className="flex items-center justify-between px-1">
-          <span className="text-sm text-muted-foreground">
-            {filtered.length === 1
-              ? t('archive.itemCount_one', { count: filtered.length })
-              : t('archive.itemCount_other', { count: filtered.length })}
-          </span>
-          <button
-            type="button"
-            onClick={cycleSortMode}
-            className="flex items-center gap-1 text-sm text-nox-text-link transition-colors hover:text-nox-text-link/80"
-          >
-            <ArrowUpDown className="h-2.5 w-2.5" />
-            {sortLabel}
-          </button>
-        </div>
-
         <ArchivePauseItems
-          rows={rows}
-          filtered={filtered}
+          items={items}
           loading={pauseArchive.loading}
           listLoadFailed={pauseArchive.listLoadFailed}
           refetch={pauseArchive.refetch}

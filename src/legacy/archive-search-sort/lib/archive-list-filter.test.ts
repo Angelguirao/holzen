@@ -3,7 +3,7 @@ import {
   collectArchiveTags,
   filterAndSortArchiveRows,
   rowMatchesArchiveSearch,
-} from './archive-list-filter';
+} from '@/legacy/archive-search-sort/lib/archive-list-filter';
 import type { PauseArchiveRow } from '@/features/pause/public-hooks';
 
 const row = (overrides: Partial<PauseArchiveRow>): PauseArchiveRow =>
