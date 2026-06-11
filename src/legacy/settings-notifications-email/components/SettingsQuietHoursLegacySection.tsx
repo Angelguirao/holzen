@@ -3,12 +3,14 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   deleteQuietWindow,
-  getQuietWindowsQueryOptions,
   insertQuietWindow,
-  quietWindowsQueryKey,
   updateQuietWindow,
+} from '@/legacy/settings-notifications-email/queries/quiet-windows-mutations';
+import {
+  getQuietWindowsQueryOptions,
+  quietWindowsQueryKey,
   type QuietWindow,
-} from '@/features/user/public-queries';
+} from '@/legacy/settings-notifications-email/queries/quiet-windows-query';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
@@ -16,7 +18,8 @@ import { toast } from 'sonner';
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-export function QuietWindowsManager({ userId }: { userId?: string }) {
+/** Extended quiet schedules — legacy; MVP uses Home snooze instead. */
+export function SettingsQuietHoursLegacySection({ userId }: { userId?: string }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 

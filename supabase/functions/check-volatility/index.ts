@@ -80,21 +80,15 @@ interface VolatilityProfile {
   threshold?: number | null;
   threshold_down?: number | null;
   display_currency?: string | null;
-  email_notifications?: boolean | null;
   last_trigger_at?: string | null;
-  reflection_tone?: string | null;
   companion_haiku?: boolean | null;
   companion_grounding?: boolean | null;
   companion_signal?: boolean | null;
   companion_zoom_out?: boolean | null;
   companion_history?: boolean | null;
-  quiet_hours_start?: number | null;
-  quiet_hours_end?: number | null;
   timezone?: string | null;
   language?: string | null;
   snoozed_until?: string | null;
-  custom_prompt?: string | null;
-  reflection_style?: string | null;
   motivations?: unknown;
   mantra?: string | null;
   grounding_activities?: unknown;
@@ -170,7 +164,7 @@ serve(
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select(
-        "user_id, threshold, threshold_down, display_currency, tracked_asset_id, email_notifications, last_trigger_at, reflection_tone, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
+        "user_id, threshold, threshold_down, display_currency, tracked_asset_id, last_trigger_at, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, timezone, language, snoozed_until, motivations, mantra, grounding_activities",
       );
 
     if (profilesError) throw profilesError;
@@ -258,68 +252,6 @@ serve(
       asset_currency_pairs: pairRows.filter((r) => r.m).length,
     });
 
-    // Helper: get user's local hour
-    function getUserLocalHour(timezone: string): number {
-      try {
-        const formatter = new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone: timezone });
-        return parseInt(formatter.format(new Date()), 10);
-      } catch { return new Date().getUTCHours(); }
-    }
-
-    // Helper: check if user is in quiet hours (timezone-aware)
-    // Checks both the legacy single-window profile fields AND the new quiet_windows table
-    const { data: allQuietWindows } = await supabase
-      .from("quiet_windows")
-      .select("user_id, start_hour, end_hour, days, active");
-
-    const quietWindowsByUser = new Map<string, Array<{ start_hour: number; end_hour: number; days: number[] }>>();
-    for (const w of (allQuietWindows || [])) {
-      if (!w.active) continue;
-      if (!quietWindowsByUser.has(w.user_id)) quietWindowsByUser.set(w.user_id, []);
-      quietWindowsByUser.get(w.user_id)!.push(w);
-    }
-
-    function isInQuietHours(p: VolatilityProfile): boolean {
-      const tz = p.timezone || "UTC";
-      const localHour = getUserLocalHour(tz);
-
-      // Check legacy single-window
-      const start = p.quiet_hours_start;
-      const end = p.quiet_hours_end;
-      if (start != null && end != null) {
-        if (start <= end ? (localHour >= start && localHour < end) : (localHour >= start || localHour < end)) {
-          return true;
-        }
-      }
-
-      // Check extended quiet windows
-      const windows = quietWindowsByUser.get(p.user_id);
-      if (windows) {
-        // Get local day of week (0=Sunday)
-        let localDay: number;
-        try {
-          const formatter = new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: tz });
-          const dayStr = formatter.format(new Date());
-          const dayMap: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-          localDay = dayMap[dayStr] ?? new Date().getDay();
-        } catch { localDay = new Date().getDay(); }
-
-        for (const w of windows) {
-          if (!w.days.includes(localDay)) continue;
-          const s = w.start_hour;
-          const e = w.end_hour;
-          if (s <= e ? (localHour >= s && localHour < e) : (localHour >= s || localHour < e)) {
-            return true;
-          }
-        }
-      }
-
-      return false;
-    }
-
-    // Filter: must exceed threshold, not in quiet hours/snooze. Skip net-new offers when
-    // a pending cron offer exists; still re-check users with open active|engaged cron pauses
-    // or a lone pending offer so context_snapshot can refresh within the same fingerprint band.
     function isSnoozed(p: VolatilityProfile): boolean {
       const snoozedUntil = p.snoozed_until;
       if (!snoozedUntil) return false;
@@ -333,7 +265,6 @@ serve(
 
     function passesVolatilityGates(p: VolatilityProfile): boolean {
       if (!profileVolatilityBreached(p)) return false;
-      if (isInQuietHours(p)) return false;
       if (isSnoozed(p)) return false;
       return true;
     }
@@ -658,7 +589,6 @@ serve(
         supabase,
         webpush,
         userId: profile.user_id,
-        emailNotifications: profile.email_notifications ?? false,
         contextPreview: ctx,
         pauseInstanceId,
         log,

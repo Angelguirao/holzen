@@ -3,8 +3,6 @@ import { useProfile } from '@/features/user/public-hooks';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { useInstallPrompt } from '@/app/hooks/use-install-prompt';
 import { usePushNotifications } from '@/features/notifications/public-hooks';
-import { useLatestChangelogVersion } from '@/screens/settings/hooks/use-latest-changelog-version';
-import { useSettingsCheckoutWindow } from '@/screens/settings/hooks/use-settings-checkout-window';
 import { useSettingsLocalPrefs } from '@/screens/settings/hooks/use-settings-local-prefs';
 import { useSettingsProfileAutoSaveToast } from '@/screens/settings/hooks/use-settings-profile-auto-save-toast';
 import { trackPaywallViewed } from '@/features/subscription/public';
@@ -19,21 +17,6 @@ export function useSettingsModel() {
     setThreshold,
     thresholdDown,
     setThresholdDown,
-    emailNotifications,
-    setEmailNotifications,
-    companionPrefs,
-    setCompanionPref,
-    reflectionTone,
-    setReflectionTone,
-    reflectionStyle,
-    setReflectionStyle,
-    silentMode,
-    setSilentMode,
-    customPrompt,
-    setCustomPrompt,
-    quietHoursStart,
-    quietHoursEnd,
-    setQuietHours,
     firstName,
     setFirstName,
     motivations,
@@ -83,45 +66,19 @@ export function useSettingsModel() {
   } = usePushNotifications();
 
   const localPrefs = useSettingsLocalPrefs();
-  const checkoutWindow = useSettingsCheckoutWindow();
-  const { hasNewVersion: hasUnseenChangelog } = useLatestChangelogVersion();
 
   const profileSaveKey = useMemo(
     () =>
       JSON.stringify({
         threshold,
         thresholdDown,
-        emailNotifications,
-        reflectionTone,
-        reflectionStyle,
-        silentMode,
-        customPrompt,
-        quietHoursStart,
-        quietHoursEnd,
         firstName,
         motivations,
         mantra,
         currency,
         trackedAssetId,
-        companionPrefs,
       }),
-    [
-      threshold,
-      thresholdDown,
-      emailNotifications,
-      reflectionTone,
-      reflectionStyle,
-      silentMode,
-      customPrompt,
-      quietHoursStart,
-      quietHoursEnd,
-      firstName,
-      motivations,
-      mantra,
-      currency,
-      trackedAssetId,
-      companionPrefs,
-    ],
+    [threshold, thresholdDown, firstName, motivations, mantra, currency, trackedAssetId],
   );
 
   useSettingsProfileAutoSaveToast(profileLoaded, profileSaveKey, t);
@@ -133,21 +90,6 @@ export function useSettingsModel() {
     setThreshold,
     thresholdDown,
     setThresholdDown,
-    emailNotifications,
-    setEmailNotifications,
-    companionPrefs,
-    setCompanionPref,
-    reflectionTone,
-    setReflectionTone,
-    reflectionStyle,
-    setReflectionStyle,
-    silentMode,
-    setSilentMode,
-    customPrompt,
-    setCustomPrompt,
-    quietHoursStart,
-    quietHoursEnd,
-    setQuietHours,
     firstName,
     setFirstName,
     motivations,
@@ -179,9 +121,7 @@ export function useSettingsModel() {
     pushPermissionGrantedIncomplete,
     pushSubscribe,
     pushUnsubscribe,
-    hasUnseenChangelog,
     ...localPrefs,
-    ...checkoutWindow,
   };
 }
 

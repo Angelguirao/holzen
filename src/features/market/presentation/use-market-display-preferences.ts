@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import { readUnitBasisModeFromStorage, writeUnitBasisModeToStorage } from '@/features/market/domain/unit-basis-mode-storage';
 import { trackHomeMarketChartExpandToggled } from './market-display-io';
 
 function readIsTrue(key: string): boolean {
@@ -10,20 +9,17 @@ function readIsTrue(key: string): boolean {
   }
 }
 
-/**
- * Price visibility, unit-basis display mode (1 BTC = 1 BTC), and market chart expand state for Home.
- */
+/** Price visibility and market chart expand state for Home. */
 export function useMarketDisplayPreferences() {
   const [priceHidden, setPriceHidden] = useState(() => readIsTrue('holzen_hide_price'));
-  const [unitBasisMode, setUnitBasisMode] = useState(() => readUnitBasisModeFromStorage());
   const [marketChartExpanded, setMarketChartExpanded] = useState(false);
-  const marketChartExpandBlocked = unitBasisMode || priceHidden;
+  const marketChartExpandBlocked = priceHidden;
 
   useEffect(() => {
-    if (unitBasisMode || priceHidden) {
+    if (priceHidden) {
       setMarketChartExpanded(false);
     }
-  }, [unitBasisMode, priceHidden]);
+  }, [priceHidden]);
 
   const togglePriceHidden = useCallback(() => {
     setPriceHidden((prev) => {
@@ -33,14 +29,6 @@ export function useMarketDisplayPreferences() {
       } catch {
         /* ignore */
       }
-      return next;
-    });
-  }, []);
-
-  const toggleUnitBasisMode = useCallback(() => {
-    setUnitBasisMode((prev) => {
-      const next = !prev;
-      writeUnitBasisModeToStorage(next);
       return next;
     });
   }, []);
@@ -55,15 +43,9 @@ export function useMarketDisplayPreferences() {
 
   return {
     priceHidden,
-    unitBasisMode,
     marketChartExpanded,
     marketChartExpandBlocked,
     togglePriceHidden,
-    toggleUnitBasisMode,
     toggleMarketChartExpanded,
-    /** @deprecated Use unitBasisMode */
-    btcMode: unitBasisMode,
-    /** @deprecated Use toggleUnitBasisMode */
-    toggleBtcMode: toggleUnitBasisMode,
   };
 }

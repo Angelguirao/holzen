@@ -84,15 +84,6 @@ export interface OrchestratorRecencyHints {
   recentZoomOutTitles: string[];
 }
 
-type UserSignalPreferenceRow = {
-  source_id: string | null;
-  custom_name: string | null;
-  custom_url: string | null;
-  custom_type: string | null;
-  active: boolean;
-  category: string;
-};
-
 type SignalCatalogRow = {
   id: string;
   name: string;
@@ -255,82 +246,40 @@ export async function pauseRecencyInputs(
   return { moodHistory, recentMessages, recentHaikus };
 }
 
-/** Active signal catalog + custom URLs for Signal companion (same rules as use-companion-data). */
+/** Active signal catalog for Signal companion orchestration. */
 export async function fetchSignalSourcesForOrchestrate(
   svcClient: SupabaseClient,
-  userId: string,
+  _userId: string,
 ): Promise<Array<{ name: string; type: string; url: string }> | undefined> {
   try {
-    const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-      svcClient.from("signal_sources").select("id, name, type, url, category").eq("category", "signal").eq("demoted_for_live", false),
-      svcClient
-        .from("user_signal_preferences")
-        .select("source_id, custom_name, custom_url, custom_type, active, category")
-        .eq("user_id", userId)
-        .eq("category", "signal"),
-    ]);
-    const typedUserPrefs = (userPrefs ?? []) as UserSignalPreferenceRow[];
-    const prefsMap = new Map<string, UserSignalPreferenceRow>(
-      typedUserPrefs
-        .filter((p) => typeof p.source_id === "string" && p.source_id.length > 0)
-        .map((p) => [p.source_id as string, p] as const),
-    );
-    const catalogRows = (catalog ?? []) as SignalCatalogRow[];
-    const catalogActive = catalogRows
-      .filter((s) => {
-        const pref = prefsMap.get(s.id);
-        return pref?.active ?? true;
-      })
-      .map((s) => ({ name: s.name, type: s.type, url: s.url }));
-    const customActive = typedUserPrefs
-      .filter((p) => !p.source_id && p.custom_name && p.active)
-      .map((p) => ({
-        name: p.custom_name as string,
-        type: p.custom_type || "blog",
-        url: p.custom_url ?? "",
-      }));
-    const sources = [...catalogActive, ...customActive];
+    const { data: catalog } = await svcClient
+      .from("signal_sources")
+      .select("name, type, url, category")
+      .eq("category", "signal")
+      .eq("demoted_for_live", false);
+    const sources = ((catalog ?? []) as SignalCatalogRow[])
+      .map((s) => ({ name: s.name, type: s.type, url: s.url }))
+      .filter((s) => typeof s.url === "string" && s.url.length > 0);
     return sources.length > 0 ? sources : undefined;
   } catch {
     return undefined;
   }
 }
 
-/** Active grounding catalog + custom URLs for Grounding companion (same merge rules as signal). */
+/** Active grounding catalog for Grounding companion orchestration. */
 export async function fetchGroundingSourcesForOrchestrate(
   svcClient: SupabaseClient,
-  userId: string,
+  _userId: string,
 ): Promise<Array<{ name: string; type: string; url: string }> | undefined> {
   try {
-    const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-      svcClient.from("signal_sources").select("id, name, type, url, category").eq("category", "grounding").eq("demoted_for_live", false),
-      svcClient
-        .from("user_signal_preferences")
-        .select("source_id, custom_name, custom_url, custom_type, active, category")
-        .eq("user_id", userId)
-        .eq("category", "grounding"),
-    ]);
-    const typedUserPrefs = (userPrefs ?? []) as UserSignalPreferenceRow[];
-    const prefsMap = new Map<string, UserSignalPreferenceRow>(
-      typedUserPrefs
-        .filter((p) => typeof p.source_id === "string" && p.source_id.length > 0)
-        .map((p) => [p.source_id as string, p] as const),
-    );
-    const catalogRows = (catalog ?? []) as SignalCatalogRow[];
-    const catalogActive = catalogRows
-      .filter((s) => {
-        const pref = prefsMap.get(s.id);
-        return pref?.active ?? true;
-      })
-      .map((s) => ({ name: s.name, type: s.type, url: s.url }));
-    const customActive = typedUserPrefs
-      .filter((p) => !p.source_id && p.custom_name && p.active)
-      .map((p) => ({
-        name: p.custom_name as string,
-        type: p.custom_type || "blog",
-        url: p.custom_url ?? "",
-      }));
-    const sources = [...catalogActive, ...customActive];
+    const { data: catalog } = await svcClient
+      .from("signal_sources")
+      .select("name, type, url, category")
+      .eq("category", "grounding")
+      .eq("demoted_for_live", false);
+    const sources = ((catalog ?? []) as SignalCatalogRow[])
+      .map((s) => ({ name: s.name, type: s.type, url: s.url }))
+      .filter((s) => typeof s.url === "string" && s.url.length > 0);
     return sources.length > 0 ? sources : undefined;
   } catch {
     return undefined;

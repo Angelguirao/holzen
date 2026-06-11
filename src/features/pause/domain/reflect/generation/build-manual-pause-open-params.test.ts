@@ -21,7 +21,6 @@ describe('buildManualPauseOpenParams', () => {
   it('maps to openManualPauseFromHome params', () => {
     const params = buildManualPauseOpenParams({
       userId: 'user-1',
-      silentMode: false,
       mood: 'anxious',
       data: baseMarket,
       profileTrackedAssetId: 'bitcoin',

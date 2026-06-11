@@ -5,7 +5,7 @@ vi.mock('@/features/auth/public', () => ({
   getAuthUser: vi.fn(),
 }));
 
-vi.mock('@/features/pause/public-hooks', () => ({
+vi.mock('../infrastructure/queries/settings-data-export-query', () => ({
   fetchSettingsDataExportBundle: vi.fn(),
 }));
 
@@ -14,7 +14,7 @@ vi.mock('@/features/user/public-queries', () => ({
 }));
 
 import { getAuthUser } from '@/features/auth/public';
-import { fetchSettingsDataExportBundle } from '@/features/pause/public-hooks';
+import { fetchSettingsDataExportBundle } from '../infrastructure/queries/settings-data-export-query';
 import { fetchProfileRowForUser } from '@/features/user/public-queries';
 
 describe('exportDataAction', () => {

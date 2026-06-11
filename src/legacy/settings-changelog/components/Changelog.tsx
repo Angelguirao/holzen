@@ -5,7 +5,7 @@ import {
   CHANGELOG_ENTRIES_QUERY_KEY,
   getChangelogEntriesInfiniteQueryOptions,
   prefetchChangelogEntriesFirstPage,
-} from '@/features/user/public-queries';
+} from '@/legacy/settings-changelog/queries/changelog-query';
 import {
   AlertDialog,
   AlertDialogContent,

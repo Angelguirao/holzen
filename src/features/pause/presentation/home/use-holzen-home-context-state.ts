@@ -29,12 +29,7 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
   const profile = useProfile();
   const queryClient = useQueryClient();
 
-  const {
-    silentMode,
-    currency,
-    trackedAssetId: profileTrackedAssetId,
-    profileLoaded,
-  } = profile;
+  const { currency, trackedAssetId: profileTrackedAssetId, profileLoaded } = profile;
 
   const marketQuery = useQuery(
     getHolzenMarketDisplayQueryOptions({
@@ -82,7 +77,6 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
 
   const { generateMessage, loading } = useManualPauseTrigger({
     user,
-    silentMode,
     trackedAssetId: profile.trackedAssetId,
     syncOpenPauseFromDb,
     setError,

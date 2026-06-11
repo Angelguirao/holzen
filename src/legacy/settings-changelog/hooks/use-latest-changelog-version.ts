@@ -1,13 +1,9 @@
 import { useCallback, useMemo, useReducer } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import {
-  CHANGELOG_LATEST_VERSION_QUERY_KEY,
-  getLatestChangelogVersionQueryOptions,
-} from '@/features/user/public-queries';
 
 const LAST_SEEN_VERSION_KEY = 'holzen_last_seen_version';
 
-export { CHANGELOG_LATEST_VERSION_QUERY_KEY };
+/** Legacy hook — changelog_entries table removed; uses app package version for display only. */
+export const CHANGELOG_LATEST_VERSION_QUERY_KEY = ['changelog-latest-version'] as const;
 
 function readLastSeenVersion(): string | null {
   try {
@@ -17,14 +13,18 @@ function readLastSeenVersion(): string | null {
   }
 }
 
+function readAppVersion(): string | null {
+  const fromEnv = import.meta.env.VITE_APP_VERSION?.trim();
+  return fromEnv || null;
+}
+
 /**
- * Changelog "latest" version for Settings About + What's New. Uses `changelog_entries` latest row.
- * Shared TanStack cache across all callers (e.g. Settings hub + About).
+ * Changelog "latest" version for legacy Settings About + What's New.
+ * No longer backed by `changelog_entries`.
  */
 export function useLatestChangelogVersion() {
   const [, bump] = useReducer((n: number) => n + 1, 0);
-
-  const { data: latestVersion = null } = useQuery(getLatestChangelogVersionQueryOptions());
+  const latestVersion = readAppVersion();
 
   const hasNewVersion = useMemo(
     () => Boolean(latestVersion && readLastSeenVersion() !== latestVersion),

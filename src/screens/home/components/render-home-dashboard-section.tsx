@@ -19,9 +19,6 @@ export interface HomeDashboardSectionDeps {
   togglePriceHidden: () => void;
   currency: string;
   trackedAssetId: TrackedAssetId;
-  unitBasisModeSupported: boolean;
-  unitBasisMode: boolean;
-  toggleUnitBasisMode: () => void;
   marketChartExpanded: boolean;
   toggleMarketChartExpanded: () => void;
   pauseCardBody: ReactNode;
@@ -54,8 +51,6 @@ export function renderHomeDashboardSection(sectionId: string, d: HomeDashboardSe
             onToggleHidden={d.togglePriceHidden}
             currency={d.currency}
             coinId={d.trackedAssetId}
-            unitBasisMode={d.unitBasisModeSupported && d.unitBasisMode}
-            onToggleUnitBasisMode={d.unitBasisModeSupported ? d.toggleUnitBasisMode : undefined}
             chartExpanded={d.marketChartExpanded}
             onToggleChartExpanded={d.toggleMarketChartExpanded}
             chartChevronInPriceRow={false}

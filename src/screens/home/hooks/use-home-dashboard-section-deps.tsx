@@ -22,9 +22,6 @@ export function useHomeDashboardSectionDeps(args: {
   togglePriceHidden: () => void;
   currency: string;
   trackedAssetId: TrackedAssetId;
-  unitBasisModeSupported: boolean;
-  unitBasisMode: boolean;
-  toggleUnitBasisMode: () => void;
   marketChartExpanded: boolean;
   toggleMarketChartExpanded: () => void;
   pauseCardBody: ReactNode;
@@ -52,9 +49,6 @@ export function useHomeDashboardSectionDeps(args: {
     togglePriceHidden,
     currency,
     trackedAssetId,
-    unitBasisModeSupported,
-    unitBasisMode,
-    toggleUnitBasisMode,
     marketChartExpanded,
     toggleMarketChartExpanded,
     pauseCardBody,
@@ -92,9 +86,6 @@ export function useHomeDashboardSectionDeps(args: {
       togglePriceHidden,
       currency,
       trackedAssetId,
-      unitBasisModeSupported,
-      unitBasisMode,
-      toggleUnitBasisMode,
       marketChartExpanded,
       toggleMarketChartExpanded,
       pauseCardBody,
@@ -117,9 +108,6 @@ export function useHomeDashboardSectionDeps(args: {
       togglePriceHidden,
       currency,
       trackedAssetId,
-      unitBasisModeSupported,
-      unitBasisMode,
-      toggleUnitBasisMode,
       marketChartExpanded,
       toggleMarketChartExpanded,
       pauseCardBody,

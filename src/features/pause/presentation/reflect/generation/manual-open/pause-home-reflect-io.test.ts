@@ -65,7 +65,6 @@ describe('pause-home-reflect-io', () => {
   it('re-exports buildManualPauseOpenParams and default manual-open ports', () => {
     const params = buildManualPauseOpenParams({
       userId: 'u1',
-      silentMode: false,
       data: {
         coinId: 'bitcoin',
         currentPrice: 100000,

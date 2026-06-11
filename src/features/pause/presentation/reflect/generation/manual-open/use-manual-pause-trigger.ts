@@ -23,7 +23,6 @@ import { holzenLog } from '@/lib/holzen-console';
 
 export interface UseManualPauseTriggerParams {
   user: User | null;
-  silentMode: boolean;
   trackedAssetId: string;
   syncOpenPauseFromDb: () => Promise<void>;
   setError: Dispatch<SetStateAction<string | null>>;
@@ -40,7 +39,6 @@ export interface UseManualPauseTriggerParams {
  */
 export function useManualPauseTrigger({
   user,
-  silentMode,
   trackedAssetId: profileTrackedAssetId,
   syncOpenPauseFromDb,
   setError,
@@ -66,13 +64,11 @@ export function useManualPauseTrigger({
       const t0 = Date.now();
       holzenLog.manual('generateMessage: start', {
         marketChangePct: data.changePercent,
-        silentMode,
         mood: mood ?? '(none)',
       });
 
       const built = buildManualPauseOpenParams({
         userId: user.id,
-        silentMode,
         mood,
         data,
         profileTrackedAssetId,
@@ -108,17 +104,6 @@ export function useManualPauseTrigger({
           previewPorts,
         );
 
-      if (silentMode) {
-        holzenLog.manual('generateMessage: silent mode');
-        const result = await openManualPauseFromHome(pauseHomeManualOpenPorts, openParams);
-        if (result.outcome === 'error') {
-          holzenLog.manual('generateMessage: silent pause create failed', {
-            message: result.userMessage,
-          });
-        }
-        return applyOpenResult(result);
-      }
-
       return new Promise<ManualPauseTriggerResult>((resolve) => {
         startTransition(async () => {
           setError(null);
@@ -137,7 +122,6 @@ export function useManualPauseTrigger({
     },
     [
       user,
-      silentMode,
       profileTrackedAssetId,
       syncOpenPauseFromDb,
       setError,

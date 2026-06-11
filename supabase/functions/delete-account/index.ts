@@ -113,7 +113,6 @@ serve(
     // pause_companion_events / pause_ai_artifacts) already cascade from
     // auth.users(id); explicit deletes here keep the order obvious.
     await Promise.all([
-      serviceClient.from("user_signal_preferences").delete().eq("user_id", userId),
       serviceClient.from("feedback").delete().eq("user_id", userId),
       serviceClient.from("analytics_events").delete().eq("user_id", userId),
       serviceClient.from("testimonials").delete().eq("user_id", userId),

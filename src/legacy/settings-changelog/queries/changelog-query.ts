@@ -1,11 +1,14 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
 
-export type ChangelogEntryRow = Pick<
-  Database['public']['Tables']['changelog_entries']['Row'],
-  'id' | 'version' | 'date' | 'changes' | 'created_at'
->;
+/** Legacy row shape — `changelog_entries` dropped in pause-first schema cleanup. */
+export type ChangelogEntryRow = {
+  id: string;
+  version: string;
+  date: string;
+  changes: string[];
+  created_at: string;
+};
 
 export const CHANGELOG_LATEST_VERSION_QUERY_PREFIX = ['changelog-entries'] as const;
 

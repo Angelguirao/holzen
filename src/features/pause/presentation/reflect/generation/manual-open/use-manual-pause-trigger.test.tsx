@@ -43,13 +43,11 @@ vi.mock('@/features/pause/presentation/reflect/generation/manual-open/pause-home
   openManualPauseFromHome: openManualPauseFromHomeMock,
   buildManualPauseOpenParams: (input: {
     userId: string;
-    silentMode: boolean;
     mood?: string;
     data: { changePercent: number };
     profileTrackedAssetId: string;
   }) => ({
     userId: input.userId,
-    silentMode: input.silentMode,
     mood: input.mood,
     changePercent: input.data.changePercent,
     trackedAssetId: input.profileTrackedAssetId,
@@ -87,7 +85,6 @@ describe('useManualPauseTrigger', () => {
     const { result } = renderHook(() =>
       useManualPauseTrigger({
         user,
-        silentMode: true,
         trackedAssetId: 'bitcoin',
         syncOpenPauseFromDb: vi.fn().mockResolvedValue(undefined),
         setError: noopSet,
@@ -109,7 +106,6 @@ describe('useManualPauseTrigger', () => {
       mockPauseHomeManualOpenPorts,
       expect.objectContaining({
         userId: 'user-1',
-        silentMode: true,
         changePercent: -2.5,
       }),
     );

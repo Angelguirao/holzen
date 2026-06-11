@@ -48,14 +48,9 @@ export {
 } from '@/features/pause/public-queries';
 
 export {
-  ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_KEY,
-  approveSignalSourceSuggestion,
   deleteSignalSourceRow,
   deleteSignalSourceRowsByIds,
-  fetchPendingSourceSuggestionsRows,
-  getAdminPendingSourceSuggestionsQueryOptions,
   insertAdminSignalSource,
-  rejectSignalSourceSuggestion,
   setSignalSourceDemotedForLive,
 } from '@/features/user/public-queries';
 
@@ -90,5 +85,3 @@ export type {
   PregenerateCacheTopupKey,
   PregenerateCacheTopupTypeConfig,
 } from '@/features/pause/public-queries';
-
-export type { SourceSuggestionRow } from '@/features/user/public-queries';

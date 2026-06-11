@@ -1,4 +1,4 @@
-import { Eye, EyeOff, WifiOff, Bitcoin, Coins, Clock, ChevronDown } from 'lucide-react';
+import { Eye, EyeOff, WifiOff, Clock, ChevronDown } from 'lucide-react';
 import { MarketChartLazyGate } from '@/screens/home/components/MarketChartLazyGate';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatMarketPrice, trackedAssetSymbol, type MarketQuote } from '@/features/market/public';
@@ -12,8 +12,6 @@ interface Props {
   hidden: boolean;
   onToggleHidden: () => void;
   currency?: string;
-  unitBasisMode?: boolean;
-  onToggleUnitBasisMode?: () => void;
   /** When set, headline price row includes a chevron to show/hide chart + 24h detail below the price. */
   chartExpanded?: boolean;
   onToggleChartExpanded?: () => void;
@@ -30,8 +28,6 @@ export function MarketStatus({
   onToggleHidden,
   currency = 'USD',
   coinId: coinIdProp,
-  unitBasisMode = false,
-  onToggleUnitBasisMode,
   chartExpanded = true,
   onToggleChartExpanded,
   chartChevronInPriceRow = true,
@@ -41,66 +37,15 @@ export function MarketStatus({
   const toggle = onToggleHidden;
   const quoteSym = trackedAssetSymbol(data?.coinId ?? coinIdProp ?? 'bitcoin');
 
-  const fiatLabelCurrency = (data?.currency ?? currency).toUpperCase();
-  const iconBtnDisabled = 'pointer-events-none opacity-30';
-
-  /** Fiat row — disabled while price is hidden (icons stay visible). */
-  const enterBtcToolbarBtn =
-    onToggleUnitBasisMode && !unitBasisMode ? (
-      <button
-        type="button"
-        onClick={onToggleUnitBasisMode}
-        disabled={hidden}
-        aria-disabled={hidden}
-        className={cn(
-          homeInWidget.iconBtn,
-          'text-muted-foreground/40 hover:text-foreground',
-          hidden && iconBtnDisabled,
-        )}
-        aria-label={t('marketStatus.enterUnitBasisMode')}
-        title={t('marketStatus.enterUnitBasisMode')}
-      >
-        <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
-      </button>
-    ) : null;
-
-  /** Unit-basis row — coin icon exits back to fiat (Figma 533:36421). */
-  const exitBtcToolbarBtn =
-    onToggleUnitBasisMode && unitBasisMode ? (
-      <button
-        type="button"
-        onClick={onToggleUnitBasisMode}
-        className={cn(homeInWidget.iconBtn, 'text-foreground/50 hover:text-foreground')}
-        aria-label={t('marketStatus.exitUnitBasisMode', { currency: fiatLabelCurrency })}
-        title={t('marketStatus.exitUnitBasisMode', { currency: fiatLabelCurrency })}
-      >
-        <Coins className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
-      </button>
-    ) : null;
-
   const eyeToggleBtn = (
     <button
       type="button"
       onClick={toggle}
-      disabled={unitBasisMode}
-      aria-disabled={unitBasisMode}
-      className={cn(homeInWidget.iconBtn, unitBasisMode && iconBtnDisabled)}
-      aria-label={
-        unitBasisMode
-          ? t('marketStatus.hidePriceDisabledInUnitBasis')
-          : hidden
-            ? t('marketStatus.showPrice')
-            : t('marketStatus.hidePrice')
-      }
-      title={
-        unitBasisMode
-          ? t('marketStatus.hidePriceDisabledInUnitBasis')
-          : hidden
-            ? t('marketStatus.showPrice')
-            : t('marketStatus.hidePrice')
-      }
+      className={homeInWidget.iconBtn}
+      aria-label={hidden ? t('marketStatus.showPrice') : t('marketStatus.hidePrice')}
+      title={hidden ? t('marketStatus.showPrice') : t('marketStatus.hidePrice')}
     >
-      {hidden && !unitBasisMode ? (
+      {hidden ? (
         <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
       ) : (
         <Eye className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
@@ -132,31 +77,6 @@ export function MarketStatus({
           <div className="flex shrink-0 gap-1">
             <Skeleton className="h-9 w-9 rounded-lg" />
             <Skeleton className="h-9 w-9 rounded-lg" />
-            <Skeleton className="h-9 w-9 rounded-lg" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (unitBasisMode) {
-    return (
-      <div className="space-y-3">
-        <div className="flex flex-col gap-2">
-          <p className="text-base font-medium leading-6 tracking-[0.16px] text-foreground">
-            {t('marketStatus.priceIsNoise')}
-          </p>
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-[22px] font-bold leading-7 tabular-nums tracking-[0.088px] text-foreground">
-              {t('marketStatus.unitBasisIdentity', {
-                symbol: quoteSym,
-                defaultValue: `1 ${quoteSym} = 1 ${quoteSym}`,
-              })}
-            </p>
-            <div className="flex shrink-0 items-center justify-end gap-1">
-              {exitBtcToolbarBtn}
-              {eyeToggleBtn}
-            </div>
           </div>
         </div>
       </div>
@@ -184,7 +104,6 @@ export function MarketStatus({
             : 'text-nox-accent-green'
     : '';
 
-  /** Collapsed: pair + price + footer only (Figma 251:17255). Expand reveals 24h/F&G + 7-day chart. */
   const showExpandedDetails = !hidden && chartExpanded;
   const chartChevronToggle =
     chartChevronInPriceRow && onToggleChartExpanded ? (
@@ -207,7 +126,6 @@ export function MarketStatus({
 
   const priceRowToolbar = (
     <div className="flex shrink-0 items-center justify-end gap-1">
-      {enterBtcToolbarBtn}
       {eyeToggleBtn}
       {chartChevronToggle}
     </div>

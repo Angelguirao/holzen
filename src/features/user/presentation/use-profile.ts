@@ -39,29 +39,6 @@ export function useProfile() {
 
   const [threshold, setThresholdState] = useState(5);
   const [thresholdDown, setThresholdDownState] = useState(5);
-  const [emailNotificationsCommitted, setEmailNotificationsCommitted] = useState(true);
-  const [emailNotifications, addOptimisticEmailNotifications] = useOptimistic(
-    emailNotificationsCommitted,
-    (_current, next: boolean) => next,
-  );
-  const [reflectionToneCommitted, setReflectionToneCommitted] = useState('stoic');
-  const [reflectionTone, addOptimisticReflectionTone] = useOptimistic(
-    reflectionToneCommitted,
-    (_current, next: string) => next,
-  );
-  const [silentModeCommitted, setSilentModeCommitted] = useState(false);
-  const [silentMode, addOptimisticSilentMode] = useOptimistic(
-    silentModeCommitted,
-    (_current, next: boolean) => next,
-  );
-  const [customPrompt, setCustomPromptState] = useState<string | null>(null);
-  const [reflectionStyleCommitted, setReflectionStyleCommitted] = useState('standard');
-  const [reflectionStyle, addOptimisticReflectionStyle] = useOptimistic(
-    reflectionStyleCommitted,
-    (_current, next: string) => next,
-  );
-  const [quietHoursStart, setQuietHoursStartState] = useState<number | null>(null);
-  const [quietHoursEnd, setQuietHoursEndState] = useState<number | null>(null);
   const [firstName, setFirstNameState] = useState<string | null>(null);
   const [motivations, setMotivationsState] = useState<string[]>([]);
   const [mantra, setMantraState] = useState<string | null>(null);
@@ -144,13 +121,6 @@ export function useProfile() {
       const row = data;
       setThresholdState(row.threshold);
       setThresholdDownState(row.threshold_down ?? row.threshold);
-      setEmailNotificationsCommitted(row.email_notifications ?? true);
-      setReflectionToneCommitted(row.reflection_tone ?? 'stoic');
-      setSilentModeCommitted(row.silent_mode ?? false);
-      setCustomPromptState(row.custom_prompt ?? null);
-      setReflectionStyleCommitted(row.reflection_style ?? 'standard');
-      setQuietHoursStartState(row.quiet_hours_start ?? null);
-      setQuietHoursEndState(row.quiet_hours_end ?? null);
       setFirstNameState(row.first_name ?? null);
       setMotivationsState(row.motivations ?? []);
       setMantraState(row.mantra ?? null);
@@ -166,12 +136,10 @@ export function useProfile() {
         zoomOut: row.companion_zoom_out ?? true,
         history: row.companion_history ?? true,
       });
-
     }
     holzenLog.profile('ready', {
       hasRow: !!data,
       hasOnboarded: data?.has_onboarded ?? null,
-      silentMode: data ? !!data.silent_mode : null,
       hasLastContext: !!(data?.last_context),
     });
   }, [userId, profileQueryStatus, profileRow]);
@@ -189,81 +157,6 @@ export function useProfile() {
     const { error } = await updateProfileFields(user.id, { threshold_down: val });
     if (!error) invalidateProfileQuery();
   }, [user, invalidateProfileQuery]);
-
-  const setEmailNotifications = useCallback(
-    (val: boolean) => {
-      startProfileTransition(async () => {
-        const previous = emailNotificationsCommitted;
-        addOptimisticEmailNotifications(val);
-        if (!user) return;
-        const { error } = await updateProfileFields(user.id, { email_notifications: val });
-        if (!error) {
-          setEmailNotificationsCommitted(val);
-          invalidateProfileQuery();
-        } else {
-          setEmailNotificationsCommitted(previous);
-          addOptimisticEmailNotifications(previous);
-        }
-      });
-    },
-    [
-      user,
-      invalidateProfileQuery,
-      emailNotificationsCommitted,
-      addOptimisticEmailNotifications,
-      startProfileTransition,
-    ],
-  );
-
-  const setReflectionTone = useCallback(
-    (val: string) => {
-      startProfileTransition(async () => {
-        const previous = reflectionToneCommitted;
-        addOptimisticReflectionTone(val);
-        if (!user) return;
-        const { error } = await updateProfileFields(user.id, { reflection_tone: val });
-        if (!error) {
-          setReflectionToneCommitted(val);
-          invalidateProfileQuery();
-        } else {
-          setReflectionToneCommitted(previous);
-          addOptimisticReflectionTone(previous);
-        }
-      });
-    },
-    [
-      user,
-      invalidateProfileQuery,
-      reflectionToneCommitted,
-      addOptimisticReflectionTone,
-      startProfileTransition,
-    ],
-  );
-
-  const setSilentMode = useCallback(
-    (val: boolean) => {
-      startProfileTransition(async () => {
-        const previous = silentModeCommitted;
-        addOptimisticSilentMode(val);
-        if (!user) return;
-        const { error } = await updateProfileFields(user.id, { silent_mode: val });
-        if (!error) {
-          setSilentModeCommitted(val);
-          invalidateProfileQuery();
-        } else {
-          setSilentModeCommitted(previous);
-          addOptimisticSilentMode(previous);
-        }
-      });
-    },
-    [
-      user,
-      invalidateProfileQuery,
-      silentModeCommitted,
-      addOptimisticSilentMode,
-      startProfileTransition,
-    ],
-  );
 
   const setCompanionPref = useCallback(
     (key: keyof CompanionPrefs, val: boolean) => {
@@ -346,61 +239,11 @@ export function useProfile() {
     );
   }, [user, queryClient, t]);
 
-  const isInQuietHours = useCallback(() => {
-    if (quietHoursStart === null || quietHoursEnd === null) return false;
-    const nowHour = new Date().getHours();
-    if (quietHoursStart <= quietHoursEnd) {
-      return nowHour >= quietHoursStart && nowHour < quietHoursEnd;
-    }
-    return nowHour >= quietHoursStart || nowHour < quietHoursEnd;
-  }, [quietHoursStart, quietHoursEnd]);
-
   return {
     threshold,
     setThreshold,
     thresholdDown,
     setThresholdDown,
-    emailNotifications,
-    setEmailNotifications,
-    reflectionTone,
-    setReflectionTone,
-    silentMode,
-    setSilentMode,
-    customPrompt,
-    setCustomPrompt: async (val: string | null) => {
-      setCustomPromptState(val);
-      if (!user) return;
-      const { error } = await updateProfileFields(user.id, { custom_prompt: val });
-      if (!error) invalidateProfileQuery();
-    },
-    reflectionStyle,
-    setReflectionStyle: (val: string) => {
-      startProfileTransition(async () => {
-        const previous = reflectionStyleCommitted;
-        addOptimisticReflectionStyle(val);
-        if (!user) return;
-        const { error } = await updateProfileFields(user.id, { reflection_style: val });
-        if (!error) {
-          setReflectionStyleCommitted(val);
-          invalidateProfileQuery();
-        } else {
-          setReflectionStyleCommitted(previous);
-          addOptimisticReflectionStyle(previous);
-        }
-      });
-    },
-    quietHoursStart,
-    quietHoursEnd,
-    setQuietHours: async (start: number | null, end: number | null) => {
-      setQuietHoursStartState(start);
-      setQuietHoursEndState(end);
-      if (!user) return;
-      const { error } = await updateProfileFields(user.id, {
-        quiet_hours_start: start,
-        quiet_hours_end: end,
-      });
-      if (!error) invalidateProfileQuery();
-    },
     firstName,
     setFirstName: async (val: string | null) => {
       setFirstNameState(val);
@@ -495,6 +338,5 @@ export function useProfile() {
     hasOnboarded,
     saveOnboardingDraft,
     completeOnboarding,
-    isInQuietHours,
   };
 }

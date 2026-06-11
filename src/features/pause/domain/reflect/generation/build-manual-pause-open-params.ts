@@ -11,7 +11,6 @@ export type { ManualPauseMarketContext };
 /** Full `openManualPauseFromHome` params from Home market data + profile. */
 export type BuildManualPauseOpenParamsInput = {
   userId: string;
-  silentMode: boolean;
   mood?: string;
   data: MarketQuote;
   profileTrackedAssetId: string;
@@ -31,9 +30,7 @@ export function buildManualPauseOpenParams(
     severityBand,
     silentMsg,
     userId: input.userId,
-    silentMode: input.silentMode,
     contextText: ctx,
-    silentMessage: silentMsg,
     mood: input.mood,
     changePercent: input.data.changePercent,
     trackedAssetId: assetId,

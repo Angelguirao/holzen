@@ -102,7 +102,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run check:prepush`                | Full bash preflight (`scripts/pre-push-check.sh`); use **Git Bash** or **WSL** on Windows                                                  |
 | `npm run smoke:edge-logging`           | Optional live HTTP probe of edge `x-cid` behavior (see `supabase/functions/README.md`)                                                     |
 | `npm run test:coverage`                | Vitest with coverage (no JUnit; use `**test:ci`** for logging guards + JUnit)                                                              |
-| `npm run check:version-sync`           | `package.json` version vs latest `changelog_entries` (runs automatically as `**prebuild**` on `**npm run build**`)                         |
+| `npm run check:version-sync`           | Validates `package.json` semver (runs automatically as **`prebuild`** on **`npm run build`**)                         |
 | `npm run stamp:release`                | Refresh `**supabase/functions/_shared/release.ts**` (`EDGE_RELEASE` = `**git rev-parse --short=12 HEAD**`) for edge observability releases |
 | `npm run check:release-stamp`          | Verify `**EDGE_RELEASE**` in `**release.ts**` matches `**git rev-parse --short=12 HEAD**` (no write)                                       |
 
@@ -199,7 +199,7 @@ Visual work follows **Nox** (`docs/design/nox/`, Figma keys in that README). For
 
 ESLint is enabled project-wide. The tree may report many existing issues; treat new changes as the bar for cleanliness. Tests use Vitest with Testing Library where present.
 
-**Production builds** run `**npm run check:version-sync`** first (`prebuild` hook) so `**package.json` `version**` stays aligned with the latest `**changelog_entries**` row for the configured Supabase project.
+**Production builds** run **`npm run check:version-sync`** first (`prebuild` hook) so **`package.json` `version`** is valid semver before Vite builds.
 
 **Edge functions:** After changing `supabase/functions/**/*.ts`, run `**npm run check:edge`** if you have [Deno](https://deno.land/) on your `PATH` — it runs `deno check` on each function’s `index.ts`. If Deno is missing, the script exits successfully and prints a skip message (so CI can call it without installing Deno unless you want stricter checks). Before shipping edge changes, ensure `**npm run stamp:release**` has been run (or run `**npm run check:prepush**`, which stamps and warns if `**release.ts**` drifted).
 

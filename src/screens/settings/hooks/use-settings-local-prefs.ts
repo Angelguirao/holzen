@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react';
-import { readUnitBasisModeFromStorage } from '@/features/market/public';
 import { isHapticEnabled, setHapticEnabled as persistHapticEnabled } from '@/lib/haptics';
 
 /** Device-local toggles (not persisted to profile). */
@@ -8,7 +7,6 @@ export function useSettingsLocalPrefs() {
   const [soundEnabled, setSoundEnabled] = useState(
     () => localStorage.getItem('holzen_sound_enabled') !== 'false',
   );
-  const [unitBasisMode, setUnitBasisMode] = useState(() => readUnitBasisModeFromStorage());
 
   const setHapticEnabled = useCallback((value: boolean) => {
     setHapticEnabledState(value);
@@ -20,11 +18,5 @@ export function useSettingsLocalPrefs() {
     setHapticEnabled,
     soundEnabled,
     setSoundEnabled,
-    unitBasisMode,
-    setUnitBasisMode,
-    /** @deprecated Use unitBasisMode */
-    btcMode: unitBasisMode,
-    /** @deprecated Use setUnitBasisMode */
-    setBtcMode: setUnitBasisMode,
   };
 }

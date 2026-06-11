@@ -18,9 +18,7 @@ const computeContextFingerprintMock = vi.mocked(computeContextFingerprint);
 
 const baseParams = {
   userId: 'u1',
-  silentMode: false,
   contextText: 'ctx',
-  silentMessage: 'BTC moved.',
   changePercent: 3,
   trackedAssetId: 'bitcoin',
   severityBand: 'mild',

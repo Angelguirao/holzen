@@ -2,7 +2,6 @@ export const SETTINGS_SECTION_IDS = [
   'you',
   'reflection',
   'experience',
-  'companions',
   'notifications',
   'subscription',
   'account',

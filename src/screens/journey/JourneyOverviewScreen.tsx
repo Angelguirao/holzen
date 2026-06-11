@@ -1,9 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { JourneyStreakCard } from '@/screens/journey/components/JourneyStreakCard';
 import { JourneyPracticeXpBreakdown } from '@/screens/journey/components/JourneyPracticeXpBreakdown';
-import { Button } from '@/components/ui/button';
 import { useJourneyPauseInstances } from '@/features/pause/public-hooks';
 import { EMPTY_PRACTICE_XP_BY_SIGNAL, usePracticeSummary } from '@/features/pause/public-hooks';
 import { trackJourneyOverviewViewed } from '@/features/pause/public-hooks';
@@ -88,12 +86,6 @@ export default function JourneyOverview() {
           isLoading={practiceLoading}
         />
       </section>
-
-      <Button asChild variant="outline" className="w-full">
-        <Link to="/archive">
-          {t('journey.overview.archiveCta', { defaultValue: 'Open your pause library' })}
-        </Link>
-      </Button>
     </div>
   );
 }
