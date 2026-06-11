@@ -3,7 +3,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Switch } from '@/components/ui/switch';
-import { InstallHolzenCard } from '@/screens/home/components/InstallHolzenCard';
+import { useInstallPrompt } from '@/app/hooks/use-install-prompt';
 import { useSettingsState } from '@/screens/settings/hooks/use-settings-state';
 
 export function SettingsNotificationsPanel() {
@@ -16,9 +16,25 @@ export function SettingsNotificationsPanel() {
     pushSubscribe,
     pushUnsubscribe,
   } = useSettingsState();
+  const { isInstalled } = useInstallPrompt();
+
   return (
     <>
       <div className="space-y-3">
+        {!pushSupported && !isInstalled && (
+          <Alert className="border-border/60 bg-muted/30">
+            <Info className="h-4 w-4 text-muted-foreground" />
+            <AlertTitle className="text-sm">
+              {t('settings.pushRequiresInstallTitle', { defaultValue: 'Install Holzen for push' })}
+            </AlertTitle>
+            <AlertDescription className="mt-2 text-xs leading-relaxed text-muted-foreground">
+              {t(
+                'settings.pushRequiresInstallBody',
+                'Push notifications need the installed app (especially on iPhone). Use Settings → Account & security → Install app, or add Holzen to your home screen from the browser share menu.',
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
         {pushSupported && pushPermissionGrantedIncomplete && (
           <Alert className="border-border/60 bg-muted/30">
             <Info className="h-4 w-4 text-muted-foreground" />
@@ -65,8 +81,6 @@ export function SettingsNotificationsPanel() {
           </div>
         )}
       </div>
-
-      <InstallHolzenCard alwaysShow compact />
     </>
   );
 }
