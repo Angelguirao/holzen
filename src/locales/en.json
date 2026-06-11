@@ -277,15 +277,11 @@
       }
     },
     "nextAutoCheck": "Next auto-check · {{time}}",
-    "cooldownHeadline": "{{hours}}h cooldown · {{time}} left",
     "nextScanLine": "Next scan · {{scan}}",
     "nextScanIdleTitle": "When Holzen next checks market conditions against your settings (about every hour).",
     "autoCooldown": {
-      "afterPauseKicker": "Rest window after your last pause",
       "serverChecksKicker": "Holzen is watching the market for you",
-      "cooldownAria": "You are in the rest period that starts when a pause is created. It is not the same timer as the Need a moment button. This rest window ends at {{time}} ({{hours}} hours from that pause).",
       "nextScanAria": "Holzen reviews conditions about once an hour. The next routine check is around {{time}}. A new automatic pause only happens when your settings and the market align — this is only the schedule.",
-      "cooldownReadyAt": "{{hours}}h rest · until {{time}}",
       "nextScanAtClock": "Next routine check · {{time}}"
     },
     "monitoringReady": "Monitoring · ready",
@@ -518,7 +514,7 @@
   "settings": {
     "hubIntro": "Pick a category to change how Holzen fits you — same layout as Tools for consistency.",
     "hubDescYou": "Name, motivations, optional mantra for breathing pauses, and how Home greets you.",
-    "hubDescReflection": "Cooldown, tone, style, custom prompt, and silent mode for pauses.",
+    "hubDescReflection": "Volatility thresholds that trigger automatic pauses.",
     "hubDescExperience": "Display mode, currency, language, haptics, zen mode, and sounds.",
     "hubDescCompanions": "Which companion cards appear with your pause.",
     "hubDescNotifications": "Email, push, digest cadence, and quiet hours.",
@@ -526,7 +522,7 @@
     "hubDescAccount": "Password, sign out, and account deletion.",
     "backToAll": "All settings",
     "sectionPageSubtitleYou": "Identity and motivation — what Holzen greets you with.",
-    "sectionPageSubtitleReflection": "How automatic pauses feel and how often they arrive.",
+    "sectionPageSubtitleReflection": "When Holzen offers a pause based on market moves.",
     "sectionPageSubtitleExperience": "Display, language, and sensory defaults across the app.",
     "sectionPageSubtitleCompanions": "Tune which insights sit beside your pause.",
     "sectionPageSubtitleNotifications": "Stay informed without noise — on your schedule.",
@@ -585,9 +581,6 @@
     "displayCurrencyDesc": "Choose how BTC prices are displayed throughout the app.",
     "reflectionLanguage": "Language",
     "reflectionLanguageDesc": "Choose the language for the entire app, including AI pause prompts, haikus, and insights.",
-    "cooldown": "Cooldown",
-    "cooldownLabel": "Cooldown between pauses",
-    "cooldownDesc": "Minimum time between automatic pauses.",
     "tone": "Tone",
     "toneDesc": "Choose the voice of your AI pause copy.",
     "tones": {
@@ -726,8 +719,6 @@
     "checkoutWindowDesc": "How long Stripe checkout stays open before it expires.",
     "checkoutWindowLabel": "Checkout session length",
     "checkoutWindowRange": "{{min}}–{{max}} minutes",
-    "cooldownHelpBody": "Automatic pauses wait at least this long after the previous one.",
-    "cooldownHelpTitle": "Cooldown help",
     "creditsDashboard": "Credits & allowances",
     "companionCreditsMeteringHelp": "Companions & guidance counts when Holzen first generates or regenerates Signal, Grounding, Look Back, or Zoom Out for a pause. Opening cards or full views you already have does not use allowance. Haiku and reflection prose are separate.",
     "flexBalanceShort": "{{count}} flex credits",
