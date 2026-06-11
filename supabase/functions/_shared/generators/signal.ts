@@ -24,7 +24,6 @@ import {
 } from "../fallbacks.ts";
 import { type CacheServeRelaxation, parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger, trackEvent } from "../observe.ts";
-import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import {
   type LlmBudgetTier,
@@ -762,13 +761,6 @@ URL RULES (CRITICAL):
       log(`cache write failed: ${e}`);
     }
   }
-
-  void enqueueCatalogSourceSuggestion(svcClient, {
-    category: "signal",
-    name: signal.source,
-    url: signal.url,
-    pauseInstanceId,
-  });
 
   // ── Step 6: Background URL validation (fire-and-forget) ──
   if (signal.url && signal.url.startsWith("http")) {
