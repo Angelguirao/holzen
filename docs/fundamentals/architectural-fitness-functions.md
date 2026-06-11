@@ -116,7 +116,7 @@ Scripts live under `scripts/`. See script headers for exact rules and allowlists
 | `check:i18n-active-keys` | Yes | Active `t('…')` keys exist in `src/locales/en.json` |
 | `check:view-migrations` | Prepush | Safe `CREATE OR REPLACE VIEW` patterns |
 | `check:sql-search-path` | Yes (`test:ci`) + Prepush | Every migration function pins `public` in `search_path` |
-| `check:version-sync` | Prebuild | `package.json` version = latest changelog row |
+| `check:version-sync` | Prebuild | `package.json` version is valid semver |
 | `stamp-edge-release` / `check:release-stamp` | Prepush stamp step | Edge `EDGE_RELEASE` = Git SHA |
 | `npm run test` + `npm run build` | Prepush / CI | Behavior + production bundle |
 

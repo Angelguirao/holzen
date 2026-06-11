@@ -1,5 +1,4 @@
 import { buildManualPauseCreateOrReuseParams } from '@/features/pause/domain/reflect/generation/build-manual-pause-create-or-reuse-params';
-import { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-open-manual-pause-silent-mode-after-create';
 import { mapManualPauseOpenError } from '@/features/pause/domain/reflect/generation/map-manual-pause-open-error';
 import { pauseCreateSkippedUserMessage } from '@/features/pause/domain/reflect/generation/pause-create-skipped-user-message';
 import { runPauseCreateOrReuse } from '@/features/pause/application/use-cases/session/run-pause-create-or-reuse';
@@ -18,7 +17,7 @@ export type {
   OpenManualPauseFromHomeSuccess,
 } from '@/features/pause/domain/reflect/generation/open-manual-pause-from-home-types';
 
-/** Home "Need a moment": `pause_create_or_reuse` (+ silent reflection stub when enabled). */
+/** Home "Need a moment": `pause_create_or_reuse` then reflect generation. */
 export async function openManualPauseFromHome(
   ports: OpenManualPauseFromHomePorts,
   params: OpenManualPauseFromHomeParams,
@@ -31,17 +30,6 @@ export async function openManualPauseFromHome(
     }
 
     const pendingOffer = res.pending_offer === true;
-
-    if (params.silentMode) {
-      return runOpenManualPauseSilentModeAfterCreate(ports.reflect, {
-        pauseInstanceId: res.instance_id,
-        userId: params.userId,
-        contextText: params.contextText,
-        silentMessage: params.silentMessage,
-        pendingOffer,
-        created: res.created,
-      });
-    }
 
     return {
       outcome: 'opened',

@@ -1,8 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
-import type { QuietWindow } from '@/features/user/infrastructure/queries/quiet-windows-query';
-
-type QuietWindowUpdate = Database['public']['Tables']['quiet_windows']['Update'];
+import type { QuietWindow } from '@/legacy/settings-notifications-email/queries/quiet-windows-query';
 
 export async function insertQuietWindow(input: {
   userId: string;
@@ -27,10 +24,7 @@ export async function updateQuietWindow(
   id: string,
   updates: Partial<QuietWindow>,
 ): Promise<{ error: Error | null }> {
-  const { error } = await supabase
-    .from('quiet_windows')
-    .update(updates as QuietWindowUpdate)
-    .eq('id', id);
+  const { error } = await supabase.from('quiet_windows').update(updates).eq('id', id);
   return { error: error ? new Error(error.message) : null };
 }
 

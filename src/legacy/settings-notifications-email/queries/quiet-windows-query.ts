@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 
-/** Row shape used by quiet-windows UI (subset of `quiet_windows` select('*')). */
+/** Legacy row shape — `quiet_windows` dropped in pause-first schema cleanup. */
 export interface QuietWindow {
   id: string;
   label: string;

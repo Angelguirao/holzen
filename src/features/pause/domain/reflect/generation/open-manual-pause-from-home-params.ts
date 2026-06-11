@@ -1,9 +1,7 @@
 /** Input for Home manual-open orchestration and create-or-reuse RPC shaping. */
 export type OpenManualPauseFromHomeParams = {
   userId: string;
-  silentMode: boolean;
   contextText: string;
-  silentMessage: string;
   mood?: string | null;
   changePercent: number;
   trackedAssetId: string;

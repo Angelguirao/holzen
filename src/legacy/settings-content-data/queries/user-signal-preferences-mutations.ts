@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { UserSignalPreference } from '@/features/user/domain/user-signal-preference';
+import type { UserSignalPreference } from '@/legacy/settings-content-data/domain/user-signal-preference';
 
 export async function updateUserSignalPreferenceActive(
   prefId: string,

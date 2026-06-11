@@ -2,8 +2,8 @@
  * Settings data export form action — orchestrates auth, profile, and pause export bundle.
  */
 import { getAuthUser } from '@/features/auth/public';
-import { fetchSettingsDataExportBundle } from '@/features/pause/public-hooks';
 import { fetchProfileRowForUser } from '@/features/user/public-queries';
+import { fetchSettingsDataExportBundle } from '../infrastructure/queries/settings-data-export-query';
 
 export type ExportDataFormat = 'json' | 'csv';
 
@@ -72,11 +72,7 @@ export async function buildSettingsExportDownload(
       ? {
           threshold: profile.threshold,
           threshold_down: profile.threshold_down,
-          cooldown_hours: profile.cooldown_hours,
-          reflection_tone: profile.reflection_tone,
-          reflection_style: profile.reflection_style,
           language: profile.language,
-          email_notifications: profile.email_notifications,
           created_at: profile.created_at,
         }
       : null,

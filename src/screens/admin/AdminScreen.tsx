@@ -14,7 +14,6 @@ import { RejectionEntry } from '@/screens/admin/components/RejectionEntry';
 import { CuratedContentManager } from '@/screens/admin/components/CuratedContentManager';
 import { HardcodedFallbacksManager } from '@/screens/admin/components/HardcodedFallbacksManager';
 import { SourceCatalogViewer } from '@/screens/admin/components/SourceCatalogViewer';
-import { SourceSuggestionsPanel } from '@/screens/admin/components/SourceSuggestionsPanel';
 import { AdminSubNav } from '@/screens/admin/components/AdminSubNav';
 import { AppConfigTools } from '@/screens/admin/components/AppConfigTools';
 import { MigrationStatus } from '@/screens/admin/components/MigrationStatus';
@@ -855,7 +854,6 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="sources" className="mt-0 space-y-4">
-          <SourceSuggestionsPanel onCatalogChanged={refresh} />
           <SourceCatalogViewer sources={signalSources} onRefresh={refresh} libraryEntries={libraryEntries} />
         </TabsContent>
 

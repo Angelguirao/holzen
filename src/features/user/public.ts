@@ -4,12 +4,6 @@ export {
   type HoldGoalHeadlineGoal,
 } from './application/hold-goal-headline';
 export type { HoldGoalProfile } from './domain/hold-goal-profile';
-export type { UserSignalPreference } from './domain/user-signal-preference';
-export {
-  exportDataAction,
-  type ExportDataActionState,
-  type ExportDataFormat,
-} from './presentation/settings-export-data-io';
 export {
   submitFeedbackAction,
   type FeedbackActionState,

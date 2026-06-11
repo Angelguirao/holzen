@@ -3,17 +3,6 @@
  * other features should use `@/features/user/public` (no eager Supabase).
  */
 export {
-  getUserSignalPreferencesQueryOptions,
-  USER_SIGNAL_PREFS_QUERY_KEY,
-  type UserPref,
-} from './infrastructure/queries/user-signal-preferences-query';
-export {
-  deleteUserSignalPreference,
-  insertCatalogSignalPreference,
-  insertCustomUserSignalPreference,
-  updateUserSignalPreferenceActive,
-} from './infrastructure/queries/user-signal-preferences-mutations';
-export {
   fetchProfileRowForUser,
   getProfileRowQueryOptions,
   PROFILE_QUERY_KEY,
@@ -22,16 +11,6 @@ export {
 export { subscribeProfileLastContextUpdates } from './infrastructure/realtime/profile-last-context-realtime';
 export { getHoldGoalProfileQueryOptions } from './infrastructure/queries/hold-goal-profile-query';
 export {
-  deleteQuietWindow,
-  insertQuietWindow,
-  updateQuietWindow,
-} from './infrastructure/queries/quiet-windows-mutations';
-export {
-  getQuietWindowsQueryOptions,
-  quietWindowsQueryKey,
-  type QuietWindow,
-} from './infrastructure/queries/quiet-windows-query';
-export {
   SIGNAL_SOURCES_CATALOG_QUERY_KEY,
   SIGNAL_SOURCES_CATALOG_QUERY_PREFIX,
   fetchSignalSourcesCatalog,
@@ -39,22 +18,12 @@ export {
   type CatalogSource,
 } from './infrastructure/queries/signal-sources-catalog-query';
 export {
-  approveSignalSourceSuggestion,
   deleteSignalSourceRow,
   deleteSignalSourceRowsByIds,
   insertAdminSignalSource,
-  rejectSignalSourceSuggestion,
   setSignalSourceDemotedForLive,
-  type ApproveSignalSourceSuggestionInput,
-  type ApproveSignalSourceSuggestionResult,
   type SignalSourceAdminMutationResult,
 } from './infrastructure/queries/signal-sources-admin-mutations';
-export {
-  ADMIN_PENDING_SOURCE_SUGGESTIONS_QUERY_KEY,
-  fetchPendingSourceSuggestionsRows,
-  getAdminPendingSourceSuggestionsQueryOptions,
-  type SourceSuggestionRow,
-} from './infrastructure/queries/signal-source-suggestions-admin-query';
 export {
   getThresholdVolatilityEstimatorQueryOptions,
   thresholdVolatilityEstimatorQueryKey,
@@ -83,21 +52,6 @@ export {
   LANDING_TESTIMONIALS_QUERY_PREFIX,
   type LandingTestimonialRow,
 } from './infrastructure/queries/landing-testimonials-query';
-export {
-  CHANGELOG_ENTRIES_PAGE_SIZE,
-  CHANGELOG_ENTRIES_QUERY_KEY,
-  CHANGELOG_ENTRIES_QUERY_LEAF,
-  CHANGELOG_ENTRIES_QUERY_PREFIX,
-  CHANGELOG_LATEST_VERSION_QUERY_KEY,
-  CHANGELOG_LATEST_VERSION_QUERY_LEAF,
-  CHANGELOG_LATEST_VERSION_QUERY_PREFIX,
-  fetchChangelogEntriesPage,
-  fetchLatestChangelogVersion,
-  getChangelogEntriesInfiniteQueryOptions,
-  getLatestChangelogVersionQueryOptions,
-  prefetchChangelogEntriesFirstPage,
-  type ChangelogEntryRow,
-} from './infrastructure/queries/changelog-query';
 export {
   BLOG_POST_BY_SLUG_DISABLED_SLUG,
   BLOG_POST_BY_SLUG_NONE_QUERY_KEY,

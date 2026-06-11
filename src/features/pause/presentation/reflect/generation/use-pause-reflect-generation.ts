@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/public';
 import { useProfile } from '@/features/user/public-hooks';
-import type { ReflectGenerationProfileInput } from '@/features/pause/domain/reflect/generation/reflect-generation-edge-params';
 import {
   reflectionContentFromLegacyMessage,
   type ReflectionContentV2,
@@ -40,25 +39,17 @@ export function usePauseReflectGeneration({
   const { t } = useTranslation();
   const { user } = useAuth();
   const profile = useProfile();
-  const profileForReflect = useMemo<ReflectGenerationProfileInput>(
+  const profileForReflect = useMemo(
     () => ({
-      reflectionTone: profile.reflectionTone,
-      reflectionStyle: profile.reflectionStyle,
-      customPrompt: profile.customPrompt ?? '',
+      reflectionTone: 'stoic',
+      reflectionStyle: 'standard',
+      customPrompt: '',
       motivations: profile.motivations ?? [],
       mantra: profile.mantra ?? '',
       currency: profile.currency,
       language: profile.language,
     }),
-    [
-      profile.reflectionTone,
-      profile.reflectionStyle,
-      profile.customPrompt,
-      profile.motivations,
-      profile.mantra,
-      profile.currency,
-      profile.language,
-    ],
+    [profile.motivations, profile.mantra, profile.currency, profile.language],
   );
 
   const [reflectionContent, setReflectionContent] = useState<ReflectionContentV2 | null>(() =>

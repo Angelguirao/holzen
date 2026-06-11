@@ -44,7 +44,6 @@ const SmokeTest = lazy(() => import("./screens/ops/SmokeTestScreen"));
 const SentryAlerts = lazy(() => import("./screens/ops/SentryAlertsScreen"));
 const EdgeCoverage = lazy(() => import("./screens/ops/EdgeCoverageScreen"));
 const Unsubscribe = lazy(() => import("./screens/marketing/UnsubscribeScreen"));
-const BillingHistory = lazy(() => import("./screens/settings/BillingHistoryScreen"));
 const SettingsAbout = lazy(() => import("./screens/settings/SettingsAboutScreen"));
 
 const queryClient = createHolzenQueryClient();
@@ -228,7 +227,6 @@ const App = () => (
                   <Route path="/journey" element={<JourneyOverview />} />
                   <Route path="/settings" element={<SettingsRoot />}>
                     <Route path="about" element={<SettingsAbout />} />
-                    <Route path="billing-history" element={<BillingHistory />} />
                     <Route element={<SettingsStateLayout />}>
                       <Route index element={<SettingsHub />} />
                       <Route path=":section" element={<SettingsSectionPage />} />

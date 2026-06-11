@@ -25,7 +25,6 @@ export type DeliverPauseOfferChannelsInput = {
   supabase: SupabaseClient;
   webpush: typeof webpush;
   userId: string;
-  emailNotifications: boolean;
   contextPreview: string;
   pauseInstanceId: string;
   log: PauseOfferDeliveryLog;
@@ -108,7 +107,7 @@ async function sendPauseOfferEmail(
       <p style="font-size: 13px; color: #737373; margin-bottom: 16px;">${context}</p>
       <p style="font-size: 14px; line-height: 1.6; margin-bottom: 24px;">Open Holzen when you're ready — your personalized reflection is waiting in the pause ritual.</p>
       <hr style="border: none; border-top: 1px solid #e5e2dc; margin: 24px 0;">
-      <p style="font-size: 11px; color: #a3a3a3;">This is an automated notification from Holzen. You can disable email notifications in your settings.</p>
+      <p style="font-size: 11px; color: #a3a3a3;">This is an automated notification from Holzen.</p>
     </body>
     </html>
   `;
@@ -222,7 +221,6 @@ export async function deliverPauseOfferChannels(
 
   await Promise.all([
     (async () => {
-      if (!input.emailNotifications) return;
       if (!isPauseVolatilityEmailEnabled()) {
         log("notifications_deliver_email", {
           holzen_event: holzenEvent,

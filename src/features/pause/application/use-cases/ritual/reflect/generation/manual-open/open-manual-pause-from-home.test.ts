@@ -2,22 +2,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import type { ReflectGenerator } from '@/features/pause/ports/reflect-generator';
 import { runPauseCreateOrReuse } from '@/features/pause/application/use-cases/session/run-pause-create-or-reuse';
-import { runOpenManualPauseSilentModeAfterCreate } from '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-open-manual-pause-silent-mode-after-create';
 import { openManualPauseFromHome } from './open-manual-pause-from-home';
 
 vi.mock('@/features/pause/application/use-cases/session/run-pause-create-or-reuse', () => ({
   runPauseCreateOrReuse: vi.fn(),
 }));
 
-vi.mock(
-  '@/features/pause/application/use-cases/ritual/reflect/generation/manual-open/run-open-manual-pause-silent-mode-after-create',
-  () => ({
-    runOpenManualPauseSilentModeAfterCreate: vi.fn(),
-  }),
-);
-
 const runPauseCreateOrReuseMock = vi.mocked(runPauseCreateOrReuse);
-const runOpenManualPauseSilentModeAfterCreateMock = vi.mocked(runOpenManualPauseSilentModeAfterCreate);
 
 function mockPorts(): { repository: PauseRepository; reflect: ReflectGenerator } {
   return {
@@ -26,10 +17,21 @@ function mockPorts(): { repository: PauseRepository; reflect: ReflectGenerator }
   };
 }
 
+const baseParams = {
+  userId: 'u1',
+  contextText: 'ctx',
+  changePercent: 3,
+  trackedAssetId: 'bitcoin',
+  severityBand: 'mild',
+  fearGreedLabel: null,
+  onChainBand: null,
+  fearGreed: null,
+  onChain: null,
+} as const;
+
 describe('openManualPauseFromHome', () => {
   beforeEach(() => {
     runPauseCreateOrReuseMock.mockReset();
-    runOpenManualPauseSilentModeAfterCreateMock.mockReset();
   });
 
   it('routes create through runPauseCreateOrReuse on the repository port', async () => {
@@ -47,19 +49,7 @@ describe('openManualPauseFromHome', () => {
         repository,
         reflect: { persistReflectionArtifacts: vi.fn() } as unknown as ReflectGenerator,
       },
-      {
-        userId: 'u1',
-        silentMode: false,
-        contextText: 'ctx',
-        silentMessage: 'BTC moved.',
-        changePercent: 3,
-        trackedAssetId: 'bitcoin',
-        severityBand: 'mild',
-        fearGreedLabel: null,
-        onChainBand: null,
-        fearGreed: null,
-        onChain: null,
-      },
+      { ...baseParams, changePercent: 3 },
     );
 
     expect(runPauseCreateOrReuseMock).toHaveBeenCalledOnce();
@@ -83,100 +73,14 @@ describe('openManualPauseFromHome', () => {
       prior_open_instance_id: null,
     });
     const result = await openManualPauseFromHome(mockPorts(), {
-      userId: 'u1',
-      silentMode: false,
-      contextText: 'ctx',
-      silentMessage: 'BTC moved.',
+      ...baseParams,
       changePercent: -5,
-      trackedAssetId: 'bitcoin',
       severityBand: 'moderate',
-      fearGreedLabel: null,
-      onChainBand: null,
-      fearGreed: null,
-      onChain: null,
     });
     expect(result.outcome).toBe('idle');
   });
 
-  it('persists silent stub when silentMode is on', async () => {
-    runPauseCreateOrReuseMock.mockResolvedValue({
-      instance_id: 'pause-1',
-      created: true,
-      reused_reason: null,
-      pending_offer: false,
-      prior_open_instance_id: null,
-    });
-    runOpenManualPauseSilentModeAfterCreateMock.mockResolvedValue({
-      outcome: 'opened',
-      instanceId: 'pause-1',
-      context: 'ctx',
-      pendingOffer: false,
-      created: true,
-      silentStubPersisted: true,
-    });
-    const ports = mockPorts();
-    const result = await openManualPauseFromHome(ports, {
-      userId: 'u1',
-      silentMode: true,
-      contextText: 'ctx',
-      silentMessage: 'BTC moved.',
-      changePercent: 2,
-      trackedAssetId: 'bitcoin',
-      severityBand: 'mild',
-      fearGreedLabel: 'Fear',
-      onChainBand: '1:2:3',
-      fearGreed: { label: 'Fear', value: 33 },
-      onChain: { mempoolSize: 1, fastestFee: 2, medianFee: 3 },
-    });
-    expect(result).toMatchObject({
-      outcome: 'opened',
-      instanceId: 'pause-1',
-      silentStubPersisted: true,
-    });
-    expect(runOpenManualPauseSilentModeAfterCreateMock).toHaveBeenCalledWith(ports.reflect, {
-      pauseInstanceId: 'pause-1',
-      userId: 'u1',
-      contextText: 'ctx',
-      silentMessage: 'BTC moved.',
-      pendingOffer: false,
-      created: true,
-    });
-  });
-
-  it('returns error when silent stub persist fails', async () => {
-    runPauseCreateOrReuseMock.mockResolvedValue({
-      instance_id: 'pause-1',
-      created: true,
-      reused_reason: null,
-      pending_offer: false,
-      prior_open_instance_id: null,
-    });
-    runOpenManualPauseSilentModeAfterCreateMock.mockResolvedValue({
-      outcome: 'error',
-      userMessage: 'Could not save reflection.',
-      isNetwork: false,
-    });
-    const result = await openManualPauseFromHome(mockPorts(), {
-      userId: 'u1',
-      silentMode: true,
-      contextText: 'ctx',
-      silentMessage: 'BTC moved.',
-      changePercent: 2,
-      trackedAssetId: 'bitcoin',
-      severityBand: 'mild',
-      fearGreedLabel: null,
-      onChainBand: null,
-      fearGreed: null,
-      onChain: null,
-    });
-    expect(result).toEqual({
-      outcome: 'error',
-      userMessage: 'Could not save reflection.',
-      isNetwork: false,
-    });
-  });
-
-  it('skips artifact persist for non-silent opens', async () => {
+  it('returns opened when instance is created', async () => {
     runPauseCreateOrReuseMock.mockResolvedValue({
       instance_id: 'pause-2',
       created: true,
@@ -185,23 +89,13 @@ describe('openManualPauseFromHome', () => {
       prior_open_instance_id: null,
     });
     const result = await openManualPauseFromHome(mockPorts(), {
-      userId: 'u1',
-      silentMode: false,
-      contextText: 'ctx',
-      silentMessage: 'BTC moved.',
+      ...baseParams,
       changePercent: 2,
-      trackedAssetId: 'bitcoin',
-      severityBand: 'mild',
-      fearGreedLabel: null,
-      onChainBand: null,
-      fearGreed: null,
-      onChain: null,
     });
     expect(result).toMatchObject({
       outcome: 'opened',
       pendingOffer: true,
       silentStubPersisted: false,
     });
-    expect(runOpenManualPauseSilentModeAfterCreateMock).not.toHaveBeenCalled();
   });
 });

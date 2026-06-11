@@ -1,6 +1,5 @@
 // Sends an optional one-screen checkout-confirmation summary via email and/or
-// web push. Gated by `profiles.email_notifications` (per the user's preference
-// to reuse this single flag for both channels). Idempotent: dedup key is
+// web push. Idempotent: dedup key is `confirm:<userId>:<mode>:<bucket>` where
 // `confirm:<userId>:<mode>:<bucket>` where bucket is the calendar minute, so a
 // double-trigger from React StrictMode / refresh within the same minute will
 // still result in exactly one email and one push payload per device.
@@ -107,20 +106,6 @@ serve(
     if (!body || (body.mode !== "subscription" && body.mode !== "flex_pack_s" && body.mode !== "flex_pack_m")) {
       return new Response(JSON.stringify({ error: "Invalid body" }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("email_notifications, first_name")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    const notificationsOn = profile?.email_notifications !== false;
-    if (!notificationsOn) {
-      log("opted_out", { userId: user.id });
-      return new Response(JSON.stringify({ skipped: "opted_out", emailed: false, pushed: 0 }), {
-        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

@@ -1,15 +1,19 @@
 import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  SIGNAL_SOURCES_CATALOG_QUERY_KEY,
   deleteUserSignalPreference,
-  getSignalSourcesCatalogQueryOptions,
-  getUserSignalPreferencesQueryOptions,
   insertCatalogSignalPreference,
   insertCustomUserSignalPreference,
   updateUserSignalPreferenceActive,
+} from '@/legacy/settings-content-data/queries/user-signal-preferences-mutations';
+import {
+  getUserSignalPreferencesQueryOptions,
   USER_SIGNAL_PREFS_QUERY_KEY,
   type UserPref,
+} from '@/legacy/settings-content-data/queries/user-signal-preferences-query';
+import {
+  SIGNAL_SOURCES_CATALOG_QUERY_KEY,
+  getSignalSourcesCatalogQueryOptions,
 } from '@/features/user/public-queries';
 import { useAuth } from '@/features/auth/public';
 import { useTranslation } from 'react-i18next';

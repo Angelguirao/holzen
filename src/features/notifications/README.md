@@ -20,7 +20,7 @@ features/notifications/
   public.ts | public-queries.ts | public-hooks.ts
 ```
 
-**User** context still owns `profiles.email_notifications` and quiet hours; settings toggles call `useProfile` there.
+**User** context owns `profiles.snoozed_until` (Home snooze). Pause-offer email is always attempted when transactional email is configured; push follows device subscription.
 
 ## Shell
 

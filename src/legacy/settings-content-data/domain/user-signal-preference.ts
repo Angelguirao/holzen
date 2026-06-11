@@ -1,4 +1,4 @@
-/** Row shape for `user_signal_preferences` (settings signal sources). */
+/** Legacy row shape — `user_signal_preferences` dropped in pause-first schema cleanup. */
 export interface UserSignalPreference {
   id: string;
   source_id: string | null;
