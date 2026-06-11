@@ -212,10 +212,7 @@ export {
   companionUiCompletionQueryKey,
   getCompanionUiCompletionQueryOptions,
 } from './infrastructure/queries/companion/companion-ui-completion-query';
-export {
-  companionUiCompletionQueryKey,
-  invalidateCompanionUiCompletionQuery,
-} from './infrastructure/queries/companion/companion-ui-completion-query-key';
+export { invalidateCompanionUiCompletionQuery } from './infrastructure/queries/companion/companion-ui-completion-query-key';
 export {
   EMPTY_COMPANION_UI_COMPLETION,
   loadCompanionUiCompletionState,

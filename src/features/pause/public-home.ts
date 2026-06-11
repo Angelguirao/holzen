@@ -30,8 +30,10 @@ export type {
   HomePauseWidgetBodyProjection,
 } from './domain/home/home-pause-widget-projection-types';
 export {
-  resolveHomePauseWidgetSurface,
   homePauseWidgetSectionTitleKey,
+  homePauseWidgetSurfaceIsManualCooldownFirstPause,
+  homePauseWidgetSurfaceIsManualCooldownWithArchive,
+  resolveHomePauseWidgetSurface,
   type HomePauseWidgetSurface,
 } from './domain/home/home-pause-widget-surface';
 export { hasReachedReflectForHome } from './domain/home/has-reached-reflect-for-home';
@@ -93,16 +95,7 @@ export {
 } from './presentation/home/home-screen-telemetry-io';
 export type { HomePauseWidgetPreviewLine } from './domain/home/resolve-home-pause-widget-preview-line';
 export type { HomePauseMarketBlock } from './domain/home/format-home-pause-market-block';
-export {
-  homePauseWidgetSectionTitleKey,
-  resolveHomePauseWidgetSurface,
-  type HomePauseWidgetSurface,
-} from './domain/home/home-pause-widget-surface';
 export { computeManualCooldownReadyAtMs } from './domain/reflect/generation/compute-pause-trigger-cooldowns';
-export {
-  homePauseWidgetSurfaceIsManualCooldownFirstPause,
-  homePauseWidgetSurfaceIsManualCooldownWithArchive,
-} from './domain/home/home-pause-widget-surface';
 export { useHomePauseHelpFeedback } from './presentation/home/use-home-pause-help-feedback';
 export {
   isPauseOpenMaxExpired,
