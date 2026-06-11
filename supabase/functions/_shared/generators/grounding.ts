@@ -24,7 +24,6 @@ import {
 } from "../fallbacks.ts";
 import { type CacheServeRelaxation, parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger, trackEvent } from "../observe.ts";
-import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import {
   type LlmBudgetTier,
@@ -587,16 +586,6 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
       log(`cache write failed: ${e}`);
     }
   }
-
-  const suggestName =
-    (nudge.citation && nudge.citation.split("(")[0]?.trim()) ||
-    nudge.title;
-  void enqueueCatalogSourceSuggestion(svcClient, {
-    category: "grounding",
-    name: suggestName,
-    url: nudge.url,
-    pauseInstanceId,
-  });
 
   // ── Step 6: Background URL validation (fire-and-forget) ──
   if (nudge.url && nudge.url.startsWith("http")) {

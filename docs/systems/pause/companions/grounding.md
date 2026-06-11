@@ -26,7 +26,7 @@ Grounding also serves as the **data source for trap interventions**: when `selec
 
 | Input | Source | Role |
 |--------|--------|------|
-| **`groundingSources`** | `grounding_sources` + user prefs (`loadActiveOrchestrateSources('grounding')` in `companion-orchestrate-sources.ts`) | Optional **catalog**: names + URLs → hostnames for Perplexity **domain filter**. |
+| **`groundingSources`** | `signal_sources` catalog, category `grounding` (`loadActiveOrchestrateSources('grounding')`) | Optional **catalog**: names + URLs → hostnames for Perplexity **domain filter**. Same global admin catalog as Signal; no per-user prefs. |
 | **`recentGroundingSources`** | `localStorage` keys + DB merge | Dedup: avoid repeating same sources across recent pauses. |
 | **`recentNudgeTopics`** | Recent grounding titles from `pause_ai_artifacts` | Dedup: avoid repeating same bias topics. |
 | **`context`** | BTC + Fear & Greed + on-chain line | Grounds the bias selection in the current market move. |

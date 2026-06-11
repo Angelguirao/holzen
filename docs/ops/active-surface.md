@@ -116,7 +116,7 @@ Listed in `supabase/config.toml` `[functions.*]` and `src/screens/ops/EdgeCovera
 
 ## Postgres — Tier C (shipped)
 
-`pause_*`, trimmed `profiles`, `notifications`, `roadmap_items` / `roadmap_votes`, **`companion_catalog`** (curated companion pool; renamed from `content_library`), `companion_cache`, `companion_serves`, `companion_fallbacks`, `generation_attempts`, `signal_sources`, `user_signal_preferences`, `signal_source_suggestions`, `quiet_windows`, Stripe/credits, `market_price_cache`, email infra, `audit_log`, `app_config`.
+`pause_*`, trimmed `profiles`, `notifications`, `roadmap_items` / `roadmap_votes`, **`companion_catalog`** (curated companion pool; renamed from `content_library`), `companion_cache`, `companion_serves`, `companion_fallbacks`, `generation_attempts`, **`signal_sources`** (admin catalog for Signal/Grounding allowlists), Stripe/credits, `market_price_cache`, email infra, `audit_log`, `app_config`.
 
 ## Postgres — Tier D dropped (zombie schema cleanup)
 
@@ -135,6 +135,16 @@ Migration `20260610210000_pause_first_referral_schema_cleanup.sql`:
 | `referrals`, `referral_rewards`, `referral_pending_jobs` | Invite-friends program + cron worker | Restore from pre-cleanup migration history; see `src/legacy/referrals/README.md` |
 | `profiles.referral_code`, `profiles.referred_by` | Referral link + attribution | Same migration rollback path |
 | `claim_referral_pending_jobs` | Queue worker RPC | Same |
+
+Migration `20260611180000_pause_first_legacy_settings_schema_cleanup.sql`:
+
+| Dropped | Was | Recovery |
+| --- | --- | --- |
+| `quiet_windows` | Extended quiet-hours schedules (Settings) | Home **`profiles.snoozed_until`** snooze only |
+| `user_signal_preferences` | Per-user source toggles + custom URLs | Global **`signal_sources`** catalog only; legacy UI in `src/legacy/settings-content-data/` |
+| `signal_source_suggestions` | Admin queue from live Signal/Ground citations | Manual catalog CRUD in **Admin → Sources** |
+| `changelog_entries` | What's New / version sync | `package.json` semver + `VITE_APP_VERSION`; legacy UI in `src/legacy/settings-changelog/` |
+| `profiles` columns | `email_notifications`, `reflection_*`, `custom_prompt`, `quiet_hours_*`, `silent_mode` | Removed from active Settings; see legacy modules |
 
 ## Postgres — Tier E (schema hygiene)
 

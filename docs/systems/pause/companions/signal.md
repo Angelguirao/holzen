@@ -25,7 +25,7 @@ Signal is **not** a primary **intervention** type (mirror / trap / pattern / que
 
 | Input | Source | Role |
 |--------|--------|------|
-| **`signalSources`** | `signal_sources` + `user_signal_preferences` (`loadActiveOrchestrateSources('signal')` in `companion-orchestrate-sources.ts`) | Optional **catalog**: names + URLs → hostnames for Perplexity **allowlist** when URLs exist. |
+| **`signalSources`** | `signal_sources` catalog (`loadActiveOrchestrateSources('signal')` in `orchestrate-sources.ts` / cron parity) | Optional **catalog**: names + URLs → hostnames for Perplexity **allowlist** when URLs exist. Admin adds rows via **Admin → Sources**; no per-user prefs or auto-suggestion queue (dropped `20260611180000`). |
 | **`recentSignalTitles` / `recentSignalSources` / `recentSignalUrls`** | `localStorage` keys `holzen_recent_signal_*` (`getRecencyHints` in `companion-recency-hints.ts`) | Dedup: do not repeat same **titles**, **attribution strings**, or **citation URLs** across recent pauses on this browser. |
 | **`context`** | BTC + Fear & Greed + on-chain line (same suffix as reflection) | Grounds the **search query** in the current move. |
 | **`searchAngle`** | `determineSessionIntent()` → **`signalAngle`** (`session-intent.ts`) | Aligns Signal thematically with the rest of the pause session. |
@@ -105,7 +105,7 @@ Engineering and product options to revisit when repetition or quality still feel
 
 - **Stricter URL policy** — Harder rules on YouTube or other hosts; per-host frequency caps in prompts or post-filtering.
 - **Phase tuning** — Adjust `COMPANION_PHASE_*` env vars to disable live generation for some deployments, or disable library/cache to force fresh AI content.
-- **Analytics-driven tuning** — Use **`companion_serves`** / fingerprints to spot dominant domains or titles and feed that into exclusions or catalog suggestions.
+- **Analytics-driven tuning** — Use **`companion_serves`** / fingerprints to spot dominant domains or titles and feed that into exclusions or **manual admin catalog** updates (`signal_sources`).
 - **User-visible controls** — Narrower “only these sources” vs “surprise me” modes change the diversity–predictability tradeoff by design.
 - **Faster dedup path** — One Postgres RPC or a single query with a join (instead of two round trips) for recent Signal URLs; watch **`.in(pause_instance_id, …)`** size if the pause window grows very large.
 
