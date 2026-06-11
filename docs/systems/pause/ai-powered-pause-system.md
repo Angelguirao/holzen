@@ -117,9 +117,9 @@ If two rows in the reference table below look “duplicated,” check whether th
 **B. Guards: when a pause is allowed**
 
 - **Manual:** A **short client cooldown** (1 hour in production, 5 seconds in dev) so repeated taps do not hammer APIs. There is **no** “market must have moved X%” rule—you already decided to pause. A **normal** manual pause does **not** advance **`profiles.last_trigger_at`** (your **automatic** cooldown is not consumed by a voluntary pause). **Silent mode** is special: it is meant to align with **trigger-like** behavior (see product rules in code). Manual path does **not** update **`profiles.last_context`** (cron-only delivery field).
-- **Automatic:** Per-profile **thresholds** (`threshold` / `threshold_down`, `cumulative_threshold`), `**cooldown_hours`**, quiet hours (timezone + `**quiet_windows`**), `**snoozed_until**`, plus **optimistic claiming** on `**last_trigger_at`** so two workers do not double-fire.
+- **Automatic:** Per-profile **thresholds** (`threshold` / `threshold_down`), **context fingerprint** idempotency (open-pause reuse / `pending` offers), quiet hours (timezone + `**quiet_windows`**), `**snoozed_until**`, plus **`claim_trigger_slot`** stamping `**last_trigger_at`** (audit + double-worker guard; **not** a time cooldown).
 
-*Why:* proactive interrupts need **strong anti-spam** rules. Voluntary pauses need a **light** throttle only. Splitting `**last_trigger_at*`* avoids punishing automatic cadence when someone reflects manually.
+*Why:* proactive interrupts need **regime-based** anti-spam (threshold + fingerprint), not an arbitrary hours-between-pauses timer. Voluntary pauses use a **separate** short client cooldown only.
 
 ---
 
@@ -211,7 +211,7 @@ Up to **five** recent haikus and **five** recent reflect-step **messages** (from
 | --------------------- | ---------------------------------------------- | -------------------------------------------------------------------------- |
 | **Entry**             | `HolzenProvider.tsx` / `use-holzen-home-context-state.ts` (`features/pause/presentation/`) | `check-volatility/index.ts`                                                |
 | **BTC + suffix**      | `fetchBtcData` + `pause-context-suffix`        | CoinGecko per currency + one F&G / on-chain per run + same suffix module   |
-| **Cooldown / gates**  | Short client cooldown; no volatility gate      | Thresholds, `cooldown_hours`, quiet hours, snooze, `last_trigger_at` claim |
+| **Cooldown / gates**  | Short client cooldown; no volatility gate      | Thresholds, fingerprint, quiet hours, snooze, open-pause reuse; `last_trigger_at` audit stamp |
 | **Reflection AI**     | At **Reflect** (browser): `holzen-reflect` → `generateUnifiedReflection` | Pause row on claim; **reflection LLM** in browser (hook on through **Decide**, **Frame** + second **Breathe** included), same path as manual |
 | **Orchestrator auth** | User JWT                                       | User JWT in **`PauseSession`** after claim (**no** service-role **`companion-orchestrate`** from **`check-volatility`** in Pause V2) |
 | **Notifications**     | In-app                                         | Push / email / unified `notifications` (legacy `pause_notifications` removed) |

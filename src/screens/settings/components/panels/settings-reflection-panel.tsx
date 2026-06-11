@@ -18,8 +18,6 @@ export function SettingsReflectionPanel() {
     setThreshold,
     thresholdDown,
     setThresholdDown,
-    cooldownHours,
-    setCooldownHours,
     reflectionTone,
     setReflectionTone,
     reflectionStyle,
@@ -57,54 +55,8 @@ export function SettingsReflectionPanel() {
         onSetUp={setThreshold}
         thresholdDown={thresholdDown}
         onSetDown={setThresholdDown}
-        cooldownHours={cooldownHours}
         trackedAssetId={trackedAssetId}
       />
-
-      <div className="space-y-3 text-sm font-sans">
-        <p id="settings-cooldown-label" className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">
-          {t('settings.cooldown')}
-        </p>
-        <p className="leading-relaxed text-sm text-secondary-foreground">{t('settings.cooldownDesc')}</p>
-        <section
-          role="note"
-          aria-labelledby="settings-cooldown-help-title"
-          aria-describedby="settings-cooldown-help-body"
-          className="space-y-1 rounded-md border border-border/50 bg-muted/20 px-3 py-2"
-        >
-          <h3 id="settings-cooldown-help-title" className="text-sm font-medium text-secondary-foreground">
-            {t('settings.cooldownHelpTitle', { defaultValue: 'Cooldown help' })}
-          </h3>
-          <p id="settings-cooldown-help-body" className="text-sm leading-relaxed text-muted-foreground">
-            {t(
-              'settings.cooldownHelpBody',
-              'After an automatic pause, Holzen waits before sending another one. You can set this wait between 6 and 24 hours: shorter means more frequent pauses, longer means more quiet time.',
-            )}
-          </p>
-        </section>
-        <fieldset
-          className="m-0 grid min-w-0 grid-cols-4 gap-2 border-0 p-0"
-          aria-describedby="settings-cooldown-help-body"
-        >
-          <legend id="settings-cooldown-label" className="sr-only">
-            {t('settings.cooldownLabel', { defaultValue: 'Cooldown between pauses' })}
-          </legend>
-          {([1, 6, 12, 24] as const).map((h) => (
-            <button
-              type="button"
-              key={h}
-              onClick={() => setCooldownHours(h)}
-              className={`rounded-md border px-3 py-2 text-center transition-colors ${
-                cooldownHours === h
-                  ? 'border-ring bg-muted/40 text-foreground'
-                  : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <p className="text-base font-sans">{h}h</p>
-            </button>
-          ))}
-        </fieldset>
-      </div>
 
       <ProLock feature="tone">
         <div className="space-y-3">

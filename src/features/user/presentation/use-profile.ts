@@ -8,7 +8,6 @@ import { holzenLog } from '@/lib/holzen-console';
 import type { CompanionPrefs } from '@/features/pause/public-hooks';
 import { normalizeTrackedAssetId } from '@/features/market/public';
 import {
-  fetchProfileLastTriggerAt,
   fetchProfileRowForUser,
   getProfileRowQueryOptions,
   PROFILE_QUERY_KEY,
@@ -55,7 +54,6 @@ export function useProfile() {
     silentModeCommitted,
     (_current, next: boolean) => next,
   );
-  const [cooldownHours, setCooldownHoursState] = useState(6);
   const [customPrompt, setCustomPromptState] = useState<string | null>(null);
   const [reflectionStyleCommitted, setReflectionStyleCommitted] = useState('standard');
   const [reflectionStyle, addOptimisticReflectionStyle] = useOptimistic(
@@ -148,7 +146,6 @@ export function useProfile() {
       setThresholdDownState(row.threshold_down ?? row.threshold);
       setEmailNotificationsCommitted(row.email_notifications ?? true);
       setReflectionToneCommitted(row.reflection_tone ?? 'stoic');
-      setCooldownHoursState(row.cooldown_hours ?? 6);
       setSilentModeCommitted(row.silent_mode ?? false);
       setCustomPromptState(row.custom_prompt ?? null);
       setReflectionStyleCommitted(row.reflection_style ?? 'standard');
@@ -349,14 +346,6 @@ export function useProfile() {
     );
   }, [user, queryClient, t]);
 
-  const isInCooldown = useCallback(async () => {
-    if (!user) return true;
-    const lastTriggerAt = await fetchProfileLastTriggerAt(user.id);
-    if (!lastTriggerAt) return false;
-    const cooldownMs = cooldownHours * 60 * 60 * 1000;
-    return Date.now() - new Date(lastTriggerAt).getTime() < cooldownMs;
-  }, [user, cooldownHours]);
-
   const isInQuietHours = useCallback(() => {
     if (quietHoursStart === null || quietHoursEnd === null) return false;
     const nowHour = new Date().getHours();
@@ -366,16 +355,7 @@ export function useProfile() {
     return nowHour >= quietHoursStart || nowHour < quietHoursEnd;
   }, [quietHoursStart, quietHoursEnd]);
 
-  const setCooldownHours = useCallback(async (val: number) => {
-    setCooldownHoursState(val);
-    if (!user) return;
-    const { error } = await updateProfileFields(user.id, { cooldown_hours: val });
-    if (!error) invalidateProfileQuery();
-  }, [user, invalidateProfileQuery]);
-
   return {
-    /** From cached `profiles.last_trigger_at` — automatic pause cooldown anchor. */
-    lastTriggerAt: profileRow?.last_trigger_at ?? null,
     threshold,
     setThreshold,
     thresholdDown,
@@ -386,8 +366,6 @@ export function useProfile() {
     setReflectionTone,
     silentMode,
     setSilentMode,
-    cooldownHours,
-    setCooldownHours,
     customPrompt,
     setCustomPrompt: async (val: string | null) => {
       setCustomPromptState(val);
@@ -517,7 +495,6 @@ export function useProfile() {
     hasOnboarded,
     saveOnboardingDraft,
     completeOnboarding,
-    isInCooldown,
     isInQuietHours,
   };
 }

@@ -24,14 +24,7 @@ export function useHomePauseWidgetInputs(
   deps: UseHomePauseWidgetScreenDeps,
 ): HomePauseWidgetProjectionContext {
   const { user } = useAuth();
-  const {
-    companionPrefs,
-    cooldownHours,
-    trackedAssetId,
-    threshold,
-    thresholdDown,
-    profileLastTriggerAt,
-  } = useProfile();
+  const { companionPrefs, trackedAssetId, threshold, thresholdDown } = useProfile();
 
   const {
     loading: subLoading,
@@ -62,7 +55,6 @@ export function useHomePauseWidgetInputs(
     dismissOpenPauseFromWidget,
     manualTrigger,
     manualCooldownRemaining,
-    autoCooldownRemaining,
     nextCronCheckIn,
     resyncOpenPauseFromDb,
   } = usePauseHomeContext();
@@ -125,13 +117,10 @@ export function useHomePauseWidgetInputs(
       marketData,
       showPauseScheduling,
       completedPauseCount,
-      profileLastTriggerAt,
       newPauseArrival,
       trackedAssetId,
       threshold,
       thresholdDown,
-      cooldownHours,
-      autoCooldownRemaining,
       nextCronCheckIn,
       manualCooldownRemaining,
       resyncOpenPauseFromDb,
@@ -173,13 +162,10 @@ export function useHomePauseWidgetInputs(
       marketData,
       showPauseScheduling,
       completedPauseCount,
-      profileLastTriggerAt,
       newPauseArrival,
       trackedAssetId,
       threshold,
       thresholdDown,
-      cooldownHours,
-      autoCooldownRemaining,
       nextCronCheckIn,
       manualCooldownRemaining,
       resyncOpenPauseFromDb,

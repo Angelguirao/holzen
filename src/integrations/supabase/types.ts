@@ -1217,7 +1217,6 @@ export type Database = {
           companion_history: boolean
           companion_signal: boolean
           companion_zoom_out: boolean
-          cooldown_hours: number
           created_at: string
           custom_prompt: string | null
           email_notifications: boolean
@@ -1257,7 +1256,6 @@ export type Database = {
           companion_history?: boolean
           companion_signal?: boolean
           companion_zoom_out?: boolean
-          cooldown_hours?: number
           created_at?: string
           custom_prompt?: string | null
           email_notifications?: boolean
@@ -1297,7 +1295,6 @@ export type Database = {
           companion_history?: boolean
           companion_signal?: boolean
           companion_zoom_out?: boolean
-          cooldown_hours?: number
           created_at?: string
           custom_prompt?: string | null
           email_notifications?: boolean
@@ -2567,7 +2564,7 @@ export type Database = {
         Returns: Json
       }
       claim_trigger_slot: {
-        Args: { _cooldown_hours: number; _user_id: string }
+        Args: { _user_id: string }
         Returns: boolean
       }
       consume_feature_allowance_or_credits: {

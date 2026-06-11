@@ -33,9 +33,7 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
     silentMode,
     currency,
     trackedAssetId: profileTrackedAssetId,
-    cooldownHours,
     profileLoaded,
-    lastTriggerAt: profileLastTriggerAt,
   } = profile;
 
   const marketQuery = useQuery(
@@ -95,17 +93,14 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
     setLastPauseInstanceId,
   });
 
-  const { manualTrigger, manualCooldownRemaining, autoCooldownRemaining } =
-    useHolzenManualTriggerOrchestration({
-      user,
-      profileTrackedAssetId,
-      currency,
-      cooldownHours,
-      lastTriggerAt: profileLastTriggerAt,
-      queryClient,
-      generateMessage,
-      setError,
-    });
+  const { manualTrigger, manualCooldownRemaining } = useHolzenManualTriggerOrchestration({
+    user,
+    profileTrackedAssetId,
+    currency,
+    queryClient,
+    generateMessage,
+    setError,
+  });
 
   const nextCronCheckIn = useCallback(() => millisecondsUntilNextVolatilityCheck(), []);
   const { pending, refresh: refreshPendingOffer } = usePendingPauseOffer();
@@ -192,7 +187,6 @@ export function useHolzenHomeContextState(): PauseHomeContextValue {
     dismissOpenPauseFromWidget,
     manualTrigger,
     manualCooldownRemaining,
-    autoCooldownRemaining,
     nextCronCheckIn,
     resyncOpenPauseFromDb: syncOpenPauseFromDb,
   };

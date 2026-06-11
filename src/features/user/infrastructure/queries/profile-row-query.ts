@@ -15,7 +15,7 @@ export {
 export type { ProfileRow } from '@/features/user/domain/user-profile-row';
 
 const PROFILE_SELECT_COLUMNS =
-  'threshold, threshold_down, last_context, email_notifications, has_onboarded, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, motivations, mantra, display_currency, tracked_asset_id, language, grounding_activities, created_at, snoozed_until, is_admin';
+  'threshold, threshold_down, last_context, email_notifications, has_onboarded, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, reflection_tone, last_trigger_at, silent_mode, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, motivations, mantra, display_currency, tracked_asset_id, language, grounding_activities, created_at, snoozed_until, is_admin';
 
 /**
  * Loads (or creates) the caller's `profiles` row. Used as a single `queryFn` so all

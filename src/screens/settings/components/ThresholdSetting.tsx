@@ -10,13 +10,12 @@ interface Props {
   onSetUp: (val: number) => void;
   thresholdDown: number;
   onSetDown: (val: number) => void;
-  cooldownHours?: number;
   /** CoinGecko coin id for volatility frequency estimates. */
   trackedAssetId?: string;
 }
 
 export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function ThresholdSetting(
-  { thresholdUp, onSetUp, thresholdDown, onSetDown, cooldownHours, trackedAssetId = 'bitcoin' },
+  { thresholdUp, onSetUp, thresholdDown, onSetDown, trackedAssetId = 'bitcoin' },
   ref
 ) {
   const { t } = useTranslation();
@@ -31,7 +30,6 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
       <ThresholdFrequencyEstimator
         thresholdUp={upVal}
         thresholdDown={downVal}
-        cooldownHours={cooldownHours}
         coinId={trackedAssetId}
       />
 

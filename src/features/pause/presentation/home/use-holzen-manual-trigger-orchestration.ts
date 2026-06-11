@@ -4,6 +4,7 @@ import type { User } from '@supabase/supabase-js';
 import type { MarketQuote } from '@/features/market/public';
 import { fetchMarketData, getHolzenMarketDisplayQueryOptions } from '@/features/market/public';
 import { isHolzenDevMode } from '@/features/market/public';
+import { holzenLog } from '@/lib/holzen-console';
 import {
   buildManualTriggerCooldownStorageKey,
   computeManualCooldownRemainingMs,
@@ -24,8 +25,6 @@ export type UseHolzenManualTriggerOrchestrationParams = {
   user: User | null;
   profileTrackedAssetId: string;
   currency: string;
-  cooldownHours: number;
-  lastTriggerAt: string | null;
   queryClient: QueryClient;
   generateMessage: (
     data: MarketQuote,
@@ -43,30 +42,23 @@ export function useHolzenManualTriggerOrchestration({
   user,
   profileTrackedAssetId,
   currency,
-  cooldownHours,
-  lastTriggerAt,
   queryClient,
   generateMessage,
   setError,
 }: UseHolzenManualTriggerOrchestrationParams) {
   const manualCooldownKey = buildManualTriggerCooldownStorageKey(user?.id);
-  const [lastManualAt, setLastManualAt] = useState<number | null>(null);
+  const [lastManualAt, setLastManualAt] = useState<number | null>(() =>
+    readManualTriggerCooldownAtMs(manualCooldownKey),
+  );
 
   useEffect(() => {
     setLastManualAt(readManualTriggerCooldownAtMs(manualCooldownKey));
   }, [manualCooldownKey]);
 
   useEffect(() => {
-    const onStorage = (e: StorageEvent) => {
-      const parsed = parseManualTriggerCooldownFromStorageEvent(
-        {
-          key: e.key,
-          storageArea: e.storageArea === window.localStorage ? 'localStorage' : null,
-          newValue: e.newValue,
-        },
-        manualCooldownKey,
-      );
-      if (parsed === 'ignore') return;
+    const onStorage = (event: StorageEvent) => {
+      const parsed = parseManualTriggerCooldownFromStorageEvent(event, manualCooldownKey);
+      if (parsed == null) return;
       setLastManualAt(parsed);
     };
     window.addEventListener('storage', onStorage);
@@ -77,8 +69,6 @@ export function useHolzenManualTriggerOrchestration({
     () => computeManualCooldownRemainingMs(lastManualAt),
     [lastManualAt],
   );
-
-  const autoCooldownRemaining = useCallback(() => 0, []);
 
   const manualTrigger = useCallback(
     async (
@@ -124,8 +114,9 @@ export function useHolzenManualTriggerOrchestration({
       profileTrackedAssetId,
       queryClient,
       setError,
+      user?.id,
     ],
   );
 
-  return { manualTrigger, manualCooldownRemaining, autoCooldownRemaining };
+  return { manualTrigger, manualCooldownRemaining };
 }

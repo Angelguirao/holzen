@@ -82,7 +82,6 @@ interface VolatilityProfile {
   display_currency?: string | null;
   email_notifications?: boolean | null;
   last_trigger_at?: string | null;
-  cooldown_hours?: number | null;
   reflection_tone?: string | null;
   companion_haiku?: boolean | null;
   companion_grounding?: boolean | null;
@@ -171,7 +170,7 @@ serve(
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select(
-        "user_id, threshold, threshold_down, display_currency, tracked_asset_id, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
+        "user_id, threshold, threshold_down, display_currency, tracked_asset_id, email_notifications, last_trigger_at, reflection_tone, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
       );
 
     if (profilesError) throw profilesError;
@@ -479,7 +478,7 @@ serve(
       // Stamp last_trigger_at for audit; pause_create_or_reuse_as handles open-offer idempotency.
       const { data: claimed, error: claimError } = await supabase.rpc(
         "claim_trigger_slot",
-        { _user_id: profile.user_id, _cooldown_hours: profile.cooldown_hours ?? 6 },
+        { _user_id: profile.user_id },
       );
       if (claimError) {
         log.error("check_volatility_claim", {

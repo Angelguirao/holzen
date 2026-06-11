@@ -23,8 +23,6 @@ describe('buildZenModeHomeRouteProps', () => {
       showLimitUpsell: false,
       entitlement: 'active',
       showPauseScheduling: true,
-      autoCooldownRemaining: () => 0,
-      cooldownHours: 4,
       nextCronCheckIn: () => 1000,
       manualCooldownRemaining: () => 0,
       checkoutLoading: false,

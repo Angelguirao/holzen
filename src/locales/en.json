@@ -391,7 +391,6 @@
     "overview": {
       "title": "Journey",
       "subtitle": "Your pause rhythm at a glance.",
-      "archiveCta": "Open your pause library",
       "presence": {
         "label": "Presence",
         "footnote": "Lifetime practice XP",
@@ -1138,7 +1137,7 @@
       "companions": "5 AI Companions",
       "companionsDesc": "Haiku, Signal, Grounding, Zoom Out, and Look Back — different angles on the same pause, ready to explore",
       "detection": "Smart detection",
-      "detectionDesc": "Separate up/down thresholds, 24h + 7-day cumulative, configurable cooldown",
+      "detectionDesc": "Separate up/down thresholds on 24h moves, plus quiet hours and snooze when you need silence",
       "mood": "Emotional tracking",
       "moodDesc": "8 states from FOMO to detachment, tags, notes, and outcome logging on each pause",
       "grounding": "Personal grounding",
@@ -2473,8 +2472,8 @@
     "confirm": "Confirm",
     "estimator": {
       "avg": "Average daily move: {{avg}}%",
-      "raw": "{{raw}} signals detected · {{filtered}} filtered by {{cooldown}}h cooldown",
-      "result": "Estimated triggers per month: {{count}}"
+      "note": "Estimate uses threshold breaches only. Quiet hours, snooze, and open-pause reuse reduce real alerts.",
+      "result": "You'd have paused ~{{count}} times last month"
     }
   },
   "changelog": {

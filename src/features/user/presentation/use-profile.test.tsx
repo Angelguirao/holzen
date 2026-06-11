@@ -70,7 +70,6 @@ function buildProfileRow(overrides: Partial<ProfileRow> = {}): ProfileRow {
     companion_zoom_out: true,
     companion_history: true,
     reflection_tone: 'stoic',
-    cooldown_hours: 6,
     last_trigger_at: null,
     silent_mode: false,
     custom_prompt: null,

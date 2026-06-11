@@ -163,7 +163,7 @@ If **Signal** hits **3** Perplexity requests (retries) and **Grounding** hits **
 ### 6.1 What the product actually limits
 
 - **`check-volatility`** runs **hourly** (see [cron-setup.md](../../ops/cron-setup.md)); each tick only **evaluates** users — it does **not** mean one new pause per user every hour.
-- **Automatic** pauses require thresholds **and** passing quiet hours, snooze, and “one open cron offer” rules (profile **`cooldown_hours`** no longer gates cron offers as of 2026-06). In sustained volatile markets, cost is bounded mainly by how often conditions actually align — not by scan cadence alone.
+- **Automatic** pauses require thresholds **and** passing quiet hours, snooze, fingerprint / open-offer reuse rules (no profile time cooldown). In sustained volatile markets, cost is bounded mainly by how often conditions actually align — not by scan cadence alone.
 - **Manual** pauses: each full flow does **reflection** (`pause_ai_call`) + **orchestrate**. `companion-orchestrate` uses `checkRateLimit` (**30** allowlisted AI events per **60** minutes per user). That caps **combined** frequency with other features that emit the same events (see `ratelimit.ts` allowlist).
 
 So “unlimited pauses” in product terms still has a **practical ceiling** from rate limits and from how often a user actually completes sessions.
