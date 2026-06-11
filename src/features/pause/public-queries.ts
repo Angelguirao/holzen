@@ -2,7 +2,6 @@
  * Pause TanStack query modules (imports Supabase). App hooks/screens only —
  * other features should use `@/features/pause/public` (no eager Supabase).
  */
-export { getArchivePausesTabHasRowsQueryOptions } from './infrastructure/queries/archive/archive-pauses-tab-query';
 export {
   COMPLETED_PAUSE_COUNT_QUERY_KEY,
   fetchCompletedPauseCount,
@@ -36,7 +35,6 @@ export {
   type PendingPauseOfferRow,
 } from './infrastructure/queries/reflect/pending-offer/pending-pause-offer-query';
 export {
-  type PauseArchiveListSort,
   type PauseArchiveRow,
   type PauseArchiveSegment,
 } from './infrastructure/queries/archive/archive-list-query';
@@ -261,14 +259,6 @@ export {
   relatedBiasesGroundNudgeQueryKey,
 } from './infrastructure/queries/related-biases-ground-nudge-query';
 export { loadActiveOrchestrateSources } from './infrastructure/companion/orchestrate-sources';
-export {
-  fetchSettingsDataExportBundle,
-  type SettingsDataExportBundle,
-  type SettingsExportAiArtifact,
-  type SettingsExportCompanionEvent,
-  type SettingsExportPauseRow,
-  type SettingsExportStepEvent,
-} from './infrastructure/queries/settings-data-export-query';
 export {
   clearPostManualCooldownIdlePrompt,
   markPostManualCooldownIdlePrompt,

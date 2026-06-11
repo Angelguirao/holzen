@@ -1,5 +1,5 @@
 import type { PauseArchiveRow } from '@/features/pause/public-hooks';
-import type { ArchiveSortMode } from '@/screens/archive/lib/archive-screen-params';
+import type { ArchiveSortMode } from '@/legacy/archive-search-sort/lib/archive-screen-params';
 
 function sortKey(r: PauseArchiveRow): string {
   return r.terminal_at ?? r.created_at ?? '';
