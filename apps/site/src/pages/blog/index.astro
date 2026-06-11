@@ -1,0 +1,44 @@
+---
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
+import PublicFooter from '../../components/PublicFooter.astro';
+import { fetchAllPublishedBlogPosts, formatBlogDate } from '../../lib/blog';
+import en from '../../../../../src/locales/en.json';
+
+const blog = en.blog;
+const posts = await fetchAllPublishedBlogPosts();
+---
+
+<MarketingLayout
+  title="Holzen Blog — Bitcoin psychology, behavioral finance & self-awareness"
+  description="Articles on Bitcoin conviction, behavioral finance, and the art of pausing before you act. From the team behind Holzen."
+  canonicalPath="/blog"
+>
+  <article class="marketing-page">
+    <a class="back-link" href="/welcome">← {en.common.back}</a>
+    <h1 class="page-title">{blog.title}</h1>
+
+    {
+      posts.length > 0 ? (
+        <div class="blog-list">
+          {posts.map((post) => (
+            <a class="blog-card" href={`/blog/${post.slug}`}>
+              {post.published_at ? (
+                <p class="blog-date">{formatBlogDate(post.published_at)}</p>
+              ) : null}
+              <p class="blog-card-title">{post.title}</p>
+              {post.excerpt ? <p class="blog-card-excerpt">{post.excerpt}</p> : null}
+              <span class="blog-read">{blog.read} →</span>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <div class="prose-section">
+          <p class="blog-empty-title">{blog.nothingYet}</p>
+          <p class="blog-empty-desc">{blog.nothingDesc}</p>
+        </div>
+      )
+    }
+
+    <PublicFooter />
+  </article>
+</MarketingLayout>

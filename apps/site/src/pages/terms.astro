@@ -1,0 +1,18 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+import LegalDocument from '../components/LegalDocument.astro';
+import { termsCopy } from '../lib/legal-content';
+---
+
+<MarketingLayout
+  title={termsCopy.meta.title}
+  description={termsCopy.meta.description}
+  canonicalPath={termsCopy.meta.path}
+>
+  <LegalDocument
+    title={termsCopy.title}
+    subtitle={termsCopy.subtitle}
+    sections={termsCopy.sections}
+    closing={termsCopy.closing}
+  />
+</MarketingLayout>

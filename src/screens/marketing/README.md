@@ -1,23 +1,17 @@
 # Marketing / public screens
 
-Public routes (no auth shell). Shared marketing chrome: `components/PublicFooter.tsx`. Other section components under `components/`.
+Public routes (no auth shell). **Marketing HTML** (`/welcome`, `/about`, `/blog`, legal) is Astro — see `apps/site/`. This folder keeps SPA-only public flows.
 
-| `hooks/` | Route conductors (`use-auth-screen`, `use-reset-password-screen`, `use-unsubscribe-screen`) |
+| Screen | Route | Notes |
+|--------|-------|-------|
+| `MarketingDevFallback` | `/welcome`, `/about`, `/blog`, `/terms`, `/privacy` | Dev stub → Astro on :4321 |
+| `AuthScreen` | `/auth` | Product SPA |
+| `ResetPasswordScreen` | `/reset-password` | Product SPA |
+| `NotFoundScreen` | `*` catch-all | Product SPA |
+| `UnsubscribeScreen` | `/unsubscribe` | Product SPA |
+| ~~`AboutScreen`~~ etc. | — | **legacy** `src/legacy/marketing-spa-screens/` |
 
-| Screen | Route |
-|--------|-------|
-| `LandingScreen` | `/welcome` (and public entry) |
-| `AuthScreen` | `/auth` |
-| `AboutScreen` | `/about` |
-| `TermsScreen` | `/terms` |
-| `PrivacyScreen` | `/privacy` |
-| `ResetPasswordScreen` | `/reset-password` |
-| `NotFoundScreen` | `*` catch-all |
-| `BlogScreen` | `/blog` |
-| `BlogPostScreen` | `/blog/:slug` |
-| ~~`RoadmapScreen`~~ | `/roadmap` — **legacy** (`src/legacy/marketing-roadmap-reserve/`) |
-| ~~`ReserveScreen`~~ | `/reserve` — **legacy** (`src/legacy/marketing-roadmap-reserve/`) |
-| `UnsubscribeScreen` | `/unsubscribe` |
+`components/PublicFooter.tsx` — still used by quarantined legacy roadmap/reserve screens.
 
 `App.tsx` lazy-loads `screens/marketing/*Screen` directly.
 
