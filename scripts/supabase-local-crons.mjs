@@ -3,8 +3,8 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
-import { spawnSync } from "node:child_process";
 import { firstEnvValue, readDotenvFile } from "./parse-dotenv.mjs";
+import { runLocalSupabaseSqlFile } from "./supabase-local-db-query.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const localSupabaseDir = join(root, "supabase");
@@ -13,24 +13,12 @@ const rescheduleSqlPath = join(root, "scripts", "sql", "reschedule-local-active-
 const disableSqlPath = join(root, "scripts", "sql", "disable-local-active-crons.sql");
 const inspectSqlPath = join(root, "scripts", "sql", "inspect-local-active-crons.sql");
 
-function runSupabaseQuery(label, args) {
-  console.log(`\n▶ ${label}`);
-  const result = spawnSync("npx", ["supabase", "db", "query", "--local", ...args], {
-    cwd: root,
-    stdio: "inherit",
-    shell: process.platform === "win32",
-  });
-
-  if (result.status !== 0) {
-    console.error(`\n✗ ${label} failed (exit ${result.status ?? 1})`);
-    process.exit(result.status ?? 1);
-  }
-
-  console.log(`✓ ${label}`);
+function runSupabaseQuery(label, filePath) {
+  runLocalSupabaseSqlFile(label, filePath);
 }
 
 function inspectLocalCronJobs(label) {
-  runSupabaseQuery(label, ["--file", inspectSqlPath]);
+  runSupabaseQuery(label, inspectSqlPath);
 }
 
 function sqlLiteral(value) {
@@ -57,7 +45,7 @@ if (!cronSecret) {
     "Local CRON_SECRET not configured in supabase/.env.local, supabase/.env, or OS env.",
   );
   console.log("Disabling shipped local HTTP crons so the local DB does not call stale remote URLs.");
-  runSupabaseQuery("disable local active HTTP crons", ["--file", disableSqlPath]);
+  runSupabaseQuery("disable local active HTTP crons", disableSqlPath);
   inspectLocalCronJobs("inspect local active HTTP crons");
   process.exit(0);
 }
@@ -114,8 +102,8 @@ const { tempDir, tempPath } = writeTempSql(secretBootstrapSql);
 
 try {
   console.log("Local CRON_SECRET detected; rewiring shipped local HTTP crons to the local gateway.");
-  runSupabaseQuery("bootstrap local cron secrets", ["--file", tempPath]);
-  runSupabaseQuery("rewire local active HTTP crons", ["--file", rescheduleSqlPath]);
+  runSupabaseQuery("bootstrap local cron secrets", tempPath);
+  runSupabaseQuery("rewire local active HTTP crons", rescheduleSqlPath);
   inspectLocalCronJobs("inspect local active HTTP crons");
 } finally {
   rmSync(tempDir, { recursive: true, force: true });
