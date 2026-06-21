@@ -46,4 +46,4 @@ Before publishing a new release:
 
 ## Legacy
 
-- **`changelog_entries` table** and in-app What's New changelog UI were removed in pause-first MVP (`20260611180000_pause_first_legacy_settings_schema_cleanup.sql`). Reference implementations live under `src/legacy/settings-changelog/`.
+- **`changelog_entries` table** and in-app What's New changelog UI were removed in the pause-first strip (`20260611180000_pause_first_legacy_settings_schema_cleanup.sql`). Reference implementations live under `src/legacy/settings-changelog/`.
