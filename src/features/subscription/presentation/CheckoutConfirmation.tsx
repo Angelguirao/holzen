@@ -934,7 +934,7 @@ export function CheckoutConfirmation() {
    * lets it through) covers the just-returned-from-Stripe happy path.
    */
 
-  // Fire-and-forget the optional email + push confirmation (no per-user email opt-out in MVP).
+  // Fire-and-forget the optional email + push confirmation (no per-user email opt-out in shipped scope).
   useEffect(() => {
     if (!mode) return;
     if (notifySentRef.current === mode) return;
