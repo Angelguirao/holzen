@@ -119,7 +119,7 @@ export function AppLayout() {
           </Alert>
         ) : null}
         <header className="sticky top-0 z-40 -mx-6 mb-10 grid grid-cols-[1fr_auto_1fr] items-center gap-x-2 border-b border-border bg-background/95 px-6 pt-4 pb-3 backdrop-blur-sm supports-[backdrop-filter]:bg-background/85">
-          <h1 className="justify-self-start text-sm font-mono tracking-[0.25em] uppercase" style={{ color: '#DBB366' }}>
+          <h1 className="justify-self-start text-sm font-mono tracking-[0.25em] uppercase text-nox-text-highlight">
             Holzen
           </h1>
           {centerNavLabel ? (

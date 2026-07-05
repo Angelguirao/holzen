@@ -1,0 +1,19 @@
+---
+import { landingCopy } from '../lib/landing-content';
+
+const { howItWorks } = landingCopy;
+---
+
+<ol class="how-steps">
+  {
+    howItWorks.map((step, index) => (
+      <li class="how-step">
+        <span class="how-step-num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+        <div class="how-step-body">
+          <h2 class="how-step-title">{step.title}</h2>
+          <p class="how-step-desc">{step.desc}</p>
+        </div>
+      </li>
+    ))
+  }
+</ol>

@@ -111,7 +111,7 @@ export const privacyCopy = {
     path: '/privacy',
   },
   title: 'Privacy Policy',
-  subtitle: 'Last updated: March 6, 2026',
+  subtitle: 'Last updated: July 5, 2026',
   sections: [
     {
       title: '1. What We Collect',
@@ -143,7 +143,9 @@ export const privacyCopy = {
     {
       title: '5. Cookies & Tracking',
       paragraphs: [
-        'Holzen does not use tracking cookies, analytics pixels, or any third-party tracking scripts. We use only essential session cookies required for authentication.',
+        'Holzen does not use third-party advertising cookies, analytics pixels, or cross-site tracking scripts.',
+        'On marketing pages (such as the waitlist landing), we collect your email address when you join the waitlist and increment a first-party daily page-view counter so we can measure interest. That data is stored on our infrastructure and is not sold or shared with advertisers.',
+        'In the signed-in app we use essential session cookies required for authentication. Optional product analytics may run inside the app under our privacy controls; the public marketing site does not load those scripts.',
       ],
     },
     {
