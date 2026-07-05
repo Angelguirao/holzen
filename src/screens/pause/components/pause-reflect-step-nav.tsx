@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
+import { isPauseReflectContinueDisabled } from '@/features/pause/public-ritual-reflect';
 import { pauseStepLayout } from '@/features/pause/public-session';
 import { Button } from '@/components/ui/button';
 import { PauseRitualBackRow } from '@/screens/pause/components/pause-ritual-back-row';
@@ -9,15 +10,17 @@ export type PauseReflectStepNavProps = {
   reflectionLoading: boolean;
   reflectionError: string | null;
   reflectionMessage: string;
+  reflectionContent?: import('@/features/pause/domain/reflect/generation/reflection-content-v2').ReflectionContentV2 | null;
   onContinue: () => void;
   onBack?: () => void;
 };
 
 /** Continue / back controls for the pause reflect ritual step. */
 export function PauseReflectStepNav({
-  reflectionLoading,
+  reflectionLoading: _reflectionLoading,
   reflectionError,
   reflectionMessage,
+  reflectionContent,
   onContinue,
   onBack,
 }: PauseReflectStepNavProps) {
@@ -37,7 +40,11 @@ export function PauseReflectStepNav({
           variant="outline"
           className={pauseStepLayout.ritualPrimaryOutlineCta}
           onClick={onContinue}
-          disabled={reflectionLoading || Boolean(reflectionError) || !reflectionMessage.trim()}
+          disabled={isPauseReflectContinueDisabled({
+            reflectionError,
+            reflectionMessage,
+            reflectionContent,
+          })}
         >
           {t('pause.steps.continue', { defaultValue: 'Continue' })}
           <ChevronRight className="ml-1 h-4 w-4" aria-hidden />

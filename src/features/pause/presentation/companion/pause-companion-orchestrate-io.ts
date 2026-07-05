@@ -24,11 +24,7 @@ import {
   type CompanionSlotCommitters,
   type CompanionSlotRelaxations,
 } from '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply';
-import { resetInterventionIdempotency } from '@/features/pause/application/use-cases/ritual/frame/intervention-idempotency';
-import {
-  runCompanionInterventionBootstrap,
-  type RunCompanionInterventionBootstrapPorts,
-} from '@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap';
+import { hydrateCompanionSlotsFromArtifactCache } from '@/features/pause/application/use-cases/ritual/frame/hydrate-companion-slots-from-artifact-cache';
 import { logCompanionSlotOrchestrateInvoke } from '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry';
 import { trackCompanionGenerationInitiated } from '@/features/pause/application/use-cases/ritual/frame/companion-generation-telemetry';
 import {
@@ -60,16 +56,14 @@ export type {
   CompanionSlotTransitionStarters,
   CompanionSlotOrchestrateMode,
   CompanionSlotRelaxations,
-  RunCompanionInterventionBootstrapPorts,
 };
 
 export {
   applyCompanionOrchestrateRetryReset,
   applyCompanionSlotOrchestrateOutcome,
   EMPTY_COMPANION_SLOT_RELAXATIONS,
+  hydrateCompanionSlotsFromArtifactCache,
   logCompanionSlotOrchestrateInvoke,
-  resetInterventionIdempotency,
-  runCompanionInterventionBootstrap,
   runCompanionSlotOrchestrate,
   setCompanionSlotError,
   setCompanionSlotLoading,

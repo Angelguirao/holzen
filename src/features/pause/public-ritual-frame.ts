@@ -5,10 +5,13 @@
  */
 export type { CompanionData, CompanionPrefs } from './domain/companion-card-types';
 export type { CachedHistoricalInsightShape } from './domain/historical-insight';
-export type {
-  InterventionState,
-  RegenerateCompanionSlot,
-} from './domain/companion-orchestrate';
+export { resolveHistoricalMarketInsight } from './domain/historical-insight';
+export { mergeHistoryMarketOverlay } from './application/use-cases/ritual/frame/historical-insight-payload';
+export { companionSlotHasDisplayableContent } from './domain/companion-slot-display-content';
+export type { SignalPayload } from './domain/signal-payload';
+export { normalizeSignalKeyIdeas } from './domain/signal-payload';
+export type { MarketOnThisDayEntry } from './domain/market-on-this-day';
+export type { RegenerateCompanionSlot } from './domain/companion-orchestrate';
 export type { CompanionFeedbackVote } from './application/use-cases/ritual/frame/log-companion-feedback-vote';
 export type {
   CompanionSlotCacheIds,
@@ -28,7 +31,6 @@ export {
   type CompanionSectionVisibility,
 } from './application/use-cases/ritual/frame/section-visibility';
 export { estimateReadTime } from './application/use-cases/ritual/frame/estimate-read-time';
-export { formatCompanionHistoryRelativeDay } from './application/use-cases/ritual/frame/format-companion-history-relative-day';
 export { zoomOutTotalCharsForReadTime } from './application/use-cases/ritual/frame/zoom-out-payload';
 export type {
   EchoUserWord,
@@ -37,10 +39,6 @@ export type {
   ZoomOutOnThisDayEntry,
 } from './domain/zoom-out-display';
 
-export {
-  useCompanionHistoryThread,
-  type HistoryThreadRow,
-} from './presentation/companion/use-companion-history-thread';
 export { useRelatedBiasesThisMonth } from './presentation/companion/use-related-biases-this-month';
 export { useCompanionFeedbackVote } from './presentation/companion/use-companion-feedback-vote';
 export { isCompanionRegenerateUiEnabled } from './presentation/companion/is-companion-regenerate-ui-enabled';
@@ -53,10 +51,6 @@ export {
   type UseCompanionOrchestrateSessionParams,
 } from './presentation/companion/use-companion-orchestrate-session';
 export {
-  useCompanionInterventionFetch,
-  type UseCompanionInterventionFetchParams,
-} from './presentation/companion/use-companion-intervention-fetch';
-export {
   useCompanionOrchestrateRetry,
   type UseCompanionOrchestrateRetryParams,
 } from './presentation/companion/use-companion-orchestrate-retry';
@@ -64,10 +58,6 @@ export {
   useCompanionSlotOrchestrateFailurePorts,
   type UseCompanionSlotOrchestrateFailurePortsParams,
 } from './presentation/companion/use-companion-slot-orchestrate-failure-ports';
-export {
-  useCompanionInterventionBootstrap,
-  type UseCompanionInterventionBootstrapParams,
-} from './presentation/companion/use-companion-intervention-bootstrap';
 export {
   useCompanionSlotRunOrchestrate,
   type UseCompanionSlotRunOrchestrateParams,
@@ -93,10 +83,6 @@ export {
   useCompanionSectionExpansion,
   type UseCompanionSectionExpansionParams,
 } from './presentation/companion/use-companion-section-expansion';
-export {
-  useGroundingEnrichment,
-  type GroundingEnrichment,
-} from './presentation/companion/use-grounding-enrichment';
 export { usePauseSessionCompanionSnapshot } from './presentation/companion/use-pause-session-companion-snapshot';
 export {
   useFullviewTelemetry,

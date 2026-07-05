@@ -14,7 +14,7 @@ All sends go through Supabase Edge Functions → [`transactional-email.ts`](../.
 |------|---------------|--------|
 | Auth (signup, magic link, reset, …) | `auth-email-hook` | Supabase **Send Email Hook** |
 | Welcome, checkout confirmation | `send-transactional-email` | Queued via `process-email-queue` |
-| Volatility pause offers | `check-volatility` → `notifications-deliver-pause-offer.ts` | Respects `profiles.email_notifications` |
+| Volatility pause offers | `check-volatility` → `notifications-deliver-pause-offer.ts` | Respects `profiles.email_notifications`; kill switch `PAUSE_VOLATILITY_EMAIL_ENABLED` (default on) |
 | Referral rewards | `record-referral` / `process-referral-pending` | |
 | Feedback copy | `send-feedback` | Optional if key set |
 | AI cost alerts | `ai-cost-alert` | Ops recipients in `app_config` |
@@ -36,6 +36,8 @@ Set in Dashboard → Edge Functions → Secrets, or via `npm run staging:secrets
 
 Use **restricted** Resend API keys when possible (send-only for edges, read-only for Cursor MCP).
 
+**Send-only keys** (`sending_access`) can deliver mail but **cannot** list domains, create webhooks, or use most Resend MCP management tools. Use a **full_access** key (or the Resend dashboard) once to create webhooks, then store only send-only keys on Supabase Edge.
+
 ---
 
 ## Email identity env vars (optional)
@@ -53,6 +55,9 @@ Read at runtime by [`email-env.ts`](../../supabase/functions/_shared/email-env.t
 | `EMAIL_ROOT_DOMAIN` | `holzen.app` | `holzen.app` (links in templates) |
 | `EMAIL_APP_URL` | `https://holzen.app` | `http://localhost:8080` or Vercel preview URL |
 | `EMAIL_FEEDBACK_INBOX` | `hello@holzen.app` | Same or a test inbox |
+| `PAUSE_VOLATILITY_EMAIL_ENABLED` | `true` (unset = on) | `false` to disable pause-offer email only |
+
+Set `PAUSE_VOLATILITY_EMAIL_ENABLED=false` in **Supabase Dashboard → Edge Functions → Secrets** (staging and/or prod) to stop “A moment to pause” mail without redeploying. Web push and in-app bell notifications are unchanged.
 
 Staging example (add to `.env.staging.secrets`):
 
@@ -126,6 +131,59 @@ The Resend MCP plugin is for **ops/debug** (domains, webhooks, logs). It does no
 ```sh
 npm run test   # includes src/test/shared/email-env.test.ts
 ```
+
+---
+
+## Local development
+
+Local email testing uses the same Edge functions as hosted environments, but there
+are two important differences:
+
+1. **Mail is still delivered via Resend**, not via local SMTP/Mailpit.
+2. **Supabase Auth Send Email Hook is not auto-wired locally** the same way your
+   hosted staging/prod projects are, so full auth-email end-to-end testing is
+   usually easier on staging.
+
+Recommended local setup:
+
+1. Start the local stack and functions:
+
+   ```sh
+   npm run supabase:start
+   npm run supabase:functions:serve
+   npm run dev:local
+   ```
+
+2. Ensure `supabase/.env.local` contains at least:
+
+   ```env
+   RESEND_API_KEY=re_...
+   SEND_EMAIL_HOOK_SECRET=<local secret>
+   EMAIL_PREVIEW_SECRET=<local secret>
+   ```
+
+3. Preview templates safely without sending:
+
+   ```sh
+   curl http://127.0.0.1:55421/functions/v1/preview-transactional-email ^
+     -H "Authorization: Bearer <EMAIL_PREVIEW_SECRET>"
+   ```
+
+4. Drain queued transactional emails manually after enqueueing one:
+
+   ```sh
+   npm run supabase:email:drain-local -- --until-empty
+   ```
+
+Notes:
+
+- `send-transactional-email` **enqueues** mail; `process-email-queue` performs the
+  actual delivery.
+- `auth-email-hook` sends directly once the hook request is verified, but local
+  Supabase Auth hook wiring still needs explicit setup if you want the full
+  signup / magic-link path locally.
+- If you use `resend.dev`, sending is sandboxed; use your Resend account email or
+  Resend's documented test addresses instead of random mailbox providers.
 
 ---
 

@@ -10,14 +10,11 @@ export function computeManualCooldownRemainingMs(
   return Math.max(0, getManualReflectionCooldownMs() - elapsed);
 }
 
-/** Remaining ms before cron/auto pause can fire again (profile `cooldown_hours`). */
-export function computeAutoCooldownRemainingMs(
-  lastTriggerAt: string | null,
-  cooldownHours: number,
+/** Wall-clock moment when the manual “Let’s pause” cooldown ends. */
+export function computeManualCooldownReadyAtMs(
+  manualCooldownRemainingMs: number,
   nowMs: number = Date.now(),
-): number {
-  if (!lastTriggerAt) return 0;
-  const cooldownMs = cooldownHours * 60 * 60 * 1000;
-  const elapsed = nowMs - new Date(lastTriggerAt).getTime();
-  return Math.max(0, cooldownMs - elapsed);
+): number | null {
+  if (manualCooldownRemainingMs <= 0) return null;
+  return nowMs + manualCooldownRemainingMs;
 }

@@ -1,117 +1,124 @@
 import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
-import { HolzenNumber } from '@/screens/home/components/HolzenNumber';
+import { HomeMarketWidgetFooter } from '@/screens/home/components/HomeMarketWidgetFooter';
 import type { HomeDashboardSectionDeps } from '@/screens/home/components/render-home-dashboard-section';
-import type { BtcPriceData, TrackedAssetId } from '@/features/market/public';
+import type { MarketQuote, TrackedAssetId } from '@/features/market/public';
 
 /** Memoized bundle passed into {@link renderHomeDashboardSection}. */
 export function useHomeDashboardSectionDeps(args: {
   t: TFunction;
-  goalWhyHoldSummary: string | null;
-  setGoalWhyHoldSummary: (v: string | null) => void;
-  goalWhyHeaderRight: ReactNode;
-  goalWhyExpanded: boolean;
   error: string | null;
   marketHeaderRight: ReactNode;
-  /** Defaults to a compact {@link HolzenNumber} when omitted. */
+  /** Defaults to {@link HomeMarketWidgetFooter} when omitted. */
   marketFooter?: ReactNode;
-  btcData: BtcPriceData | null;
+  marketData: MarketQuote | null;
+  threshold: number;
+  thresholdDown: number;
+  openPauseSource?: string | null;
+  openPauseState?: 'active' | 'engaged' | null;
+  openPauseContextSnapshot?: Record<string, unknown> | null;
   priceHidden: boolean;
   togglePriceHidden: () => void;
   currency: string;
   trackedAssetId: TrackedAssetId;
-  unitBasisModeSupported: boolean;
-  btcMode: boolean;
-  toggleBtcMode: () => void;
   marketChartExpanded: boolean;
   toggleMarketChartExpanded: () => void;
   pauseCardBody: ReactNode;
   pauseSectionHeaderRight: ReactNode | undefined;
+  pauseWidgetProjection: import('@/features/pause/public-home').HomePauseWidgetProjection;
   subscribed: boolean;
   collapsed: Record<string, boolean>;
   toggleCollapsed: (id: string) => void;
+  presenceXp: number | null;
+  completedPauseCount: number | null;
+  practiceStatsLoading: boolean;
 }): HomeDashboardSectionDeps {
-  const defaultMarketFooter = useMemo(() => <HolzenNumber variant="compact" />, []);
-
   const {
     t,
-    goalWhyHoldSummary,
-    setGoalWhyHoldSummary,
-    goalWhyHeaderRight,
-    goalWhyExpanded,
     error,
     marketHeaderRight,
     marketFooter: marketFooterProp,
-    btcData,
+    marketData,
+    threshold,
+    thresholdDown,
+    openPauseSource,
+    openPauseState,
+    openPauseContextSnapshot,
     priceHidden,
     togglePriceHidden,
     currency,
     trackedAssetId,
-    unitBasisModeSupported,
-    btcMode,
-    toggleBtcMode,
     marketChartExpanded,
     toggleMarketChartExpanded,
     pauseCardBody,
     pauseSectionHeaderRight,
+    pauseWidgetProjection,
     subscribed,
     collapsed,
     toggleCollapsed,
+    presenceXp,
+    completedPauseCount,
+    practiceStatsLoading,
   } = args;
 
-  const marketFooter = marketFooterProp ?? defaultMarketFooter;
+  const marketFooter =
+    marketFooterProp ??
+    (marketData && !error ? (
+      <HomeMarketWidgetFooter
+        marketData={marketData}
+        threshold={threshold}
+        thresholdDown={thresholdDown}
+        openPauseSource={openPauseSource}
+        openPauseState={openPauseState}
+        openPauseContextSnapshot={openPauseContextSnapshot}
+      />
+    ) : null);
 
   return useMemo(
     () => ({
       t,
-      goalWhyHoldSummary,
-      setGoalWhyHoldSummary,
-      goalWhyHeaderRight,
-      goalWhyExpanded,
       error,
       marketHeaderRight,
       marketFooter,
-      btcData,
+      marketData,
       priceHidden,
       togglePriceHidden,
       currency,
       trackedAssetId,
-      unitBasisModeSupported,
-      btcMode,
-      toggleBtcMode,
       marketChartExpanded,
       toggleMarketChartExpanded,
       pauseCardBody,
       pauseSectionHeaderRight,
+      pauseWidgetProjection,
       subscribed,
       collapsed,
       toggleCollapsed,
+      presenceXp,
+      completedPauseCount,
+      practiceStatsLoading,
     }),
     [
       t,
-      goalWhyHoldSummary,
-      setGoalWhyHoldSummary,
-      goalWhyHeaderRight,
-      goalWhyExpanded,
       error,
       marketHeaderRight,
       marketFooter,
-      btcData,
+      marketData,
       priceHidden,
       togglePriceHidden,
       currency,
       trackedAssetId,
-      unitBasisModeSupported,
-      btcMode,
-      toggleBtcMode,
       marketChartExpanded,
       toggleMarketChartExpanded,
       pauseCardBody,
       pauseSectionHeaderRight,
+      pauseWidgetProjection,
       subscribed,
       collapsed,
       toggleCollapsed,
+      presenceXp,
+      completedPauseCount,
+      practiceStatsLoading,
     ],
   );
 }

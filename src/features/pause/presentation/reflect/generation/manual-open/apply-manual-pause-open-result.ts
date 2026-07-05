@@ -20,7 +20,6 @@ export type ManualPauseHomePreviewPorts = {
   setContext: (context: string | null) => void;
   setCompanionsEmpty: () => void;
   setNewPauseArrival: (value: boolean) => void;
-  setLastTriggerAt: (iso: string) => void;
   syncOpenPauseFromDb: () => Promise<void>;
   /** PostHog — wired from `public-rpc` in Home presentation; defaults for unit tests. */
   trackInstanceCreated?: (payload: TrackManualPauseInstanceCreatedPayload) => void;
@@ -34,6 +33,7 @@ export type ApplyManualPauseOpenResultInput = {
   assetId: string;
   severityBand: string;
   startedAtMs: number;
+  skipHomePreview?: boolean;
 };
 
 /** Maps `openManualPauseFromHome` outcome to Home preview state + analytics. */
@@ -41,7 +41,7 @@ export async function applyManualPauseOpenResult(
   input: ApplyManualPauseOpenResultInput,
   ports: ManualPauseHomePreviewPorts,
 ): Promise<ManualPauseTriggerResult> {
-  const { result, ctx, silentMsg, assetId, severityBand, startedAtMs } = input;
+  const { result, ctx, silentMsg, assetId, severityBand, startedAtMs, skipHomePreview } = input;
   const trackCreated = ports.trackInstanceCreated ?? trackManualPauseInstanceCreated;
   const trackCompleted = ports.trackManualCompleted ?? trackPauseManualCompleted;
 
@@ -70,8 +70,9 @@ export async function applyManualPauseOpenResult(
     ports.setMessage(result.silentStubPersisted ? silentMsg : null);
     ports.setContext(ctx);
     ports.setCompanionsEmpty();
-    ports.setNewPauseArrival(true);
-    ports.setLastTriggerAt(new Date().toISOString());
+    if (!skipHomePreview) {
+      ports.setNewPauseArrival(true);
+    }
     trackCompleted({
       durationS: Math.round((Date.now() - startedAtMs) / 1000),
       hadBitcoinContext: assetId === 'bitcoin',

@@ -20,14 +20,13 @@ export async function fetchProfileLastTriggerAt(userId: string): Promise<string 
   return data?.last_trigger_at ?? null;
 }
 
-export type ProfilesHoldGoalUpdate = Pick<
+export type ProfilesDisplayCurrencyUpdate = Pick<
   Database['public']['Tables']['profiles']['Update'],
-  | 'hold_goal_type'
-  | 'hold_goal_start'
-  | 'hold_goal_target_months'
-  | 'hold_goal_target_price'
-  | 'hold_goal_currency'
+  'display_currency'
 >;
+
+/** @deprecated Use `ProfilesDisplayCurrencyUpdate` */
+export type ProfilesHoldGoalUpdate = ProfilesDisplayCurrencyUpdate;
 
 export async function updateProfileSnoozedUntil(
   userId: string,
@@ -43,11 +42,7 @@ export async function updateProfileHoldGoal(
   return updateProfileFields(userId, updates);
 }
 
-export async function clearProfileHoldGoal(userId: string): Promise<{ error: Error | null }> {
-  return updateProfileHoldGoal(userId, {
-    hold_goal_type: null,
-    hold_goal_start: null,
-    hold_goal_target_months: null,
-    hold_goal_target_price: null,
-  });
+export async function clearProfileHoldGoal(_userId: string): Promise<{ error: Error | null }> {
+  // Hold-goal columns dropped in 20260604120000_pause_first_zombie_schema_cleanup.sql.
+  return { error: null };
 }

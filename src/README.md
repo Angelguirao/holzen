@@ -11,7 +11,8 @@ Active Holzen frontend. **Pause ritual** is the product; Archive, Journey overvi
 | Journey | `/journey` | `screens/journey/JourneyOverviewScreen.tsx` |
 | Settings | `/settings/*` | `screens/settings/*` |
 | Pause | `/pause`, `/companion/*` | `screens/pause/` |
-| Public | `/welcome`, `/auth`, legal, blog | `screens/marketing/*Screen` |
+| Public marketing | `/welcome`, `/about`, legal, `/blog` | Astro `apps/site/` (SPA dev stub: `MarketingDevFallback`) |
+| Public product | `/auth`, `/reset-password`, `/unsubscribe` | `screens/marketing/*Screen` |
 
 Dead IA (`/tools/*`, `/library`, `/journey/stats`, …) → `NotFound` (no legacy redirects).
 

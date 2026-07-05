@@ -48,7 +48,7 @@ export type {
 
 function scheduleInvalidatePauseStatsOnCompleted(pauseInstanceId: string) {
   void supabase.auth.getUser().then(({ data: { user } }) => {
-    invalidatePauseStatsDataForUser(user?.id);
+    invalidatePauseStatsDataForUser(user?.id, { pauseInstanceId });
     invalidateCompanionUiCompletionQuery(pauseInstanceId);
     const qc = getHolzenQueryClient();
     if (qc) {
@@ -110,7 +110,7 @@ export async function pauseLogStep(params: {
   const state = (data as PauseState | null) ?? null;
   if (params.stepType === 'post_pause_emotion_logged') {
     void supabase.auth.getUser().then(({ data: { user } }) => {
-      invalidatePauseStatsDataForUser(user?.id);
+      invalidatePauseStatsDataForUser(user?.id, { pauseInstanceId: params.instanceId });
     });
   }
   if (state === 'engaged') {
@@ -177,6 +177,27 @@ export async function pauseLogCompanion(params: {
 
 export async function pauseDismissCurrent(): Promise<PauseState | null> {
   const { data, error } = await supabase.rpc('pause_dismiss_current' as never);
+  if (error) throw error;
+  return (data as PauseState | null) ?? null;
+}
+
+export async function pauseApplyCronCalmSweepForSelf(input: {
+  changePercent: number;
+  direction: 'up' | 'down';
+}): Promise<Record<string, unknown> | null> {
+  const { data, error } = await supabase.rpc('pause_apply_cron_calm_sweep_for_self' as never, {
+    p_change_percent: input.changePercent,
+    p_direction: input.direction,
+  } as never);
+  if (error) throw error;
+  return (data as Record<string, unknown> | null) ?? null;
+}
+
+/** Re-run transition engine for one instance (open_max_age, completion gates, etc.). */
+export async function pauseEvaluateTransitions(instanceId: string): Promise<PauseState | null> {
+  const { data, error } = await supabase.rpc('pause_evaluate_transitions' as never, {
+    p_instance_id: instanceId,
+  } as never);
   if (error) throw error;
   return (data as PauseState | null) ?? null;
 }

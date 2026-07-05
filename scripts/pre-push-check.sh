@@ -134,7 +134,7 @@ fi
 # ---- 4. Frontend build + tests ----------------------------------------------
 step "4/6  Frontend tests + build"
 
-if npm run check:active-surface --silent && npm run check:no-phase-labels --silent && npm run check:invoke-edge-allowlist --silent && npm run check:react19-leverage --silent; then
+if npm run check:active-surface --silent && npm run check:no-phase-labels --silent && npm run check:invoke-edge-allowlist --silent && npm run check:no-idle-query-polling --silent && npm run check:react19-leverage --silent; then
   ok "active-surface + phase-label + invoke-edge guards"
 else
   fail_check "surface/allowlist guard failed"
@@ -158,10 +158,10 @@ else
   fail_check "npm run check:bundle-shipped failed — BadgesPanelV2/ToolsHub leaked into dist/assets"
 fi
 
-if npm run check:bruno-active-manifest --silent && npm run check:posthog-events-allowlist --silent && npm run check:feature-flags-doc --silent && npm run check:i18n-active-keys --silent; then
-  ok "bruno manifest + PostHog allowlist + feature flags doc + i18n keys"
+if npm run check:bruno-active-manifest --silent && npm run check:posthog-events-allowlist --silent && npm run check:feature-flags-doc --silent && npm run check:env-docs --silent && npm run check:i18n-active-keys --silent; then
+  ok "bruno manifest + PostHog allowlist + feature flags doc + env docs + i18n keys"
 else
-  fail_check "bruno manifest, PostHog allowlist, feature flags doc, or i18n keys check failed"
+  fail_check "bruno manifest, PostHog allowlist, feature flags doc, env docs, or i18n keys check failed"
 fi
 
 # ---- 5. Local supabase db reset ---------------------------------------------

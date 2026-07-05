@@ -21,11 +21,11 @@ import {
 describe('pause-session-providers-io', () => {
   it('re-exports pickPauseHolzenProvidersSlice from pause-holzen-providers-slice', () => {
     const slice: PauseHolzenProvidersSlice = pickPauseHolzenProvidersSlice({
-      mantra: null,
       dismissMessage: async () => {},
+      dismissOpenPauseFromWidget: () => {},
       message: 'Take a breath.',
       context: 'btc_move',
-      companions: { haiku: 'line', groundingTitle: null, groundingBody: null },
+      companions: { haiku: 'line' },
       lastPauseInstanceId: 'inst-1',
       companionPrefs: {
         breathing: true,
@@ -38,11 +38,10 @@ describe('pause-session-providers-io', () => {
       severity: 'moderate',
       profileLoaded: true,
       resyncOpenPauseFromDb: () => {},
-      btcData: null,
+      marketData: null,
       trackedAssetId: 'bitcoin',
     });
 
-    expect(slice.mantra).toBe('');
     expect(slice.message).toBe('Take a breath.');
   });
 

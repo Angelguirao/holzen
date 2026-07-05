@@ -21,6 +21,7 @@ const {
   const mockBreathBundle = { goToStep: vi.fn() };
   const mockReflectBundle = {
     effectiveReflectionMessage: 'copy',
+    reflectionContent: null,
     reflectionLoading: false,
     reflectionError: null,
     retryReflection: vi.fn(),
@@ -89,7 +90,7 @@ function baseProviders() {
     subscribed: true,
     requirePro: vi.fn().mockReturnValue(true),
     dismissMessage: vi.fn(),
-    btcData: { changePercent: -2 } as import('@/features/market/public').BtcPriceData,
+    marketData: { changePercent: -2 } as import('@/features/market/public').MarketQuote,
     subLoading: false,
     refreshSubscription: vi.fn(),
   };

@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import {
   type PregenerateCacheTopupConfig,
   mergePregenerateCacheTopup,
@@ -21,21 +21,7 @@ export { DEFAULT_PREGENERATE_CACHE_TOPUP, mergePregenerateCacheTopup } from "./p
  */
 
 /** Feature keys known to `feature_flags`. Extend here when adding a new AI feature. */
-export type FeatureFlagKey =
-  | "wallpaper"
-  | "letters"
-  | "nudges"
-  | "digest"
-  | "reports"
-  | "night_reflection"
-  | "reflection_insights"
-  | "suggest_ritual"
-  | "suggest_grounding"
-  | "journal_prompt"
-  | "pregenerate"
-  | "fetch_source_feeds"
-  | "grounding_enrich"
-  | "admin_library_preview";
+export type FeatureFlagKey = "pregenerate";
 
 /**
  * Companion generator feature keys that are short-circuited when `panic_mode` is on.

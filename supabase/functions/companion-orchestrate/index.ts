@@ -5,16 +5,22 @@ import { getProviderHealth } from "../_shared/circuit-breaker.ts";
 import { handleRegenerateOnly } from "../_shared/regenerate-only.ts";
 import { trackEvent } from "../_shared/observe.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { resolveTierFromProfile, tierLimits } from "../_shared/subscription-entitlements.ts";
 import {
-  consumeAllowanceOrCredits,
-  resolveTierFromProfile,
-  tierLimits,
-} from "../_shared/subscription-entitlements.ts";
+  checkPremiumCompanionQuota,
+  consumePremiumCompanionUnitsAfterSuccess,
+  countBillablePremiumCompanionUnits,
+} from "../_shared/companion-orchestrate-billing.ts";
 import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "../_shared/ai-user-messages.ts";
-import { generateQuestion } from "../_shared/generators/question.ts";
 import { resolveLlmCredentialChain, resolveLlmBudgetTier } from "../_shared/llm-gateway.ts";
 import { determineSessionIntent } from "../_shared/session-intent.ts";
-import { selectIntervention, parseDirection, bucketSeverity, type InterventionSelection } from "../_shared/intervention-selector.ts";
+import {
+  selectIntervention,
+  parseDirection,
+  bucketSeverity,
+  type InterventionSelection,
+} from "../legacy/featured-intervention/intervention-selector.ts";
+import { generateQuestion } from "../legacy/featured-intervention/question.ts";
 import { fetchGroundingSourcesForOrchestrate } from "../_shared/pause-cron-parity.ts";
 import type { InterventionPayload } from "../_shared/companion-orchestrate-types.ts";
 import {
@@ -42,7 +48,7 @@ const corsHeaders = {
  * Single entry point for intervention selection and companion generation.
  *
  * Client invocation modes:
- * - Intervention-only: all enable* false, useIntervention true (mount)
+ * - Intervention-only (optional): all enable* false, useIntervention true — not used by pause-first SPA
  * - Single-slot lazy: one enable* true (card tap, holzenInvokeSource: browser_lazy_fetch)
  * - Regenerate: regenerateOnly param (explicit user action)
  *
@@ -79,7 +85,7 @@ serve(
       });
     }
 
-    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.57.2");
+    const { createClient } = await import("npm:@supabase/supabase-js@2");
     const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
@@ -166,7 +172,7 @@ serve(
       enableGrounding = false,
       enableHistory = false,
       enableZoomOut = false,
-      useIntervention = true,
+      useIntervention = false,
     } = body as Record<string, unknown>;
 
     const moodHistory = body.moodHistory as
@@ -269,53 +275,25 @@ serve(
       log("zoomOut task forced for intervention secondary (companion pref off)");
     }
 
-    if (premiumCompanionUnits > 0) {
-      if (tier === "free") {
-        return new Response(
-          JSON.stringify({
-            error: "Premium companions require an active plan.",
-            code: "companions_upgrade_required",
-          }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
-      }
+    const premiumRequested = {
+      signal: Boolean(enableSignal),
+      grounding: shouldRunGrounding,
+      history: shouldRunHistory,
+    };
 
-      const quota = await consumeAllowanceOrCredits(svcClient, {
+    if (premiumCompanionUnits > 0) {
+      const quotaBlock = await checkPremiumCompanionQuota(svcClient, {
         userId,
-        feature: "premium_companion",
+        tier,
         limit: tierQuotaLimits.premium_companion,
         amount: premiumCompanionUnits,
-        reason: "companions_overage",
-        source: "companion-orchestrate",
       });
-      if (!quota.allowed) {
-        return new Response(
-          JSON.stringify({
-            error: "You've used this month's premium companion allowance.",
-            code: "companions_quota_exceeded",
-            tier,
-            companion_limit: quota.limit,
-            companion_used: quota.used,
-            companion_remaining: quota.remainingAllowance,
-            credits_balance: quota.creditsBalance,
-            credits_needed: Math.max(
-              0,
-              (premiumCompanionUnits - quota.remainingAllowance) * quota.creditCost - quota.creditsBalance,
-            ),
-          }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
+      if (quotaBlock) {
+        return new Response(JSON.stringify(quotaBlock.body), {
+          status: quotaBlock.status,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
-
-      log("premium companion quota consumed", {
-        tier,
-        amount: premiumCompanionUnits,
-        used: quota.used,
-        remaining: quota.remainingAllowance,
-        limit: quota.limit,
-        credits_used: quota.creditsUsed,
-        credits_balance: quota.creditsBalance,
-      });
     }
 
     const pid = typeof pauseInstanceId === "string" ? pauseInstanceId : "";
@@ -331,6 +309,21 @@ serve(
         log,
       });
       if (skipped) {
+        const billableFromCache = countBillablePremiumCompanionUnits(skipped, premiumRequested);
+        if (billableFromCache > 0) {
+          await consumePremiumCompanionUnitsAfterSuccess(
+            svcClient,
+            {
+              userId,
+              limit: tierQuotaLimits.premium_companion,
+              amount: billableFromCache,
+              source: "companion-orchestrate",
+              sourceRef: pid,
+              metadata: { path: "artifact_skip" },
+            },
+            log,
+          );
+        }
         return new Response(JSON.stringify(skipped), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -515,6 +508,22 @@ serve(
       userId,
       log,
     });
+
+    const billableUnits = countBillablePremiumCompanionUnits(response, premiumRequested);
+    if (billableUnits > 0) {
+      await consumePremiumCompanionUnitsAfterSuccess(
+        svcClient,
+        {
+          userId,
+          limit: tierQuotaLimits.premium_companion,
+          amount: billableUnits,
+          source: "companion-orchestrate",
+          sourceRef: pauseInstanceIdValue,
+          metadata: { path: "post_generate" },
+        },
+        log,
+      );
+    }
 
     log(`done, returning ${keys.length} companions`);
 

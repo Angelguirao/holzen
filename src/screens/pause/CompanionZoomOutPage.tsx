@@ -11,8 +11,6 @@ import { CompanionFeedback } from '@/screens/pause/components/CompanionFeedback'
 import { CompanionFocusLayout } from '@/screens/pause/components/companion/CompanionFocusLayout';
 import { ReadTime } from '@/screens/pause/components/companion/ReadTime';
 import { WhyThisCard } from '@/screens/pause/components/companion/WhyThisCard';
-import { HistoryThread } from '@/screens/pause/components/companion/HistoryThread';
-import { InterventionCrossRefBadge } from '@/screens/pause/components/companion/InterventionCrossRefBadge';
 import { PageMeta } from '@/app/components/PageMeta';
 
 export default function CompanionZoomOutPage() {
@@ -38,7 +36,6 @@ export default function CompanionZoomOutPage() {
       cacheIds,
       cacheRelaxations,
       regenerateCompanion,
-      intervention,
     },
   } = useCompanionFullViewPage({
     routeInstanceId: rid,
@@ -51,7 +48,7 @@ export default function CompanionZoomOutPage() {
 
   if (loadError) {
     return (
-      <CompanionFocusLayout title={t('companions.zoomOut')} onBack={handleBack}>
+      <CompanionFocusLayout title={t('companions.zoomOutTitle')} onBack={handleBack}>
         <PageMeta
           title={t('companions.focusZoomOutMeta')}
           description={t('companions.focusZoomOutMeta')}
@@ -64,22 +61,20 @@ export default function CompanionZoomOutPage() {
 
   if (!loadError && (snapshotPending || !snapshot)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background" role="status" aria-busy="true">
+      <div className="min-h-screen flex items-center justify-center bg-background" aria-busy="true">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-border/50 border-t-nox-text-link/70" />
       </div>
     );
   }
 
   return (
-    <CompanionFocusLayout title={t('companions.zoomOut')} onBack={handleBack}>
+    <CompanionFocusLayout title={t('companions.zoomOutTitle')} onBack={handleBack}>
       <PageMeta
         title={t('companions.focusZoomOutMeta')}
         description={t('companions.focusZoomOutMeta')}
         noindex
       />
       <div className="space-y-6">
-        <InterventionCrossRefBadge companion="zoomOut" intervention={intervention} />
-
         {zoomOut && (
           <div className="flex items-center gap-2 flex-wrap">
             <ReadTime chars={zoomOutTotalCharsForReadTime(zoomOut)} />
@@ -94,7 +89,7 @@ export default function CompanionZoomOutPage() {
           onRetry={retryZoomOut}
         />
         {zoomOut && cacheRelaxations.zoomOut && (
-          <p className="text-[10px] text-muted-foreground/55 font-mono leading-snug" role="status">
+          <p className="text-[10px] text-muted-foreground/55 font-mono leading-snug">
             {t(`companions.cacheRelaxation.${cacheRelaxations.zoomOut}`)}
           </p>
         )}
@@ -110,8 +105,6 @@ export default function CompanionZoomOutPage() {
             />
           </div>
         )}
-
-        <HistoryThread companion="zoomOut" currentPauseInstanceId={pauseInstanceId} />
       </div>
     </CompanionFocusLayout>
   );

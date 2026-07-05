@@ -18,15 +18,14 @@ const computeContextFingerprintMock = vi.mocked(computeContextFingerprint);
 
 const baseParams = {
   userId: 'u1',
-  silentMode: false,
   contextText: 'ctx',
-  silentMessage: 'BTC moved.',
   changePercent: 3,
-  cumulativeChangePercent: 4,
   trackedAssetId: 'bitcoin',
   severityBand: 'mild',
-  fearGreedLabel: 'fear',
+  fearGreedLabel: 'Fear',
   onChainBand: 'low',
+  fearGreed: { label: 'Fear', value: 33 },
+  onChain: { mempoolSize: 120_000, fastestFee: 12, medianFee: 8 },
 } as const;
 
 describe('buildManualPauseCreateOrReuseParams', () => {
@@ -44,9 +43,8 @@ describe('buildManualPauseCreateOrReuseParams', () => {
       directionBucket: 'up',
       severityBand: 'mild',
       dailyBucketPct: 3,
-      cumulativeBucketPct: 4,
       trackedAssetId: 'bitcoin',
-      fearGreedBand: 'fear',
+      fearGreedBand: 'Fear',
       onChainBand: 'low',
     });
     expect(result).toEqual({
@@ -54,10 +52,11 @@ describe('buildManualPauseCreateOrReuseParams', () => {
       source: 'manual',
       contextSnapshot: {
         change_24h_pct: 3,
-        change_7d_pct: 4,
         direction: 'up',
         severity: 'mild',
         context_text: 'ctx',
+        fear_greed: { label: 'Fear', value: 33 },
+        on_chain: { mempoolSize: 120_000, fastestFee: 12, medianFee: 8 },
         last_reported_mood: null,
         tracked_asset_id: 'bitcoin',
       },
@@ -70,7 +69,6 @@ describe('buildManualPauseCreateOrReuseParams', () => {
     const result = await buildManualPauseCreateOrReuseParams({
       ...baseParams,
       changePercent: -2,
-      cumulativeChangePercent: null,
       mood: 'calm',
     });
 
@@ -79,6 +77,5 @@ describe('buildManualPauseCreateOrReuseParams', () => {
     );
     expect(result.contextSnapshot.direction).toBe('down');
     expect(result.contextSnapshot.last_reported_mood).toBe('calm');
-    expect(result.contextSnapshot.change_7d_pct).toBeNull();
   });
 });

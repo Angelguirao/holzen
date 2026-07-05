@@ -30,6 +30,8 @@ export function asSourceArray(value: unknown): OrchestrateSourceInput[] | undefi
   return items.length > 0 ? items : undefined;
 }
 
+import { hasHistoricalInsightBody } from "./historical-insight-wire.ts";
+
 export function isCompanionContent(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
@@ -44,7 +46,7 @@ export function contentSatisfiesCompanion(companionType: string, raw: unknown): 
       return typeof c.title === "string" && c.title.length > 0 &&
         typeof c.body === "string" && c.body.length > 0;
     case "historical_insight":
-      return typeof c.btcInsight === "string" && c.btcInsight.length > 0;
+      return hasHistoricalInsightBody(c);
     case "zoom_out":
     case "zoom_out_deep_time":
       return Object.keys(c).length > 0;

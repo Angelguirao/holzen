@@ -42,7 +42,6 @@ interface Props {
 
 /** Legacy library `source_type`; same empty state as Ground companion. */
 function normalizeCompanionType(type: string | undefined): string | undefined {
-  "use memo";
   if (!type) return undefined;
   return type === 'learning' ? 'grounding' : type;
 }
@@ -70,7 +69,7 @@ export function CompanionError({ message, companionType, onRetry }: Props) {
         </p>
       )}
       {onRetry && (
-        <button
+        <button type="button"
           onClick={onRetry}
           className="flex items-center gap-1.5 text-[10px] font-sans font-medium text-nox-text-link/75 hover:text-nox-text-link transition-colors active:scale-[0.97]"
         >

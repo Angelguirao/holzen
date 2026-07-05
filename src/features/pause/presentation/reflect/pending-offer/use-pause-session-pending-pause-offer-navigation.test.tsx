@@ -15,19 +15,19 @@ describe('usePauseSessionPendingPauseOfferNavigation', () => {
     clearSessionMock.mockClear();
   });
 
-  it('onAfterMutation voids resync', async () => {
+  it('onAfterMutation awaits resync', async () => {
     const resyncOpenPauseFromDb = vi.fn().mockResolvedValue(undefined);
     const navigate = vi.fn();
     const { result } = renderHook(() =>
       usePauseSessionPendingPauseOfferNavigation({ navigate, resyncOpenPauseFromDb }),
     );
     await act(async () => {
-      result.current.onAfterMutation();
+      await result.current.onAfterMutation();
     });
     expect(resyncOpenPauseFromDb).toHaveBeenCalledTimes(1);
   });
 
-  it('navigateAfterAdopt clears session then navigates with instance id', () => {
+  it('navigateAfterAdopt clears session then opens depth picker on new instance', () => {
     const navigate = vi.fn();
     const { result } = renderHook(() =>
       usePauseSessionPendingPauseOfferNavigation({
@@ -36,11 +36,19 @@ describe('usePauseSessionPendingPauseOfferNavigation', () => {
       }),
     );
     act(() => {
-      result.current.navigateAfterAdopt('abc-uuid');
+      result.current.navigateAfterAdopt({
+        instanceId: 'abc-uuid',
+        context: 'BTC is down 15.1% in the last 24 hours.',
+      });
     });
     expect(clearSessionMock).toHaveBeenCalledTimes(1);
     expect(navigate).toHaveBeenCalledWith('/pause', {
-      state: { pauseInstanceId: 'abc-uuid' },
+      state: {
+        pauseInstanceId: 'abc-uuid',
+        context: 'BTC is down 15.1% in the last 24 hours.',
+        reflectionMessage: '',
+        startAtDepthPicker: true,
+      },
       replace: true,
     });
   });

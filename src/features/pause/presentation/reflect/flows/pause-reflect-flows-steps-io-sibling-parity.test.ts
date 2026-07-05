@@ -2,14 +2,12 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'reflectPauseRepository' },
-  reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' },
+  reflectionStepSessionStorage: { storage: 'reflectionStepSessionStorage' }
 }));
 
 import * as stepsIo from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   reflectPauseRepository as flowsReflectPauseRepository,
@@ -17,7 +15,7 @@ import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeSaveFailedToast
 } from './pause-reflect-flows-io';
 import * as flowsIo from './pause-reflect-flows-io';
 import {
@@ -31,7 +29,7 @@ import {
   pauseReflectionStepLogOnceWithRepository,
   reflectPauseRepository as stepsReflectPauseRepository,
   shouldLogPauseReflectionStep,
-  shouldShowFavoriteProHint,
+  shouldShowFavoriteProHint
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 
 /**
@@ -42,9 +40,7 @@ describe('pause-reflect-flows-io ↔ pause-reflect-steps-io sibling parity', () 
   it('flows-io and steps-io are distinct presentation I/O surfaces', () => {
     expect(typeof resolvePauseSessionReflectAndDecidePreflight).toBe('function');
     expect(typeof resolvePauseSessionReflectAndDecideAfterGeneration).toBe('function');
-    expect(typeof formatReinforcementQuoteFromSession).toBe('function');
     expect(typeof resolvePauseDecideOutcomeFlow).toBe('function');
-    expect(typeof getSessionQuote).toBe('function');
     expect(typeof buildPauseScoreImpacts).toBe('function');
     expect(typeof pauseReflectOutcomeLog).toBe('function');
     expect(typeof pauseReflectOutcomeLogWithRepository).toBe('function');
@@ -69,9 +65,7 @@ describe('pause-reflect-flows-io ↔ pause-reflect-steps-io sibling parity', () 
     expect('pauseReflectOutcomeLogWithRepository' in stepsIo).toBe(false);
     expect('resolvePauseSessionReflectAndDecidePreflight' in stepsIo).toBe(false);
     expect('resolvePauseSessionReflectAndDecideAfterGeneration' in stepsIo).toBe(false);
-    expect('formatReinforcementQuoteFromSession' in stepsIo).toBe(false);
     expect('resolvePauseDecideOutcomeFlow' in stepsIo).toBe(false);
-    expect('getSessionQuote' in stepsIo).toBe(false);
     expect('buildPauseScoreImpacts' in stepsIo).toBe(false);
     expect('showPauseOutcomeNotCompletedToast' in stepsIo).toBe(false);
     expect('showPauseOutcomeSaveFailedToast' in stepsIo).toBe(false);
@@ -83,9 +77,7 @@ describe('pause-reflect-flows-io ↔ pause-reflect-steps-io sibling parity', () 
     expect(pauseReflectNoteUpdate).not.toBe(pauseReflectOutcomeLogWithRepository);
     expect(pauseReflectTagUpdate).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(pauseReflectionStepLogOnce).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
-    expect(shouldShowFavoriteProHint).not.toBe(formatReinforcementQuoteFromSession);
     expect(shouldLogPauseReflectionStep).not.toBe(resolvePauseDecideOutcomeFlow);
-    expect(pauseReflectFavoriteToggle).not.toBe(getSessionQuote);
     expect(pauseReflectNoteUpdate).not.toBe(buildPauseScoreImpacts);
     expect(pauseReflectTagUpdate).not.toBe(showPauseOutcomeNotCompletedToast);
     expect(pauseReflectionStepLogOnce).not.toBe(showPauseOutcomeSaveFailedToast);

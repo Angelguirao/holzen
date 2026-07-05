@@ -8,6 +8,7 @@ import { setHolzenQueryClient } from "@/features/pause/public-queries";
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { reactRouterFutureFlags } from "@/lib/router-future";
 import { AuthProvider, useAuth } from "@/features/auth/public";
+import { useProfile } from "@/features/user/public-hooks";
 import { HolzenProvider } from "@/app/components/HolzenProvider";
 import { isAppShellPath } from "@/lib/app-routes";
 import { holzenLog } from "@/lib/holzen-console";
@@ -22,6 +23,7 @@ import { RobotsNoIndex } from "@/app/components/PageMeta";
 import { FeedbackWidget } from "@/app/components/FeedbackWidget";
 
 const Home = lazy(() => import("./screens/home/HomeScreen"));
+const Onboarding = lazy(() => import("./screens/onboarding/OnboardingScreen"));
 const Archive = lazy(() => import("./screens/archive/ArchiveScreen"));
 const JourneyOverview = lazy(() => import("./screens/journey/JourneyOverviewScreen"));
 const SettingsRoot = lazy(() => import("./screens/settings/SettingsRoot"));
@@ -29,15 +31,9 @@ const SettingsStateLayout = lazy(() => import("./screens/settings/SettingsStateL
 const SettingsHub = lazy(() => import("./screens/settings/SettingsHubScreen"));
 const SettingsSectionPage = lazy(() => import("./screens/settings/SettingsSectionScreen"));
 const Auth = lazy(() => import("./screens/marketing/AuthScreen"));
-const Landing = lazy(() => import("./screens/marketing/LandingScreen"));
-const Terms = lazy(() => import("./screens/marketing/TermsScreen"));
-const Privacy = lazy(() => import("./screens/marketing/PrivacyScreen"));
+const MarketingDevFallback = lazy(() => import("./screens/marketing/MarketingDevFallback"));
 const ResetPassword = lazy(() => import("./screens/marketing/ResetPasswordScreen"));
 const NotFound = lazy(() => import("./screens/marketing/NotFoundScreen"));
-const About = lazy(() => import("./screens/marketing/AboutScreen"));
-const Blog = lazy(() => import("./screens/marketing/BlogScreen"));
-const BlogPost = lazy(() => import("./screens/marketing/BlogPostScreen"));
-const Reserve = lazy(() => import("./screens/marketing/ReserveScreen"));
 const PauseSession = lazy(() => import("./screens/pause/PauseSessionScreen"));
 const CompanionZoomOutPage = lazy(() => import("./screens/pause/CompanionZoomOutPage"));
 const CompanionHistoryPage = lazy(() => import("./screens/pause/CompanionHistoryPage"));
@@ -48,9 +44,7 @@ const SmokeTest = lazy(() => import("./screens/ops/SmokeTestScreen"));
 const SentryAlerts = lazy(() => import("./screens/ops/SentryAlertsScreen"));
 const EdgeCoverage = lazy(() => import("./screens/ops/EdgeCoverageScreen"));
 const Unsubscribe = lazy(() => import("./screens/marketing/UnsubscribeScreen"));
-const BillingHistory = lazy(() => import("./screens/settings/BillingHistoryScreen"));
 const SettingsAbout = lazy(() => import("./screens/settings/SettingsAboutScreen"));
-const Roadmap = lazy(() => import("./screens/marketing/RoadmapScreen"));
 
 const queryClient = createHolzenQueryClient();
 
@@ -65,6 +59,20 @@ function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   if (loading) return <AuthLoading />;
   if (user) return <Navigate to="/" replace />;
+  return <>{children}</>;
+}
+
+function OnboardedRoute({ children }: { children: React.ReactNode }) {
+  const { profileLoaded, hasOnboarded } = useProfile();
+  if (!profileLoaded) return <AuthLoading />;
+  if (!hasOnboarded) return <Navigate to="/onboarding" replace />;
+  return <>{children}</>;
+}
+
+function PendingOnboardingRoute({ children }: { children: React.ReactNode }) {
+  const { profileLoaded, hasOnboarded } = useProfile();
+  if (!profileLoaded) return <AuthLoading />;
+  if (hasOnboarded) return <Navigate to="/" replace />;
   return <>{children}</>;
 }
 
@@ -111,7 +119,6 @@ function RouteChunkFallback() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-6 bg-background"
-      role="status"
       aria-live="polite"
       aria-busy="true"
       aria-label="Loading"
@@ -213,21 +220,20 @@ const App = () => (
             <FeedbackWidgetGate />
             <Suspense fallback={<RouteChunkFallback />}>
               <Routes>
-                <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+                <Route element={<ProtectedRoute><OnboardedRoute><AppLayout /></OnboardedRoute></ProtectedRoute>}>
                   <Route path="/" element={<Home />} />
                   <Route path="/index" element={<Navigate to="/" replace />} />
                   <Route path="/archive" element={<Archive />} />
                   <Route path="/journey" element={<JourneyOverview />} />
                   <Route path="/settings" element={<SettingsRoot />}>
                     <Route path="about" element={<SettingsAbout />} />
-                    <Route path="billing-history" element={<BillingHistory />} />
                     <Route element={<SettingsStateLayout />}>
                       <Route index element={<SettingsHub />} />
                       <Route path=":section" element={<SettingsSectionPage />} />
                     </Route>
                   </Route>
                 </Route>
-                <Route element={<ProtectedRoute><PrivateExperienceLayout /></ProtectedRoute>}>
+                <Route element={<ProtectedRoute><OnboardedRoute><PrivateExperienceLayout /></OnboardedRoute></ProtectedRoute>}>
                   <Route path="/pause" element={<PauseSession />} />
                   <Route path="/companion/zoom-out/:pauseInstanceId" element={<CompanionZoomOutPage />} />
                   <Route path="/companion/history/:pauseInstanceId" element={<CompanionHistoryPage />} />
@@ -238,19 +244,20 @@ const App = () => (
                   <Route path="/admin/sentry-alerts" element={<SentryAlerts />} />
                   <Route path="/admin/edge-coverage" element={<EdgeCoverage />} />
                 </Route>
-                <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
+                <Route element={<ProtectedRoute><PendingOnboardingRoute><PrivateExperienceLayout /></PendingOnboardingRoute></ProtectedRoute>}>
+                  <Route path="/onboarding" element={<Onboarding />} />
+                </Route>
+                <Route path="/welcome" element={<PublicOnlyRoute><MarketingDevFallback /></PublicOnlyRoute>} />
+                <Route path="/about" element={<MarketingDevFallback />} />
+                <Route path="/terms" element={<MarketingDevFallback />} />
+                <Route path="/privacy" element={<MarketingDevFallback />} />
+                <Route path="/blog" element={<MarketingDevFallback />} />
+                <Route path="/blog/:slug" element={<MarketingDevFallback />} />
                 <Route element={<UtilityNoIndexLayout />}>
                   <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/unsubscribe" element={<Unsubscribe />} />
                 </Route>
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/roadmap" element={<Roadmap />} />
-                <Route path="/reserve" element={<Reserve />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

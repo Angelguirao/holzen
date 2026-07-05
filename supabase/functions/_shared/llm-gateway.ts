@@ -1,6 +1,13 @@
 /**
- * LLM gateway — task-aware model selection with provider cascade:
- *   Google Gemini direct → OpenRouter (failover).
+ * LLM gateway — OpenRouter-first, explicit model slugs per task (not `openrouter/auto`).
+ *
+ * Routing lanes (see docs/ops/llm-openrouter.md):
+ * - **Critical (JSON):** `reflect` — fixed cascade; parse failures retry next slug.
+ * - **Medium:** `structure`, `intervention`, `enrich` — tiered flash / flash-lite.
+ * - **Low:** `cron_digest` — always flash-lite; `image` — image model only.
+ *
+ * Provider order: `LLM_PROVIDER_ORDER` (default `openrouter`). Add `google` only for direct Gemini billing.
+ * Failover: retryable HTTP statuses try the next provider credential (includes 402 billing).
  */
 import { fetchInitWithIncomingTrace } from "./forward-trace-headers.ts";
 import type { LlmBudgetTier } from "./llm-budget.ts";
@@ -10,8 +17,10 @@ export { budgetTierFromSpendRatio, resolveLlmBudgetTier } from "./llm-budget.ts"
 
 export type LlmGatewayProvider = "google" | "openrouter";
 
-/** Active deploys use Google → OpenRouter only. */
+/** Active deploys use Google and/or OpenRouter only. */
 const ACTIVE_LLM_PROVIDERS: readonly LlmGatewayProvider[] = ["google", "openrouter"];
+
+const DEFAULT_LLM_PROVIDER_ORDER: readonly LlmGatewayProvider[] = ["openrouter"];
 
 export type LlmTask =
   | "reflect"
@@ -41,6 +50,7 @@ const GOOGLE_MODEL_MAP: Record<string, string> = {
   "google/gemini-2.5-flash-image": "gemini-2.0-flash-preview-image-generation",
 };
 
+/** Explicit OpenRouter slugs — never `openrouter/auto` (Reflect JSON + cost predictability). */
 const TASK_MODEL_CASCADE: Record<LlmTask, Record<LlmBudgetTier, readonly string[]>> = {
   reflect: {
     normal: ["google/gemini-3-flash-preview", "google/gemini-2.5-flash"],
@@ -82,6 +92,39 @@ export function resolveModelsForTask(
   return [...cascade];
 }
 
+/** Parse `LLM_PROVIDER_ORDER` (comma-separated `google` / `openrouter`). Exported for tests. */
+export function parseLlmProviderOrder(
+  raw: string | undefined | null,
+): LlmGatewayProvider[] {
+  if (!raw?.trim()) return [...DEFAULT_LLM_PROVIDER_ORDER];
+  const order: LlmGatewayProvider[] = [];
+  for (const part of raw.split(",")) {
+    const p = part.trim().toLowerCase();
+    if (p !== "google" && p !== "openrouter") continue;
+    const provider = p as LlmGatewayProvider;
+    if (!order.includes(provider)) order.push(provider);
+  }
+  return order.length > 0 ? order : [...DEFAULT_LLM_PROVIDER_ORDER];
+}
+
+function readLlmProviderOrderFromEnv(): LlmGatewayProvider[] {
+  // deno-lint-ignore no-explicit-any
+  const denoGlobal = (globalThis as any).Deno;
+  return parseLlmProviderOrder(denoGlobal?.env?.get?.("LLM_PROVIDER_ORDER"));
+}
+
+/**
+ * When the Gemini-family circuit breaker is open (`circuit-breaker` bucket `google`),
+ * skip curated fallback only if OpenRouter is configured — live gen can still run.
+ */
+export function shouldUseCuratedFallbackForGoogleDegradation(
+  geminiCircuitOpen: boolean,
+  chain: readonly LlmCredentials[],
+): boolean {
+  if (!geminiCircuitOpen) return false;
+  return !chain.some((c) => c.provider === "openrouter");
+}
+
 /** Ordered provider credentials — first is primary. */
 export function resolveLlmCredentialChain(
   allowedProviders?: ReadonlySet<LlmGatewayProvider>,
@@ -89,18 +132,33 @@ export function resolveLlmCredentialChain(
   const allow = (provider: LlmGatewayProvider) =>
     !allowedProviders || allowedProviders.has(provider);
 
-  const chain: LlmCredentials[] = [];
+  const byProvider = new Map<LlmGatewayProvider, LlmCredentials>();
 
-  const googleKey =
-    Deno.env.get("GOOGLE_AI_API_KEY")?.trim() ||
-    Deno.env.get("GEMINI_API_KEY")?.trim();
-  if (allow("google") && googleKey) chain.push({ apiKey: googleKey, provider: "google" });
+  const order = readLlmProviderOrderFromEnv();
+  const wantsGoogle = order.includes("google");
+  const wantsOpenRouter = order.includes("openrouter");
 
-  const openRouterKey = Deno.env.get("OPENROUTER_API_KEY")?.trim();
-  if (allow("openrouter") && openRouterKey) {
-    chain.push({ apiKey: openRouterKey, provider: "openrouter" });
+  if (wantsGoogle) {
+    const googleKey =
+      Deno.env.get("GOOGLE_AI_API_KEY")?.trim() ||
+      Deno.env.get("GEMINI_API_KEY")?.trim();
+    if (allow("google") && googleKey) {
+      byProvider.set("google", { apiKey: googleKey, provider: "google" });
+    }
   }
 
+  if (wantsOpenRouter) {
+    const openRouterKey = Deno.env.get("OPENROUTER_API_KEY")?.trim();
+    if (allow("openrouter") && openRouterKey) {
+      byProvider.set("openrouter", { apiKey: openRouterKey, provider: "openrouter" });
+    }
+  }
+
+  const chain: LlmCredentials[] = [];
+  for (const provider of order) {
+    const creds = byProvider.get(provider);
+    if (creds) chain.push(creds);
+  }
   return chain;
 }
 
@@ -142,7 +200,28 @@ function openRouterHeaders(apiKey: string): Record<string, string> {
 }
 
 function isRetryableLlmStatus(status: number): boolean {
-  return status === 408 || status === 429 || status === 502 || status === 503 || status === 504;
+  return (
+    status === 402 ||
+    status === 403 ||
+    status === 408 ||
+    status === 429 ||
+    status === 502 ||
+    status === 503 ||
+    status === 504
+  );
+}
+
+/**
+ * Drain an LLM response body and return a fresh `Response` with the same status/headers
+ * so callers can still `.text()` / `.json()` after we read the stream for failover logging.
+ */
+export async function rewrapDrainedLlmResponse(response: Response): Promise<Response> {
+  const text = await response.text().catch(() => "");
+  return new Response(text, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+  });
 }
 
 export async function llmChatCompletions(
@@ -202,7 +281,7 @@ export async function llmChatCompletionsWithFallback(
   );
   if (chain.length === 0) {
     throw new Error(
-      "No LLM credentials configured (GOOGLE_AI_API_KEY and/or OPENROUTER_API_KEY)",
+      "No LLM credentials configured (OPENROUTER_API_KEY required for default openrouter-only order)",
     );
   }
 
@@ -216,7 +295,7 @@ export async function llmChatCompletionsWithFallback(
     if (!isRetryableLlmStatus(response.status)) {
       return { response, creds };
     }
-    await response.text().catch(() => undefined);
+    lastResponse = await rewrapDrainedLlmResponse(response);
   }
 
   return { response: lastResponse!, creds: lastCreds };

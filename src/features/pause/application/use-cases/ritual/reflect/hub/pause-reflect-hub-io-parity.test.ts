@@ -21,7 +21,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
   supabasePauseRepository: { port: 'supabasePauseRepository' },
-  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' },
+  supabaseReflectGenerator: { port: 'supabaseReflectGenerator' }
 }));
 
 vi.mock(
@@ -29,26 +29,26 @@ vi.mock(
   () => ({
     runShiftEmotionFrameHubDone: vi.fn(() =>
       Promise.resolve({ status: 'advance' as const, logKey: 'k' }),
-    ),
+    )
   }),
 );
 
 import { runShiftEmotionFrameHubDone as runShiftHubDoneDirect } from '@/features/pause/application/use-cases/ritual/reflect/hub/run-shift-emotion-frame-hub-done';
 import { buildShiftEmotionFrameHubLogBundle as buildLogBundleDirect } from '@/features/pause/domain/reflect/hub/shift-emotion-log';
 import {
-  resolveShiftFrameHubDonePresentation as resolvePresentationDirect,
+  resolveShiftFrameHubDonePresentation as resolvePresentationDirect
 } from '@/features/pause/domain/reflect/hub/shift-frame-hub-done-presentation';
 import {
   buildShiftEmotionFrameHubLogBundle,
   resolveShiftFrameHubDonePresentation,
-  runShiftEmotionFrameHubDone as runShiftHubDoneFromFlow,
+  runShiftEmotionFrameHubDone as runShiftHubDoneFromFlow
 } from '@/features/pause/application/use-cases/ritual/reflect/hub/pause-reflect-hub-flow';
 import {
   buildShiftEmotionFrameHubLogBundle as buildLogBundleFromHubIo,
   pauseShiftEmotionFrameHubDone,
   pauseShiftEmotionFrameHubDoneWithRepository,
   reflectPauseRepository,
-  resolveShiftFrameHubDonePresentation as resolvePresentationFromHubIo,
+  resolveShiftFrameHubDonePresentation as resolvePresentationFromHubIo
 } from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import {
   messageFromReflectGenerationResult,
@@ -56,7 +56,7 @@ import {
   reflectGenerationPrerequisite,
   reflectGenerator,
   runReflectGeneration,
-  shouldCommitReflectGeneration,
+  shouldCommitReflectGeneration
 } from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
 import {
   pauseReflectFavoriteToggle,
@@ -68,39 +68,37 @@ import {
   pauseReflectTagUpdateWithRepository,
   pauseReflectionStepLogOnceWithRepository,
   shouldLogPauseReflectionStep,
-  shouldShowFavoriteProHint,
+  shouldShowFavoriteProHint
 } from '@/features/pause/presentation/reflect/steps/pause-reflect-steps-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
   showPauseOutcomeNotCompletedToast,
-  showPauseOutcomeSaveFailedToast,
+  showPauseOutcomeSaveFailedToast
 } from '@/features/pause/presentation/reflect/flows/pause-reflect-flows-io';
 import {
   getPendingPauseOfferDisplay,
   pauseAdoptPendingOffer,
   pauseAdoptPendingOfferWithRepository,
   pauseDeclinePendingOffer,
-  pauseDeclinePendingOfferWithRepository,
+  pauseDeclinePendingOfferWithRepository
 } from '@/features/pause/presentation/reflect/pending-offer/pause-reflect-pending-offer-io';
 import {
   startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
   trackPauseReflectPostItOpen,
   trackPauseReflectShareTap,
-  trackPauseReflectWallpaperTap,
+  trackPauseReflectWallpaperTap
 } from '@/features/pause/presentation/reflect/telemetry/pause-reflect-telemetry-io';
 import {
   buildReflectionShareText,
-  pauseReflectionShareImage,
+  pauseReflectionShareImage
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
   applyBriefDepthPickerRitualEntry,
@@ -110,7 +108,7 @@ import {
   pauseInitialEmotionSkip,
   pauseInitialEmotionSelectWithRepository,
   pauseInitialEmotionSkipWithRepository,
-  resolvePauseSessionChromeCloseAction,
+  resolvePauseSessionChromeCloseAction
 } from '@/features/pause/presentation/feel/pause-feel-io';
 import * as hubIo from '@/features/pause/presentation/reflect/hub/pause-reflect-hub-io';
 import * as generationIo from '@/features/pause/presentation/reflect/generation/pause-reflect-generation-io';
@@ -203,10 +201,8 @@ describe('pause-reflect-hub-io parity (application)', () => {
     expect(pauseShiftEmotionFrameHubDone).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(pauseShiftEmotionFrameHubDone).not.toBe(pauseReflectOutcomeLog);
     expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(pauseReflectOutcomeLogWithRepository);
-    expect(buildShiftEmotionFrameHubLogBundle).not.toBe(formatReinforcementQuoteFromSession);
     expect(resolveShiftFrameHubDonePresentation).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(pauseShiftEmotionFrameHubDone).not.toBe(showPauseOutcomeNotCompletedToast);
-    expect(buildShiftEmotionFrameHubLogBundle).not.toBe(getSessionQuote);
     expect(pauseShiftEmotionFrameHubDone).not.toBe(buildPauseScoreImpacts);
     expect(pauseShiftEmotionFrameHubDoneWithRepository).not.toBe(showPauseOutcomeSaveFailedToast);
     expect(pauseShiftEmotionFrameHubDone).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);

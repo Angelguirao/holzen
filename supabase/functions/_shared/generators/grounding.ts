@@ -8,7 +8,7 @@
  * API keys are read from Deno.env directly (same as the original function).
  */
 
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import {
   qualityGate,
   containsSlop,
@@ -24,7 +24,6 @@ import {
 } from "../fallbacks.ts";
 import { type CacheServeRelaxation, parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger, trackEvent } from "../observe.ts";
-import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import {
   type LlmBudgetTier,
@@ -425,10 +424,10 @@ CONNECTION TO THE MOMENT:
 - Example: "Recognizing this pattern is the first step to not acting on it."
 - This sentence should feel like a gentle mirror, not advice
 
-BITCOIN ONLY:
-- Frame everything in terms of Bitcoin holders, not "crypto investors"
+BITCOIN CONTEXT:
+- Frame for investors who track Bitcoin volatility — not generic "crypto investors"
 - Say "Bitcoin" not "crypto" or "cryptocurrency"
-- The user holds Bitcoin specifically — this is not about altcoins or "the crypto market"
+- Do not recommend buying, selling, or holding — offer perspective and emotional regulation only
 
 BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shift, revolutionary, unprecedented, navigate the, in the world of, it's worth noting, at the end of the day, moving forward, leverage, synergy, ecosystem, disruptive, next-gen, cutting-edge`,
       },
@@ -587,16 +586,6 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
       log(`cache write failed: ${e}`);
     }
   }
-
-  const suggestName =
-    (nudge.citation && nudge.citation.split("(")[0]?.trim()) ||
-    nudge.title;
-  void enqueueCatalogSourceSuggestion(svcClient, {
-    category: "grounding",
-    name: suggestName,
-    url: nudge.url,
-    pauseInstanceId,
-  });
 
   // ── Step 6: Background URL validation (fire-and-forget) ──
   if (nudge.url && nudge.url.startsWith("http")) {

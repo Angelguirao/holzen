@@ -21,7 +21,6 @@ import type { PauseBreathingHandle } from '@/features/pause/public-session-ritua
 export type { PauseBreathSegment };
 
 interface Props {
-  mantra: string | null;
   /** Retained for future Feel-tile pattern routing (`pause-breathing-pattern.ts`). */
   severity?: 'mild' | 'moderate' | 'high';
   /**
@@ -38,8 +37,8 @@ interface Props {
   feelTile?: FeelStepTile | null;
   /** After full breath cycles: deep shows an interstitial then continues; brief auto-invokes (Integrate). */
   onContinueAfterBreath: () => void;
-  /** Intro or mid-pattern skip: leave breath without logging completion. */
-  onSkipBreath: () => void | Promise<void>;
+  /** Deep second Breathe intro only — skip logs `breath_completed` with `skipped: true`. */
+  onSkipBreath?: () => void | Promise<void>;
   completed?: boolean;
   /** Fires when timed cycles finish — parent may mark session “past pattern” for header chrome (no DB log yet). */
   onPatternComplete?: () => void;
@@ -55,7 +54,6 @@ interface Props {
 
 export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function PauseBreathing(
   {
-    mantra,
     severity = 'mild',
     ritualVariant,
     breathSegment = 'first',
@@ -140,7 +138,6 @@ export const PauseBreathing = forwardRef<PauseBreathingHandle, Props>(function P
       started={started}
       completed={completed}
       breathSegment={breathSegment}
-      mantra={mantra}
       ritualVariant={ritualVariant}
       ritualVar={ritualVar}
       prefersReducedMotion={!!prefersReduced}

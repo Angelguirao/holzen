@@ -1,6 +1,7 @@
 import { useCallback, useTransition, type Dispatch, type SetStateAction } from 'react';
 import type { User } from '@supabase/supabase-js';
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
+import type { ManualPauseTriggerOptions } from '@/features/pause/domain/manual-pause-trigger-options';
 import {
   MANUAL_PAUSE_TRIGGER_IDLE,
   type ManualPauseTriggerResult,
@@ -22,8 +23,6 @@ import { holzenLog } from '@/lib/holzen-console';
 
 export interface UseManualPauseTriggerParams {
   user: User | null;
-  silentMode: boolean;
-  cumulativeThreshold: number;
   trackedAssetId: string;
   syncOpenPauseFromDb: () => Promise<void>;
   setError: Dispatch<SetStateAction<string | null>>;
@@ -32,7 +31,6 @@ export interface UseManualPauseTriggerParams {
   setCompanions: Dispatch<SetStateAction<CompanionData>>;
   setNewPauseArrival: Dispatch<SetStateAction<boolean>>;
   setLastPauseInstanceId: Dispatch<SetStateAction<string | null>>;
-  setLastTriggerAt: Dispatch<SetStateAction<string | null>>;
 }
 
 /**
@@ -41,8 +39,6 @@ export interface UseManualPauseTriggerParams {
  */
 export function useManualPauseTrigger({
   user,
-  silentMode,
-  cumulativeThreshold,
   trackedAssetId: profileTrackedAssetId,
   syncOpenPauseFromDb,
   setError,
@@ -51,12 +47,15 @@ export function useManualPauseTrigger({
   setCompanions,
   setNewPauseArrival,
   setLastPauseInstanceId,
-  setLastTriggerAt,
 }: UseManualPauseTriggerParams) {
   const [isPending, startTransition] = useTransition();
 
   const generateMessage = useCallback(
-    async (data: BtcPriceData, mood?: string): Promise<ManualPauseTriggerResult> => {
+    async (
+      data: MarketQuote,
+      mood?: string,
+      options?: ManualPauseTriggerOptions,
+    ): Promise<ManualPauseTriggerResult> => {
       if (!user) {
         holzenLog.manual('generateMessage: skipped (no user)');
         return MANUAL_PAUSE_TRIGGER_IDLE;
@@ -64,17 +63,14 @@ export function useManualPauseTrigger({
       markPauseManualStartedHomeOnce();
       const t0 = Date.now();
       holzenLog.manual('generateMessage: start', {
-        btcChangePct: data.changePercent,
-        silentMode,
+        marketChangePct: data.changePercent,
         mood: mood ?? '(none)',
       });
 
       const built = buildManualPauseOpenParams({
         userId: user.id,
-        silentMode,
         mood,
         data,
-        cumulativeThreshold,
         profileTrackedAssetId,
       });
       const { assetId, ctx, silentMsg, ...openParams } = built;
@@ -87,9 +83,8 @@ export function useManualPauseTrigger({
         setMessage,
         setContext,
         setCompanionsEmpty: () =>
-          setCompanions({ haiku: null, groundingTitle: null, groundingBody: null }),
+          setCompanions({ haiku: null }),
         setNewPauseArrival,
-        setLastTriggerAt,
         syncOpenPauseFromDb,
         trackInstanceCreated: trackManualPauseInstanceCreated,
         trackManualCompleted: trackPauseManualCompleted,
@@ -97,20 +92,17 @@ export function useManualPauseTrigger({
 
       const applyOpenResult = (result: Parameters<typeof applyManualPauseOpenResult>[0]['result']) =>
         applyManualPauseOpenResult(
-          { result, ctx, silentMsg, assetId, severityBand, startedAtMs: t0 },
+          {
+            result,
+            ctx,
+            silentMsg,
+            assetId,
+            severityBand,
+            startedAtMs: t0,
+            skipHomePreview: options?.skipHomePreview,
+          },
           previewPorts,
         );
-
-      if (silentMode) {
-        holzenLog.manual('generateMessage: silent mode');
-        const result = await openManualPauseFromHome(pauseHomeManualOpenPorts, openParams);
-        if (result.outcome === 'error') {
-          holzenLog.manual('generateMessage: silent pause create failed', {
-            message: result.userMessage,
-          });
-        }
-        return applyOpenResult(result);
-      }
 
       return new Promise<ManualPauseTriggerResult>((resolve) => {
         startTransition(async () => {
@@ -130,8 +122,6 @@ export function useManualPauseTrigger({
     },
     [
       user,
-      silentMode,
-      cumulativeThreshold,
       profileTrackedAssetId,
       syncOpenPauseFromDb,
       setError,
@@ -140,7 +130,6 @@ export function useManualPauseTrigger({
       setCompanions,
       setNewPauseArrival,
       setLastPauseInstanceId,
-      setLastTriggerAt,
       startTransition,
     ],
   );

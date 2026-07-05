@@ -1,4 +1,10 @@
-import type { CachedHistoricalInsightShape } from '@/features/pause/domain/historical-insight';
+import {
+  toHistoricalInsightDisplayData,
+} from '@/features/pause/application/use-cases/ritual/frame/historical-insight-payload';
+import {
+  type CachedHistoricalInsightShape,
+  resolveHistoricalMarketInsight,
+} from '@/features/pause/domain/historical-insight';
 import type { ZoomOutData } from '@/features/pause/domain/zoom-out-display';
 import { trackCompanionServed } from '@/features/pause/application/use-cases/ritual/frame/companion-generation-telemetry';
 import { updateRecencyHints } from '@/features/pause/application/use-cases/ritual/frame/recency-hints';
@@ -11,6 +17,7 @@ import {
   toZoomOutDisplayData,
   zoomOutLibraryAutosaveFromDisplayData,
 } from '@/features/pause/application/use-cases/ritual/frame/zoom-out-payload';
+import { normalizeSignalPayload } from '@/features/pause/domain/signal-payload';
 
 /** Legacy hook name: companion slots no longer mirror rows into a bookmark table. */
 export type CompanionSlotAutosaveParams = {
@@ -21,7 +28,7 @@ export type CompanionSlotAutosaveParams = {
 };
 
 export type CompanionSlotCacheIds = {
-  nudge: string | null;
+  grounding: string | null;
   signal: string | null;
   zoomOut: string | null;
   history: string | null;
@@ -31,14 +38,14 @@ export type CompanionSlotCacheIds = {
 export type CompanionSlotRelaxationUi = 'market' | 'repeat_or_lower_quality' | null;
 
 export type CompanionSlotRelaxations = {
-  nudge: CompanionSlotRelaxationUi;
+  grounding: CompanionSlotRelaxationUi;
   signal: CompanionSlotRelaxationUi;
   zoomOut: CompanionSlotRelaxationUi;
   history: CompanionSlotRelaxationUi;
 };
 
 export const EMPTY_COMPANION_SLOT_RELAXATIONS: CompanionSlotRelaxations = {
-  nudge: null,
+  grounding: null,
   signal: null,
   zoomOut: null,
   history: null,
@@ -51,7 +58,7 @@ function toSlotRelaxationUi(v: string | null | undefined): CompanionSlotRelaxati
 
 const SLOT_CACHE_KEY: Record<RegenerateCompanionSlot, keyof CompanionSlotCacheIds> = {
   signal: 'signal',
-  grounding: 'nudge',
+  grounding: 'grounding',
   history: 'history',
   zoomOut: 'zoomOut',
 };
@@ -63,7 +70,7 @@ export type CompanionSlotCommitters = {
     source: string;
     url: string;
   }) => void;
-  setNudge: (v: { title: string; body: string; citation: string; url: string }) => void;
+  setGrounding: (v: { title: string; body: string; citation: string; url: string }) => void;
   setHistoryInsight: (v: CachedHistoricalInsightShape) => void;
   setZoomOut: (v: ZoomOutData | null) => void;
   autoSaveToLibrary: (p: CompanionSlotAutosaveParams) => void | Promise<void>;
@@ -100,21 +107,27 @@ function commitOrchestrateSlotData(
 ): void {
   switch (slot) {
     case 'signal': {
-      const d = data as { title: string; body: string; source: string; url: string };
+      const d = normalizeSignalPayload(data);
+      if (!d) break;
       c.setSignal(d);
       void c.autoSaveToLibrary({ title: d.title, body: d.body, sourceType: 'signal', sourceUrl: d.url });
       break;
     }
     case 'grounding': {
       const d = data as { title: string; body: string; citation: string; url: string };
-      c.setNudge(d);
+      c.setGrounding(d);
       void c.autoSaveToLibrary({ title: d.title, body: d.body, sourceType: 'grounding', sourceUrl: d.url });
       break;
     }
     case 'history': {
-      const d = data as CachedHistoricalInsightShape;
+      const d = toHistoricalInsightDisplayData(data);
+      if (!d) break;
       c.setHistoryInsight(d);
-      void c.autoSaveToLibrary({ title: d.title, body: d.btcInsight, sourceType: 'history_insight' });
+      void c.autoSaveToLibrary({
+        title: d.title ?? '',
+        body: resolveHistoricalMarketInsight(d) ?? '',
+        sourceType: 'history_insight',
+      });
       break;
     }
     case 'zoomOut': {
@@ -154,37 +167,6 @@ function pushRecencyForOrchestrateSlot(slot: RegenerateCompanionSlot, data: unkn
       break;
     }
   }
-}
-
-/** Slots the intervention orchestrate response may populate (order preserved for hydration). */
-export const INTERVENTION_RESPONSE_COMPANION_SLOTS: readonly RegenerateCompanionSlot[] = [
-  'grounding',
-  'history',
-  'zoomOut',
-  'signal',
-];
-
-/**
- * Hydrate companion cards returned alongside an intervention-only orchestrate call
- * (trap → grounding, pattern → history, secondary → zoomOut, etc.).
- * Returns the signal slot body for optional debug logging.
- */
-export function hydrateOrchestrateSlotsFromInterventionResponse(
-  orchestrateBody: Record<string, unknown>,
-  fetchedSlots: Set<string>,
-  committers: CompanionSlotCommitters,
-  setCacheRelaxations?: (fn: (prev: CompanionSlotRelaxations) => CompanionSlotRelaxations) => void,
-): CompanionOrchestrateSlotResult | null {
-  for (const slot of INTERVENTION_RESPONSE_COMPANION_SLOTS) {
-    hydrateOrchestrateSlotIfNew(
-      slot,
-      readOrchestrateSlotBody(orchestrateBody, slot),
-      fetchedSlots,
-      committers,
-      setCacheRelaxations,
-    );
-  }
-  return readOrchestrateSlotBody(orchestrateBody, 'signal');
 }
 
 /** Server returned a slot alongside intervention — no recency or cacheId updates. */

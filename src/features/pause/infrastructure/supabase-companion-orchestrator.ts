@@ -1,4 +1,3 @@
-import { buildInterventionOrchestrateBody } from '@/features/pause/application/use-cases/ritual/frame/build-companion-orchestrate-body';
 import { loadActiveOrchestrateSources } from '@/features/pause/infrastructure/companion/orchestrate-sources';
 import { invokeCompanionOrchestrate } from '@/features/pause/infrastructure/edge/companion-orchestrate-edge';
 import type { CompanionOrchestrator } from '@/features/pause/ports/companion-orchestrator';
@@ -8,8 +7,6 @@ export const supabaseCompanionOrchestrator: CompanionOrchestrator = {
   loadSignalSources: () => loadActiveOrchestrateSources('signal'),
   loadGroundingSources: () => loadActiveOrchestrateSources('grounding'),
   invoke: (body) => invokeCompanionOrchestrate(body),
-  invokeIntervention: (session) =>
-    invokeCompanionOrchestrate(buildInterventionOrchestrateBody(session)),
 };
 
 /** @deprecated Prefer `supabaseCompanionOrchestrator` from this module (presentation imports infrastructure directly). */

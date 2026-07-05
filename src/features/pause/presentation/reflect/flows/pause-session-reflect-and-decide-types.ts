@@ -1,7 +1,9 @@
 import type { Dispatch, SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
+import type { CompanionPrefs } from '@/features/pause/domain/companion-card-types';
 import type { PauseImpactData } from '@/features/pause/presentation/session/pause-session-decide-io';
+import type { FeelStepTile } from '@/features/pause/domain/feel-step-tile';
 import type { MoodValue } from '@/features/pause/domain/mood-value';
 import type { PauseStep } from '@/features/pause/domain/pause-ritual-steps';
 import type { RitualDepth } from '@/features/pause/domain/ritual-types';
@@ -14,7 +16,7 @@ export type UsePauseSessionReflectAndDecideParams = {
   pauseInstanceId: string | null;
   context: string | null;
   message: string;
-  btcData: BtcPriceData | null;
+  marketData: MarketQuote | null;
   companionsHaiku: string | null;
   dismissMessage: () => void | Promise<void>;
   refreshSubscription: () => void | Promise<void>;
@@ -22,9 +24,14 @@ export type UsePauseSessionReflectAndDecideParams = {
   setPauseImpactData: Dispatch<SetStateAction<PauseImpactData | null>>;
   setPhase: Dispatch<SetStateAction<'session' | 'done'>>;
   selectedMood: MoodValue | null;
+  selectedBriefFace: FeelStepTile | null;
   selectedMoodAfter: MoodValue | null;
   breathingFirstCompleted: boolean;
   breathingSecondCompleted: boolean;
   feelIntensity: number | null;
   shiftIntensity: number | null;
+  ritualStartedAtMs: number | null;
+  companionPrefs: CompanionPrefs;
+  isFavorite: boolean;
+  pauseInstanceMetadata?: unknown;
 };

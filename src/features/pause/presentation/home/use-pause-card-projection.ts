@@ -1,32 +1,23 @@
 import { useMemo } from 'react';
-import {
-  buildHomePauseCardBodyProps,
-  shouldShowHomePauseSectionSnooze,
-  type BuildHomePauseCardBodyPropsInput,
-  type HomePauseCardBodyPropsProjection,
-} from '@/features/pause/public-home';
+import { shouldShowHomePauseSectionSnooze } from '@/features/pause/domain/home/pause-home-widget-error';
 
-export type UsePauseCardProjectionParams = BuildHomePauseCardBodyPropsInput & {
+export type UsePauseCardProjectionParams = {
   subscriptionReady: boolean;
   hasAccess: boolean;
 };
 
 export type PauseCardProjection = {
   showSnoozeToolbar: boolean;
-  pauseCardBodyProps: HomePauseCardBodyPropsProjection;
 };
 
-/** Read-model for Home “Your pause” widget (body props + snooze gate; screen wires JSX). */
+/** Snooze toolbar gate for Home “Your pause” section header. */
 export function usePauseCardProjection(params: UsePauseCardProjectionParams): PauseCardProjection {
-  const { subscriptionReady, hasAccess, ...rest } = params;
-  const bodyInput: BuildHomePauseCardBodyPropsInput = { ...rest, hasAccess };
+  const { subscriptionReady, hasAccess } = params;
 
   const showSnoozeToolbar = useMemo(
     () => shouldShowHomePauseSectionSnooze(subscriptionReady, hasAccess),
     [subscriptionReady, hasAccess],
   );
 
-  const pauseCardBodyProps = useMemo(() => buildHomePauseCardBodyProps(bodyInput), [params]);
-
-  return { showSnoozeToolbar, pauseCardBodyProps };
+  return { showSnoozeToolbar };
 }

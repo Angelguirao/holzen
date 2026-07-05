@@ -16,16 +16,14 @@ const ALLOWED = new Set([
   'list-checkout-events',
   'notify-checkout-confirmation',
   'holzen-number',
+  'market-quote',
   'health',
   'register-push',
   'delete-account',
   'send-feedback',
-  'record-referral',
   'send-transactional-email',
   'handle-email-unsubscribe',
   'admin-check-stripe-prices',
-  'process-referral-pending',
-  'grounding-enrich',
 ]);
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

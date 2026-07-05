@@ -1,0 +1,15 @@
+vars {
+  VITE_SUPABASE_URL: https://YOUR_PROD_PROJECT_REF.supabase.co
+  AUTH_EMAIL: your-test-user@example.com
+  AUTH_USER_ID: optional-after-sign-in
+  EMAIL_PREVIEW_SECRET: optional-for-preview-email-only
+  EMAIL_UNSUBSCRIBE_TOKEN: optional-for-unsubscribe-tests
+}
+vars:secret [
+  VITE_SUPABASE_PUBLISHABLE_KEY,
+  AUTH_PASSWORD,
+  SUPABASE_ACCESS_TOKEN,
+  SERVICE_CRON_BEARER,
+  EMAIL_PREVIEW_SECRET,
+  SUPABASE_SERVICE_ROLE_JWT
+]

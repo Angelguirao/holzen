@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { buildFetchedPauseInstanceFromFetch } from './fetched-instance-from-fetch';
 
 describe('buildFetchedPauseInstanceFromFetch', () => {
-  it('maps reflection, context snapshot, and companion artifact kinds', () => {
+  it('maps reflection, context snapshot, and haiku artifact', () => {
     const out = buildFetchedPauseInstanceFromFetch(
       'pid-1',
       { context_snapshot: { context_text: 'BTC quiet' } },
@@ -17,10 +17,11 @@ describe('buildFetchedPauseInstanceFromFetch', () => {
       reflection_message: 'Breathe first.',
       context: 'BTC quiet',
       haiku: 'line / line / line',
-      grounding_title: 'G title',
-      grounding_body: 'G body',
       db_state: null,
       engaged_at: null,
+      created_at: null,
+      source: null,
+      metadata: null,
     });
   });
 
@@ -31,10 +32,11 @@ describe('buildFetchedPauseInstanceFromFetch', () => {
       reflection_message: '',
       context: null,
       haiku: null,
-      grounding_title: null,
-      grounding_body: null,
       db_state: null,
       engaged_at: null,
+      created_at: null,
+      source: null,
+      metadata: null,
     });
   });
 

@@ -29,11 +29,6 @@ export {
   reflectionStepSessionStorage,
   persistedTabSessionStorage,
 };
-export {
-  invokeGroundingEnrich,
-  type GroundingEnrichBody,
-  type GroundingEnrichment,
-} from './infrastructure/edge/grounding-enrich-edge';
 import { runPauseCreateOrReuse } from './application/use-cases/session/run-pause-create-or-reuse';
 import { runPauseDismissCurrent } from './application/use-cases/session/run-pause-dismiss-current';
 import type { RunReflectGenerationInput } from './application/use-cases/ritual/reflect/generation/holzen-reflect/run-reflect-generation';

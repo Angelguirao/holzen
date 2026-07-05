@@ -2,7 +2,7 @@
  * Multi-channel delivery for automatic pause offers (email + web push).
  * In-app inbox rows come from `notifications_from_pause_instances` on pause insert — not here.
  */
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import webpush from "https://esm.sh/web-push@3.6.7";
 import { sendWebPushWithCid, type PushSubscriptionRecord } from "./cid-clients.ts";
 import {
@@ -11,6 +11,7 @@ import {
   sendTransactionalEmail,
 } from "./transactional-email.ts";
 import {
+  isPauseVolatilityEmailEnabled,
   prefixEmailSubject,
   resolveNotifyFromAddress,
   resolveVapidMailto,
@@ -24,7 +25,6 @@ export type DeliverPauseOfferChannelsInput = {
   supabase: SupabaseClient;
   webpush: typeof webpush;
   userId: string;
-  emailNotifications: boolean;
   contextPreview: string;
   pauseInstanceId: string;
   log: PauseOfferDeliveryLog;
@@ -107,7 +107,7 @@ async function sendPauseOfferEmail(
       <p style="font-size: 13px; color: #737373; margin-bottom: 16px;">${context}</p>
       <p style="font-size: 14px; line-height: 1.6; margin-bottom: 24px;">Open Holzen when you're ready — your personalized reflection is waiting in the pause ritual.</p>
       <hr style="border: none; border-top: 1px solid #e5e2dc; margin: 24px 0;">
-      <p style="font-size: 11px; color: #a3a3a3;">This is an automated notification from Holzen. You can disable email notifications in your settings.</p>
+      <p style="font-size: 11px; color: #a3a3a3;">This is an automated notification from Holzen.</p>
     </body>
     </html>
   `;
@@ -221,7 +221,13 @@ export async function deliverPauseOfferChannels(
 
   await Promise.all([
     (async () => {
-      if (!input.emailNotifications) return;
+      if (!isPauseVolatilityEmailEnabled()) {
+        log("notifications_deliver_email", {
+          holzen_event: holzenEvent,
+          phase: "volatility_email_disabled_by_env",
+        });
+        return;
+      }
       const { data: userData } = await input.supabase.auth.admin.getUserById(input.userId);
       const email = userData?.user?.email;
       if (email) {

@@ -1,38 +1,104 @@
+import { useEffect, useMemo, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
-import { HomePauseBlockingErrorPanel } from '@/screens/home/components/HomePauseBlockingErrorPanel';
-import { resolvePauseReflectMessageView } from '@/features/pause/public-ritual-reflect';
+import {
+  buildReflectFeelRecapLine,
+  formatReflectDisplayLetter,
+  resolvePauseReflectDisplayContent,
+  type CurrentFeelForReflect,
+  type ReflectionContentV2,
+} from '@/features/pause/public-ritual-reflect';
+import {
+  resolvePauseReflectMessageView,
+  trackPauseReflectBlockViewed,
+  trackPauseReflectInquiryDisplayed,
+} from '@/features/pause/public-ritual-reflect';
+import { PauseReflectInlineNotice } from '@/screens/pause/components/pause-reflect-inline-notice';
+import { PauseReflectMarketContext } from '@/screens/pause/components/pause-reflect-market-context';
 
 export type PauseReflectMessageBodyProps = {
+  pauseInstanceId: string | null;
   context: string | null;
   reflectionMessage: string;
+  reflectionContent: ReflectionContentV2 | null;
+  severityAbsPct?: number;
+  currentFeel?: CurrentFeelForReflect;
   reflectionLoading: boolean;
   reflectionError: string | null;
   onReflectionRetry?: () => void;
-  artifactHaiku: string | null | undefined;
 };
 
-/** Reflection card main copy: context, error/loading/body, optional haiku line. */
+/** Reflect card: Feel recap + reflection letter + collapsed market context. */
 export function PauseReflectMessageBody({
+  pauseInstanceId,
   context,
   reflectionMessage,
+  reflectionContent,
+  severityAbsPct = 0,
+  currentFeel,
   reflectionLoading,
   reflectionError,
   onReflectionRetry,
-  artifactHaiku,
 }: PauseReflectMessageBodyProps) {
   "use memo";
   const { t } = useTranslation();
-  const view = resolvePauseReflectMessageView({ reflectionError, reflectionLoading, reflectionMessage });
+
+  const displayContent = useMemo(
+    () =>
+      resolvePauseReflectDisplayContent({
+        reflectionContent,
+        reflectionMessage,
+        reflectionError,
+        context,
+        severityAbsPct,
+        currentFeel,
+        t,
+      }),
+    [reflectionContent, reflectionMessage, reflectionError, context, severityAbsPct, currentFeel, t],
+  );
+
+  const feelRecap = useMemo(
+    () => buildReflectFeelRecapLine(currentFeel, t),
+    [currentFeel, t],
+  );
+
+  const letter = useMemo(
+    () => (displayContent ? formatReflectDisplayLetter(displayContent) : ''),
+    [displayContent],
+  );
+
+  const view = resolvePauseReflectMessageView({
+    reflectionError: null,
+    reflectionLoading,
+    reflectionMessage,
+    reflectionContent: displayContent,
+  });
+
+  const trackedRef = useRef(false);
+  const usedClientFallback = Boolean(reflectionError && !reflectionContent && !reflectionMessage.trim());
+
+  useEffect(() => {
+    if (trackedRef.current || view !== 'body' || !displayContent) return;
+    trackedRef.current = true;
+    trackPauseReflectBlockViewed(pauseInstanceId, {
+      schema_version: displayContent.schemaVersion,
+      has_draft: usedClientFallback,
+    });
+    if (displayContent.inquiry.trim()) {
+      trackPauseReflectInquiryDisplayed(pauseInstanceId, { mood: currentFeel?.mood });
+    }
+  }, [view, displayContent, pauseInstanceId, currentFeel?.mood, usedClientFallback]);
+
+  const contextStrip = displayContent?.contextStrip?.trim() || null;
 
   return (
-    <div className="min-w-0 flex-1 space-y-2">
-      {context?.trim() ? (
-        <p className="text-xs font-mono uppercase tracking-wide text-muted-foreground">{context.trim()}</p>
-      ) : null}
-      {view === 'error' ? (
-        <HomePauseBlockingErrorPanel error={reflectionError!} onTryAgain={() => onReflectionRetry?.()} />
+    <div className="min-w-0 flex-1 space-y-4">
+      {reflectionError ? (
+        <PauseReflectInlineNotice
+          message={reflectionError}
+          onTryAgain={onReflectionRetry ? () => onReflectionRetry() : undefined}
+        />
       ) : null}
       {view === 'loading' ? (
         <div className="space-y-2" aria-busy="true">
@@ -46,11 +112,20 @@ export function PauseReflectMessageBody({
           <Skeleton className="h-4 w-5/6" />
         </div>
       ) : null}
-      {view === 'body' ? (
-        <p className="font-editorial text-base leading-relaxed text-foreground sm:text-lg">{reflectionMessage}</p>
+      {view === 'body' && feelRecap ? (
+        <p className="text-sm leading-relaxed text-muted-foreground">{feelRecap}</p>
       ) : null}
-      {artifactHaiku?.trim() ? (
-        <p className="pt-1 text-sm italic leading-relaxed text-muted-foreground">{artifactHaiku.trim()}</p>
+      {view === 'body' && letter ? (
+        <p className="whitespace-pre-line font-editorial text-base leading-relaxed text-foreground sm:text-lg">
+          {letter}
+        </p>
+      ) : null}
+      {view === 'body' ? (
+        <PauseReflectMarketContext
+          pauseInstanceId={pauseInstanceId}
+          marketContext={context}
+          contextStrip={contextStrip}
+        />
       ) : null}
     </div>
   );

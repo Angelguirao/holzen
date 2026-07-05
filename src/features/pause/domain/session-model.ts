@@ -45,12 +45,12 @@ export interface PersistedSession {
   briefIntegrateDone?: boolean;
   /** v4: which tile was chosen on the brief Feel grid (Other maps to uncertain in RPC mood). */
   briefFace?: FeelStepTile | null;
+  /** Client ritual clock anchor (ms since epoch) for Done Time row. */
+  ritualStartedAtMs?: number;
 }
 
 export const DEFAULT_COMPANIONS: CompanionData = {
   haiku: null,
-  groundingTitle: null,
-  groundingBody: null,
 };
 
 export const DEFAULT_PREFS: CompanionPrefs = {
@@ -67,10 +67,11 @@ export interface FetchedPauseInstance {
   reflection_message: string;
   context: string | null;
   haiku: string | null;
-  grounding_title: string | null;
-  grounding_body: string | null;
   /** Present when hydrating from `pause_instances` (id-only `/pause` navigation). */
   db_state?: PauseState | null;
   /** ISO timestamp when the row entered `engaged` (for `open_max_age` UI countdown). */
   engaged_at?: string | null;
+  created_at?: string | null;
+  source?: string | null;
+  metadata?: Record<string, unknown> | null;
 }

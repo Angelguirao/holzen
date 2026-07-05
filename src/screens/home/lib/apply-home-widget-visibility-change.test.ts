@@ -1,24 +1,29 @@
 import { describe, expect, it } from 'vitest';
 import { applyHomeWidgetVisibilityChange } from './apply-home-widget-visibility-change';
+import { JOURNEY_STAT_TILES_VISIBILITY_ID } from './home-section-visibility-constants';
 
 describe('applyHomeWidgetVisibilityChange', () => {
-  it('appends id to order when enabling a widget not yet in order', () => {
+  it('appends id when enabling a widget missing from order', () => {
     expect(
       applyHomeWidgetVisibilityChange({
-        id: 'quick-capture',
+        id: JOURNEY_STAT_TILES_VISIBILITY_ID,
         value: true,
         order: ['goal-why', 'market'],
       }),
-    ).toEqual(['goal-why', 'market', 'quick-capture']);
+    ).toEqual(['goal-why', 'market', JOURNEY_STAT_TILES_VISIBILITY_ID]);
   });
 
-  it('leaves order unchanged when disabling or id already present', () => {
-    const order = ['goal-why', 'quick-capture'];
+  it('returns the same order when enabling an id already present', () => {
+    const order = ['goal-why', JOURNEY_STAT_TILES_VISIBILITY_ID];
     expect(
-      applyHomeWidgetVisibilityChange({ id: 'quick-capture', value: true, order }),
+      applyHomeWidgetVisibilityChange({ id: JOURNEY_STAT_TILES_VISIBILITY_ID, value: true, order }),
     ).toBe(order);
+  });
+
+  it('returns the same order when disabling', () => {
+    const order = ['goal-why', 'market'];
     expect(
-      applyHomeWidgetVisibilityChange({ id: 'night', value: false, order }),
+      applyHomeWidgetVisibilityChange({ id: 'market', value: false, order }),
     ).toBe(order);
   });
 });

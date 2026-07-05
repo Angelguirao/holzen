@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { EdgeError } from "../_shared/edge-error.ts";
 import { logDependencyCall } from "../_shared/deps.ts";
@@ -112,26 +112,12 @@ serve(
     // Pause V2 tables (pause_instances / pause_step_events /
     // pause_companion_events / pause_ai_artifacts) already cascade from
     // auth.users(id); explicit deletes here keep the order obvious.
-    await serviceClient
-      .from("collection_items")
-      .delete()
-      .in(
-        "collection_id",
-        (
-          await serviceClient.from("collections").select("id").eq("user_id", userId)
-        ).data?.map((c: { id: string }) => c.id) ?? []
-      );
-
     await Promise.all([
-      serviceClient.from("user_signal_preferences").delete().eq("user_id", userId),
-      serviceClient.from("collections").delete().eq("user_id", userId),
       serviceClient.from("feedback").delete().eq("user_id", userId),
       serviceClient.from("analytics_events").delete().eq("user_id", userId),
       serviceClient.from("testimonials").delete().eq("user_id", userId),
       serviceClient.from("roadmap_votes").delete().eq("user_id", userId),
       serviceClient.from("push_subscriptions").delete().eq("user_id", userId),
-      serviceClient.from("referral_rewards").delete().eq("user_id", userId),
-      serviceClient.from("referrals").delete().eq("referrer_id", userId),
       serviceClient.from("pause_ai_artifacts").delete().eq("user_id", userId),
       serviceClient.from("pause_step_events").delete().eq("user_id", userId),
       serviceClient.from("pause_companion_events").delete().eq("user_id", userId),

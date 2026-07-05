@@ -70,9 +70,9 @@ Pre-PMF we're a team of one. "On-call" means: Slack unmuted during waking hours;
 
 ### Scenario: Cron heartbeat miss
 
-1. BetterStack Heartbeat alert → job name is in the alert title (e.g. `refresh-btc-prices`).
-2. Check the cron's recent runs: `SELECT * FROM cron.job_run_details WHERE jobname = 'refresh-btc-prices' ORDER BY start_time DESC LIMIT 10;`.
-3. Inspect the latest function log in BetterStack for `fn: "refresh-btc-prices"` and its `request.error` line.
+1. BetterStack Heartbeat alert → job name is in the alert title (e.g. `refresh-market-prices` or `holzen-cron-refresh-market-prices`).
+2. Check the cron's recent runs: `SELECT * FROM cron.job_run_details WHERE jobname = 'refresh-market-prices' ORDER BY start_time DESC LIMIT 10;`.
+3. Inspect the latest function log in BetterStack for `fn: "refresh-market-prices"` and its `request.error` line (legacy logs may still show `refresh-btc-prices` pre-cutover).
 4. If `pg_cron` itself died (unlikely on Supabase), reschedule via SQL. See [cron-setup.md](cron-setup.md).
 
 ### Scenario: Sentry first-seen frontend

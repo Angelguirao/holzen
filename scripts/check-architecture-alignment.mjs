@@ -183,12 +183,20 @@ mustNotExist(
   'pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow.ts (use ritual/decide/pause-decide-outcome-toast-flow.ts)',
 );
 mustExist(
+  'src/legacy/pause-wisdom-quotes/session-wisdom-quotes.ts',
+  'legacy/pause-wisdom-quotes/session-wisdom-quotes.ts (session quotes quarantined)',
+);
+mustNotExist(
   'src/features/pause/application/use-cases/ritual/decide/pause-decide-wisdom-quotes-flow.ts',
-  'pause/application/use-cases/ritual/decide/pause-decide-wisdom-quotes-flow.ts',
+  'pause/application/use-cases/ritual/decide/pause-decide-wisdom-quotes-flow.ts (moved to src/legacy/pause-wisdom-quotes/)',
+);
+mustNotExist(
+  'src/features/pause/domain/decide/session-wisdom-quotes.ts',
+  'pause/domain/decide/session-wisdom-quotes.ts (moved to src/legacy/pause-wisdom-quotes/)',
 );
 mustNotExist(
   'src/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow.ts',
-  'pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow.ts (use ritual/decide/pause-decide-wisdom-quotes-flow.ts)',
+  'pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow.ts (wisdom quotes legacy)',
 );
 mustExist(
   'src/features/pause/application/use-cases/session/scaffold',
@@ -1089,8 +1097,6 @@ const LEGACY_PAUSE_REFLECT_FLOWS_FLOW_SUBCLUSTER_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-log-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-toast-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow',
-  '@/features/pause/application/use-cases/ritual/decide/pause-decide-wisdom-quotes-flow',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-log-flow',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-score-impacts-flow',
   "from './pause-reflect-and-decide-view-flow'",
@@ -1101,9 +1107,6 @@ const LEGACY_PAUSE_REFLECT_FLOWS_FLOW_SUBCLUSTER_IMPORTS = [
   "from './pause-reflect-decide-outcome-toast-flow'",
   "from '../pause-reflect-decide-outcome-toast-flow'",
   "from '../../decide/pause-decide-outcome-toast-flow'",
-  "from './pause-reflect-decide-wisdom-quotes-flow'",
-  "from '../pause-reflect-decide-wisdom-quotes-flow'",
-  "from '../../decide/pause-decide-wisdom-quotes-flow'",
   "from '../../decide/pause-decide-outcome-log-flow'",
   "from '../../decide/pause-decide-score-impacts-flow'",
 ];
@@ -1195,8 +1198,6 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_SUBCLUSTER_FLOW_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-log-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-toast-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow',
-  '@/features/pause/application/use-cases/ritual/decide/pause-decide-wisdom-quotes-flow',
   "from './application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow'",
   "from '../application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow'",
   "from './application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow'",
@@ -1211,10 +1212,6 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_IO_SUBCLUSTER_FLOW_IMPORTS = [
   "from '../application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow'",
   "from './application/use-cases/ritual/decide/pause-decide-outcome-toast-flow'",
   "from '../application/use-cases/ritual/decide/pause-decide-outcome-toast-flow'",
-  "from './application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow'",
-  "from '../application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow'",
-  "from './application/use-cases/ritual/decide/pause-decide-wisdom-quotes-flow'",
-  "from '../application/use-cases/ritual/decide/pause-decide-wisdom-quotes-flow'",
 ];
 
 const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_IO_UMBRELLA_FLOW_IMPORTS = [
@@ -1244,7 +1241,6 @@ const LEGACY_PAUSE_COMPANION_ORCHESTRATE_FLOW_SUBCLUSTER_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-retry-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-outcome-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-slot-apply-flow',
-  '@/features/pause/application/use-cases/ritual/frame/pause-companion-intervention-orchestrate-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-telemetry-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-ui-flow',
@@ -1254,8 +1250,6 @@ const LEGACY_PAUSE_COMPANION_ORCHESTRATE_FLOW_SUBCLUSTER_IMPORTS = [
   "from '../pause-companion-orchestrate-outcome-flow'",
   "from './pause-companion-orchestrate-slot-apply-flow'",
   "from '../pause-companion-orchestrate-slot-apply-flow'",
-  "from './pause-companion-intervention-orchestrate-flow'",
-  "from '../pause-companion-intervention-orchestrate-flow'",
   "from './pause-companion-slot-orchestrate-telemetry-flow'",
   "from '../pause-companion-slot-orchestrate-telemetry-flow'",
   "from './pause-companion-slot-orchestrate-flow'",
@@ -1276,7 +1270,6 @@ const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATE_IO_SUBCLUSTER_FLOW_IMPORTS
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-retry-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-outcome-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-slot-apply-flow',
-  '@/features/pause/application/use-cases/ritual/frame/pause-companion-intervention-orchestrate-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-telemetry-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-ui-flow',
@@ -1286,8 +1279,6 @@ const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATE_IO_SUBCLUSTER_FLOW_IMPORTS
   "from '../application/use-cases/ritual/frame/pause-companion-orchestrate-outcome-flow'",
   "from './application/use-cases/ritual/frame/pause-companion-orchestrate-slot-apply-flow'",
   "from '../application/use-cases/ritual/frame/pause-companion-orchestrate-slot-apply-flow'",
-  "from './application/use-cases/ritual/frame/pause-companion-intervention-orchestrate-flow'",
-  "from '../application/use-cases/ritual/frame/pause-companion-intervention-orchestrate-flow'",
   "from './application/use-cases/ritual/frame/pause-companion-slot-orchestrate-telemetry-flow'",
   "from '../application/use-cases/ritual/frame/pause-companion-slot-orchestrate-telemetry-flow'",
   "from './application/use-cases/ritual/frame/pause-companion-slot-orchestrate-flow'",
@@ -1364,20 +1355,17 @@ const LEGACY_PAUSE_PRESENTATION_COMPANION_ORCHESTRATION_DOMAIN_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-section-expansion-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-flow',
-  '@/features/pause/application/use-cases/ritual/frame/pause-companion-intervention-orchestrate-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-outcome-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-retry-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-telemetry-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-slot-orchestrate-ui-flow',
   '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-slot-apply-flow',
   '@/features/pause/application/use-cases/ritual/frame/run-companion-slot-orchestrate',
-  '@/features/pause/application/use-cases/ritual/frame/run-companion-intervention-bootstrap',
   '@/features/pause/application/use-cases/ritual/frame/apply-companion-slot-orchestrate-outcome',
   '@/features/pause/application/use-cases/ritual/frame/apply-companion-orchestrate-retry-reset',
   '@/features/pause/application/use-cases/ritual/frame/companion-slot-orchestrate-telemetry',
   '@/features/pause/application/use-cases/ritual/frame/companion-generation-telemetry',
   '@/features/pause/application/use-cases/ritual/frame/companion-slot-ui-state',
-  '@/features/pause/application/use-cases/ritual/frame/intervention-idempotency',
   '@/features/pause/application/use-cases/ritual/frame/orchestrate-slot-apply',
   "from './load-companion-orchestrate-session'",
   "from '../load-companion-orchestrate-session'",
@@ -1400,7 +1388,6 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation',
   '@/features/pause/application/use-cases/ritual/decide/run-pause-outcome-log',
   '@/features/pause/application/use-cases/ritual/decide/outcome-toast',
-  '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-and-decide-view-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-decide-outcome-view-flow',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-view-flow',
@@ -1408,8 +1395,6 @@ const LEGACY_PAUSE_PRESENTATION_REFLECT_FLOWS_DOMAIN_IMPORTS = [
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-log-flow',
   '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-outcome-toast-flow',
   '@/features/pause/application/use-cases/ritual/decide/pause-decide-outcome-toast-flow',
-  '@/features/pause/application/use-cases/ritual/reflect/flows/pause-reflect-decide-wisdom-quotes-flow',
-  '@/features/pause/application/use-cases/ritual/decide/pause-decide-wisdom-quotes-flow',
   "from './domain/reflect/flows/",
   "from '../domain/reflect/flows/",
   "from './domain/decide/pause-impact-data",

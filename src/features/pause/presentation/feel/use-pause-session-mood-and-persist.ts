@@ -38,6 +38,7 @@ export interface UsePauseSessionMoodAndPersistParams {
   briefStep: BriefPauseStep;
   briefIntegrateDone: boolean;
   selectedBriefFace: FeelStepTile | null;
+  ritualStartedAtMs: number | null;
   setRitualEntry: Dispatch<SetStateAction<RitualDepth | 'picker'>>;
   setBriefStep: Dispatch<SetStateAction<BriefPauseStep>>;
   setBriefIntegrateDone: Dispatch<SetStateAction<boolean>>;
@@ -75,6 +76,7 @@ export function usePauseSessionMoodAndPersist({
   briefStep,
   briefIntegrateDone,
   selectedBriefFace,
+  ritualStartedAtMs,
   setRitualEntry,
   setBriefStep,
   setBriefIntegrateDone,
@@ -140,6 +142,7 @@ export function usePauseSessionMoodAndPersist({
     briefStep,
     briefIntegrateDone,
     selectedBriefFace,
+    ritualStartedAtMs,
   });
 
   return {

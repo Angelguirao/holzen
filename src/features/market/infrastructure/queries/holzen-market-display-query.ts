@@ -1,4 +1,4 @@
-import { fetchMarketData } from '@/features/market/infrastructure/fetch-market-data';
+import { fetchMarketDataLite } from '@/features/market/infrastructure/fetch-market-data';
 import { holzenMarketDisplayQueryKey } from '@/features/market/application/queries/holzen-market-display-keys';
 
 export {
@@ -14,11 +14,11 @@ export function getHolzenMarketDisplayQueryOptions(input: {
   const { coinIdRaw, currency, enabled } = input;
   return {
     queryKey: holzenMarketDisplayQueryKey(coinIdRaw, currency),
-    queryFn: () => fetchMarketData(coinIdRaw, currency),
+    queryFn: () => fetchMarketDataLite(coinIdRaw, currency),
     enabled,
-    staleTime: 4 * 60_000,
+    staleTime: 5 * 60_000,
     gcTime: 15 * 60_000,
-    refetchInterval: 5 * 60_000,
+    refetchInterval: false,
     refetchOnWindowFocus: false,
     retry: 1,
   } as const;

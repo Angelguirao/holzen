@@ -1,5 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { reflectionContentFromLegacyMessage } from '@/features/pause/domain/reflect/generation/reflection-content-v2';
 import { usePauseReflectGeneration } from './use-pause-reflect-generation';
 import { usePauseArtifactReflectionText } from './use-pause-artifact-reflection-text';
 
@@ -31,12 +32,25 @@ vi.mock('@/features/auth/public', () => ({
   useAuth: () => ({ user: { id: 'user-1' } }),
 }));
 
-const { profileFixture } = vi.hoisted(() => ({
-  profileFixture: { display_name: 'Test' },
-}));
+const { profileFixture, useProfileMock } = vi.hoisted(() => {
+  const profileFixture = {
+    reflectionTone: 'stoic',
+    reflectionStyle: 'standard',
+    customPrompt: null as string | null,
+    motivations: [] as string[],
+    mantra: null as string | null,
+    currency: 'USD',
+    language: 'en',
+    display_name: 'Test',
+  };
+  return {
+    profileFixture,
+    useProfileMock: vi.fn(() => profileFixture),
+  };
+});
 
 vi.mock('@/features/user/public-hooks', () => ({
-  useProfile: () => profileFixture,
+  useProfile: () => useProfileMock(),
 }));
 
 vi.mock('react-i18next', () => ({
@@ -70,6 +84,7 @@ beforeEach(() => {
   );
   usePauseArtifactReflectionTextMock.mockReturnValue({
     artifactReflectionText: null,
+    artifactReflectionContent: null,
     reflectionTextFetch: 'idle',
   });
 });
@@ -102,8 +117,10 @@ describe('usePauseReflectGeneration', () => {
   });
 
   it('hydrates reflectionMessage from artifact before holzen-reflect completes', async () => {
+    const persisted = reflectionContentFromLegacyMessage('persisted reflection');
     usePauseArtifactReflectionTextMock.mockReturnValue({
       artifactReflectionText: 'persisted reflection',
+      artifactReflectionContent: persisted,
       reflectionTextFetch: 'done',
     });
 
@@ -123,7 +140,11 @@ describe('usePauseReflectGeneration', () => {
   });
 
   it('keeps nav seed when initialReflectionMessage is non-empty', async () => {
-    pauseReflectGenerationMock.mockResolvedValue({ status: 'generated', message: 'edge' });
+    pauseReflectGenerationMock.mockResolvedValue({
+      status: 'generated',
+      message: 'edge',
+      content: reflectionContentFromLegacyMessage('edge'),
+    });
 
     usePauseArtifactReflectionTextMock.mockReturnValue({
       artifactReflectionText: 'artifact only',
@@ -141,12 +162,18 @@ describe('usePauseReflectGeneration', () => {
   });
 
   it('commits holzen-reflect result after artifact hydrate when edge completes', async () => {
+    const fromRow = reflectionContentFromLegacyMessage('from artifact row');
     usePauseArtifactReflectionTextMock.mockReturnValue({
       artifactReflectionText: 'from artifact row',
+      artifactReflectionContent: fromRow,
       reflectionTextFetch: 'done',
     });
 
-    let resolveEdge: (value: { status: 'generated'; message: string }) => void = () => {};
+    let resolveEdge: (value: {
+      status: 'generated';
+      message: string;
+      content: ReturnType<typeof reflectionContentFromLegacyMessage>;
+    }) => void = () => {};
     pauseReflectGenerationMock.mockImplementation(
       () =>
         new Promise((resolve) => {
@@ -160,7 +187,11 @@ describe('usePauseReflectGeneration', () => {
       expect(result.current.reflectionMessage).toBe('from artifact row');
     });
 
-    resolveEdge({ status: 'generated', message: 'edge copy' });
+    resolveEdge({
+      status: 'generated',
+      message: 'edge copy',
+      content: reflectionContentFromLegacyMessage('edge copy'),
+    });
     await waitFor(() => {
       expect(result.current.reflectionMessage).toBe('edge copy');
     });
@@ -169,10 +200,38 @@ describe('usePauseReflectGeneration', () => {
         pauseInstanceId: 'pause-1',
         userId: 'user-1',
         context: 'btc',
-        profile: profileFixture,
+        profile: expect.objectContaining({
+          reflectionTone: 'stoic',
+          reflectionStyle: 'standard',
+          currency: 'USD',
+          language: 'en',
+        }),
       }),
       mockReflectGenerator,
     );
+  });
+
+  it('does not restart holzen-reflect when useProfile returns a new object reference', async () => {
+    pauseReflectGenerationMock.mockResolvedValue({
+      status: 'generated',
+      message: 'edge',
+      content: reflectionContentFromLegacyMessage('edge'),
+    });
+
+    const { rerender } = renderHook(() => usePauseReflectGeneration(baseParams()));
+
+    await waitFor(() => {
+      expect(pauseReflectGenerationMock.mock.calls.length).toBeGreaterThan(0);
+    });
+    const callsAfterMount = pauseReflectGenerationMock.mock.calls.length;
+
+    useProfileMock.mockImplementation(() => ({
+      ...profileFixture,
+      display_name: 'Re-render tick',
+    }));
+    rerender();
+
+    expect(pauseReflectGenerationMock.mock.calls.length).toBe(callsAfterMount);
   });
 
   it('reports missing-context error without calling holzen-reflect', async () => {

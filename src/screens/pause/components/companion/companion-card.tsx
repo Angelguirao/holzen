@@ -1,6 +1,10 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Check, Heart, Lock } from 'lucide-react';
+import { Check, ChevronDown, Heart, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
+import { CompanionFrameIconTooltip } from '@/screens/pause/components/companion/companion-frame-icon-tooltip';
+
+export type CompanionCardAppearance = 'default' | 'frame';
 
 export type CompanionCardProps = {
   id: string;
@@ -14,6 +18,10 @@ export type CompanionCardProps = {
   onToggleFavorite?: () => void;
   locked?: boolean;
   onUpgrade?: () => void;
+  /** Frame step wireframe: purple collapsed border, foreground when expanded. */
+  appearance?: CompanionCardAppearance;
+  /** Brief hover help on the icon when `appearance="frame"`. */
+  iconHelp?: string;
   children: React.ReactNode;
 };
 
@@ -29,6 +37,8 @@ export function CompanionCard({
   onToggleFavorite,
   locked,
   onUpgrade,
+  appearance = 'default',
+  iconHelp,
   children,
 }: CompanionCardProps) {
   "use memo";
@@ -37,7 +47,7 @@ export function CompanionCard({
 
   if (locked) {
     return (
-      <button
+      <button type="button"
         onClick={onUpgrade}
         className="flex w-full items-center gap-3 rounded-xl border border-border/10 bg-card/10 px-4 py-3.5 text-left text-muted-foreground/30 transition-all duration-300 hover:bg-card/20 hover:text-muted-foreground/50"
       >
@@ -52,57 +62,94 @@ export function CompanionCard({
     );
   }
 
+  const frameChrome = appearance === 'frame';
+
   return (
-    <div className="space-y-0">
+    <div
+      className={cn(
+        'space-y-0',
+        frameChrome && 'overflow-hidden rounded-2xl border-2 bg-background transition-colors',
+        frameChrome && (expanded ? 'border-foreground' : 'border-primary'),
+      )}
+    >
       <div
-        onClick={onToggle}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onToggle();
-          }
-        }}
-        className={`flex w-full cursor-pointer items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-all duration-300 ${
-          expanded
-            ? 'border-primary/15 bg-primary/3'
-            : completed
-              ? 'border-border/10 bg-card/10'
-              : 'border-border/10 bg-card/15 hover:border-border/20 hover:bg-card/25'
-        }`}
+        className={cn(
+          'relative',
+          !frameChrome &&
+            cn(
+              'rounded-xl border transition-all duration-300',
+              expanded
+                ? 'border-primary/15 bg-primary/3'
+                : completed
+                  ? 'border-border/10 bg-card/10'
+                  : 'border-border/10 bg-card/15 hover:border-border/20 hover:bg-card/25',
+            ),
+        )}
       >
-        <div
-          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors duration-300 ${
-            loading && !completed
-              ? 'animate-pulse bg-muted/30'
-              : completed
-                ? 'bg-primary/10'
-                : expanded
-                  ? 'bg-primary/8'
-                  : 'bg-muted/30'
-          }`}
-        >
-          {completed ? (
-            <Check className="h-3.5 w-3.5 text-nox-accent-green" />
-          ) : (
-            <Icon
-              className={`h-3.5 w-3.5 ${loading ? 'text-muted-foreground/30' : expanded ? 'text-nox-text-link/80' : 'text-muted-foreground/50'}`}
-            />
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={expanded}
+          className={cn(
+            'flex w-full cursor-pointer items-center gap-3 text-left transition-all duration-300',
+            frameChrome ? 'px-4 py-3 hover:bg-primary/5' : 'rounded-xl px-4 py-3.5',
+            onToggleFavorite && 'pr-10',
           )}
-        </div>
-        <span
-          className={`flex-1 text-sm font-medium ${completed ? 'text-muted-foreground/50' : 'text-foreground/80'}`}
         >
-          {label}
-        </span>
+          {(() => {
+            const iconBox = (
+              <div
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors duration-300 ${
+                  loading && !completed
+                    ? 'animate-pulse bg-muted/30'
+                    : completed
+                      ? 'bg-primary/10'
+                      : expanded
+                        ? 'bg-primary/8'
+                        : 'bg-muted/30'
+                }`}
+              >
+                {completed ? (
+                  <Check className="h-3.5 w-3.5 text-nox-accent-green" />
+                ) : (
+                  <Icon
+                    className={`h-3.5 w-3.5 ${loading ? 'text-muted-foreground/30' : expanded ? 'text-nox-text-link/80' : 'text-muted-foreground/50'}`}
+                  />
+                )}
+              </div>
+            );
+
+            return frameChrome && iconHelp ? (
+              <CompanionFrameIconTooltip content={iconHelp}>{iconBox}</CompanionFrameIconTooltip>
+            ) : (
+              iconBox
+            );
+          })()}
+          <span
+            className={`flex-1 text-sm font-medium ${completed ? 'text-muted-foreground/50' : 'text-foreground/80'}`}
+          >
+            {label}
+          </span>
+          {frameChrome && completed ? (
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              {t('pause.frame.companionSeen', { defaultValue: 'Seen' })}
+            </span>
+          ) : null}
+          {frameChrome ? (
+            <ChevronDown
+              className={cn(
+                'h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200',
+                expanded && 'rotate-180',
+              )}
+              aria-hidden
+            />
+          ) : null}
+        </button>
         {onToggleFavorite ? (
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleFavorite();
-            }}
-            className={`p-1 transition-colors ${isFavorite ? 'text-destructive' : 'text-muted-foreground/20 hover:text-destructive/60'}`}
+            type="button"
+            onClick={onToggleFavorite}
+            className={`absolute right-3 top-1/2 z-10 -translate-y-1/2 p-1 transition-colors ${isFavorite ? 'text-destructive' : 'text-muted-foreground/20 hover:text-destructive/60'}`}
             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           >
             <Heart className={`h-3 w-3 ${isFavorite ? 'fill-current' : ''}`} />
@@ -118,7 +165,7 @@ export function CompanionCard({
             transition={{ duration: 0.3, ease: 'easeOut' }}
             className="overflow-hidden"
           >
-            <div className="px-1 pb-1 pt-3">{children}</div>
+            <div className={cn(frameChrome ? 'px-4 pb-4' : 'px-1 pb-1 pt-3')}>{children}</div>
           </motion.div>
         ) : null}
       </AnimatePresence>

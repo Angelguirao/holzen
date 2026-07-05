@@ -64,14 +64,14 @@ export function useCompanionFullViewPage({
   });
 
   const {
-    interventionLoading,
     fetchCompanion,
+    whenArtifactHydrateReady,
     signal,
     signalLoading,
     signalError,
-    nudge,
-    nudgeLoading,
-    nudgeError,
+    grounding,
+    groundingLoading,
+    groundingError,
     historyInsight,
     historyLoading,
     historyError,
@@ -82,37 +82,45 @@ export function useCompanionFullViewPage({
 
   useEffect(() => {
     if (!pauseInstanceId || !reflectionMessage) return;
-    if (interventionLoading) return;
-    if (
-      isCompanionFullViewSlotSettled(slot, {
-        signal,
-        signalLoading,
-        signalError,
-        nudge,
-        nudgeLoading,
-        nudgeError,
-        historyInsight,
-        historyLoading,
-        historyError,
-        zoomOut,
-        zoomOutLoading,
-        zoomOutError,
-      })
-    ) {
-      return;
-    }
-    void fetchCompanion(slot);
+
+    let cancelled = false;
+    void (async () => {
+      await whenArtifactHydrateReady();
+      if (cancelled) return;
+      if (
+        isCompanionFullViewSlotSettled(slot, {
+          signal,
+          signalLoading,
+          signalError,
+          grounding,
+          groundingLoading,
+          groundingError,
+          historyInsight,
+          historyLoading,
+          historyError,
+          zoomOut,
+          zoomOutLoading,
+          zoomOutError,
+        })
+      ) {
+        return;
+      }
+      await fetchCompanion(slot);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [
     pauseInstanceId,
     reflectionMessage,
-    interventionLoading,
     slot,
     signal,
     signalLoading,
     signalError,
-    nudge,
-    nudgeLoading,
-    nudgeError,
+    grounding,
+    groundingLoading,
+    groundingError,
     historyInsight,
     historyLoading,
     historyError,
@@ -120,6 +128,7 @@ export function useCompanionFullViewPage({
     zoomOutLoading,
     zoomOutError,
     fetchCompanion,
+    whenArtifactHydrateReady,
   ]);
 
   const revealed = useStaggeredReveal(COMPANION_FULL_VIEW_BREATHING_ROOM_MS);

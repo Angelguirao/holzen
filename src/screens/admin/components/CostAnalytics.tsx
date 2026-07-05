@@ -38,7 +38,7 @@ import {
 } from '@/screens/admin/public-queries';
 import { ProviderHealthCard } from '@/screens/admin/components/ProviderHealthCard';
 
-/** All AI features we expect to see logging in `generation_attempts`. */
+/** Pause-first AI features we expect to see logging in `generation_attempts`. */
 const EXPECTED_FEATURES = [
   'reflection',
   'signal',
@@ -46,17 +46,8 @@ const EXPECTED_FEATURES = [
   'history',
   'zoom_out',
   'intervention',
-  'journal_prompt',
-  'suggest_grounding',
-  'suggest_ritual',
-  'wallpaper',
-  'night_reflection',
-  'reflection_insights',
-  'digest',
-  'reports',
   'admin_library_preview',
   'pregenerate',
-  'fetch_source_feeds',
 ] as const;
 
 interface FeatureStat {
@@ -160,7 +151,7 @@ export function CostAnalytics() {
     () => rows7d.reduce((s, r) => s + Number(r.estimated_cost_usd ?? 0), 0),
     [rows7d],
   );
-  const projectedMonthly = useMemo(() => (totalCost7d / 7) * 30, [totalCost7d]);
+  const projectedMonthly = (totalCost7d / 7) * 30;
 
   const logged = useMemo(() => loggedFeatures(rows7d), [rows7d]);
   const missingCoverage = useMemo(
@@ -175,7 +166,7 @@ export function CostAnalytics() {
         <h3 className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/70">
           Cost analytics
         </h3>
-        <button
+        <button type="button"
           onClick={() => void refreshAll()}
           className="flex items-center gap-1 text-[10px] font-sans font-medium text-muted-foreground/50 hover:text-nox-text-link"
         >
@@ -188,7 +179,7 @@ export function CostAnalytics() {
       <div className="space-y-2">
         <div className="flex items-center gap-1.5">
           {PERIOD_OPTIONS.map((opt) => (
-            <button
+            <button type="button"
               key={opt.value}
               onClick={() => setPeriod(opt.value)}
               className={`text-[9px] font-mono px-2 py-0.5 rounded-full transition-colors ${

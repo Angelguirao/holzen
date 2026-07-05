@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { useCompanionInterventionBootstrap } from './use-companion-intervention-bootstrap';
+import { useCallback, useRef, useState } from 'react';
+import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
+import { useCompanionArtifactHydrate } from './use-companion-artifact-hydrate';
 import { useCompanionOrchestrateRetry } from './use-companion-orchestrate-retry';
 import { useCompanionSlotOrchestrateActions } from './use-companion-slot-orchestrate-actions';
 import { useCompanionSlotUiState } from './use-companion-slot-ui-state';
@@ -23,9 +24,7 @@ export type UseCompanionOrchestrationParams = {
   startCheckout: () => void;
 };
 
-/**
- * Slot UI, intervention bootstrap, lazy-fetch/regenerate, and full orchestrate retry.
- */
+/** Slot UI, lazy-fetch/regenerate, and full orchestrate retry (featured intervention lives in legacy). */
 export function useCompanionOrchestration({
   pauseInstanceId,
   context,
@@ -44,18 +43,38 @@ export function useCompanionOrchestration({
 
   const slotUi = useCompanionSlotUiState(pauseInstanceId);
 
-  const interventionBootstrap = useCompanionInterventionBootstrap({
+  const slotPayloadRef = useRef({
+    signal: slotUi.signal,
+    grounding: slotUi.grounding,
+    zoomOut: slotUi.zoomOut,
+    history: slotUi.historyInsight,
+  });
+  slotPayloadRef.current = {
+    signal: slotUi.signal,
+    grounding: slotUi.grounding,
+    zoomOut: slotUi.zoomOut,
+    history: slotUi.historyInsight,
+  };
+
+  const getSlotPayload = useCallback((slot: RegenerateCompanionSlot) => {
+    switch (slot) {
+      case 'signal':
+        return slotPayloadRef.current.signal;
+      case 'grounding':
+        return slotPayloadRef.current.grounding;
+      case 'zoomOut':
+        return slotPayloadRef.current.zoomOut;
+      case 'history':
+        return slotPayloadRef.current.history;
+      default:
+        return null;
+    }
+  }, []);
+
+  const { whenArtifactHydrateReady } = useCompanionArtifactHydrate({
     pauseInstanceId,
-    retryCount,
-    context,
-    reflectionMessage,
-    mood,
-    severityNumber,
-    language,
-    autoSaveToLibrary: slotUi.autoSaveToLibrary,
-    slotCommitters: slotUi.slotCommitters,
     fetchedSlotsRef: slotUi.fetchedSlotsRef,
-    setCacheRelaxations: slotUi.setCacheRelaxations,
+    slotCommitters: slotUi.slotCommitters,
   });
 
   const orchestrateActions = useCompanionSlotOrchestrateActions({
@@ -72,6 +91,8 @@ export function useCompanionOrchestration({
     requirePro,
     startCheckout,
     fetchedSlotsRef: slotUi.fetchedSlotsRef,
+    getSlotPayload,
+    whenArtifactHydrateReady,
     setCacheIds: slotUi.setCacheIds,
     setCacheRelaxations: slotUi.setCacheRelaxations,
     slotCommitters: slotUi.slotCommitters,
@@ -85,26 +106,21 @@ export function useCompanionOrchestration({
     fetchedSlotsRef: slotUi.fetchedSlotsRef,
     setSignal: slotUi.setSignal,
     setSignalError: slotUi.setSignalError,
-    setNudge: slotUi.setNudge,
-    setNudgeError: slotUi.setNudgeError,
+    setGrounding: slotUi.setGrounding,
+    setGroundingError: slotUi.setGroundingError,
     setZoomOut: slotUi.setZoomOut,
     setZoomOutError: slotUi.setZoomOutError,
     setHistoryInsight: slotUi.setHistoryInsight,
     setHistoryError: slotUi.setHistoryError,
-    setIntervention: interventionBootstrap.setIntervention,
-    setInterventionError: interventionBootstrap.setInterventionError,
-    clearInterventionFetchDedupe: interventionBootstrap.clearInterventionFetchDedupe,
-    interventionSkippedRef: interventionBootstrap.interventionSkippedRef,
-    pendingRetryConfirmRef: interventionBootstrap.pendingRetryConfirmRef,
     setCacheRelaxations: slotUi.setCacheRelaxations,
   });
 
   return {
     cacheIds: slotUi.cacheIds,
     cacheRelaxations: slotUi.cacheRelaxations,
-    nudge: slotUi.nudge,
-    nudgeLoading: slotUi.nudgeLoading,
-    nudgeError: slotUi.nudgeError,
+    grounding: slotUi.grounding,
+    groundingLoading: slotUi.groundingLoading,
+    groundingError: slotUi.groundingError,
     signal: slotUi.signal,
     signalLoading: slotUi.signalLoading,
     signalError: slotUi.signalError,
@@ -114,15 +130,13 @@ export function useCompanionOrchestration({
     historyInsight: slotUi.historyInsight,
     historyLoading: slotUi.historyLoading,
     historyError: slotUi.historyError,
-    intervention: interventionBootstrap.intervention,
-    interventionLoading: interventionBootstrap.interventionLoading,
-    interventionError: interventionBootstrap.interventionError,
     retryOrchestrate,
     fetchCompanion: orchestrateActions.fetchCompanion,
     regenerateCompanion: orchestrateActions.regenerateCompanion,
-    retryNudge: orchestrateActions.retryNudge,
+    retryGrounding: orchestrateActions.retryGrounding,
     retrySignal: orchestrateActions.retrySignal,
     retryZoomOut: orchestrateActions.retryZoomOut,
     retryHistory: orchestrateActions.retryHistory,
+    whenArtifactHydrateReady,
   };
 }

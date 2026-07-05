@@ -1,10 +1,9 @@
 import type { UseQueryOptions } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { holzenLog } from '@/lib/holzen-console';
+import type { PracticeSummary } from '@/features/pause/domain/practice/practice-summary';
 import {
-  COMPLETED_PAUSE_COUNT_NONE_KEY,
-  COMPLETED_PAUSE_COUNT_QUERY_KEY,
-} from './completed-pause-count-query-key';
+  fetchCompletedPauseCount,
+  getPracticeSummaryQueryOptions,
+} from './practice-summary-query';
 
 export {
   COMPLETED_PAUSE_COUNT_DISABLED_USER_ID,
@@ -13,34 +12,21 @@ export {
   COMPLETED_PAUSE_COUNT_QUERY_KEY,
 } from './completed-pause-count-query-key';
 
-const COMPLETED_PAUSE_COUNT_STALE_MS = 60_000;
+/** @deprecated Same data as get_practice_summary — use PRACTICE_SUMMARY_QUERY_KEY. */
+export const COMPLETED_PAUSE_COUNT_ALIASES_PRACTICE_SUMMARY = true;
 
-export async function fetchCompletedPauseCount(userId: string): Promise<number> {
-  const { count, error } = await supabase
-    .from('pause_instances' as never)
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .eq('state', 'completed');
-  if (error) {
-    holzenLog.home('completed_pause_count_unavailable', { message: error.message });
-    return 0;
-  }
-  return count ?? 0;
-}
+export { fetchCompletedPauseCount };
 
-/** Shared TanStack options for completed-pause count (Home + Journey). */
+/** Shared TanStack options: selects completed count from practice summary cache. */
 export function getCompletedPauseCountQueryOptions(
   userId: string | undefined,
 ): Pick<
-  UseQueryOptions<number>,
-  'queryKey' | 'queryFn' | 'enabled' | 'staleTime' | 'refetchOnWindowFocus' | 'retry'
+  UseQueryOptions<PracticeSummary, Error, number>,
+  'queryKey' | 'queryFn' | 'enabled' | 'staleTime' | 'refetchOnWindowFocus' | 'retry' | 'select'
 > {
+  const base = getPracticeSummaryQueryOptions(userId);
   return {
-    queryKey: userId ? COMPLETED_PAUSE_COUNT_QUERY_KEY(userId) : COMPLETED_PAUSE_COUNT_NONE_KEY,
-    queryFn: () => fetchCompletedPauseCount(userId!),
-    enabled: Boolean(userId),
-    staleTime: COMPLETED_PAUSE_COUNT_STALE_MS,
-    refetchOnWindowFocus: false,
-    retry: false,
+    ...base,
+    select: (summary) => summary.completedPauseCount,
   };
 }

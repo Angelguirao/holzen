@@ -6,7 +6,7 @@
  * cutover migration; all callers must supply pauseInstanceId + userId.
  */
 
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 interface CompanionContent {
   [key: string]: unknown;

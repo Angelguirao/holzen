@@ -8,17 +8,16 @@ export type PauseBreathSegment = 'first' | 'second';
 
 export type PauseBreathIntroProps = {
   breathSegment: PauseBreathSegment;
-  mantra: string | null;
   ritualVariant: 'brief' | 'deep';
   prefersReducedMotion: boolean;
   onStart: () => void;
-  onSkipBreath: () => void | Promise<void>;
+  /** Deep second segment only — omit on brief and deep first breathe. */
+  onSkipBreath?: () => void | Promise<void>;
 };
 
-/** Pre-start breath ritual intro (first/second segment copy, mantra, start/skip CTAs). */
+/** Pre-start breath ritual intro (first/second segment copy, start/skip CTAs). */
 export function PauseBreathIntro({
   breathSegment,
-  mantra,
   ritualVariant,
   prefersReducedMotion,
   onStart,
@@ -46,15 +45,16 @@ export function PauseBreathIntro({
           </p>
         )}
         {breathSegment === 'second' ? (
-          <>
-            <p className={pauseStepLayout.screenTitle}>
-              {t('pause.breathSecondHeadline', { defaultValue: 'Just two more breaths' })}
+          <div className="flex max-w-md flex-col items-center gap-2 text-center">
+            <p className="max-w-md text-center font-editorial text-[1.375rem] leading-7 tracking-wide text-foreground">
+              {t('pause.breathSecondHeadline', { defaultValue: 'Final breath' })}
             </p>
-            <div className={`${pauseStepLayout.screenSubtitle} flex flex-col gap-0`}>
-              <p>{t('pause.breathSecondSubline1', { defaultValue: 'Decisions land differently' })}</p>
-              <p>{t('pause.breathSecondSubline2', { defaultValue: 'when the body is here.' })}</p>
-            </div>
-          </>
+            <p className="max-w-md text-center text-base leading-6 tracking-wide text-foreground">
+              {t('pause.breathSecondSubline', {
+                defaultValue: "A breath to settle what you've moved through",
+              })}
+            </p>
+          </div>
         ) : (
           <p className={`${pauseStepLayout.screenTitle} max-w-md`}>
             {t('pause.breathIntroSingle', {
@@ -62,16 +62,6 @@ export function PauseBreathIntro({
             })}
           </p>
         )}
-        {breathSegment === 'first' && mantra ? (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 1 }}
-            className="max-w-sm text-sm italic leading-relaxed text-muted-foreground"
-          >
-            {`"${mantra}"`}
-          </motion.p>
-        ) : null}
       </div>
 
       <div className="flex flex-col items-center gap-3">
@@ -94,17 +84,19 @@ export function PauseBreathIntro({
             <Play className="h-4 w-4 shrink-0 fill-current" aria-hidden />
           </Button>
         </motion.div>
-        {ritualVariant === 'deep' && breathSegment === 'second' ? (
+        {ritualVariant === 'deep' && breathSegment === 'second' && onSkipBreath ? (
           <Button
             type="button"
             variant="ghost"
-            className={`${pauseStepLayout.textContinue} font-medium`}
+            className="text-sm font-medium tracking-wide text-primary hover:bg-transparent hover:text-primary/90"
             onClick={() => {
               hapticFeedback('light');
               void onSkipBreath();
             }}
           >
-            {t('pause.breathSkipToDecide', { defaultValue: 'Skip to decide' })}
+            {t('pause.breathContinueWithoutFinalBreath', {
+              defaultValue: 'Continue without final breath',
+            })}
           </Button>
         ) : null}
       </div>

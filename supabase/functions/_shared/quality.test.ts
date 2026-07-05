@@ -255,7 +255,7 @@ describe('qualityGate - ground_nudge', () => {
 describe('qualityGate - historical_insight', () => {
   const validInsight = {
     title: 'When gold crashed 26% in 2013',
-    btcInsight: 'Between April 12-15, 2013, gold plummeted from $1,560 to $1,321 per ounce — a 26% crash in three days. Panic sellers locked in generational losses.',
+    marketInsight: 'Between April 12-15, 2013, gold plummeted from $1,560 to $1,321 per ounce — a 26% crash in three days. Panic sellers locked in generational losses.',
     analogy: 'Bitcoin has experienced five drawdowns of 70%+ in its history.',
     assetClass: 'Gold',
     period: 'April 2013',
@@ -265,16 +265,21 @@ describe('qualityGate - historical_insight', () => {
     expect(qualityGate('historical_insight', validInsight).pass).toBe(true);
   });
 
-  it('rejects missing btcInsight', () => {
-    const result = qualityGate('historical_insight', { ...validInsight, btcInsight: '' });
+  it('passes legacy btcInsight rows via dual-read', () => {
+    const { marketInsight: _drop, ...legacy } = validInsight;
+    expect(qualityGate('historical_insight', { ...legacy, btcInsight: validInsight.marketInsight }).pass).toBe(true);
+  });
+
+  it('rejects missing marketInsight', () => {
+    const result = qualityGate('historical_insight', { ...validInsight, marketInsight: '' });
     expect(result.pass).toBe(false);
-    expect(result.reason).toBe('missing_btcInsight');
+    expect(result.reason).toBe('missing_marketInsight');
   });
 
   it('rejects history without specific dates or numbers', () => {
     const result = qualityGate('historical_insight', {
       ...validInsight,
-      btcInsight: 'Gold once crashed significantly and many investors panicked. Those who held saw the price recover over time, just as it always does with sound assets.',
+      marketInsight: 'Gold once crashed significantly and many investors panicked. Those who held saw the price recover over time, just as it always does with sound assets.',
     });
     expect(result.pass).toBe(false);
     expect(result.reason).toContain('history_lacks_specificity');
@@ -283,7 +288,7 @@ describe('qualityGate - historical_insight', () => {
   it('passes history with numeric slash date (no English month name)', () => {
     const result = qualityGate('historical_insight', {
       ...validInsight,
-      btcInsight:
+      marketInsight:
         'On 15/03/2020 markets gapped down violently. Many portfolios saw double-digit paper losses in a single session. Recovery took months, not days.',
     });
     expect(result.pass).toBe(true);

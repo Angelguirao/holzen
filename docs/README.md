@@ -4,13 +4,16 @@ This folder contains human-readable notes that complement the source code and in
 
 ## Start here (new contributors)
 
-**Shipping pause-first?** Tick [ops/ship-checklist.md](ops/ship-checklist.md) · deploy via **Vercel + owned Supabase** ([platform-exit-runbook.md](ops/platform-exit-runbook.md)).
+**Shipping pause-first?** Tick [ops/ship-checklist.md](ops/ship-checklist.md) · deploy via **GitHub Actions + Vercel + owned Supabase** ([cicd-overview.md](ops/cicd-overview.md) · [platform-exit-runbook.md](ops/platform-exit-runbook.md)).
+
+**Product strategy / roadmap / moats?** Read [fundamentals/strategy-and-defensibility.md](fundamentals/strategy-and-defensibility.md) → [behavioral-platform-strategy.md](fundamentals/behavioral-platform-strategy.md). Engineers can defer until prioritizing cross-surface or GTM work.
 
 1. **[src/README.md](../src/README.md)** — what ships in active `src/` (4-tab pause-first surface).
 2. **[ops/active-surface.md](ops/active-surface.md)** — routes, edges, crons, dropped tables, PostHog events (canonical shipped manifest).
 3. **[architecture/c4-holzen.md](architecture/c4-holzen.md)** — who the system talks to (System Context + Container). Optional: [workspace.dsl](architecture/workspace.dsl) in Structurizr.
 4. **[fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md)** — boot flow, routing, auth, hooks, and how Supabase pieces connect at runtime. **§19** — phased **learning path** (pause slice first, then whole app).
 5. **Optional — [fundamentals/mental-models-for-contributors.md](fundamentals/mental-models-for-contributors.md)** — plain-language glossary, SPA/React/Supabase mental models, and suggested external primers if you’re coming from a backend-heavy background.
+5b. **Marketing vs product frontends?** — [ops/marketing-site-split.md](ops/marketing-site-split.md) — Astro + React on one domain (`holzen.app`), build merge, and request routing explained for non-infra readers.
 6. **[fundamentals/holzen-application-architecture.md](fundamentals/holzen-application-architecture.md)** — **principles** for modular monolith structure: bounded contexts, use cases, ports/adapters, inspirations, alternatives (read before large frontend restructures).
 6b. **[fundamentals/modern-react-practices-holzen.md](fundamentals/modern-react-practices-holzen.md)** — how current React best practices map to Holzen (target vs transitional `src/`, scorecard).
 7. **Optional — [fundamentals/client-server-architecture-holzen.md](fundamentals/client-server-architecture-holzen.md)** — where **truth** vs **projection** live, TanStack Query vs UI-only state (pair with holzen-application-architecture and §6.1 in navigating-the-codebase).
@@ -24,14 +27,17 @@ This folder contains human-readable notes that complement the source code and in
 
 | Kind of information | Authoritative place | Notes |
 |---------------------|---------------------|--------|
-| Commands, env vars, “where to edit” table | [AGENTS.md](../AGENTS.md) | Keep tables here; link out for narratives. |
+| Commands and “where to edit” table | [AGENTS.md](../AGENTS.md) | Keep the quick lookup table here; link out for longer narratives. |
+| Environment variables, secret storage, and env behavior differences | [ops/environment-matrix.md](ops/environment-matrix.md) | Canonical env/config source across local, CI, Vercel, and Supabase Edge. |
 | **Pause-first shipped scope** (routes, edges, crons, dropped tables) | [ops/active-surface.md](ops/active-surface.md) | Pairs with [src/README.md](../src/README.md); enforced by `npm run check:active-surface`. |
 | **Meta:** where docs go, HTTP doc posture (Bruno vs OpenAPI), edge checklist | [fundamentals/documentation-strategy.md](fundamentals/documentation-strategy.md) | Complements this index; does not duplicate the owner table. |
 | Supabase **`Database` types** (`src/integrations/supabase/types.ts`) | [AGENTS.md](../AGENTS.md) (`npm run gen:types`) | Regenerate after migrations; if types lag, use `as unknown as T` per [deployment-sync-guide.md](ops/deployment-sync-guide.md). |
 | Boot sequence, repo tour, deploy paths (Vercel + Supabase) | [fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md) | Do not duplicate long boot narratives in AGENTS. |
+| **CI/CD** (workflows, secrets, deploy order) | [ops/cicd-overview.md](ops/cicd-overview.md) | Branch model in [branch-model.md](ops/branch-model.md); pre-push in [deployment-sync-guide.md](ops/deployment-sync-guide.md). |
 | **Lovable sync risk, staging, platform exit** | [ops/lovable-staging-and-platform-exit.md](ops/lovable-staging-and-platform-exit.md) | Why merges hit prod DB; CI gaps; phased exit. Pairs with [platform-exit-runbook.md](ops/platform-exit-runbook.md), [vercel-frontend-setup.md](ops/vercel-frontend-setup.md), [production-supabase-setup.md](ops/production-supabase-setup.md). |
 | `index.html`, SPA shell, default SEO/PWA meta | [fundamentals/index-html-and-spa-shell.md](fundamentals/index-html-and-spa-shell.md) | Canonical origin `https://holzen.app`; pairs with §3 in navigating-the-codebase. |
-| Pause lifecycle (instances, events, artifacts, state machine) | [systems/pause-system.md](systems/pause-system.md) | Canonical **data model** and invariants (Pause V2). |
+| **Marketing site + product app** (Astro + React, one URL, build merge) | [ops/marketing-site-split.md](ops/marketing-site-split.md) | Plain-language guide: `apps/site/`, `build:unified`, `spa.html` routing; pairs with [vercel-frontend-setup.md](ops/vercel-frontend-setup.md). |
+| Pause lifecycle (instances, events, artifacts, state machine) | [systems/pause-system.md](systems/pause-system.md) | Canonical **data model** and invariants (Pause V2). **Home widget projection:** [systems/home-pause-widget-projection.md](systems/home-pause-widget-projection.md). |
 | **Pause client module** (features/pause layout, ritual folders, public barrels, collections → legacy) | [systems/pause-client-architecture.md](systems/pause-client-architecture.md) | Pairs with pause-system (server) and [screens/pause.md](screens/pause.md); template for other contexts §9. |
 | **Full client `src/` rings + per-context client targets** | [fundamentals/client-architecture-overview.md](fundamentals/client-architecture-overview.md) | Index of `*-client-architecture.md` (subscription, auth, market, user, notifications); pairs with [client-src-layout.md](fundamentals/client-src-layout.md). |
 | Pause AI pipeline (triggers, edge functions, generators, storage, hooks) | [systems/pause/ai-powered-pause-system.md](systems/pause/ai-powered-pause-system.md) | **Current** Pause V2 pipeline narrative; complements `pause-system.md` (starts with a V2 banner — not a pre‑V2 archive). |
@@ -44,6 +50,8 @@ This folder contains human-readable notes that complement the source code and in
 | App information architecture (routes, primary nav) | [design/information-architecture.md](design/information-architecture.md) | Product IA narrative; **§1–§3 = full-IA pre-strip reference**; **live shipped routes/tabs → [active-surface.md](ops/active-surface.md)**; PostHog `navigation.*` → [event-taxonomy.md](ops/event-taxonomy.md). |
 | **React screen composition** (orchestration, hooks, memoization, reuse) | [fundamentals/react-screen-orchestration.md](fundamentals/react-screen-orchestration.md) | Principles abstracted from Home refactor; **beginner-friendly** vocabulary, Rules of Hooks examples, toolbox, **guided tour of `HomeScreen`**; apply to other `src/screens/*` surfaces. |
 | **Application architecture** (principles, bounded contexts, use cases, target packages, alternatives) | [fundamentals/holzen-application-architecture.md](fundamentals/holzen-application-architecture.md) | Repo map: [frontend-module-layout.md](fundamentals/frontend-module-layout.md); ADR: [decisions/2026-05-17-modular-monolith-hexagonal-client.md](decisions/2026-05-17-modular-monolith-hexagonal-client.md). |
+| **Strategy and defensibility** (cheap AI code era, moat tiers, investment priorities) | [fundamentals/strategy-and-defensibility.md](fundamentals/strategy-and-defensibility.md) | Parent strategy layer; pairs with behavioral-platform-strategy (execution) and active-surface (shipped). |
+| **Behavioral platform strategy** (engine layers, extension-first wedge, stack/surface roadmap) | [fundamentals/behavioral-platform-strategy.md](fundamentals/behavioral-platform-strategy.md) | Product thesis + next surfaces; pairs with pause-system (runtime) and active-surface (shipped). |
 | **Modern React practices** (industry norms, Holzen scorecard, PR checklist) | [fundamentals/modern-react-practices-holzen.md](fundamentals/modern-react-practices-holzen.md) | Pairs with [react-screen-orchestration.md](fundamentals/react-screen-orchestration.md) and §6.1 in navigating-the-codebase. |
 | **Architectural fitness functions** (CI guards, capability map, manual scorecard, gaps) | [fundamentals/architectural-fitness-functions.md](fundamentals/architectural-fitness-functions.md) | Command names in [AGENTS.md](../AGENTS.md); push workflow in [deployment-sync-guide.md](ops/deployment-sync-guide.md). |
 | **Client vs server responsibility** (truth, projection, Query vs UI state) | [fundamentals/client-server-architecture-holzen.md](fundamentals/client-server-architecture-holzen.md) | Pair with holzen-application-architecture and [navigating-the-codebase.md](fundamentals/navigating-the-codebase.md) §6.1. |
@@ -69,6 +77,8 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 - **`fundamentals/react-screen-orchestration.md`** — **reusable playbook** (includes React beginner vocabulary + bad/good hook examples + **step-by-step `Home.tsx` walkthrough**): page as conductor, hook/lib splits, Rules of Hooks + early returns, lazy branches, memoized props, typing at source; concrete maps in [screens/home.md](screens/home.md) and [screens/pause.md](screens/pause.md).
 - `fundamentals/mental-models-for-contributors.md` — glossary + vocabulary for SPAs, React, TypeScript, Vite, Supabase (RLS, edge functions); links to official docs and learning resources.
 - **`fundamentals/holzen-application-architecture.md`** — **principles constitution**: bounded contexts, use cases, ports/adapters, CQRS-lite, inspirations, alternatives, anti-patterns; target monorepo shape.
+- **`fundamentals/strategy-and-defensibility.md`** — **parent strategy**: why features/code are not moats in the cheap-AI era; defensibility tiers; operating principles and roadmap filters; honest maturity snapshot.
+- **`fundamentals/behavioral-platform-strategy.md`** — **execution layer**: behavioral engine (inputs → decisions → outputs), browser extension as next surface, mobile later, metrics north star, volatility/checking wedge; maps guidance to current Vite + Supabase stack.
 - `fundamentals/frontend-module-layout.md` — **repository map**: `apps/web`, `packages/*`, migration waves, CI checks — companion to holzen-application-architecture.
 - **`fundamentals/modern-react-practices-holzen.md`** — modern React industry norms (feature folders, Query, colocation) vs Holzen today/target; PR checklist.
 - **`fundamentals/architectural-fitness-functions.md`** — automated CI guardrails + manual review scorecard mapped to architectural capabilities; how to add new checks.
@@ -86,7 +96,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 ## Screens (in-app surfaces)
 
-- `screens/home.md` — **`/`** dashboard: modes (zen vs full), widgets, subscription/checkout interplay, pause error surfacing, analytics touchpoints.
+- `screens/home.md` — **`/`** dashboard: greeting + widget stack (goal-why, market, your-pause, Presence/Pauses stats), subscription/checkout interplay, pause error surfacing, analytics touchpoints. **Presence XP:** [systems/stats-system.md](systems/stats-system.md) § Pause-first MVP.
 - `screens/pause.md` — **`/pause`** full-screen volatility ritual: gate, depth picker, brief vs deep scaffold, `@/features/pause/public-rpc` wiring, exit navigation, analytics notes.
 
 ## Reports (snapshots)
@@ -100,6 +110,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 ## Ops
 
 - `ops/deployment-sync-guide.md` — **GitHub → Vercel + Supabase**: what auto-deploys, safe workflow, pre-push checklist, **`npm run check:prepush`** (bash full gate), and troubleshooting (401s, migration failures, stale deploys, CRON_SECRET mismatches).
+- `ops/environment-matrix.md` — canonical **env/config inventory**: what each variable is for, where it lives, where to get it, naming rules, and how staging/preview/prod differ.
 - `ops/lovable-staging-and-platform-exit.md` — **staging DB + visible CI + leaving Lovable**: production migration risk, hybrid paths, phased exit checklist (strategic; not a day-to-day push guide).
 - `ops/cron-setup.md` — scheduled jobs: pg_cron + `net.http_post` callouts for pause-adjacent workers.
 - `ops/logging-strategy.md` — edge vs browser vs DB logging; `observe.ts` patterns; correlation and PII.
@@ -142,7 +153,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 - `systems/pause/companions/` — deep dives per companion type (see [companions/signal.md](systems/pause/companions/signal.md) for Signal).
 - `systems/pause/past-reflections.md` — shared "user words" read model behind Zoom Out's Echo and Daily Practice Replay (notes + replay entries, never AI text).
 - `systems/content-library-fetch-source-feeds.md` — **`fetch-source-feeds`** pipeline: RSS/Map discovery → scrape → Gemini → `content_library`; admin setup and **JSON** log grep tokens (`fn`, **`fetch_feeds_*`** **`msg`**).
-- `systems/stats-system.md` — **legacy full-shell only** (not pause-first): Profile → Stats / skills-first model reference in UI order (`src/legacy/full-shell/`).
+- `systems/stats-system.md` — **pause-first:** Practice Presence XP (Postgres + formula + Home/Journey surfaces). **Legacy:** Holzen Score / Profile → Stats (`src/legacy/full-shell/`).
 - `systems/badges-system.md` — **legacy full-shell only** (not pause-first): Profile → Badges reference in UI order (`src/legacy/full-shell/`).
 
 ## Postmortems

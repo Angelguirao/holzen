@@ -25,4 +25,6 @@ export { usePauseSessionFeelTilesSelect } from './presentation/feel/use-pause-se
 export { usePauseSessionInitialMoodHandlers } from './presentation/feel/use-pause-session-initial-mood-handlers';
 export { usePauseSessionDepthAndBriefCopy } from './presentation/feel/use-pause-session-depth-and-brief-copy';
 export { PAUSE_DEPTH_PICKER_CARD_BUTTON_CLASS } from './presentation/feel/pause-depth-picker-styles';
+export { formatPauseDepthPickerMarketLines } from './domain/feel/format-pause-depth-picker-market-lines';
+export { shouldShowPauseRitualMarketContext } from './domain/session/should-show-pause-ritual-market-context';
 export { usePauseFeelShiftLogDedupeRefs } from './presentation/feel/use-pause-feel-shift-log-dedupe-refs';

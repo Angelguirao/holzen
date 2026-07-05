@@ -7,10 +7,16 @@
  * inside one "Today" block after the anchor row.
  */
 
+import { isLegacyHomeSectionId } from '@/screens/home/lib/home-section-visibility-constants';
+
 export const GOAL_WHY_SECTION_ID = 'goal-why' as const;
 
+function stripLegacyHomeSectionIds(ids: string[]): string[] {
+  return ids.filter((id) => !isLegacyHomeSectionId(id));
+}
+
 export function mergeOrderWithDefaults(parsed: string[], defaultOrder: readonly string[]): string[] {
-  const merged = parsed.filter((id) => defaultOrder.includes(id));
+  const merged = stripLegacyHomeSectionIds(parsed).filter((id) => defaultOrder.includes(id));
   const missing = defaultOrder.filter((id) => !merged.includes(id));
   return [...merged, ...missing];
 }

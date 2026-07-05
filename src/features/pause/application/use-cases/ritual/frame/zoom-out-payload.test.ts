@@ -4,6 +4,7 @@ import {
   ZOOM_OUT_DEFAULT_LABEL,
   toZoomOutDisplayData,
   zoomOutBodyPreviewFromJsonString,
+  zoomOutBtcMarketContext,
   zoomOutLibraryAutosaveFromDisplayData,
   zoomOutSaveThisMomentSeed,
   zoomOutTotalCharsForReadTime,
@@ -17,6 +18,18 @@ describe('zoom-out-payload', () => {
       echo: null,
       deepTime: null,
     });
+  });
+
+  it('zoomOutBtcMarketContext returns null without price rows', () => {
+    expect(zoomOutBtcMarketContext(toZoomOutDisplayData({ deepTime: { title: 'T', body: 'B' } }))).toBeNull();
+    expect(
+      zoomOutBtcMarketContext(
+        toZoomOutDisplayData({
+          onThisDay: [{ yearsAgo: 1, price: 1, date: '2020-01-01' }],
+          currentPrice: 2,
+        }),
+      ),
+    ).toMatchObject({ currentPrice: 2 });
   });
 
   it('zoomOutBodyPreviewFromJsonString returns null on invalid JSON', () => {

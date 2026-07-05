@@ -22,7 +22,7 @@ Wrapped:
 - `supabase/functions/health/index.ts`
 - `supabase/functions/delete-account/index.ts`
 - `supabase/functions/companion-orchestrate/index.ts`
-- `supabase/functions/refresh-btc-prices/index.ts`
+- `supabase/functions/refresh-market-prices/index.ts`
 - `supabase/functions/fetch-source-feeds/index.ts`
 - `supabase/functions/pregenerate-companions/index.ts`
 - `supabase/functions/check-volatility/index.ts`

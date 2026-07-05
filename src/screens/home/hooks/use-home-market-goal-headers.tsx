@@ -1,7 +1,6 @@
 import type { TFunction } from 'i18next';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { HomeExpandChevronButton } from '@/screens/home/components/HomeExpandChevronButton';
-import { trackHomeGoalWhyExpandToggled } from '@/features/pause/public-home';
 
 export function useHomeMarketGoalHeaders(args: {
   t: TFunction;
@@ -10,16 +9,6 @@ export function useHomeMarketGoalHeaders(args: {
   toggleMarketChartExpanded: () => void;
 }) {
   const { t, marketChartExpanded, marketChartExpandBlocked, toggleMarketChartExpanded } = args;
-
-  const [goalWhyExpanded, setGoalWhyExpanded] = useState(false);
-
-  const toggleGoalWhyExpanded = useCallback(() => {
-    setGoalWhyExpanded((prev) => {
-      const next = !prev;
-      trackHomeGoalWhyExpandToggled(next);
-      return next;
-    });
-  }, []);
 
   const marketExpandLabel = marketChartExpandBlocked
     ? t('home.market.chartExpandDisabled')
@@ -41,19 +30,5 @@ export function useHomeMarketGoalHeaders(args: {
     [marketChartExpanded, marketChartExpandBlocked, toggleMarketChartExpanded, marketExpandLabel],
   );
 
-  const goalWhyHeaderRight = useMemo(
-    () => (
-      <HomeExpandChevronButton
-        expanded={goalWhyExpanded}
-        onToggle={toggleGoalWhyExpanded}
-        ariaExpandedWhenEnabled={goalWhyExpanded}
-        ariaLabel={
-          goalWhyExpanded ? t('home.goalWhy.collapseHoldDetails') : t('home.goalWhy.expandHoldDetails')
-        }
-      />
-    ),
-    [goalWhyExpanded, toggleGoalWhyExpanded, t],
-  );
-
-  return { goalWhyExpanded, goalWhyHeaderRight, marketHeaderRight };
+  return { marketHeaderRight };
 }

@@ -14,7 +14,6 @@ function makePorts() {
     setContext: vi.fn(),
     setCompanionsEmpty: vi.fn(),
     setNewPauseArrival: vi.fn(),
-    setLastTriggerAt: vi.fn(),
     syncOpenPauseFromDb: vi.fn().mockResolvedValue(undefined),
   };
 }

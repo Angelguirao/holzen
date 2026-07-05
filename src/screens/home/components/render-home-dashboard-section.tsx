@@ -1,54 +1,41 @@
 import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
-import { BtcStatus } from '@/screens/home/components/BtcStatus';
+import { Moon } from 'lucide-react';
+import { MarketStatus } from '@/screens/home/components/MarketStatus';
 import { HomeGoalWhyCard } from '@/screens/home/components/HomeGoalWhyCard';
 import { HomeSectionCard } from '@/screens/home/components/HomeSectionCard';
-import type { BtcPriceData, TrackedAssetId } from '@/features/market/public';
+import { HomePracticeStatTiles } from '@/screens/home/components/HomePracticeStatTiles';
+import type { HomePauseWidgetProjection } from '@/features/pause/public-home';
+import type { MarketQuote, TrackedAssetId } from '@/features/market/public';
 
-/** Everything needed to render one Home “Today” / goal-why section by id. */
+/** Everything needed to render one Home dashboard section by id. */
 export interface HomeDashboardSectionDeps {
   t: TFunction;
-  goalWhyHoldSummary: string | null;
-  setGoalWhyHoldSummary: (v: string | null) => void;
-  goalWhyHeaderRight: ReactNode;
-  goalWhyExpanded: boolean;
   error: string | null;
   marketHeaderRight: ReactNode;
   marketFooter: ReactNode;
-  btcData: BtcPriceData | null;
+  marketData: MarketQuote | null;
   priceHidden: boolean;
   togglePriceHidden: () => void;
   currency: string;
   trackedAssetId: TrackedAssetId;
-  unitBasisModeSupported: boolean;
-  btcMode: boolean;
-  toggleBtcMode: () => void;
   marketChartExpanded: boolean;
   toggleMarketChartExpanded: () => void;
   pauseCardBody: ReactNode;
   pauseSectionHeaderRight: ReactNode | undefined;
+  pauseWidgetProjection: HomePauseWidgetProjection;
   subscribed: boolean;
   collapsed: Record<string, boolean>;
   toggleCollapsed: (id: string) => void;
+  presenceXp: number | null;
+  completedPauseCount: number | null;
+  practiceStatsLoading: boolean;
 }
 
 export function renderHomeDashboardSection(sectionId: string, d: HomeDashboardSectionDeps): ReactNode {
   switch (sectionId) {
     case 'goal-why':
-      return (
-        <HomeSectionCard
-          className="rounded-lg"
-          title={d.t('home.widget.whyHoldTitle')}
-          headerSubtitle={d.goalWhyHoldSummary ?? undefined}
-          headerRight={d.goalWhyHeaderRight}
-        >
-          <HomeGoalWhyCard
-            currentPrice={d.btcData?.currentPrice}
-            detailsExpanded={d.goalWhyExpanded}
-            onHoldGoalSummaryChange={d.setGoalWhyHoldSummary}
-          />
-        </HomeSectionCard>
-      );
+      return <HomeGoalWhyCard />;
 
     case 'market':
       return (
@@ -57,15 +44,13 @@ export function renderHomeDashboardSection(sectionId: string, d: HomeDashboardSe
           headerRight={d.error ? undefined : d.marketHeaderRight}
           footer={d.marketFooter}
         >
-          <BtcStatus
-            data={d.btcData}
+          <MarketStatus
+            data={d.marketData}
             error={d.error}
             hidden={d.priceHidden}
             onToggleHidden={d.togglePriceHidden}
             currency={d.currency}
             coinId={d.trackedAssetId}
-            btcMode={d.unitBasisModeSupported && d.btcMode}
-            onToggleBtcMode={d.unitBasisModeSupported ? d.toggleBtcMode : undefined}
             chartExpanded={d.marketChartExpanded}
             onToggleChartExpanded={d.toggleMarketChartExpanded}
             chartChevronInPriceRow={false}
@@ -75,14 +60,42 @@ export function renderHomeDashboardSection(sectionId: string, d: HomeDashboardSe
 
     case 'your-pause':
       return (
-        <HomeSectionCard title={d.t('home.widget.yourPause')} headerRight={d.pauseSectionHeaderRight}>
+        <HomeSectionCard
+          title={d.t(d.pauseWidgetProjection.sectionTitleKey, {
+            defaultValue:
+              d.pauseWidgetProjection.sectionTitleKey === 'home.widget.continueYourPause'
+                ? 'Continue your pause'
+                : d.pauseWidgetProjection.sectionTitleKey === 'home.widget.newPauseAvailable'
+                    ? 'New pause available'
+                    : d.pauseWidgetProjection.sectionTitleKey === 'home.widget.youPaused'
+                        ? 'You paused'
+                        : 'Your pause',
+          })}
+          headerRight={
+            d.pauseSectionHeaderRight ??
+            (d.pauseWidgetProjection.showMoonIcon ? (
+              <Moon className="h-5 w-5 shrink-0 text-muted-foreground/70" aria-hidden />
+            ) : undefined)
+          }
+          collapsible={d.pauseWidgetProjection.collapsible}
+          collapsed={d.pauseWidgetProjection.collapsed}
+          onToggleCollapse={d.pauseWidgetProjection.onToggleCollapse}
+        >
           {d.pauseCardBody}
         </HomeSectionCard>
       );
 
+    case 'journey-pulse':
+      return (
+        <HomePracticeStatTiles
+          presenceXp={d.presenceXp}
+          completedPauseCount={d.completedPauseCount}
+          isLoading={d.practiceStatsLoading}
+        />
+      );
+
     case 'quick-capture':
     case 'night':
-    case 'journey-pulse':
       return null;
 
     default:

@@ -1,11 +1,14 @@
 # Intervention (end-to-end)
 
-> **Pause V2:** This doc reflects the current model. Interventions are stored
-> in `pause_ai_artifacts` (kind `intervention`) keyed by `pause_instance_id`.
-> Legacy `reflections` / `reflection_companions` storage was removed.
+> **Pause-first shipped UI (2026):** The **featured intervention headline is not rendered**
+> (`InterventionSection` removed). The SPA does **not** call intervention-only orchestrate
+> (`PAUSE_FEATURED_INTERVENTION_ENABLED = false`). Edge `selectIntervention` remains for
+> `useIntervention: true` callers. Re-enable: [src/legacy/pause-featured-intervention/README.md](../../../src/legacy/pause-featured-intervention/README.md).
 
+> **Pause V2 storage:** Interventions are stored in `pause_ai_artifacts` (kind `intervention`)
+> keyed by `pause_instance_id`. Legacy `reflections` / `reflection_companions` was removed.
 
-The **intervention** is the featured cognitive headline at the top of the pause UI. It is **not** a companion card — it is a separate concept that sits above the companion card grid.
+The **intervention** is the featured cognitive headline at the top of the pause UI (when enabled). It is **not** a companion card — it is a separate concept that sits above the companion card grid.
 
 This page is the **intervention-level** view. For the full **orchestrator** contract, **companion cards**, **cost limits**, and the **end-to-end pipeline**, see the system doc: **[AI-powered pause system](../ai-powered-pause-system.md)** (especially **§5** `companion-orchestrate`, **§5.2** intervention selection, **§7** per-type reference).
 
@@ -13,17 +16,21 @@ This page is the **intervention-level** view. For the full **orchestrator** cont
 
 ## 1. Where the intervention sits in the pipeline
 
+**Shipped pause-first UI (2026):** steps 2–5 below do **not** run on the client (`PAUSE_FEATURED_INTERVENTION_ENABLED = false`). **`PauseFrame`** is a hub of companion deep-links; **`useCompanionOrchestration`** only lazy-fetches slots. The edge path remains for **`useIntervention: true`** (tests, Bruno, future re-enable).
+
+When enabled (legacy client in `src/legacy/pause-featured-intervention/`):
+
 1. Client creates a `pause_instances` row (manual via `pause_create_or_reuse`) or `check-volatility` creates one (automatic via `pause_create_or_reuse_as`).
-2. **`use-companion-data`** calls **`companion-orchestrate`** with **`useIntervention: true`** and all **`enable*`** flags **false** (intervention-only request, `holzenInvokeSource: 'browser_pause_intervention'`).
-3. **`companion-orchestrate`** runs **`selectIntervention`** (`_shared/intervention-selector.ts`), which evaluates rules in priority order and returns a **selection** object (`mode`, `primary`, `secondary`, optional `mirrorData`).
+2. **`useCompanionInterventionFetch`** (legacy) calls **`companion-orchestrate`** with **`useIntervention: true`** and all **`enable*`** flags **false** (`holzenInvokeSource: 'browser_pause_intervention'`).
+3. **`companion-orchestrate`** runs **`selectIntervention`** (`legacy/featured-intervention/intervention-selector.ts`), which evaluates rules in priority order and returns a **selection** object (`mode`, `primary`, `secondary`, optional `mirrorData`).
 4. The orchestrator assembles the **intervention payload** and persists it to **`pause_ai_artifacts`** (kind `intervention`).
-5. The Pause UI renders the result: mirror / trap / pattern / question, plus optional zoom-out secondary (via `CompanionSection` and related components).
+5. The Pause UI would render the result: mirror / trap / pattern / question, plus optional zoom-out secondary (`InterventionSection` — removed from active screens).
 
 Companion cards are fetched **separately** via lazy single-slot requests when the user taps them. The intervention request does **not** generate companion data — it only selects the headline type and, for mirror, assembles DB-only data.
 
 ---
 
-## 2. Selection order (`intervention-selector.ts`)
+## 2. Selection order (`legacy/featured-intervention/intervention-selector.ts`)
 
 `selectIntervention` evaluates in **strict priority order** — first match wins:
 
@@ -90,7 +97,7 @@ flowchart LR
 | Aspect | Detail |
 |--------|--------|
 | **Trigger conditions** | `severity === "mild"` (<5% move) **and** total completed pause count for user **≥ 20**. |
-| **Data source** | **`generateQuestion`** (`_shared/generators/question.ts`) — dedicated AI path via Gemini. |
+| **Data source** | **`generateQuestion`** (`legacy/featured-intervention/question.ts`) — dedicated AI path via Gemini. |
 | **AI** | **Yes** — single reflective question, parallel with companion tasks. |
 | **Payload** | `intervention.mode === "question"`, `intervention.question` string. No `primary` / `secondary`. |
 | **UI** | Centered question copy + "Sit with this before deciding." No companion-shaped body. |
@@ -109,7 +116,7 @@ flowchart LR
 
 ## 4. Severity bucketing
 
-`bucketSeverity` in `intervention-selector.ts` converts the absolute 24h % move:
+`bucketSeverity` in `legacy/featured-intervention/intervention-selector.ts` (re-exported from `_shared/market-context.ts` for active callers) converts the absolute 24h % move:
 
 | Absolute % change | Severity |
 |--------------------|----------|
@@ -124,7 +131,7 @@ flowchart LR
 These are **independent** systems that run in sequence inside `companion-orchestrate`:
 
 - **`determineSessionIntent`** (`session-intent.ts`) — maps mood + market + history to a **theme** that biases all generator outputs (Signal angle, Grounding bias, History mood, Zoom-out seed). Uses 7 theme keys plus fallbacks.
-- **`selectIntervention`** (`intervention-selector.ts`) — decides **what to feature** at the top of the UI and **which generator outputs** to copy into the intervention payload.
+- **`selectIntervention`** (`legacy/featured-intervention/intervention-selector.ts`) — decides **what to feature** at the top of the UI and **which generator outputs** to copy into the intervention payload when `useIntervention: true`.
 
 The intervention type does not change the session theme, and the session theme does not change intervention selection. They are parallel concerns.
 
@@ -134,9 +141,10 @@ The intervention type does not change the session theme, and the session theme d
 
 | Area | Path |
 |------|------|
-| Intervention selector | `supabase/functions/_shared/intervention-selector.ts` |
-| Mirror builder | `supabase/functions/_shared/generators/mirror.ts` |
-| Question generator | `supabase/functions/_shared/generators/question.ts` |
+| Intervention selector | `supabase/functions/legacy/featured-intervention/intervention-selector.ts` |
+| Mirror builder | `supabase/functions/legacy/featured-intervention/mirror.ts` |
+| Question generator | `supabase/functions/legacy/featured-intervention/question.ts` |
+| Client stack (quarantined) | `src/legacy/pause-featured-intervention/` |
 | Session intent | `supabase/functions/_shared/session-intent.ts` |
 | Orchestrator | `supabase/functions/companion-orchestrate/index.ts` |
 | UI | `src/screens/pause/components/CompanionSection.tsx` (intervention block + cross-ref badges) |
