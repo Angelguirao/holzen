@@ -54,6 +54,8 @@ describe('usePauseShiftFrameDoneHandler', () => {
         pauseInstanceId: 'pi-1',
         t,
         lastShiftLogKeyRef,
+        frameShiftMood: null,
+        frameShiftIntensity: null,
         setFrameDone,
         setMoodAfterDone,
         goToStep,
@@ -66,6 +68,8 @@ describe('usePauseShiftFrameDoneHandler', () => {
     expect(pauseShiftEmotionFrameHubDoneMock).toHaveBeenCalledWith({
       pauseInstanceId: 'pi-1',
       lastShiftLogKey: null,
+      shiftMood: null,
+      shiftIntensity: null,
     });
     await act(async () => {
       await result.current.handleFrameImDone();
@@ -74,6 +78,8 @@ describe('usePauseShiftFrameDoneHandler', () => {
     expect(pauseShiftEmotionFrameHubDoneMock).toHaveBeenLastCalledWith({
       pauseInstanceId: 'pi-1',
       lastShiftLogKey: SHIFT_LOG_KEY,
+      shiftMood: null,
+      shiftIntensity: null,
     });
     expect(goToStep).toHaveBeenLastCalledWith('breath2');
     expect(setFrameDone).toHaveBeenCalled();
@@ -92,6 +98,8 @@ describe('usePauseShiftFrameDoneHandler', () => {
         pauseInstanceId: 'pi-1',
         t,
         lastShiftLogKeyRef,
+        frameShiftMood: null,
+        frameShiftIntensity: null,
         setFrameDone,
         setMoodAfterDone,
         goToStep,
@@ -132,6 +140,8 @@ describe('usePauseShiftFrameDoneHandler', () => {
     expect(pauseShiftEmotionFrameHubDoneMock).toHaveBeenCalledWith({
       pauseInstanceId: null,
       lastShiftLogKey: null,
+      shiftMood: null,
+      shiftIntensity: null,
     });
     expect(goToStep).toHaveBeenCalledWith('breath2');
   });

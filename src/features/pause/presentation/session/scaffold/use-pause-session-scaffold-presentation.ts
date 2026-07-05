@@ -1,11 +1,10 @@
 import type { ReactNode } from 'react';
 import type { TFunction } from 'i18next';
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
 import { isPauseSessionDepthPickerActive } from '@/features/pause/presentation/feel/pause-feel-io';
 import type { FetchedPauseInstance } from '@/features/pause/domain/session-model';
 import type { RitualDepth } from '@/features/pause/domain/ritual-types';
 import type { PauseSessionScaffoldRitualPayloadsParams } from './scaffold-ritual-payloads';
-import { usePauseSessionDepthAndBriefCopy } from '../../feel/use-pause-session-depth-and-brief-copy';
 import { usePauseSessionScaffoldRitual } from './use-pause-session-scaffold-ritual';
 import { usePauseSessionStepTransition } from '../use-pause-session-step-transition';
 
@@ -14,7 +13,7 @@ export type UsePauseSessionScaffoldPresentationParams = Omit<
   'prefersReducedMotion' | 'stepTransition'
 > & {
   t: TFunction;
-  btcData: BtcPriceData | null;
+  marketData: MarketQuote | null;
   trackedAssetId: string;
   ritualEntry: RitualDepth | 'picker';
   phase: 'session' | 'done';
@@ -35,7 +34,7 @@ export type UsePauseSessionScaffoldPresentationParams = Omit<
 export function usePauseSessionScaffoldPresentation(params: UsePauseSessionScaffoldPresentationParams) {
   const {
     t,
-    btcData,
+    marketData,
     trackedAssetId,
     ritualEntry,
     phase,
@@ -47,13 +46,6 @@ export function usePauseSessionScaffoldPresentation(params: UsePauseSessionScaff
     engagedOpenMaxCountdownSlot,
     ...ritualPayloads
   } = params;
-
-  const { depthContextLine } = usePauseSessionDepthAndBriefCopy({
-    t,
-    btcData,
-    trackedAssetId,
-    ritualEntry,
-  });
 
   const stepTransition = usePauseSessionStepTransition({
     swipeDirection,
@@ -79,13 +71,14 @@ export function usePauseSessionScaffoldPresentation(params: UsePauseSessionScaff
     },
     payloads: {
       ...ritualPayloads,
+      marketData,
+      trackedAssetId,
       stepTransition,
       prefersReducedMotion: !!prefersReducedMotion,
     },
   });
 
   return {
-    depthContextLine,
     sessionOnPicker,
     briefStepperSlot,
     engagedOpenMaxCountdownSlot,

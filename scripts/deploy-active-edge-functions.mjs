@@ -11,6 +11,10 @@ import { readConfigTomlFunctionNames } from "./lib/read-config-toml-functions.mj
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const names = readConfigTomlFunctionNames();
+const projectRefFlagIndex = process.argv.indexOf("--project-ref");
+const explicitProjectRef =
+  projectRefFlagIndex >= 0 ? process.argv[projectRefFlagIndex + 1] : undefined;
+const projectRef = explicitProjectRef?.trim() || process.env.SUPABASE_PROJECT_REF?.trim();
 
 const missing = names.filter(
   (name) => !existsSync(join(root, "supabase", "functions", name, "index.ts")),
@@ -21,9 +25,14 @@ if (missing.length) {
   process.exit(1);
 }
 
-console.log(`[deploy-active-edge-functions] Deploying ${names.length} active functions…`);
+console.log(
+  `[deploy-active-edge-functions] Deploying ${names.length} active functions${projectRef ? ` to ${projectRef}` : ""}…`,
+);
 
-const result = spawnSync("npx", ["supabase", "functions", "deploy", ...names], {
+const args = ["supabase", "functions", "deploy", ...names];
+if (projectRef) args.push("--project-ref", projectRef);
+
+const result = spawnSync("npx", args, {
   stdio: "inherit",
   shell: process.platform === "win32",
 });

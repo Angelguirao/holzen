@@ -20,9 +20,9 @@ describe('home-screen-telemetry', () => {
   });
 
   it('tracks optional widget toggle', () => {
-    trackHomeOptionalWidgetToggled('night', true);
+    trackHomeOptionalWidgetToggled('journey-pulse', true);
     expect(trackEvent).toHaveBeenCalledWith('home.optional_widget_toggled', {
-      widget_id: 'night',
+      widget_id: 'journey-pulse',
       visible: true,
     });
   });
@@ -48,7 +48,17 @@ describe('home-screen-telemetry', () => {
   });
 
   it('tracks onboarding completed', () => {
-    trackOnboardingCompleted(2);
-    expect(trackEvent).toHaveBeenCalledWith('onboarding.completed', { steps_completed: 2 });
+    trackOnboardingCompleted({
+      stepsCompleted: 4,
+      trackedAssetId: 'bitcoin',
+      thresholdUp: 5,
+      thresholdDown: 5,
+    });
+    expect(trackEvent).toHaveBeenCalledWith('onboarding.completed', {
+      steps_completed: 4,
+      tracked_asset_id: 'bitcoin',
+      threshold_up: 5,
+      threshold_down: 5,
+    });
   });
 });

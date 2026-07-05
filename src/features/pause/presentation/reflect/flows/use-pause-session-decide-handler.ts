@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { hapticFeedback } from '@/lib/haptics';
 import { useAuth } from '@/features/auth/public';
 import {
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
+  readPauseImpactPracticeFieldsFromCache,
   resolvePauseDecideOutcomeFlow,
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
@@ -19,6 +19,7 @@ export function usePauseSessionDecideHandler(
   input: UsePauseSessionDecideHandlerParams,
 ): { handleDecide: (d: string) => Promise<void> } {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const {
     decidingRef,
     pauseInstanceId,
@@ -38,6 +39,10 @@ export function usePauseSessionDecideHandler(
     shiftIntensity,
     reflectionMessage,
     haiku,
+    ritualStartedAtMs,
+    companionPrefs,
+    isFavorite,
+    pauseInstanceMetadata,
   } = input;
 
   const handleDecide = useCallback(
@@ -51,6 +56,12 @@ export function usePauseSessionDecideHandler(
           pauseInstanceId,
           decision: d,
         });
+
+        const practiceFields = readPauseImpactPracticeFieldsFromCache(
+          queryClient,
+          pauseInstanceId,
+          pauseInstanceMetadata,
+        );
 
         const flow = resolvePauseDecideOutcomeFlow({
           outcome,
@@ -66,8 +77,15 @@ export function usePauseSessionDecideHandler(
             shiftIntensity,
             reflectionMessage,
             haiku,
+            ritualStartedAtMs,
+            companionPrefs,
+            isFavorite,
+            engagedTools: practiceFields.engagedTools,
+            wroteNote: practiceFields.wroteNote,
+            usedTags: practiceFields.usedTags,
+            completedFrameCompanions: practiceFields.completedFrameCompanions,
+            companionSlotFavoriteXp: practiceFields.companionSlotFavoriteXp,
           },
-          reinforcementQuote: formatReinforcementQuoteFromSession(getSessionQuote()),
         });
 
         if (flow.kind === 'abort_sync_failed') {
@@ -76,7 +94,7 @@ export function usePauseSessionDecideHandler(
         }
 
         if (flow.kind === 'abort_not_completed') {
-          invalidatePauseStatsDataForUser(user?.id);
+          invalidatePauseStatsDataForUser(user?.id, { pauseInstanceId });
           showPauseOutcomeNotCompletedToast(t);
           void refreshSubscription();
           return;
@@ -113,8 +131,13 @@ export function usePauseSessionDecideHandler(
       shiftIntensity,
       reflectionMessage,
       haiku,
+      ritualStartedAtMs,
+      companionPrefs,
+      isFavorite,
+      pauseInstanceMetadata,
       refreshSubscription,
       user?.id,
+      queryClient,
       t,
       setDecision,
       setPauseImpactData,

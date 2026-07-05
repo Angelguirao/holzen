@@ -12,13 +12,14 @@ describe('runToggleCompanionLibraryFavorite', () => {
       runToggleCompanionLibraryFavorite(repository, {
         pauseInstanceId: 'pause-1',
         sourceType: 'signal',
+        nextBucket: { signal: true },
         onBucketComputed,
       }),
     ).resolves.toBe(true);
 
     expect(toggleCompanionSlotFavorite).toHaveBeenCalledWith({
       pauseInstanceId: 'pause-1',
-      sourceType: 'signal',
+      nextBucket: { signal: true },
       onBucketComputed,
     });
   });

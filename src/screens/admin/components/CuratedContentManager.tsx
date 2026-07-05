@@ -178,7 +178,7 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
         </p>
       </div>
 
-      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full text-left">
+      <button type="button" onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full text-left">
         {open ? <ChevronDown className="h-3 w-3 text-muted-foreground/60" /> : <ChevronRight className="h-3 w-3 text-muted-foreground/60" />}
         <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
           Cache Entries <span className="text-muted-foreground/45">({entries.length})</span>
@@ -256,13 +256,13 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
                     </div>
                     <div className="flex items-center gap-1.5 pt-0.5">
                       {!isCurated && (
-                        <button onClick={() => promote(entry.id)} disabled={isActing}
+                        <button type="button" onClick={() => promote(entry.id)} disabled={isActing}
                           className="flex items-center gap-0.5 text-[9px] font-sans font-medium text-nox-text-link/75 hover:text-nox-text-link disabled:opacity-30 transition-colors">
                           <ArrowUp className="h-2.5 w-2.5" /> Promote
                         </button>
                       )}
                       {(isCurated || entry.quality_score >= 2) && (
-                        <button onClick={() => demote(entry.id)} disabled={isActing}
+                        <button type="button" onClick={() => demote(entry.id)} disabled={isActing}
                           className="flex items-center gap-0.5 text-[9px] font-mono text-destructive/70 hover:text-destructive disabled:opacity-30 transition-colors">
                           <ArrowDown className="h-2.5 w-2.5" /> Demote
                         </button>
@@ -275,7 +275,7 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
                       >
                         {entry.source_untrusted ? 'Trust attribution' : 'Untrusted attribution'}
                       </button>
-                      <button onClick={() => remove(entry.id)} disabled={isActing}
+                      <button type="button" onClick={() => remove(entry.id)} disabled={isActing}
                         className="flex items-center gap-0.5 text-[9px] font-mono text-destructive/50 hover:text-destructive/80 disabled:opacity-30 transition-colors">
                         <Trash2 className="h-2.5 w-2.5" /> Delete
                       </button>

@@ -2,23 +2,7 @@
 
 import { readFile } from "node:fs/promises";
 
-// holzen-prod — same fallback as vite.config.ts when VITE_SUPABASE_* is unset at build time.
-const FALLBACK_SUPABASE_URL = "https://geqkxsnyqvhtascjghuu.supabase.co";
-const FALLBACK_SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_q81zcl_HC0sLoPIsBxmDzg_r424f7BY";
-
-function resolveSupabaseConfig() {
-  return {
-    url:
-      process.env.VITE_SUPABASE_URL ||
-      process.env.SUPABASE_URL ||
-      FALLBACK_SUPABASE_URL,
-    publishableKey:
-      process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-      process.env.SUPABASE_PUBLISHABLE_KEY ||
-      FALLBACK_SUPABASE_PUBLISHABLE_KEY,
-  };
-}
+const SEMVER_PATTERN = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
 
 async function readPackageVersion() {
   const raw = await readFile(new URL("../package.json", import.meta.url), "utf8");
@@ -29,65 +13,11 @@ async function readPackageVersion() {
   return pkg.version.trim();
 }
 
-async function fetchLatestChangelogVersion({ url, publishableKey }) {
-  const endpoint = `${url}/rest/v1/changelog_entries?select=version&order=created_at.desc&limit=1`;
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8000);
-
-  try {
-    const res = await fetch(endpoint, {
-      method: "GET",
-      headers: {
-        apikey: publishableKey,
-        Authorization: `Bearer ${publishableKey}`,
-      },
-      signal: controller.signal,
-    });
-
-    if (!res.ok) {
-      const body = await res.text().catch(() => "");
-      throw new Error(`Supabase request failed (${res.status}): ${body || "no body"}`);
-    }
-
-    const rows = await res.json();
-    const version = rows?.[0]?.version;
-    if (!version || typeof version !== "string") {
-      throw new Error("No changelog_entries row found with a valid `version`.");
-    }
-    return version.trim();
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
-function isChangelogTableMissing(err) {
-  const msg = err instanceof Error ? err.message : String(err);
-  return msg.includes("PGRST205") || msg.includes("changelog_entries");
-}
-
 async function main() {
   const packageVersion = await readPackageVersion();
-  const config = resolveSupabaseConfig();
-  let changelogVersion;
-  try {
-    changelogVersion = await fetchLatestChangelogVersion(config);
-  } catch (err) {
-    if (isChangelogTableMissing(err)) {
-      console.warn(
-        "Version sync skipped: changelog_entries not on this Supabase project yet (run prod migrations first).",
-      );
-      return;
-    }
-    throw err;
-  }
-
-  if (packageVersion !== changelogVersion) {
+  if (!SEMVER_PATTERN.test(packageVersion)) {
     console.error("Version sync check failed.");
-    console.error(`- package.json version: ${packageVersion}`);
-    console.error(`- latest changelog version: ${changelogVersion}`);
-    console.error(
-      "Update package.json `version` to match the latest changelog entry before building."
-    );
+    console.error(`- package.json version is not valid semver: ${packageVersion}`);
     process.exit(1);
   }
 

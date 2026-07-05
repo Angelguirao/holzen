@@ -16,6 +16,9 @@ export type PauseInstanceContextSnapshotRow = {
   context_snapshot: Record<string, unknown> | null;
   state?: PauseState | null;
   engaged_at?: string | null;
+  created_at?: string | null;
+  source?: string | null;
+  metadata?: Record<string, unknown> | null;
 };
 
 export type PauseAiArtifactKindRow = {
@@ -38,9 +41,10 @@ export function buildFetchedPauseInstanceFromFetch(
     reflection_message: msg,
     context: ctx,
     haiku: companionData.haiku,
-    grounding_title: companionData.groundingTitle,
-    grounding_body: companionData.groundingBody,
     db_state: inst.state ?? null,
     engaged_at: inst.engaged_at ?? null,
+    created_at: inst.created_at ?? null,
+    source: inst.source ?? null,
+    metadata: inst.metadata ?? null,
   };
 }

@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { generateSignal, PROMPT_VERSION as SIGNAL_VERSION } from "./generators/signal.ts";
 import { generateGrounding, PROMPT_VERSION as GROUNDING_VERSION } from "./generators/grounding.ts";
 import { generateHistory, PROMPT_VERSION as HISTORY_VERSION } from "./generators/history.ts";

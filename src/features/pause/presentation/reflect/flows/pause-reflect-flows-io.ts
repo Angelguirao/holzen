@@ -55,10 +55,7 @@ import {
   type ScoreImpactVariant,
   type ScoreImpactViewMode,
 } from '@/features/pause/application/use-cases/ritual/decide/score-impact-presentation';
-import {
-  formatReinforcementQuoteFromSession,
-  resolvePauseDecideOutcomeFlow,
-} from '@/features/pause/domain/decide/pause-decide-outcome-flow';
+import { resolvePauseDecideOutcomeFlow } from '@/features/pause/domain/decide/pause-decide-outcome-flow';
 import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
@@ -69,18 +66,17 @@ import {
   showPauseOutcomeNotCompletedToast,
   showPauseOutcomeSaveFailedToast,
 } from '@/features/pause/application/use-cases/ritual/decide/outcome-toast';
-import { getSessionQuote } from '@/features/pause/application/use-cases/ritual/decide/wisdom-quotes';
 import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 import { supabasePauseRepository } from '@/features/pause/public-rpc';
+import { readPauseImpactPracticeFieldsFromCache } from './read-pause-impact-practice-fields';
 
 /** Default `PauseRepository` for reflect+decide presentation hooks. */
 export const reflectPauseRepository = supabasePauseRepository;
 
 export {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   parseScoreImpactVolatilityPct,
+  readPauseImpactPracticeFieldsFromCache,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
@@ -95,6 +91,7 @@ export {
   type ScoreImpactVariant,
   type ScoreImpactViewMode,
 };
+export type { PauseImpactPracticeFields } from './read-pause-impact-practice-fields';
 
 /** Default port + use case: decide step `outcome_logged` RPC. */
 export function pauseReflectOutcomeLog(

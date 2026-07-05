@@ -4,7 +4,7 @@
  *
  * **When `[holzen:*]` is on (any of):**
  * - **`import.meta.env.DEV`** — local Vite dev server.
- * - **`VITE_HOLZEN_DEBUG=1`** — hosted/staging/prod build (e.g. `.env.hosted.local` for `npm run dev:hosted`).
+ * - **`VITE_HOLZEN_DEBUG=1`** — staging/prod-like build (e.g. `.env.prod.local` for `npm run dev:prod`).
  * - **`?holzenDebug=1`** once in the URL — sets **session** `holzen:debug` and strips the param (this tab only).
  * - **`localStorage.setItem('holzen:debug','1')`** + reload — persistent opt-in (support / power users).
  *

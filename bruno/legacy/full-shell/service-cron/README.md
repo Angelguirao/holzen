@@ -10,7 +10,7 @@ Every request uses:
 Authorization: Bearer {{SERVICE_CRON_BEARER}}
 ```
 
-Set **`SERVICE_CRON_BEARER`** in your Bruno environment (**`environments/hosted.bru`** or **`local.bru`**, gitignored) to **either**:
+Set **`SERVICE_CRON_BEARER`** in your Bruno environment (**`environments/local.bru`**, **`staging.bru`**, or **`prod.bru`**, gitignored) to **either**:
 
 | Where you get credentials | What to paste into `SERVICE_CRON_BEARER` |
 |---------------------------|------------------------------------------|

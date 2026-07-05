@@ -44,7 +44,7 @@ curl.exe -s -w "\nHTTP:%{http_code}" -X POST \
   -H "Content-Type: application/json" -d "{}"
 ```
 
-CI alternative: [staging-backend.yml](../../.github/workflows/staging-backend.yml) and [deploy-production.yml](../../.github/workflows/deploy-production.yml).
+CI alternative: [staging-deploy.yml](../../.github/workflows/staging-deploy.yml) and [deploy-production.yml](../../.github/workflows/deploy-production.yml).
 
 ### 2. Stripe Dashboard access
 
@@ -124,7 +124,7 @@ After saving, copy the **Signing secret** → `STRIPE_WEBHOOK_SECRET` on the mat
 
 ```sh
 stripe login
-stripe listen --forward-to http://127.0.0.1:54321/functions/v1/stripe-webhook
+stripe listen --forward-to http://127.0.0.1:55421/functions/v1/stripe-webhook
 # paste printed whsec_… into local supabase secrets
 ```
 
@@ -153,7 +153,7 @@ npm run dev:staging
 
 ### A. Secrets + prices (in-app)
 
-1. Sign in as admin (`VITE_ADMIN_USER_IDS`).
+1. Sign in as a user with `profiles.is_admin = true` (see [environment-matrix.md](environment-matrix.md)).
 2. Open **`/admin`** → **Stripe Price Check** (calls `admin-check-stripe-prices`).
 3. All three required prices should show **ok** with correct recurrence (Pro = recurring, flex = one_time).
 
@@ -165,7 +165,7 @@ npm run dev:staging
 
 ### C. Bruno (API-only)
 
-[bruno/active/billing/README.md](../../bruno/active/billing/README.md) — `01-create-checkout`, `02-check-subscription`, `04-ensure-trial-subscription`. Requires JWT + deployed edges + Stripe secrets.
+[bruno/active/billing/README.md](../../bruno/active/billing/README.md) — `01-create-checkout-trial`, `02-check-subscription`, `04-ensure-trial-subscription` (idempotent read / legacy). Requires JWT + deployed edges + Stripe secrets.
 
 ### D. Webhook delivery
 
@@ -200,7 +200,8 @@ Stripe Dashboard → Webhooks → endpoint → **Recent deliveries** — expect 
 |----------|------|
 | `create-checkout` | Stripe Checkout Session URL |
 | `check-subscription` | Profile cache + Stripe subscription read |
-| `ensure-trial-subscription` | 7-day trial without card at onboarding |
+| `create-checkout` (`trial: true`) | 7-day trial via Stripe Checkout (card on file; $0 today) |
+| `ensure-trial-subscription` | Idempotent trial status read; returns `checkout_required` when a new trial must start via Checkout |
 | `stripe-webhook` | Subscription sync + flex credit grants |
 | `customer-portal` | Billing portal URL |
 | `admin-check-stripe-prices` | Secret/price validation (admin) |

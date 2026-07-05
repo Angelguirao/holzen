@@ -15,7 +15,8 @@ See **[SCOPE.md](SCOPE.md)** (HTTP vs SPA) and **[`active/functions-catalog.md`]
 | File | Example |
 | --- | --- |
 | `environments/local.bru` | [`local.bru.example`](environments/local.bru.example) |
-| `environments/hosted.bru` | [`hosted.bru.example`](environments/hosted.bru.example) |
+| `environments/staging.bru` | [`staging.bru.example`](environments/staging.bru.example) |
+| `environments/prod.bru` | [`prod.bru.example`](environments/prod.bru.example) |
 
 | Variable | Purpose |
 | --- | --- |
@@ -23,7 +24,9 @@ See **[SCOPE.md](SCOPE.md)** (HTTP vs SPA) and **[`active/functions-catalog.md`]
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Anon key |
 | `AUTH_EMAIL` / `AUTH_PASSWORD` | Test user |
 | `SERVICE_CRON_BEARER` | For `active/service-cron/` only |
+| `SUPABASE_SERVICE_ROLE_JWT` | Ops-only; required for `active/email/99-process-email-queue-OPS` |
 | `EMAIL_PREVIEW_SECRET` | For `active/auth-hook/` preview only (or use `CRON_SECRET`) |
+| `EMAIL_UNSUBSCRIBE_TOKEN` | Optional token for `active/email/03` and `04` |
 
 After auth, `active/auth/00` and `01` set **`SUPABASE_ACCESS_TOKEN`** (and **`AUTH_USER_ID`** when present).
 
@@ -31,9 +34,9 @@ After auth, `active/auth/00` and `01` set **`SUPABASE_ACCESS_TOKEN`** (and **`AU
 
 | Path | Role |
 | --- | --- |
-| **`active/`** | **Default** — auth, pause, billing, platform, shipped crons |
+| **`active/`** | **Default** — auth, pause, billing, email, platform, shipped crons |
 | **`legacy/full-shell/`** | Retired full-IA `.bru` (undeployed on prod) |
-| **`environments/`** | `local` / `hosted` vars |
+| **`environments/`** | `local` / `staging` / `prod` vars |
 
 ## Typical shipped-surface flow
 
@@ -41,9 +44,9 @@ After auth, `active/auth/00` and `01` set **`SUPABASE_ACCESS_TOKEN`** (and **`AU
 2. `active/pause-pipeline/*`, `active/billing/*`, `active/platform/health`
 3. Pre-publish smoke: [active/README.md](active/README.md) + [launch-runbook](../docs/ops/launch-runbook.md) §4
 
-Cron / batch: `active/service-cron/` with **`SERVICE_CRON_BEARER`** — staging first.
+Cron / batch: `active/service-cron/` with **`SERVICE_CRON_BEARER`** — run on staging first.
 
-**Not in Bruno:** `stripe-webhook` (signatures); full pause RPC path (use app).
+**Not in Bruno:** `stripe-webhook` and `handle-email-suppression` (signed webhooks); full pause RPC path (use app).
 
 ## Running a review
 

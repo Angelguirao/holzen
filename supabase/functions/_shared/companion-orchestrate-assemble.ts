@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { writeCompanionData } from "./companion-data.ts";
 import { isCompanionContent } from "./companion-orchestrate-parse.ts";
 import type {
@@ -6,7 +6,7 @@ import type {
   InterventionPayload,
   OrchestrateResponse,
 } from "./companion-orchestrate-types.ts";
-import type { InterventionSelection } from "./intervention-selector.ts";
+import type { InterventionSelection } from "../legacy/featured-intervention/intervention-selector.ts";
 import { ORCHESTRATOR_KEY_MAP } from "./companion-types.ts";
 
 const companionTypeMap = ORCHESTRATOR_KEY_MAP;

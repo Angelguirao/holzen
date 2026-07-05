@@ -34,23 +34,18 @@ export function PauseDoneBriefCheckInPanel({
   "use memo";
   const { t } = useTranslation();
 
-  const checkInRowRightHint = t('pause.brief.done.checkInRowRightHint', {
-    defaultValue:
-      'Optional: if how you feel now changed after deciding, adjust mood or intensity and tap Save so Journey reflects your after-state.',
-  });
-
   return (
-    <div className="w-full max-w-md space-y-4 rounded-xl border border-primary bg-card p-4 text-left shadow-sm">
+    <div className="w-full max-w-md space-y-4 rounded-xl border border-primary bg-muted/30 p-4 text-left">
       <p className="text-center text-sm font-medium leading-5 tracking-wide text-foreground">
-        {t('pause.brief.done.checkInSectionTitle', { defaultValue: 'How are you now?' })}
+        {t('pause.brief.done.checkInSectionTitle')}
       </p>
 
       <div className="flex w-full items-start justify-between gap-3 text-sm leading-5 text-foreground">
         <span className="shrink-0 font-normal">
-          {t('pause.brief.done.checkInRowLeft', { defaultValue: 'Check in again' })}
+          {t('pause.brief.done.checkInRowLeft')}
         </span>
-        <span className="line-clamp-4 max-w-[62%] text-right text-xs font-normal leading-snug text-muted-foreground sm:text-sm">
-          {checkInRowRightHint}
+        <span className="text-right text-sm text-muted-foreground">
+          {t('pause.brief.done.checkInRowXpReward', { count: 5, defaultValue: '+5 XP' })}
         </span>
       </div>
 

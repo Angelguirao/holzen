@@ -4,7 +4,7 @@ import {
   type PauseSessionPersistSnapshotInput,
 } from './persist-snapshot';
 
-const companions = { haiku: null, groundingTitle: null, groundingBody: null } as const;
+const companions = { haiku: null } as const;
 const companionPrefs = {
   breathing: true,
   haiku: true,

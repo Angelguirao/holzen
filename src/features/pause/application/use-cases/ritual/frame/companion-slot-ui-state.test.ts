@@ -8,9 +8,9 @@ import {
 describe('companion slot UI state helpers', () => {
   it('routes loading to the matching setter', () => {
     const setSignalLoading = vi.fn();
-    const setNudgeLoading = vi.fn();
-    setCompanionSlotLoading('grounding', { setSignalLoading, setNudgeLoading, setHistoryLoading: vi.fn(), setZoomOutLoading: vi.fn() }, true);
-    expect(setNudgeLoading).toHaveBeenCalledWith(true);
+    const setGroundingLoading = vi.fn();
+    setCompanionSlotLoading('grounding', { setSignalLoading, setGroundingLoading, setHistoryLoading: vi.fn(), setZoomOutLoading: vi.fn() }, true);
+    expect(setGroundingLoading).toHaveBeenCalledWith(true);
     expect(setSignalLoading).not.toHaveBeenCalled();
   });
 
@@ -32,7 +32,7 @@ describe('companion slot UI state helpers', () => {
     const setZoomOutError = vi.fn();
     setCompanionSlotError('zoomOut', {
       setSignalError: vi.fn(),
-      setNudgeError: vi.fn(),
+      setGroundingError: vi.fn(),
       setHistoryError: vi.fn(),
       setZoomOutError,
     }, true);

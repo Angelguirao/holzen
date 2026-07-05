@@ -1,6 +1,12 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { usePauseReflectionStepLog } from '@/features/pause/public-ritual-reflect';
+import { resolvePauseReflectDisplayContent } from '@/features/pause/public-ritual-reflect';
+import {
+  usePauseReflectionStepLog,
+  type CurrentFeelForReflect,
+  type ReflectionContentV2,
+} from '@/features/pause/public-ritual-reflect';
 import { pauseStepLayout } from '@/features/pause/public-session';
 import { PauseReflectCard } from '@/screens/pause/components/pause-reflect-card';
 import { PauseReflectStepNav } from '@/screens/pause/components/pause-reflect-step-nav';
@@ -9,11 +15,12 @@ interface Props {
   pauseInstanceId: string | null;
   context: string | null;
   reflectionMessage: string;
+  reflectionContent?: ReflectionContentV2 | null;
+  currentFeel?: CurrentFeelForReflect;
+  severityAbsPct?: number;
   reflectionLoading?: boolean;
   reflectionError?: string | null;
   onReflectionRetry?: () => void;
-  /** When false, skip loading / showing the haiku line (profile companion toggle). */
-  companionHaikuEnabled: boolean;
   isFavorite: boolean;
   onToggleFavorite: () => void;
   subscribed: boolean;
@@ -25,10 +32,12 @@ export function PauseReflect({
   pauseInstanceId,
   context,
   reflectionMessage,
+  reflectionContent = null,
+  currentFeel,
+  severityAbsPct = 0,
   reflectionLoading = false,
   reflectionError = null,
   onReflectionRetry,
-  companionHaikuEnabled,
   isFavorite,
   onToggleFavorite,
   subscribed,
@@ -37,6 +46,28 @@ export function PauseReflect({
 }: Props) {
   "use memo";
   const { t } = useTranslation();
+
+  const effectiveReflectionContent = useMemo(
+    () =>
+      resolvePauseReflectDisplayContent({
+        reflectionContent,
+        reflectionMessage,
+        reflectionError,
+        context,
+        severityAbsPct,
+        currentFeel,
+        t,
+      }),
+    [
+      reflectionContent,
+      reflectionMessage,
+      reflectionError,
+      context,
+      severityAbsPct,
+      currentFeel,
+      t,
+    ],
+  );
 
   usePauseReflectionStepLog({
     pauseInstanceId,
@@ -58,7 +89,9 @@ export function PauseReflect({
           {t('pause.reflect.title', { defaultValue: 'Reflect' })}
         </p>
         <p className={pauseStepLayout.screenSubtitle}>
-          {t('pause.reflect.subtitle', { defaultValue: 'Take your time' })}
+          {t('pause.reflect.subtitle', {
+            defaultValue: 'Take your time',
+          })}
         </p>
       </div>
 
@@ -66,10 +99,12 @@ export function PauseReflect({
         pauseInstanceId={pauseInstanceId}
         context={context}
         reflectionMessage={reflectionMessage}
+        reflectionContent={reflectionContent}
+        currentFeel={currentFeel}
+        severityAbsPct={severityAbsPct}
         reflectionLoading={reflectionLoading}
         reflectionError={reflectionError}
         onReflectionRetry={onReflectionRetry}
-        companionHaikuEnabled={companionHaikuEnabled}
         isFavorite={isFavorite}
         onToggleFavorite={onToggleFavorite}
         subscribed={subscribed}
@@ -79,6 +114,7 @@ export function PauseReflect({
         reflectionLoading={reflectionLoading}
         reflectionError={reflectionError}
         reflectionMessage={reflectionMessage}
+        reflectionContent={effectiveReflectionContent}
         onContinue={onContinue}
         onBack={onBack}
       />

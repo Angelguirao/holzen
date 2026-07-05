@@ -16,7 +16,7 @@ const NotFoundScreen = () => {
     trackedPathRef.current = attempted;
     trackAppRouteNotFound(attempted);
     console.error('404 Error: User attempted to access non-existent route:', attempted);
-  }, [location.pathname]);
+  }, [location]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6">

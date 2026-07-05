@@ -1,8 +1,8 @@
 ---
 version: alpha
 name: Holzen (Nox)
-description: >-
-  Bitcoin-aware mindfulness SPA. Visual system follows Google Stitch Nox;
+  description: >-
+  Volatility-triggered pause practice for investors. Visual system follows Google Stitch Nox;
   runtime tokens live in src/index.css and tailwind.config.ts.
 colors:
   background-primary: "#151E30"
@@ -125,9 +125,25 @@ Holzen is a **dark-first** app: one appearance (`class="dark"` on `html`), calm 
 
 ## Elevation & Depth
 
-- Prefer **flat** hierarchy: borders (`border-nox-border-default`) and **surface step** (primary → secondary → accent) over heavy shadows.
+- **In-app:** Prefer **flat** hierarchy — borders (`border-nox-border-default`) and **surface step** (primary → secondary → accent) over heavy shadows.
+- **Marketing:** One documented elevation tier only — see `docs/design/nox/patterns/marketing.md` (`--nox-elevation-marketing-*`, glass tokens).
 - Overlays: `background-overlay` / scrim gradients from `background` with alpha stops.
 - Focus: `border-focus` / `ring` aligned to `--nox-color-border-focus`.
+
+## Motion
+
+- **Default:** Short, functional transitions (150–200ms ease) on hover/focus — border color, opacity, subtle `translateY(-1px)` on primary CTAs.
+- **Ambient / pause:** Slow breathing pulse (≈4s) only where it supports the ritual; always respect `prefers-reduced-motion: reduce` (disable animation, keep static state).
+- **No:** Parallax, bounce easing, or motion that draws attention away from copy during waitlist / auth flows.
+- **Marketing hero:** `breath-pulse` on product preview ring is allowed; disable under reduced motion.
+
+## Voice & Tone (UI copy)
+
+- **Calm, direct, investor-literate** — no hype, no “revolutionary,” no fear-mongering about markets.
+- **Second person** for actions (“Get early access”, “Pause before you trade”); **first person** sparingly in journal/reflection contexts.
+- **Short sentences** in marketing; in-app microcopy even shorter (labels, toasts).
+- **Science claims:** Cite or soften (“research suggests”); disclaimer on landing for non-advice.
+- **Errors:** Plain language, one recovery step — no error codes in user-facing text unless support needs them.
 
 ## Shapes
 
@@ -152,9 +168,23 @@ Holzen is a **dark-first** app: one appearance (`class="dark"` on `html`), calm 
 
 **Don't**
 
-- Hardcode hex colors for links (e.g. legacy cyan `#24B2C8`) — use tokens.
+- Hardcode hex colors (e.g. `#DBB366`, `#0F172A`, legacy cyan `#24B2C8`) — use `nox.*` tokens; CI enforces via `check:nox-hex`.
+- Duplicate `--nox-*` or `--font-*` in `src/index.css` — import `@holzen/design-tokens/tokens.css` instead.
 - Use **`text-cyan`** / removed Tailwind cyan for Holzen UI.
 - Use **`text-primary`** for hyperlink styling — it is the **light inverse fill** token path, not the link hue.
+- Invent marketing-only CSS variables outside `packages/design-tokens/tokens.css` (no ad-hoc `--glass`, `--shadow-card`).
+- Set user-facing body copy below **12px** (`--nox-text-xs`) except decorative mono labels inside product mocks.
+
+## Anti-patterns (Holzen-specific)
+
+| Anti-pattern | Why | Fix |
+|--------------|-----|-----|
+| Three styling dialects (hex + shadcn + bespoke CSS) | Drift, a11y risk | One token source + Tailwind `nox.*` |
+| Heavy shadows in app screens | Breaks calm Nox hierarchy | Flat surfaces; marketing elevation doc only |
+| Bright cyan links | Retired palette | `text-nox-text-link` |
+| `style={{ color: '#…' }}` on wordmark | Bypasses theme | `text-nox-text-highlight` |
+| Arbitrary `text-[13px]` | Off-scale type | `--nox-text-*` scale |
+| Marketing glass vars in React app | Split brain | Keep glass tokens marketing-only |
 
 ---
 
@@ -162,9 +192,10 @@ Holzen is a **dark-first** app: one appearance (`class="dark"` on `html`), calm 
 
 | Artifact | Role |
 |----------|------|
-| `src/index.css` | CSS variables: Nox palette, semantic shadcn bridge, fonts |
+| `packages/design-tokens/tokens.css` | **Source of truth** for raw Nox CSS variables |
+| `src/index.css` | Imports tokens + shadcn semantic bridge |
 | `tailwind.config.ts` | `nox.*` color map, `cyan: undefined`, fonts, radius |
-| `docs/design/nox/` | Migration contract, components, foundations, parity |
-| `docs/design/information-architecture.md` | Routes, nav, analytics names |
+| `docs/design/nox/` | Patterns, parity board, marketing elevation rules |
+| `apps/site/src/styles/` | Astro marketing CSS (token-based) |
 
 **Optional validation:** [`@google/design.md`](https://www.npmjs.com/package/@google/design.md) — `npx @google/design.md lint DESIGN.md` (tokens + WCAG hints). Format aligns with [Google DESIGN.md spec](https://github.com/google-labs-code/design.md).

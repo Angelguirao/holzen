@@ -21,13 +21,14 @@ export interface CurrentPauseRow {
   created_at: string;
   window_ends_at: string;
   engaged_at: string | null;
+  metadata: Record<string, unknown> | null;
   context_snapshot: Record<string, unknown> | null;
 }
 
 export async function fetchCurrentPause(userId: string): Promise<CurrentPauseRow | null> {
   const { data, error } = await supabase
     .from('v_pause_current' as never)
-    .select('id, user_id, state, source, created_at, window_ends_at, engaged_at, context_snapshot')
+    .select('id, user_id, state, source, created_at, window_ends_at, engaged_at, metadata, context_snapshot')
     .eq('user_id', userId)
     .maybeSingle();
 
@@ -43,7 +44,7 @@ export function getCurrentPauseQueryOptions(userId: string | undefined) {
     queryFn: () => fetchCurrentPause(userId!),
     enabled: Boolean(userId),
     staleTime: 30_000,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
     retry: false,
   } as const;
 }

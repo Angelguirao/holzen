@@ -34,20 +34,18 @@ vi.mock(
 import { persistCompanionUiStepCompletion as persistDirect } from '@/features/pause/application/use-cases/ritual/frame/persist-ui-step-completion';
 import { runToggleCompanionLibraryFavorite as toggleFavoriteDirect } from '@/features/pause/application/use-cases/ritual/frame/run-toggle-companion-library-favorite';
 import {
+  applyCompanionSlotOrchestrateOutcome,
+  logCompanionSlotOrchestrateInvoke,
+  runCompanionSlotOrchestrate,
+  setCompanionSlotLoading,
+  trackCompanionGenerationInitiated,
+} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow';
+import {
   loadCompanionOrchestrateSession,
   nextExpandedWithLazyFetch,
   persistCompanionUiStepCompletion,
   runToggleCompanionLibraryFavorite,
 } from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestration-flow';
-import {
-  applyCompanionSlotOrchestrateOutcome,
-  logCompanionSlotOrchestrateInvoke,
-  resetInterventionIdempotency,
-  runCompanionInterventionBootstrap,
-  runCompanionSlotOrchestrate,
-  setCompanionSlotLoading,
-  trackCompanionGenerationInitiated,
-} from '@/features/pause/application/use-cases/ritual/frame/pause-companion-orchestrate-flow';
 import {
   companionOrchestrator,
   companionPauseRepository,
@@ -111,12 +109,14 @@ describe('pause-companion-orchestration-io parity', () => {
     await pauseToggleCompanionLibraryFavorite({
       pauseInstanceId: 'pi-parity',
       sourceType: 'article',
+      nextBucket: { article: true },
       onBucketComputed,
     });
 
     expect(toggleFavoriteDirect).toHaveBeenCalledWith(companionPauseRepository, {
       pauseInstanceId: 'pi-parity',
       sourceType: 'article',
+      nextBucket: { article: true },
       onBucketComputed,
     });
   });
@@ -135,11 +135,13 @@ describe('pause-companion-orchestration-io parity', () => {
     await pauseToggleCompanionLibraryFavoriteWithRepository(customRepo, {
       pauseInstanceId: 'pi-injected',
       sourceType: 'podcast',
+      nextBucket: { podcast: true },
     });
 
     expect(toggleFavoriteDirect).toHaveBeenCalledWith(customRepo, {
       pauseInstanceId: 'pi-injected',
       sourceType: 'podcast',
+      nextBucket: { podcast: true },
     });
   });
 
@@ -157,14 +159,14 @@ describe('pause-companion-orchestration-io parity', () => {
    * Reciprocal inline pins ↔ `pause-companion-orchestrate-io-parity.test.ts` (application + presentation).
    * Persist/favorite leaf pins: orchestrate-io parity `sibling cluster: orchestration-io persist/favorite wrappers…`.
    */
-  it('sibling cluster: orchestrate-io slot/intervention exports stay distinct from orchestration-io', () => {
+  it('sibling cluster: orchestrate-io slot exports stay distinct from orchestration-io', () => {
     expect(pauseLoadCompanionOrchestrateSession).not.toBe(runCompanionSlotOrchestrate);
-    expect(pauseToggleCompanionLibraryFavorite).not.toBe(runCompanionInterventionBootstrap);
+    expect(pauseToggleCompanionLibraryFavorite).not.toBe(runCompanionSlotOrchestrate);
     expect(pauseCompanionUiStepCompletion).not.toBe(applyCompanionSlotOrchestrateOutcome);
     expect(loadCompanionOrchestrateSession).not.toBe(logCompanionSlotOrchestrateInvoke);
     expect(nextExpandedWithLazyFetch).not.toBe(trackCompanionGenerationInitiated);
     expect(pauseLoadCompanionOrchestrateSession).not.toBe(setCompanionSlotLoading);
-    expect(pauseToggleCompanionLibraryFavorite).not.toBe(resetInterventionIdempotency);
+    expect(pauseToggleCompanionLibraryFavorite).not.toBe(logCompanionSlotOrchestrateInvoke);
     expect(companionOrchestrator).not.toBe(runCompanionSlotOrchestrate);
   });
 });

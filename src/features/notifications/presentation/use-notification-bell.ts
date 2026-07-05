@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -8,20 +8,23 @@ import {
   notificationsInboxQueryKey,
   type NotificationsInboxRow,
 } from '@/features/notifications/public-queries';
+import {
+  dismissAllNotificationsInboxRows,
+  dismissNotificationsInboxRow,
+} from '@/features/notifications/infrastructure/queries/dismiss-notifications-inbox-query';
 import { useAuth } from '@/features/auth/public';
 import type { NotificationNavigateState } from '@/features/pause/public-navigation';
 import { subscribeNotificationsInbox } from './notifications-inbox-realtime-io';
 import {
-  getDismissedNotificationIds,
   getNotificationsLastReadAt,
   markNotificationsReadAt,
-  saveDismissedNotificationIds,
 } from './notification-bell-storage';
 import {
   mapNotificationInboxRow,
   normalizeNotificationInboxItems,
 } from './map-notification-inbox-row';
 import type { NotificationInboxItem } from './notification-inbox-item';
+import { useOpenPauseNotificationContext } from './use-open-pause-notification-context';
 
 function getString(value: unknown): string | null {
   return typeof value === 'string' ? value : null;
@@ -32,7 +35,7 @@ export function useNotificationBell() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [dismissed, setDismissed] = useState<Set<string>>(getDismissedNotificationIds);
+  const openPause = useOpenPauseNotificationContext();
   const [open, setOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [freshIds, setFreshIds] = useState<Set<string>>(new Set());
@@ -41,47 +44,36 @@ export function useNotificationBell() {
   const freshTimersRef = useRef<Map<string, number>>(new Map());
 
   const mapRowToNotification = useCallback(
-    (row: NotificationsInboxRow) => mapNotificationInboxRow(row, t),
-    [t],
+    (row: NotificationsInboxRow) => mapNotificationInboxRow(row, t, openPause),
+    [t, openPause],
   );
 
-  const { data: allNotifications = [], isPending: loading } = useQuery(
+  const { data: inboxRows = [], isPending: loading } = useQuery(
     getNotificationsInboxMappedListQueryOptions({
       userId: user?.id,
-      queryFn: async () => {
-        const rows = await fetchNotificationsInboxRows(user!.id);
-        const mapped = rows
-          .map(mapRowToNotification)
-          .filter((item): item is NotificationInboxItem => item !== null);
-        return normalizeNotificationInboxItems(mapped);
-      },
+      queryFn: async () => fetchNotificationsInboxRows(user!.id),
     }),
   );
 
-  const visibleNotifications = allNotifications.filter((n) => !dismissed.has(n.id));
+  const allNotifications = useMemo(() => {
+    const mapped = inboxRows
+      .map(mapRowToNotification)
+      .filter((item): item is NotificationInboxItem => item !== null);
+    return normalizeNotificationInboxItems(mapped);
+  }, [inboxRows, mapRowToNotification]);
+
+  const visibleNotifications = allNotifications;
 
   const bumpInbox = useCallback(() => {
     if (!user) return;
     void queryClient.invalidateQueries({ queryKey: notificationsInboxQueryKey(user.id) });
   }, [user, queryClient]);
 
-  const upsertNotification = useCallback(
-    (next: NotificationInboxItem) => {
-      if (!user) return;
-      queryClient.setQueryData<NotificationInboxItem[]>(notificationsInboxQueryKey(user.id), (prev) => {
-        const base = prev ?? [];
-        const filtered = base.filter((item) => item.id !== next.id);
-        return normalizeNotificationInboxItems([next, ...filtered]);
-      });
-    },
-    [user, queryClient],
-  );
-
   const removeNotification = useCallback(
     (id: string) => {
       if (!user) return;
-      queryClient.setQueryData<NotificationInboxItem[]>(notificationsInboxQueryKey(user.id), (prev) =>
-        (prev ?? []).filter((item) => item.id !== id),
+      queryClient.setQueryData<NotificationsInboxRow[]>(notificationsInboxQueryKey(user.id), (prev) =>
+        (prev ?? []).filter((row) => row.id !== id),
       );
       setFreshIds((prev) => {
         if (!prev.has(id)) return prev;
@@ -150,21 +142,29 @@ export function useNotificationBell() {
       }
 
       const mapped = mapRowToNotification(row);
-      if (mapped) upsertNotification(mapped);
-      else bumpInbox();
+      if (mapped) {
+        queryClient.setQueryData<NotificationsInboxRow[]>(notificationsInboxQueryKey(user.id), (prev) => {
+          const base = prev ?? [];
+          const filtered = base.filter((item) => item.id !== row.id);
+          return [row, ...filtered];
+        });
+      } else {
+        bumpInbox();
+      }
     });
-  }, [user, bumpInbox, mapRowToNotification, removeNotification, upsertNotification]);
+  }, [user, bumpInbox, mapRowToNotification, removeNotification, queryClient]);
 
   useEffect(() => {
-    const visible = allNotifications.filter((n) => !dismissed.has(n.id));
     const lastRead = getNotificationsLastReadAt();
     if (lastRead) {
       const readTime = new Date(lastRead).getTime();
-      setUnreadCount(visible.filter((i) => new Date(i.timestamp).getTime() > readTime).length);
+      setUnreadCount(
+        visibleNotifications.filter((i) => new Date(i.timestamp).getTime() > readTime).length,
+      );
     } else {
-      setUnreadCount(visible.length);
+      setUnreadCount(visibleNotifications.length);
     }
-  }, [allNotifications, dismissed]);
+  }, [visibleNotifications]);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -205,23 +205,21 @@ export function useNotificationBell() {
     [navigate],
   );
 
-  const dismissOne = useCallback((id: string) => {
-    setDismissed((prev) => {
-      const next = new Set(prev);
-      next.add(id);
-      saveDismissedNotificationIds(next);
-      return next;
-    });
-  }, []);
+  const dismissOne = useCallback(
+    (id: string) => {
+      if (!user) return;
+      removeNotification(id);
+      void dismissNotificationsInboxRow(user.id, id).catch(() => bumpInbox());
+    },
+    [user, removeNotification, bumpInbox],
+  );
 
   const dismissAll = useCallback(() => {
-    setDismissed((prev) => {
-      const next = new Set(prev);
-      for (const n of allNotifications) next.add(n.id);
-      saveDismissedNotificationIds(next);
-      return next;
-    });
-  }, [allNotifications]);
+    if (!user) return;
+    const ids = visibleNotifications.map((n) => n.id);
+    for (const id of ids) removeNotification(id);
+    void dismissAllNotificationsInboxRows(user.id, ids).catch(() => bumpInbox());
+  }, [user, visibleNotifications, removeNotification, bumpInbox]);
 
   const displayCount = unreadCount > 9 ? '9+' : String(unreadCount);
   const bellAriaLabel =

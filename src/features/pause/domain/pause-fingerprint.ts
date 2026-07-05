@@ -30,7 +30,6 @@ export async function computeContextFingerprint(parts: {
   directionBucket: string;
   severityBand: string;
   dailyBucketPct: number;
-  cumulativeBucketPct: number;
   /** CoinGecko coin id — keeps fingerprints distinct across assets. */
   trackedAssetId?: string;
   fearGreedBand?: string | null;
@@ -41,7 +40,6 @@ export async function computeContextFingerprint(parts: {
     d: parts.directionBucket,
     s: parts.severityBand,
     db: parts.dailyBucketPct,
-    cb: parts.cumulativeBucketPct,
     a: parts.trackedAssetId ?? 'bitcoin',
     fg: parts.fearGreedBand ?? null,
     oc: parts.onChainBand ?? null,

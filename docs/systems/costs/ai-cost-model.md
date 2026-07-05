@@ -5,7 +5,7 @@ enforced, and how to respond when spend goes sideways. Supersedes the old
 pause-only estimates doc (which is now a focused case study — see link in §7).
 
 > **Scope.** Third-party AI API spend only: Perplexity (Sonar Pro, Sonar) and
-> **Google Gemini** (direct via `GOOGLE_AI_API_KEY`, optional OpenRouter failover).
+> **Google Gemini models via OpenRouter** (`OPENROUTER_API_KEY`; default in `llm-gateway.ts`). See [llm-openrouter.md](../../ops/llm-openrouter.md).
 > **Not** included: Vercel/hosting, Supabase plan fees, Stripe, Resend email,
 > VAPID, CoinGecko usage. Those bill on separate dashboards and don't scale with AI usage.
 
@@ -38,9 +38,9 @@ negotiated rate differs.
 > If the generators ever pass `search_context_size: "medium" | "high"`, override
 > via `PERPLEXITY_REQUEST_FEE_USD_JSON`.
 
-### 1.2 Google Gemini (direct + OpenRouter failover)
+### 1.2 LLM via OpenRouter (Gemini slugs)
 
-Primary path: **`GOOGLE_AI_API_KEY`** → [Google Gemini OpenAI-compat API](https://ai.google.dev/gemini-api/docs/pricing). Optional failover: **`OPENROUTER_API_KEY`** → [OpenRouter](https://openrouter.ai/docs) (same model ids, used only on retryable errors).
+Primary path: **`OPENROUTER_API_KEY`** → [OpenRouter](https://openrouter.ai/docs/pricing) with explicit model ids such as `google/gemini-2.5-flash` (see `TASK_MODEL_CASCADE` in `llm-gateway.ts`). Optional direct Google only when **`LLM_PROVIDER_ORDER`** includes `google`.
 
 Legacy Tier B edges under `supabase/functions/legacy/` use **`llm-gateway.ts`** (Google → OpenRouter) and **`transactional-email.ts`** (Resend). They no longer require `LOVABLE_API_KEY`.
 
@@ -92,7 +92,7 @@ spent — a row without logging still runs but cannot be capped per-user.
 | `reflection-insights` *(legacy)*                  | cron / user                      | Gemini via `llm-gateway`                                   | ✓                          | Skip run / 503                             |
 | `weekly-digest` *(legacy cron)*                   | cron                             | Gemini `gemini-2.5-flash-lite`                             | ✓                          | Digest email sent **without** AI insight   |
 | `monthly-report` *(legacy cron)*                  | cron                             | Gemini `gemini-2.5-flash-lite`                             | ✓                          | Report email sent **without** AI paragraph |
-| `grounding-enrich`                                | user                             | Gemini `gemini-2.5-flash` (cache hits skip)                | (via `createLogger`)       | 503                                        |
+| `grounding-enrich` *(legacy — undeployed)*        | user                             | Gemini `gemini-2.5-flash` (cache hits skip)                | (via `createLogger`)       | 503                                        |
 | `admin-library-preview` *(legacy)*                | admin                            | Gemini `gemini-2.5-flash-lite`                             | ✓                          | 503                                        |
 | `pregenerate-companions`                          | cron                             | Fills `companion_cache` only; Perplexity + Gemini per step when below target | ✓                   | Skip run                                   |
 | `fetch-source-feeds` *(legacy cron)*              | cron                             | Gemini + optional Perplexity                               | ✓                          | Skip run                                   |
@@ -100,6 +100,24 @@ spent — a row without logging still runs but cannot be capped per-user.
 | `deliver-letters`                                 | cron                             | **none** — stored letters + push                           | N/A                        | N/A                                        |
 | `holzen-number`                                   | user                             | **none**                                                   | N/A                        | N/A                                        |
 
+
+---
+
+## 2.1 Premium companion metering — when users are charged
+
+**Product feature key:** `premium_companion` (included monthly allowance on Pro, then flex credits at **3 credits per unit** — see `FEATURE_CREDIT_COST` in `subscription-entitlements.ts`).
+
+| Layer | When charge happens | Refund on generation failure? |
+| --- | --- | --- |
+| **Edge `companion-orchestrate`** | `peekAllowanceOrCredits` pre-checks affordability for requested premium slots; `consumeAllowanceOrCredits` runs **after** generation (or artifact cache hit) for **billable** slots only (`contentSatisfiesCompanion` per slot). Multi-slot invokes debit 0–3 units based on what actually rendered. Panic mode / rate limit / budget **after** peek → **no debit**. | **N/A** — empty or errored slots are not debited. |
+| **Edge `regenerate-only`** | Peek before generate; consume **one** unit only when persisted content satisfies the slot. | **N/A** — failed regenerate does not debit. |
+| **Client lazy fetch** | No optimistic companion decrement; `refreshSubscription()` in `finally` after orchestrate returns. | Balance matches server post-success billing. |
+
+**Implications for Frame (May 2026):** companions generate **on first card expand** only — users are not charged at Frame mount. Failed expand (empty body, error) should not reduce monthly allowance or flex credits. Re-opening full view or expanding an already-generated card is read-only. **`pregenerate-companions`** is not user-metered (shared `companion_cache`).
+
+**User-facing summary:** [companion-metering.md](../pause/companions/companion-metering.md).
+
+**Implementation:** `supabase/functions/_shared/companion-orchestrate-billing.ts` + `peekAllowanceOrCredits` in `subscription-entitlements.ts`.
 
 ---
 
@@ -284,7 +302,7 @@ a threshold.
 | `suggest-grounding`      | ✓            | ✓              | ✓       | —                 | `suggest_grounding`     |
 | `suggest-ritual`         | ✓            | ✓              | ✓       | —                 | `suggest_ritual`        |
 | `generate-wallpaper`     | ✓            | ✓              | ✓       | —                 | `wallpaper`             |
-| `grounding-enrich`       | ✓            | ✓              | ✓       | —                 | `grounding_enrich`      |
+| `grounding-enrich` *(legacy)* | ✓       | ✓              | ✓       | —                 | `grounding_enrich`      |
 | `admin-library-preview`  | ✓            | ✓              | ✓       | —                 | `admin_library_preview` |
 | `night-reflection`       | ✓            | —              | ✓       | —                 | `night_reflection`      |
 | `weekly-digest`          | ✓            | —              | ✓       | —                 | `digest`                |
@@ -416,17 +434,18 @@ Each $150 top-up buys ~750 Sonar Pro calls at the current midpoint. The
 $1,200 cap keeps provider billing aligned with the new engineering monthly cap,
 while still limiting blast radius during abnormal traffic.
 
-### 8.2 Google AI (Google AI Studio / Cloud billing)
+### 8.2 OpenRouter (primary LLM billing)
 
-Set billing alerts and budget caps in Google Cloud / AI Studio for the project tied to **`GOOGLE_AI_API_KEY`**. If significant traffic fails over to OpenRouter, mirror caps on the OpenRouter dashboard too.
+Set spend limits and alerts on the [OpenRouter dashboard](https://openrouter.ai/) for the key in **`OPENROUTER_API_KEY`**. Engineering caps in `app_config` should trip before provider limits in normal operation.
 
 | Setting | Suggested starting point |
 | --- | --- |
-| Monthly budget alert | **$600** (adjust to ~2× expected Gemini burn) |
-| Hard cap / disable | Per your risk tolerance — engineering caps in `app_config` should trip first |
+| Monthly budget alert | **$600** (adjust to ~2× expected LLM burn) |
+| Hard cap / disable | Per your risk tolerance |
 
-Gemini spend is dominated by cheap flash tokens; wallpaper images
-are the outlier.
+If you still run **`LLM_PROVIDER_ORDER=google,openrouter`**, also set Google Cloud / AI Studio alerts on **`GOOGLE_AI_API_KEY`**.
+
+Gemini spend is dominated by cheap flash tokens; wallpaper images are the outlier.
 
 ### 8.3 What **not** to enable
 

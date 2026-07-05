@@ -147,8 +147,6 @@ export function computePauseSessionResolved(
       pauseInstanceId: f.id,
       companions: {
         haiku: f.haiku,
-        groundingTitle: f.grounding_title,
-        groundingBody: f.grounding_body,
       },
       companionPrefs: p.navCompanionPrefs ?? p.holzenCompanionPrefs ?? DEFAULT_PREFS,
       severity: p.navSeverity ?? p.holzenSeverity,

@@ -1,4 +1,5 @@
-import type { BtcPriceData } from '@/features/market/public';
+import type { MarketQuote } from '@/features/market/public';
+import { isBitcoinTrackedAsset } from '@/features/market/public';
 import {
   buildManualPauseMarketContext,
   type ManualPauseMarketContext,
@@ -10,10 +11,8 @@ export type { ManualPauseMarketContext };
 /** Full `openManualPauseFromHome` params from Home market data + profile. */
 export type BuildManualPauseOpenParamsInput = {
   userId: string;
-  silentMode: boolean;
   mood?: string;
-  data: BtcPriceData;
-  cumulativeThreshold: number;
+  data: MarketQuote;
   profileTrackedAssetId: string;
 };
 
@@ -22,7 +21,6 @@ export function buildManualPauseOpenParams(
 ): OpenManualPauseFromHomeParams & ManualPauseMarketContext {
   const { assetId, ctx, severityBand, onChainBand, silentMsg } = buildManualPauseMarketContext(
     input.data,
-    input.cumulativeThreshold,
     input.profileTrackedAssetId,
   );
 
@@ -32,14 +30,16 @@ export function buildManualPauseOpenParams(
     severityBand,
     silentMsg,
     userId: input.userId,
-    silentMode: input.silentMode,
     contextText: ctx,
-    silentMessage: silentMsg,
     mood: input.mood,
     changePercent: input.data.changePercent,
-    cumulativeChangePercent: input.data.cumulativeChangePercent ?? null,
     trackedAssetId: assetId,
     fearGreedLabel: input.data.fearGreed?.label ?? null,
     onChainBand,
+    fearGreed: input.data.fearGreed ?? null,
+    onChain:
+      isBitcoinTrackedAsset(assetId) && input.data.onChain
+        ? (input.data.onChain as Record<string, unknown>)
+        : null,
   };
 }

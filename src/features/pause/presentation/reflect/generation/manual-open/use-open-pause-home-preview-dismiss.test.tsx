@@ -1,5 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { useOpenPauseHomePreview } from './use-open-pause-home-preview';
 
@@ -30,10 +32,18 @@ beforeEach(() => {
   pauseDismissOpenPauseHomePreviewMock.mockReset().mockResolvedValue(undefined);
 });
 
+function renderPreviewHook(user: User | null) {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const wrapper = ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+  return renderHook(() => useOpenPauseHomePreview(user), { wrapper });
+}
+
 describe('useOpenPauseHomePreview dismiss', () => {
   it('dismisses via dismissOpenPauseHome + PauseRepository when user is signed in', async () => {
     const user = { id: 'user-1' } as User;
-    const { result } = renderHook(() => useOpenPauseHomePreview(user));
+    const { result } = renderPreviewHook(user);
 
     await act(async () => {
       await result.current.dismissOpenPauseHome();
@@ -46,7 +56,7 @@ describe('useOpenPauseHomePreview dismiss', () => {
   });
 
   it('clears preview without RPC when user is null', async () => {
-    const { result } = renderHook(() => useOpenPauseHomePreview(null));
+    const { result } = renderPreviewHook(null);
 
     await act(async () => {
       await result.current.dismissOpenPauseHome();

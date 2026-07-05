@@ -84,6 +84,7 @@ export interface SignalSourceRow {
 /** Rows from `v_companion_serves_per_day` (view — not in generated `Database`). */
 export interface DailyServeRow {
   day?: string | null;
+  companion_type?: string | null;
   serve_count?: number | null;
   serve_source?: string | null;
 }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { CalendarClock, RefreshCw, Settings as SettingsIcon, AlertTriangle, Receipt, FileCheck, Mail, BellRing, BellOff } from 'lucide-react';
 import {
   Dialog,
@@ -399,8 +399,11 @@ export function CheckoutConfirmation() {
   // QUIET_STATE_CHECKLIST audit effect below. Never read in production.
   const dialogContentRef = useRef<HTMLDivElement | null>(null);
 
+  const [searchParams] = useSearchParams();
+
   useEffect(() => {
-    const detected = detectMode(location.search);
+    const search = searchParams.toString();
+    const detected = detectMode(search ? `?${search}` : '');
     if (!detected) return;
     // If we already showed a confirmation for this mode within the window,
     // strip params silently and bail — handles refresh + back-navigation
@@ -422,7 +425,7 @@ export function CheckoutConfirmation() {
       activeGuardTsRef.current = null;
     }
     if (alreadyConfirmed) {
-      const params = new URLSearchParams(location.search);
+      const params = new URLSearchParams(search);
       params.delete('subscribed');
       params.delete('credits');
       params.delete('pack');
@@ -466,7 +469,7 @@ export function CheckoutConfirmation() {
       //   - past-tense, descriptive copy ("already shown", not "great job")
       //   - dedup keyed on the suppressed search string so back-and-forth
       //     navigation doesn't stack toasts.
-      const dedupeKey = `${detected}:${location.search}`;
+      const dedupeKey = `${detected}:${search ? `?${search}` : ''}`;
       if (suppressionAnnouncedRef.current !== dedupeKey) {
         suppressionAnnouncedRef.current = dedupeKey;
         toast.message('Checkout already confirmed — no new sync triggered.', {
@@ -484,7 +487,7 @@ export function CheckoutConfirmation() {
     // `Date.now()`, so re-read to capture the exact value.
     activeGuardTsRef.current = readConfirmedGuard()?.ts ?? Date.now();
     // Strip checkout query params; keep path + hash.
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(search);
     params.delete('subscribed');
     params.delete('credits');
     params.delete('pack');
@@ -503,7 +506,7 @@ export function CheckoutConfirmation() {
       void sub.refresh();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- checkout query + localStorage guard; listing sub/navigate would re-run and duplicate side effects
-  }, [location.search]);
+  }, [searchParams]);
 
   const open = mode !== null;
 
@@ -586,6 +589,7 @@ export function CheckoutConfirmation() {
     if (!mode || mode === 'subscription') return;
     let cancelled = false;
     let attempt = 0;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     const maxAttempts = 6; // ~ up to 30s with the backoff below
 
     const tick = async () => {
@@ -593,14 +597,16 @@ export function CheckoutConfirmation() {
       try {
         const events = await fetchCheckoutEvents();
         // Most recent paid session for this pack type, by created desc.
-        const match = events
-          .filter(
-            (e) =>
-              e.pack_type === mode &&
-              e.payment_status === 'paid' &&
-              (e.expected_credits > 0 || (e.granted_credits ?? 0) > 0),
-          )
-          .sort((a, b) => b.created - a.created)[0];
+        const paidForMode = events.filter(
+          (e) =>
+            e.pack_type === mode &&
+            e.payment_status === 'paid' &&
+            (e.expected_credits > 0 || (e.granted_credits ?? 0) > 0),
+        );
+        const match = paidForMode.reduce<(typeof paidForMode)[number] | undefined>(
+          (best, e) => (!best || e.created > best.created ? e : best),
+          undefined,
+        );
         if (match && !cancelled) {
           // Prefer the actual granted amount once the webhook applied it
           // (handles partial grants or future per-session pricing). Otherwise
@@ -621,12 +627,13 @@ export function CheckoutConfirmation() {
       if (attempt < maxAttempts) {
         // Backoff: 1.5s, 3s, 5s, 8s, 12s, 18s
         const delays = [1500, 3000, 5000, 8000, 12000, 18000];
-        setTimeout(tick, delays[Math.min(attempt - 1, delays.length - 1)]);
+        timeoutId = setTimeout(tick, delays[Math.min(attempt - 1, delays.length - 1)]);
       }
     };
     void tick();
     return () => {
       cancelled = true;
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
     };
   }, [mode]);
 
@@ -927,9 +934,7 @@ export function CheckoutConfirmation() {
    * lets it through) covers the just-returned-from-Stripe happy path.
    */
 
-  // Fire-and-forget the optional email + push confirmation. Honors
-  // `profiles.email_notifications` server-side, so users who turned that off
-  // get neither channel without any extra UI here.
+  // Fire-and-forget the optional email + push confirmation (no per-user email opt-out in shipped scope).
   useEffect(() => {
     if (!mode) return;
     if (notifySentRef.current === mode) return;
@@ -1394,7 +1399,7 @@ function NotifyDispatchStatus({
 
   if (status === null) {
     return (
-      <div className={baseClass} role="status" aria-live="polite">
+      <div className={baseClass} aria-live="polite">
         <LoadingSpinner className="h-3 w-3 border-[1.5px]" />
         <span>Queuing email and push confirmation…</span>
       </div>
@@ -1403,7 +1408,7 @@ function NotifyDispatchStatus({
 
   if (status.skipped === 'opted_out') {
     return (
-      <div className={baseClass} role="status">
+      <div className={baseClass}>
         <BellOff className="h-3.5 w-3.5" aria-hidden />
         <span>Notifications are off — no email or push sent.</span>
       </div>
@@ -1414,7 +1419,6 @@ function NotifyDispatchStatus({
     return (
       <div
         className="mt-3 flex items-center gap-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground"
-        role="status"
       >
         <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
         <span>
@@ -1435,7 +1439,7 @@ function NotifyDispatchStatus({
       : 'Push skipped';
 
   return (
-    <div className={baseClass} role="status">
+    <div className={baseClass}>
       <span className="inline-flex items-center gap-1.5">
         <Mail className="h-3.5 w-3.5" aria-hidden />
         {emailLabel}
@@ -1484,7 +1488,6 @@ function RefreshStatusBanner({
     return (
       <div
         className="mt-3 flex flex-col gap-2 rounded-md border border-border bg-muted/20 px-3 py-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between"
-        role="status"
         aria-live="polite"
         aria-busy="true"
       >
@@ -1529,7 +1532,6 @@ function RefreshStatusBanner({
     return (
       <div
         className="mt-3 flex flex-col gap-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between"
-        role="status"
         aria-live="polite"
       >
         <span className="flex items-center gap-2">

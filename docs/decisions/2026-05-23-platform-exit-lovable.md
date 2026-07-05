@@ -12,7 +12,7 @@ Move to **owned infrastructure**:
 | Code | GitHub (Cursor/local dev) |
 | Database + Edge | Owned Supabase projects (staging + prod) via CLI/CI |
 | Frontend | **Vercel** (GitHub integration) |
-| AI | Direct Gemini (`GOOGLE_AI_API_KEY`) via `_shared/llm-gateway.ts` |
+| AI | Gemini via OpenRouter (`OPENROUTER_API_KEY`) via `_shared/llm-gateway.ts` |
 | Email | Resend (`RESEND_API_KEY`) with Supabase Auth custom SMTP |
 | Auth OAuth | Supabase Auth native Google provider |
 

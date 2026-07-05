@@ -1,11 +1,12 @@
-import type { InterventionState } from '@/features/pause/domain/companion-orchestrate';
 import type { CachedHistoricalInsightShape } from '@/features/pause/domain/historical-insight';
+import { toHistoricalInsightDisplayData } from '@/features/pause/application/use-cases/ritual/frame/historical-insight-payload';
 
 export interface CachedSignalShape {
   title: string;
   body: string;
   source: string;
   url: string;
+  keyIdeas?: string[];
 }
 
 export interface CachedGroundingShape {
@@ -31,7 +32,8 @@ export interface ParsedPauseArtifactCache {
   grounding?: CachedGroundingShape | null;
   history?: CachedHistoricalInsightShape | null;
   zoomOut?: CachedZoomOutShape | null;
-  intervention?: InterventionState | null;
+  /** Legacy featured headline (`pause_ai_artifacts` kind `intervention`) — not rendered in pause-first UI. */
+  intervention?: Record<string, unknown> | null;
 }
 
 type ArtifactRow = { kind: string; content: unknown };
@@ -47,6 +49,7 @@ export function parsePauseArtifactRows(rows: ArtifactRow[]): ParsedPauseArtifact
         body: (d.body as string) ?? '',
         source: d.source as string,
         url: (d.url as string) ?? '',
+        ...(Array.isArray(d.keyIdeas) ? { keyIdeas: d.keyIdeas as string[] } : {}),
       };
     } else if (c.kind === 'ground_nudge' && d) {
       result.grounding = {
@@ -56,11 +59,11 @@ export function parsePauseArtifactRows(rows: ArtifactRow[]): ParsedPauseArtifact
         url: (d.url as string) ?? '',
       };
     } else if (c.kind === 'historical_insight' && d) {
-      result.history = d as unknown as CachedHistoricalInsightShape;
+      result.history = toHistoricalInsightDisplayData(d);
     } else if ((c.kind === 'zoom_out' || c.kind === 'zoom_out_deep_time') && d) {
       if (!result.zoomOut) result.zoomOut = d as CachedZoomOutShape;
     } else if (c.kind === 'intervention' && d) {
-      result.intervention = d as unknown as InterventionState;
+      result.intervention = d;
     }
   }
   return result;

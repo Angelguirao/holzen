@@ -3,33 +3,34 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { useProfile } from '@/features/user/public-hooks';
-import { formatBtcPrice } from '@/features/market/public';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import type { ZoomOutData } from '@/features/pause/public-ritual-frame';
 import { companionHistoryPath } from '@/lib/app-routes';
+import { cn } from '@/lib/utils';
 import { CompanionError } from '@/screens/pause/components/CompanionError';
 import { ZoomOutDeepTime } from '@/screens/pause/components/zoom-out-deep-time';
 import { ZoomOutEchoPanel } from '@/screens/pause/components/zoom-out-echo-panel';
-import { ZoomOutOnThisDay } from '@/screens/pause/components/zoom-out-on-this-day';
+import { ZoomOutFrameDisplay } from '@/screens/pause/components/zoom-out-frame-display';
 
 export type { EchoUserWord, ZoomOutData, ZoomOutEchoData } from '@/features/pause/public-ritual-frame';
+
+export type ZoomOutDisplayVariant = 'default' | 'frame';
 
 interface Props {
   data: ZoomOutData | null;
   loading: boolean;
   error: boolean;
   onRetry?: () => void;
+  variant?: ZoomOutDisplayVariant;
 }
 
-export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
+export function ZoomOutDisplay({ data, loading, error, onRetry, variant = 'default' }: Props) {
   "use memo";
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { subscribed, startCheckout } = useSubscription();
-  const { currency } = useProfile();
-  const fmtPrice = (n: number) => formatBtcPrice(n, currency);
+  const isFrame = variant === 'frame';
 
   const goToReplay = useCallback(() => {
     const echoId = data?.echo?.id;
@@ -47,50 +48,47 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
     navigate(companionHistoryPath(echoId), {
       state: { returnTo: location.pathname + location.search },
     });
-  }, [data?.echo?.id, subscribed, t, startCheckout, navigate, location.pathname, location.search]);
+  }, [data?.echo?.id, subscribed, t, startCheckout, navigate, location]);
 
   if (loading) {
     return (
-      <div className="space-y-3">
-        <Skeleton className="h-3 w-full" />
-        <Skeleton className="h-3 w-4/5" />
-        <Skeleton className="h-3 w-3/5" />
+      <div className={cn('space-y-3', isFrame && 'px-1 pt-2')}>
+        <Skeleton className={cn(isFrame ? 'h-4 w-4/5' : 'h-3 w-full')} />
+        <Skeleton className={cn(isFrame ? 'h-4 w-full' : 'h-3 w-4/5')} />
+        <Skeleton className={cn(isFrame ? 'h-4 w-3/5' : 'h-3 w-3/5')} />
       </div>
     );
   }
 
   if (error) {
-    return <CompanionError companionType="zoomOut" onRetry={onRetry} />;
+    return (
+      <div className={cn(isFrame && 'px-1 pt-2')}>
+        <CompanionError companionType="zoomOut" onRetry={onRetry} />
+      </div>
+    );
   }
   if (!data) return null;
 
-  const { onThisDay, currentPrice, echo, deepTime } = data;
-  const hasPrices = currentPrice && onThisDay.length > 0;
+  if (isFrame) {
+    return <ZoomOutFrameDisplay data={data} onGoToReplay={goToReplay} />;
+  }
+
+  const { echo, deepTime } = data;
   const hasEcho = !!echo && (echo.userWords?.length ?? 0) > 0;
   const hasContent = !!deepTime || hasEcho;
-  const isEmpty = !hasPrices && !hasContent;
+  const isEmpty = !hasContent;
 
   return (
     <div className="space-y-4">
       {isEmpty ? (
         <div className="rounded-lg border border-border/30 bg-muted/20 px-4 py-3.5 space-y-1.5">
           <p className="text-xs font-mono text-muted-foreground/70 leading-relaxed">
-            Perspective takes time to build.
+            {t('pause.frame.zoomOutContent.emptyTitle')}
           </p>
           <p className="text-[10px] text-muted-foreground/40 leading-relaxed">
-            The more you pause and add notes, the richer your zoom-out view becomes. Historical price data and your
-            own words from past pauses will appear here over time.
+            {t('pause.frame.zoomOutContent.emptyBody')}
           </p>
         </div>
-      ) : null}
-
-      {hasPrices && currentPrice ? (
-        <ZoomOutOnThisDay
-          currentPrice={currentPrice}
-          onThisDay={onThisDay}
-          partial={data.partial}
-          formatPrice={fmtPrice}
-        />
       ) : null}
 
       {deepTime ? <ZoomOutDeepTime deepTime={deepTime} /> : null}

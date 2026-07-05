@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
+  isPauseVolatilityEmailEnabled,
   prefixEmailSubject,
   resolveEmailAppUrl,
   resolveEmailFromAddress,
@@ -18,6 +19,7 @@ const ENV_KEYS = [
   "EMAIL_NOTIFY_LOCAL",
   "EMAIL_FEEDBACK_INBOX",
   "EMAIL_VAPID_MAILTO_LOCAL",
+  "PAUSE_VOLATILITY_EMAIL_ENABLED",
 ] as const;
 
 function clearEmailEnv(): void {
@@ -55,5 +57,14 @@ describe("email-env", () => {
   it("does not double-prefix subjects", () => {
     process.env.EMAIL_SUBJECT_PREFIX = "[STAGING]";
     expect(prefixEmailSubject("[STAGING] Already prefixed")).toBe("[STAGING] Already prefixed");
+  });
+
+  it("enables pause volatility email by default", () => {
+    expect(isPauseVolatilityEmailEnabled()).toBe(true);
+  });
+
+  it("disables pause volatility email when PAUSE_VOLATILITY_EMAIL_ENABLED is false", () => {
+    process.env.PAUSE_VOLATILITY_EMAIL_ENABLED = "false";
+    expect(isPauseVolatilityEmailEnabled()).toBe(false);
   });
 });

@@ -1,5 +1,7 @@
 # Auth system (Supabase) + referral side-effect
 
+> **Pause-first strip (2026):** The referral program is **not shipped**. Client code lives in [`src/legacy/referrals/`](../../src/legacy/referrals/README.md); edges in `supabase/functions/legacy/referrals/`. The narrative below documents the **full-IA** flow for recovery.
+
 This system doc explains how authentication works end-to-end in Holzen:
 
 - client-side Supabase session setup

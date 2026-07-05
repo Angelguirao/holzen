@@ -1,4 +1,8 @@
-import type { CompanionData, CompanionPrefs } from '@/features/pause/domain/companion-card-types';
+import {
+  normalizeCompanionData,
+  type CompanionData,
+  type CompanionPrefs,
+} from '@/features/pause/domain/companion-card-types';
 
 /** Severity passed with pause navigation (Home, hook-aligned data). */
 export type PauseSeverity = 'mild' | 'moderate' | 'high';
@@ -14,6 +18,12 @@ export interface PauseSessionLocationState {
   companions?: CompanionData;
   companionPrefs?: CompanionPrefs;
   severity?: PauseSeverity;
+  /** Home manual “Let’s pause” — land on depth picker, not a restored ritual step. */
+  startAtDepthPicker?: boolean;
+  /** Optimistic nav while `manualTrigger` runs — depth picker renders before instance id exists. */
+  openingManualPause?: boolean;
+  /** Home engaged “Start over” — same instance, ritual from Feel (clears tab session before nav). */
+  restartEngagedRitual?: boolean;
 }
 
 export interface PauseSessionNavParsed {
@@ -23,6 +33,9 @@ export interface PauseSessionNavParsed {
   companions: CompanionData | undefined;
   companionPrefs: CompanionPrefs | undefined;
   severity: PauseSeverity | undefined;
+  startAtDepthPicker: boolean;
+  openingManualPause: boolean;
+  restartEngagedRitual: boolean;
 }
 
 /** Router state passed from notification actions (pause deep links use `action_state`). */
@@ -32,7 +45,7 @@ function isCompanionData(v: unknown): v is CompanionData {
   if (!v || typeof v !== 'object') return false;
   const o = v as Record<string, unknown>;
   const strOrNull = (x: unknown) => x === null || typeof x === 'string';
-  return strOrNull(o.haiku) && strOrNull(o.groundingTitle) && strOrNull(o.groundingBody);
+  return strOrNull(o.haiku);
 }
 
 function isCompanionPrefs(v: unknown): v is CompanionPrefs {
@@ -56,6 +69,9 @@ export function parsePauseSessionLocationState(state: unknown): PauseSessionNavP
     companions: undefined,
     companionPrefs: undefined,
     severity: undefined,
+    startAtDepthPicker: false,
+    openingManualPause: false,
+    restartEngagedRitual: false,
   };
   if (!state || typeof state !== 'object') return empty;
   const o = state as Record<string, unknown>;
@@ -65,13 +81,17 @@ export function parsePauseSessionLocationState(state: unknown): PauseSessionNavP
   const reflectionMessage =
     typeof o.reflectionMessage === 'string' ? o.reflectionMessage.trim() : '';
   const context = typeof o.context === 'string' ? o.context : null;
-  const companions = isCompanionData(o.companions) ? o.companions : undefined;
+  const companions = isCompanionData(o.companions) ? normalizeCompanionData(o.companions) : undefined;
   const companionPrefs = isCompanionPrefs(o.companionPrefs) ? o.companionPrefs : undefined;
   const sev = o.severity;
   const severity =
     typeof sev === 'string' && (PAUSE_SEVERITIES as readonly string[]).includes(sev)
       ? (sev as PauseSeverity)
       : undefined;
+
+  const startAtDepthPicker = o.startAtDepthPicker === true;
+  const openingManualPause = o.openingManualPause === true;
+  const restartEngagedRitual = o.restartEngagedRitual === true;
 
   return {
     pauseInstanceId,
@@ -80,5 +100,8 @@ export function parsePauseSessionLocationState(state: unknown): PauseSessionNavP
     companions,
     companionPrefs,
     severity,
+    startAtDepthPicker,
+    openingManualPause,
+    restartEngagedRitual,
   };
 }

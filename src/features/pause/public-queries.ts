@@ -2,12 +2,18 @@
  * Pause TanStack query modules (imports Supabase). App hooks/screens only —
  * other features should use `@/features/pause/public` (no eager Supabase).
  */
-export { getArchivePausesTabHasRowsQueryOptions } from './infrastructure/queries/archive/archive-pauses-tab-query';
 export {
   COMPLETED_PAUSE_COUNT_QUERY_KEY,
   fetchCompletedPauseCount,
   getCompletedPauseCountQueryOptions,
 } from './infrastructure/queries/completed-pause-count-query';
+export type { PracticeSummary } from './domain/practice/practice-summary';
+export {
+  fetchPracticeSummary,
+  fetchHomePracticeStats,
+  getPracticeSummaryQueryOptions,
+  PRACTICE_SUMMARY_QUERY_KEY,
+} from './infrastructure/queries/practice-summary-query';
 export {
   fetchPauseInstancesForJourney,
   getJourneyPauseInstancesQueryOptions,
@@ -19,21 +25,19 @@ export {
   getCurrentPauseQueryOptions,
   type CurrentPauseRow,
 } from './infrastructure/queries/current-pause-query';
-export { subscribePauseInstancesForUser } from './infrastructure/realtime/pause-instances-realtime';
+export {
+  subscribePauseInstanceOpenUpdates,
+  subscribePauseInstancesForUser,
+} from './infrastructure/realtime/pause-instances-realtime';
 export {
   getPendingPauseOfferQueryOptions,
   pendingPauseOfferQueryKey,
   type PendingPauseOfferRow,
 } from './infrastructure/queries/reflect/pending-offer/pending-pause-offer-query';
 export {
-  type PauseArchiveListSort,
   type PauseArchiveRow,
   type PauseArchiveSegment,
 } from './infrastructure/queries/archive/archive-list-query';
-export {
-  getHistoryThreadQueryOptions,
-  type HistoryThreadRow,
-} from './infrastructure/queries/history-thread-query';
 export {
   companionFeedbackVoteQueryKey,
   getCompanionFeedbackVoteQueryOptions,
@@ -247,16 +251,6 @@ export {
   type OpenPauseHomePreview,
 } from './infrastructure/queries/open-pause-home-preview-query';
 export {
-  GROUNDING_ENRICHMENT_DISABLED_QUERY_KEY,
-  GROUNDING_ENRICHMENT_DISABLED_SEGMENT,
-  GROUNDING_ENRICHMENT_QUERY_PREFIX,
-  fetchGroundingEnrichment,
-  getGroundingEnrichmentQueryOptions,
-  groundingEnrichmentQueryKey,
-  type GroundingEnrichment,
-  type GroundingEnrichmentInput,
-} from './infrastructure/queries/grounding-enrichment-query';
-export {
   RELATED_BIASES_GROUND_NUDGE_DISABLED_USER_ID,
   RELATED_BIASES_GROUND_NUDGE_NONE_QUERY_KEY,
   RELATED_BIASES_GROUND_NUDGE_QUERY_PREFIX,
@@ -266,10 +260,24 @@ export {
 } from './infrastructure/queries/related-biases-ground-nudge-query';
 export { loadActiveOrchestrateSources } from './infrastructure/companion/orchestrate-sources';
 export {
-  fetchSettingsDataExportBundle,
-  type SettingsDataExportBundle,
-  type SettingsExportAiArtifact,
-  type SettingsExportCompanionEvent,
-  type SettingsExportPauseRow,
-  type SettingsExportStepEvent,
-} from './infrastructure/queries/settings-data-export-query';
+  clearPostManualCooldownIdlePrompt,
+  markPostManualCooldownIdlePrompt,
+  shouldShowPostManualCooldownIdlePrompt,
+} from './infrastructure/home-post-manual-cooldown-idle-storage';
+export {
+  markHomePauseWidgetFirstVisitHandled,
+  shouldExpandHomePauseWidgetFirstVisit,
+} from './infrastructure/home-pause-widget-first-visit-storage';
+export {
+  readPauseHelpFeedbackStorage,
+  writePauseHelpFeedbackStorage,
+} from './infrastructure/pause-help-feedback-storage';
+export {
+  CONTEXT_LOST_HOME_WINDOW_MS,
+  fetchRecentContextLostPause,
+} from './infrastructure/queries/recent-context-lost-pause-query';
+export { subscribePauseAiArtifactsForInstance } from './infrastructure/realtime/pause-ai-artifacts-realtime';
+export {
+  fetchPauseInstancePracticeXpAwarded,
+  pauseInstancePracticeXpQueryKey,
+} from './infrastructure/queries/pause-instance-practice-xp-query';

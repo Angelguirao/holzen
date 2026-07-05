@@ -4,18 +4,19 @@ How GitHub merges deploy Holzen to **owned Supabase** + **Vercel**, and how to a
 
 **Repo integration:** This checklist is referenced from [AGENTS.md](../../AGENTS.md) (humans + AI) and enforced for Cursor via [`.cursor/rules/deployment-sync.mdc`](../../.cursor/rules/deployment-sync.mdc) (`alwaysApply`). Run it before every push that touches app code, migrations, or edge functions.
 
-**Branch model:** `feature/* → staging → main`. See [branch-model.md](branch-model.md). **Platform exit:** [platform-exit-runbook.md](platform-exit-runbook.md) · [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md) (optional Lovable editor only — not prod host).
+**Branch model:** `feature/* → staging → main`. See [branch-model.md](branch-model.md). **CI/CD map:** [cicd-overview.md](cicd-overview.md). **Platform exit:** [platform-exit-runbook.md](platform-exit-runbook.md) · [lovable-staging-and-platform-exit.md](lovable-staging-and-platform-exit.md) (optional Lovable editor only — not prod host).
 
 ## What happens on merge / deploy
 
 | Artifact | How it deploys | Goes live when |
 |----------|----------------|----------------|
-| `supabase/migrations/*.sql` | GitHub Actions or `supabase db push` to the **target project** (staging or prod) | On successful migration apply to that project |
-| `supabase/functions/*/index.ts` | Supabase CLI / linked CI deploy | After edge deploy completes |
-| `supabase/config.toml` | Merged into project config on deploy | With edge deploy |
-| Frontend (`src/`, `index.html`, etc.) | **Vercel** production deploy on merge to `main` (preview on PRs) | After Vercel build succeeds |
+| `supabase/migrations/*.sql` | GitHub Actions `deploy-backend` job → `supabase db push` | After migration apply succeeds on target project |
+| `supabase/functions/*/index.ts` | Same job → [`deploy-active-edge-functions.mjs`](../../scripts/deploy-active-edge-functions.mjs) | After edge deploy completes |
+| `supabase/config.toml` | Merged into project config on edge deploy | With edge deploy |
+| Frontend (`src/`, `index.html`, etc.) | GitHub Actions `deploy-frontend` → [`vercel-ci-deploy.mjs`](../../scripts/vercel-ci-deploy.mjs) **after** backend | After Vercel build succeeds |
+| PR previews | Vercel Git integration (automatic; not Actions) | On PR open/sync |
 
-**Key insight:** Point migrations and edge deploys at the **correct Supabase project** for the branch (`staging` vs `main`). Frontend release SHA (`VITE_APP_VERSION`) must match edge `SENTRY_RELEASE` / `EDGE_RELEASE`.
+**Key insight:** `main` and `staging` **do not** auto-deploy from Vercel Git ([vercel.json](../../vercel.json) `git.deploymentEnabled`) — Actions runs **backend first, then frontend** so the SPA never races migrations/edges. PR previews on feature branches still auto-deploy via Vercel.
 
 ### When CI or Supabase reports a migration error (ownership / “must be owner”)
 
@@ -38,9 +39,9 @@ files so `check:view-migrations` + full chain stay honest.
 | What | Where it runs | Where you set it (hosted) | When changes take effect |
 |------|---------------|---------------------------|---------------------------|
 | `VITE_*` | Browser (built SPA) | **Vercel** project env (prod/preview); local `.env` for dev | Next Vercel deploy (or local `npm run dev`) |
-| Edge secrets (`GOOGLE_AI_API_KEY`, `RESEND_API_KEY`, `CRON_SECRET`, Stripe keys, …) | Supabase Edge | **Supabase Dashboard → Edge Functions → Secrets** (per project) | Next function invocation after secret update |
+| Edge secrets (`OPENROUTER_API_KEY`, `RESEND_API_KEY`, `CRON_SECRET`, Stripe keys, …) | Supabase Edge | **Supabase Dashboard → Edge Functions → Secrets** (per project) | Next function invocation after secret update |
 
-**Important:** Files like `.env.example`, `.env.hosted`, or `.env` in this repo **only affect the frontend build** when you run Vite locally (or when Vercel/CI loads them). They are **not** read by deployed Edge functions. Configure edge secrets in the **Supabase dashboard** for staging and prod separately.
+**Important:** Files like `.env.example`, `.env.prod`, or `.env` in this repo **only affect the frontend build** when you run Vite locally (or when Vercel/CI loads them). They are **not** read by deployed Edge functions. Configure edge secrets in the **Supabase dashboard** for staging and prod separately.
 
 **Local development only:** `supabase functions serve` can load `supabase/.env` (gitignored). That path does not apply to hosted runs.
 
@@ -56,7 +57,7 @@ npm run supabase:start
 npm run supabase:reset          # re-applies all migrations from scratch
 
 # Verify the migration works
-psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -f supabase/migrations/XXXX_my_change.sql
+psql "postgresql://postgres:postgres@127.0.0.1:55422/postgres" -f supabase/migrations/XXXX_my_change.sql
 ```
 
 **Naming:** Supabase sorts migrations lexicographically. Use the timestamp format:
@@ -104,7 +105,9 @@ See [vercel-frontend-setup.md](vercel-frontend-setup.md).
 
 ### 4. config.toml
 
-- **`project_id`** in `config.toml` must match the Supabase project you deploy to (staging vs prod link).
+- **`project_id`** in the checked-in `config.toml` is a neutral local CLI identifier, not a staging/prod selector.
+- Browser traffic follows `VITE_SUPABASE_*`.
+- Target-specific scripts (`staging:*`, `prod:*`, `gen:types`, `*:reschedule-crons`) use explicit project refs or relink the target for you before they run.
 - Only add `[functions.*]` blocks for new edge functions.
 - Don't remove existing function blocks unless you're also deleting the function folder.
 
@@ -131,7 +134,7 @@ See [vercel-frontend-setup.md](vercel-frontend-setup.md).
 
 **Why these checks exist:** each guard maps to an architectural capability (pause-first scope, edge observability, modular monolith folders, etc.). See [architectural-fitness-functions.md](../fundamentals/architectural-fitness-functions.md) for the full catalog; this section lists **what to run** before push.
 
-`npm run check:prepush` runs `scripts/pre-push-check.sh`: edge release stamp (**`node scripts/stamp-edge-release.mjs`**, same effect as **`npm run stamp:release`**), **`npm run check:view-migrations`** (unsafe `CREATE OR REPLACE VIEW` patterns), every `supabase/functions/<name>/` has a matching `[functions.<name>]` in `config.toml`, **`npm run check:edge`** (skips if Deno missing), **`npm run check:edge-logging`**, **`npm run check:edge-coverage-manifest`**, **`npm run check:active-surface`**, **`npm run check:no-phase-labels`**, **`npm run check:invoke-edge-allowlist`**, **`npm run test`**, **`npm run build`** (which runs **`prebuild`** → **`npm run check:version-sync`**), and (when Docker + Supabase CLI are available) a local **`supabase db reset`**. **Requires `bash`** — on Windows use **Git Bash** or **WSL** (PowerShell alone will not run this script). For the full CI gate (coverage + JUnit), also run **`npm run test:ci`** before high-stakes pushes.
+`npm run check:prepush` runs `scripts/pre-push-check.sh`: edge release stamp (**`node scripts/stamp-edge-release.mjs`**, same effect as **`npm run stamp:release`**), **`npm run check:view-migrations`** (unsafe `CREATE OR REPLACE VIEW` patterns), every `supabase/functions/<name>/` has a matching `[functions.<name>]` in `config.toml`, **`npm run check:edge`** (skips if Deno missing), **`npm run check:edge-logging`**, **`npm run check:edge-coverage-manifest`**, **`npm run check:active-surface`**, **`npm run check:no-phase-labels`**, **`npm run check:invoke-edge-allowlist`**, **`npm run check:env-docs`**, **`npm run test`**, **`npm run build`** (which runs **`prebuild`** → **`npm run check:version-sync`**), and (when Docker + Supabase CLI are available) a local **`supabase db reset`**. **Requires `bash`** — on Windows use **Git Bash** or **WSL** (PowerShell alone will not run this script). For the full CI gate (coverage + JUnit), also run **`npm run test:ci`** before high-stakes pushes.
 
 **Optional deeper probe** after changing request logging / `x-cid` behavior: **`npm run smoke:edge-logging`** — OPTIONS each HTTP edge URL and assert `x-cid` round-trip (and optionally BetterStack query when `LOG_DRAIN_QUERY_*` are set). See **`supabase/functions/README.md`**.
 
@@ -158,7 +161,7 @@ Define your own interface for the expected shape and cast through `unknown`. The
 1. **Same-commit migrations + code:** Always use `as unknown as T` for queries touching new columns.
 2. **Two-commit approach (safest):** Push the migration first, wait for staging/prod to apply it and regenerate types, then push the code that uses the new columns.
 3. **Wrap in try/catch** when the table or column genuinely might not exist yet (pre-migration graceful degradation).
-4. **`npm run gen:types`** — Regenerates `src/integrations/supabase/types.ts` from the **linked** project (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Run after schema-changing migrations so the repo matches production.
+4. **`npm run gen:types`** — Regenerates `src/integrations/supabase/types.ts` from the explicit **production** project ref (`supabase login` or `SUPABASE_ACCESS_TOKEN`). Use `npm run gen:types:staging` when you intentionally want staging instead.
 
 ### Migrations that unlock Edge code (same push)
 
@@ -178,7 +181,7 @@ Some Edge functions assume columns already exist — e.g. **`fetch-source-feeds`
 
 **`npm run check:edge-coverage-manifest`:** Runs `scripts/verify-edge-coverage-manifest.mjs` — every `[functions.<name>]` in `supabase/config.toml` must appear in `src/screens/ops/EdgeCoverageScreen.tsx` `COVERAGE` (and extras are forbidden). CI runs this via `npm run test:ci`. It is also included in **`npm run check:prepush`** (see **Combined local gate** above). Update the `COVERAGE` row flags when you change observability patterns in a function's `index.ts`.
 
-**`npm run check:version-sync`:** Runs `scripts/check-version-sync.mjs` — compares **`package.json` `version`** to the latest **`changelog_entries`** row (PostgREST). **`npm run build`** runs it automatically via the **`prebuild`** hook.
+**`npm run check:version-sync`:** Runs `scripts/check-version-sync.mjs` — validates **`package.json` `version`** is valid semver. **`npm run build`** runs it automatically via the **`prebuild`** hook.
 
 **`npm run stamp:release` / `npm run check:release-stamp`:** `scripts/stamp-edge-release.mjs` keeps **`EDGE_RELEASE`** in **`supabase/functions/_shared/release.ts`** aligned with **`git rev-parse --short=12 HEAD`** for edge Sentry/BetterStack release tags. **`npm run check:release-stamp`** fails if that file is stale (read-only). **`npm run check:prepush`** runs the stamp step first (warns if the file changed so you can commit).
 

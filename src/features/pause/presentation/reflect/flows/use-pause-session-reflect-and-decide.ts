@@ -1,4 +1,5 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
+import { buildCurrentFeelForReflect } from '@/features/pause/domain/reflect/generation/build-current-feel-for-reflect';
 import {
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
@@ -19,7 +20,7 @@ export function usePauseSessionReflectAndDecide({
   pauseInstanceId,
   context,
   message,
-  btcData,
+  marketData,
   companionsHaiku,
   dismissMessage,
   refreshSubscription,
@@ -27,22 +28,42 @@ export function usePauseSessionReflectAndDecide({
   setPauseImpactData,
   setPhase,
   selectedMood,
+  selectedBriefFace,
   selectedMoodAfter,
   breathingFirstCompleted,
   breathingSecondCompleted,
   feelIntensity,
   shiftIntensity,
+  ritualStartedAtMs,
+  companionPrefs,
+  isFavorite,
+  pauseInstanceMetadata,
 }: UsePauseSessionReflectAndDecideParams) {
   const decidingRef = useRef(false);
   const { reflectGenEnabled, severityAbsPct } = resolvePauseSessionReflectAndDecidePreflight({
     ritualEntry,
     step,
     seedMessage: message,
-    btcData,
+    marketData,
   });
+
+  const currentFeel = useMemo(
+    () =>
+      buildCurrentFeelForReflect({
+        mood: selectedMood,
+        intensity: feelIntensity,
+        tile: selectedBriefFace,
+        tileLabel:
+          selectedBriefFace != null
+            ? t(`pause.feelStep.tiles.${selectedBriefFace}`, { defaultValue: selectedBriefFace })
+            : null,
+      }),
+    [selectedMood, feelIntensity, selectedBriefFace, t],
+  );
 
   const {
     reflectionMessage: generatedReflectionMessage,
+    reflectionContent: generatedReflectionContent,
     loading: reflectionLoading,
     error: reflectionError,
     retry: retryReflection,
@@ -51,6 +72,7 @@ export function usePauseSessionReflectAndDecide({
     context,
     initialReflectionMessage: message,
     severityAbsPct,
+    currentFeel,
     enabled: reflectGenEnabled,
   });
 
@@ -59,7 +81,7 @@ export function usePauseSessionReflectAndDecide({
     step,
     seedMessage: message,
     generatedReflectionMessage,
-    btcData,
+    marketData,
   });
 
   const { handleDecide } = usePauseSessionDecideHandler({
@@ -81,10 +103,15 @@ export function usePauseSessionReflectAndDecide({
     shiftIntensity,
     reflectionMessage: effectiveReflectionMessage,
     haiku: companionsHaiku,
+    ritualStartedAtMs,
+    companionPrefs,
+    isFavorite,
+    pauseInstanceMetadata,
   });
 
   return {
     effectiveReflectionMessage,
+    reflectionContent: generatedReflectionContent,
     reflectionLoading,
     reflectionError,
     retryReflection,

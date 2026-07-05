@@ -6,6 +6,7 @@ Tick before calling launch **done**. Canonical detail: [launch-runbook.md](./lau
 
 ## You — before destructive cutover (§3.1)
 
+- [ ] **Production not public** until launch-ready ([vercel-frontend-setup.md](./vercel-frontend-setup.md) §5.1 — e.g. `VITE_COMING_SOON=true` on Vercel Production only) — remove env and redeploy when launching
 - [ ] Confirm **no real production users** on prod project (test/founder accounts disposable)
 - [ ] Stripe webhook + price secrets set in **Supabase Edge secrets**
 - [ ] Observability secrets per [observability-setup.md](./observability-setup.md) (Vercel + Supabase + CI)
@@ -22,15 +23,18 @@ Tick before calling launch **done**. Canonical detail: [launch-runbook.md](./lau
 
 ## You — frontend (Vercel)
 
-- [ ] **`main` merge** triggered Vercel production deploy
+- [ ] **`staging` push** triggered **Staging deploy** workflow (`deploy-frontend` job green)
+- [ ] **`main` merge** triggered **Production deploy** workflow (`deploy-frontend` job green)
 - [ ] `VITE_APP_VERSION` = Git short SHA for that deploy
 - [ ] `SENTRY_RELEASE` (edges) matches `EDGE_RELEASE` in `supabase/functions/_shared/release.ts` or tip SHA
+
+Detail: [cicd-overview.md](./cicd-overview.md)
 
 ---
 
 ## You — smoke (optional, ~15 min)
 
-- [ ] `bruno/active/`: sign-in → health → check-subscription → ensure-trial
+- [ ] `bruno/active/`: sign-in → health → check-subscription → create-checkout-trial (or app onboarding → Stripe return)
 - [ ] App: onboarding → trial → Home pause → Archive/Journey when lapsed read-only
 
 ---
@@ -47,6 +51,6 @@ Tick before calling launch **done**. Canonical detail: [launch-runbook.md](./lau
 
 - Baseline squash (`holzen_schema_baseline.sql`) — tail cutover used instead
 - `en.full.json` on disk — use tag `full-ia-pre-strip`
-- Undeploy `grounding-enrich` — **rejected**; stays shipped
+- Undeploy `grounding-enrich` — **done** (legacy handler + `src/legacy/grounding-enrich/`; full view = orchestrate/hydrate only)
 - Rename `reflection_text` → `opening_message` — **rejected**
 - `check:i18n-active-keys` in CI — optional debt (~118 keys)

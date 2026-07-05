@@ -32,7 +32,7 @@ import {
   createClient,
   type SupabaseClient,
   type SupabaseClientOptions,
-} from "https://esm.sh/@supabase/supabase-js@2.57.2";
+} from "npm:@supabase/supabase-js@2";
 import { extractForwardedTraceHeaders } from "./forward-trace-headers.ts";
 import { logDependencyCall } from "./deps.ts";
 import type { createLogger } from "./observe.ts";

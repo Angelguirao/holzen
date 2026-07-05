@@ -126,7 +126,7 @@
   "history": [
     {
       "title": "When gold crashed 26% in 2013",
-      "btcInsight": "Between April 12-15, 2013, gold plummeted from $1,560 to $1,321 per ounce — a 26% crash in three days. Panic sellers locked in generational losses. Those who held saw gold consolidate and stabilize, eventually becoming a cornerstone of central bank reserves again.",
+      "marketInsight": "Between April 12-15, 2013, gold plummeted from $1,560 to $1,321 per ounce — a 26% crash in three days. Panic sellers locked in generational losses. Those who held saw gold consolidate and stabilize, eventually becoming a cornerstone of central bank reserves again.",
       "analogy": "The same pattern preceded every major Bitcoin recovery: sharp fear, forced selling, then quiet accumulation by those who understood what they owned.",
       "assetClass": "Gold",
       "period": "April 2013",
@@ -135,7 +135,7 @@
     },
     {
       "title": "Amazon lost 95% and became the everything store",
-      "btcInsight": "From its December 1999 peak of $106.69, Amazon crashed to $5.51 by October 2001 — a 95% drawdown. The narrative shifted from 'world-changing company' to 'overvalued dot-com.' Anyone who sold at $5.51 missed a stock that would eventually reach $3,000+.",
+      "marketInsight": "From its December 1999 peak of $106.69, Amazon crashed to $5.51 by October 2001 — a 95% drawdown. The narrative shifted from 'world-changing company' to 'overvalued dot-com.' Anyone who sold at $5.51 missed a stock that would eventually reach $3,000+.",
       "analogy": "Bitcoin has experienced five drawdowns of 70%+ in its history. Each time, the 'it's dead' narrative peaked at the bottom.",
       "assetClass": "Tech stocks",
       "period": "2000-2001",
@@ -144,7 +144,7 @@
     },
     {
       "title": "The 2020 COVID crash recovered in 40 days",
-      "btcInsight": "On March 12, 2020 — 'Black Thursday' — Bitcoin fell from $7,900 to $3,800 in 24 hours, a 52% single-day crash. It was the fastest drawdown in Bitcoin's history. Yet within 40 days, BTC had recovered to pre-crash levels, and within 9 months it set a new all-time high.",
+      "marketInsight": "On March 12, 2020 — 'Black Thursday' — Bitcoin fell from $7,900 to $3,800 in 24 hours, a 52% single-day crash. It was the fastest drawdown in Bitcoin's history. Yet within 40 days, BTC had recovered to pre-crash levels, and within 9 months it set a new all-time high.",
       "analogy": "The S&P 500 followed a similar pattern, crashing 34% and fully recovering by August 2020. The lesson: the speed of the crash rarely predicts the timeline of recovery.",
       "assetClass": "S&P 500",
       "period": "March 2020",
@@ -153,7 +153,7 @@
     },
     {
       "title": "The Swiss franc shock of 2015",
-      "btcInsight": "On January 15, 2015, the Swiss National Bank unexpectedly removed the EUR/CHF floor. The franc surged 30% in minutes, wiping out over-exposed traders and bankrupting multiple brokerages. It was the largest single-day move in a major currency in modern history.",
+      "marketInsight": "On January 15, 2015, the Swiss National Bank unexpectedly removed the EUR/CHF floor. The franc surged 30% in minutes, wiping out over-exposed traders and bankrupting multiple brokerages. It was the largest single-day move in a major currency in modern history.",
       "analogy": "Like Bitcoin's sudden moves, the Swiss franc shock demonstrated that markets can reprice decades of assumptions in minutes. Those with no borrowed exposure and long time horizons were unscathed.",
       "assetClass": "Forex",
       "period": "January 2015",
@@ -162,7 +162,7 @@
     },
     {
       "title": "Bitcoin's 2018 winter lasted 12 months",
-      "btcInsight": "After reaching $19,783 in December 2017, Bitcoin entered a 12-month bear market that bottomed at $3,122 in December 2018 — an 84% drawdown. The narrative shifted entirely from 'new paradigm' to 'dead technology.' Yet Bitcoin survived and went on to set new all-time highs.",
+      "marketInsight": "After reaching $19,783 in December 2017, Bitcoin entered a 12-month bear market that bottomed at $3,122 in December 2018 — an 84% drawdown. The narrative shifted entirely from 'new paradigm' to 'dead technology.' Yet Bitcoin survived and went on to set new all-time highs.",
       "analogy": "The dot-com bust of 2000 saw the NASDAQ lose 78% over 30 months. Both events cleared speculative excess while the underlying technology continued developing.",
       "assetClass": "NASDAQ",
       "period": "December 2017 – December 2018",
@@ -171,7 +171,7 @@
     },
     {
       "title": "Black Monday erased a fifth of the Dow in hours",
-      "btcInsight": "On October 19, 1987, the Dow Jones Industrial Average closed 22.6% below the prior session—the largest one-day U.S. percentage drop of the modern era. Program trading and portfolio insurance amplified the slide. Within two years the index had reclaimed its pre-crash high, a pattern many volatile assets later echoed.",
+      "marketInsight": "On October 19, 1987, the Dow Jones Industrial Average closed 22.6% below the prior session—the largest one-day U.S. percentage drop of the modern era. Program trading and portfolio insurance amplified the slide. Within two years the index had reclaimed its pre-crash high, a pattern many volatile assets later echoed.",
       "analogy": "Bitcoin has seen single-session shocks that felt terminal in the moment yet were followed by long repair phases; the speed of a crash rarely maps neatly onto how long fear lasts.",
       "assetClass": "U.S. equities",
       "period": "October 1987",
@@ -180,7 +180,7 @@
     },
     {
       "title": "Lehman's fall froze credit markets overnight",
-      "btcInsight": "Lehman Brothers filed for Chapter 11 on September 15, 2008, listing roughly $613 billion in debts—the largest bankruptcy filing in U.S. history at the time. Interbank lending seized up, the TED spread spiked, and policy makers rushed emergency facilities. Recovery took years, not weeks.",
+      "marketInsight": "Lehman Brothers filed for Chapter 11 on September 15, 2008, listing roughly $613 billion in debts—the largest bankruptcy filing in U.S. history at the time. Interbank lending seized up, the TED spread spiked, and policy makers rushed emergency facilities. Recovery took years, not weeks.",
       "analogy": "Liquidity can vanish faster than narratives change; assets with 24/7 markets can compress that shock into shorter calendar spans while the emotional aftertaste lingers.",
       "assetClass": "Credit / banking",
       "period": "September 2008",
@@ -189,7 +189,7 @@
     },
     {
       "title": "Gold spiked in 1980 then slept for two decades",
-      "btcInsight": "Gold touched about $850 per ounce in January 1980 during panic and inflation hedging, then drifted down toward roughly $250 by mid-1999—a long grind that outlasted most headlines. Holders who bought the spike waited years for a new nominal high.",
+      "marketInsight": "Gold touched about $850 per ounce in January 1980 during panic and inflation hedging, then drifted down toward roughly $250 by mid-1999—a long grind that outlasted most headlines. Holders who bought the spike waited years for a new nominal high.",
       "analogy": "Long drawdowns test whether you own an asset for a thesis or for the last tick; Bitcoin's multi-year bears rhyme with that endurance problem even though the mechanics differ.",
       "assetClass": "Precious metals",
       "period": "January 1980 – 1999",
@@ -198,7 +198,7 @@
     },
     {
       "title": "The Nikkei peak in 1989 needed decades to revisit",
-      "btcInsight": "Japan's Nikkei 225 closed near 38,915 on December 29, 1989, then entered a prolonged slide that erased most of the bubble's gains. The index did not sustainably exceed that 1989 closing high until February 2024—more than thirty-four years later.",
+      "marketInsight": "Japan's Nikkei 225 closed near 38,915 on December 29, 1989, then entered a prolonged slide that erased most of the bubble's gains. The index did not sustainably exceed that 1989 closing high until February 2024—more than thirty-four years later.",
       "analogy": "Index-level recoveries can take human careers, not quarters; comparing personal holding periods to headline index timelines keeps expectations honest.",
       "assetClass": "Japanese equities",
       "period": "December 1989 – February 2024",
@@ -207,7 +207,7 @@
     },
     {
       "title": "Silver Thursday broke the Hunts in March 1980",
-      "btcInsight": "On March 27, 1980—Silver Thursday—COMEX raised margin requirements and restricted trading as silver crashed from roughly $21 to about $10.50 in two months after briefly touching near $50 in January. The Hunt brothers, who had borrowed heavily to corner silver, faced massive margin calls and later bankruptcy.",
+      "marketInsight": "On March 27, 1980—Silver Thursday—COMEX raised margin requirements and restricted trading as silver crashed from roughly $21 to about $10.50 in two months after briefly touching near $50 in January. The Hunt brothers, who had borrowed heavily to corner silver, faced massive margin calls and later bankruptcy.",
       "analogy": "Concentrated bets financed with credit can unravel faster than spot prices suggest; forced selling turns a liquidity pinch into a rout.",
       "assetClass": "Commodities futures",
       "period": "January – March 1980",
@@ -259,43 +259,73 @@
   ],
   "reflection": [
     {
-      "message": "The number changed. You didn't. That distinction is worth sitting with.",
+      "land": "The number changed. You didn't.",
+      "hypothesis": "That distinction might be worth sitting with before the next alert pulls you forward.",
+      "inquiry": "What story is the chart telling your body right now?",
+      "message": "The number changed. You didn't. That distinction might be worth sitting with before the next alert pulls you forward. What story is the chart telling your body right now?",
       "haiku": "Digits on a screen\nshift like sand beneath the tide\nthe shore remains still"
     },
     {
-      "message": "Between the price alert and your next action, there is a space. That space is yours.",
+      "land": "Between the price alert and your next action, there is a space.",
+      "hypothesis": "That gap is often where agency lives — not in the tick, but in what you do with the breath before you move.",
+      "inquiry": "What would it cost you to stay in that space a little longer?",
+      "message": "Between the price alert and your next action, there is a space. That gap is often where agency lives — not in the tick, but in what you do with the breath before you move. What would it cost you to stay in that space a little longer?",
       "haiku": "A bell rings somewhere\nthe hand pauses, breath arrives\nchoice lives in the gap"
     },
     {
-      "message": "Every holder who came before you sat exactly where you're sitting now, feeling exactly what you feel.",
+      "land": "Every investor who came before you sat where you are sitting now.",
+      "hypothesis": "The feeling might not be new — only the timestamp on the screen.",
+      "inquiry": "What part of this moment feels oldest in you?",
+      "message": "Every investor who came before you sat where you are sitting now. The feeling might not be new — only the timestamp on the screen. What part of this moment feels oldest in you?",
       "haiku": "Footprints in the snow\nthousands walked this path before\nspring remembered them"
     },
     {
-      "message": "What would the version of you one year from now think about this moment?",
+      "land": "Moments like this often invite a longer view than the chart allows.",
+      "hypothesis": "Part of you might already be imagining a future self judging this pause.",
+      "inquiry": "What would the version of you one year from now notice about this moment?",
+      "message": "Moments like this often invite a longer view than the chart allows. Part of you might already be imagining a future self judging this pause. What would the version of you one year from now notice about this moment?",
       "haiku": "Tomorrow's calm self\nlooks back at today's sharp edge\nand finds it was round"
     },
     {
-      "message": "Volatility is not the enemy of conviction. It's the price of it.",
+      "land": "Volatility is not the enemy of conviction.",
+      "hypothesis": "It might simply be the price of caring about something that moves in public.",
+      "inquiry": "What are you trying to protect by holding on?",
+      "message": "Volatility is not the enemy of conviction. It might simply be the price of caring about something that moves in public. What are you trying to protect by holding on?",
       "haiku": "The mountain does not\napologize for its storms\nit simply endures"
     },
     {
-      "message": "Breathing does not wait for the chart to finish its story.",
+      "land": "Breathing does not wait for the chart to finish its story.",
+      "hypothesis": "Your body might already be ahead of the candle — steady before the narrative catches up.",
+      "inquiry": "What changes if you let the exhale lead?",
+      "message": "Breathing does not wait for the chart to finish its story. Your body might already be ahead of the candle — steady before the narrative catches up. What changes if you let the exhale lead?",
       "haiku": "The chart keeps moving\nYour exhale was always here\nBefore the pixels"
     },
     {
-      "message": "Stillness is allowed even when alerts stack like unread mail.",
+      "land": "Stillness is allowed even when alerts stack like unread mail.",
+      "hypothesis": "The inbox can feel louder than the move — urgency might be coming from habit, not from the market alone.",
+      "inquiry": "Which notification is actually asking for your attention?",
+      "message": "Stillness is allowed even when alerts stack like unread mail. The inbox can feel louder than the move — urgency might be coming from habit, not from the market alone. Which notification is actually asking for your attention?",
       "haiku": "Snow falls on signal\nthe masts forgot their long names\nQuiet white fields wait"
     },
     {
-      "message": "You can notice fear without handing it the keys to your hands.",
+      "land": "You can notice fear without handing it the keys to your hands.",
+      "hypothesis": "Fear often wants a decision before you have had a breath — naming it might loosen its grip.",
+      "inquiry": "What is fear asking you to do right now?",
+      "message": "You can notice fear without handing it the keys to your hands. Fear often wants a decision before you have had a breath — naming it might loosen its grip. What is fear asking you to do right now?",
       "haiku": "Fear knocks the same door\nseasons return with soft rain\nSoft breath holds the lock"
     },
     {
-      "message": "The body knows noon light whether markets agree with the sky.",
+      "land": "The body knows noon light whether markets agree with the sky.",
+      "hypothesis": "Grounding might live in sensation before it lives in any price.",
+      "inquiry": "What do you feel in your body that the chart cannot show?",
+      "message": "The body knows noon light whether markets agree with the sky. Grounding might live in sensation before it lives in any price. What do you feel in your body that the chart cannot show?",
       "haiku": "Sun warms your shoulders\nDistant rooms hum on softly\nNoon rests on your skin"
     },
     {
-      "message": "Curiosity toward the feeling beats verdicts about the number.",
+      "land": "Curiosity toward the feeling beats verdicts about the number.",
+      "hypothesis": "A label like good or bad might be smaller than what you are actually carrying.",
+      "inquiry": "What would you notice if you stayed curious for one more breath?",
+      "message": "Curiosity toward the feeling beats verdicts about the number. A label like good or bad might be smaller than what you are actually carrying. What would you notice if you stayed curious for one more breath?",
       "haiku": "Candle melts its wax\nevening rounds each jagged edge\nGlow holds the dark room"
     }
   ]

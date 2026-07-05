@@ -12,14 +12,14 @@ describe('isPauseSessionDepthPickerActive', () => {
     ).toBe(true);
   });
 
-  it('is false without coalesced shell', () => {
+  it('is true on picker even before reflection copy is coalesced', () => {
     expect(
       isPauseSessionDepthPickerActive({
         phase: 'session',
         ritualEntry: 'picker',
         hasShellMessage: false,
       }),
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it('is false when ritual already chosen', () => {

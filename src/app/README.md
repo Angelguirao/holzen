@@ -39,6 +39,7 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 | `hooks/use-feedback-widget.ts` | Error-boundary feedback sheet conductor |
 | `lib/navigation-telemetry.ts` | Shell nav PostHog (`navigation.primary_tab_opened`) |
 | `lib/app-route-telemetry.ts` | App 404 PostHog (`app.route_not_found`) |
+| `lib/app-shell-layout.ts` | Shared shell width tiers (`APP_SHELL_WIDTH_CLASS`) + container root class |
 
 ## Placement rationale (what lives elsewhere)
 
@@ -48,7 +49,7 @@ Cross-route chrome and providers: layout, bottom nav, document meta, error bound
 | `CheckoutConfirmation`, `PaywallSubscribedTracker` | `features/subscription/presentation/` | `AppLayout` via `@/features/subscription/public` | Subscription domain; shell only mounts globally for Stripe return on any tab |
 | `NotificationBell` | `features/notifications/presentation/` | `AppLayout` via `@/features/notifications/public-hooks` | Inbox + realtime; header slot is shell |
 | `PageHeading`, `ProLock` | `components/ui/` | Many routes | Shared presentation primitives |
-| `HoldGoalWidget`, `InstallHolzenCard`, `SubscriptionSkeleton`, `ThresholdFrequencyEstimator` | `screens/home/components/` | Home (+ Settings composes some) | Home/settings product UI, not shell |
+| `HomeGoalWhyCard`, `InstallHolzenCard`, `SubscriptionSkeleton`, `ThresholdFrequencyEstimator` | `screens/home/components/` | Home (+ Settings composes some) | Home/settings product UI, not shell |
 | `ThresholdSetting`, `QuietWindowsManager`, `AppVersionBadge` | `screens/settings/components/` | Settings | User prefs content |
 
 **`AppLayout` orchestration:** `useShellProfile` + `useAutoTrigger` (outlet context for Home), `ShellPauseChrome` (pause modal/banner), subscription checkout trackers, `NotificationBell` — see docblock in `AppLayout.tsx`.

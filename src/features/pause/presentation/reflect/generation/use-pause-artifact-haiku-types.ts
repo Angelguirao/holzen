@@ -1,4 +1,4 @@
-/** Params for artifact-only haiku hydrate on Reflect / Frame beats. */
+/** Params for artifact-only haiku hydrate (Frame companion hub). */
 export type PauseArtifactHaikuFetchPhase = 'idle' | 'loading' | 'error' | 'done';
 
 type UsePauseArtifactHaikuBase = {
@@ -7,7 +7,7 @@ type UsePauseArtifactHaikuBase = {
 };
 
 export type UsePauseArtifactHaikuImmediateParams = UsePauseArtifactHaikuBase & {
-  /** Fetch as soon as `pauseInstanceId` is set (Reflect step). */
+  /** Fetch as soon as `pauseInstanceId` is set (legacy / tests). */
   trigger: 'immediate';
 };
 
@@ -15,6 +15,8 @@ export type UsePauseArtifactHaikuWhenEnabledParams = UsePauseArtifactHaikuBase &
   /** Fetch only when true (Frame step — user expanded haiku). */
   trigger: 'whenEnabled';
   fetchEnabled: boolean;
+  /** When this changes after a prior fetch, retries artifact read (late holzen-reflect persist). */
+  reflectionMessage?: string;
 };
 
 export type UsePauseArtifactHaikuParams =

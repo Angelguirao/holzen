@@ -1,0 +1,24 @@
+meta {
+  name: grounding-enrich (legacy)
+  type: http
+  seq: 99
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/grounding-enrich
+  body: json
+  auth: none
+}
+
+headers {
+  x-cid: bruno-{{$timestamp}}-review
+  Authorization: Bearer {{SUPABASE_ACCESS_TOKEN}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "citation": "Bruno smoke — undeployed; restore edge from legacy/ before calling"
+  }
+}

@@ -14,8 +14,9 @@ Before non-trivial edits under `src/` or `supabase/`, read [docs/ops/active-surf
 
 - Do **not** import `@/legacy/**` from active code (enforced by `npm run check:active-surface`).
 - Do **not** add queries to Tier B tables dropped in `20260521200000_holzen_mvp_launch_cutover.sql` (`user_badges`, `practice_entries`, etc.).
+- Do **not** add queries to Tier D tables dropped in `20260604120000_pause_first_zombie_schema_cleanup.sql` (`collections`, `collection_items`, `grounding_enrichment_cache`).
 - Curated companion pool is **`companion_catalog`** (renamed from `content_library` in the same cutover) — not user Archive / `collections`.
-- Do **not** use dropped `profiles` columns (`companion_breathing`, `ai_insights_enabled`, `notify_badges`, …) — see manifest schema notes.
+- Do **not** use dropped `profiles` columns (`companion_breathing`, `ai_insights_enabled`, `notify_badges`, `hold_goal_type`, …) — see manifest schema notes.
 - Companion orchestration is **catalog → cache → live → curated** (`COMPANION_PHASE_CATALOG` defaults on).
 - Reflect-step artifact kind stays **`reflection_text`** (do not rename to `opening_message`).
 - New edge HTTP handlers need `config.toml`, `EdgeCoverage.tsx`, and logging checks per AGENTS.md.

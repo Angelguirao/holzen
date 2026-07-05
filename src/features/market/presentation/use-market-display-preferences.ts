@@ -9,38 +9,23 @@ function readIsTrue(key: string): boolean {
   }
 }
 
-/**
- * Price visibility, BTC unit mode, and market chart expand state for the Home market widget.
- */
+/** Price visibility and market chart expand state for Home. */
 export function useMarketDisplayPreferences() {
   const [priceHidden, setPriceHidden] = useState(() => readIsTrue('holzen_hide_price'));
-  const [btcMode, setBtcMode] = useState(() => readIsTrue('holzen_btc_mode'));
   const [marketChartExpanded, setMarketChartExpanded] = useState(false);
-  const marketChartExpandBlocked = btcMode || priceHidden;
+  const marketChartExpandBlocked = priceHidden;
 
   useEffect(() => {
-    if (btcMode || priceHidden) {
+    if (priceHidden) {
       setMarketChartExpanded(false);
     }
-  }, [btcMode, priceHidden]);
+  }, [priceHidden]);
 
   const togglePriceHidden = useCallback(() => {
     setPriceHidden((prev) => {
       const next = !prev;
       try {
         localStorage.setItem('holzen_hide_price', String(next));
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
-  }, []);
-
-  const toggleBtcMode = useCallback(() => {
-    setBtcMode((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem('holzen_btc_mode', String(next));
       } catch {
         /* ignore */
       }
@@ -58,11 +43,9 @@ export function useMarketDisplayPreferences() {
 
   return {
     priceHidden,
-    btcMode,
     marketChartExpanded,
     marketChartExpandBlocked,
     togglePriceHidden,
-    toggleBtcMode,
     toggleMarketChartExpanded,
   };
 }

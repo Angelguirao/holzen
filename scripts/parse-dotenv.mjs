@@ -41,11 +41,11 @@ export function firstEnvValue(maps, keys) {
 }
 
 export function serializeMcpSecrets(env, headerLines = []) {
+  const gemini = env.GEMINI_API_KEY?.trim();
   const lines = [
     ...headerLines,
     "",
-    `GEMINI_API_KEY=${env.GEMINI_API_KEY ?? ""}`,
-    `GOOGLE_AI_API_KEY=${env.GOOGLE_AI_API_KEY ?? ""}`,
+    gemini ? `GEMINI_API_KEY=${gemini}` : "# GEMINI_API_KEY=  # optional — Cursor aistudio MCP only",
     `IONOS_API_KEY=${env.IONOS_API_KEY ?? ""}`,
     `IONOS_MCP_PATH=${env.IONOS_MCP_PATH ?? ""}`,
     "",

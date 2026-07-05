@@ -4,6 +4,8 @@
 
 It is **not** the same as a user tap or cron calling `companion-orchestrate` with multiple slots; pregenerate only **inserts pool rows** (and adjusts scores). **Haiku** is not pregenerated here.
 
+**Billing:** pregenerate is platform spend only — it does **not** debit any user’s **Companions & guidance** allowance (see [companion-metering.md](companion-metering.md)).
+
 ## Is it “working”?
 
 Yes, as an implemented and deployed path:
@@ -11,7 +13,7 @@ Yes, as an implemented and deployed path:
 - **Edge function:** `supabase/functions/pregenerate-companions/index.ts` — HTTP handler wrapped in `withRequestLogging`, logged as `fn: pregenerate-companions`.
 - **Schedule:** `pg_cron` posts to the function URL (project-specific URL in migrations; typical schedule is every **6 hours** — see [cron-setup.md](../../../ops/cron-setup.md) § “Cache Warmer” and [observability-setup.md](../../../ops/observability-setup.md) for heartbeat).
 - **Auth:** `verifyServiceAuth` — `Authorization: Bearer` must be **service role** or **`CRON_SECRET`** (same pattern as other cron workers; see [cron-worker-auth-consistency.md](../../../backlog/cron-worker-auth-consistency.md)).
-- **Secrets:** Requires **`PERPLEXITY_API_KEY`** and **`GOOGLE_AI_API_KEY`** (or **`GEMINI_API_KEY`**) on the edge runtime. Missing keys → **500** with `{ error: "Missing API keys" }`.
+- **Secrets:** Requires **`PERPLEXITY_API_KEY`** and **`OPENROUTER_API_KEY`** on the edge runtime. Missing keys → **500** with `{ error: "Missing API keys" }`.
 - **Kill switches:** `guardAiFeature(svcClient, "pregenerate", { providers: ["perplexity", "google"] })` in `_shared/ratelimit.ts` — if the **`pregenerate`** app-config flag is off, daily budget / panic mode blocks, etc., the function returns **200** with `{ skipped: true, reason: "..." }` and does not burn APIs.
 - **Top-up targets (tunable):** `app_config.pregenerate_cache_topup` — per `companion_type`, **min** count of *healthy* rows (`quality_score` ≥ 2, not expired) and **max** new rows to attempt per cron. Loaded via `loadAppConfig` (~30s cache on edge). Editable in **Admin → Tools** (“Pregenerate cache top-up”) without redeploy. Defaults are seeded in `20260425120000_app_config_pregenerate_cache_topup.sql`.
 
@@ -35,7 +37,7 @@ Yes, as an implemented and deployed path:
 
 When a user (or service job) invokes **`companion-orchestrate`**, the generators in `_shared/generators/{signal,grounding,history,zoom-out}.ts` can **read** matching rows from `companion_cache` according to [phase-config](../../../../supabase/functions/_shared/phase-config.ts). Pregenerate **feeds** that pool; it does not write to `pause_ai_artifacts` by itself.
 
-**Admin:** Companion cache table and hints about the warmer appear in the admin surface ([Admin.tsx](../../../../src/screens/admin/AdminScreen.tsx) copy references `pregenerate-companions`).
+**Admin:** Companion cache table and hints about the warmer appear in the admin surface ([AdminScreen.tsx](../../../../src/screens/admin/AdminScreen.tsx)). **Monitor → Cache hit rate by companion** (per `companion_type`, respects the period selector) is the primary ROI readout for pregenerate — higher cache % means fewer live orchestrate calls.
 
 ## Ops and cost
 

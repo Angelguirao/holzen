@@ -2,6 +2,7 @@ import { renderHook, act } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TFunction } from 'i18next';
 import type { MutableRefObject } from 'react';
+import { DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 import { usePauseSessionBreathReflectHandlers } from './use-pause-session-breath-reflect-handlers';
 
 const {
@@ -29,6 +30,7 @@ const {
     lastReflectArgs.current = args;
     return {
       effectiveReflectionMessage: 'Effective copy',
+      reflectionContent: null,
       reflectionLoading: false,
       reflectionError: null,
       retryReflection: vi.fn(),
@@ -70,7 +72,7 @@ function baseProviders() {
   return {
     t,
     dismissMessage: vi.fn(),
-    btcData: { changePercent: -3.1 } as import('@/features/market/public').BtcPriceData,
+    marketData: { changePercent: -3.1 } as import('@/features/market/public').MarketQuote,
     subscribed: true,
     subLoading: false,
     requirePro: vi.fn(),
@@ -85,6 +87,7 @@ function baseShell() {
     context: 'btc_dip',
     pauseInstanceId: 'pause-inst-1',
     companions: { haiku: 'haiku line' } as import('@/features/pause/domain/companion-card-types').CompanionData,
+    companionPrefs: DEFAULT_PREFS,
   };
 }
 
@@ -100,6 +103,8 @@ function baseRitual() {
     selectedMoodAfter: null,
     feelIntensity: 2,
     shiftIntensity: 4,
+    isFavorite: false,
+    ritualStartedAtMs: Date.now() - 90_000,
     setSwipeDirection: vi.fn(),
     setStep: vi.fn(),
     setBriefStep: vi.fn(),
@@ -169,6 +174,8 @@ describe('usePauseSessionBreathReflectHandlers', () => {
     expect(lastShiftFrameArgs.current).toMatchObject({
       pauseInstanceId: 'pause-inst-1',
       lastShiftLogKeyRef: mood.lastShiftLogKeyRef,
+      frameShiftMood: null,
+      frameShiftIntensity: 4,
       goToStep: goToStepMock,
     });
     expect(lastShiftFrameArgs.current?.setFrameDone).toBe(ritual.setFrameDone);

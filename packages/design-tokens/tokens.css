@@ -1,0 +1,91 @@
+/**
+ * Holzen Nox design tokens — single source of truth for raw CSS variables.
+ * Consumed by: src/index.css (app), apps/site (marketing).
+ * CI: npm run check:design-tokens
+ */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&family=Newsreader:ital,wght@0,300;0,400;1,300;1,400&display=swap');
+
+:root {
+  /* ─── Color: surfaces ─── */
+  --nox-color-background-primary: 219 38% 13%;
+  --nox-color-background-secondary: 218 35% 19%;
+  --nox-color-background-accent: 218 35% 28%;
+  --nox-color-background-deep: 219 45% 10%;
+  --nox-color-background-inverse: 217 22% 89%;
+  --nox-color-background-inverse-pressed: 217 22% 82%;
+  --nox-color-background-overlay: 219 38% 13% / 0.9;
+
+  /* ─── Color: text ─── */
+  --nox-color-text-primary: 217 22% 89%;
+  --nox-color-text-secondary: 213 22% 80%;
+  --nox-color-text-muted: 214 15% 55%;
+  --nox-color-text-contrast: 0 0% 100%;
+  --nox-color-text-link: 213 53% 67%;
+  --nox-color-text-highlight: 36 58% 63%;
+  --nox-color-text-inverse-contrast: 219 45% 10%;
+
+  /* ─── Color: state ─── */
+  --nox-color-state-success: 152 41% 51%;
+  --nox-color-state-error: 0 53% 57%;
+  --nox-color-state-warning: 38 65% 62%;
+
+  /* ─── Color: accent ─── */
+  --nox-color-accent-cyan: 188 41% 60%;
+  --nox-color-accent-cyan-strong: 189 59% 41%;
+  --nox-color-accent-green: 152 41% 51%;
+  --nox-color-accent-violet: 252 32% 67%;
+  --nox-color-accent-magenta: 290 44% 62%;
+  --nox-color-accent-mustard: 38 65% 62%;
+
+  /* ─── Border ─── */
+  --nox-color-border-default: 218 35% 28%;
+  --nox-color-border-focus: 213 53% 67%;
+
+  /* ─── Radius ─── */
+  --nox-radius-s: 0.25rem;
+  --nox-radius-m: 0.75rem;
+  --nox-radius-l: 1rem;
+  --nox-radius-full: 999px;
+
+  /* ─── Typography scale (12px floor for user-facing UI copy) ─── */
+  --nox-text-xs: 0.75rem;
+  --nox-text-sm: 0.875rem;
+  --nox-text-base: 1rem;
+  --nox-text-md: 0.9375rem;
+  --nox-text-lg: 1.0625rem;
+  --nox-text-xl: 1.25rem;
+  --nox-text-2xl: 1.5rem;
+  --nox-text-display-sm: clamp(2rem, 5.5vw, 2.75rem);
+  --nox-text-display-md: clamp(1.375rem, 3.5vw, 1.625rem);
+
+  /* ─── Spacing (Nox semantic) ─── */
+  --nox-space-category: 0.5rem;
+  --nox-space-group: 1rem;
+  --nox-space-header: 1rem;
+  --nox-space-footer: 1.5rem;
+  --nox-space-section: 2rem;
+
+  /* ─── Layout ─── */
+  --nox-content-max: 36rem;
+  --nox-hero-max: 68rem;
+  --nox-touch-min: 2.875rem;
+
+  /* ─── Marketing elevation (not used in flat in-app surfaces) ─── */
+  --nox-elevation-marketing-soft: 0 24px 48px hsl(var(--nox-color-background-deep) / 0.35);
+  --nox-elevation-marketing-card:
+    0 1px 0 hsl(0 0% 100% / 0.04) inset,
+    0 16px 40px hsl(0 0% 0% / 0.22);
+  --nox-glass-surface: var(--nox-color-background-primary) / 0.55;
+  --nox-glass-border: var(--nox-color-border-default) / 0.45;
+
+  /* ─── Semantic aliases (marketing CSS) ─── */
+  --nox-border-subtle: var(--nox-color-border-default) / 0.35;
+  --nox-border-strong: var(--nox-color-border-default) / 0.55;
+
+  /* ─── Fonts ─── */
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-editorial: 'Newsreader', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  color-scheme: dark;
+}

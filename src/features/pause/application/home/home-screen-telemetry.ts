@@ -40,9 +40,19 @@ export function trackHomeGoalWhyExpandToggled(expanded: boolean): void {
   }
 }
 
-export function trackOnboardingCompleted(stepsCompleted: number): void {
+export function trackOnboardingCompleted(args: {
+  stepsCompleted: number;
+  trackedAssetId: string;
+  thresholdUp: number;
+  thresholdDown: number;
+}): void {
   try {
-    trackEvent('onboarding.completed', { steps_completed: stepsCompleted });
+    trackEvent('onboarding.completed', {
+      steps_completed: args.stepsCompleted,
+      tracked_asset_id: args.trackedAssetId,
+      threshold_up: args.thresholdUp,
+      threshold_down: args.thresholdDown,
+    });
   } catch {
     /* no-op */
   }

@@ -12,7 +12,6 @@ import {
   pauseRecencyInputs,
 } from "../_shared/pause-cron-parity.ts";
 import {
-  isCumulativeMoveTriggered,
   isVolatilityThresholdBreached,
 } from "../_shared/volatility-thresholds.ts";
 import { unknownErrorForLog } from "../_shared/log-unknown-error.ts";
@@ -28,7 +27,7 @@ import {
   bucketChangePercent,
   computeContextFingerprint,
 } from "../_shared/pause.ts";
-import { normalizeTrackedAssetId, trackedAssetSymbol } from "../_shared/tracked-assets.ts";
+import { normalizeTrackedAssetId, isBitcoinTrackedAsset, trackedAssetSymbol } from "../_shared/tracked-assets.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -64,8 +63,8 @@ async function fetchWithRetry(
   throw new Error("Failed to fetch market data after retries");
 }
 
-/** CoinGecko quote currency — matches `use-holzen` / `fetchBtcData(currency)` (`profiles.hold_goal_currency`). */
-function normalizeHoldGoalCurrency(raw: unknown): string {
+/** CoinGecko quote currency — matches market fetch (`profiles.display_currency`). */
+function normalizeDisplayCurrency(raw: unknown): string {
   if (typeof raw === "string" && raw.trim().length >= 3) return raw.trim().toLowerCase();
   return "usd";
 }
@@ -73,8 +72,6 @@ function normalizeHoldGoalCurrency(raw: unknown): string {
 type AssetVolatilityMetrics = {
   changePercent: number;
   direction: string;
-  cumulativeChangePercent: number;
-  cumulativeDirection: string;
 };
 
 /** Row shape from the `profiles` select in this handler. */
@@ -82,24 +79,16 @@ interface VolatilityProfile {
   user_id: string;
   threshold?: number | null;
   threshold_down?: number | null;
-  cumulative_threshold?: number | null;
-  hold_goal_currency?: string | null;
-  email_notifications?: boolean | null;
+  display_currency?: string | null;
   last_trigger_at?: string | null;
-  cooldown_hours?: number | null;
-  reflection_tone?: string | null;
   companion_haiku?: boolean | null;
   companion_grounding?: boolean | null;
   companion_signal?: boolean | null;
   companion_zoom_out?: boolean | null;
   companion_history?: boolean | null;
-  quiet_hours_start?: number | null;
-  quiet_hours_end?: number | null;
   timezone?: string | null;
   language?: string | null;
   snoozed_until?: string | null;
-  custom_prompt?: string | null;
-  reflection_style?: string | null;
   motivations?: unknown;
   mantra?: string | null;
   grounding_activities?: unknown;
@@ -114,18 +103,11 @@ async function fetchAssetVolatilityForCurrency(
 ): Promise<AssetVolatilityMetrics> {
   const cur = vsCurrency.toLowerCase();
   const id = encodeURIComponent(coinId);
-  const [res1d, res7d] = await Promise.all([
-    fetchWithRetry(
-      incoming,
-      `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=1`,
-      log,
-    ),
-    fetchWithRetry(
-      incoming,
-      `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=7`,
-      log,
-    ),
-  ]);
+  const res1d = await fetchWithRetry(
+    incoming,
+    `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${cur}&days=1`,
+    log,
+  );
 
   const data1d = await res1d.json();
   const prices1d: [number, number][] = data1d.prices;
@@ -135,19 +117,9 @@ async function fetchAssetVolatilityForCurrency(
   const currentPrice = prices1d[prices1d.length - 1][1];
   const changePercent = ((currentPrice - price24hAgo) / price24hAgo) * 100;
 
-  const data7d = await res7d.json();
-  const prices7d: [number, number][] = data7d.prices;
-  let cumulativeChangePercent = 0;
-  if (prices7d && prices7d.length >= 2) {
-    const price7dAgo = prices7d[0][1];
-    cumulativeChangePercent = ((currentPrice - price7dAgo) / price7dAgo) * 100;
-  }
-
   return {
     changePercent,
     direction: changePercent >= 0 ? "up" : "down",
-    cumulativeChangePercent,
-    cumulativeDirection: cumulativeChangePercent >= 0 ? "up" : "down",
   };
 }
 
@@ -192,7 +164,7 @@ serve(
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select(
-        "user_id, threshold, threshold_down, cumulative_threshold, hold_goal_currency, tracked_asset_id, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
+        "user_id, threshold, threshold_down, display_currency, tracked_asset_id, last_trigger_at, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, timezone, language, snoozed_until, motivations, mantra, grounding_activities",
       );
 
     if (profilesError) throw profilesError;
@@ -211,7 +183,7 @@ serve(
     const assetToCurrencies = new Map<string, Set<string>>();
     for (const p of profileRows) {
       const aid = normalizeTrackedAssetId(p.tracked_asset_id);
-      const c = normalizeHoldGoalCurrency(p.hold_goal_currency);
+      const c = normalizeDisplayCurrency(p.display_currency);
       if (!assetToCurrencies.has(aid)) assetToCurrencies.set(aid, new Set());
       assetToCurrencies.get(aid)!.add(c);
     }
@@ -266,7 +238,7 @@ serve(
 
     function metricsForProfile(p: VolatilityProfile, fallback: AssetVolatilityMetrics): AssetVolatilityMetrics {
       const aid = normalizeTrackedAssetId(p.tracked_asset_id);
-      const c = normalizeHoldGoalCurrency(p.hold_goal_currency);
+      const c = normalizeDisplayCurrency(p.display_currency);
       return metricsByAssetCur.get(aid)?.get(c) ??
         metricsByAssetCur.get(aid)?.get("usd") ??
         metricsByAssetCur.get("bitcoin")?.get(c) ??
@@ -277,71 +249,9 @@ serve(
       holzen_event: "check_volatility_cron",
       phase: "market_sample_loaded",
       change24h_pct: Number(usdPeek.changePercent.toFixed(2)),
-      change7d_pct: Number(usdPeek.cumulativeChangePercent.toFixed(2)),
       asset_currency_pairs: pairRows.filter((r) => r.m).length,
     });
 
-    // Helper: get user's local hour
-    function getUserLocalHour(timezone: string): number {
-      try {
-        const formatter = new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone: timezone });
-        return parseInt(formatter.format(new Date()), 10);
-      } catch { return new Date().getUTCHours(); }
-    }
-
-    // Helper: check if user is in quiet hours (timezone-aware)
-    // Checks both the legacy single-window profile fields AND the new quiet_windows table
-    const { data: allQuietWindows } = await supabase
-      .from("quiet_windows")
-      .select("user_id, start_hour, end_hour, days, active");
-
-    const quietWindowsByUser = new Map<string, Array<{ start_hour: number; end_hour: number; days: number[] }>>();
-    for (const w of (allQuietWindows || [])) {
-      if (!w.active) continue;
-      if (!quietWindowsByUser.has(w.user_id)) quietWindowsByUser.set(w.user_id, []);
-      quietWindowsByUser.get(w.user_id)!.push(w);
-    }
-
-    function isInQuietHours(p: VolatilityProfile): boolean {
-      const tz = p.timezone || "UTC";
-      const localHour = getUserLocalHour(tz);
-
-      // Check legacy single-window
-      const start = p.quiet_hours_start;
-      const end = p.quiet_hours_end;
-      if (start != null && end != null) {
-        if (start <= end ? (localHour >= start && localHour < end) : (localHour >= start || localHour < end)) {
-          return true;
-        }
-      }
-
-      // Check extended quiet windows
-      const windows = quietWindowsByUser.get(p.user_id);
-      if (windows) {
-        // Get local day of week (0=Sunday)
-        let localDay: number;
-        try {
-          const formatter = new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: tz });
-          const dayStr = formatter.format(new Date());
-          const dayMap: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-          localDay = dayMap[dayStr] ?? new Date().getDay();
-        } catch { localDay = new Date().getDay(); }
-
-        for (const w of windows) {
-          if (!w.days.includes(localDay)) continue;
-          const s = w.start_hour;
-          const e = w.end_hour;
-          if (s <= e ? (localHour >= s && localHour < e) : (localHour >= s || localHour < e)) {
-            return true;
-          }
-        }
-      }
-
-      return false;
-    }
-
-    // Filter: must exceed at least one threshold AND not in cooldown AND not in quiet hours
-    // Helper: check if user has an active snooze
     function isSnoozed(p: VolatilityProfile): boolean {
       const snoozedUntil = p.snoozed_until;
       if (!snoozedUntil) return false;
@@ -353,40 +263,78 @@ serve(
       return isVolatilityThresholdBreached(p, metrics);
     }
 
-    const eligible = profileRows.filter((p) => {
+    function passesVolatilityGates(p: VolatilityProfile): boolean {
       if (!profileVolatilityBreached(p)) return false;
-      if (isInQuietHours(p)) return false;
       if (isSnoozed(p)) return false;
-      if (!p.last_trigger_at) return true;
-      const cooldownMs = (p.cooldown_hours ?? 6) * 60 * 60 * 1000;
-      return new Date(p.last_trigger_at).getTime() < Date.now() - cooldownMs;
-    });
+      return true;
+    }
+
+    const profileByUserId = new Map(profileRows.map((p) => [p.user_id, p]));
+    const { data: openCronPauseRows, error: openCronPauseErr } = await supabase
+      .from("pause_instances")
+      .select("user_id, state")
+      .eq("source", "cron_volatility")
+      .in("state", ["active", "pending", "engaged"]);
+    if (openCronPauseErr) throw openCronPauseErr;
+
+    const { data: openEngagedRows, error: openEngagedErr } = await supabase
+      .from("pause_instances")
+      .select("user_id")
+      .eq("state", "engaged");
+    if (openEngagedErr) throw openEngagedErr;
+
+    const openEngagedUserIds = new Set(
+      (openEngagedRows ?? []).map((row) => row.user_id as string),
+    );
+
+    const openCronActiveEngagedUserIds = new Set(
+      (openCronPauseRows ?? [])
+        .filter((row) => row.state === "active" || row.state === "engaged")
+        .map((row) => row.user_id as string),
+    );
+    const openCronPendingUserIds = new Set(
+      (openCronPauseRows ?? [])
+        .filter((row) => row.state === "pending")
+        .map((row) => row.user_id as string),
+    );
+
+    const openCronPendingOnlyUserIds = new Set(
+      (openCronPauseRows ?? [])
+        .filter((row) => row.state === "pending")
+        .map((row) => row.user_id as string)
+        .filter((userId) => !openCronActiveEngagedUserIds.has(userId)),
+    );
+
+    const eligible = profileRows.filter(
+      (p) =>
+        passesVolatilityGates(p) &&
+        !openCronActiveEngagedUserIds.has(p.user_id) &&
+        !openCronPendingUserIds.has(p.user_id),
+    );
+    const contextRefresh = profileRows.filter(
+      (p) =>
+        passesVolatilityGates(p) &&
+        (openCronActiveEngagedUserIds.has(p.user_id) ||
+          openCronPendingOnlyUserIds.has(p.user_id)),
+    );
+    const toProcess = [...eligible, ...contextRefresh];
 
     log("check_volatility_phase", {
       holzen_event: "check_volatility_cron",
       phase: "eligible_users",
       eligible: eligible.length,
+      context_refresh: contextRefresh.length,
       total_profiles: profileRows.length,
     });
 
-    const profileByUserId = new Map(profileRows.map((p) => [p.user_id, p]));
-    const { data: openCronPauseRows, error: openCronPauseErr } = await supabase
-      .from("pause_instances")
-      .select("user_id")
-      .eq("source", "cron_volatility")
-      .in("state", ["active", "pending"]);
-    if (openCronPauseErr) throw openCronPauseErr;
-
-    const calmSweepUserIds = [
-      ...new Set(
-        (openCronPauseRows ?? [])
-          .map((row) => row.user_id as string)
-          .filter((userId) => {
-            const profile = profileByUserId.get(userId);
-            return profile != null && !profileVolatilityBreached(profile);
-          }),
-      ),
-    ];
+    const calmSweepCandidateUserIds = new Set<string>([
+      ...(openCronPauseRows ?? []).map((row) => row.user_id as string),
+      ...openEngagedUserIds,
+    ]);
+    const calmSweepUserIds = [...calmSweepCandidateUserIds].filter((userId) => {
+      const profile = profileByUserId.get(userId);
+      return profile != null && !profileVolatilityBreached(profile);
+    });
 
     const calmSweepResults = await Promise.all(
       calmSweepUserIds.map(async (userId) => {
@@ -428,18 +376,40 @@ serve(
 
     const vapidReady = await initWebPushVapidFromEnv(log);
 
-    // Process all eligible users in parallel
-    const results = await Promise.all(eligible.map(async (profile) => {
-      // Server-side idempotency: a single atomic UPDATE acts as the per-user
-      // cooldown lock. `claim_trigger_slot` returns true only for the first
-      // cron tick whose write actually flips `last_trigger_at` for this user
-      // within the cooldown window — every concurrent or duplicated tick
-      // (pg_cron retry, manual invoke, overlapping schedule) is rejected
-      // before any LLM call is made.
-      const cooldownHours = profile.cooldown_hours ?? 6;
+    const hotEngagedClearUserIds = [...openEngagedUserIds].filter((userId) => {
+      const profile = profileByUserId.get(userId);
+      return profile != null && profileVolatilityBreached(profile);
+    });
+    const clearCalmSettledUserIds = new Set([
+      ...toProcess.map((profile) => profile.user_id),
+      ...hotEngagedClearUserIds,
+    ]);
+
+    if (clearCalmSettledUserIds.size > 0) {
+      await Promise.all(
+        [...clearCalmSettledUserIds].map(async (userId) => {
+          const { error: clearErr } = await supabase.rpc(
+            "pause_clear_cron_volatility_calm_settled",
+            { p_user_id: userId },
+          );
+          if (clearErr) {
+            log.error("check_volatility_clear_calm_settled", {
+              holzen_event: "check_volatility_cron",
+              phase: "pause_clear_cron_volatility_calm_settled_failed",
+              user_id_prefix: String(userId).slice(0, 8),
+              ...unknownErrorForLog(clearErr),
+            });
+          }
+        }),
+      );
+    }
+
+    // Process eligible users and open-pause context refresh in parallel
+    const results = await Promise.all(toProcess.map(async (profile) => {
+      // Stamp last_trigger_at for audit; pause_create_or_reuse_as handles open-offer idempotency.
       const { data: claimed, error: claimError } = await supabase.rpc(
         "claim_trigger_slot",
-        { _user_id: profile.user_id, _cooldown_hours: cooldownHours },
+        { _user_id: profile.user_id },
       );
       if (claimError) {
         log.error("check_volatility_claim", {
@@ -452,9 +422,8 @@ serve(
       if (claimed !== true) {
         log("check_volatility_skip", {
           holzen_event: "check_volatility_cron",
-          phase: "cooldown_slot_already_claimed",
+          phase: "claim_trigger_slot_no_profile",
           user_id_prefix: String(profile.user_id).slice(0, 8),
-          cooldown_hours: cooldownHours,
         });
         return false;
       }
@@ -466,12 +435,7 @@ serve(
       const assetId = normalizeTrackedAssetId(profile.tracked_asset_id);
       const sym = trackedAssetSymbol(assetId);
       let ctx = `${sym} is ${dir} ${pct}% in the last 24 hours.`;
-      if (isCumulativeMoveTriggered(userM.cumulativeChangePercent, profile.cumulative_threshold)) {
-        const cumDir = userM.cumulativeDirection === "down" ? "down" : "up";
-        const absCum = Math.abs(userM.cumulativeChangePercent);
-        ctx += ` Over 7 days, it's ${cumDir} ${absCum.toFixed(1)}%.`;
-      }
-      const onChainForUser = assetId === "bitcoin" ? onChainSnapshot : null;
+      const onChainForUser = isBitcoinTrackedAsset(assetId) ? onChainSnapshot : null;
       ctx = enrichAutomaticPauseContext(ctx, fearGreedSnapshot, onChainForUser);
 
       const { moodHistory } = await pauseRecencyInputs(supabase, profile.user_id);
@@ -492,7 +456,6 @@ serve(
         directionBucket,
         severityBand,
         dailyBucketPct,
-        cumulativeBucketPct: bucketChangePercent(userM.cumulativeChangePercent),
         trackedAssetId: assetId,
         fearGreedBand: fearGreedSnapshot?.label ?? null,
         onChainBand: onChainForUser
@@ -510,7 +473,6 @@ serve(
           p_source: "cron_volatility",
           p_context_snapshot: {
             change_24h_pct: userM.changePercent,
-            change_7d_pct: userM.cumulativeChangePercent,
             direction: userM.direction,
             severity: severityBand,
             context_text: ctx,
@@ -523,12 +485,6 @@ serve(
             triggered: [
               Math.abs(userM.changePercent) >= (profile.threshold ?? 5)
                 ? "daily"
-                : null,
-              isCumulativeMoveTriggered(
-                userM.cumulativeChangePercent,
-                profile.cumulative_threshold,
-              )
-                ? "cumulative"
                 : null,
             ].filter(Boolean),
           },
@@ -548,6 +504,7 @@ serve(
       const wasCreated: boolean = createRes?.created === true;
       const reusedReason: string | null = createRes?.reused_reason ?? null;
       const pendingOffer: boolean = createRes?.pending_offer === true;
+      const contextRefreshed: boolean = createRes?.context_refreshed === true;
 
       if (!pauseInstanceId) {
         // Recent-dismissal match: user already walked away from this
@@ -562,8 +519,33 @@ serve(
       }
 
       if (!wasCreated) {
-        // Fingerprint match with an already-open pause: reuse, don't
-        // re-dispatch a push.
+        if (contextRefreshed) {
+          if (!pendingOffer) {
+            const { error: refreshProfileErr } = await supabase
+              .from("profiles")
+              .update({ last_context: ctx })
+              .eq("user_id", profile.user_id);
+            if (refreshProfileErr) {
+              log.error("check_volatility_profile", {
+                holzen_event: "check_volatility_cron",
+                phase: "context_refresh_profile_failed",
+                ...unknownErrorForLog(refreshProfileErr),
+              });
+              return false;
+            }
+          }
+          log("check_volatility_context_refresh", {
+            holzen_event: "check_volatility_cron",
+            phase: pendingOffer
+              ? "pending_offer_context_refreshed"
+              : "open_pause_context_refreshed",
+            user_id_prefix: String(profile.user_id).slice(0, 8),
+            instance_id_prefix: String(pauseInstanceId).slice(0, 8),
+          });
+          return "refreshed";
+        }
+
+        // Fingerprint match without refresh flag, or other reuse: no push.
         log("check_volatility_skip", {
           holzen_event: "check_volatility_cron",
           phase: "open_pause_covers_context",
@@ -607,7 +589,6 @@ serve(
         supabase,
         webpush,
         userId: profile.user_id,
-        emailNotifications: profile.email_notifications ?? false,
         contextPreview: ctx,
         pauseInstanceId,
         log,
@@ -616,19 +597,22 @@ serve(
         holzenEvent: "check_volatility_cron",
       });
 
-      return true;
+      return "triggered";
     }));
 
-    const triggered = results.filter(Boolean).length;
+    const triggered = results.filter((r) => r === "triggered").length;
+    const contextRefreshed = results.filter((r) => r === "refreshed").length;
     log("check_volatility_complete", {
       holzen_event: "check_volatility_cron",
       phase: "run_complete",
       triggered,
+      context_refreshed: contextRefreshed,
     });
 
     return new Response(
       JSON.stringify({
         triggered,
+        contextRefreshed,
         contextLostExpired,
         btcChangeUsd: usdPeek.changePercent,
         marketPairsLoaded: pairRows.filter((r) => r.m).length,

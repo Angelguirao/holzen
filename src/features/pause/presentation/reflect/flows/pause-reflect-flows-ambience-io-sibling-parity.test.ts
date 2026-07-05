@@ -1,25 +1,23 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: { port: 'reflectPauseRepository' },
+  supabasePauseRepository: { port: 'reflectPauseRepository' }
 }));
 
 import {
   startPauseReflectFrameFocusAmbience,
-  stopPauseReflectFrameFocusAmbience,
+  stopPauseReflectFrameFocusAmbience
 } from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import * as ambienceIo from '@/features/pause/presentation/reflect/ambience/pause-reflect-ambience-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
-  getSessionQuote,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   reflectPauseRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
-  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeNotCompletedToast
 } from './pause-reflect-flows-io';
 import * as flowsIo from './pause-reflect-flows-io';
 
@@ -34,9 +32,7 @@ describe('pause-reflect-flows-io ↔ pause-reflect-ambience-io sibling parity', 
   it('flows-io and ambience-io are distinct presentation I/O surfaces', () => {
     expect(typeof resolvePauseSessionReflectAndDecidePreflight).toBe('function');
     expect(typeof resolvePauseSessionReflectAndDecideAfterGeneration).toBe('function');
-    expect(typeof formatReinforcementQuoteFromSession).toBe('function');
     expect(typeof resolvePauseDecideOutcomeFlow).toBe('function');
-    expect(typeof getSessionQuote).toBe('function');
     expect(typeof buildPauseScoreImpacts).toBe('function');
     expect(typeof pauseReflectOutcomeLog).toBe('function');
     expect(typeof pauseReflectOutcomeLogWithRepository).toBe('function');
@@ -50,8 +46,6 @@ describe('pause-reflect-flows-io ↔ pause-reflect-ambience-io sibling parity', 
     expect('stopPauseReflectFrameFocusAmbience' in flowsIo).toBe(false);
     expect('resolvePauseSessionReflectAndDecidePreflight' in ambienceIo).toBe(false);
     expect('resolvePauseSessionReflectAndDecideAfterGeneration' in ambienceIo).toBe(false);
-    expect('formatReinforcementQuoteFromSession' in ambienceIo).toBe(false);
-    expect('getSessionQuote' in ambienceIo).toBe(false);
     expect('pauseReflectOutcomeLog' in ambienceIo).toBe(false);
     expect('buildPauseScoreImpacts' in ambienceIo).toBe(false);
   });
@@ -60,7 +54,6 @@ describe('pause-reflect-flows-io ↔ pause-reflect-ambience-io sibling parity', 
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(pauseReflectOutcomeLog).not.toBe(startPauseReflectFrameFocusAmbience);
-    expect(formatReinforcementQuoteFromSession).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(startPauseReflectFrameFocusAmbience);
     expect(buildPauseScoreImpacts).not.toBe(stopPauseReflectFrameFocusAmbience);
     expect(pauseReflectOutcomeLogWithRepository).not.toBe(stopPauseReflectFrameFocusAmbience);
@@ -71,7 +64,6 @@ describe('pause-reflect-flows-io ↔ pause-reflect-ambience-io sibling parity', 
     expect(startPauseReflectFrameFocusAmbience).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(stopPauseReflectFrameFocusAmbience).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);
     expect(startPauseReflectFrameFocusAmbience).not.toBe(pauseReflectOutcomeLog);
-    expect(stopPauseReflectFrameFocusAmbience).not.toBe(formatReinforcementQuoteFromSession);
     expect(startPauseReflectFrameFocusAmbience).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(stopPauseReflectFrameFocusAmbience).not.toBe(buildPauseScoreImpacts);
     expect(startPauseReflectFrameFocusAmbience).not.toBe(pauseReflectOutcomeLogWithRepository);

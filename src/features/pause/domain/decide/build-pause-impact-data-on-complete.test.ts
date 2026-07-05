@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { DEFAULT_PREFS } from '@/features/pause/domain/session-model';
 import { buildPauseImpactDataOnComplete } from './build-pause-impact-data-on-complete';
 
 const base = () => ({
@@ -8,9 +9,11 @@ const base = () => ({
   selectedMoodAfter: 'fomo' as const,
   feelIntensity: 3,
   shiftIntensity: 4,
-  reinforcementQuote: '"Hi" — Author',
   reflectionMessage: 'Reflection body',
   haiku: 'one\ntwo\nthree' as string | null,
+  ritualStartedAtMs: Date.now() - 623_000,
+  companionPrefs: DEFAULT_PREFS,
+  isFavorite: false,
 });
 
 describe('buildPauseImpactDataOnComplete', () => {
@@ -54,20 +57,48 @@ describe('buildPauseImpactDataOnComplete', () => {
     ).toBe(false);
   });
 
-  it('passes through static done fields and quote', () => {
+  it('passes through static done fields', () => {
     const d = buildPauseImpactDataOnComplete({
       ...base(),
       ritualEntry: 'brief',
       breathingFirstCompleted: true,
       breathingSecondCompleted: false,
+      wroteNote: true,
+      engagedTools: 1,
+      completedFrameCompanions: ['grounding'],
+      companionSlotFavoriteXp: 2,
     });
     expect(d.decision).toBe('hold');
     expect(d.context).toBe('c');
-    expect(d.engagedTools).toBe(0);
-    expect(d.wroteNote).toBe(false);
+    expect(d.engagedTools).toBe(1);
+    expect(d.wroteNote).toBe(true);
     expect(d.usedTags).toBe(false);
-    expect(d.reinforcementQuote).toBe('"Hi" — Author');
     expect(d.reflectionMessage).toBe('Reflection body');
     expect(d.haiku).toBe('one\ntwo\nthree');
+    expect(d.ritualDepth).toBe('brief');
+    expect(d.ritualDurationMs).toBeGreaterThan(600_000);
+    expect(d.isFavorite).toBe(false);
+    expect(d.completedFrameCompanions).toEqual(['grounding']);
+    expect(d.companionSlotFavoriteXp).toBe(2);
+  });
+
+  it('sets shiftMoodLogged when mood after is present', () => {
+    expect(
+      buildPauseImpactDataOnComplete({
+        ...base(),
+        ritualEntry: 'deep',
+        breathingFirstCompleted: true,
+        breathingSecondCompleted: true,
+        selectedMoodAfter: null,
+      }).shiftMoodLogged,
+    ).toBe(false);
+    expect(
+      buildPauseImpactDataOnComplete({
+        ...base(),
+        ritualEntry: 'deep',
+        breathingFirstCompleted: true,
+        breathingSecondCompleted: true,
+      }).shiftMoodLogged,
+    ).toBe(true);
   });
 });

@@ -23,9 +23,11 @@ export function getPushSubscriptionQueryOptions(input: { userId: string | undefi
     queryKey: userId ? pushSubscriptionQueryKey(userId) : PUSH_SUBSCRIPTION_NONE_QUERY_KEY,
     queryFn: fetchBrowserPushSubscribed,
     enabled,
-    staleTime: 0,
+    // Subscribe/unsubscribe updates cache via setQueryData in usePushNotifications.
+    staleTime: 5 * 60_000,
     gcTime: 5 * 60_000,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     retry: false,
   } as const;
 }

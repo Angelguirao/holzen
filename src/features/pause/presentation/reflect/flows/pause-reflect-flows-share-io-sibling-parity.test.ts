@@ -1,20 +1,19 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/pause/public-rpc', () => ({
-  supabasePauseRepository: { port: 'reflectPauseRepository' },
+  supabasePauseRepository: { port: 'reflectPauseRepository' }
 }));
 
 import * as flowsIo from './pause-reflect-flows-io';
 import {
   buildPauseScoreImpacts,
-  formatReinforcementQuoteFromSession,
   pauseReflectOutcomeLog,
   pauseReflectOutcomeLogWithRepository,
   reflectPauseRepository as flowsReflectPauseRepository,
   resolvePauseDecideOutcomeFlow,
   resolvePauseSessionReflectAndDecideAfterGeneration,
   resolvePauseSessionReflectAndDecidePreflight,
-  showPauseOutcomeNotCompletedToast,
+  showPauseOutcomeNotCompletedToast
 } from './pause-reflect-flows-io';
 import * as shareIo from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 import {
@@ -22,7 +21,7 @@ import {
   buildReflectionShareText,
   buildReflectionShareTweetUrl,
   buildReflectionShareWhatsAppUrl,
-  pauseReflectionShareImage,
+  pauseReflectionShareImage
 } from '@/features/pause/presentation/reflect/share/pause-reflect-share-io';
 
 /**
@@ -38,7 +37,6 @@ describe('pause-reflect-flows-io ↔ pause-reflect-share-io sibling parity', () 
   it('flows-io and share-io are distinct presentation I/O surfaces', () => {
     expect(typeof resolvePauseSessionReflectAndDecidePreflight).toBe('function');
     expect(typeof resolvePauseSessionReflectAndDecideAfterGeneration).toBe('function');
-    expect(typeof formatReinforcementQuoteFromSession).toBe('function');
     expect(typeof resolvePauseDecideOutcomeFlow).toBe('function');
     expect(typeof pauseReflectOutcomeLog).toBe('function');
     expect(typeof pauseReflectOutcomeLogWithRepository).toBe('function');
@@ -69,7 +67,6 @@ describe('pause-reflect-flows-io ↔ pause-reflect-share-io sibling parity', () 
     expect(resolvePauseSessionReflectAndDecidePreflight).not.toBe(pauseReflectionShareImage);
     expect(resolvePauseSessionReflectAndDecideAfterGeneration).not.toBe(buildReflectionShareText);
     expect(pauseReflectOutcomeLog).not.toBe(buildReflectionShareTelegramUrl);
-    expect(formatReinforcementQuoteFromSession).not.toBe(buildReflectionShareTweetUrl);
     expect(resolvePauseDecideOutcomeFlow).not.toBe(buildReflectionShareWhatsAppUrl);
     expect(buildPauseScoreImpacts).not.toBe(pauseReflectionShareImage);
     expect(showPauseOutcomeNotCompletedToast).not.toBe(buildReflectionShareText);
@@ -80,7 +77,6 @@ describe('pause-reflect-flows-io ↔ pause-reflect-share-io sibling parity', () 
   it('share-io exports stay off reflect+decide preflight, outcome RPC, and decide presentation helpers', () => {
     expect(pauseReflectionShareImage).not.toBe(resolvePauseSessionReflectAndDecidePreflight);
     expect(buildReflectionShareText).not.toBe(pauseReflectOutcomeLog);
-    expect(buildReflectionShareTelegramUrl).not.toBe(formatReinforcementQuoteFromSession);
     expect(buildReflectionShareTweetUrl).not.toBe(resolvePauseDecideOutcomeFlow);
     expect(buildReflectionShareWhatsAppUrl).not.toBe(buildPauseScoreImpacts);
     expect(pauseReflectionShareImage).not.toBe(resolvePauseSessionReflectAndDecideAfterGeneration);

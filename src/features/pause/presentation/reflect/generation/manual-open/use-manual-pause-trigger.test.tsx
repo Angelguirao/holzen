@@ -43,17 +43,13 @@ vi.mock('@/features/pause/presentation/reflect/generation/manual-open/pause-home
   openManualPauseFromHome: openManualPauseFromHomeMock,
   buildManualPauseOpenParams: (input: {
     userId: string;
-    silentMode: boolean;
     mood?: string;
     data: { changePercent: number };
-    cumulativeThreshold: number;
     profileTrackedAssetId: string;
   }) => ({
     userId: input.userId,
-    silentMode: input.silentMode,
     mood: input.mood,
     changePercent: input.data.changePercent,
-    cumulativeThreshold: input.cumulativeThreshold,
     trackedAssetId: input.profileTrackedAssetId,
     assetId: input.profileTrackedAssetId,
     ctx: 'ctx',
@@ -61,9 +57,10 @@ vi.mock('@/features/pause/presentation/reflect/generation/manual-open/pause-home
     silentMsg: 'silent',
     contextText: 'ctx',
     silentMessage: 'silent',
-    cumulativeChangePercent: null,
     fearGreedLabel: null,
     onChainBand: null,
+    fearGreed: null,
+    onChain: null,
   }),
 }));
 
@@ -88,8 +85,6 @@ describe('useManualPauseTrigger', () => {
     const { result } = renderHook(() =>
       useManualPauseTrigger({
         user,
-        silentMode: true,
-        cumulativeThreshold: 5,
         trackedAssetId: 'bitcoin',
         syncOpenPauseFromDb: vi.fn().mockResolvedValue(undefined),
         setError: noopSet,
@@ -98,13 +93,12 @@ describe('useManualPauseTrigger', () => {
         setCompanions: noopSet,
         setNewPauseArrival: noopSet,
         setLastPauseInstanceId: noopSet,
-        setLastTriggerAt: noopSet,
       }),
     );
 
     await act(async () => {
       await result.current.generateMessage(
-        { changePercent: -2.5 } as import('@/features/market/public').BtcPriceData,
+        { changePercent: -2.5 } as import('@/features/market/public').MarketQuote,
       );
     });
 
@@ -112,7 +106,6 @@ describe('useManualPauseTrigger', () => {
       mockPauseHomeManualOpenPorts,
       expect.objectContaining({
         userId: 'user-1',
-        silentMode: true,
         changePercent: -2.5,
       }),
     );

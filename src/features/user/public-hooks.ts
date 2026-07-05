@@ -10,3 +10,4 @@ export {
 } from './presentation/use-profile';
 export { useHoldGoalProfile, type HoldGoalProfile } from './presentation/use-hold-goal';
 export { useSnooze } from './presentation/use-snooze';
+export { useHolzenCommunityStatsRealtime } from './presentation/use-holzen-community-stats-realtime';

@@ -52,7 +52,8 @@ export function pauseReflectionShareImage(
   message: string,
   context: string | null | undefined,
   haiku: string | null | undefined,
+  mood?: string | null,
   deps?: DeliverReflectionShareImageDeps,
 ): ReturnType<typeof runReflectionShareImage> {
-  return runReflectionShareImage(message, context, haiku, deps);
+  return runReflectionShareImage(message, context, haiku, mood, deps);
 }

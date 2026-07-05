@@ -3,7 +3,7 @@ import type { SubscriptionBillingInterval } from '../domain/subscription-snapsho
 
 export type PaywallViewedSource = 'feature-gate' | 'limit-hit' | 'settings';
 export type PaywallSubscribedPlan = 'monthly' | 'yearly' | 'unknown';
-export type TrialStartedSource = 'ensure_trial';
+export type TrialStartedSource = 'ensure_trial' | 'trial_checkout';
 
 /** Paywall UI impression (taxonomy: paywall.viewed). */
 export function trackPaywallViewed(source: PaywallViewedSource): void {
@@ -31,10 +31,26 @@ export function trackPaywallSubscribed(plan: PaywallSubscribedPlan): void {
   }
 }
 
-/** Stripe trial created via ensure-trial-subscription (`created: true`). */
+/** Stripe trial started (Checkout return or legacy ensure-trial path). */
 export function trackTrialStarted(source: TrialStartedSource): void {
   try {
     trackEvent('trial.started', { source });
+  } catch {
+    /* no-op */
+  }
+}
+
+export type TrialDeniedReason =
+  | 'trial_already_used'
+  | 'email_not_verified'
+  | 'disposable_email'
+  | 'checkout_required'
+  | 'trial_card_not_accepted';
+
+/** Server rejected trial start (abuse guard or verification). */
+export function trackTrialDenied(reason: TrialDeniedReason): void {
+  try {
+    trackEvent('trial.denied', { reason });
   } catch {
     /* no-op */
   }

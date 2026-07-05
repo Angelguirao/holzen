@@ -50,6 +50,8 @@ vi.mock('./pause-companion-orchestrate-io', () => ({
 }));
 
 const noop = vi.fn();
+const clearLazyFetchSlot = vi.fn();
+const markLazyFetchSlotComplete = vi.fn();
 
 function baseParams() {
   return {
@@ -59,14 +61,20 @@ function baseParams() {
     mood: null,
     severityNumber: 50,
     language: 'en',
-    failureUiPorts: {} as ApplyCompanionSlotOrchestrateFailureUiPorts,
+    failureUiPorts: {
+      clearLazyFetchSlot,
+      markLazyFetchSlotComplete,
+      requirePro: noop,
+      showLimitReached: noop,
+      showErrorToast: noop,
+    } as ApplyCompanionSlotOrchestrateFailureUiPorts,
     toast: vi.fn(),
     refreshSubscription: vi.fn(),
     setCacheIds: noop,
     setCacheRelaxations: noop,
     slotCommitters: {
       setSignal: noop,
-      setNudge: noop,
+      setGrounding: noop,
       setHistoryInsight: noop,
       setZoomOut: noop,
       autoSaveToLibrary: noop,
@@ -79,7 +87,7 @@ function baseParams() {
     },
     companionSlotErrorSetters: {
       setSignalError: noop,
-      setNudgeError: noop,
+      setGroundingError: noop,
       setHistoryError: noop,
       setZoomOutError: noop,
     },
@@ -94,6 +102,8 @@ beforeEach(() => {
   });
   applyCompanionSlotOrchestrateOutcomeMock.mockReset();
   buildOrchestrateSessionMock.mockReset().mockResolvedValue(orchestrateSessionFixture);
+  clearLazyFetchSlot.mockReset();
+  markLazyFetchSlotComplete.mockReset();
 });
 
 describe('useCompanionSlotRunOrchestrate', () => {
@@ -125,5 +135,17 @@ describe('useCompanionSlotRunOrchestrate', () => {
     );
     expect(mockCompanionOrchestrator.port).toBe('supabaseCompanionOrchestrator');
     expect(applyCompanionSlotOrchestrateOutcomeMock).toHaveBeenCalled();
+  });
+
+  it('clears lazy fetch slot and sets error when session build returns null', async () => {
+    buildOrchestrateSessionMock.mockResolvedValueOnce(null);
+    const { result } = renderHook(() => useCompanionSlotRunOrchestrate(baseParams()));
+
+    await act(async () => {
+      await result.current.runSlotOrchestrate('signal', 'lazy_fetch');
+    });
+
+    expect(runCompanionSlotOrchestrateMock).not.toHaveBeenCalled();
+    expect(clearLazyFetchSlot).toHaveBeenCalledWith('signal');
   });
 });

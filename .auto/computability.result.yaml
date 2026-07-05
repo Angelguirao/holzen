@@ -1,0 +1,45 @@
+venture: holzen
+evaluated_at: "2026-06-13T00:00:00.000Z"
+evaluator: human
+
+tests:
+  domain_clarity:
+    passed: true
+    notes: >
+      Volatility-triggered investor pause practice: breathing/grounding, journaling,
+      library, AI companions. Core rules in pause-system.md and active-surface.md.
+
+  automation_potential:
+    passed: true
+    notes: >
+      Engineering, CI, edge pipelines, cron, notifications are automatable.
+      User reflection quality and emotional resolution are NOT — stay user-side.
+
+  coordination_load:
+    passed: true
+    notes: >
+      No marketplace, moderation, or user-to-user coordination in shipped scope.
+      Success does not require managing people.
+
+  failure_modes:
+    passed: true
+    notes: >
+      Predictable failure domains (edge timeouts, auth, Stripe webhooks) with
+      documented ops playbooks. Graceful degradation for AI generation limits.
+
+  exit_sovereignty:
+    passed: true
+    notes: >
+      Owned GitHub repo, Supabase, Stripe, Vercel. Extensive docs and CI guards.
+      Platform exit runbooks exist.
+
+  life_compatibility:
+    passed: true
+    notes: Operator-defined; auto cycles are maintainer-only to preserve attention.
+
+overall: passed
+failed_reason: ""
+caveats:
+  - User emotional work and reflection quality are not computable — product must not absorb them as ops burden
+  - AI companions assist; they do not guarantee outcomes or replace judgment
+  - Growth must not re-expand stripped legacy surfaces without explicit decision

@@ -1,34 +1,38 @@
+import { useMemo, type ReactNode } from 'react';
 import type {
   CachedHistoricalInsightShape,
-  CompanionData,
   CompanionSlotCacheIds,
   CompanionSlotRelaxations,
   RegenerateCompanionSlot,
 } from '@/features/pause/public-ritual-frame';
 import type { ZoomOutData } from '@/features/pause/public-ritual-frame';
+import { mergeHistoryMarketOverlay } from '@/features/pause/public-ritual-frame';
 import type {
   CompanionUiCompletionState,
   CompanionUiCompletionStep,
 } from '@/features/pause/public-queries';
 
-type CompanionSignalPayload = {
-  title: string;
-  body: string;
-  source: string;
-  url: string;
-} | null;
+import {
+  companionSlotHasDisplayableContent,
+  type SignalPayload,
+} from '@/features/pause/public-ritual-frame';
 
-type CompanionNudgePayload = {
+type CompanionSignalPayload = SignalPayload | null;
+
+type CompanionGroundingPayload = {
   title: string;
   body: string;
   citation: string;
   url: string;
 } | null;
-import { LearningInput } from '@/screens/pause/components/LearningInput';
+import { GroundingDisplay } from '@/screens/pause/components/GroundingDisplay';
 import { SignalDisplay } from '@/screens/pause/components/SignalDisplay';
 import { ZoomOutDisplay } from '@/screens/pause/components/ZoomOutDisplay';
 import { HistoricalInsightDisplay } from '@/screens/pause/components/HistoricalInsightDisplay';
-import { CompanionOrchestratedCard } from '@/screens/pause/components/companion/companion-orchestrated-card';
+import {
+  CompanionOrchestratedCard,
+  type CompanionOrchestratedCardProps,
+} from '@/screens/pause/components/companion/companion-orchestrated-card';
 import { COMPANION_SECTION_ICONS } from '@/screens/pause/components/companion/companion-section-icons';
 import type { CompanionSectionProFavoriteProps } from '@/features/pause/public-ritual-frame';
 
@@ -45,7 +49,6 @@ export type CompanionSectionOrchestratedSlotsProps = {
     hasZoomOut: boolean;
     hasHistory: boolean;
   };
-  companions: CompanionData;
   pauseInstanceId?: string | null;
   completion: CompanionUiCompletionState;
   markCompleted: (key: CompanionUiCompletionStep) => void | Promise<void>;
@@ -61,10 +64,10 @@ export type CompanionSectionOrchestratedSlotsProps = {
   signalLoading: boolean;
   signalError: boolean;
   retrySignal: () => void;
-  nudge: CompanionNudgePayload;
-  nudgeLoading: boolean;
-  nudgeError: boolean;
-  retryNudge: () => void;
+  grounding: CompanionGroundingPayload;
+  groundingLoading: boolean;
+  groundingError: boolean;
+  retryGrounding: () => void;
   zoomOut: ZoomOutData | null;
   zoomOutLoading: boolean;
   zoomOutError: boolean;
@@ -77,12 +80,25 @@ export type CompanionSectionOrchestratedSlotsProps = {
   cacheRelaxations: CompanionSlotRelaxations;
   regenerateCompanion: (slot: RegenerateCompanionSlot) => void;
   proFavorite: (favoriteKey: string) => CompanionSectionProFavoriteProps;
+  appearance?: CompanionOrchestratedCardProps['appearance'];
+  /** Figma Frame: Grounding → Zoom out → Look back → Signal (default: Signal first). */
+  companionSlotOrder?: 'default' | 'frame';
+  iconHelps?: {
+    signal?: string;
+    grounding?: string;
+    zoomOut?: string;
+    lookBack?: string;
+  };
 };
+
+type OrchestratedSlotKey = 'signal' | 'grounding' | 'zoomOut' | 'history';
+
+const DEFAULT_SLOT_ORDER: OrchestratedSlotKey[] = ['signal', 'grounding', 'zoomOut', 'history'];
+const FRAME_SLOT_ORDER: OrchestratedSlotKey[] = ['grounding', 'zoomOut', 'history', 'signal'];
 
 export function CompanionSectionOrchestratedSlots({
   labels,
   visibility,
-  companions,
   pauseInstanceId,
   completion,
   markCompleted,
@@ -98,10 +114,10 @@ export function CompanionSectionOrchestratedSlots({
   signalLoading,
   signalError,
   retrySignal,
-  nudge,
-  nudgeLoading,
-  nudgeError,
-  retryNudge,
+  grounding,
+  groundingLoading,
+  groundingError,
+  retryGrounding,
   zoomOut,
   zoomOutLoading,
   zoomOutError,
@@ -114,13 +130,23 @@ export function CompanionSectionOrchestratedSlots({
   cacheRelaxations,
   regenerateCompanion,
   proFavorite,
+  appearance = 'default',
+  companionSlotOrder = 'default',
+  iconHelps,
 }: CompanionSectionOrchestratedSlotsProps) {
   "use memo";
   const { hasSignal, hasGrounding, hasZoomOut, hasHistory } = visibility;
+  const frameAppearance = appearance === 'frame';
+  const showFullViewButton = !frameAppearance;
+  const historyDisplay = useMemo(
+    () => mergeHistoryMarketOverlay(historyInsight, zoomOut),
+    [historyInsight, zoomOut],
+  );
 
-  return (
-    <>
-      {hasSignal ? (
+  const slotOrder = companionSlotOrder === 'frame' ? FRAME_SLOT_ORDER : DEFAULT_SLOT_ORDER;
+
+  const slots: Record<OrchestratedSlotKey, ReactNode> = {
+    signal: hasSignal ? (
         <CompanionOrchestratedCard
           id="signal"
           label={labels.signal}
@@ -131,20 +157,29 @@ export function CompanionSectionOrchestratedSlots({
           onFirstExpandComplete={() => markCompleted('signal')}
           loading={signalLoading}
           pauseInstanceId={pauseInstanceId}
-          hasContent={Boolean(signal)}
+          hasContent={companionSlotHasDisplayableContent('signal', signal)}
           relaxationKey={cacheRelaxations.signal}
           companionType="signal"
           cacheId={cacheIds.signal}
           regenerateSlot="signal"
           onRegenerate={() => regenerateCompanion('signal')}
           routeSegment="signal"
+          appearance={appearance}
+          iconHelp={iconHelps?.signal}
+          showFullViewButton={frameAppearance ? false : showFullViewButton}
           {...proFavorite('signal')}
         >
-          <SignalDisplay signal={signal} loading={signalLoading} error={signalError} onRetry={retrySignal} />
+          <SignalDisplay
+            signal={signal}
+            loading={signalLoading}
+            error={signalError}
+            onRetry={retrySignal}
+            variant={frameAppearance ? 'frame' : 'default'}
+            pauseInstanceId={pauseInstanceId}
+          />
         </CompanionOrchestratedCard>
-      ) : null}
-
-      {hasGrounding ? (
+      ) : null,
+    grounding: hasGrounding ? (
         <CompanionOrchestratedCard
           id="grounding"
           label={labels.ground}
@@ -153,29 +188,30 @@ export function CompanionSectionOrchestratedSlots({
           onToggleExpand={toggleGrounding}
           completed={Boolean(completion.grounding)}
           onFirstExpandComplete={() => markCompleted('grounding')}
-          loading={nudgeLoading}
+          loading={groundingLoading}
           pauseInstanceId={pauseInstanceId}
-          hasContent={Boolean(nudge)}
-          relaxationKey={cacheRelaxations.nudge}
+          hasContent={companionSlotHasDisplayableContent('grounding', grounding)}
+          relaxationKey={cacheRelaxations.grounding}
           companionType="grounding"
-          cacheId={cacheIds.nudge}
+          cacheId={cacheIds.grounding}
           regenerateSlot="grounding"
           onRegenerate={() => regenerateCompanion('grounding')}
           routeSegment="grounding"
+          appearance={appearance}
+          iconHelp={iconHelps?.grounding}
+          showFullViewButton={frameAppearance ? false : showFullViewButton}
           {...proFavorite('grounding')}
         >
-          <LearningInput
-            title={companions.groundingTitle ?? ''}
-            body={companions.groundingBody ?? ''}
-            nudge={nudge}
-            nudgeLoading={nudgeLoading}
-            nudgeError={nudgeError}
-            onRetry={retryNudge}
+          <GroundingDisplay
+            grounding={grounding}
+            loading={groundingLoading}
+            error={groundingError}
+            onRetry={retryGrounding}
+            variant={frameAppearance ? 'frame' : 'default'}
           />
         </CompanionOrchestratedCard>
-      ) : null}
-
-      {hasZoomOut ? (
+      ) : null,
+    zoomOut: hasZoomOut ? (
         <CompanionOrchestratedCard
           id="zoomOut"
           label={labels.zoomOut}
@@ -186,20 +222,28 @@ export function CompanionSectionOrchestratedSlots({
           onFirstExpandComplete={() => markCompleted('zoomOut')}
           loading={zoomOutLoading}
           pauseInstanceId={pauseInstanceId}
-          hasContent={Boolean(zoomOut)}
+          hasContent={companionSlotHasDisplayableContent('zoomOut', zoomOut)}
           relaxationKey={cacheRelaxations.zoomOut}
           companionType="zoom_out"
           cacheId={cacheIds.zoomOut}
           regenerateSlot="zoomOut"
           onRegenerate={() => regenerateCompanion('zoomOut')}
           routeSegment="zoom-out"
+          appearance={appearance}
+          iconHelp={iconHelps?.zoomOut}
+          showFullViewButton={frameAppearance ? false : showFullViewButton}
           {...proFavorite('zoom_out')}
         >
-          <ZoomOutDisplay data={zoomOut} loading={zoomOutLoading} error={zoomOutError} onRetry={retryZoomOut} />
+          <ZoomOutDisplay
+            data={zoomOut}
+            loading={zoomOutLoading}
+            error={zoomOutError}
+            onRetry={retryZoomOut}
+            variant={frameAppearance ? 'frame' : 'default'}
+          />
         </CompanionOrchestratedCard>
-      ) : null}
-
-      {hasHistory ? (
+      ) : null,
+    history: hasHistory ? (
         <CompanionOrchestratedCard
           id="history"
           label={labels.lookBack}
@@ -210,23 +254,35 @@ export function CompanionSectionOrchestratedSlots({
           onFirstExpandComplete={() => markCompleted('history')}
           loading={historyLoading}
           pauseInstanceId={pauseInstanceId}
-          hasContent={Boolean(historyInsight)}
+          hasContent={companionSlotHasDisplayableContent('history', historyDisplay)}
           relaxationKey={cacheRelaxations.history}
           companionType="history_insight"
           cacheId={cacheIds.history}
           regenerateSlot="history"
           onRegenerate={() => regenerateCompanion('history')}
           routeSegment="history"
+          appearance={appearance}
+          iconHelp={iconHelps?.lookBack}
+          showFullViewButton={frameAppearance ? false : showFullViewButton}
           {...proFavorite('history_insight')}
         >
           <HistoricalInsightDisplay
-            data={historyInsight}
+            data={historyDisplay}
             loading={historyLoading}
             error={historyError}
             onRetry={retryHistory}
+            variant={frameAppearance ? 'frame' : 'default'}
+            pauseInstanceId={pauseInstanceId}
           />
         </CompanionOrchestratedCard>
-      ) : null}
+      ) : null,
+  };
+
+  return (
+    <>
+      {slotOrder.map((key) => (
+        <div key={key}>{slots[key]}</div>
+      ))}
     </>
   );
 }

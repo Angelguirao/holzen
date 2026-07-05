@@ -1,6 +1,6 @@
 import { Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { BottomNav, isPrimaryTabActive } from './BottomNav';
 import { ShellPauseChrome } from '@/app/components/ShellPauseChrome';
 import {
@@ -10,10 +10,12 @@ import {
 import { NotificationBell } from '@/features/notifications/public-hooks';
 import { useShellProfile } from '@/app/hooks/use-shell-profile';
 import { useAutoTrigger } from '@/app/hooks/use-auto-trigger';
+import { usePauseReadyDeepLink } from '@/app/hooks/use-pause-ready-deep-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { RobotsNoIndex } from '@/app/components/PageMeta';
+import { APP_SHELL_ROOT_CLASS, APP_SHELL_WIDTH_CLASS } from '@/app/lib/app-shell-layout';
 
 /**
  * Lightweight fallback shown while a lazy page chunk downloads *within*
@@ -24,7 +26,6 @@ function PageChunkFallback() {
   return (
     <div
       className="space-y-6"
-      role="status"
       aria-live="polite"
       aria-busy="true"
       aria-label="Loading"
@@ -75,7 +76,7 @@ function useTabChunkPrefetch() {
  * **Orchestration (intentional):** this file mounts cross-context chrome that must
  * survive tab switches — not domain logic owned by a single screen.
  * - `useShellProfile` — profile load errors + i18n (via `useProfile`, not Home’s `useHolzen`)
- * - `ShellPauseChrome` — pending offer modal + pause-ready banner (`useHolzen` isolated there)
+ * - `ShellPauseChrome` — pause-ready banner off Home (pending offer inline on Home widget)
  * - `CheckoutConfirmation` / `PaywallSubscribedTracker` — subscription return UX on any tab
  * - `NotificationBell` — inbox header (`features/notifications`)
  *
@@ -92,9 +93,11 @@ function shellCenterNavLabel(pathname: string, t: (key: string) => string): stri
 
 export function AppLayout() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { profileLoadError, retryProfileLoad } = useShellProfile();
   useTabChunkPrefetch();
-  const { pauseReady, dismiss } = useAutoTrigger();
+  const { pauseReady, dismiss, setPauseReady } = useAutoTrigger();
+  usePauseReadyDeepLink({ navigate, setPauseReadyBanner: setPauseReady });
   const location = useLocation();
   const centerNavLabel = shellCenterNavLabel(location.pathname, t);
 
@@ -104,7 +107,7 @@ export function AppLayout() {
       <ShellPauseChrome pauseReady={pauseReady} onDismissPauseReady={dismiss} />
       <CheckoutConfirmation />
       <PaywallSubscribedTracker />
-      <div className="w-full max-w-sm">
+      <div className={APP_SHELL_ROOT_CLASS}>
         {profileLoadError ? (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription className="flex flex-col gap-3 text-left">
@@ -116,7 +119,7 @@ export function AppLayout() {
           </Alert>
         ) : null}
         <header className="sticky top-0 z-40 -mx-6 mb-10 grid grid-cols-[1fr_auto_1fr] items-center gap-x-2 border-b border-border bg-background/95 px-6 pt-4 pb-3 backdrop-blur-sm supports-[backdrop-filter]:bg-background/85">
-          <h1 className="justify-self-start text-sm font-mono tracking-[0.25em] uppercase" style={{ color: '#DBB366' }}>
+          <h1 className="justify-self-start text-sm font-mono tracking-[0.25em] uppercase text-nox-text-highlight">
             Holzen
           </h1>
           {centerNavLabel ? (

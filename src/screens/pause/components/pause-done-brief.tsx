@@ -1,12 +1,13 @@
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { usePauseBriefDoneCheckIn } from '@/features/pause/public-ritual-done';
+import { resolveDoneWallpaperMood, usePauseBriefDoneCheckIn, usePauseDonePracticeXp } from '@/features/pause/public-ritual-done';
 import { pauseStepLayout } from '@/features/pause/public-session';
 import { useSubscription } from '@/features/subscription/public-hooks';
 import { PauseDoneBriefCheckInPanel } from '@/screens/pause/components/pause-done-brief-check-in-panel';
-import { PauseDoneBriefJourneyCopy } from '@/screens/pause/components/pause-done-brief-journey-copy';
 import { PauseDoneBriefOutcomeHero } from '@/screens/pause/components/pause-done-brief-outcome-hero';
 import { PauseDoneReflectShareRow } from '@/screens/pause/components/pause-done-reflect-share-row';
+import { PauseDoneSummaryCard } from '@/screens/pause/components/pause-done-summary-card';
 import type { PauseDonePauseData } from '@/screens/pause/components/pause-done-types';
 
 export type PauseDoneBriefProps = {
@@ -30,6 +31,8 @@ export function PauseDoneBrief({ decision, pauseData, pauseInstanceId, onSaveToJ
     setMoodEditorOpen,
     saveBusy,
     handleSaveToJourney,
+    savedEndedFeel,
+    postCheckInXpBonus,
   } = usePauseBriefDoneCheckIn({
     doneVariant: 'brief',
     pauseInstanceId,
@@ -37,6 +40,13 @@ export function PauseDoneBrief({ decision, pauseData, pauseInstanceId, onSaveToJ
     onSaveToJourney,
     t,
   });
+  const { presenceXp } = usePauseDonePracticeXp(pauseInstanceId, pauseData, postCheckInXpBonus);
+
+  const wallpaperMood = resolveDoneWallpaperMood(
+    savedEndedFeel
+      ? { mood: pauseData?.mood, moodAfter: savedEndedFeel.mood }
+      : pauseData,
+  );
 
   return (
     <motion.div
@@ -48,7 +58,14 @@ export function PauseDoneBrief({ decision, pauseData, pauseInstanceId, onSaveToJ
       <div className="flex w-full max-w-md flex-col items-center gap-10 text-center">
         <PauseDoneBriefOutcomeHero decision={decision} />
 
-        <PauseDoneBriefJourneyCopy />
+        {pauseData ? (
+          <PauseDoneSummaryCard
+            pauseData={pauseData}
+            endedMood={savedEndedFeel?.mood ?? null}
+            endedIntensity={savedEndedFeel?.intensity ?? null}
+            presenceXp={presenceXp}
+          />
+        ) : null}
 
         <PauseDoneBriefCheckInPanel
           briefDoneMood={briefDoneMood}
@@ -68,7 +85,7 @@ export function PauseDoneBrief({ decision, pauseData, pauseInstanceId, onSaveToJ
           reflectionMessage={pauseData?.reflectionMessage}
           context={pauseData?.context}
           haiku={pauseData?.haiku}
-          wallpaperMood={briefDoneMood}
+          wallpaperMood={wallpaperMood}
           pauseInstanceId={pauseInstanceId}
         />
       </div>

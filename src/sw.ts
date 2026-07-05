@@ -50,7 +50,7 @@ self.addEventListener("push", (event) => {
   // Build deep-link URL: navigate to Home with pause=ready flag
   const baseUrl = self.registration.scope.replace(/\/$/, "");
   const targetUrl = data.action === "pause_ready"
-    ? `${baseUrl}/?pause=ready`
+    ? `${baseUrl}/?pause=ready${data.pauseInstanceId ? `&pauseInstanceId=${encodeURIComponent(data.pauseInstanceId)}` : ""}`
     : baseUrl;
 
   const options = {
@@ -73,11 +73,16 @@ self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const targetUrl = event.notification.data?.url || self.registration.scope;
 
+  const pauseInstanceId = event.notification.data?.pauseInstanceId ?? null;
+  const postMessagePayload = { type: "holzen:pause-ready", pauseInstanceId };
+
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
       for (const client of clients) {
         if (new URL(client.url).origin === new URL(targetUrl).origin && "focus" in client) {
-          return client.focus();
+          client.focus();
+          client.postMessage(postMessagePayload);
+          return;
         }
       }
       return self.clients.openWindow(targetUrl);

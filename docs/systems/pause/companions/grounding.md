@@ -26,7 +26,7 @@ Grounding also serves as the **data source for trap interventions**: when `selec
 
 | Input | Source | Role |
 |--------|--------|------|
-| **`groundingSources`** | `grounding_sources` + user prefs (`loadActiveOrchestrateSources('grounding')` in `companion-orchestrate-sources.ts`) | Optional **catalog**: names + URLs → hostnames for Perplexity **domain filter**. |
+| **`groundingSources`** | `signal_sources` catalog, category `grounding` (`loadActiveOrchestrateSources('grounding')`) | Optional **catalog**: names + URLs → hostnames for Perplexity **domain filter**. Same global admin catalog as Signal; no per-user prefs. |
 | **`recentGroundingSources`** | `localStorage` keys + DB merge | Dedup: avoid repeating same sources across recent pauses. |
 | **`recentNudgeTopics`** | Recent grounding titles from `pause_ai_artifacts` | Dedup: avoid repeating same bias topics. |
 | **`context`** | BTC + Fear & Greed + on-chain line | Grounds the bias selection in the current market move. |
@@ -38,7 +38,7 @@ Grounding also serves as the **data source for trap interventions**: when `selec
 
 High-level order (source of truth: **`supabase/functions/_shared/generators/grounding.ts`**, **`PROMPT_VERSION`** v3):
 
-**Phase 1: Library — disabled for grounding.** Gated by the module-level constant `GROUNDING_LIBRARY_ENABLED = false` in `grounding.ts` (in addition to the global `COMPANION_PHASE_LIBRARY` env toggle). We short-circuit the phase entirely because `content_library` currently has no rows of `type: "paper"` and paper ingestion is parked; calling `searchLibrary` would only emit `library_search_rejected reason:"empty"` and add an unnecessary DB round-trip per grounding request. When ingestion resumes, flip the flag (or swap it for a `COMPANION_PHASE_LIBRARY_GROUNDING` env var) and the existing `searchLibrary` / `paperToGrounding` / `recordLibraryServe` path is ready to use.
+**Phase 1: Library — disabled for grounding.** Gated by the module-level constant `GROUNDING_LIBRARY_ENABLED = false` in `grounding.ts` (in addition to the global `COMPANION_PHASE_CATALOG` env toggle). We short-circuit the phase entirely because `content_library` currently has no rows of `type: "paper"` and paper ingestion is parked; calling `searchLibrary` would only emit `library_search_rejected reason:"empty"` and add an unnecessary DB round-trip per grounding request. When ingestion resumes, flip the flag (or swap it for a `COMPANION_PHASE_CATALOG_GROUNDING` env var) and the existing `searchLibrary` / `paperToGrounding` / `recordLibraryServe` path is ready to use.
 
 **Phase 2: Cache (strict)** — `serveFromCache` with `strict: true` checks `companion_cache` for fresh, quality-≥-2 rows with per-user dedup and market direction awareness. If found, returns (`source: "cache"`). If the strict pool is empty it returns `null` and emits `cache_strict_miss` (Edge log) so the flow falls through to Phase 3 instead of recycling seen rows.
 
@@ -57,7 +57,7 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/grou
 
 **Phase 4: Curated** — if all above fail, static fallback pool from `companion_fallbacks` DB / `fallback-seed.json`.
 
-Phase toggles: `COMPANION_PHASE_LIBRARY`, `COMPANION_PHASE_CACHE`, `COMPANION_PHASE_LIVE` (all enabled by default; see `_shared/phase-config.ts`). Note: grounding also has a module-local override (`GROUNDING_LIBRARY_ENABLED`) that forces Phase 1 off regardless of the global `COMPANION_PHASE_LIBRARY` setting — see Phase 1 above.
+Phase toggles: `COMPANION_PHASE_CATALOG`, `COMPANION_PHASE_CACHE`, `COMPANION_PHASE_LIVE` (all enabled by default; see `_shared/phase-config.ts`). Note: grounding also has a module-local override (`GROUNDING_LIBRARY_ENABLED`) that forces Phase 1 off regardless of the global `COMPANION_PHASE_CATALOG` setting — see Phase 1 above.
 
 ---
 
@@ -134,11 +134,8 @@ When `selectIntervention` picks **trap** as the primary intervention:
 | UI | `src/screens/pause/components/CompanionSection.tsx` (Ground card via `LearningInput`) |
 | Full View page | `src/screens/pause/CompanionGroundingPage.tsx` (route `/companion/grounding/:pauseInstanceId`) |
 | Full View presentation | `src/screens/pause/components/companion/GroundingFullView.tsx` |
-| Enrichment edge fn | `supabase/functions/grounding-enrich/index.ts` |
-| Enrichment helpers | `supabase/functions/_shared/grounding-enrichment-util.ts` |
-| Enrichment client hook | `src/features/pause/presentation/companion/use-grounding-enrichment.ts` (`public-hooks`) |
-| Enrichment presentation | `src/screens/pause/components/companion/GroundingEnrichment.tsx` |
-| Enrichment cache table | `grounding_enrichment_cache` (migration `20260418140000_grounding_enrichment_cache.sql`) |
+| Legacy enrichment (undeployed) | `supabase/functions/legacy/grounding-enrich/`, `src/legacy/grounding-enrich/` |
+| Enrichment cache table | **Dropped** (`20260604120000_pause_first_zombie_schema_cleanup.sql`) — restore with edge per legacy README |
 | Related biases rail | `src/screens/pause/components/companion/RelatedBiasesThisMonth.tsx` (+ `related-biases-util.ts`) |
 | Full View telemetry hook | `src/features/pause/presentation/companion/use-fullview-telemetry.ts` (`public-hooks`; event `companion_fullview_opened`) |
 
@@ -149,7 +146,7 @@ When `selectIntervention` picks **trap** as the primary intervention:
 The inline Ground card in `CompanionSection` has an **"Open full view"** button that routes to **`/companion/grounding/:pauseInstanceId`** (lazy-loaded in `src/App.tsx`). The Full View keeps the generated body verbatim and surrounds it with affordances that don't fit in the inline card:
 
 - **Promoted citation CTA** — the tiny `ExternalLink` footnote in `LearningInput` becomes a proper **"Read the paper →"** link sitting directly under the citation text.
-- **Enrichment slot** — the `GroundingFullView` accepts an `enrichmentSlot` ReactNode where `CompanionGroundingPage` renders abstract preview + 1–2 sentence researcher bios + Semantic Scholar citation count from the `grounding-enrich` edge function (see §10). Missing fields hide silently — we never show a "couldn't enrich" banner.
+- **No second AI call** — full view shows orchestrate/hydrated title, body, citation, and external link only (parity with Signal). Legacy citation enrichment lived in §10 and is undeployed.
 - **Read-time indicator** + **"Why this card now?"** disclosure with mood / market direction / session-intent transparency (explains why *this* bias was picked today).
 - **Cross-reference badge** — when the session's primary intervention was a `trap` that used this same Ground payload, a subtle **"This was also today's headline"** badge sits above the card so the repetition is acknowledged rather than confusing.
 - **Breathing-room pacing** (8 s) before feedback + save CTAs fade in.
@@ -161,9 +158,11 @@ The "Open full view" navigation is free; only the **Save this moment** action is
 
 ---
 
-## 10. Citation enrichment (`grounding-enrich` edge function)
+## 10. Citation enrichment (legacy — undeployed)
 
-The Full View's enrichment block is served by a dedicated edge function, `grounding-enrich` (JWT verified, authenticated users only). It exists for three reasons:
+> **Pause-first (May 2026):** `grounding-enrich` was moved to `supabase/functions/legacy/grounding-enrich/` and removed from `config.toml`. The active client no longer invokes it. Recovery: `src/legacy/grounding-enrich/README.md`.
+
+The former Full View enrichment block was served by a dedicated edge function, `grounding-enrich` (JWT verified, authenticated users only). It existed for three reasons:
 
 1. **Cross-user cache.** Every user who sees the same citation shares the same enriched row — keyed by `sha256(normalizeCitation(citation))` — so we pay each upstream API once per paper, not once per user. TTL: **60 days** on the happy path, **1 day** when all three providers failed (so outages self-heal).
 2. **Graceful fan-out.** The function calls Crossref, Semantic Scholar, and Gemini **in parallel**. Each helper returns `null` on failure so one bad provider can't tank the whole response. The final payload fields are *all nullable*; the UI renders only what arrived.
@@ -194,18 +193,15 @@ citation + url (+ optional DOI)
 | --- | --- | --- | --- |
 | **Crossref** `/works` or `/works?query.bibliographic=…` | Canonical DOI + URL, abstract (when publisher provided one), author names | None (User-Agent with contact email) | 8s |
 | **Semantic Scholar** `/graph/v1/paper/DOI:…` | `citationCount` integer | None (free tier) | 8s |
-| **Gemini via `llm-gateway`** | 1–2 sentence researcher bios, bounded to ≤160 chars each | `GOOGLE_AI_API_KEY` | 10s |
+| **Gemini via `llm-gateway`** | 1–2 sentence researcher bios, bounded to ≤160 chars each | `OPENROUTER_API_KEY` | 10s |
 
 ### Client wiring
 
-`useGroundingEnrichment({ citation, url })` is a TanStack Query hook that memoizes the edge-function call per `(citation, doi, url)` tuple. Result is passed to `<GroundingEnrichment data loading error />` which renders nothing until data arrives and nothing at all if every field is null/empty (i.e. the page looks exactly like pre-enrichment, only richer when the data exists).
+When deployed, `useGroundingEnrichment({ citation, url })` (now under `src/legacy/grounding-enrich/`) memoized the edge call per `(citation, doi, url)` and rendered via `<GroundingEnrichment />`, hiding silently when all fields were empty.
 
 ### Storage
 
-Table `grounding_enrichment_cache` (migration `20260418140000_grounding_enrichment_cache.sql`):
-- PK: `id`; unique key for upsert: `citation_hash`.
-- Columns: `doi`, `url`, `abstract`, `researchers jsonb` (`[{name, bio}]`), `citation_count`, `source_provenance jsonb`, `last_validated_at`, `expires_at`.
-- RLS: `authenticated` role can `SELECT` (content is public metadata); writes are service-role only via the edge function.
+Table `grounding_enrichment_cache` was removed in `20260604120000_pause_first_zombie_schema_cleanup.sql`. To recover citation enrichment, recreate the table from `20260418140000_grounding_enrichment_cache.sql` and redeploy the edge (see `src/legacy/grounding-enrich/README.md`).
 
 ### Telemetry
 

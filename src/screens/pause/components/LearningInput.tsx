@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { CompanionError } from './CompanionError';
 import { useTranslation } from 'react-i18next';
 
-interface NudgeData {
+interface GroundingData {
   title: string;
   body: string;
   citation: string;
@@ -13,20 +13,27 @@ interface NudgeData {
 interface Props {
   title: string;
   body: string;
-  nudge?: NudgeData | null;
-  nudgeLoading?: boolean;
-  nudgeError?: boolean;
+  grounding?: GroundingData | null;
+  groundingLoading?: boolean;
+  groundingError?: boolean;
   onRetry?: () => void;
 }
 
-export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeError = false, onRetry }: Props) {
+export function LearningInput({
+  title,
+  body,
+  grounding,
+  groundingLoading = false,
+  groundingError = false,
+  onRetry,
+}: Props) {
   "use memo";
   const { t } = useTranslation();
-  const hasNudgeSystem = nudge !== undefined || nudgeLoading || nudgeError;
-  const displayTitle = nudge?.title ?? (!hasNudgeSystem || nudgeError ? title : '');
-  const displayBody = nudge?.body ?? (!hasNudgeSystem || nudgeError ? body : '');
+  const hasGroundingSystem = grounding !== undefined || groundingLoading || groundingError;
+  const displayTitle = grounding?.title ?? (!hasGroundingSystem || groundingError ? title : '');
+  const displayBody = grounding?.body ?? (!hasGroundingSystem || groundingError ? body : '');
 
-  if (nudgeLoading) {
+  if (groundingLoading) {
     return (
       <div className="py-3 space-y-2">
         <Skeleton className="h-3.5 w-3/4" />
@@ -38,7 +45,7 @@ export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeE
 
   // Failed to load expanded grounding — show retry even when reflection has no featured title/body
   // (SignalDisplay does this first; we used to `return null` here and hid CompanionError).
-  if (nudgeError && !nudge) {
+  if (groundingError && !grounding) {
     return (
       <div className="py-3 space-y-1.5">
         {(displayTitle || displayBody) ? (
@@ -58,14 +65,14 @@ export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeE
     <div className="py-3 space-y-1.5">
       <p className="text-xs font-mono font-medium text-foreground/80">{displayTitle}</p>
       <p className="text-xs text-muted-foreground leading-relaxed">{displayBody}</p>
-      {nudge?.citation && (
+      {grounding?.citation && (
         <div className="flex items-center gap-1.5 pt-1">
           <p className="text-[9px] font-mono text-muted-foreground/40">
-            {nudge.citation}
+            {grounding.citation}
           </p>
-          {nudge.url && (
+          {grounding.url && (
             <a
-              href={nudge.url}
+              href={grounding.url}
               target="_blank"
               rel="noopener noreferrer"
               className="text-nox-text-link/60 hover:text-nox-text-link transition-colors"

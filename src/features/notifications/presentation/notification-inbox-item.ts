@@ -2,7 +2,7 @@ import type { NotificationNavigateState } from '@/features/pause/public-navigati
 
 export type NotificationInboxItem = {
   id: string;
-  type: 'badge' | 'night_reflection' | 'letter' | 'insight' | 'pause';
+  type: 'pause';
   title: string;
   subtitle: string;
   timestamp: string;
@@ -10,9 +10,5 @@ export type NotificationInboxItem = {
 };
 
 export const NOTIFICATION_INBOX_ICON_MAP: Record<NotificationInboxItem['type'], string> = {
-  badge: '🏅',
-  night_reflection: '🌙',
-  letter: '✉️',
-  insight: '✨',
   pause: '⚡',
 };

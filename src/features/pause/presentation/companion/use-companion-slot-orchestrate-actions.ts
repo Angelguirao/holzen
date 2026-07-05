@@ -1,10 +1,11 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import type {
   CompanionSlotCacheIds,
   CompanionSlotCommitters,
   CompanionSlotRelaxations,
 } from './pause-companion-orchestrate-io';
 import type { RegenerateCompanionSlot } from '@/features/pause/domain/companion-orchestrate';
+import { companionSlotHasDisplayableContent } from '@/features/pause/domain/companion-slot-display-content';
 import type { CompanionSlotTransitionStarters } from './pause-companion-orchestrate-io';
 import { useCompanionSlotOrchestrateFailurePorts } from './use-companion-slot-orchestrate-failure-ports';
 import { useCompanionSlotRunOrchestrate } from './use-companion-slot-run-orchestrate';
@@ -27,16 +28,38 @@ export interface UseCompanionSlotOrchestrateActionsParams {
   requirePro: (feature: 'companions') => boolean;
   startCheckout: () => void;
   fetchedSlotsRef: React.MutableRefObject<Set<string>>;
+  getSlotPayload: (slot: RegenerateCompanionSlot) => unknown;
+  whenArtifactHydrateReady: () => Promise<void>;
   setCacheIds: React.Dispatch<React.SetStateAction<CompanionSlotCacheIds>>;
   setCacheRelaxations: React.Dispatch<React.SetStateAction<CompanionSlotRelaxations>>;
   slotCommitters: CompanionSlotCommitters;
   companionSlotTransitionStarters: CompanionSlotTransitionStarters;
   companionSlotErrorSetters: {
     setSignalError: (v: boolean) => void;
-    setNudgeError: (v: boolean) => void;
+    setGroundingError: (v: boolean) => void;
     setHistoryError: (v: boolean) => void;
     setZoomOutError: (v: boolean) => void;
   };
+}
+
+function slotAlreadySatisfied(
+  slot: RegenerateCompanionSlot,
+  fetchedSlotsRef: React.MutableRefObject<Set<string>>,
+  getSlotPayload: (slot: RegenerateCompanionSlot) => unknown,
+): boolean {
+  return (
+    fetchedSlotsRef.current.has(slot) &&
+    companionSlotHasDisplayableContent(slot, getSlotPayload(slot))
+  );
+}
+
+function clearStaleFetchedMarker(
+  slot: RegenerateCompanionSlot,
+  fetchedSlotsRef: React.MutableRefObject<Set<string>>,
+): void {
+  if (fetchedSlotsRef.current.has(slot)) {
+    fetchedSlotsRef.current.delete(slot);
+  }
 }
 
 /**
@@ -51,18 +74,22 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
     severityNumber,
     language,
     canAccessCompanion,
-    applyOptimisticDecrement,
+    applyOptimisticDecrement: _applyOptimisticDecrement,
     refreshSubscription,
     toast,
     requirePro,
     startCheckout,
     fetchedSlotsRef,
+    getSlotPayload,
+    whenArtifactHydrateReady,
     setCacheIds,
     setCacheRelaxations,
     slotCommitters,
     companionSlotTransitionStarters,
     companionSlotErrorSetters,
   } = params;
+
+  const lazyFetchTasksRef = useRef(new Map<RegenerateCompanionSlot, Promise<void>>());
 
   const failureUiPorts = useCompanionSlotOrchestrateFailurePorts({
     fetchedSlotsRef,
@@ -91,14 +118,44 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
   const fetchCompanion = useCallback(
     async (slot: RegenerateCompanionSlot) => {
       if (!pauseInstanceId) return;
-      if (fetchedSlotsRef.current.has(slot)) return;
+      await whenArtifactHydrateReady();
+
+      if (slotAlreadySatisfied(slot, fetchedSlotsRef, getSlotPayload)) {
+        return;
+      }
+      clearStaleFetchedMarker(slot, fetchedSlotsRef);
       if (!canAccessCompanion()) return;
 
-      fetchedSlotsRef.current.add(slot);
-      applyOptimisticDecrement('companion');
-      await runSlotOrchestrate(slot, 'lazy_fetch');
+      const existing = lazyFetchTasksRef.current.get(slot);
+      if (existing) {
+        await existing;
+        if (slotAlreadySatisfied(slot, fetchedSlotsRef, getSlotPayload)) {
+          return;
+        }
+        clearStaleFetchedMarker(slot, fetchedSlotsRef);
+      }
+
+      const task = (async () => {
+        await runSlotOrchestrate(slot, 'lazy_fetch');
+      })();
+
+      lazyFetchTasksRef.current.set(slot, task);
+      try {
+        await task;
+      } finally {
+        if (lazyFetchTasksRef.current.get(slot) === task) {
+          lazyFetchTasksRef.current.delete(slot);
+        }
+      }
     },
-    [pauseInstanceId, canAccessCompanion, applyOptimisticDecrement, runSlotOrchestrate, fetchedSlotsRef],
+    [
+      pauseInstanceId,
+      whenArtifactHydrateReady,
+      canAccessCompanion,
+      runSlotOrchestrate,
+      fetchedSlotsRef,
+      getSlotPayload,
+    ],
   );
 
   const regenerateCompanion = useCallback(
@@ -118,7 +175,7 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
     [fetchCompanion, fetchedSlotsRef],
   );
 
-  const retryNudge = useCallback(() => retrySlot('grounding'), [retrySlot]);
+  const retryGrounding = useCallback(() => retrySlot('grounding'), [retrySlot]);
   const retrySignal = useCallback(() => retrySlot('signal'), [retrySlot]);
   const retryZoomOut = useCallback(() => retrySlot('zoomOut'), [retrySlot]);
   const retryHistory = useCallback(() => retrySlot('history'), [retrySlot]);
@@ -126,7 +183,7 @@ export function useCompanionSlotOrchestrateActions(params: UseCompanionSlotOrche
   return {
     fetchCompanion,
     regenerateCompanion,
-    retryNudge,
+    retryGrounding,
     retrySignal,
     retryZoomOut,
     retryHistory,

@@ -3,6 +3,8 @@ import type { PauseRepository } from '@/features/pause/ports/pause-repository';
 export type ToggleCompanionLibraryFavoriteInput = {
   pauseInstanceId: string;
   sourceType: string;
+  /** Client-computed favorites map after toggling `sourceType`. */
+  nextBucket: Record<string, boolean>;
   onBucketComputed?: (bucket: Record<string, boolean>) => void;
 };
 
@@ -13,7 +15,7 @@ export async function runToggleCompanionLibraryFavorite(
 ): Promise<boolean> {
   return repository.toggleCompanionSlotFavorite({
     pauseInstanceId: input.pauseInstanceId,
-    sourceType: input.sourceType,
+    nextBucket: input.nextBucket,
     onBucketComputed: input.onBucketComputed,
   });
 }

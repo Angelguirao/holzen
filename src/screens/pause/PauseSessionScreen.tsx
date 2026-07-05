@@ -5,6 +5,7 @@ import { PauseSessionScaffoldShell } from '@/screens/pause/components/PauseSessi
 import { PauseSessionGateContent } from '@/screens/pause/components/PauseSessionGateContent';
 import { PauseSessionDepthPickerStack } from '@/screens/pause/components/PauseSessionDepthPickerStack';
 import { PauseLeaveWithPendingSheet } from '@/screens/pause/components/PauseLeaveWithPendingSheet';
+import { PauseSessionInactivitySheet } from '@/screens/pause/components/PauseSessionInactivitySheet';
 import { usePauseSessionScreen } from '@/features/pause/public-session-ritual';
 import { pauseSessionScaffoldChromeRegistry } from '@/screens/pause/components/pause-scaffold-chrome-registry';
 
@@ -42,10 +43,13 @@ export default function PauseSessionScreen() {
           sessionOnPicker={vm.sessionOnPicker}
           depthPickerSlot={
             <PauseSessionDepthPickerStack
-              contextLine={vm.depthContextLine}
+              marketData={vm.depthPickerMarketData}
+              trackedAssetId={vm.depthPickerTrackedAssetId}
+              contextText={vm.depthPickerContextText}
               onBrief={vm.depthPickerOnBrief}
               onDeep={vm.handleDepthPickerDeep}
               deepPauseLocked={!vm.subscribed}
+              choicesDisabled={vm.openingManualPausePending}
               onClose={vm.requestExitPauseBeforeDone}
             />
           }
@@ -93,6 +97,13 @@ export default function PauseSessionScreen() {
         }}
         onAdoptNew={() => void vm.handlePendingAdoptFromLeaveSheet()}
         onDismissPendingOffer={() => void vm.handleDeclinePendingFromLeaveSheet()}
+      />
+      <PauseSessionInactivitySheet
+        open={vm.inactivityOpen}
+        onOpenChange={vm.inactivityHandlers.onOpenChange}
+        onContinue={vm.inactivityHandlers.onContinue}
+        onStartOver={vm.inactivityHandlers.onStartOver}
+        onDiscard={vm.inactivityHandlers.onDiscard}
       />
     </Fragment>
   );

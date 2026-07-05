@@ -16,7 +16,7 @@ export function SettingsAccountPanel() {
       <SettingsAccountDataSection />
 
       {canInstall && (
-        <button
+        <button type="button"
           onClick={install}
           className="text-xs font-mono text-muted-foreground underline"
         >
