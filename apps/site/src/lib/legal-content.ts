@@ -12,7 +12,7 @@ export const termsCopy = {
     path: '/terms',
   },
   title: 'Terms of Service',
-  subtitle: 'Last updated: March 6, 2026',
+  subtitle: 'Last updated: July 5, 2026',
   sections: [
     {
       title: '1. Acceptance of Terms',
@@ -75,27 +75,27 @@ export const termsCopy = {
       ],
     },
     {
-      title: '11. Business Entity',
+      title: '11. Operator',
       paragraphs: [
-        'Holzen is operated by [Your Company Name], a company registered in [Country/State], registration number [Registration Number]. Registered address: [Street Address, City, Postal Code, Country].',
+        'Holzen is operated by Angel Guirao, an individual based in Spain. Holzen is a personal project and is not operated through a registered company. For legal correspondence: hello@holzen.app.',
       ],
     },
     {
       title: '12. Invoices & Billing',
       paragraphs: [
-        'Invoices for your subscription are generated automatically and sent to the email address associated with your account. You can view and download past invoices through the Stripe customer portal accessible from your Settings page. Invoices include the business details listed in Section 11.',
+        'When paid subscriptions are offered, invoices are generated automatically and sent to the email address associated with your account. You can view and download past invoices through the Stripe customer portal accessible from your Settings page.',
       ],
     },
     {
       title: '13. Governing Law',
       paragraphs: [
-        'These Terms shall be governed by and construed in accordance with the laws of [Country/State]. Any disputes arising under these terms shall be subject to the exclusive jurisdiction of the courts of [City, Country].',
+        'These Terms shall be governed by and construed in accordance with the laws of Spain. Any disputes arising under these terms shall be subject to the courts of Spain, without prejudice to mandatory consumer protections in your country of residence.',
       ],
     },
     {
       title: '14. Contact',
       paragraphs: [
-        'For questions about these terms, reach out via the support channels provided within the app or email [contact@yourdomain.com].',
+        'For questions about these terms, email hello@holzen.app or use the support channels provided within the app.',
       ],
     },
   ] satisfies LegalSection[],
@@ -175,9 +175,9 @@ export const privacyCopy = {
       ],
     },
     {
-      title: '9. Contact',
+      title: '9. Contact & Data Controller',
       paragraphs: [
-        'For privacy-related questions or requests, reach out via the support channels provided within the app.',
+        'Holzen is operated by Angel Guirao (individual operator), based in Spain. For privacy-related questions or requests, email hello@holzen.app or use the support channels provided within the app.',
       ],
     },
   ],
