@@ -3,6 +3,7 @@ import MarketingLayout from '../layouts/MarketingLayout.astro';
 import LandingComparison from '../components/LandingComparison.astro';
 import LandingFaq from '../components/LandingFaq.astro';
 import PublicFooter from '../components/PublicFooter.astro';
+import WaitlistForm from '../components/WaitlistForm.astro';
 import { appAuthUrl } from '../lib/app-url';
 import { landingCopy, landingFaqJsonLd } from '../lib/landing-content';
 import '../styles/welcome.css';
@@ -28,8 +29,11 @@ const copy = landingCopy;
     <main class="hero">
       <h1>{copy.hero}</h1>
       <p>{copy.heroDesc}</p>
-      <a class="cta" href={signUpUrl}>{copy.getStartedForFree}</a>
-      <p class="muted">{copy.noCreditCard}</p>
+      <WaitlistForm ref={ref} />
+      <p class="muted waitlist-secondary">
+        Already have an account? <a href={signInUrl}>{copy.signIn}</a>
+        · <a href={signUpUrl}>{copy.getStartedForFree}</a>
+      </p>
     </main>
     <a class="scroll-hint" href="#reflection-loop" aria-label="Scroll to content">↓</a>
   </div>
@@ -112,7 +116,7 @@ const copy = landingCopy;
     <div class="pricing-card">
       <p class="pricing-title">{copy.freeToStart}</p>
       <p class="pricing-desc">{copy.pricingDesc}</p>
-      <a class="cta" href={signUpUrl}>{copy.getStartedForFree}</a>
+      <WaitlistForm ref={ref} compact />
     </div>
   </section>
 

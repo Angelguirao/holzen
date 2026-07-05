@@ -20,7 +20,8 @@ Static marketing HTML. **Not a separate website** — it merges into the same `h
 
 | File | Purpose |
 | --- | --- |
-| `src/pages/welcome.astro` | Landing → `/welcome` |
+| `src/pages/welcome.astro` | Landing → `/welcome` (waitlist form + sign-in link) |
+| `src/pages/index.astro` | Redirect `/` → `/welcome` (cold traffic after unified build) |
 | `src/pages/about.astro` | About → `/about` |
 | `src/pages/terms.astro`, `privacy.astro` | Legal |
 | `src/pages/blog/` | Index + `[slug]` (build-time Supabase) |
